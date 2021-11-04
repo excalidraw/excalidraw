@@ -20,10 +20,6 @@
     "background": "Fundal",
     "fill": "Umplere",
     "strokeWidth": "Lățimea conturului",
-    "strokeShape": "Forma conturului",
-    "strokeShape_gel": "Pix cu gel",
-    "strokeShape_fountain": "Stilou",
-    "strokeShape_brush": "Pensulă tip stilou",
     "strokeStyle": "Stilul conturului",
     "strokeStyle_solid": "Neîntrerupt",
     "strokeStyle_dashed": "Liniuțe",
@@ -168,7 +164,7 @@
     "imageInsertError": "Imaginea nu a putut fi introdusă. Reîncearcă mai târziu...",
     "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": "SVG invalid."
   },
   "toolBar": {
     "selection": "Selecție",
@@ -189,6 +185,7 @@
     "shapes": "Forme"
   },
   "hints": {
+    "canvasPanning": "Pentru a muta pânză, ține apăsată rotița mausului sau bara de spațiu în timpul glisării",
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",

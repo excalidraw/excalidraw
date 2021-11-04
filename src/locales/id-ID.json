@@ -20,10 +20,6 @@
     "background": "Latar",
     "fill": "Isian",
     "strokeWidth": "Lebar guratan",
-    "strokeShape": "Bentuk guratan",
-    "strokeShape_gel": "Pena gel",
-    "strokeShape_fountain": "Pena gunung",
-    "strokeShape_brush": "Kuas",
     "strokeStyle": "Gaya guratan",
     "strokeStyle_solid": "Padat",
     "strokeStyle_dashed": "Putus-putus",
@@ -168,7 +164,7 @@
     "imageInsertError": "Tidak dapat menyisipkan gambar. Coba lagi nanti...",
     "fileTooBig": "File terlalu besar. Ukuran maksimum yang dibolehkan {{maxSize}}.",
     "svgImageInsertError": "Tidak dapat menyisipkan gambar SVG. Markup SVG sepertinya tidak valid.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": "SVG tidak valid."
   },
   "toolBar": {
     "selection": "Pilihan",
@@ -189,6 +185,7 @@
     "shapes": "Bentuk"
   },
   "hints": {
+    "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spasi ketika menarik",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Perbesar ke seleksi"
   },
   "clearCanvasDialog": {
-    "title": "Hapus Kanvas"
+    "title": "Hapus kanvas"
   },
   "encrypted": {
     "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya.",

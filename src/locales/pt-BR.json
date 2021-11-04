@@ -20,10 +20,6 @@
     "background": "Fundo",
     "fill": "Preenchimento",
     "strokeWidth": "Espessura do traço",
-    "strokeShape": "Estilo do traço",
-    "strokeShape_gel": "Caneta de gel",
-    "strokeShape_fountain": "Caneta de fonte",
-    "strokeShape_brush": "Pincel",
     "strokeStyle": "Estilo de traço",
     "strokeStyle_solid": "Sólido",
     "strokeStyle_dashed": "Tracejado",
@@ -168,7 +164,7 @@
     "imageInsertError": "Não foi possível inserir imagem. Tente novamente mais tarde...",
     "fileTooBig": "O arquivo é muito grande. O tamanho máximo permitido é {{maxSize}}.",
     "svgImageInsertError": "Não foi possível inserir a imagem SVG. A marcação SVG parece inválida.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": "SVG Inválido."
   },
   "toolBar": {
     "selection": "Seleção",
@@ -189,6 +185,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "canvasPanning": "Para mover a tela, segure a roda do mouse ou a barra de espaço enquanto arrasta",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Toque e arraste, solte quando terminar",
     "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",

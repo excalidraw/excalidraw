@@ -20,10 +20,6 @@
     "background": "पृष्ठभूमि",
     "fill": "भरें",
     "strokeWidth": "रेखा की चौड़ाई",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "स्ट्रोक का आकार",
     "strokeStyle_solid": "ठोस",
     "strokeStyle_dashed": "डैश",
@@ -189,6 +185,7 @@
     "shapes": "आकृतियाँ"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, सिंगल लाइन के लिए खींचें",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोड़ो",
     "text": "आप चयन टूल से कहीं भी डबल-क्लिक करके टेक्स्ट जोड़ सकते हैं",

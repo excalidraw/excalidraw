@@ -20,10 +20,6 @@
     "background": "Fundo",
     "fill": "Preenchimento",
     "strokeWidth": "Espessura do traço",
-    "strokeShape": "Forma do traço",
-    "strokeShape_gel": "Caneta de gel",
-    "strokeShape_fountain": "Caneta de fonte",
-    "strokeShape_brush": "Caneta de pincel",
     "strokeStyle": "Estilo de traço",
     "strokeStyle_solid": "Sólido",
     "strokeStyle_dashed": "Tracejado",
@@ -168,7 +164,7 @@
     "imageInsertError": "Não foi possível inserir a imagem, tente novamente mais tarde...",
     "fileTooBig": "O ficheiro é muito grande. O tamanho máximo permitido é {{maxSize}}.",
     "svgImageInsertError": "Não foi possível inserir a imagem SVG. A marcação SVG parece inválida.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "Seleção",
@@ -189,6 +185,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Clique e arraste, large quando terminar",
     "text": "Dica: também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Ampliar a seleção"
   },
   "clearCanvasDialog": {
-    "title": "Limpar tela"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Os seus desenhos são encriptados de ponta-a-ponta, por isso os servidores do Excalidraw nunca os verão.",

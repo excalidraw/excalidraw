@@ -20,10 +20,6 @@
     "background": "填充顏色",
     "fill": "背景樣式",
     "strokeWidth": "筆跡寬度",
-    "strokeShape": "筆跡樣式",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "筆跡線條",
     "strokeStyle_solid": "實線",
     "strokeStyle_dashed": "虛線（較密）",
@@ -39,7 +35,7 @@
     "arrowhead_arrow": "普通箭嘴",
     "arrowhead_bar": "平頭條狀",
     "arrowhead_dot": "圓點",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "三角箭嘴",
     "fontSize": "字型大小",
     "fontFamily": "字體",
     "onlySelected": "只匯出已選取的物件",
@@ -189,6 +185,7 @@
     "shapes": ""
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "",
     "freeDraw": "",
     "text": "",
@@ -270,7 +267,7 @@
     "zoomToSelection": ""
   },
   "clearCanvasDialog": {
-    "title": "清空畫布"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "",

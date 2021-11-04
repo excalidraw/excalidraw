@@ -20,10 +20,6 @@
     "background": "Фон",
     "fill": "Заливка",
     "strokeWidth": "Толщина штриха",
-    "strokeShape": "Стиль обводки",
-    "strokeShape_gel": "Гелевая ручка",
-    "strokeShape_fountain": "Фонтанная ручка",
-    "strokeShape_brush": "Кисть",
     "strokeStyle": "Стиль обводки",
     "strokeStyle_solid": "Сплошная",
     "strokeStyle_dashed": "Пунктирная",
@@ -189,6 +185,7 @@
     "shapes": "Фигуры"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "text": "Совет: при выбранном инструменте выделения дважды щёлкните в любом месте, чтобы добавить текст",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Увеличить до выделенного"
   },
   "clearCanvasDialog": {
-    "title": "Очистить Холст"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Ваши данные защищены сквозным (End-to-end) шифрованием. Серверы Excalidraw никогда не получат доступ к ним.",

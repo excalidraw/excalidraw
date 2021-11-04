@@ -20,10 +20,6 @@
     "background": "Fondo",
     "fill": "Rellenar",
     "strokeWidth": "Grosor del trazo",
-    "strokeShape": "Estilo del trazo",
-    "strokeShape_gel": "Bolígrafo de gel",
-    "strokeShape_fountain": "Pluma estilográfica",
-    "strokeShape_brush": "Rotulador",
     "strokeStyle": "Estilo del trazo",
     "strokeStyle_solid": "Sólido",
     "strokeStyle_dashed": "Discontinua",
@@ -189,6 +185,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Zoom a la selección"
   },
   "clearCanvasDialog": {
-    "title": "Borrar Lienzo"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",

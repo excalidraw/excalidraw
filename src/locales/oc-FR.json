@@ -20,10 +20,6 @@
     "background": "Rèireplan",
     "fill": "Empliment",
     "strokeWidth": "Largor de contorn",
-    "strokeShape": "Fòrma del trach",
-    "strokeShape_gel": "Estilo gèl",
-    "strokeShape_fountain": "Calam",
-    "strokeShape_brush": "Pincèl",
     "strokeStyle": "Estil de contorn",
     "strokeStyle_solid": "Solide",
     "strokeStyle_dashed": "Tiret",
@@ -168,7 +164,7 @@
     "imageInsertError": "Insercion d’imatge impossibla. Tornatz ensajar mai tard...",
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "Seleccion",
@@ -189,6 +185,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Clicatz per començar mantun punt, lisatz per una sola linha",
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Zoomar la seleccion"
   },
   "clearCanvasDialog": {
-    "title": "Escafar canabàs"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai.",

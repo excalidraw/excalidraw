@@ -20,10 +20,6 @@
     "background": "ਬੈਕਗਰਾਉਂਡ",
     "fill": "ਭਰਨਾ",
     "strokeWidth": "ਰੇਖਾ ਦੀ ਚੌੜਾਈ",
-    "strokeShape": "ਰੇਖਾ ਦਾ ਰੂਪ",
-    "strokeShape_gel": "ਜੈੱਲ ਪੈੱਨ",
-    "strokeShape_fountain": "ਫਾਉਨਟੇਨ ਪੈੱਨ",
-    "strokeShape_brush": "ਬੁਰਸ਼ ਪੈੱਨ",
     "strokeStyle": "ਰੇਖਾ ਦਾ ਸਟਾਇਲ",
     "strokeStyle_solid": "ਠੋਸ",
     "strokeStyle_dashed": "ਡੈਸ਼ ਵਾਲੀ",
@@ -189,6 +185,7 @@
     "shapes": "ਆਕ੍ਰਿਤੀਆਂ"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "ਇੱਕ ਤੋਂ ਜ਼ਿਆਦਾ ਬਿੰਦੂਆਂ ਲਈ ਕਲਿੱਕ ਕਰਕੇ ਸ਼ੁਰੂਆਤ ਕਰੋ, ਇਕਹਿਰੀ ਲਕੀਰ ਲਈ ਘਸੀਟੋ",
     "freeDraw": "ਕਲਿੱਕ ਕਰਕੇ ਘਸੀਟੋ, ਪੂਰਾ ਹੋਣ 'ਤੇ ਛੱਡ ਦਿਉ",
     "text": "ਨੁਸਖਾ: ਤੁਸੀਂ ਚੋਣਕਾਰ ਸੰਦ ਰਾਹੀਂ ਕਿਤੇ ਵੀ ਡਬਲ-ਕਲਿੱਕ ਕਰਕੇ ਵੀ ਪਾਠ ਜੋੜ ਸਕਦੇ ਹੋ",

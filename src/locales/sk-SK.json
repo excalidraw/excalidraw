@@ -20,10 +20,6 @@
     "background": "Pozadie",
     "fill": "Výplň",
     "strokeWidth": "Hrúbka obrysu",
-    "strokeShape": "Tvar obrysu",
-    "strokeShape_gel": "Gélové pero",
-    "strokeShape_fountain": "Plniace pero",
-    "strokeShape_brush": "Fixka",
     "strokeStyle": "Štýl obrysu",
     "strokeStyle_solid": "Plný",
     "strokeStyle_dashed": "Čiarkovaný",
@@ -39,7 +35,7 @@
     "arrowhead_arrow": "Šípka",
     "arrowhead_bar": "Čiara",
     "arrowhead_dot": "Bod",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "Trojuholník",
     "fontSize": "Veľkosť písma",
     "fontFamily": "Písmo",
     "onlySelected": "Iba vybrané",
@@ -189,6 +185,7 @@
     "shapes": "Tvary"
   },
   "hints": {
+    "canvasPanning": "Pre pohyb plátna podržte koliesko myši ale medzerník počas ťahania",
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Priblížiť na výber"
   },
   "clearCanvasDialog": {
-    "title": "Vyčistiť plátno"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať.",

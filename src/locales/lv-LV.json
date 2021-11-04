@@ -20,10 +20,6 @@
     "background": "Fons",
     "fill": "Aizpildījums",
     "strokeWidth": "Līnijas platums",
-    "strokeShape": "Līnijas forma",
-    "strokeShape_gel": "Gēla pildspalva",
-    "strokeShape_fountain": "Lodīšu pildspalva",
-    "strokeShape_brush": "Flomāsters - ota",
     "strokeStyle": "Līnijas forma",
     "strokeStyle_solid": "Vienlaidu",
     "strokeStyle_dashed": "Raustīta līnija",
@@ -189,6 +185,7 @@
     "shapes": ""
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "",
     "freeDraw": "",
     "text": "",

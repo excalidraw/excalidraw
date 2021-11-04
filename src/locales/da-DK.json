@@ -20,10 +20,6 @@
     "background": "Baggrund",
     "fill": "",
     "strokeWidth": "Linjebredde",
-    "strokeShape": "Linjeform",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "",
     "strokeStyle_solid": "",
     "strokeStyle_dashed": "",
@@ -189,6 +185,7 @@
     "shapes": ""
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "",
     "freeDraw": "Klik og træk, slip når du er færdig",
     "text": "",

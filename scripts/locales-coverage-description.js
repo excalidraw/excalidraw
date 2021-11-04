@@ -133,7 +133,7 @@ const languages = {
   "tr-TR": "Türkçe",
   "uk-UA": "Українська",
   "zh-CN": "简体中文",
-  "zh-HK": "Chinese Traditional, Hong Kong",
+  "zh-HK": "繁體中文 (香港)",
   "zh-TW": "繁體中文",
 };
 

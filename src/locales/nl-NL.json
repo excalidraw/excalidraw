@@ -20,10 +20,6 @@
     "background": "Achtergrond",
     "fill": "Invulling",
     "strokeWidth": "Lijnbreedte",
-    "strokeShape": "Lijnstijl",
-    "strokeShape_gel": "Gel pen",
-    "strokeShape_fountain": "Vulpen",
-    "strokeShape_brush": "Penseel",
     "strokeStyle": "Lijnstijl",
     "strokeStyle_solid": "Ononderbroken",
     "strokeStyle_dashed": "Gestreept",
@@ -168,7 +164,7 @@
     "imageInsertError": "Afbeelding invoegen mislukt. Probeer het later opnieuw...",
     "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "Ongeldige SVG."
   },
   "toolBar": {
     "selection": "Selectie",
@@ -189,6 +185,7 @@
     "shapes": "Vormen"
   },
   "hints": {
+    "canvasPanning": "Om canvas te verplaatsen, houd muiswiel of spatiebalk ingedrukt tijdens slepen",
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Inzoomen op selectie"
   },
   "clearCanvasDialog": {
-    "title": "Canvas wissen"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent.",

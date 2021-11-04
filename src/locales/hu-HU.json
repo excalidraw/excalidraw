@@ -20,10 +20,6 @@
     "background": "Háttér",
     "fill": "Kitöltés",
     "strokeWidth": "Körvonal vastagsága",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "Körvonal stílusa",
     "strokeStyle_solid": "Kitöltött",
     "strokeStyle_dashed": "Szaggatott",
@@ -189,6 +185,7 @@
     "shapes": "Alakzatok"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Kattintással görbe, az eger húzásával pedig egyenes nyilat rajzolhatsz",
     "freeDraw": "Kattints és húzd, majd engedd el, amikor végeztél",
     "text": "Tipp: A kijelölés eszközzel a dupla kattintás új szöveget hoz létre",

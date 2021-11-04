@@ -20,10 +20,6 @@
     "background": "Agilal",
     "fill": "Taččart",
     "strokeWidth": "Tehri n yizirig",
-    "strokeShape": "Talɣa n yizirig",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "Amfezzu",
     "strokeStyle": "Aɣanib n tizirig",
     "strokeStyle_solid": "Aččuran",
     "strokeStyle_dashed": "S tjerriḍin",
@@ -168,7 +164,7 @@
     "imageInsertError": "D awezɣi tugra n tugna. Eɛreḍ tikkelt-nniḍen ardeqqal...",
     "fileTooBig": "Afaylu meqqer aṭas. Tiddi tafellayt yurgen d {{maxSize}}.",
     "svgImageInsertError": "D awezɣi tugra n tugna SVG. Acraḍ SVG yettban-d d armeɣtu.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "Tafrayt",
@@ -189,6 +185,7 @@
     "shapes": "Talɣiwin"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Ssit akken ad tebduḍ aṭas n tenqiḍin, zuɣer i yiwen n yizirig",
     "freeDraw": "Ssit yerna zuɣer, serreḥ ticki tfukeḍ",
     "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Simɣur ɣer tefrayt"
   },
   "clearCanvasDialog": {
-    "title": "Sfeḍ taɣzut n usuneɣ"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Unuɣen-inek (m) ttuwgelhnen seg yixef s ixef dɣa iqeddacen n Excalidraw werǧin ad ten-walin. ",

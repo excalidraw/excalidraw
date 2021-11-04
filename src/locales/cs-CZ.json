@@ -20,10 +20,6 @@
     "background": "Pozadí",
     "fill": "Výplň",
     "strokeWidth": "Šířka obrysu",
-    "strokeShape": "Tvar tahu",
-    "strokeShape_gel": "Gelové pero",
-    "strokeShape_fountain": "Plnicí pero",
-    "strokeShape_brush": "Fixa",
     "strokeStyle": "Styl tahu",
     "strokeStyle_solid": "Plný",
     "strokeStyle_dashed": "Čárkovaný",
@@ -189,6 +185,7 @@
     "shapes": "Tvary"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "",
     "freeDraw": "",
     "text": "",
