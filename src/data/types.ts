@@ -1,5 +1,5 @@
-import { ExcalidrawElement, NonDeleted } from "../element/types";
-import { AppState, BinaryFiles, LibraryItems } from "../types";
+import { ExcalidrawElement } from "../element/types";
+import { AppState, BinaryFiles, LibraryItems, LibraryItems_v1 } from "../types";
 import type { cleanAppStateForExport } from "../appState";
 
 export interface ExportedDataState {
@@ -18,9 +18,7 @@ export interface ImportedDataState {
   elements?: readonly ExcalidrawElement[] | null;
   appState?: Readonly<Partial<AppState>> | null;
   scrollToContent?: boolean;
-  libraryItems?:
-    | LibraryItems
-    | readonly (readonly NonDeleted<ExcalidrawElement>[])[];
+  libraryItems?: LibraryItems | LibraryItems_v1;
   files?: BinaryFiles;
 }
 
