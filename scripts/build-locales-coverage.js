@@ -1,6 +1,16 @@
 const { readdirSync, writeFileSync } = require("fs");
-const flatten = require("flat").flatten;
 const files = readdirSync(`${__dirname}/../src/locales`);
+
+const flatten = (object = {}, result = {}, extraKey = "") => {
+  for (const key in object) {
+    if (typeof object[key] !== "object") {
+      result[extraKey + key] = object[key];
+    } else {
+      flatten(object[key], result, `${extraKey}${key}.`);
+    }
+  }
+  return result;
+};
 
 const locales = files.filter(
   (file) => file !== "README.md" && file !== "percentages.json",
