@@ -323,6 +323,8 @@ export const generateRoughOptions = (
     roughness: element.roughness,
     stroke: element.strokeColor,
     preserveVertices: continuousPath,
+    // disable decimals to fix Skia rendering issues #4046
+    fixedDecimalPlaceDigits: 0,
   };
 
   switch (element.type) {
