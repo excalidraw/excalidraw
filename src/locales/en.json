@@ -277,7 +277,8 @@
     "githubUsername": "GitHub Username",
     "twitterUsername": "Twitter Username",
     "libraryName": "Library Name",
-    "libraryDesc": "Library Description"
+    "libraryDesc": "Library Description",
+    "website": "Website"
   },
   "publishSuccessDialog": {
     "title": "Library Publish Success",

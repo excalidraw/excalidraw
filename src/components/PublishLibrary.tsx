@@ -31,6 +31,7 @@ const PublishLibrary = ({
     name: "",
     description: "",
     twitterHandle: "",
+    website: "",
   });
 
   const onInputChange = (event: any) => {
@@ -70,6 +71,8 @@ const PublishLibrary = ({
     formData.append("name", libraryData.name);
     formData.append("description", libraryData.description);
     formData.append("twitterHandle", libraryData.twitterHandle);
+    formData.append("website", libraryData.website);
+
     fetch(
       "https://us-central1-excalidraw-room-persistence.cloudfunctions.net/api/libraries/publish",
       {
@@ -124,24 +127,6 @@ const PublishLibrary = ({
             />
           </label>
           <label>
-            <span>{t("publishDialog.githubUsername")}</span>
-            <input
-              type="text"
-              name="githubHandle"
-              value={libraryData.githubHandle}
-              onChange={onInputChange}
-            />
-          </label>
-          <label>
-            <span>{t("publishDialog.twitterUsername")}</span>
-            <input
-              type="text"
-              name="twitterHandle"
-              value={libraryData.twitterHandle}
-              onChange={onInputChange}
-            />
-          </label>
-          <label>
             <div>
               <span>{t("publishDialog.libraryName")}</span>
               <span aria-hidden="true" className="required">
@@ -168,6 +153,33 @@ const PublishLibrary = ({
               rows={4}
               required
               value={libraryData.description}
+              onChange={onInputChange}
+            />
+          </label>
+          <label>
+            <span>{t("publishDialog.githubUsername")}</span>
+            <input
+              type="text"
+              name="githubHandle"
+              value={libraryData.githubHandle}
+              onChange={onInputChange}
+            />
+          </label>
+          <label>
+            <span>{t("publishDialog.twitterUsername")}</span>
+            <input
+              type="text"
+              name="twitterHandle"
+              value={libraryData.twitterHandle}
+              onChange={onInputChange}
+            />
+          </label>
+          <label>
+            <span>{t("publishDialog.website")}</span>
+            <input
+              type="text"
+              name="website"
+              value={libraryData.website}
               onChange={onInputChange}
             />
           </label>
