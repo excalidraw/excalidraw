@@ -41,7 +41,8 @@ const PublishLibrary = ({
     });
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     const elements: ExcalidrawElement[] = [];
     libraryItems.forEach((libItem) => {
       elements.push(...libItem.items);
@@ -109,7 +110,7 @@ const PublishLibrary = ({
       title="Publish Library"
       className="publish-library"
     >
-      <form>
+      <form onSubmit={onSubmit}>
         <div className="publish-library__fields">
           <label>
             <div>
@@ -200,7 +201,6 @@ const PublishLibrary = ({
             aria-label={t("buttons.submit")}
             label={t("buttons.submit")}
             className="publish-library__buttons--confirm"
-            onClick={onSubmit}
           />
         </div>
       </form>
