@@ -23,3 +23,5 @@ export const FIREBASE_STORAGE_PREFIXES = {
   shareLinkFiles: `/files/shareLinks`,
   collabFiles: `/files/rooms`,
 };
+
+export const ROOM_ID_BYTES = 10;

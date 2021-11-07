@@ -1,7 +1,7 @@
 import {
-  createIV,
+  decryptData,
+  encryptData,
   generateEncryptionKey,
-  getImportedKey,
   IV_LENGTH_BYTES,
 } from "../../data/encryption";
 import { serializeAsJSON } from "../../data/json";
@@ -16,19 +16,18 @@ import {
   BinaryFiles,
   UserIdleState,
 } from "../../types";
-import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
+import { bytesToHexString } from "../../utils";
+import { FILE_UPLOAD_MAX_BYTES, ROOM_ID_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
-
-const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
 const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
 const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
 
-const generateRandomID = async () => {
-  const arr = new Uint8Array(10);
-  window.crypto.getRandomValues(arr);
-  return Array.from(arr, byteToHex).join("");
+const generateRoomId = async () => {
+  const buffer = new Uint8Array(ROOM_ID_BYTES);
+  window.crypto.getRandomValues(buffer);
+  return bytesToHexString(buffer);
 };
 
 export const SOCKET_SERVER = process.env.REACT_APP_SOCKET_SERVER_URL;
@@ -82,54 +81,6 @@ export type SocketUpdateData =
     _brand: "socketUpdateData";
   };
 
-export const encryptAESGEM = async (
-  data: Uint8Array,
-  key: string,
-): Promise<EncryptedData> => {
-  const importedKey = await getImportedKey(key, "encrypt");
-  const iv = createIV();
-  return {
-    data: await window.crypto.subtle.encrypt(
-      {
-        name: "AES-GCM",
-        iv,
-      },
-      importedKey,
-      data,
-    ),
-    iv,
-  };
-};
-
-export const decryptAESGEM = async (
-  data: ArrayBuffer,
-  key: string,
-  iv: Uint8Array,
-): Promise<SocketUpdateDataIncoming> => {
-  try {
-    const importedKey = await getImportedKey(key, "decrypt");
-    const decrypted = await window.crypto.subtle.decrypt(
-      {
-        name: "AES-GCM",
-        iv,
-      },
-      importedKey,
-      data,
-    );
-
-    const decodedData = new TextDecoder("utf-8").decode(
-      new Uint8Array(decrypted),
-    );
-    return JSON.parse(decodedData);
-  } catch (error: any) {
-    window.alert(t("alerts.decryptFailed"));
-    console.error(error);
-  }
-  return {
-    type: "INVALID_RESPONSE",
-  };
-};
-
 export const getCollaborationLinkData = (link: string) => {
   const hash = new URL(link).hash;
   const match = hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
@@ -141,7 +92,7 @@ export const getCollaborationLinkData = (link: string) => {
 };
 
 export const generateCollaborationLinkData = async () => {
-  const roomId = await generateRandomID();
+  const roomId = await generateRoomId();
   const roomKey = await generateEncryptionKey();
 
   if (!roomKey) {
@@ -156,22 +107,6 @@ export const getCollaborationLink = (data: {
   roomKey: string;
 }) => {
   return `${window.location.origin}${window.location.pathname}#room=${data.roomId},${data.roomKey}`;
-};
-
-export const decryptImported = async (
-  iv: ArrayBuffer | Uint8Array,
-  encrypted: ArrayBuffer,
-  privateKey: string,
-): Promise<ArrayBuffer> => {
-  const key = await getImportedKey(privateKey, "decrypt");
-  return window.crypto.subtle.decrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    key,
-    encrypted,
-  );
 };
 
 const importFromBackend = async (
@@ -192,11 +127,11 @@ const importFromBackend = async (
       // Buffer should contain both the IV (fixed length) and encrypted data
       const iv = buffer.slice(0, IV_LENGTH_BYTES);
       const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
-      decrypted = await decryptImported(iv, encrypted, privateKey);
+      decrypted = await decryptData(new Uint8Array(iv), encrypted, privateKey);
     } catch (error: any) {
       // Fixed IV (old format, backward compatibility)
       const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
-      decrypted = await decryptImported(fixedIv, buffer, privateKey);
+      decrypted = await decryptData(fixedIv, buffer, privateKey);
     }
 
     // We need to convert the decrypted array buffer to a string
@@ -256,29 +191,12 @@ export const exportToBackend = async (
   const json = serializeAsJSON(elements, appState, files, "database");
   const encoded = new TextEncoder().encode(json);
 
-  const cryptoKey = await window.crypto.subtle.generateKey(
-    {
-      name: "AES-GCM",
-      length: 128,
-    },
-    true, // extractable
-    ["encrypt", "decrypt"],
-  );
+  const cryptoKey = await generateEncryptionKey("cryptoKey");
 
-  const iv = createIV();
-  // We use symmetric encryption. AES-GCM is the recommended algorithm and
-  // includes checks that the ciphertext has not been modified by an attacker.
-  const encrypted = await window.crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    cryptoKey,
-    encoded,
-  );
+  const { encryptedBuffer, iv } = await encryptData(cryptoKey, encoded);
 
   // Concatenate IV with encrypted data (IV does not have to be secret).
-  const payloadBlob = new Blob([iv.buffer, encrypted]);
+  const payloadBlob = new Blob([iv.buffer, encryptedBuffer]);
   const payload = await new Response(payloadBlob).arrayBuffer();
 
   // We use jwk encoding to be able to extract just the base64 encoded key.

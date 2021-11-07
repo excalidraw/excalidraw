@@ -449,3 +449,9 @@ export const preventUnload = (event: BeforeUnloadEvent) => {
   // NOTE: modern browsers no longer allow showing a custom message here
   event.returnValue = "";
 };
+
+export const bytesToHexString = (bytes: Uint8Array) => {
+  return Array.from(bytes)
+    .map((byte) => `0${byte.toString(16)}`.slice(-2))
+    .join("");
+};

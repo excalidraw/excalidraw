@@ -1,8 +1,4 @@
-import {
-  encryptAESGEM,
-  SocketUpdateData,
-  SocketUpdateDataSource,
-} from "../data";
+import { SocketUpdateData, SocketUpdateDataSource } from "../data";
 
 import CollabWrapper from "./CollabWrapper";
 
@@ -13,6 +9,7 @@ import { trackEvent } from "../../analytics";
 import { throttle } from "lodash";
 import { newElementWith } from "../../element/mutateElement";
 import { BroadcastedExcalidrawElement } from "./reconciliation";
+import { encryptData } from "../../data/encryption";
 
 class Portal {
   collab: CollabWrapper;
@@ -79,12 +76,13 @@ class Portal {
     if (this.isOpen()) {
       const json = JSON.stringify(data);
       const encoded = new TextEncoder().encode(json);
-      const encrypted = await encryptAESGEM(encoded, this.roomKey!);
+      const { encryptedBuffer, iv } = await encryptData(this.roomKey!, encoded);
+
       this.socket?.emit(
         volatile ? BROADCAST.SERVER_VOLATILE : BROADCAST.SERVER,
         this.roomId,
-        encrypted.data,
-        encrypted.iv,
+        encryptedBuffer,
+        iv,
       );
     }
   }

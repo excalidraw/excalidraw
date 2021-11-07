@@ -24,7 +24,6 @@ import {
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
 import {
-  decryptAESGEM,
   generateCollaborationLinkData,
   getCollaborationLink,
   SocketUpdateDataSource,
@@ -65,6 +64,7 @@ import {
   ReconciledElements,
   reconcileElements as _reconcileElements,
 } from "./reconciliation";
+import { decryptData } from "../../data/encryption";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -301,6 +301,27 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     return await this.fileManager.getFiles(unfetchedImages);
   };
 
+  private decryptPayload = async (
+    iv: Uint8Array,
+    encryptedData: ArrayBuffer,
+    decryptionKey: string,
+  ) => {
+    try {
+      const decrypted = await decryptData(iv, encryptedData, decryptionKey);
+
+      const decodedData = new TextDecoder("utf-8").decode(
+        new Uint8Array(decrypted),
+      );
+      return JSON.parse(decodedData);
+    } catch (error) {
+      window.alert(t("alerts.decryptFailed"));
+      console.error(error);
+      return {
+        type: "INVALID_RESPONSE",
+      };
+    }
+  };
+
   private initializeSocketClient = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
@@ -388,10 +409,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         if (!this.portal.roomKey) {
           return;
         }
-        const decryptedData = await decryptAESGEM(
+
+        const decryptedData = await this.decryptPayload(
+          iv,
           encryptedData,
           this.portal.roomKey,
-          iv,
         );
 
         switch (decryptedData.type) {
