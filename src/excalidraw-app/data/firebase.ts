@@ -5,7 +5,7 @@ import { restoreElements } from "../../data/restore";
 import { BinaryFileData, BinaryFileMetadata, DataURL } from "../../types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 import { decompressData } from "../../data/encode";
-import { getImportedKey, createIV } from "../../data/encryption";
+import { encryptData, decryptData } from "../../data/encryption";
 import { MIME_TYPES } from "../../constants";
 
 // private
@@ -92,20 +92,11 @@ const encryptElements = async (
   key: string,
   elements: readonly ExcalidrawElement[],
 ): Promise<{ ciphertext: ArrayBuffer; iv: Uint8Array }> => {
-  const importedKey = await getImportedKey(key, "encrypt");
-  const iv = createIV();
   const json = JSON.stringify(elements);
   const encoded = new TextEncoder().encode(json);
-  const ciphertext = await window.crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    importedKey,
-    encoded,
-  );
+  const { encryptedBuffer, iv } = await encryptData(key, encoded);
 
-  return { ciphertext, iv };
+  return { ciphertext: encryptedBuffer, iv };
 };
 
 const decryptElements = async (
@@ -113,16 +104,7 @@ const decryptElements = async (
   iv: Uint8Array,
   ciphertext: ArrayBuffer | Uint8Array,
 ): Promise<readonly ExcalidrawElement[]> => {
-  const importedKey = await getImportedKey(key, "decrypt");
-  const decrypted = await window.crypto.subtle.decrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    importedKey,
-    ciphertext,
-  );
-
+  const decrypted = await decryptData(iv, ciphertext, key);
   const decodedData = new TextDecoder("utf-8").decode(
     new Uint8Array(decrypted),
   );
