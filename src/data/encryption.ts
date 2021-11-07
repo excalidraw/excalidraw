@@ -8,7 +8,7 @@ export const createIV = () => {
 };
 
 export const generateEncryptionKey = async <
-  T extends "string" | "cryptoKey" = "string"
+  T extends "string" | "cryptoKey" = "string",
 >(
   returnAs?: T,
 ): Promise<T extends "cryptoKey" ? CryptoKey : string> => {
@@ -20,10 +20,11 @@ export const generateEncryptionKey = async <
     true, // extractable
     ["encrypt", "decrypt"],
   );
-  return (returnAs === "cryptoKey"
-    ? key
-    : (await window.crypto.subtle.exportKey("jwk", key))
-        .k) as T extends "cryptoKey" ? CryptoKey : string;
+  return (
+    returnAs === "cryptoKey"
+      ? key
+      : (await window.crypto.subtle.exportKey("jwk", key)).k
+  ) as T extends "cryptoKey" ? CryptoKey : string;
 };
 
 export const getCryptoKey = (key: string, usage: KeyUsage) =>
