@@ -163,7 +163,7 @@ const initializeScene = async (opts: {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
   const jsonBackendMatch = window.location.hash.match(
-    /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+    /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/,
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
