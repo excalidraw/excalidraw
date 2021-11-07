@@ -54,9 +54,8 @@ export const reconcileElements = (
   remoteElements: readonly BroadcastedExcalidrawElement[],
   localAppState: AppState,
 ): ReconciledElements => {
-  const localElementsData = getElementsMapWithIndex<ExcalidrawElement>(
-    localElements,
-  );
+  const localElementsData =
+    getElementsMapWithIndex<ExcalidrawElement>(localElements);
 
   const reconciledElements: ExcalidrawElement[] = localElements.slice();
 

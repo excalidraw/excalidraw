@@ -20,10 +20,6 @@
     "background": "Kolor wypełnienia",
     "fill": "Wypełnienie",
     "strokeWidth": "Grubość obramowania",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "Styl obrysu",
     "strokeStyle_solid": "Pełny",
     "strokeStyle_dashed": "Kreskowany",
@@ -189,6 +185,7 @@
     "shapes": "Kształty"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",

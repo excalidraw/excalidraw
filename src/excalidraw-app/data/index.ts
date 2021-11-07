@@ -21,7 +21,6 @@ import { FILE_UPLOAD_MAX_BYTES, ROOM_ID_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
 
-const BACKEND_GET = process.env.REACT_APP_BACKEND_V1_GET_URL;
 const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
 const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
 
@@ -77,9 +76,10 @@ export type SocketUpdateDataIncoming =
       type: "INVALID_RESPONSE";
     };
 
-export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-  _brand: "socketUpdateData";
-};
+export type SocketUpdateData =
+  SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
+    _brand: "socketUpdateData";
+  };
 
 export const getCollaborationLinkData = (link: string) => {
   const hash = new URL(link).hash;
@@ -110,53 +110,41 @@ export const getCollaborationLink = (data: {
 };
 
 const importFromBackend = async (
-  id: string | null,
-  privateKey?: string | null,
+  id: string,
+  privateKey: string,
 ): Promise<ImportedDataState> => {
   try {
-    const response = await fetch(
-      privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
-    );
+    const response = await fetch(`${BACKEND_V2_GET}${id}`);
 
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
       return {};
     }
-    let data: ImportedDataState;
-    if (privateKey) {
-      const buffer = await response.arrayBuffer();
+    const buffer = await response.arrayBuffer();
 
-      let decrypted: ArrayBuffer;
-      try {
-        // Buffer should contain both the IV (fixed length) and encrypted data
-        const iv = buffer.slice(0, IV_LENGTH_BYTES);
-        const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
-        decrypted = await decryptData(
-          new Uint8Array(iv),
-          encrypted,
-          privateKey,
-        );
-      } catch (error) {
-        // Fixed IV (old format, backward compatibility)
-        const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
-        decrypted = await decryptData(fixedIv, buffer, privateKey);
-      }
-
-      // We need to convert the decrypted array buffer to a string
-      const string = new window.TextDecoder("utf-8").decode(
-        new Uint8Array(decrypted),
-      );
-      data = JSON.parse(string);
-    } else {
-      // Legacy format
-      data = await response.json();
+    let decrypted: ArrayBuffer;
+    try {
+      // Buffer should contain both the IV (fixed length) and encrypted data
+      const iv = buffer.slice(0, IV_LENGTH_BYTES);
+      const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
+      decrypted = await decryptData(new Uint8Array(iv), encrypted, privateKey);
+    } catch (error: any) {
+      // Fixed IV (old format, backward compatibility)
+      const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
+      decrypted = await decryptData(fixedIv, buffer, privateKey);
     }
+
+    // We need to convert the decrypted array buffer to a string
+    const string = new window.TextDecoder("utf-8").decode(
+      new Uint8Array(decrypted),
+    );
+    const data: ImportedDataState = JSON.parse(string);
 
     return {
       elements: data.elements || null,
       appState: data.appState || null,
     };
-  } catch (error) {
+  } catch (error: any) {
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
     return {};
@@ -172,7 +160,7 @@ export const loadScene = async (
   localDataState: ImportedDataState | undefined | null,
 ) => {
   let data;
-  if (id != null) {
+  if (id != null && privateKey != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
     data = restore(
@@ -254,7 +242,7 @@ export const exportToBackend = async (
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }

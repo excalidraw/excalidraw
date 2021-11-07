@@ -92,7 +92,7 @@ export const MobileMenu = ({
             </Stack.Col>
           )}
         </Section>
-        <HintViewer appState={appState} elements={elements} />
+        <HintViewer appState={appState} elements={elements} isMobile={true} />
       </FixedSideContainer>
     );
   };

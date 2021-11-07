@@ -20,10 +20,6 @@
     "background": "پس زمینه",
     "fill": "رنگ آمیزی",
     "strokeWidth": "ضخامت حاشیه",
-    "strokeShape": "حاشیه شکل",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "استایل حاشیه",
     "strokeStyle_solid": "یکدست",
     "strokeStyle_dashed": "خط چین",
@@ -189,6 +185,7 @@
     "shapes": "شکل‌ها"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",

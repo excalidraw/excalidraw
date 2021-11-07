@@ -25,7 +25,7 @@ const parseFileContents = async (blob: Blob | File) => {
       return await (
         await import(/* webpackChunkName: "image" */ "./image")
       ).decodePngMetadata(blob);
-    } catch (error) {
+    } catch (error: any) {
       if (error.message === "INVALID") {
         throw new DOMException(
           t("alerts.imageDoesNotContainScene"),
@@ -59,7 +59,7 @@ const parseFileContents = async (blob: Blob | File) => {
         ).decodeSvgMetadata({
           svg: contents,
         });
-      } catch (error) {
+      } catch (error: any) {
         if (error.message === "INVALID") {
           throw new DOMException(
             t("alerts.imageDoesNotContainScene"),
@@ -157,7 +157,7 @@ export const loadFromBlob = async (
     );
 
     return result;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error.message);
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
@@ -188,7 +188,7 @@ export const canvasToBlob = async (
         }
         resolve(blob);
       });
-    } catch (error) {
+    } catch (error: any) {
       reject(error);
     }
   });
@@ -203,7 +203,7 @@ export const generateIdFromFile = async (file: File): Promise<FileId> => {
       await file.arrayBuffer(),
     );
     return bytesToHexString(new Uint8Array(hashBuffer)) as FileId;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     // length 40 to align with the HEX length of SHA-1 (which is 160 bit)
     return nanoid(40) as FileId;

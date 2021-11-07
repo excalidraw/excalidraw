@@ -91,9 +91,8 @@ describe("contextMenu element", () => {
       clientY: 1,
     });
     const contextMenu = queryContextMenu();
-    const contextMenuOptions = contextMenu?.querySelectorAll(
-      ".context-menu li",
-    );
+    const contextMenuOptions =
+      contextMenu?.querySelectorAll(".context-menu li");
     const expectedShortcutNames: ShortcutName[] = [
       "selectAll",
       "gridMode",
@@ -122,9 +121,8 @@ describe("contextMenu element", () => {
       clientY: 1,
     });
     const contextMenu = queryContextMenu();
-    const contextMenuOptions = contextMenu?.querySelectorAll(
-      ".context-menu li",
-    );
+    const contextMenuOptions =
+      contextMenu?.querySelectorAll(".context-menu li");
     const expectedShortcutNames: ShortcutName[] = [
       "copyStyles",
       "pasteStyles",
@@ -210,9 +208,8 @@ describe("contextMenu element", () => {
     });
 
     const contextMenu = queryContextMenu();
-    const contextMenuOptions = contextMenu?.querySelectorAll(
-      ".context-menu li",
-    );
+    const contextMenuOptions =
+      contextMenu?.querySelectorAll(".context-menu li");
     const expectedShortcutNames: ShortcutName[] = [
       "copyStyles",
       "pasteStyles",
@@ -261,9 +258,8 @@ describe("contextMenu element", () => {
     });
 
     const contextMenu = queryContextMenu();
-    const contextMenuOptions = contextMenu?.querySelectorAll(
-      ".context-menu li",
-    );
+    const contextMenuOptions =
+      contextMenu?.querySelectorAll(".context-menu li");
     const expectedShortcutNames: ShortcutName[] = [
       "copyStyles",
       "pasteStyles",

@@ -93,7 +93,7 @@ class Portal {
         elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
         files: this.collab.excalidrawAPI.getFiles(),
       });
-    } catch (error) {
+    } catch (error: any) {
       if (error.name !== "AbortError") {
         this.collab.excalidrawAPI.updateScene({
           appState: {
@@ -208,8 +208,8 @@ class Portal {
           socketId: this.socket.id,
           pointer: payload.pointer,
           button: payload.button || "up",
-          selectedElementIds: this.collab.excalidrawAPI.getAppState()
-            .selectedElementIds,
+          selectedElementIds:
+            this.collab.excalidrawAPI.getAppState().selectedElementIds,
           username: this.collab.state.username,
         },
       };

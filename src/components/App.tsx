@@ -621,7 +621,7 @@ class App extends React.Component<AppProps, AppState> {
     this.onBlur();
   };
 
-  private disableEvent: EventHandlerNonNull = (event) => {
+  private disableEvent: EventListener = (event) => {
     event.preventDefault();
   };
 
@@ -665,7 +665,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         this.setState({ isLibraryOpen: true });
       }
-    } catch (error) {
+    } catch (error: any) {
       window.alert(t("alerts.errorLoadingLibrary"));
       console.error(error);
     } finally {
@@ -794,7 +794,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public async componentDidMount() {
-    this.excalidrawContainerValue.container = this.excalidrawContainerRef.current;
+    this.excalidrawContainerValue.container =
+      this.excalidrawContainerRef.current;
 
     if (
       process.env.NODE_ENV === ENV.TEST ||
@@ -836,10 +837,8 @@ class App extends React.Component<AppProps, AppState> {
       this.resizeObserver = new ResizeObserver(() => {
         // compute isMobile state
         // ---------------------------------------------------------------------
-        const {
-          width,
-          height,
-        } = this.excalidrawContainerRef.current!.getBoundingClientRect();
+        const { width, height } =
+          this.excalidrawContainerRef.current!.getBoundingClientRect();
         this.isMobile =
           width < MQ_MAX_WIDTH_PORTRAIT ||
           (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE);
@@ -1243,9 +1242,8 @@ class App extends React.Component<AppProps, AppState> {
     async (event: ClipboardEvent | null) => {
       // #686
       const target = document.activeElement;
-      const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
-        target,
-      );
+      const isExcalidrawActive =
+        this.excalidrawContainerRef.current?.contains(target);
       if (!isExcalidrawActive) {
         return;
       }
@@ -1296,8 +1294,8 @@ class App extends React.Component<AppProps, AppState> {
           if ((await this.props.onPaste(data, event)) === false) {
             return;
           }
-        } catch (e) {
-          console.error(e);
+        } catch (error: any) {
+          console.error(error);
         }
       }
       if (data.errorMessage) {
@@ -2207,7 +2205,10 @@ class App extends React.Component<AppProps, AppState> {
       }));
       this.resetShouldCacheIgnoreZoomDebounced();
     } else {
-      gesture.lastCenter = gesture.initialDistance = gesture.initialScale = null;
+      gesture.lastCenter =
+        gesture.initialDistance =
+        gesture.initialScale =
+          null;
     }
 
     if (isHoldingSpace || isPanning || isDraggingScrollBar) {
@@ -2516,13 +2517,11 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    const onPointerMove = this.onPointerMoveFromPointerDownHandler(
-      pointerDownState,
-    );
+    const onPointerMove =
+      this.onPointerMoveFromPointerDownHandler(pointerDownState);
 
-    const onPointerUp = this.onPointerUpFromPointerDownHandler(
-      pointerDownState,
-    );
+    const onPointerUp =
+      this.onPointerUpFromPointerDownHandler(pointerDownState);
 
     const onKeyDown = this.onKeyDownFromPointerDownHandler(pointerDownState);
     const onKeyUp = this.onKeyUpFromPointerDownHandler(pointerDownState);
@@ -2727,10 +2726,11 @@ class App extends React.Component<AppProps, AppState> {
         allHitElements: [],
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
-        hasHitCommonBoundingBoxOfSelectedElements: this.isHittingCommonBoundingBoxOfSelectedElements(
-          origin,
-          selectedElements,
-        ),
+        hasHitCommonBoundingBoxOfSelectedElements:
+          this.isHittingCommonBoundingBoxOfSelectedElements(
+            origin,
+            selectedElements,
+          ),
       },
       drag: {
         hasOccurred: false,
@@ -2807,14 +2807,15 @@ class App extends React.Component<AppProps, AppState> {
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
-        const elementWithTransformHandleType = getElementWithTransformHandleType(
-          elements,
-          this.state,
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          this.state.zoom,
-          event.pointerType,
-        );
+        const elementWithTransformHandleType =
+          getElementWithTransformHandleType(
+            elements,
+            this.state,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            this.state.zoom,
+            event.pointerType,
+          );
         if (elementWithTransformHandleType != null) {
           this.setState({
             resizingElement: elementWithTransformHandleType.element,
@@ -2890,9 +2891,10 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         const hitElement = pointerDownState.hit.element;
-        const someHitElementIsSelected = pointerDownState.hit.allHitElements.some(
-          (element) => this.isASelectedElement(element),
-        );
+        const someHitElementIsSelected =
+          pointerDownState.hit.allHitElements.some((element) =>
+            this.isASelectedElement(element),
+          );
         if (
           (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
@@ -3554,8 +3556,8 @@ class App extends React.Component<AppProps, AppState> {
                   ? {
                       // if using ctrl/cmd, select the hitElement only if we
                       // haven't box-selected anything else
-                      [pointerDownState.hit.element
-                        .id]: !elementsWithinSelection.length,
+                      [pointerDownState.hit.element.id]:
+                        !elementsWithinSelection.length,
                     }
                   : null),
               },
@@ -3703,7 +3705,7 @@ class App extends React.Component<AppProps, AppState> {
               this.actionManager.executeAction(actionFinalize);
             },
           );
-        } catch (error) {
+        } catch (error: any) {
           console.error(error);
           this.scene.replaceAllElements(
             this.scene
@@ -3972,7 +3974,7 @@ class App extends React.Component<AppProps, AppState> {
           await normalizeSVG(await imageFile.text()),
           imageFile.name,
         );
-      } catch (error) {
+      } catch (error: any) {
         console.warn(error);
         throw new Error(t("errors.svgImageInsertError"));
       }
@@ -3998,7 +4000,7 @@ class App extends React.Component<AppProps, AppState> {
           imageFile,
           DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error("error trying to resing image file on insertion", error);
       }
 
@@ -4059,7 +4061,7 @@ class App extends React.Component<AppProps, AppState> {
             this.initializeImageDimensions(imageElement, true);
           }
           resolve(imageElement);
-        } catch (error) {
+        } catch (error: any) {
           console.error(error);
           reject(new Error(t("errors.imageInsertError")));
         } finally {
@@ -4090,7 +4092,7 @@ class App extends React.Component<AppProps, AppState> {
         imageElement,
         showCursorImagePreview,
       });
-    } catch (error) {
+    } catch (error: any) {
       mutateElement(imageElement, {
         isDeleted: true,
       });
@@ -4185,7 +4187,7 @@ class App extends React.Component<AppProps, AppState> {
           },
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error(error);
       }
@@ -4270,12 +4272,24 @@ class App extends React.Component<AppProps, AppState> {
         if (updatedFiles.has(element.fileId)) {
           invalidateShapeForElement(element);
         }
-
-        if (erroredFiles.has(element.fileId)) {
-          newElementWith(element, { status: "error" });
-        }
       }
     }
+    if (erroredFiles.size) {
+      this.scene.replaceAllElements(
+        this.scene.getElementsIncludingDeleted().map((element) => {
+          if (
+            isInitializedImageElement(element) &&
+            erroredFiles.has(element.fileId)
+          ) {
+            return newElementWith(element, {
+              status: "error",
+            });
+          }
+          return element;
+        }),
+      );
+    }
+
     return { updatedFiles, erroredFiles };
   };
 
@@ -4417,7 +4431,9 @@ class App extends React.Component<AppProps, AppState> {
                 // This will only work as of Chrome 86,
                 // but can be safely ignored on older releases.
                 const item = event.dataTransfer.items[0];
-                (file as any).handle = await (item as any).getAsFileSystemHandle();
+                (file as any).handle = await (
+                  item as any
+                ).getAsFileSystemHandle();
               } catch (error: any) {
                 console.warn(error.name, error.message);
               }
@@ -4539,10 +4555,8 @@ class App extends React.Component<AppProps, AppState> {
     const type = element ? "element" : "canvas";
 
     const container = this.excalidrawContainerRef.current!;
-    const {
-      top: offsetTop,
-      left: offsetLeft,
-    } = container.getBoundingClientRect();
+    const { top: offsetTop, left: offsetLeft } =
+      container.getBoundingClientRect();
     const left = event.clientX - offsetLeft;
     const top = event.clientY - offsetTop;
 
