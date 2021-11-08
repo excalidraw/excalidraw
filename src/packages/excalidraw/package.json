@@ -1,6 +1,6 @@
 {
-  "name": "@excalidraw/excalidraw",
-  "version": "0.10.0",
+  "name": "@databutton/excalidraw",
+  "version": "0.10.1",
   "main": "main.js",
   "types": "types/packages/excalidraw/index.d.ts",
   "files": [
@@ -8,10 +8,10 @@
     "types/*"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   },
   "description": "Excalidraw as a React component",
-  "repository": "https://github.com/excalidraw/excalidraw",
+  "repository": "https://github.com/databutton/excalidraw",
   "license": "MIT",
   "keywords": [
     "excalidraw",
