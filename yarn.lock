@@ -1953,13 +1953,13 @@
     "@sentry/utils" "6.2.5"
     tslib "^1.9.3"
 
-"@sentry/integrations@6.2.5":
-  version "6.2.5"
-  resolved "https://registry.npmjs.org/@sentry/integrations/-/integrations-6.2.5.tgz"
-  integrity sha512-4LOgO8lSeGaRV4w1Y03YWtTqrZdm56ciD7k0GLhv+PcFLpiu0exsS1XSs/9vET5LB5GtIgBTeJNNbxVFvvmv8g==
+"@sentry/integrations@6.14.1":
+  version "6.14.1"
+  resolved "https://registry.yarnpkg.com/@sentry/integrations/-/integrations-6.14.1.tgz#2293d954cdb14e1992f6bdc6484275defb2667f2"
+  integrity sha512-GZFp03w0c/o2iY1oxebsqpumsDQsoOWiUXpfPriG6UoXZdCDrSoiotaRHPAagsWKQ1XjbILph8Vdz5dSMIuQTg==
   dependencies:
-    "@sentry/types" "6.2.5"
-    "@sentry/utils" "6.2.5"
+    "@sentry/types" "6.14.1"
+    "@sentry/utils" "6.14.1"
     localforage "^1.8.1"
     tslib "^1.9.3"
 
@@ -1972,10 +1972,23 @@
     "@sentry/types" "6.2.5"
     tslib "^1.9.3"
 
+"@sentry/types@6.14.1":
+  version "6.14.1"
+  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-6.14.1.tgz#0d562a7aa91253b7843723344b4ba03a010e6376"
+  integrity sha512-RIk3ZwQKZnASrYWfV5i4wbzVveHz8xLFAS2ySIMqh+hICKnB0N4/r8a1Of/84j7pj+iAbf5vPS85639eIf+9qg==
+
 "@sentry/types@6.2.5":
   version "6.2.5"
   resolved "https://registry.npmjs.org/@sentry/types/-/types-6.2.5.tgz"
   integrity sha512-1Sux6CLYrV9bETMsGP/HuLFLouwKoX93CWzG8BjMueW+Di0OGxZphYjXrGuDs8xO8bAKEVGCHgVQdcB2jevS0w==
+
+"@sentry/utils@6.14.1":
+  version "6.14.1"
+  resolved "https://registry.yarnpkg.com/@sentry/utils/-/utils-6.14.1.tgz#cb746858665314c07cfe9b0f307b410e377032ad"
+  integrity sha512-GVvf0z18L4DN0a6vIBdHSlrK/Dj8QFhuiiJ8NtccSoY8xiKXQNz9FKN5d52NUNqm59aopAxcVAcs57yQSdxrZQ==
+  dependencies:
+    "@sentry/types" "6.14.1"
+    tslib "^1.9.3"
 
 "@sentry/utils@6.2.5":
   version "6.2.5"
@@ -14230,12 +14243,7 @@ tslib@^1.8.1, tslib@^1.9.0, tslib@^1.9.3:
   resolved "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.npmjs.org/tslib/-/tslib-2.1.0.tgz"
-  integrity sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==
-
-tslib@^2.2.0:
+tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.2.0:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
   integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
