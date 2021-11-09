@@ -1,9 +1,11 @@
+import { useState } from "react";
+import oc from "open-color";
+
 import { Dialog } from "./Dialog";
 import { t } from "../i18n";
 
 import { ToolButton } from "./ToolButton";
 
-import { useState } from "react";
 import { AppState, LibraryItems } from "../types";
 import { exportToBlob } from "../packages/utils";
 import { EXPORT_DATA_TYPES, EXPORT_SOURCE } from "../constants";
@@ -11,6 +13,9 @@ import { ExportedLibraryData } from "../data/types";
 
 import "./PublishLibrary.scss";
 import { ExcalidrawElement } from "../element/types";
+import { newElement } from "../element";
+import { mutateElement } from "../element/mutateElement";
+import { getCommonBoundingBox } from "../element/bounds";
 
 const PublishLibrary = ({
   onClose,
@@ -44,13 +49,52 @@ const PublishLibrary = ({
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const elements: ExcalidrawElement[] = [];
+    const prevBoundingBox = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
     libraryItems.forEach((libItem) => {
-      elements.push(...libItem.items);
+      const boundingBox = getCommonBoundingBox(libItem.items);
+      const width = boundingBox.maxX - boundingBox.minX + 30;
+      const height = boundingBox.maxY - boundingBox.minY + 30;
+      const offset = {
+        x: prevBoundingBox.maxX - boundingBox.minX,
+        y: prevBoundingBox.maxY - boundingBox.minY,
+      };
+
+      const itemsWithUpdatedCoords = libItem.items.map((item) => {
+        item = mutateElement(item, {
+          x: item.x + offset.x + 15,
+          y: item.y + offset.y + 15,
+        });
+        return item;
+      });
+      const items = [
+        ...itemsWithUpdatedCoords,
+        newElement({
+          type: "rectangle",
+          width,
+          height,
+          x: prevBoundingBox.maxX,
+          y: prevBoundingBox.maxY,
+          strokeColor: "#ced4da",
+          backgroundColor: "transparent",
+          strokeStyle: "solid",
+          opacity: 100,
+          roughness: 0,
+          strokeSharpness: "sharp",
+          fillStyle: "solid",
+          strokeWidth: 1,
+        }),
+      ];
+      elements.push(...items);
+      prevBoundingBox.maxX = prevBoundingBox.maxX + width + 30;
     });
     const png = await exportToBlob({
       elements,
       mimeType: "image/png",
-      appState,
+      appState: {
+        ...appState,
+        viewBackgroundColor: oc.white,
+        exportBackground: true,
+      },
       files: null,
     });
 
