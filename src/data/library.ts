@@ -59,7 +59,6 @@ class Library {
 
     const filtered = libraryFile.library!.reduce((acc, libraryItem) => {
       const isOldLibrary = !!Array.isArray(libraryItem);
-      //@ts-ignore
       const libItem: LibraryItem = isOldLibrary
         ? {
             status: "published",
