@@ -283,7 +283,15 @@
   "publishSuccessDialog": {
     "title": "Library Publish Success",
     "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",
-    "link": "here"
+    "link": "here",
+    "placeholder": {
+      "authorName": "Your name",
+      "libraryName": "Name of your library",
+      "libraryDesc": "Description of your library to help people understand its usage",
+      "githubHandle": "Github username (optional)",
+      "twitterHandle": "Twitter username, so we know who to credite when promoting over Twitter (optional)",
+      "website": "Link to your personal website or elsewhere (optional)"
+    }
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",

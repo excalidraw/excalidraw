@@ -169,6 +169,7 @@ const PublishLibrary = ({
               required
               value={libraryData.authorName}
               onChange={onInputChange}
+              placeholder={t("publishSuccessDialog.placeholder.authorName")}
             />
           </label>
           <label>
@@ -184,6 +185,7 @@ const PublishLibrary = ({
               required
               value={libraryData.name}
               onChange={onInputChange}
+              placeholder={t("publishSuccessDialog.placeholder.libraryName")}
             />
           </label>
           <label>
@@ -199,6 +201,7 @@ const PublishLibrary = ({
               required
               value={libraryData.description}
               onChange={onInputChange}
+              placeholder={t("publishSuccessDialog.placeholder.libraryDesc")}
             />
           </label>
           <label>
@@ -208,6 +211,7 @@ const PublishLibrary = ({
               name="githubHandle"
               value={libraryData.githubHandle}
               onChange={onInputChange}
+              placeholder={t("publishSuccessDialog.placeholder.githubHandle")}
             />
           </label>
           <label>
@@ -217,6 +221,7 @@ const PublishLibrary = ({
               name="twitterHandle"
               value={libraryData.twitterHandle}
               onChange={onInputChange}
+              placeholder={t("publishSuccessDialog.placeholder.twitterHandle")}
             />
           </label>
           <label>
@@ -226,6 +231,7 @@ const PublishLibrary = ({
               name="website"
               value={libraryData.website}
               onChange={onInputChange}
+              placeholder={t("publishSuccessDialog.placeholder.website")}
             />
           </label>
         </div>
