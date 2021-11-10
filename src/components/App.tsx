@@ -447,6 +447,7 @@ class App extends React.Component<AppProps, AppState> {
         onKeyDown={
           this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
         }
+        onDrop={this.handleAppOnDrop}
       >
         <ExcalidrawContainerContext.Provider
           value={this.excalidrawContainerValue}
