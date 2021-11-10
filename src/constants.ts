@@ -96,6 +96,7 @@ export const MIME_TYPES = {
   jpg: "image/jpeg",
   gif: "image/gif",
   binary: "application/octet-stream",
+  csv: "text/csv",
 } as const;
 
 export const EXPORT_DATA_TYPES = {

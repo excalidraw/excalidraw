@@ -177,6 +177,7 @@
     "freedraw": "Draw",
     "text": "Text",
     "library": "Library",
+    "table": "Insert table",
     "lock": "Keep selected tool active after drawing"
   },
   "headings": {

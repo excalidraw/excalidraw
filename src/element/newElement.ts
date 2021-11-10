@@ -11,6 +11,7 @@ import {
   Arrowhead,
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
+  ExcalidrawTableElement,
 } from "../element/types";
 import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -256,6 +257,22 @@ export const newImageElement = (
 ): NonDeleted<ExcalidrawImageElement> => {
   return {
     ..._newElementBase<ExcalidrawImageElement>("image", opts),
+    // in the future we'll support changing stroke color for some SVG elements,
+    // and `transparent` will likely mean "use original colors of the image"
+    strokeColor: "transparent",
+    status: "pending",
+    fileId: null,
+    scale: [1, 1],
+  };
+};
+
+export const newTableElement = (
+  opts: {
+    type: ExcalidrawTableElement["type"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawTableElement> => {
+  return {
+    ..._newElementBase<ExcalidrawTableElement>("table", opts),
     // in the future we'll support changing stroke color for some SVG elements,
     // and `transparent` will likely mean "use original colors of the image"
     strokeColor: "transparent",

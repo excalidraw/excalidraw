@@ -192,7 +192,7 @@ export const setCursorForShape = (
     resetCursor(canvas);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
-  } else if (shape !== "image") {
+  } else if (shape !== "image" && shape !== "table") {
     canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };

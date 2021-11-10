@@ -10,6 +10,7 @@ import {
   ExcalidrawElement,
   FileId,
   InitializedExcalidrawImageElement,
+  InitializedExcalidrawTableElement,
 } from "./types";
 
 export const loadHTMLImageElement = (dataURL: DataURL) => {
@@ -85,9 +86,10 @@ export const updateImageCache = async ({
 export const getInitializedImageElements = (
   elements: readonly ExcalidrawElement[],
 ) =>
-  elements.filter((element) =>
-    isInitializedImageElement(element),
-  ) as InitializedExcalidrawImageElement[];
+  elements.filter((element) => isInitializedImageElement(element)) as (
+    | InitializedExcalidrawImageElement
+    | InitializedExcalidrawTableElement
+  )[];
 
 export const isHTMLSVGElement = (node: Node | null): node is SVGElement => {
   // lower-casing due to XML/HTML convention differences

@@ -34,6 +34,7 @@ type MobileMenuProps = {
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
+  onTableAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: AppState,
@@ -56,6 +57,7 @@ export const MobileMenu = ({
   viewModeEnabled,
   showThemeBtn,
   onImageAction,
+  onTableAction,
   renderTopRightUI,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
@@ -74,6 +76,11 @@ export const MobileMenu = ({
                       setAppState={setAppState}
                       onImageAction={({ pointerType }) => {
                         onImageAction({
+                          insertOnCanvasDirectly: pointerType !== "mouse",
+                        });
+                      }}
+                      onTableAction={({ pointerType }) => {
+                        onTableAction({
                           insertOnCanvasDirectly: pointerType !== "mouse",
                         });
                       }}

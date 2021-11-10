@@ -16,7 +16,8 @@ type FILE_EXTENSION =
   | "svg"
   | "json"
   | "excalidraw"
-  | "excalidrawlib";
+  | "excalidrawlib"
+  | "csv";
 
 const INPUT_CHANGE_INTERVAL_MS = 500;
 

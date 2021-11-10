@@ -118,7 +118,11 @@ import {
   mutateElement,
   newElementWith,
 } from "../element/mutateElement";
-import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
+import {
+  deepCopyElement,
+  newFreeDrawElement,
+  newTableElement,
+} from "../element/newElement";
 import {
   isBindingElement,
   isBindingElementType,
@@ -138,6 +142,8 @@ import {
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
   FileId,
+  ExcalidrawTableElement,
+  InitializedExcalidrawTableElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -484,6 +490,7 @@ class App extends React.Component<AppProps, AppState> {
               library={this.library}
               id={this.id}
               onImageAction={this.onImageAction}
+              onTableAction={this.onTableAction}
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
@@ -750,7 +757,8 @@ class App extends React.Component<AppProps, AppState> {
     scene.appState = {
       ...scene.appState,
       elementType:
-        scene.appState.elementType === "image"
+        scene.appState.elementType === "image" ||
+        scene.appState.elementType === "table"
           ? "selection"
           : scene.appState.elementType,
       isLoading: false,
@@ -1799,6 +1807,9 @@ class App extends React.Component<AppProps, AppState> {
     if (elementType === "image") {
       this.onImageAction();
     }
+    if (elementType === "table") {
+      this.onTableAction();
+    }
     if (elementType !== "selection") {
       this.setState({
         elementType,
@@ -2510,6 +2521,26 @@ class App extends React.Component<AppProps, AppState> {
         this.state.elementType,
         pointerDownState,
       );
+    } else if (this.state.elementType === "table") {
+      // reset image preview on pointerdown
+      setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
+
+      if (!this.state.pendingImageElement) {
+        return;
+      }
+
+      this.setState({
+        draggingElement: this.state.pendingImageElement,
+        editingElement: this.state.pendingImageElement,
+        pendingImageElement: null,
+        multiElement: null,
+      });
+
+      const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+      mutateElement(this.state.pendingImageElement, {
+        x,
+        y,
+      });
     } else {
       this.createGenericElementOnPointerDown(
         this.state.elementType,
@@ -3085,6 +3116,32 @@ class App extends React.Component<AppProps, AppState> {
 
     const element = newImageElement({
       type: "image",
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+    });
+
+    return element;
+  };
+
+  private createTableElement = ({
+    sceneX,
+    sceneY,
+  }: {
+    sceneX: number;
+    sceneY: number;
+  }) => {
+    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+
+    const element = newTableElement({
+      type: "table",
       x: gridX,
       y: gridY,
       strokeColor: this.state.currentItemStrokeColor,
@@ -3950,6 +4007,80 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  private initializeTable = async ({
+    tableFile,
+    tableElement: _tableElement,
+    showCursorImagePreview = false,
+  }: {
+    tableFile: File;
+    tableElement: ExcalidrawTableElement;
+    showCursorImagePreview?: boolean;
+  }) => {
+    // This mimetypes represents the placeholder image on the canvas
+    const mimeType = "image/png";
+    setCursor(this.canvas, "wait");
+    const fileId = await ((this.props.generateIdForFile?.(
+      tableFile,
+    ) as Promise<FileId>) || generateIdFromFile(tableFile));
+    const awesome_dataurl =
+      "data:image/png;base64,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" as DataURL;
+    const existingFileData = this.files[fileId];
+
+    if (!existingFileData?.dataURL) {
+      // TODO: Should generate a dataURL here from the table
+    }
+    const dataURL = this.files[fileId]?.dataURL || awesome_dataurl;
+    if (showCursorImagePreview) {
+      this.setImagePreviewCursor(dataURLToFile(dataURL, "table"));
+    }
+    const tableElement = mutateElement(
+      _tableElement,
+      {
+        fileId,
+      },
+      false,
+    ) as NonDeleted<InitializedExcalidrawTableElement>;
+
+    return new Promise<NonDeleted<InitializedExcalidrawTableElement>>(
+      async (resolve, reject) => {
+        try {
+          this.files = {
+            ...this.files,
+            [fileId]: {
+              mimeType,
+              id: fileId,
+              dataURL,
+              created: Date.now(),
+              fileMimeType: tableFile.type,
+            },
+          };
+          const cachedImageData = this.imageCache.get(fileId);
+          if (!cachedImageData) {
+            this.addNewImagesToImageCache();
+            await this.updateImageCache([tableElement]);
+          }
+          if (cachedImageData?.image instanceof Promise) {
+            await cachedImageData.image;
+          }
+          if (
+            this.state.pendingImageElement?.id !== tableElement.id &&
+            this.state.draggingElement?.id !== tableElement.id
+          ) {
+            this.initializeImageDimensions(tableElement, true);
+          }
+          resolve(tableElement);
+        } catch (error: any) {
+          console.error(error);
+          reject(new Error(t("errors.tableInsertError")));
+        } finally {
+          if (!showCursorImagePreview) {
+            resetCursor(this.canvas);
+          }
+        }
+      },
+    );
+  };
+
   private initializeImage = async ({
     imageFile,
     imageElement: _imageElement,
@@ -4074,6 +4205,36 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   /**
+   * inserts table into elements array and rerenders
+   */
+  private insertTableElement = async (
+    tableElement: ExcalidrawTableElement,
+    tableFile: File,
+    showCursorImagePreview?: boolean,
+  ) => {
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      tableElement,
+    ]);
+
+    try {
+      await this.initializeTable({
+        tableFile,
+        tableElement,
+        showCursorImagePreview,
+      });
+    } catch (error: any) {
+      mutateElement(tableElement, {
+        isDeleted: true,
+      });
+      this.actionManager.executeAction(actionFinalize);
+      this.setState({
+        errorMessage: error.message || t("errors.tableInsertError"),
+      });
+    }
+  };
+
+  /**
    * inserts image into elements array and rerenders
    */
   private insertImageElement = async (
@@ -4137,6 +4298,71 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.pendingImageElement) {
       setCursor(this.canvas, `url(${previewDataURL}) 4 4, auto`);
+    }
+  };
+
+  private onTableAction = async (
+    { insertOnCanvasDirectly } = { insertOnCanvasDirectly: false },
+  ) => {
+    try {
+      const clientX = this.state.width / 2 + this.state.offsetLeft;
+      const clientY = this.state.height / 2 + this.state.offsetTop;
+
+      const { x, y } = viewportCoordsToSceneCoords(
+        { clientX, clientY },
+        this.state,
+      );
+
+      const tableFile = await fileOpen({
+        description: "Table data",
+        extensions: ["csv"],
+      });
+
+      const tableElement = this.createTableElement({
+        sceneX: x,
+        sceneY: y,
+      });
+
+      if (insertOnCanvasDirectly) {
+        // TODO: This becomes useful when it's dragged in
+        this.insertTableElement(tableElement, tableFile);
+        this.initializeImageDimensions(tableElement);
+        this.setState(
+          {
+            selectedElementIds: { [tableElement.id]: true },
+          },
+          () => {
+            this.actionManager.executeAction(actionFinalize);
+          },
+        );
+      } else {
+        this.setState(
+          {
+            pendingImageElement: tableElement,
+          },
+          () => {
+            this.insertTableElement(
+              tableElement,
+              tableFile,
+              /* showCursorImagePreview */ true,
+            );
+          },
+        );
+      }
+    } catch (error: any) {
+      if (error.name !== "AbortError") {
+        console.error(error);
+      }
+      this.setState(
+        {
+          pendingImageElement: null,
+          editingElement: null,
+          elementType: "selection",
+        },
+        () => {
+          this.actionManager.executeAction(actionFinalize);
+        },
+      );
     }
   };
 
@@ -4205,7 +4431,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private initializeImageDimensions = (
-    imageElement: ExcalidrawImageElement,
+    imageElement: ExcalidrawImageElement | ExcalidrawTableElement,
     forceNaturalSize = false,
   ) => {
     const image =
@@ -4259,7 +4485,10 @@ class App extends React.Component<AppProps, AppState> {
   /** updates image cache, refreshing updated elements and/or setting status
       to error for images that fail during <img> element creation */
   private updateImageCache = async (
-    elements: readonly InitializedExcalidrawImageElement[],
+    elements: readonly (
+      | InitializedExcalidrawImageElement
+      | InitializedExcalidrawTableElement
+    )[],
     files = this.files,
   ) => {
     const { updatedFiles, erroredFiles } = await _updateImageCache({
@@ -4295,9 +4524,10 @@ class App extends React.Component<AppProps, AppState> {
 
   /** adds new images to imageCache and re-renders if needed */
   private addNewImagesToImageCache = async (
-    imageElements: InitializedExcalidrawImageElement[] = getInitializedImageElements(
-      this.scene.getElements(),
-    ),
+    imageElements: (
+      | InitializedExcalidrawImageElement
+      | InitializedExcalidrawTableElement
+    )[] = getInitializedImageElements(this.scene.getElements()),
     files: BinaryFiles = this.files,
   ) => {
     const uncachedImageElements = imageElements.filter(
@@ -4417,9 +4647,28 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    const { onDrop } = this.props;
+    if (onDrop) {
+      const shouldContinue = await onDrop(event);
+      if (!shouldContinue) {
+        return;
+      }
+    }
     try {
       const file = event.dataTransfer.files[0];
+      if (file.type === "text/csv") {
+        // Do it right away
+        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+          event,
+          this.state,
+        );
+        const tableElement = this.createTableElement({ sceneX, sceneY });
+        this.insertTableElement(tableElement, file);
+        this.initializeImageDimensions(tableElement);
+        this.setState({ selectedElementIds: { [tableElement.id]: true } });
 
+        return;
+      }
       if (isSupportedImageFile(file)) {
         // first attempt to decode scene from the image if it's embedded
         // ---------------------------------------------------------------------
