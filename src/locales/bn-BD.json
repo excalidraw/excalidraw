@@ -20,10 +20,6 @@
     "background": "",
     "fill": "",
     "strokeWidth": "",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "",
     "strokeStyle_solid": "",
     "strokeStyle_dashed": "",
@@ -189,6 +185,7 @@
     "shapes": ""
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "",
     "freeDraw": "",
     "text": "",

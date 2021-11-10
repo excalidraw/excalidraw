@@ -20,10 +20,6 @@
     "background": "רקע",
     "fill": "מילוי",
     "strokeWidth": "עובי קו מתאר",
-    "strokeShape": "סגנון קו המתאר",
-    "strokeShape_gel": "עט נובע",
-    "strokeShape_fountain": "עט נובע",
-    "strokeShape_brush": "מברשת",
     "strokeStyle": "סגנון קו המתאר",
     "strokeStyle_solid": "מלא",
     "strokeStyle_dashed": "מקווקו",
@@ -189,6 +185,7 @@
     "shapes": "צורות"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
