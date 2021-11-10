@@ -63,6 +63,13 @@
       height: 12px;
       border-radius: 2px;
       margin: 0.5em;
+      background-color: $oc-blue-1;
+    }
+
+    &.Checkbox:hover {
+      .Checkbox-box {
+        background-color: $oc-blue-2;
+      }
     }
   }
 
