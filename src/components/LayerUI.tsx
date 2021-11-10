@@ -131,10 +131,10 @@ const LibraryMenuItems = ({
   onPublish,
 }: {
   libraryItems: LibraryItems;
-  pendingElements: LibraryItem["items"];
+  pendingElements: LibraryItem["elements"];
   onRemoveFromLibrary: () => void;
-  onInsertShape: (elements: LibraryItem["items"]) => void;
-  onAddToLibrary: (elements: LibraryItem["items"]) => void;
+  onInsertShape: (elements: LibraryItem["elements"]) => void;
+  onAddToLibrary: (elements: LibraryItem["elements"]) => void;
   theme: AppState["theme"];
   files: BinaryFiles;
   setAppState: React.Component<any, AppState>["setState"];
@@ -271,7 +271,7 @@ const LibraryMenuItems = ({
         !addedPendingElements &&
         y + x >= libraryItems.length;
       addedPendingElements = addedPendingElements || shouldAddPendingElements;
-      const elements = libraryItems[y + x]?.items;
+      const elements = libraryItems[y + x]?.elements;
       children.push(
         <Stack.Col key={x}>
           <LibraryUnit
@@ -322,9 +322,9 @@ const LibraryMenu = ({
   id,
   appState,
 }: {
-  pendingElements: LibraryItem["items"];
+  pendingElements: LibraryItem["elements"];
   onClickOutside: (event: MouseEvent) => void;
-  onInsertShape: (elements: LibraryItem["items"]) => void;
+  onInsertShape: (elements: LibraryItem["elements"]) => void;
   onAddToLibrary: () => void;
   theme: AppState["theme"];
   files: BinaryFiles;
@@ -394,7 +394,7 @@ const LibraryMenu = ({
   }, [library, setAppState, activeIndexes, setActiveIndexes]);
 
   const addToLibrary = useCallback(
-    async (elements: LibraryItem["items"]) => {
+    async (elements: LibraryItem["elements"]) => {
       if (elements.some((element) => element.type === "image")) {
         return setAppState({
           errorMessage: "Support for adding images to the library coming soon!",
@@ -403,7 +403,7 @@ const LibraryMenu = ({
       const items = await library.loadLibrary();
       const nextItems: LibraryItems = [
         ...items,
-        { status: "unpublished", items: elements },
+        { status: "unpublished", elements },
       ];
       onAddToLibrary();
       library.saveLibrary(nextItems).catch((error) => {

@@ -181,7 +181,7 @@ export declare class GestureEvent extends UIEvent {
 /** v2 library item */
 export type LibraryItem = {
   status: "published" | "unpublished";
-  items: readonly NonDeleted<ExcalidrawElement>[];
+  elements: readonly NonDeleted<ExcalidrawElement>[];
 };
 export type LibraryItems = readonly LibraryItem[];
 

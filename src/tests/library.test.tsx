@@ -20,7 +20,10 @@ describe("library", () => {
     );
     await waitFor(async () => {
       expect(await h.app.library.loadLibrary()).toEqual([
-        { status: "published", items: [expect.objectContaining({ id: "A" })] },
+        {
+          status: "published",
+          elements: [expect.objectContaining({ id: "A" })],
+        },
       ]);
     });
   });

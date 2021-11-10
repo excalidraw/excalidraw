@@ -27,9 +27,9 @@ export const LibraryUnit = ({
   activeIndexes,
   onToggle,
 }: {
-  elements?: LibraryItem["items"];
+  elements?: LibraryItem["elements"];
   files: BinaryFiles;
-  pendingElements?: LibraryItem["items"];
+  pendingElements?: LibraryItem["elements"];
   onClick: () => void;
   index: number;
   activeIndexes: Array<number>;

@@ -51,7 +51,7 @@ const PublishLibrary = ({
     const elements: ExcalidrawElement[] = [];
     const prevBoundingBox = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
     libraryItems.forEach((libItem) => {
-      const boundingBox = getCommonBoundingBox(libItem.items);
+      const boundingBox = getCommonBoundingBox(libItem.elements);
       const width = boundingBox.maxX - boundingBox.minX + 30;
       const height = boundingBox.maxY - boundingBox.minY + 30;
       const offset = {
@@ -59,12 +59,12 @@ const PublishLibrary = ({
         y: prevBoundingBox.maxY - boundingBox.minY,
       };
 
-      const itemsWithUpdatedCoords = libItem.items.map((item) => {
-        item = mutateElement(item, {
-          x: item.x + offset.x + 15,
-          y: item.y + offset.y + 15,
+      const itemsWithUpdatedCoords = libItem.elements.map((element) => {
+        element = mutateElement(element, {
+          x: element.x + offset.x + 15,
+          y: element.y + offset.y + 15,
         });
-        return item;
+        return element;
       });
       const items = [
         ...itemsWithUpdatedCoords,

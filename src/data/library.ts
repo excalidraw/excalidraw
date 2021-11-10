@@ -19,9 +19,9 @@ class Library {
 
   restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
     const elements = getNonDeletedElements(
-      restoreElements(libraryItem.items, null),
+      restoreElements(libraryItem.elements, null),
     );
-    return elements.length ? { ...libraryItem, items: elements } : null;
+    return elements.length ? { ...libraryItem, elements } : null;
   };
 
   /** imports library (currently merges, removing duplicates) */
@@ -39,17 +39,17 @@ class Library {
       targetLibraryItem: LibraryItem,
     ) => {
       return !existingLibraryItems.find((libraryItem) => {
-        if (libraryItem.items.length !== targetLibraryItem.items.length) {
+        if (libraryItem.elements.length !== targetLibraryItem.elements.length) {
           return false;
         }
 
         // detect z-index difference by checking the excalidraw elements
         // are in order
-        return libraryItem.items.every((libItemExcalidrawItem, idx) => {
+        return libraryItem.elements.every((libItemExcalidrawItem, idx) => {
           return (
-            libItemExcalidrawItem.id === targetLibraryItem.items[idx].id &&
+            libItemExcalidrawItem.id === targetLibraryItem.elements[idx].id &&
             libItemExcalidrawItem.versionNonce ===
-              targetLibraryItem.items[idx].versionNonce
+              targetLibraryItem.elements[idx].versionNonce
           );
         });
       });
@@ -62,7 +62,7 @@ class Library {
       const libItem: LibraryItem = isOldLibrary
         ? {
             status: "published",
-            items: libraryItem,
+            elements: libraryItem,
           }
         : libraryItem;
       const restoredItem = this.restoreLibraryItem(libItem);

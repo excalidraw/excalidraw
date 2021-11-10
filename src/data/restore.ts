@@ -286,7 +286,7 @@ export const restoreLibraryItems = (
   for (const item of libraryItems) {
     // migrate older libraries
     if (Array.isArray(item)) {
-      restoredItems.push({ status: "unpublished", items: item });
+      restoredItems.push({ status: "unpublished", elements: item });
     } else {
       restoredItems.push(item as LibraryItem);
     }
