@@ -221,24 +221,24 @@
   },
   "roomDialog": {
     "desc_intro": "Varat ielūgt cilvēkus pašreizējajā ainā, lai sadarbotos ar tiem.",
-    "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
-    "desc_inProgressIntro": "",
-    "desc_shareLink": "",
-    "desc_exitSession": "",
-    "shareTitle": ""
+    "desc_privacy": "Neuztraucieties, sesija izmanto šifrēšanu no gala līdz galam, tātad jūsu zīmējums paliks privāts. Pat mūsu serveri nevarēs redzēt, ar ko esat nācis klajā.",
+    "button_startSession": "Sākt sesiju",
+    "button_stopSession": "Beigt sesiju",
+    "desc_inProgressIntro": "Notiek tiešsaistes sadarbības sesija.",
+    "desc_shareLink": "Dalieties ar šo saiti ar jebkuru, ar ko vēlaties sadarboties:",
+    "desc_exitSession": "Sesijas beigšana jūs atvienos no sadarbošanās, bet jūs vēl joprojām varēsiet strādāt ar ainu savā datorā. Ievērojiet, ka šis neietekmēs citus dalībniekus, un viņi vēl joprojām varēs sadarboties savā ainas versijā.",
+    "shareTitle": "Pievienoties tiešsaistes sadarbībai programmā Excalidraw"
   },
   "errorDialog": {
-    "title": ""
+    "title": "Kļūda"
   },
   "exportDialog": {
-    "disk_title": "",
-    "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": "",
+    "disk_title": "Saglabāt diskā",
+    "disk_details": "Eksportēt ainas datus failā, ko vēlāk varēsiet importēt.",
+    "disk_button": "Saglabāt failā",
+    "link_title": "Kopīgošanas saite",
+    "link_details": "Eksportēt kā tikai lasāmu saiti.",
+    "link_button": "Eksportēt kā saiti",
     "excalidrawplus_description": "",
     "excalidrawplus_button": "",
     "excalidrawplus_exportError": ""
