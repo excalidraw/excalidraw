@@ -11,7 +11,8 @@ export const hasBackground = (type: string) =>
   type === "diamond" ||
   type === "line";
 
-export const hasStrokeColor = (type: string) => type !== "image";
+export const hasStrokeColor = (type: string) =>
+  type !== "image" && type !== "table";
 
 export const hasStrokeWidth = (type: string) =>
   type === "rectangle" ||

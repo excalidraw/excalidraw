@@ -35,6 +35,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onLibraryChange,
     autoFocus = false,
     generateIdForFile,
+    onDrop,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -96,6 +97,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         onLibraryChange={onLibraryChange}
         autoFocus={autoFocus}
         generateIdForFile={generateIdForFile}
+        onDrop={onDrop}
       />
     </InitializeApp>
   );

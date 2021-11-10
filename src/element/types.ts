@@ -73,8 +73,20 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     scale: [number, number];
   }>;
 
+export type ExcalidrawTableElement = _ExcalidrawElementBase & {
+  type: "table";
+  fileId: FileId | null;
+  status: "pending" | "saved" | "error";
+  scale: [number, number];
+};
+
 export type InitializedExcalidrawImageElement = MarkNonNullable<
   ExcalidrawImageElement,
+  "fileId"
+>;
+
+export type InitializedExcalidrawTableElement = MarkNonNullable<
+  ExcalidrawTableElement,
   "fileId"
 >;
 
@@ -97,7 +109,8 @@ export type ExcalidrawElement =
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawFreeDrawElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawTableElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: boolean;
@@ -121,7 +134,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawTableElement;
 
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];

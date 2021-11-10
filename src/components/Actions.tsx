@@ -170,11 +170,13 @@ export const ShapesSwitcher = ({
   elementType,
   setAppState,
   onImageAction,
+  onTableAction,
 }: {
   canvas: HTMLCanvasElement | null;
   elementType: ExcalidrawElement["type"];
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
+  onTableAction: (data: { pointerType: PointerType | null }) => void;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
@@ -205,6 +207,9 @@ export const ShapesSwitcher = ({
             setCursorForShape(canvas, value);
             if (value === "image") {
               onImageAction({ pointerType });
+            }
+            if (value === "table") {
+              onTableAction({ pointerType });
             }
           }}
         />
