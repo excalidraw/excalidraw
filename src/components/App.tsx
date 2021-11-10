@@ -443,7 +443,6 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--mobile": this.isMobile,
         })}
         ref={this.excalidrawContainerRef}
-        onDrop={this.handleAppOnDrop}
         tabIndex={0}
         onKeyDown={
           this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
@@ -4647,13 +4646,6 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
-    const { onDrop } = this.props;
-    if (onDrop) {
-      const shouldContinue = await onDrop(event);
-      if (!shouldContinue) {
-        return;
-      }
-    }
     try {
       const file = event.dataTransfer.files[0];
       if (file.type === "text/csv") {
