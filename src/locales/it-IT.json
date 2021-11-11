@@ -20,10 +20,6 @@
     "background": "Sfondo",
     "fill": "Riempimento",
     "strokeWidth": "Spessore del tratto",
-    "strokeShape": "Forma del tratto",
-    "strokeShape_gel": "Penna gel",
-    "strokeShape_fountain": "Penna stilografica",
-    "strokeShape_brush": "Pennello",
     "strokeStyle": "Stile del tratto",
     "strokeStyle_solid": "Pieno",
     "strokeStyle_dashed": "Tratteggiato",
@@ -168,7 +164,7 @@
     "imageInsertError": "Non è stato possibile inserire l'immagine. Riprova più tardi...",
     "fileTooBig": "Il file è troppo grande. La dimensione massima consentita è {{maxSize}}.",
     "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG non valido."
   },
   "toolBar": {
     "selection": "Selezione",
@@ -189,6 +185,7 @@
     "shapes": "Forme"
   },
   "hints": {
+    "canvasPanning": "Per spostare la tela, tieni premuta la rotella del mouse o la barra spaziatrice mentre la trascini",
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",

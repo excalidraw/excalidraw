@@ -20,7 +20,7 @@ export const saveUsernameToLocalStorage = (username: string) => {
       STORAGE_KEYS.LOCAL_STORAGE_COLLAB,
       JSON.stringify({ username }),
     );
-  } catch (error) {
+  } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
   }
@@ -32,7 +32,7 @@ export const importUsernameFromLocalStorage = (): string | null => {
     if (data) {
       return JSON.parse(data).username;
     }
-  } catch (error) {
+  } catch (error: any) {
     // Unable to access localStorage
     console.error(error);
   }
@@ -53,7 +53,7 @@ export const saveToLocalStorage = (
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
       JSON.stringify(clearAppStateForLocalStorage(appState)),
     );
-  } catch (error) {
+  } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
   }
@@ -66,7 +66,7 @@ export const importFromLocalStorage = () => {
   try {
     savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
     savedState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
-  } catch (error) {
+  } catch (error: any) {
     // Unable to access localStorage
     console.error(error);
   }
@@ -75,7 +75,7 @@ export const importFromLocalStorage = () => {
   if (savedElements) {
     try {
       elements = clearElementsForLocalStorage(JSON.parse(savedElements));
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       // Do nothing because elements array is already empty
     }
@@ -90,7 +90,7 @@ export const importFromLocalStorage = () => {
           JSON.parse(savedState) as Partial<AppState>,
         ),
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       // Do nothing because appState is already null
     }
@@ -103,7 +103,7 @@ export const getElementsStorageSize = () => {
     const elements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
     const elementsSize = elements?.length || 0;
     return elementsSize;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     return 0;
   }
@@ -122,7 +122,7 @@ export const getTotalStorageSize = () => {
     const librarySize = library?.length || 0;
 
     return appStateSize + collabSize + librarySize + getElementsStorageSize();
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     return 0;
   }

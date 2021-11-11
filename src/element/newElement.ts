@@ -12,7 +12,11 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
 } from "../element/types";
-import { applyTextOpts, measureTextElement } from "../textlike";
+import {
+  applyTextOpts,
+  cleanTextOptUpdates,
+  measureTextElement,
+} from "../textlike";
 import { TextOpts } from "../textlike/types";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
@@ -118,7 +122,8 @@ export const newTextElement = (
     textOpts?: TextOpts;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const metrics = measureTextElement(opts);
+  const cleanedOpts = cleanTextOptUpdates(opts.subtype, opts);
+  const metrics = measureTextElement(opts, cleanedOpts);
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {

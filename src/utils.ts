@@ -360,7 +360,7 @@ export const resolvablePromise = <T>() => {
  * @param func handler taking at most single parameter (event).
  */
 export const withBatchedUpdates = <
-  TFunction extends ((event: any) => void) | (() => void)
+  TFunction extends ((event: any) => void) | (() => void),
 >(
   func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
 ) =>
@@ -448,4 +448,10 @@ export const preventUnload = (event: BeforeUnloadEvent) => {
   event.preventDefault();
   // NOTE: modern browsers no longer allow showing a custom message here
   event.returnValue = "";
+};
+
+export const bytesToHexString = (bytes: Uint8Array) => {
+  return Array.from(bytes)
+    .map((byte) => `0${byte.toString(16)}`.slice(-2))
+    .join("");
 };

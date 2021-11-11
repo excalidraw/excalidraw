@@ -208,7 +208,7 @@ export const applyTextOpts = (
   element: ExcalidrawTextElement,
   textOpts?: TextOpts,
 ): ExcalidrawTextElement => {
-  mutateElement(element, cleanTextOptUpdates(element, element));
+  mutateElement(element, cleanTextOptUpdates(element.subtype, element));
   for (let i = 0; i < applyMethodsA.length; i++) {
     if (applyMethodsA[i].subtype === element.subtype) {
       return applyMethodsA[i].method(element, textOpts);
@@ -222,11 +222,11 @@ export const applyTextOpts = (
 };
 
 export const cleanTextOptUpdates = (
-  element: ExcalidrawTextElement,
+  subtype: string,
   opts: ElementUpdate<ExcalidrawTextElement>,
 ): ElementUpdate<ExcalidrawTextElement> => {
   for (let i = 0; i < cleanMethodsA.length; i++) {
-    if (cleanMethodsA[i].subtype === element.subtype) {
+    if (cleanMethodsA[i].subtype === subtype) {
       return cleanMethodsA[i].method(opts);
     }
   }
@@ -256,6 +256,7 @@ export const measureTextElement = (
   next?: {
     fontSize?: number;
     text?: string;
+    textOpts?: TextOpts;
   },
 ): { width: number; height: number; baseline: number } => {
   for (let i = 0; i < measureMethodsA.length; i++) {

@@ -20,10 +20,6 @@
     "background": "Фон",
     "fill": "Наситеност",
     "strokeWidth": "Ширина на щриха",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "Стил на линия",
     "strokeStyle_solid": "Плътен",
     "strokeStyle_dashed": "Пунктир",
@@ -189,6 +185,7 @@
     "shapes": "Фигури"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Кликнете, за да стартирате няколко точки, плъзнете за една линия",
     "freeDraw": "Натиснете и влачете, пуснете като сте готови",
     "text": "Подсказка: Можете също да добавите текст като натиснете някъде два път с инструмента за селекция",
