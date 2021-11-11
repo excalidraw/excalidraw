@@ -11,11 +11,13 @@
     height: 63px; // match width
 
     &--hover {
-      box-shadow: inset 0px 0px 1px 2px $oc-pink-5;
+      box-shadow: inset 0px 0px 0px 2px $oc-blue-5;
+      border-color: $oc-blue-5;
     }
 
     &--selected {
-      box-shadow: inset 0px 0px 1px 2px $oc-pink-8;
+      box-shadow: inset 0px 0px 0px 2px $oc-blue-8;
+      border-color: $oc-blue-8;
     }
   }
 
