@@ -168,6 +168,7 @@ const PublishLibrary = ({
       onCloseRequest={onClose}
       title="Publish Library"
       className="publish-library"
+      closeOnClickOutside={false}
     >
       {renderLibraryItems()}
       <form onSubmit={onSubmit}>
