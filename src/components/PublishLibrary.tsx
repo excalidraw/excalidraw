@@ -103,7 +103,7 @@ const PublishLibrary = ({
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
       version: 1,
       source: EXPORT_SOURCE,
-      library: libraryItems,
+      libraryItems,
     };
     const content = JSON.stringify(libContent, null, 2);
     const lib = new Blob([content], { type: "application/json" });

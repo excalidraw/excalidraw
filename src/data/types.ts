@@ -26,7 +26,8 @@ export interface ExportedLibraryData {
   type: string;
   version: number;
   source: string;
-  library: LibraryItems;
+  libraryItems: LibraryItems;
+  library?: LibraryItems | LibraryItems_v1;
 }
 
 export interface ImportedLibraryData extends Partial<ExportedLibraryData> {}

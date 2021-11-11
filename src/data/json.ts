@@ -124,7 +124,7 @@ export const saveLibraryAsJSON = async (library: Library) => {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
     version: 1,
     source: EXPORT_SOURCE,
-    library: libraryItems,
+    libraryItems,
   };
   const serialized = JSON.stringify(data, null, 2);
   await fileSave(

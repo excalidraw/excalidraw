@@ -27,7 +27,7 @@ class Library {
   /** imports library (currently merges, removing duplicates) */
   async importLibrary(blob: Blob) {
     const libraryFile = await loadLibraryFromBlob(blob);
-    if (!libraryFile || !libraryFile.library) {
+    if (!libraryFile || !(libraryFile.libraryItems || libraryFile.library)) {
       return;
     }
 
@@ -57,22 +57,23 @@ class Library {
 
     const existingLibraryItems = await this.loadLibrary();
 
-    const filtered = libraryFile.library!.reduce((acc, libraryItem) => {
-      const isOldLibrary = !!Array.isArray(libraryItem);
-      const libItem: LibraryItem = isOldLibrary
+    const library = libraryFile.libraryItems || libraryFile.library || [];
+    const filteredItems = [];
+    for (const item of library) {
+      const isOldLibrary = !!Array.isArray(item);
+      const libItem = isOldLibrary
         ? {
             status: "published",
-            elements: libraryItem,
+            elements: item,
           }
-        : libraryItem;
-      const restoredItem = this.restoreLibraryItem(libItem);
+        : item;
+      const restoredItem = this.restoreLibraryItem(libItem as LibraryItem);
       if (restoredItem && isUniqueitem(existingLibraryItems, restoredItem)) {
-        acc.push(restoredItem);
+        filteredItems.push(restoredItem);
       }
-      return acc;
-    }, [] as Mutable<LibraryItems>);
+    }
 
-    await this.saveLibrary([...existingLibraryItems, ...filtered]);
+    await this.saveLibrary([...existingLibraryItems, ...filteredItems]);
   }
 
   loadLibrary = (): Promise<LibraryItems> => {
