@@ -1,6 +1,6 @@
 // Some imports
-import { FontFamilyValues, FontString } from "../../element/types";
-import { SVG_NS } from "../../constants";
+import { FontString } from "../../element/types";
+import { FONT_FAMILY, SVG_NS } from "../../constants";
 import {
   getFontString,
   getFontFamilyString,
@@ -32,10 +32,8 @@ import { registerAuxLangData } from "../../i18n";
 import { t } from "../../i18n";
 import { Action } from "../../actions/types";
 import { AppState } from "../../types";
-import {
-  getCommonAttributeOfSelectedElements,
-  getSelectedElements,
-} from "../../scene";
+import { getFormValue } from "../../actions/actionProperties";
+import { getSelectedElements } from "../../scene";
 import { getElementMap, getNonDeletedElements } from "../../element";
 import { invalidateShapeForElement } from "../../renderer/renderElement";
 import { ButtonSelect } from "../../components/ButtonSelect";
@@ -47,12 +45,13 @@ import {
   TEXT_SUBTYPE_MATH,
 } from "./types";
 
+const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;
+
 // Begin exports
 type ExcalidrawTextElementMath = ExcalidrawTextElement &
   Readonly<{
     subtype: typeof TEXT_SUBTYPE_MATH;
     useTex: boolean;
-    fontFamily: 2;
   }>;
 
 const isMathElement = (
@@ -210,15 +209,12 @@ const markupText = (
 const getCacheKey = (
   text: string,
   fontSize: number,
-  fontFamily: FontFamilyValues,
   strokeColor: String,
   textAlign: CanvasTextAlign,
   opacity: Number,
   useTex: boolean,
 ) => {
-  const key = `${text}, ${fontSize}, ${getFontFamilyString({
-    fontFamily,
-  })}, ${strokeColor}, ${textAlign}, ${opacity}, ${useTex}`;
+  const key = `${text}, ${fontSize}, ${strokeColor}, ${textAlign}, ${opacity}, ${useTex}`;
   return key;
 };
 
@@ -365,7 +361,6 @@ const svgCache = {} as { [key: string]: SVGSVGElement };
 const createSvg = (
   text: string,
   fontSize: number,
-  fontFamily: FontFamilyValues,
   strokeColor: String,
   textAlign: CanvasTextAlign,
   opacity: Number,
@@ -375,7 +370,6 @@ const createSvg = (
   const key = getCacheKey(
     text,
     fontSize,
-    fontFamily,
     strokeColor,
     textAlign,
     opacity,
@@ -385,10 +379,8 @@ const createSvg = (
   const mathLines = text.replace(/\r\n?/g, "\n").split("\n");
   const processed = markupText(text, useTex, isMathJaxLoaded);
 
-  const fontString = getFontString({
-    fontSize,
-    fontFamily,
-  });
+  const fontFamily = FONT_FAMILY_MATH;
+  const fontString = getFontString({ fontSize, fontFamily });
   const metrics = measureOutputs(processed, fontString, isMathJaxLoaded);
   const imageMetrics = metrics.imageMetrics;
 
@@ -485,38 +477,17 @@ const getRenderDims = (width: number, height: number) => {
   return [width / window.devicePixelRatio, height / window.devicePixelRatio];
 };
 
-const containsMath = (text: string, useTex: boolean) => {
-  const delimiter = (useTex ? "\\$\\$" : "`") as string;
-  return text.search(delimiter) >= 0;
-};
-
-const isMathMode = (fontString: FontString) => {
-  return fontString.search("Helvetica") >= 0;
-};
-
 const measureMath = (
   text: string,
   fontSize: number,
-  fontFamily: FontFamilyValues,
   useTex: boolean,
   isMathJaxLoaded: boolean,
 ) => {
-  const fontString = getFontString({ fontSize, fontFamily });
-  const metrics = isMathMode(fontString)
-    ? measureOutputs(
-        markupText(text, useTex, isMathJaxLoaded),
-        fontString,
-        isMathJaxLoaded,
-      ).imageMetrics
-    : measureText(text, fontString);
-  if (isMathMode(fontString)) {
-    return {
-      width: metrics.width,
-      height: metrics.height,
-      baseline: metrics.baseline,
-    };
-  }
-  return metrics;
+  return measureOutputs(
+    markupText(text, useTex, isMathJaxLoaded),
+    getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH }),
+    isMathJaxLoaded,
+  ).imageMetrics;
 };
 
 const getSelectedMathElements = (
@@ -543,7 +514,7 @@ const applyTextElementMathOpts = (
   textOpts?: TextOptsMath,
 ): NonDeleted<ExcalidrawTextElement> => {
   const useTex = textOpts?.useTex !== undefined ? textOpts.useTex : true;
-  return newElementWith(element, { useTex, fontFamily: 2 });
+  return newElementWith(element, { useTex, fontFamily: FONT_FAMILY_MATH });
 };
 
 const cleanTextOptUpdatesMath = (
@@ -551,7 +522,7 @@ const cleanTextOptUpdatesMath = (
 ): ElementUpdate<ExcalidrawTextElementMath> => {
   const newOpts = {};
   for (const key in opts) {
-    const value = key === "fontFamily" ? 2 : (opts as any)[key];
+    const value = key === "fontFamily" ? FONT_FAMILY_MATH : (opts as any)[key];
     (newOpts as any)[key] = value;
   }
   return newOpts;
@@ -576,20 +547,18 @@ const measureTextElementMath = (
   next?: {
     fontSize?: number;
     text?: string;
+    textOpts?: TextOptsMath;
   },
 ) => {
   const isMathJaxLoaded = mathJaxLoaded;
   const fontSize =
     next?.fontSize !== undefined ? next.fontSize : element.fontSize;
   const text = next?.text !== undefined ? next.text : element.text;
-  const useTex = element.useTex !== undefined ? element.useTex : true;
-  return measureMath(
-    text,
-    fontSize,
-    element.fontFamily,
-    useTex,
-    isMathJaxLoaded,
-  );
+  const useTex =
+    next?.textOpts !== undefined && next.textOpts.useTex !== undefined
+      ? next.textOpts.useTex
+      : element.useTex;
+  return measureMath(text, fontSize, useTex, isMathJaxLoaded);
 };
 
 const renderTextElementMath = (
@@ -601,7 +570,7 @@ const renderTextElementMath = (
 
   const text = element.text;
   const fontSize = element.fontSize * window.devicePixelRatio;
-  const fontFamily = element.fontFamily;
+  const fontFamily = FONT_FAMILY_MATH;
   const strokeColor = element.strokeColor;
   const textAlign = element.textAlign;
   const opacity = context.globalAlpha;
@@ -610,7 +579,6 @@ const renderTextElementMath = (
   const key = getCacheKey(
     text,
     fontSize,
-    fontFamily,
     strokeColor,
     textAlign,
     opacity,
@@ -656,7 +624,6 @@ const renderTextElementMath = (
     const svgString = createSvg(
       text,
       fontSize,
-      fontFamily,
       strokeColor,
       textAlign,
       opacity,
@@ -702,7 +669,6 @@ const renderSvgTextElementMath = (
   const svg = createSvg(
     element.text,
     element.fontSize,
-    element.fontFamily,
     element.strokeColor,
     element.textAlign,
     element.opacity / 100,
@@ -776,13 +742,7 @@ const enableActionChangeUseTex = (
 
   let enabled = false;
   eligibleElements.forEach((element) => {
-    // Only operate on selected elements which are text elements in
-    // math mode containing math content.
-    if (
-      isMathMode(getFontString(element)) &&
-      (containsMath(element.text, element.useTex) ||
-        containsMath(element.text, !element.useTex))
-    ) {
+    if (isMathElement(element)) {
       enabled = true;
     }
   });
@@ -809,7 +769,6 @@ const setUseTexForSelectedElements = (
     const metrics = measureMath(
       element.text,
       element.fontSize,
-      element.fontFamily,
       element.useTex,
       isMathJaxLoaded,
     );
@@ -828,31 +787,13 @@ const setUseTexForSelectedElements = (
   };
 };
 
-const getValueForMathElements = function <T>(
-  elements: readonly ExcalidrawElement[],
-  appState: Readonly<AppState>,
-  getAttribute: (element: ExcalidrawElement) => T,
-  defaultValue?: T,
-): T | null {
-  const selectedElements = getSelectedMathElements(elements, appState);
-  return appState.editingElement
-    ? getAttribute(appState.editingElement)
-    : selectedElements.length > 0
-    ? getCommonAttributeOfSelectedElements(
-        selectedElements,
-        appState,
-        getAttribute,
-      )
-    : defaultValue ?? null;
-};
-
 const registerActionsMath = () => {
   const mathActions: Action[] = [];
   const actionChangeUseTex: Action = {
     name: "changeUseTex",
     perform: (elements, appState, useTex) => {
       if (useTex === null) {
-        useTex = getValueForMathElements(
+        useTex = getFormValue(
           elements,
           appState,
           (element) => isMathElement(element) && element.useTex,
@@ -862,10 +803,8 @@ const registerActionsMath = () => {
         }
         useTex = !useTex;
       }
-      const {
-        elements: modElements,
-        appState: modAppState,
-      } = setUseTexForSelectedElements(elements, appState, useTex);
+      const { elements: modElements, appState: modAppState } =
+        setUseTexForSelectedElements(elements, appState, useTex);
 
       return {
         elements: modElements,
@@ -916,7 +855,7 @@ const registerActionsMath = () => {
               text: t("labels.useTexFalse"),
             },
           ]}
-          value={getValueForMathElements(
+          value={getFormValue(
             elements,
             appState,
             (element) => isMathElement(element) && element.useTex,
