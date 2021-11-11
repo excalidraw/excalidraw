@@ -105,7 +105,10 @@ const findPartsForData = (data: any, parts: string[]) => {
   return data;
 };
 
-export const t = (path: string, replacement?: { [key: string]: string }) => {
+export const t = (
+  path: string,
+  replacement?: { [key: string]: string | number },
+) => {
   if (currentLang.code.startsWith(TEST_LANG_CODE)) {
     const name = replacement
       ? `${path}(${JSON.stringify(replacement).slice(1, -1)})`
@@ -123,7 +126,7 @@ export const t = (path: string, replacement?: { [key: string]: string }) => {
 
   if (replacement) {
     for (const key in replacement) {
-      translation = translation.replace(`{{${key}}}`, replacement[key]);
+      translation = translation.replace(`{{${key}}}`, String(replacement[key]));
     }
   }
   return translation;

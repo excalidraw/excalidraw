@@ -392,15 +392,21 @@ const LibraryMenu = ({
 
   const removeFromLibrary = useCallback(async () => {
     const items = await library.loadLibrary();
-    const nextItems = items.filter(
-      (_, index) => !activeIndexes.includes(index),
-    );
-    library.saveLibrary(nextItems).catch((error) => {
-      setLibraryItems(items);
-      setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
-    });
-    setActiveIndexes([]);
-    setLibraryItems(nextItems);
+    if (
+      window.confirm(
+        t("alerts.removeItemsFromsLibrary", { count: activeIndexes.length }),
+      )
+    ) {
+      const nextItems = items.filter(
+        (_, index) => !activeIndexes.includes(index),
+      );
+      library.saveLibrary(nextItems).catch((error) => {
+        setLibraryItems(items);
+        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
+      });
+      setActiveIndexes([]);
+      setLibraryItems(nextItems);
+    }
   }, [library, setAppState, activeIndexes, setActiveIndexes]);
 
   const addToLibrary = useCallback(
