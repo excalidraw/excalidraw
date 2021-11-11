@@ -20,10 +20,6 @@
     "background": "Тло",
     "fill": "Заповнити",
     "strokeWidth": "Товщина контуру",
-    "strokeShape": "Форма обведення",
-    "strokeShape_gel": "Гельручка",
-    "strokeShape_fountain": "Перо",
-    "strokeShape_brush": "Пензель",
     "strokeStyle": "Стиль контуру",
     "strokeStyle_solid": "Суцільний",
     "strokeStyle_dashed": "Пунктир",
@@ -189,6 +185,7 @@
     "shapes": "Фігури"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Натисніть щоб додати кілька точок, перетягніть щоб намалювати одну лінію",
     "freeDraw": "Натисніть і потягніть, відпустіть коли завершите",
     "text": "Порада: можна також додати текст, двічі клацнувши по будь-якому місці інструментом вибору",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Наблизити вибране"
   },
   "clearCanvasDialog": {
-    "title": "Очистити полотно"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать.",
