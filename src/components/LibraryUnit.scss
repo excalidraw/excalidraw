@@ -7,8 +7,8 @@
     display: flex;
     justify-content: center;
     position: relative;
-    width: 60px;
-    height: 60px; // match width
+    width: 63px;
+    height: 63px; // match width
 
     &--hover {
       box-shadow: inset 0px 0px 1px 2px $oc-pink-5;
@@ -109,35 +109,6 @@
 
     100% {
       transform: scale(0.95);
-    }
-  }
-
-  .library-item-actions {
-    display: flex;
-    .ToolIcon__icon {
-      min-width: 2.5rem;
-      width: auto;
-      font-size: 1rem;
-      color: $oc-white;
-    }
-
-    .ToolIcon_type_button {
-      margin-right: 0.5rem;
-      padding: 0 0.5rem;
-    }
-
-    &--remove {
-      background-color: $oc-red-6;
-      &:hover {
-        background-color: $oc-red-8;
-      }
-    }
-
-    &--publish {
-      background-color: $oc-blue-6;
-      &:hover {
-        background-color: $oc-blue-8;
-      }
     }
   }
 }

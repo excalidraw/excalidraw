@@ -152,4 +152,27 @@
       }
     }
   }
+
+  .library-item-actions {
+    display: flex;
+
+    &--remove {
+      svg {
+        color: $oc-red-6;
+      }
+    }
+    &--publish {
+      svg {
+        fill: $oc-blue-6;
+      }
+    }
+  }
+
+  .library-actions {
+    &--remove {
+      svg {
+        color: $oc-red-6;
+      }
+    }
+  }
 }

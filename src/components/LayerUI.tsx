@@ -32,7 +32,7 @@ import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HintViewer } from "./HintViewer";
-import { exportFile, load, trash } from "./icons";
+import { exportFile, load, publishIcon, trash } from "./icons";
 import { Island } from "./Island";
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
@@ -150,7 +150,7 @@ const LibraryMenuItems = ({
 }) => {
   const isMobile = useIsMobile();
 
-  const getLibraryItemActions = () => {
+  const renderLibraryItemActions = () => {
     if (!activeIndexes.length) {
       return null;
     }
@@ -162,6 +162,7 @@ const LibraryMenuItems = ({
           title={t("buttons.removeFromLibrary")}
           aria-label={t("buttons.removeFromLibrary")}
           label={t("buttons.removeFromLibrary")}
+          icon={trash}
           onClick={onRemoveFromLibrary}
           className="library-item-actions--remove"
         />
@@ -172,6 +173,7 @@ const LibraryMenuItems = ({
             title={t("buttons.publishLibrary")}
             aria-label={t("buttons.publishLibrary")}
             label={t("buttons.publishLibrary")}
+            icon={publishIcon}
             className="library-item-actions--publish"
             onClick={onPublish}
           />
@@ -180,10 +182,72 @@ const LibraryMenuItems = ({
     );
   };
 
+  const renderLibraryActions = () => {
+    if (activeIndexes.length) {
+      return null;
+    }
+    return (
+      <div className="library-actions">
+        <ToolButton
+          key="import"
+          type="button"
+          title={t("buttons.load")}
+          aria-label={t("buttons.load")}
+          icon={load}
+          onClick={() => {
+            importLibraryFromJSON(library)
+              .then(() => {
+                // Close and then open to get the libraries updated
+                setAppState({ isLibraryOpen: false });
+                setAppState({ isLibraryOpen: true });
+              })
+              .catch(muteFSAbortError)
+              .catch((error) => {
+                setAppState({ errorMessage: error.message });
+              });
+          }}
+        />
+        {!!libraryItems && (
+          <>
+            <ToolButton
+              key="export"
+              type="button"
+              title={t("buttons.export")}
+              aria-label={t("buttons.export")}
+              icon={exportFile}
+              onClick={() => {
+                saveLibraryAsJSON(library)
+                  .catch(muteFSAbortError)
+                  .catch((error) => {
+                    setAppState({ errorMessage: error.message });
+                  });
+              }}
+            />
+            <ToolButton
+              key="reset"
+              type="button"
+              title={t("buttons.resetLibrary")}
+              aria-label={t("buttons.resetLibrary")}
+              icon={trash}
+              onClick={() => {
+                if (window.confirm(t("alerts.resetLibrary"))) {
+                  library.resetLibrary();
+                  setLibraryItems([]);
+                  focusContainer();
+                }
+              }}
+              className="library-actions--remove"
+            />
+          </>
+        )}
+      </div>
+    );
+  };
+
   const numCells =
     Object.keys(libraryItems ?? []).length +
     (pendingElements.length > 0 ? 1 : 0);
-  const CELLS_PER_ROW = isMobile ? 4 : 7;
+  const CELLS_PER_ROW = isMobile ? 4 : 6;
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
   let addedPendingElements = false;
@@ -195,58 +259,8 @@ const LibraryMenuItems = ({
   );
   rows.push(
     <div className="layer-ui__library-header" key="library-header">
-      <ToolButton
-        key="import"
-        type="button"
-        title={t("buttons.load")}
-        aria-label={t("buttons.load")}
-        icon={load}
-        onClick={() => {
-          importLibraryFromJSON(library)
-            .then(() => {
-              // Close and then open to get the libraries updated
-              setAppState({ isLibraryOpen: false });
-              setAppState({ isLibraryOpen: true });
-            })
-            .catch(muteFSAbortError)
-            .catch((error) => {
-              setAppState({ errorMessage: error.message });
-            });
-        }}
-      />
-      {!!libraryItems && (
-        <>
-          <ToolButton
-            key="export"
-            type="button"
-            title={t("buttons.export")}
-            aria-label={t("buttons.export")}
-            icon={exportFile}
-            onClick={() => {
-              saveLibraryAsJSON(library)
-                .catch(muteFSAbortError)
-                .catch((error) => {
-                  setAppState({ errorMessage: error.message });
-                });
-            }}
-          />
-          <ToolButton
-            key="reset"
-            type="button"
-            title={t("buttons.resetLibrary")}
-            aria-label={t("buttons.resetLibrary")}
-            icon={trash}
-            onClick={() => {
-              if (window.confirm(t("alerts.resetLibrary"))) {
-                library.resetLibrary();
-                setLibraryItems([]);
-                focusContainer();
-              }
-            }}
-          />
-        </>
-      )}
-      {!isMobile && getLibraryItemActions()}
+      {renderLibraryActions()}
+      {renderLibraryItemActions()}
       <a
         href={`https://libraries.excalidraw.com?target=${
           window.name || "_blank"
@@ -257,10 +271,6 @@ const LibraryMenuItems = ({
       </a>
     </div>,
   );
-
-  if (isMobile) {
-    rows.push(getLibraryItemActions());
-  }
 
   for (let row = 0; row < numRows; row++) {
     const y = CELLS_PER_ROW * row;
