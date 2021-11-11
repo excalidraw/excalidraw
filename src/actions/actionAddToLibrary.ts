@@ -3,11 +3,13 @@ import { getSelectedElements } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { deepCopyElement } from "../element/newElement";
 import { LibraryItem } from "../types";
+import { randomId } from "../random";
 
 export const actionAddToLibrary = register({
   name: "addToLibrary",
   perform: (elements, appState, _, app) => {
     const selectedElements: LibraryItem = {
+      id: randomId(),
       status: "unpublished",
       elements: getSelectedElements(
         getNonDeletedElements(elements),

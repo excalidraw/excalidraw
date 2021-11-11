@@ -180,6 +180,7 @@ export declare class GestureEvent extends UIEvent {
 
 /** v2 library item */
 export type LibraryItem = {
+  id: string;
   status: "published" | "unpublished";
   elements: readonly NonDeleted<ExcalidrawElement>[];
 };

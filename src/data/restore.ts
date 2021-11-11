@@ -286,9 +286,18 @@ export const restoreLibraryItems = (
   for (const item of libraryItems) {
     // migrate older libraries
     if (Array.isArray(item)) {
-      restoredItems.push({ status: "unpublished", elements: item });
+      restoredItems.push({
+        status: "unpublished",
+        elements: item,
+        id: randomId(),
+      });
     } else {
-      restoredItems.push(item as LibraryItem);
+      const _item = item as MarkOptional<LibraryItem, "id" | "status">;
+      restoredItems.push({
+        ..._item,
+        id: _item.id || randomId(),
+        status: _item.status || "unpublished",
+      });
     }
   }
   return restoredItems;

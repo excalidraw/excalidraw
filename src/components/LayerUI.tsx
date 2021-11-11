@@ -11,7 +11,11 @@ import { CLASSES } from "../constants";
 import { exportCanvas } from "../data";
 import { importLibraryFromJSON, saveLibraryAsJSON } from "../data/json";
 import { isTextElement, showSelectedShapeActions } from "../element";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { Language, t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
@@ -24,7 +28,7 @@ import {
   LibraryItem,
   LibraryItems,
 } from "../types";
-import { muteFSAbortError } from "../utils";
+import { chunk, muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
@@ -52,6 +56,7 @@ import { LibraryButton } from "./LibraryButton";
 import { isImageFileHandle } from "../data/blob";
 import PublishLibrary from "./PublishLibrary";
 import { Dialog } from "./Dialog";
+import { randomId } from "../random";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -126,7 +131,7 @@ const LibraryMenuItems = ({
   files,
   id,
   appState,
-  activeIndexes,
+  selectedItems,
   onToggle,
   onPublish,
 }: {
@@ -144,20 +149,19 @@ const LibraryMenuItems = ({
   library: Library;
   id: string;
   appState: AppState;
-  activeIndexes: Array<number>;
-  onToggle: (index: number) => void;
+  selectedItems: LibraryItem["id"][];
+  onToggle: (id: LibraryItem["id"]) => void;
   onPublish: () => void;
 }) => {
   const isMobile = useIsMobile();
 
   const renderLibraryItemActions = () => {
-    if (!activeIndexes.length) {
+    if (!selectedItems.length) {
       return null;
     }
     return (
       <div className="library-item-actions">
         <ToolButton
-          key={`remove-${activeIndexes}`}
           type="button"
           title={t("buttons.removeFromLibrary")}
           aria-label={t("buttons.removeFromLibrary")}
@@ -168,7 +172,6 @@ const LibraryMenuItems = ({
         />
         {!isPublished && (
           <ToolButton
-            key={`publish-${activeIndexes}`}
             type="button"
             title={t("buttons.publishLibrary")}
             aria-label={t("buttons.publishLibrary")}
@@ -183,7 +186,7 @@ const LibraryMenuItems = ({
   };
 
   const renderLibraryActions = () => {
-    if (activeIndexes.length) {
+    if (selectedItems.length) {
       return null;
     }
     return (
@@ -244,75 +247,125 @@ const LibraryMenuItems = ({
     );
   };
 
-  const numCells =
-    Object.keys(libraryItems ?? []).length +
-    (pendingElements.length > 0 ? 1 : 0);
   const CELLS_PER_ROW = isMobile ? 4 : 6;
-  const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
-  const rows = [];
-  let addedPendingElements = false;
 
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;
-  const isPublished = activeIndexes.some(
-    (index) => libraryItems[index].status === "published",
-  );
-  rows.push(
-    <div className="layer-ui__library-header" key="library-header">
-      {renderLibraryActions()}
-      {renderLibraryItemActions()}
-      <a
-        href={`https://libraries.excalidraw.com?target=${
-          window.name || "_blank"
-        }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}`}
-        target="_excalidraw_libraries"
-      >
-        {t("labels.libraries")}
-      </a>
-    </div>,
+  const isPublished = selectedItems.some(
+    (id) => libraryItems.find((item) => item.id === id)?.status === "published",
   );
 
-  for (let row = 0; row < numRows; row++) {
-    const y = CELLS_PER_ROW * row;
-    const children = [];
-    for (let x = 0; x < CELLS_PER_ROW; x++) {
-      const shouldAddPendingElements: boolean =
-        pendingElements.length > 0 &&
-        !addedPendingElements &&
-        y + x >= libraryItems.length;
-      addedPendingElements = addedPendingElements || shouldAddPendingElements;
-      const elements = libraryItems[y + x]?.elements;
-      children.push(
-        <Stack.Col key={x}>
-          <LibraryUnit
-            elements={elements}
-            files={files}
-            pendingElements={
-              shouldAddPendingElements ? pendingElements : undefined
+  const createLibraryItemCompo = (params: {
+    item:
+      | LibraryItem
+      | /* pending library item */ {
+          id: null;
+          elements: readonly NonDeleted<ExcalidrawElement>[];
+        }
+      | null;
+    onClick?: () => void;
+    key: string;
+  }) => {
+    return (
+      <Stack.Col key={params.key}>
+        <LibraryUnit
+          elements={params.item?.elements}
+          files={files}
+          isPending={!params.item?.id && !!params.item?.elements}
+          onClick={params.onClick || (() => {})}
+          id={params.item?.id || null}
+          selected={!!params.item?.id && selectedItems.includes(params.item.id)}
+          onToggle={() => {
+            if (params.item?.id) {
+              onToggle(params.item.id);
             }
-            onClick={
-              shouldAddPendingElements
-                ? onAddToLibrary.bind(null, pendingElements)
-                : onInsertShape.bind(null, elements)
-            }
-            index={x + y}
-            activeIndexes={activeIndexes}
-            onToggle={onToggle.bind(null, x + y)}
-          />
-        </Stack.Col>,
-      );
-    }
-    rows.push(
-      <Stack.Row align="center" gap={1} key={row}>
-        {children}
-      </Stack.Row>,
+          }}
+        />
+      </Stack.Col>
     );
-  }
+  };
+
+  const renderLibrarySection = (
+    items: (
+      | LibraryItem
+      | /* pending library item */ {
+          id: null;
+          elements: readonly NonDeleted<ExcalidrawElement>[];
+        }
+    )[],
+  ) => {
+    const _items = items.map((item) => {
+      if (item.id) {
+        return createLibraryItemCompo({
+          item,
+          onClick: () => onInsertShape(item.elements),
+          key: item.id,
+        });
+      }
+      return createLibraryItemCompo({
+        key: "__pending__item__",
+        item,
+        onClick: () => onAddToLibrary(pendingElements),
+      });
+    });
+
+    return chunk(_items, CELLS_PER_ROW).map((rowItems, index, rows) => {
+      if (index === rows.length - 1) {
+        // pad row with empty cells
+        rowItems = rowItems.concat(
+          new Array(CELLS_PER_ROW - rowItems.length)
+            .fill(null)
+            .map((_, index) => {
+              return createLibraryItemCompo({
+                key: `empty_${index}`,
+                item: null,
+              });
+            }),
+        );
+      }
+      return (
+        <Stack.Row align="center" gap={1} key={index}>
+          {rowItems}
+        </Stack.Row>
+      );
+    });
+  };
+
+  const publishedItems = libraryItems.filter(
+    (item) => item.status === "published",
+  );
+  const unpublishedItems = [
+    ...libraryItems.filter((item) => item.status !== "published"),
+    // append pending library item
+    ...(pendingElements.length
+      ? [{ id: null, elements: pendingElements }]
+      : []),
+  ];
 
   return (
     <>
       <Stack.Col align="start" gap={1} className="layer-ui__library-items">
-        {rows}
+        <div className="layer-ui__library-header" key="library-header">
+          {renderLibraryActions()}
+          {renderLibraryItemActions()}
+          <a
+            href={`https://libraries.excalidraw.com?target=${
+              window.name || "_blank"
+            }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}`}
+            target="_excalidraw_libraries"
+          >
+            {t("labels.libraries")}
+          </a>
+        </div>
+        {renderLibrarySection(publishedItems)}
+        {unpublishedItems.length > 0 && (
+          <>
+            <div key="separator" style={{ margin: ".6em 0" }}>
+              Unpublished items
+            </div>
+            {renderLibrarySection(unpublishedItems)}
+          </>
+        )}
       </Stack.Col>
     </>
   );
@@ -360,7 +413,7 @@ const LibraryMenu = ({
   const [loadingState, setIsLoading] = useState<
     "preloading" | "loading" | "ready"
   >("preloading");
-  const [activeIndexes, setActiveIndexes] = useState<Array<number>>([]);
+  const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
   const [showPublishLibraryDialog, setShowPublishLibraryDialog] =
     useState(false);
   const [publishLibSuccess, setPublishLibSuccess] = useState<null | {
@@ -394,20 +447,20 @@ const LibraryMenu = ({
     const items = await library.loadLibrary();
     if (
       window.confirm(
-        t("alerts.removeItemsFromsLibrary", { count: activeIndexes.length }),
+        t("alerts.removeItemsFromsLibrary", { count: selectedItems.length }),
       )
     ) {
       const nextItems = items.filter(
-        (_, index) => !activeIndexes.includes(index),
+        (item) => !selectedItems.includes(item.id),
       );
       library.saveLibrary(nextItems).catch((error) => {
         setLibraryItems(items);
         setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
       });
-      setActiveIndexes([]);
+      setSelectedItems([]);
       setLibraryItems(nextItems);
     }
-  }, [library, setAppState, activeIndexes, setActiveIndexes]);
+  }, [library, setAppState, selectedItems, setSelectedItems]);
 
   const addToLibrary = useCallback(
     async (elements: LibraryItem["elements"]) => {
@@ -419,7 +472,7 @@ const LibraryMenu = ({
       const items = await library.loadLibrary();
       const nextItems: LibraryItems = [
         ...items,
-        { status: "unpublished", elements },
+        { status: "unpublished", elements, id: randomId() },
       ];
       onAddToLibrary();
       library.saveLibrary(nextItems).catch((error) => {
@@ -465,7 +518,7 @@ const LibraryMenu = ({
   }, [setPublishLibSuccess, publishLibSuccess]);
 
   const getSelectedItems = () =>
-    libraryItems.filter((_, index) => activeIndexes.includes(index));
+    libraryItems.filter((item) => selectedItems.includes(item.id));
 
   const onPublishLibSuccess = useCallback(
     (data) => {
@@ -473,8 +526,8 @@ const LibraryMenu = ({
       setPublishLibSuccess(data);
       const nextLibItems = libraryItems.slice();
 
-      nextLibItems.forEach((libItem, index) => {
-        if (activeIndexes.includes(index)) {
+      nextLibItems.forEach((libItem) => {
+        if (selectedItems.includes(libItem.id)) {
           libItem.status = "published";
         }
       });
@@ -486,7 +539,7 @@ const LibraryMenu = ({
       setPublishLibSuccess,
       libraryItems,
       setLibraryItems,
-      activeIndexes,
+      selectedItems,
       library,
     ],
   );
@@ -524,15 +577,12 @@ const LibraryMenu = ({
           files={files}
           id={id}
           appState={appState}
-          activeIndexes={activeIndexes}
-          onToggle={(index) => {
-            const pos = activeIndexes.indexOf(index);
-            if (pos === -1) {
-              setActiveIndexes([...activeIndexes, index]);
+          selectedItems={selectedItems}
+          onToggle={(id) => {
+            if (!selectedItems.includes(id)) {
+              setSelectedItems([...selectedItems, id]);
             } else {
-              const activeIndexesCopy = activeIndexes.slice();
-              activeIndexesCopy.splice(pos, 1);
-              setActiveIndexes(activeIndexesCopy);
+              setSelectedItems(selectedItems.filter((_id) => _id !== id));
             }
           }}
           onPublish={() => setShowPublishLibraryDialog(true)}

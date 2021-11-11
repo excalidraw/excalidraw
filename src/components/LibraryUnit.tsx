@@ -19,21 +19,21 @@ const PLUS_ICON = (
 );
 
 export const LibraryUnit = ({
+  id,
   elements,
   files,
-  pendingElements,
+  isPending,
   onClick,
-  index,
-  activeIndexes,
+  selected,
   onToggle,
 }: {
+  id: LibraryItem["id"] | /** for pending item */ null;
   elements?: LibraryItem["elements"];
   files: BinaryFiles;
-  pendingElements?: LibraryItem["elements"];
+  isPending?: boolean;
   onClick: () => void;
-  index: number;
-  activeIndexes: Array<number>;
-  onToggle: (index: number) => void;
+  selected: boolean;
+  onToggle: (id: string) => void;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -43,7 +43,7 @@ export const LibraryUnit = ({
     }
 
     (async () => {
-      const elementsToRender = elements || pendingElements;
+      const elementsToRender = elements;
       if (!elementsToRender) {
         return;
       }
@@ -61,32 +61,31 @@ export const LibraryUnit = ({
     return () => {
       node.innerHTML = "";
     };
-  }, [elements, pendingElements, files]);
+  }, [elements, files]);
 
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useIsMobile();
-  const checked = activeIndexes.includes(index);
-  const adder = (isHovered || isMobile) && pendingElements && (
+  const adder = (isHovered || isMobile) && isPending && (
     <div className="library-unit__adder">{PLUS_ICON}</div>
   );
 
   return (
     <div
       className={clsx("library-unit", {
-        "library-unit__active": elements || pendingElements,
+        "library-unit__active": elements,
         "library-unit--hover": elements && isHovered,
-        "library-unit--selected": checked,
+        "library-unit--selected": selected,
       })}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
         className={clsx("library-unit__dragger", {
-          "library-unit__pulse": !!pendingElements,
+          "library-unit__pulse": !!isPending,
         })}
         ref={ref}
         draggable={!!elements}
-        onClick={!!elements || !!pendingElements ? onClick : undefined}
+        onClick={!!elements || !!isPending ? onClick : undefined}
         onDragStart={(event) => {
           setIsHovered(false);
           event.dataTransfer.setData(
@@ -96,17 +95,11 @@ export const LibraryUnit = ({
         }}
       />
       {adder}
-      {elements && (isHovered || isMobile || checked) && (
+      {id && elements && (isHovered || isMobile || selected) && (
         <>
           <CheckboxItem
-            checked={checked}
-            onChange={() => {
-              if (checked) {
-                onToggle(index);
-              } else {
-                onToggle(index);
-              }
-            }}
+            checked={selected}
+            onChange={() => onToggle(id)}
             className="library-unit__checkbox"
           />
         </>
