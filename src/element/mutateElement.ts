@@ -23,7 +23,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 ): TElement => {
   if (isTextElement(element)) {
     updates = cleanTextOptUpdates(
-      element,
+      element.subtype,
       updates as ElementUpdate<ExcalidrawTextElement>,
     ) as ElementUpdate<TElement>;
   }
@@ -115,7 +115,7 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
 ): TElement => {
   if (isTextElement(element)) {
     updates = cleanTextOptUpdates(
-      element,
+      element.subtype,
       updates as ElementUpdate<ExcalidrawTextElement>,
     ) as ElementUpdate<TElement>;
   }
