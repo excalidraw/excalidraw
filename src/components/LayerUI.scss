@@ -157,21 +157,42 @@
     display: flex;
 
     &--remove {
+      background-color: $oc-red-7;
+      &:hover {
+        background-color: $oc-red-8;
+      }
+      &:active {
+        background-color: $oc-red-9;
+      }
       svg {
-        color: $oc-red-6;
+        color: $oc-white;
       }
     }
     &--publish {
+      background-color: $oc-blue-6;
+      &:hover {
+        background-color: $oc-blue-7;
+      }
+      &:active {
+        background-color: $oc-blue-9;
+      }
       svg {
-        fill: $oc-blue-6;
+        color: $oc-white;
       }
     }
   }
 
   .library-actions {
     &--remove {
+      background-color: $oc-red-7;
+      &:hover {
+        background-color: $oc-red-8;
+      }
+      &:active {
+        background-color: $oc-red-9;
+      }
       svg {
-        color: $oc-red-6;
+        color: $oc-white;
       }
     }
   }
