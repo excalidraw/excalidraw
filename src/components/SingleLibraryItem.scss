@@ -1,0 +1,13 @@
+.excalidraw {
+  .single-library-item {
+    width: 63px;
+    height: 63px;
+    border: 1px solid var(--button-gray-2);
+    margin: 0.3rem;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}

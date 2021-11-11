@@ -16,6 +16,7 @@ import { ExcalidrawElement } from "../element/types";
 import { newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import { getCommonBoundingBox } from "../element/bounds";
+import LibraryItem from "./SingleLibraryItem";
 
 const PublishLibrary = ({
   onClose,
@@ -148,12 +149,27 @@ const PublishLibrary = ({
         onError(err);
       });
   };
+
+  const renderLibraryItems = () => {
+    const items: any = [];
+    libraryItems.forEach((libItem, index) => {
+      items.push(
+        <LibraryItem
+          key={index}
+          elements={libItem.elements}
+          appState={appState}
+        />,
+      );
+    });
+    return <div className="selected-library-items">{items}</div>;
+  };
   return (
     <Dialog
       onCloseRequest={onClose}
       title="Publish Library"
       className="publish-library"
     >
+      {renderLibraryItems()}
       <form onSubmit={onSubmit}>
         <div className="publish-library__fields">
           <label>

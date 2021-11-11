@@ -61,5 +61,10 @@
         margin: 0.2rem;
       }
     }
+    .selected-library-items {
+      display: flex;
+      padding: 0 0.8rem;
+      flex-wrap: wrap;
+    }
   }
 }
