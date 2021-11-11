@@ -55,14 +55,14 @@
 
   .library-unit__checkbox {
     position: absolute;
-    left: 2rem;
-    bottom: 2rem;
+    left: 2.3rem;
+    bottom: 2.3rem;
 
     .Checkbox-box {
-      width: 12px;
-      height: 12px;
+      width: 13px;
+      height: 13px;
       border-radius: 2px;
-      margin: 0.5em;
+      margin: 0.5em 0.5em 0.2em 0.2em;
       background-color: $oc-blue-1;
     }
 
