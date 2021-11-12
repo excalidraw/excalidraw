@@ -298,7 +298,8 @@ const LibraryMenuItems = ({
             {t("labels.libraries")}
           </a>
         </div>
-        {renderLibrarySection(publishedItems)}
+        {(publishedItems.length > 0 || !unpublishedItems.length) &&
+          renderLibrarySection(publishedItems)}
         {unpublishedItems.length > 0 && (
           <>
             <div
