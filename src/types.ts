@@ -239,6 +239,7 @@ export interface ExcalidrawProps {
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
+  onDoubleClick?: (elements: readonly NonDeletedExcalidrawElement[]) => boolean;
 }
 
 export type SceneData = {

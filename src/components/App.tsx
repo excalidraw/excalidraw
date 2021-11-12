@@ -2118,6 +2118,13 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
 
+    if (this.props.onDoubleClick) {
+      const shouldContinue = this.props.onDoubleClick(selectedElements);
+      if (!shouldContinue) {
+        return;
+      }
+    }
+
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
         !this.state.editingLinearElement ||
