@@ -4052,6 +4052,7 @@ class App extends React.Component<AppProps, AppState> {
               dataURL,
               created: Date.now(),
               fileMimeType: tableFile.type,
+              extraFile: tableFile,
             },
           };
           const cachedImageData = this.imageCache.get(fileId);

@@ -60,8 +60,9 @@ export type BinaryFileData = {
   created: number;
   // For when the fileType is different than the mimetype
   // Currently applicable to tables, where mimeType is the placeholder for the canvas
-  // FileID refers to the real file which has a fileType
+  // FileID refers to the real file which has a fileType and an extraFile
   fileMimeType?: string;
+  extraFile?: File;
 };
 
 export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
