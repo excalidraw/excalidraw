@@ -295,8 +295,11 @@ const LibraryMenuItems = ({
         {renderLibrarySection(publishedItems)}
         {unpublishedItems.length > 0 && (
           <>
-            <div key="separator" style={{ margin: ".6em 0" }}>
-              Unpublished items
+            <div
+              key="separator"
+              style={{ margin: ".6em .2em", fontWeight: 500 }}
+            >
+              {t("labels.unpublishedItems")}
             </div>
             {renderLibrarySection(unpublishedItems)}
           </>
