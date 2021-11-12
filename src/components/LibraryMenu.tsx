@@ -244,7 +244,13 @@ const LibraryMenuItems = ({
       });
     });
 
-    return chunk(_items, CELLS_PER_ROW).map((rowItems, index, rows) => {
+    // ensure we render all empty cells if no items are present
+    let rows = chunk(_items, CELLS_PER_ROW);
+    if (!rows.length) {
+      rows = [[]];
+    }
+
+    return rows.map((rowItems, index, rows) => {
       if (index === rows.length - 1) {
         // pad row with empty cells
         rowItems = rowItems.concat(
