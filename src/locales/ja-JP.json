@@ -164,7 +164,7 @@
     "imageInsertError": "画像を挿入できませんでした。後でもう一度お試しください...",
     "fileTooBig": "ファイルが大きすぎます。許可される最大サイズは {{maxSize}} です。",
     "svgImageInsertError": "SVGイメージを挿入できませんでした。SVGマークアップは無効に見えます。",
-    "invalidSVGString": ""
+    "invalidSVGString": "無効なSVGです。"
   },
   "toolBar": {
     "selection": "選択",
@@ -267,7 +267,7 @@
     "zoomToSelection": "選択要素にズーム"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "キャンバスを消去"
   },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。",
