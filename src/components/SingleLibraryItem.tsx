@@ -2,10 +2,8 @@ import oc from "open-color";
 import { useEffect, useRef, useState } from "react";
 import { exportToSvg } from "../packages/utils";
 import { AppState, LibraryItem } from "../types";
-import { close, editIcon } from "./icons";
 
 import "./SingleLibraryItem.scss";
-import { ToolButton } from "./ToolButton";
 
 const SingleLibraryItem = ({
   libItem,
@@ -18,11 +16,13 @@ const SingleLibraryItem = ({
   index: number;
   onChange: (val: string, index: number) => void;
 }) => {
-  const ref = useRef<HTMLDivElement | null>(null);
+  const svgRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
   const [editLibName, setEditLibName] = useState(false);
 
   useEffect(() => {
-    const node = ref.current;
+    const node = svgRef.current;
     if (!node) {
       return;
     }
@@ -38,10 +38,17 @@ const SingleLibraryItem = ({
       });
       node.innerHTML = svg.outerHTML;
     })();
-  });
+  }, [libItem.elements, appState]);
+
+  useEffect(() => {
+    if (!inputRef.current || !editLibName) {
+      return;
+    }
+    inputRef.current.focus();
+  }, [editLibName]);
   return (
     <div className="single-library-item">
-      <div ref={ref} className="single-library-item__svg" />
+      <div ref={svgRef} className="single-library-item__svg" />
       <div
         style={{
           display: "flex",
@@ -53,41 +60,30 @@ const SingleLibraryItem = ({
         }}
       >
         {editLibName ? (
-          <>
-            <input
-              style={{ width: "70%", padding: "0.2rem" }}
-              value={libItem.name}
-              placeholder="Item name"
-              onChange={(event) => {
-                onChange(event.target.value, index);
-              }}
-            />
-            <ToolButton
-              aria-label="edit"
-              type="icon"
-              icon={close}
-              onClick={() => setEditLibName(false)}
-            />
-          </>
+          <input
+            ref={inputRef}
+            style={{ width: "70%", padding: "0.2rem" }}
+            value={libItem.name}
+            placeholder="Item name"
+            onChange={(event) => {
+              onChange(event.target.value, index);
+            }}
+            onBlur={() => setEditLibName(false)}
+          />
         ) : (
-          <>
-            <span
-              style={{
-                minWidth: "70%",
-                maxWidth: "70%",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {libItem.name || "Unnamed Item"}
-            </span>
-            <ToolButton
-              aria-label="edit"
-              type="icon"
-              icon={editIcon}
-              onClick={() => setEditLibName(true)}
-            />
-          </>
+          <span
+            style={{
+              minWidth: "70%",
+              maxWidth: "70%",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+            onClick={() => {
+              setEditLibName(true);
+            }}
+          >
+            {libItem.name || "Unnamed Item"}
+          </span>
         )}
       </div>
     </div>
