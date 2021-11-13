@@ -290,7 +290,7 @@ const LibraryMenuItems = ({
           {renderLibraryActions()}
           {renderLibraryItemActions()}
           <a
-            href={`https://libraries.excalidraw.com?target=${
+            href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
               window.name || "_blank"
             }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}`}
             target="_excalidraw_libraries"
