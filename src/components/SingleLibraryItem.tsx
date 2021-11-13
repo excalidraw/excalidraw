@@ -55,7 +55,7 @@ const SingleLibraryItem = ({
         {editLibName ? (
           <>
             <input
-              style={{ width: "60%", padding: "0.2rem" }}
+              style={{ width: "70%", padding: "0.2rem" }}
               value={libItem.name}
               placeholder="Item name"
               onChange={(event) => {
@@ -73,8 +73,8 @@ const SingleLibraryItem = ({
           <>
             <span
               style={{
-                minWidth: "63%",
-                maxWidth: "63%",
+                minWidth: "70%",
+                maxWidth: "70%",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
