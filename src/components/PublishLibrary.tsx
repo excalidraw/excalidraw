@@ -16,7 +16,7 @@ import { ExcalidrawElement } from "../element/types";
 import { newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import { getCommonBoundingBox } from "../element/bounds";
-import LibraryItem from "./SingleLibraryItem";
+import SingleLibraryItem from "./SingleLibraryItem";
 
 const PublishLibrary = ({
   onClose,
@@ -40,6 +40,10 @@ const PublishLibrary = ({
     website: "",
   });
 
+  const [clonedLibItems, setClonedLibItems] = useState<LibraryItems>(
+    libraryItems.slice(),
+  );
+
   const onInputChange = (event: any) => {
     setLibraryData({
       ...libraryData,
@@ -51,7 +55,7 @@ const PublishLibrary = ({
     event.preventDefault();
     const elements: ExcalidrawElement[] = [];
     const prevBoundingBox = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
-    libraryItems.forEach((libItem) => {
+    clonedLibItems.forEach((libItem) => {
       const boundingBox = getCommonBoundingBox(libItem.elements);
       const width = boundingBox.maxX - boundingBox.minX + 30;
       const height = boundingBox.maxY - boundingBox.minY + 30;
@@ -103,7 +107,7 @@ const PublishLibrary = ({
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
       version: 1,
       source: EXPORT_SOURCE,
-      libraryItems,
+      libraryItems: clonedLibItems,
     };
     const content = JSON.stringify(libContent, null, 2);
     const lib = new Blob([content], { type: "application/json" });
@@ -152,13 +156,21 @@ const PublishLibrary = ({
 
   const renderLibraryItems = () => {
     const items: any = [];
-    libraryItems.forEach((libItem, index) => {
+    clonedLibItems.forEach((libItem, index) => {
       items.push(
-        <LibraryItem
-          key={index}
-          elements={libItem.elements}
-          appState={appState}
-        />,
+        <div className="single-library-item-wrapper">
+          <SingleLibraryItem
+            key={index}
+            libItem={libItem}
+            appState={appState}
+            index={index}
+            onChange={(val, index) => {
+              const items = clonedLibItems.slice();
+              items[index].name = val;
+              setClonedLibItems(items);
+            }}
+          />
+        </div>,
       );
     });
     return <div className="selected-library-items">{items}</div>;

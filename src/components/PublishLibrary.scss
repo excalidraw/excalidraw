@@ -65,6 +65,10 @@
       display: flex;
       padding: 0 0.8rem;
       flex-wrap: wrap;
+
+      .single-library-item-wrapper {
+        width: 9rem;
+      }
     }
   }
 }
