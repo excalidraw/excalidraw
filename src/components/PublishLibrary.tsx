@@ -140,7 +140,18 @@ const PublishLibrary = ({
               });
             });
           } else {
-            throw new Error(response.statusText || "something went wrong");
+            return response
+              .json()
+              .catch(() => {
+                throw new Error(response.statusText || "something went wrong");
+              })
+              .then((error) => {
+                throw new Error(
+                  error.message ||
+                    response.statusText ||
+                    "something went wrong",
+                );
+              });
           }
         },
         (err) => {
