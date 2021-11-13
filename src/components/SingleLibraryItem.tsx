@@ -10,10 +10,12 @@ const SingleLibraryItem = ({
   appState,
   index,
   onChange,
+  error,
 }: {
   libItem: LibraryItem;
   appState: AppState;
   index: number;
+  error: string | null;
   onChange: (val: string, index: number) => void;
 }) => {
   const svgRef = useRef<HTMLDivElement | null>(null);
@@ -62,7 +64,7 @@ const SingleLibraryItem = ({
         {editLibName ? (
           <input
             ref={inputRef}
-            style={{ width: "70%", padding: "0.2rem" }}
+            style={{ width: "80%", padding: "0.2rem" }}
             value={libItem.name}
             placeholder="Item name"
             onChange={(event) => {
@@ -71,19 +73,26 @@ const SingleLibraryItem = ({
             onBlur={() => setEditLibName(false)}
           />
         ) : (
-          <span
-            style={{
-              minWidth: "70%",
-              maxWidth: "70%",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-            onClick={() => {
-              setEditLibName(true);
-            }}
-          >
-            {libItem.name || "Unnamed Item"}
-          </span>
+          <div>
+            <div>
+              <span
+                style={{
+                  width: "80%",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+                onClick={() => {
+                  setEditLibName(true);
+                }}
+              >
+                {libItem.name || `Unnamed Item ${index}`}
+              </span>
+              <span aria-hidden="true" className="required">
+                *
+              </span>
+            </div>
+            <span className="error">{error}</span>
+          </div>
         )}
       </div>
     </div>

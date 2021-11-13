@@ -44,6 +44,8 @@ const PublishLibrary = ({
     libraryItems.slice(),
   );
 
+  const [error, setError] = useState<string | null>(null);
+
   const onInputChange = (event: any) => {
     setLibraryData({
       ...libraryData,
@@ -53,6 +55,11 @@ const PublishLibrary = ({
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const itemsWithoutName = clonedLibItems.some((libItem) => !libItem.name);
+    if (itemsWithoutName) {
+      setError("Item name required");
+      return;
+    }
     const elements: ExcalidrawElement[] = [];
     const prevBoundingBox = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
     clonedLibItems.forEach((libItem) => {
@@ -177,6 +184,7 @@ const PublishLibrary = ({
               items[index].name = val;
               setClonedLibItems(items);
             }}
+            error={error}
           />
         </div>,
       );
@@ -190,8 +198,9 @@ const PublishLibrary = ({
       className="publish-library"
       closeOnClickOutside={false}
     >
-      {renderLibraryItems()}
       <form onSubmit={onSubmit}>
+        {renderLibraryItems()}
+
         <div className="publish-library__fields">
           <label>
             <div>

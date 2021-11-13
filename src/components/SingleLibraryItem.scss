@@ -23,5 +23,17 @@
     .ToolIcon_type_button:hover {
       background-color: white;
     }
+    .required,
+    .error {
+      color: $oc-red-8;
+      font-weight: bold;
+      font-size: 1rem;
+      margin: 0.2rem;
+    }
+    .error {
+      font-weight: 500;
+      margin: 0;
+      white-space: nowrap;
+    }
   }
 }
