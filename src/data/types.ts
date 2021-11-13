@@ -24,7 +24,7 @@ export interface ImportedDataState {
 
 export interface ExportedLibraryData {
   type: string;
-  version: number;
+  version: 1 | 2;
   source: string;
   libraryItems: LibraryItems;
   library?: LibraryItems | LibraryItems_v1;

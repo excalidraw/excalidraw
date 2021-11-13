@@ -105,7 +105,7 @@ const PublishLibrary = ({
 
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
-      version: 1,
+      version: 2,
       source: EXPORT_SOURCE,
       libraryItems: clonedLibItems,
     };
