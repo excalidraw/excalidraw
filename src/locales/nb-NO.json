@@ -20,10 +20,6 @@
     "background": "Bakgrunn",
     "fill": "Fyll",
     "strokeWidth": "Strektykkelse",
-    "strokeShape": "Strekstil",
-    "strokeShape_gel": "Gelepenn",
-    "strokeShape_fountain": "Fyllepenn",
-    "strokeShape_brush": "Pensel",
     "strokeStyle": "Strekstil",
     "strokeStyle_solid": "Heltrukket",
     "strokeStyle_dashed": "Stiplet",
@@ -168,7 +164,7 @@
     "imageInsertError": "Kunne ikke sette inn bildet. Prøv igjen senere...",
     "fileTooBig": "Filen er for stor. Maksimal tillatt størrelse er {{maxSize}}.",
     "svgImageInsertError": "Kunne ikke sette inn SVG-bilde. SVG-koden ser ugyldig ut.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": "Ugyldig SVG."
   },
   "toolBar": {
     "selection": "Velg",
@@ -189,6 +185,7 @@
     "shapes": "Former"
   },
   "hints": {
+    "canvasPanning": "For å flytte lerretet, hold musehjulet eller mellomromstasten mens du drar",
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
     "freeDraw": "Klikk og dra, slipp når du er ferdig",
     "text": "Tips: du kan også legge til tekst ved å dobbeltklikke hvor som helst med utvalgsverktøyet",

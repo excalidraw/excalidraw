@@ -323,12 +323,13 @@ export const generateRoughOptions = (
     roughness: element.roughness,
     stroke: element.strokeColor,
     preserveVertices: continuousPath,
+    // disable decimals to fix Skia rendering issues #4046
+    fixedDecimalPlaceDigits: 0,
   };
 
   switch (element.type) {
     case "rectangle":
     case "diamond":
-    case "image":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
       options.fill =
@@ -398,16 +399,8 @@ const generateElementShape = (
         }
         break;
       case "diamond": {
-        const [
-          topX,
-          topY,
-          rightX,
-          rightY,
-          bottomX,
-          bottomY,
-          leftX,
-          leftY,
-        ] = getDiamondPoints(element);
+        const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+          getDiamondPoints(element);
         shape = generator.polygon(
           [
             [topX, topY],

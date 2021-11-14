@@ -20,10 +20,6 @@
     "background": "Color del fons",
     "fill": "Estil del fons",
     "strokeWidth": "Amplada del traç",
-    "strokeShape": "Estil del traç",
-    "strokeShape_gel": "Bolígraf de gel",
-    "strokeShape_fountain": "Bolígraf de font",
-    "strokeShape_brush": "Bolígraf de raspall",
     "strokeStyle": "Estil del traç",
     "strokeStyle_solid": "Sòlid",
     "strokeStyle_dashed": "Guions",
@@ -189,6 +185,7 @@
     "shapes": "Formes"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Feu clic per a dibuixar múltiples punts; arrossegueu per a una sola línia",
     "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
     "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",

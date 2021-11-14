@@ -24,7 +24,6 @@ import {
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
 import {
-  decryptAESGEM,
   generateCollaborationLinkData,
   getCollaborationLink,
   SocketUpdateDataSource,
@@ -65,6 +64,7 @@ import {
   ReconciledElements,
   reconcileElements as _reconcileElements,
 } from "./reconciliation";
+import { decryptData } from "../../data/encryption";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -230,7 +230,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   ) => {
     try {
       await saveToFirebase(this.portal, syncableElements);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
     }
   };
@@ -301,6 +301,27 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     return await this.fileManager.getFiles(unfetchedImages);
   };
 
+  private decryptPayload = async (
+    iv: Uint8Array,
+    encryptedData: ArrayBuffer,
+    decryptionKey: string,
+  ) => {
+    try {
+      const decrypted = await decryptData(iv, encryptedData, decryptionKey);
+
+      const decodedData = new TextDecoder("utf-8").decode(
+        new Uint8Array(decrypted),
+      );
+      return JSON.parse(decodedData);
+    } catch (error) {
+      window.alert(t("alerts.decryptFailed"));
+      console.error(error);
+      return {
+        type: "INVALID_RESPONSE",
+      };
+    }
+  };
+
   private initializeSocketClient = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
@@ -347,7 +368,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             scrollToContent: true,
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         // log the error and move on. other peers will sync us the scene.
         console.error(error);
       }
@@ -388,10 +409,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         if (!this.portal.roomKey) {
           return;
         }
-        const decryptedData = await decryptAESGEM(
+
+        const decryptedData = await this.decryptPayload(
+          iv,
           encryptedData,
           this.portal.roomKey,
-          iv,
         );
 
         switch (decryptedData.type) {
@@ -419,12 +441,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             );
             break;
           case "MOUSE_LOCATION": {
-            const {
-              pointer,
-              button,
-              username,
-              selectedElementIds,
-            } = decryptedData.payload;
+            const { pointer, button, username, selectedElementIds } =
+              decryptedData.payload;
             const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
               decryptedData.payload.socketId ||
               // @ts-ignore legacy, see #2094 (#2097)
@@ -503,12 +521,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   private loadImageFiles = throttle(async () => {
-    const {
-      loadedFiles,
-      erroredFiles,
-    } = await this.fetchImageFilesFromFirebase({
-      elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
-    });
+    const { loadedFiles, erroredFiles } =
+      await this.fetchImageFilesFromFirebase({
+        elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+      });
 
     this.excalidrawAPI.addFiles(loadedFiles);
 
@@ -591,9 +607,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   setCollaborators(sockets: string[]) {
     this.setState((state) => {
-      const collaborators: InstanceType<
-        typeof CollabWrapper
-      >["collaborators"] = new Map();
+      const collaborators: InstanceType<typeof CollabWrapper>["collaborators"] =
+        new Map();
       for (const socketId of sockets) {
         if (this.collaborators.has(socketId)) {
           collaborators.set(socketId, this.collaborators.get(socketId)!);
@@ -695,7 +710,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.contextValue.initializeSocketClient = this.initializeSocketClient;
     this.contextValue.onCollabButtonClick = this.onCollabButtonClick;
     this.contextValue.broadcastElements = this.broadcastElements;
-    this.contextValue.fetchImageFilesFromFirebase = this.fetchImageFilesFromFirebase;
+    this.contextValue.fetchImageFilesFromFirebase =
+      this.fetchImageFilesFromFirebase;
     return this.contextValue;
   };
 

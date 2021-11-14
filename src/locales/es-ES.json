@@ -20,10 +20,6 @@
     "background": "Fondo",
     "fill": "Rellenar",
     "strokeWidth": "Grosor del trazo",
-    "strokeShape": "Estilo del trazo",
-    "strokeShape_gel": "Bolígrafo de gel",
-    "strokeShape_fountain": "Pluma estilográfica",
-    "strokeShape_brush": "Rotulador",
     "strokeStyle": "Estilo del trazo",
     "strokeStyle_solid": "Sólido",
     "strokeStyle_dashed": "Discontinua",
@@ -168,7 +164,7 @@
     "imageInsertError": "No se pudo insertar la imagen. Inténtelo de nuevo más tarde...",
     "fileTooBig": "Archivo demasiado grande. El tamaño máximo permitido es {{maxSize}}.",
     "svgImageInsertError": "No se pudo insertar la imagen SVG. El código SVG parece inválido.",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG no válido."
   },
   "toolBar": {
     "selection": "Selección",
@@ -189,6 +185,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "canvasPanning": "Para mover lienzo, mantenga la rueda del ratón o la barra espaciadora mientras arrastra",
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Zoom a la selección"
   },
   "clearCanvasDialog": {
-    "title": "Borrar Lienzo"
+    "title": "Borrar lienzo"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",
