@@ -2435,10 +2435,10 @@
   dependencies:
     source-map "^0.6.1"
 
-"@types/web@0.0.46":
-  version "0.0.46"
-  resolved "https://registry.yarnpkg.com/@types/web/-/web-0.0.46.tgz#7f447e5eb3c511dbdc6f69e435f7ec4311d18b48"
-  integrity sha512-ki0OmbjSdAEfvmy5AYWFpMkRsPW+6h4ibQ4tzk8SJsS9dkrrD3B/U1eVvdNNWxAzntjq6o2sjSia6UBCoPH+Yg==
+"@types/web@0.0.47":
+  version "0.0.47"
+  resolved "https://registry.yarnpkg.com/@types/web/-/web-0.0.47.tgz#a48314590af421939f59fd2ec975a77b8d54dfbd"
+  integrity sha512-kNX2VcGuQt4Xen78iIbUXyj+WxNPlP7hGCno/sJSI4p2zo7u6jAtryAKwNNqOoOaWfFZas1lbKJKOxUarsUzog==
 
 "@types/webpack-sources@*":
   version "2.1.0"

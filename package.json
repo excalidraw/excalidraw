@@ -61,7 +61,7 @@
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.2",
     "@types/resize-observer-browser": "0.1.6",
-    "@types/web": "0.0.46",
+    "@types/web": "0.0.47",
     "chai": "4.3.4",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.3.1",
