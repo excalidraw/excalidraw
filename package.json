@@ -51,7 +51,7 @@
     "react-scripts": "4.0.3",
     "roughjs": "4.5.0",
     "sass": "1.43.4",
-    "socket.io-client": "2.3.1",
+    "socket.io-client": "4.3.2",
     "typescript": "4.4.4"
   },
   "devDependencies": {
