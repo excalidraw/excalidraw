@@ -245,7 +245,17 @@ const PublishLibrary = ({
     >
       <form onSubmit={onSubmit}>
         {renderLibraryItems()}
-
+        <span className="publish-library-note">
+          {t("publishDialog.noteHeader.pre")}
+          <a
+            href="https://github.com/excalidraw/excalidraw-libraries#guidelines"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t("publishDialog.noteHeader.guidelines")}
+          </a>
+          {t("publishDialog.noteHeader.post")}
+        </span>
         <div className="publish-library__fields">
           <label>
             <div>
@@ -326,11 +336,15 @@ const PublishLibrary = ({
             />
           </label>
           <span className="publish-library-note">
-            {t("publishDialog.note.pre")}
-            <a href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE">
-              {t("publishDialog.note.mit")}
+            {t("publishDialog.noteFooter.pre")}
+            <a
+              href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("publishDialog.noteFooter.mit")}
             </a>
-            {t("publishDialog.note.post")}
+            {t("publishDialog.noteFooter.post")}
           </span>
         </div>
         <div className="publish-library__buttons">

@@ -293,7 +293,12 @@
       "required": "Required",
       "letter&Spaces": "Only letters and spaces allowed"
     },
-    "note": {
+    "noteHeader": {
+      "pre": "It is strongly recommended to read the ",
+      "guidelines": "guidelines",
+      "post": " before submitting the libraries for review"
+    },
+    "noteFooter": {
       "pre": "Note: By publish libraries, you are automatically complying with our ",
       "mit": "MIT License, ",
       "post": "which in short means anyone can use them without restrictions."
