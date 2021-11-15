@@ -48,7 +48,6 @@ const SingleLibraryItem = ({
           width: "100%",
           fontSize: "14px",
           fontWeight: 500,
-          color: oc.gray[6],
           flexDirection: "column",
         }}
       >
@@ -60,7 +59,7 @@ const SingleLibraryItem = ({
           }}
         >
           <div style={{ padding: "0.5em 0" }}>
-            <span>Library Item Name</span>
+            <span style={{ fontWeight: "bold" }}>Library Item Name</span>
             <span aria-hidden="true" className="required">
               *
             </span>
