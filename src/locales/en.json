@@ -292,8 +292,14 @@
     "errors": {
       "required": "Required",
       "letter&Spaces": "Only letters and spaces allowed"
+    },
+    "note": {
+      "pre": "Note: By publish libraries, you are automatically complying with our ",
+      "mit": "MIT License, ",
+      "post": "which in short means anyone can use them without restrictions."
     }
   },
+
   "publishSuccessDialog": {
     "title": "Library Publish Success",
     "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",

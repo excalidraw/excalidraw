@@ -325,6 +325,13 @@ const PublishLibrary = ({
               placeholder={t("publishDialog.placeholder.website")}
             />
           </label>
+          <span className="publish-library-note">
+            {t("publishDialog.note.pre")}
+            <a href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE">
+              {t("publishDialog.note.mit")}
+            </a>
+            {t("publishDialog.note.post")}
+          </span>
         </div>
         <div className="publish-library__buttons">
           <ToolButton

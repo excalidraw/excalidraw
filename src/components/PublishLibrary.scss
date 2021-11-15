@@ -73,5 +73,13 @@
         width: 9rem;
       }
     }
+
+    &-note {
+      color: $oc-pink-4;
+      font-size: 14px;
+      padding: 1em;
+      font-style: italic;
+      display: block;
+    }
   }
 }
