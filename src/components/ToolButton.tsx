@@ -25,6 +25,7 @@ type ToolButtonBaseProps = {
   visible?: boolean;
   selected?: boolean;
   className?: string;
+  isLoading?: boolean;
 };
 
 type ToolButtonProps =
@@ -117,7 +118,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         type={type}
         onClick={onClick}
         ref={innerRef}
-        disabled={isLoading}
+        disabled={isLoading || props.isLoading}
       >
         {(props.icon || props.label) && (
           <div className="ToolIcon__icon" aria-hidden="true">
@@ -127,6 +128,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
                 {props.keyBindingLabel}
               </span>
             )}
+            {props.isLoading && <Spinner />}
           </div>
         )}
         {props.showAriaLabel && (

@@ -60,6 +60,8 @@ const PublishLibrary = ({
     website: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     const data = importPublishLibDataFromStorage();
     if (data) {
@@ -80,7 +82,7 @@ const PublishLibrary = ({
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    setIsSubmitting(true);
     const erroredLibItems: LibraryItem[] = [];
     let isError = false;
     clonedLibItems.forEach((libItem) => {
@@ -97,6 +99,7 @@ const PublishLibrary = ({
 
     if (isError) {
       setClonedLibItems(erroredLibItems);
+      setIsSubmitting(false);
       return;
     }
     const elements: ExcalidrawElement[] = [];
@@ -202,11 +205,13 @@ const PublishLibrary = ({
         (err) => {
           console.error(err);
           onError(err);
+          setIsSubmitting(false);
         },
       )
       .catch((err) => {
         console.error(err);
         onError(err);
+        setIsSubmitting(false);
       });
   };
 
@@ -363,6 +368,7 @@ const PublishLibrary = ({
             aria-label={t("buttons.submit")}
             label={t("buttons.submit")}
             className="publish-library__buttons--confirm"
+            isLoading={isSubmitting}
           />
         </div>
       </form>

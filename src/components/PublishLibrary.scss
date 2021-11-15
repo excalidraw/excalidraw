@@ -61,6 +61,12 @@
 
       .ToolIcon__icon {
         color: $oc-white;
+        .Spinner {
+          --spinner-color: #fff;
+          svg {
+            padding: 0.5rem;
+          }
+        }
       }
     }
 
