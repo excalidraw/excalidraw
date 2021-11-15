@@ -11,8 +11,9 @@
         display: flex;
         justify-content: space-between;
         span {
-          font-weight: bold;
+          font-weight: 500;
           font-size: 1rem;
+          color: $oc-gray-6;
         }
         input,
         textarea {

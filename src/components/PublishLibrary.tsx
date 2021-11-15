@@ -59,10 +59,10 @@ const PublishLibrary = ({
     clonedLibItems.forEach((libItem) => {
       let error = "";
       if (!libItem.name) {
-        error = "Required";
+        error = t("publishDialog.errors.required");
         isError = true;
       } else if (!/^[a-zA-Z\s]+$/i.test(libItem.name)) {
-        error = "Only letters and spaces allowed";
+        error = t("publishDialog.errors.letter&Spaces");
         isError = true;
       }
       erroredLibItems.push({ ...libItem, error });
@@ -225,7 +225,7 @@ const PublishLibrary = ({
               required
               value={libraryData.authorName}
               onChange={onInputChange}
-              placeholder={t("publishSuccessDialog.placeholder.authorName")}
+              placeholder={t("publishDialog.placeholder.authorName")}
             />
           </label>
           <label>
@@ -241,7 +241,7 @@ const PublishLibrary = ({
               required
               value={libraryData.name}
               onChange={onInputChange}
-              placeholder={t("publishSuccessDialog.placeholder.libraryName")}
+              placeholder={t("publishDialog.placeholder.libraryName")}
             />
           </label>
           <label>
@@ -257,7 +257,7 @@ const PublishLibrary = ({
               required
               value={libraryData.description}
               onChange={onInputChange}
-              placeholder={t("publishSuccessDialog.placeholder.libraryDesc")}
+              placeholder={t("publishDialog.placeholder.libraryDesc")}
             />
           </label>
           <label>
@@ -267,7 +267,7 @@ const PublishLibrary = ({
               name="githubHandle"
               value={libraryData.githubHandle}
               onChange={onInputChange}
-              placeholder={t("publishSuccessDialog.placeholder.githubHandle")}
+              placeholder={t("publishDialog.placeholder.githubHandle")}
             />
           </label>
           <label>
@@ -277,7 +277,7 @@ const PublishLibrary = ({
               name="twitterHandle"
               value={libraryData.twitterHandle}
               onChange={onInputChange}
-              placeholder={t("publishSuccessDialog.placeholder.twitterHandle")}
+              placeholder={t("publishDialog.placeholder.twitterHandle")}
             />
           </label>
           <label>
@@ -287,7 +287,7 @@ const PublishLibrary = ({
               name="website"
               value={libraryData.website}
               onChange={onInputChange}
-              placeholder={t("publishSuccessDialog.placeholder.website")}
+              placeholder={t("publishDialog.placeholder.website")}
             />
           </label>
         </div>

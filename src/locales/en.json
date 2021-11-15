@@ -280,20 +280,24 @@
     "twitterUsername": "Twitter Username",
     "libraryName": "Library Name",
     "libraryDesc": "Library Description",
-    "website": "Website"
-  },
-  "publishSuccessDialog": {
-    "title": "Library Publish Success",
-    "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",
-    "link": "here",
+    "website": "Website",
     "placeholder": {
       "authorName": "Your name",
       "libraryName": "Name of your library",
       "libraryDesc": "Description of your library to help people understand its usage",
-      "githubHandle": "Github username (optional)",
-      "twitterHandle": "Twitter username, so we know who to credite when promoting over Twitter (optional)",
+      "githubHandle": "Github username (optional), so you can edit the library once submitted for review",
+      "twitterHandle": "Twitter username (optional), so we know who to credit when promoting over Twitter",
       "website": "Link to your personal website or elsewhere (optional)"
+    },
+    "errors": {
+      "required": "Required",
+      "letter&Spaces": "Only letters and spaces allowed"
     }
+  },
+  "publishSuccessDialog": {
+    "title": "Library Publish Success",
+    "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",
+    "link": "here"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
