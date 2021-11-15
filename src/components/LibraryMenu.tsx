@@ -22,6 +22,7 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 
 import "./LibraryMenu.scss";
+import { Tooltip } from "./Tooltip";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -106,15 +107,16 @@ const LibraryMenuItems = ({
           className="library-item-actions--remove"
         />
         {!isPublished && (
-          <ToolButton
-            type="button"
-            title={t("buttons.publishLibrary")}
-            aria-label={t("buttons.publishLibrary")}
-            label={t("buttons.publishLibrary")}
-            icon={publishIcon}
-            className="library-item-actions--publish"
-            onClick={onPublish}
-          />
+          <Tooltip label={t("hints.publishLibrary")}>
+            <ToolButton
+              type="button"
+              aria-label={t("buttons.publishLibrary")}
+              label={t("buttons.publishLibrary")}
+              icon={publishIcon}
+              className="library-item-actions--publish"
+              onClick={onPublish}
+            />
+          </Tooltip>
         )}
       </div>
     );
