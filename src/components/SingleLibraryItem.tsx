@@ -1,5 +1,5 @@
 import oc from "open-color";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { exportToSvg } from "../packages/utils";
 import { AppState, LibraryItem } from "../types";
 
@@ -21,8 +21,6 @@ const SingleLibraryItem = ({
   const svgRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const [editLibName, setEditLibName] = useState(false);
-
   useEffect(() => {
     const node = svgRef.current;
     if (!node) {
@@ -42,12 +40,6 @@ const SingleLibraryItem = ({
     })();
   }, [libItem.elements, appState]);
 
-  useEffect(() => {
-    if (!inputRef.current || !editLibName) {
-      return;
-    }
-    inputRef.current.focus();
-  }, [editLibName]);
   return (
     <div className="single-library-item">
       <div ref={svgRef} className="single-library-item__svg" />
@@ -61,7 +53,19 @@ const SingleLibraryItem = ({
           color: oc.gray[6],
         }}
       >
-        {editLibName ? (
+        <label
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            flexDirection: "column",
+          }}
+        >
+          <div style={{ padding: "0.5em 0" }}>
+            <span>Library Item Name</span>
+            <span aria-hidden="true" className="required">
+              *
+            </span>
+          </div>
           <input
             ref={inputRef}
             style={{ width: "80%", padding: "0.2rem" }}
@@ -70,30 +74,9 @@ const SingleLibraryItem = ({
             onChange={(event) => {
               onChange(event.target.value, index);
             }}
-            onBlur={() => setEditLibName(false)}
           />
-        ) : (
-          <div>
-            <div>
-              <span
-                style={{
-                  width: "80%",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-                onClick={() => {
-                  setEditLibName(true);
-                }}
-              >
-                {libItem.name || `Unnamed Item ${index}`}
-              </span>
-              <span aria-hidden="true" className="required">
-                *
-              </span>
-            </div>
-            <span className="error">{error}</span>
-          </div>
-        )}
+        </label>
+        <span className="error">{error}</span>
       </div>
     </div>
   );

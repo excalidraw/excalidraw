@@ -5,6 +5,26 @@
     &__fields {
       display: flex;
       flex-direction: column;
+
+      label {
+        padding: 1em;
+        display: flex;
+        justify-content: space-between;
+        span {
+          font-weight: bold;
+          font-size: 1rem;
+        }
+        input,
+        textarea {
+          width: 70%;
+          padding: 0.5em;
+        }
+
+        .required {
+          color: $oc-red-8;
+          margin: 0.2rem;
+        }
+      }
     }
 
     &__buttons {
@@ -42,25 +62,7 @@
         color: $oc-white;
       }
     }
-    label {
-      padding: 1em;
-      display: flex;
-      justify-content: space-between;
-      span {
-        font-weight: bold;
-        font-size: 1rem;
-      }
-      input,
-      textarea {
-        width: 70%;
-        padding: 0.5em;
-      }
 
-      .required {
-        color: $oc-red-8;
-        margin: 0.2rem;
-      }
-    }
     .selected-library-items {
       display: flex;
       padding: 0 0.8rem;
