@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import oc from "open-color";
 
 import { Dialog } from "./Dialog";
@@ -17,21 +17,41 @@ import { newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import { getCommonBoundingBox } from "../element/bounds";
 import SingleLibraryItem from "./SingleLibraryItem";
+import {
+  savePublishLibDataToStorage,
+  importPublishLibDataFromStorage,
+  clearPublishLibDataInStorage,
+} from "../excalidraw-app/data/localStorage";
 
+export interface PublishLibraryDataParams {
+  authorName: string;
+  githubHandle: string;
+  name: string;
+  description: string;
+  twitterHandle: string;
+  website: string;
+}
 const PublishLibrary = ({
   onClose,
   libraryItems,
   appState,
   onSuccess,
   onError,
+  updateItemsInStorage,
 }: {
   onClose: () => void;
   libraryItems: LibraryItems;
   appState: AppState;
-  onSuccess: (data: { url: string; authorName: string }) => void;
+  onSuccess: (data: {
+    url: string;
+    authorName: string;
+    items: LibraryItems;
+  }) => void;
+
   onError: (error: Error) => void;
+  updateItemsInStorage: (items: LibraryItems) => void;
 }) => {
-  const [libraryData, setLibraryData] = useState({
+  const [libraryData, setLibraryData] = useState<PublishLibraryDataParams>({
     authorName: "",
     githubHandle: "",
     name: "",
@@ -39,6 +59,13 @@ const PublishLibrary = ({
     twitterHandle: "",
     website: "",
   });
+
+  useEffect(() => {
+    const data = importPublishLibDataFromStorage();
+    if (data) {
+      setLibraryData(data);
+    }
+  }, []);
 
   const [clonedLibItems, setClonedLibItems] = useState<LibraryItems>(
     libraryItems.slice(),
@@ -150,9 +177,11 @@ const PublishLibrary = ({
         (response) => {
           if (response.ok) {
             response.json().then(({ url }) => {
+              clearPublishLibDataInStorage();
               onSuccess({
                 url,
                 authorName: libraryData.authorName,
+                items: clonedLibItems,
               });
             });
           } else {
@@ -201,9 +230,15 @@ const PublishLibrary = ({
     });
     return <div className="selected-library-items">{items}</div>;
   };
+
+  const onDialogClose = useCallback(() => {
+    updateItemsInStorage(clonedLibItems);
+    savePublishLibDataToStorage(libraryData);
+    onClose();
+  }, [clonedLibItems, onClose, updateItemsInStorage, libraryData]);
   return (
     <Dialog
-      onCloseRequest={onClose}
+      onCloseRequest={onDialogClose}
       title="Publish Library"
       className="publish-library"
       closeOnClickOutside={false}
@@ -297,7 +332,7 @@ const PublishLibrary = ({
             title={t("buttons.cancel")}
             aria-label={t("buttons.cancel")}
             label={t("buttons.cancel")}
-            onClick={onClose}
+            onClick={onDialogClose}
             data-testid="cancel-clear-canvas-button"
             className="publish-library__buttons--cancel"
           />

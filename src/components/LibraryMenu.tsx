@@ -468,9 +468,8 @@ export const LibraryMenu = ({
   const onPublishLibSuccess = useCallback(
     (data) => {
       setShowPublishLibraryDialog(false);
-      setPublishLibSuccess(data);
+      setPublishLibSuccess({ url: data.url, authorName: data.authorName });
       const nextLibItems = libraryItems.slice();
-
       nextLibItems.forEach((libItem) => {
         if (selectedItems.includes(libItem.id)) {
           libItem.status = "published";
@@ -483,7 +482,6 @@ export const LibraryMenu = ({
       setShowPublishLibraryDialog,
       setPublishLibSuccess,
       libraryItems,
-      setLibraryItems,
       selectedItems,
       library,
     ],
@@ -498,6 +496,7 @@ export const LibraryMenu = ({
           appState={appState}
           onSuccess={onPublishLibSuccess}
           onError={(error) => window.alert(error)}
+          updateItemsInStorage={() => library.saveLibrary(libraryItems)}
         />
       )}
       {publishLibSuccess && renderPublishSuccess()}

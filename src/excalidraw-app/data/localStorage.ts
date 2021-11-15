@@ -6,12 +6,14 @@ import {
 } from "../../appState";
 import { clearElementsForLocalStorage } from "../../element";
 import { STORAGE_KEYS as APP_STORAGE_KEYS } from "../../constants";
+import { PublishLibraryDataParams } from "../../components/PublishLibrary";
 
 export const STORAGE_KEYS = {
   LOCAL_STORAGE_ELEMENTS: "excalidraw",
   LOCAL_STORAGE_APP_STATE: "excalidraw-state",
   LOCAL_STORAGE_COLLAB: "excalidraw-collab",
   LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG: "collabLinkForceLoadFlag",
+  LOCAL_STORAGE_KEY_PUBLISH_LIBRARY: "publish-library-data",
 };
 
 export const saveUsernameToLocalStorage = (username: string) => {
@@ -126,4 +128,36 @@ export const getTotalStorageSize = () => {
     console.error(error);
     return 0;
   }
+};
+
+export const savePublishLibDataToStorage = (data: PublishLibraryDataParams) => {
+  try {
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_KEY_PUBLISH_LIBRARY,
+      JSON.stringify(data),
+    );
+  } catch (error: any) {
+    // Unable to access window.localStorage
+    console.error(error);
+  }
+};
+
+export const importPublishLibDataFromStorage = () => {
+  try {
+    const data = localStorage.getItem(
+      STORAGE_KEYS.LOCAL_STORAGE_KEY_PUBLISH_LIBRARY,
+    );
+    if (data) {
+      return JSON.parse(data);
+    }
+  } catch (error: any) {
+    // Unable to access localStorage
+    console.error(error);
+  }
+
+  return null;
+};
+
+export const clearPublishLibDataInStorage = () => {
+  localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_KEY_PUBLISH_LIBRARY);
 };
