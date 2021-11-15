@@ -10,12 +10,10 @@ const SingleLibraryItem = ({
   appState,
   index,
   onChange,
-  error,
 }: {
   libItem: LibraryItem;
   appState: AppState;
   index: number;
-  error: string | null;
   onChange: (val: string, index: number) => void;
 }) => {
   const svgRef = useRef<HTMLDivElement | null>(null);
@@ -51,6 +49,7 @@ const SingleLibraryItem = ({
           fontSize: "14px",
           fontWeight: 500,
           color: oc.gray[6],
+          flexDirection: "column",
         }}
       >
         <label
@@ -76,7 +75,7 @@ const SingleLibraryItem = ({
             }}
           />
         </label>
-        <span className="error">{error}</span>
+        <span className="error">{libItem.error}</span>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import oc from "open-color";
 
 import { Dialog } from "./Dialog";
@@ -6,7 +6,7 @@ import { t } from "../i18n";
 
 import { ToolButton } from "./ToolButton";
 
-import { AppState, LibraryItems } from "../types";
+import { AppState, LibraryItems, LibraryItem } from "../types";
 import { exportToBlob } from "../packages/utils";
 import { EXPORT_DATA_TYPES, EXPORT_SOURCE } from "../constants";
 import { ExportedLibraryData } from "../data/types";
@@ -44,8 +44,6 @@ const PublishLibrary = ({
     libraryItems.slice(),
   );
 
-  const [error, setError] = useState<string | null>(null);
-
   const onInputChange = (event: any) => {
     setLibraryData({
       ...libraryData,
@@ -55,9 +53,23 @@ const PublishLibrary = ({
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const itemsWithoutName = clonedLibItems.some((libItem) => !libItem.name);
-    if (itemsWithoutName) {
-      setError("Item name required");
+
+    const erroredLibItems: LibraryItem[] = [];
+    let isError = false;
+    clonedLibItems.forEach((libItem) => {
+      let error = "";
+      if (!libItem.name) {
+        error = "Required";
+        isError = true;
+      } else if (!/^[a-zA-Z\s]+$/i.test(libItem.name)) {
+        error = "Only letters and spaces allowed";
+        isError = true;
+      }
+      erroredLibItems.push({ ...libItem, error });
+    });
+
+    if (isError) {
+      setClonedLibItems(erroredLibItems);
       return;
     }
     const elements: ExcalidrawElement[] = [];
@@ -170,12 +182,11 @@ const PublishLibrary = ({
   };
 
   const renderLibraryItems = () => {
-    const items: any = [];
+    const items: ReactNode[] = [];
     clonedLibItems.forEach((libItem, index) => {
       items.push(
-        <div className="single-library-item-wrapper">
+        <div className="single-library-item-wrapper" key={index}>
           <SingleLibraryItem
-            key={index}
             libItem={libItem}
             appState={appState}
             index={index}
@@ -184,7 +195,6 @@ const PublishLibrary = ({
               items[index].name = val;
               setClonedLibItems(items);
             }}
-            error={error}
           />
         </div>,
       );

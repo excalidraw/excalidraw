@@ -184,6 +184,7 @@ export type LibraryItem = {
   status: "published" | "unpublished";
   elements: readonly NonDeleted<ExcalidrawElement>[];
   name?: string;
+  error?: string;
 };
 export type LibraryItems = readonly LibraryItem[];
 
