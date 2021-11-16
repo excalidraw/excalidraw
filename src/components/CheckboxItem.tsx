@@ -11,7 +11,7 @@ export const CheckboxItem: React.FC<{
 }> = ({ children, checked, onChange, className }) => {
   return (
     <div
-      className={clsx(`Checkbox ${className}`, { "is-checked": checked })}
+      className={clsx("Checkbox", className, { "is-checked": checked })}
       onClick={(event) => {
         onChange(!checked);
         (
