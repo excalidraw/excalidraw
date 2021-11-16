@@ -135,7 +135,8 @@
     "zenMode": "Modalità Zen",
     "exitZenMode": "Uscire dalla modalità zen",
     "cancel": "Annulla",
-    "clear": "Cancella"
+    "clear": "Cancella",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Questa azione cancellerà l'intera tela. Sei sicuro?",
