@@ -135,7 +135,8 @@
     "zenMode": "Zen-läge",
     "exitZenMode": "Gå ur zen-läge",
     "cancel": "Avbryt",
-    "clear": "Rensa"
+    "clear": "Rensa",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Detta rensar hela canvasen. Är du säker?",
