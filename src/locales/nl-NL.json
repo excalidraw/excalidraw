@@ -135,7 +135,8 @@
     "zenMode": "Zen modus",
     "exitZenMode": "Verlaat zen modus",
     "cancel": "Annuleren",
-    "clear": "Wissen"
+    "clear": "Wissen",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Weet je het zeker?",
