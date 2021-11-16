@@ -135,7 +135,8 @@
     "zenMode": "Zen modu",
     "exitZenMode": "Zen modundan çık",
     "cancel": "İptal",
-    "clear": "Temizle"
+    "clear": "Temizle",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
