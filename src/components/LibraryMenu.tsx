@@ -141,6 +141,14 @@ export const LibraryMenu = ({
     }
   }, [library, setAppState, selectedItems, setSelectedItems]);
 
+  const resetLibrary = useCallback(() => {
+    if (window.confirm(t("alerts.resetLibrary"))) {
+      library.resetLibrary();
+      setLibraryItems([]);
+      focusContainer();
+    }
+  }, [library, focusContainer]);
+
   const addToLibrary = useCallback(
     async (elements: LibraryItem["elements"]) => {
       if (elements.some((element) => element.type === "image")) {
@@ -244,9 +252,7 @@ export const LibraryMenu = ({
           onInsertShape={onInsertShape}
           pendingElements={pendingElements}
           setAppState={setAppState}
-          setLibraryItems={setLibraryItems}
           libraryReturnUrl={libraryReturnUrl}
-          focusContainer={focusContainer}
           library={library}
           theme={theme}
           files={files}
@@ -261,6 +267,7 @@ export const LibraryMenu = ({
             }
           }}
           onPublish={() => setShowPublishLibraryDialog(true)}
+          resetLibrary={resetLibrary}
         />
       )}
     </Island>

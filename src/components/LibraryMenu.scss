@@ -58,24 +58,9 @@
     }
   }
 
-  .library-item-actions {
+  .library-actions {
     display: flex;
-    &--publish {
-      background-color: $oc-blue-6;
-      &:hover {
-        background-color: $oc-blue-7;
-      }
-      &:active {
-        background-color: $oc-blue-9;
-      }
-      svg {
-        color: $oc-white;
-      }
-    }
-  }
 
-  .library-actions,
-  .library-item-actions {
     &--remove {
       background-color: $oc-red-7;
       &:hover {
@@ -98,6 +83,19 @@
 
       &:active {
         background-color: $oc-lime-8;
+      }
+      svg {
+        color: $oc-white;
+      }
+    }
+
+    &--publish {
+      background-color: $oc-blue-6;
+      &:hover {
+        background-color: $oc-blue-7;
+      }
+      &:active {
+        background-color: $oc-blue-9;
       }
       svg {
         color: $oc-white;

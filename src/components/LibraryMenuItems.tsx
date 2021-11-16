@@ -26,9 +26,8 @@ const LibraryMenuItems = ({
   pendingElements,
   theme,
   setAppState,
-  setLibraryItems,
+
   libraryReturnUrl,
-  focusContainer,
   library,
   files,
   id,
@@ -36,6 +35,7 @@ const LibraryMenuItems = ({
   selectedItems,
   onToggle,
   onPublish,
+  resetLibrary,
 }: {
   libraryItems: LibraryItems;
   pendingElements: LibraryItem["elements"];
@@ -45,93 +45,47 @@ const LibraryMenuItems = ({
   theme: AppState["theme"];
   files: BinaryFiles;
   setAppState: React.Component<any, AppState>["setState"];
-  setLibraryItems: (library: LibraryItems) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
-  focusContainer: () => void;
   library: Library;
   id: string;
   appState: AppState;
   selectedItems: LibraryItem["id"][];
   onToggle: (id: LibraryItem["id"]) => void;
   onPublish: () => void;
+  resetLibrary: () => void;
 }) => {
   const isMobile = useIsMobile();
 
-  const renderLibraryItemActions = () => {
-    if (!selectedItems.length) {
-      return null;
-    }
-    const items = libraryItems.filter((item) =>
-      selectedItems.includes(item.id),
-    );
-    return (
-      <div className="library-item-actions">
-        <ToolButton
-          key="export"
-          type="button"
-          title={t("buttons.export")}
-          aria-label={t("buttons.export")}
-          icon={exportToFileIcon}
-          onClick={async () => {
-            saveLibraryAsJSON(items)
-              .catch(muteFSAbortError)
-              .catch((error) => {
-                setAppState({ errorMessage: error.message });
-              });
-          }}
-          className="library-item-actions--export"
-        />
-        <ToolButton
-          type="button"
-          title={t("buttons.removeFromLibrary")}
-          aria-label={t("buttons.removeFromLibrary")}
-          label={t("buttons.removeFromLibrary")}
-          icon={trash}
-          onClick={onRemoveFromLibrary}
-          className="library-item-actions--remove"
-        />
-        {!isPublished && (
-          <Tooltip label={t("hints.publishLibrary")}>
-            <ToolButton
-              type="button"
-              aria-label={t("buttons.publishLibrary")}
-              label={t("buttons.publishLibrary")}
-              icon={publishIcon}
-              className="library-item-actions--publish"
-              onClick={onPublish}
-            />
-          </Tooltip>
-        )}
-      </div>
-    );
-  };
-
   const renderLibraryActions = () => {
-    if (selectedItems.length) {
-      return null;
-    }
+    const itemsSelected = !!selectedItems.length;
+    const items = itemsSelected
+      ? libraryItems.filter((item) => selectedItems.includes(item.id))
+      : libraryItems;
+
     return (
       <div className="library-actions">
-        <ToolButton
-          key="import"
-          type="button"
-          title={t("buttons.load")}
-          aria-label={t("buttons.load")}
-          icon={load}
-          onClick={() => {
-            importLibraryFromJSON(library)
-              .then(() => {
-                // Close and then open to get the libraries updated
-                setAppState({ isLibraryOpen: false });
-                setAppState({ isLibraryOpen: true });
-              })
-              .catch(muteFSAbortError)
-              .catch((error) => {
-                setAppState({ errorMessage: error.message });
-              });
-          }}
-        />
-        {!!libraryItems && (
+        {!itemsSelected && (
+          <ToolButton
+            key="import"
+            type="button"
+            title={t("buttons.load")}
+            aria-label={t("buttons.load")}
+            icon={load}
+            onClick={() => {
+              importLibraryFromJSON(library)
+                .then(() => {
+                  // Close and then open to get the libraries updated
+                  setAppState({ isLibraryOpen: false });
+                  setAppState({ isLibraryOpen: true });
+                })
+                .catch(muteFSAbortError)
+                .catch((error) => {
+                  setAppState({ errorMessage: error.message });
+                });
+            }}
+          />
+        )}
+        {!!items && (
           <>
             <ToolButton
               key="export"
@@ -140,7 +94,9 @@ const LibraryMenuItems = ({
               aria-label={t("buttons.export")}
               icon={exportToFileIcon}
               onClick={async () => {
-                const libraryItems = await library.loadLibrary();
+                const libraryItems = itemsSelected
+                  ? items
+                  : await library.loadLibrary();
                 saveLibraryAsJSON(libraryItems)
                   .catch(muteFSAbortError)
                   .catch((error) => {
@@ -155,16 +111,22 @@ const LibraryMenuItems = ({
               title={t("buttons.resetLibrary")}
               aria-label={t("buttons.resetLibrary")}
               icon={trash}
-              onClick={() => {
-                if (window.confirm(t("alerts.resetLibrary"))) {
-                  library.resetLibrary();
-                  setLibraryItems([]);
-                  focusContainer();
-                }
-              }}
+              onClick={itemsSelected ? onRemoveFromLibrary : resetLibrary}
               className="library-actions--remove"
             />
           </>
+        )}
+        {itemsSelected && !isPublished && (
+          <Tooltip label={t("hints.publishLibrary")}>
+            <ToolButton
+              type="button"
+              aria-label={t("buttons.publishLibrary")}
+              label={t("buttons.publishLibrary")}
+              icon={publishIcon}
+              className="library-actions--publish"
+              onClick={onPublish}
+            />
+          </Tooltip>
         )}
       </div>
     );
@@ -276,7 +238,6 @@ const LibraryMenuItems = ({
       <Stack.Col align="start" gap={1} className="layer-ui__library-items">
         <div className="layer-ui__library-header" key="library-header">
           {renderLibraryActions()}
-          {renderLibraryItemActions()}
           <a
             href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
               window.name || "_blank"
