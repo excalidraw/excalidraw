@@ -135,7 +135,8 @@
     "zenMode": "禅模式",
     "exitZenMode": "退出禅模式",
     "cancel": "取消",
-    "clear": "清除"
+    "clear": "清除",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "这将会清除整个画布。您是否要继续?",
