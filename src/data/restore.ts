@@ -281,14 +281,14 @@ export const restore = (
 
 export const restoreLibraryItems = (
   libraryItems: NonOptional<ImportedDataState["libraryItems"]>,
-  status: LibraryItem["status"],
+  defaultStatus: LibraryItem["status"],
 ) => {
   const restoredItems: LibraryItem[] = [];
   for (const item of libraryItems) {
     // migrate older libraries
     if (Array.isArray(item)) {
       restoredItems.push({
-        status,
+        status: defaultStatus,
         elements: item,
         id: randomId(),
       });
@@ -297,7 +297,7 @@ export const restoreLibraryItems = (
       restoredItems.push({
         ..._item,
         id: _item.id || randomId(),
-        status: _item.status || status,
+        status: _item.status || defaultStatus,
       });
     }
   }
