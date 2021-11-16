@@ -135,7 +135,8 @@
     "zenMode": "Modo Zen",
     "exitZenMode": "Sair do modo zen",
     "cancel": "Cancelar",
-    "clear": "Limpar"
+    "clear": "Limpar",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Isto irá limpar toda a tela. Você tem certeza?",
