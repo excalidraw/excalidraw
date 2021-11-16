@@ -135,7 +135,8 @@
     "zenMode": "專注模式",
     "exitZenMode": "離開專注模式",
     "cancel": "取消",
-    "clear": "清除"
+    "clear": "清除",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",
