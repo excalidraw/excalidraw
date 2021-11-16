@@ -1,23 +1,19 @@
 import { t } from "../i18n";
-import { Dialog } from "./Dialog";
+import { Dialog, DialogProps } from "./Dialog";
 import { ToolButton } from "./ToolButton";
 
 import "./ConfirmDialog.scss";
 
-interface Props {
+interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;
   onCancel: () => void;
-  title: string;
-  children: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
-  className?: string;
 }
 const ConfirmDialog = (props: Props) => {
   const {
     onConfirm,
     onCancel,
-    title,
     children,
     confirmText = t("buttons.confirm"),
     cancelText = t("buttons.cancel"),
@@ -27,7 +23,6 @@ const ConfirmDialog = (props: Props) => {
   return (
     <Dialog
       onCloseRequest={onCancel}
-      title={title}
       small={true}
       {...rest}
       className={`confirm-dialog ${className}`}
