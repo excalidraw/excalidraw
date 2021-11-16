@@ -135,7 +135,8 @@
     "zenMode": "Zen-modus",
     "exitZenMode": "Avslutt zen-modus",
     "cancel": "Avbryt",
-    "clear": "Tøm"
+    "clear": "Tøm",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
