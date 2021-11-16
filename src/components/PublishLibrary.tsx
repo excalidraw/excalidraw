@@ -248,18 +248,33 @@ const PublishLibrary = ({
       className="publish-library"
     >
       <form onSubmit={onSubmit}>
-        {renderLibraryItems()}
+        <div className="publish-library-note">
+          {t("publishDialog.noteDescription.pre")}
+          <a
+            href="https://libraries.excalidraw.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t("publishDialog.noteDescription.link")}
+          </a>{" "}
+          {t("publishDialog.noteDescription.post")}
+        </div>
         <span className="publish-library-note">
-          {t("publishDialog.noteHeader.pre")}
+          {t("publishDialog.noteGuidelines.pre")}
           <a
             href="https://github.com/excalidraw/excalidraw-libraries#guidelines"
             target="_blank"
             rel="noopener noreferrer"
           >
-            {t("publishDialog.noteHeader.guidelines")}
+            {t("publishDialog.noteGuidelines.link")}
           </a>
-          {t("publishDialog.noteHeader.post")}
+          {t("publishDialog.noteGuidelines.post")}
         </span>
+
+        <div className="publish-library-note">
+          {t("publishDialog.noteItems")}
+        </div>
+        {renderLibraryItems()}
         <div className="publish-library__fields">
           <label>
             <div>
@@ -340,15 +355,15 @@ const PublishLibrary = ({
             />
           </label>
           <span className="publish-library-note">
-            {t("publishDialog.noteFooter.pre")}
+            {t("publishDialog.noteLicense.pre")}
             <a
               href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE"
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t("publishDialog.noteFooter.mit")}
+              {t("publishDialog.noteLicense.link")}
             </a>
-            {t("publishDialog.noteFooter.post")}
+            {t("publishDialog.noteLicense.post")}
           </span>
         </div>
         <div className="publish-library__buttons">
