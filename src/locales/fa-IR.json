@@ -135,7 +135,8 @@
     "zenMode": "حالت ذن",
     "exitZenMode": "خروج از حالت تمرکز",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",
