@@ -241,7 +241,7 @@ const PublishLibrary = ({
   return (
     <Dialog
       onCloseRequest={onDialogClose}
-      title="Publish Library"
+      title={t("publishDialog.title")}
       className="publish-library"
     >
       <form onSubmit={onSubmit}>

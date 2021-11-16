@@ -1,5 +1,6 @@
 import oc from "open-color";
 import { useEffect, useRef } from "react";
+import { t } from "../i18n";
 import { exportToSvg } from "../packages/utils";
 import { AppState, LibraryItem } from "../types";
 
@@ -60,7 +61,7 @@ const SingleLibraryItem = ({
         >
           <div style={{ padding: "0.5em 0" }}>
             <span style={{ fontWeight: 500, color: oc.gray[6] }}>
-              Library Item Name
+              {t("publishDialog.itemName")}
             </span>
             <span aria-hidden="true" className="required">
               *

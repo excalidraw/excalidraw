@@ -277,6 +277,8 @@
     "title": "Clear canvas"
   },
   "publishDialog": {
+    "title": "Publish library",
+    "itemName": "Item name",
     "authorName": "Author Name",
     "githubUsername": "GitHub Username",
     "twitterUsername": "Twitter Username",
