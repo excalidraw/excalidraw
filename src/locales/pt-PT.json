@@ -135,7 +135,8 @@
     "zenMode": "Modo zen",
     "exitZenMode": "Sair do modo zen",
     "cancel": "Cancelar",
-    "clear": "Limpar"
+    "clear": "Limpar",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Isto irá limpar toda a área de desenho. Tem a certeza?",
