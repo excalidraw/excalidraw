@@ -23,6 +23,7 @@ describe("library", () => {
         {
           status: "published",
           elements: [expect.objectContaining({ id: "A" })],
+          id: "id0",
         },
       ]);
     });
