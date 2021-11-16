@@ -135,7 +135,8 @@
     "zenMode": "Zen režīms",
     "exitZenMode": "Pamest Zen režīmu",
     "cancel": "Atcelt",
-    "clear": "Notīrīt"
+    "clear": "Notīrīt",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Šī funkcija notīrīs visu tāfeli. Vai turpināt?",
