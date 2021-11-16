@@ -67,6 +67,7 @@ const SingleLibraryItem = ({
             </span>
           </div>
           <input
+            type="text"
             ref={inputRef}
             style={{ width: "80%", padding: "0.2rem" }}
             value={libItem.name}
