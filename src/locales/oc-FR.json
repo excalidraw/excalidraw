@@ -135,7 +135,8 @@
     "zenMode": "Mòde escur",
     "exitZenMode": "Sortir del mòde zen",
     "cancel": "Anullar",
-    "clear": "Escafar"
+    "clear": "Escafar",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Aquò suprimirà lo canabàs complèt. O volètz vertadièrament ?",
