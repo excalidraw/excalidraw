@@ -135,7 +135,8 @@
     "zenMode": "Modo Zen",
     "exitZenMode": "Salir del modo Zen",
     "cancel": "Cancelar",
-    "clear": "Borrar"
+    "clear": "Borrar",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
