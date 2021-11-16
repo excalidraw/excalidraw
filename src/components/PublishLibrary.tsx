@@ -278,22 +278,6 @@ const PublishLibrary = ({
         <div className="publish-library__fields">
           <label>
             <div>
-              <span>{t("publishDialog.authorName")}</span>
-              <span aria-hidden="true" className="required">
-                *
-              </span>
-            </div>
-            <input
-              type="text"
-              name="authorName"
-              required
-              value={libraryData.authorName}
-              onChange={onInputChange}
-              placeholder={t("publishDialog.placeholder.authorName")}
-            />
-          </label>
-          <label>
-            <div>
               <span>{t("publishDialog.libraryName")}</span>
               <span aria-hidden="true" className="required">
                 *
@@ -322,6 +306,22 @@ const PublishLibrary = ({
               value={libraryData.description}
               onChange={onInputChange}
               placeholder={t("publishDialog.placeholder.libraryDesc")}
+            />
+          </label>
+          <label>
+            <div>
+              <span>{t("publishDialog.authorName")}</span>
+              <span aria-hidden="true" className="required">
+                *
+              </span>
+            </div>
+            <input
+              type="text"
+              name="authorName"
+              required
+              value={libraryData.authorName}
+              onChange={onInputChange}
+              placeholder={t("publishDialog.placeholder.authorName")}
             />
           </label>
           <label>
