@@ -178,6 +178,13 @@ export declare class GestureEvent extends UIEvent {
   readonly scale: number;
 }
 
+// libraries
+// -----------------------------------------------------------------------------
+/** @deprecated legacy: do not use outside of migration paths */
+export type LibraryItem_v1 = readonly NonDeleted<ExcalidrawElement>[];
+/** @deprecated legacy: do not use outside of migration paths */
+export type LibraryItems_v1 = readonly LibraryItem_v1[];
+
 /** v2 library item */
 export type LibraryItem = {
   id: string;
@@ -187,11 +194,7 @@ export type LibraryItem = {
   error?: string;
 };
 export type LibraryItems = readonly LibraryItem[];
-
-/** @deprecated legacy: do not use outside of migration paths */
-export type LibraryItem_v1 = readonly NonDeleted<ExcalidrawElement>[];
-/** @deprecated legacy: do not use outside of migration paths */
-export type LibraryItems_v1 = readonly LibraryItem_v1[];
+// -----------------------------------------------------------------------------
 
 // NOTE ready/readyPromise props are optional for host apps' sake (our own
 // implem guarantees existence)
