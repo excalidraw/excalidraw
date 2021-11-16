@@ -24,10 +24,10 @@ export interface ImportedDataState {
 
 export interface ExportedLibraryData {
   type: string;
-  version: 1 | 2;
+  version: 2;
   source: string;
   libraryItems: LibraryItems;
-  library?: LibraryItems | LibraryItems_v1;
+  library?: LibraryItems;
 }
 
 export interface ImportedLibraryData extends Partial<ExportedLibraryData> {}

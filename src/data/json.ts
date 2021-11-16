@@ -121,7 +121,7 @@ export const isValidLibrary = (json: any) => {
 export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
   const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
-    version: 1,
+    version: 2,
     source: EXPORT_SOURCE,
     libraryItems,
   };
