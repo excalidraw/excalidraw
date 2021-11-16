@@ -135,7 +135,8 @@
     "zenMode": "Letisztult mód",
     "exitZenMode": "Kilépés a letisztult módból",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
