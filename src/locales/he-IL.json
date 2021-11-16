@@ -135,7 +135,8 @@
     "zenMode": "מצב זן",
     "exitZenMode": "צא ממצב תפריט מרחף",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
