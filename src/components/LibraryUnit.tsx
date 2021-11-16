@@ -43,12 +43,11 @@ export const LibraryUnit = ({
     }
 
     (async () => {
-      const elementsToRender = elements;
-      if (!elementsToRender) {
+      if (!elements) {
         return;
       }
       const svg = await exportToSvg(
-        elementsToRender,
+        elements,
         {
           exportBackground: false,
           viewBackgroundColor: oc.white,
@@ -96,13 +95,11 @@ export const LibraryUnit = ({
       />
       {adder}
       {id && elements && (isHovered || isMobile || selected) && (
-        <>
-          <CheckboxItem
-            checked={selected}
-            onChange={() => onToggle(id)}
-            className="library-unit__checkbox"
-          />
-        </>
+        <CheckboxItem
+          checked={selected}
+          onChange={() => onToggle(id)}
+          className="library-unit__checkbox"
+        />
       )}
     </div>
   );
