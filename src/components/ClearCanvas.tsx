@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { t } from "../i18n";
 import { useIsMobile } from "./App";
-import { Dialog } from "./Dialog";
 import { trash } from "./icons";
 import { ToolButton } from "./ToolButton";
 
-import "./ClearCanvas.scss";
+import ConfirmDialog from "./ConfirmDialog";
 
 const ClearCanvas = ({ onConfirm }: { onConfirm: () => void }) => {
   const [showDialog, setShowDialog] = useState(false);
@@ -26,39 +25,16 @@ const ClearCanvas = ({ onConfirm }: { onConfirm: () => void }) => {
       />
 
       {showDialog && (
-        <Dialog
-          onCloseRequest={toggleDialog}
+        <ConfirmDialog
+          onConfirm={() => {
+            onConfirm();
+            toggleDialog();
+          }}
+          onCancel={toggleDialog}
           title={t("clearCanvasDialog.title")}
-          className="clear-canvas"
-          small={true}
         >
-          <>
-            <p className="clear-canvas__content"> {t("alerts.clearReset")}</p>
-            <div className="clear-canvas-buttons">
-              <ToolButton
-                type="button"
-                title={t("buttons.clear")}
-                aria-label={t("buttons.clear")}
-                label={t("buttons.clear")}
-                onClick={() => {
-                  onConfirm();
-                  toggleDialog();
-                }}
-                data-testid="confirm-clear-canvas-button"
-                className="clear-canvas--confirm"
-              />
-              <ToolButton
-                type="button"
-                title={t("buttons.cancel")}
-                aria-label={t("buttons.cancel")}
-                label={t("buttons.cancel")}
-                onClick={toggleDialog}
-                data-testid="cancel-clear-canvas-button"
-                className="clear-canvas--cancel"
-              />
-            </div>
-          </>
-        </Dialog>
+          <p className="clear-canvas__content"> {t("alerts.clearReset")}</p>
+        </ConfirmDialog>
       )}
     </>
   );

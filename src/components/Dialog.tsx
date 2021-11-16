@@ -10,7 +10,7 @@ import { Island } from "./Island";
 import { Modal } from "./Modal";
 import { AppState } from "../types";
 
-export const Dialog = (props: {
+export interface DialogProps {
   children: React.ReactNode;
   className?: string;
   small?: boolean;
@@ -18,7 +18,8 @@ export const Dialog = (props: {
   title: React.ReactNode;
   autofocus?: boolean;
   theme?: AppState["theme"];
-}) => {
+}
+export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
   const { id } = useExcalidrawContainer();

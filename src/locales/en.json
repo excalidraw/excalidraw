@@ -135,7 +135,8 @@
     "zenMode": "Zen mode",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",
-    "clear": "Clear"
+    "clear": "Clear",
+    "confirm": "Confirm"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
