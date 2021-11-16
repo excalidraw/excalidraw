@@ -135,7 +135,8 @@
     "zenMode": "Režim zen",
     "exitZenMode": "Zrušiť režim zen",
     "cancel": "Zrušiť",
-    "clear": "Vymazať"
+    "clear": "Vymazať",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Týmto sa vyčistí celé plátno. Ste si istí?",
