@@ -135,7 +135,8 @@
     "zenMode": "Zen-tila",
     "exitZenMode": "Poistu zen-tilasta",
     "cancel": "Peruuta",
-    "clear": "Pyyhi"
+    "clear": "Pyyhi",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
