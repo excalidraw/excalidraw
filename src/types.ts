@@ -240,6 +240,7 @@ export interface ExcalidrawProps {
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
   onDoubleClick?: (elements: readonly NonDeletedExcalidrawElement[]) => boolean;
+  generateThumbnailForTable?: (file: File) => DataURL | Promise<DataURL>;
 }
 
 export type SceneData = {

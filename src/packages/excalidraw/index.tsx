@@ -35,6 +35,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onLibraryChange,
     autoFocus = false,
     generateIdForFile,
+    generateThumbnailForTable,
     onDoubleClick,
   } = props;
 
@@ -97,6 +98,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         onLibraryChange={onLibraryChange}
         autoFocus={autoFocus}
         generateIdForFile={generateIdForFile}
+        generateThumbnailForTable={generateThumbnailForTable}
         onDoubleClick={onDoubleClick}
       />
     </InitializeApp>
