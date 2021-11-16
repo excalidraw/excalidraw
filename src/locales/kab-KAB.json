@@ -135,7 +135,8 @@
     "zenMode": "Askar Zen",
     "exitZenMode": "Ffeɣ seg uskar Zen",
     "cancel": "Sefsex",
-    "clear": "Sfeḍ"
+    "clear": "Sfeḍ",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Ayagi ad isfeḍ akk taɣzut n usuneɣ. Tetḥeqqeḍ?",
