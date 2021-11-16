@@ -61,7 +61,6 @@ const LibraryMenuItems = ({
     const items = itemsSelected
       ? libraryItems.filter((item) => selectedItems.includes(item.id))
       : libraryItems;
-
     return (
       <div className="library-actions">
         {!itemsSelected && (
@@ -85,7 +84,7 @@ const LibraryMenuItems = ({
             }}
           />
         )}
-        {!!items && (
+        {!!items.length && (
           <>
             <ToolButton
               key="export"
