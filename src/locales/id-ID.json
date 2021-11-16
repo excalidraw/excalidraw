@@ -135,7 +135,8 @@
     "zenMode": "Mode zen",
     "exitZenMode": "Keluar dari mode zen",
     "cancel": "Batal",
-    "clear": "Hapus"
+    "clear": "Hapus",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
