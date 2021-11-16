@@ -308,7 +308,7 @@ const PublishLibrary = ({
               placeholder={t("publishDialog.placeholder.libraryName")}
             />
           </label>
-          <label>
+          <label style={{ alignItems: "flex-start" }}>
             <div>
               <span>{t("publishDialog.libraryDesc")}</span>
               <span aria-hidden="true" className="required">
