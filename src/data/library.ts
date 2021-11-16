@@ -1,6 +1,6 @@
 import { loadLibraryFromBlob } from "./blob";
 import { LibraryItems, LibraryItem } from "../types";
-import { restoreElements } from "./restore";
+import { restoreElements, restoreLibraryItems } from "./restore";
 import { getNonDeletedElements } from "../element";
 import type App from "../components/App";
 
@@ -58,16 +58,11 @@ class Library {
     const existingLibraryItems = await this.loadLibrary();
 
     const library = libraryFile.libraryItems || libraryFile.library || [];
+    const restoredLibItems = restoreLibraryItems(library, "published");
+    debugger;
     const filteredItems = [];
-    for (const item of library) {
-      const isOldLibrary = !!Array.isArray(item);
-      const libItem = isOldLibrary
-        ? {
-            status: "published",
-            elements: item,
-          }
-        : item;
-      const restoredItem = this.restoreLibraryItem(libItem as LibraryItem);
+    for (const item of restoredLibItems) {
+      const restoredItem = this.restoreLibraryItem(item as LibraryItem);
       if (restoredItem && isUniqueitem(existingLibraryItems, restoredItem)) {
         filteredItems.push(restoredItem);
       }

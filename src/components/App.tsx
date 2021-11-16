@@ -734,6 +734,7 @@ class App extends React.Component<AppProps, AppState> {
       if (initialData?.libraryItems) {
         this.libraryItemsFromStorage = restoreLibraryItems(
           initialData.libraryItems,
+          "unpublished",
         ) as LibraryItems;
       }
     } catch (error: any) {

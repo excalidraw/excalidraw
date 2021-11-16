@@ -114,7 +114,7 @@ export const isValidLibrary = (json: any) => {
     typeof json === "object" &&
     json &&
     json.type === EXPORT_DATA_TYPES.excalidrawLibrary &&
-    json.version === 1
+    (json.version === 1 || json.version === 2)
   );
 };
 
