@@ -135,7 +135,8 @@
     "zenMode": "Zen mód",
     "exitZenMode": "Opustit zen mód",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "",
