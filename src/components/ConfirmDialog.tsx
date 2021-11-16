@@ -36,19 +36,19 @@ const ConfirmDialog = (props: Props) => {
       <div className="confirm-dialog-buttons">
         <ToolButton
           type="button"
-          title={confirmText}
-          aria-label={confirmText}
-          label={confirmText}
-          onClick={onConfirm}
-          className="confirm-dialog--confirm"
-        />
-        <ToolButton
-          type="button"
           title={cancelText}
           aria-label={cancelText}
           label={cancelText}
           onClick={onCancel}
           className="confirm-dialog--cancel"
+        />
+        <ToolButton
+          type="button"
+          title={confirmText}
+          aria-label={confirmText}
+          label={confirmText}
+          onClick={onConfirm}
+          className="confirm-dialog--confirm"
         />
       </div>
     </Dialog>
