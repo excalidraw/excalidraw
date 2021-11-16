@@ -135,7 +135,8 @@
     "zenMode": "Mode zen",
     "exitZenMode": "Quitter le mode zen",
     "cancel": "Annuler",
-    "clear": "Effacer"
+    "clear": "Effacer",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "L'intégralité du canevas va être effacée. Êtes-vous sûr ?",
