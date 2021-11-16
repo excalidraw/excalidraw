@@ -135,7 +135,8 @@
     "zenMode": "Tryb Zen",
     "exitZenMode": "Wyjdź z trybu Zen",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
