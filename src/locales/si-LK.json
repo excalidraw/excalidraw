@@ -135,7 +135,8 @@
     "zenMode": "",
     "exitZenMode": "",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "",
