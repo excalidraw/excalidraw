@@ -135,7 +135,8 @@
     "zenMode": "",
     "exitZenMode": "ဇင်မြင်ကွင်းမှထွက်",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "ကားချပ်တစ်ခုလုံးရှင်းလင်းပါတော့မည်။ အတည်ပြုပါ။",
