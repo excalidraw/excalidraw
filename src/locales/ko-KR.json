@@ -135,7 +135,8 @@
     "zenMode": "젠 모드",
     "exitZenMode": "젠 모드 종료하기",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "모든 작업 내용이 초기화됩니다. 계속하시겠습니까?",
