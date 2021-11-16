@@ -101,7 +101,7 @@
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
     "toggleTheme": "Toggle theme",
-    "unpublishedItems": "Unpublished Items"
+    "unpublishedItems": "Unpublished items"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -279,11 +279,11 @@
   "publishDialog": {
     "title": "Publish library",
     "itemName": "Item name",
-    "authorName": "Author Name",
-    "githubUsername": "GitHub Username",
-    "twitterUsername": "Twitter Username",
-    "libraryName": "Library Name",
-    "libraryDesc": "Library Description",
+    "authorName": "Author name",
+    "githubUsername": "GitHub username",
+    "twitterUsername": "Twitter username",
+    "libraryName": "Library name",
+    "libraryDesc": "Library description",
     "website": "Website",
     "placeholder": {
       "authorName": "Your name or username",
@@ -316,7 +316,7 @@
   },
 
   "publishSuccessDialog": {
-    "title": "Library Publish Success",
+    "title": "Library submitted",
     "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",
     "link": "here"
   },
