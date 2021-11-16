@@ -179,7 +179,7 @@ const PublishLibrary = ({
       .then(
         (response) => {
           if (response.ok) {
-            response.json().then(({ url }) => {
+            return response.json().then(({ url }) => {
               clearPublishLibDataInStorage();
               onSuccess({
                 url,
@@ -187,20 +187,17 @@ const PublishLibrary = ({
                 items: clonedLibItems,
               });
             });
-          } else {
-            return response
-              .json()
-              .catch(() => {
-                throw new Error(response.statusText || "something went wrong");
-              })
-              .then((error) => {
-                throw new Error(
-                  error.message ||
-                    response.statusText ||
-                    "something went wrong",
-                );
-              });
           }
+          return response
+            .json()
+            .catch(() => {
+              throw new Error(response.statusText || "something went wrong");
+            })
+            .then((error) => {
+              throw new Error(
+                error.message || response.statusText || "something went wrong",
+              );
+            });
         },
         (err) => {
           console.error(err);
