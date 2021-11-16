@@ -135,7 +135,8 @@
     "zenMode": "Zenモード",
     "exitZenMode": "集中モードをやめる",
     "cancel": "キャンセル",
-    "clear": "消去"
+    "clear": "消去",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "この操作によってキャンバス全体が消えます。よろしいですか？",
