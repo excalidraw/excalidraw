@@ -135,7 +135,8 @@
     "zenMode": "Mode zen",
     "exitZenMode": "Surt de mode zen",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "S'esborrarà tot el llenç. N'esteu segur?",
