@@ -135,7 +135,8 @@
     "zenMode": "Mod zen",
     "exitZenMode": "Ieșire din modul zen",
     "cancel": "Anulare",
-    "clear": "Ștergere"
+    "clear": "Ștergere",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Această opțiune va șterge întreaga pânză. Confirmi?",
