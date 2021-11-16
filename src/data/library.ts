@@ -59,7 +59,6 @@ class Library {
 
     const library = libraryFile.libraryItems || libraryFile.library || [];
     const restoredLibItems = restoreLibraryItems(library, "published");
-    debugger;
     const filteredItems = [];
     for (const item of restoredLibItems) {
       const restoredItem = this.restoreLibraryItem(item as LibraryItem);

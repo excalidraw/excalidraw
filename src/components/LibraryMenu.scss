@@ -60,19 +60,6 @@
 
   .library-item-actions {
     display: flex;
-
-    &--remove {
-      background-color: $oc-red-7;
-      &:hover {
-        background-color: $oc-red-8;
-      }
-      &:active {
-        background-color: $oc-red-9;
-      }
-      svg {
-        color: $oc-white;
-      }
-    }
     &--publish {
       background-color: $oc-blue-6;
       &:hover {
@@ -87,7 +74,8 @@
     }
   }
 
-  .library-actions {
+  .library-actions,
+  .library-item-actions {
     &--remove {
       background-color: $oc-red-7;
       &:hover {
@@ -95,6 +83,21 @@
       }
       &:active {
         background-color: $oc-red-9;
+      }
+      svg {
+        color: $oc-white;
+      }
+    }
+
+    &--export {
+      background-color: $oc-lime-5;
+
+      &:hover {
+        background-color: $oc-lime-7;
+      }
+
+      &:active {
+        background-color: $oc-lime-8;
       }
       svg {
         color: $oc-white;

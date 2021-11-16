@@ -14,7 +14,7 @@ import {
 import { muteFSAbortError, chunk } from "../utils";
 import { useIsMobile } from "./App";
 import { Dialog } from "./Dialog";
-import { trash, publishIcon, load, exportFile } from "./icons";
+import { trash, publishIcon, load, exportToFileIcon } from "./icons";
 import { Island } from "./Island";
 import { LibraryUnit } from "./LibraryUnit";
 import PublishLibrary from "./PublishLibrary";
@@ -51,6 +51,11 @@ const useOnClickOutside = (
     };
   }, [ref, cb]);
 };
+
+const getSelectedItems = (
+  libraryItems: LibraryItems,
+  selectedItems: LibraryItem["id"][],
+) => libraryItems.filter((item) => selectedItems.includes(item.id));
 
 const LibraryMenuItems = ({
   libraryItems,
@@ -97,6 +102,21 @@ const LibraryMenuItems = ({
     }
     return (
       <div className="library-item-actions">
+        <ToolButton
+          key="export"
+          type="button"
+          title={t("buttons.export")}
+          aria-label={t("buttons.export")}
+          icon={exportToFileIcon}
+          onClick={async () => {
+            saveLibraryAsJSON(getSelectedItems(libraryItems, selectedItems))
+              .catch(muteFSAbortError)
+              .catch((error) => {
+                setAppState({ errorMessage: error.message });
+              });
+          }}
+          className="library-item-actions--export"
+        />
         <ToolButton
           type="button"
           title={t("buttons.removeFromLibrary")}
@@ -154,14 +174,16 @@ const LibraryMenuItems = ({
               type="button"
               title={t("buttons.export")}
               aria-label={t("buttons.export")}
-              icon={exportFile}
-              onClick={() => {
-                saveLibraryAsJSON(library)
+              icon={exportToFileIcon}
+              onClick={async () => {
+                const libraryItems = await library.loadLibrary();
+                saveLibraryAsJSON(libraryItems)
                   .catch(muteFSAbortError)
                   .catch((error) => {
                     setAppState({ errorMessage: error.message });
                   });
               }}
+              className="library-actions--export"
             />
             <ToolButton
               key="reset"
@@ -464,9 +486,6 @@ export const LibraryMenu = ({
     );
   }, [setPublishLibSuccess, publishLibSuccess]);
 
-  const getSelectedItems = () =>
-    libraryItems.filter((item) => selectedItems.includes(item.id));
-
   const onPublishLibSuccess = useCallback(
     (data) => {
       setShowPublishLibraryDialog(false);
@@ -494,7 +513,7 @@ export const LibraryMenu = ({
       {showPublishLibraryDialog && (
         <PublishLibrary
           onClose={() => setShowPublishLibraryDialog(false)}
-          libraryItems={getSelectedItems()}
+          libraryItems={getSelectedItems(libraryItems, selectedItems)}
           appState={appState}
           onSuccess={onPublishLibSuccess}
           onError={(error) => window.alert(error)}

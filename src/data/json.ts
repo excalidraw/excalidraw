@@ -3,7 +3,7 @@ import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import { EXPORT_DATA_TYPES, EXPORT_SOURCE, MIME_TYPES } from "../constants";
 import { clearElementsForDatabase, clearElementsForExport } from "../element";
 import { ExcalidrawElement } from "../element/types";
-import { AppState, BinaryFiles } from "../types";
+import { AppState, BinaryFiles, LibraryItems } from "../types";
 import { isImageFileHandle, loadFromBlob } from "./blob";
 
 import {
@@ -118,8 +118,7 @@ export const isValidLibrary = (json: any) => {
   );
 };
 
-export const saveLibraryAsJSON = async (library: Library) => {
-  const libraryItems = await library.loadLibrary();
+export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
   const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
     version: 1,
