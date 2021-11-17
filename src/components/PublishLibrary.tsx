@@ -17,13 +17,8 @@ import { newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import { getCommonBoundingBox } from "../element/bounds";
 import SingleLibraryItem from "./SingleLibraryItem";
-import {
-  savePublishLibDataToStorage,
-  importPublishLibDataFromStorage,
-  clearPublishLibDataInStorage,
-} from "../excalidraw-app/data/localStorage";
 
-export interface PublishLibraryDataParams {
+interface PublishLibraryDataParams {
   authorName: string;
   githubHandle: string;
   name: string;
@@ -31,6 +26,35 @@ export interface PublishLibraryDataParams {
   twitterHandle: string;
   website: string;
 }
+
+const LOCAL_STORAGE_KEY_PUBLISH_LIBRARY = "publish-library-data";
+
+const savePublishLibDataToStorage = (data: PublishLibraryDataParams) => {
+  try {
+    localStorage.setItem(
+      LOCAL_STORAGE_KEY_PUBLISH_LIBRARY,
+      JSON.stringify(data),
+    );
+  } catch (error: any) {
+    // Unable to access window.localStorage
+    console.error(error);
+  }
+};
+
+const importPublishLibDataFromStorage = () => {
+  try {
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY_PUBLISH_LIBRARY);
+    if (data) {
+      return JSON.parse(data);
+    }
+  } catch (error: any) {
+    // Unable to access localStorage
+    console.error(error);
+  }
+
+  return null;
+};
+
 const PublishLibrary = ({
   onClose,
   libraryItems,
@@ -180,7 +204,8 @@ const PublishLibrary = ({
         (response) => {
           if (response.ok) {
             return response.json().then(({ url }) => {
-              clearPublishLibDataInStorage();
+              // flush data from local storage
+              localStorage.removeItem(LOCAL_STORAGE_KEY_PUBLISH_LIBRARY);
               onSuccess({
                 url,
                 authorName: libraryData.authorName,
