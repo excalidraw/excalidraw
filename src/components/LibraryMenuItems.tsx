@@ -304,15 +304,15 @@ const LibraryMenuItems = ({
         align="start"
         gap={1}
       >
-        {unpublishedItems.length > 0 && (
+        {
           <>
             <div key="separator" className="separator">
               {t("labels.personalLib")}
             </div>
             {renderLibrarySection(unpublishedItems)}
           </>
-        )}
-        {(publishedItems.length > 0 || !unpublishedItems.length) && (
+        }
+        {
           <>
             <div key="separator" className="separator">
               {t("labels.excalidrawLib")}{" "}
@@ -320,7 +320,7 @@ const LibraryMenuItems = ({
 
             {renderLibrarySection(publishedItems)}
           </>
-        )}
+        }
       </Stack.Col>
     </div>
   );

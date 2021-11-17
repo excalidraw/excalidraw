@@ -58,7 +58,7 @@ class Library {
     const existingLibraryItems = await this.loadLibrary();
 
     const library = libraryFile.libraryItems || libraryFile.library || [];
-    const restoredLibItems = restoreLibraryItems(library, "unpublished");
+    const restoredLibItems = restoreLibraryItems(library, "published");
     const filteredItems = [];
     for (const item of restoredLibItems) {
       const restoredItem = this.restoreLibraryItem(item as LibraryItem);
