@@ -518,7 +518,7 @@
   }
 
   input[type="text"],
-  textarea {
+  textarea:not(.excalidraw-wysiwyg) {
     color: var(--text-primary-color);
     border: 1.5px solid var(--input-border-color);
     padding: 0.75rem;
