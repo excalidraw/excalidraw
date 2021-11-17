@@ -1,0 +1,48 @@
+@import "open-color/open-color";
+
+.excalidraw {
+  .library-actions {
+    display: flex;
+
+    &--remove {
+      background-color: $oc-red-7;
+      &:hover {
+        background-color: $oc-red-8;
+      }
+      &:active {
+        background-color: $oc-red-9;
+      }
+      svg {
+        color: $oc-white;
+      }
+    }
+
+    &--export {
+      background-color: $oc-lime-5;
+
+      &:hover {
+        background-color: $oc-lime-7;
+      }
+
+      &:active {
+        background-color: $oc-lime-8;
+      }
+      svg {
+        color: $oc-white;
+      }
+    }
+
+    &--publish {
+      background-color: $oc-blue-6;
+      &:hover {
+        background-color: $oc-blue-7;
+      }
+      &:active {
+        background-color: $oc-blue-9;
+      }
+      svg {
+        color: $oc-white;
+      }
+    }
+  }
+}

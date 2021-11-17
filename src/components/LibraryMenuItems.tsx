@@ -20,6 +20,8 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 
+import "./LibraryMenuItems.scss";
+
 const LibraryMenuItems = ({
   libraryItems,
   onRemoveFromLibrary,
