@@ -269,7 +269,7 @@ const LayerUI = ({
   const libraryMenu = appState.isLibraryOpen ? (
     <LibraryMenu
       pendingElements={getSelectedElements(elements, appState)}
-      onClickOutside={closeLibrary}
+      onClose={closeLibrary}
       onInsertShape={onInsertElements}
       onAddToLibrary={deselectItems}
       setAppState={setAppState}

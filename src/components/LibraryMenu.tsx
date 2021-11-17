@@ -16,6 +16,8 @@ import { ToolButton } from "./ToolButton";
 
 import "./LibraryMenu.scss";
 import LibraryMenuItems from "./LibraryMenuItems";
+import { EVENT } from "../constants";
+import { KEYS } from "../keys";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -51,7 +53,7 @@ const getSelectedItems = (
 ) => libraryItems.filter((item) => selectedItems.includes(item.id));
 
 export const LibraryMenu = ({
-  onClickOutside,
+  onClose,
   onInsertShape,
   pendingElements,
   onAddToLibrary,
@@ -65,7 +67,7 @@ export const LibraryMenu = ({
   appState,
 }: {
   pendingElements: LibraryItem["elements"];
-  onClickOutside: (event: MouseEvent) => void;
+  onClose: () => void;
   onInsertShape: (elements: LibraryItem["elements"]) => void;
   onAddToLibrary: () => void;
   theme: AppState["theme"];
@@ -84,8 +86,20 @@ export const LibraryMenu = ({
     if ((event.target as Element).closest(".ToolIcon__library")) {
       return;
     }
-    onClickOutside(event);
+    onClose();
   });
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === KEYS.ESCAPE) {
+        onClose();
+      }
+    };
+    document.addEventListener(EVENT.KEYDOWN, handleKeyDown);
+    return () => {
+      document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
+    };
+  }, [onClose]);
 
   const [libraryItems, setLibraryItems] = useState<LibraryItems>([]);
 
