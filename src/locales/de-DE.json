@@ -291,21 +291,21 @@
       "libraryName": "Name deiner Bibliothek",
       "libraryDesc": "Beschreibung deiner Bibliothek, um anderen Nutzern bei der Verwendung zu helfen",
       "githubHandle": "GitHub-Handle (optional), damit du die Bibliothek bearbeiten kannst, wenn sie zur Überprüfung eingereicht wurde",
-      "twitterHandle": "",
-      "website": ""
+      "twitterHandle": "Twitter-Benutzername (optional), damit wir wissen, wen wir bei Werbung über Twitter nennen können",
+      "website": "Link zu deiner persönlichen Webseite oder zu anderer Seite (optional)"
     },
     "errors": {
-      "required": "",
-      "letter&Spaces": ""
+      "required": "Erforderlich",
+      "letter&Spaces": "Nur Buchstaben und Leerzeichen erlaubt"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Sende deine Bibliothek ein, um in die ",
+      "link": "öffentliche Bibliotheks-Repository aufgenommen zu werden",
+      "post": "damit andere Nutzer sie in ihren Zeichnungen verwenden können."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
+      "pre": "Die Bibliothek muss zuerst manuell freigegeben werden. Bitte lies die ",
+      "link": "Richtlinien",
       "post": ""
     },
     "noteLicense": {
