@@ -269,33 +269,35 @@ const LibraryMenuItems = ({
   return (
     <div className="library-menu-items-container">
       {showRemoveLibAlert && renderRemoveLibAlert()}
-      <Stack.Col align="start" gap={1}>
-        <div className="layer-ui__library-header" key="library-header">
-          {renderLibraryActions()}
-          <a
-            href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-              window.name || "_blank"
-            }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}`}
-            target="_excalidraw_libraries"
-          >
-            {t("labels.libraries")}
-          </a>
-        </div>
-        <div className="library-menu-items-container__items">
-          {(publishedItems.length > 0 || !unpublishedItems.length) &&
-            renderLibrarySection(publishedItems)}
-          {unpublishedItems.length > 0 && (
-            <>
-              <div
-                key="separator"
-                style={{ margin: ".6em .2em", fontWeight: 500 }}
-              >
-                {t("labels.unpublishedItems")}
-              </div>
-              {renderLibrarySection(unpublishedItems)}
-            </>
-          )}
-        </div>
+      <div className="layer-ui__library-header" key="library-header">
+        {renderLibraryActions()}
+        <a
+          href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+            window.name || "_blank"
+          }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}`}
+          target="_excalidraw_libraries"
+        >
+          {t("labels.libraries")}
+        </a>
+      </div>
+      <Stack.Col
+        className="library-menu-items-container__items"
+        align="start"
+        gap={1}
+      >
+        {(publishedItems.length > 0 || !unpublishedItems.length) &&
+          renderLibrarySection(publishedItems)}
+        {unpublishedItems.length > 0 && (
+          <>
+            <div
+              key="separator"
+              style={{ margin: ".6em .2em", fontWeight: 500 }}
+            >
+              {t("labels.unpublishedItems")}
+            </div>
+            {renderLibrarySection(unpublishedItems)}
+          </>
+        )}
       </Stack.Col>
     </div>
   );
