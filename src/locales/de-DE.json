@@ -306,24 +306,24 @@
     "noteGuidelines": {
       "pre": "Die Bibliothek muss zuerst manuell freigegeben werden. Bitte lies die ",
       "link": "Richtlinien",
-      "post": ""
+      "post": " vor dem Absenden. Du benötigst ein GitHub-Konto, um zu kommunizieren und Änderungen vorzunehmen, falls erforderlich, aber es ist nicht unbedingt erforderlich."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Mit dem Absenden stimmst du zu, dass die Bibliothek unter der ",
+      "link": "MIT-Lizenz, ",
+      "post": "die zusammengefasst beinhaltet, dass jeder sie ohne Einschränkungen nutzen kann."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Jedes Bibliothekselement muss einen eigenen Namen haben, damit es gefiltert werden kann. Die folgenden Bibliothekselemente werden hinzugefügt:",
+    "atleastOneLibItem": "Bitte wähle mindestens ein Bibliothekselement aus, um zu beginnen"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Bibliothek übermittelt",
+    "content": "Vielen Dank {{authorName}}. Deine Bibliothek wurde zur Überprüfung eingereicht. Du kannst den Status verfolgen",
+    "link": "hier"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Bibliothek zurücksetzen",
+    "removeItemsFromLib": "Ausgewählte Elemente aus der Bibliothek entfernen"
   },
   "encrypted": {
     "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals.",
@@ -345,7 +345,7 @@
     "width": "Breite"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Zur Bibliothek hinzugefügt",
     "copyStyles": "Formatierungen kopiert.",
     "copyToClipboard": "In die Zwischenablage kopiert.",
     "copyToClipboardAsPng": "{{exportSelection}} als PNG in die Zwischenablage kopiert\n({{exportColorScheme}})",
