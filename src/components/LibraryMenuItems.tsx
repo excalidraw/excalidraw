@@ -96,7 +96,7 @@ const LibraryMenuItems = ({
       : t("buttons.resetLibrary");
     return (
       <div className="library-actions">
-        {!itemsSelected && (
+        {(!itemsSelected || !isMobile) && (
           <ToolButton
             key="import"
             type="button"
@@ -117,18 +117,6 @@ const LibraryMenuItems = ({
             }}
             className="library-actions--load"
           />
-        )}
-        {itemsSelected && !isPublished && (
-          <Tooltip label={t("hints.publishLibrary")}>
-            <ToolButton
-              type="button"
-              aria-label={t("buttons.publishLibrary")}
-              label={t("buttons.publishLibrary")}
-              icon={publishIcon}
-              className="library-actions--publish"
-              onClick={onPublish}
-            />
-          </Tooltip>
         )}
         {!!items.length && (
           <>
@@ -160,6 +148,20 @@ const LibraryMenuItems = ({
               className="library-actions--remove"
             />
           </>
+        )}
+        {itemsSelected && !isPublished && (
+          <Tooltip label={t("hints.publishLibrary")}>
+            <ToolButton
+              type="button"
+              aria-label={t("buttons.publishLibrary")}
+              label={t("buttons.publishLibrary")}
+              icon={publishIcon}
+              className="library-actions--publish"
+              onClick={onPublish}
+            >
+              {!isMobile && <label>{t("buttons.publishLibrary")}</label>}
+            </ToolButton>
+          </Tooltip>
         )}
       </div>
     );
