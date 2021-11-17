@@ -70,7 +70,7 @@ class Library {
       }
     }
 
-    await this.saveLibrary([...existingLibraryItems, ...filteredItems]);
+    await this.saveLibrary([...filteredItems, ...existingLibraryItems]);
   }
 
   loadLibrary = (): Promise<LibraryItems> => {

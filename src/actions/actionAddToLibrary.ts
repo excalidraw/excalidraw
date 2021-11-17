@@ -12,7 +12,6 @@ export const actionAddToLibrary = register({
       .loadLibrary()
       .then((items) => {
         return app.library.saveLibrary([
-          ...items,
           {
             id: randomId(),
             status: "unpublished",
@@ -21,6 +20,7 @@ export const actionAddToLibrary = register({
               appState,
             ).map(deepCopyElement),
           },
+          ...items,
         ]);
       })
       .then(() => {
