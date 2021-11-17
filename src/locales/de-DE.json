@@ -102,7 +102,7 @@
     "showBackground": "Hintergrundfarbe auswählen",
     "toggleTheme": "Design umschalten",
     "personalLib": "Persönliche Bibliothek",
-    "excalidrawLib": "Excalidraw Bibliothek"
+    "excalidrawLib": "Excalidraw-Bibliothek"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -281,7 +281,7 @@
     "title": "Bibliothek veröffentlichen",
     "itemName": "Elementname",
     "authorName": "Name des Autors",
-    "githubUsername": "GitHub Benutzername",
+    "githubUsername": "GitHub-Benutzername",
     "twitterUsername": "Twitter-Benutzername",
     "libraryName": "Name der Bibliothek",
     "libraryDesc": "Beschreibung der Bibliothek",
