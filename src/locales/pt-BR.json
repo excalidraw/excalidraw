@@ -299,26 +299,26 @@
       "letter&Spaces": "Apenas letras e espaços são permitidos"
     },
     "noteDescription": {
-      "pre": "",
+      "pre": "Envie sua biblioteca para ser incluída no ",
       "link": "repositório de biblioteca pública",
-      "post": ""
+      "post": "para outras pessoas usarem em seus desenhos."
     },
     "noteGuidelines": {
-      "pre": "",
+      "pre": "A biblioteca precisa ser aprovada manualmente primeiro. Por favor leia o ",
       "link": "orientações",
       "post": " antes de enviar. Você precisará de uma conta do GitHub para se comunicar e fazer alterações quando solicitado, mas não é estritamente necessário."
     },
     "noteLicense": {
       "pre": "Ao enviar, você concorda que a biblioteca será publicada sob a ",
       "link": "Licença MIT, ",
-      "post": ""
+      "post": "o que, em suma, significa que qualquer pessoa pode utilizá-los sem restrições."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Cada item da biblioteca deve ter seu próprio nome para que seja filtrável. Os seguintes itens da biblioteca serão incluídos:",
+    "atleastOneLibItem": "Por favor, selecione pelo menos um item da biblioteca para começar"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
+    "title": "Biblioteca enviada",
+    "content": "Obrigado {{authorName}}. Sua biblioteca foi enviada para análise. Você pode acompanhar o status",
     "link": "aqui"
   },
   "confirmDialog": {
