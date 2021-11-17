@@ -100,7 +100,9 @@
     "share": "Dela",
     "showStroke": "Visa färgväljare för linjefärg",
     "showBackground": "Visa färgväljare för bakgrundsfärg",
-    "toggleTheme": "Växla tema"
+    "toggleTheme": "Växla tema",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -136,6 +138,9 @@
     "exitZenMode": "Gå ur zen-läge",
     "cancel": "Avbryt",
     "clear": "Rensa",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
     "confirm": "Bekräfta"
   },
   "alerts": {
@@ -158,6 +163,7 @@
     "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil",
     "invalidSceneUrl": "Det gick inte att importera skiss från den angivna webbadressen. Antingen har den fel format, eller så innehåller den ingen giltig Excalidraw JSON data.",
     "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat."
   },
   "errors": {
@@ -200,7 +206,8 @@
     "lineEditor_info": "Dubbelklicka eller tryck på Enter för att redigera punkter",
     "lineEditor_pointSelected": "Tryck på Ta bort för att ta bort punkt, Ctrl + D eller Cmd + D för att duplicera, eller dra för att flytta",
     "lineEditor_nothingSelected": "Välj en punkt att flytta eller ta bort, eller håll ned ALT och klicka för att lägga till nya punkter",
-    "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt"
+    "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
@@ -270,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Rensa canvas"
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "letter&Spaces": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",
     "link": "Blogginlägg om kryptering från ände till ände i Excalidraw"
@@ -290,6 +345,7 @@
     "width": "Bredd"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "Kopierade stilar.",
     "copyToClipboard": "Kopierad till urklipp.",
     "copyToClipboardAsPng": "Kopierade {{exportSelection}} till urklipp som PNG\n({{exportColorScheme}})",
