@@ -33,6 +33,19 @@
     }
 
     &--publish {
+      background-color: $oc-cyan-6;
+      &:hover {
+        background-color: $oc-cyan-7;
+      }
+      &:active {
+        background-color: $oc-cyan-9;
+      }
+      svg {
+        color: $oc-white;
+      }
+    }
+
+    &--load {
       background-color: $oc-blue-6;
       &:hover {
         background-color: $oc-blue-7;

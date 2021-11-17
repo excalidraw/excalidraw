@@ -115,6 +115,7 @@ const LibraryMenuItems = ({
                   setAppState({ errorMessage: error.message });
                 });
             }}
+            className="library-actions--load"
           />
         )}
         {!!items.length && (
