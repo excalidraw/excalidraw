@@ -101,8 +101,8 @@
     "showStroke": "Afișare selector culoare contur",
     "showBackground": "Afișare selector culoare fundal",
     "toggleTheme": "Comutare temă",
-    "personalLib": "Bibliotecă personală",
-    "excalidrawLib": ""
+    "personalLib": "Biblioteca personală",
+    "excalidrawLib": "Biblioteca Excalidraw"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -138,9 +138,9 @@
     "exitZenMode": "Ieșire din modul zen",
     "cancel": "Anulare",
     "clear": "Ștergere",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
+    "remove": "Eliminare",
+    "publishLibrary": "Publicare",
+    "submit": "Trimitere",
     "confirm": "Confirmare"
   },
   "alerts": {
@@ -163,7 +163,7 @@
     "cannotRestoreFromImage": "Scena nu a putut fi restaurată din acest fișier de imagine",
     "invalidSceneUrl": "Scena nu a putut fi importată din URL-ul furnizat. Este fie incorect formată, fie nu conține date JSON Excalidraw valide.",
     "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "Ștergi {{count}} element(e) din bibliotecă?",
     "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată."
   },
   "errors": {
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctul, combinația de taste Ctrl sau Cmd + D pentru a-l duplica sau glisează-l pentru a-i schimba poziția",
     "lineEditor_nothingSelected": "Selectează un punct pentru a-l muta sau elimina sau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi",
     "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
-    "publishLibrary": ""
+    "publishLibrary": "Publică propria bibliotecă"
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
