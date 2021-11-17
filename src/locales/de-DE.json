@@ -289,8 +289,8 @@
     "placeholder": {
       "authorName": "Dein Name oder Benutzername",
       "libraryName": "Name deiner Bibliothek",
-      "libraryDesc": "",
-      "githubHandle": "",
+      "libraryDesc": "Beschreibung deiner Bibliothek, um anderen Nutzern bei der Verwendung zu helfen",
+      "githubHandle": "GitHub-Handle (optional), damit du die Bibliothek bearbeiten kannst, wenn sie zur Überprüfung eingereicht wurde",
       "twitterHandle": "",
       "website": ""
     },
