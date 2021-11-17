@@ -21,7 +21,7 @@ describe("library", () => {
     await waitFor(async () => {
       expect(await h.app.library.loadLibrary()).toEqual([
         {
-          status: "published",
+          status: "unpublished",
           elements: [expect.objectContaining({ id: "A" })],
           id: "id0",
         },
