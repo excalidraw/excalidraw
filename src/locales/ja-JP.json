@@ -100,7 +100,9 @@
     "share": "共有",
     "showStroke": "ストロークカラーピッカーを表示",
     "showBackground": "背景色ピッカーを表示",
-    "toggleTheme": "テーマの切り替え"
+    "toggleTheme": "テーマの切り替え",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -136,6 +138,9 @@
     "exitZenMode": "集中モードをやめる",
     "cancel": "キャンセル",
     "clear": "消去",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
     "confirm": ""
   },
   "alerts": {
@@ -158,6 +163,7 @@
     "cannotRestoreFromImage": "このイメージファイルからシーンを復元できませんでした",
     "invalidSceneUrl": "指定された URL からシーンをインポートできませんでした。不正な形式であるか、有効な Excalidraw JSON データが含まれていません。",
     "resetLibrary": "ライブラリを消去します。本当によろしいですか？",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。"
   },
   "errors": {
@@ -200,7 +206,8 @@
     "lineEditor_info": "ポイントを編集するには、ダブルクリックまたはEnterキーを押します",
     "lineEditor_pointSelected": "削除ボタンを押して点を削除します。Ctrl+D または Cmd+D で複製します。またはドラッグして移動します",
     "lineEditor_nothingSelected": "移動または削除する点を選択するか、Altキーを押しながらクリックして新しい点を追加します",
-    "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します"
+    "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
@@ -270,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "キャンバスを消去"
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "letter&Spaces": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。",
     "link": "Excalidrawのエンドツーエンド暗号化に関するブログ記事"
@@ -290,6 +345,7 @@
     "width": "幅"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "スタイルをコピーしました。",
     "copyToClipboard": "クリップボードにコピー",
     "copyToClipboardAsPng": "{{exportSelection}} を PNG 形式でクリップボードにコピーしました\n({{exportColorScheme}})",
