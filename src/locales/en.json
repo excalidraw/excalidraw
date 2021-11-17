@@ -313,7 +313,8 @@
       "link": "MIT License, ",
       "post": "which in short means anyone can use them without restrictions."
     },
-    "noteItems": "Each library item must have its own name so it's filterable. The following library items will be included:"
+    "noteItems": "Each library item must have its own name so it's filterable. The following library items will be included:",
+    "atleastOneLibItem": "Please select at least one library item to get started"
   },
 
   "publishSuccessDialog": {

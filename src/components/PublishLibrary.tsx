@@ -420,7 +420,7 @@ const PublishLibrary = ({
         </form>
       ) : (
         <p style={{ padding: "1em", textAlign: "center", fontWeight: 500 }}>
-          Please select atleast one library Item to get started
+          {t("publishDialog.atleastOneLibItem")}
         </p>
       )}
     </Dialog>
