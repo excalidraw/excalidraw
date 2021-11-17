@@ -101,8 +101,8 @@
     "showStroke": "Tampilkan garis pengambil warna",
     "showBackground": "Tampilkan latar pengambil warna",
     "toggleTheme": "Ubah tema",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Pustaka Pribadi",
+    "excalidrawLib": "Pustaka Excalidraw"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -138,9 +138,9 @@
     "exitZenMode": "Keluar dari mode zen",
     "cancel": "Batal",
     "clear": "Hapus",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
+    "remove": "Hapus",
+    "publishLibrary": "Terbitkan",
+    "submit": "Kirimkan",
     "confirm": "Konfirmasi"
   },
   "alerts": {
@@ -163,7 +163,7 @@
     "cannotRestoreFromImage": "Pemandangan tidak dapat dipulihkan dari file gambar ini",
     "invalidSceneUrl": "Tidak dapat impor pemandangan dari URL. Kemungkinan URL itu rusak atau tidak berisi data JSON Excalidraw yang valid.",
     "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "Hapus {{count}} item dari pustaka?",
     "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan."
   },
   "errors": {
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "Tekan Delete untuk menghapus titik, Ctrl/Cmd + D untuk menduplikasi, atau seret untuk memindahkan",
     "lineEditor_nothingSelected": "Pilih sebuah titik untuk memindah atau menghapus, atau tekan Alt dan klik untuk menambahkan titik baru",
     "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
-    "publishLibrary": ""
+    "publishLibrary": "Terbitkan pustaka Anda"
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -278,18 +278,18 @@
     "title": "Hapus kanvas"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "Terbitkan pustaka",
+    "itemName": "Nama item",
+    "authorName": "Nama pembuat",
+    "githubUsername": "Nama pengguna github",
+    "twitterUsername": "Nama pengguna Twitter",
+    "libraryName": "Nama Pustaka",
+    "libraryDesc": "Deskripsi pustaka",
+    "website": "Situs Web",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
+      "authorName": "Nama atau nama pengguna Anda",
+      "libraryName": "Nama dari pustaka Anda",
+      "libraryDesc": "Deskripsi pustaka Anda untuk membantu orang mengerti penggunaannya",
       "githubHandle": "",
       "twitterHandle": "",
       "website": ""
