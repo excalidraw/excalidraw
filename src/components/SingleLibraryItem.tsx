@@ -83,7 +83,7 @@ const SingleLibraryItem = ({
             type="text"
             ref={inputRef}
             style={{ width: "80%", padding: "0.2rem" }}
-            value={libItem.name}
+            defaultValue={libItem.name}
             placeholder="Item name"
             onChange={(event) => {
               onChange(event.target.value, index);
