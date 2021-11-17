@@ -202,7 +202,7 @@ const PublishLibrary = ({
     formData.append("twitterHandle", libraryData.twitterHandle);
     formData.append("website", libraryData.website);
 
-    fetch(`${process.env.REACT_APP_LIBRARY_BACKEND}/api/libraries/publish`, {
+    fetch(`${process.env.REACT_APP_LIBRARY_BACKEND}/submit`, {
       method: "post",
       body: formData,
     })
