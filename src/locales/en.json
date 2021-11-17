@@ -299,19 +299,16 @@
       "letter&Spaces": "Only letters and spaces allowed"
     },
     "noteDescription": {
-      "pre": "Submit your library to be included in the ",
-      "link": "public library repository",
-      "post": "for other people to use in their drawings."
+      "content": "Submit your library to be included in the {{link}} for other people to use in their drawings.",
+      "link": "public library repository"
     },
     "noteGuidelines": {
-      "pre": "The library needs to be manually approved first. Please read the ",
-      "link": "guidelines",
-      "post": " before submitting. You will need a GitHub account to communicate and make changes if requested, but it is not strictly required."
+      "content": "The library needs to be manually approved first. Please read the {{link}} before submitting. You will need a GitHub account to communicate and make changes if requested, but it is not strictly required.",
+      "link": "guidelines"
     },
     "noteLicense": {
-      "pre": "By submitting, you agree the library will be published under the ",
-      "link": "MIT License, ",
-      "post": "which in short means anyone can use them without restrictions."
+      "content": "By submitting, you agree the library will be published under the {{link}}, which in short means anyone can use them without restrictions.",
+      "link": "MIT License"
     },
     "noteItems": "Each library item must have its own name so it's filterable. The following library items will be included:",
     "atleastOneLibItem": "Please select at least one library item to get started"
@@ -319,7 +316,7 @@
 
   "publishSuccessDialog": {
     "title": "Library submitted",
-    "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",
+    "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status {{link}}",
     "link": "here"
   },
   "confirmDialog": {

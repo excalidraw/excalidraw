@@ -131,3 +131,16 @@ export const t = (
   }
   return translation;
 };
+
+export const te = (
+  path: string,
+  replacement: { [key: string]: string | number | JSX.Element },
+) => {
+  const translation = t(path);
+  const translationFrag = translation
+    .split(/({{.*?}})/g)
+    .map((frag) =>
+      /^{{.*}}$/.test(frag) ? replacement[frag.slice(2, -2)] : frag,
+    );
+  return translationFrag;
+};

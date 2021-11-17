@@ -2,7 +2,7 @@ import { ReactNode, useCallback, useEffect, useState } from "react";
 import oc from "open-color";
 
 import { Dialog } from "./Dialog";
-import { t } from "../i18n";
+import { t, te } from "../i18n";
 
 import { ToolButton } from "./ToolButton";
 
@@ -281,26 +281,30 @@ const PublishLibrary = ({
       {shouldRenderForm ? (
         <form onSubmit={onSubmit}>
           <div className="publish-library-note">
-            {t("publishDialog.noteDescription.pre")}
-            <a
-              href="https://libraries.excalidraw.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t("publishDialog.noteDescription.link")}
-            </a>{" "}
-            {t("publishDialog.noteDescription.post")}
+            {te("publishDialog.noteDescription.content", {
+              link: (
+                <a
+                  href="https://libraries.excalidraw.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t("publishDialog.noteDescription.link")}
+                </a>
+              ),
+            })}
           </div>
           <span className="publish-library-note">
-            {t("publishDialog.noteGuidelines.pre")}
-            <a
-              href="https://github.com/excalidraw/excalidraw-libraries#guidelines"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t("publishDialog.noteGuidelines.link")}
-            </a>
-            {t("publishDialog.noteGuidelines.post")}
+            {te("publishDialog.noteGuidelines.content", {
+              link: (
+                <a
+                  href="https://github.com/excalidraw/excalidraw-libraries#guidelines"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t("publishDialog.noteGuidelines.link")}
+                </a>
+              ),
+            })}
           </span>
 
           <div className="publish-library-note">
@@ -387,15 +391,17 @@ const PublishLibrary = ({
               />
             </label>
             <span className="publish-library-note">
-              {t("publishDialog.noteLicense.pre")}
-              <a
-                href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t("publishDialog.noteLicense.link")}
-              </a>
-              {t("publishDialog.noteLicense.post")}
+              {te("publishDialog.noteLicense.content", {
+                link: (
+                  <a
+                    href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t("publishDialog.noteLicense.link")}
+                  </a>
+                ),
+              })}
             </span>
           </div>
           <div className="publish-library__buttons">
