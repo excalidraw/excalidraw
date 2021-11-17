@@ -24,6 +24,7 @@ describe("library", () => {
           status: "unpublished",
           elements: [expect.objectContaining({ id: "A" })],
           id: "id0",
+          created: expect.any(Number),
         },
       ]);
     });
