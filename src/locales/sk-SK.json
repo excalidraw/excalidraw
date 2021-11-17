@@ -100,7 +100,9 @@
     "share": "Zdieľať",
     "showStroke": "Zobraziť výber farby pre obrys",
     "showBackground": "Zobraziť výber farby pre pozadie",
-    "toggleTheme": "Prepnúť tému"
+    "toggleTheme": "Prepnúť tému",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -136,6 +138,9 @@
     "exitZenMode": "Zrušiť režim zen",
     "cancel": "Zrušiť",
     "clear": "Vymazať",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
     "confirm": "Potvrdiť"
   },
   "alerts": {
@@ -158,6 +163,7 @@
     "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru",
     "invalidSceneUrl": "Nepodarilo sa načítať scénu z poskytnutej URL. Je nevalidná alebo neobsahuje žiadne validné Excalidraw JSON dáta.",
     "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá."
   },
   "errors": {
@@ -200,7 +206,8 @@
     "lineEditor_info": "Použite dvojklik alebo stlačte Enter na editáciu bodov",
     "lineEditor_pointSelected": "Stačte Delete na vymazanie bodu, CtrlOrCmd+D na jeho duplikovanie, alebo potiahnite na jeho presunutie",
     "lineEditor_nothingSelected": "Zvoľte bod na jeho presunutie alebo vymazanie, alebo podržte Alt a kliknite na pridanie nového bodu",
-    "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti"
+    "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -270,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Vyčistiť plátno"
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "letter&Spaces": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať.",
     "link": "Blog o end-to-end šifrovaní v Excalidraw"
@@ -290,6 +345,7 @@
     "width": "Šírka"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "Štýly skopírované.",
     "copyToClipboard": "Skopírované do schránky.",
     "copyToClipboardAsPng": "Kopírovanie {{exportSelection}} do schránky ako PNG prebehlo úspešne\n({{exportColorScheme}})",
