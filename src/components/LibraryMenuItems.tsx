@@ -58,6 +58,9 @@ const LibraryMenuItems = ({
     const items = itemsSelected
       ? libraryItems.filter((item) => selectedItems.includes(item.id))
       : libraryItems;
+    const resetLabel = itemsSelected
+      ? t("buttons.remove")
+      : t("buttons.resetLibrary");
     return (
       <div className="library-actions">
         {!itemsSelected && (
@@ -104,8 +107,8 @@ const LibraryMenuItems = ({
             <ToolButton
               key="reset"
               type="button"
-              title={t("buttons.resetLibrary")}
-              aria-label={t("buttons.resetLibrary")}
+              title={resetLabel}
+              aria-label={resetLabel}
               icon={trash}
               onClick={itemsSelected ? onRemoveFromLibrary : resetLibrary}
               className="library-actions--remove"
