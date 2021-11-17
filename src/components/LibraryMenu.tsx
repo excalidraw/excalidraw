@@ -81,7 +81,7 @@ export const LibraryMenu = ({
 
   useOnClickOutside(ref, (event) => {
     // If click on the library icon, do nothing.
-    if ((event.target as Element).closest(".ToolIcon_type_button__library")) {
+    if ((event.target as Element).closest(".ToolIcon__library")) {
       return;
     }
     onClickOutside(event);
