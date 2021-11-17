@@ -280,9 +280,9 @@
   "publishDialog": {
     "title": "Publicera bibliotek",
     "itemName": "Objektnamn",
-    "authorName": "",
-    "githubUsername": "GitHub användarnamn",
-    "twitterUsername": "Twitter användarnamn",
+    "authorName": "Upphovsmannens namn",
+    "githubUsername": "GitHub-användarnamn",
+    "twitterUsername": "Twitter-användarnamn",
     "libraryName": "Biblioteksnamn",
     "libraryDesc": "Biblioteksbeskrivning",
     "website": "Webbplats",
@@ -313,17 +313,17 @@
       "link": "MIT-licens, ",
       "post": "vilket kort sagt betyder att vem som helst kan använda det utan restriktioner."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Varje objekt måste ha sitt eget namn så att det är filtrerbart. Följande objekt kommer att inkluderas:",
+    "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Bibliotek inskickat",
+    "content": "Tack {{authorName}}. Ditt bibliotek har skickats för granskning. Du kan följa status",
+    "link": "här"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Återställ bibliotek",
+    "removeItemsFromLib": "Ta bort markerade objekt från biblioteket"
   },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",
@@ -345,7 +345,7 @@
     "width": "Bredd"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Tillagd i biblioteket",
     "copyStyles": "Kopierade stilar.",
     "copyToClipboard": "Kopierad till urklipp.",
     "copyToClipboardAsPng": "Kopierade {{exportSelection}} till urklipp som PNG\n({{exportColorScheme}})",
