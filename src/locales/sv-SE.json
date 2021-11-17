@@ -284,34 +284,34 @@
     "githubUsername": "GitHub användarnamn",
     "twitterUsername": "Twitter användarnamn",
     "libraryName": "Biblioteksnamn",
-    "libraryDesc": "",
-    "website": "",
+    "libraryDesc": "Biblioteksbeskrivning",
+    "website": "Webbplats",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "authorName": "Ditt namn eller användarnamn",
+      "libraryName": "Namn på ditt bibliotek",
+      "libraryDesc": "Beskrivning av ditt bibliotek för att hjälpa människor att förstå dess användning",
+      "githubHandle": "Github-användarnamn (valfritt), så att du kan redigera biblioteket när du har skickat in det för granskning",
+      "twitterHandle": "Twitter-användarnamn (valfritt), så vi vet vem att kreditera när du marknadsför på Twitter",
+      "website": "Länk till din personliga webbplats eller någon annan (valfritt)"
     },
     "errors": {
-      "required": "",
-      "letter&Spaces": ""
+      "required": "Obligatoriskt",
+      "letter&Spaces": "Endast bokstäver och mellanslag tillåtna"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Skicka ditt bibliotek för att inkluderas i ",
+      "link": "det offentliga bibliotekets arkiv",
+      "post": "för andra människor att använda i sina skisser."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Biblioteket måste godkännas manuellt först. Vänligen läs ",
+      "link": "riktlinjerna",
+      "post": " innan du skickar in. Du behöver ett GitHub-konto för att kommunicera och göra ändringar om så önskas, men det krävs inte."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Genom att skicka in godkänner du att biblioteket kommer att publiceras under ",
+      "link": "MIT-licens, ",
+      "post": "vilket kort sagt betyder att vem som helst kan använda det utan restriktioner."
     },
     "noteItems": "",
     "atleastOneLibItem": ""
