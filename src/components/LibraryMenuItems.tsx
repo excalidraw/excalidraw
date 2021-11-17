@@ -267,9 +267,9 @@ const LibraryMenuItems = ({
   ];
 
   return (
-    <>
+    <div className="library-menu-items-container">
       {showRemoveLibAlert && renderRemoveLibAlert()}
-      <Stack.Col align="start" gap={1} className="layer-ui__library-items">
+      <Stack.Col align="start" gap={1}>
         <div className="layer-ui__library-header" key="library-header">
           {renderLibraryActions()}
           <a
@@ -281,21 +281,23 @@ const LibraryMenuItems = ({
             {t("labels.libraries")}
           </a>
         </div>
-        {(publishedItems.length > 0 || !unpublishedItems.length) &&
-          renderLibrarySection(publishedItems)}
-        {unpublishedItems.length > 0 && (
-          <>
-            <div
-              key="separator"
-              style={{ margin: ".6em .2em", fontWeight: 500 }}
-            >
-              {t("labels.unpublishedItems")}
-            </div>
-            {renderLibrarySection(unpublishedItems)}
-          </>
-        )}
+        <div className="library-menu-items-container__items">
+          {(publishedItems.length > 0 || !unpublishedItems.length) &&
+            renderLibrarySection(publishedItems)}
+          {unpublishedItems.length > 0 && (
+            <>
+              <div
+                key="separator"
+                style={{ margin: ".6em .2em", fontWeight: 500 }}
+              >
+                {t("labels.unpublishedItems")}
+              </div>
+              {renderLibrarySection(unpublishedItems)}
+            </>
+          )}
+        </div>
       </Stack.Col>
-    </>
+    </div>
   );
 };
 
