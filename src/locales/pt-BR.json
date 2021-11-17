@@ -101,8 +101,8 @@
     "showStroke": "Exibir seletor de cores do traço",
     "showBackground": "Exibir seletor de cores do fundo",
     "toggleTheme": "Alternar tema",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Biblioteca Pessoal",
+    "excalidrawLib": "Biblioteca do Excalidraw"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -138,10 +138,10 @@
     "exitZenMode": "Sair do modo zen",
     "cancel": "Cancelar",
     "clear": "Limpar",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "remove": "Remover",
+    "publishLibrary": "Publicar",
+    "submit": "Enviar",
+    "confirm": "Confirmar"
   },
   "alerts": {
     "clearReset": "Isto irá limpar toda a tela. Você tem certeza?",
@@ -163,7 +163,7 @@
     "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem",
     "invalidSceneUrl": "Não foi possível importar a cena da URL fornecida. Ela está incompleta ou não contém dados JSON válidos do Excalidraw.",
     "resetLibrary": "Isto limpará a sua biblioteca. Você tem certeza?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "Excluir {{count}} item(ns) da biblioteca?",
     "invalidEncryptionKey": "A chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desabilitada."
   },
   "errors": {
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "Pressione Deletar para remover o ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
     "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos",
     "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
-    "publishLibrary": ""
+    "publishLibrary": "Publicar sua própria biblioteca"
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -278,25 +278,25 @@
     "title": "Limpar a tela"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "Publicar biblioteca",
+    "itemName": "Nome do item",
+    "authorName": "Nome do autor",
+    "githubUsername": "Nome de usuário do GitHub",
+    "twitterUsername": "Nome de usuário do Twitter",
+    "libraryName": "Nome da Biblioteca",
+    "libraryDesc": "Descrição da biblioteca",
+    "website": "Site",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "authorName": "Seu nome ou nome de usuário",
+      "libraryName": "Nome da sua biblioteca",
+      "libraryDesc": "Descrição para ajudar as pessoas a entenderem o uso da sua da sua biblioteca",
+      "githubHandle": "GitHub handle (opcional), para que você possa editar a biblioteca uma vez que submetido para revisão",
+      "twitterHandle": "Nome de usuário do Twitter (opcional), para que saibamos quem deve ser creditado se promovermos no Twitter",
+      "website": "Link para o seu site pessoal ou outro lugar (opcional)"
     },
     "errors": {
-      "required": "",
-      "letter&Spaces": ""
+      "required": "Obrigatório",
+      "letter&Spaces": "Apenas letras e espaços são permitidos"
     },
     "noteDescription": {
       "pre": "",
