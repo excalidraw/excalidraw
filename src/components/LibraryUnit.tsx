@@ -64,7 +64,7 @@ export const LibraryUnit = ({
 
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useIsMobile();
-  const adder = (isHovered || isMobile) && isPending && (
+  const adder = isPending && (
     <div className="library-unit__adder">{PLUS_ICON}</div>
   );
 

@@ -80,27 +80,28 @@
     width: 16px;
   }
 
-  .library-unit__pulse {
+  .library-unit__adder {
     transform: scale(1);
-    animation: library-unit__pulse-animation 1s ease-in infinite;
+    animation: library-unit__adder-animation 1s ease-in infinite;
   }
 
   .library-unit__adder {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 20px;
-    height: 20px;
+    left: 40%;
+    top: 40%;
+    width: 2rem;
+    height: 2rem;
     margin-left: -10px;
     margin-top: -10px;
     pointer-events: none;
+    background-color: $oc-gray-2;
   }
 
   .library-unit__active {
     cursor: pointer;
   }
 
-  @keyframes library-unit__pulse-animation {
+  @keyframes library-unit__adder-animation {
     0% {
       transform: scale(0.95);
     }
