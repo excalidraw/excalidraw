@@ -100,7 +100,9 @@
     "share": "Kopīgot",
     "showStroke": "Rādīt svītras krāsas atlasītāju",
     "showBackground": "Rādīt fona krāsas atlasītāju",
-    "toggleTheme": "Pārslēgt krāsu tēmu"
+    "toggleTheme": "Pārslēgt krāsu tēmu",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
@@ -136,6 +138,9 @@
     "exitZenMode": "Pamest Zen režīmu",
     "cancel": "Atcelt",
     "clear": "Notīrīt",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
     "confirm": "Apstiprināt"
   },
   "alerts": {
@@ -158,6 +163,7 @@
     "cannotRestoreFromImage": "Ainu nevarēja atgūt no attēla faila",
     "invalidSceneUrl": "Nevarēja importēt ainu no norādītā URL. Vai nu tas ir nederīgs, vai nesatur derīgus Excalidraw JSON datus.",
     "resetLibrary": "Šī funkcija iztukšos bibliotēku. Vai turpināt?",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "Šifrēšanas atslēgai jābūt 22 simbolus garai. Tiešsaistes sadarbība ir izslēgta."
   },
   "errors": {
@@ -200,7 +206,8 @@
     "lineEditor_info": "Dubultklikšķiniet vai spiediet ievades taustiņu, lai rediģētu punktus",
     "lineEditor_pointSelected": "Spiediet dzēšanas taustiņu, lai noņemtu punktu, – CtrlOrCmd+D, lai to kopētu, vai velciet, lai pārvietotu",
     "lineEditor_nothingSelected": "Atlasiet punktu, lai to pārvietotu vai noņemtu; lai pievienotu jaunus punktus, turiet nospiestu Alt taustiņu",
-    "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru"
+    "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nevar rādīt priekšskatījumu",
@@ -270,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Notīrīt tāfeli"
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "letter&Spaces": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "Jūsu zīmējumi ir šifrēti no gala līdz galam; līdz ar to Excalidraw serveri tos nekad neredzēs.",
     "link": "Ieraksts par šifrēšanu no gala līdz galam Excalidraw blogā"
@@ -290,6 +345,7 @@
     "width": "Platums"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "Nokopēja stilus.",
     "copyToClipboard": "Nokopēja starpliktuvē.",
     "copyToClipboardAsPng": "Nokopēja {{exportSelection}} starpliktuvē kā PNG ({{exportColorScheme}})",
