@@ -19,6 +19,7 @@ export const actionAddToLibrary = register({
               getNonDeletedElements(elements),
               appState,
             ).map(deepCopyElement),
+            created: Date.now(),
           },
           ...items,
         ]);

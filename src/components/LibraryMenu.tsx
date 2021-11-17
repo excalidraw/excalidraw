@@ -149,7 +149,12 @@ export const LibraryMenu = ({
       }
       const items = await library.loadLibrary();
       const nextItems: LibraryItems = [
-        { status: "unpublished", elements, id: randomId() },
+        {
+          status: "unpublished",
+          elements,
+          id: randomId(),
+          created: Date.now(),
+        },
         ...items,
       ];
       onAddToLibrary();

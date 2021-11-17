@@ -291,6 +291,7 @@ export const restoreLibraryItems = (
         status: defaultStatus,
         elements: item,
         id: randomId(),
+        created: Date.now(),
       });
     } else {
       const _item = item as MarkOptional<LibraryItem, "id" | "status">;
@@ -298,6 +299,7 @@ export const restoreLibraryItems = (
         ..._item,
         id: _item.id || randomId(),
         status: _item.status || defaultStatus,
+        created: _item.created || Date.now(),
       });
     }
   }

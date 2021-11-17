@@ -190,6 +190,8 @@ export type LibraryItem = {
   id: string;
   status: "published" | "unpublished";
   elements: readonly NonDeleted<ExcalidrawElement>[];
+  /** timestamp in epoch (ms) */
+  created: number;
   name?: string;
   error?: string;
 };
