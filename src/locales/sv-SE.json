@@ -136,7 +136,7 @@
     "exitZenMode": "Gå ur zen-läge",
     "cancel": "Avbryt",
     "clear": "Rensa",
-    "confirm": ""
+    "confirm": "Bekräfta"
   },
   "alerts": {
     "clearReset": "Detta rensar hela canvasen. Är du säker?",
@@ -268,7 +268,7 @@
     "zoomToSelection": "Zooma till markering"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Rensa canvas"
   },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",
