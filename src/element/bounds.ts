@@ -3,6 +3,7 @@ import {
   ExcalidrawLinearElement,
   Arrowhead,
   ExcalidrawFreeDrawElement,
+  NonDeleted,
 } from "./types";
 import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
@@ -512,4 +513,18 @@ export const getClosestElementBounds = (
   });
 
   return getElementBounds(closestElement);
+};
+
+export interface Box {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
+export const getCommonBoundingBox = (
+  elements: ExcalidrawElement[] | readonly NonDeleted<ExcalidrawElement>[],
+): Box => {
+  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  return { minX, minY, maxX, maxY };
 };

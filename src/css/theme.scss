@@ -16,7 +16,7 @@
   --icon-green-fill-color: #{$oc-green-9};
   --default-bg-color: #{$oc-white};
   --input-bg-color: #{$oc-white};
-  --input-border-color: #{$oc-gray-3};
+  --input-border-color: #{$oc-gray-4};
   --input-hover-bg-color: #{$oc-gray-1};
   --input-label-color: #{$oc-gray-7};
   --island-bg-color: rgba(255, 255, 255, 0.96);
@@ -64,6 +64,7 @@
     --input-label-color: #{$oc-gray-2};
     --island-bg-color: rgba(30, 30, 30, 0.98);
     --keybinding-color: #{$oc-gray-6};
+    --link-color: #{$oc-blue-4};
     --overlay-bg-color: #{transparentize($oc-gray-8, 0.88)};
     --popup-bg-color: #2c2c2c;
     --popup-secondary-bg-color: #222;

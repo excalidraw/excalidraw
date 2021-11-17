@@ -4,13 +4,13 @@ import {
 } from "../scene/export";
 import { getDefaultAppState } from "../appState";
 import { AppState, BinaryFiles } from "../types";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { getNonDeletedElements } from "../element";
 import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
 
 type ExportOpts = {
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeleted<ExcalidrawElement>[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
   getDimensions?: (

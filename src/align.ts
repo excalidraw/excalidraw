@@ -1,13 +1,6 @@
 import { ExcalidrawElement } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
-import { getCommonBounds } from "./element";
-
-interface Box {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
-}
+import { Box, getCommonBoundingBox } from "./element/bounds";
 
 export interface Alignment {
   position: "start" | "center" | "end";
@@ -87,9 +80,4 @@ const calculateTranslation = (
       (selectionBoundingBox[min] + selectionBoundingBox[max]) / 2 -
       (groupBoundingBox[min] + groupBoundingBox[max]) / 2,
   };
-};
-
-const getCommonBoundingBox = (elements: ExcalidrawElement[]): Box => {
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  return { minX, minY, maxX, maxY };
 };

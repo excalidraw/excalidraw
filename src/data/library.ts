@@ -1,6 +1,6 @@
 import { loadLibraryFromBlob } from "./blob";
 import { LibraryItems, LibraryItem } from "../types";
-import { restoreElements } from "./restore";
+import { restoreElements, restoreLibraryItems } from "./restore";
 import { getNonDeletedElements } from "../element";
 import type App from "../components/App";
 
@@ -18,14 +18,16 @@ class Library {
   };
 
   restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
-    const elements = getNonDeletedElements(restoreElements(libraryItem, null));
-    return elements.length ? elements : null;
+    const elements = getNonDeletedElements(
+      restoreElements(libraryItem.elements, null),
+    );
+    return elements.length ? { ...libraryItem, elements } : null;
   };
 
   /** imports library (currently merges, removing duplicates) */
-  async importLibrary(blob: Blob) {
+  async importLibrary(blob: Blob, defaultStatus = "unpublished") {
     const libraryFile = await loadLibraryFromBlob(blob);
-    if (!libraryFile || !libraryFile.library) {
+    if (!libraryFile || !(libraryFile.libraryItems || libraryFile.library)) {
       return;
     }
 
@@ -37,17 +39,17 @@ class Library {
       targetLibraryItem: LibraryItem,
     ) => {
       return !existingLibraryItems.find((libraryItem) => {
-        if (libraryItem.length !== targetLibraryItem.length) {
+        if (libraryItem.elements.length !== targetLibraryItem.elements.length) {
           return false;
         }
 
         // detect z-index difference by checking the excalidraw elements
         // are in order
-        return libraryItem.every((libItemExcalidrawItem, idx) => {
+        return libraryItem.elements.every((libItemExcalidrawItem, idx) => {
           return (
-            libItemExcalidrawItem.id === targetLibraryItem[idx].id &&
+            libItemExcalidrawItem.id === targetLibraryItem.elements[idx].id &&
             libItemExcalidrawItem.versionNonce ===
-              targetLibraryItem[idx].versionNonce
+              targetLibraryItem.elements[idx].versionNonce
           );
         });
       });
@@ -55,15 +57,20 @@ class Library {
 
     const existingLibraryItems = await this.loadLibrary();
 
-    const filtered = libraryFile.library!.reduce((acc, libraryItem) => {
-      const restoredItem = this.restoreLibraryItem(libraryItem);
+    const library = libraryFile.libraryItems || libraryFile.library || [];
+    const restoredLibItems = restoreLibraryItems(
+      library,
+      defaultStatus as "published" | "unpublished",
+    );
+    const filteredItems = [];
+    for (const item of restoredLibItems) {
+      const restoredItem = this.restoreLibraryItem(item as LibraryItem);
       if (restoredItem && isUniqueitem(existingLibraryItems, restoredItem)) {
-        acc.push(restoredItem);
+        filteredItems.push(restoredItem);
       }
-      return acc;
-    }, [] as Mutable<LibraryItems>);
+    }
 
-    await this.saveLibrary([...existingLibraryItems, ...filtered]);
+    await this.saveLibrary([...filteredItems, ...existingLibraryItems]);
   }
 
   loadLibrary = (): Promise<LibraryItems> => {

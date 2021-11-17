@@ -50,6 +50,8 @@ type MarkNonNullable<T, K extends keyof T> = {
   [P in K]-?: P extends K ? NonNullable<T[P]> : T[P];
 } & { [P in keyof T]: T[P] };
 
+type NonOptional<T> = Exclude<T, undefined>;
+
 // PNG encoding/decoding
 // -----------------------------------------------------------------------------
 type TEXtChunk = { name: "tEXt"; data: Uint8Array };

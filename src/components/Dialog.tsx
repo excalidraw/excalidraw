@@ -18,7 +18,9 @@ export interface DialogProps {
   title: React.ReactNode;
   autofocus?: boolean;
   theme?: AppState["theme"];
+  closeOnClickOutside?: boolean;
 }
+
 export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
@@ -82,6 +84,7 @@ export const Dialog = (props: DialogProps) => {
       maxWidth={props.small ? 550 : 800}
       onCloseRequest={onClose}
       theme={props.theme}
+      closeOnClickOutside={props.closeOnClickOutside}
     >
       <Island ref={setIslandNode}>
         <h2 id={`${id}-dialog-title`} className="Dialog__title">

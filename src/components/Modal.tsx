@@ -15,8 +15,9 @@ export const Modal = (props: {
   onCloseRequest(): void;
   labelledBy: string;
   theme?: AppState["theme"];
+  closeOnClickOutside?: boolean;
 }) => {
-  const { theme = THEME.LIGHT } = props;
+  const { theme = THEME.LIGHT, closeOnClickOutside = true } = props;
   const modalRoot = useBodyRoot(theme);
 
   if (!modalRoot) {
@@ -39,7 +40,10 @@ export const Modal = (props: {
       onKeyDown={handleKeydown}
       aria-labelledby={props.labelledBy}
     >
-      <div className="Modal__background" onClick={props.onCloseRequest}></div>
+      <div
+        className="Modal__background"
+        onClick={closeOnClickOutside ? props.onCloseRequest : undefined}
+      ></div>
       <div
         className="Modal__content"
         style={{ "--max-width": `${props.maxWidth}px` }}
