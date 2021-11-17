@@ -118,6 +118,18 @@ const LibraryMenuItems = ({
             className="library-actions--load"
           />
         )}
+        {itemsSelected && !isPublished && (
+          <Tooltip label={t("hints.publishLibrary")}>
+            <ToolButton
+              type="button"
+              aria-label={t("buttons.publishLibrary")}
+              label={t("buttons.publishLibrary")}
+              icon={publishIcon}
+              className="library-actions--publish"
+              onClick={onPublish}
+            />
+          </Tooltip>
+        )}
         {!!items.length && (
           <>
             <ToolButton
@@ -148,18 +160,6 @@ const LibraryMenuItems = ({
               className="library-actions--remove"
             />
           </>
-        )}
-        {itemsSelected && !isPublished && (
-          <Tooltip label={t("hints.publishLibrary")}>
-            <ToolButton
-              type="button"
-              aria-label={t("buttons.publishLibrary")}
-              label={t("buttons.publishLibrary")}
-              icon={publishIcon}
-              className="library-actions--publish"
-              onClick={onPublish}
-            />
-          </Tooltip>
         )}
       </div>
     );
