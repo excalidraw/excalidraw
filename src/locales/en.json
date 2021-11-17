@@ -320,6 +320,10 @@
     "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",
     "link": "here"
   },
+  "confirmDialog": {
+    "resetLibrary": "Reset library",
+    "removeItemsFromLib": "Remove selected items from library"
+  },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
     "link": "Blog post on end-to-end encryption in Excalidraw"

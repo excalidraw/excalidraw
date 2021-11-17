@@ -124,29 +124,20 @@ export const LibraryMenu = ({
 
   const removeFromLibrary = useCallback(async () => {
     const items = await library.loadLibrary();
-    if (
-      window.confirm(
-        t("alerts.removeItemsFromsLibrary", { count: selectedItems.length }),
-      )
-    ) {
-      const nextItems = items.filter(
-        (item) => !selectedItems.includes(item.id),
-      );
-      library.saveLibrary(nextItems).catch((error) => {
-        setLibraryItems(items);
-        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
-      });
-      setSelectedItems([]);
-      setLibraryItems(nextItems);
-    }
+
+    const nextItems = items.filter((item) => !selectedItems.includes(item.id));
+    library.saveLibrary(nextItems).catch((error) => {
+      setLibraryItems(items);
+      setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
+    });
+    setSelectedItems([]);
+    setLibraryItems(nextItems);
   }, [library, setAppState, selectedItems, setSelectedItems]);
 
   const resetLibrary = useCallback(() => {
-    if (window.confirm(t("alerts.resetLibrary"))) {
-      library.resetLibrary();
-      setLibraryItems([]);
-      focusContainer();
-    }
+    library.resetLibrary();
+    setLibraryItems([]);
+    focusContainer();
   }, [library, focusContainer]);
 
   const addToLibrary = useCallback(

@@ -249,19 +249,15 @@ const LayerUI = ({
     </Section>
   );
 
-  const closeLibrary = useCallback(
-    (event) => {
-      const isPublishDialogOpen = !!document.querySelector(".publish-library");
-      const isPublishDialogSuccessOpen = !!document.querySelector(
-        ".publish-library-success",
-      );
-      if (isPublishDialogOpen || isPublishDialogSuccessOpen) {
-        return;
-      }
-      setAppState({ isLibraryOpen: false });
-    },
-    [setAppState],
-  );
+  const closeLibrary = useCallback(() => {
+    const isDialogOpen = !!document.querySelector(".Dialog");
+
+    // Prevent closing if any dialog is open
+    if (isDialogOpen) {
+      return;
+    }
+    setAppState({ isLibraryOpen: false });
+  }, [setAppState]);
 
   const deselectItems = useCallback(() => {
     setAppState({

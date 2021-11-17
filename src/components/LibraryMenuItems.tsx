@@ -1,4 +1,5 @@
 import { chunk } from "lodash";
+import { useCallback, useState } from "react";
 import { importLibraryFromJSON, saveLibraryAsJSON } from "../data/json";
 import Library from "../data/library";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
@@ -12,6 +13,7 @@ import {
 } from "../types";
 import { muteFSAbortError } from "../utils";
 import { useIsMobile } from "./App";
+import ConfirmDialog from "./ConfirmDialog";
 import { exportToFileIcon, load, publishIcon, trash } from "./icons";
 import { LibraryUnit } from "./LibraryUnit";
 import Stack from "./Stack";
@@ -51,6 +53,35 @@ const LibraryMenuItems = ({
   onPublish: () => void;
   resetLibrary: () => void;
 }) => {
+  const renderRemoveLibAlert = useCallback(() => {
+    const content = selectedItems.length
+      ? t("alerts.removeItemsFromsLibrary", { count: selectedItems.length })
+      : t("alerts.resetLibrary");
+    const title = selectedItems.length
+      ? t("confirmDialog.removeItemsFromLib")
+      : t("confirmDialog.resetLibrary");
+    return (
+      <ConfirmDialog
+        onConfirm={() => {
+          if (selectedItems.length) {
+            onRemoveFromLibrary();
+          } else {
+            resetLibrary();
+          }
+          setShowRemoveLibAlert(false);
+        }}
+        onCancel={() => {
+          setShowRemoveLibAlert(false);
+        }}
+        title={title}
+      >
+        <p>{content}</p>
+      </ConfirmDialog>
+    );
+  }, [selectedItems, onRemoveFromLibrary, resetLibrary]);
+
+  const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
+
   const isMobile = useIsMobile();
 
   const renderLibraryActions = () => {
@@ -110,7 +141,7 @@ const LibraryMenuItems = ({
               title={resetLabel}
               aria-label={resetLabel}
               icon={trash}
-              onClick={itemsSelected ? onRemoveFromLibrary : resetLibrary}
+              onClick={() => setShowRemoveLibAlert(true)}
               className="library-actions--remove"
             />
           </>
@@ -234,6 +265,7 @@ const LibraryMenuItems = ({
 
   return (
     <>
+      {showRemoveLibAlert && renderRemoveLibAlert()}
       <Stack.Col align="start" gap={1} className="layer-ui__library-items">
         <div className="layer-ui__library-header" key="library-header">
           {renderLibraryActions()}
