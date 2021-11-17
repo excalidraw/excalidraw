@@ -46,16 +46,16 @@
         margin: 0;
       }
       .ToolIcon__icon {
-        background-color: var(--button-gray-1);
+        background-color: $oc-red-6;
         &:hover {
-          background-color: var(--button-gray-2);
+          background-color: $oc-red-7;
         }
         &:active {
-          background-color: var(--button-gray-3);
+          background-color: $oc-red-8;
         }
       }
       svg {
-        color: var(--icon-fill-color);
+        color: $oc-white;
         padding: 0.26rem;
         border-radius: 0.3em;
         width: 1rem;
