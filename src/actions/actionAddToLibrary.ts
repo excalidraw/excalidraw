@@ -8,6 +8,16 @@ import { t } from "../i18n";
 export const actionAddToLibrary = register({
   name: "addToLibrary",
   perform: (elements, appState, _, app) => {
+    if (elements.some((element) => element.type === "image")) {
+      return {
+        commitToHistory: false,
+        appState: {
+          ...appState,
+          errorMessage: "Support for adding images to the library coming soon!",
+        },
+      };
+    }
+
     return app.library
       .loadLibrary()
       .then((items) => {
