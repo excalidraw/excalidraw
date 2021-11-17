@@ -137,7 +137,13 @@ const LibraryMenuItems = ({
                   });
               }}
               className="library-actions--export"
-            />
+            >
+              {selectedItems.length > 0 && (
+                <span className="library-actions-counter">
+                  {selectedItems.length}
+                </span>
+              )}
+            </ToolButton>
             <ToolButton
               key="reset"
               type="button"
@@ -146,7 +152,13 @@ const LibraryMenuItems = ({
               icon={trash}
               onClick={() => setShowRemoveLibAlert(true)}
               className="library-actions--remove"
-            />
+            >
+              {selectedItems.length > 0 && (
+                <span className="library-actions-counter">
+                  {selectedItems.length}
+                </span>
+              )}
+            </ToolButton>
           </>
         )}
         {itemsSelected && !isPublished && (
@@ -160,6 +172,11 @@ const LibraryMenuItems = ({
               onClick={onPublish}
             >
               {!isMobile && <label>{t("buttons.publishLibrary")}</label>}
+              {selectedItems.length > 0 && (
+                <span className="library-actions-counter">
+                  {selectedItems.length}
+                </span>
+              )}
             </ToolButton>
           </Tooltip>
         )}

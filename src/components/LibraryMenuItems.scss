@@ -5,6 +5,18 @@
     .library-actions {
       display: flex;
 
+      button .library-actions-counter {
+        position: absolute;
+        right: 2px;
+        bottom: 2px;
+        border-radius: 50%;
+        width: 1em;
+        height: 1em;
+        padding: 1px;
+        font-size: 0.7rem;
+        background: #fff;
+      }
+
       &--remove {
         background-color: $oc-red-7;
         &:hover {
@@ -15,6 +27,9 @@
         }
         svg {
           color: $oc-white;
+        }
+        .library-actions-counter {
+          color: $oc-red-7;
         }
       }
 
@@ -31,6 +46,9 @@
         svg {
           color: $oc-white;
         }
+        .library-actions-counter {
+          color: $oc-lime-5;
+        }
       }
 
       &--publish {
@@ -45,8 +63,13 @@
           color: $oc-white;
         }
         label {
+          margin-left: -0.2em;
+          margin-right: 1.1em;
           color: $oc-white;
           font-size: 0.86em;
+        }
+        .library-actions-counter {
+          color: $oc-cyan-6;
         }
       }
 
