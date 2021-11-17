@@ -45,10 +45,21 @@
       .ToolIcon__icon {
         margin: 0;
       }
+      .ToolIcon__icon {
+        background-color: var(--button-gray-1);
+        &:hover {
+          background-color: var(--button-gray-2);
+        }
+        &:active {
+          background-color: var(--button-gray-3);
+        }
+      }
       svg {
-        color: $oc-red-8;
-        background-color: $oc-gray-4;
-        padding: 0 0.2rem;
+        color: var(--icon-fill-color);
+        padding: 0.26rem;
+        border-radius: 0.3em;
+        width: 1rem;
+        height: 1rem;
       }
     }
   }
