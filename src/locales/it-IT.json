@@ -100,7 +100,9 @@
     "share": "Condividi",
     "showStroke": "Mostra selettore colore del tratto",
     "showBackground": "Mostra selettore colore di sfondo",
-    "toggleTheme": "Cambia tema"
+    "toggleTheme": "Cambia tema",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -136,6 +138,9 @@
     "exitZenMode": "Uscire dalla modalità zen",
     "cancel": "Annulla",
     "clear": "Cancella",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
     "confirm": "Conferma"
   },
   "alerts": {
@@ -158,6 +163,7 @@
     "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine",
     "invalidSceneUrl": "Impossibile importare la scena dall'URL fornito. Potrebbe essere malformato o non contenere dati JSON Excalidraw validi.",
     "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata."
   },
   "errors": {
@@ -200,7 +206,8 @@
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
     "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
     "lineEditor_nothingSelected": "Seleziona un punto per spostare o rimuovere, oppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
-    "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente"
+    "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
@@ -270,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Svuota la tela"
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "letter&Spaces": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.",
     "link": "Articolo del blog sulla crittografia end-to-end di Excalidraw"
@@ -290,6 +345,7 @@
     "width": "Larghezza"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "Stili copiati.",
     "copyToClipboard": "Copiato negli appunti.",
     "copyToClipboardAsPng": "{{exportSelection}} copiato negli appunti come PNG\n({{exportColorScheme}})",
