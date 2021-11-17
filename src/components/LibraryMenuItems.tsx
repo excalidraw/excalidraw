@@ -278,11 +278,11 @@ const LibraryMenuItems = ({
     (item) => item.status === "published",
   );
   const unpublishedItems = [
-    ...libraryItems.filter((item) => item.status !== "published"),
     // append pending library item
     ...(pendingElements.length
       ? [{ id: null, elements: pendingElements }]
       : []),
+    ...libraryItems.filter((item) => item.status !== "published"),
   ];
 
   return (
