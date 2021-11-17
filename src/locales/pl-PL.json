@@ -100,7 +100,9 @@
     "share": "",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": ""
+    "toggleTheme": "",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -136,6 +138,9 @@
     "exitZenMode": "Wyjdź z trybu Zen",
     "cancel": "",
     "clear": "",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
     "confirm": ""
   },
   "alerts": {
@@ -158,6 +163,7 @@
     "cannotRestoreFromImage": "Scena nie mogła zostać przywrócona z pliku obrazu",
     "invalidSceneUrl": "",
     "resetLibrary": "To wyczyści twoją bibliotekę. Jesteś pewien?",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": ""
   },
   "errors": {
@@ -200,7 +206,8 @@
     "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
     "lineEditor_pointSelected": "Naciśnij przycisk Usuń, aby usunąć punkt, Ctrl/Cmd+D, aby zduplikować, lub przeciągnij, aby przenieść",
     "lineEditor_nothingSelected": "Naciśnij w punkt by go edytować, przytrzymaj Alt i naciśnij by dodać nowy punkt",
-    "placeImage": ""
+    "placeImage": "",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
@@ -270,6 +277,54 @@
   "clearCanvasDialog": {
     "title": ""
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "letter&Spaces": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz.",
     "link": ""
@@ -290,6 +345,7 @@
     "width": "Szerokość"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "Skopiowano style.",
     "copyToClipboard": "Skopiowano do schowka.",
     "copyToClipboardAsPng": "",
