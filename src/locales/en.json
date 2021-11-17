@@ -101,7 +101,8 @@
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
     "toggleTheme": "Toggle theme",
-    "unpublishedItems": "Unpublished items"
+    "personalLib": "Personal Library",
+    "excalidrawLib": "Excalidraw Library"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
