@@ -655,7 +655,9 @@ class App extends React.Component<AppProps, AppState> {
       if (
         token === this.id ||
         window.confirm(
-          t("alerts.confirmAddLibrary", { numShapes: json.library.length }),
+          t("alerts.confirmAddLibrary", {
+            numShapes: (json.libraryItems || json.library || []).length,
+          }),
         )
       ) {
         await this.library.importLibrary(blob, "published");
