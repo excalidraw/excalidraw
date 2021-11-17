@@ -101,8 +101,8 @@
     "showStroke": "Auswahl für Strichfarbe anzeigen",
     "showBackground": "Hintergrundfarbe auswählen",
     "toggleTheme": "Design umschalten",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Persönliche Bibliothek",
+    "excalidrawLib": "Excalidraw Bibliothek"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -138,9 +138,9 @@
     "exitZenMode": "Zen-Modus verlassen",
     "cancel": "Abbrechen",
     "clear": "Löschen",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
+    "remove": "Entfernen",
+    "publishLibrary": "Veröffentlichen",
+    "submit": "Absenden",
     "confirm": "Bestätigen"
   },
   "alerts": {
@@ -163,7 +163,7 @@
     "cannotRestoreFromImage": "Die Zeichnung konnte aus dieser Bilddatei nicht wiederhergestellt werden",
     "invalidSceneUrl": "Die Szene konnte nicht von der angegebenen URL importiert werden. Sie ist entweder fehlerhaft oder enthält keine gültigen Excalidraw JSON-Daten.",
     "resetLibrary": "Dieses löscht deine Bibliothek. Bist du sicher?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "{{count}} Element(e) aus der Bibliothek löschen?",
     "invalidEncryptionKey": "Verschlüsselungsschlüssel muss 22 Zeichen lang sein. Die Live-Zusammenarbeit ist deaktiviert."
   },
   "errors": {
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "Drücke Löschen, um Punkt zu entfernen, Strg+D oder Cmd+D zum Duplizieren oder ziehe zum Verschieben",
     "lineEditor_nothingSelected": "Wähle einen Punkt zum Verschieben oder Löschen oder halte die Alt-Taste gedrückt und klicke, um neue Punkte hinzuzufügen",
     "placeImage": "Klicken, um das Bild zu platzieren oder klicken und ziehen um seine Größe manuell zu setzen",
-    "publishLibrary": ""
+    "publishLibrary": "Veröffentliche deine eigene Bibliothek"
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
@@ -278,17 +278,17 @@
     "title": "Zeichenfläche löschen"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "Bibliothek veröffentlichen",
+    "itemName": "Elementname",
+    "authorName": "Name des Autors",
+    "githubUsername": "GitHub Benutzername",
+    "twitterUsername": "Twitter-Benutzername",
+    "libraryName": "Name der Bibliothek",
+    "libraryDesc": "Beschreibung der Bibliothek",
+    "website": "Webseite",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
+      "authorName": "Dein Name oder Benutzername",
+      "libraryName": "Name deiner Bibliothek",
       "libraryDesc": "",
       "githubHandle": "",
       "twitterHandle": "",
