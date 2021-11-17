@@ -236,6 +236,9 @@ export const LibraryMenu = ({
           onSuccess={onPublishLibSuccess}
           onError={(error) => window.alert(error)}
           updateItemsInStorage={() => library.saveLibrary(libraryItems)}
+          onRemove={(id: string) =>
+            setSelectedItems(selectedItems.filter((_id) => _id !== id))
+          }
         />
       )}
       {publishLibSuccess && renderPublishSuccess()}
@@ -257,7 +260,6 @@ export const LibraryMenu = ({
           theme={theme}
           files={files}
           id={id}
-          appState={appState}
           selectedItems={selectedItems}
           onToggle={(id) => {
             if (!selectedItems.includes(id)) {

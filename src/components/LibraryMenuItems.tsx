@@ -26,12 +26,10 @@ const LibraryMenuItems = ({
   pendingElements,
   theme,
   setAppState,
-
   libraryReturnUrl,
   library,
   files,
   id,
-  appState,
   selectedItems,
   onToggle,
   onPublish,
@@ -48,7 +46,6 @@ const LibraryMenuItems = ({
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   library: Library;
   id: string;
-  appState: AppState;
   selectedItems: LibraryItem["id"][];
   onToggle: (id: LibraryItem["id"]) => void;
   onPublish: () => void;

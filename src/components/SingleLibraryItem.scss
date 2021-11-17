@@ -2,6 +2,7 @@
 
 .excalidraw {
   .single-library-item {
+    position: relative;
     &__svg {
       width: 7.5rem;
       height: 7.5rem;
@@ -34,6 +35,21 @@
       font-weight: 500;
       margin: 0;
       padding: 0.3em 0;
+    }
+
+    &--remove {
+      position: absolute;
+      top: 0.2rem;
+      right: 1.3rem;
+
+      .ToolIcon__icon {
+        margin: 0;
+      }
+      svg {
+        color: $oc-red-8;
+        background-color: $oc-gray-4;
+        padding: 0 0.2rem;
+      }
     }
   }
 }

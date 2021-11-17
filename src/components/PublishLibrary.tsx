@@ -62,6 +62,7 @@ const PublishLibrary = ({
   onSuccess,
   onError,
   updateItemsInStorage,
+  onRemove,
 }: {
   onClose: () => void;
   libraryItems: LibraryItems;
@@ -74,6 +75,7 @@ const PublishLibrary = ({
 
   onError: (error: Error) => void;
   updateItemsInStorage: (items: LibraryItems) => void;
+  onRemove: (id: string) => void;
 }) => {
   const [libraryData, setLibraryData] = useState<PublishLibraryDataParams>({
     authorName: "",
@@ -96,6 +98,10 @@ const PublishLibrary = ({
   const [clonedLibItems, setClonedLibItems] = useState<LibraryItems>(
     libraryItems.slice(),
   );
+
+  useEffect(() => {
+    setClonedLibItems(libraryItems.slice());
+  }, [libraryItems]);
 
   const onInputChange = (event: any) => {
     setLibraryData({
@@ -251,6 +257,7 @@ const PublishLibrary = ({
               items[index].name = val;
               setClonedLibItems(items);
             }}
+            onRemove={onRemove}
           />
         </div>,
       );
@@ -263,151 +270,159 @@ const PublishLibrary = ({
     savePublishLibDataToStorage(libraryData);
     onClose();
   }, [clonedLibItems, onClose, updateItemsInStorage, libraryData]);
+
+  const shouldRenderForm = !!libraryItems.length;
   return (
     <Dialog
       onCloseRequest={onDialogClose}
       title={t("publishDialog.title")}
       className="publish-library"
     >
-      <form onSubmit={onSubmit}>
-        <div className="publish-library-note">
-          {t("publishDialog.noteDescription.pre")}
-          <a
-            href="https://libraries.excalidraw.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t("publishDialog.noteDescription.link")}
-          </a>{" "}
-          {t("publishDialog.noteDescription.post")}
-        </div>
-        <span className="publish-library-note">
-          {t("publishDialog.noteGuidelines.pre")}
-          <a
-            href="https://github.com/excalidraw/excalidraw-libraries#guidelines"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t("publishDialog.noteGuidelines.link")}
-          </a>
-          {t("publishDialog.noteGuidelines.post")}
-        </span>
-
-        <div className="publish-library-note">
-          {t("publishDialog.noteItems")}
-        </div>
-        {renderLibraryItems()}
-        <div className="publish-library__fields">
-          <label>
-            <div>
-              <span>{t("publishDialog.libraryName")}</span>
-              <span aria-hidden="true" className="required">
-                *
-              </span>
-            </div>
-            <input
-              type="text"
-              name="name"
-              required
-              value={libraryData.name}
-              onChange={onInputChange}
-              placeholder={t("publishDialog.placeholder.libraryName")}
-            />
-          </label>
-          <label style={{ alignItems: "flex-start" }}>
-            <div>
-              <span>{t("publishDialog.libraryDesc")}</span>
-              <span aria-hidden="true" className="required">
-                *
-              </span>
-            </div>
-            <textarea
-              name="description"
-              rows={4}
-              required
-              value={libraryData.description}
-              onChange={onInputChange}
-              placeholder={t("publishDialog.placeholder.libraryDesc")}
-            />
-          </label>
-          <label>
-            <div>
-              <span>{t("publishDialog.authorName")}</span>
-              <span aria-hidden="true" className="required">
-                *
-              </span>
-            </div>
-            <input
-              type="text"
-              name="authorName"
-              required
-              value={libraryData.authorName}
-              onChange={onInputChange}
-              placeholder={t("publishDialog.placeholder.authorName")}
-            />
-          </label>
-          <label>
-            <span>{t("publishDialog.githubUsername")}</span>
-            <input
-              type="text"
-              name="githubHandle"
-              value={libraryData.githubHandle}
-              onChange={onInputChange}
-              placeholder={t("publishDialog.placeholder.githubHandle")}
-            />
-          </label>
-          <label>
-            <span>{t("publishDialog.twitterUsername")}</span>
-            <input
-              type="text"
-              name="twitterHandle"
-              value={libraryData.twitterHandle}
-              onChange={onInputChange}
-              placeholder={t("publishDialog.placeholder.twitterHandle")}
-            />
-          </label>
-          <label>
-            <span>{t("publishDialog.website")}</span>
-            <input
-              type="text"
-              name="website"
-              value={libraryData.website}
-              onChange={onInputChange}
-              placeholder={t("publishDialog.placeholder.website")}
-            />
-          </label>
-          <span className="publish-library-note">
-            {t("publishDialog.noteLicense.pre")}
+      {shouldRenderForm ? (
+        <form onSubmit={onSubmit}>
+          <div className="publish-library-note">
+            {t("publishDialog.noteDescription.pre")}
             <a
-              href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE"
+              href="https://libraries.excalidraw.com"
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t("publishDialog.noteLicense.link")}
+              {t("publishDialog.noteDescription.link")}
+            </a>{" "}
+            {t("publishDialog.noteDescription.post")}
+          </div>
+          <span className="publish-library-note">
+            {t("publishDialog.noteGuidelines.pre")}
+            <a
+              href="https://github.com/excalidraw/excalidraw-libraries#guidelines"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("publishDialog.noteGuidelines.link")}
             </a>
-            {t("publishDialog.noteLicense.post")}
+            {t("publishDialog.noteGuidelines.post")}
           </span>
-        </div>
-        <div className="publish-library__buttons">
-          <ToolButton
-            type="button"
-            title={t("buttons.cancel")}
-            aria-label={t("buttons.cancel")}
-            label={t("buttons.cancel")}
-            onClick={onDialogClose}
-            data-testid="cancel-clear-canvas-button"
-            className="publish-library__buttons--cancel"
-          />
-          <ToolButton
-            type="submit"
-            title={t("buttons.submit")}
-            aria-label={t("buttons.submit")}
-            label={t("buttons.submit")}
-            className="publish-library__buttons--confirm"
-            isLoading={isSubmitting}
-          />
-        </div>
-      </form>
+
+          <div className="publish-library-note">
+            {t("publishDialog.noteItems")}
+          </div>
+          {renderLibraryItems()}
+          <div className="publish-library__fields">
+            <label>
+              <div>
+                <span>{t("publishDialog.libraryName")}</span>
+                <span aria-hidden="true" className="required">
+                  *
+                </span>
+              </div>
+              <input
+                type="text"
+                name="name"
+                required
+                value={libraryData.name}
+                onChange={onInputChange}
+                placeholder={t("publishDialog.placeholder.libraryName")}
+              />
+            </label>
+            <label style={{ alignItems: "flex-start" }}>
+              <div>
+                <span>{t("publishDialog.libraryDesc")}</span>
+                <span aria-hidden="true" className="required">
+                  *
+                </span>
+              </div>
+              <textarea
+                name="description"
+                rows={4}
+                required
+                value={libraryData.description}
+                onChange={onInputChange}
+                placeholder={t("publishDialog.placeholder.libraryDesc")}
+              />
+            </label>
+            <label>
+              <div>
+                <span>{t("publishDialog.authorName")}</span>
+                <span aria-hidden="true" className="required">
+                  *
+                </span>
+              </div>
+              <input
+                type="text"
+                name="authorName"
+                required
+                value={libraryData.authorName}
+                onChange={onInputChange}
+                placeholder={t("publishDialog.placeholder.authorName")}
+              />
+            </label>
+            <label>
+              <span>{t("publishDialog.githubUsername")}</span>
+              <input
+                type="text"
+                name="githubHandle"
+                value={libraryData.githubHandle}
+                onChange={onInputChange}
+                placeholder={t("publishDialog.placeholder.githubHandle")}
+              />
+            </label>
+            <label>
+              <span>{t("publishDialog.twitterUsername")}</span>
+              <input
+                type="text"
+                name="twitterHandle"
+                value={libraryData.twitterHandle}
+                onChange={onInputChange}
+                placeholder={t("publishDialog.placeholder.twitterHandle")}
+              />
+            </label>
+            <label>
+              <span>{t("publishDialog.website")}</span>
+              <input
+                type="text"
+                name="website"
+                value={libraryData.website}
+                onChange={onInputChange}
+                placeholder={t("publishDialog.placeholder.website")}
+              />
+            </label>
+            <span className="publish-library-note">
+              {t("publishDialog.noteLicense.pre")}
+              <a
+                href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("publishDialog.noteLicense.link")}
+              </a>
+              {t("publishDialog.noteLicense.post")}
+            </span>
+          </div>
+          <div className="publish-library__buttons">
+            <ToolButton
+              type="button"
+              title={t("buttons.cancel")}
+              aria-label={t("buttons.cancel")}
+              label={t("buttons.cancel")}
+              onClick={onDialogClose}
+              data-testid="cancel-clear-canvas-button"
+              className="publish-library__buttons--cancel"
+            />
+            <ToolButton
+              type="submit"
+              title={t("buttons.submit")}
+              aria-label={t("buttons.submit")}
+              label={t("buttons.submit")}
+              className="publish-library__buttons--confirm"
+              isLoading={isSubmitting}
+            />
+          </div>
+        </form>
+      ) : (
+        <p style={{ padding: "1em", textAlign: "center", fontWeight: 500 }}>
+          Please select atleast one library Item to get started
+        </p>
+      )}
     </Dialog>
   );
 };

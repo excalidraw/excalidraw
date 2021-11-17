@@ -3,19 +3,23 @@ import { useEffect, useRef } from "react";
 import { t } from "../i18n";
 import { exportToSvg } from "../packages/utils";
 import { AppState, LibraryItem } from "../types";
+import { close } from "./icons";
 
 import "./SingleLibraryItem.scss";
+import { ToolButton } from "./ToolButton";
 
 const SingleLibraryItem = ({
   libItem,
   appState,
   index,
   onChange,
+  onRemove,
 }: {
   libItem: LibraryItem;
   appState: AppState;
   index: number;
   onChange: (val: string, index: number) => void;
+  onRemove: (id: string) => void;
 }) => {
   const svgRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -42,6 +46,14 @@ const SingleLibraryItem = ({
   return (
     <div className="single-library-item">
       <div ref={svgRef} className="single-library-item__svg" />
+      <ToolButton
+        aria-label={t("buttons.remove")}
+        type="button"
+        icon={close}
+        className="single-library-item--remove"
+        onClick={onRemove.bind(null, libItem.id)}
+        title={t("buttons.remove")}
+      />
       <div
         style={{
           display: "flex",
