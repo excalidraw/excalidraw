@@ -658,7 +658,7 @@ class App extends React.Component<AppProps, AppState> {
           t("alerts.confirmAddLibrary", { numShapes: json.library.length }),
         )
       ) {
-        await this.library.importLibrary(blob);
+        await this.library.importLibrary(blob, "published");
         // hack to rerender the library items after import
         if (this.state.isLibraryOpen) {
           this.setState({ isLibraryOpen: false });

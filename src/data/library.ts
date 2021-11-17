@@ -25,7 +25,7 @@ class Library {
   };
 
   /** imports library (currently merges, removing duplicates) */
-  async importLibrary(blob: Blob) {
+  async importLibrary(blob: Blob, defaultStatus = "unpublished") {
     const libraryFile = await loadLibraryFromBlob(blob);
     if (!libraryFile || !(libraryFile.libraryItems || libraryFile.library)) {
       return;
@@ -58,7 +58,10 @@ class Library {
     const existingLibraryItems = await this.loadLibrary();
 
     const library = libraryFile.libraryItems || libraryFile.library || [];
-    const restoredLibItems = restoreLibraryItems(library, "published");
+    const restoredLibItems = restoreLibraryItems(
+      library,
+      defaultStatus as "published" | "unpublished",
+    );
     const filteredItems = [];
     for (const item of restoredLibItems) {
       const restoredItem = this.restoreLibraryItem(item as LibraryItem);
