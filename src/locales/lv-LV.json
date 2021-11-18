@@ -290,7 +290,7 @@
       "authorName": "Jūsu vārds vai lietotājvārds",
       "libraryName": "Jūsu bibliotēkas nosaukums",
       "libraryDesc": "Bibliotēkas apraksts, kas palīdzēs citiem saprast tās pielietojumu",
-      "githubHandle": "",
+      "githubHandle": "GitHub lietotājvārds (neobligāts), lai jūs varētu rediģēt bibliotēku pēc tās iesniegšanas izskatīšanai",
       "twitterHandle": "Twitter lietotājvārds (neobligāts), lai mēs varētu jūs pieminēt kā autoru, kad reklamēsim bibliotēku platformā Twitter",
       "website": "Saikne uz jūsu personīgo mājaslapu vai kādu citu lapu (neobligāta)"
     },
