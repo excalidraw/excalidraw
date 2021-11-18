@@ -291,33 +291,33 @@
       "libraryName": "您的資料庫名稱",
       "libraryDesc": "提供您的資料庫說明以利他人理解其用途",
       "githubHandle": "Github handle（選填），填寫後您可編輯已送出審查的資料庫",
-      "twitterHandle": "",
-      "website": ""
+      "twitterHandle": "Twitter 帳號（選填），填寫後若我們在 Twitter 推廣時可提及您",
+      "website": "您個人網站或其他網站的連結（選填）"
     },
     "errors": {
-      "required": "",
-      "letter&Spaces": ""
+      "required": "必填",
+      "letter&Spaces": "僅可輸入英文字母與空白"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "送出您的資料庫後將被包含於",
+      "link": "公開資料庫 repository",
+      "post": "以利他人在其繪圖中使用。"
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "資料庫需先經人工審查。請閱讀",
+      "link": "說明文件",
+      "post": "再送出。若需溝通與修改時要透過 GitHub 帳號來進行，但並非強制需求。"
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "送出即代表您同意此資料庫將發布時使用 ",
+      "link": "MIT 授權，",
+      "post": "簡單來說是指任何人都能不受限制的使用。"
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "每個資料庫項目都有獨立的名稱故可篩選。會包含下列資料庫項目：",
+    "atleastOneLibItem": "請選擇至少一項資料庫項目"
   },
   "publishSuccessDialog": {
-    "title": "",
+    "title": "資料庫已送出",
     "content": "",
     "link": ""
   },
