@@ -280,12 +280,12 @@
   "publishDialog": {
     "title": "",
     "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "authorName": "Nom de l'auteur",
+    "githubUsername": "Nom d'utilisateur GitHub",
+    "twitterUsername": "Nom d'utilisateur Twitter",
+    "libraryName": "Nom de la bibliothèque",
+    "libraryDesc": "Description de la bibliothèque",
+    "website": "Site web",
     "placeholder": {
       "authorName": "",
       "libraryName": "",
