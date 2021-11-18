@@ -290,13 +290,13 @@
       "authorName": "Dein Name oder Benutzername",
       "libraryName": "Name deiner Bibliothek",
       "libraryDesc": "Beschreibung deiner Bibliothek, um anderen Nutzern bei der Verwendung zu helfen",
-      "githubHandle": "",
+      "githubHandle": "GitHub-Handle (optional), damit du die Bibliothek bearbeiten kannst, wenn sie zur Überprüfung eingereicht wurde",
       "twitterHandle": "Twitter-Benutzername (optional), damit wir wissen, wen wir bei Werbung über Twitter nennen können",
       "website": "Link zu deiner persönlichen Webseite oder zu anderer Seite (optional)"
     },
     "errors": {
       "required": "Erforderlich",
-      "website": ""
+      "website": "Gültige URL eingeben"
     },
     "noteDescription": {
       "pre": "Sende deine Bibliothek ein, um in die ",
