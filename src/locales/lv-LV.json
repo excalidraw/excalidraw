@@ -311,19 +311,19 @@
     "noteLicense": {
       "pre": "Iesniedzot bibliotēku, jūs piekrītat tās publicēšanai saskaņā ar ",
       "link": "MIT Licenci, ",
-      "post": ""
+      "post": "kas īsumā nozīmē, ka jebkurš to varēs izmantot bez ierobežojumiem."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Katram bibliotēkas vienumam jābūt savam nosaukumam, lai to varētu atrast filtrējot. Tiks iekļauti sekojošie bibliotēkas vienumi:",
+    "atleastOneLibItem": "Lūdzu, atlasiet vismaz vienu bibliotēkas vienumu, lai sāktu darbu"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Bibliotēka iesniegta",
+    "content": "Paldies, {{authorName}}! Jūsu bibliotēka iesniegta izskatīšanai. Jūs varat izsekot iesnieguma statusam",
+    "link": "šeit"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Atiestatīt bibliotēku",
+    "removeItemsFromLib": "Noņemt atlasītos vienumus no bibliotēkas"
   },
   "encrypted": {
     "tooltip": "Jūsu zīmējumi ir šifrēti no gala līdz galam; līdz ar to Excalidraw serveri tos nekad neredzēs.",
@@ -345,7 +345,7 @@
     "width": "Platums"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Pievienots bibliotēkai",
     "copyStyles": "Nokopēja stilus.",
     "copyToClipboard": "Nokopēja starpliktuvē.",
     "copyToClipboardAsPng": "Nokopēja {{exportSelection}} starpliktuvē kā PNG ({{exportColorScheme}})",
