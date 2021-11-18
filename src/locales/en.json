@@ -290,7 +290,7 @@
       "authorName": "Your name or username",
       "libraryName": "Name of your library",
       "libraryDesc": "Description of your library to help people understand its usage",
-      "githubHandle": "Github handle (optional), so you can edit the library once submitted for review",
+      "githubHandle": "GitHub handle (optional), so you can edit the library once submitted for review",
       "twitterHandle": "Twitter username (optional), so we know who to credit when promoting over Twitter",
       "website": "Link to your personal website or elsewhere (optional)"
     },
