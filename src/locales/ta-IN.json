@@ -101,8 +101,8 @@
     "showStroke": "கீறல் நிற எடுப்பானைக் காட்டு",
     "showBackground": "பின்னணி நிற எடுப்பானைக் காட்டு",
     "toggleTheme": "தோற்றத்தை நிலைமாற்று",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "தனக்குரிய நூலகம்",
+    "excalidrawLib": "எக்ஸ்கேலிட்ரா நூலகம்"
   },
   "buttons": {
     "clearReset": "கித்தானை அகரமாக்கு",
@@ -306,24 +306,24 @@
     "noteGuidelines": {
       "pre": "நூலகம் முதலில் கைமுறையாக ஒப்புக்கொள்ளப்படவேண்டும். வாசிக்கவும் ",
       "link": "வழிகாட்டுதல்களை",
-      "post": ""
+      "post": " சமர்ப்பிக்கும் முன்பு. கோரப்பட்டால் தொடர்புகொள்ள மற்றும் மாற்றங்கள் செய்ய உமக்கொரு GitHub கணக்கு தேவை, ஆனால் அது கண்டிப்பாக தேவையல்ல."
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
+      "link": "MIT உரிமம், ",
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "ஆரம்பிக்க ஒரு நூலக உருப்படியையாவது தேர்ந்தெடுக்கவும்"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "நூலகம் சமர்ப்பிக்கப்பட்டது",
+    "content": "நன்றி {{authorName}}. உமது நூலகம் மதிப்பாய்விற்காக சமர்ப்பிக்கப்பட்டது. நிலையை நீங்கள் தடமறியலாம்",
+    "link": "இங்கே"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "நூலகத்தை அகரமாக்கு",
+    "removeItemsFromLib": "நூலகத்திலிருந்து தேர்ந்தெடுத்த உருப்படிகளை நீக்கு"
   },
   "encrypted": {
     "tooltip": "உம் சித்திரங்கள் இருமுனை மறையாக்கம் செய்யப்பட்டவையாதலால் எக்ஸ்கேலிட்ராவின் சேவையகங்கள் அவற்றை ஒருபோதும் பார்க்கா.",
@@ -345,7 +345,7 @@
     "width": "அகலம்"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "நூலகத்தில் சேர்க்கப்பட்டது",
     "copyStyles": "ஒயில்கள் நகலெடுக்கப்பட்டன.",
     "copyToClipboard": "நகலகத்திற்கு நகலெடுக்கப்பட்டது.",
     "copyToClipboardAsPng": "{{exportSelection}}-ஐ நகலகத்திற்கு PNG ஆக நகலெடுத்தது\n({{exportColorScheme}})",
