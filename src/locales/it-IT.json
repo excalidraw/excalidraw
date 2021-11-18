@@ -288,7 +288,7 @@
     "website": "Sito Web",
     "placeholder": {
       "authorName": "Il tuo nome o nome utente",
-      "libraryName": "",
+      "libraryName": "Nome della tua libreria",
       "libraryDesc": "Descrizione della tua libreria per aiutare gli utenti a capirne lo scopo",
       "githubHandle": "",
       "twitterHandle": "Nome utente Twitter (opzionale), così da sapere chi accreditare quando promossa su Twitter",
