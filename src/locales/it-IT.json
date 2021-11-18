@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "Obbligatorio",
-      "letter&Spaces": ""
+      "website": ""
     },
     "noteDescription": {
       "pre": "",
