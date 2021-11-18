@@ -290,13 +290,13 @@
       "authorName": "Jūsu vārds vai lietotājvārds",
       "libraryName": "Jūsu bibliotēkas nosaukums",
       "libraryDesc": "Bibliotēkas apraksts, kas palīdzēs citiem saprast tās pielietojumu",
-      "githubHandle": "GitHub lietotājvārds (neobligāts), lai jūs varētu rediģēt bibliotēku pēc tās iesniegšanas izskatīšanai",
+      "githubHandle": "",
       "twitterHandle": "Twitter lietotājvārds (neobligāts), lai mēs varētu jūs pieminēt kā autoru, kad reklamēsim bibliotēku platformā Twitter",
       "website": "Saikne uz jūsu personīgo mājaslapu vai kādu citu lapu (neobligāta)"
     },
     "errors": {
       "required": "Obligāts",
-      "letter&Spaces": "Atļauti tikai burti un atstarpes"
+      "website": ""
     },
     "noteDescription": {
       "pre": "Iesniegt savu bibliotēku iekļaušanai ",
