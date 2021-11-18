@@ -290,13 +290,13 @@
       "authorName": "Nimi tai käyttäjänimi",
       "libraryName": "Kirjastosi nimi",
       "libraryDesc": "Kirjaston kuvaus, joka auttaa ihmisiä ymmärtämään sen käyttöä",
-      "githubHandle": "Github-tunnus (valinnainen), jotta voit muokata kirjastoa sen jälkeen kun se on lähetetty tarkastettavaksi",
+      "githubHandle": "",
       "twitterHandle": "Twitter-tunnus (valinnainen), jotta tiedämme ketä kiittää kun viestimme Twitterissä",
       "website": "Linkki henkilökohtaiseen verkkosivustoosi tai muualle (valinnainen)"
     },
     "errors": {
       "required": "Pakollinen",
-      "letter&Spaces": "Vain kirjaimet ja välilyönnit sallittuja"
+      "website": ""
     },
     "noteDescription": {
       "pre": "Lähetä kirjastosi, jotta se voidaan sisällyttää ",
