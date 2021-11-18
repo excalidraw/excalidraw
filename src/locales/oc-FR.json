@@ -300,30 +300,30 @@
     },
     "noteDescription": {
       "pre": "Enviatz vòstra bibliotèca per èsser compresa al ",
-      "link": "",
-      "post": ""
+      "link": "repertòri public de bibliotèca",
+      "post": "per que los autres l’utilizen dins lor dessenhs."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Qualqu’un deu aprovar la bibliotèca manualament per començar. Volgatz legir las ",
+      "link": "linhas directrises",
+      "post": " abans de sometre. Vos farà mestièr un compte GitHub per comunicar e realizar de modificacions se demandadas, mas es pas complètament obligatòri."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "En sometent, acceptatz que la bibliotèca siá publicada sota la ",
+      "link": "Licéncia MIT, ",
+      "post": "que significa en brèu que qual que siá pòt l’utilizar sens cap de restriccion."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Cada element de bibliotèca deu aver un nom pròpri per èsser filtrable. Los elements de bibliotèca seguentas seràn incluses :",
+    "atleastOneLibItem": "Volgatz seleccionar almens un element de bibliotèca per començar"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
+    "title": "Bibliotèca somesa",
+    "content": "Mercés {{authorName}}. Vòstre bibliotèca es estada somesa per repassa. Podètz seguir l’avançament",
     "link": "aquí"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Reïnicializar la bibliotèca",
+    "removeItemsFromLib": "Tirar los elements seleccionats de la bibliotèca"
   },
   "encrypted": {
     "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai.",
@@ -345,7 +345,7 @@
     "width": "Largor"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Apondut a la bibliotèca",
     "copyStyles": "Estiles copiats.",
     "copyToClipboard": "Copiats al quichapapièrs.",
     "copyToClipboardAsPng": "{{exportSelection}} copiat coma PNG ({{exportColorScheme}})",
