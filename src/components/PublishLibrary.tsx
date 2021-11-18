@@ -120,7 +120,7 @@ const PublishLibrary = ({
       if (!libItem.name) {
         error = t("publishDialog.errors.required");
         isError = true;
-      } else if (!/^[a-zA-Z\s]+$/i.test(libItem.name)) {
+      } else if (!/^[a-zA-Z0-9\s]+$/i.test(libItem.name)) {
         error = t("publishDialog.errors.libraryName");
         isError = true;
       }
@@ -319,7 +319,7 @@ const PublishLibrary = ({
                 type="text"
                 name="name"
                 required
-                pattern="[a-zA-Z\s]+"
+                pattern="[a-zA-Z0-9\s]+"
                 title={t("publishDialog.errors.libraryName")}
                 value={libraryData.name}
                 onChange={onInputChange}
