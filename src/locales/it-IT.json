@@ -101,8 +101,8 @@
     "showStroke": "Mostra selettore colore del tratto",
     "showBackground": "Mostra selettore colore di sfondo",
     "toggleTheme": "Cambia tema",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Libreria Personale",
+    "excalidrawLib": "Libreria Excalidraw"
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -138,9 +138,9 @@
     "exitZenMode": "Uscire dalla modalità zen",
     "cancel": "Annulla",
     "clear": "Cancella",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
+    "remove": "Rimuovi",
+    "publishLibrary": "Pubblica",
+    "submit": "Invia",
     "confirm": "Conferma"
   },
   "alerts": {
@@ -163,7 +163,7 @@
     "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine",
     "invalidSceneUrl": "Impossibile importare la scena dall'URL fornito. Potrebbe essere malformato o non contenere dati JSON Excalidraw validi.",
     "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "Eliminare {{count}} elementi dalla libreria?",
     "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata."
   },
   "errors": {
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
     "lineEditor_nothingSelected": "Seleziona un punto per spostare o rimuovere, oppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
     "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente",
-    "publishLibrary": ""
+    "publishLibrary": "Pubblica la tua libreria"
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
@@ -278,24 +278,24 @@
     "title": "Svuota la tela"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "Pubblica libreria",
+    "itemName": "Nome elemento",
+    "authorName": "Nome autore",
+    "githubUsername": "Nome utente GitHub",
+    "twitterUsername": "Nome utente Twitter",
+    "libraryName": "Nome libreria",
+    "libraryDesc": "Descrizione libreria",
+    "website": "Sito Web",
     "placeholder": {
-      "authorName": "",
+      "authorName": "Il tuo nome o nome utente",
       "libraryName": "",
-      "libraryDesc": "",
+      "libraryDesc": "Descrizione della tua libreria per aiutare gli utenti a capirne lo scopo",
       "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "twitterHandle": "Nome utente Twitter (opzionale), così da sapere chi accreditare quando promossa su Twitter",
+      "website": "Link al tuo sito personale (facoltativo)"
     },
     "errors": {
-      "required": "",
+      "required": "Obbligatorio",
       "letter&Spaces": ""
     },
     "noteDescription": {
