@@ -101,8 +101,8 @@
     "showStroke": "顯示線條檢色器",
     "showBackground": "顯示背景檢色器",
     "toggleTheme": "切換主題",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "個人資料庫",
+    "excalidrawLib": "Excalidraw 資料庫"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -138,9 +138,9 @@
     "exitZenMode": "離開專注模式",
     "cancel": "取消",
     "clear": "清除",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
+    "remove": "刪除",
+    "publishLibrary": "發布",
+    "submit": "送出",
     "confirm": "確認"
   },
   "alerts": {
@@ -163,7 +163,7 @@
     "cannotRestoreFromImage": "無法由此檔案回復場景。",
     "invalidSceneUrl": "無法由提供的 URL 匯入場景。可能是發生異常，或未包含有效的 Excalidraw JSON 資料。",
     "resetLibrary": "這會清除您的資料庫，是否確定？",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "從資料庫刪除 {{count}} 項？",
     "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。"
   },
   "errors": {
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "按下 Delete 可移除錨點；Ctrl 或 Cmd + D 可複製；或可拖曳來移動",
     "lineEditor_nothingSelected": "點選想移動或刪除的控制點；或按住 Alt 再點擊以增加新控制點",
     "placeImage": "點擊以放置圖片，或點擊並拖曳以手動調整其尺寸。",
-    "publishLibrary": ""
+    "publishLibrary": "發布個人資料庫"
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
@@ -278,19 +278,19 @@
     "title": "清除畫布"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "發布資料庫",
+    "itemName": "項目名稱",
+    "authorName": "作者名稱",
+    "githubUsername": "GitHub 帳號",
+    "twitterUsername": "Twitter 帳號",
+    "libraryName": "資料庫名稱",
+    "libraryDesc": "資料庫說明",
+    "website": "網站",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
+      "authorName": "您的名稱或帳號",
+      "libraryName": "您的資料庫名稱",
+      "libraryDesc": "提供您的資料庫說明以利他人理解其用途",
+      "githubHandle": "Github handle（選填），填寫後您可編輯已送出審查的資料庫",
       "twitterHandle": "",
       "website": ""
     },
