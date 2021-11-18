@@ -101,8 +101,8 @@
     "showStroke": "Afficher le sélecteur de couleur de trait",
     "showBackground": "Afficher le sélecteur de couleur d'arrière-plan",
     "toggleTheme": "Changer le thème",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Bibliothèque personnelle",
+    "excalidrawLib": "Bibliothèque Excalidraw"
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
@@ -138,9 +138,9 @@
     "exitZenMode": "Quitter le mode zen",
     "cancel": "Annuler",
     "clear": "Effacer",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
+    "remove": "Supprimer",
+    "publishLibrary": "Publier",
+    "submit": "Envoyer",
     "confirm": "Confirmer"
   },
   "alerts": {
@@ -163,7 +163,7 @@
     "cannotRestoreFromImage": "Impossible de restaurer la scène depuis ce fichier image",
     "invalidSceneUrl": "Impossible d'importer la scène depuis l'URL fournie. Elle est soit incorrecte, soit ne contient pas de données JSON Excalidraw valides.",
     "resetLibrary": "Cela va effacer votre bibliothèque. Êtes-vous sûr·e ?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "Supprimer {{count}} élément(s) de la bibliothèque ?",
     "invalidEncryptionKey": "La clé de chiffrement doit comporter 22 caractères. La collaboration en direct est désactivée."
   },
   "errors": {
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "Appuyez sur Supprimer pour supprimer le point, Ctrl ou Cmd+D pour le dupliquer, ou faites-le glisser pour le déplacer",
     "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou supprimer, ou maintenez Alt et cliquez pour ajouter de nouveaux points",
     "placeImage": "Cliquez pour placer l'image, ou cliquez et faites glisser pour définir sa taille manuellement",
-    "publishLibrary": ""
+    "publishLibrary": "Publier votre propre bibliothèque"
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
@@ -278,7 +278,7 @@
     "title": "Effacer la zone de dessin"
   },
   "publishDialog": {
-    "title": "",
+    "title": "Publier la bibliothèque",
     "itemName": "",
     "authorName": "Nom de l'auteur",
     "githubUsername": "Nom d'utilisateur GitHub",
@@ -287,9 +287,9 @@
     "libraryDesc": "Description de la bibliothèque",
     "website": "Site web",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
+      "authorName": "Votre nom ou nom d'utilisateur",
+      "libraryName": "Nom de votre bibliothèque",
+      "libraryDesc": "Description de votre bibliothèque pour aider les gens à comprendre son usage",
       "githubHandle": "",
       "twitterHandle": "",
       "website": ""
