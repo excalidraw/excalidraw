@@ -139,7 +139,7 @@
     "cancel": "ரத்துசெய்",
     "clear": "துடை",
     "remove": "நீக்கு",
-    "publishLibrary": "",
+    "publishLibrary": "பிரசுரி",
     "submit": "சமர்ப்பி",
     "confirm": "உறுதிசெய்"
   },
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "புள்ளியை நீக்க Deleteஐ அழுத்து, நகலாக்க CtrlOrCmd+D, அ நகர்த்த பிடித்திழு",
     "lineEditor_nothingSelected": "நகர்த்தவோ நீக்கவோ புள்ளியைத் தேர், அ புதிய புள்ளிகளைச் சேர்க்க Altஐ அழுத்திப்பிடித்துச் சொடுக்கு",
     "placeImage": "படத்தை வைக்கச் சொடுக்கு, அ கைமுறையாக அளவு அமைக்க சொடுக்கி பிடித்திழு",
-    "publishLibrary": ""
+    "publishLibrary": "உம் சொந்த நூலகத்தைப் பிரசுரி"
   },
   "canvasError": {
     "cannotShowPreview": "முன்னோட்டம் காட்ட இயலவில்லை",
@@ -278,10 +278,10 @@
     "title": "கித்தானைத் துடை"
   },
   "publishDialog": {
-    "title": "",
+    "title": "நூலகத்தைப் பிரசுரி",
     "itemName": "உருப்படியின் பெயர்",
-    "authorName": "",
-    "githubUsername": "",
+    "authorName": "ஆசிரியர் பெயர்",
+    "githubUsername": "GitHub பயனர்பெயர்",
     "twitterUsername": "டுவிட்டர் பயனர்பெயர்",
     "libraryName": "நூலக பெயர்",
     "libraryDesc": "நூலக விவரிப்பு",
@@ -290,7 +290,7 @@
       "authorName": "உம் பெயர் அ பயனர்பெயர்",
       "libraryName": "உம் நூலகத்தின் பெயர்",
       "libraryDesc": "உம் நூலகத்தின் விவரிப்பு இதன் பயன்பாட்டை மக்கள் புரிந்துகொள்ளவுதவ",
-      "githubHandle": "",
+      "githubHandle": "GitHub கைப்பிடி (விரும்பினால்), ஆதலால் நீங்கள் நூலகத்தை மதிப்பாய்விற்காக சமர்ப்பித்தவுடன் திருத்தமுடியும்",
       "twitterHandle": "",
       "website": ""
     },
