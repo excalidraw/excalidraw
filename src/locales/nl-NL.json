@@ -290,13 +290,13 @@
       "authorName": "Uw naam of gebruikersnaam:",
       "libraryName": "Naam van je bibliotheek",
       "libraryDesc": "Beschrijving van uw bibliotheek om mensen te helpen het gebruik ervan te begrijpen",
-      "githubHandle": "Github handle (optioneel), u kunt de bibliotheek bewerken eenmaal ingediend voor review",
+      "githubHandle": "",
       "twitterHandle": "",
       "website": "Link naar je persoonlijke website of elders (optioneel)"
     },
     "errors": {
       "required": "Vereist",
-      "letter&Spaces": "Alleen letters en spaties toegestaan"
+      "website": ""
     },
     "noteDescription": {
       "pre": "",
