@@ -163,7 +163,7 @@
     "cannotRestoreFromImage": "இப்படக்கோப்பிலிருந்து காட்சி மீட்டெடுக்கப்பட முடியாது",
     "invalidSceneUrl": "வழங்கப்பட்ட உரலியிலிருந்து காட்சியை இறக்கவியலா. இது தவறான வடிவத்தில் உள்ளது, அ செல்லத்தக்க எக்ஸ்கேலிட்ரா JSON தரவைக் கொண்டில்லை.",
     "resetLibrary": "இது உங்கள் நுலகத்தைத் துடைக்கும். நீங்கள் உறுதியா?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "{{count}} உருப்படி(கள்)-ஐ உம் நூலகத்திலிருந்து அழிக்கவா?",
     "invalidEncryptionKey": "மறையாக்க விசை 22 வரியுருக்கள் கொண்டிருக்கவேண்டும். நேரடி கூட்டுப்பணி முடக்கப்பட்டது."
   },
   "errors": {
@@ -279,12 +279,12 @@
   },
   "publishDialog": {
     "title": "",
-    "itemName": "",
+    "itemName": "உருப்படியின் பெயர்",
     "authorName": "",
     "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
+    "twitterUsername": "டுவிட்டர் பயனர்பெயர்",
+    "libraryName": "நூலக பெயர்",
+    "libraryDesc": "நூலக விவரிப்பு",
     "website": "",
     "placeholder": {
       "authorName": "",
