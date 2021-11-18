@@ -120,9 +120,6 @@ const PublishLibrary = ({
       if (!libItem.name) {
         error = t("publishDialog.errors.required");
         isError = true;
-      } else if (!/^[a-zA-Z\s]+$/i.test(libItem.name)) {
-        error = t("publishDialog.errors.letter&Spaces");
-        isError = true;
       }
       erroredLibItems.push({ ...libItem, error });
     });
@@ -381,6 +378,8 @@ const PublishLibrary = ({
               <input
                 type="text"
                 name="website"
+                pattern="https?://.+"
+                title={t("publishDialog.errors.website")}
                 value={libraryData.website}
                 onChange={onInputChange}
                 placeholder={t("publishDialog.placeholder.website")}
