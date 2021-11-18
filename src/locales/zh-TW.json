@@ -318,12 +318,12 @@
   },
   "publishSuccessDialog": {
     "title": "資料庫已送出",
-    "content": "",
-    "link": ""
+    "content": "感謝 {{authorName}} 。您的資料庫已送出待審查。您可查看目前狀態",
+    "link": "在此"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "重設資料庫",
+    "removeItemsFromLib": "從資料庫移除所選的項目"
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。",
@@ -345,7 +345,7 @@
     "width": "寬度"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "加入資料庫",
     "copyStyles": "已複製樣式",
     "copyToClipboard": "複製至剪貼簿。",
     "copyToClipboardAsPng": "以 PNG 格式將 {{exportSelection}} 複製至剪貼簿\n({{exportColorScheme}})",
