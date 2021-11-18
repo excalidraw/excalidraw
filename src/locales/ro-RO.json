@@ -290,13 +290,13 @@
       "authorName": "Numele sau numele tău de utilizator",
       "libraryName": "Numele bibliotecii tale",
       "libraryDesc": "Descrierea bibliotecii tale pentru a ajuta oamenii să înțeleagă utilizarea acesteia",
-      "githubHandle": "Numele de utilizator GitHub (opțional), pentru a putea edita bibliotecă odată ce este trimisă pentru revizuire",
+      "githubHandle": "",
       "twitterHandle": "Numele de utilizator Twitter (opțional), pentru a indica sursa la promovarea pe Twitter",
       "website": "Trimitere către pagina ta personală de internet sau altundeva (opțional)"
     },
     "errors": {
       "required": "Obligatoriu",
-      "letter&Spaces": "Sunt permise numai litere și spații"
+      "website": ""
     },
     "noteDescription": {
       "pre": "Trimite-ți biblioteca pentru fi inclus în ",
