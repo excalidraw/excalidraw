@@ -296,7 +296,6 @@
     },
     "errors": {
       "required": "Required",
-      "libraryName": "Only letters, digits and spaces allowed",
       "website": "Enter a valid Url"
     },
     "noteDescription": {
