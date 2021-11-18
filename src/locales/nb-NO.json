@@ -281,7 +281,7 @@
     "title": "Publiser bibliotek",
     "itemName": "Elementnavn",
     "authorName": "Forfatterens navn",
-    "githubUsername": "GitHub-brukernavnet ditt",
+    "githubUsername": "GitHub-brukernavnet",
     "twitterUsername": "Twitter-brukernavn",
     "libraryName": "Biblioteknavn",
     "libraryDesc": "Beskrivelse av bibliotek",
@@ -299,18 +299,18 @@
       "letter&Spaces": "Kun bokstaver og mellomrom tillatt"
     },
     "noteDescription": {
-      "pre": "Sende inn biblioteket ditt som skal inkluderes i ",
+      "pre": "Send inn biblioteket ditt som skal inkluderes i ",
       "link": "kildekode for offentlig bibliotek",
       "post": "for andre å bruke dem i tegninger."
     },
     "noteGuidelines": {
       "pre": "Biblioteket må godkjennes manuelt først. Les ",
       "link": "retningslinjene",
-      "post": " før innsending. Du vil trenge en GitHub konto for å kommunisere og gjøre endringer hvis ønsket, men det er ikke påkrevd."
+      "post": " før innsending. Du vil trenge en GitHub-konto for å kommunisere og gjøre endringer hvis ønsket, men det er ikke påkrevd."
     },
     "noteLicense": {
       "pre": "Ved å sende inn godtar du at biblioteket blir publisert under ",
-      "link": "MIT-lisens ",
+      "link": "MIT-lisens, ",
       "post": "som kortfattet betyr at andre kan bruke dem uten begrensninger."
     },
     "noteItems": "Hvert bibliotek må ha sitt eget navn, så det er filtrerbart. Følgende bibliotekselementer vil bli inkludert:",
