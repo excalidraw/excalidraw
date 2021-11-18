@@ -35,7 +35,7 @@
     "arrowhead_arrow": "Sageta",
     "arrowhead_bar": "Barra",
     "arrowhead_dot": "Ponch",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "Triangle",
     "fontSize": "Talha poliça",
     "fontFamily": "Familha de poliça",
     "onlySelected": "Seleccion sonque",
@@ -101,8 +101,8 @@
     "showStroke": "Mostrar lo selector de color de contorn",
     "showBackground": "Mostrar lo selector de color de fons",
     "toggleTheme": "Alternar tèma",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Bibliotèca personala",
+    "excalidrawLib": "Bibliotèca Excalidraw"
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
@@ -138,10 +138,10 @@
     "exitZenMode": "Sortir del mòde zen",
     "cancel": "Anullar",
     "clear": "Escafar",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "remove": "Tirar",
+    "publishLibrary": "Publicar",
+    "submit": "Enviar",
+    "confirm": "Confirmar"
   },
   "alerts": {
     "clearReset": "Aquò suprimirà lo canabàs complèt. O volètz vertadièrament ?",
@@ -163,7 +163,7 @@
     "cannotRestoreFromImage": "Restauracion impossibla de la scèna a partir del fichièr imatge",
     "invalidSceneUrl": "Importacion impossibla de la scèna a partir de l’URL provesida. Es siá mal formatada o siá conten pas cap de donada JSON Excalidraw valida.",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. O volètz vertadièrament ?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la bibliotèca ?",
     "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada."
   },
   "errors": {
