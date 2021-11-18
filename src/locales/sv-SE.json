@@ -290,13 +290,13 @@
       "authorName": "Ditt namn eller användarnamn",
       "libraryName": "Namn på ditt bibliotek",
       "libraryDesc": "Beskrivning av ditt bibliotek för att hjälpa människor att förstå dess användning",
-      "githubHandle": "",
+      "githubHandle": "Github-användarnamn (valfritt), så att du kan redigera biblioteket när du har skickat in det för granskning",
       "twitterHandle": "Twitter-användarnamn (valfritt), så vi vet vem att kreditera när du marknadsför på Twitter",
       "website": "Länk till din personliga webbplats eller någon annan (valfritt)"
     },
     "errors": {
       "required": "Obligatoriskt",
-      "website": ""
+      "website": "Ange en giltig URL"
     },
     "noteDescription": {
       "pre": "Skicka ditt bibliotek för att inkluderas i ",
