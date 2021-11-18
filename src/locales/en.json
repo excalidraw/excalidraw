@@ -290,13 +290,13 @@
       "authorName": "Your name or username",
       "libraryName": "Name of your library",
       "libraryDesc": "Description of your library to help people understand its usage",
-      "githubHandle": "Github handle (optional), so you can edit the library once submitted for review",
+      "githubHandle": "GitHub handle (optional), so you can edit the library once submitted for review",
       "twitterHandle": "Twitter username (optional), so we know who to credit when promoting over Twitter",
       "website": "Link to your personal website or elsewhere (optional)"
     },
     "errors": {
       "required": "Required",
-      "letter&Spaces": "Only letters and spaces allowed"
+      "website": "Enter a valid Url"
     },
     "noteDescription": {
       "pre": "Submit your library to be included in the ",
