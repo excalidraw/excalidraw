@@ -285,27 +285,27 @@
     "twitterUsername": "டுவிட்டர் பயனர்பெயர்",
     "libraryName": "நூலக பெயர்",
     "libraryDesc": "நூலக விவரிப்பு",
-    "website": "",
+    "website": "வலைத்தளம்",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
+      "authorName": "உம் பெயர் அ பயனர்பெயர்",
+      "libraryName": "உம் நூலகத்தின் பெயர்",
+      "libraryDesc": "உம் நூலகத்தின் விவரிப்பு இதன் பயன்பாட்டை மக்கள் புரிந்துகொள்ளவுதவ",
       "githubHandle": "",
       "twitterHandle": "",
       "website": ""
     },
     "errors": {
-      "required": "",
-      "letter&Spaces": ""
+      "required": "தேவைப்டுகிறது",
+      "letter&Spaces": "எழுத்துகளுக்கும் இடைவெளிக்கும் மட்டுமே அனுமதி"
     },
     "noteDescription": {
       "pre": "",
-      "link": "",
+      "link": "பொது நூலக களஞ்சியம்",
       "post": ""
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
+      "pre": "நூலகம் முதலில் கைமுறையாக ஒப்புக்கொள்ளப்படவேண்டும். வாசிக்கவும் ",
+      "link": "வழிகாட்டுதல்களை",
       "post": ""
     },
     "noteLicense": {
