@@ -296,7 +296,8 @@
     },
     "errors": {
       "required": "Required",
-      "letter&Spaces": "Only letters and spaces allowed"
+      "libraryName": "Only letters and spaces allowed",
+      "website": "Enter a valid Url"
     },
     "noteDescription": {
       "pre": "Submit your library to be included in the ",
