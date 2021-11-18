@@ -290,7 +290,7 @@
       "authorName": "Nimi tai käyttäjänimi",
       "libraryName": "Kirjastosi nimi",
       "libraryDesc": "Kirjaston kuvaus, joka auttaa ihmisiä ymmärtämään sen käyttöä",
-      "githubHandle": "",
+      "githubHandle": "GitHub-tunnuksesi (valinnainen), jotta voit muokata kirjastoa sen jälkeen kun se on lähetetty tarkastettavaksi",
       "twitterHandle": "Twitter-tunnus (valinnainen), jotta tiedämme ketä kiittää kun viestimme Twitterissä",
       "website": "Linkki henkilökohtaiseen verkkosivustoosi tai muualle (valinnainen)"
     },
