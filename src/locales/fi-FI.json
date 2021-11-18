@@ -101,8 +101,8 @@
     "showStroke": "Näytä viivan värin valitsin",
     "showBackground": "Näytä taustavärin valitsin",
     "toggleTheme": "Vaihda teema",
-    "personalLib": "Oma Kirjasto",
-    "excalidrawLib": "Excalidraw Kirjasto"
+    "personalLib": "Oma kirjasto",
+    "excalidrawLib": "Excalidraw kirjasto"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -281,18 +281,18 @@
     "title": "Julkaise kirjasto",
     "itemName": "Kohteen nimi",
     "authorName": "Tekijän nimi",
-    "githubUsername": "GitHub käyttäjätunnus",
+    "githubUsername": "GitHub-käyttäjätunnus",
     "twitterUsername": "Twitter-käyttäjätunnus",
     "libraryName": "Kirjaston nimi",
     "libraryDesc": "Kirjaston kuvaus",
     "website": "Verkkosivu",
     "placeholder": {
-      "authorName": "Nimi tai käyttäjänimi",
+      "authorName": "Nimesi tai käyttäjänimesi",
       "libraryName": "Kirjastosi nimi",
-      "libraryDesc": "Kirjaston kuvaus, joka auttaa ihmisiä ymmärtämään sen käyttöä",
+      "libraryDesc": "Kirjaston kuvaus, joka auttaa ihmisiä ymmärtämään sen käyttötarkoitukset",
       "githubHandle": "GitHub-tunnuksesi (valinnainen), jotta voit muokata kirjastoa sen jälkeen kun se on lähetetty tarkastettavaksi",
       "twitterHandle": "Twitter-tunnus (valinnainen), jotta tiedämme ketä kiittää kun viestimme Twitterissä",
-      "website": "Linkki henkilökohtaiseen verkkosivustoosi tai muualle (valinnainen)"
+      "website": "Linkki henkilökohtaiselle verkkosivustollesi tai muualle (valinnainen)"
     },
     "errors": {
       "required": "Pakollinen",
