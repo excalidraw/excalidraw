@@ -171,7 +171,7 @@
     "imageInsertError": "Insercion d’imatge impossibla. Tornatz ensajar mai tard...",
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG invalid."
   },
   "toolBar": {
     "selection": "Seleccion",
@@ -192,7 +192,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Per desplaçar los canabasses, tenètz la rodeta de la mirga o la barra d’espaci pendent lo desplaçament",
     "linearElement": "Clicatz per començar mantun punt, lisatz per una sola linha",
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "Quichatz Suprimir per suprimir lo punt, Ctrl o Cmd+D per lo duplicar, o fasètz lisar per lo desplaçar",
     "lineEditor_nothingSelected": "Seleccionatz un punt de desplaçar o suprimir, o mantenètz Alt e clicatz per apondre punts novèls",
     "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament",
-    "publishLibrary": ""
+    "publishLibrary": "Publicar vòstra pròpria bibliotèca"
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
@@ -275,31 +275,31 @@
     "zoomToSelection": "Zoomar la seleccion"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Escafar canabàs"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "Publicar la bibliotèca",
+    "itemName": "Nom de l’element",
+    "authorName": "Nom de l’autor",
+    "githubUsername": "Nom d’utilizaire GitHub",
+    "twitterUsername": "Nom d’utilizaire Twitter",
+    "libraryName": "Nom de la bibliotèca",
+    "libraryDesc": "Descripcion de la bibliotèca",
+    "website": "Site web",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "authorName": "Vòstre nom o nom d’utilizaire",
+      "libraryName": "Nom de vòstra bibliotèca",
+      "libraryDesc": "Descripcion de vòstra bibliotèca per ajudar lo monde a comprendre son utilizacion",
+      "githubHandle": "GitHub handle(opcional), per poder modificar la bibliotèca un còp enviada per repassa",
+      "twitterHandle": "Nom d’utilizaire Twitter (opcional), per saber qual mercejar quand ne parlam sus Twitter",
+      "website": "Ligam cap a vòstre site web personal o endacòm mai (opcional)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Requerit",
+      "website": "Picatz una Url valida"
     },
     "noteDescription": {
-      "pre": "",
+      "pre": "Enviatz vòstra bibliotèca per èsser compresa al ",
       "link": "",
       "post": ""
     },
@@ -319,7 +319,7 @@
   "publishSuccessDialog": {
     "title": "",
     "content": "",
-    "link": ""
+    "link": "aquí"
   },
   "confirmDialog": {
     "resetLibrary": "",
