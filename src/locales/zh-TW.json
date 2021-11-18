@@ -290,13 +290,13 @@
       "authorName": "您的名稱或帳號",
       "libraryName": "您的資料庫名稱",
       "libraryDesc": "提供您的資料庫說明以利他人理解其用途",
-      "githubHandle": "",
+      "githubHandle": "Github handle（選填），填寫後您可編輯已送出待審查的資料庫",
       "twitterHandle": "Twitter 帳號（選填），填寫後若我們在 Twitter 推廣時可提及您",
       "website": "您個人網站或其他網站的連結（選填）"
     },
     "errors": {
       "required": "必填",
-      "website": ""
+      "website": "請輸入有效的 URL"
     },
     "noteDescription": {
       "pre": "送出您的資料庫後將被包含於",
