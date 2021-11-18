@@ -290,13 +290,13 @@
       "authorName": "Ditt navn eller brukernavn",
       "libraryName": "Navnet på biblioteket ditt",
       "libraryDesc": "Beskrivelse av biblioteket ditt for å hjelpe folk med å forstå bruken",
-      "githubHandle": "",
+      "githubHandle": "Github-brukernavn (valgfritt), slik at du kan redigere biblioteket når du har sendt inn for gjennomgang",
       "twitterHandle": "Twitter-brukernavn (valgfritt), slik at vi vet hvem vi skal kreditere når promotert på Twitter",
       "website": "Lenke til din personlige nettside eller et annet sted (valgfritt)"
     },
     "errors": {
       "required": "Påkrevd",
-      "website": ""
+      "website": "Angi en gyldig nettadresse"
     },
     "noteDescription": {
       "pre": "Send inn biblioteket ditt som skal inkluderes i ",
