@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "Vereist",
-      "website": ""
+      "website": "Vul een geldige URL in"
     },
     "noteDescription": {
       "pre": "",
