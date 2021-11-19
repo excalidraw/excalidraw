@@ -317,12 +317,12 @@
     "atleastOneLibItem": ""
   },
   "publishSuccessDialog": {
-    "title": "",
+    "title": "ライブラリを送信しました",
     "content": "",
     "link": ""
   },
   "confirmDialog": {
-    "resetLibrary": "",
+    "resetLibrary": "ライブラリをリセット",
     "removeItemsFromLib": ""
   },
   "encrypted": {
@@ -345,7 +345,7 @@
     "width": "幅"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "ライブラリに追加しました",
     "copyStyles": "スタイルをコピーしました。",
     "copyToClipboard": "クリップボードにコピー",
     "copyToClipboardAsPng": "{{exportSelection}} を PNG 形式でクリップボードにコピーしました\n({{exportColorScheme}})",
