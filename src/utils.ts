@@ -303,6 +303,7 @@ export const tupleToCoors = (
 /** use as a rejectionHandler to mute filesystem Abort errors */
 export const muteFSAbortError = (error?: Error) => {
   if (error?.name === "AbortError") {
+    console.warn(error);
     return;
   }
   throw error;
