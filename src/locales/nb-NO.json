@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "Påkrevd",
-      "website": "Angi en gyldig nettadresse"
+      "website": ""
     },
     "noteDescription": {
       "pre": "Send inn biblioteket ditt som skal inkluderes i ",
