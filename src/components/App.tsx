@@ -4195,6 +4195,8 @@ class App extends React.Component<AppProps, AppState> {
     } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error(error);
+      } else {
+        console.warn(error);
       }
       this.setState(
         {
