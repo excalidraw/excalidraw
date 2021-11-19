@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "Required",
-      "website": "Enter a valid Url"
+      "website": "Enter a valid URL"
     },
     "noteDescription": {
       "pre": "Submit your library to be included in the ",
