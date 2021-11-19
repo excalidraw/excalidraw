@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "",
-      "website": ""
+      "website": "有効なURLを入力してください"
     },
     "noteDescription": {
       "pre": "",
@@ -305,7 +305,7 @@
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "ガイドライン",
       "post": ""
     },
     "noteLicense": {
