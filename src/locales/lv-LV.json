@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "Obligāts",
-      "website": "Ievadiet derīgu URL"
+      "website": ""
     },
     "noteDescription": {
       "pre": "Iesniegt savu bibliotēku iekļaušanai ",
