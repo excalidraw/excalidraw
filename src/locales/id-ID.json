@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "Dibutuhkan",
-      "website": ""
+      "website": "Masukkan URL valid"
     },
     "noteDescription": {
       "pre": "Kirimkan pustaka Anda untuk disertakan di ",
