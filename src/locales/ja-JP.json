@@ -101,8 +101,8 @@
     "showStroke": "ストロークカラーピッカーを表示",
     "showBackground": "背景色ピッカーを表示",
     "toggleTheme": "テーマの切り替え",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "個人ライブラリ",
+    "excalidrawLib": "Excalidrawライブラリ"
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -138,8 +138,8 @@
     "exitZenMode": "集中モードをやめる",
     "cancel": "キャンセル",
     "clear": "消去",
-    "remove": "",
-    "publishLibrary": "",
+    "remove": "削除",
+    "publishLibrary": "公開",
     "submit": "",
     "confirm": ""
   },
@@ -278,14 +278,14 @@
     "title": "キャンバスを消去"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
+    "title": "ライブラリを公開",
+    "itemName": "アイテム名",
+    "authorName": "作成者名",
+    "githubUsername": "GitHub ユーザ名",
+    "twitterUsername": "Twitter ユーザ名",
+    "libraryName": "ライブラリ名",
     "libraryDesc": "",
-    "website": "",
+    "website": "Webサイト",
     "placeholder": {
       "authorName": "",
       "libraryName": "",
@@ -310,7 +310,7 @@
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
+      "link": "MIT ライセンス",
       "post": ""
     },
     "noteItems": "",
