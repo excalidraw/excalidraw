@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "Obligatoriu",
-      "website": "Introdu un URL valid"
+      "website": ""
     },
     "noteDescription": {
       "pre": "Trimite-ți biblioteca pentru fi inclus în ",
