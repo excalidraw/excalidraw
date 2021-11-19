@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "必填",
-      "website": ""
+      "website": "請輸入有效的 URL"
     },
     "noteDescription": {
       "pre": "送出您的資料庫後將被包含於",
