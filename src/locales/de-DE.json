@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "Erforderlich",
-      "website": ""
+      "website": "Gültige URL eingeben"
     },
     "noteDescription": {
       "pre": "Sende deine Bibliothek ein, um in die ",
