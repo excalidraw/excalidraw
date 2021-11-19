@@ -111,6 +111,7 @@ export const textWysiwyg = ({
   editable.dataset.type = "wysiwyg";
   // prevent line wrapping on Safari
   editable.wrap = "off";
+  editable.classList.add("excalidraw-wysiwyg");
 
   Object.assign(editable.style, {
     position: "absolute",
