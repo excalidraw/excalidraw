@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "Obbligatorio",
-      "website": ""
+      "website": "Inserisci un URL valido"
     },
     "noteDescription": {
       "pre": "Invia la tua libreria da includere nella ",
