@@ -138,10 +138,10 @@
     "exitZenMode": "Έξοδος από την λειτουργία Zen",
     "cancel": "Ακύρωση",
     "clear": "Καθαρισμός",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "remove": "Κατάργηση",
+    "publishLibrary": "Δημοσίευση",
+    "submit": "Υποβολή",
+    "confirm": "Επιβεβαίωση"
   },
   "alerts": {
     "clearReset": "Αυτό θα σβήσει ολόκληρο τον καμβά. Είσαι σίγουρος;",
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "Πιέστε Διαγραφή για να αφαιρέσετε το σημείου, CtrlOrCmd+D για να το αντιγράψετε ή σύρτε το για να το μετακινήσετε",
     "lineEditor_nothingSelected": "Επιλέξτε ένα σημείο για μετακίνηση ή αφαίρεση, ή κρατήστε παρατεταμένα το Alt και κάντε κλικ για να προσθέσετε νέα σημεία",
     "placeImage": "",
-    "publishLibrary": ""
+    "publishLibrary": "Δημοσιεύστε τη δική σας βιβλιοθήκη"
   },
   "canvasError": {
     "cannotShowPreview": "Αδυναμία εμφάνισης προεπισκόπησης",
@@ -280,12 +280,12 @@
   "publishDialog": {
     "title": "",
     "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
+    "authorName": "Όνομα δημιουργού",
+    "githubUsername": "GitHub username",
+    "twitterUsername": "Twitter username",
+    "libraryName": "Όνομα βιβλιοθήκης",
     "libraryDesc": "",
-    "website": "",
+    "website": "Ιστοσελίδα",
     "placeholder": {
       "authorName": "",
       "libraryName": "",
@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "",
-      "website": ""
+      "website": "Εισάγετε μια έγκυρη διεύθυνση URL"
     },
     "noteDescription": {
       "pre": "",
