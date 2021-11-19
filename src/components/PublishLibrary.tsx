@@ -281,27 +281,27 @@ const PublishLibrary = ({
       {shouldRenderForm ? (
         <form onSubmit={onSubmit}>
           <div className="publish-library-note">
-            {te("publishDialog.noteDescription.content", {
-              link: (
+            {te("publishDialog.noteDescription", {
+              link: (translation) => (
                 <a
                   href="https://libraries.excalidraw.com"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {t("publishDialog.noteDescription.link")}
+                  {translation}
                 </a>
               ),
             })}
           </div>
           <span className="publish-library-note">
-            {te("publishDialog.noteGuidelines.content", {
-              link: (
+            {te("publishDialog.noteGuidelines", {
+              link: (translation) => (
                 <a
                   href="https://github.com/excalidraw/excalidraw-libraries#guidelines"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {t("publishDialog.noteGuidelines.link")}
+                  {translation}
                 </a>
               ),
             })}
@@ -391,14 +391,14 @@ const PublishLibrary = ({
               />
             </label>
             <span className="publish-library-note">
-              {te("publishDialog.noteLicense.content", {
-                link: (
+              {te("publishDialog.noteLicense", {
+                link: (translation) => (
                   <a
                     href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {t("publishDialog.noteLicense.link")}
+                    {translation}
                   </a>
                 ),
               })}

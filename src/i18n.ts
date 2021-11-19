@@ -134,13 +134,42 @@ export const t = (
 
 export const te = (
   path: string,
-  replacement: { [key: string]: string | number | JSX.Element },
+  replacement: {
+    [key: string]:
+      | string
+      | number
+      | ((val: (string | JSX.Element)[]) => JSX.Element);
+  },
 ) => {
-  const translation = t(path);
-  const translationFrag = translation
-    .split(/({{.*?}})/g)
-    .map((frag) =>
-      /^{{.*}}$/.test(frag) ? replacement[frag.slice(2, -2)] : frag,
-    );
-  return translationFrag;
+  const replacementSingle: { [key: string]: string | number } = {};
+  const replacementFn: {
+    [key: string]: (val: (string | JSX.Element)[]) => JSX.Element;
+  } = {};
+  for (const [key, r] of Object.entries(replacement)) {
+    if (typeof r === "string" || typeof r === "number") {
+      replacementSingle[key] = r;
+    } else {
+      replacementFn[key] = r;
+    }
+  }
+  const translation = t(path, replacementSingle);
+
+  const _tagRecr = (s: string): (string | JSX.Element)[] => {
+    const er = /<(.*?)>(.*?)<\/\1>/.exec(s); // try grabbing the first, outmost tag
+    if (er === null) {
+      return [s];
+    }
+    const [pre, key, inner, post] = [
+      s.slice(0, er.index),
+      er[1],
+      er[2],
+      s.slice(er.index + er[0].length),
+    ];
+    return [
+      ..._tagRecr(pre),
+      replacementFn[key](_tagRecr(inner)),
+      ..._tagRecr(post),
+    ];
+  };
+  return _tagRecr(translation);
 };

@@ -192,13 +192,13 @@ export const LibraryMenu = ({
         <p>
           {te("publishSuccessDialog.content", {
             authorName: publishLibSuccess!.authorName,
-            link: (
+            link: (translation) => (
               <a
                 href={publishLibSuccess?.url}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {t("publishSuccessDialog.link")}
+                {translation}
               </a>
             ),
           })}
