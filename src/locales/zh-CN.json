@@ -132,7 +132,7 @@
     "resetLibrary": "重置资源库",
     "createNewRoom": "新建会议室",
     "fullScreen": "全屏",
-    "darkMode": "暗色主题",
+    "darkMode": "深色模式",
     "lightMode": "浅色模式",
     "zenMode": "禅模式",
     "exitZenMode": "退出禅模式",
@@ -163,7 +163,7 @@
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
     "invalidSceneUrl": "无法从提供的 URL 导入场景。它或者格式不正确，或者不包含有效的 Excalidraw JSON 数据。",
     "resetLibrary": "这将会清除你的资源库。你确定这么做吗？",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "要从库中删除 {{count}} 个项目吗？",
     "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。"
   },
   "errors": {
@@ -279,7 +279,7 @@
   },
   "publishDialog": {
     "title": "",
-    "itemName": "",
+    "itemName": "项目名称",
     "authorName": "作者名",
     "githubUsername": "GitHub 用户名",
     "twitterUsername": "",
@@ -292,7 +292,7 @@
       "libraryDesc": "介绍您的库，让人们了解其用途",
       "githubHandle": "",
       "twitterHandle": "",
-      "website": ""
+      "website": "您个人网站的或任意的链接（可选）"
     },
     "errors": {
       "required": "",
@@ -323,7 +323,7 @@
   },
   "confirmDialog": {
     "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "removeItemsFromLib": "从库中删除选中的项目"
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
