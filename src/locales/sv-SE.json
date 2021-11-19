@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "Obligatoriskt",
-      "website": "Ange en giltig URL"
+      "website": ""
     },
     "noteDescription": {
       "pre": "Skicka ditt bibliotek för att inkluderas i ",
