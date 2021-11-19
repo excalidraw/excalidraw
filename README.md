@@ -88,6 +88,13 @@ Try out [`@excalidraw/excalidraw`](https://www.npmjs.com/package/@excalidraw/exc
   - You may need to sign in with GitHub and reload the page
 - You can start coding instantly, and even send PRs from there!
 
+### Gitpod
+
+Open a fresh, automated dev environment using Gitpod. 
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/excalidraw/excalidraw)
+
+
 ### Local Installation
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
