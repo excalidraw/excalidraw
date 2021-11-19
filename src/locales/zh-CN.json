@@ -139,8 +139,8 @@
     "cancel": "取消",
     "clear": "清除",
     "remove": "",
-    "publishLibrary": "",
-    "submit": "",
+    "publishLibrary": "发布",
+    "submit": "提交",
     "confirm": "确定"
   },
   "alerts": {
@@ -280,16 +280,16 @@
   "publishDialog": {
     "title": "",
     "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
+    "authorName": "作者名",
+    "githubUsername": "GitHub 用户名",
     "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "libraryName": "名称",
+    "libraryDesc": "简介",
+    "website": "网址",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
+      "authorName": "您的名字或用户名",
+      "libraryName": "库的名称",
+      "libraryDesc": "介绍您的库，让人们了解其用途",
       "githubHandle": "",
       "twitterHandle": "",
       "website": ""
