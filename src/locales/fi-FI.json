@@ -296,7 +296,7 @@
     },
     "errors": {
       "required": "Pakollinen",
-      "website": ""
+      "website": "Syötä oikeamuotoinen URL-osoite"
     },
     "noteDescription": {
       "pre": "Lähetä kirjastosi, jotta se voidaan sisällyttää ",
