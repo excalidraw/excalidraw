@@ -285,17 +285,17 @@
     "twitterUsername": "Twitter užívateľské meno",
     "libraryName": "Názov knižnice",
     "libraryDesc": "Popis knižnice",
-    "website": "",
+    "website": "Webová stránka",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
+      "authorName": "Vaše meno alebo užívateľske meno",
+      "libraryName": "Názov vašej knižnice",
       "libraryDesc": "",
       "githubHandle": "",
-      "twitterHandle": "",
+      "twitterHandle": "Twitter užívateľské meno (nepovinné), aby sme vedeli komu pripísať zásluhu pri propagovaní cez Twitter",
       "website": ""
     },
     "errors": {
-      "required": "",
+      "required": "Povinné",
       "website": ""
     },
     "noteDescription": {
