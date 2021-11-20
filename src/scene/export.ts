@@ -158,6 +158,7 @@ export const exportToSvg = async (
   renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,
+    exportWithDarkMode: appState.exportWithDarkMode,
   });
 
   return svgRoot;
