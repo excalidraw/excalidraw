@@ -101,8 +101,8 @@
     "showStroke": "Zobraziť výber farby pre obrys",
     "showBackground": "Zobraziť výber farby pre pozadie",
     "toggleTheme": "Prepnúť tému",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Moja knižnica",
+    "excalidrawLib": "Excalidraw knižnica"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -138,9 +138,9 @@
     "exitZenMode": "Zrušiť režim zen",
     "cancel": "Zrušiť",
     "clear": "Vymazať",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
+    "remove": "Odstrániť",
+    "publishLibrary": "Uverejniť",
+    "submit": "Potvrdiť",
     "confirm": "Potvrdiť"
   },
   "alerts": {
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "Stačte Delete na vymazanie bodu, CtrlOrCmd+D na jeho duplikovanie, alebo potiahnite na jeho presunutie",
     "lineEditor_nothingSelected": "Zvoľte bod na jeho presunutie alebo vymazanie, alebo podržte Alt a kliknite na pridanie nového bodu",
     "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
-    "publishLibrary": ""
+    "publishLibrary": "Uverejniť vašu knižnicu"
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -278,13 +278,13 @@
     "title": "Vyčistiť plátno"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
+    "title": "Uverejniť knižnicu",
+    "itemName": "Názov položky",
+    "authorName": "Meno autora",
+    "githubUsername": "Github užívateľské meno",
+    "twitterUsername": "Twitter užívateľské meno",
+    "libraryName": "Názov knižnice",
+    "libraryDesc": "Popis knižnice",
     "website": "",
     "placeholder": {
       "authorName": "",
