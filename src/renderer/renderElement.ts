@@ -838,6 +838,7 @@ export const renderElementToSvg = (
       break;
     }
     case "image": {
+      const filter = svgRoot.getAttribute("filter");
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
@@ -860,6 +861,13 @@ export const renderElementToSvg = (
 
         const use = svgRoot.ownerDocument!.createElementNS(SVG_NS, "use");
         use.setAttribute("href", `#${symbolId}`);
+
+        //svgRoot filter causes bitmap image to be inverted
+        //same filter needs to be added to revert the inversion
+        //https://stackoverflow.com/questions/51154171/remove-css-filter-on-child-elements
+        if (filter && fileData.mimeType != "image/svg+xml") {
+          use.setAttribute("filter", filter);
+        }
 
         use.setAttribute("width", `${Math.round(element.width)}`);
         use.setAttribute("height", `${Math.round(element.height)}`);
