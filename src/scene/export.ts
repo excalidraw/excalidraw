@@ -51,6 +51,54 @@ export const exportToCanvas = async (
     files,
   });
 
+  const sceneState = {
+    viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+    scrollX: -minX + exportPadding,
+    scrollY: -minY + exportPadding,
+    zoom: defaultAppState.zoom,
+    remotePointerViewportCoords: {},
+    remoteSelectedElementIds: {},
+    shouldCacheIgnoreZoom: false,
+    remotePointerUsernames: {},
+    remotePointerUserStates: {},
+    theme: appState.exportWithDarkMode ? "dark" : "light",
+    imageCache,
+  };
+
+  let refreshTimer = 0;
+
+  const extraOpts = {
+    renderScrollbars: false,
+    renderSelection: false,
+    renderOptimizations: true,
+    renderGrid: false,
+    isExport: true,
+    renderCb: () => {
+      // If a scene refresh is cued, restart the countdown.
+      // This way we are not calling renderScene once per
+      // ExcalidrawTextElement. The countdown improves performance
+      // when there are large numbers of ExcalidrawTextElements
+      // executing this callback.
+      if (refreshTimer !== 0) {
+        window.clearTimeout(refreshTimer);
+      }
+      refreshTimer = window.setTimeout(() => {
+        extraOpts.renderCb = () => {};
+        window.clearTimeout(refreshTimer);
+        renderScene(
+          elements,
+          appState,
+          null,
+          scale,
+          rough.canvas(canvas),
+          canvas,
+          sceneState,
+          extraOpts,
+        );
+      }, 50);
+    },
+  };
+
   renderScene(
     elements,
     appState,
@@ -58,26 +106,8 @@ export const exportToCanvas = async (
     scale,
     rough.canvas(canvas),
     canvas,
-    {
-      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: -minX + exportPadding,
-      scrollY: -minY + exportPadding,
-      zoom: defaultAppState.zoom,
-      remotePointerViewportCoords: {},
-      remoteSelectedElementIds: {},
-      shouldCacheIgnoreZoom: false,
-      remotePointerUsernames: {},
-      remotePointerUserStates: {},
-      theme: appState.exportWithDarkMode ? "dark" : "light",
-      imageCache,
-    },
-    {
-      renderScrollbars: false,
-      renderSelection: false,
-      renderOptimizations: true,
-      renderGrid: false,
-      isExport: true,
-    },
+    sceneState,
+    extraOpts,
   );
 
   return canvas;
@@ -158,6 +188,7 @@ export const exportToSvg = async (
   renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,
+    exportWithDarkMode: appState.exportWithDarkMode,
   });
 
   return svgRoot;

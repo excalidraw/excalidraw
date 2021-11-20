@@ -274,11 +274,11 @@ export const measureTextElement = (
 export const renderTextElement = (
   element: NonDeleted<ExcalidrawTextElement>,
   context: CanvasRenderingContext2D,
-  refresh?: () => void,
+  renderCb?: () => void,
 ): void => {
   for (let i = 0; i < renderMethodsA.length; i++) {
     if (renderMethodsA[i].subtype === element.subtype) {
-      renderMethodsA[i].method(element, context, refresh);
+      renderMethodsA[i].method(element, context, renderCb);
       return;
     }
   }
@@ -286,7 +286,7 @@ export const renderTextElement = (
     .find((value, index, renderMethodsA) => {
       return value.default !== undefined && value.default === true;
     })!
-    .method(element, context, refresh);
+    .method(element, context, renderCb);
 };
 
 export const renderSvgTextElement = (

@@ -811,9 +811,11 @@ export const renderSceneToSvg = (
   {
     offsetX = 0,
     offsetY = 0,
+    exportWithDarkMode = false,
   }: {
     offsetX?: number;
     offsetY?: number;
+    exportWithDarkMode?: boolean;
   } = {},
 ) => {
   if (!svgRoot) {
@@ -830,6 +832,7 @@ export const renderSceneToSvg = (
           files,
           element.x + offsetX,
           element.y + offsetY,
+          exportWithDarkMode,
         );
       } catch (error: any) {
         console.error(error);
