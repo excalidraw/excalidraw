@@ -865,7 +865,7 @@ export const renderElementToSvg = (
         //svgRoot filter causes bitmap image to be inverted
         //same filter needs to be added to revert the inversion
         //https://stackoverflow.com/questions/51154171/remove-css-filter-on-child-elements
-        if (filter && fileData.mimeType != "image/svg+xml") {
+        if (filter && fileData.mimeType !== "image/svg+xml") {
           use.setAttribute("filter", filter);
         }
 
