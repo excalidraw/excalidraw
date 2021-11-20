@@ -160,22 +160,6 @@ export const exportToSvg = async (
     offsetY: -minY + exportPadding,
   });
 
-  //if SVG includes embedded image declared as symbol, and
-  //the image is not image/svg, when exporting in darkmode
-  //filter causes bitmap image to be inverted
-  //same filter needs to be added to revert the inversion
-  //https://stackoverflow.com/questions/51154171/remove-css-filter-on-child-elements
-  if (appState.exportWithDarkMode) {
-    svgRoot
-      .querySelectorAll("image:not([href^='data:image/svg'])")
-      .forEach((i) => {
-        const id = i.parentElement?.id;
-        svgRoot.querySelectorAll(`use[href='#${id}']`).forEach((u) => {
-          u.setAttribute("filter", THEME_FILTER);
-        });
-      });
-  }
-
   return svgRoot;
 };
 
