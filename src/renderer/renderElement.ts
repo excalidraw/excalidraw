@@ -838,7 +838,9 @@ export const renderElementToSvg = (
       break;
     }
     case "image": {
-      const filter = svgRoot.getAttribute("filter");
+      const filter = svgRoot.getAttribute("filter")
+        ? "invert(100%) hue-rotate(180deg) saturate(1.25)"
+        : null;
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
