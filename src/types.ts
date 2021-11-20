@@ -258,6 +258,7 @@ export interface ExcalidrawProps {
     isDeleted: boolean,
   ) => string;
   generateIdForFile?: (file: File) => string | Promise<string>;
+  onThemeChange?: (newTheme: string) => void;  
 }
 
 export type SceneData = {
