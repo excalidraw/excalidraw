@@ -42,6 +42,7 @@ export const ProjectName = (props: Props) => {
       </label>
       {props.isNameEditable ? (
         <input
+          type="text"
           className="TextInput"
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
