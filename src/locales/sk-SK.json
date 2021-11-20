@@ -163,7 +163,7 @@
     "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru",
     "invalidSceneUrl": "Nepodarilo sa načítať scénu z poskytnutej URL. Je nevalidná alebo neobsahuje žiadne validné Excalidraw JSON dáta.",
     "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "Odstrániť {{count}} položiek z knižnice?",
     "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá."
   },
   "errors": {
@@ -290,13 +290,13 @@
       "authorName": "Vaše meno alebo užívateľské meno",
       "libraryName": "Názov vašej knižnice",
       "libraryDesc": "",
-      "githubHandle": "",
+      "githubHandle": "GitHub užívateľské meno (nepovinné), aby ste mohli robiť úpravy po tom, čo bude knižnica uverejnená na schválenie",
       "twitterHandle": "Twitter užívateľské meno (nepovinné), aby sme vedeli komu pripísať zásluhu pri propagovaní cez Twitter",
       "website": "Odkaz na vašu osobnú webovú stránku alebo niekam inam (nepovinné)"
     },
     "errors": {
       "required": "Povinné",
-      "website": ""
+      "website": "Zadajte platnú adresu URL"
     },
     "noteDescription": {
       "pre": "Uverejnite vašu knižnicu vo ",
@@ -317,13 +317,13 @@
     "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Knižnica uverejnená",
+    "content": "Ďakujeme vám {{authorName}}. Vaša knižnica bola uverejnená na posúdenie. Stav môžete skontrolovať",
+    "link": "tu"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Obnoviť knižnicu",
+    "removeItemsFromLib": "Odstrániť zvolené položky z knižnice"
   },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať.",
@@ -345,7 +345,7 @@
     "width": "Šírka"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Pridané do knižnice",
     "copyStyles": "Štýly skopírované.",
     "copyToClipboard": "Skopírované do schránky.",
     "copyToClipboardAsPng": "Kopírovanie {{exportSelection}} do schránky ako PNG prebehlo úspešne\n({{exportColorScheme}})",
