@@ -263,7 +263,12 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
-  perform: (_, appState, value) => {
+  perform: (_, appState, value, app) => {
+    if (app.props.onThemeChange) {
+      app.props.onThemeChange(
+        value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
+      );
+    }
     return {
       appState: {
         ...appState,
