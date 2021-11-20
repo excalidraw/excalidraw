@@ -292,16 +292,16 @@
       "libraryDesc": "",
       "githubHandle": "",
       "twitterHandle": "Twitter užívateľské meno (nepovinné), aby sme vedeli komu pripísať zásluhu pri propagovaní cez Twitter",
-      "website": ""
+      "website": "Odkaz na vašu osobnú webovú stránku alebo niekam inam (nepovinné)"
     },
     "errors": {
       "required": "Povinné",
       "website": ""
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Uverejnite vašu knižnicu vo ",
+      "link": "verejnom zozname knižníc",
+      "post": "aby ju aj ostatní mohli použiť v ich náčrtoch."
     },
     "noteGuidelines": {
       "pre": "",
