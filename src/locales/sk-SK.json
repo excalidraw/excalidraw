@@ -287,7 +287,7 @@
     "libraryDesc": "Popis knižnice",
     "website": "Webová stránka",
     "placeholder": {
-      "authorName": "Vaše meno alebo užívateľske meno",
+      "authorName": "Vaše meno alebo užívateľské meno",
       "libraryName": "Názov vašej knižnice",
       "libraryDesc": "",
       "githubHandle": "",
@@ -309,12 +309,12 @@
       "post": " pred uverejnením. Budete potrebovať Github účet na komunikáciu a vykonanie zmien, ak budú potrebné, avšak nie je to úplne povinné."
     },
     "noteLicense": {
-      "pre": "Potvrdením súhlasite, že knižnica bude zverejnená s ",
+      "pre": "Potvrdením súhlasíte, že knižnica bude zverejnená s ",
       "link": "MIT licenciou, ",
-      "post": "čo v skratke znamená, že ju može použiť hocikto bez obmedzení."
+      "post": "čo v skratke znamená, že ju môže použiť hocikto bez obmedzení."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Každá položka v knižnici musí mať svoje vlastné meno, aby sa dala vyhľadať. Súčasťou knižnice budú nasledujúce položky:",
+    "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice"
   },
   "publishSuccessDialog": {
     "title": "",
