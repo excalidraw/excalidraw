@@ -304,14 +304,14 @@
       "post": "aby ju aj ostatní mohli použiť v ich náčrtoch."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Knižnica musí byť najprv manuálne schválená. Prosím prečítajte si ",
+      "link": "pokyny",
+      "post": " pred uverejnením. Budete potrebovať Github účet na komunikáciu a vykonanie zmien, ak budú potrebné, avšak nie je to úplne povinné."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Potvrdením súhlasite, že knižnica bude zverejnená s ",
+      "link": "MIT licenciou, ",
+      "post": "čo v skratke znamená, že ju može použiť hocikto bez obmedzení."
     },
     "noteItems": "",
     "atleastOneLibItem": ""
