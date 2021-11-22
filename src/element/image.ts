@@ -12,8 +12,6 @@ import {
   FileId,
   InitializedExcalidrawImageElement,
 } from "./types";
-import decodePng from "png-chunks-extract";
-import { findPngChunk } from "../data/image";
 
 export const loadHTMLImageElement = (dataURL: DataURL) => {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -154,8 +152,10 @@ export const hasTransparentPixels = async (imageFile: Blob | File) => {
     return false;
   }
 
+  const { findPngChunk, extractPngChunks } = await import("../data/image");
+
   const buffer = await imageFile.arrayBuffer();
-  const chunks = decodePng(new Uint8Array(buffer));
+  const chunks = extractPngChunks(new Uint8Array(buffer));
 
   // early exit if tRNS not found and IHDR states no support for alpha
   // -----------------------------------------------------------------------

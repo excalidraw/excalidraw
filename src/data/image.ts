@@ -1,9 +1,11 @@
-import decodePng from "png-chunks-extract";
+import extractPngChunks from "png-chunks-extract";
 import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
 import { stringToBase64, encode, decode, base64ToString } from "./encode";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
 import { PngChunk } from "../types";
+
+export { extractPngChunks };
 
 // -----------------------------------------------------------------------------
 // PNG
@@ -29,7 +31,9 @@ const blobToArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {
 export const getTEXtChunk = async (
   blob: Blob,
 ): Promise<{ keyword: string; text: string } | null> => {
-  const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
+  const chunks = extractPngChunks(
+    new Uint8Array(await blobToArrayBuffer(blob)),
+  );
   const metadataChunk = chunks.find((chunk) => chunk.name === "tEXt");
   if (metadataChunk) {
     return tEXt.decode(metadataChunk.data);
@@ -66,7 +70,9 @@ export const encodePngMetadata = async ({
   blob: Blob;
   metadata: string;
 }) => {
-  const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
+  const chunks = extractPngChunks(
+    new Uint8Array(await blobToArrayBuffer(blob)),
+  );
 
   const metadataChunk = tEXt.encode(
     MIME_TYPES.excalidraw,
