@@ -118,7 +118,6 @@ export const normalizeSVG = async (SVGString: string) => {
 export const speedyImageToCanvas = async (imageFile: Blob | File) => {
   let imageSrc: HTMLImageElement | ImageBitmap;
   if (
-    // Math.random() > 1 &&
     typeof ImageBitmap !== "undefined" &&
     ImageBitmap.prototype &&
     ImageBitmap.prototype.close &&
