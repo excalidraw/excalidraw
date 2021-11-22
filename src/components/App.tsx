@@ -43,7 +43,8 @@ import {
 import {
   APP_NAME,
   CURSOR_TYPE,
-  DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+  DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT_JPG,
+  DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT_OTHER,
   DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -222,6 +223,7 @@ import {
 } from "../data/blob";
 import {
   getInitializedImageElements,
+  hasTransparentPixels,
   loadHTMLImageElement,
   normalizeSVG,
   updateImageCache as _updateImageCache,
@@ -4001,20 +4003,30 @@ class App extends React.Component<AppProps, AppState> {
     const existingFileData = this.files[fileId];
     if (!existingFileData?.dataURL) {
       try {
-        imageFile = await resizeImageFile(
-          imageFile,
-          DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-        );
+        if (!(await hasTransparentPixels(imageFile))) {
+          const _imageFile = await resizeImageFile(imageFile, {
+            maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT_JPG,
+            outputType: MIME_TYPES.jpg,
+          });
+          if (_imageFile.size > MAX_ALLOWED_FILE_BYTES) {
+            imageFile = await resizeImageFile(imageFile, {
+              maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT_OTHER,
+              outputType: MIME_TYPES.jpg,
+            });
+          } else {
+            imageFile = _imageFile;
+          }
+        } else {
+          imageFile = await resizeImageFile(imageFile, {
+            maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT_OTHER,
+          });
+        }
       } catch (error: any) {
         console.error("error trying to resing image file on insertion", error);
       }
 
       if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
-        throw new Error(
-          t("errors.fileTooBig", {
-            maxSize: `${Math.trunc(MAX_ALLOWED_FILE_BYTES / 1024 / 1024)}MB`,
-          }),
-        );
+        throw new Error(t("errors.fileTooBig"));
       }
     }
 
@@ -4113,7 +4125,9 @@ class App extends React.Component<AppProps, AppState> {
     // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Basic_User_Interface/Using_URL_values_for_the_cursor_property
     const cursorImageSizePx = 96;
 
-    const imagePreview = await resizeImageFile(imageFile, cursorImageSizePx);
+    const imagePreview = await resizeImageFile(imageFile, {
+      maxWidthOrHeight: cursorImageSizePx,
+    });
 
     let previewDataURL = await getDataURL(imagePreview);
 

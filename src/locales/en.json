@@ -169,7 +169,7 @@
   "errors": {
     "unsupportedFileType": "Unsupported file type.",
     "imageInsertError": "Couldn't insert image. Try again later...",
-    "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
+    "fileTooBig": "File is too big.",
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
     "invalidSVGString": "Invalid SVG."
   },

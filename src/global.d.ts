@@ -1,3 +1,5 @@
+// import type {PngChunk} from "./types";
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface Document {
   fonts?: {
@@ -54,8 +56,6 @@ type NonOptional<T> = Exclude<T, undefined>;
 
 // PNG encoding/decoding
 // -----------------------------------------------------------------------------
-type TEXtChunk = { name: "tEXt"; data: Uint8Array };
-
 declare module "png-chunk-text" {
   function encode(
     name: string,
@@ -64,11 +64,11 @@ declare module "png-chunk-text" {
   function decode(data: Uint8Array): { keyword: string; text: string };
 }
 declare module "png-chunks-encode" {
-  function encode(chunks: TEXtChunk[]): Uint8Array;
+  function encode(chunks: import("./types").PngChunk[]): Uint8Array;
   export = encode;
 }
 declare module "png-chunks-extract" {
-  function extract(buffer: Uint8Array): TEXtChunk[];
+  function extract(buffer: Uint8Array): import("./types").PngChunk[];
   export = extract;
 }
 // -----------------------------------------------------------------------------
@@ -111,10 +111,17 @@ interface Uint8Array {
 
 // https://github.com/nodeca/image-blob-reduce/issues/23#issuecomment-783271848
 declare module "image-blob-reduce" {
-  import { PicaResizeOptions } from "pica";
+  import { PicaResizeOptions, Pica } from "pica";
   namespace ImageBlobReduce {
     interface ImageBlobReduce {
       toBlob(file: File, options: ImageBlobReduceOptions): Promise<Blob>;
+      _create_blob(
+        this: { pica: Pica },
+        env: {
+          out_canvas: HTMLCanvasElement;
+          out_blob: Blob;
+        },
+      ): Promise<any>;
     }
 
     interface ImageBlobReduceStatic {

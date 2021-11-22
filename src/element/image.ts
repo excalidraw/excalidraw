@@ -3,6 +3,7 @@
 // -----------------------------------------------------------------------------
 
 import { MIME_TYPES, SVG_NS } from "../constants";
+import { getDataURL } from "../data/blob";
 import { t } from "../i18n";
 import { AppClassProperties, DataURL, BinaryFiles } from "../types";
 import { isInitializedImageElement } from "./typeChecks";
@@ -11,6 +12,8 @@ import {
   FileId,
   InitializedExcalidrawImageElement,
 } from "./types";
+import decodePng from "png-chunks-extract";
+import { findPngChunk } from "../data/image";
 
 export const loadHTMLImageElement = (dataURL: DataURL) => {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -108,4 +111,81 @@ export const normalizeSVG = async (SVGString: string) => {
 
     return svg.outerHTML;
   }
+};
+
+/**
+ * To improve perf, uses `createImageBitmap` is available. But there are
+ * quality issues across browsers, so don't use this API where quality matters.
+ */
+export const speedyImageToCanvas = async (imageFile: Blob | File) => {
+  let imageSrc: HTMLImageElement | ImageBitmap;
+  if (
+    // Math.random() > 1 &&
+    typeof ImageBitmap !== "undefined" &&
+    ImageBitmap.prototype &&
+    ImageBitmap.prototype.close &&
+    window.createImageBitmap
+  ) {
+    imageSrc = await window.createImageBitmap(imageFile);
+  } else {
+    imageSrc = await loadHTMLImageElement(await getDataURL(imageFile));
+  }
+  const { width, height } = imageSrc;
+
+  const canvas = document.createElement("canvas");
+  canvas.height = height;
+  canvas.width = width;
+  const context = canvas.getContext("2d")!;
+  context.drawImage(imageSrc, 0, 0, width, height);
+
+  if (typeof ImageBitmap !== "undefined" && imageSrc instanceof ImageBitmap) {
+    imageSrc.close();
+  }
+
+  return { canvas, context, width, height };
+};
+
+/**
+ * Does its best at figuring out if an image (PNG) has any (semi)transparent
+ * pixels. If not PNG, always returns false.
+ */
+export const hasTransparentPixels = async (imageFile: Blob | File) => {
+  if (imageFile.type !== MIME_TYPES.png) {
+    return false;
+  }
+
+  const buffer = await imageFile.arrayBuffer();
+  const chunks = decodePng(new Uint8Array(buffer));
+
+  // early exit if tRNS not found and IHDR states no support for alpha
+  // -----------------------------------------------------------------------
+
+  const IHDR = findPngChunk(chunks, "IHDR");
+
+  if (
+    IHDR &&
+    IHDR.data[9] !== 4 &&
+    IHDR.data[9] !== 6 &&
+    !findPngChunk(chunks, "tRNS")
+  ) {
+    return false;
+  }
+
+  // otherwise loop through pixels to check if there's any actually
+  // (semi)transparent pixel
+  // -----------------------------------------------------------------------
+
+  const { width, height, context } = await speedyImageToCanvas(imageFile);
+  {
+    const { data } = context.getImageData(0, 0, width, height);
+    const len = data.byteLength;
+    let i = 3;
+    while (i <= len) {
+      if (data[i] !== 255) {
+        return true;
+      }
+      i += 4;
+    }
+  }
+  return false;
 };

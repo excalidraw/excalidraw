@@ -199,11 +199,7 @@ export const encodeFilesForUpload = async ({
     });
 
     if (buffer.byteLength > maxBytes) {
-      throw new Error(
-        t("errors.fileTooBig", {
-          maxSize: `${Math.trunc(maxBytes / 1024 / 1024)}MB`,
-        }),
-      );
+      throw new Error(t("errors.fileTooBig"));
     }
 
     processedFiles.push({

@@ -237,7 +237,11 @@ export const dataURLToFile = (dataURL: DataURL, filename = "") => {
 
 export const resizeImageFile = async (
   file: File,
-  maxWidthOrHeight: number,
+  opts: {
+    /** undefined indicates auto */
+    outputType?: typeof MIME_TYPES["jpg"];
+    maxWidthOrHeight: number;
+  },
 ): Promise<File> => {
   // SVG files shouldn't a can't be resized
   if (file.type === MIME_TYPES.svg) {
@@ -257,6 +261,16 @@ export const resizeImageFile = async (
     pica: pica({ features: ["js", "wasm"] }),
   });
 
+  if (opts.outputType) {
+    const { outputType } = opts;
+    reduce._create_blob = function (env) {
+      return this.pica.toBlob(env.out_canvas, outputType, 0.8).then((blob) => {
+        env.out_blob = blob;
+        return env;
+      });
+    };
+  }
+
   const fileType = file.type;
 
   if (!isSupportedImageFile(file)) {
@@ -264,9 +278,11 @@ export const resizeImageFile = async (
   }
 
   return new File(
-    [await reduce.toBlob(file, { max: maxWidthOrHeight })],
+    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight })],
     file.name,
-    { type: fileType },
+    {
+      type: fileType,
+    },
   );
 };
 

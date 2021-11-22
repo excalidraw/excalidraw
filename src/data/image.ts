@@ -3,6 +3,7 @@ import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
 import { stringToBase64, encode, decode, base64ToString } from "./encode";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
+import { PngChunk } from "../types";
 
 // -----------------------------------------------------------------------------
 // PNG
@@ -32,6 +33,28 @@ export const getTEXtChunk = async (
   const metadataChunk = chunks.find((chunk) => chunk.name === "tEXt");
   if (metadataChunk) {
     return tEXt.decode(metadataChunk.data);
+  }
+  return null;
+};
+
+export const findPngChunk = (
+  chunks: PngChunk[],
+  name: PngChunk["name"],
+  /** this makes the search stop before IDAT chunk (before which most
+   * metadata chunks reside). This is a perf optim. */
+  breakBeforeIDAT = true,
+) => {
+  let i = 0;
+  const len = chunks.length;
+  while (i <= len) {
+    const chunk = chunks[i];
+    if (chunk.name === name) {
+      return chunk;
+    }
+    if (breakBeforeIDAT && chunk.name === "IDAT") {
+      return null;
+    }
+    i++;
   }
   return null;
 };
