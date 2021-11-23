@@ -104,13 +104,12 @@ export const textWysiwyg = ({
               excalidrawContainer?.parentNode as Element,
             ).marginRight.slice(0, -2),
           );
-
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
         width: `${width}px`,
-        height: editable.clientHeight,
+        height: `${Math.max(editable.clientHeight, updatedElement.height)}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
         transform: getTransform(width, height, angle, appState, maxWidth),
