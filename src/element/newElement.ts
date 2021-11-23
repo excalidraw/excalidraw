@@ -199,7 +199,7 @@ const getAdjustedDimensions = (
       deltaY2,
     );
     if (textContainer) {
-      if (nextHeight > textContainer.height) {
+      if (nextHeight === textContainer.height) {
         y = textContainer.y;
       }
     }

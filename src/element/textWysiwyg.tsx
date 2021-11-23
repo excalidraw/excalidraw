@@ -199,7 +199,7 @@ export const textWysiwyg = ({
     const { selectionStart, selectionEnd } = editable;
     const linesStartIndices = getSelectedLinesStartIndices();
 
-    let value = editable.innerHTML;
+    let value = editable.value;
     linesStartIndices.forEach((startIndex: number) => {
       const startValue = value.slice(0, startIndex);
       const endValue = value.slice(startIndex);
@@ -207,7 +207,7 @@ export const textWysiwyg = ({
       value = `${startValue}${TAB}${endValue}`;
     });
 
-    editable.innerHTML = value;
+    editable.value = value;
 
     editable.selectionStart = selectionStart + TAB_SIZE;
     editable.selectionEnd = selectionEnd + TAB_SIZE * linesStartIndices.length;

@@ -100,9 +100,7 @@ export const measureText = (
   font: FontString,
   textContainer?: ExcalidrawElement | null,
 ) => {
-  const wrappedText = wrapText(text, font, textContainer || null);
-  const { width, height, baseline } = getTextDimensions(wrappedText, font);
-
+  const { width, height, baseline } = getTextDimensions(text, font);
   return { width, height, baseline };
 };
 
@@ -141,30 +139,38 @@ export const wrapText = (
   if (!textContainer) {
     return text;
   }
-  const words = text.split(" ");
-  const lines = [];
-  let currentLine = "";
-  const maxWidth = textContainer.width;
-  while (words.length > 0) {
-    while (getTextDimensions(words[0], font).width >= maxWidth) {
-      const currentWord = words[0];
-      words[0] = currentWord.slice(0, -1);
-      if (words.length > 1) {
-        words[1] = currentWord.slice(-1) + words[1];
+
+  const lines: Array<string> = [];
+  const originalLines = text.split("\n");
+  originalLines.forEach((originalLine) => {
+    const words = originalLine.split(" ");
+
+    let currentLine = "";
+    const maxWidth = textContainer.width;
+    while (words.length > 0) {
+      while (getTextDimensions(words[0], font).width >= maxWidth) {
+        const currentWord = words[0];
+        words[0] = currentWord.slice(0, -1);
+        const lastChar = currentWord.slice(-1);
+
+        if (words.length > 1) {
+          words[1] = lastChar + words[1];
+        } else {
+          words.push(lastChar);
+        }
+      }
+      if (getTextDimensions(words[0] + currentLine, font).width >= maxWidth) {
+        lines.push(currentLine);
+        currentLine = "";
       } else {
-        words.push(currentWord.slice(-1));
+        currentLine += `${words.shift()} `;
       }
     }
-    if (getTextDimensions(words[0] + currentLine, font).width >= maxWidth) {
+    if (currentLine) {
       lines.push(currentLine);
-      currentLine = "";
-    } else {
-      currentLine += `${words.shift()} `;
     }
-  }
-  if (currentLine) {
-    lines.push(currentLine);
-  }
+  });
+
   return lines.join("\n");
 };
 
