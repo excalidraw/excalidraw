@@ -33,7 +33,7 @@ export const LibraryUnit = ({
   isPending?: boolean;
   onClick: () => void;
   selected: boolean;
-  onToggle: (id: string) => void;
+  onToggle: (id: string, event: React.MouseEvent) => void;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -84,7 +84,17 @@ export const LibraryUnit = ({
         })}
         ref={ref}
         draggable={!!elements}
-        onClick={!!elements || !!isPending ? onClick : undefined}
+        onClick={
+          !!elements || !!isPending
+            ? (event) => {
+                if (id && event.shiftKey) {
+                  onToggle(id, event);
+                } else {
+                  onClick();
+                }
+              }
+            : undefined
+        }
         onDragStart={(event) => {
           setIsHovered(false);
           event.dataTransfer.setData(
@@ -97,7 +107,7 @@ export const LibraryUnit = ({
       {id && elements && (isHovered || isMobile || selected) && (
         <CheckboxItem
           checked={selected}
-          onChange={() => onToggle(id)}
+          onChange={(checked, event) => onToggle(id, event)}
           className="library-unit__checkbox"
         />
       )}
