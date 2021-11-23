@@ -5,7 +5,11 @@ import {
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import { FontFamilyValues, FontString } from "./element/types";
+import {
+  ExcalidrawElement,
+  FontFamilyValues,
+  FontString,
+} from "./element/types";
 import { Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
@@ -91,34 +95,78 @@ export const getFontString = ({
 };
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-export const measureText = (text: string, font: FontString) => {
-  const line = document.createElement("div");
-  const body = document.body;
-  line.style.position = "absolute";
-  line.style.whiteSpace = "pre";
-  line.style.font = font;
-  body.appendChild(line);
-  line.innerText = text
+export const measureText = (
+  text: string,
+  font: FontString,
+  textContainer?: ExcalidrawElement | null,
+) => {
+  const wrappedText = wrapText(text, font, textContainer || null);
+
+  const { width, height, baseline } = getTextDimensions(wrappedText, font);
+
+  return { width, height, baseline };
+};
+
+const getTextDimensions = (text: string, font: FontString) => {
+  text = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
     // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
-  const width = line.offsetWidth;
-  const height = line.offsetHeight;
-  // Now creating 1px sized item that will be aligned to baseline
-  // to calculate baseline shift
+  const line = document.createElement("div");
+  line.style.position = "absolute";
+  line.style.whiteSpace = "pre-wrap";
+  line.style.font = font;
+  document.body.appendChild(line);
+  line.innerText = text;
   const span = document.createElement("span");
   span.style.display = "inline-block";
   span.style.overflow = "hidden";
   span.style.width = "1px";
   span.style.height = "1px";
-  line.appendChild(span);
+  line.append(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
-  document.body.removeChild(line);
+  const width = line.offsetWidth;
 
+  const height = line.offsetHeight;
+  document.body.removeChild(line);
   return { width, height, baseline };
+};
+export const wrapText = (
+  text: string,
+  font: FontString,
+  textContainer: ExcalidrawElement | null,
+) => {
+  if (!textContainer) {
+    return text;
+  }
+  const words = text.split(" ");
+  const lines = [];
+  let currentLine = "";
+  const maxWidth = textContainer.width;
+  while (words.length > 0) {
+    while (getTextDimensions(words[0], font).width >= maxWidth) {
+      const currentWord = words[0];
+      words[0] = currentWord.slice(0, -1);
+      if (words.length > 1) {
+        words[1] = currentWord.slice(-1) + words[1];
+      } else {
+        words.push(currentWord.slice(-1));
+      }
+    }
+    if (getTextDimensions(words[0] + currentLine, font).width >= maxWidth) {
+      lines.push(currentLine);
+      currentLine = "";
+    } else {
+      currentLine += `${words.shift()} `;
+    }
+  }
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  return lines.join("\n");
 };
 
 export const debounce = <T extends any[]>(

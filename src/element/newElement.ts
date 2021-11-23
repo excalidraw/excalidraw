@@ -113,6 +113,7 @@ export const newTextElement = (
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
+    textContainer?: ExcalidrawElement;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const metrics = measureText(opts.text, getFontString(opts));
@@ -130,6 +131,7 @@ export const newTextElement = (
       width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
+      textContainer: opts.textContainer || null,
     },
     {},
   );
@@ -139,6 +141,7 @@ export const newTextElement = (
 const getAdjustedDimensions = (
   element: ExcalidrawTextElement,
   nextText: string,
+  textContainer: ExcalidrawElement | null,
 ): {
   x: number;
   y: number;
@@ -150,13 +153,16 @@ const getAdjustedDimensions = (
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureText(nextText, getFontString(element));
+  } = measureText(nextText, getFontString(element), textContainer);
   const { textAlign, verticalAlign } = element;
 
   let x: number;
   let y: number;
-
-  if (textAlign === "center" && verticalAlign === "middle") {
+  if (
+    textAlign === "center" &&
+    verticalAlign === "middle" &&
+    !element.textContainer
+  ) {
     const prevMetrics = measureText(element.text, getFontString(element));
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
@@ -206,11 +212,12 @@ const getAdjustedDimensions = (
 export const updateTextElement = (
   element: ExcalidrawTextElement,
   { text, isDeleted }: { text: string; isDeleted?: boolean },
+  textContainer: ExcalidrawElement | null,
 ): ExcalidrawTextElement => {
   return newElementWith(element, {
     text,
     isDeleted: isDeleted ?? element.isDeleted,
-    ...getAdjustedDimensions(element, text),
+    ...getAdjustedDimensions(element, text, textContainer),
   });
 };
 

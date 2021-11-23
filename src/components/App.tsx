@@ -1870,10 +1870,17 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            return updateTextElement(_element, {
-              text,
-              isDeleted,
-            });
+            const textContainer = _element.textContainer
+              ? element.textContainer
+              : null;
+            return updateTextElement(
+              _element,
+              {
+                text,
+                isDeleted,
+              },
+              textContainer,
+            );
           }
           return _element;
         }),
@@ -1892,10 +1899,7 @@ class App extends React.Component<AppProps, AppState> {
           },
           this.state,
         );
-        return [
-          viewportX - this.state.offsetLeft,
-          viewportY - this.state.offsetTop,
-        ];
+        return [viewportX, viewportY];
       },
       onChange: withBatchedUpdates((text) => {
         updateElement(text);
@@ -1935,6 +1939,7 @@ class App extends React.Component<AppProps, AppState> {
       }),
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
+      scene: this.scene,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
@@ -2023,7 +2028,11 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter?: boolean;
   }) => {
     const existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
-
+    const textContainer = getElementContainingPosition(
+      this.scene.getElements(),
+      sceneX,
+      sceneY,
+    );
     const parentCenterPosition =
       insertAtParentCenter &&
       this.getTextWysiwygSnappedToCenterPosition(
@@ -2060,6 +2069,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
+          textContainer: textContainer ?? undefined,
         });
 
     this.setState({ editingElement: element });
