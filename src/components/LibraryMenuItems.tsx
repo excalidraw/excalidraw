@@ -21,6 +21,7 @@ import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 
 import "./LibraryMenuItems.scss";
+import { VERSIONS } from "../constants";
 
 const LibraryMenuItems = ({
   libraryItems,
@@ -293,7 +294,9 @@ const LibraryMenuItems = ({
         <a
           href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
             window.name || "_blank"
-          }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}`}
+          }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+            VERSIONS.excalidrawLibrary
+          }`}
           target="_excalidraw_libraries"
         >
           {t("labels.libraries")}

@@ -1,6 +1,7 @@
 import { ExcalidrawElement } from "../element/types";
 import { AppState, BinaryFiles, LibraryItems, LibraryItems_v1 } from "../types";
 import type { cleanAppStateForExport } from "../appState";
+import { VERSIONS } from "../constants";
 
 export interface ExportedDataState {
   type: string;
@@ -24,7 +25,7 @@ export interface ImportedDataState {
 
 export interface ExportedLibraryData {
   type: string;
-  version: 2;
+  version: typeof VERSIONS.excalidrawLibrary;
   source: string;
   libraryItems: LibraryItems;
 }
