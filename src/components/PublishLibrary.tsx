@@ -8,7 +8,7 @@ import { ToolButton } from "./ToolButton";
 
 import { AppState, LibraryItems, LibraryItem } from "../types";
 import { exportToBlob } from "../packages/utils";
-import { EXPORT_DATA_TYPES, EXPORT_SOURCE } from "../constants";
+import { EXPORT_DATA_TYPES, EXPORT_SOURCE, VERSIONS } from "../constants";
 import { ExportedLibraryData } from "../data/types";
 
 import "./PublishLibrary.scss";
@@ -181,7 +181,7 @@ const PublishLibrary = ({
 
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
-      version: 2,
+      version: VERSIONS.excalidrawLibrary,
       source: EXPORT_SOURCE,
       libraryItems: clonedLibItems,
     };
