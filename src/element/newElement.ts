@@ -198,6 +198,11 @@ const getAdjustedDimensions = (
       deltaX2,
       deltaY2,
     );
+    if (textContainer) {
+      if (nextHeight > textContainer.height) {
+        y = textContainer.y;
+      }
+    }
   }
 
   return {
@@ -213,11 +218,15 @@ export const updateTextElement = (
   element: ExcalidrawTextElement,
   { text, isDeleted }: { text: string; isDeleted?: boolean },
   textContainer: ExcalidrawElement | null,
+  updateDimensions: boolean,
 ): ExcalidrawTextElement => {
+  const dimensions = updateDimensions
+    ? getAdjustedDimensions(element, text, textContainer)
+    : undefined;
   return newElementWith(element, {
     text,
     isDeleted: isDeleted ?? element.isDeleted,
-    ...getAdjustedDimensions(element, text, textContainer),
+    ...dimensions,
   });
 };
 

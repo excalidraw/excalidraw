@@ -101,7 +101,6 @@ export const measureText = (
   textContainer?: ExcalidrawElement | null,
 ) => {
   const wrappedText = wrapText(text, font, textContainer || null);
-
   const { width, height, baseline } = getTextDimensions(wrappedText, font);
 
   return { width, height, baseline };

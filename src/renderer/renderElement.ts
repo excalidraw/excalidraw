@@ -251,7 +251,9 @@ const drawElementOnCanvas = (
 
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        const lineHeight = element.height / lines.length;
+        const lineHeight = element.textContainer
+          ? 25
+          : element.height / lines.length;
         const verticalOffset = element.height - element.baseline;
         const horizontalOffset =
           element.textAlign === "center"

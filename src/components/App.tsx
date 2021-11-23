@@ -1866,7 +1866,11 @@ class App extends React.Component<AppProps, AppState> {
       isExistingElement?: boolean;
     },
   ) {
-    const updateElement = (text: string, isDeleted = false) => {
+    const updateElement = (
+      text: string,
+      isDeleted = false,
+      updateDimensions = false,
+    ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
@@ -1880,6 +1884,7 @@ class App extends React.Component<AppProps, AppState> {
                 isDeleted,
               },
               textContainer,
+              updateDimensions,
             );
           }
           return _element;
@@ -1902,14 +1907,14 @@ class App extends React.Component<AppProps, AppState> {
         return [viewportX, viewportY];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text);
+        updateElement(text, false, !element.textContainer);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
       }),
       onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
         const isDeleted = !text.trim();
-        updateElement(text, isDeleted);
+        updateElement(text, isDeleted, true);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {

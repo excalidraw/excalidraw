@@ -64,20 +64,24 @@ export const textWysiwyg = ({
       let width = updatedElement.width;
       let height = updatedElement.height;
       if (textContainer) {
-        width = Math.min(width, textContainer.width);
-        height = Math.max(height, textContainer.height);
+        width = textContainer.width;
+        height = Math.min(height, textContainer.height);
       }
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
+
       if (textContainer) {
-        if (coordX < textContainer.x) {
+        if (coordX > textContainer.x) {
           coordX = textContainer.x;
         }
 
-        if (updatedElement.height > textContainer.height) {
-          mutateElement(textContainer, { height: updatedElement.height });
+        if (editable.clientHeight > textContainer.height) {
+          mutateElement(textContainer, { height: editable.clientHeight });
           return;
-        } else if (updatedElement.height > textContainer.height / 2) {
+        } else if (
+          editable.clientHeight > textContainer.height / 2 &&
+          coordY !== textContainer.y
+        ) {
           coordY = textContainer.y;
         }
       }
@@ -86,10 +90,9 @@ export const textWysiwyg = ({
       const { textAlign, angle } = updatedElement;
 
       editable.value = updatedElement.text;
-
       const lines = updatedElement.text.split("\n");
       const lineHeight = updatedElement.textContainer
-        ? "normal"
+        ? 25
         : updatedElement.height / lines.length;
       const maxWidth = textContainer
         ? width
@@ -107,7 +110,7 @@ export const textWysiwyg = ({
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
         width: `${width}px`,
-        height: `${height}px`,
+        height: editable.clientHeight,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
         transform: getTransform(width, height, angle, appState, maxWidth),
@@ -154,7 +157,8 @@ export const textWysiwyg = ({
   updateWysiwygStyle();
 
   if (onChange) {
-    editable.oninput = () => {
+    editable.oninput = (event) => {
+      editable.style.height = `${editable.scrollHeight}px`;
       onChange(normalizeText(editable.value));
     };
   }
@@ -196,15 +200,15 @@ export const textWysiwyg = ({
     const { selectionStart, selectionEnd } = editable;
     const linesStartIndices = getSelectedLinesStartIndices();
 
-    let value = editable.value;
-    linesStartIndices.forEach((startIndex) => {
+    let value = editable.innerHTML;
+    linesStartIndices.forEach((startIndex: number) => {
       const startValue = value.slice(0, startIndex);
       const endValue = value.slice(startIndex);
 
       value = `${startValue}${TAB}${endValue}`;
     });
 
-    editable.value = value;
+    editable.innerHTML = value;
 
     editable.selectionStart = selectionStart + TAB_SIZE;
     editable.selectionEnd = selectionEnd + TAB_SIZE * linesStartIndices.length;
