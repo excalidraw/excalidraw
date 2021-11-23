@@ -10,11 +10,7 @@ import {
   NormalizedZoomValue,
 } from "../types";
 import { ImportedDataState } from "./types";
-import {
-  getElementMap,
-  getNormalizedDimensions,
-  isInvisiblySmallElement,
-} from "../element";
+import { getNormalizedDimensions, isInvisiblySmallElement } from "../element";
 import { isLinearElementType } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
@@ -26,6 +22,7 @@ import {
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
+import { arrayToMap } from "../utils";
 
 type RestoredAppState = Omit<
   AppState,
@@ -204,14 +201,14 @@ export const restoreElements = (
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
 ): ExcalidrawElement[] => {
-  const localElementsMap = localElements ? getElementMap(localElements) : null;
+  const localElementsMap = localElements ? arrayToMap(localElements) : null;
   return (elements || []).reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
     // and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
       let migratedElement: ExcalidrawElement | null = restoreElement(element);
       if (migratedElement) {
-        const localElement = localElementsMap?.[element.id];
+        const localElement = localElementsMap?.get(element.id);
         if (localElement && localElement.version > migratedElement.version) {
           migratedElement = bumpVersion(migratedElement, localElement.version);
         }

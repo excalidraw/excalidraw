@@ -864,21 +864,21 @@ import { isInvisiblySmallElement } from "@excalidraw/excalidraw-next";
 
 Returns `true` if element is invisibly small (e.g. width & height are zero).
 
-#### `getElementMap`
+#### `arrayToMap`
 
 **_Signature_**
 
 <pre>
-getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
+arrayToMap(item: ({id: string} | string)[]): Map<string, typeof item>
 </pre>
 
 **How to use**
 
 ```js
-import { getElementsMap } from "@excalidraw/excalidraw-next";
+import { arrayToMap } from "@excalidraw/excalidraw";
 ```
 
-This function returns an object where each element is mapped to its id.
+Transforms array of objects containing `id` attribute, or array of ids (strings), into a Map, keyd by `id`. Useful if you need to get or check for existence of an item in an array in a loop (as a performance optimization).
 
 #### `loadLibraryFromBlob`
 

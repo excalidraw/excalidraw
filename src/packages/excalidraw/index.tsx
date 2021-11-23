@@ -171,10 +171,10 @@ const forwardedRefComp = forwardRef<
 export default React.memo(forwardedRefComp, areEqual);
 export {
   getSceneVersion,
-  getElementMap,
   isInvisiblySmallElement,
   getNonDeletedElements,
 } from "../../element";
+export { arrayToMap } from "../../utils";
 export { defaultLang, languages } from "../../i18n";
 export { restore, restoreAppState, restoreElements } from "../../data/restore";
 export {

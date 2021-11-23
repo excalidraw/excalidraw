@@ -470,3 +470,16 @@ export const bytesToHexString = (bytes: Uint8Array) => {
     .map((byte) => `0${byte.toString(16)}`.slice(-2))
     .join("");
 };
+
+/**
+ * Transforms array of objects containing `id` attribute,
+ * or array of ids (strings), into a Map, keyd by `id`.
+ */
+export const arrayToMap = <T extends { id: string } | string>(
+  items: readonly T[],
+) => {
+  return items.reduce((acc: Map<string, T>, element) => {
+    acc.set(typeof element === "string" ? element : element.id, element);
+    return acc;
+  }, new Map());
+};
