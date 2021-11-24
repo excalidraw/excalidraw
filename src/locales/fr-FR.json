@@ -20,10 +20,6 @@
     "background": "Arrière-plan",
     "fill": "Remplissage",
     "strokeWidth": "Largeur du trait",
-    "strokeShape": "Forme du trait",
-    "strokeShape_gel": "Stylo à bille",
-    "strokeShape_fountain": "Stylo-plume",
-    "strokeShape_brush": "Pinceau",
     "strokeStyle": "Style du trait",
     "strokeStyle_solid": "Plein",
     "strokeStyle_dashed": "Tirets",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Flèche",
     "arrowhead_bar": "Barre",
     "arrowhead_dot": "Point",
+    "arrowhead_triangle": "Triangle",
     "fontSize": "Taille de la police",
     "fontFamily": "Police",
     "onlySelected": "Uniquement la sélection",
@@ -136,7 +133,9 @@
     "darkMode": "Mode sombre",
     "lightMode": "Mode clair",
     "zenMode": "Mode zen",
-    "exitZenMode": "Quitter le mode zen"
+    "exitZenMode": "Quitter le mode zen",
+    "cancel": "Annuler",
+    "clear": "Effacer"
   },
   "alerts": {
     "clearReset": "L'intégralité du canevas va être effacée. Êtes-vous sûr ?",
@@ -154,14 +153,22 @@
     "errorAddingToLibrary": "Impossible d'ajouter l'élément à la bibliothèque",
     "errorRemovingFromLibrary": "Impossible de retirer l'élément de la bibliothèque",
     "confirmAddLibrary": "Cela va ajouter {{numShapes}} forme(s) à votre bibliothèque. Êtes-vous sûr·e ?",
-    "imageDoesNotContainScene": "L'importation d'images n'est pas prise en charge pour le moment.\n\nVouliez-vous importer une scène ? Cette image ne semble pas contenir de données de scène. Avez-vous activé cette option lors de l'exportation ?",
+    "imageDoesNotContainScene": "Cette image ne semble pas contenir de données de scène. Avez-vous activé l'intégration de scène lors de l'exportation ?",
     "cannotRestoreFromImage": "Impossible de restaurer la scène depuis ce fichier image",
     "invalidSceneUrl": "Impossible d'importer la scène depuis l'URL fournie. Elle est soit incorrecte, soit ne contient pas de données JSON Excalidraw valides.",
     "resetLibrary": "Cela va effacer votre bibliothèque. Êtes-vous sûr·e ?",
     "invalidEncryptionKey": "La clé de chiffrement doit comporter 22 caractères. La collaboration en direct est désactivée."
   },
+  "errors": {
+    "unsupportedFileType": "Type de fichier non supporté.",
+    "imageInsertError": "Impossible d'insérer l'image. Réessayez plus tard...",
+    "fileTooBig": "Le fichier est trop volumineux. La taille maximale autorisée est de {{maxSize}}.",
+    "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
+    "invalidSVGString": "SVG invalide."
+  },
   "toolBar": {
     "selection": "Sélection",
+    "image": "Insérer une image",
     "rectangle": "Rectangle",
     "diamond": "Losange",
     "ellipse": "Ellipse",
@@ -178,6 +185,7 @@
     "shapes": "Formes"
   },
   "hints": {
+    "canvasPanning": "Pour déplacer la zone de dessin, maintenez la molette de la souris enfoncée ou la barre d'espace tout en faisant glisser",
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
@@ -186,10 +194,12 @@
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
     "lockAngle": "Vous pouvez restreindre l'angle en maintenant MAJ",
     "resize": "Vous pouvez conserver les proportions en maintenant la touche MAJ pendant le redimensionnement,\nmaintenez la touche ALT pour redimensionner par rapport au centre",
+    "resizeImage": "Vous pouvez redimensionner librement en maintenant SHIFT,\nmaintenez ALT pour redimensionner depuis le centre",
     "rotate": "Vous pouvez restreindre les angles en maintenant MAJ pendant la rotation",
     "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
     "lineEditor_pointSelected": "Appuyez sur Supprimer pour supprimer le point, Ctrl ou Cmd+D pour le dupliquer, ou faites-le glisser pour le déplacer",
-    "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou supprimer, ou maintenez Alt et cliquez pour ajouter de nouveaux points"
+    "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou supprimer, ou maintenez Alt et cliquez pour ajouter de nouveaux points",
+    "placeImage": "Cliquez pour placer l'image, ou cliquez et faites glisser pour définir sa taille manuellement"
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
@@ -255,6 +265,9 @@
     "view": "Affichage",
     "zoomToFit": "Zoomer pour voir tous les éléments",
     "zoomToSelection": "Zoomer sur la sélection"
+  },
+  "clearCanvasDialog": {
+    "title": "Effacer la zone de dessin"
   },
   "encrypted": {
     "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais.",

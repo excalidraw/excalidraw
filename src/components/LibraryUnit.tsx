@@ -1,13 +1,12 @@
 import clsx from "clsx";
 import oc from "open-color";
 import { useEffect, useRef, useState } from "react";
-import { close } from "../components/icons";
 import { MIME_TYPES } from "../constants";
-import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import { exportToSvg } from "../scene/export";
-import { LibraryItem } from "../types";
+import { BinaryFiles, LibraryItem } from "../types";
 import "./LibraryUnit.scss";
+import { CheckboxItem } from "./CheckboxItem";
 
 // fa-plus
 const PLUS_ICON = (
@@ -20,68 +19,72 @@ const PLUS_ICON = (
 );
 
 export const LibraryUnit = ({
+  id,
   elements,
-  pendingElements,
-  onRemoveFromLibrary,
+  files,
+  isPending,
   onClick,
+  selected,
+  onToggle,
 }: {
-  elements?: LibraryItem;
-  pendingElements?: LibraryItem;
-  onRemoveFromLibrary: () => void;
+  id: LibraryItem["id"] | /** for pending item */ null;
+  elements?: LibraryItem["elements"];
+  files: BinaryFiles;
+  isPending?: boolean;
   onClick: () => void;
+  selected: boolean;
+  onToggle: (id: string) => void;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    const elementsToRender = elements || pendingElements;
-    if (!elementsToRender) {
+    const node = ref.current;
+    if (!node) {
       return;
     }
-    let svg: SVGSVGElement;
-    const current = ref.current!;
 
     (async () => {
-      svg = await exportToSvg(elementsToRender, {
-        exportBackground: false,
-        viewBackgroundColor: oc.white,
-      });
-      for (const child of ref.current!.children) {
-        if (child.tagName !== "svg") {
-          continue;
-        }
-        current!.removeChild(child);
+      if (!elements) {
+        return;
       }
-      current!.appendChild(svg);
+      const svg = await exportToSvg(
+        elements,
+        {
+          exportBackground: false,
+          viewBackgroundColor: oc.white,
+        },
+        files,
+      );
+      node.innerHTML = svg.outerHTML;
     })();
 
     return () => {
-      if (svg) {
-        current.removeChild(svg);
-      }
+      node.innerHTML = "";
     };
-  }, [elements, pendingElements]);
+  }, [elements, files]);
 
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useIsMobile();
-
-  const adder = (isHovered || isMobile) && pendingElements && (
+  const adder = isPending && (
     <div className="library-unit__adder">{PLUS_ICON}</div>
   );
 
   return (
     <div
       className={clsx("library-unit", {
-        "library-unit__active": elements || pendingElements,
+        "library-unit__active": elements,
+        "library-unit--hover": elements && isHovered,
+        "library-unit--selected": selected,
       })}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
         className={clsx("library-unit__dragger", {
-          "library-unit__pulse": !!pendingElements,
+          "library-unit__pulse": !!isPending,
         })}
         ref={ref}
         draggable={!!elements}
-        onClick={!!elements || !!pendingElements ? onClick : undefined}
+        onClick={!!elements || !!isPending ? onClick : undefined}
         onDragStart={(event) => {
           setIsHovered(false);
           event.dataTransfer.setData(
@@ -91,14 +94,12 @@ export const LibraryUnit = ({
         }}
       />
       {adder}
-      {elements && (isHovered || isMobile) && (
-        <button
-          className="library-unit__removeFromLibrary"
-          aria-label={t("labels.removeFromLibrary")}
-          onClick={onRemoveFromLibrary}
-        >
-          {close}
-        </button>
+      {id && elements && (isHovered || isMobile || selected) && (
+        <CheckboxItem
+          checked={selected}
+          onChange={() => onToggle(id)}
+          className="library-unit__checkbox"
+        />
       )}
     </div>
   );

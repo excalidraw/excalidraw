@@ -6,7 +6,6 @@
     display: inline-flex;
     align-items: center;
     position: relative;
-    font-family: Cascadia;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     border-radius: var(--space-factor);
@@ -54,10 +53,16 @@
   }
 
   .ToolIcon__label {
+    display: flex;
+    align-items: center;
     color: var(--icon-fill-color);
     font-family: var(--ui-font);
     margin: 0 0.8em;
     text-overflow: ellipsis;
+
+    .Spinner {
+      margin-left: 0.6em;
+    }
   }
 
   .ToolIcon_size_small .ToolIcon__icon {

@@ -20,10 +20,6 @@
     "background": "Hintergrund",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
-    "strokeShape": "Strichform",
-    "strokeShape_gel": "Gelschreiber",
-    "strokeShape_fountain": "Füllfederhalter",
-    "strokeShape_brush": "Pinselstift",
     "strokeStyle": "Konturstil",
     "strokeStyle_solid": "Durchgezogen",
     "strokeStyle_dashed": "Gestrichelt",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Pfeil",
     "arrowhead_bar": "Balken",
     "arrowhead_dot": "Punkt",
+    "arrowhead_triangle": "Dreieck",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
@@ -136,7 +133,9 @@
     "darkMode": "Dunkler Modus",
     "lightMode": "Heller Modus",
     "zenMode": "Zen-Modus",
-    "exitZenMode": "Zen-Modus verlassen"
+    "exitZenMode": "Zen-Modus verlassen",
+    "cancel": "Abbrechen",
+    "clear": "Löschen"
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -154,14 +153,22 @@
     "errorAddingToLibrary": "Das Element konnte nicht zur Bibliothek hinzugefügt werden",
     "errorRemovingFromLibrary": "Das Element konnte nicht aus der Bibliothek entfernt werden",
     "confirmAddLibrary": "Dies fügt {{numShapes}} Form(en) zu deiner Bibliothek hinzu. Bist du dir sicher?",
-    "imageDoesNotContainScene": "Das Importieren von Bildern wird derzeit nicht unterstützt.\n\nMöchtest du eine Szene importieren? Dieses Bild scheint keine Zeichnungsdaten zu enthalten. Hast du dies beim Exportieren aktiviert?",
+    "imageDoesNotContainScene": "Dieses Bild scheint keine Szenendaten zu enthalten. Hast Du das Einbetten der Szene während des Exports aktiviert?",
     "cannotRestoreFromImage": "Die Zeichnung konnte aus dieser Bilddatei nicht wiederhergestellt werden",
     "invalidSceneUrl": "Die Szene konnte nicht von der angegebenen URL importiert werden. Sie ist entweder fehlerhaft oder enthält keine gültigen Excalidraw JSON-Daten.",
     "resetLibrary": "Dieses löscht deine Bibliothek. Bist du sicher?",
     "invalidEncryptionKey": "Verschlüsselungsschlüssel muss 22 Zeichen lang sein. Die Live-Zusammenarbeit ist deaktiviert."
   },
+  "errors": {
+    "unsupportedFileType": "Nicht unterstützter Dateityp.",
+    "imageInsertError": "Das Bild konnte nicht eingefügt werden. Versuche es später erneut...",
+    "fileTooBig": "Die Datei ist zu groß. Die maximal zulässige Größe ist {{maxSize}}.",
+    "svgImageInsertError": "SVG-Bild konnte nicht eingefügt werden. Das SVG-Markup sieht ungültig aus.",
+    "invalidSVGString": "Ungültige SVG."
+  },
   "toolBar": {
     "selection": "Auswahl",
+    "image": "Bild einfügen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
     "ellipse": "Ellipse",
@@ -178,6 +185,7 @@
     "shapes": "Formen"
   },
   "hints": {
+    "canvasPanning": "Um die Zeichenfläche zu verschieben, halte das Mausrad oder die Leertaste während des Ziehens",
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
@@ -186,10 +194,12 @@
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
     "lockAngle": "Du kannst Winkel einschränken, indem du SHIFT gedrückt hältst",
     "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
+    "resizeImage": "Du kannst die Größe frei ändern, indem du SHIFT gedrückt hältst; halte ALT, um die Größe vom Zentrum aus zu ändern",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
     "lineEditor_info": "Doppelklicken oder Eingabetaste drücken, um Punkte zu bearbeiten",
     "lineEditor_pointSelected": "Drücke Löschen, um Punkt zu entfernen, Strg+D oder Cmd+D zum Duplizieren oder ziehe zum Verschieben",
-    "lineEditor_nothingSelected": "Wähle einen Punkt zum Verschieben oder Löschen oder halte die Alt-Taste gedrückt und klicke, um neue Punkte hinzuzufügen"
+    "lineEditor_nothingSelected": "Wähle einen Punkt zum Verschieben oder Löschen oder halte die Alt-Taste gedrückt und klicke, um neue Punkte hinzuzufügen",
+    "placeImage": "Klicken, um das Bild zu platzieren oder klicken und ziehen um seine Größe manuell zu setzen"
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
@@ -256,6 +266,9 @@
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
     "zoomToSelection": "Auf Auswahl zoomen"
   },
+  "clearCanvasDialog": {
+    "title": "Zeichenfläche löschen"
+  },
   "encrypted": {
     "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals.",
     "link": "Blogbeitrag über Ende-zu-Ende-Verschlüsselung in Excalidraw"
@@ -297,7 +310,7 @@
     "e3fafc": "Cyan 0",
     "e6fcf5": "Teal 0",
     "ebfbee": "Grün 0",
-    "f4fce3": "Limette 0",
+    "f4fce3": "Hellgrün 0",
     "fff9db": "Gelb 0",
     "fff4e6": "Orange 0",
     "transparent": "Transparent",
@@ -312,7 +325,7 @@
     "15aabf": "Cyan 6",
     "12b886": "Teal 6",
     "40c057": "Grün 6",
-    "82c91e": "Limette 6",
+    "82c91e": "Hellgrün 6",
     "fab005": "Gelb 6",
     "fd7e14": "Orange 6",
     "000000": "Schwarz",
@@ -327,7 +340,7 @@
     "0b7285": "Cyan 9",
     "087f5b": "Teal 9",
     "2b8a3e": "Grün 9",
-    "5c940d": "Limette 9",
+    "5c940d": "Hellgrün 9",
     "e67700": "Gelb 9",
     "d9480f": "Orange 9"
   }

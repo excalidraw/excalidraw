@@ -20,10 +20,6 @@
     "background": "Fundal",
     "fill": "Umplere",
     "strokeWidth": "Lățimea conturului",
-    "strokeShape": "Forma conturului",
-    "strokeShape_gel": "Pix cu gel",
-    "strokeShape_fountain": "Stilou",
-    "strokeShape_brush": "Pensulă tip stilou",
     "strokeStyle": "Stilul conturului",
     "strokeStyle_solid": "Neîntrerupt",
     "strokeStyle_dashed": "Liniuțe",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Săgeată",
     "arrowhead_bar": "Bară",
     "arrowhead_dot": "Bulină",
+    "arrowhead_triangle": "Triunghi",
     "fontSize": "Dimensiune font",
     "fontFamily": "Familia de fonturi",
     "onlySelected": "Numai selecția",
@@ -136,7 +133,9 @@
     "darkMode": "Mod întunecat",
     "lightMode": "Mod luminos",
     "zenMode": "Mod zen",
-    "exitZenMode": "Ieșire din modul zen"
+    "exitZenMode": "Ieșire din modul zen",
+    "cancel": "Anulare",
+    "clear": "Ștergere"
   },
   "alerts": {
     "clearReset": "Această opțiune va șterge întreaga pânză. Confirmi?",
@@ -154,14 +153,22 @@
     "errorAddingToLibrary": "Elementul nu a putut fi adăugat în bibliotecă",
     "errorRemovingFromLibrary": "Elementul nu a putut fi eliminat din bibliotecă",
     "confirmAddLibrary": "Această acțiune va adăuga {{numShapes}} formă(e) la biblioteca ta. Confirmi?",
-    "imageDoesNotContainScene": "Importarea imaginilor nu este acceptată în acest moment.\n\nVoiai să imporți o scenă? Această imagine nu pare să conțină date de scenă. Ai activat această opțiune pe durata exportării?",
+    "imageDoesNotContainScene": "Această imagine nu pare să conțină date de scenă. Ai activat încorporarea scenei în timpul exportului?",
     "cannotRestoreFromImage": "Scena nu a putut fi restaurată din acest fișier de imagine",
     "invalidSceneUrl": "Scena nu a putut fi importată din URL-ul furnizat. Este fie incorect formată, fie nu conține date JSON Excalidraw valide.",
     "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?",
     "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată."
   },
+  "errors": {
+    "unsupportedFileType": "Tip de fișier neacceptat.",
+    "imageInsertError": "Imaginea nu a putut fi introdusă. Reîncearcă mai târziu...",
+    "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
+    "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
+    "invalidSVGString": "SVG invalid."
+  },
   "toolBar": {
     "selection": "Selecție",
+    "image": "Introducere imagine",
     "rectangle": "Dreptunghi",
     "diamond": "Romb",
     "ellipse": "Elipsă",
@@ -178,6 +185,7 @@
     "shapes": "Forme"
   },
   "hints": {
+    "canvasPanning": "Pentru a muta pânză, ține apăsată rotița mausului sau bara de spațiu în timpul glisării",
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
@@ -186,10 +194,12 @@
     "linearElementMulti": "Dă clic pe ultimul punct sau apasă tasta Escape sau tasta Enter pentru a termina",
     "lockAngle": "Poți constrânge unghiul prin ținerea apăsată a tastei SHIFT",
     "resize": "Poți constrânge proporțiile, ținând apăsată tasta SHIFT în timp ce redimensionezi,\nține apăsată tasta ALT pentru a redimensiona de la centru",
+    "resizeImage": "Poți redimensiona liber ținând apăsată tasta SHIFT,\nține apăsată tasta ALT pentru a redimensiona din centru",
     "rotate": "Poți constrânge unghiurile, ținând apăsată tasta SHIFT în timp ce rotești",
     "lineEditor_info": "Dă dublu clic sau apasă tasta Enter pentru a edita punctele",
     "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctul, combinația de taste Ctrl sau Cmd + D pentru a-l duplica sau glisează-l pentru a-i schimba poziția",
-    "lineEditor_nothingSelected": "Selectează un punct pentru a-l muta sau elimina sau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi"
+    "lineEditor_nothingSelected": "Selectează un punct pentru a-l muta sau elimina sau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi",
+    "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii"
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -255,6 +265,9 @@
     "view": "Vizualizare",
     "zoomToFit": "Transfocare pentru a cuprinde totul",
     "zoomToSelection": "Transfocare la selecție"
+  },
+  "clearCanvasDialog": {
+    "title": "Ștergere pânză"
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată.",

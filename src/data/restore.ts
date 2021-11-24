@@ -3,7 +3,12 @@ import {
   ExcalidrawSelectionElement,
   FontFamilyValues,
 } from "../element/types";
-import { AppState, NormalizedZoomValue } from "../types";
+import {
+  AppState,
+  BinaryFiles,
+  LibraryItem,
+  NormalizedZoomValue,
+} from "../types";
 import { ImportedDataState } from "./types";
 import {
   getElementMap,
@@ -38,6 +43,7 @@ export const AllowedExcalidrawElementTypes: Record<
   diamond: true,
   ellipse: true,
   line: true,
+  image: true,
   arrow: true,
   freedraw: true,
 };
@@ -45,6 +51,7 @@ export const AllowedExcalidrawElementTypes: Record<
 export type RestoredDataState = {
   elements: ExcalidrawElement[];
   appState: RestoredAppState;
+  files: BinaryFiles;
 };
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
@@ -58,16 +65,19 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 
 const restoreElementWithProperties = <
   T extends ExcalidrawElement,
-  K extends keyof Omit<
-    Required<T>,
-    Exclude<keyof ExcalidrawElement, "type" | "x" | "y">
-  >
+  K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
   element: Required<T>,
-  extra: Pick<T, K>,
+  extra: Pick<
+    T,
+    // This extra Pick<T, keyof K> ensure no excess properties are passed.
+    // @ts-ignore TS complains here but type checks the call sites fine.
+    keyof K
+  > &
+    Partial<Pick<ExcalidrawElement, "type" | "x" | "y">>,
 ): T => {
   const base: Pick<T, keyof ExcalidrawElement> = {
-    type: (extra as Partial<T>).type || element.type,
+    type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
     version: element.version || 1,
@@ -80,8 +90,8 @@ const restoreElementWithProperties = <
     roughness: element.roughness ?? 1,
     opacity: element.opacity == null ? 100 : element.opacity,
     angle: element.angle || 0,
-    x: (extra as Partial<T>).x ?? element.x ?? 0,
-    y: (extra as Partial<T>).y ?? element.y ?? 0,
+    x: extra.x ?? element.x ?? 0,
+    y: extra.y ?? element.y ?? 0,
     strokeColor: element.strokeColor,
     backgroundColor: element.backgroundColor,
     width: element.width || 0,
@@ -95,25 +105,24 @@ const restoreElementWithProperties = <
     updated: element.updated ?? getUpdatedTimestamp(),
   };
 
-  return ({
+  return {
     ...base,
     ...getNormalizedDimensions(base),
     ...extra,
-  } as unknown) as T;
+  } as unknown as T;
 };
 
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-): typeof element => {
+): typeof element | null => {
   switch (element.type) {
     case "text":
       let fontSize = element.fontSize;
       let fontFamily = element.fontFamily;
       if ("font" in element) {
-        const [fontPx, _fontFamily]: [
-          string,
-          string,
-        ] = (element as any).font.split(" ");
+        const [fontPx, _fontFamily]: [string, string] = (
+          element as any
+        ).font.split(" ");
         fontSize = parseInt(fontPx, 10);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
@@ -133,6 +142,12 @@ const restoreElement = (
         pressures: element.pressures,
       });
     }
+    case "image":
+      return restoreElementWithProperties(element, {
+        status: element.status || "pending",
+        fileId: element.fileId,
+        scale: element.scale || [1, 1],
+      });
     case "line":
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough
@@ -196,7 +211,7 @@ export const restoreElements = (
     // filtering out selection, which is legacy, no longer kept in elements,
     // and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-      let migratedElement: ExcalidrawElement = restoreElement(element);
+      let migratedElement: ExcalidrawElement | null = restoreElement(element);
       if (migratedElement) {
         const localElement = localElementsMap?.[element.id];
         if (localElement && localElement.version > migratedElement.version) {
@@ -262,5 +277,33 @@ export const restore = (
   return {
     elements: restoreElements(data?.elements, localElements),
     appState: restoreAppState(data?.appState, localAppState || null),
+    files: data?.files || {},
   };
+};
+
+export const restoreLibraryItems = (
+  libraryItems: NonOptional<ImportedDataState["libraryItems"]>,
+  defaultStatus: LibraryItem["status"],
+) => {
+  const restoredItems: LibraryItem[] = [];
+  for (const item of libraryItems) {
+    // migrate older libraries
+    if (Array.isArray(item)) {
+      restoredItems.push({
+        status: defaultStatus,
+        elements: item,
+        id: randomId(),
+        created: Date.now(),
+      });
+    } else {
+      const _item = item as MarkOptional<LibraryItem, "id" | "status">;
+      restoredItems.push({
+        ..._item,
+        id: _item.id || randomId(),
+        status: _item.status || defaultStatus,
+        created: _item.created || Date.now(),
+      });
+    }
+  }
+  return restoredItems;
 };

@@ -10,8 +10,6 @@ import { Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 
-export const SVG_NS = "http://www.w3.org/2000/svg";
-
 let mockDateTime: string | null = null;
 
 export const setDateTimeForTests = (dateTime: string) => {
@@ -152,6 +150,20 @@ export const debounce = <T extends any[]>(
   return ret;
 };
 
+// https://github.com/lodash/lodash/blob/es/chunk.js
+export const chunk = <T extends any>(array: T[], size: number): T[][] => {
+  if (!array.length || size < 1) {
+    return [];
+  }
+  let index = 0;
+  let resIndex = 0;
+  const result = Array(Math.ceil(array.length / size));
+  while (index < array.length) {
+    result[resIndex++] = array.slice(index, (index += size));
+  }
+  return result;
+};
+
 export const selectNode = (node: Element) => {
   const selection = window.getSelection();
   if (selection) {
@@ -192,7 +204,9 @@ export const setCursorForShape = (
   }
   if (shape === "selection") {
     resetCursor(canvas);
-  } else {
+    // do nothing if image tool is selected which suggests there's
+    // a image-preview set as the cursor
+  } else if (shape !== "image") {
     canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
@@ -289,6 +303,7 @@ export const tupleToCoors = (
 /** use as a rejectionHandler to mute filesystem Abort errors */
 export const muteFSAbortError = (error?: Error) => {
   if (error?.name === "AbortError") {
+    console.warn(error);
     return;
   }
   throw error;
@@ -360,7 +375,7 @@ export const resolvablePromise = <T>() => {
  * @param func handler taking at most single parameter (event).
  */
 export const withBatchedUpdates = <
-  TFunction extends ((event: any) => void) | (() => void)
+  TFunction extends ((event: any) => void) | (() => void),
 >(
   func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
 ) =>
@@ -442,6 +457,18 @@ export const focusNearestParent = (element: HTMLInputElement) => {
     }
     parent = parent.parentElement;
   }
+};
+
+export const preventUnload = (event: BeforeUnloadEvent) => {
+  event.preventDefault();
+  // NOTE: modern browsers no longer allow showing a custom message here
+  event.returnValue = "";
+};
+
+export const bytesToHexString = (bytes: Uint8Array) => {
+  return Array.from(bytes)
+    .map((byte) => `0${byte.toString(16)}`.slice(-2))
+    .join("");
 };
 
 export const getUpdatedTimestamp = () =>

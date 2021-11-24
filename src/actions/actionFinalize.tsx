@@ -19,11 +19,8 @@ export const actionFinalize = register({
   name: "finalize",
   perform: (elements, appState, _, { canvas, focusContainer }) => {
     if (appState.editingLinearElement) {
-      const {
-        elementId,
-        startBindingElement,
-        endBindingElement,
-      } = appState.editingLinearElement;
+      const { elementId, startBindingElement, endBindingElement } =
+        appState.editingLinearElement;
       const element = LinearElementEditor.getElement(elementId);
 
       if (element) {
@@ -49,6 +46,11 @@ export const actionFinalize = register({
     }
 
     let newElements = elements;
+
+    if (appState.pendingImageElement) {
+      mutateElement(appState.pendingImageElement, { isDeleted: true }, false);
+    }
+
     if (window.document.activeElement instanceof HTMLElement) {
       focusContainer();
     }
@@ -152,6 +154,7 @@ export const actionFinalize = register({
                 [multiPointElement.id]: true,
               }
             : appState.selectedElementIds,
+        pendingImageElement: null,
       },
       commitToHistory: appState.elementType === "freedraw",
     };

@@ -20,10 +20,6 @@
     "background": "Bakgrunn",
     "fill": "Fyll",
     "strokeWidth": "Strektykkelse",
-    "strokeShape": "Strekstil",
-    "strokeShape_gel": "Gelepenn",
-    "strokeShape_fountain": "Fyllepenn",
-    "strokeShape_brush": "Pensel",
     "strokeStyle": "Strekstil",
     "strokeStyle_solid": "Heltrukket",
     "strokeStyle_dashed": "Stiplet",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Pil",
     "arrowhead_bar": "Søyle",
     "arrowhead_dot": "Prikk",
+    "arrowhead_triangle": "Trekant",
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Fontfamilie",
     "onlySelected": "Kun valgte",
@@ -136,7 +133,9 @@
     "darkMode": "Mørk modus",
     "lightMode": "Lys modus",
     "zenMode": "Zen-modus",
-    "exitZenMode": "Avslutt zen-modus"
+    "exitZenMode": "Avslutt zen-modus",
+    "cancel": "Avbryt",
+    "clear": "Tøm"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
@@ -154,14 +153,22 @@
     "errorAddingToLibrary": "Kunne ikke legge element i biblioteket",
     "errorRemovingFromLibrary": "Kunne ikke fjerne element fra biblioteket",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
-    "imageDoesNotContainScene": "Importering av bilder støttes ikke for øyeblikket.\n\nVil du importere en scene? Dette bildet ser ikke ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
+    "imageDoesNotContainScene": "Det ser ikke ut til at dette bildet inneholder noen scenedata. Har du aktivert innebygging av scene under eksporten?",
     "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen",
     "invalidSceneUrl": "Kunne ikke importere scene fra den oppgitte URL-en. Den er enten ødelagt, eller inneholder ikke gyldig Excalidraw JSON-data.",
     "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?",
     "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert."
   },
+  "errors": {
+    "unsupportedFileType": "Filtypen støttes ikke.",
+    "imageInsertError": "Kunne ikke sette inn bildet. Prøv igjen senere...",
+    "fileTooBig": "Filen er for stor. Maksimal tillatt størrelse er {{maxSize}}.",
+    "svgImageInsertError": "Kunne ikke sette inn SVG-bilde. SVG-koden ser ugyldig ut.",
+    "invalidSVGString": "Ugyldig SVG."
+  },
   "toolBar": {
     "selection": "Velg",
+    "image": "Sett inn bilde",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellipse",
@@ -178,6 +185,7 @@
     "shapes": "Former"
   },
   "hints": {
+    "canvasPanning": "For å flytte lerretet, hold musehjulet eller mellomromstasten mens du drar",
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
     "freeDraw": "Klikk og dra, slipp når du er ferdig",
     "text": "Tips: du kan også legge til tekst ved å dobbeltklikke hvor som helst med utvalgsverktøyet",
@@ -186,10 +194,12 @@
     "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
     "lockAngle": "Du kan låse vinkelen ved å holde nede SHIFT",
     "resize": "Du kan beholde forholdet ved å trykke SHIFT mens du endrer størrelse,\ntrykk ALT for å endre størrelsen fra midten",
+    "resizeImage": "Du kan endre størrelse fritt ved å holde SHIFT,\nhold ALT for å endre størrelse fra midten",
     "rotate": "Du kan låse vinklene ved å holde SHIFT mens du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkter",
     "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, Ctrl / Cmd+D for å duplisere, eller dra for å flytte",
-    "lineEditor_nothingSelected": "Velg et punkt å flytte eller fjerne, eller hold Alt og klikk for å legge til nye punkter"
+    "lineEditor_nothingSelected": "Velg et punkt å flytte eller fjerne, eller hold Alt og klikk for å legge til nye punkter",
+    "placeImage": "Klikk for å plassere bildet, eller klikk og dra for å angi størrelsen manuelt"
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
@@ -255,6 +265,9 @@
     "view": "Vis",
     "zoomToFit": "Zoom for å se alle elementer",
     "zoomToSelection": "Zoom til utvalg"
+  },
+  "clearCanvasDialog": {
+    "title": "Tøm lerret"
   },
   "encrypted": {
     "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem.",

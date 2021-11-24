@@ -20,10 +20,6 @@
     "background": "Fundo",
     "fill": "Preenchimento",
     "strokeWidth": "Espessura do traço",
-    "strokeShape": "Estilo do traço",
-    "strokeShape_gel": "Caneta de gel",
-    "strokeShape_fountain": "Caneta de fonte",
-    "strokeShape_brush": "Pincel",
     "strokeStyle": "Estilo de traço",
     "strokeStyle_solid": "Sólido",
     "strokeStyle_dashed": "Tracejado",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Flecha",
     "arrowhead_bar": "Barra",
     "arrowhead_dot": "Ponto",
+    "arrowhead_triangle": "Triângulo",
     "fontSize": "Tamanho da fonte",
     "fontFamily": "Família da fonte",
     "onlySelected": "Somente a seleção",
@@ -136,7 +133,9 @@
     "darkMode": "Modo escuro",
     "lightMode": "Modo claro",
     "zenMode": "Modo Zen",
-    "exitZenMode": "Sair do modo zen"
+    "exitZenMode": "Sair do modo zen",
+    "cancel": "Cancelar",
+    "clear": "Limpar"
   },
   "alerts": {
     "clearReset": "Isto irá limpar toda a tela. Você tem certeza?",
@@ -154,14 +153,22 @@
     "errorAddingToLibrary": "Não foi possível adicionar o item à biblioteca",
     "errorRemovingFromLibrary": "Não foi possível remover o item da biblioteca",
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem certeza?",
-    "imageDoesNotContainScene": "A importação de imagens não é suportada no momento.\n\nVocê deseja importar uma cena? Esta imagem parece não conter dados de cena. Você ativou isto durante a exportação?",
+    "imageDoesNotContainScene": "Esta imagem parece não conter dados de cenas. Você ativou a incorporação da cena durante a exportação?",
     "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem",
     "invalidSceneUrl": "Não foi possível importar a cena da URL fornecida. Ela está incompleta ou não contém dados JSON válidos do Excalidraw.",
     "resetLibrary": "Isto limpará a sua biblioteca. Você tem certeza?",
     "invalidEncryptionKey": "A chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desabilitada."
   },
+  "errors": {
+    "unsupportedFileType": "Tipo de arquivo não suportado.",
+    "imageInsertError": "Não foi possível inserir imagem. Tente novamente mais tarde...",
+    "fileTooBig": "O arquivo é muito grande. O tamanho máximo permitido é {{maxSize}}.",
+    "svgImageInsertError": "Não foi possível inserir a imagem SVG. A marcação SVG parece inválida.",
+    "invalidSVGString": "SVG Inválido."
+  },
   "toolBar": {
     "selection": "Seleção",
+    "image": "Inserir imagem",
     "rectangle": "Retângulo",
     "diamond": "Losango",
     "ellipse": "Elipse",
@@ -178,6 +185,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "canvasPanning": "Para mover a tela, segure a roda do mouse ou a barra de espaço enquanto arrasta",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Toque e arraste, solte quando terminar",
     "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
@@ -186,10 +194,12 @@
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
     "lockAngle": "Você pode restringir o ângulo segurando o SHIFT",
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
+    "resizeImage": "Você pode redimensionar livremente segurando SHIFT,\nsegure ALT para redimensionar a partir do centro",
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",
     "lineEditor_info": "Clique duas vezes ou pressione Enter para editar os pontos",
     "lineEditor_pointSelected": "Pressione Deletar para remover o ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
-    "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos"
+    "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos",
+    "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho"
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -255,6 +265,9 @@
     "view": "Visualizar",
     "zoomToFit": "Ampliar para encaixar todos os elementos",
     "zoomToSelection": "Ampliar a seleção"
+  },
+  "clearCanvasDialog": {
+    "title": "Limpar a tela"
   },
   "encrypted": {
     "tooltip": "Seus desenhos são criptografados de ponta a ponta, então os servidores do Excalidraw nunca os verão.",

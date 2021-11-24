@@ -20,10 +20,6 @@
     "background": "Sfondo",
     "fill": "Riempimento",
     "strokeWidth": "Spessore del tratto",
-    "strokeShape": "Forma del tratto",
-    "strokeShape_gel": "Penna gel",
-    "strokeShape_fountain": "Penna stilografica",
-    "strokeShape_brush": "Pennello",
     "strokeStyle": "Stile del tratto",
     "strokeStyle_solid": "Pieno",
     "strokeStyle_dashed": "Tratteggiato",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Freccia",
     "arrowhead_bar": "Barra",
     "arrowhead_dot": "Punto",
+    "arrowhead_triangle": "Triangolo",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
@@ -136,7 +133,9 @@
     "darkMode": "Tema scuro",
     "lightMode": "Tema chiaro",
     "zenMode": "Modalità Zen",
-    "exitZenMode": "Uscire dalla modalità zen"
+    "exitZenMode": "Uscire dalla modalità zen",
+    "cancel": "Annulla",
+    "clear": "Cancella"
   },
   "alerts": {
     "clearReset": "Questa azione cancellerà l'intera tela. Sei sicuro?",
@@ -154,14 +153,22 @@
     "errorAddingToLibrary": "Impossibile aggiungere l'elemento alla libreria",
     "errorRemovingFromLibrary": "Impossibile rimuovere l'elemento dalla libreria",
     "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua libreria. Sei sicuro?",
-    "imageDoesNotContainScene": "L'importazione di immagini al momento non è supportata.\n\nVuoi importare una scena? Questa immagine non sembra contenere alcun dato di scena. Hai abilitato questa opzione durante l'esportazione?",
+    "imageDoesNotContainScene": "Questa immagine pare non contenere alcuna scena. Avevi incluso la scena durante l'esportazione?",
     "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine",
     "invalidSceneUrl": "Impossibile importare la scena dall'URL fornito. Potrebbe essere malformato o non contenere dati JSON Excalidraw validi.",
     "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
     "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata."
   },
+  "errors": {
+    "unsupportedFileType": "Tipo di file non supportato.",
+    "imageInsertError": "Non è stato possibile inserire l'immagine. Riprova più tardi...",
+    "fileTooBig": "Il file è troppo grande. La dimensione massima consentita è {{maxSize}}.",
+    "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
+    "invalidSVGString": "SVG non valido."
+  },
   "toolBar": {
     "selection": "Selezione",
+    "image": "Inserisci immagine",
     "rectangle": "Rettangolo",
     "diamond": "Rombo",
     "ellipse": "Ellisse",
@@ -178,6 +185,7 @@
     "shapes": "Forme"
   },
   "hints": {
+    "canvasPanning": "Per spostare la tela, tieni premuta la rotella del mouse o la barra spaziatrice mentre la trascini",
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
@@ -186,10 +194,12 @@
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
     "lockAngle": "Puoi limitare l'angolo tenendo premuto SHIFT",
     "resize": "Per vincolare le proporzioni, tieni premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tieni premuto ALT",
+    "resizeImage": "Puoi ridimensionare liberamente tenendo premuto SHIFT,\ntieni premuto ALT per ridimensionare dal centro",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
     "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
-    "lineEditor_nothingSelected": "Seleziona un punto per spostare o rimuovere, oppure tieni premuto Alt e fai clic per aggiungere nuovi punti"
+    "lineEditor_nothingSelected": "Seleziona un punto per spostare o rimuovere, oppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
+    "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente"
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
@@ -255,6 +265,9 @@
     "view": "Vista",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
     "zoomToSelection": "Zoom alla selezione"
+  },
+  "clearCanvasDialog": {
+    "title": "Svuota la tela"
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.",

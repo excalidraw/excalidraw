@@ -10,6 +10,8 @@ import {
   Arrowhead,
   ChartType,
   FontFamilyValues,
+  FileId,
+  ExcalidrawImageElement,
   Theme,
 } from "./element/types";
 import { SHAPES } from "./shapes";
@@ -24,7 +26,9 @@ import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
 import { isOverScrollBars } from "./scene";
 import { MaybeTransformHandleType } from "./element/transformHandles";
-import { FileSystemHandle } from "./data/filesystem";
+import Library from "./data/library";
+import type { FileSystemHandle } from "./data/filesystem";
+import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -42,6 +46,22 @@ export type Collaborator = {
     stroke: string;
   };
 };
+
+export type DataURL = string & { _brand: "DataURL" };
+
+export type BinaryFileData = {
+  mimeType:
+    | typeof ALLOWED_IMAGE_MIME_TYPES[number]
+    // future user or unknown file type
+    | typeof MIME_TYPES.binary;
+  id: FileId;
+  dataURL: DataURL;
+  created: number;
+};
+
+export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
+
+export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
 export type AppState = {
   isLoading: boolean;
@@ -127,6 +147,8 @@ export type AppState = {
         shown: true;
         data: Spreadsheet;
       };
+  /** imageElement waiting to be placed on canvas */
+  pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -156,8 +178,25 @@ export declare class GestureEvent extends UIEvent {
   readonly scale: number;
 }
 
-export type LibraryItem = readonly NonDeleted<ExcalidrawElement>[];
+// libraries
+// -----------------------------------------------------------------------------
+/** @deprecated legacy: do not use outside of migration paths */
+export type LibraryItem_v1 = readonly NonDeleted<ExcalidrawElement>[];
+/** @deprecated legacy: do not use outside of migration paths */
+export type LibraryItems_v1 = readonly LibraryItem_v1[];
+
+/** v2 library item */
+export type LibraryItem = {
+  id: string;
+  status: "published" | "unpublished";
+  elements: readonly NonDeleted<ExcalidrawElement>[];
+  /** timestamp in epoch (ms) */
+  created: number;
+  name?: string;
+  error?: string;
+};
 export type LibraryItems = readonly LibraryItem[];
+// -----------------------------------------------------------------------------
 
 // NOTE ready/readyPromise props are optional for host apps' sake (our own
 // implem guarantees existence)
@@ -172,6 +211,7 @@ export interface ExcalidrawProps {
   onChange?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
+    files: BinaryFiles,
   ) => void;
   initialData?: ImportedDataState | null | Promise<ImportedDataState | null>;
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
@@ -207,6 +247,7 @@ export interface ExcalidrawProps {
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
+  generateIdForFile?: (file: File) => string | Promise<string>;
 }
 
 export type SceneData = {
@@ -227,11 +268,13 @@ export type ExportOpts = {
   onExportToBackend?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
+    files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
   ) => void;
   renderCustomUI?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
+    files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
   ) => JSX.Element;
 };
@@ -256,6 +299,23 @@ export type AppProps = ExcalidrawProps & {
   };
   detectScroll: boolean;
   handleKeyboardGlobally: boolean;
+};
+
+/** A subset of App class properties that we need to use elsewhere
+ * in the app, eg Manager. Factored out into a separate type to keep DRY. */
+export type AppClassProperties = {
+  props: AppProps;
+  canvas: HTMLCanvasElement | null;
+  focusContainer(): void;
+  library: Library;
+  imageCache: Map<
+    FileId,
+    {
+      image: HTMLImageElement | Promise<HTMLImageElement>;
+      mimeType: typeof ALLOWED_IMAGE_MIME_TYPES[number];
+    }
+  >;
+  files: BinaryFiles;
 };
 
 export type PointerDownState = Readonly<{
@@ -327,9 +387,11 @@ export type ExcalidrawImperativeAPI = {
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
+  getFiles: () => InstanceType<typeof App>["files"];
   refresh: InstanceType<typeof App>["refresh"];
   importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
   setToastMessage: InstanceType<typeof App>["setToastMessage"];
+  addFiles: (data: BinaryFileData[]) => void;
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
   id: string;

@@ -128,13 +128,13 @@ export const actionChangeExportEmbedScene = register({
 
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
-  perform: async (elements, appState, value) => {
+  perform: async (elements, appState, value, app) => {
     const fileHandleExists = !!appState.fileHandle;
 
     try {
       const { fileHandle } = isImageFileHandle(appState.fileHandle)
-        ? await resaveAsImageWithScene(elements, appState)
-        : await saveAsJSON(elements, appState);
+        ? await resaveAsImageWithScene(elements, appState, app.files)
+        : await saveAsJSON(elements, appState, app.files);
 
       return {
         commitToHistory: false,
@@ -151,9 +151,11 @@ export const actionSaveToActiveFile = register({
             : null,
         },
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error?.name !== "AbortError") {
         console.error(error);
+      } else {
+        console.warn(error);
       }
       return { commitToHistory: false };
     }
@@ -170,16 +172,22 @@ export const actionSaveToActiveFile = register({
 
 export const actionSaveFileToDisk = register({
   name: "saveFileToDisk",
-  perform: async (elements, appState, value) => {
+  perform: async (elements, appState, value, app) => {
     try {
-      const { fileHandle } = await saveAsJSON(elements, {
-        ...appState,
-        fileHandle: null,
-      });
+      const { fileHandle } = await saveAsJSON(
+        elements,
+        {
+          ...appState,
+          fileHandle: null,
+        },
+        app.files,
+      );
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
-    } catch (error) {
+    } catch (error: any) {
       if (error?.name !== "AbortError") {
         console.error(error);
+      } else {
+        console.warn(error);
       }
       return { commitToHistory: false };
     }
@@ -202,24 +210,28 @@ export const actionSaveFileToDisk = register({
 
 export const actionLoadScene = register({
   name: "loadScene",
-  perform: async (elements, appState) => {
+  perform: async (elements, appState, _, app) => {
     try {
       const {
         elements: loadedElements,
         appState: loadedAppState,
+        files,
       } = await loadFromJSON(appState, elements);
       return {
         elements: loadedElements,
         appState: loadedAppState,
+        files,
         commitToHistory: true,
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error?.name === "AbortError") {
+        console.warn(error);
         return false;
       }
       return {
         elements,
         appState: { ...appState, errorMessage: error.message },
+        files: app.files,
         commitToHistory: false,
       };
     }

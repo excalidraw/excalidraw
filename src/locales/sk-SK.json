@@ -20,10 +20,6 @@
     "background": "Pozadie",
     "fill": "Výplň",
     "strokeWidth": "Hrúbka obrysu",
-    "strokeShape": "Tvar obrysu",
-    "strokeShape_gel": "Gélové pero",
-    "strokeShape_fountain": "Plniace pero",
-    "strokeShape_brush": "Fixka",
     "strokeStyle": "Štýl obrysu",
     "strokeStyle_solid": "Plný",
     "strokeStyle_dashed": "Čiarkovaný",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Šípka",
     "arrowhead_bar": "Čiara",
     "arrowhead_dot": "Bod",
+    "arrowhead_triangle": "Trojuholník",
     "fontSize": "Veľkosť písma",
     "fontFamily": "Písmo",
     "onlySelected": "Iba vybrané",
@@ -136,7 +133,9 @@
     "darkMode": "Tmavý režim",
     "lightMode": "Svetlý režim",
     "zenMode": "Režim zen",
-    "exitZenMode": "Zrušiť režim zen"
+    "exitZenMode": "Zrušiť režim zen",
+    "cancel": "Zrušiť",
+    "clear": "Vymazať"
   },
   "alerts": {
     "clearReset": "Týmto sa vyčistí celé plátno. Ste si istí?",
@@ -154,14 +153,22 @@
     "errorAddingToLibrary": "Nepodarilo sa pridať položku do knižnice",
     "errorRemovingFromLibrary": "Nepodarilo sa odstrániť položku z knižnice",
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
-    "imageDoesNotContainScene": "Importovanie obrázku v tomto momente nie je možné.\n\nChceli ste importovať scénu? Tento obrázok neobsahuje žiadne údaje scény. Povolili ste túto možnosť počas exportovania?",
+    "imageDoesNotContainScene": "Tento obrázok neobsahuje žiadne údaje scény. Zvolili ste možnosť zahrnúť scénu počas exportu?",
     "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru",
     "invalidSceneUrl": "Nepodarilo sa načítať scénu z poskytnutej URL. Je nevalidná alebo neobsahuje žiadne validné Excalidraw JSON dáta.",
     "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?",
     "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá."
   },
+  "errors": {
+    "unsupportedFileType": "Nepodporovaný typ súboru.",
+    "imageInsertError": "Nepodarilo sa vložiť obrázok. Skúste to znova neskôr...",
+    "fileTooBig": "Súbor je príliš veľký. Maximálna povolená veľkosť je {{maxSize}}.",
+    "svgImageInsertError": "Nepodarilo sa vložiť SVG obrázok. SVG formát je pravdepodobne nevalidný.",
+    "invalidSVGString": "Nevalidné SVG."
+  },
   "toolBar": {
     "selection": "Výber",
+    "image": "Vložiť obrázok",
     "rectangle": "Obdĺžnik",
     "diamond": "Diamant",
     "ellipse": "Elipsa",
@@ -178,6 +185,7 @@
     "shapes": "Tvary"
   },
   "hints": {
+    "canvasPanning": "Pre pohyb plátna podržte koliesko myši ale medzerník počas ťahania",
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
@@ -186,10 +194,12 @@
     "linearElementMulti": "Kliknite na počiatočný bod alebo stlačte Escape alebo Enter na ukončenie",
     "lockAngle": "Počas rotácie obmedzíte uhol podržaním SHIFT",
     "resize": "Počas zmeny veľkosti zachováte proporcie podržaním SHIFT,\\npodržaním ALT meníte veľkosť so zachovaním stredu",
+    "resizeImage": "Podržte SHIFT pre voľnú zmenu veľkosti, podržte ALT pre zmenu veľkosti od stredu",
     "rotate": "Počas rotácie obmedzíte uhol podržaním SHIFT",
     "lineEditor_info": "Použite dvojklik alebo stlačte Enter na editáciu bodov",
     "lineEditor_pointSelected": "Stačte Delete na vymazanie bodu, CtrlOrCmd+D na jeho duplikovanie, alebo potiahnite na jeho presunutie",
-    "lineEditor_nothingSelected": "Zvoľte bod na jeho presunutie alebo vymazanie, alebo podržte Alt a kliknite na pridanie nového bodu"
+    "lineEditor_nothingSelected": "Zvoľte bod na jeho presunutie alebo vymazanie, alebo podržte Alt a kliknite na pridanie nového bodu",
+    "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti"
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -255,6 +265,9 @@
     "view": "Zobrazenie",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
     "zoomToSelection": "Priblížiť na výber"
+  },
+  "clearCanvasDialog": {
+    "title": "Vyčistiť plátno"
   },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať.",

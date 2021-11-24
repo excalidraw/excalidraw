@@ -20,25 +20,22 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "描边宽度",
-    "strokeShape": "描边形状",
-    "strokeShape_gel": "中性笔",
-    "strokeShape_fountain": "钢笔",
-    "strokeShape_brush": "墨笔",
-    "strokeStyle": "描边 (样式)",
+    "strokeStyle": "描边样式",
     "strokeStyle_solid": "实线",
     "strokeStyle_dashed": "虚线",
     "strokeStyle_dotted": "点虚线",
-    "sloppiness": "边框",
-    "opacity": "不透明度",
+    "sloppiness": "线条风格",
+    "opacity": "透明度",
     "textAlign": "文本对齐",
     "edges": "边角",
     "sharp": "尖锐",
     "round": "圆润",
-    "arrowheads": "箭头",
+    "arrowheads": "端点",
     "arrowhead_none": "无",
-    "arrowhead_arrow": "箭头",
+    "arrowhead_arrow": "线条箭头",
     "arrowhead_bar": "条",
     "arrowhead_dot": "圆点",
+    "arrowhead_triangle": "三角箭头",
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
@@ -136,7 +133,9 @@
     "darkMode": "暗色主题",
     "lightMode": "浅色模式",
     "zenMode": "禅模式",
-    "exitZenMode": "退出禅模式"
+    "exitZenMode": "退出禅模式",
+    "cancel": "取消",
+    "clear": "清除"
   },
   "alerts": {
     "clearReset": "这将会清除整个画布。您是否要继续?",
@@ -154,14 +153,22 @@
     "errorAddingToLibrary": "无法将项目添加到库中",
     "errorRemovingFromLibrary": "无法从库中移除项目",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
-    "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入画布数据吗？此图像似乎不包含任何画布数据。您是否在导出过程中启用了嵌入画布的选项？",
+    "imageDoesNotContainScene": "此图像似乎不包含任何画布数据。您是否在导出时启用了画布嵌入功能？",
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
     "invalidSceneUrl": "无法从提供的 URL 导入场景。它或者格式不正确，或者不包含有效的 Excalidraw JSON 数据。",
     "resetLibrary": "这将会清除你的资源库。你确定这么做吗？",
     "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。"
   },
+  "errors": {
+    "unsupportedFileType": "不支持的文件格式。",
+    "imageInsertError": "无法插入图像。请稍后再试……",
+    "fileTooBig": "文件过大。最大允许的大小为 {{maxSize}}。",
+    "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
+    "invalidSVGString": "无效的 SVG。"
+  },
   "toolBar": {
     "selection": "选择",
+    "image": "插入图像",
     "rectangle": "矩形",
     "diamond": "菱形",
     "ellipse": "椭圆",
@@ -178,6 +185,7 @@
     "shapes": "形状"
   },
   "hints": {
+    "canvasPanning": "要移动画布，请按住鼠标滚轮或空格键，再拖拽鼠标",
     "linearElement": "点击创建多个点 拖动创建直线",
     "freeDraw": "点击并拖动，完成时松开",
     "text": "提示：您也可以使用选择工具双击任意位置来添加文字",
@@ -186,10 +194,12 @@
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
     "lockAngle": "可以按住 Shift 来约束角度",
     "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
+    "resizeImage": "按住SHIFT可以自由缩放，\n按住ALT可以从中间缩放",
     "rotate": "旋转时可以按住 Shift 来约束角度",
     "lineEditor_info": "双击或按回车键编辑",
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，或拖动以移动",
-    "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点"
+    "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点",
+    "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小"
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -255,6 +265,9 @@
     "view": "视图",
     "zoomToFit": "缩放以适应所有元素",
     "zoomToSelection": "缩放到选区"
+  },
+  "clearCanvasDialog": {
+    "title": "清除画布"
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",

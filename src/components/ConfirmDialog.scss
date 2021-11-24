@@ -1,0 +1,37 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .confirm-dialog {
+    &-buttons {
+      display: flex;
+      padding: 0.2rem 0;
+      justify-content: flex-end;
+    }
+    .ToolIcon__icon {
+      min-width: 2.5rem;
+      width: auto;
+      font-size: 1rem;
+    }
+
+    .ToolIcon_type_button {
+      margin-left: 0.8rem;
+      padding: 0 0.5rem;
+    }
+
+    &__content {
+      font-size: 1rem;
+    }
+
+    &--confirm.ToolIcon_type_button {
+      background-color: $oc-red-6;
+
+      &:hover {
+        background-color: $oc-red-8;
+      }
+
+      .ToolIcon__icon {
+        color: $oc-white;
+      }
+    }
+  }
+}

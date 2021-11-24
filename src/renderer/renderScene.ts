@@ -2,7 +2,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 import oc from "open-color";
 
-import { AppState, Zoom } from "../types";
+import { AppState, BinaryFiles, Zoom } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -181,7 +181,7 @@ export const renderScene = (
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
   sceneState: SceneState,
-  // extra options, currently passed by export helper
+  // extra options passed to the renderer
   {
     renderScrollbars = true,
     renderSelection = true,
@@ -190,11 +190,15 @@ export const renderScene = (
     // doesn't guarantee pixel-perfect output.
     renderOptimizations = false,
     renderGrid = true,
+    /** when exporting the behavior is slightly different (e.g. we can't use
+        CSS filters) */
+    isExport = false,
   }: {
     renderScrollbars?: boolean;
     renderSelection?: boolean;
     renderOptimizations?: boolean;
     renderGrid?: boolean;
+    isExport?: boolean;
   } = {},
 ) => {
   if (canvas === null) {
@@ -211,7 +215,7 @@ export const renderScene = (
   const normalizedCanvasWidth = canvas.width / scale;
   const normalizedCanvasHeight = canvas.height / scale;
 
-  if (sceneState.exportWithDarkMode) {
+  if (isExport && sceneState.theme === "dark") {
     context.filter = THEME_FILTER;
   }
 
@@ -270,7 +274,7 @@ export const renderScene = (
   visibleElements.forEach((element) => {
     try {
       renderElement(element, rc, context, renderOptimizations, sceneState);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
     }
   });
@@ -294,7 +298,7 @@ export const renderScene = (
         renderOptimizations,
         sceneState,
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
     }
   }
@@ -332,12 +336,8 @@ export const renderScene = (
         );
       }
       if (selectionColors.length) {
-        const [
-          elementX1,
-          elementY1,
-          elementX2,
-          elementY2,
-        ] = getElementAbsoluteCoords(element);
+        const [elementX1, elementY1, elementX2, elementY2] =
+          getElementAbsoluteCoords(element);
         acc.push({
           angle: element.angle,
           elementX1,
@@ -352,9 +352,8 @@ export const renderScene = (
 
     const addSelectionForGroupId = (groupId: GroupId) => {
       const groupElements = getElementsInGroup(elements, groupId);
-      const [elementX1, elementY1, elementX2, elementY2] = getCommonBounds(
-        groupElements,
-      );
+      const [elementX1, elementY1, elementX2, elementY2] =
+        getCommonBounds(groupElements);
       selections.push({
         angle: 0,
         elementX1,
@@ -626,14 +625,8 @@ const renderSelectionBorder = (
     selectionColors: string[];
   },
 ) => {
-  const {
-    angle,
-    elementX1,
-    elementY1,
-    elementX2,
-    elementY2,
-    selectionColors,
-  } = elementProperties;
+  const { angle, elementX1, elementY1, elementX2, elementY2, selectionColors } =
+    elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
 
@@ -805,12 +798,15 @@ export const renderSceneToSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
   rsvg: RoughSVG,
   svgRoot: SVGElement,
+  files: BinaryFiles,
   {
     offsetX = 0,
     offsetY = 0,
+    exportWithDarkMode = false,
   }: {
     offsetX?: number;
     offsetY?: number;
+    exportWithDarkMode?: boolean;
   } = {},
 ) => {
   if (!svgRoot) {
@@ -824,10 +820,12 @@ export const renderSceneToSvg = (
           element,
           rsvg,
           svgRoot,
+          files,
           element.x + offsetX,
           element.y + offsetY,
+          exportWithDarkMode,
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
       }
     }

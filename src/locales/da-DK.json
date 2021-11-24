@@ -20,10 +20,6 @@
     "background": "Baggrund",
     "fill": "",
     "strokeWidth": "Linjebredde",
-    "strokeShape": "Linjeform",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "",
     "strokeStyle_solid": "",
     "strokeStyle_dashed": "",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Pil",
     "arrowhead_bar": "",
     "arrowhead_dot": "",
+    "arrowhead_triangle": "",
     "fontSize": "",
     "fontFamily": "",
     "onlySelected": "",
@@ -136,7 +133,9 @@
     "darkMode": "Mørk tilstand",
     "lightMode": "Lys baggrund",
     "zenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "",
@@ -160,8 +159,16 @@
     "resetLibrary": "",
     "invalidEncryptionKey": ""
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "",
+    "image": "",
     "rectangle": "",
     "diamond": "",
     "ellipse": "",
@@ -178,6 +185,7 @@
     "shapes": ""
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "",
     "freeDraw": "Klik og træk, slip når du er færdig",
     "text": "",
@@ -186,10 +194,12 @@
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
+    "resizeImage": "",
     "rotate": "",
     "lineEditor_info": "",
     "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_nothingSelected": "",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -255,6 +265,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": ""
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "",

@@ -20,10 +20,6 @@
     "background": "רקע",
     "fill": "מילוי",
     "strokeWidth": "עובי קו מתאר",
-    "strokeShape": "סגנון קו המתאר",
-    "strokeShape_gel": "עט נובע",
-    "strokeShape_fountain": "עט נובע",
-    "strokeShape_brush": "מברשת",
     "strokeStyle": "סגנון קו המתאר",
     "strokeStyle_solid": "מלא",
     "strokeStyle_dashed": "מקווקו",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "חץ",
     "arrowhead_bar": "שורה",
     "arrowhead_dot": "נקודה",
+    "arrowhead_triangle": "",
     "fontSize": "גודל גופן",
     "fontFamily": "סוג הגופן",
     "onlySelected": "רק מה שנבחר",
@@ -136,7 +133,9 @@
     "darkMode": "מצב כהה",
     "lightMode": "מצב בהיר",
     "zenMode": "מצב זן",
-    "exitZenMode": "צא ממצב תפריט מרחף"
+    "exitZenMode": "צא ממצב תפריט מרחף",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
@@ -154,14 +153,22 @@
     "errorAddingToLibrary": "לא ניתן להוסיף פריט לספרייה",
     "errorRemovingFromLibrary": "לא ניתן למחוק פריט מהספריה",
     "confirmAddLibrary": "הפעולה תוסיף {{numShapes}} צורה(ות) לספריה שלך. האם אתה בטוח?",
-    "imageDoesNotContainScene": "אין תמיכה בייבוא תמונות כעת.\n\nהאם אתה רוצה לייבא תצוגה? התמונה הזאת אינה מכילה מידע על תצוגה. האם הפעלת את האפשרות הזאת בזמן הוצאת המידע?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "לא הצלחנו לשחזר את התצוגה מקובץ התמונה",
     "invalidSceneUrl": "ייבוא המידע מן סצינה מכתובת האינטרנט נכשלה. המידע בנוי באופן משובש או שהוא אינו קובץ JSON תקין של Excalidraw.",
     "resetLibrary": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
     "invalidEncryptionKey": ""
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "בחירה",
+    "image": "",
     "rectangle": "מרובע",
     "diamond": "מעוין",
     "ellipse": "אליפסה",
@@ -178,6 +185,7 @@
     "shapes": "צורות"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
@@ -186,10 +194,12 @@
     "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
     "lockAngle": "אתה יכול להגביל זווית ע״י לחיצה על SHIFT",
     "resize": "ניתן להגביל פרופורציות על ידי לחיצה על SHIFT תוך כדי שינוי גודל,\nהחזק ALT בשביל לשנות גודל ביחס למרכז",
+    "resizeImage": "",
     "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב",
     "lineEditor_info": "לחץ לחיצה כפולה או אנטר לעריכת הנקודות",
     "lineEditor_pointSelected": "לחץ על Delete להסרת נקודה, CtrlOrCmd+D לשכפל, או גרור להזזה",
-    "lineEditor_nothingSelected": "בחר נקודה להזזה או הסרה, או החזק את כפתור Alt והקלק להוספת נקודות חדשות"
+    "lineEditor_nothingSelected": "בחר נקודה להזזה או הסרה, או החזק את כפתור Alt והקלק להוספת נקודות חדשות",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "לא הצלחנו להציג את התצוגה המקדימה",
@@ -255,6 +265,9 @@
     "view": "תצוגה",
     "zoomToFit": "גלילה להצגת כל האלמנטים במסך",
     "zoomToSelection": "התמקד בבחירה"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם.",

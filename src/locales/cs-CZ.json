@@ -20,10 +20,6 @@
     "background": "Pozadí",
     "fill": "Výplň",
     "strokeWidth": "Šířka obrysu",
-    "strokeShape": "Tvar tahu",
-    "strokeShape_gel": "Gelové pero",
-    "strokeShape_fountain": "Plnicí pero",
-    "strokeShape_brush": "Fixa",
     "strokeStyle": "Styl tahu",
     "strokeStyle_solid": "Plný",
     "strokeStyle_dashed": "Čárkovaný",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Šipka",
     "arrowhead_bar": "Kóta",
     "arrowhead_dot": "Tečka",
+    "arrowhead_triangle": "",
     "fontSize": "Velikost písma",
     "fontFamily": "Písmo",
     "onlySelected": "Pouze vybrané",
@@ -136,7 +133,9 @@
     "darkMode": "Tmavý režim",
     "lightMode": "Světlý režim",
     "zenMode": "Zen mód",
-    "exitZenMode": "Opustit zen mód"
+    "exitZenMode": "Opustit zen mód",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "",
@@ -160,8 +159,16 @@
     "resetLibrary": "",
     "invalidEncryptionKey": ""
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "Výběr",
+    "image": "",
     "rectangle": "Obdélník",
     "diamond": "Diamant",
     "ellipse": "Elipsa",
@@ -178,6 +185,7 @@
     "shapes": "Tvary"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "",
     "freeDraw": "",
     "text": "",
@@ -186,10 +194,12 @@
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
+    "resizeImage": "",
     "rotate": "",
     "lineEditor_info": "",
     "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_nothingSelected": "",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -255,6 +265,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": ""
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "",

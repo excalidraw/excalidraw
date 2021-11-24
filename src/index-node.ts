@@ -66,6 +66,7 @@ const canvas = exportToCanvas(
     width: 0,
     height: 0,
   },
+  {}, // files
   {
     exportBackground: true,
     viewBackgroundColor: "#ffffff",

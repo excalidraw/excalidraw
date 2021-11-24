@@ -6,7 +6,7 @@
     margin: 1.5em 0;
   }
 
-  .RoomDialog-link {
+  input.RoomDialog-link {
     color: var(--text-primary-color);
     min-width: 0;
     flex: 1 1 auto;
@@ -14,8 +14,6 @@
     display: inline-block;
     cursor: pointer;
     border: none;
-    height: 2.5rem;
-    line-height: 2.5rem;
     padding: 0 0.5rem;
     white-space: nowrap;
     border-radius: var(--space-factor);
@@ -55,10 +53,7 @@
       margin-top: 0.5em;
       margin-inline-start: 0;
     }
-    height: 2.5rem;
     font-size: 1em;
-    line-height: 1.5;
-    padding: 0 0.5rem;
   }
 
   .RoomDialog-sessionStartButtonContainer {

@@ -53,7 +53,7 @@ const RoomDialog = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
-    } catch (error) {
+    } catch (error: any) {
       setErrorMessage(error.message);
     }
     if (roomLinkInput.current) {
@@ -68,7 +68,7 @@ const RoomDialog = ({
         text: t("roomDialog.shareTitle"),
         url: activeRoomLink,
       });
-    } catch (error) {
+    } catch (error: any) {
       // Just ignore.
     }
   };
@@ -124,6 +124,7 @@ const RoomDialog = ({
                 />
               </Stack.Row>
               <input
+                type="text"
                 value={activeRoomLink}
                 readOnly={true}
                 className="RoomDialog-link"
@@ -136,6 +137,7 @@ const RoomDialog = ({
                 {t("labels.yourName")}
               </label>
               <input
+                type="text"
                 id="username"
                 value={username || ""}
                 className="RoomDialog-username TextInput"

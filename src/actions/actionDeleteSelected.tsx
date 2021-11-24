@@ -110,10 +110,8 @@ export const actionDeleteSelected = register({
       };
     }
 
-    let {
-      elements: nextElements,
-      appState: nextAppState,
-    } = deleteSelectedElements(elements, appState);
+    let { elements: nextElements, appState: nextAppState } =
+      deleteSelectedElements(elements, appState);
     fixBindingsAfterDeletion(
       nextElements,
       elements.filter(({ id }) => appState.selectedElementIds[id]),

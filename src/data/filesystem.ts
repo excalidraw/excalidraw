@@ -4,12 +4,13 @@ import {
   fileSave as _fileSave,
   FileSystemHandle,
   supported as nativeFileSystemSupported,
-} from "@dwelle/browser-fs-access";
+} from "browser-fs-access";
 import { EVENT, MIME_TYPES } from "../constants";
 import { AbortError } from "../errors";
 import { debounce } from "../utils";
 
 type FILE_EXTENSION =
+  | "gif"
   | "jpg"
   | "png"
   | "svg"
@@ -17,20 +18,11 @@ type FILE_EXTENSION =
   | "excalidraw"
   | "excalidrawlib";
 
-const FILE_TYPE_TO_MIME_TYPE: Record<FILE_EXTENSION, string> = {
-  jpg: "image/jpeg",
-  png: "image/png",
-  svg: "image/svg+xml",
-  json: "application/json",
-  excalidraw: MIME_TYPES.excalidraw,
-  excalidrawlib: MIME_TYPES.excalidrawlib,
-};
-
 const INPUT_CHANGE_INTERVAL_MS = 500;
 
 export const fileOpen = <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
-  description?: string;
+  description: string;
   multiple?: M;
 }): Promise<
   M extends false | undefined ? FileWithHandle : FileWithHandle[]
@@ -41,7 +33,7 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
     : FileWithHandle[];
 
   const mimeTypes = opts.extensions?.reduce((mimeTypes, type) => {
-    mimeTypes.push(FILE_TYPE_TO_MIME_TYPE[type]);
+    mimeTypes.push(MIME_TYPES[type]);
 
     return mimeTypes;
   }, [] as string[]);
@@ -102,7 +94,7 @@ export const fileSave = (
     name: string;
     /** file extension */
     extension: FILE_EXTENSION;
-    description?: string;
+    description: string;
     /** existing FileSystemHandle */
     fileHandle?: FileSystemHandle | null;
   },

@@ -20,10 +20,6 @@
     "background": "Háttér",
     "fill": "Kitöltés",
     "strokeWidth": "Körvonal vastagsága",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "Körvonal stílusa",
     "strokeStyle_solid": "Kitöltött",
     "strokeStyle_dashed": "Szaggatott",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Nyíl",
     "arrowhead_bar": "Oszlop",
     "arrowhead_dot": "Pont",
+    "arrowhead_triangle": "",
     "fontSize": "Betűméret",
     "fontFamily": "Betűkészlet család",
     "onlySelected": "Csak a kijelölt",
@@ -136,7 +133,9 @@
     "darkMode": "Sötét mód",
     "lightMode": "Világos mód",
     "zenMode": "Letisztult mód",
-    "exitZenMode": "Kilépés a letisztult módból"
+    "exitZenMode": "Kilépés a letisztult módból",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
@@ -154,14 +153,22 @@
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "Ez a művelet {{numShapes}} formát fog hozzáadni a könyvtáradhoz. Biztos vagy benne?",
-    "imageDoesNotContainScene": "Képek importálása egyelőre nem támogatott.\n\nEgy jelenetet szeretnél betölteni? Úgy tűnik ez a kép fájl nem tartalmazza a szükséges adatokat. Exportáláskor ezt egy külön opcióval lehet beállítani.",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "A jelenet visszaállítása nem sikerült ebből a kép fájlból",
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "invalidEncryptionKey": ""
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "Kijelölés",
+    "image": "",
     "rectangle": "Téglalap",
     "diamond": "Rombusz",
     "ellipse": "Ellipszis",
@@ -178,6 +185,7 @@
     "shapes": "Alakzatok"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Kattintással görbe, az eger húzásával pedig egyenes nyilat rajzolhatsz",
     "freeDraw": "Kattints és húzd, majd engedd el, amikor végeztél",
     "text": "Tipp: A kijelölés eszközzel a dupla kattintás új szöveget hoz létre",
@@ -186,10 +194,12 @@
     "linearElementMulti": "Kattints a következő ív pozíciójára, vagy fejezd be a nyilat az Escape vagy Enter megnyomásával",
     "lockAngle": "A SHIFT billentyű lenyomva tartásával korlátozhatja forgatás szögét",
     "resize": "A SHIFT billentyű lenyomva tartásával az átméretezés megtartja az arányokat,\naz ALT lenyomva tartásával pedig a középpont egy helyben marad",
+    "resizeImage": "",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
     "lineEditor_info": "Kattints duplán, vagy nyomj entert a pontok szerkesztéséhez",
     "lineEditor_pointSelected": "Nyomd meg a delete gombot a pont eltávolításához, Ctrl vagy Cmd + D-t a duplikáláshoz, vagy húzva mozgasd",
-    "lineEditor_nothingSelected": "Válassz ki egy pontot a mozgatáshoz vagy törtléshez, vagy az Alt lenyomása mellett kattintva hozz létre új pontokat"
+    "lineEditor_nothingSelected": "Válassz ki egy pontot a mozgatáshoz vagy törtléshez, vagy az Alt lenyomása mellett kattintva hozz létre új pontokat",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "Előnézet nem jeleníthető meg",
@@ -255,6 +265,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": ""
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "A rajzaidat végpontok közötti titkosítással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni.",

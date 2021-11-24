@@ -20,10 +20,6 @@
     "background": "Tausta",
     "fill": "Täyttö",
     "strokeWidth": "Viivan leveys",
-    "strokeShape": "Viivan muoto",
-    "strokeShape_gel": "Geelikynä",
-    "strokeShape_fountain": "Sulkakynä",
-    "strokeShape_brush": "Sivellinkynä",
     "strokeStyle": "Viivan tyyli",
     "strokeStyle_solid": "Yhtenäinen",
     "strokeStyle_dashed": "Katkoviiva",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Nuoli",
     "arrowhead_bar": "Tasapää",
     "arrowhead_dot": "Piste",
+    "arrowhead_triangle": "Kolmio",
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
     "onlySelected": "Vain valitut",
@@ -46,7 +43,7 @@
     "exportEmbedScene": "Upota työ",
     "exportEmbedScene_details": "Teoksen tiedot tallennetaan PNG/SVG-tiedostoon, jolloin teoksen voi palauttaa siitä. Kasvattaa tallennetun tiedoston kokoa.",
     "addWatermark": "Lisää \"Tehty Excalidrawilla\"",
-    "handDrawn": "Käsinkirjoitettu",
+    "handDrawn": "Käsinpiirretty",
     "normal": "Tavallinen",
     "code": "Koodi",
     "small": "Pieni",
@@ -136,12 +133,14 @@
     "darkMode": "Tumma tila",
     "lightMode": "Vaalea tila",
     "zenMode": "Zen-tila",
-    "exitZenMode": "Poistu zen-tilasta"
+    "exitZenMode": "Poistu zen-tilasta",
+    "cancel": "Peruuta",
+    "clear": "Pyyhi"
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
     "couldNotCreateShareableLink": "Jaettavan linkin luominen epäonnistui.",
-    "couldNotCreateShareableLinkTooBig": "Jaettavaa linkkiä ei voitu luoda: piirtoalue on liian suuri",
+    "couldNotCreateShareableLinkTooBig": "Jaettavaa linkkiä ei voitu luoda: teos on liian suuri",
     "couldNotLoadInvalidFile": "Virheellistä tiedostoa ei voitu avata",
     "importBackendFailed": "Palvelimelta tuonti epäonnistui.",
     "cannotExportEmptyCanvas": "Tyhjää piirtoaluetta ei voi viedä.",
@@ -154,14 +153,22 @@
     "errorAddingToLibrary": "Kohdetta ei voitu lisätä kirjastoon",
     "errorRemovingFromLibrary": "Kohdetta ei voitu poistaa kirjastosta",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Jatketaanko?",
-    "imageDoesNotContainScene": "Kuvien lisääminen ei ole tällä hetkellä mahdollista.\n\nHaluatko tuoda piirroksen? Tämä kuva ei näytä sisältävän tarvittavia tietoja. Oletko ottanut piirrostietojen tallennuksen käyttöön viennin aikana?",
+    "imageDoesNotContainScene": "Tämä kuva ei näytä sisältävän piirrostietoja. Oletko ottanut käyttöön piirroksen tallennuksen viennin aikana?",
     "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta",
     "invalidSceneUrl": "Teosta ei voitu tuoda annetusta URL-osoitteesta. Tallenne on vioittunut, tai osoitteessa ei ole Excalidraw JSON-dataa.",
     "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?",
     "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä."
   },
+  "errors": {
+    "unsupportedFileType": "Tiedostotyyppiä ei tueta.",
+    "imageInsertError": "Kuvan lisääminen epäonnistui. Yritä myöhemmin uudelleen...",
+    "fileTooBig": "Tiedosto on liian suuri. Suurin sallittu koko on {{maxSize}}.",
+    "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
+    "invalidSVGString": "Virheellinen SVG."
+  },
   "toolBar": {
     "selection": "Valinta",
+    "image": "Lisää kuva",
     "rectangle": "Suorakulmio",
     "diamond": "Vinoneliö",
     "ellipse": "Soikio",
@@ -178,6 +185,7 @@
     "shapes": "Muodot"
   },
   "hints": {
+    "canvasPanning": "Liikuttaaksesi piirtoaluetta, raahaa hiiren vieritysrulla tai välilyöntinäppäin alaspainettuna",
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
@@ -186,10 +194,12 @@
     "linearElementMulti": "Lopeta klikkaamalla viimeistä pistettä, painamalla Escape- tai Enter-näppäintä",
     "lockAngle": "Voit rajoittaa kulmaa pitämällä SHIFT-näppäintä alaspainettuna",
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT-näppäintä alaspainettuna kun muutat kokoa, pidä ALT-näppäintä alaspainettuna muuttaaksesi kokoa keskipisteen suhteen",
+    "resizeImage": "Voit muuttaa kokoa vapaasti pitämällä SHIFTiä pohjassa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen ympäri",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
     "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, Ctrl tai Cmd+D monistaaksesi, tai raahaa liikuttaaksesi",
-    "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä ALT-näppäintä alaspainettuna ja napsauta lisätäksesi uusia pisteitä"
+    "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä ALT-näppäintä alaspainettuna ja napsauta lisätäksesi uusia pisteitä",
+    "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti"
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
@@ -255,6 +265,9 @@
     "view": "Näkymä",
     "zoomToFit": "Näytä kaikki elementit",
     "zoomToSelection": "Näytä valinta"
+  },
+  "clearCanvasDialog": {
+    "title": "Pyyhi piirtoalue"
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä.",

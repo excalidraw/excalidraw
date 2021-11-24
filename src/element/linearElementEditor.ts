@@ -150,9 +150,8 @@ export class LinearElementEditor {
           )
         : null;
       binding = {
-        [activePointIndex === 0
-          ? "startBindingElement"
-          : "endBindingElement"]: bindingElement,
+        [activePointIndex === 0 ? "startBindingElement" : "endBindingElement"]:
+          bindingElement,
       };
     }
     return {
@@ -236,10 +235,8 @@ export class LinearElementEditor {
       // from the end points of the `linearElement` - this is to allow disabling
       // binding (which needs to happen at the point the user finishes moving
       // the point).
-      const {
-        startBindingElement,
-        endBindingElement,
-      } = appState.editingLinearElement;
+      const { startBindingElement, endBindingElement } =
+        appState.editingLinearElement;
       if (isBindingEnabled(appState) && isBindingElement(element)) {
         bindOrUnbindLinearElement(
           element,
