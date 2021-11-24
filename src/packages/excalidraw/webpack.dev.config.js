@@ -81,7 +81,7 @@ module.exports = {
     new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ }),
     new webpack.DefinePlugin({
       "process.env": parseEnvVariables(
-        path.resolve(__dirname, "../../../.env"),
+        path.resolve(__dirname, "../../../.env.development"),
       ),
     }),
   ],
