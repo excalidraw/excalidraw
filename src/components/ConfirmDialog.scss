@@ -1,22 +1,21 @@
 @import "../css/variables.module";
 
 .excalidraw {
-  .clear-canvas {
+  .confirm-dialog {
     &-buttons {
       display: flex;
       padding: 0.2rem 0;
       justify-content: flex-end;
+    }
+    .ToolIcon__icon {
+      min-width: 2.5rem;
+      width: auto;
+      font-size: 1rem;
+    }
 
-      .ToolIcon__icon {
-        min-width: 2.5rem;
-        width: auto;
-        font-size: 1rem;
-      }
-
-      .ToolIcon_type_button {
-        margin-left: 1.5rem;
-        padding: 0 0.5rem;
-      }
+    .ToolIcon_type_button {
+      margin-left: 0.8rem;
+      padding: 0 0.5rem;
     }
 
     &__content {
@@ -33,10 +32,6 @@
       .ToolIcon__icon {
         color: $oc-white;
       }
-    }
-
-    &--cancel.ToolIcon_type_button {
-      background-color: $oc-gray-2;
     }
   }
 }
