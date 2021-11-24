@@ -396,3 +396,26 @@ export type ExcalidrawImperativeAPI = {
   ready: true;
   id: string;
 };
+
+export type PngChunk = {
+  name:
+    | "PLTE"
+    | "IHDR"
+    | "IDAT"
+    | "IEND"
+    | "cHRM"
+    | "gAMA"
+    | "iCCP"
+    | "sRGB"
+    | "sBIT"
+    | "bKGD"
+    | "hIST"
+    | "tRNS"
+    | "pHYs"
+    | "sPLT"
+    | "tIME"
+    | "iTXt"
+    | "tEXt"
+    | "zTXt";
+  data: Uint8Array;
+};
