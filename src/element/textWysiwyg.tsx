@@ -74,15 +74,20 @@ export const textWysiwyg = ({
         if (coordX > textContainer.x) {
           coordX = textContainer.x;
         }
-
-        if (editable.clientHeight > textContainer.height) {
+        if (editable.clientHeight === textContainer.height) {
+          coordY = textContainer.y;
+        } else if (editable.clientHeight > textContainer.height) {
           mutateElement(textContainer, { height: editable.clientHeight });
           return;
         } else if (
           editable.clientHeight > textContainer.height / 2 &&
-          coordY !== textContainer.y
+          editable.clientHeight !== textContainer.height
         ) {
-          coordY = textContainer.y;
+          const lineCount = editable.clientHeight / 25;
+          const extraLines = Math.floor(
+            lineCount - textContainer.height / (25 * 2),
+          );
+          coordY = coordY - 25 * extraLines;
         }
       }
 
