@@ -3,6 +3,8 @@ const TerserPlugin = require("terser-webpack-plugin");
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const autoprefixer = require("autoprefixer");
+const webpack = require("webpack");
+const { parseEnvVariables } = require("./env");
 
 module.exports = {
   mode: "production",
@@ -104,6 +106,11 @@ module.exports = {
   },
   plugins: [
     ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
+    new webpack.DefinePlugin({
+      "process.env": parseEnvVariables(
+        path.resolve(__dirname, "../../../.env.production"),
+      ),
+    }),
   ],
   externals: {
     react: {
