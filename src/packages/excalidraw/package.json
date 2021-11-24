@@ -47,9 +47,9 @@
     "@babel/core": "7.16.0",
     "@babel/plugin-transform-arrow-functions": "7.16.0",
     "@babel/plugin-transform-async-to-generator": "7.16.0",
-    "@babel/plugin-transform-runtime": "7.16.0",
+    "@babel/plugin-transform-runtime": "7.16.4",
     "@babel/plugin-transform-typescript": "7.16.1",
-    "@babel/preset-env": "7.16.0",
+    "@babel/preset-env": "7.16.4",
     "@babel/preset-react": "7.16.0",
     "@babel/preset-typescript": "7.16.0",
     "autoprefixer": "10.4.0",
@@ -58,13 +58,13 @@
     "cross-env": "7.0.3",
     "css-loader": "6.5.1",
     "file-loader": "6.2.0",
-    "mini-css-extract-plugin": "2.4.4",
+    "mini-css-extract-plugin": "2.4.5",
     "postcss-loader": "6.2.0",
     "sass-loader": "12.3.0",
-    "terser-webpack-plugin": "5.2.4",
+    "terser-webpack-plugin": "5.2.5",
     "ts-loader": "9.2.6",
-    "typescript": "4.4.4",
-    "webpack": "5.62.1",
+    "typescript": "4.5.2",
+    "webpack": "5.64.3",
     "webpack-bundle-analyzer": "4.5.0",
     "webpack-cli": "4.9.1"
   },
@@ -75,5 +75,8 @@
     "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
     "pack": "yarn build:umd && yarn pack"
+  },
+  "dependencies": {
+    "dotenv": "10.0.0"
   }
 }

@@ -164,7 +164,7 @@
     "imageInsertError": "无法插入图像。请稍后再试……",
     "fileTooBig": "文件过大。最大允许的大小为 {{maxSize}}。",
     "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
-    "invalidSVGString": ""
+    "invalidSVGString": "无效的 SVG。"
   },
   "toolBar": {
     "selection": "选择",
@@ -267,7 +267,7 @@
     "zoomToSelection": "缩放到选区"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "清除画布"
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",

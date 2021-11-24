@@ -150,6 +150,20 @@ export const debounce = <T extends any[]>(
   return ret;
 };
 
+// https://github.com/lodash/lodash/blob/es/chunk.js
+export const chunk = <T extends any>(array: T[], size: number): T[][] => {
+  if (!array.length || size < 1) {
+    return [];
+  }
+  let index = 0;
+  let resIndex = 0;
+  const result = Array(Math.ceil(array.length / size));
+  while (index < array.length) {
+    result[resIndex++] = array.slice(index, (index += size));
+  }
+  return result;
+};
+
 export const selectNode = (node: Element) => {
   const selection = window.getSelection();
   if (selection) {
@@ -289,6 +303,7 @@ export const tupleToCoors = (
 /** use as a rejectionHandler to mute filesystem Abort errors */
 export const muteFSAbortError = (error?: Error) => {
   if (error?.name === "AbortError") {
+    console.warn(error);
     return;
   }
   throw error;
@@ -455,3 +470,6 @@ export const bytesToHexString = (bytes: Uint8Array) => {
     .map((byte) => `0${byte.toString(16)}`.slice(-2))
     .join("");
 };
+
+export const getUpdatedTimestamp = () =>
+  process.env.NODE_ENV === "test" ? 1 : Date.now();

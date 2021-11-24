@@ -25,11 +25,17 @@ type ToolButtonBaseProps = {
   visible?: boolean;
   selected?: boolean;
   className?: string;
+  isLoading?: boolean;
 };
 
 type ToolButtonProps =
   | (ToolButtonBaseProps & {
       type: "button";
+      children?: React.ReactNode;
+      onClick?(event: React.MouseEvent): void;
+    })
+  | (ToolButtonBaseProps & {
+      type: "submit";
       children?: React.ReactNode;
       onClick?(event: React.MouseEvent): void;
     })
@@ -64,6 +70,8 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
       } catch (error: any) {
         if (!(error instanceof AbortError)) {
           throw error;
+        } else {
+          console.warn(error);
         }
       } finally {
         if (isMountedRef.current) {
@@ -82,7 +90,14 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
 
   const lastPointerTypeRef = useRef<PointerType | null>(null);
 
-  if (props.type === "button" || props.type === "icon") {
+  if (
+    props.type === "button" ||
+    props.type === "icon" ||
+    props.type === "submit"
+  ) {
+    const type = (props.type === "icon" ? "button" : props.type) as
+      | "button"
+      | "submit";
     return (
       <button
         className={clsx(
@@ -102,10 +117,10 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         hidden={props.hidden}
         title={props.title}
         aria-label={props["aria-label"]}
-        type="button"
+        type={type}
         onClick={onClick}
         ref={innerRef}
-        disabled={isLoading}
+        disabled={isLoading || props.isLoading}
       >
         {(props.icon || props.label) && (
           <div className="ToolIcon__icon" aria-hidden="true">
@@ -115,6 +130,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
                 {props.keyBindingLabel}
               </span>
             )}
+            {props.isLoading && <Spinner />}
           </div>
         )}
         {props.showAriaLabel && (

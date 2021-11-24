@@ -4,6 +4,7 @@ import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { Point } from "../types";
+import { getUpdatedTimestamp } from "../utils";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -92,6 +93,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
   element.version++;
   element.versionNonce = randomInteger();
+  element.updated = getUpdatedTimestamp();
 
   if (informMutation) {
     Scene.getScene(element)?.informMutation();
@@ -126,13 +128,14 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
   return {
     ...element,
     ...updates,
+    updated: getUpdatedTimestamp(),
     version: element.version + 1,
     versionNonce: randomInteger(),
   };
 };
 
 /**
- * Mutates element and updates `version` & `versionNonce`.
+ * Mutates element, bumping `version`, `versionNonce`, and `updated`.
  *
  * NOTE: does not trigger re-render.
  */
@@ -142,5 +145,6 @@ export const bumpVersion = (
 ) => {
   element.version = (version ?? element.version) + 1;
   element.versionNonce = randomInteger();
+  element.updated = getUpdatedTimestamp();
   return element;
 };

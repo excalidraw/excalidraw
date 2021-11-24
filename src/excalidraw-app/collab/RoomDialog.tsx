@@ -124,6 +124,7 @@ const RoomDialog = ({
                 />
               </Stack.Row>
               <input
+                type="text"
                 value={activeRoomLink}
                 readOnly={true}
                 className="RoomDialog-link"
@@ -136,6 +137,7 @@ const RoomDialog = ({
                 {t("labels.yourName")}
               </label>
               <input
+                type="text"
                 id="username"
                 value={username || ""}
                 className="RoomDialog-username TextInput"
