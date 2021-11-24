@@ -74,9 +74,8 @@ export const exportToCanvas = async (
     {
       renderScrollbars: false,
       renderSelection: false,
-      renderOptimizations: true,
       renderGrid: false,
-      isExport: true,
+      isExporting: true,
     },
   );
 

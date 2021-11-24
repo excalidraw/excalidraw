@@ -46,6 +46,18 @@ const isPendingImageElement = (
   isInitializedImageElement(element) &&
   !sceneState.imageCache.has(element.fileId);
 
+const shouldResetImageFilter = (
+  element: ExcalidrawElement,
+  sceneState: SceneState,
+) => {
+  return (
+    sceneState.theme === "dark" &&
+    isInitializedImageElement(element) &&
+    !isPendingImageElement(element, sceneState) &&
+    sceneState.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
+  );
+};
+
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
 const getDashArrayDotted = (strokeWidth: number) => [1.5, 6 + strokeWidth];
@@ -123,12 +135,7 @@ const generateElementCanvas = (
   const rc = rough.canvas(canvas);
 
   // in dark theme, revert the image color filter
-  if (
-    sceneState.theme === "dark" &&
-    isInitializedImageElement(element) &&
-    !isPendingImageElement(element, sceneState) &&
-    sceneState.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
-  ) {
+  if (shouldResetImageFilter(element, sceneState)) {
     context.filter = IMAGE_INVERT_FILTER;
   }
 
@@ -647,7 +654,7 @@ export const renderElement = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderOptimizations: boolean,
+  isExporting: boolean,
   sceneState: SceneState,
 ) => {
   const generator = rc.generator;
@@ -666,7 +673,7 @@ export const renderElement = (
     case "freedraw": {
       generateElementShape(element, generator);
 
-      if (renderOptimizations) {
+      if (isExporting) {
         const elementWithCanvas = generateElementWithCanvas(
           element,
           sceneState,
@@ -696,13 +703,7 @@ export const renderElement = (
     case "image":
     case "text": {
       generateElementShape(element, generator);
-      if (renderOptimizations) {
-        const elementWithCanvas = generateElementWithCanvas(
-          element,
-          sceneState,
-        );
-        drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
-      } else {
+      if (isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + sceneState.scrollX;
         const cy = (y1 + y2) / 2 + sceneState.scrollY;
@@ -712,8 +713,21 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
+
+        if (shouldResetImageFilter(element, sceneState)) {
+          context.filter = "none";
+        }
+
         drawElementOnCanvas(element, rc, context, sceneState);
         context.restore();
+        // not exporting → optimized rendering (cache & render from element
+        // canvases)
+      } else {
+        const elementWithCanvas = generateElementWithCanvas(
+          element,
+          sceneState,
+        );
+        drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       }
       break;
     }

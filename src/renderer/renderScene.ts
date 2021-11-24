@@ -185,21 +185,16 @@ export const renderScene = (
   {
     renderScrollbars = true,
     renderSelection = true,
-    // Whether to employ render optimizations to improve performance.
-    // Should not be turned on for export operations and similar, because it
-    // doesn't guarantee pixel-perfect output.
-    renderOptimizations = false,
     renderGrid = true,
     /** when exporting the behavior is slightly different (e.g. we can't use
-        CSS filters) */
-    isExport = false,
+        CSS filters), and we disable render optimizations for best output */
+    isExporting,
   }: {
     renderScrollbars?: boolean;
     renderSelection?: boolean;
-    renderOptimizations?: boolean;
     renderGrid?: boolean;
-    isExport?: boolean;
-  } = {},
+    isExporting: boolean;
+  },
 ) => {
   if (canvas === null) {
     return { atLeastOneVisibleElement: false };
@@ -215,7 +210,7 @@ export const renderScene = (
   const normalizedCanvasWidth = canvas.width / scale;
   const normalizedCanvasHeight = canvas.height / scale;
 
-  if (isExport && sceneState.theme === "dark") {
+  if (isExporting && sceneState.theme === "dark") {
     context.filter = THEME_FILTER;
   }
 
@@ -273,7 +268,7 @@ export const renderScene = (
 
   visibleElements.forEach((element) => {
     try {
-      renderElement(element, rc, context, renderOptimizations, sceneState);
+      renderElement(element, rc, context, isExporting, sceneState);
     } catch (error: any) {
       console.error(error);
     }
@@ -291,13 +286,7 @@ export const renderScene = (
   // Paint selection element
   if (selectionElement) {
     try {
-      renderElement(
-        selectionElement,
-        rc,
-        context,
-        renderOptimizations,
-        sceneState,
-      );
+      renderElement(selectionElement, rc, context, isExporting, sceneState);
     } catch (error: any) {
       console.error(error);
     }
