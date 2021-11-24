@@ -257,7 +257,7 @@
     "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "Zakrzywiona linia",
     "documentation": "Dokumentacja",
-    "doubleClick": "",
+    "doubleClick": "podwójne kliknięcie",
     "drag": "przeciągnij",
     "editor": "Edytor",
     "editSelectedShape": "Edytuj wybrany kształt (tekst/strzałka/linia)",
@@ -291,8 +291,8 @@
       "libraryName": "Nazwa twojej biblioteki",
       "libraryDesc": "Opis twojej biblioteki, aby pomóc innym zrozumieć jej działanie",
       "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "twitterHandle": "Nazwa użytkownika w serwisie Twitter (opcjonalna), aby wiedzieć kogo oznaczyć przy promowaniu na Twitterze",
+      "website": "Link do Twojej osobistej strony internetowej lub gdzie indziej (opcjonalnie)"
     },
     "errors": {
       "required": "Wymagane",
@@ -301,25 +301,25 @@
     "noteDescription": {
       "pre": "",
       "link": "",
-      "post": ""
+      "post": "dla innych osób do wykorzystania w swoich rysunkach."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
+      "pre": "Biblioteka musi być najpierw zatwierdzona ręcznie. Przeczytaj ",
+      "link": "wytyczne",
       "post": ""
     },
     "noteLicense": {
-      "pre": "",
+      "pre": "Wysyłając zgadzasz się, że biblioteka zostanie opublikowana pod ",
       "link": "Licencja MIT, ",
-      "post": ""
+      "post": "w skrócie, każdy może z nich korzystać bez ograniczeń."
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "Proszę wybrać co najmniej jeden element biblioteki, by rozpocząć"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Biblioteka została przesłana",
+    "content": "Dziękujemy {{authorName}}. Twoja biblioteka została przesłana do sprawdzenia. Możesz śledzić jej stan",
+    "link": "tutaj"
   },
   "confirmDialog": {
     "resetLibrary": "Zresetuj Bibliotekę",
@@ -348,19 +348,19 @@
     "addedToLibrary": "Dodano do biblioteki",
     "copyStyles": "Skopiowano style.",
     "copyToClipboard": "Skopiowano do schowka.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "Skopiowano {{exportSelection}} do schowka jako PNG\n({{exportColorScheme}})",
     "fileSaved": "Zapisano plik.",
     "fileSavedToFilename": "Zapisano jako {filename}",
     "canvas": "płótno",
-    "selection": ""
+    "selection": "zaznaczenie"
   },
   "colors": {
-    "ffffff": "",
-    "f8f9fa": "",
-    "f1f3f5": "",
-    "fff5f5": "",
-    "fff0f6": "",
-    "f8f0fc": "",
+    "ffffff": "Biały",
+    "f8f9fa": "Szary 0",
+    "f1f3f5": "Szary 1",
+    "fff5f5": "Czerwony 0",
+    "fff0f6": "Różowy 0",
+    "f8f0fc": "Bordowy 0",
     "f3f0ff": "Fioletowy 0",
     "edf2ff": "Granatowy 0",
     "e7f5ff": "Niebieski 0",
