@@ -1,6 +1,6 @@
+import { compressData, decompressData } from "../../data/encode";
 import {
   decryptData,
-  encryptData,
   generateEncryptionKey,
   IV_LENGTH_BYTES,
 } from "../../data/encryption";
@@ -109,9 +109,45 @@ export const getCollaborationLink = (data: {
   return `${window.location.origin}${window.location.pathname}#room=${data.roomId},${data.roomKey}`;
 };
 
+/**
+ * Decodes shareLink data using the legacy buffer format.
+ * @deprecated
+ */
+const legacy_decodeFromBackend = async ({
+  buffer,
+  decryptionKey,
+}: {
+  buffer: ArrayBuffer;
+  decryptionKey: string;
+}) => {
+  let decrypted: ArrayBuffer;
+
+  try {
+    // Buffer should contain both the IV (fixed length) and encrypted data
+    const iv = buffer.slice(0, IV_LENGTH_BYTES);
+    const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
+    decrypted = await decryptData(new Uint8Array(iv), encrypted, decryptionKey);
+  } catch (error: any) {
+    // Fixed IV (old format, backward compatibility)
+    const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
+    decrypted = await decryptData(fixedIv, buffer, decryptionKey);
+  }
+
+  // We need to convert the decrypted array buffer to a string
+  const string = new window.TextDecoder("utf-8").decode(
+    new Uint8Array(decrypted),
+  );
+  const data: ImportedDataState = JSON.parse(string);
+
+  return {
+    elements: data.elements || null,
+    appState: data.appState || null,
+  };
+};
+
 const importFromBackend = async (
   id: string,
-  privateKey: string,
+  decryptionKey: string,
 ): Promise<ImportedDataState> => {
   try {
     const response = await fetch(`${BACKEND_V2_GET}${id}`);
@@ -122,28 +158,28 @@ const importFromBackend = async (
     }
     const buffer = await response.arrayBuffer();
 
-    let decrypted: ArrayBuffer;
     try {
-      // Buffer should contain both the IV (fixed length) and encrypted data
-      const iv = buffer.slice(0, IV_LENGTH_BYTES);
-      const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
-      decrypted = await decryptData(new Uint8Array(iv), encrypted, privateKey);
+      const { data: decodedBuffer } = await decompressData(
+        new Uint8Array(buffer),
+        {
+          decryptionKey,
+        },
+      );
+      const data: ImportedDataState = JSON.parse(
+        new TextDecoder().decode(decodedBuffer),
+      );
+
+      return {
+        elements: data.elements || null,
+        appState: data.appState || null,
+      };
     } catch (error: any) {
-      // Fixed IV (old format, backward compatibility)
-      const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
-      decrypted = await decryptData(fixedIv, buffer, privateKey);
+      console.warn(
+        "error when decoding shareLink data using the new format:",
+        error,
+      );
+      return legacy_decodeFromBackend({ buffer, decryptionKey });
     }
-
-    // We need to convert the decrypted array buffer to a string
-    const string = new window.TextDecoder("utf-8").decode(
-      new Uint8Array(decrypted),
-    );
-    const data: ImportedDataState = JSON.parse(string);
-
-    return {
-      elements: data.elements || null,
-      appState: data.appState || null,
-    };
   } catch (error: any) {
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
@@ -188,20 +224,14 @@ export const exportToBackend = async (
   appState: AppState,
   files: BinaryFiles,
 ) => {
-  const json = serializeAsJSON(elements, appState, files, "database");
-  const encoded = new TextEncoder().encode(json);
+  const encryptionKey = await generateEncryptionKey("string");
 
-  const cryptoKey = await generateEncryptionKey("cryptoKey");
-
-  const { encryptedBuffer, iv } = await encryptData(cryptoKey, encoded);
-
-  // Concatenate IV with encrypted data (IV does not have to be secret).
-  const payloadBlob = new Blob([iv.buffer, encryptedBuffer]);
-  const payload = await new Response(payloadBlob).arrayBuffer();
-
-  // We use jwk encoding to be able to extract just the base64 encoded key.
-  // We will hardcode the rest of the attributes when importing back the key.
-  const exportedKey = await window.crypto.subtle.exportKey("jwk", cryptoKey);
+  const payload = await compressData(
+    new TextEncoder().encode(
+      serializeAsJSON(elements, appState, files, "database"),
+    ),
+    { encryptionKey },
+  );
 
   try {
     const filesMap = new Map<FileId, BinaryFileData>();
@@ -211,8 +241,6 @@ export const exportToBackend = async (
       }
     }
 
-    const encryptionKey = exportedKey.k!;
-
     const filesToUpload = await encodeFilesForUpload({
       files: filesMap,
       encryptionKey,
@@ -221,7 +249,7 @@ export const exportToBackend = async (
 
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
-      body: payload,
+      body: payload.buffer,
     });
     const json = await response.json();
     if (json.id) {
