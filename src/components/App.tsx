@@ -1535,16 +1535,18 @@ class App extends React.Component<AppProps, AppState> {
       // bump versions for elements that reference added files so that
       // we/host apps can detect the change, and invalidate the image & shape
       // cache
-      this.scene.getElements().forEach((element) => {
-        if (
-          isInitializedImageElement(element) &&
-          filesMap.has(element.fileId)
-        ) {
-          this.imageCache.delete(element.fileId);
-          invalidateShapeForElement(element);
-          bumpVersion(element);
-        }
-      });
+      if (Object.keys(this.files).length > 0) {
+        this.scene.getElements().forEach((element) => {
+          if (
+            isInitializedImageElement(element) &&
+            filesMap.has(element.fileId)
+          ) {
+            this.imageCache.delete(element.fileId);
+            invalidateShapeForElement(element);
+            bumpVersion(element);
+          }
+        });
+      }
       this.scene.informMutation();
 
       this.addNewImagesToImageCache();
