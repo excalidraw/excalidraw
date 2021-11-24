@@ -1874,11 +1874,11 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            const textContainer = _element.textContainer
+            const textContainer = element.textContainer
               ? element.textContainer
               : null;
             return updateTextElement(
-              _element,
+              element,
               {
                 text,
                 isDeleted,
@@ -2826,7 +2826,6 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.elementType === "selection") {
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
-      console.log(pointerDownState, "seelce");
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(

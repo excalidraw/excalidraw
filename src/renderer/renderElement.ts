@@ -30,6 +30,7 @@ import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import { MAX_DECIMALS_FOR_SVG_EXPORT, MIME_TYPES, SVG_NS } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
+import { DEFAULT_LINE_HEIGHT } from "../element/textWysiwyg";
 
 const defaultAppState = getDefaultAppState();
 
@@ -252,7 +253,7 @@ const drawElementOnCanvas = (
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.textContainer
-          ? 25
+          ? DEFAULT_LINE_HEIGHT
           : element.height / lines.length;
         const verticalOffset = element.height - element.baseline;
         const horizontalOffset =

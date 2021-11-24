@@ -1,5 +1,10 @@
 import { CODES, KEYS } from "../keys";
-import { isWritableElement, getFontString, wrapText } from "../utils";
+import {
+  isWritableElement,
+  getFontString,
+  wrapText,
+  viewportCoordsToSceneCoords,
+} from "../utils";
 import Scene from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
@@ -7,6 +12,7 @@ import { ExcalidrawElement } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 
+export const DEFAULT_LINE_HEIGHT = 25;
 const normalizeText = (text: string) => {
   return (
     text
@@ -74,6 +80,7 @@ export const textWysiwyg = ({
         if (coordX > textContainer.x) {
           coordX = textContainer.x;
         }
+
         if (editable.clientHeight === textContainer.height) {
           coordY = textContainer.y;
         } else if (editable.clientHeight > textContainer.height) {
@@ -83,11 +90,14 @@ export const textWysiwyg = ({
           editable.clientHeight > textContainer.height / 2 &&
           editable.clientHeight !== textContainer.height
         ) {
-          const lineCount = editable.clientHeight / 25;
+          const lineCount = editable.clientHeight / DEFAULT_LINE_HEIGHT;
           const extraLines = Math.floor(
-            lineCount - textContainer.height / (25 * 2),
+            lineCount - textContainer.height / (DEFAULT_LINE_HEIGHT * 2),
           );
-          coordY = coordY - 25 * extraLines;
+          coordY = Math.max(
+            coordY - DEFAULT_LINE_HEIGHT * extraLines,
+            textContainer.y,
+          );
         }
       }
 
@@ -97,7 +107,7 @@ export const textWysiwyg = ({
       editable.value = updatedElement.text;
       const lines = updatedElement.text.split("\n");
       const lineHeight = updatedElement.textContainer
-        ? 25
+        ? DEFAULT_LINE_HEIGHT
         : updatedElement.height / lines.length;
       const maxWidth = textContainer
         ? width
@@ -315,17 +325,27 @@ export const textWysiwyg = ({
     } else {
       wrappedText = editable.value;
     }
-    onSubmit({
-      text: normalizeText(wrappedText),
-      viaKeyboard: submittedViaKeyboard,
-    });
+    const { y } = viewportCoordsToSceneCoords(
+      {
+        clientX: Number(editable.style.left.slice(0, -2)),
+        clientY: Number(editable.style.top.slice(0, -2)),
+      },
+      appState,
+    );
     if (
       element.type === "text" &&
       element.textContainer &&
       element.textContainer.type === "rectangle"
     ) {
+      mutateElement(element, { y });
+
       mutateElement(element.textContainer, { boundTextElement: element.id });
     }
+
+    onSubmit({
+      text: normalizeText(wrappedText),
+      viaKeyboard: submittedViaKeyboard,
+    });
   };
 
   const cleanup = () => {
