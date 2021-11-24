@@ -1529,13 +1529,13 @@ class App extends React.Component<AppProps, AppState> {
         acc.set(fileData.id, fileData);
         return acc;
       }, new Map<FileId, BinaryFileData>());
-
+      const shouldUpdateElements = Object.keys(this.files).length > 0;
       this.files = { ...this.files, ...Object.fromEntries(filesMap) };
 
       // bump versions for elements that reference added files so that
       // we/host apps can detect the change, and invalidate the image & shape
       // cache
-      if (Object.keys(this.files).length > 0) {
+      if (shouldUpdateElements) {
         this.scene.getElements().forEach((element) => {
           if (
             isInitializedImageElement(element) &&
