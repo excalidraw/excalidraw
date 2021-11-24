@@ -470,3 +470,6 @@ export const bytesToHexString = (bytes: Uint8Array) => {
     .map((byte) => `0${byte.toString(16)}`.slice(-2))
     .join("");
 };
+
+export const getUpdatedTimestamp = () =>
+  process.env.NODE_ENV === "test" ? 1 : Date.now();
