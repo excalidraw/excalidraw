@@ -190,7 +190,9 @@ const restoreElement = (
     case "ellipse":
       return restoreElementWithProperties(element, {});
     case "rectangle":
-      return restoreElementWithProperties(element, {});
+      return restoreElementWithProperties(element, {
+        boundTextElement: element.boundTextElement || null,
+      });
     case "diamond":
       return restoreElementWithProperties(element, {});
 

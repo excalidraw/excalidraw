@@ -319,6 +319,13 @@ export const textWysiwyg = ({
       text: normalizeText(wrappedText),
       viaKeyboard: submittedViaKeyboard,
     });
+    if (
+      element.type === "text" &&
+      element.textContainer &&
+      element.textContainer.type === "rectangle"
+    ) {
+      mutateElement(element.textContainer, { boundTextElement: element.id });
+    }
   };
 
   const cleanup = () => {

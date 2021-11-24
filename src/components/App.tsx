@@ -2826,6 +2826,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.elementType === "selection") {
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
+      console.log(pointerDownState, "seelce");
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
@@ -2969,6 +2970,8 @@ class App extends React.Component<AppProps, AppState> {
                     selectedElementIds: {
                       ...prevState.selectedElementIds,
                       [hitElement.id]: true,
+                      //@ts-ignore
+                      [hitElement?.boundTextElement]: true,
                     },
                   },
                   this.scene.getElements(),
@@ -3886,6 +3889,8 @@ class App extends React.Component<AppProps, AppState> {
           } else {
             // add element to selection while
             // keeping prev elements selected
+            console.log("hello hit", hitElement.id);
+
             this.setState((_prevState) => ({
               selectedElementIds: {
                 ..._prevState.selectedElementIds,
