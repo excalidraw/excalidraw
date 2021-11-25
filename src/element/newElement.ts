@@ -156,7 +156,7 @@ const getAdjustedDimensions = (
     baseline: nextBaseline,
   } = measureText(nextText, getFontString(element), textContainer);
   const { textAlign, verticalAlign } = element;
-
+  console.log(nextHeight, element.height, nextWidth, element.width);
   let x: number;
   let y: number;
   if (

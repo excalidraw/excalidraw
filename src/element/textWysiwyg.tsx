@@ -67,36 +67,41 @@ export const textWysiwyg = ({
     const updatedElement = Scene.getScene(element)?.getElement(id);
     if (updatedElement && isTextElement(updatedElement)) {
       const textContainer = updatedElement?.textContainer;
+      let maxWidth = updatedElement.width;
+      let maxHeight = updatedElement.height;
       let width = updatedElement.width;
       let height = updatedElement.height;
       if (textContainer) {
-        width = textContainer.width;
-        height = Math.min(height, textContainer.height);
+        maxWidth = textContainer.width - 60;
+        maxHeight = textContainer.height - 60;
+        width = maxWidth;
+        height = Math.min(height, maxHeight);
       }
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
 
       if (textContainer) {
-        if (coordX > textContainer.x) {
-          coordX = textContainer.x;
+        if (coordX - textContainer.x >= 30) {
+          coordX = textContainer.x + 30;
         }
 
-        if (editable.clientHeight === textContainer.height) {
-          coordY = textContainer.y;
-        } else if (editable.clientHeight > textContainer.height) {
-          mutateElement(textContainer, { height: editable.clientHeight });
+        if (editable.clientHeight === maxHeight) {
+          coordY = textContainer.y + 30;
+        } else if (editable.clientHeight > maxHeight) {
+          const diff = Math.min(editable.clientHeight - maxHeight, 30);
+          mutateElement(textContainer, { height: textContainer.height + diff });
           return;
         } else if (
-          editable.clientHeight > textContainer.height / 2 &&
-          editable.clientHeight !== textContainer.height
+          editable.clientHeight > maxHeight / 2 &&
+          editable.clientHeight !== maxHeight
         ) {
           const lineCount = editable.clientHeight / DEFAULT_LINE_HEIGHT;
           const extraLines = Math.floor(
-            lineCount - textContainer.height / (DEFAULT_LINE_HEIGHT * 2),
+            lineCount - maxHeight / (DEFAULT_LINE_HEIGHT * 2),
           );
           coordY = Math.max(
             coordY - DEFAULT_LINE_HEIGHT * extraLines,
-            textContainer.y,
+            textContainer.y + 30,
           );
         }
       }
@@ -109,9 +114,9 @@ export const textWysiwyg = ({
       const lineHeight = updatedElement.textContainer
         ? DEFAULT_LINE_HEIGHT
         : updatedElement.height / lines.length;
-      const maxWidth = textContainer
-        ? width
-        : (appState.offsetLeft + appState.width - viewportX - 8) /
+      if (!textContainer)
+        maxWidth =
+          (appState.offsetLeft + appState.width - viewportX - 8) /
             appState.zoom.value -
           // margin-right of parent if any
           Number(
@@ -325,7 +330,7 @@ export const textWysiwyg = ({
     } else {
       wrappedText = editable.value;
     }
-    const { y } = viewportCoordsToSceneCoords(
+    const { x, y } = viewportCoordsToSceneCoords(
       {
         clientX: Number(editable.style.left.slice(0, -2)),
         clientY: Number(editable.style.top.slice(0, -2)),
@@ -337,7 +342,12 @@ export const textWysiwyg = ({
       element.textContainer &&
       element.textContainer.type === "rectangle"
     ) {
-      mutateElement(element, { y });
+      mutateElement(element, {
+        y,
+        height: Number(editable.style.height.slice(0, -2)),
+        width: Number(editable.style.width.slice(0, -2)),
+        x,
+      });
 
       mutateElement(element.textContainer, { boundTextElement: element.id });
     }
