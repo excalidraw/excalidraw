@@ -174,7 +174,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import Scene from "../scene/Scene";
-import { SceneState, ScrollBars } from "../scene/types";
+import { RenderConfig, ScrollBars } from "../scene/types";
 import { getNewZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
 import {
@@ -1053,8 +1053,10 @@ class App extends React.Component<AppProps, AppState> {
     const cursorButton: {
       [id: string]: string | undefined;
     } = {};
-    const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
-    const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
+    const pointerViewportCoords: RenderConfig["remotePointerViewportCoords"] =
+      {};
+    const remoteSelectedElementIds: RenderConfig["remoteSelectedElementIds"] =
+      {};
     const pointerUsernames: { [id: string]: string } = {};
     const pointerUserStates: { [id: string]: string } = {};
     this.state.collaborators.forEach((user, socketId) => {
@@ -1122,9 +1124,7 @@ class App extends React.Component<AppProps, AppState> {
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
         theme: this.state.theme,
         imageCache: this.imageCache,
-      },
-      {
-        renderOptimizations: true,
+        isExporting: false,
         renderScrollbars: !this.isMobile,
       },
     );
