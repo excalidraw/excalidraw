@@ -62,6 +62,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
   const rows = chunk(libraryItems, MAX_ITEMS_PER_ROW);
 
   const canvas = document.createElement("canvas");
+
   canvas.width =
     rows[0].length * BOX_SIZE +
     (rows[0].length + 1) * (BOX_PADDING * 2) -
@@ -76,24 +77,32 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
   ctx.fillStyle = OpenColor.white;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // draw items
+  // ---------------------------------------------------------------------------
   for (const [index, item] of libraryItems.entries()) {
-    const _canvas = await exportToCanvas({
+    const itemCanvas = await exportToCanvas({
       elements: item.elements,
       files: null,
       maxWidthOrHeight: BOX_SIZE,
     });
 
-    const { width, height } = _canvas;
+    const { width, height } = itemCanvas;
+
+    // draw item
+    // -------------------------------------------------------------------------
     const rowOffset =
       Math.floor(index / MAX_ITEMS_PER_ROW) * (BOX_SIZE + BOX_PADDING * 2);
     const colOffset =
       (index % MAX_ITEMS_PER_ROW) * (BOX_SIZE + BOX_PADDING * 2);
+
     ctx.drawImage(
-      _canvas,
+      itemCanvas,
       colOffset + (BOX_SIZE - width) / 2 + BOX_PADDING,
       rowOffset + (BOX_SIZE - height) / 2 + BOX_PADDING,
     );
 
+    // draw item border
+    // -------------------------------------------------------------------------
     ctx.lineWidth = BORDER_WIDTH;
     ctx.strokeStyle = OpenColor.gray[3];
     ctx.strokeRect(
