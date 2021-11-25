@@ -8,12 +8,17 @@ import { ToolButton } from "./ToolButton";
 
 import { AppState, LibraryItems, LibraryItem } from "../types";
 import { exportToCanvas } from "../packages/utils";
-import { EXPORT_DATA_TYPES, EXPORT_SOURCE, VERSIONS } from "../constants";
+import {
+  EXPORT_DATA_TYPES,
+  EXPORT_SOURCE,
+  MIME_TYPES,
+  VERSIONS,
+} from "../constants";
 import { ExportedLibraryData } from "../data/types";
 
 import "./PublishLibrary.scss";
 import SingleLibraryItem from "./SingleLibraryItem";
-import { canvasToBlob } from "../data/blob";
+import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { chunk } from "../utils";
 
 interface PublishLibraryDataParams {
@@ -113,7 +118,13 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
     );
   }
 
-  return await canvasToBlob(canvas);
+  return await resizeImageFile(
+    new File([await canvasToBlob(canvas)], "preview", { type: MIME_TYPES.png }),
+    {
+      outputType: MIME_TYPES.jpg,
+      maxWidthOrHeight: 5000,
+    },
+  );
 };
 
 const PublishLibrary = ({
@@ -191,7 +202,7 @@ const PublishLibrary = ({
       return;
     }
 
-    const png = await generatePreviewImage(clonedLibItems);
+    const previewImage = await generatePreviewImage(clonedLibItems);
 
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
@@ -204,7 +215,8 @@ const PublishLibrary = ({
 
     const formData = new FormData();
     formData.append("excalidrawLib", lib);
-    formData.append("excalidrawPng", png!);
+    formData.append("previewImage", previewImage);
+    formData.append("previewImageType", previewImage.type);
     formData.append("title", libraryData.name);
     formData.append("authorName", libraryData.authorName);
     formData.append("githubHandle", libraryData.githubHandle);
