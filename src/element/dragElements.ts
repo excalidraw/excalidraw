@@ -20,30 +20,61 @@ export const dragSelectedElements = (
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
   selectedElements.forEach((element) => {
-    let x: number;
-    let y: number;
-    if (lockDirection) {
-      const lockX = lockDirection && distanceX < distanceY;
-      const lockY = lockDirection && distanceX > distanceY;
-      const original = pointerDownState.originalElements.get(element.id);
-      x = lockX && original ? original.x : element.x + offset.x;
-      y = lockY && original ? original.y : element.y + offset.y;
-    } else {
-      x = element.x + offset.x;
-      y = element.y + offset.y;
+    updateElementCoords(
+      lockDirection,
+      distanceX,
+      distanceY,
+      pointerDownState,
+      element,
+      offset,
+    );
+    if (element.type === "rectangle" && element.boundTextElement) {
+      const textElement = Scene.getScene(element)!.getElement(
+        element.boundTextElement,
+      );
+      if (textElement) {
+        updateElementCoords(
+          lockDirection,
+          distanceX,
+          distanceY,
+          pointerDownState,
+          Scene.getScene(element)!.getElement(element.boundTextElement)!,
+          offset,
+        );
+      }
     }
-
-    mutateElement(element, {
-      x,
-      y,
-    });
-
     updateBoundElements(element, {
       simultaneouslyUpdated: selectedElements,
     });
   });
 };
 
+const updateElementCoords = (
+  lockDirection: boolean,
+  distanceX: number,
+  distanceY: number,
+  pointerDownState: PointerDownState,
+  element: NonDeletedExcalidrawElement,
+  offset: { x: number; y: number },
+) => {
+  let x: number;
+  let y: number;
+  if (lockDirection) {
+    const lockX = lockDirection && distanceX < distanceY;
+    const lockY = lockDirection && distanceX > distanceY;
+    const original = pointerDownState.originalElements.get(element.id);
+    x = lockX && original ? original.x : element.x + offset.x;
+    y = lockY && original ? original.y : element.y + offset.y;
+  } else {
+    x = element.x + offset.x;
+    y = element.y + offset.y;
+  }
+
+  mutateElement(element, {
+    x,
+    y,
+  });
+};
 export const getDragOffsetXY = (
   selectedElements: NonDeletedExcalidrawElement[],
   x: number,

@@ -1966,7 +1966,9 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
   ): NonDeleted<ExcalidrawTextElement> | null {
-    const element = this.getElementAtPosition(x, y);
+    const element = this.getElementAtPosition(x, y, {
+      includeBoundTextElement: true,
+    });
 
     if (element && isTextElement(element) && !element.isDeleted) {
       return element;
@@ -1981,9 +1983,14 @@ class App extends React.Component<AppProps, AppState> {
       /** if true, returns the first selected element (with highest z-index)
         of all hit elements */
       preferSelected?: boolean;
+      includeBoundTextElement?: boolean;
     },
   ): NonDeleted<ExcalidrawElement> | null {
-    const allHitElements = this.getElementsAtPosition(x, y);
+    const allHitElements = this.getElementsAtPosition(
+      x,
+      y,
+      opts?.includeBoundTextElement,
+    );
     if (allHitElements.length > 1) {
       if (opts?.preferSelected) {
         for (let index = allHitElements.length - 1; index > -1; index--) {
@@ -2014,8 +2021,16 @@ class App extends React.Component<AppProps, AppState> {
   private getElementsAtPosition(
     x: number,
     y: number,
+    includeBoundTextElement: boolean = false,
   ): NonDeleted<ExcalidrawElement>[] {
-    return getElementsAtPosition(this.scene.getElements(), (element) =>
+    const elements = includeBoundTextElement
+      ? this.scene.getElements()
+      : this.scene
+          .getElements()
+          .filter(
+            (element) => !(element.type === "text" && element.textContainer),
+          );
+    return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, x, y),
     );
   }
@@ -2969,8 +2984,6 @@ class App extends React.Component<AppProps, AppState> {
                     selectedElementIds: {
                       ...prevState.selectedElementIds,
                       [hitElement.id]: true,
-                      //@ts-ignore
-                      [hitElement?.boundTextElement]: true,
                     },
                   },
                   this.scene.getElements(),
