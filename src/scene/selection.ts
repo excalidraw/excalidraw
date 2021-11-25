@@ -53,7 +53,22 @@ export const getCommonAttributeOfSelectedElements = <T>(
 export const getSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-) => elements.filter((element) => appState.selectedElementIds[element.id]);
+  includeBoundTextElement: boolean = false,
+) =>
+  elements.filter((element) => {
+    if (appState.selectedElementIds[element.id]) {
+      return element;
+    }
+    if (
+      includeBoundTextElement &&
+      element.type === "text" &&
+      element.textContainer &&
+      appState.selectedElementIds[element?.textContainer.id]
+    ) {
+      return element;
+    }
+    return null;
+  });
 
 export const getTargetElements = (
   elements: readonly NonDeletedExcalidrawElement[],

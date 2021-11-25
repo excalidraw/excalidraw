@@ -3901,7 +3901,6 @@ class App extends React.Component<AppProps, AppState> {
           } else {
             // add element to selection while
             // keeping prev elements selected
-            console.log("hello hit", hitElement.id);
 
             this.setState((_prevState) => ({
               selectedElementIds: {
@@ -4670,6 +4669,7 @@ class App extends React.Component<AppProps, AppState> {
     const selectedElements = getSelectedElements(
       this.scene.getElements(),
       this.state,
+      true,
     );
     const transformHandleType = pointerDownState.resize.handleType;
     this.setState({

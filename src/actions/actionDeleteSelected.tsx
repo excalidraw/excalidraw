@@ -21,6 +21,13 @@ const deleteSelectedElements = (
       if (appState.selectedElementIds[el.id]) {
         return newElementWith(el, { isDeleted: true });
       }
+      if (
+        el.type === "text" &&
+        el.textContainer &&
+        appState.selectedElementIds[el.textContainer.id]
+      ) {
+        return newElementWith(el, { isDeleted: true });
+      }
       return el;
     }),
     appState: {
@@ -109,7 +116,6 @@ export const actionDeleteSelected = register({
         commitToHistory: true,
       };
     }
-
     let { elements: nextElements, appState: nextAppState } =
       deleteSelectedElements(elements, appState);
     fixBindingsAfterDeletion(
