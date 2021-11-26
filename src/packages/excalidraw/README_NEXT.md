@@ -865,22 +865,6 @@ import { isInvisiblySmallElement } from "@excalidraw/excalidraw-next";
 
 Returns `true` if element is invisibly small (e.g. width & height are zero).
 
-#### `arrayToMap`
-
-**_Signature_**
-
-<pre>
-arrayToMap(item: ({id: string} | string)[]): Map<string, typeof item>
-</pre>
-
-**How to use**
-
-```js
-import { arrayToMap } from "@excalidraw/excalidraw";
-```
-
-Transforms array of objects containing `id` attribute, or array of ids (strings), into a Map, keyd by `id`. Useful if you need to get or check for existence of an item in an array in a loop (as a performance optimization).
-
 #### `loadLibraryFromBlob`
 
 ```js

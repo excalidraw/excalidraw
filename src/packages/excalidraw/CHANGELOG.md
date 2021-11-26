@@ -15,11 +15,9 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- Replace `getElementMap` with [`arrayToMap`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#arrayToMap).
+- #### BREAKING CHANGE
 
-  #### BREAKING CHANGE
-
-  `getElementMap` util method is now removed.
+  Removed `getElementMap` util method.
 
 - Changes to [`exportToCanvas`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToCanvas) util function:
 
