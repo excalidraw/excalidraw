@@ -100,7 +100,9 @@
     "share": "",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": ""
+    "toggleTheme": "",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
@@ -135,7 +137,11 @@
     "zenMode": "",
     "exitZenMode": "ဇင်မြင်ကွင်းမှထွက်",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "ကားချပ်တစ်ခုလုံးရှင်းလင်းပါတော့မည်။ အတည်ပြုပါ။",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "ဤပုံဖြင့်မြင်ကွင်းပြန်လည်မရယူနိုင်ပါ။",
     "invalidSceneUrl": "",
     "resetLibrary": "",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": ""
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "အမှတ်များပြင်ဆင်သတ်မှတ်ရင် ကလစ်နှစ်ချက် (သို့) Enter ကိုနှိပ်ပါ",
     "lineEditor_pointSelected": "အမှတ်များအား ဖျက်ရန် Delete နှင့် ပွားရန် Ctrl/Cmd + D သုံးပါ၊ ရွှေ့လိုပါက တရွတ်ဆွဲပါ",
     "lineEditor_nothingSelected": "ရွှေ့လို (သို့) ဖယ်ရှားလိုသောအမှတ်ကိုရွေးပါ၊ Alt နှင့် ကလစ်တွဲနှိပ်၍လည်းအမှတ်အသစ်ထပ်ထည့်နိုင်သည်",
-    "placeImage": ""
+    "placeImage": "",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "နမူနာမပြသနိုင်ပါ",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": ""
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။",
     "link": ""
@@ -289,6 +345,7 @@
     "width": "အကျယ်"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "",
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",

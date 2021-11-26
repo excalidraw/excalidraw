@@ -22,6 +22,7 @@ import {
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
+import { getUpdatedTimestamp } from "../utils";
 import { arrayToMap } from "../utils";
 
 type RestoredAppState = Omit<
@@ -98,6 +99,7 @@ const restoreElementWithProperties = <
       element.strokeSharpness ??
       (isLinearElementType(element.type) ? "round" : "sharp"),
     boundElementIds: element.boundElementIds ?? [],
+    updated: element.updated ?? getUpdatedTimestamp(),
   };
 
   return {

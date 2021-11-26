@@ -100,7 +100,9 @@
     "share": "Bagikan",
     "showStroke": "Tampilkan garis pengambil warna",
     "showBackground": "Tampilkan latar pengambil warna",
-    "toggleTheme": "Ubah tema"
+    "toggleTheme": "Ubah tema",
+    "personalLib": "Pustaka Pribadi",
+    "excalidrawLib": "Pustaka Excalidraw"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -135,7 +137,11 @@
     "zenMode": "Mode zen",
     "exitZenMode": "Keluar dari mode zen",
     "cancel": "Batal",
-    "clear": "Hapus"
+    "clear": "Hapus",
+    "remove": "Hapus",
+    "publishLibrary": "Terbitkan",
+    "submit": "Kirimkan",
+    "confirm": "Konfirmasi"
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Pemandangan tidak dapat dipulihkan dari file gambar ini",
     "invalidSceneUrl": "Tidak dapat impor pemandangan dari URL. Kemungkinan URL itu rusak atau tidak berisi data JSON Excalidraw yang valid.",
     "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?",
+    "removeItemsFromsLibrary": "Hapus {{count}} item dari pustaka?",
     "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Klik ganda atau tekan Enter untuk mengedit titik",
     "lineEditor_pointSelected": "Tekan Delete untuk menghapus titik, Ctrl/Cmd + D untuk menduplikasi, atau seret untuk memindahkan",
     "lineEditor_nothingSelected": "Pilih sebuah titik untuk memindah atau menghapus, atau tekan Alt dan klik untuk menambahkan titik baru",
-    "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual"
+    "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
+    "publishLibrary": "Terbitkan pustaka Anda"
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Hapus kanvas"
   },
+  "publishDialog": {
+    "title": "Terbitkan pustaka",
+    "itemName": "Nama item",
+    "authorName": "Nama pembuat",
+    "githubUsername": "Nama pengguna github",
+    "twitterUsername": "Nama pengguna Twitter",
+    "libraryName": "Nama Pustaka",
+    "libraryDesc": "Deskripsi pustaka",
+    "website": "Situs Web",
+    "placeholder": {
+      "authorName": "Nama atau nama pengguna Anda",
+      "libraryName": "Nama dari pustaka Anda",
+      "libraryDesc": "Deskripsi pustaka Anda untuk membantu orang mengerti penggunaannya",
+      "githubHandle": "Akun GitHub (opsional), jadi Anda dapat mengubah pustaka ketika diserahkan untuk review",
+      "twitterHandle": "Nama pengguna Twitter (opsional), jadi kami tahu siapa dipuji ketika mempromosikannya melalui Twitter",
+      "website": "Hubungkan ke situs personal Anda atau lainnya (opsional)"
+    },
+    "errors": {
+      "required": "Dibutuhkan",
+      "website": "Masukkan URL valid"
+    },
+    "noteDescription": {
+      "pre": "Kirimkan pustaka Anda untuk disertakan di ",
+      "link": "repositori pustaka publik",
+      "post": "untuk orang lain menggunakannya dalam gambar mereka."
+    },
+    "noteGuidelines": {
+      "pre": "Pustaka butuh disetujui secara manual terlebih dahulu. Baca ",
+      "link": "pedoman",
+      "post": " sebelum mengirim. Anda butuh akun GitHub untuk berkomunikasi dan membuat perubahan jika dibutuhkan, tetapi tidak wajib dibutukan."
+    },
+    "noteLicense": {
+      "pre": "Dengan mengkirimkannya, Anda setuju pustaka akan diterbitkan dibawah ",
+      "link": "Lisensi MIT, ",
+      "post": "yang artinya siapa pun dapat menggunakannya tanpa batasan."
+    },
+    "noteItems": "Setiap item pustaka harus memiliki nama, sehingga bisa disortir. Item pustaka di bawah ini akan dimasukan:",
+    "atleastOneLibItem": "Pilih setidaknya satu item pustaka untuk mulai"
+  },
+  "publishSuccessDialog": {
+    "title": "Pustaka telah dikirm",
+    "content": "Terima kasih {{authorName}}. pustaka Anda telah diserahkan untuk ditinjau ulang. Anda dapat cek statusnya",
+    "link": "di sini"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Reset pustaka",
+    "removeItemsFromLib": "Hapus item yang dipilih dari pustaka"
+  },
   "encrypted": {
     "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya.",
     "link": "Pos blog tentang enkripsi ujung ke ujung di Excalidraw"
@@ -289,6 +345,7 @@
     "width": "Lebar"
   },
   "toast": {
+    "addedToLibrary": "Tambahkan ke pustaka",
     "copyStyles": "Gaya tersalin.",
     "copyToClipboard": "Tersalin ke papan klip.",
     "copyToClipboardAsPng": "Tersalin {{exportSelection}} ke clipboard sebagai PNG\n({{exportColorScheme}})",

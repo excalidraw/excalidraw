@@ -471,6 +471,9 @@ export const bytesToHexString = (bytes: Uint8Array) => {
     .join("");
 };
 
+export const getUpdatedTimestamp = () =>
+  process.env.NODE_ENV === "test" ? 1 : Date.now();
+
 /**
  * Transforms array of objects containing `id` attribute,
  * or array of ids (strings), into a Map, keyd by `id`.
