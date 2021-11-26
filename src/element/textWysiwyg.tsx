@@ -13,6 +13,8 @@ import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 
 export const DEFAULT_LINE_HEIGHT = 25;
+const PADDING = 30;
+
 const normalizeText = (text: string) => {
   return (
     text
@@ -51,7 +53,6 @@ export const textWysiwyg = ({
   element,
   canvas,
   excalidrawContainer,
-  scene,
 }: {
   id: ExcalidrawElement["id"];
   appState: AppState;
@@ -61,48 +62,83 @@ export const textWysiwyg = ({
   element: ExcalidrawElement;
   canvas: HTMLCanvasElement | null;
   excalidrawContainer: HTMLDivElement | null;
-  scene: Scene;
 }) => {
+  let originalContainerHeight: number;
+
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
+
     if (updatedElement && isTextElement(updatedElement)) {
+      let coordX = updatedElement.x;
+      let coordY = updatedElement.y;
       const textContainer = updatedElement?.textContainer;
       let maxWidth = updatedElement.width;
+
       let maxHeight = updatedElement.height;
       let width = updatedElement.width;
       let height = updatedElement.height;
       if (textContainer) {
-        maxWidth = textContainer.width - 60;
-        maxHeight = textContainer.height - 60;
+        if (!originalContainerHeight) {
+          originalContainerHeight = textContainer.height;
+        }
+        maxWidth = textContainer.width - PADDING * 2;
+        maxHeight = textContainer.height - PADDING * 2;
         width = maxWidth;
         height = Math.min(height, maxHeight);
       }
-      let coordX = updatedElement.x;
-      let coordY = updatedElement.y;
 
       if (textContainer) {
-        if (coordX - textContainer.x >= 30) {
-          coordX = textContainer.x + 30;
-        }
+        // The coordinates of text box set a distance of
+        // 30px to preserve padding
+        coordX = textContainer.x + PADDING;
 
-        if (editable.clientHeight === maxHeight) {
+        if (editable.clientHeight >= maxHeight) {
           coordY = textContainer.y + 30;
-        } else if (editable.clientHeight > maxHeight) {
-          const diff = Math.min(editable.clientHeight - maxHeight, 30);
+        }
+        // autogrow container height if text exceeds
+        if (editable.clientHeight > maxHeight) {
+          const diff = Math.min(editable.clientHeight - maxHeight, PADDING);
           mutateElement(textContainer, { height: textContainer.height + diff });
           return;
         } else if (
+          // autoshrink container height until original container height
+          // is reached when text is removed
+          textContainer.height > originalContainerHeight &&
+          editable.clientHeight < maxHeight
+        ) {
+          const diff = Math.min(maxHeight - editable.clientHeight, PADDING);
+          mutateElement(textContainer, { height: textContainer.height - diff });
+          return;
+        } else if (
+          // Start pushing text upward until a diff of 30px (padding)
+          // is reached
           editable.clientHeight > maxHeight / 2 &&
           editable.clientHeight !== maxHeight
         ) {
           const lineCount = editable.clientHeight / DEFAULT_LINE_HEIGHT;
+
+          // lines beyond maxwidth/2 are considered extra lines as
+          // we don't need t to update coordy until then
           const extraLines = Math.floor(
-            lineCount - maxHeight / (DEFAULT_LINE_HEIGHT * 2),
+            lineCount - maxHeight / 2 / DEFAULT_LINE_HEIGHT,
           );
-          coordY = Math.max(
-            coordY - DEFAULT_LINE_HEIGHT * extraLines,
-            textContainer.y + 30,
+
+          const { y: currentCoordY } = viewportCoordsToSceneCoords(
+            {
+              clientX: Number(editable.style.left.slice(0, -2)),
+              clientY: Number(editable.style.top.slice(0, -2)),
+            },
+            appState,
           );
+          const newCoordY = Math.max(
+            coordY - PADDING * extraLines,
+            textContainer.y + PADDING,
+          );
+          if (newCoordY < currentCoordY) {
+            coordY = newCoordY;
+          } else {
+            coordY = currentCoordY;
+          }
         }
       }
 
@@ -114,7 +150,7 @@ export const textWysiwyg = ({
       const lineHeight = updatedElement.textContainer
         ? DEFAULT_LINE_HEIGHT
         : updatedElement.height / lines.length;
-      if (!textContainer)
+      if (!textContainer) {
         maxWidth =
           (appState.offsetLeft + appState.width - viewportX - 8) /
             appState.zoom.value -
@@ -124,6 +160,7 @@ export const textWysiwyg = ({
               excalidrawContainer?.parentNode as Element,
             ).marginRight.slice(0, -2),
           );
+      }
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -176,7 +213,8 @@ export const textWysiwyg = ({
   updateWysiwygStyle();
 
   if (onChange) {
-    editable.oninput = (event) => {
+    editable.oninput = () => {
+      editable.style.height = "auto";
       editable.style.height = `${editable.scrollHeight}px`;
       onChange(normalizeText(editable.value));
     };

@@ -111,7 +111,6 @@ const getTextDimensions = (text: string, font: FontString) => {
     // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
-  // console.log("text", text);
   const line = document.createElement("div");
   line.style.position = "absolute";
   line.style.whiteSpace = "pre-wrap";
@@ -140,12 +139,10 @@ export const wrapText = (
   if (!textContainer) {
     return text;
   }
-  //console.log("original", text);
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   originalLines.forEach((originalLine) => {
     const words = originalLine.split(" ");
-    //console.log(words, "words");
     let currentLine = "";
     const maxWidth = textContainer.width - 60;
     while (words.length > 0) {
@@ -168,11 +165,8 @@ export const wrapText = (
       }
     }
     currentLine = currentLine.trim();
-    if (currentLine.length) {
-      lines.push(currentLine);
-    }
+    lines.push(currentLine);
   });
-  // console.log("wrapped", lines);
 
   return lines.join("\n");
 };

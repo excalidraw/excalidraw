@@ -1944,7 +1944,6 @@ class App extends React.Component<AppProps, AppState> {
       }),
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
-      scene: this.scene,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
