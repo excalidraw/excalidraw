@@ -1874,8 +1874,8 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            const textContainer = element.textContainer
-              ? element.textContainer
+            const textContainer = element.textContainerId
+              ? Scene.getScene(element)?.getElement(element.textContainerId)
               : null;
             return updateTextElement(
               element,
@@ -1883,7 +1883,7 @@ class App extends React.Component<AppProps, AppState> {
                 text,
                 isDeleted,
               },
-              textContainer,
+              textContainer || null,
               updateDimensions,
             );
           }
@@ -1907,7 +1907,7 @@ class App extends React.Component<AppProps, AppState> {
         return [viewportX, viewportY];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text, false, !element.textContainer);
+        updateElement(text, false, !element.textContainerId);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
@@ -2027,7 +2027,7 @@ class App extends React.Component<AppProps, AppState> {
       : this.scene
           .getElements()
           .filter(
-            (element) => !(element.type === "text" && element.textContainer),
+            (element) => !(element.type === "text" && element.textContainerId),
           );
     return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, x, y),
@@ -2088,7 +2088,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
-          textContainer: textContainer ?? undefined,
+          textContainerId: textContainer?.id ?? undefined,
         });
 
     this.setState({ editingElement: element });

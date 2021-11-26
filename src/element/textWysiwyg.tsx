@@ -74,7 +74,11 @@ export const textWysiwyg = ({
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
-      const textContainer = updatedElement?.textContainer;
+      const textContainer = updatedElement?.textContainerId
+        ? Scene.getScene(updatedElement)!.getElement(
+            updatedElement.textContainerId,
+          )
+        : null;
       let maxWidth = updatedElement.width;
 
       let maxHeight = updatedElement.height;
@@ -159,7 +163,7 @@ export const textWysiwyg = ({
 
       editable.value = updatedElement.text;
       const lines = updatedElement.text.split("\n");
-      const lineHeight = updatedElement.textContainer
+      const lineHeight = updatedElement.textContainerId
         ? approxLineHeight
         : updatedElement.height / lines.length;
       if (!textContainer) {
@@ -202,7 +206,7 @@ export const textWysiwyg = ({
 
   let whiteSpace = "pre";
   if (element.type === "text") {
-    whiteSpace = element.textContainer ? "pre-wrap" : "pre";
+    whiteSpace = element.textContainerId ? "pre-wrap" : "pre";
   }
   Object.assign(editable.style, {
     position: "absolute",
@@ -371,35 +375,37 @@ export const textWysiwyg = ({
     // wysiwyg on update
     cleanup();
     let wrappedText = "";
-    if (element.type === "text" && element?.textContainer) {
-      wrappedText = wrapText(
-        editable.value,
-        getFontString(element),
-        element.textContainer,
+    if (element.type === "text" && element?.textContainerId) {
+      const textContainer = Scene.getScene(element)!.getElement(
+        element.textContainerId,
       );
+
+      if (textContainer && textContainer.type === "rectangle") {
+        wrappedText = wrapText(
+          editable.value,
+          getFontString(element),
+          textContainer,
+        );
+        const { x, y } = viewportCoordsToSceneCoords(
+          {
+            clientX: Number(editable.style.left.slice(0, -2)),
+            clientY: Number(editable.style.top.slice(0, -2)),
+          },
+          appState,
+        );
+        if (element.type === "text" && element.textContainerId) {
+          mutateElement(element, {
+            y,
+            height: Number(editable.style.height.slice(0, -2)),
+            width: Number(editable.style.width.slice(0, -2)),
+            x,
+          });
+
+          mutateElement(textContainer, { boundTextElement: element.id });
+        }
+      }
     } else {
       wrappedText = editable.value;
-    }
-    const { x, y } = viewportCoordsToSceneCoords(
-      {
-        clientX: Number(editable.style.left.slice(0, -2)),
-        clientY: Number(editable.style.top.slice(0, -2)),
-      },
-      appState,
-    );
-    if (
-      element.type === "text" &&
-      element.textContainer &&
-      element.textContainer.type === "rectangle"
-    ) {
-      mutateElement(element, {
-        y,
-        height: Number(editable.style.height.slice(0, -2)),
-        width: Number(editable.style.width.slice(0, -2)),
-        x,
-      });
-
-      mutateElement(element.textContainer, { boundTextElement: element.id });
     }
 
     onSubmit({

@@ -11,6 +11,7 @@ import {
   Arrowhead,
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
+  ExcalidrawRectangleElement,
 } from "../element/types";
 import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -114,7 +115,7 @@ export const newTextElement = (
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    textContainer?: ExcalidrawElement;
+    textContainerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const metrics = measureText(opts.text, getFontString(opts));
@@ -132,7 +133,7 @@ export const newTextElement = (
       width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
-      textContainer: opts.textContainer || null,
+      textContainerId: opts.textContainerId || null,
     },
     {},
   );
@@ -154,14 +155,14 @@ const getAdjustedDimensions = (
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureText(nextText, getFontString(element), textContainer);
+  } = measureText(nextText, getFontString(element));
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
   if (
     textAlign === "center" &&
     verticalAlign === "middle" &&
-    !element.textContainer
+    !element.textContainerId
   ) {
     const prevMetrics = measureText(element.text, getFontString(element));
     const offsets = getTextElementPositionOffsets(element, {

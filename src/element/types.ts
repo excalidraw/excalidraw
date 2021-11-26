@@ -115,7 +115,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     baseline: number;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    textContainer: ExcalidrawElement | null;
+    textContainerId: ExcalidrawRectangleElement["id"] | null;
   }>;
 
 export type ExcalidrawBindableElement =

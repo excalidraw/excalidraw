@@ -95,11 +95,7 @@ export const getFontString = ({
 };
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-export const measureText = (
-  text: string,
-  font: FontString,
-  textContainer?: ExcalidrawElement | null,
-) => {
+export const measureText = (text: string, font: FontString) => {
   const { width, height, baseline } = getTextDimensions(text, font);
   return { width, height, baseline };
 };

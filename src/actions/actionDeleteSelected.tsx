@@ -23,8 +23,8 @@ const deleteSelectedElements = (
       }
       if (
         el.type === "text" &&
-        el.textContainer &&
-        appState.selectedElementIds[el.textContainer.id]
+        el.textContainerId &&
+        appState.selectedElementIds[el.textContainerId]
       ) {
         return newElementWith(el, { isDeleted: true });
       }

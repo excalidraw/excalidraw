@@ -62,8 +62,8 @@ export const getSelectedElements = (
     if (
       includeBoundTextElement &&
       element.type === "text" &&
-      element.textContainer &&
-      appState.selectedElementIds[element?.textContainer.id]
+      element.textContainerId &&
+      appState.selectedElementIds[element?.textContainerId]
     ) {
       return element;
     }

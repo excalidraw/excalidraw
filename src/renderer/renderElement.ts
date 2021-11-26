@@ -257,7 +257,7 @@ const drawElementOnCanvas = (
 
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        const lineHeight = element.textContainer
+        const lineHeight = element.textContainerId
           ? getApproxLineHeight(getFontString(element))
           : element.height / lines.length;
         const verticalOffset = element.height - element.baseline;
