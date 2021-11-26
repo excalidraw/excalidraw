@@ -15,6 +15,10 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- #### BREAKING CHANGE
+
+  Removed `getElementMap` util method.
+
 - Changes to [`exportToCanvas`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToCanvas) util function:
 
   - Add `maxWidthOrHeight?: number` attribute.
