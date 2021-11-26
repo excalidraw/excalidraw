@@ -60,9 +60,9 @@ const importPublishLibDataFromStorage = () => {
 
 const generatePreviewImage = async (libraryItems: LibraryItems) => {
   const MAX_ITEMS_PER_ROW = 6;
-  const BOX_SIZE = 160;
-  const BOX_PADDING = Math.round(BOX_SIZE / 19);
-  const BORDER_WIDTH = Math.round(BOX_SIZE / 64);
+  const BOX_SIZE = 128;
+  const BOX_PADDING = Math.round(BOX_SIZE / 16);
+  const BORDER_WIDTH = Math.max(Math.round(BOX_SIZE / 64), 2);
 
   const rows = chunk(libraryItems, MAX_ITEMS_PER_ROW);
 
@@ -109,7 +109,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
     // draw item border
     // -------------------------------------------------------------------------
     ctx.lineWidth = BORDER_WIDTH;
-    ctx.strokeStyle = OpenColor.gray[3];
+    ctx.strokeStyle = OpenColor.gray[4];
     ctx.strokeRect(
       colOffset + BOX_PADDING / 2,
       rowOffset + BOX_PADDING / 2,
