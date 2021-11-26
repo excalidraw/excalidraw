@@ -26,7 +26,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
 export const rectangleFixture: ExcalidrawElement = {
   ...elementBase,
   type: "rectangle",
-  boundTextElement: null,
+  boundTextElementId: null,
 };
 export const ellipseFixture: ExcalidrawElement = {
   ...elementBase,

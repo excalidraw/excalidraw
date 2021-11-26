@@ -28,9 +28,9 @@ export const dragSelectedElements = (
       element,
       offset,
     );
-    if (element.type === "rectangle" && element.boundTextElement) {
+    if (element.type === "rectangle" && element.boundTextElementId) {
       const textElement = Scene.getScene(element)!.getElement(
-        element.boundTextElement,
+        element.boundTextElementId,
       );
       if (textElement) {
         updateElementCoords(
@@ -38,7 +38,7 @@ export const dragSelectedElements = (
           distanceX,
           distanceY,
           pointerDownState,
-          Scene.getScene(element)!.getElement(element.boundTextElement)!,
+          Scene.getScene(element)!.getElement(element.boundTextElementId)!,
           offset,
         );
       }

@@ -191,7 +191,7 @@ const restoreElement = (
       return restoreElementWithProperties(element, {});
     case "rectangle":
       return restoreElementWithProperties(element, {
-        boundTextElement: element.boundTextElement || null,
+        boundTextElementId: element.boundTextElementId || null,
       });
     case "diamond":
       return restoreElementWithProperties(element, {});

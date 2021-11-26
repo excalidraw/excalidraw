@@ -401,7 +401,7 @@ export const textWysiwyg = ({
             x,
           });
 
-          mutateElement(textContainer, { boundTextElement: element.id });
+          mutateElement(textContainer, { boundTextElementId: element.id });
         }
       }
     } else {

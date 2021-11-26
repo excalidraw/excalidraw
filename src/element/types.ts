@@ -53,7 +53,7 @@ export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
 
 export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
   type: "rectangle";
-  boundTextElement: ExcalidrawTextElement["id"] | null;
+  boundTextElementId: ExcalidrawTextElement["id"] | null;
 };
 
 export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
