@@ -865,22 +865,6 @@ import { isInvisiblySmallElement } from "@excalidraw/excalidraw-next";
 
 Returns `true` if element is invisibly small (e.g. width & height are zero).
 
-#### `getElementMap`
-
-**_Signature_**
-
-<pre>
-getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
-</pre>
-
-**How to use**
-
-```js
-import { getElementsMap } from "@excalidraw/excalidraw-next";
-```
-
-This function returns an object where each element is mapped to its id.
-
 #### `loadLibraryFromBlob`
 
 ```js
