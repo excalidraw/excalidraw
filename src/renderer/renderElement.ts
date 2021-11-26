@@ -23,14 +23,19 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
+import {
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+  getApproxLineHeight,
+} from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import { MAX_DECIMALS_FOR_SVG_EXPORT, MIME_TYPES, SVG_NS } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
-import { DEFAULT_LINE_HEIGHT } from "../element/textWysiwyg";
 
 const defaultAppState = getDefaultAppState();
 
@@ -253,7 +258,7 @@ const drawElementOnCanvas = (
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.textContainer
-          ? DEFAULT_LINE_HEIGHT
+          ? getApproxLineHeight(getFontString(element))
           : element.height / lines.length;
         const verticalOffset = element.height - element.baseline;
         const horizontalOffset =

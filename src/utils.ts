@@ -171,6 +171,11 @@ export const wrapText = (
   return lines.join("\n");
 };
 
+export const getApproxLineHeight = (font: FontString) => {
+  const text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  return getTextDimensions(text, font).height;
+};
+
 export const debounce = <T extends any[]>(
   fn: (...args: T) => void,
   timeout: number,

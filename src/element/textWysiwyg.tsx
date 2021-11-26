@@ -4,6 +4,7 @@ import {
   getFontString,
   wrapText,
   viewportCoordsToSceneCoords,
+  getApproxLineHeight,
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
@@ -12,7 +13,6 @@ import { ExcalidrawElement } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 
-export const DEFAULT_LINE_HEIGHT = 25;
 const PADDING = 30;
 
 const normalizeText = (text: string) => {
@@ -65,6 +65,9 @@ export const textWysiwyg = ({
 }) => {
   let originalContainerHeight: number;
 
+  //@ts-ignore
+  const approxLineHeight = getApproxLineHeight(getFontString(element));
+
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
 
@@ -93,11 +96,14 @@ export const textWysiwyg = ({
         coordX = textContainer.x + PADDING;
 
         if (editable.clientHeight >= maxHeight) {
-          coordY = textContainer.y + 30;
+          coordY = textContainer.y + PADDING;
         }
         // autogrow container height if text exceeds
         if (editable.clientHeight > maxHeight) {
-          const diff = Math.min(editable.clientHeight - maxHeight, PADDING);
+          const diff = Math.min(
+            editable.clientHeight - maxHeight,
+            approxLineHeight,
+          );
           mutateElement(textContainer, { height: textContainer.height + diff });
           return;
         } else if (
@@ -106,7 +112,10 @@ export const textWysiwyg = ({
           textContainer.height > originalContainerHeight &&
           editable.clientHeight < maxHeight
         ) {
-          const diff = Math.min(maxHeight - editable.clientHeight, PADDING);
+          const diff = Math.min(
+            maxHeight - editable.clientHeight,
+            approxLineHeight,
+          );
           mutateElement(textContainer, { height: textContainer.height - diff });
           return;
         } else if (
@@ -115,12 +124,12 @@ export const textWysiwyg = ({
           editable.clientHeight > maxHeight / 2 &&
           editable.clientHeight !== maxHeight
         ) {
-          const lineCount = editable.clientHeight / DEFAULT_LINE_HEIGHT;
+          const lineCount = editable.clientHeight / approxLineHeight;
 
           // lines beyond maxwidth/2 are considered extra lines as
           // we don't need t to update coordy until then
           const extraLines = Math.floor(
-            lineCount - maxHeight / 2 / DEFAULT_LINE_HEIGHT,
+            lineCount - maxHeight / 2 / approxLineHeight,
           );
 
           const { y: currentCoordY } = viewportCoordsToSceneCoords(
@@ -130,8 +139,11 @@ export const textWysiwyg = ({
             },
             appState,
           );
+
+          // Since we need to maintain padding hence thats the max
+          // limit of y coord
           const newCoordY = Math.max(
-            coordY - PADDING * extraLines,
+            coordY - approxLineHeight * extraLines,
             textContainer.y + PADDING,
           );
           if (newCoordY < currentCoordY) {
@@ -148,7 +160,7 @@ export const textWysiwyg = ({
       editable.value = updatedElement.text;
       const lines = updatedElement.text.split("\n");
       const lineHeight = updatedElement.textContainer
-        ? DEFAULT_LINE_HEIGHT
+        ? approxLineHeight
         : updatedElement.height / lines.length;
       if (!textContainer) {
         maxWidth =
