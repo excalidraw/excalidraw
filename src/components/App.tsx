@@ -4001,10 +4001,9 @@ class App extends React.Component<AppProps, AppState> {
     const existingFileData = this.files[fileId];
     if (!existingFileData?.dataURL) {
       try {
-        imageFile = await resizeImageFile(
-          imageFile,
-          DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-        );
+        imageFile = await resizeImageFile(imageFile, {
+          maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+        });
       } catch (error: any) {
         console.error("error trying to resing image file on insertion", error);
       }
@@ -4113,7 +4112,9 @@ class App extends React.Component<AppProps, AppState> {
     // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Basic_User_Interface/Using_URL_values_for_the_cursor_property
     const cursorImageSizePx = 96;
 
-    const imagePreview = await resizeImageFile(imageFile, cursorImageSizePx);
+    const imagePreview = await resizeImageFile(imageFile, {
+      maxWidthOrHeight: cursorImageSizePx,
+    });
 
     let previewDataURL = await getDataURL(imagePreview);
 

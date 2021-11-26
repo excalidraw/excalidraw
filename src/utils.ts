@@ -151,7 +151,10 @@ export const debounce = <T extends any[]>(
 };
 
 // https://github.com/lodash/lodash/blob/es/chunk.js
-export const chunk = <T extends any>(array: T[], size: number): T[][] => {
+export const chunk = <T extends any>(
+  array: readonly T[],
+  size: number,
+): T[][] => {
   if (!array.length || size < 1) {
     return [];
   }
