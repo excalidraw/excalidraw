@@ -25,7 +25,6 @@ Please add the latest change on the top under the correct section.
 
   - Add `maxWidthOrHeight?: number` attribute.
   - `scale` returned from `getDimensions()` is now optional (default to `1`).
->>>>>>> master
 
 - Image support.
 
