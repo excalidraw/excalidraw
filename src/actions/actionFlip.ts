@@ -1,6 +1,6 @@
 import { register } from "./register";
 import { getSelectedElements } from "../scene";
-import { getElementMap, getNonDeletedElements } from "../element";
+import { getNonDeletedElements } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { normalizeAngle, resizeSingleElement } from "../element/resizeElements";
@@ -9,6 +9,7 @@ import { getTransformHandles } from "../element/transformHandles";
 import { isFreeDrawElement, isLinearElement } from "../element/typeChecks";
 import { updateBoundElements } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { arrayToMap } from "../utils";
 
 const enableActionFlipHorizontal = (
   elements: readonly ExcalidrawElement[],
@@ -83,9 +84,11 @@ const flipSelectedElements = (
     flipDirection,
   );
 
-  const updatedElementsMap = getElementMap(updatedElements);
+  const updatedElementsMap = arrayToMap(updatedElements);
 
-  return elements.map((element) => updatedElementsMap[element.id] || element);
+  return elements.map(
+    (element) => updatedElementsMap.get(element.id) || element,
+  );
 };
 
 const flipElements = (

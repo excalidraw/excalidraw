@@ -4,13 +4,13 @@ import {
 } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { distributeElements, Distribution } from "../disitrubte";
-import { getElementMap, getNonDeletedElements } from "../element";
+import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { CODES } from "../keys";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { AppState } from "../types";
-import { getShortcutKey } from "../utils";
+import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 
 const enableActionGroup = (
@@ -30,9 +30,11 @@ const distributeSelectedElements = (
 
   const updatedElements = distributeElements(selectedElements, distribution);
 
-  const updatedElementsMap = getElementMap(updatedElements);
+  const updatedElementsMap = arrayToMap(updatedElements);
 
-  return elements.map((element) => updatedElementsMap[element.id] || element);
+  return elements.map(
+    (element) => updatedElementsMap.get(element.id) || element,
+  );
 };
 
 export const distributeHorizontally = register({
