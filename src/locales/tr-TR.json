@@ -100,7 +100,9 @@
     "share": "Paylaş",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": "Temayı etkinleştir/devre dışı bırak"
+    "toggleTheme": "Temayı etkinleştir/devre dışı bırak",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -135,7 +137,11 @@
     "zenMode": "Zen modu",
     "exitZenMode": "Zen modundan çık",
     "cancel": "İptal",
-    "clear": "Temizle"
+    "clear": "Temizle",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
     "invalidSceneUrl": "Verilen URL'den çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
     "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Noktaları düzenlemek için çift-tıklayın veya Enter'a basın",
     "lineEditor_pointSelected": "Noktayı silmek için Delete'e, kopyalamak için CtrlVeyaCmd+D'ye, veya hareket ettirmek için sürükleyin",
     "lineEditor_nothingSelected": "Kaldırmak veya oynatmak için bir nokta seç, veya yeni noktalar eklemek için Alt'a basılı tut",
-    "placeImage": ""
+    "placeImage": "",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Tuvali temizle"
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez.",
     "link": "Excalidraw'da uçtan uca şifreleme hakkında blog yazısı"
@@ -289,6 +345,7 @@
     "width": "Genişlik"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "Stiller kopyalandı.",
     "copyToClipboard": "Panoya kopyalandı.",
     "copyToClipboardAsPng": "{{exportSelection}} panoya PNG olarak\n({{exportColorScheme}}) kopyalandı",

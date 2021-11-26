@@ -100,7 +100,9 @@
     "share": "Dela",
     "showStroke": "Visa färgväljare för linjefärg",
     "showBackground": "Visa färgväljare för bakgrundsfärg",
-    "toggleTheme": "Växla tema"
+    "toggleTheme": "Växla tema",
+    "personalLib": "Personligt bibliotek",
+    "excalidrawLib": "Excalidraw bibliotek"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -135,7 +137,11 @@
     "zenMode": "Zen-läge",
     "exitZenMode": "Gå ur zen-läge",
     "cancel": "Avbryt",
-    "clear": "Rensa"
+    "clear": "Rensa",
+    "remove": "Ta bort",
+    "publishLibrary": "Publicera",
+    "submit": "Skicka",
+    "confirm": "Bekräfta"
   },
   "alerts": {
     "clearReset": "Detta rensar hela canvasen. Är du säker?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil",
     "invalidSceneUrl": "Det gick inte att importera skiss från den angivna webbadressen. Antingen har den fel format, eller så innehåller den ingen giltig Excalidraw JSON data.",
     "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?",
+    "removeItemsFromsLibrary": "Ta bort {{count}} objekt från biblioteket?",
     "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Dubbelklicka eller tryck på Enter för att redigera punkter",
     "lineEditor_pointSelected": "Tryck på Ta bort för att ta bort punkt, Ctrl + D eller Cmd + D för att duplicera, eller dra för att flytta",
     "lineEditor_nothingSelected": "Välj en punkt att flytta eller ta bort, eller håll ned ALT och klicka för att lägga till nya punkter",
-    "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt"
+    "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt",
+    "publishLibrary": "Publicera ditt eget bibliotek"
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
@@ -267,7 +275,55 @@
     "zoomToSelection": "Zooma till markering"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Rensa canvas"
+  },
+  "publishDialog": {
+    "title": "Publicera bibliotek",
+    "itemName": "Objektnamn",
+    "authorName": "Upphovsmannens namn",
+    "githubUsername": "GitHub-användarnamn",
+    "twitterUsername": "Twitter-användarnamn",
+    "libraryName": "Biblioteksnamn",
+    "libraryDesc": "Biblioteksbeskrivning",
+    "website": "Webbplats",
+    "placeholder": {
+      "authorName": "Ditt namn eller användarnamn",
+      "libraryName": "Namn på ditt bibliotek",
+      "libraryDesc": "Beskrivning av ditt bibliotek för att hjälpa människor att förstå dess användning",
+      "githubHandle": "Github-användarnamn (valfritt), så att du kan redigera biblioteket när du har skickat in det för granskning",
+      "twitterHandle": "Twitter-användarnamn (valfritt), så vi vet vem att kreditera när du marknadsför på Twitter",
+      "website": "Länk till din personliga webbplats eller någon annan (valfritt)"
+    },
+    "errors": {
+      "required": "Obligatoriskt",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "Skicka ditt bibliotek för att inkluderas i ",
+      "link": "det offentliga bibliotekets arkiv",
+      "post": "för andra människor att använda i sina skisser."
+    },
+    "noteGuidelines": {
+      "pre": "Biblioteket måste godkännas manuellt först. Vänligen läs ",
+      "link": "riktlinjerna",
+      "post": " innan du skickar in. Du behöver ett GitHub-konto för att kommunicera och göra ändringar om så önskas, men det krävs inte."
+    },
+    "noteLicense": {
+      "pre": "Genom att skicka in godkänner du att biblioteket kommer att publiceras under ",
+      "link": "MIT-licens, ",
+      "post": "vilket kort sagt betyder att vem som helst kan använda det utan restriktioner."
+    },
+    "noteItems": "Varje objekt måste ha sitt eget namn så att det är filtrerbart. Följande objekt kommer att inkluderas:",
+    "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång"
+  },
+  "publishSuccessDialog": {
+    "title": "Bibliotek inskickat",
+    "content": "Tack {{authorName}}. Ditt bibliotek har skickats för granskning. Du kan följa status",
+    "link": "här"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Återställ bibliotek",
+    "removeItemsFromLib": "Ta bort markerade objekt från biblioteket"
   },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",
@@ -289,6 +345,7 @@
     "width": "Bredd"
   },
   "toast": {
+    "addedToLibrary": "Tillagd i biblioteket",
     "copyStyles": "Kopierade stilar.",
     "copyToClipboard": "Kopierad till urklipp.",
     "copyToClipboardAsPng": "Kopierade {{exportSelection}} till urklipp som PNG\n({{exportColorScheme}})",

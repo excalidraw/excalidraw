@@ -100,7 +100,9 @@
     "share": "Del",
     "showStroke": "Vis fargevelger for kantfarge",
     "showBackground": "Vis fargevelger for bakgrunnsfarge",
-    "toggleTheme": "Veksle tema"
+    "toggleTheme": "Veksle tema",
+    "personalLib": "Personlig bibliotek",
+    "excalidrawLib": "Excalidraw-bibliotek"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -135,7 +137,11 @@
     "zenMode": "Zen-modus",
     "exitZenMode": "Avslutt zen-modus",
     "cancel": "Avbryt",
-    "clear": "Tøm"
+    "clear": "Tøm",
+    "remove": "Fjern",
+    "publishLibrary": "Publiser",
+    "submit": "Send inn",
+    "confirm": "Bekreft"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen",
     "invalidSceneUrl": "Kunne ikke importere scene fra den oppgitte URL-en. Den er enten ødelagt, eller inneholder ikke gyldig Excalidraw JSON-data.",
     "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?",
+    "removeItemsFromsLibrary": "Slett {{count}} element(er) fra biblioteket?",
     "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkter",
     "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, Ctrl / Cmd+D for å duplisere, eller dra for å flytte",
     "lineEditor_nothingSelected": "Velg et punkt å flytte eller fjerne, eller hold Alt og klikk for å legge til nye punkter",
-    "placeImage": "Klikk for å plassere bildet, eller klikk og dra for å angi størrelsen manuelt"
+    "placeImage": "Klikk for å plassere bildet, eller klikk og dra for å angi størrelsen manuelt",
+    "publishLibrary": "Publiser ditt eget bibliotek"
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Tøm lerret"
   },
+  "publishDialog": {
+    "title": "Publiser bibliotek",
+    "itemName": "Elementnavn",
+    "authorName": "Forfatterens navn",
+    "githubUsername": "GitHub-brukernavnet",
+    "twitterUsername": "Twitter-brukernavn",
+    "libraryName": "Biblioteknavn",
+    "libraryDesc": "Beskrivelse av bibliotek",
+    "website": "Nettsted",
+    "placeholder": {
+      "authorName": "Ditt navn eller brukernavn",
+      "libraryName": "Navnet på biblioteket ditt",
+      "libraryDesc": "Beskrivelse av biblioteket ditt for å hjelpe folk med å forstå bruken",
+      "githubHandle": "Github-brukernavn (valgfritt), slik at du kan redigere biblioteket når du har sendt inn for gjennomgang",
+      "twitterHandle": "Twitter-brukernavn (valgfritt), slik at vi vet hvem vi skal kreditere når promotert på Twitter",
+      "website": "Lenke til din personlige nettside eller et annet sted (valgfritt)"
+    },
+    "errors": {
+      "required": "Påkrevd",
+      "website": "Angi en gyldig nettadresse"
+    },
+    "noteDescription": {
+      "pre": "Send inn biblioteket ditt som skal inkluderes i ",
+      "link": "kildekode for offentlig bibliotek",
+      "post": "for andre å bruke dem i tegninger."
+    },
+    "noteGuidelines": {
+      "pre": "Biblioteket må godkjennes manuelt først. Les ",
+      "link": "retningslinjene",
+      "post": " før innsending. Du vil trenge en GitHub-konto for å kommunisere og gjøre endringer hvis ønsket, men det er ikke påkrevd."
+    },
+    "noteLicense": {
+      "pre": "Ved å sende inn godtar du at biblioteket blir publisert under ",
+      "link": "MIT-lisens, ",
+      "post": "som kortfattet betyr at andre kan bruke dem uten begrensninger."
+    },
+    "noteItems": "Hvert bibliotek må ha sitt eget navn, så det er filtrerbart. Følgende bibliotekselementer vil bli inkludert:",
+    "atleastOneLibItem": "Vennligst velg minst ett bibliotek for å komme i gang"
+  },
+  "publishSuccessDialog": {
+    "title": "Bibliotek innsendt",
+    "content": "Takk {{authorName}}. Ditt bibliotek har blitt sendt inn for gjennomgang. Du kan spore statusen",
+    "link": "her"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Nullstill bibliotek",
+    "removeItemsFromLib": "Fjern valgte elementer fra bibliotek"
+  },
   "encrypted": {
     "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem.",
     "link": "Blogginnlegg om ende-til-ende-kryptering i Excalidraw"
@@ -289,6 +345,7 @@
     "width": "Bredde"
   },
   "toast": {
+    "addedToLibrary": "Lagt til i biblioteket",
     "copyStyles": "Kopierte stiler.",
     "copyToClipboard": "Kopiert til utklippstavlen.",
     "copyToClipboardAsPng": "Kopierte {{exportSelection}} til utklippstavlen som PNG\n({{exportColorScheme}})",

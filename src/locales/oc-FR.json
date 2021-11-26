@@ -35,7 +35,7 @@
     "arrowhead_arrow": "Sageta",
     "arrowhead_bar": "Barra",
     "arrowhead_dot": "Ponch",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "Triangle",
     "fontSize": "Talha poliça",
     "fontFamily": "Familha de poliça",
     "onlySelected": "Seleccion sonque",
@@ -100,7 +100,9 @@
     "share": "Partejar",
     "showStroke": "Mostrar lo selector de color de contorn",
     "showBackground": "Mostrar lo selector de color de fons",
-    "toggleTheme": "Alternar tèma"
+    "toggleTheme": "Alternar tèma",
+    "personalLib": "Bibliotèca personala",
+    "excalidrawLib": "Bibliotèca Excalidraw"
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
@@ -135,7 +137,11 @@
     "zenMode": "Mòde escur",
     "exitZenMode": "Sortir del mòde zen",
     "cancel": "Anullar",
-    "clear": "Escafar"
+    "clear": "Escafar",
+    "remove": "Tirar",
+    "publishLibrary": "Publicar",
+    "submit": "Enviar",
+    "confirm": "Confirmar"
   },
   "alerts": {
     "clearReset": "Aquò suprimirà lo canabàs complèt. O volètz vertadièrament ?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Restauracion impossibla de la scèna a partir del fichièr imatge",
     "invalidSceneUrl": "Importacion impossibla de la scèna a partir de l’URL provesida. Es siá mal formatada o siá conten pas cap de donada JSON Excalidraw valida.",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. O volètz vertadièrament ?",
+    "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la bibliotèca ?",
     "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada."
   },
   "errors": {
@@ -164,7 +171,7 @@
     "imageInsertError": "Insercion d’imatge impossibla. Tornatz ensajar mai tard...",
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG invalid."
   },
   "toolBar": {
     "selection": "Seleccion",
@@ -185,7 +192,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Per desplaçar los canabasses, tenètz la rodeta de la mirga o la barra d’espaci pendent lo desplaçament",
     "linearElement": "Clicatz per començar mantun punt, lisatz per una sola linha",
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
@@ -199,7 +206,8 @@
     "lineEditor_info": "Doble-clicatz o quichatz Entrada per modificar los punts",
     "lineEditor_pointSelected": "Quichatz Suprimir per suprimir lo punt, Ctrl o Cmd+D per lo duplicar, o fasètz lisar per lo desplaçar",
     "lineEditor_nothingSelected": "Seleccionatz un punt de desplaçar o suprimir, o mantenètz Alt e clicatz per apondre punts novèls",
-    "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament"
+    "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament",
+    "publishLibrary": "Publicar vòstra pròpria bibliotèca"
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
@@ -267,7 +275,55 @@
     "zoomToSelection": "Zoomar la seleccion"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Escafar canabàs"
+  },
+  "publishDialog": {
+    "title": "Publicar la bibliotèca",
+    "itemName": "Nom de l’element",
+    "authorName": "Nom de l’autor",
+    "githubUsername": "Nom d’utilizaire GitHub",
+    "twitterUsername": "Nom d’utilizaire Twitter",
+    "libraryName": "Nom de la bibliotèca",
+    "libraryDesc": "Descripcion de la bibliotèca",
+    "website": "Site web",
+    "placeholder": {
+      "authorName": "Vòstre nom o nom d’utilizaire",
+      "libraryName": "Nom de vòstra bibliotèca",
+      "libraryDesc": "Descripcion de vòstra bibliotèca per ajudar lo monde a comprendre son utilizacion",
+      "githubHandle": "GitHub handle(opcional), per poder modificar la bibliotèca un còp enviada per repassa",
+      "twitterHandle": "Nom d’utilizaire Twitter (opcional), per saber qual mercejar quand ne parlam sus Twitter",
+      "website": "Ligam cap a vòstre site web personal o endacòm mai (opcional)"
+    },
+    "errors": {
+      "required": "Requerit",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "Enviatz vòstra bibliotèca per èsser compresa al ",
+      "link": "repertòri public de bibliotèca",
+      "post": "per que los autres l’utilizen dins lor dessenhs."
+    },
+    "noteGuidelines": {
+      "pre": "Qualqu’un deu aprovar la bibliotèca manualament per començar. Volgatz legir las ",
+      "link": "linhas directrises",
+      "post": " abans de sometre. Vos farà mestièr un compte GitHub per comunicar e realizar de modificacions se demandadas, mas es pas complètament obligatòri."
+    },
+    "noteLicense": {
+      "pre": "En sometent, acceptatz que la bibliotèca siá publicada sota la ",
+      "link": "Licéncia MIT, ",
+      "post": "que significa en brèu que qual que siá pòt l’utilizar sens cap de restriccion."
+    },
+    "noteItems": "Cada element de bibliotèca deu aver un nom pròpri per èsser filtrable. Los elements de bibliotèca seguentas seràn incluses :",
+    "atleastOneLibItem": "Volgatz seleccionar almens un element de bibliotèca per començar"
+  },
+  "publishSuccessDialog": {
+    "title": "Bibliotèca somesa",
+    "content": "Mercés {{authorName}}. Vòstre bibliotèca es estada somesa per repassa. Podètz seguir l’avançament",
+    "link": "aquí"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Reïnicializar la bibliotèca",
+    "removeItemsFromLib": "Tirar los elements seleccionats de la bibliotèca"
   },
   "encrypted": {
     "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai.",
@@ -289,6 +345,7 @@
     "width": "Largor"
   },
   "toast": {
+    "addedToLibrary": "Apondut a la bibliotèca",
     "copyStyles": "Estiles copiats.",
     "copyToClipboard": "Copiats al quichapapièrs.",
     "copyToClipboardAsPng": "{{exportSelection}} copiat coma PNG ({{exportColorScheme}})",

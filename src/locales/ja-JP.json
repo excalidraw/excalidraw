@@ -100,7 +100,9 @@
     "share": "共有",
     "showStroke": "ストロークカラーピッカーを表示",
     "showBackground": "背景色ピッカーを表示",
-    "toggleTheme": "テーマの切り替え"
+    "toggleTheme": "テーマの切り替え",
+    "personalLib": "個人ライブラリ",
+    "excalidrawLib": "Excalidrawライブラリ"
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -135,7 +137,11 @@
     "zenMode": "Zenモード",
     "exitZenMode": "集中モードをやめる",
     "cancel": "キャンセル",
-    "clear": "消去"
+    "clear": "消去",
+    "remove": "削除",
+    "publishLibrary": "公開",
+    "submit": "送信",
+    "confirm": "確認"
   },
   "alerts": {
     "clearReset": "この操作によってキャンバス全体が消えます。よろしいですか？",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "このイメージファイルからシーンを復元できませんでした",
     "invalidSceneUrl": "指定された URL からシーンをインポートできませんでした。不正な形式であるか、有効な Excalidraw JSON データが含まれていません。",
     "resetLibrary": "ライブラリを消去します。本当によろしいですか？",
+    "removeItemsFromsLibrary": "{{count}} 個のアイテムをライブラリから削除しますか？",
     "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。"
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "ポイントを編集するには、ダブルクリックまたはEnterキーを押します",
     "lineEditor_pointSelected": "削除ボタンを押して点を削除します。Ctrl+D または Cmd+D で複製します。またはドラッグして移動します",
     "lineEditor_nothingSelected": "移動または削除する点を選択するか、Altキーを押しながらクリックして新しい点を追加します",
-    "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します"
+    "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
+    "publishLibrary": "自分のライブラリを公開"
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "キャンバスを消去"
   },
+  "publishDialog": {
+    "title": "ライブラリを公開",
+    "itemName": "アイテム名",
+    "authorName": "作成者名",
+    "githubUsername": "GitHub ユーザ名",
+    "twitterUsername": "Twitter ユーザ名",
+    "libraryName": "ライブラリ名",
+    "libraryDesc": "ライブラリの説明",
+    "website": "Webサイト",
+    "placeholder": {
+      "authorName": "お名前またはユーザー名",
+      "libraryName": "あなたのライブラリ名",
+      "libraryDesc": "ライブラリの使い方を理解するための説明",
+      "githubHandle": "GitHubハンドル(任意)。一度レビューのために送信されると、ライブラリを編集できます",
+      "twitterHandle": "Twitterのユーザー名 (任意)。Twitterでプロモーションする際にクレジットする人を知っておくためのものです",
+      "website": "個人のウェブサイトまたは他のサイトへのリンク (オプション)"
+    },
+    "errors": {
+      "required": "必須項目",
+      "website": "有効な URL を入力してください"
+    },
+    "noteDescription": {
+      "pre": "以下に含めるライブラリを提出してください ",
+      "link": "公開ライブラリのリポジトリ",
+      "post": "他の人が作図に使えるようにするためです"
+    },
+    "noteGuidelines": {
+      "pre": "最初にライブラリを手動で承認する必要があります。次をお読みください ",
+      "link": "ガイドライン",
+      "post": " 送信する前に、GitHubアカウントが必要になりますが、必須ではありません。"
+    },
+    "noteLicense": {
+      "pre": "提出することにより、ライブラリが次の下で公開されることに同意します： ",
+      "link": "MIT ライセンス",
+      "post": "つまり誰でも制限なく使えるということです"
+    },
+    "noteItems": "",
+    "atleastOneLibItem": "開始するには少なくとも1つのライブラリ項目を選択してください"
+  },
+  "publishSuccessDialog": {
+    "title": "ライブラリを送信しました",
+    "content": "{{authorName}} さん、ありがとうございます。あなたのライブラリはレビューのために提出されました。状況を追跡できます。",
+    "link": "こちら"
+  },
+  "confirmDialog": {
+    "resetLibrary": "ライブラリをリセット",
+    "removeItemsFromLib": "選択したアイテムをライブラリから削除"
+  },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。",
     "link": "Excalidrawのエンドツーエンド暗号化に関するブログ記事"
@@ -289,6 +345,7 @@
     "width": "幅"
   },
   "toast": {
+    "addedToLibrary": "ライブラリに追加しました",
     "copyStyles": "スタイルをコピーしました。",
     "copyToClipboard": "クリップボードにコピー",
     "copyToClipboardAsPng": "{{exportSelection}} を PNG 形式でクリップボードにコピーしました\n({{exportColorScheme}})",
