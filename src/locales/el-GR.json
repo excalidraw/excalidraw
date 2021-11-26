@@ -100,7 +100,9 @@
     "share": "Κοινοποίηση",
     "showStroke": "Εμφάνιση επιλογέα χρωμάτων πινελιάς",
     "showBackground": "Εμφάνιση επιλογέα χρώματος φόντου",
-    "toggleTheme": "Εναλλαγή θέματος"
+    "toggleTheme": "Εναλλαγή θέματος",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -135,7 +137,11 @@
     "zenMode": "Λειτουργία Zεν",
     "exitZenMode": "Έξοδος από την λειτουργία Zen",
     "cancel": "Ακύρωση",
-    "clear": "Καθαρισμός"
+    "clear": "Καθαρισμός",
+    "remove": "Κατάργηση",
+    "publishLibrary": "Δημοσίευση",
+    "submit": "Υποβολή",
+    "confirm": "Επιβεβαίωση"
   },
   "alerts": {
     "clearReset": "Αυτό θα σβήσει ολόκληρο τον καμβά. Είσαι σίγουρος;",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Η σκηνή δεν ήταν δυνατό να αποκατασταθεί από αυτό το αρχείο εικόνας",
     "invalidSceneUrl": "",
     "resetLibrary": "Αυτό θα καθαρίσει τη βιβλιοθήκη σας. Είστε σίγουροι;",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "Το κλειδί κρυπτογράφησης πρέπει να είναι 22 χαρακτήρες. Η ζωντανή συνεργασία είναι απενεργοποιημένη."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Διπλό-κλικ ή πιέστε Enter για να επεξεργαστείτε τα σημεία",
     "lineEditor_pointSelected": "Πιέστε Διαγραφή για να αφαιρέσετε το σημείου, CtrlOrCmd+D για να το αντιγράψετε ή σύρτε το για να το μετακινήσετε",
     "lineEditor_nothingSelected": "Επιλέξτε ένα σημείο για μετακίνηση ή αφαίρεση, ή κρατήστε παρατεταμένα το Alt και κάντε κλικ για να προσθέσετε νέα σημεία",
-    "placeImage": ""
+    "placeImage": "",
+    "publishLibrary": "Δημοσιεύστε τη δική σας βιβλιοθήκη"
   },
   "canvasError": {
     "cannotShowPreview": "Αδυναμία εμφάνισης προεπισκόπησης",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Καθαρισμός καμβά"
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "Όνομα δημιουργού",
+    "githubUsername": "GitHub username",
+    "twitterUsername": "Twitter username",
+    "libraryName": "Όνομα βιβλιοθήκης",
+    "libraryDesc": "",
+    "website": "Ιστοσελίδα",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": "Εισάγετε μια έγκυρη διεύθυνση URL"
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα είναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw.",
     "link": "Blog post στην κρυπτογράφηση end-to-end στο Excalidraw"
@@ -289,6 +345,7 @@
     "width": "Πλάτος"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "Αντιγράφηκαν στυλ.",
     "copyToClipboard": "Αντιγράφηκε στο πρόχειρο.",
     "copyToClipboardAsPng": "Αντιγράφηκε {{exportSelection}} στο πρόχειρο ως PNG\n({{exportColorScheme}})",

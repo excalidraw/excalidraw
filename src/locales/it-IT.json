@@ -100,7 +100,9 @@
     "share": "Condividi",
     "showStroke": "Mostra selettore colore del tratto",
     "showBackground": "Mostra selettore colore di sfondo",
-    "toggleTheme": "Cambia tema"
+    "toggleTheme": "Cambia tema",
+    "personalLib": "Libreria Personale",
+    "excalidrawLib": "Libreria di Excalidraw"
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -135,7 +137,11 @@
     "zenMode": "Modalità Zen",
     "exitZenMode": "Uscire dalla modalità zen",
     "cancel": "Annulla",
-    "clear": "Cancella"
+    "clear": "Cancella",
+    "remove": "Rimuovi",
+    "publishLibrary": "Pubblica",
+    "submit": "Invia",
+    "confirm": "Conferma"
   },
   "alerts": {
     "clearReset": "Questa azione cancellerà l'intera tela. Sei sicuro?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine",
     "invalidSceneUrl": "Impossibile importare la scena dall'URL fornito. Potrebbe essere malformato o non contenere dati JSON Excalidraw validi.",
     "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
+    "removeItemsFromsLibrary": "Eliminare {{count}} elementi dalla libreria?",
     "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
     "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
     "lineEditor_nothingSelected": "Seleziona un punto per spostare o rimuovere, oppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
-    "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente"
+    "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente",
+    "publishLibrary": "Pubblica la tua libreria"
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Svuota la tela"
   },
+  "publishDialog": {
+    "title": "Pubblica la libreria",
+    "itemName": "Nome dell'elemento",
+    "authorName": "Nome dell'autore",
+    "githubUsername": "Nome utente di GitHub",
+    "twitterUsername": "Nome utente di Twitter",
+    "libraryName": "Nome della libreria",
+    "libraryDesc": "Descrizione della libreria",
+    "website": "Sito Web",
+    "placeholder": {
+      "authorName": "Il tuo nome o nome utente",
+      "libraryName": "Nome della tua libreria",
+      "libraryDesc": "Descrizione della tua libreria per aiutare le persone a comprenderne lo scopo",
+      "githubHandle": "Handle di GitHub (opzionale), così che tu possa modificare la libreria una volta inviata per la revisione",
+      "twitterHandle": "Nome utente di Twitter (opzionale), così che sappiamo chi accreditare promuovendo su Twitter",
+      "website": "Link al tuo sito web personale o altro (opzionale)"
+    },
+    "errors": {
+      "required": "Obbligatorio",
+      "website": "Inserisci un URL valido"
+    },
+    "noteDescription": {
+      "pre": "Invia la tua libreria da includere nella ",
+      "link": "repository della libreria pubblica",
+      "post": "perché sia usata da altri nei loro disegni."
+    },
+    "noteGuidelines": {
+      "pre": "La libreria dev'esser prima approvata manualmente. Sei pregato di leggere le ",
+      "link": "linee guida",
+      "post": " prima di inviarla. Necessiterai di un profilo di GitHub per comunicare ed effettuare modifiche se richiesto, ma non è strettamente necessario."
+    },
+    "noteLicense": {
+      "pre": "Inviando, acconsenti che la libreria sarà pubblicata sotto la ",
+      "link": "Licenza MIT, ",
+      "post": "che in breve significa che chiunque possa usarla senza restrizioni."
+    },
+    "noteItems": "Ogni elemento della libreria deve avere il proprio nome, così che sia filtrabile. Gli elementi della seguente libreria saranno inclusi:",
+    "atleastOneLibItem": "Sei pregato di selezionare almeno un elemento della libreria per iniziare"
+  },
+  "publishSuccessDialog": {
+    "title": "Libreria inviata",
+    "content": "Grazie {{authorName}}. La tua libreria è stata inviata per la revisione. Puoi monitorarne lo stato",
+    "link": "qui"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Ripristina la libreria",
+    "removeItemsFromLib": "Rimuovi gli elementi selezionati dalla libreria"
+  },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.",
     "link": "Articolo del blog sulla crittografia end-to-end di Excalidraw"
@@ -289,6 +345,7 @@
     "width": "Larghezza"
   },
   "toast": {
+    "addedToLibrary": "Aggiunto alla libreria",
     "copyStyles": "Stili copiati.",
     "copyToClipboard": "Copiato negli appunti.",
     "copyToClipboardAsPng": "{{exportSelection}} copiato negli appunti come PNG\n({{exportColorScheme}})",
