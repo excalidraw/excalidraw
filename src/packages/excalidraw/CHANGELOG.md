@@ -13,11 +13,19 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Features
+
 - Replace `getElementMap` with [`arrayToMap`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#arrayToMap).
 
   #### BREAKING CHANGE
 
   `getElementMap` util method is now removed.
+
+- Changes to [`exportToCanvas`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToCanvas) util function:
+
+  - Add `maxWidthOrHeight?: number` attribute.
+  - `scale` returned from `getDimensions()` is now optional (default to `1`).
+>>>>>>> master
 
 - Image support.
 
