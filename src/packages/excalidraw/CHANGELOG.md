@@ -13,6 +13,13 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Features
+
+- Changes to [`exportToCanvas`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToCanvas) util function:
+
+  - Add `maxWidthOrHeight?: number` attribute.
+  - `scale` returned from `getDimensions()` is now optional (default to `1`).
+
 - Image support.
 
   NOTE: the unreleased API is highly unstable and may change significantly before the next stable release. As such it's largely undocumented at this point. You are encouraged to read through the [PR](https://github.com/excalidraw/excalidraw/pull/4011) description if you want to know more about the internals.
