@@ -319,10 +319,10 @@
   "publishSuccessDialog": {
     "title": "",
     "content": "",
-    "link": ""
+    "link": "εδώ"
   },
   "confirmDialog": {
-    "resetLibrary": "",
+    "resetLibrary": "Καθαρισμός βιβλιοθήκης",
     "removeItemsFromLib": ""
   },
   "encrypted": {
@@ -345,7 +345,7 @@
     "width": "Πλάτος"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Προστέθηκε στη βιβλιοθήκη",
     "copyStyles": "Αντιγράφηκαν στυλ.",
     "copyToClipboard": "Αντιγράφηκε στο πρόχειρο.",
     "copyToClipboardAsPng": "Αντιγράφηκε {{exportSelection}} στο πρόχειρο ως PNG\n({{exportColorScheme}})",
