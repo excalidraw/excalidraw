@@ -305,7 +305,7 @@
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "οδηγίες",
       "post": ""
     },
     "noteLicense": {
@@ -323,7 +323,7 @@
   },
   "confirmDialog": {
     "resetLibrary": "Καθαρισμός βιβλιοθήκης",
-    "removeItemsFromLib": ""
+    "removeItemsFromLib": "Αφαίρεση επιλεγμένων αντικειμένων από τη βιβλιοθήκη"
   },
   "encrypted": {
     "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα είναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw.",
