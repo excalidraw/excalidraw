@@ -96,10 +96,10 @@
     "flipHorizontal": "Irauli horizontalki",
     "flipVertical": "Irauli bertikalki",
     "viewMode": "Ikuspegia",
-    "toggleExportColorScheme": "",
-    "share": "",
-    "showStroke": "",
-    "showBackground": "",
+    "toggleExportColorScheme": "Aldatu esportatzeko kolorearen eszena",
+    "share": "Partekatu",
+    "showStroke": "Erakutsi marraren kolore-hautatzailea",
+    "showBackground": "Erakutsi atzeko planoaren kolore-hautatzailea",
     "toggleTheme": "Aldatu gaia",
     "personalLib": "Liburutegi pertsonala",
     "excalidrawLib": "Excalidraw liburutegia"
@@ -278,43 +278,43 @@
     "title": "Garbitu oihala"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "Argitaratu liburutegia",
+    "itemName": "Elementuaren izena",
+    "authorName": "Egilearen izena",
+    "githubUsername": "GitHub-eko erabiltzaile-izena",
+    "twitterUsername": "Twitter-eko erabiltzaile-izena",
+    "libraryName": "Liburutegiaren izena",
+    "libraryDesc": "Liburutegiaren deskripzioa",
+    "website": "Webgunea",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "authorName": "Zure izena edo erabiltzaile-izena",
+      "libraryName": "Zure liburutegiaren izena",
+      "libraryDesc": "Zure liburutegiaren deskripzioa laguntzeko jendeari ulertzen haren erabilpena",
+      "githubHandle": "GitHub heldulekua (aukerakoa), liburutegia editatu ahal izateko berrikustera bidalitakoan",
+      "twitterHandle": "Twitter-eko erabiltzaile-izena (aukerakoa), badakigu nori kreditatu behar dugun Twitter bidez sustatzeko",
+      "website": "Estekatu zure webgunera edo nahi duzun tokira (aukerakoa)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Beharrezkoa",
+      "website": "Sartu baliozko URL bat"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Bidali zure liburutegira sartu ahal izateko ",
+      "link": "zure liburutegiko biltegian",
+      "post": "beste jendeak bere marrazkietan erabili ahal izateko."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Liburutegia eskuz onartu behar da. Irakurri ",
+      "link": "gidalerroak",
+      "post": " bidali aurretik. GitHub kontu bat edukitzea komeni da komunikatzeko eta aldaketak egin ahal izateko, baina ez da guztiz beharrezkoa."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Bidaltzen baduzu, onartzen duzu liburutegia ",
+      "link": "MIT lizentziarekin argitaratuko dela, ",
+      "post": "zeinak, laburbilduz, esan nahi du edozeinek erabiltzen ahal duela murrizketarik gabe."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Liburutegiko elementu bakoitzak bere izena eduki behar du iragazi ahal izateko. Liburutegiko hurrengo elementuak barne daude:",
+    "atleastOneLibItem": "Hautatu gutxienez liburutegiko elementu bat gutxienez hasi ahal izateko"
   },
   "publishSuccessDialog": {
     "title": "",
