@@ -224,17 +224,17 @@
     "trackedToSentry_post": " gure sistemak behatu du.",
     "openIssueMessage_pre": "Oso kontuz ibili gara zure eszenaren informazioa errorean ez sartzeko. Zure eszena pribatua ez bada, kontuan hartu gure ",
     "openIssueMessage_button": "erroreen jarraipena egitea.",
-    "openIssueMessage_post": "",
-    "sceneContent": ""
+    "openIssueMessage_post": " Sartu beheko informazioa kopiatu eta itsatsi bidez GitHub issue-n.",
+    "sceneContent": "Eszenaren edukia:"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
-    "desc_inProgressIntro": "",
-    "desc_shareLink": "",
-    "desc_exitSession": "",
+    "desc_intro": "Jendea zure uneko eszenara gonbida dezakezu zurekin elkarlanean aritzeko.",
+    "desc_privacy": "Ez kezkatu, saioak muturretik muturrerako enkriptatzea erabiltzen du, beraz, marrazten duzuna pribatua izango da. Gure zerbitzariak ere ezingo du ikusi zer egiten duzun.",
+    "button_startSession": "Hasi saioa",
+    "button_stopSession": "Itxi saioa",
+    "desc_inProgressIntro": "Zuzeneko lankidetza saioa abian da.",
+    "desc_shareLink": "Partekatu esteka hau elkarlanean aritu nahi duzun edonorekin:",
+    "desc_exitSession": "Saioa ixteak aretotik deskonektatuko zaitu, baina eszenarekin lanean jarraitu ahal izango duzu lokalean. Kontuan izan honek ez diela beste pertsonei eragingo, eta euren bertsioan elkarlanean aritu ahal izango dira.",
     "shareTitle": ""
   },
   "errorDialog": {
