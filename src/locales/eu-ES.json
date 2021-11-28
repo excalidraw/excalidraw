@@ -317,37 +317,37 @@
     "atleastOneLibItem": "Hautatu gutxienez liburutegiko elementu bat gutxienez hasi ahal izateko"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Liburutegia bidali da",
+    "content": "Eskerrik asko {{authorName}}. Zure liburutegia bidali da berrikustera. Jarraitu dezakezu haren egoera",
+    "link": "hemen"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Leheneratu liburutegia",
+    "removeItemsFromLib": "Kendu hautatutako elementuak liburutegitik"
   },
   "encrypted": {
-    "tooltip": "",
-    "link": ""
+    "tooltip": "Zure marrazkiak muturretik muturrera enkriptatu dira, beraz Excalidraw-ren zerbitzariek ezingo dituzte ikusi.",
+    "link": "Excalidraw-ren muturretik muturrerako enkriptatzearen gaineko mezua blogean"
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
-    "total": "",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
-    "width": ""
+    "angle": "Angelua",
+    "element": "Elementua",
+    "elements": "Elementuak",
+    "height": "Altuera",
+    "scene": "Eszena",
+    "selected": "Hautatua",
+    "storage": "Biltegia",
+    "title": "Datuak",
+    "total": "Guztira",
+    "version": "Bertsioa",
+    "versionCopy": "Klikatu kopiatzeko",
+    "versionNotAvailable": "Bertsio ez eskuragarria",
+    "width": "Zabalera"
   },
   "toast": {
-    "addedToLibrary": "",
-    "copyStyles": "",
-    "copyToClipboard": "",
+    "addedToLibrary": "Liburutegira gehitu da",
+    "copyStyles": "Estiloak kopiatu dira.",
+    "copyToClipboard": "Arbelean kopiatu da.",
     "copyToClipboardAsPng": "{{exportSelection}} kopiatu da arbelean PNG gisa\n({{exportColorScheme}})",
     "fileSaved": "Fitxategia gorde da.",
     "fileSavedToFilename": "{filename}-n gorde da",
