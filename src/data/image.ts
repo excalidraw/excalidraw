@@ -1,5 +1,6 @@
 import decodePng from "png-chunks-extract";
 import tEXt from "png-chunk-text";
+import { writePngDpi } from "png-chunk-phys";
 import encodePng from "png-chunks-encode";
 import { stringToBase64, encode, decode, base64ToString } from "./encode";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
@@ -39,25 +40,34 @@ export const getTEXtChunk = async (
 export const encodePngMetadata = async ({
   blob,
   metadata,
+  scale,
 }: {
   blob: Blob;
-  metadata: string;
+  metadata: string | undefined;
+  scale: number | undefined;
 }) => {
   const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
 
-  const metadataChunk = tEXt.encode(
-    MIME_TYPES.excalidraw,
-    JSON.stringify(
-      await encode({
-        text: metadata,
-        compress: true,
-      }),
-    ),
-  );
-  // insert metadata before last chunk (iEND)
-  chunks.splice(-1, 0, metadataChunk);
+  if (metadata) {
+    const metadataChunk = tEXt.encode(
+      MIME_TYPES.excalidraw,
+      JSON.stringify(
+        await encode({
+          text: metadata,
+          compress: true,
+        }),
+      ),
+    );
+    // insert metadata before last chunk (iEND)
+    chunks.splice(-1, 0, metadataChunk);
+  }
 
-  return new Blob([encodePng(chunks)], { type: MIME_TYPES.png });
+  let png = encodePng(chunks);
+  if (scale !== undefined && scale > 1) {
+    png = writePngDpi(png, scale * 72);
+  }
+
+  return new Blob([png], { type: MIME_TYPES.png });
 };
 
 export const decodePngMetadata = async (blob: Blob) => {

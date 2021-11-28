@@ -77,12 +77,15 @@ export const exportCanvas = async (
   tempCanvas.remove();
 
   if (type === "png") {
-    if (appState.exportEmbedScene) {
+    if (appState.exportEmbedScene || appState.exportScale > 1) {
       blob = await (
         await import(/* webpackChunkName: "image" */ "./image")
       ).encodePngMetadata({
         blob,
-        metadata: serializeAsJSON(elements, appState, files, "local"),
+        metadata: appState.exportEmbedScene
+          ? serializeAsJSON(elements, appState, files, "local")
+          : undefined,
+        scale: appState.exportScale,
       });
     }
 
