@@ -3,6 +3,7 @@ const autoprefixer = require("autoprefixer");
 const webpack = require("webpack");
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const { parseEnvVariables } = require("./env");
 
 module.exports = {
   mode: "development",
@@ -91,6 +92,12 @@ module.exports = {
   plugins: [
     ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
     new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
+    new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ }),
+    new webpack.DefinePlugin({
+      "process.env": parseEnvVariables(
+        path.resolve(__dirname, "../../../.env.development"),
+      ),
+    }),
   ],
   externals: {
     react: {

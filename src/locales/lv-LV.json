@@ -43,7 +43,7 @@
     "exportEmbedScene": "Iegult ainu",
     "exportEmbedScene_details": "Ainas dati tiks iekļauti saglabātajā PNG/SVG datnē, lai no tās būtu iespējams ainu atgūt. Tas palielinās datnes izmēru.",
     "addWatermark": "Pievienot \"Radīts ar Excalidraw\"",
-    "handDrawn": "Ar roku zīmēts",
+    "handDrawn": "Rokraksts",
     "normal": "Parasts",
     "code": "Kods",
     "small": "Mazs",
@@ -100,7 +100,9 @@
     "share": "Kopīgot",
     "showStroke": "Rādīt svītras krāsas atlasītāju",
     "showBackground": "Rādīt fona krāsas atlasītāju",
-    "toggleTheme": "Pārslēgt krāsu tēmu"
+    "toggleTheme": "Pārslēgt krāsu tēmu",
+    "personalLib": "Personīgā bibliotēka",
+    "excalidrawLib": "Excalidraw bibliotēka"
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
@@ -135,7 +137,11 @@
     "zenMode": "Zen režīms",
     "exitZenMode": "Pamest Zen režīmu",
     "cancel": "Atcelt",
-    "clear": "Notīrīt"
+    "clear": "Notīrīt",
+    "remove": "Noņemt",
+    "publishLibrary": "Publicēt",
+    "submit": "Iesniegt",
+    "confirm": "Apstiprināt"
   },
   "alerts": {
     "clearReset": "Šī funkcija notīrīs visu tāfeli. Vai turpināt?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Ainu nevarēja atgūt no attēla faila",
     "invalidSceneUrl": "Nevarēja importēt ainu no norādītā URL. Vai nu tas ir nederīgs, vai nesatur derīgus Excalidraw JSON datus.",
     "resetLibrary": "Šī funkcija iztukšos bibliotēku. Vai turpināt?",
+    "removeItemsFromsLibrary": "Vai izņemt {{count}} vienumu(s) no bibliotēkas?",
     "invalidEncryptionKey": "Šifrēšanas atslēgai jābūt 22 simbolus garai. Tiešsaistes sadarbība ir izslēgta."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Dubultklikšķiniet vai spiediet ievades taustiņu, lai rediģētu punktus",
     "lineEditor_pointSelected": "Spiediet dzēšanas taustiņu, lai noņemtu punktu, – CtrlOrCmd+D, lai to kopētu, vai velciet, lai pārvietotu",
     "lineEditor_nothingSelected": "Atlasiet punktu, lai to pārvietotu vai noņemtu; lai pievienotu jaunus punktus, turiet nospiestu Alt taustiņu",
-    "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru"
+    "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru",
+    "publishLibrary": "Publicēt savu bibliotēku"
   },
   "canvasError": {
     "cannotShowPreview": "Nevar rādīt priekšskatījumu",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Notīrīt tāfeli"
   },
+  "publishDialog": {
+    "title": "Publicēt bibliotēku",
+    "itemName": "Vienuma nosaukums",
+    "authorName": "Autora vārds",
+    "githubUsername": "GitHub lietotājvārds",
+    "twitterUsername": "Twitter lietotājvārds",
+    "libraryName": "Bibliotēkas nosaukums",
+    "libraryDesc": "Bibliotēkas apraksts",
+    "website": "Mājaslapa",
+    "placeholder": {
+      "authorName": "Jūsu vārds vai lietotājvārds",
+      "libraryName": "Jūsu bibliotēkas nosaukums",
+      "libraryDesc": "Bibliotēkas apraksts, kas palīdzēs citiem saprast tās pielietojumu",
+      "githubHandle": "GitHub lietotājvārds (neobligāts), lai jūs varētu rediģēt bibliotēku pēc tās iesniegšanas izskatīšanai",
+      "twitterHandle": "Twitter lietotājvārds (neobligāts), lai mēs varētu jūs pieminēt kā autoru, kad reklamēsim bibliotēku platformā Twitter",
+      "website": "Saikne uz jūsu personīgo mājaslapu vai kādu citu lapu (neobligāta)"
+    },
+    "errors": {
+      "required": "Obligāts",
+      "website": "Ievadiet derīgu URL"
+    },
+    "noteDescription": {
+      "pre": "Iesniegt savu bibliotēku iekļaušanai ",
+      "link": "publiskajā bibliotēku datubāzē",
+      "post": ", lai citi to varētu izmantot savos zīmējumos."
+    },
+    "noteGuidelines": {
+      "pre": "Šai bibliotēkai vispirms jātiek manuāli apstiprinātai. Lūdzu, izlasiet ",
+      "link": "norādījumus",
+      "post": " pirms iesniegšanas. Jums vajadzēs GitHub kontu, lai sazinātos un veiktu izmaiņas, ja tādas būs pieprasītas, bet tas nav absolūti nepieciešams."
+    },
+    "noteLicense": {
+      "pre": "Iesniedzot bibliotēku, jūs piekrītat tās publicēšanai saskaņā ar ",
+      "link": "MIT Licenci, ",
+      "post": "kas īsumā nozīmē, ka jebkurš to varēs izmantot bez ierobežojumiem."
+    },
+    "noteItems": "Katram bibliotēkas vienumam jābūt savam nosaukumam, lai to varētu atrast filtrējot. Tiks iekļauti sekojošie bibliotēkas vienumi:",
+    "atleastOneLibItem": "Lūdzu, atlasiet vismaz vienu bibliotēkas vienumu, lai sāktu darbu"
+  },
+  "publishSuccessDialog": {
+    "title": "Bibliotēka iesniegta",
+    "content": "Paldies, {{authorName}}! Jūsu bibliotēka iesniegta izskatīšanai. Jūs varat izsekot iesnieguma statusam",
+    "link": "šeit"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Atiestatīt bibliotēku",
+    "removeItemsFromLib": "Noņemt atlasītos vienumus no bibliotēkas"
+  },
   "encrypted": {
     "tooltip": "Jūsu zīmējumi ir šifrēti no gala līdz galam; līdz ar to Excalidraw serveri tos nekad neredzēs.",
     "link": "Ieraksts par šifrēšanu no gala līdz galam Excalidraw blogā"
@@ -289,6 +345,7 @@
     "width": "Platums"
   },
   "toast": {
+    "addedToLibrary": "Pievienots bibliotēkai",
     "copyStyles": "Nokopēja stilus.",
     "copyToClipboard": "Nokopēja starpliktuvē.",
     "copyToClipboardAsPng": "Nokopēja {{exportSelection}} starpliktuvē kā PNG ({{exportColorScheme}})",

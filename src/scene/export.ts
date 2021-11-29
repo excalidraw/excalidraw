@@ -51,34 +51,23 @@ export const exportToCanvas = async (
     files,
   });
 
-  renderScene(
-    elements,
-    appState,
-    null,
-    scale,
-    rough.canvas(canvas),
-    canvas,
-    {
-      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: -minX + exportPadding,
-      scrollY: -minY + exportPadding,
-      zoom: defaultAppState.zoom,
-      remotePointerViewportCoords: {},
-      remoteSelectedElementIds: {},
-      shouldCacheIgnoreZoom: false,
-      remotePointerUsernames: {},
-      remotePointerUserStates: {},
-      theme: appState.exportWithDarkMode ? "dark" : "light",
-      imageCache,
-    },
-    {
-      renderScrollbars: false,
-      renderSelection: false,
-      renderOptimizations: true,
-      renderGrid: false,
-      isExport: true,
-    },
-  );
+  renderScene(elements, appState, null, scale, rough.canvas(canvas), canvas, {
+    viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+    scrollX: -minX + exportPadding,
+    scrollY: -minY + exportPadding,
+    zoom: defaultAppState.zoom,
+    remotePointerViewportCoords: {},
+    remoteSelectedElementIds: {},
+    shouldCacheIgnoreZoom: false,
+    remotePointerUsernames: {},
+    remotePointerUserStates: {},
+    theme: appState.exportWithDarkMode ? "dark" : "light",
+    imageCache,
+    renderScrollbars: false,
+    renderSelection: false,
+    renderGrid: false,
+    isExporting: true,
+  });
 
   return canvas;
 };
