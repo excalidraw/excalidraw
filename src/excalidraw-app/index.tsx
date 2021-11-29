@@ -383,8 +383,6 @@ const ExcalidrawWrapper = () => {
     initializeScene({ collabAPI }).then((data) => {
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
-      // This will be overridden if it exists in localstorage somehow
-      excalidrawAPI.zoomToFit(undefined, 1, 0.3);
     });
 
     const onHashChange = (event: HashChangeEvent) => {
