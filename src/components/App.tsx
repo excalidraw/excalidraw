@@ -781,15 +781,30 @@ class App extends React.Component<AppProps, AppState> {
         ),
       };
     } else if (initialData?.zoomToFit) {
+      const zoomToFitConfig = initialData.zoomToFit;
+      const maxZoom =
+        typeof zoomToFitConfig === "boolean"
+          ? undefined
+          : zoomToFitConfig.maxZoom;
+      const zoomMargin =
+        typeof zoomToFitConfig === "boolean"
+          ? undefined
+          : zoomToFitConfig.margin;
       scene.appState = {
         ...scene.appState,
         ...zoomToFitElements(
           scene.elements,
-          scene.appState as Readonly<AppState>,
+          {
+            ...(scene.appState as Readonly<AppState>),
+            width: this.state.width,
+            height: this.state.height,
+            offsetTop: this.state.offsetTop,
+            offsetLeft: this.state.offsetLeft,
+          },
           false,
-          1,
-          0.24,
-        ),
+          maxZoom,
+          zoomMargin,
+        ).appState,
       };
     }
 

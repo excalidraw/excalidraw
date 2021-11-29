@@ -383,7 +383,10 @@ const ExcalidrawWrapper = () => {
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve({
         ...data.scene,
-        zoomToFit: true,
+        zoomToFit: {
+          margin: 0.24,
+          maxZoom: 1,
+        },
       });
     });
 
