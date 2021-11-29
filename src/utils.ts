@@ -151,7 +151,10 @@ export const debounce = <T extends any[]>(
 };
 
 // https://github.com/lodash/lodash/blob/es/chunk.js
-export const chunk = <T extends any>(array: T[], size: number): T[][] => {
+export const chunk = <T extends any>(
+  array: readonly T[],
+  size: number,
+): T[][] => {
   if (!array.length || size < 1) {
     return [];
   }
@@ -303,6 +306,7 @@ export const tupleToCoors = (
 /** use as a rejectionHandler to mute filesystem Abort errors */
 export const muteFSAbortError = (error?: Error) => {
   if (error?.name === "AbortError") {
+    console.warn(error);
     return;
   }
   throw error;
@@ -468,4 +472,20 @@ export const bytesToHexString = (bytes: Uint8Array) => {
   return Array.from(bytes)
     .map((byte) => `0${byte.toString(16)}`.slice(-2))
     .join("");
+};
+
+export const getUpdatedTimestamp = () =>
+  process.env.NODE_ENV === "test" ? 1 : Date.now();
+
+/**
+ * Transforms array of objects containing `id` attribute,
+ * or array of ids (strings), into a Map, keyd by `id`.
+ */
+export const arrayToMap = <T extends { id: string } | string>(
+  items: readonly T[],
+) => {
+  return items.reduce((acc: Map<string, T>, element) => {
+    acc.set(typeof element === "string" ? element : element.id, element);
+    return acc;
+  }, new Map());
 };

@@ -154,6 +154,8 @@ export const actionSaveToActiveFile = register({
     } catch (error: any) {
       if (error?.name !== "AbortError") {
         console.error(error);
+      } else {
+        console.warn(error);
       }
       return { commitToHistory: false };
     }
@@ -184,6 +186,8 @@ export const actionSaveFileToDisk = register({
     } catch (error: any) {
       if (error?.name !== "AbortError") {
         console.error(error);
+      } else {
+        console.warn(error);
       }
       return { commitToHistory: false };
     }
@@ -221,6 +225,7 @@ export const actionLoadScene = register({
       };
     } catch (error: any) {
       if (error?.name === "AbortError") {
+        console.warn(error);
         return false;
       }
       return {
