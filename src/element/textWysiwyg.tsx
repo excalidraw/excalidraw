@@ -374,16 +374,20 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
+    const updateElement = Scene.getScene(element)?.getElement(element.id);
+    if (!updateElement) {
+      return;
+    }
     let wrappedText = "";
-    if (element.type === "text" && element?.textContainerId) {
-      const textContainer = Scene.getScene(element)!.getElement(
-        element.textContainerId,
+    if (updateElement.type === "text" && updateElement?.textContainerId) {
+      const textContainer = Scene.getScene(updateElement)!.getElement(
+        updateElement.textContainerId,
       );
 
       if (textContainer && textContainer.type === "rectangle") {
         wrappedText = wrapText(
           editable.value,
-          getFontString(element),
+          getFontString(updateElement),
           textContainer,
         );
         const { x, y } = viewportCoordsToSceneCoords(
@@ -393,8 +397,8 @@ export const textWysiwyg = ({
           },
           appState,
         );
-        if (element.type === "text" && element.textContainerId) {
-          mutateElement(element, {
+        if (updateElement.type === "text" && updateElement.textContainerId) {
+          mutateElement(updateElement, {
             y,
             height: Number(editable.style.height.slice(0, -2)),
             width: Number(editable.style.width.slice(0, -2)),

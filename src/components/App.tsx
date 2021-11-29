@@ -1878,7 +1878,7 @@ class App extends React.Component<AppProps, AppState> {
               ? Scene.getScene(element)?.getElement(element.textContainerId)
               : null;
             return updateTextElement(
-              element,
+              _element,
               {
                 text,
                 isDeleted,
