@@ -189,7 +189,6 @@ const initializeScene = async (opts: {
           localDataState,
         );
       }
-      scene.scrollToContent = true;
       if (!roomLinkData) {
         window.history.replaceState({}, APP_NAME, window.location.origin);
       }
@@ -382,9 +381,10 @@ const ExcalidrawWrapper = () => {
 
     initializeScene({ collabAPI }).then((data) => {
       loadImages(data, /* isInitialLoad */ true);
-      initialStatePromiseRef.current.promise.resolve(data.scene);
-      // This will be overridden if it exists in localstorage somehow
-      excalidrawAPI.zoomToFit(undefined, 1, 0.3);
+      initialStatePromiseRef.current.promise.resolve({
+        ...data.scene,
+        zoomToFit: true,
+      });
     });
 
     const onHashChange = (event: HashChangeEvent) => {

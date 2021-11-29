@@ -337,7 +337,6 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
-        zoomToFit: this.zoomToFit,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
@@ -779,6 +778,17 @@ class App extends React.Component<AppProps, AppState> {
             offsetLeft: this.state.offsetLeft,
           },
           null,
+        ),
+      };
+    } else if (initialData?.zoomToFit) {
+      scene.appState = {
+        ...scene.appState,
+        ...zoomToFitElements(
+          scene.elements,
+          scene.appState as Readonly<AppState>,
+          false,
+          1,
+          0.24,
         ),
       };
     }
