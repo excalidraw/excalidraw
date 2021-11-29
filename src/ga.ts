@@ -67,7 +67,7 @@ export const nvector = (value: number = 0, index: number = 0): NVector => {
   if (value !== 0) {
     result[index] = value;
   }
-  return (result as unknown) as NVector;
+  return result as unknown as NVector;
 };
 
 const STRING_EPSILON = 0.000001;

@@ -6,6 +6,7 @@ import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
   ArrowheadDotIcon,
+  ArrowheadTriangleIcon,
   ArrowheadNoneIcon,
   EdgeRoundIcon,
   EdgeSharpIcon,
@@ -738,6 +739,14 @@ export const actionChangeArrowhead = register({
                 icon: <ArrowheadDotIcon theme={appState.theme} flip={!isRTL} />,
                 keyBinding: "r",
               },
+              {
+                value: "triangle",
+                text: t("labels.arrowhead_triangle"),
+                icon: (
+                  <ArrowheadTriangleIcon theme={appState.theme} flip={!isRTL} />
+                ),
+                keyBinding: "t",
+              },
             ]}
             value={getFormValue<Arrowhead | null>(
               elements,
@@ -779,6 +788,14 @@ export const actionChangeArrowhead = register({
                 text: t("labels.arrowhead_dot"),
                 keyBinding: "r",
                 icon: <ArrowheadDotIcon theme={appState.theme} flip={isRTL} />,
+              },
+              {
+                value: "triangle",
+                text: t("labels.arrowhead_triangle"),
+                icon: (
+                  <ArrowheadTriangleIcon theme={appState.theme} flip={isRTL} />
+                ),
+                keyBinding: "t",
               },
             ]}
             value={getFormValue<Arrowhead | null>(

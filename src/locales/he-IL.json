@@ -20,10 +20,6 @@
     "background": "רקע",
     "fill": "מילוי",
     "strokeWidth": "עובי קו מתאר",
-    "strokeShape": "סגנון קו המתאר",
-    "strokeShape_gel": "עט נובע",
-    "strokeShape_fountain": "עט נובע",
-    "strokeShape_brush": "מברשת",
     "strokeStyle": "סגנון קו המתאר",
     "strokeStyle_solid": "מלא",
     "strokeStyle_dashed": "מקווקו",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "חץ",
     "arrowhead_bar": "שורה",
     "arrowhead_dot": "נקודה",
+    "arrowhead_triangle": "",
     "fontSize": "גודל גופן",
     "fontFamily": "סוג הגופן",
     "onlySelected": "רק מה שנבחר",
@@ -103,7 +100,9 @@
     "share": "שתף",
     "showStroke": "הצג צבעי קו מתאר",
     "showBackground": "הצג צבעי רקע",
-    "toggleTheme": "שינוי ערכת העיצוב"
+    "toggleTheme": "שינוי ערכת העיצוב",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -138,7 +137,11 @@
     "zenMode": "מצב זן",
     "exitZenMode": "צא ממצב תפריט מרחף",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
@@ -160,6 +163,7 @@
     "cannotRestoreFromImage": "לא הצלחנו לשחזר את התצוגה מקובץ התמונה",
     "invalidSceneUrl": "ייבוא המידע מן סצינה מכתובת האינטרנט נכשלה. המידע בנוי באופן משובש או שהוא אינו קובץ JSON תקין של Excalidraw.",
     "resetLibrary": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": ""
   },
   "errors": {
@@ -188,6 +192,7 @@
     "shapes": "צורות"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
@@ -201,7 +206,8 @@
     "lineEditor_info": "לחץ לחיצה כפולה או אנטר לעריכת הנקודות",
     "lineEditor_pointSelected": "לחץ על Delete להסרת נקודה, CtrlOrCmd+D לשכפל, או גרור להזזה",
     "lineEditor_nothingSelected": "בחר נקודה להזזה או הסרה, או החזק את כפתור Alt והקלק להוספת נקודות חדשות",
-    "placeImage": ""
+    "placeImage": "",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "לא הצלחנו להציג את התצוגה המקדימה",
@@ -271,6 +277,54 @@
   "clearCanvasDialog": {
     "title": ""
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם.",
     "link": "פוסט בבלוג על הצפנה מקצה לקצב ב-Excalidraw"
@@ -291,6 +345,7 @@
     "width": "רוחב"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "העתק סגנונות.",
     "copyToClipboard": "הועתק אל הלוח.",
     "copyToClipboardAsPng": "{{exportSelection}} הועתקה ללוח כ-PNG\n({{exportColorScheme}})",

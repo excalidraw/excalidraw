@@ -20,10 +20,6 @@
     "background": "Háttér",
     "fill": "Kitöltés",
     "strokeWidth": "Körvonal vastagsága",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "Körvonal stílusa",
     "strokeStyle_solid": "Kitöltött",
     "strokeStyle_dashed": "Szaggatott",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "Nyíl",
     "arrowhead_bar": "Oszlop",
     "arrowhead_dot": "Pont",
+    "arrowhead_triangle": "",
     "fontSize": "Betűméret",
     "fontFamily": "Betűkészlet család",
     "onlySelected": "Csak a kijelölt",
@@ -103,7 +100,9 @@
     "share": "",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": ""
+    "toggleTheme": "",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -138,7 +137,11 @@
     "zenMode": "Letisztult mód",
     "exitZenMode": "Kilépés a letisztult módból",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
@@ -160,6 +163,7 @@
     "cannotRestoreFromImage": "A jelenet visszaállítása nem sikerült ebből a kép fájlból",
     "invalidSceneUrl": "",
     "resetLibrary": "",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": ""
   },
   "errors": {
@@ -188,6 +192,7 @@
     "shapes": "Alakzatok"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Kattintással görbe, az eger húzásával pedig egyenes nyilat rajzolhatsz",
     "freeDraw": "Kattints és húzd, majd engedd el, amikor végeztél",
     "text": "Tipp: A kijelölés eszközzel a dupla kattintás új szöveget hoz létre",
@@ -201,7 +206,8 @@
     "lineEditor_info": "Kattints duplán, vagy nyomj entert a pontok szerkesztéséhez",
     "lineEditor_pointSelected": "Nyomd meg a delete gombot a pont eltávolításához, Ctrl vagy Cmd + D-t a duplikáláshoz, vagy húzva mozgasd",
     "lineEditor_nothingSelected": "Válassz ki egy pontot a mozgatáshoz vagy törtléshez, vagy az Alt lenyomása mellett kattintva hozz létre új pontokat",
-    "placeImage": ""
+    "placeImage": "",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "Előnézet nem jeleníthető meg",
@@ -271,6 +277,54 @@
   "clearCanvasDialog": {
     "title": ""
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "A rajzaidat végpontok közötti titkosítással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni.",
     "link": ""
@@ -291,6 +345,7 @@
     "width": "Szélesség"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "",
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",

@@ -20,10 +20,6 @@
     "background": "पृष्ठभूमि",
     "fill": "भरें",
     "strokeWidth": "रेखा की चौड़ाई",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "स्ट्रोक का आकार",
     "strokeStyle_solid": "ठोस",
     "strokeStyle_dashed": "डैश",
@@ -39,6 +35,7 @@
     "arrowhead_arrow": "तीर",
     "arrowhead_bar": "बार",
     "arrowhead_dot": "बिंदु",
+    "arrowhead_triangle": "",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "onlySelected": "केवल चयनित",
@@ -103,7 +100,9 @@
     "share": "",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": ""
+    "toggleTheme": "",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -138,7 +137,11 @@
     "zenMode": "ज़ेन मोड",
     "exitZenMode": "जेन मोड से बाहर निकलें",
     "cancel": "",
-    "clear": ""
+    "clear": "",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "इससे पूरा कैनवास साफ हो जाएगा। क्या आपको यकीन है?",
@@ -160,6 +163,7 @@
     "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है",
     "invalidSceneUrl": "",
     "resetLibrary": "",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": ""
   },
   "errors": {
@@ -188,6 +192,7 @@
     "shapes": "आकृतियाँ"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, सिंगल लाइन के लिए खींचें",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोड़ो",
     "text": "आप चयन टूल से कहीं भी डबल-क्लिक करके टेक्स्ट जोड़ सकते हैं",
@@ -201,7 +206,8 @@
     "lineEditor_info": "बिंदुओं को संपादित करने के लिए Enter पर डबल-क्लिक करें या दबाएँ",
     "lineEditor_pointSelected": "बिंदु हटाने के लिए डिलीट दबाएं, प्रतिरूपित करने के लिए कण्ट्रोल या कमांड डी दबाएं या स्थानांतरित करने के लिए खींचे",
     "lineEditor_nothingSelected": "स्थानांतरित करने या हटाने के लिए एक बिंदु का चयन करें, या Alt दबाए रखें और नए बिंदुओं को जोड़ने के लिए क्लिक करें",
-    "placeImage": ""
+    "placeImage": "",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -271,6 +277,54 @@
   "clearCanvasDialog": {
     "title": ""
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।",
     "link": ""
@@ -291,6 +345,7 @@
     "width": "चौड़ाई"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "काॅपी कीए स्टाइल",
     "copyToClipboard": "क्लिपबोर्ड में कॉपी कीए",
     "copyToClipboardAsPng": "",
