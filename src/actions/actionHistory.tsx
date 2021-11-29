@@ -6,9 +6,9 @@ import History, { HistoryEntry } from "../history";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { isWindows, KEYS } from "../keys";
-import { getElementMap } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { fixBindingsAfterDeletion } from "../element/binding";
+import { arrayToMap } from "../utils";
 
 const writeData = (
   prevElements: readonly ExcalidrawElement[],
@@ -27,17 +27,17 @@ const writeData = (
       return { commitToHistory };
     }
 
-    const prevElementMap = getElementMap(prevElements);
+    const prevElementMap = arrayToMap(prevElements);
     const nextElements = data.elements;
-    const nextElementMap = getElementMap(nextElements);
+    const nextElementMap = arrayToMap(nextElements);
 
     const deletedElements = prevElements.filter(
-      (prevElement) => !nextElementMap.hasOwnProperty(prevElement.id),
+      (prevElement) => !nextElementMap.has(prevElement.id),
     );
     const elements = nextElements
       .map((nextElement) =>
         newElementWith(
-          prevElementMap[nextElement.id] || nextElement,
+          prevElementMap.get(nextElement.id) || nextElement,
           nextElement,
         ),
       )

@@ -7,7 +7,7 @@
     "outDir": "src/packages/excalidraw/types",
     "jsx": "react-jsx",
     "target": "es6",
-    "lib": ["esnext"],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,

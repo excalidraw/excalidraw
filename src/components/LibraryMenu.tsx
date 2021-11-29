@@ -18,6 +18,7 @@ import "./LibraryMenu.scss";
 import LibraryMenuItems from "./LibraryMenuItems";
 import { EVENT } from "../constants";
 import { KEYS } from "../keys";
+import { arrayToMap } from "../utils";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -236,6 +237,10 @@ export const LibraryMenu = ({
     ],
   );
 
+  const [lastSelectedItem, setLastSelectedItem] = useState<
+    LibraryItem["id"] | null
+  >(null);
+
   return loadingState === "preloading" ? null : (
     <Island padding={1} ref={ref} className="layer-ui__library">
       {showPublishLibraryDialog && (
@@ -271,10 +276,44 @@ export const LibraryMenu = ({
           files={files}
           id={id}
           selectedItems={selectedItems}
-          onToggle={(id) => {
-            if (!selectedItems.includes(id)) {
-              setSelectedItems([...selectedItems, id]);
+          onToggle={(id, event) => {
+            const shouldSelect = !selectedItems.includes(id);
+
+            if (shouldSelect) {
+              if (event.shiftKey && lastSelectedItem) {
+                const rangeStart = libraryItems.findIndex(
+                  (item) => item.id === lastSelectedItem,
+                );
+                const rangeEnd = libraryItems.findIndex(
+                  (item) => item.id === id,
+                );
+
+                if (rangeStart === -1 || rangeEnd === -1) {
+                  setSelectedItems([...selectedItems, id]);
+                  return;
+                }
+
+                const selectedItemsMap = arrayToMap(selectedItems);
+                const nextSelectedIds = libraryItems.reduce(
+                  (acc: LibraryItem["id"][], item, idx) => {
+                    if (
+                      (idx >= rangeStart && idx <= rangeEnd) ||
+                      selectedItemsMap.has(item.id)
+                    ) {
+                      acc.push(item.id);
+                    }
+                    return acc;
+                  },
+                  [],
+                );
+
+                setSelectedItems(nextSelectedIds);
+              } else {
+                setSelectedItems([...selectedItems, id]);
+              }
+              setLastSelectedItem(id);
             } else {
+              setLastSelectedItem(null);
               setSelectedItems(selectedItems.filter((_id) => _id !== id));
             }
           }}

@@ -100,7 +100,9 @@
     "share": "Поділитися",
     "showStroke": "Показати палітру для контура",
     "showBackground": "Показати палітру для фону",
-    "toggleTheme": "Перемкнути тему"
+    "toggleTheme": "Перемкнути тему",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -135,7 +137,11 @@
     "zenMode": "Режим Дзен",
     "exitZenMode": "Вийти з дзен-режиму",
     "cancel": "Скасувати",
-    "clear": "Очистити"
+    "clear": "Очистити",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Це очистить все полотно. Впевнені?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Сцена не може бути відновлена з цього файлу зображення",
     "invalidSceneUrl": "Не вдалося імпортувати сцену з наданого URL. Він або недоформований, або не містить дійсних даних Excalidraw JSON.",
     "resetLibrary": "Це призведе до очищення бібліотеки. Ви впевнені?",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": ""
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Двічі клацніть або натисніть Enter щоб редагувати точки",
     "lineEditor_pointSelected": "Натисніть Видалити, щоб видалити точку, CtrlOrCmd+D для дублювання, або перетягніть, щоб переміститися",
     "lineEditor_nothingSelected": "Виберіть точку для переміщення чи видалення, або утримуйте Alt і натисніть, щоб додати нові точки",
-    "placeImage": ""
+    "placeImage": "",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не вдається показати попередній перегляд",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Очистити полотно"
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать.",
     "link": "Допис у блозі на наскрізному шифруванні в Excalidraw"
@@ -289,6 +345,7 @@
     "width": "Ширина"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "Скопійовані стилі.",
     "copyToClipboard": "Скопіювати до буферу обміну.",
     "copyToClipboardAsPng": "Скопійовано {{exportSelection}} до буфера обміну як PNG\n({{exportColorScheme}})",
