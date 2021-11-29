@@ -100,7 +100,9 @@
     "share": "Jaa",
     "showStroke": "Näytä viivan värin valitsin",
     "showBackground": "Näytä taustavärin valitsin",
-    "toggleTheme": "Vaihda teema"
+    "toggleTheme": "Vaihda teema",
+    "personalLib": "Oma kirjasto",
+    "excalidrawLib": "Excalidraw kirjasto"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -135,7 +137,11 @@
     "zenMode": "Zen-tila",
     "exitZenMode": "Poistu zen-tilasta",
     "cancel": "Peruuta",
-    "clear": "Pyyhi"
+    "clear": "Pyyhi",
+    "remove": "Poista",
+    "publishLibrary": "Julkaise",
+    "submit": "Lähetä",
+    "confirm": "Vahvista"
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta",
     "invalidSceneUrl": "Teosta ei voitu tuoda annetusta URL-osoitteesta. Tallenne on vioittunut, tai osoitteessa ei ole Excalidraw JSON-dataa.",
     "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?",
+    "removeItemsFromsLibrary": "Poista {{count}} kohdetta kirjastosta?",
     "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
     "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, Ctrl tai Cmd+D monistaaksesi, tai raahaa liikuttaaksesi",
     "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä ALT-näppäintä alaspainettuna ja napsauta lisätäksesi uusia pisteitä",
-    "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti"
+    "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
+    "publishLibrary": "Julkaise oma kirjasto"
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Pyyhi piirtoalue"
   },
+  "publishDialog": {
+    "title": "Julkaise kirjasto",
+    "itemName": "Kohteen nimi",
+    "authorName": "Tekijän nimi",
+    "githubUsername": "GitHub-käyttäjätunnus",
+    "twitterUsername": "Twitter-käyttäjätunnus",
+    "libraryName": "Kirjaston nimi",
+    "libraryDesc": "Kirjaston kuvaus",
+    "website": "Verkkosivu",
+    "placeholder": {
+      "authorName": "Nimesi tai käyttäjänimesi",
+      "libraryName": "Kirjastosi nimi",
+      "libraryDesc": "Kirjaston kuvaus, joka auttaa ihmisiä ymmärtämään sen käyttötarkoitukset",
+      "githubHandle": "GitHub-tunnuksesi (valinnainen), jotta voit muokata kirjastoa sen jälkeen kun se on lähetetty tarkastettavaksi",
+      "twitterHandle": "Twitter-tunnus (valinnainen), jotta tiedämme ketä kiittää kun viestimme Twitterissä",
+      "website": "Linkki henkilökohtaiselle verkkosivustollesi tai muualle (valinnainen)"
+    },
+    "errors": {
+      "required": "Pakollinen",
+      "website": "Syötä oikeamuotoinen URL-osoite"
+    },
+    "noteDescription": {
+      "pre": "Lähetä kirjastosi, jotta se voidaan sisällyttää ",
+      "link": "julkisessa kirjastolistauksessa",
+      "post": "muiden käyttöön omissa piirrustuksissaan."
+    },
+    "noteGuidelines": {
+      "pre": "Kirjasto on ensin hyväksyttävä manuaalisesti. Ole hyvä ja lue ",
+      "link": "ohjeet",
+      "post": " ennen lähettämistä. Tarvitset GitHub-tilin, jotta voit viestiä ja tehdä muutoksia pyydettäessä, mutta se ei ole ehdottoman välttämätöntä."
+    },
+    "noteLicense": {
+      "pre": "Lähettämällä hyväksyt että kirjasto julkaistaan ",
+      "link": "MIT-lisenssin ",
+      "post": "alla, mikä lyhyesti antaa muiden käyttää sitä ilman rajoituksia."
+    },
+    "noteItems": "Jokaisella kirjaston kohteella on oltava oma nimensä suodatusta varten. Seuraavat kirjaston kohteet sisältyvät:",
+    "atleastOneLibItem": "Valitse vähintään yksi kirjaston kohde aloittaaksesi"
+  },
+  "publishSuccessDialog": {
+    "title": "Kirjasto lähetetty",
+    "content": "Kiitos {{authorName}}. Kirjastosi on lähetetty tarkistettavaksi. Voit seurata sen tilaa",
+    "link": "täällä"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Tyhjennä kirjasto",
+    "removeItemsFromLib": "Poista valitut kohteet kirjastosta"
+  },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä.",
     "link": "Blogiartikkeli päästä päähän -salauksesta Excalidraw:ssa"
@@ -289,6 +345,7 @@
     "width": "Leveys"
   },
   "toast": {
+    "addedToLibrary": "Lisätty kirjastoon",
     "copyStyles": "Tyylit kopioitiin.",
     "copyToClipboard": "Kopioitiin leikepöydälle.",
     "copyToClipboardAsPng": "Kopioitiin {{exportSelection}} leikepöydälle PNG:nä\n({{exportColorScheme}})",
