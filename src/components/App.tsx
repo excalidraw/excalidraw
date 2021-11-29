@@ -27,6 +27,7 @@ import {
   actionToggleStats,
   actionToggleZenMode,
   actionUngroup,
+  zoomToFitElements,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -336,6 +337,7 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
+        zoomToFit: this.zoomToFit,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
@@ -1329,6 +1331,22 @@ class App extends React.Component<AppProps, AppState> {
       event?.preventDefault();
     },
   );
+
+  zoomToFit = (
+    target: readonly ExcalidrawElement[] = this.scene.getElements(),
+    maxZoom: number = 1, //null will zoom to max based on viewport
+    margin: number = 0.03, //percentage of viewport width&height
+  ) => {
+    if (!target) {
+      target = this.scene.getElements();
+    }
+    if (target.length === 0) {
+      maxZoom = 1;
+    }
+    this.setState(
+      zoomToFitElements(target, this.state, false, maxZoom, margin).appState,
+    );
+  };
 
   private addElementsFromPasteOrLibrary = (opts: {
     elements: readonly ExcalidrawElement[];
