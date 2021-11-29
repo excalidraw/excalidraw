@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback, RefObject } from "react";
 import Library from "../data/library";
-import { t, te } from "../i18n";
+import { t } from "../i18n";
 import { randomId } from "../random";
 import {
   LibraryItems,
@@ -191,7 +191,7 @@ export const LibraryMenu = ({
         small={true}
       >
         <p>
-          {te("publishSuccessDialog.content", {
+          {t("publishSuccessDialog.content", {
             authorName: publishLibSuccess!.authorName,
             link: (translation) => (
               <a

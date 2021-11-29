@@ -2,7 +2,7 @@ import { ReactNode, useCallback, useEffect, useState } from "react";
 import OpenColor from "open-color";
 
 import { Dialog } from "./Dialog";
-import { t, te } from "../i18n";
+import { t } from "../i18n";
 
 import { ToolButton } from "./ToolButton";
 
@@ -304,7 +304,7 @@ const PublishLibrary = ({
       {shouldRenderForm ? (
         <form onSubmit={onSubmit}>
           <div className="publish-library-note">
-            {te("publishDialog.noteDescription", {
+            {t("publishDialog.noteDescription", {
               link: (translation) => (
                 <a
                   href="https://libraries.excalidraw.com"
@@ -317,7 +317,7 @@ const PublishLibrary = ({
             })}
           </div>
           <span className="publish-library-note">
-            {te("publishDialog.noteGuidelines", {
+            {t("publishDialog.noteGuidelines", {
               link: (translation) => (
                 <a
                   href="https://github.com/excalidraw/excalidraw-libraries#guidelines"
@@ -416,7 +416,7 @@ const PublishLibrary = ({
               />
             </label>
             <span className="publish-library-note">
-              {te("publishDialog.noteLicense", {
+              {t("publishDialog.noteLicense", {
                 link: (translation) => (
                   <a
                     href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE"

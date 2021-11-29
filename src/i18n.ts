@@ -105,10 +105,10 @@ const findPartsForData = (data: any, parts: string[]) => {
   return data;
 };
 
-export const t = (
+const _translateReplacementSimple = (
   path: string,
   replacement?: { [key: string]: string | number },
-) => {
+): string => {
   if (currentLang.code.startsWith(TEST_LANG_CODE)) {
     const name = replacement
       ? `${path}(${JSON.stringify(replacement).slice(1, -1)})`
@@ -132,7 +132,11 @@ export const t = (
   return translation;
 };
 
-export const te = (
+export function t(
+  path: string,
+  replacement?: { [key: string]: string | number },
+): string; // simple replacement
+export function t(
   path: string,
   replacement: {
     [key: string]:
@@ -140,19 +144,32 @@ export const te = (
       | number
       | ((val: (string | JSX.Element)[]) => JSX.Element);
   },
-) => {
-  const replacementSingle: { [key: string]: string | number } = {};
+): (string | JSX.Element)[]; // JSX.Element template replacement
+export function t(
+  path: string,
+  replacement?: {
+    [key: string]:
+      | string
+      | number
+      | ((val: (string | JSX.Element)[]) => JSX.Element);
+  },
+): any {
+  const replacementSimple: { [key: string]: string | number } = {};
   const replacementFn: {
     [key: string]: (val: (string | JSX.Element)[]) => JSX.Element;
   } = {};
+  replacement = replacement || {};
   for (const [key, r] of Object.entries(replacement)) {
     if (typeof r === "string" || typeof r === "number") {
-      replacementSingle[key] = r;
+      replacementSimple[key] = r;
     } else {
       replacementFn[key] = r;
     }
   }
-  const translation = t(path, replacementSingle);
+  const translation = _translateReplacementSimple(path, replacementSimple);
+  if (Object.keys(replacementFn).length === 0) {
+    return translation;
+  }
 
   const _tagRecr = (s: string): (string | JSX.Element)[] => {
     const er = /<(.*?)>(.*?)<\/\1>/.exec(s); // try grabbing the first, outmost tag
@@ -172,4 +189,4 @@ export const te = (
     ];
   };
   return _tagRecr(translation);
-};
+}
