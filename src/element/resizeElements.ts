@@ -115,28 +115,42 @@ export const transformElements = (
           const updatedElement = Scene.getScene(element)!.getElement(
             element.id,
           );
+          if (!updatedElement) {
+            return;
+          }
           let text = textElement.text;
+          let nextWidth = textElement.width;
+          let nextHeight = textElement.height;
+          let containerHeight = updatedElement.height;
+          let nextBaseLine = textElement.baseline;
           if (transformHandleType !== "n" && transformHandleType !== "s") {
             text = wrapText(
               textElement.originalText,
               getFontString(textElement),
               updatedElement,
             );
+            const dimensions = measureText(text, getFontString(textElement));
+            nextWidth = dimensions.width;
+            nextHeight = dimensions.height;
+            nextBaseLine = dimensions.baseline;
+          }
+          if (nextHeight > updatedElement.height - PADDING * 2) {
+            containerHeight = nextHeight + PADDING * 2;
+            mutateElement(updatedElement, { height: containerHeight });
           }
 
           const updatedY =
-            updatedElement!.y +
-            updatedElement!.height / 2 -
-            textElement.height / 2;
+            updatedElement!.y + containerHeight / 2 - nextHeight / 2;
+
           const updatedX =
-            updatedElement!.x +
-            updatedElement!.width / 2 -
-            textElement.width / 2;
+            updatedElement!.x + updatedElement!.width / 2 - nextWidth / 2;
           mutateElement(textElement, {
             text,
-            width: updatedElement!.width - PADDING * 2,
+            width: nextWidth,
+            height: nextHeight,
             y: updatedY,
             x: updatedX,
+            baseline: nextBaseLine,
           });
         }
       }
