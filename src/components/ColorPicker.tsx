@@ -7,6 +7,7 @@ import { isArrowKey, KEYS } from "../keys";
 import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
+import { colorNumberByHex, localeIdByHex } from "./colorPickerHelpers";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -34,7 +35,7 @@ const getColor = (color: string): string | null => {
 const keyBindings = [
   ["1", "2", "3", "4", "5"],
   ["q", "w", "e", "r", "t"],
-  ["a", "s", "d", "f", "g"],
+  ["a", "s", "d", "f", "g"]
 ].flat();
 
 const Picker = ({
@@ -44,7 +45,7 @@ const Picker = ({
   onClose,
   label,
   showInput = true,
-  type,
+  type
 }: {
   colors: string[];
   color: string | null;
@@ -87,7 +88,7 @@ const Picker = ({
       const isRTL = getLanguage().rtl;
       const index = Array.prototype.indexOf.call(
         gallery!.current!.children,
-        activeElement,
+        activeElement
       );
       if (index !== -1) {
         const length = gallery!.current!.children.length - (showInput ? 1 : 0);
@@ -139,7 +140,13 @@ const Picker = ({
         tabIndex={0}
       >
         {colors.map((_color, i) => {
-          const _colorWithoutHash = _color.replace("#", "");
+          const numToAppend = colorNumberByHex[_color];
+          const localeId = localeIdByHex[_color];
+          const translatedColorStr = `${t(`colors.${localeId}`, {
+            number: numToAppend
+          })}${!isTransparent(_color) ? ` (${_color})` : ""} — ${keyBindings[
+            i
+          ].toUpperCase()}`;
           return (
             <button
               className="color-picker-swatch"
@@ -147,10 +154,10 @@ const Picker = ({
                 (event.currentTarget as HTMLButtonElement).focus();
                 onChange(_color);
               }}
-              title={`${t(`colors.${_colorWithoutHash}`)}${
-                !isTransparent(_color) ? ` (${_color})` : ""
-              } — ${keyBindings[i].toUpperCase()}`}
-              aria-label={t(`colors.${_colorWithoutHash}`)}
+              title={translatedColorStr}
+              aria-label={t(`colors.${localeId}`, {
+                number: numToAppend
+              })}
               aria-keyshortcuts={keyBindings[i]}
               style={{ color: _color }}
               key={_color}
@@ -193,13 +200,13 @@ const ColorInput = React.forwardRef(
     {
       color,
       onChange,
-      label,
+      label
     }: {
       color: string | null;
       onChange: (color: string) => void;
       label: string;
     },
-    ref,
+    ref
   ) => {
     const [innerValue, setInnerValue] = React.useState(color);
     const inputRef = React.useRef(null);
@@ -219,7 +226,7 @@ const ColorInput = React.forwardRef(
         }
         setInnerValue(value);
       },
-      [onChange],
+      [onChange]
     );
 
     return (
@@ -236,7 +243,7 @@ const ColorInput = React.forwardRef(
         />
       </label>
     );
-  },
+  }
 );
 
 export const ColorPicker = ({
@@ -245,7 +252,7 @@ export const ColorPicker = ({
   onChange,
   label,
   isActive,
-  setActive,
+  setActive
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   color: string | null;
