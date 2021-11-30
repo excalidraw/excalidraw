@@ -98,11 +98,11 @@
     "viewMode": "Görünüm modu",
     "toggleExportColorScheme": "Renk şemasını dışa aktar/aktarma",
     "share": "Paylaş",
-    "showStroke": "",
-    "showBackground": "",
+    "showStroke": "Kontur için renk seçiciyi göster",
+    "showBackground": "Arkaplan için renk seçiciyi göster",
     "toggleTheme": "Temayı etkinleştir/devre dışı bırak",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Kişisel Kitaplık",
+    "excalidrawLib": "Excalidraw Kitaplığı"
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -138,10 +138,10 @@
     "exitZenMode": "Zen modundan çık",
     "cancel": "İptal",
     "clear": "Temizle",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "remove": "Kaldır",
+    "publishLibrary": "Yayınla",
+    "submit": "Gönder",
+    "confirm": "Onayla"
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
@@ -159,7 +159,7 @@
     "errorAddingToLibrary": "Öğe kütüphaneye eklenemedi",
     "errorRemovingFromLibrary": "Öğe kütüphaneden silinemedi",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Bu görüntü herhangi bir sahne verisi içermiyor gibi görünüyor. Dışa aktarma sırasında sahne yerleştirmeyi etkinleştirdiniz mi?",
     "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
     "invalidSceneUrl": "Verilen URL'den çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
     "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?",
