@@ -65,12 +65,12 @@ export const textWysiwyg = ({
 }) => {
   let originalContainerHeight: number;
 
-  //@ts-ignore
-  const approxLineHeight = getApproxLineHeight(getFontString(element));
+  const approxLineHeight = isTextElement(element)
+    ? getApproxLineHeight(getFontString(element))
+    : 0;
 
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
-
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
