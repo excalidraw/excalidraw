@@ -163,14 +163,14 @@
     "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
     "invalidSceneUrl": "Verilen URL'den çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
     "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "{{count}} öğe(ler) kitaplıktan kaldırılsın mı?",
     "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı."
   },
   "errors": {
     "unsupportedFileType": "Desteklenmeyen dosya türü.",
     "imageInsertError": "Görsel eklenemedi. Daha sonra tekrar deneyin...",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
+    "fileTooBig": "Dosya çok büyük. İzin verilen maksimum boyut {{maxSize}}.",
+    "svgImageInsertError": "SVG resmi eklenemedi. SVG işaretlemesi geçersiz görünüyor.",
     "invalidSVGString": "Geçersiz SVG."
   },
   "toolBar": {
@@ -196,7 +196,7 @@
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
-    "text_selected": "",
+    "text_selected": "Metni düzenlemek için çift tıklayın veya ENTER'a basın",
     "text_editing": "",
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
     "lockAngle": "SHIFT tuşuna basılı tutarak açıyı koruyabilirsiniz",
