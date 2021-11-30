@@ -828,6 +828,8 @@ import { exportToBlob } from "@excalidraw/excalidraw";
 
 Returns a promise which resolves with a [blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob). It internally uses [canvas.ToBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob).
 
+Note: `appState.exportBackground` is always set to `true` if exporting to `image/jpeg` to ensure the alpha channel isn't compressed to black.
+
 #### `exportToSvg`
 
 **_Signature_**

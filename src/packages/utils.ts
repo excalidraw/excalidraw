@@ -80,8 +80,6 @@ export const exportToBlob = async (
     quality?: number;
   },
 ): Promise<Blob | null> => {
-  const canvas = await exportToCanvas(opts);
-
   let { mimeType = MIME_TYPES.png, quality } = opts;
 
   if (mimeType === MIME_TYPES.png && typeof quality === "number") {
@@ -92,6 +90,18 @@ export const exportToBlob = async (
   if (mimeType === "image/jpg") {
     mimeType = MIME_TYPES.jpg;
   }
+
+  if (mimeType === MIME_TYPES.jpg && !opts.appState?.exportBackground) {
+    console.warn(
+      `Defaulting "exportBackground" to "true" for "${MIME_TYPES.jpg}" mimeType`,
+    );
+    opts = {
+      ...opts,
+      appState: { ...opts.appState, exportBackground: true },
+    };
+  }
+
+  const canvas = await exportToCanvas(opts);
 
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
