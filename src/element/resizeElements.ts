@@ -25,7 +25,7 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import { measureText, getFontString } from "../utils";
+import { measureText, getFontString, wrapText } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
   TransformHandleType,
@@ -33,6 +33,8 @@ import {
   TransformHandleDirection,
 } from "./transformHandles";
 import { Point, PointerDownState } from "../types";
+import Scene from "../scene/Scene";
+import { PADDING } from "./textWysiwyg";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -105,6 +107,39 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
+      if (element.type === "rectangle" && element.boundTextElementId) {
+        const textElement = Scene.getScene(element)!.getElement(
+          element.boundTextElementId,
+        ) as ExcalidrawTextElement;
+        if (textElement && textElement.text) {
+          const updatedElement = Scene.getScene(element)!.getElement(
+            element.id,
+          );
+          let text = textElement.text;
+          if (transformHandleType !== "n" && transformHandleType !== "s") {
+            text = wrapText(
+              textElement.originalText,
+              getFontString(textElement),
+              updatedElement,
+            );
+          }
+
+          const updatedY =
+            updatedElement!.y +
+            updatedElement!.height / 2 -
+            textElement.height / 2;
+          const updatedX =
+            updatedElement!.x +
+            updatedElement!.width / 2 -
+            textElement.width / 2;
+          mutateElement(textElement, {
+            text,
+            width: updatedElement!.width - PADDING * 2,
+            y: updatedY,
+            x: updatedX,
+          });
+        }
+      }
     }
 
     return true;

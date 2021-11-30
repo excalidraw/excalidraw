@@ -13,7 +13,7 @@ import { ExcalidrawElement } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 
-const PADDING = 30;
+export const PADDING = 30;
 
 const normalizeText = (text: string) => {
   return (
@@ -403,6 +403,7 @@ export const textWysiwyg = ({
             height: Number(editable.style.height.slice(0, -2)),
             width: Number(editable.style.width.slice(0, -2)),
             x,
+            originalText: editable.value,
           });
 
           mutateElement(textContainer, { boundTextElementId: element.id });

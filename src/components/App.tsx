@@ -1874,16 +1874,12 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            const textContainer = element.textContainerId
-              ? Scene.getScene(element)?.getElement(element.textContainerId)
-              : null;
             return updateTextElement(
               _element,
               {
                 text,
                 isDeleted,
               },
-              textContainer || null,
               updateDimensions,
             );
           }
@@ -4665,10 +4661,14 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
+    let includeBoundTextElement = false;
+    if (pointerDownState.resize.handleType === "rotation") {
+      includeBoundTextElement = true;
+    }
     const selectedElements = getSelectedElements(
       this.scene.getElements(),
       this.state,
-      true,
+      includeBoundTextElement,
     );
     const transformHandleType = pointerDownState.resize.handleType;
     this.setState({

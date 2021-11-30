@@ -134,6 +134,7 @@ export const newTextElement = (
       height: metrics.height,
       baseline: metrics.baseline,
       textContainerId: opts.textContainerId || null,
+      originalText: opts.text,
     },
     {},
   );
@@ -143,7 +144,6 @@ export const newTextElement = (
 const getAdjustedDimensions = (
   element: ExcalidrawTextElement,
   nextText: string,
-  textContainer: ExcalidrawElement | null,
 ): {
   x: number;
   y: number;
@@ -213,11 +213,11 @@ const getAdjustedDimensions = (
 export const updateTextElement = (
   element: ExcalidrawTextElement,
   { text, isDeleted }: { text: string; isDeleted?: boolean },
-  textContainer: ExcalidrawElement | null,
+
   updateDimensions: boolean,
 ): ExcalidrawTextElement => {
   const dimensions = updateDimensions
-    ? getAdjustedDimensions(element, text, textContainer)
+    ? getAdjustedDimensions(element, text)
     : undefined;
   return newElementWith(element, {
     text,
