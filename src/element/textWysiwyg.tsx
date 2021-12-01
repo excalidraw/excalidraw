@@ -57,7 +57,11 @@ export const textWysiwyg = ({
   id: ExcalidrawElement["id"];
   appState: AppState;
   onChange?: (text: string) => void;
-  onSubmit: (data: { text: string; viaKeyboard: boolean }) => void;
+  onSubmit: (data: {
+    text: string;
+    viaKeyboard: boolean;
+    originalText: string;
+  }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawElement;
   canvas: HTMLCanvasElement | null;
@@ -92,9 +96,6 @@ export const textWysiwyg = ({
         maxHeight = textContainer.height - PADDING * 2;
         width = maxWidth;
         height = Math.min(height, maxHeight);
-      }
-
-      if (textContainer) {
         // The coordinates of text box set a distance of
         // 30px to preserve padding
         coordX = textContainer.x + PADDING;
@@ -126,7 +127,7 @@ export const textWysiwyg = ({
           // Start pushing text upward until a diff of 30px (padding)
           // is reached
           editable.clientHeight > maxHeight / 2 &&
-          editable.clientHeight !== maxHeight
+          textContainer.height - editable.clientHeight !== maxHeight
         ) {
           const lineCount = editable.clientHeight / approxLineHeight;
 
@@ -135,7 +136,6 @@ export const textWysiwyg = ({
           const extraLines = Math.floor(
             lineCount - maxHeight / 2 / approxLineHeight,
           );
-
           const { y: currentCoordY } = viewportCoordsToSceneCoords(
             {
               clientX: Number(editable.style.left.slice(0, -2)),
@@ -161,8 +161,8 @@ export const textWysiwyg = ({
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
       const { textAlign, angle } = updatedElement;
 
-      editable.value = updatedElement.text;
-      const lines = updatedElement.text.split("\n");
+      editable.value = updatedElement.originalText || updatedElement.text;
+      const lines = updatedElement.originalText.split("\n");
       const lineHeight = updatedElement.textContainerId
         ? approxLineHeight
         : updatedElement.height / lines.length;
@@ -403,7 +403,6 @@ export const textWysiwyg = ({
             height: Number(editable.style.height.slice(0, -2)),
             width: Number(editable.style.width.slice(0, -2)),
             x,
-            originalText: editable.value,
           });
 
           mutateElement(textContainer, { boundTextElementId: element.id });
@@ -416,6 +415,7 @@ export const textWysiwyg = ({
     onSubmit({
       text: normalizeText(wrappedText),
       viaKeyboard: submittedViaKeyboard,
+      originalText: editable.value,
     });
   };
 
