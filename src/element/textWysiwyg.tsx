@@ -100,9 +100,6 @@ export const textWysiwyg = ({
         // 30px to preserve padding
         coordX = textContainer.x + PADDING;
 
-        if (editable.clientHeight >= maxHeight) {
-          coordY = textContainer.y + PADDING;
-        }
         // autogrow container height if text exceeds
         if (editable.clientHeight > maxHeight) {
           const diff = Math.min(
@@ -122,39 +119,15 @@ export const textWysiwyg = ({
             approxLineHeight,
           );
           mutateElement(textContainer, { height: textContainer.height - diff });
-          return;
-        } else if (
-          // Start pushing text upward until a diff of 30px (padding)
-          // is reached
-          editable.clientHeight > maxHeight / 2 &&
-          textContainer.height - editable.clientHeight !== maxHeight
-        ) {
-          const lineCount = editable.clientHeight / approxLineHeight;
-
-          // lines beyond maxwidth/2 are considered extra lines as
-          // we don't need t to update coordy until then
-          const extraLines = Math.floor(
-            lineCount - maxHeight / 2 / approxLineHeight,
-          );
-          const { y: currentCoordY } = viewportCoordsToSceneCoords(
-            {
-              clientX: Number(editable.style.left.slice(0, -2)),
-              clientY: Number(editable.style.top.slice(0, -2)),
-            },
-            appState,
-          );
-
-          // Since we need to maintain padding hence thats the max
-          // limit of y coord
-          const newCoordY = Math.max(
-            coordY - approxLineHeight * extraLines,
-            textContainer.y + PADDING,
-          );
-          if (newCoordY < currentCoordY) {
-            coordY = newCoordY;
-          } else {
-            coordY = currentCoordY;
-          }
+        }
+        // Start pushing text upward until a diff of 30px (padding)
+        // is reached
+        else {
+          // vertically center align the text
+          coordY =
+            textContainer.y +
+            textContainer.height / 2 -
+            editable.clientHeight / 2;
         }
       }
 
