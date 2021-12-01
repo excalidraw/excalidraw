@@ -2,7 +2,11 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { getElementAbsoluteCoords, getElementBounds } from "../element";
+import {
+  getElementAbsoluteCoords,
+  getElementBounds,
+  isTextElement,
+} from "../element";
 import { AppState } from "../types";
 
 export const getElementsWithinSelection = (
@@ -61,7 +65,7 @@ export const getSelectedElements = (
     }
     if (
       includeBoundTextElement &&
-      element.type === "text" &&
+      isTextElement(element) &&
       element.textContainerId &&
       appState.selectedElementIds[element?.textContainerId]
     ) {

@@ -4,7 +4,7 @@ import { ToolButton } from "../components/ToolButton";
 import { trash } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
-import { getNonDeletedElements } from "../element";
+import { getNonDeletedElements, isTextElement } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { newElementWith } from "../element/mutateElement";
@@ -22,7 +22,7 @@ const deleteSelectedElements = (
         return newElementWith(el, { isDeleted: true });
       }
       if (
-        el.type === "text" &&
+        isTextElement(el) &&
         el.textContainerId &&
         appState.selectedElementIds[el.textContainerId]
       ) {

@@ -32,6 +32,7 @@ import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { isImageElement } from "./typeChecks";
+import { isTextElement } from ".";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -90,12 +91,11 @@ const isHittingElementNotConsideringBoundingBox = (
 ): boolean => {
   const threshold = 10 / appState.zoom.value;
 
-  const check =
-    element.type === "text"
-      ? isStrictlyInside
-      : isElementDraggableFromInside(element)
-      ? isInsideCheck
-      : isNearCheck;
+  const check = isTextElement(element)
+    ? isStrictlyInside
+    : isElementDraggableFromInside(element)
+    ? isInsideCheck
+    : isNearCheck;
 
   return hitTestPointAgainstElement({ element, point, threshold, check });
 };

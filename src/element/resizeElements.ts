@@ -697,7 +697,7 @@ const resizeMultipleElements = (
         const width = element.width * scale;
         const height = element.height * scale;
         let font: { fontSize?: number; baseline?: number } = {};
-        if (element.type === "text") {
+        if (isTextElement(element)) {
           const nextFont = measureFontSizeFromWH(element, width, height);
           if (nextFont === null) {
             return null;

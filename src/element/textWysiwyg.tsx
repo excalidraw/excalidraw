@@ -205,7 +205,7 @@ export const textWysiwyg = ({
   editable.classList.add("excalidraw-wysiwyg");
 
   let whiteSpace = "pre";
-  if (element.type === "text") {
+  if (isTextElement(element)) {
     whiteSpace = element.textContainerId ? "pre-wrap" : "pre";
   }
   Object.assign(editable.style, {
@@ -379,7 +379,7 @@ export const textWysiwyg = ({
       return;
     }
     let wrappedText = "";
-    if (updateElement.type === "text" && updateElement?.textContainerId) {
+    if (isTextElement(updateElement) && updateElement?.textContainerId) {
       const textContainer = Scene.getScene(updateElement)!.getElement(
         updateElement.textContainerId,
       );
@@ -397,7 +397,7 @@ export const textWysiwyg = ({
           },
           appState,
         );
-        if (updateElement.type === "text" && updateElement.textContainerId) {
+        if (isTextElement(updateElement) && updateElement.textContainerId) {
           mutateElement(updateElement, {
             y,
             height: Number(editable.style.height.slice(0, -2)),

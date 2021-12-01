@@ -1133,7 +1133,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     const scrolledOutside =
       // hide when editing text
-      this.state.editingElement?.type === "text"
+      isTextElement(this.state.editingElement)
         ? false
         : !atLeastOneVisibleElement && renderingElements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
@@ -2025,7 +2025,7 @@ class App extends React.Component<AppProps, AppState> {
       : this.scene
           .getElements()
           .filter(
-            (element) => !(element.type === "text" && element.textContainerId),
+            (element) => !(isTextElement(element) && element.textContainerId),
           );
     return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, x, y),
@@ -3029,7 +3029,7 @@ class App extends React.Component<AppProps, AppState> {
     // if we're currently still editing text, clicking outside
     // should only finalize it, not create another (irrespective
     // of state.elementLocked)
-    if (this.state.editingElement?.type === "text") {
+    if (isTextElement(this.state.editingElement)) {
       return;
     }
 
