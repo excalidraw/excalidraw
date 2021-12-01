@@ -6,13 +6,13 @@ import { getPerfectElementSize } from "./sizeHelpers";
 import Scene from "../scene/Scene";
 import { NonDeletedExcalidrawElement } from "./types";
 import { PointerDownState } from "../types";
+import { isRectangleElement } from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
   selectedElements: NonDeletedExcalidrawElement[],
   pointerX: number,
   pointerY: number,
-  scene: Scene,
   lockDirection: boolean = false,
   distanceX: number = 0,
   distanceY: number = 0,
@@ -28,7 +28,7 @@ export const dragSelectedElements = (
       element,
       offset,
     );
-    if (element.type === "rectangle" && element.boundTextElementId) {
+    if (isRectangleElement(element) && element.boundTextElementId) {
       const textElement = Scene.getScene(element)!.getElement(
         element.boundTextElementId,
       );

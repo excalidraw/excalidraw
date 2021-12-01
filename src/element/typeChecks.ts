@@ -7,6 +7,7 @@ import {
   ExcalidrawFreeDrawElement,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
+  ExcalidrawRectangleElement,
 } from "./types";
 
 export const isGenericElement = (
@@ -99,4 +100,10 @@ export const isExcalidrawElement = (element: any): boolean => {
     element?.type === "freedraw" ||
     element?.type === "line"
   );
+};
+
+export const isRectangleElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawRectangleElement => {
+  return element != null && element.type === "rectangle";
 };

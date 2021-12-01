@@ -3428,7 +3428,6 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements,
             dragX,
             dragY,
-            this.scene,
             lockDirection,
             dragDistanceX,
             dragDistanceY,

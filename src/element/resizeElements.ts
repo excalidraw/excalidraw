@@ -21,6 +21,7 @@ import {
 import {
   isFreeDrawElement,
   isLinearElement,
+  isRectangleElement,
   isTextElement,
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
@@ -107,7 +108,7 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
-      if (element.type === "rectangle" && element.boundTextElementId) {
+      if (isRectangleElement(element) && element.boundTextElementId) {
         const textElement = Scene.getScene(element)!.getElement(
           element.boundTextElementId,
         ) as ExcalidrawTextElement;
