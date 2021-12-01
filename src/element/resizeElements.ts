@@ -19,9 +19,9 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 import {
+  hasBoundTextElement,
   isFreeDrawElement,
   isLinearElement,
-  isRectangleElement,
   isTextElement,
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
@@ -108,7 +108,7 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
-      if (isRectangleElement(element) && element.boundTextElementId) {
+      if (hasBoundTextElement(element)) {
         const textElement = Scene.getScene(element)!.getElement(
           element.boundTextElementId,
         ) as ExcalidrawTextElement;

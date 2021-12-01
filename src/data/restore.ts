@@ -188,13 +188,17 @@ const restoreElement = (
     }
     // generic elements
     case "ellipse":
-      return restoreElementWithProperties(element, {});
+      return restoreElementWithProperties(element, {
+        boundTextElementId: element.boundTextElementId || null,
+      });
     case "rectangle":
       return restoreElementWithProperties(element, {
         boundTextElementId: element.boundTextElementId || null,
       });
     case "diamond":
-      return restoreElementWithProperties(element, {});
+      return restoreElementWithProperties(element, {
+        boundTextElementId: element.boundTextElementId || null,
+      });
 
     // Don't use default case so as to catch a missing an element type case.
     // We also don't want to throw, but instead return void so we filter

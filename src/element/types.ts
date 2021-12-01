@@ -55,15 +55,20 @@ export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
 
 export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
   type: "rectangle";
+  /* id of the text element inside shape */
   boundTextElementId: ExcalidrawTextElement["id"] | null;
 };
 
 export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
   type: "diamond";
+  /* id of the text element inside shape */
+  boundTextElementId: ExcalidrawTextElement["id"] | null;
 };
 
 export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
+  /* id of the text element inside shape */
+  boundTextElementId: ExcalidrawTextElement["id"] | null;
 };
 
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
@@ -117,7 +122,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     baseline: number;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    textContainerId: ExcalidrawRectangleElement["id"] | null;
+    textContainerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
   }>;
 
@@ -127,6 +132,12 @@ export type ExcalidrawBindableElement =
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
   | ExcalidrawImageElement;
+
+export type ExcalidrawBoundTextElement = { boundTextElementId: string } & (
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement
+);
 
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];

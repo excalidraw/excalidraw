@@ -6,7 +6,7 @@ import { getPerfectElementSize } from "./sizeHelpers";
 import Scene from "../scene/Scene";
 import { NonDeletedExcalidrawElement } from "./types";
 import { PointerDownState } from "../types";
-import { isRectangleElement } from "./typeChecks";
+import { hasBoundTextElement } from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -28,7 +28,7 @@ export const dragSelectedElements = (
       element,
       offset,
     );
-    if (isRectangleElement(element) && element.boundTextElementId) {
+    if (hasBoundTextElement(element)) {
       const textElement = Scene.getScene(element)!.getElement(
         element.boundTextElementId,
       );

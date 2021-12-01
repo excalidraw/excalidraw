@@ -32,8 +32,10 @@ export const rectangleFixture: ExcalidrawElement = {
 export const ellipseFixture: ExcalidrawElement = {
   ...elementBase,
   type: "ellipse",
+  boundTextElementId: null,
 };
 export const diamondFixture: ExcalidrawElement = {
   ...elementBase,
   type: "diamond",
+  boundTextElementId: null,
 };

@@ -7,9 +7,9 @@ import {
   getApproxLineHeight,
 } from "../utils";
 import Scene from "../scene/Scene";
-import { isRectangleElement, isTextElement } from "./typeChecks";
+import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
-import { ExcalidrawElement } from "./types";
+import { ExcalidrawBoundTextElement, ExcalidrawElement } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 
@@ -382,9 +382,9 @@ export const textWysiwyg = ({
     if (isTextElement(updateElement) && updateElement?.textContainerId) {
       const textContainer = Scene.getScene(updateElement)!.getElement(
         updateElement.textContainerId,
-      );
+      ) as ExcalidrawBoundTextElement;
 
-      if (textContainer && isRectangleElement(textContainer)) {
+      if (textContainer) {
         wrappedText = wrapText(
           editable.value,
           getFontString(updateElement),
