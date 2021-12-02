@@ -9,6 +9,7 @@ import {
   ExcalidrawImageElement,
   ExcalidrawRectangleElement,
   ExcalidrawBoundTextElement,
+  ExcalidrawBindableTextELement,
 } from "./types";
 
 export const isGenericElement = (
@@ -113,10 +114,15 @@ export const hasBoundTextElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawBoundTextElement => {
   return (
-    element !== null &&
-    (element.type === "rectangle" ||
-      element.type === "diamond" ||
-      element.type === "ellipse") &&
+    isExcalidrawBindableTextELement(element) &&
     element.boundTextElementId !== null
   );
 };
+
+export const isExcalidrawBindableTextELement = (
+  element: any,
+): element is ExcalidrawBindableTextELement =>
+  element !== null &&
+  (element.type === "rectangle" ||
+    element.type === "diamond" ||
+    element.type === "ellipse");

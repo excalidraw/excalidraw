@@ -139,6 +139,11 @@ export type ExcalidrawBoundTextElement = { boundTextElementId: string } & (
   | ExcalidrawEllipseElement
 );
 
+export type ExcalidrawBindableTextELement =
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement
+  | ExcalidrawRectangleElement;
+
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];
   focus: number;

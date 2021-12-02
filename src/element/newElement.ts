@@ -21,6 +21,7 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
+import { isExcalidrawBindableTextELement } from "./typeChecks";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -54,30 +55,36 @@ const _newElementBase = <T extends ExcalidrawElement>(
     boundElementIds = null,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
-) => ({
-  id: rest.id || randomId(),
-  type,
-  x,
-  y,
-  width,
-  height,
-  angle,
-  strokeColor,
-  backgroundColor,
-  fillStyle,
-  strokeWidth,
-  strokeStyle,
-  roughness,
-  opacity,
-  groupIds,
-  strokeSharpness,
-  seed: rest.seed ?? randomInteger(),
-  version: rest.version || 1,
-  versionNonce: rest.versionNonce ?? 0,
-  isDeleted: false as false,
-  boundElementIds,
-  updated: getUpdatedTimestamp(),
-});
+) => {
+  const element = {
+    id: rest.id || randomId(),
+    type,
+    x,
+    y,
+    width,
+    height,
+    angle,
+    strokeColor,
+    backgroundColor,
+    fillStyle,
+    strokeWidth,
+    strokeStyle,
+    roughness,
+    opacity,
+    groupIds,
+    strokeSharpness,
+    seed: rest.seed ?? randomInteger(),
+    version: rest.version || 1,
+    versionNonce: rest.versionNonce ?? 0,
+    isDeleted: false as false,
+    boundElementIds,
+    updated: getUpdatedTimestamp(),
+  };
+  if (isExcalidrawBindableTextELement(element)) {
+    element.boundTextElementId = null;
+  }
+  return element;
+};
 
 export const newElement = (
   opts: {

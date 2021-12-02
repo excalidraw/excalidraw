@@ -381,7 +381,6 @@ export const textWysiwyg = ({
             width: Number(editable.style.width.slice(0, -2)),
             x,
           });
-
           mutateElement(textContainer, { boundTextElementId: element.id });
         }
       }
