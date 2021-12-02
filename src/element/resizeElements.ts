@@ -1,4 +1,4 @@
-import { SHIFT_LOCKING_ANGLE } from "../constants";
+import { PADDING, SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
 import {
@@ -26,7 +26,12 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import { measureText, getFontString, wrapText } from "../utils";
+import {
+  measureText,
+  getFontString,
+  wrapText,
+  getApproxLineWidth,
+} from "../utils";
 import { updateBoundElements } from "./binding";
 import {
   TransformHandleType,
@@ -35,7 +40,6 @@ import {
 } from "./transformHandles";
 import { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
-import { PADDING } from "./textWysiwyg";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -616,8 +620,18 @@ export const resizeSingleElement = (
     });
   }
 
+  const boundTextElement = hasBoundTextElement(element)
+    ? (Scene.getScene(element)!.getElement(
+        element.boundTextElementId,
+      ) as ExcalidrawTextElement)
+    : null;
+
+  const minWidth = boundTextElement
+    ? getApproxLineWidth(getFontString(boundTextElement)) + PADDING * 2
+    : 0;
+
   if (
-    resizedElement.width !== 0 &&
+    resizedElement.width > minWidth &&
     resizedElement.height !== 0 &&
     Number.isFinite(resizedElement.x) &&
     Number.isFinite(resizedElement.y)

@@ -4,6 +4,7 @@ import {
   DEFAULT_VERSION,
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
+  PADDING,
 } from "./constants";
 import {
   ExcalidrawElement,
@@ -135,12 +136,12 @@ export const wrapText = (
   if (!textContainer) {
     return text;
   }
+  const maxWidth = textContainer.width - PADDING * 2;
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   originalLines.forEach((originalLine) => {
     const words = originalLine.split(" ");
     let currentLine = "";
-    const maxWidth = textContainer.width - 60;
     while (words.length > 0) {
       while (getTextDimensions(words[0], font).width >= maxWidth) {
         const currentWord = words[0];
@@ -167,9 +168,13 @@ export const wrapText = (
   return lines.join("\n");
 };
 
+const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 export const getApproxLineHeight = (font: FontString) => {
-  const text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  return getTextDimensions(text, font).height;
+  return getTextDimensions(DUMMY_TEXT, font).height;
+};
+
+export const getApproxLineWidth = (font: FontString) => {
+  return getTextDimensions(DUMMY_TEXT.split("").join("\n"), font).width;
 };
 
 export const debounce = <T extends any[]>(

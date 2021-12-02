@@ -8,12 +8,10 @@ import {
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
-import { CLASSES } from "../constants";
+import { CLASSES, PADDING } from "../constants";
 import { ExcalidrawBoundTextElement, ExcalidrawElement } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
-
-export const PADDING = 30;
 
 const normalizeText = (text: string) => {
   return (
