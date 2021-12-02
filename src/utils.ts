@@ -173,8 +173,14 @@ export const getApproxLineHeight = (font: FontString) => {
   return getTextDimensions(DUMMY_TEXT, font).height;
 };
 
-export const getApproxLineWidth = (font: FontString) => {
-  return getTextDimensions(DUMMY_TEXT.split("").join("\n"), font).width;
+export const getApproxMinLineWidth = (font: FontString) => {
+  return (
+    getTextDimensions(DUMMY_TEXT.split("").join("\n"), font).width + PADDING * 2
+  );
+};
+
+export const getApproxMinLineHeight = (font: FontString) => {
+  return getApproxLineHeight(font) + PADDING * 2;
 };
 
 export const debounce = <T extends any[]>(

@@ -30,7 +30,7 @@ import {
   measureText,
   getFontString,
   wrapText,
-  getApproxLineWidth,
+  getApproxMinLineWidth,
 } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
@@ -627,7 +627,7 @@ export const resizeSingleElement = (
     : null;
 
   const minWidth = boundTextElement
-    ? getApproxLineWidth(getFontString(boundTextElement)) + PADDING * 2
+    ? getApproxMinLineWidth(getFontString(boundTextElement))
     : 0;
 
   if (

@@ -194,6 +194,9 @@ import {
 import {
   debounce,
   distance,
+  getApproxMinLineHeight,
+  getApproxMinLineWidth,
+  getFontString,
   getNearestScrollableContainer,
   isInputLike,
   isToolIcon,
@@ -1709,6 +1712,7 @@ class App extends React.Component<AppProps, AppState> {
           !isLinearElement(selectedElements[0])
         ) {
           const selectedElement = selectedElements[0];
+
           this.startTextEditing({
             sceneX: selectedElement.x + selectedElement.width / 2,
             sceneY: selectedElement.y + selectedElement.height / 2,
@@ -2050,6 +2054,19 @@ class App extends React.Component<AppProps, AppState> {
       sceneX,
       sceneY,
     );
+    if (!existingTextElement && textContainer) {
+      const fontString = {
+        fontSize: this.state.currentItemFontSize,
+        fontFamily: this.state.currentItemFontFamily,
+      };
+      const minWidth = getApproxMinLineWidth(getFontString(fontString));
+      const minHeight = getApproxMinLineHeight(getFontString(fontString));
+      const newHeight = Math.max(textContainer.height, minHeight);
+      const newWidth = Math.max(textContainer.width, minWidth);
+      mutateElement(textContainer, { height: newHeight, width: newWidth });
+      sceneX = textContainer.x + newWidth / 2;
+      sceneY = textContainer.y + newHeight / 2;
+    }
     const parentCenterPosition =
       insertAtParentCenter &&
       this.getTextWysiwygSnappedToCenterPosition(
