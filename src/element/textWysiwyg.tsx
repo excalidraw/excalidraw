@@ -123,11 +123,17 @@ export const textWysiwyg = ({
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
         else {
-          // vertically center align the text
-          coordY =
-            textContainer.y +
-            textContainer.height / 2 -
-            editable.clientHeight / 2;
+          const lines = editable.clientHeight / approxLineHeight;
+          // For some reason the scrollHeight gets set to twice the lineHeight
+          // when you start typing for first time  and thus line count is 2
+          // hence this check
+          if (lines > 2) {
+            // vertically center align the text
+            coordY =
+              textContainer.y +
+              textContainer.height / 2 -
+              editable.clientHeight / 2;
+          }
         }
       }
 
