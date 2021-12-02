@@ -87,7 +87,7 @@ export const isBindableElement = (
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
-      element.type === "text")
+      (element.type === "text" && !element.textContainerId))
   );
 };
 
