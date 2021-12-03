@@ -136,33 +136,49 @@ export const wrapText = (
   if (!textContainer) {
     return text;
   }
-  const maxWidth = textContainer.width - PADDING * 2;
+
+  // Adding 1px in max width to calculate accurately since we append
+  // a span of 1px when calculating width
+  const maxWidth = Math.round(textContainer.width - PADDING * 2) + 1;
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
-  originalLines.forEach((originalLine) => {
+  originalLines.forEach((originalLine, index) => {
     const words = originalLine.split(" ");
-    let currentLine = "";
-    while (words.length > 0) {
-      while (getTextDimensions(words[0], font).width >= maxWidth) {
-        const currentWord = words[0];
-        words[0] = currentWord.slice(0, -1);
-        const lastChar = currentWord.slice(-1);
-
-        if (words.length > 1) {
-          words[1] = lastChar + words[1];
+    // This means its newline so push it
+    if (words.length === 1 && words[0] === "") {
+      lines.push(words[0]);
+    } else {
+      let currentLine = "";
+      while (words.length > 0) {
+        let addSpace = true;
+        const originalWordLength = words.length;
+        while (getTextDimensions(words[0], font).width > maxWidth) {
+          const currentWord = words[0];
+          words[0] = currentWord.slice(0, -1);
+          const lastChar = currentWord.slice(-1);
+          if (words.length > 1) {
+            // So that space is preserved before appending the remaining
+            //characters of current word to next word when more than
+            // one words available
+            if (addSpace && originalWordLength > 1) {
+              words[1] = ` ${words[1]}`;
+              addSpace = false;
+            }
+            words[1] = lastChar + words[1];
+          } else {
+            words.push(lastChar);
+          }
+        }
+        if (getTextDimensions(words[0] + currentLine, font).width > maxWidth) {
+          lines.push(currentLine.trim());
+          currentLine = "";
         } else {
-          words.push(lastChar);
+          currentLine += `${words.shift()} `;
         }
       }
-      if (getTextDimensions(words[0] + currentLine, font).width >= maxWidth) {
-        lines.push(currentLine.trim());
-        currentLine = "";
-      } else {
-        currentLine += `${words.shift()} `;
-      }
+      currentLine = currentLine.trim();
+      lines.push(currentLine);
     }
-    currentLine = currentLine.trim();
-    lines.push(currentLine);
   });
 
   return lines.join("\n");

@@ -183,7 +183,7 @@ export const textWysiwyg = ({
 
   let whiteSpace = "pre";
   if (isTextElement(element)) {
-    whiteSpace = element.textContainerId ? "pre-wrap" : "pre";
+    whiteSpace = element.textContainerId ? "normal" : "pre";
   }
   Object.assign(editable.style, {
     position: "absolute",
@@ -197,11 +197,11 @@ export const textWysiwyg = ({
     resize: "none",
     background: "transparent",
     overflow: "hidden",
-    overflowWrap: "break-word",
     // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
     whiteSpace,
     // must be specified because in dark mode canvas creates a stacking context
     zIndex: "var(--zIndex-wysiwyg)",
+    wordBreak: "break-word",
   });
   updateWysiwygStyle();
 
