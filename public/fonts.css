@@ -11,3 +11,33 @@
   src: url("Cascadia.woff2");
   font-display: swap;
 }
+
+@font-face {
+  font-family: "REDACTED_REGULAR";
+  src: url("redacted-regular.woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "REDACTED_SCRIPT_BOLD";
+  src: url("redacted-script-bold.woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "REDACTED_SCRIPT_REGULAR";
+  src: url("redacted-script-regular.woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Scribble";
+  src: url("scribble-webfont.woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Blokk";
+  src: url("BLOKKNeue-Regular.woff2");
+  font-display: swap;
+}

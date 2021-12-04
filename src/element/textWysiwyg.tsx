@@ -320,7 +320,9 @@ export const textWysiwyg = ({
 
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
-    if (
+    if (event.target instanceof HTMLSelectElement) {
+      handleSubmit();
+    } else if (
       (event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
       event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&

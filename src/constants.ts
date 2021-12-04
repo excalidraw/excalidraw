@@ -68,6 +68,11 @@ export const FONT_FAMILY = {
   Virgil: 1,
   Helvetica: 2,
   Cascadia: 3,
+  REDACTED_REGULAR: 4,
+  REDACTED_SCRIPT_REGULAR: 5,
+  REDACTED_SCRIPT_BOLD: 6,
+  SCRIBBLE: 7,
+  BLOKK: 8,
 };
 
 export const THEME = {

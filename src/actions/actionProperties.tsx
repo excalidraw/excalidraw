@@ -13,9 +13,9 @@ import {
   FillCrossHatchIcon,
   FillHachureIcon,
   FillSolidIcon,
-  FontFamilyCodeIcon,
-  FontFamilyHandDrawnIcon,
-  FontFamilyNormalIcon,
+  // FontFamilyCodeIcon,
+  // FontFamilyHandDrawnIcon,
+  // FontFamilyNormalIcon,
   FontSizeExtraLargeIcon,
   FontSizeLargeIcon,
   FontSizeMediumIcon,
@@ -34,7 +34,7 @@ import {
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
-  FONT_FAMILY,
+  //FONT_FAMILY,
 } from "../constants";
 import {
   getNonDeletedElements,
@@ -48,7 +48,7 @@ import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
-  FontFamilyValues,
+  //FontFamilyValues,
   TextAlign,
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
@@ -62,6 +62,7 @@ import {
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
 import { register } from "./register";
+import FontsList from "../components/FontList";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -506,41 +507,43 @@ export const actionChangeFontFamily = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
-    const options: {
-      value: FontFamilyValues;
-      text: string;
-      icon: JSX.Element;
-    }[] = [
-      {
-        value: FONT_FAMILY.Virgil,
-        text: t("labels.handDrawn"),
-        icon: <FontFamilyHandDrawnIcon theme={appState.theme} />,
-      },
-      {
-        value: FONT_FAMILY.Helvetica,
-        text: t("labels.normal"),
-        icon: <FontFamilyNormalIcon theme={appState.theme} />,
-      },
-      {
-        value: FONT_FAMILY.Cascadia,
-        text: t("labels.code"),
-        icon: <FontFamilyCodeIcon theme={appState.theme} />,
-      },
-    ];
+    // const options: {
+    //   value: FontFamilyValues;
+    //   text: string;
+    //   icon: JSX.Element;
+    // }[] = [
+    //   {
+    //     value: FONT_FAMILY.Virgil,
+    //     text: t("labels.handDrawn"),
+    //     icon: <FontFamilyHandDrawnIcon theme={appState.theme} />,
+    //   },
+    //   {
+    //     value: FONT_FAMILY.Helvetica,
+    //     text: t("labels.normal"),
+    //     icon: <FontFamilyNormalIcon theme={appState.theme} />,
+    //   },
+    //   {
+    //     value: FONT_FAMILY.Cascadia,
+    //     text: t("labels.code"),
+    //     icon: <FontFamilyCodeIcon theme={appState.theme} />,
+    //   },
+    // ];
 
     return (
       <fieldset>
         <legend>{t("labels.fontFamily")}</legend>
-        <ButtonIconSelect<FontFamilyValues | false>
-          group="font-family"
-          options={options}
-          value={getFormValue(
-            elements,
-            appState,
-            (element) => isTextElement(element) && element.fontFamily,
-            appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
-          )}
-          onChange={(value) => updateData(value)}
+        <FontsList
+          onChange={(val) => {
+            updateData(val);
+          }}
+          currentFontFamily={
+            getFormValue(
+              elements,
+              appState,
+              (element) => isTextElement(element) && element.fontFamily,
+              appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
+            ) || DEFAULT_FONT_FAMILY
+          }
         />
       </fieldset>
     );
