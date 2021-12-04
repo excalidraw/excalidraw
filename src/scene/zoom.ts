@@ -25,6 +25,6 @@ export const getNewZoom = (
 
 export const getNormalizedZoom = (zoom: number): NormalizedZoomValue => {
   const normalizedZoom = parseFloat(zoom.toFixed(2));
-  const clampedZoom = Math.max(0.1, Math.min(normalizedZoom, 10));
+  const clampedZoom = Math.max(0.1, Math.min(normalizedZoom, 30));
   return clampedZoom as NormalizedZoomValue;
 };
