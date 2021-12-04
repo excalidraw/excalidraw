@@ -3,6 +3,7 @@ import {
   ExcalidrawLinearElement,
   Arrowhead,
   ExcalidrawFreeDrawElement,
+  NonDeleted,
 } from "./types";
 import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
@@ -78,7 +79,7 @@ const getMinMaxXYFromCurvePathOps = (
       // move, bcurveTo, lineTo, and curveTo
       if (op === "move") {
         // change starting point
-        currentP = (data as unknown) as Point;
+        currentP = data as unknown as Point;
         // move operation does not draw anything; so, it always
         // returns false
       } else if (op === "bcurveTo") {
@@ -227,7 +228,7 @@ export const getArrowheadPoints = (
   const prevOp = ops[index - 1];
   let p0: Point = [0, 0];
   if (prevOp.op === "move") {
-    p0 = (prevOp.data as unknown) as Point;
+    p0 = prevOp.data as unknown as Point;
   } else if (prevOp.op === "bcurveTo") {
     p0 = [prevOp.data[4], prevOp.data[5]];
   }
@@ -258,6 +259,7 @@ export const getArrowheadPoints = (
     arrow: 30,
     bar: 15,
     dot: 15,
+    triangle: 15,
   }[arrowhead]; // pixels (will differ for each arrowhead)
 
   let length = 0;
@@ -294,6 +296,7 @@ export const getArrowheadPoints = (
   const angle = {
     arrow: 20,
     bar: 90,
+    triangle: 25,
   }[arrowhead]; // degrees
 
   // Return points
@@ -510,4 +513,18 @@ export const getClosestElementBounds = (
   });
 
   return getElementBounds(closestElement);
+};
+
+export interface Box {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
+export const getCommonBoundingBox = (
+  elements: ExcalidrawElement[] | readonly NonDeleted<ExcalidrawElement>[],
+): Box => {
+  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  return { minX, minY, maxX, maxY };
 };

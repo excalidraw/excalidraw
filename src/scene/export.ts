@@ -51,34 +51,23 @@ export const exportToCanvas = async (
     files,
   });
 
-  renderScene(
-    elements,
-    appState,
-    null,
-    scale,
-    rough.canvas(canvas),
-    canvas,
-    {
-      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: -minX + exportPadding,
-      scrollY: -minY + exportPadding,
-      zoom: defaultAppState.zoom,
-      remotePointerViewportCoords: {},
-      remoteSelectedElementIds: {},
-      shouldCacheIgnoreZoom: false,
-      remotePointerUsernames: {},
-      remotePointerUserStates: {},
-      theme: appState.exportWithDarkMode ? "dark" : "light",
-      imageCache,
-    },
-    {
-      renderScrollbars: false,
-      renderSelection: false,
-      renderOptimizations: true,
-      renderGrid: false,
-      isExport: true,
-    },
-  );
+  renderScene(elements, appState, null, scale, rough.canvas(canvas), canvas, {
+    viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+    scrollX: -minX + exportPadding,
+    scrollY: -minY + exportPadding,
+    zoom: defaultAppState.zoom,
+    remotePointerViewportCoords: {},
+    remoteSelectedElementIds: {},
+    shouldCacheIgnoreZoom: false,
+    remotePointerUsernames: {},
+    remotePointerUserStates: {},
+    theme: appState.exportWithDarkMode ? "dark" : "light",
+    imageCache,
+    renderScrollbars: false,
+    renderSelection: false,
+    renderGrid: false,
+    isExporting: true,
+  });
 
   return canvas;
 };
@@ -109,8 +98,8 @@ export const exportToSvg = async (
       ).encodeSvgMetadata({
         text: serializeAsJSON(elements, appState, files || {}, "local"),
       });
-    } catch (err) {
-      console.error(err);
+    } catch (error: any) {
+      console.error(error);
     }
   }
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
@@ -158,6 +147,7 @@ export const exportToSvg = async (
   renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,
+    exportWithDarkMode: appState.exportWithDarkMode,
   });
 
   return svgRoot;
@@ -180,10 +170,9 @@ export const getExportSize = (
   exportPadding: number,
   scale: number,
 ): [number, number] => {
-  const [, , width, height] = getCanvasSize(
-    elements,
-    exportPadding,
-  ).map((dimension) => Math.trunc(dimension * scale));
+  const [, , width, height] = getCanvasSize(elements, exportPadding).map(
+    (dimension) => Math.trunc(dimension * scale),
+  );
 
   return [width, height];
 };

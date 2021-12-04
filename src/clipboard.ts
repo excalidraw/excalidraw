@@ -74,7 +74,7 @@ export const copyToClipboard = async (
   try {
     PREFER_APP_CLIPBOARD = false;
     await copyTextToSystemClipboard(json);
-  } catch (error) {
+  } catch (error: any) {
     PREFER_APP_CLIPBOARD = true;
     console.error(error);
   }
@@ -87,7 +87,7 @@ const getAppClipboard = (): Partial<ElementsClipboard> => {
 
   try {
     return JSON.parse(CLIPBOARD);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     return {};
   }
@@ -179,7 +179,7 @@ export const copyTextToSystemClipboard = async (text: string | null) => {
       // not focused
       await navigator.clipboard.writeText(text || "");
       copied = true;
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
     }
   }
@@ -219,7 +219,7 @@ const copyTextViaExecCommand = (text: string) => {
     textarea.setSelectionRange(0, textarea.value.length);
 
     success = document.execCommand("copy");
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
   }
 

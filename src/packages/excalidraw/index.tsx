@@ -171,7 +171,6 @@ const forwardedRefComp = forwardRef<
 export default React.memo(forwardedRefComp, areEqual);
 export {
   getSceneVersion,
-  getElementMap,
   isInvisiblySmallElement,
   getNonDeletedElements,
 } from "../../element";

@@ -85,7 +85,7 @@ export const encode = async ({
   if (compress !== false) {
     try {
       deflated = await toByteString(deflate(text));
-    } catch (error) {
+    } catch (error: any) {
       console.error("encode: cannot deflate", error);
     }
   }
@@ -234,7 +234,19 @@ const splitBuffers = (concatenatedBuffer: Uint8Array) => {
 
   let cursor = 0;
 
-  // first chunk is the version (ignored for now)
+  // first chunk is the version
+  const version = dataView(
+    concatenatedBuffer,
+    NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
+    cursor,
+  );
+  // If version is outside of the supported versions, throw an error.
+  // This usually means the buffer wasn't encoded using this API, so we'd only
+  // waste compute.
+  if (version > CONCAT_BUFFERS_VERSION) {
+    throw new Error(`invalid version ${version}`);
+  }
+
   cursor += VERSION_DATAVIEW_BYTES;
 
   while (true) {
@@ -367,7 +379,7 @@ export const decompressData = async <T extends Record<string, any>>(
       /** data can be anything so the caller must decode it */
       data: contentsBuffer,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error(
       `Error during decompressing and decrypting the file.`,
       encodingMetadata,

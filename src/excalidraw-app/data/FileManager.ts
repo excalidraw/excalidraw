@@ -1,5 +1,5 @@
 import { compressData } from "../../data/encode";
-import { mutateElement } from "../../element/mutateElement";
+import { newElementWith } from "../../element/mutateElement";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import {
   ExcalidrawElement,
@@ -31,15 +31,11 @@ export class FileManager {
     getFiles,
     saveFiles,
   }: {
-    getFiles: (
-      fileIds: FileId[],
-    ) => Promise<{
+    getFiles: (fileIds: FileId[]) => Promise<{
       loadedFiles: BinaryFileData[];
       erroredFiles: Map<FileId, true>;
     }>;
-    saveFiles: (data: {
-      addedFiles: Map<FileId, BinaryFileData>;
-    }) => Promise<{
+    saveFiles: (data: { addedFiles: Map<FileId, BinaryFileData> }) => Promise<{
       savedFiles: Map<FileId, true>;
       erroredFiles: Map<FileId, true>;
     }>;
@@ -235,13 +231,9 @@ export const updateStaleImageStatuses = (params: {
           isInitializedImageElement(element) &&
           params.erroredFiles.has(element.fileId)
         ) {
-          return mutateElement(
-            element,
-            {
-              status: "error",
-            },
-            false,
-          );
+          return newElementWith(element, {
+            status: "error",
+          });
         }
         return element;
       }),

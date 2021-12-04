@@ -11,6 +11,7 @@ import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { AppState, DataURL } from "../types";
+import { bytesToHexString } from "../utils";
 import { FileSystemHandle } from "./filesystem";
 import { isValidExcalidrawData } from "./json";
 import { restore } from "./restore";
@@ -24,7 +25,7 @@ const parseFileContents = async (blob: Blob | File) => {
       return await (
         await import(/* webpackChunkName: "image" */ "./image")
       ).decodePngMetadata(blob);
-    } catch (error) {
+    } catch (error: any) {
       if (error.message === "INVALID") {
         throw new DOMException(
           t("alerts.imageDoesNotContainScene"),
@@ -58,7 +59,7 @@ const parseFileContents = async (blob: Blob | File) => {
         ).decodeSvgMetadata({
           svg: contents,
         });
-      } catch (error) {
+      } catch (error: any) {
         if (error.message === "INVALID") {
           throw new DOMException(
             t("alerts.imageDoesNotContainScene"),
@@ -156,7 +157,7 @@ export const loadFromBlob = async (
     );
 
     return result;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error.message);
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
@@ -187,7 +188,7 @@ export const canvasToBlob = async (
         }
         resolve(blob);
       });
-    } catch (error) {
+    } catch (error: any) {
       reject(error);
     }
   });
@@ -195,26 +196,18 @@ export const canvasToBlob = async (
 
 /** generates SHA-1 digest from supplied file (if not supported, falls back
     to a 40-char base64 random id) */
-export const generateIdFromFile = async (file: File) => {
-  let id: FileId;
+export const generateIdFromFile = async (file: File): Promise<FileId> => {
   try {
     const hashBuffer = await window.crypto.subtle.digest(
       "SHA-1",
       await file.arrayBuffer(),
     );
-    id =
-      // convert buffer to byte array
-      Array.from(new Uint8Array(hashBuffer))
-        // convert to hex string
-        .map((byte) => byte.toString(16).padStart(2, "0"))
-        .join("") as FileId;
-  } catch (error) {
+    return bytesToHexString(new Uint8Array(hashBuffer)) as FileId;
+  } catch (error: any) {
     console.error(error);
     // length 40 to align with the HEX length of SHA-1 (which is 160 bit)
-    id = nanoid(40) as FileId;
+    return nanoid(40) as FileId;
   }
-
-  return id;
 };
 
 export const getDataURL = async (file: Blob | File): Promise<DataURL> => {
@@ -244,7 +237,11 @@ export const dataURLToFile = (dataURL: DataURL, filename = "") => {
 
 export const resizeImageFile = async (
   file: File,
-  maxWidthOrHeight: number,
+  opts: {
+    /** undefined indicates auto */
+    outputType?: typeof MIME_TYPES["jpg"];
+    maxWidthOrHeight: number;
+  },
 ): Promise<File> => {
   // SVG files shouldn't a can't be resized
   if (file.type === MIME_TYPES.svg) {
@@ -264,16 +261,26 @@ export const resizeImageFile = async (
     pica: pica({ features: ["js", "wasm"] }),
   });
 
-  const fileType = file.type;
+  if (opts.outputType) {
+    const { outputType } = opts;
+    reduce._create_blob = function (env) {
+      return this.pica.toBlob(env.out_canvas, outputType, 0.8).then((blob) => {
+        env.out_blob = blob;
+        return env;
+      });
+    };
+  }
 
   if (!isSupportedImageFile(file)) {
     throw new Error(t("errors.unsupportedFileType"));
   }
 
   return new File(
-    [await reduce.toBlob(file, { max: maxWidthOrHeight })],
+    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight })],
     file.name,
-    { type: fileType },
+    {
+      type: opts.outputType || file.type,
+    },
   );
 };
 

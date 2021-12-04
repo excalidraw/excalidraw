@@ -1,8 +1,4 @@
-import {
-  encryptAESGEM,
-  SocketUpdateData,
-  SocketUpdateDataSource,
-} from "../data";
+import { SocketUpdateData, SocketUpdateDataSource } from "../data";
 
 import CollabWrapper from "./CollabWrapper";
 
@@ -11,7 +7,9 @@ import { BROADCAST, FILE_UPLOAD_TIMEOUT, SCENE } from "../app_constants";
 import { UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
 import { throttle } from "lodash";
-import { mutateElement } from "../../element/mutateElement";
+import { newElementWith } from "../../element/mutateElement";
+import { BroadcastedExcalidrawElement } from "./reconciliation";
+import { encryptData } from "../../data/encryption";
 
 class Portal {
   collab: CollabWrapper;
@@ -40,9 +38,7 @@ class Portal {
     this.socket.on("new-user", async (_socketId: string) => {
       this.broadcastScene(
         SCENE.INIT,
-        this.collab.getSyncableElements(
-          this.collab.getSceneElementsIncludingDeleted(),
-        ),
+        this.collab.getSceneElementsIncludingDeleted(),
         /* syncAll */ true,
       );
     });
@@ -55,6 +51,7 @@ class Portal {
     if (!this.socket) {
       return;
     }
+    this.queueFileUpload.flush();
     this.socket.close();
     this.socket = null;
     this.roomId = null;
@@ -79,12 +76,13 @@ class Portal {
     if (this.isOpen()) {
       const json = JSON.stringify(data);
       const encoded = new TextEncoder().encode(json);
-      const encrypted = await encryptAESGEM(encoded, this.roomKey!);
-      this.socket!.emit(
+      const { encryptedBuffer, iv } = await encryptData(this.roomKey!, encoded);
+
+      this.socket?.emit(
         volatile ? BROADCAST.SERVER_VOLATILE : BROADCAST.SERVER,
         this.roomId,
-        encrypted.data,
-        encrypted.iv,
+        encryptedBuffer,
+        iv,
       );
     }
   }
@@ -95,12 +93,14 @@ class Portal {
         elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
         files: this.collab.excalidrawAPI.getFiles(),
       });
-    } catch (error) {
-      this.collab.excalidrawAPI.updateScene({
-        appState: {
-          errorMessage: error.message,
-        },
-      });
+    } catch (error: any) {
+      if (error.name !== "AbortError") {
+        this.collab.excalidrawAPI.updateScene({
+          appState: {
+            errorMessage: error.message,
+          },
+        });
+      }
     }
 
     this.collab.excalidrawAPI.updateScene({
@@ -111,11 +111,7 @@ class Portal {
             // this will signal collaborators to pull image data from server
             // (using mutation instead of newElementWith otherwise it'd break
             // in-progress dragging)
-            return mutateElement(
-              element,
-              { status: "saved" },
-              /* informMutation */ false,
-            );
+            return newElementWith(element, { status: "saved" });
           }
           return element;
         }),
@@ -124,24 +120,35 @@ class Portal {
 
   broadcastScene = async (
     sceneType: SCENE.INIT | SCENE.UPDATE,
-    syncableElements: ExcalidrawElement[],
+    allElements: readonly ExcalidrawElement[],
     syncAll: boolean,
   ) => {
     if (sceneType === SCENE.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
 
-    if (!syncAll) {
-      // sync out only the elements we think we need to to save bandwidth.
-      // periodically we'll resync the whole thing to make sure no one diverges
-      // due to a dropped message (server goes down etc).
-      syncableElements = syncableElements.filter(
-        (syncableElement) =>
-          !this.broadcastedElementVersions.has(syncableElement.id) ||
-          syncableElement.version >
-            this.broadcastedElementVersions.get(syncableElement.id)!,
-      );
-    }
+    // sync out only the elements we think we need to to save bandwidth.
+    // periodically we'll resync the whole thing to make sure no one diverges
+    // due to a dropped message (server goes down etc).
+    const syncableElements = allElements.reduce(
+      (acc, element: BroadcastedExcalidrawElement, idx, elements) => {
+        if (
+          (syncAll ||
+            !this.broadcastedElementVersions.has(element.id) ||
+            element.version >
+              this.broadcastedElementVersions.get(element.id)!) &&
+          this.collab.isSyncableElement(element)
+        ) {
+          acc.push({
+            ...element,
+            // z-index info for the reconciler
+            parent: idx === 0 ? "^" : elements[idx - 1]?.id,
+          });
+        }
+        return acc;
+      },
+      [] as BroadcastedExcalidrawElement[],
+    );
 
     const data: SocketUpdateDataSource[typeof sceneType] = {
       type: sceneType,
@@ -201,8 +208,8 @@ class Portal {
           socketId: this.socket.id,
           pointer: payload.pointer,
           button: payload.button || "up",
-          selectedElementIds: this.collab.excalidrawAPI.getAppState()
-            .selectedElementIds,
+          selectedElementIds:
+            this.collab.excalidrawAPI.getAppState().selectedElementIds,
           username: this.collab.state.username,
         },
       };

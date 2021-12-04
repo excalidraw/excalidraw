@@ -99,9 +99,8 @@ export const actionGroup = register({
     // to the z order of the highest element in the layer stack
     const elementsInGroup = getElementsInGroup(updatedElements, newGroupId);
     const lastElementInGroup = elementsInGroup[elementsInGroup.length - 1];
-    const lastGroupElementIndex = updatedElements.lastIndexOf(
-      lastElementInGroup,
-    );
+    const lastGroupElementIndex =
+      updatedElements.lastIndexOf(lastElementInGroup);
     const elementsAfterGroup = updatedElements.slice(lastGroupElementIndex + 1);
     const elementsBeforeGroup = updatedElements
       .slice(0, lastGroupElementIndex)
