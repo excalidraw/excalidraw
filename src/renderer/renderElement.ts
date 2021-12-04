@@ -87,12 +87,7 @@ const generateElementCanvas = (
   let canvasOffsetY = 0;
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-
-    x1 = Math.floor(x1);
-    x2 = Math.ceil(x2);
-    y1 = Math.floor(y1);
-    y2 = Math.ceil(y2);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
     canvas.width =
       distance(x1, x2) * window.devicePixelRatio * zoom.value +
@@ -103,16 +98,12 @@ const generateElementCanvas = (
 
     canvasOffsetX =
       element.x > x1
-        ? Math.floor(distance(element.x, x1)) *
-          window.devicePixelRatio *
-          zoom.value
+        ? distance(element.x, x1) * window.devicePixelRatio * zoom.value
         : 0;
 
     canvasOffsetY =
       element.y > y1
-        ? Math.floor(distance(element.y, y1)) *
-          window.devicePixelRatio *
-          zoom.value
+        ? distance(element.y, y1) * window.devicePixelRatio * zoom.value
         : 0;
 
     context.translate(canvasOffsetX, canvasOffsetY);
@@ -333,8 +324,6 @@ export const generateRoughOptions = (
     roughness: element.roughness,
     stroke: element.strokeColor,
     preserveVertices: continuousPath,
-    // disable decimals to fix Skia rendering issues #4046
-    fixedDecimalPlaceDigits: 0,
   };
 
   switch (element.type) {
