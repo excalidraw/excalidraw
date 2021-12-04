@@ -34,10 +34,8 @@ const updateTooltip = (
     width: itemWidth,
   } = item.getBoundingClientRect();
 
-  const {
-    width: labelWidth,
-    height: labelHeight,
-  } = tooltip.getBoundingClientRect();
+  const { width: labelWidth, height: labelHeight } =
+    tooltip.getBoundingClientRect();
 
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
@@ -64,9 +62,15 @@ type TooltipProps = {
   children: React.ReactNode;
   label: string;
   long?: boolean;
+  style?: React.CSSProperties;
 };
 
-export const Tooltip = ({ children, label, long = false }: TooltipProps) => {
+export const Tooltip = ({
+  children,
+  label,
+  long = false,
+  style,
+}: TooltipProps) => {
   useEffect(() => {
     return () =>
       getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
@@ -86,6 +90,7 @@ export const Tooltip = ({ children, label, long = false }: TooltipProps) => {
       onPointerLeave={() =>
         getTooltipDiv().classList.remove("excalidraw-tooltip--visible")
       }
+      style={style}
     >
       {children}
     </div>

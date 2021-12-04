@@ -54,6 +54,7 @@ export const exportCanvas = async (
       return await fileSave(
         new Blob([tempSvg.outerHTML], { type: MIME_TYPES.svg }),
         {
+          description: "Export to SVG",
           name,
           extension: "svg",
           fileHandle,
@@ -86,6 +87,7 @@ export const exportCanvas = async (
     }
 
     return await fileSave(blob, {
+      description: "Export to PNG",
       name,
       extension: "png",
       fileHandle,
@@ -93,7 +95,7 @@ export const exportCanvas = async (
   } else if (type === "clipboard") {
     try {
       await copyBlobToClipboardAsPng(blob);
-    } catch (error) {
+    } catch (error: any) {
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
       }

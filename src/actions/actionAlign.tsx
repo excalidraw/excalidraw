@@ -8,13 +8,13 @@ import {
   CenterVerticallyIcon,
 } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { getElementMap, getNonDeletedElements } from "../element";
+import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { AppState } from "../types";
-import { getShortcutKey } from "../utils";
+import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 
 const enableActionGroup = (
@@ -34,9 +34,11 @@ const alignSelectedElements = (
 
   const updatedElements = alignElements(selectedElements, alignment);
 
-  const updatedElementsMap = getElementMap(updatedElements);
+  const updatedElementsMap = arrayToMap(updatedElements);
 
-  return elements.map((element) => updatedElementsMap[element.id] || element);
+  return elements.map(
+    (element) => updatedElementsMap.get(element.id) || element,
+  );
 };
 
 export const actionAlignTop = register({

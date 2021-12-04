@@ -4,7 +4,7 @@ import {
   fileSave as _fileSave,
   FileSystemHandle,
   supported as nativeFileSystemSupported,
-} from "@dwelle/browser-fs-access";
+} from "browser-fs-access";
 import { EVENT, MIME_TYPES } from "../constants";
 import { AbortError } from "../errors";
 import { debounce } from "../utils";
@@ -22,7 +22,7 @@ const INPUT_CHANGE_INTERVAL_MS = 500;
 
 export const fileOpen = <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
-  description?: string;
+  description: string;
   multiple?: M;
 }): Promise<
   M extends false | undefined ? FileWithHandle : FileWithHandle[]
@@ -94,7 +94,7 @@ export const fileSave = (
     name: string;
     /** file extension */
     extension: FILE_EXTENSION;
-    description?: string;
+    description: string;
     /** existing FileSystemHandle */
     fileHandle?: FileSystemHandle | null;
   },

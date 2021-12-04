@@ -19,7 +19,6 @@ interface Window {
 // https://github.com/facebook/create-react-app/blob/ddcb7d5/packages/react-scripts/lib/react-app.d.ts
 declare namespace NodeJS {
   interface ProcessEnv {
-    readonly REACT_APP_BACKEND_V1_GET_URL: string;
     readonly REACT_APP_BACKEND_V2_GET_URL: string;
     readonly REACT_APP_BACKEND_V2_POST_URL: string;
     readonly REACT_APP_SOCKET_SERVER_URL: string;
@@ -49,8 +48,9 @@ type MarkRequired<T, RK extends keyof T> = Exclude<T, RK> &
 
 type MarkNonNullable<T, K extends keyof T> = {
   [P in K]-?: P extends K ? NonNullable<T[P]> : T[P];
-} &
-  { [P in keyof T]: T[P] };
+} & { [P in keyof T]: T[P] };
+
+type NonOptional<T> = Exclude<T, undefined>;
 
 // PNG encoding/decoding
 // -----------------------------------------------------------------------------
@@ -102,19 +102,26 @@ declare module "*.scss";
 // (due to TS structural typing)
 // https://github.com/microsoft/TypeScript/issues/31311#issuecomment-490690695
 interface ArrayBuffer {
-  private _brand?: "ArrayBuffer";
+  _brand?: "ArrayBuffer";
 }
 interface Uint8Array {
-  private _brand?: "Uint8Array";
+  _brand?: "Uint8Array";
 }
 // --------------------------------------------------------------------------—
 
 // https://github.com/nodeca/image-blob-reduce/issues/23#issuecomment-783271848
 declare module "image-blob-reduce" {
-  import { PicaResizeOptions } from "pica";
+  import { PicaResizeOptions, Pica } from "pica";
   namespace ImageBlobReduce {
     interface ImageBlobReduce {
       toBlob(file: File, options: ImageBlobReduceOptions): Promise<Blob>;
+      _create_blob(
+        this: { pica: Pica },
+        env: {
+          out_canvas: HTMLCanvasElement;
+          out_blob: Blob;
+        },
+      ): Promise<any>;
     }
 
     interface ImageBlobReduceStatic {

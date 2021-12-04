@@ -45,6 +45,8 @@ type _ExcalidrawElementBase = Readonly<{
   groupIds: readonly GroupId[];
   /** Ids of (linear) elements that are bound to this element. */
   boundElementIds: readonly ExcalidrawLinearElement["id"][] | null;
+  /** epoch (ms) timestamp of last element update */
+  updated: number;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
@@ -129,7 +131,7 @@ export type PointBinding = {
   gap: number;
 };
 
-export type Arrowhead = "arrow" | "bar" | "dot";
+export type Arrowhead = "arrow" | "bar" | "dot" | "triangle";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{

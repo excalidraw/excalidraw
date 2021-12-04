@@ -57,7 +57,7 @@ export class API {
   };
 
   static createElement = <
-    T extends Exclude<ExcalidrawElement["type"], "selection">
+    T extends Exclude<ExcalidrawElement["type"], "selection">,
   >({
     type,
     id,
@@ -197,7 +197,7 @@ export class API {
           resolve(reader.result as string);
         };
         reader.readAsText(blob);
-      } catch (error) {
+      } catch (error: any) {
         reject(error);
       }
     });

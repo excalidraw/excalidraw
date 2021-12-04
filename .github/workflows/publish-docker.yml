@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Prepare
         id: prep
         run: |
@@ -20,7 +20,7 @@ jobs:
           TAGS="${DOCKER_IMAGE}:${GITHUB_SHA},${DOCKER_IMAGE}:latest"
           # Set output parameters.
           echo ::set-output name=tags::${TAGS}
-      
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
         with:

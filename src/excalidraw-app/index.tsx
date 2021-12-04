@@ -64,7 +64,7 @@ import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
 import { getMany, set, del, keys, createStore } from "idb-keyval";
 import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
-import { mutateElement } from "../element/mutateElement";
+import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
 
@@ -109,7 +109,7 @@ const localFileStorage = new FileManager({
         try {
           await set(id, fileData, filesStore);
           savedFiles.set(id, true);
-        } catch (error) {
+        } catch (error: any) {
           console.error(error);
           erroredFiles.set(id, true);
         }
@@ -163,7 +163,7 @@ const initializeScene = async (opts: {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
   const jsonBackendMatch = window.location.hash.match(
-    /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+    /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/,
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
@@ -184,10 +184,7 @@ const initializeScene = async (opts: {
       // otherwise, prompt whether user wants to override current scene
       window.confirm(t("alerts.loadSceneOverridePrompt"))
     ) {
-      // Backwards compatibility with legacy url format
-      if (id) {
-        scene = await loadScene(id, null, localDataState);
-      } else if (jsonBackendMatch) {
+      if (jsonBackendMatch) {
         scene = await loadScene(
           jsonBackendMatch[1],
           jsonBackendMatch[2],
@@ -228,7 +225,7 @@ const initializeScene = async (opts: {
       ) {
         return { scene: data, isExternalScene };
       }
-    } catch (error) {
+    } catch (error: any) {
       return {
         scene: {
           appState: {
@@ -276,7 +273,10 @@ const PlusLinkJSX = (
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const currentLangCode = languageDetector.detect() || defaultLang.code;
+  let currentLangCode = languageDetector.detect() || defaultLang.code;
+  if (Array.isArray(currentLangCode)) {
+    currentLangCode = currentLangCode[0];
+  }
   const [langCode, setLangCode] = useState(currentLangCode);
 
   // initial state
@@ -286,7 +286,8 @@ const ExcalidrawWrapper = () => {
     promise: ResolvablePromise<ImportedDataState | null>;
   }>({ promise: null! });
   if (!initialStatePromiseRef.current.promise) {
-    initialStatePromiseRef.current.promise = resolvablePromise<ImportedDataState | null>();
+    initialStatePromiseRef.current.promise =
+      resolvablePromise<ImportedDataState | null>();
   }
 
   useEffect(() => {
@@ -296,10 +297,8 @@ const ExcalidrawWrapper = () => {
     }, VERSION_TIMEOUT);
   }, []);
 
-  const [
-    excalidrawAPI,
-    excalidrawRefCallback,
-  ] = useCallbackRefState<ExcalidrawImperativeAPI>();
+  const [excalidrawAPI, excalidrawRefCallback] =
+    useCallbackRefState<ExcalidrawImperativeAPI>();
 
   const collabAPI = useContext(CollabContext)?.api;
 
@@ -378,8 +377,8 @@ const ExcalidrawWrapper = () => {
           JSON.parse(
             localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
           ) || [];
-      } catch (e) {
-        console.error(e);
+      } catch (error: any) {
+        console.error(error);
       }
     };
 
@@ -460,16 +459,17 @@ const ExcalidrawWrapper = () => {
         if (excalidrawAPI) {
           let didChange = false;
 
+          let pendingImageElement = appState.pendingImageElement;
           const elements = excalidrawAPI
             .getSceneElementsIncludingDeleted()
             .map((element) => {
               if (localFileStorage.shouldUpdateImageElementStatus(element)) {
                 didChange = true;
-                return mutateElement(
-                  element,
-                  { status: "saved" },
-                  /* informMutation */ false,
-                );
+                const newEl = newElementWith(element, { status: "saved" });
+                if (pendingImageElement === element) {
+                  pendingImageElement = newEl;
+                }
+                return newEl;
               }
               return element;
             });
@@ -477,6 +477,9 @@ const ExcalidrawWrapper = () => {
           if (didChange) {
             excalidrawAPI.updateScene({
               elements,
+              appState: {
+                pendingImageElement,
+              },
             });
           }
         }
@@ -505,7 +508,7 @@ const ExcalidrawWrapper = () => {
           },
           files,
         );
-      } catch (error) {
+      } catch (error: any) {
         if (error.name !== "AbortError") {
           const { width, height } = canvas;
           console.error(error, { width, height });
