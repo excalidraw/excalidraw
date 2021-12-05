@@ -311,7 +311,7 @@
   }
 
   .App-menu_top {
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: auto max-content auto;
     grid-gap: 4px;
     align-items: flex-start;
     cursor: default;
