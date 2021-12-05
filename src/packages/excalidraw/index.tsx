@@ -192,10 +192,9 @@ export {
   loadLibraryFromBlob,
   loadFromBlob,
   getFreeDrawSvgPath,
+  getCommonBoundingBox,
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
-
-export { getCommonBoundingBox } from "../../element/bounds";
 
 export { FONT_FAMILY, THEME } from "../../constants";
 

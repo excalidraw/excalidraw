@@ -142,3 +142,4 @@ export const exportToSvg = async ({
 export { serializeAsJSON } from "../data/json";
 export { loadFromBlob, loadLibraryFromBlob } from "../data/blob";
 export { getFreeDrawSvgPath } from "../renderer/renderElement";
+export { getCommonBoundingBox } from "../element/bounds";
