@@ -287,20 +287,20 @@
     "libraryDesc": "Aglam n temkarḍit",
     "website": "Asmel n web",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
+      "authorName": "Isem neɣ isem n useqdac inek•inem",
+      "libraryName": "Isem n temkarḍit-inek•inem",
+      "libraryDesc": "Aglam n temkarḍit-inek•inem akken ad tɛiwneḍ medden ad fehmen aseqdec-inec",
+      "githubHandle": "Isem n useqdac n GitHub ( d anefrunan) akken ad tizmireḍ ad tisẓrigeḍ tamkarḍit ticki tuzneḍ-tt i uselken",
       "twitterHandle": "",
       "website": ""
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Yettwasra",
+      "website": "Sekcem URL ameɣtu"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
+      "pre": "Azen tamkarḍit-inek•inem akken ad teddu di ",
+      "link": "akaram azayez n temkarḍit",
       "post": ""
     },
     "noteGuidelines": {
@@ -310,20 +310,20 @@
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
+      "link": "Turagt MIT, ",
       "post": ""
     },
     "noteItems": "",
     "atleastOneLibItem": ""
   },
   "publishSuccessDialog": {
-    "title": "",
+    "title": "Tamkarḍit tettwazen",
     "content": "",
-    "link": ""
+    "link": "dagi"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Ales awennez n temkarḍit",
+    "removeItemsFromLib": "Kkes iferdisen yettafernen si temkarḍit"
   },
   "encrypted": {
     "tooltip": "Unuɣen-inek (m) ttuwgelhnen seg yixef s ixef dɣa iqeddacen n Excalidraw werǧin ad ten-walin. ",
@@ -345,7 +345,7 @@
     "width": "Tehri"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Yettwarna ɣer temkarḍit",
     "copyStyles": "Iɣunab yettwaneɣlen.",
     "copyToClipboard": "Yettwaɣel ɣer tecfawit.",
     "copyToClipboardAsPng": "{{exportSelection}} yettwanɣel ɣer tecfawit am PNG\n({{exportColorScheme}})",
