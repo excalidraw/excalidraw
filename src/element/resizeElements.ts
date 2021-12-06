@@ -31,6 +31,7 @@ import {
   getFontString,
   wrapText,
   getApproxMinLineWidth,
+  getMinCharWidth,
 } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
@@ -129,12 +130,23 @@ export const transformElements = (
           let containerHeight = updatedElement.height;
           let nextBaseLine = textElement.baseline;
           if (transformHandleType !== "n" && transformHandleType !== "s") {
-            console.info("called wrap text");
-            text = wrapText(
-              textElement.originalText,
-              getFontString(textElement),
-              updatedElement,
-            );
+            console.info("attempt to call wrap text");
+            let minCharWidthTillNow = 0;
+            if (text) {
+              minCharWidthTillNow = getMinCharWidth(getFontString(textElement));
+              const diff = Math.abs(
+                updatedElement.width - textElement.width - PADDING * 2,
+              );
+              if (diff >= minCharWidthTillNow) {
+                text = wrapText(
+                  textElement.originalText,
+                  getFontString(textElement),
+                  updatedElement,
+                );
+                console.info("called wrap text");
+              }
+            }
+
             const dimensions = measureText(text, getFontString(textElement));
             nextWidth = dimensions.width;
             nextHeight = dimensions.height;
@@ -630,7 +642,6 @@ export const resizeSingleElement = (
   const minWidth = boundTextElement
     ? getApproxMinLineWidth(getFontString(boundTextElement))
     : 0;
-
   if (
     resizedElement.width > minWidth &&
     resizedElement.height !== 0 &&

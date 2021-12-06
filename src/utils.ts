@@ -7,6 +7,7 @@ import {
   PADDING,
 } from "./constants";
 import {
+  ChartType,
   ExcalidrawElement,
   FontFamilyValues,
   FontString,
@@ -151,14 +152,14 @@ export const wrapText = (
   }
   const startTime = performance.now();
   const maxWidth = textContainer.width - PADDING * 2;
-  // console.log(
-  //   "maxWidth",
-  //   maxWidth,
-  //   text.length,
-  //   "container width",
-  //   textContainer.width,
-  // );
-  // console.log("min width", getApproxMinLineWidth(font));
+  console.info(
+    "maxWidth",
+    maxWidth,
+    text.length,
+    "container width",
+    textContainer.width,
+  );
+
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   originalLines.forEach((originalLine, index) => {
@@ -180,8 +181,8 @@ export const wrapText = (
           while (words[index].length > 0) {
             count++;
 
-            const currentChar = words[index][0];
-            const width = getTextWidth(currentChar, font);
+            const currentChar = words[index][0] as ChartType;
+            const width = charWidth.calculate(currentChar, font);
             widthTillNow += width;
             words[index] = words[index].slice(1);
 
@@ -246,6 +247,7 @@ export const wrapText = (
   console.info("Time taken", timeTaken);
   console.info("total Time taken,", totalTime);
   console.info("Total runs = ", count);
+  console.info("cacheed char", charWidth.getCache(font));
   return lines.join("\n");
 };
 
@@ -254,6 +256,43 @@ export const getApproxLineHeight = (font: FontString) => {
   return measureText(DUMMY_TEXT, font).height;
 };
 
+export const charWidth = (() => {
+  const cachedCharWidth: { [key: FontString]: Array<number> } = {};
+
+  const calculate = (char: ChartType, font: FontString) => {
+    const ascii = char.charCodeAt(0);
+    if (!cachedCharWidth[font]) {
+      cachedCharWidth[font] = [];
+    }
+    if (!cachedCharWidth[font][ascii]) {
+      const width = getTextWidth(char, font);
+      cachedCharWidth[font][ascii] = width;
+    }
+    return cachedCharWidth[font][ascii];
+  };
+
+  const updateCache = (char: ChartType, font: FontString) => {
+    const ascii = char.charCodeAt(0);
+
+    if (!cachedCharWidth[font][ascii]) {
+      cachedCharWidth[font][ascii] = calculate(char, font);
+    }
+  };
+
+  const clearCacheforFont = (font: FontString) => {
+    cachedCharWidth[font] = [];
+  };
+
+  const getCache = (font: FontString) => {
+    return cachedCharWidth[font];
+  };
+  return {
+    calculate,
+    updateCache,
+    clearCacheforFont,
+    getCache,
+  };
+})();
 export const getApproxMinLineWidth = (font: FontString) => {
   return measureText(DUMMY_TEXT.split("").join("\n"), font).width + PADDING * 2;
 };
@@ -262,6 +301,15 @@ export const getApproxMinLineHeight = (font: FontString) => {
   return getApproxLineHeight(font) + PADDING * 2;
 };
 
+export const getMinCharWidth = (font: FontString) => {
+  const cache = charWidth.getCache(font);
+  if (!cache) {
+    return 0;
+  }
+  const cacheWithOutEmpty = cache.filter((val) => val !== undefined);
+
+  return Math.min(...cacheWithOutEmpty);
+};
 export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
   // Generally lower case is used so converting to lower case
   const dummyText = DUMMY_TEXT.toLocaleLowerCase();
