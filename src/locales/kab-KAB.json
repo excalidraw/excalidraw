@@ -291,8 +291,8 @@
       "libraryName": "Isem n temkarḍit-inek•inem",
       "libraryDesc": "Aglam n temkarḍit-inek•inem akken ad tɛiwneḍ medden ad fehmen aseqdec-inec",
       "githubHandle": "Isem n useqdac n GitHub ( d anefrunan) akken ad tizmireḍ ad tisẓrigeḍ tamkarḍit ticki tuzneḍ-tt i uselken",
-      "twitterHandle": "",
-      "website": ""
+      "twitterHandle": "Isem n useqdac n Twitter (d anefrunan) akken ad nẓer anwa ara nsenmer deg udellel di Twitter",
+      "website": "Aseɣwen ɣer usmel-inek•inem neɣ wayeḍ (d anefrunan)"
     },
     "errors": {
       "required": "Yettwasra",
@@ -301,10 +301,10 @@
     "noteDescription": {
       "pre": "Azen tamkarḍit-inek•inem akken ad teddu di ",
       "link": "akaram azayez n temkarḍit",
-      "post": ""
+      "post": "i yimdanen-nniḍen ara isqedcen deg wunuɣen-nnsen."
     },
     "noteGuidelines": {
-      "pre": "",
+      "pre": "Tamkarḍit teḥwaǧ ad tettwaqbel s ufus qbel. Ma ulac uɣilif ɣer ",
       "link": "",
       "post": ""
     },
