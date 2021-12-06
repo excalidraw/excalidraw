@@ -129,6 +129,7 @@ export const transformElements = (
           let containerHeight = updatedElement.height;
           let nextBaseLine = textElement.baseline;
           if (transformHandleType !== "n" && transformHandleType !== "s") {
+            console.log("called wrap text");
             text = wrapText(
               textElement.originalText,
               getFontString(textElement),

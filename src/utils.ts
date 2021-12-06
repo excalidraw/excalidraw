@@ -97,37 +97,50 @@ export const getFontString = ({
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
 export const measureText = (text: string, font: FontString) => {
-  const { width, height, baseline } = getTextDimensions(text, font);
-  return { width, height, baseline };
-};
-
-const getTextDimensions = (text: string, font: FontString) => {
   text = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
     // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
-  const line = document.createElement("div");
-  line.style.position = "absolute";
-  line.style.whiteSpace = "pre-wrap";
-  line.style.font = font;
-  document.body.appendChild(line);
-  line.innerText = text;
+  const container = document.createElement("div");
+  container.style.position = "absolute";
+  container.style.whiteSpace = "pre";
+  container.style.font = font;
+  document.body.appendChild(container);
+  container.innerText = text;
+
   const span = document.createElement("span");
   span.style.display = "inline-block";
   span.style.overflow = "hidden";
   span.style.width = "1px";
   span.style.height = "1px";
-  line.append(span);
+  container.appendChild(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
-  const width = line.offsetWidth;
+  const width = container.offsetWidth;
 
-  const height = line.offsetHeight;
-  document.body.removeChild(line);
+  const height = container.offsetHeight;
+  document.body.removeChild(container);
+
   return { width, height, baseline };
 };
+
+let canvas: HTMLCanvasElement | undefined;
+const getTextWidth = (text: string, font: FontString) => {
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+  }
+  const canvas2dContext = canvas.getContext("2d") as CanvasRenderingContext2D;
+  canvas2dContext.font = font;
+
+  const metrics = canvas2dContext.measureText(text);
+
+  return metrics.width;
+};
+
+let totalTime = 0;
+let count = 0;
 export const wrapText = (
   text: string,
   font: FontString,
@@ -136,10 +149,16 @@ export const wrapText = (
   if (!textContainer) {
     return text;
   }
-
-  // Adding 1px in max width to calculate accurately since we append
-  // a span of 1px when calculating width
-  const maxWidth = Math.round(textContainer.width - PADDING * 2) + 1;
+  const startTime = performance.now();
+  const maxWidth = textContainer.width - PADDING * 2;
+  // console.log(
+  //   "maxWidth",
+  //   maxWidth,
+  //   text.length,
+  //   "container width",
+  //   textContainer.width,
+  // );
+  // console.log("min width", getApproxMinLineWidth(font));
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   originalLines.forEach((originalLine, index) => {
@@ -149,54 +168,122 @@ export const wrapText = (
       lines.push(words[0]);
     } else {
       let currentLine = "";
-      while (words.length > 0) {
-        let addSpace = true;
-        const originalWordLength = words.length;
-        while (getTextDimensions(words[0], font).width > maxWidth) {
-          const currentWord = words[0];
-          words[0] = currentWord.slice(0, -1);
-          const lastChar = currentWord.slice(-1);
-          if (words.length > 1) {
-            // So that space is preserved before appending the remaining
-            //characters of current word to next word when more than
-            // one words available
-            if (addSpace && originalWordLength > 1) {
-              words[1] = ` ${words[1]}`;
-              addSpace = false;
+      let widthTillNow = 0;
+
+      let index = 0;
+      while (index < words.length) {
+        count++;
+        const currentWidth = getTextWidth(words[index], font);
+
+        if (currentWidth > maxWidth) {
+          widthTillNow = 0;
+          while (words[index].length > 0) {
+            count++;
+
+            const currentChar = words[index][0];
+            const width = getTextWidth(currentChar, font);
+            widthTillNow += width;
+            words[index] = words[index].slice(1);
+
+            if (widthTillNow >= maxWidth) {
+              lines.push(currentLine);
+              currentLine = currentChar;
+              widthTillNow = width;
+              if (widthTillNow === maxWidth) {
+                currentLine = "";
+                widthTillNow = 0;
+              }
+            } else {
+              currentLine += currentChar;
             }
-            words[1] = lastChar + words[1];
-          } else {
-            words.push(lastChar);
+          }
+          //console.log("words[index]=", words[index]);
+
+          index++;
+          // console.log("index", index);
+        } else {
+          // console.log(
+          //   "width till now",
+          //   widthTillNow,
+          //   "index",
+          //   index,
+          //   "lenght",
+          //   words.length,
+          // );
+          while (widthTillNow < maxWidth && index < words.length) {
+            const word = words[index];
+            widthTillNow = getTextWidth(currentLine + word, font);
+            count++;
+
+            if (widthTillNow >= maxWidth) {
+              lines.push(currentLine);
+              widthTillNow = 0;
+              currentLine = "";
+
+              break;
+            }
+            index++;
+
+            currentLine += `${word} `;
+          }
+          // console.log("index", index, currentLine, words.length);
+
+          if (widthTillNow === maxWidth) {
+            currentLine = "";
+            widthTillNow = 0;
           }
         }
-        if (getTextDimensions(words[0] + currentLine, font).width > maxWidth) {
-          lines.push(currentLine.trim());
-          currentLine = "";
-        } else {
-          currentLine += `${words.shift()} `;
-        }
       }
-      currentLine = currentLine.trim();
-      lines.push(currentLine);
+
+      if (currentLine) {
+        lines.push(currentLine.trim());
+      }
     }
   });
-
+  const endTime = performance.now();
+  const timeTaken = (endTime - startTime) / 1000;
+  totalTime += timeTaken;
+  console.log("Time taken", timeTaken);
+  console.log("total Time taken,", totalTime);
+  console.log("Total runs = ", count);
   return lines.join("\n");
 };
 
-const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
 export const getApproxLineHeight = (font: FontString) => {
-  return getTextDimensions(DUMMY_TEXT, font).height;
+  return measureText(DUMMY_TEXT, font).height;
 };
 
 export const getApproxMinLineWidth = (font: FontString) => {
-  return (
-    getTextDimensions(DUMMY_TEXT.split("").join("\n"), font).width + PADDING * 2
-  );
+  return measureText(DUMMY_TEXT.split("").join("\n"), font).width + PADDING * 2;
 };
 
 export const getApproxMinLineHeight = (font: FontString) => {
   return getApproxLineHeight(font) + PADDING * 2;
+};
+
+export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
+  // Generally lower case is used so converting to lower case
+  const dummyText = DUMMY_TEXT.toLocaleLowerCase();
+  const batchLength = 6;
+  let index = 0;
+  let widthTillNow = 0;
+  let str = "";
+  while (widthTillNow <= width) {
+    const batch = dummyText.substr(index, index + batchLength);
+    str += batch;
+    widthTillNow += getTextWidth(str, font);
+    if (index === dummyText.length - 1) {
+      index = 0;
+    }
+    index = index + batchLength;
+  }
+
+  while (widthTillNow > width) {
+    str = str.substr(0, str.length - 1);
+    widthTillNow = getTextWidth(str, font);
+  }
+  return str.length;
 };
 
 export const debounce = <T extends any[]>(
