@@ -78,6 +78,58 @@ export class LinearElementEditor {
     return null;
   }
 
+  static handleBoxSelection(
+    event: PointerEvent,
+    appState: AppState,
+    setState: React.Component<any, AppState>["setState"],
+  ) {
+    if (
+      !appState.editingLinearElement ||
+      appState.draggingElement?.type !== "selection"
+    ) {
+      return false;
+    }
+    const { editingLinearElement } = appState;
+    const { selectedPointsIndices, elementId } = editingLinearElement;
+
+    const element = LinearElementEditor.getElement(elementId);
+    if (!element) {
+      return false;
+    }
+
+    const [selectionX1, selectionY1, selectionX2, selectionY2] =
+      getElementAbsoluteCoords(appState.draggingElement);
+
+    const pointsSceneCoords =
+      LinearElementEditor.getPointsGlobalCoordinates(element);
+
+    const nextSelectedPoints = pointsSceneCoords.reduce(
+      (acc: number[], point, index) => {
+        if (
+          (point[0] >= selectionX1 &&
+            point[0] <= selectionX2 &&
+            point[1] >= selectionY1 &&
+            point[1] <= selectionY2) ||
+          (event.shiftKey && selectedPointsIndices?.includes(index))
+        ) {
+          acc.push(index);
+        }
+
+        return acc;
+      },
+      [],
+    );
+
+    setState({
+      editingLinearElement: {
+        ...editingLinearElement,
+        selectedPointsIndices: nextSelectedPoints.length
+          ? nextSelectedPoints
+          : null,
+      },
+    });
+  }
+
   /** @returns whether point was dragged */
   static handlePointDragging(
     appState: AppState,
