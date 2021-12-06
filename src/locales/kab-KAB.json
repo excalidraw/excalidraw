@@ -306,15 +306,15 @@
     "noteGuidelines": {
       "pre": "Tamkarḍit teḥwaǧ ad tettwaqbel s ufus qbel. Ma ulac uɣilif ɣer ",
       "link": "",
-      "post": ""
+      "post": " send ad tazneḍ. Tesriḍ amiḍan n GitHub akken ad tmmeslayeḍ yerna ad tgeḍ ibeddilen ma yelaq, maca mačči d ayen yettwaḥetmen."
     },
     "noteLicense": {
-      "pre": "",
+      "pre": "Mi tuzneḍ ad tqebleḍ akken tamkarḍit ad d-teffeɣ s ",
       "link": "Turagt MIT, ",
-      "post": ""
+      "post": "ayen yebɣan ad d-yini belli yal yiwen izmer ad ten-iseqdec war tilist."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Yal aferdis n temkarḍit isefk ad isɛu isem-is i yiman-is akken ad yili wamek ara yettusizdeg. Iferdisen-agi n temkarḍit ad ddun:",
+    "atleastOneLibItem": "Ma ulac uɣilif fern ma drus yiwen n uferdis n temkarḍit akken ad tebduḍ"
   },
   "publishSuccessDialog": {
     "title": "Tamkarḍit tettwazen",
