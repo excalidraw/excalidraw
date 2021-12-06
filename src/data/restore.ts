@@ -3,13 +3,14 @@ import {
   ExcalidrawSelectionElement,
   FontFamilyValues,
 } from "../element/types";
-import { AppState, BinaryFiles, NormalizedZoomValue } from "../types";
-import { ImportedDataState } from "./types";
 import {
-  getElementMap,
-  getNormalizedDimensions,
-  isInvisiblySmallElement,
-} from "../element";
+  AppState,
+  BinaryFiles,
+  LibraryItem,
+  NormalizedZoomValue,
+} from "../types";
+import { ImportedDataState } from "./types";
+import { getNormalizedDimensions, isInvisiblySmallElement } from "../element";
 import { isLinearElementType } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
@@ -21,6 +22,8 @@ import {
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
+import { getUpdatedTimestamp } from "../utils";
+import { arrayToMap } from "../utils";
 
 type RestoredAppState = Omit<
   AppState,
@@ -97,6 +100,7 @@ const restoreElementWithProperties = <
       element.strokeSharpness ??
       (isLinearElementType(element.type) ? "round" : "sharp"),
     boundElementIds: element.boundElementIds ?? [],
+    updated: element.updated ?? getUpdatedTimestamp(),
   };
 
   return {
@@ -207,14 +211,14 @@ export const restoreElements = (
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
 ): ExcalidrawElement[] => {
-  const localElementsMap = localElements ? getElementMap(localElements) : null;
+  const localElementsMap = localElements ? arrayToMap(localElements) : null;
   return (elements || []).reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
     // and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
       let migratedElement: ExcalidrawElement | null = restoreElement(element);
       if (migratedElement) {
-        const localElement = localElementsMap?.[element.id];
+        const localElement = localElementsMap?.get(element.id);
         if (localElement && localElement.version > migratedElement.version) {
           migratedElement = bumpVersion(migratedElement, localElement.version);
         }
@@ -280,4 +284,31 @@ export const restore = (
     appState: restoreAppState(data?.appState, localAppState || null),
     files: data?.files || {},
   };
+};
+
+export const restoreLibraryItems = (
+  libraryItems: NonOptional<ImportedDataState["libraryItems"]>,
+  defaultStatus: LibraryItem["status"],
+) => {
+  const restoredItems: LibraryItem[] = [];
+  for (const item of libraryItems) {
+    // migrate older libraries
+    if (Array.isArray(item)) {
+      restoredItems.push({
+        status: defaultStatus,
+        elements: item,
+        id: randomId(),
+        created: Date.now(),
+      });
+    } else {
+      const _item = item as MarkOptional<LibraryItem, "id" | "status">;
+      restoredItems.push({
+        ..._item,
+        id: _item.id || randomId(),
+        status: _item.status || defaultStatus,
+        created: _item.created || Date.now(),
+      });
+    }
+  }
+  return restoredItems;
 };

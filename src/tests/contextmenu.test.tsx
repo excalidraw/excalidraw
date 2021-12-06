@@ -20,6 +20,7 @@ import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
 import { setDateTimeForTests } from "../utils";
 import { t } from "../i18n";
+import { LibraryItem } from "../types";
 
 const checkpoint = (name: string) => {
   expect(renderScene.mock.calls.length).toMatchSnapshot(
@@ -392,8 +393,8 @@ describe("contextMenu element", () => {
     await waitFor(() => {
       const library = localStorage.getItem("excalidraw-library");
       expect(library).not.toBeNull();
-      const addedElement = JSON.parse(library!)[0][0];
-      expect(addedElement).toEqual(h.elements[0]);
+      const addedElement = JSON.parse(library!)[0] as LibraryItem;
+      expect(addedElement.elements[0]).toEqual(h.elements[0]);
     });
   });
 

@@ -30,7 +30,10 @@ export const hasStrokeStyle = (type: string) =>
   type === "line";
 
 export const canChangeSharpness = (type: string) =>
-  type === "rectangle" || type === "arrow" || type === "line";
+  type === "rectangle" ||
+  type === "arrow" ||
+  type === "line" ||
+  type === "diamond";
 
 export const hasText = (type: string) => type === "text";
 

@@ -74,7 +74,7 @@ import {
 import { loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
 import Library from "../data/library";
-import { restore, restoreElements } from "../data/restore";
+import { restore, restoreElements, restoreLibraryItems } from "../data/restore";
 import {
   dragNewElement,
   dragSelectedElements,
@@ -182,7 +182,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import Scene from "../scene/Scene";
-import { SceneState, ScrollBars } from "../scene/types";
+import { RenderConfig, ScrollBars } from "../scene/types";
 import { getNewZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
 import {
@@ -664,10 +664,12 @@ class App extends React.Component<AppProps, AppState> {
       if (
         token === this.id ||
         window.confirm(
-          t("alerts.confirmAddLibrary", { numShapes: json.library.length }),
+          t("alerts.confirmAddLibrary", {
+            numShapes: (json.libraryItems || json.library || []).length,
+          }),
         )
       ) {
-        await this.library.importLibrary(blob);
+        await this.library.importLibrary(blob, "published");
         // hack to rerender the library items after import
         if (this.state.isLibraryOpen) {
           this.setState({ isLibraryOpen: false });
@@ -741,7 +743,10 @@ class App extends React.Component<AppProps, AppState> {
     try {
       initialData = (await this.props.initialData) || null;
       if (initialData?.libraryItems) {
-        this.libraryItemsFromStorage = initialData.libraryItems;
+        this.libraryItemsFromStorage = restoreLibraryItems(
+          initialData.libraryItems,
+          "unpublished",
+        ) as LibraryItems;
       }
     } catch (error: any) {
       console.error(error);
@@ -1084,8 +1089,10 @@ class App extends React.Component<AppProps, AppState> {
     const cursorButton: {
       [id: string]: string | undefined;
     } = {};
-    const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
-    const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
+    const pointerViewportCoords: RenderConfig["remotePointerViewportCoords"] =
+      {};
+    const remoteSelectedElementIds: RenderConfig["remoteSelectedElementIds"] =
+      {};
     const pointerUsernames: { [id: string]: string } = {};
     const pointerUserStates: { [id: string]: string } = {};
     this.state.collaborators.forEach((user, socketId) => {
@@ -1153,9 +1160,7 @@ class App extends React.Component<AppProps, AppState> {
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
         theme: this.state.theme,
         imageCache: this.imageCache,
-      },
-      {
-        renderOptimizations: true,
+        isExporting: false,
         renderScrollbars: !this.isMobile,
       },
     );
@@ -4185,10 +4190,9 @@ class App extends React.Component<AppProps, AppState> {
     const existingFileData = this.files[fileId];
     if (!existingFileData?.dataURL) {
       try {
-        imageFile = await resizeImageFile(
-          imageFile,
-          DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-        );
+        imageFile = await resizeImageFile(imageFile, {
+          maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+        });
       } catch (error: any) {
         console.error("error trying to resing image file on insertion", error);
       }
@@ -4327,7 +4331,9 @@ class App extends React.Component<AppProps, AppState> {
     // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Basic_User_Interface/Using_URL_values_for_the_cursor_property
     const cursorImageSizePx = 96;
 
-    const imagePreview = await resizeImageFile(imageFile, cursorImageSizePx);
+    const imagePreview = await resizeImageFile(imageFile, {
+      maxWidthOrHeight: cursorImageSizePx,
+    });
 
     let previewDataURL = await getDataURL(imagePreview);
 
@@ -4474,6 +4480,8 @@ class App extends React.Component<AppProps, AppState> {
     } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error(error);
+      } else {
+        console.warn(error);
       }
       this.setState(
         {

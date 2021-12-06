@@ -100,7 +100,9 @@
     "share": "Compartir",
     "showStroke": "Mostrar selector de color de trazo",
     "showBackground": "Mostrar el selector de color de fondo",
-    "toggleTheme": "Alternar tema"
+    "toggleTheme": "Alternar tema",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -135,7 +137,11 @@
     "zenMode": "Modo Zen",
     "exitZenMode": "Salir del modo Zen",
     "cancel": "Cancelar",
-    "clear": "Borrar"
+    "clear": "Borrar",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "No se pudo restaurar la escena desde este archivo de imagen",
     "invalidSceneUrl": "No se ha podido importar la escena desde la URL proporcionada. Está mal formada, o no contiene datos de Excalidraw JSON válidos.",
     "resetLibrary": "Esto borrará tu biblioteca. ¿Estás seguro?",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada."
   },
   "errors": {
@@ -164,7 +171,7 @@
     "imageInsertError": "No se pudo insertar la imagen. Inténtelo de nuevo más tarde...",
     "fileTooBig": "Archivo demasiado grande. El tamaño máximo permitido es {{maxSize}}.",
     "svgImageInsertError": "No se pudo insertar la imagen SVG. El código SVG parece inválido.",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG no válido."
   },
   "toolBar": {
     "selection": "Selección",
@@ -185,7 +192,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Para mover lienzo, mantenga la rueda del ratón o la barra espaciadora mientras arrastra",
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
@@ -199,7 +206,8 @@
     "lineEditor_info": "Doble clic o pulse Enter para editar puntos",
     "lineEditor_pointSelected": "Presione Suprimir para eliminar el punto, CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
     "lineEditor_nothingSelected": "Selecciona un punto sea para mover o eliminar, o mantén pulsado Alt y haz clic para añadir nuevos puntos",
-    "placeImage": "Haga clic para colocar la imagen o haga clic y arrastre para establecer su tamaño manualmente"
+    "placeImage": "Haga clic para colocar la imagen o haga clic y arrastre para establecer su tamaño manualmente",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
@@ -267,7 +275,55 @@
     "zoomToSelection": "Zoom a la selección"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Borrar lienzo"
+  },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",
@@ -289,6 +345,7 @@
     "width": "Ancho"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado en el portapapeles.",
     "copyToClipboardAsPng": "Copiado {{exportSelection}} al portapapeles como PNG\n({{exportColorScheme}})",

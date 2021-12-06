@@ -100,7 +100,9 @@
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
-    "toggleTheme": "Toggle theme"
+    "toggleTheme": "Toggle theme",
+    "personalLib": "Personal Library",
+    "excalidrawLib": "Excalidraw Library"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -135,7 +137,11 @@
     "zenMode": "Zen mode",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",
-    "clear": "Clear"
+    "clear": "Clear",
+    "remove": "Remove",
+    "publishLibrary": "Publish",
+    "submit": "Submit",
+    "confirm": "Confirm"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
     "invalidSceneUrl": "Couldn't import scene from the supplied URL. It's either malformed, or doesn't contain valid Excalidraw JSON data.",
     "resetLibrary": "This will clear your library. Are you sure?",
+    "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled."
   },
   "errors": {
@@ -200,7 +207,8 @@
     "lineEditor_info": "Double-click or press Enter to edit points",
     "lineEditor_pointSelected": "Press Delete to remove point, CtrlOrCmd+D to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points",
-    "placeImage": "Click to place the image, or click and drag to set its size manually"
+    "placeImage": "Click to place the image, or click and drag to set its size manually",
+    "publishLibrary": "Publish your own library"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -270,6 +278,55 @@
   "clearCanvasDialog": {
     "title": "Clear canvas"
   },
+  "publishDialog": {
+    "title": "Publish library",
+    "itemName": "Item name",
+    "authorName": "Author name",
+    "githubUsername": "GitHub username",
+    "twitterUsername": "Twitter username",
+    "libraryName": "Library name",
+    "libraryDesc": "Library description",
+    "website": "Website",
+    "placeholder": {
+      "authorName": "Your name or username",
+      "libraryName": "Name of your library",
+      "libraryDesc": "Description of your library to help people understand its usage",
+      "githubHandle": "GitHub handle (optional), so you can edit the library once submitted for review",
+      "twitterHandle": "Twitter username (optional), so we know who to credit when promoting over Twitter",
+      "website": "Link to your personal website or elsewhere (optional)"
+    },
+    "errors": {
+      "required": "Required",
+      "website": "Enter a valid URL"
+    },
+    "noteDescription": {
+      "pre": "Submit your library to be included in the ",
+      "link": "public library repository",
+      "post": "for other people to use in their drawings."
+    },
+    "noteGuidelines": {
+      "pre": "The library needs to be manually approved first. Please read the ",
+      "link": "guidelines",
+      "post": " before submitting. You will need a GitHub account to communicate and make changes if requested, but it is not strictly required."
+    },
+    "noteLicense": {
+      "pre": "By submitting, you agree the library will be published under the ",
+      "link": "MIT License, ",
+      "post": "which in short means anyone can use them without restrictions."
+    },
+    "noteItems": "Each library item must have its own name so it's filterable. The following library items will be included:",
+    "atleastOneLibItem": "Please select at least one library item to get started"
+  },
+
+  "publishSuccessDialog": {
+    "title": "Library submitted",
+    "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",
+    "link": "here"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Reset library",
+    "removeItemsFromLib": "Remove selected items from library"
+  },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
     "link": "Blog post on end-to-end encryption in Excalidraw"
@@ -290,6 +347,7 @@
     "width": "Width"
   },
   "toast": {
+    "addedToLibrary": "Added to library",
     "copyStyles": "Copied styles.",
     "copyToClipboard": "Copied to clipboard.",
     "copyToClipboardAsPng": "Copied {{exportSelection}} to clipboard as PNG\n({{exportColorScheme}})",

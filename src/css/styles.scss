@@ -311,7 +311,7 @@
   }
 
   .App-menu_top {
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: auto max-content auto;
     grid-gap: 4px;
     align-items: flex-start;
     cursor: default;
@@ -514,6 +514,27 @@
     .App-menu {
       display: flex;
       justify-content: space-between;
+    }
+  }
+
+  input[type="text"],
+  textarea:not(.excalidraw-wysiwyg) {
+    color: var(--text-primary-color);
+    border: 1.5px solid var(--input-border-color);
+    padding: 0.75rem;
+    white-space: nowrap;
+    border-radius: var(--space-factor);
+    background-color: var(--input-bg-color);
+
+    &:not(:focus) {
+      &:hover {
+        background-color: var(--input-hover-bg-color);
+      }
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--focus-highlight-color);
     }
   }
 

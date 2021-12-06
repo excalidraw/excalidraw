@@ -50,6 +50,8 @@ type MarkNonNullable<T, K extends keyof T> = {
   [P in K]-?: P extends K ? NonNullable<T[P]> : T[P];
 } & { [P in keyof T]: T[P] };
 
+type NonOptional<T> = Exclude<T, undefined>;
+
 // PNG encoding/decoding
 // -----------------------------------------------------------------------------
 type TEXtChunk = { name: "tEXt"; data: Uint8Array };
@@ -109,10 +111,17 @@ interface Uint8Array {
 
 // https://github.com/nodeca/image-blob-reduce/issues/23#issuecomment-783271848
 declare module "image-blob-reduce" {
-  import { PicaResizeOptions } from "pica";
+  import { PicaResizeOptions, Pica } from "pica";
   namespace ImageBlobReduce {
     interface ImageBlobReduce {
       toBlob(file: File, options: ImageBlobReduceOptions): Promise<Blob>;
+      _create_blob(
+        this: { pica: Pica },
+        env: {
+          out_canvas: HTMLCanvasElement;
+          out_blob: Blob;
+        },
+      ): Promise<any>;
     }
 
     interface ImageBlobReduceStatic {
