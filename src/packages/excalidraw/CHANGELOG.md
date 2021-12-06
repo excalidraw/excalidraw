@@ -13,6 +13,10 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+## Excalidraw API
+
+- [`exportToBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToBlob) now automatically sets `appState.exportBackground` to `true` if exporting to `image/jpeg` MIME type (to ensure that alpha channel is not compressed to black color).
+
 ### Features
 
 - #### BREAKING CHANGE
