@@ -243,9 +243,9 @@ export const wrapText = (
   const endTime = performance.now();
   const timeTaken = (endTime - startTime) / 1000;
   totalTime += timeTaken;
-  console.log("Time taken", timeTaken);
-  console.log("total Time taken,", totalTime);
-  console.log("Total runs = ", count);
+  console.info("Time taken", timeTaken);
+  console.info("total Time taken,", totalTime);
+  console.info("Total runs = ", count);
   return lines.join("\n");
 };
 
