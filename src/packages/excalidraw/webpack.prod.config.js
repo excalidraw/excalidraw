@@ -63,10 +63,7 @@ module.exports = {
                 "@babel/preset-typescript",
               ],
               plugins: [
-                "@babel/plugin-proposal-object-rest-spread",
-                "@babel/plugin-transform-arrow-functions",
                 "transform-class-properties",
-                "@babel/plugin-transform-async-to-generator",
                 "@babel/plugin-transform-runtime",
               ],
             },
