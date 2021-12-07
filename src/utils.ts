@@ -267,7 +267,7 @@ export const wrapText = (
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
 export const getApproxLineHeight = (font: FontString) => {
-  return measureText(DUMMY_TEXT, font).height;
+  return measureText(DUMMY_TEXT, font, null).height;
 };
 
 export const charWidth = (() => {

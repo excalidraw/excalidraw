@@ -5,11 +5,16 @@ import {
   wrapText,
   viewportCoordsToSceneCoords,
   getApproxLineHeight,
+  getFontFamilyString,
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES, PADDING } from "../constants";
-import { ExcalidrawBoundTextElement, ExcalidrawElement } from "./types";
+import {
+  ExcalidrawBoundTextElement,
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+} from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 
@@ -65,6 +70,22 @@ export const textWysiwyg = ({
   canvas: HTMLCanvasElement | null;
   excalidrawContainer: HTMLDivElement | null;
 }) => {
+  const textPropertiesUpdated = (
+    updatedElement: ExcalidrawTextElement,
+    editable: HTMLTextAreaElement,
+  ) => {
+    const currentFont = editable.style.fontFamily.replaceAll('"', "");
+    if (
+      getFontFamilyString({ fontFamily: updatedElement.fontFamily }) !==
+      currentFont
+    ) {
+      return true;
+    }
+    if (`${updatedElement.fontSize}px` !== editable.style.fontSize) {
+      return true;
+    }
+    return false;
+  };
   let originalContainerHeight: number;
   let approxLineHeight = isTextElement(element)
     ? getApproxLineHeight(getFontString(element))
@@ -85,14 +106,21 @@ export const textWysiwyg = ({
       let maxHeight = updatedElement.height;
       let width = updatedElement.width;
       let height = updatedElement.height;
-      if (textContainer) {
-        if (updatedElement.height > textContainer.height - PADDING * 2) {
-          const nextHeight = updatedElement.height + PADDING * 2;
-          originalContainerHeight = nextHeight;
-          mutateElement(textContainer, { height: nextHeight });
-          textContainer = Scene.getScene(textContainer)!.getElement(
-            textContainer.id,
+      if (textContainer && updatedElement.textContainerId) {
+        if (textPropertiesUpdated(updatedElement, editable)) {
+          const container = Scene.getScene(updatedElement)?.getElement(
+            updatedElement.textContainerId,
           ) as ExcalidrawBoundTextElement;
+          approxLineHeight = isTextElement(updatedElement)
+            ? getApproxLineHeight(getFontString(updatedElement))
+            : 0;
+          if (updatedElement.height > container.height - PADDING * 2) {
+            const nextHeight = updatedElement.height + PADDING * 2;
+            originalContainerHeight = nextHeight;
+            mutateElement(textContainer, { height: nextHeight });
+            textContainer = { ...textContainer, height: nextHeight };
+          }
+          editable.style.height = `${updatedElement.height}px`;
         }
         if (!originalContainerHeight) {
           originalContainerHeight = textContainer.height;
@@ -132,7 +160,7 @@ export const textWysiwyg = ({
           // For some reason the scrollHeight gets set to twice the lineHeight
           // when you start typing for first time  and thus line count is 2
           // hence this check
-          if (lines > 2) {
+          if (lines > 2 || textPropertiesUpdated(updatedElement, editable)) {
             // vertically center align the text
             coordY =
               textContainer.y +
@@ -458,11 +486,6 @@ export const textWysiwyg = ({
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
-    const updatedElement = Scene.getScene(element)!.getElement(element.id);
-    approxLineHeight = isTextElement(updatedElement)
-      ? getApproxLineHeight(getFontString(updatedElement))
-      : 0;
-
     updateWysiwygStyle();
     editable.focus();
   });
