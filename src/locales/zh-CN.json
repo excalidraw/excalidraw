@@ -101,8 +101,8 @@
     "showStroke": "显示描边颜色选择器",
     "showBackground": "显示背景颜色选择器",
     "toggleTheme": "切换主题",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "个人库",
+    "excalidrawLib": "Excalidraw 库"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -138,7 +138,7 @@
     "exitZenMode": "退出禅模式",
     "cancel": "取消",
     "clear": "清除",
-    "remove": "",
+    "remove": "删除",
     "publishLibrary": "发布",
     "submit": "提交",
     "confirm": "确定"
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，或拖动以移动",
     "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点",
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
-    "publishLibrary": ""
+    "publishLibrary": "发布您自己的库"
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -278,51 +278,51 @@
     "title": "清除画布"
   },
   "publishDialog": {
-    "title": "",
+    "title": "发布库",
     "itemName": "项目名称",
     "authorName": "作者名",
     "githubUsername": "GitHub 用户名",
-    "twitterUsername": "",
+    "twitterUsername": "Twitter 用户名",
     "libraryName": "名称",
     "libraryDesc": "简介",
     "website": "网址",
     "placeholder": {
       "authorName": "您的名字或用户名",
-      "libraryName": "库的名称",
+      "libraryName": "库名称",
       "libraryDesc": "介绍您的库，让人们了解其用途",
-      "githubHandle": "",
-      "twitterHandle": "",
+      "githubHandle": "GitHub handle（可选），填写后，您可以编辑已提交待审的库",
+      "twitterHandle": "Twitter 用户名（可选），填写后，当我们在Twitter发布推广信息时便可提及您",
       "website": "您个人网站的或任意的链接（可选）"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "必填",
+      "website": "输入一个有效的URL"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "您的库提交后将被包含在 ",
+      "link": "公共库仓库",
+      "post": "供其他人在绘图中使用。"
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "库需先经人工审核。请先阅读 ",
+      "link": "指南",
+      "post": " 在提交之前, 您需要一个 GitHub 帐号来与他人联系和更改库, 但这并不是必要项。"
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "提交时，表明您已同意库将遵循 ",
+      "link": "MIT 许可证， ",
+      "post": "简而言之，任何人都可以不受限制地使用它们。"
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "每个库都有互相独立的名称可供筛选。以下库将被包含：",
+    "atleastOneLibItem": "请选择至少一个库以开始"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "库已提交",
+    "content": "谢谢你 {{authorName}}。您的库已被提交审核。您可以跟踪此次提交的状态",
+    "link": "此处"
   },
   "confirmDialog": {
-    "resetLibrary": "",
+    "resetLibrary": "重置库",
     "removeItemsFromLib": "从库中删除选中的项目"
   },
   "encrypted": {
@@ -345,7 +345,7 @@
     "width": "宽度"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "添加到库中",
     "copyStyles": "复制样式",
     "copyToClipboard": "已复制到剪切板。",
     "copyToClipboardAsPng": "已将 {{exportSelection}} 作为 PNG 复制到剪贴板\n({{exportColorScheme}})",
