@@ -24,6 +24,7 @@ import {
   NonDeleted,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
+  ExcalidrawTableElement,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -166,6 +167,7 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
     case "text":
     case "diamond":
     case "ellipse":
+    case "table":
       const distance = distanceToBindableElement(args.element, args.point);
       return args.check(distance, args.threshold);
     case "freedraw": {
@@ -198,6 +200,7 @@ export const distanceToBindableElement = (
   switch (element.type) {
     case "rectangle":
     case "image":
+    case "table":
     case "text":
       return distanceToRectangle(element, point);
     case "diamond":
@@ -228,7 +231,8 @@ const distanceToRectangle = (
     | ExcalidrawRectangleElement
     | ExcalidrawTextElement
     | ExcalidrawFreeDrawElement
-    | ExcalidrawImageElement,
+    | ExcalidrawImageElement
+    | ExcalidrawTableElement,
   point: Point,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);
@@ -491,6 +495,7 @@ export const determineFocusDistance = (
   switch (element.type) {
     case "rectangle":
     case "image":
+    case "table":
     case "text":
       return c / (hwidth * (nabs + q * mabs));
     case "diamond":
@@ -522,6 +527,7 @@ export const determineFocusPoint = (
   switch (element.type) {
     case "rectangle":
     case "image":
+    case "table":
     case "text":
     case "diamond":
       point = findFocusPointForRectangulars(element, focus, adjecentPointRel);
@@ -572,6 +578,7 @@ const getSortedElementLineIntersections = (
   switch (element.type) {
     case "rectangle":
     case "image":
+    case "table":
     case "text":
     case "diamond":
       const corners = getCorners(element);
@@ -607,7 +614,8 @@ const getCorners = (
     | ExcalidrawRectangleElement
     | ExcalidrawImageElement
     | ExcalidrawDiamondElement
-    | ExcalidrawTextElement,
+    | ExcalidrawTextElement
+    | ExcalidrawTableElement,
   scale: number = 1,
 ): GA.Point[] => {
   const hx = (scale * element.width) / 2;
@@ -615,6 +623,7 @@ const getCorners = (
   switch (element.type) {
     case "rectangle":
     case "image":
+    case "table":
     case "text":
       return [
         GA.point(hx, hy),
@@ -758,7 +767,8 @@ export const findFocusPointForRectangulars = (
     | ExcalidrawRectangleElement
     | ExcalidrawImageElement
     | ExcalidrawDiamondElement
-    | ExcalidrawTextElement,
+    | ExcalidrawTextElement
+    | ExcalidrawTableElement,
   // Between -1 and 1 for how far away should the focus point be relative
   // to the size of the element. Sign determines orientation.
   relativeDistance: number,

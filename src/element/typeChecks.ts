@@ -7,6 +7,8 @@ import {
   ExcalidrawFreeDrawElement,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
+  InitializedExcalidrawTableElement,
+  ExcalidrawTableElement,
 } from "./types";
 
 export const isGenericElement = (
@@ -23,14 +25,20 @@ export const isGenericElement = (
 
 export const isInitializedImageElement = (
   element: ExcalidrawElement | null,
-): element is InitializedExcalidrawImageElement => {
-  return !!element && element.type === "image" && !!element.fileId;
+): element is
+  | InitializedExcalidrawImageElement
+  | InitializedExcalidrawTableElement => {
+  return (
+    !!element &&
+    (element.type === "image" || element.type === "table") &&
+    !!element.fileId
+  );
 };
 
 export const isImageElement = (
   element: ExcalidrawElement | null,
-): element is ExcalidrawImageElement => {
-  return !!element && element.type === "image";
+): element is ExcalidrawImageElement | ExcalidrawTableElement => {
+  return !!element && (element.type === "image" || element.type === "table");
 };
 
 export const isTextElement = (

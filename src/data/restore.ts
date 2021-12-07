@@ -43,6 +43,7 @@ export const AllowedExcalidrawElementTypes: Record<
   image: true,
   arrow: true,
   freedraw: true,
+  table: true,
 };
 
 export type RestoredDataState = {
@@ -145,6 +146,13 @@ const restoreElement = (
         fileId: element.fileId,
         scale: element.scale || [1, 1],
       });
+    case "table":
+      return restoreElementWithProperties(element, {
+        status: element.status || "pending",
+        fileId: element.fileId,
+        scale: element.scale || [1, 1],
+      });
+
     case "line":
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough

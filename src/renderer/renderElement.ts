@@ -6,6 +6,7 @@ import {
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
+  ExcalidrawTableElement,
 } from "../element/types";
 import {
   isTextElement,
@@ -154,7 +155,7 @@ IMAGE_ERROR_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
 )}`;
 
 const drawImagePlaceholder = (
-  element: ExcalidrawImageElement,
+  element: ExcalidrawImageElement | ExcalidrawTableElement,
   context: CanvasRenderingContext2D,
   zoomValue: AppState["zoom"]["value"],
 ) => {
@@ -218,6 +219,7 @@ const drawElementOnCanvas = (
       context.restore();
       break;
     }
+    case "table":
     case "image": {
       const img = isInitializedImageElement(element)
         ? renderConfig.imageCache.get(element.fileId)?.image
@@ -329,6 +331,8 @@ export const generateRoughOptions = (
   switch (element.type) {
     case "rectangle":
     case "diamond":
+    case "image":
+    case "table":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
       options.fill =
@@ -580,6 +584,7 @@ const generateElementShape = (
         break;
       }
       case "text":
+      case "table":
       case "image": {
         // just to ensure we don't regenerate element.canvas on rerenders
         shape = [];
@@ -723,6 +728,7 @@ export const renderElement = (
     case "line":
     case "arrow":
     case "image":
+    case "table":
     case "text": {
       generateElementShape(element, generator);
       if (renderConfig.isExporting) {
@@ -877,6 +883,7 @@ export const renderElementToSvg = (
       svgRoot.appendChild(node);
       break;
     }
+    case "table":
     case "image": {
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];

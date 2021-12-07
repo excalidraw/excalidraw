@@ -70,7 +70,6 @@ export const importFromLocalStorage = () => {
     // Unable to access localStorage
     console.error(error);
   }
-
   let elements: ExcalidrawElement[] = [];
   if (savedElements) {
     try {

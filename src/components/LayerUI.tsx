@@ -63,6 +63,7 @@ interface LayerUIProps {
   library: Library;
   id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
+  onTableAction: (data: { insertOnCanvasDirectly: boolean }) => void;
 }
 
 const LayerUI = ({
@@ -89,6 +90,7 @@ const LayerUI = ({
   library,
   id,
   onImageAction,
+  onTableAction,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -332,6 +334,11 @@ const LayerUI = ({
                               insertOnCanvasDirectly: pointerType !== "mouse",
                             });
                           }}
+                          onTableAction={({ pointerType }) => {
+                            onTableAction({
+                              insertOnCanvasDirectly: pointerType !== "mouse",
+                            });
+                          }}
                         />
                       </Stack.Row>
                     </Island>
@@ -495,6 +502,7 @@ const LayerUI = ({
         viewModeEnabled={viewModeEnabled}
         showThemeBtn={showThemeBtn}
         onImageAction={onImageAction}
+        onTableAction={onTableAction}
         renderTopRightUI={renderTopRightUI}
       />
     </>

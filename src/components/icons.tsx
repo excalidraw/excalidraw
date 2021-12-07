@@ -14,7 +14,7 @@ import { Theme } from "../element/types";
 import { THEME } from "../constants";
 
 const activeElementColor = (theme: Theme) =>
-  theme === THEME.LIGHT ? oc.orange[4] : oc.orange[9];
+  theme === THEME.LIGHT ? "#9933CC" : "#9933CC";
 const iconFillColor = (theme: Theme) =>
   theme === THEME.LIGHT ? oc.black : oc.gray[4];
 const handlerColor = (theme: Theme) =>

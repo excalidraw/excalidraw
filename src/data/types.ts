@@ -19,6 +19,7 @@ export interface ImportedDataState {
   elements?: readonly ExcalidrawElement[] | null;
   appState?: Readonly<Partial<AppState>> | null;
   scrollToContent?: boolean;
+  zoomToFit?: boolean | { margin?: number; maxZoom?: number };
   libraryItems?: LibraryItems | LibraryItems_v1;
   files?: BinaryFiles;
 }

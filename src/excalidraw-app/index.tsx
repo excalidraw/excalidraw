@@ -1,8 +1,11 @@
 import LanguageDetector from "i18next-browser-languagedetector";
+import { createStore, del, getMany, keys, set } from "idb-keyval";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
+import { shield } from "../components/icons";
+import { Tooltip } from "../components/Tooltip";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import {
   APP_NAME,
@@ -13,7 +16,10 @@ import {
   VERSION_TIMEOUT,
 } from "../constants";
 import { loadFromBlob } from "../data/blob";
+import { restoreAppState, RestoredDataState } from "../data/restore";
 import { ImportedDataState } from "../data/types";
+import { newElementWith } from "../element/mutateElement";
+import { isInitializedImageElement } from "../element/typeChecks";
 import {
   ExcalidrawElement,
   FileId,
@@ -27,10 +33,10 @@ import Excalidraw, {
 } from "../packages/excalidraw/index";
 import {
   AppState,
-  LibraryItems,
-  ExcalidrawImperativeAPI,
   BinaryFileData,
   BinaryFiles,
+  ExcalidrawImperativeAPI,
+  LibraryItems,
 } from "../types";
 import {
   debounce,
@@ -48,25 +54,17 @@ import CollabWrapper, {
   CollabContext,
   CollabContextConsumer,
 } from "./collab/CollabWrapper";
+import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 import { LanguageList } from "./components/LanguageList";
+import CustomStats from "./CustomStats";
 import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
+import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
+import { loadFilesFromFirebase } from "./data/firebase";
 import {
   importFromLocalStorage,
   saveToLocalStorage,
 } from "./data/localStorage";
-import CustomStats from "./CustomStats";
-import { restoreAppState, RestoredDataState } from "../data/restore";
-import { Tooltip } from "../components/Tooltip";
-import { shield } from "../components/icons";
-
 import "./index.scss";
-import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
-
-import { getMany, set, del, keys, createStore } from "idb-keyval";
-import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
-import { newElementWith } from "../element/mutateElement";
-import { isInitializedImageElement } from "../element/typeChecks";
-import { loadFilesFromFirebase } from "./data/firebase";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -191,7 +189,6 @@ const initializeScene = async (opts: {
           localDataState,
         );
       }
-      scene.scrollToContent = true;
       if (!roomLinkData) {
         window.history.replaceState({}, APP_NAME, window.location.origin);
       }
@@ -384,7 +381,13 @@ const ExcalidrawWrapper = () => {
 
     initializeScene({ collabAPI }).then((data) => {
       loadImages(data, /* isInitialLoad */ true);
-      initialStatePromiseRef.current.promise.resolve(data.scene);
+      initialStatePromiseRef.current.promise.resolve({
+        ...data.scene,
+        zoomToFit: {
+          margin: 0.24,
+          maxZoom: 1,
+        },
+      });
     });
 
     const onHashChange = (event: HashChangeEvent) => {
@@ -457,8 +460,9 @@ const ExcalidrawWrapper = () => {
     } else {
       saveDebounced(elements, appState, files, () => {
         if (excalidrawAPI) {
+          // TODO: We might want to delete the uploaded table files here
+          // So it's not kept in memory -- might slow things down
           let didChange = false;
-
           let pendingImageElement = appState.pendingImageElement;
           const elements = excalidrawAPI
             .getSceneElementsIncludingDeleted()

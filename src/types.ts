@@ -13,6 +13,7 @@ import {
   FileId,
   ExcalidrawImageElement,
   Theme,
+  ExcalidrawTableElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -57,6 +58,11 @@ export type BinaryFileData = {
   id: FileId;
   dataURL: DataURL;
   created: number;
+  // For when the fileType is different than the mimetype
+  // Currently applicable to tables, where mimeType is the placeholder for the canvas
+  // FileID refers to the real file which has a fileType and an extraFile
+  fileMimeType?: string;
+  extraFile?: File;
 };
 
 export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
@@ -148,7 +154,9 @@ export type AppState = {
         data: Spreadsheet;
       };
   /** imageElement waiting to be placed on canvas */
-  pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
+  pendingImageElement: NonDeleted<
+    ExcalidrawImageElement | ExcalidrawTableElement
+  > | null;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -248,6 +256,8 @@ export interface ExcalidrawProps {
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
+  onDoubleClick?: (elements: readonly NonDeletedExcalidrawElement[]) => boolean;
+  generateThumbnailForTable?: (file: File) => DataURL | Promise<DataURL>;
 }
 
 export type SceneData = {
