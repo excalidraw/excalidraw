@@ -14,7 +14,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "dist"),
     library: "Excalidraw",
-    libraryTarget: "commonjs2",
+    libraryTarget: "umd",
     filename: "[name].js",
     chunkFilename: "excalidraw-assets/[name]-[contenthash].js",
     publicPath: "",
