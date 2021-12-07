@@ -97,7 +97,11 @@ export const getFontString = ({
 };
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-export const measureText = (text: string, font: FontString) => {
+export const measureText = (
+  text: string,
+  font: FontString,
+  maxWidth?: number | null,
+) => {
   text = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
@@ -108,6 +112,16 @@ export const measureText = (text: string, font: FontString) => {
   container.style.position = "absolute";
   container.style.whiteSpace = "pre";
   container.style.font = font;
+
+  if (maxWidth) {
+    const lineHeight = getApproxLineHeight(font);
+    container.style.width = `${String(maxWidth)}px`;
+    container.style.maxWidth = `${String(maxWidth)}px`;
+    container.style.overflow = "hidden";
+    container.style.wordBreak = "break-word";
+    container.style.lineHeight = `${String(lineHeight)}px`;
+    container.style.whiteSpace = "normal";
+  }
   document.body.appendChild(container);
   container.innerText = text;
 

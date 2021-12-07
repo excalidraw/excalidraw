@@ -159,11 +159,12 @@ const getAdjustedDimensions = (
   height: number;
   baseline: number;
 } => {
+  const maxWidth = element.textContainerId ? element.width : null;
   const {
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureText(nextText, getFontString(element));
+  } = measureText(nextText, getFontString(element), maxWidth);
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
@@ -172,7 +173,11 @@ const getAdjustedDimensions = (
     verticalAlign === "middle" &&
     !element.textContainerId
   ) {
-    const prevMetrics = measureText(element.text, getFontString(element));
+    const prevMetrics = measureText(
+      element.text,
+      getFontString(element),
+      maxWidth,
+    );
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
       height: nextHeight - prevMetrics.height,

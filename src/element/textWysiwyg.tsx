@@ -66,8 +66,7 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
 }) => {
   let originalContainerHeight: number;
-
-  const approxLineHeight = isTextElement(element)
+  let approxLineHeight = isTextElement(element)
     ? getApproxLineHeight(getFontString(element))
     : 0;
 
@@ -76,7 +75,7 @@ export const textWysiwyg = ({
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
-      const textContainer = updatedElement?.textContainerId
+      let textContainer = updatedElement?.textContainerId
         ? Scene.getScene(updatedElement)!.getElement(
             updatedElement.textContainerId,
           )
@@ -87,6 +86,14 @@ export const textWysiwyg = ({
       let width = updatedElement.width;
       let height = updatedElement.height;
       if (textContainer) {
+        if (updatedElement.height > textContainer.height - PADDING * 2) {
+          const nextHeight = updatedElement.height + PADDING * 2;
+          originalContainerHeight = nextHeight;
+          mutateElement(textContainer, { height: nextHeight });
+          textContainer = Scene.getScene(textContainer)!.getElement(
+            textContainer.id,
+          ) as ExcalidrawBoundTextElement;
+        }
         if (!originalContainerHeight) {
           originalContainerHeight = textContainer.height;
         }
@@ -451,6 +458,11 @@ export const textWysiwyg = ({
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
+    const updatedElement = Scene.getScene(element)!.getElement(element.id);
+    approxLineHeight = isTextElement(updatedElement)
+      ? getApproxLineHeight(getFontString(updatedElement))
+      : 0;
+
     updateWysiwygStyle();
     editable.focus();
   });
