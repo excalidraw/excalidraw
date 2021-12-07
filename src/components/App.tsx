@@ -336,6 +336,7 @@ class App extends React.Component<AppProps, AppState> {
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
         id: this.id,
+        app: this,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
