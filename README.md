@@ -37,7 +37,7 @@ Last but not least, we're thankful to these companies for offering their service
 ### Shortcuts
 
 You can almost do anything with shortcuts. Click on the help icon on the bottom right corner to see them all.
-<img height="300" width="300" src="./public/screenshots/shortcuts-1.png" alt="shortcut demo for help button" /><img height="300" width="300" src="./public/screenshots/shortcuts-2.png" alt="shortcut demo for shortcuts menu" />
+<img height="300" width="300" src="./public/screenshots/shortcuts-1.png" alt="shortcut demo for help button" /><img height="300" width="300" src="./public/screenshots/shortcuts-2.PNG" alt="shortcut demo for shortcuts menu" />
 
 ### Curved lines and arrows
 
