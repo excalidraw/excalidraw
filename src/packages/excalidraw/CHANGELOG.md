@@ -66,6 +66,10 @@ Please add the latest change on the top under the correct section.
 
   The `Appearance` type is now removed and renamed to `Theme` so `Theme` type needs to be used.
 
+### Build
+
+- We're now compiling to `es2017` target. Notably, `async/await` is not compiled down to generators. [#4341](https://github.com/excalidraw/excalidraw/pull/4341)
+
 ---
 
 ## 0.10.0 (2021-10-13)
