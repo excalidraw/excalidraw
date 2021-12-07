@@ -45,6 +45,7 @@ Choose line or arrow and click click click instead of drag.
 <div>
   <img height="400" width="700" src="./public/screenshots/lines_arrows-1.png" alt="lines and arrows demo" />
 </div>
+
 ### Charts
 
 You can easily create charts by copy pasting data from Excel or just plain comma separated text.
