@@ -37,13 +37,13 @@ Last but not least, we're thankful to these companies for offering their service
 ### Shortcuts
 
 You can almost do anything with shortcuts. Click on the help icon on the bottom right corner to see them all.
-<img height="400" width="500" src="./public/screenshots/shortcuts-1.png" alt="shortcut demo for help button" /><img height="400" width="500" src="./public/screenshots/shortcuts-2.PNG" alt="shortcut demo for shortcuts menu" />
+<img height="400" width="500" src="./public/screenshots/shortcuts-1.png" alt="shortcut demo for help button" /><img height="700" width="300" src="./public/screenshots/shortcuts-2.PNG" alt="shortcut demo for shortcuts menu" />
 
 ### Curved lines and arrows
 
 Choose line or arrow and click click click instead of drag.
 <div>
-  <img height="400" width="500" src="./public/screenshots/lines_arrows-1.png" alt="lines and arrows demo" />
+  <img height="400" width="700" src="./public/screenshots/lines_arrows-1.png" alt="lines and arrows demo" />
 </div>
 ### Charts
 
