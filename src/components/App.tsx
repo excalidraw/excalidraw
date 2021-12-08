@@ -3484,9 +3484,15 @@ class App extends React.Component<AppProps, AppState> {
             const groupIdMap = new Map();
             const oldIdToDuplicatedId = new Map();
             const hitElement = pointerDownState.hit.element;
-            for (const element of this.scene.getElementsIncludingDeleted()) {
+            const elements = this.scene.getElementsIncludingDeleted();
+            const selectedElementIds: Array<ExcalidrawElement["id"]> =
+              getSelectedElements(elements, this.state, true).map(
+                (element) => element.id,
+              );
+
+            for (const element of elements) {
               if (
-                this.state.selectedElementIds[element.id] ||
+                selectedElementIds.includes(element.id) ||
                 // case: the state.selectedElementIds might not have been
                 // updated yet by the time this mousemove event is fired
                 (element.id === hitElement?.id &&
@@ -3514,6 +3520,11 @@ class App extends React.Component<AppProps, AppState> {
               }
             }
             const nextSceneElements = [...nextElements, ...elementsToAppend];
+            bindTextToShapeAfterDuplication(
+              nextElements,
+              elementsToAppend,
+              oldIdToDuplicatedId,
+            );
             fixBindingsAfterDuplication(
               nextSceneElements,
               elementsToAppend,
