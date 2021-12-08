@@ -122,6 +122,7 @@ import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   isBindingElement,
   isBindingElementType,
+  isExcalidrawBindableTextELement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -2174,7 +2175,7 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.canvas);
 
-    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+    let { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
       this.state,
     );
@@ -2206,6 +2207,18 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.canvas);
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
+      const selectedElements = getSelectedElements(
+        this.scene.getElements(),
+        this.state,
+      );
+      if (selectedElements.length === 1) {
+        const selectedElement = selectedElements[0];
+        const canBindText = isExcalidrawBindableTextELement(selectedElement);
+        if (canBindText) {
+          sceneX = selectedElement.x + selectedElement.width / 2;
+          sceneY = selectedElement.y + selectedElement.height / 2;
+        }
+      }
       this.startTextEditing({
         sceneX,
         sceneY,
