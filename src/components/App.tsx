@@ -1921,10 +1921,13 @@ class App extends React.Component<AppProps, AppState> {
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
+          const elementIdToSelect = element.textContainerId
+            ? element.textContainerId
+            : element.id;
           this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
-              [element.id]: true,
+              [elementIdToSelect]: true,
             },
           }));
         }
