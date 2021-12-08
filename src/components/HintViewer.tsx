@@ -5,6 +5,7 @@ import { getSelectedElements } from "../scene";
 import "./HintViewer.scss";
 import { AppState } from "../types";
 import {
+  isExcalidrawBindableTextELement,
   isImageElement,
   isLinearElement,
   isTextElement,
@@ -60,13 +61,18 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
     return t("hints.rotate");
   }
 
-  if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
-    if (appState.editingLinearElement) {
-      return appState.editingLinearElement.activePointIndex
-        ? t("hints.lineEditor_pointSelected")
-        : t("hints.lineEditor_nothingSelected");
+  if (selectedElements.length === 1) {
+    if (isLinearElement(selectedElements[0])) {
+      if (appState.editingLinearElement) {
+        return appState.editingLinearElement.activePointIndex
+          ? t("hints.lineEditor_pointSelected")
+          : t("hints.lineEditor_nothingSelected");
+      }
+      return t("hints.lineEditor_info");
     }
-    return t("hints.lineEditor_info");
+    if (isExcalidrawBindableTextELement(selectedElements[0])) {
+      return t("hints.bindTextToElement");
+    }
   }
 
   if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
