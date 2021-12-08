@@ -232,6 +232,7 @@ import {
 } from "../element/image";
 import throttle from "lodash.throttle";
 import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
+import { bindTextToShapeAfterDuplication } from "../element/textElement";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -1379,6 +1380,7 @@ class App extends React.Component<AppProps, AppState> {
       oldIdToDuplicatedId.set(element.id, newElement.id);
       return newElement;
     });
+    bindTextToShapeAfterDuplication(newElements, elements, oldIdToDuplicatedId);
     const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
@@ -1397,7 +1399,9 @@ class App extends React.Component<AppProps, AppState> {
           ...this.state,
           isLibraryOpen: false,
           selectedElementIds: newElements.reduce((map, element) => {
-            map[element.id] = true;
+            if (isTextElement(element) && !element.textContainerId) {
+              map[element.id] = true;
+            }
             return map;
           }, {} as any),
           selectedGroupIds: {},
