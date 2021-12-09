@@ -11,7 +11,7 @@ import { MIME_TYPES } from "../../constants";
 // private
 // -----------------------------------------------------------------------------
 
-let FIREBASE_CONFIG: object;
+let FIREBASE_CONFIG: Record<string, any>;
 try {
   FIREBASE_CONFIG = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
 } catch (error: any) {
