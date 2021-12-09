@@ -8,6 +8,7 @@ import {
   isTextElement,
 } from "../element";
 import { AppState } from "../types";
+import { hasBoundTextContainer } from "../element/typeChecks";
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -21,6 +22,7 @@ export const getElementsWithinSelection = (
 
     return (
       element.type !== "selection" &&
+      !hasBoundTextContainer(element) &&
       selectionX1 <= elementX1 &&
       selectionY1 <= elementY1 &&
       selectionX2 >= elementX2 &&

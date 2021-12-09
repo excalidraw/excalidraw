@@ -1,4 +1,4 @@
-import { PADDING, SHIFT_LOCKING_ANGLE } from "../constants";
+import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
 import {
@@ -26,13 +26,7 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import {
-  measureText,
-  getFontString,
-  wrapText,
-  getApproxMinLineWidth,
-  getMinCharWidth,
-} from "../utils";
+import { measureText, getFontString, getApproxMinLineWidth } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
   TransformHandleType,
@@ -41,6 +35,7 @@ import {
 } from "./transformHandles";
 import { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
+import { handleBindTextResize } from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -113,66 +108,8 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
-      if (hasBoundTextElement(element)) {
-        const textElement = Scene.getScene(element)!.getElement(
-          element.boundTextElementId,
-        ) as ExcalidrawTextElement;
-        if (textElement && textElement.text) {
-          const updatedElement = Scene.getScene(element)!.getElement(
-            element.id,
-          );
-          if (!updatedElement) {
-            return;
-          }
-          let text = textElement.text;
-          let nextWidth = textElement.width;
-          let nextHeight = textElement.height;
-          let containerHeight = updatedElement.height;
-          let nextBaseLine = textElement.baseline;
-          if (transformHandleType !== "n" && transformHandleType !== "s") {
-            console.info("attempt to call wrap text");
-            let minCharWidthTillNow = 0;
-            if (text) {
-              minCharWidthTillNow = getMinCharWidth(getFontString(textElement));
-              const diff = Math.abs(
-                updatedElement.width - textElement.width - PADDING * 2,
-              );
-              if (diff >= minCharWidthTillNow) {
-                text = wrapText(
-                  textElement.originalText,
-                  getFontString(textElement),
-                  updatedElement,
-                );
-                console.info("called wrap text");
-              }
-            }
-
-            const dimensions = measureText(text, getFontString(textElement));
-            nextWidth = dimensions.width;
-            nextHeight = dimensions.height;
-            nextBaseLine = dimensions.baseline;
-          }
-          if (nextHeight > updatedElement.height - PADDING * 2) {
-            containerHeight = nextHeight + PADDING * 2;
-            mutateElement(updatedElement, { height: containerHeight });
-          }
-
-          const updatedY =
-            updatedElement!.y + containerHeight / 2 - nextHeight / 2;
-
-          const updatedX =
-            updatedElement!.x + updatedElement!.width / 2 - nextWidth / 2;
-          mutateElement(textElement, {
-            text,
-            width: nextWidth,
-            height: nextHeight,
-            y: updatedY,
-            x: updatedX,
-            baseline: nextBaseLine,
-          });
-        }
-      }
     }
+    handleBindTextResize(selectedElements, transformHandleType);
 
     return true;
   } else if (selectedElements.length > 1) {
@@ -199,6 +136,7 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
+      handleBindTextResize(selectedElements, transformHandleType);
       return true;
     }
   }

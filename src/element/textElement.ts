@@ -1,11 +1,24 @@
-import { measureText, getFontString, arrayToMap } from "../utils";
+import {
+  measureText,
+  getFontString,
+  arrayToMap,
+  getMinCharWidth,
+  wrapText,
+} from "../utils";
 import {
   ExcalidrawBindableTextELement,
   ExcalidrawElement,
   ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
-import { isExcalidrawBindableTextELement } from "./typeChecks";
+import {
+  hasBoundTextElement,
+  isExcalidrawBindableTextELement,
+} from "./typeChecks";
+import { PADDING } from "../constants";
+import { MaybeTransformHandleType } from "./transformHandles";
+import Scene from "../scene/Scene";
 
 export const redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
   let maxWidth;
@@ -51,6 +64,71 @@ export const bindTextToShapeAfterDuplication = (
           textContainerId: newElementId,
         },
       );
+    }
+  });
+};
+
+export const handleBindTextResize = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  transformHandleType: MaybeTransformHandleType,
+) => {
+  elements.forEach((element) => {
+    if (hasBoundTextElement(element)) {
+      const textElement = Scene.getScene(element)!.getElement(
+        element.boundTextElementId,
+      ) as ExcalidrawTextElement;
+      if (textElement && textElement.text) {
+        const updatedElement = Scene.getScene(element)!.getElement(element.id);
+        if (!updatedElement) {
+          return;
+        }
+        let text = textElement.text;
+        let nextWidth = textElement.width;
+        let nextHeight = textElement.height;
+        let containerHeight = updatedElement.height;
+        let nextBaseLine = textElement.baseline;
+        if (transformHandleType !== "n" && transformHandleType !== "s") {
+          console.info("attempt to call wrap text");
+          let minCharWidthTillNow = 0;
+          if (text) {
+            minCharWidthTillNow = getMinCharWidth(getFontString(textElement));
+            const diff = Math.abs(
+              updatedElement.width - textElement.width - PADDING * 2,
+            );
+            if (diff >= minCharWidthTillNow) {
+              text = wrapText(
+                textElement.originalText,
+                getFontString(textElement),
+                updatedElement,
+              );
+              console.info("called wrap text");
+            }
+          }
+
+          const dimensions = measureText(text, getFontString(textElement));
+          nextWidth = dimensions.width;
+          nextHeight = dimensions.height;
+          nextBaseLine = dimensions.baseline;
+        }
+        if (nextHeight > updatedElement.height - PADDING * 2) {
+          containerHeight = nextHeight + PADDING * 2;
+          mutateElement(updatedElement, { height: containerHeight });
+        }
+
+        const updatedY =
+          updatedElement!.y + containerHeight / 2 - nextHeight / 2;
+
+        const updatedX =
+          updatedElement!.x + updatedElement!.width / 2 - nextWidth / 2;
+        mutateElement(textElement, {
+          text,
+          width: nextWidth,
+          height: nextHeight,
+          y: updatedY,
+          x: updatedX,
+          baseline: nextBaseLine,
+        });
+      }
     }
   });
 };

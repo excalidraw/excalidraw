@@ -127,3 +127,11 @@ export const isExcalidrawBindableTextELement = (
   (element.type === "rectangle" ||
     element.type === "diamond" ||
     element.type === "ellipse");
+
+export const hasBoundTextContainer = (element: ExcalidrawElement | null) => {
+  return (
+    element !== null &&
+    isTextElement(element) &&
+    element.textContainerId !== null
+  );
+};
