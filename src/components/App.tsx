@@ -4713,14 +4713,9 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
-    let includeBoundTextElement = false;
-    if (pointerDownState.resize.handleType === "rotation") {
-      includeBoundTextElement = true;
-    }
     const selectedElements = getSelectedElements(
       this.scene.getElements(),
       this.state,
-      includeBoundTextElement,
     );
     const transformHandleType = pointerDownState.resize.handleType;
     this.setState({

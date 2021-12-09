@@ -159,6 +159,12 @@ const rotateSingleElement = (
   }
   angle = normalizeAngle(angle);
   mutateElement(element, { angle });
+  if (hasBoundTextElement(element)) {
+    const textElement = Scene.getScene(element)!.getElement(
+      element.boundTextElementId,
+    ) as ExcalidrawTextElement;
+    mutateElement(textElement, { angle });
+  }
 };
 
 // used in DEV only
@@ -743,6 +749,16 @@ const rotateMultipleElements = (
       y: element.y + (rotatedCY - cy),
       angle: normalizeAngle(centerAngle + origAngle),
     });
+    if (hasBoundTextElement(element)) {
+      const textElement = Scene.getScene(element)!.getElement(
+        element.boundTextElementId,
+      ) as ExcalidrawTextElement;
+      mutateElement(textElement, {
+        x: textElement.x + (rotatedCX - cx),
+        y: textElement.y + (rotatedCY - cy),
+        angle: normalizeAngle(centerAngle + origAngle),
+      });
+    }
   });
 };
 
