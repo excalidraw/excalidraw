@@ -26,7 +26,7 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import { measureText, getFontString, getApproxMinLineWidth } from "../utils";
+import { getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
   TransformHandleType,
@@ -35,7 +35,11 @@ import {
 } from "./transformHandles";
 import { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
-import { handleBindTextResize } from "./textElement";
+import {
+  getApproxMinLineWidth,
+  handleBindTextResize,
+  measureText,
+} from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {

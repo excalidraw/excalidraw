@@ -195,8 +195,6 @@ import {
 import {
   debounce,
   distance,
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
   getFontString,
   getNearestScrollableContainer,
   isInputLike,
@@ -232,7 +230,11 @@ import {
 } from "../element/image";
 import throttle from "lodash.throttle";
 import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
-import { bindTextToShapeAfterDuplication } from "../element/textElement";
+import {
+  bindTextToShapeAfterDuplication,
+  getApproxMinLineHeight,
+  getApproxMinLineWidth,
+} from "../element/textElement";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);

@@ -24,19 +24,14 @@ import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
-import {
-  distance,
-  getFontString,
-  getFontFamilyString,
-  isRTL,
-  getApproxLineHeight,
-} from "../utils";
+import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import { MAX_DECIMALS_FOR_SVG_EXPORT, MIME_TYPES, SVG_NS } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
+import { getApproxLineHeight } from "../element/textElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original

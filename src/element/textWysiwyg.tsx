@@ -2,9 +2,7 @@ import { CODES, KEYS } from "../keys";
 import {
   isWritableElement,
   getFontString,
-  wrapText,
   viewportCoordsToSceneCoords,
-  getApproxLineHeight,
   getFontFamilyString,
 } from "../utils";
 import Scene from "../scene/Scene";
@@ -17,6 +15,7 @@ import {
 } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
+import { getApproxLineHeight, wrapText } from "./textElement";
 
 const normalizeText = (text: string) => {
   return (

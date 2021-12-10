@@ -13,7 +13,7 @@ import {
   FontFamilyValues,
   ExcalidrawRectangleElement,
 } from "../element/types";
-import { measureText, getFontString, getUpdatedTimestamp } from "../utils";
+import { getFontString, getUpdatedTimestamp } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -22,6 +22,7 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import { isExcalidrawBindableTextELement } from "./typeChecks";
+import { measureText } from "./textElement";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
