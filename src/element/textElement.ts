@@ -1,6 +1,5 @@
 import { getFontString, arrayToMap } from "../utils";
 import {
-  ChartType,
   ExcalidrawBindableTextELement,
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -228,7 +227,7 @@ export const wrapText = (
           while (words[index].length > 0) {
             count++;
 
-            const currentChar = words[index][0] as ChartType;
+            const currentChar = words[index][0];
             const width = charWidth.calculate(currentChar, font);
             widthTillNow += width;
             words[index] = words[index].slice(1);
@@ -294,7 +293,7 @@ export const wrapText = (
 export const charWidth = (() => {
   const cachedCharWidth: { [key: FontString]: Array<number> } = {};
 
-  const calculate = (char: ChartType, font: FontString) => {
+  const calculate = (char: string, font: FontString) => {
     const ascii = char.charCodeAt(0);
     if (!cachedCharWidth[font]) {
       cachedCharWidth[font] = [];
@@ -306,7 +305,7 @@ export const charWidth = (() => {
     return cachedCharWidth[font][ascii];
   };
 
-  const updateCache = (char: ChartType, font: FontString) => {
+  const updateCache = (char: string, font: FontString) => {
     const ascii = char.charCodeAt(0);
 
     if (!cachedCharWidth[font][ascii]) {
