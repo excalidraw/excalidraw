@@ -139,7 +139,7 @@ export type ExcalidrawBoundTextElement = { boundTextElementId: string } & (
   | ExcalidrawEllipseElement
 );
 
-export type ExcalidrawBindableTextELement =
+export type ExcalidrawElementWithBindText =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawRectangleElement;

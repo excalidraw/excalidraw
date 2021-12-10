@@ -5,7 +5,7 @@ import { getSelectedElements } from "../scene";
 import "./HintViewer.scss";
 import { AppState } from "../types";
 import {
-  isExcalidrawBindableTextELement,
+  isExcalidrawElementWithBindText,
   isImageElement,
   isLinearElement,
   isTextElement,
@@ -70,7 +70,7 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
       }
       return t("hints.lineEditor_info");
     }
-    if (isExcalidrawBindableTextELement(selectedElements[0])) {
+    if (isExcalidrawElementWithBindText(selectedElements[0])) {
       return t("hints.bindTextToElement");
     }
   }

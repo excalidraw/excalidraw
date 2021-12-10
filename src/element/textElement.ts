@@ -1,6 +1,6 @@
 import { getFontString, arrayToMap } from "../utils";
 import {
-  ExcalidrawBindableTextELement,
+  ExcalidrawElementWithBindText,
   ExcalidrawElement,
   ExcalidrawTextElement,
   FontString,
@@ -9,7 +9,7 @@ import {
 import { mutateElement } from "./mutateElement";
 import {
   hasBoundTextElement,
-  isExcalidrawBindableTextELement,
+  isExcalidrawElementWithBindText,
 } from "./typeChecks";
 import { PADDING } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
@@ -40,7 +40,7 @@ export const bindTextToShapeAfterDuplication = (
   >;
   oldElements.forEach((element) => {
     if (
-      isExcalidrawBindableTextELement(element) &&
+      isExcalidrawElementWithBindText(element) &&
       element.boundTextElementId
     ) {
       const newElementId = oldIdToDuplicatedId.get(element.id) as string;
@@ -48,7 +48,7 @@ export const bindTextToShapeAfterDuplication = (
         element.boundTextElementId,
       ) as string;
       mutateElement(
-        sceneElementMap.get(newElementId) as ExcalidrawBindableTextELement,
+        sceneElementMap.get(newElementId) as ExcalidrawElementWithBindText,
         {
           boundTextElementId: newTextElementId,
         },
