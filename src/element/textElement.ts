@@ -88,14 +88,15 @@ export const handleBindTextResize = (
           let minCharWidthTillNow = 0;
           if (text) {
             minCharWidthTillNow = getMinCharWidth(getFontString(textElement));
+            // check if the diff has exceeded min char width needed
             const diff = Math.abs(
-              updatedElement.width - textElement.width - PADDING * 2,
+              updatedElement.width - textElement.width + PADDING * 2,
             );
             if (diff >= minCharWidthTillNow) {
               text = wrapText(
                 textElement.originalText,
                 getFontString(textElement),
-                updatedElement,
+                updatedElement.width,
               );
               console.info("called wrap text");
             }
@@ -197,19 +198,16 @@ let count = 0;
 export const wrapText = (
   text: string,
   font: FontString,
-  textContainer: ExcalidrawElement | null,
+  containerWidth: number,
 ) => {
-  if (!textContainer) {
-    return text;
-  }
   const startTime = performance.now();
-  const maxWidth = textContainer.width - PADDING * 2;
+  const maxWidth = containerWidth - PADDING * 2;
   console.info(
     "maxWidth",
     maxWidth,
     text.length,
     "container width",
-    textContainer.width,
+    containerWidth,
   );
 
   const lines: Array<string> = [];

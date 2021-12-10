@@ -399,7 +399,7 @@ export const textWysiwyg = ({
         wrappedText = wrapText(
           editable.value,
           getFontString(updateElement),
-          textContainer,
+          textContainer.width,
         );
         const { x, y } = viewportCoordsToSceneCoords(
           {

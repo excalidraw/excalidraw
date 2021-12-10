@@ -113,7 +113,6 @@ export const transformElements = (
         pointerY,
       );
     }
-    handleBindTextResize(selectedElements, transformHandleType);
 
     return true;
   } else if (selectedElements.length > 1) {
@@ -601,6 +600,7 @@ export const resizeSingleElement = (
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
     mutateElement(element, resizedElement);
+    handleBindTextResize([element], transformHandleDirection);
   }
 };
 
