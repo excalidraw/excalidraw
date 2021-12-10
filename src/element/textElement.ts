@@ -74,14 +74,13 @@ export const handleBindTextResize = (
         element.boundTextElementId,
       ) as ExcalidrawTextElement;
       if (textElement && textElement.text) {
-        const updatedElement = Scene.getScene(element)!.getElement(element.id);
-        if (!updatedElement) {
+        if (!element) {
           return;
         }
         let text = textElement.text;
         let nextWidth = textElement.width;
         let nextHeight = textElement.height;
-        let containerHeight = updatedElement.height;
+        let containerHeight = element.height;
         let nextBaseLine = textElement.baseline;
         if (transformHandleType !== "n" && transformHandleType !== "s") {
           console.info("attempt to call wrap text");
@@ -90,13 +89,13 @@ export const handleBindTextResize = (
             minCharWidthTillNow = getMinCharWidth(getFontString(textElement));
             // check if the diff has exceeded min char width needed
             const diff = Math.abs(
-              updatedElement.width - textElement.width + PADDING * 2,
+              element.width - textElement.width + PADDING * 2,
             );
             if (diff >= minCharWidthTillNow) {
               text = wrapText(
                 textElement.originalText,
                 getFontString(textElement),
-                updatedElement.width,
+                element.width,
               );
               console.info("called wrap text");
             }
@@ -107,16 +106,15 @@ export const handleBindTextResize = (
           nextHeight = dimensions.height;
           nextBaseLine = dimensions.baseline;
         }
-        if (nextHeight > updatedElement.height - PADDING * 2) {
+        // increase height in case text element height exceeds
+        if (nextHeight > element.height - PADDING * 2) {
           containerHeight = nextHeight + PADDING * 2;
-          mutateElement(updatedElement, { height: containerHeight });
+          mutateElement(element, { height: containerHeight });
         }
 
-        const updatedY =
-          updatedElement!.y + containerHeight / 2 - nextHeight / 2;
+        const updatedY = element!.y + containerHeight / 2 - nextHeight / 2;
 
-        const updatedX =
-          updatedElement!.x + updatedElement!.width / 2 - nextWidth / 2;
+        const updatedX = element!.x + element!.width / 2 - nextWidth / 2;
         mutateElement(textElement, {
           text,
           width: nextWidth,
@@ -227,7 +225,6 @@ export const wrapText = (
         const currentWidth = getTextWidth(words[index], font);
 
         if (currentWidth > maxWidth) {
-          widthTillNow = 0;
           while (words[index].length > 0) {
             count++;
 
@@ -248,19 +245,13 @@ export const wrapText = (
               currentLine += currentChar;
             }
           }
-          //console.log("words[index]=", words[index]);
-
+          if (widthTillNow) {
+            lines.push(currentLine);
+            currentLine = "";
+            widthTillNow = 0;
+          }
           index++;
-          // console.log("index", index);
         } else {
-          // console.log(
-          //   "width till now",
-          //   widthTillNow,
-          //   "index",
-          //   index,
-          //   "lenght",
-          //   words.length,
-          // );
           while (widthTillNow < maxWidth && index < words.length) {
             const word = words[index];
             widthTillNow = getTextWidth(currentLine + word, font);
@@ -277,7 +268,6 @@ export const wrapText = (
 
             currentLine += `${word} `;
           }
-          // console.log("index", index, currentLine, words.length);
 
           if (widthTillNow === maxWidth) {
             currentLine = "";
