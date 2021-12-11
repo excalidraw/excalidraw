@@ -190,7 +190,7 @@
     user-select: none;
     background-color: var(--button-gray-1);
     border: 0;
-    border-radius: 4px;
+    border-radius: var(--border-radius-md);
     margin: 0.125rem 0;
     padding: 0.25rem;
     white-space: nowrap;
