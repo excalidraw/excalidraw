@@ -36,6 +36,13 @@
   --space-factor: 0.25rem;
   --text-primary-color: #{$oc-gray-8};
 
+  --color-primary: #5650f0;
+  --color-primary-dark: #332ced;
+  --color-primary-darkest: #2820ff;
+  --color-primary-light: #e2e1fc;
+
+  --border-radius-lg: 0.5rem;
+
   &.theme--dark {
     background: $oc-black;
 
@@ -73,5 +80,8 @@
     --select-highlight-color: #{$oc-blue-4};
     --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.7)};
     --text-primary-color: #{$oc-gray-4};
+
+    --color-primary: #5650f0;
+    --color-primary-light: #3e3b87;
   }
 }

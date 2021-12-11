@@ -1,0 +1,88 @@
+@import "open-color/open-color.scss";
+
+@mixin toolbarButtonColorStates {
+  .ToolIcon_type_radio,
+  .ToolIcon_type_checkbox {
+    & + .ToolIcon__icon:hover {
+      svg {
+        fill: var(--color-primary);
+        color: var(--color-primary);
+      }
+      .ToolIcon__keybinding {
+        color: var(--color-primary);
+      }
+    }
+    & + .ToolIcon__icon:active {
+      background: var(--color-primary-light);
+    }
+    &:checked + .ToolIcon__icon {
+      background: var(--color-primary);
+      svg {
+        fill: $oc-white;
+        color: $oc-white;
+      }
+      .ToolIcon__keybinding {
+        color: $oc-white;
+      }
+    }
+    &:checked + .ToolIcon__icon:active {
+      background: var(--color-primary-dark);
+    }
+  }
+
+  .ToolIcon__keybinding {
+    bottom: 4px;
+    right: 4px;
+  }
+}
+
+.excalidraw {
+  .App-toolbar-container {
+    .ToolIcon_type_floating {
+      @include toolbarButtonColorStates;
+
+      &:not(.is-mobile) {
+        .ToolIcon__icon {
+          padding: 1px;
+          background-color: var(--island-bg-color);
+          box-shadow: 1px 3px 4px 0px rgb(0 0 0 / 15%);
+          border-radius: 50%;
+          transition: box-shadow 0.5s ease, transform 0.5s ease;
+        }
+      }
+
+      .ToolIcon_type_radio,
+      .ToolIcon_type_checkbox {
+        &:focus-within + .ToolIcon__icon {
+          // override for custom floating button shadow
+          box-shadow: 0 0 0 2px var(--focus-highlight-color);
+        }
+      }
+    }
+
+    .ToolIcon.ToolIcon__lock {
+      margin-inline-end: var(--space-factor);
+      &.ToolIcon_type_floating {
+        margin-left: 0.1rem;
+      }
+    }
+
+    .ToolIcon__library {
+      margin-inline-start: var(--space-factor);
+    }
+  }
+
+  .App-toolbar {
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.01), 1px 1px 5px rgb(0 0 0 / 15%);
+
+    .ToolIcon {
+      .ToolIcon__icon {
+        background: transparent;
+        border-radius: var(--border-radius-lg);
+      }
+
+      @include toolbarButtonColorStates;
+    }
+  }
+}

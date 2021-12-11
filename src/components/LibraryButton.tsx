@@ -16,7 +16,8 @@ const LIBRARY_ICON = (
 export const LibraryButton: React.FC<{
   appState: AppState;
   setAppState: React.Component<any, AppState>["setState"];
-}> = ({ appState, setAppState }) => {
+  isMobile?: boolean;
+}> = ({ appState, setAppState, isMobile }) => {
   return (
     <label
       className={clsx(
@@ -24,6 +25,7 @@ export const LibraryButton: React.FC<{
         `ToolIcon_size_medium`,
         {
           "zen-mode-visibility--hidden": appState.zenModeEnabled,
+          "is-mobile": isMobile,
         },
       )}
       title={`${capitalizeString(t("toolBar.library"))} — 0`}

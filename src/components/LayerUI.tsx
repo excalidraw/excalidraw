@@ -19,7 +19,6 @@ import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HintViewer } from "./HintViewer";
 import { Island } from "./Island";
-import "./LayerUI.scss";
 import { LoadingMessage } from "./LoadingMessage";
 import { LockButton } from "./LockButton";
 import { MobileMenu } from "./MobileMenu";
@@ -34,6 +33,9 @@ import { JSONExportDialog } from "./JSONExportDialog";
 import { LibraryButton } from "./LibraryButton";
 import { isImageFileHandle } from "../data/blob";
 import { LibraryMenu } from "./LibraryMenu";
+
+import "./LayerUI.scss";
+import "./Toolbar.scss";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -305,7 +307,7 @@ const LayerUI = ({
             <Section heading="shapes">
               {(heading) => (
                 <Stack.Col gap={4} align="start">
-                  <Stack.Row gap={1}>
+                  <Stack.Row gap={1} className="App-toolbar-container">
                     <LockButton
                       zenModeEnabled={zenModeEnabled}
                       checked={appState.elementLocked}
