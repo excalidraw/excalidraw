@@ -217,14 +217,16 @@
 
   .active,
   .buttonList label.active {
-    background-color: var(--button-gray-2);
+    background-color: var(--color-primary);
+
+    --icon-fill-color: #{$oc-white};
 
     &:hover {
-      background-color: var(--button-gray-2);
+      background-color: var(--color-primary-dark);
     }
 
     &:active {
-      background-color: var(--button-gray-3);
+      background-color: var(--color-primary-darkest);
     }
   }
 
