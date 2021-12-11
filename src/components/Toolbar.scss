@@ -84,5 +84,12 @@
 
       @include toolbarButtonColorStates;
     }
+
+    &.zen-mode {
+      .ToolIcon__keybinding,
+      .HintViewer {
+        display: none;
+      }
+    }
   }
 }
