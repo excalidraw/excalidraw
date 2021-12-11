@@ -12793,10 +12793,10 @@ rollup@^1.31.1:
     "@types/node" "*"
     acorn "^7.1.0"
 
-roughjs@4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/roughjs/-/roughjs-4.5.0.tgz#b4cbd63d4ed6b0b613082b4f7f9bf0e55cd4ba0d"
-  integrity sha512-4c3RBuTR41uGbTT/WzG4dzu4dfxhFWrhx9ZLbjaKPazX67nQjvU//pWYw/XjbcDW3iQGxac8plBbgdWkEsnNDg==
+roughjs@4.5.2:
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/roughjs/-/roughjs-4.5.2.tgz#aab644dcb41e9a75826c8bd5a5b0a859095f2f10"
+  integrity sha512-2xSlLDKdsWyFxrveYWk9YQ/Y9UfK38EAMRNkYkMqYBJvPX8abCa9PN0x3w02H8Oa6/0bcZICJU+U95VumPqseg==
   dependencies:
     path-data-parser "^0.1.0"
     points-on-curve "^0.2.0"
