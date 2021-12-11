@@ -32,7 +32,8 @@
   --sar: env(safe-area-inset-right);
   --sat: env(safe-area-inset-top);
   --select-highlight-color: #{$oc-blue-5};
-  --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
+  --shadow-island: 0 0 0 1px rgba(0, 0, 0, 0.01), 1px 1px 5px rgb(0 0 0 / 12%);
+
   --space-factor: 0.25rem;
   --text-primary-color: #{$oc-gray-8};
 
@@ -78,7 +79,7 @@
     --popup-text-color: #{$oc-gray-4};
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$oc-blue-4};
-    --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.7)};
+    --shadow-island: 1px 1px 5px #{transparentize($oc-black, 0.7)};
     --text-primary-color: #{$oc-gray-4};
 
     --color-primary: #5650f0;
