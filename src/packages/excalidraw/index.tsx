@@ -193,6 +193,8 @@ export {
   loadFromBlob,
   getFreeDrawSvgPath,
   getCommonBoundingBox,
+  getMaximumGroups,
+  intersectElementWithLine,
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
 
