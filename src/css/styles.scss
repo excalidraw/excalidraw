@@ -180,7 +180,7 @@
   }
 
   .buttonList label:focus-within,
-  input:focus {
+  input:focus-visible {
     outline: transparent;
     box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
@@ -197,7 +197,7 @@
 
     cursor: pointer;
 
-    &:focus {
+    &:focus-visible {
       outline: transparent;
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
     }

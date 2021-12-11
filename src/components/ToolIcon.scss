@@ -83,7 +83,7 @@
     margin: 0;
     font-size: inherit;
 
-    &:focus {
+    &:focus-visible {
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
     }
 
@@ -125,7 +125,7 @@
       }
     }
 
-    &:focus + .ToolIcon__icon {
+    &:focus-visible + .ToolIcon__icon {
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
     }
 
