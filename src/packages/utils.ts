@@ -145,3 +145,4 @@ export { getFreeDrawSvgPath } from "../renderer/renderElement";
 export { getCommonBoundingBox } from "../element/bounds";
 export { getMaximumGroups } from "../align";
 export { intersectElementWithLine } from "../element/collision";
+export { determineFocusDistance } from "../element/collision";

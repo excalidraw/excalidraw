@@ -195,6 +195,7 @@ export {
   getCommonBoundingBox,
   getMaximumGroups,
   intersectElementWithLine,
+  determineFocusDistance,
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
 
