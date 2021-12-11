@@ -21,15 +21,13 @@ export const LibraryButton: React.FC<{
   return (
     <label
       className={clsx(
-        "ToolIcon ToolIcon_type_floating ToolIcon__library zen-mode-visibility",
+        "ToolIcon ToolIcon_type_floating ToolIcon__library",
         `ToolIcon_size_medium`,
         {
-          "zen-mode-visibility--hidden": appState.zenModeEnabled,
           "is-mobile": isMobile,
         },
       )}
       title={`${capitalizeString(t("toolBar.library"))} — 0`}
-      style={{ marginInlineStart: "var(--space-factor)" }}
     >
       <input
         className="ToolIcon_type_checkbox"

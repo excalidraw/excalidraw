@@ -307,7 +307,12 @@ const LayerUI = ({
             <Section heading="shapes">
               {(heading) => (
                 <Stack.Col gap={4} align="start">
-                  <Stack.Row gap={1} className="App-toolbar-container">
+                  <Stack.Row
+                    gap={1}
+                    className={clsx("App-toolbar-container", {
+                      "zen-mode": zenModeEnabled,
+                    })}
+                  >
                     <LockButton
                       zenModeEnabled={zenModeEnabled}
                       checked={appState.elementLocked}
@@ -316,7 +321,9 @@ const LayerUI = ({
                     />
                     <Island
                       padding={1}
-                      className={clsx({ "zen-mode": zenModeEnabled })}
+                      className={clsx("App-toolbar", {
+                        "zen-mode": zenModeEnabled,
+                      })}
                     >
                       <HintViewer
                         appState={appState}

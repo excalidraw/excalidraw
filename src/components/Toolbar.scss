@@ -70,6 +70,19 @@
     .ToolIcon__library {
       margin-inline-start: var(--space-factor);
     }
+
+    &.zen-mode {
+      .ToolIcon_type_floating {
+        .ToolIcon__icon {
+          box-shadow: none;
+          transform: scale(0.9);
+          svg {
+            fill: $oc-gray-5;
+            color: $oc-gray-5;
+          }
+        }
+      }
+    }
   }
 
   .App-toolbar {
