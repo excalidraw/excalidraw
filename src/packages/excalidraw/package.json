@@ -57,7 +57,6 @@
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
     "css-loader": "6.5.1",
-    "file-loader": "6.2.0",
     "mini-css-extract-plugin": "2.4.5",
     "postcss-loader": "6.2.1",
     "sass-loader": "12.3.0",
@@ -72,7 +71,7 @@
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/excalidraw",
   "scripts": {
     "gen:types": "tsc --project ../../../tsconfig-types.json",
-    "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",
+    "build:umd": "rm -rf dist && cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
     "pack": "yarn build:umd && yarn pack"
   },
