@@ -6659,10 +6659,10 @@ find-up@^3.0.0:
   dependencies:
     locate-path "^3.0.0"
 
-firebase-tools@9.23.0:
-  version "9.23.0"
-  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-9.23.0.tgz#d69efa48b075fb34b496f98b628c4285ba84e856"
-  integrity sha512-m5Yj8EBk6kyLktSV0qgvjjjjxZpp6p/ujDH5c6wQpq3dcH3LquK9D4gjmz7XJtfd7F5ww0XkjWsXra5mHcg5Iw==
+firebase-tools@9.23.1:
+  version "9.23.1"
+  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-9.23.1.tgz#fff2690e4b073866ca37e0db0630fa6212800f17"
+  integrity sha512-voBcfApvEyyuFGFg0ypmtSldFLtifDquxix1htLHll6PFvmSzBOCz+1U4manzOnoUMBcy8cVNhNNgDgcErzgHQ==
   dependencies:
     "@google-cloud/pubsub" "^2.7.0"
     "@types/archiver" "^5.1.0"
