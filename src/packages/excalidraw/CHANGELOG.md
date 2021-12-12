@@ -52,10 +52,6 @@ Please add the latest change on the top under the correct section.
   - `.excalidraw` files may now contain top-level `files` key in format of `Record<FileId, BinaryFileData>` when exporting any (image) elements.
   - Changes were made to various export utilityies exported from the package so that they take `files`. For now, TypeScript should help you figure the changes out.
 
-## Excalidraw API
-
-### Features
-
 - Export [`isLinearElement`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#isLinearElement) and [`getNonDeletedElements`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#getNonDeletedElements).
 
 - Support [`renderTopRightUI`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRightUI) in mobile UI.
@@ -65,6 +61,12 @@ Please add the latest change on the top under the correct section.
   #### BREAKING CHANGE
 
   The `Appearance` type is now removed and renamed to `Theme` so `Theme` type needs to be used.
+
+### Build
+
+- Remove `file-loader` so font assets are not duplicated by webpack and use webpack asset modules for font generation [#4380](https://github.com/excalidraw/excalidraw/pull/4380)
+
+- We're now compiling to `es2017` target. Notably, `async/await` is not compiled down to generators. [#4341](https://github.com/excalidraw/excalidraw/pull/4341)
 
 ---
 
