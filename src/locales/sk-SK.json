@@ -204,8 +204,8 @@
     "resizeImage": "Podržte SHIFT pre voľnú zmenu veľkosti, podržte ALT pre zmenu veľkosti od stredu",
     "rotate": "Počas rotácie obmedzíte uhol podržaním SHIFT",
     "lineEditor_info": "Použite dvojklik alebo stlačte Enter na editáciu bodov",
-    "lineEditor_pointSelected": "Stačte Delete na vymazanie bodu, CtrlOrCmd+D na jeho duplikovanie, alebo potiahnite na jeho presunutie",
-    "lineEditor_nothingSelected": "Zvoľte bod na jeho presunutie alebo vymazanie, alebo podržte Alt a kliknite na pridanie nového bodu",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
     "publishLibrary": "Uverejniť vašu knižnicu"
   },
