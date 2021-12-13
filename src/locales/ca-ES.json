@@ -204,8 +204,8 @@
     "resizeImage": "",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
     "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
-    "lineEditor_pointSelected": "Premeu Suprimir per a eliminar el punt, CtrlOrCmd+D per a duplicar-lo, o arrossegueu-lo per a moure'l",
-    "lineEditor_nothingSelected": "Selecciona un punt per moure o eliminar, o manté premut Alt i fes clic per afegir punts nous",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": ""
   },
