@@ -204,8 +204,8 @@
     "resizeImage": "Anda dapat mengubah secara bebas dengan menekan SHIFT,\nTekan ALT untuk mengubah dari tengah",
     "rotate": "Anda dapat menjaga sudut dengan menahan SHIFT sambil memutar",
     "lineEditor_info": "Klik ganda atau tekan Enter untuk mengedit titik",
-    "lineEditor_pointSelected": "Tekan Delete untuk menghapus titik, Ctrl/Cmd + D untuk menduplikasi, atau seret untuk memindahkan",
-    "lineEditor_nothingSelected": "Pilih sebuah titik untuk memindah atau menghapus, atau tekan Alt dan klik untuk menambahkan titik baru",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
     "publishLibrary": "Terbitkan pustaka Anda"
   },
