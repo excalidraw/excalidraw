@@ -365,6 +365,7 @@ export type PointerDownState = Readonly<{
     // pointer interaction
     hasBeenDuplicated: boolean;
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
+    hasHitElementInside: boolean;
   };
   withCmdOrCtrl: boolean;
   drag: {
@@ -383,6 +384,9 @@ export type PointerDownState = Readonly<{
     onKeyDown: null | ((event: KeyboardEvent) => void);
     // It's defined on the initial pointer down event
     onKeyUp: null | ((event: KeyboardEvent) => void);
+  };
+  boxSelection: {
+    hasOccurred: boolean;
   };
 }>;
 

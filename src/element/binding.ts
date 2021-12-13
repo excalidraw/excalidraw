@@ -401,10 +401,17 @@ const updateBoundPoint = (
       newEdgePoint = intersections[0];
     }
   }
-  LinearElementEditor.movePoint(
+  LinearElementEditor.movePoints(
     linearElement,
-    edgePointIndex,
-    LinearElementEditor.pointFromAbsoluteCoords(linearElement, newEdgePoint),
+    [
+      {
+        index: edgePointIndex,
+        point: LinearElementEditor.pointFromAbsoluteCoords(
+          linearElement,
+          newEdgePoint,
+        ),
+      },
+    ],
     { [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding },
   );
 };
