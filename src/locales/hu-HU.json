@@ -204,8 +204,8 @@
     "resizeImage": "",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
     "lineEditor_info": "Kattints duplán, vagy nyomj entert a pontok szerkesztéséhez",
-    "lineEditor_pointSelected": "Nyomd meg a delete gombot a pont eltávolításához, Ctrl vagy Cmd + D-t a duplikáláshoz, vagy húzva mozgasd",
-    "lineEditor_nothingSelected": "Válassz ki egy pontot a mozgatáshoz vagy törtléshez, vagy az Alt lenyomása mellett kattintva hozz létre új pontokat",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": ""
   },
