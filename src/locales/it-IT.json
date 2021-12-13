@@ -204,8 +204,8 @@
     "resizeImage": "Puoi ridimensionare liberamente tenendo premuto SHIFT,\ntieni premuto ALT per ridimensionare dal centro",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
-    "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
-    "lineEditor_nothingSelected": "Seleziona un punto per spostare o rimuovere, oppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente",
     "publishLibrary": "Pubblica la tua libreria"
   },
