@@ -204,8 +204,8 @@
     "resizeImage": "Du kan endre størrelse fritt ved å holde SHIFT,\nhold ALT for å endre størrelse fra midten",
     "rotate": "Du kan låse vinklene ved å holde SHIFT mens du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkter",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, Ctrl / Cmd+D for å duplisere, eller dra for å flytte",
+    "lineEditor_nothingSelected": "Velg et punkt å redigere (hold SHIFT for å velge flere),\neller hold Alt og klikk for å legge til nye punkter",
     "placeImage": "Klikk for å plassere bildet, eller klikk og dra for å angi størrelsen manuelt",
     "publishLibrary": "Publiser ditt eget bibliotek"
   },
