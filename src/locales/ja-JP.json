@@ -204,8 +204,8 @@
     "resizeImage": "SHIFTを長押しすると自由にサイズを変更できます。\n中央からサイズを変更するにはALTを長押しします",
     "rotate": "回転中にSHIFT キーを押すと角度を制限することができます",
     "lineEditor_info": "ポイントを編集するには、ダブルクリックまたはEnterキーを押します",
-    "lineEditor_pointSelected": "削除ボタンを押して点を削除します。Ctrl+D または Cmd+D で複製します。またはドラッグして移動します",
-    "lineEditor_nothingSelected": "移動または削除する点を選択するか、Altキーを押しながらクリックして新しい点を追加します",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
     "publishLibrary": "自分のライブラリを公開"
   },
