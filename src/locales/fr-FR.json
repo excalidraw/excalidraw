@@ -204,8 +204,8 @@
     "resizeImage": "Vous pouvez redimensionner librement en maintenant SHIFT,\nmaintenez ALT pour redimensionner depuis le centre",
     "rotate": "Vous pouvez restreindre les angles en maintenant MAJ pendant la rotation",
     "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
-    "lineEditor_pointSelected": "Appuyez sur Supprimer pour supprimer le point, Ctrl ou Cmd+D pour le dupliquer, ou faites-le glisser pour le déplacer",
-    "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou supprimer, ou maintenez Alt et cliquez pour ajouter de nouveaux points",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "Cliquez pour placer l'image, ou cliquez et faites glisser pour définir sa taille manuellement",
     "publishLibrary": "Publier votre propre bibliothèque"
   },
