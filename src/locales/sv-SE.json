@@ -204,8 +204,8 @@
     "resizeImage": "Du kan ändra storlek fritt genom att hålla SHIFT,\nhåll ALT för att ändra storlek från mitten",
     "rotate": "Du kan begränsa vinklar genom att hålla SHIFT medan du roterar",
     "lineEditor_info": "Dubbelklicka eller tryck på Enter för att redigera punkter",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Tryck på Ta bort för att ta bort punkt(er), Ctrl + D eller Cmd + D för att duplicera, eller dra för att flytta",
+    "lineEditor_nothingSelected": "Välj en punkt att redigera (håll SHIFT för att välja flera),\neller håll ned Alt och klicka för att lägga till nya punkter",
     "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt",
     "publishLibrary": "Publicera ditt eget bibliotek"
   },
