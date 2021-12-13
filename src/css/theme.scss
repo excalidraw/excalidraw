@@ -37,9 +37,9 @@
   --space-factor: 0.25rem;
   --text-primary-color: #{$oc-gray-8};
 
-  --color-primary: #5650f0;
-  --color-primary-dark: #332ced;
-  --color-primary-darkest: #2820ff;
+  --color-primary: #706cef;
+  --color-primary-dark: #625edb;
+  --color-primary-darkest: #504cbd;
   --color-primary-light: #e2e1fc;
 
   --border-radius-md: 0.375rem;
@@ -83,7 +83,6 @@
     --shadow-island: 1px 1px 5px #{transparentize($oc-black, 0.7)};
     --text-primary-color: #{$oc-gray-4};
 
-    --color-primary: #5650f0;
-    --color-primary-light: #3e3b87;
+    --color-primary-light: #3c3b58;
   }
 }
