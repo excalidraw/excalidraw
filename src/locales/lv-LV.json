@@ -204,7 +204,7 @@
     "resizeImage": "Varat brīvi mainīt izmēru turot nospiestu SHIFT;\nturiet nospiestu ALT, lai mainītu izmēru ap centru",
     "rotate": "Rotējot varat ierobežot leņķi turot nospiestu SHIFT",
     "lineEditor_info": "Dubultklikšķiniet vai spiediet ievades taustiņu, lai rediģētu punktus",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Spiediet dzēšanas taustiņu, lai noņemtu punktus, – CtrlOrCmd+D, lai to kopētu, vai velciet, lai pārvietotu",
     "lineEditor_nothingSelected": "",
     "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru",
     "publishLibrary": "Publicēt savu bibliotēku"
