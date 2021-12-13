@@ -210,7 +210,7 @@ export const wrapText = (
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   const spaceWidth = getTextWidth(" ", font);
-  originalLines.forEach((originalLine, index) => {
+  originalLines.forEach((originalLine) => {
     const words = originalLine.split(" ");
     // This means its newline so push it
     if (words.length === 1 && words[0] === "") {

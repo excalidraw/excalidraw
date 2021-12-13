@@ -28,10 +28,11 @@ export const dragSelectedElements = (
       element,
       offset,
     );
-    if (hasBoundTextElement(element)) {
+    if (!element.groupIds.length && hasBoundTextElement(element)) {
       const textElement = Scene.getScene(element)!.getElement(
         element.boundTextElementId,
       );
+
       if (textElement) {
         updateElementCoords(
           lockDirection,

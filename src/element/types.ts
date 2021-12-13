@@ -144,6 +144,10 @@ export type ExcalidrawElementWithBindText =
   | ExcalidrawEllipseElement
   | ExcalidrawRectangleElement;
 
+export type ExcalidrawTextElementWithContainer = {
+  textContainerId: string;
+} & ExcalidrawTextElement;
+
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];
   focus: number;

@@ -2,11 +2,7 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import {
-  getElementAbsoluteCoords,
-  getElementBounds,
-  isTextElement,
-} from "../element";
+import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
 import { hasBoundTextContainer } from "../element/typeChecks";
 
@@ -67,8 +63,7 @@ export const getSelectedElements = (
     }
     if (
       includeBoundTextElement &&
-      isTextElement(element) &&
-      element.textContainerId &&
+      hasBoundTextContainer(element) &&
       appState.selectedElementIds[element?.textContainerId]
     ) {
       return element;

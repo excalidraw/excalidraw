@@ -10,6 +10,7 @@ import {
   ExcalidrawRectangleElement,
   ExcalidrawBoundTextElement,
   ExcalidrawElementWithBindText,
+  ExcalidrawTextElementWithContainer,
 } from "./types";
 
 export const isGenericElement = (
@@ -128,7 +129,9 @@ export const isExcalidrawElementWithBindText = (
     element.type === "diamond" ||
     element.type === "ellipse");
 
-export const hasBoundTextContainer = (element: ExcalidrawElement | null) => {
+export const hasBoundTextContainer = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawTextElementWithContainer => {
   return (
     element !== null &&
     isTextElement(element) &&
