@@ -204,8 +204,8 @@
     "resizeImage": "按住 SHIFT 可任意縮放，按住 ALT 可由中央縮放。",
     "rotate": "旋轉時按住 Shift 可限制旋轉角度",
     "lineEditor_info": "雙擊滑鼠左鍵或按 Enter 來編輯控制點",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "按下 Delete 可移除錨點；Ctrl 或 Cmd + D 可複製；或可拖曳來移動",
+    "lineEditor_nothingSelected": "選擇要編輯的錨點（按住 SHIFT 可多選），\n或按住 Alt 並點擊以增加新錨點。",
     "placeImage": "點擊以放置圖片，或點擊並拖曳以手動調整其尺寸。",
     "publishLibrary": "發布個人資料庫"
   },
