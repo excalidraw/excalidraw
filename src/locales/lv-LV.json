@@ -205,7 +205,7 @@
     "rotate": "Rotējot varat ierobežot leņķi turot nospiestu SHIFT",
     "lineEditor_info": "Dubultklikšķiniet vai spiediet ievades taustiņu, lai rediģētu punktus",
     "lineEditor_pointSelected": "Spiediet dzēšanas taustiņu, lai noņemtu punktus, – CtrlOrCmd+D, lai to kopētu, vai velciet, lai pārvietotu",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_nothingSelected": "Atlasiet punktu, lai labotu (turiet nospiestu SHIFT, lai atlasītu vairākus),\nvai turiet Alt un clikšķiniet, lai pievienotu jaunus punktus",
     "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru",
     "publishLibrary": "Publicēt savu bibliotēku"
   },
