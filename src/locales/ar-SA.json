@@ -204,8 +204,8 @@
     "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط بأستمرار على SHIFT،\nاضغط بأستمرار على ALT أيضا لتغيير الحجم من المركز",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
     "lineEditor_info": "انقر نقراً مزدوجاً أو اضغط Enter لتعديل النقاط",
-    "lineEditor_pointSelected": "اضغط على حذف لإزالة النقطة، Ctrl Or Cmd+D للتكرار، أو اسحب للانتقال",
-    "lineEditor_nothingSelected": "حدد نقطة لتحريك أو إزالتها، أو اضغط Alt ثم انقر لإضافة نقاط جديدة",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": ""
   },
