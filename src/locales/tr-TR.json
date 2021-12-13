@@ -204,8 +204,8 @@
     "resizeImage": "SHIFT'e basılı tutarak serbestçe yeniden boyutlandırabilirsiniz, merkezden yeniden boyutlandırmak için ALT tuşunu basılı tutun",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",
     "lineEditor_info": "Noktaları düzenlemek için çift-tıklayın veya Enter'a basın",
-    "lineEditor_pointSelected": "Noktayı silmek için Delete'e, kopyalamak için CtrlVeyaCmd+D'ye, veya hareket ettirmek için sürükleyin",
-    "lineEditor_nothingSelected": "Kaldırmak veya oynatmak için bir nokta seç, veya yeni noktalar eklemek için Alt'a basılı tut",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "Resmi yerleştirmek için tıklayın ya da boyutunu manuel olarak ayarlamak için tıklayıp sürükleyin",
     "publishLibrary": "Kendi kitaplığınızı yayınlayın"
   },
