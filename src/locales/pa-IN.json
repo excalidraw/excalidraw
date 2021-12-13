@@ -204,8 +204,8 @@
     "resizeImage": "",
     "rotate": "ਤੁਸੀਂ ਘੁਮਾਉਂਦੇ ਹੋਏ SHIFT ਦਬਾਈ ਰੱਖ ਕੇ ਕੋਣਾਂ ਨੂੰ ਕਾਬੂ ਕਰ ਸਕਦੇ ਹੋ",
     "lineEditor_info": "ਬਿੰਦੂਆਂ ਨੂੰ ਸੋਧਣ ਲਈ ਡਬਲ-ਕਲਿੱਕ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
-    "lineEditor_pointSelected": "ਬਿੰਦੀ ਹਟਾਉਣ ਲਈ ਡਲੀਟ ਦਬਾਓ, ਡੁਪਲੀਕੇਟ ਬਣਾਉਣ ਲਈ CtrlOrCmd+D, ਜਾਂ ਹਿਲਾਉਣ ਲਈ ਘਸੀਟੋ",
-    "lineEditor_nothingSelected": "ਹਿਲਾਉਣ ਜਾਂ ਹਟਾਉਣ ਲਈ ਬਿੰਦੂ ਚੁਣੋ, ਜਾਂ ਨਵਾਂ ਬਿੰਦੂ ਜੋੜਨ ਲਈ Alt ਦਬਾਕੇ ਕਲਿੱਕ ਕਰੋ",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": ""
   },
