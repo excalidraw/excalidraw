@@ -204,8 +204,8 @@
     "resizeImage": "",
     "rotate": "Можете да ограничите ъглите, като държите SHIFT, докато се въртите",
     "lineEditor_info": "Кликнете два пъти или натиснете Enter за да промените точките",
-    "lineEditor_pointSelected": "Натиснете Delete за да изтриете точка, CtrlOrCmd+D за дуплициране, или извлачете за да преместите",
-    "lineEditor_nothingSelected": "Изберете точка за местене или изтриване, или пък задръжте Alt и натиснете за да добавите нови точки",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": ""
   },
