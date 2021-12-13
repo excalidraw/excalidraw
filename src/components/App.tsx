@@ -228,6 +228,7 @@ import {
 } from "../element/image";
 import throttle from "lodash.throttle";
 import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
+import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -2263,10 +2264,9 @@ class App extends React.Component<AppProps, AppState> {
       // and point
       const { draggingElement } = this.state;
       if (isBindingElement(draggingElement)) {
-        this.maybeSuggestBindingForLinearElementAtCursor(
+        this.maybeSuggestBindingsForLinearElementAtCoords(
           draggingElement,
-          "end",
-          scenePointer,
+          [scenePointer],
           this.state.startBoundElement,
         );
       } else {
@@ -2399,6 +2399,21 @@ class App extends React.Component<AppProps, AppState> {
       setCursor(this.canvas, CURSOR_TYPE.GRAB);
     } else if (isOverScrollBar) {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
+    } else if (this.state.editingLinearElement) {
+      const element = LinearElementEditor.getElement(
+        this.state.editingLinearElement.elementId,
+      );
+      if (
+        element &&
+        isHittingElementNotConsideringBoundingBox(element, this.state, [
+          scenePointer.x,
+          scenePointer.y,
+        ])
+      ) {
+        setCursor(this.canvas, CURSOR_TYPE.MOVE);
+      } else {
+        setCursor(this.canvas, CURSOR_TYPE.AUTO);
+      }
     } else if (
       // if using cmd/ctrl, we're not dragging
       !event[KEYS.CTRL_OR_CMD] &&
@@ -2736,6 +2751,7 @@ class App extends React.Component<AppProps, AppState> {
             origin,
             selectedElements,
           ),
+        hasHitElementInside: false,
       },
       drag: {
         hasOccurred: false,
@@ -2746,6 +2762,9 @@ class App extends React.Component<AppProps, AppState> {
         onUp: null,
         onKeyUp: null,
         onKeyDown: null,
+      },
+      boxSelection: {
+        hasOccurred: false,
       },
     };
   }
@@ -2888,6 +2907,15 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.y,
           );
 
+        if (pointerDownState.hit.element) {
+          pointerDownState.hit.hasHitElementInside =
+            isHittingElementNotConsideringBoundingBox(
+              pointerDownState.hit.element,
+              this.state,
+              [pointerDownState.origin.x, pointerDownState.origin.y],
+            );
+        }
+
         // For overlapped elements one position may hit
         // multiple elements
         pointerDownState.hit.allHitElements = this.getElementsAtPosition(
@@ -2908,8 +2936,14 @@ class App extends React.Component<AppProps, AppState> {
           this.clearSelection(hitElement);
         }
 
-        // If we click on something
-        if (hitElement != null) {
+        if (this.state.editingLinearElement) {
+          this.setState({
+            selectedElementIds: {
+              [this.state.editingLinearElement.elementId]: true,
+            },
+          });
+          // If we click on something
+        } else if (hitElement != null) {
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
             if (!this.state.selectedElementIds[hitElement.id]) {
@@ -3348,11 +3382,10 @@ class App extends React.Component<AppProps, AppState> {
           (appState) => this.setState(appState),
           pointerCoords.x,
           pointerCoords.y,
-          (element, startOrEnd) => {
-            this.maybeSuggestBindingForLinearElementAtCursor(
+          (element, pointsSceneCoords) => {
+            this.maybeSuggestBindingsForLinearElementAtCoords(
               element,
-              startOrEnd,
-              pointerCoords,
+              pointsSceneCoords,
             );
           },
         );
@@ -3369,8 +3402,16 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       if (
-        hasHitASelectedElement ||
-        pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+        (hasHitASelectedElement ||
+          pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
+        // this allows for box-selecting points when clicking inside the
+        // line's bounding box
+        (!this.state.editingLinearElement || !event.shiftKey) &&
+        // box-selecting without shift when editing line, not clicking on a line
+        (!this.state.editingLinearElement ||
+          this.state.editingLinearElement?.elementId !==
+            pointerDownState.hit.element?.id ||
+          pointerDownState.hit.hasHitElementInside)
       ) {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
@@ -3507,10 +3548,9 @@ class App extends React.Component<AppProps, AppState> {
 
         if (isBindingElement(draggingElement)) {
           // When creating a linear element by dragging
-          this.maybeSuggestBindingForLinearElementAtCursor(
+          this.maybeSuggestBindingsForLinearElementAtCoords(
             draggingElement,
-            "end",
-            pointerCoords,
+            [pointerCoords],
             this.state.startBoundElement,
           );
         }
@@ -3521,8 +3561,15 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.elementType === "selection") {
+        pointerDownState.boxSelection.hasOccurred = true;
+
         const elements = this.scene.getElements();
-        if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
+        if (
+          !event.shiftKey &&
+          // allows for box-selecting points (without shift)
+          !this.state.editingLinearElement &&
+          isSomeElementSelected(elements, this.state)
+        ) {
           if (pointerDownState.withCmdOrCtrl && pointerDownState.hit.element) {
             this.setState((prevState) =>
               selectGroupsForSelectedElements(
@@ -3543,33 +3590,43 @@ class App extends React.Component<AppProps, AppState> {
             });
           }
         }
-        const elementsWithinSelection = getElementsWithinSelection(
-          elements,
-          draggingElement,
-        );
-        this.setState((prevState) =>
-          selectGroupsForSelectedElements(
-            {
-              ...prevState,
-              selectedElementIds: {
-                ...prevState.selectedElementIds,
-                ...elementsWithinSelection.reduce((map, element) => {
-                  map[element.id] = true;
-                  return map;
-                }, {} as any),
-                ...(pointerDownState.hit.element
-                  ? {
-                      // if using ctrl/cmd, select the hitElement only if we
-                      // haven't box-selected anything else
-                      [pointerDownState.hit.element.id]:
-                        !elementsWithinSelection.length,
-                    }
-                  : null),
+        // box-select line editor points
+        if (this.state.editingLinearElement) {
+          LinearElementEditor.handleBoxSelection(
+            event,
+            this.state,
+            this.setState.bind(this),
+          );
+          // regular box-select
+        } else {
+          const elementsWithinSelection = getElementsWithinSelection(
+            elements,
+            draggingElement,
+          );
+          this.setState((prevState) =>
+            selectGroupsForSelectedElements(
+              {
+                ...prevState,
+                selectedElementIds: {
+                  ...prevState.selectedElementIds,
+                  ...elementsWithinSelection.reduce((map, element) => {
+                    map[element.id] = true;
+                    return map;
+                  }, {} as any),
+                  ...(pointerDownState.hit.element
+                    ? {
+                        // if using ctrl/cmd, select the hitElement only if we
+                        // haven't box-selected anything else
+                        [pointerDownState.hit.element.id]:
+                          !elementsWithinSelection.length,
+                      }
+                    : null),
+                },
               },
-            },
-            this.scene.getElements(),
-          ),
-        );
+              this.scene.getElements(),
+            ),
+          );
+        }
       }
     });
   }
@@ -3634,16 +3691,25 @@ class App extends React.Component<AppProps, AppState> {
       // Handle end of dragging a point of a linear element, might close a loop
       // and sets binding element
       if (this.state.editingLinearElement) {
-        const editingLinearElement = LinearElementEditor.handlePointerUp(
-          childEvent,
-          this.state.editingLinearElement,
-          this.state,
-        );
-        if (editingLinearElement !== this.state.editingLinearElement) {
-          this.setState({
-            editingLinearElement,
-            suggestedBindings: [],
-          });
+        if (
+          !pointerDownState.boxSelection.hasOccurred &&
+          (pointerDownState.hit?.element?.id !==
+            this.state.editingLinearElement.elementId ||
+            !pointerDownState.hit.hasHitElementInside)
+        ) {
+          this.actionManager.executeAction(actionFinalize);
+        } else {
+          const editingLinearElement = LinearElementEditor.handlePointerUp(
+            childEvent,
+            this.state.editingLinearElement,
+            this.state,
+          );
+          if (editingLinearElement !== this.state.editingLinearElement) {
+            this.setState({
+              editingLinearElement,
+              suggestedBindings: [],
+            });
+          }
         }
       }
 
@@ -3825,9 +3891,14 @@ class App extends React.Component<AppProps, AppState> {
       if (
         hitElement &&
         !pointerDownState.drag.hasOccurred &&
-        !pointerDownState.hit.wasAddedToSelection
+        !pointerDownState.hit.wasAddedToSelection &&
+        // if we're editing a line, pointerup shouldn't switch selection if
+        // box selected
+        (!this.state.editingLinearElement ||
+          !pointerDownState.boxSelection.hasOccurred)
       ) {
-        if (childEvent.shiftKey) {
+        // when inside line editor, shift selects points instead
+        if (childEvent.shiftKey && !this.state.editingLinearElement) {
           if (this.state.selectedElementIds[hitElement.id]) {
             if (isSelectedViaGroup(this.state, hitElement)) {
               // We want to unselect all groups hitElement is part of
@@ -4352,32 +4423,43 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private maybeSuggestBindingForLinearElementAtCursor = (
+  private maybeSuggestBindingsForLinearElementAtCoords = (
     linearElement: NonDeleted<ExcalidrawLinearElement>,
-    startOrEnd: "start" | "end",
+    /** scene coords */
     pointerCoords: {
       x: number;
       y: number;
-    },
+    }[],
     // During line creation the start binding hasn't been written yet
     // into `linearElement`
     oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
   ): void => {
-    const hoveredBindableElement = getHoveredElementForBinding(
-      pointerCoords,
-      this.scene,
+    if (!pointerCoords.length) {
+      return;
+    }
+
+    const suggestedBindings = pointerCoords.reduce(
+      (acc: NonDeleted<ExcalidrawBindableElement>[], coords) => {
+        const hoveredBindableElement = getHoveredElementForBinding(
+          coords,
+          this.scene,
+        );
+        if (
+          hoveredBindableElement != null &&
+          !isLinearElementSimpleAndAlreadyBound(
+            linearElement,
+            oppositeBindingBoundElement?.id,
+            hoveredBindableElement,
+          )
+        ) {
+          acc.push(hoveredBindableElement);
+        }
+        return acc;
+      },
+      [],
     );
-    this.setState({
-      suggestedBindings:
-        hoveredBindableElement != null &&
-        !isLinearElementSimpleAndAlreadyBound(
-          linearElement,
-          oppositeBindingBoundElement?.id,
-          hoveredBindableElement,
-        )
-          ? [hoveredBindableElement]
-          : [],
-    });
+
+    this.setState({ suggestedBindings });
   };
 
   private maybeSuggestBindingForAll(

@@ -83,7 +83,7 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
   );
 };
 
-const isHittingElementNotConsideringBoundingBox = (
+export const isHittingElementNotConsideringBoundingBox = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   point: Point,
