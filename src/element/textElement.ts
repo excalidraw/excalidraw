@@ -209,6 +209,7 @@ export const wrapText = (
 
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
+  const spaceWidth = getTextWidth(" ", font);
   originalLines.forEach((originalLine, index) => {
     const words = originalLine.split(" ");
     // This means its newline so push it
@@ -216,65 +217,79 @@ export const wrapText = (
       lines.push(words[0]);
     } else {
       let currentLine = "";
-      let widthTillNow = 0;
+      let currentLineWidthTillNow = 0;
 
       let index = 0;
       while (index < words.length) {
         count++;
-        const currentWidth = getTextWidth(words[index], font);
+        const currentWordWidth = getTextWidth(words[index], font);
 
-        if (currentWidth > maxWidth) {
+        // Start breaking longer words exceeding max width
+        if (currentWordWidth > maxWidth) {
+          // push current line since the current word exceeds the max width
+          // so will be appended in next line
+          if (currentLine) {
+            lines.push(currentLine);
+          }
+          currentLine = "";
+          currentLineWidthTillNow = 0;
           while (words[index].length > 0) {
             count++;
-
             const currentChar = words[index][0];
             const width = charWidth.calculate(currentChar, font);
-            widthTillNow += width;
+            currentLineWidthTillNow += width;
             words[index] = words[index].slice(1);
 
-            if (widthTillNow >= maxWidth) {
-              lines.push(currentLine);
+            if (currentLineWidthTillNow >= maxWidth) {
+              lines.push(currentLine.trim());
               currentLine = currentChar;
-              widthTillNow = width;
-              if (widthTillNow === maxWidth) {
+              currentLineWidthTillNow = width;
+              if (currentLineWidthTillNow === maxWidth) {
                 currentLine = "";
-                widthTillNow = 0;
+                currentLineWidthTillNow = 0;
               }
             } else {
               currentLine += currentChar;
             }
           }
-          if (widthTillNow) {
+          // push current line if appending space exceeds max width
+          if (currentLineWidthTillNow + spaceWidth > maxWidth) {
             lines.push(currentLine);
             currentLine = "";
-            widthTillNow = 0;
+            currentLineWidthTillNow = 0;
+          } else {
+            // space needs to be appended before next word
+            // as currentLine contains chars which couldn't be appended
+            // to previous line
+            currentLine += " ";
+            currentLineWidthTillNow += spaceWidth;
           }
+
           index++;
         } else {
-          while (widthTillNow < maxWidth && index < words.length) {
+          // Start appending words in a line till max width reached
+          while (currentLineWidthTillNow < maxWidth && index < words.length) {
             const word = words[index];
-            widthTillNow = getTextWidth(currentLine + word, font);
+            currentLineWidthTillNow = getTextWidth(currentLine + word, font);
             count++;
 
-            if (widthTillNow >= maxWidth) {
+            if (currentLineWidthTillNow >= maxWidth) {
               lines.push(currentLine);
-              widthTillNow = 0;
+              currentLineWidthTillNow = 0;
               currentLine = "";
 
               break;
             }
             index++;
-
             currentLine += `${word} `;
           }
 
-          if (widthTillNow === maxWidth) {
+          if (currentLineWidthTillNow === maxWidth) {
             currentLine = "";
-            widthTillNow = 0;
+            currentLineWidthTillNow = 0;
           }
         }
       }
-
       if (currentLine) {
         lines.push(currentLine.trim());
       }
