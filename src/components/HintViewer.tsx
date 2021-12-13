@@ -62,7 +62,7 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
 
   if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
     if (appState.editingLinearElement) {
-      return appState.editingLinearElement.activePointIndex
+      return appState.editingLinearElement.selectedPointsIndices
         ? t("hints.lineEditor_pointSelected")
         : t("hints.lineEditor_nothingSelected");
     }

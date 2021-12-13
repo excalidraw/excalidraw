@@ -158,7 +158,7 @@ const renderLinearPointHandles = (
       context.strokeStyle = "red";
       context.setLineDash([]);
       context.fillStyle =
-        appState.editingLinearElement?.activePointIndex === idx
+        appState.editingLinearElement?.selectedPointsIndices?.includes(idx)
           ? "rgba(255, 127, 127, 0.9)"
           : "rgba(255, 255, 255, 0.9)";
       const { POINT_HANDLE_SIZE } = LinearElementEditor;

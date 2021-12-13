@@ -145,10 +145,9 @@ const flipElement = (
   }
 
   if (isLinearElement(element)) {
-    for (let i = 1; i < element.points.length; i++) {
-      LinearElementEditor.movePoint(element, i, [
-        -element.points[i][0],
-        element.points[i][1],
+    for (let index = 1; index < element.points.length; index++) {
+      LinearElementEditor.movePoints(element, [
+        { index, point: [-element.points[index][0], element.points[index][1]] },
       ]);
     }
     LinearElementEditor.normalizePoints(element);
