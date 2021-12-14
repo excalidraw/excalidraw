@@ -104,7 +104,11 @@ export const textWysiwyg = ({
       let width = updatedElement.width;
       let height = updatedElement.height;
       if (textContainer && updatedElement.containerId) {
-        if (textPropertiesUpdated(updatedElement, editable)) {
+        const propertiesUpdated = textPropertiesUpdated(
+          updatedElement,
+          editable,
+        );
+        if (propertiesUpdated) {
           const container = Scene.getScene(updatedElement)?.getElement(
             updatedElement.containerId,
           ) as ExcalidrawBoundTextElement;
@@ -157,7 +161,7 @@ export const textWysiwyg = ({
           // For some reason the scrollHeight gets set to twice the lineHeight
           // when you start typing for first time  and thus line count is 2
           // hence this check
-          if (lines > 2 || textPropertiesUpdated(updatedElement, editable)) {
+          if (lines > 2 || propertiesUpdated) {
             // vertically center align the text
             coordY =
               textContainer.y +
@@ -229,11 +233,12 @@ export const textWysiwyg = ({
     resize: "none",
     background: "transparent",
     overflow: "hidden",
-    // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
-    whiteSpace,
     // must be specified because in dark mode canvas creates a stacking context
     zIndex: "var(--zIndex-wysiwyg)",
     wordBreak: "break-word",
+    // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
+    whiteSpace,
+    overflowWrap: "break-word",
   });
   updateWysiwygStyle();
 

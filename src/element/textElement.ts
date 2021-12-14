@@ -20,7 +20,11 @@ export const redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
   if (element.containerId) {
     maxWidth = element.width;
   }
-  const metrics = measureText(element.text, getFontString(element), maxWidth);
+  const metrics = measureText(
+    element.originalText,
+    getFontString(element),
+    maxWidth,
+  );
 
   mutateElement(element, {
     width: metrics.width,
@@ -143,6 +147,7 @@ export const measureText = (
   container.style.position = "absolute";
   container.style.whiteSpace = "pre";
   container.style.font = font;
+  container.style.minHeight = "1em";
 
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
