@@ -96,7 +96,7 @@ exports[`given element A and group of elements B and given both are selected whe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -123,7 +123,7 @@ exports[`given element A and group of elements B and given both are selected whe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id5",
@@ -152,7 +152,7 @@ exports[`given element A and group of elements B and given both are selected whe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id5",
@@ -208,7 +208,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -246,7 +246,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -270,7 +270,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -308,7 +308,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -332,7 +332,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -356,7 +356,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -399,7 +399,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -423,7 +423,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id5",
@@ -449,7 +449,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id5",
@@ -585,7 +585,7 @@ exports[`given element A and group of elements B and given both are selected whe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 100,
@@ -612,7 +612,7 @@ exports[`given element A and group of elements B and given both are selected whe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id4",
@@ -641,7 +641,7 @@ exports[`given element A and group of elements B and given both are selected whe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id4",
@@ -697,7 +697,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -735,7 +735,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -759,7 +759,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -797,7 +797,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -821,7 +821,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -845,7 +845,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -887,7 +887,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -911,7 +911,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -937,7 +937,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1056,7 +1056,7 @@ exports[`regression tests Cmd/Ctrl-click exclusively select element under pointe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id4",
@@ -1086,7 +1086,7 @@ exports[`regression tests Cmd/Ctrl-click exclusively select element under pointe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id4",
@@ -1116,7 +1116,7 @@ exports[`regression tests Cmd/Ctrl-click exclusively select element under pointe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id10",
@@ -1172,7 +1172,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -1210,7 +1210,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -1234,7 +1234,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -1277,7 +1277,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1303,7 +1303,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1344,7 +1344,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1370,7 +1370,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1410,7 +1410,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1436,7 +1436,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1462,7 +1462,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -1506,7 +1506,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1533,7 +1533,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1560,7 +1560,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id10",
@@ -1601,7 +1601,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1628,7 +1628,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1655,7 +1655,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id10",
@@ -1696,7 +1696,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1723,7 +1723,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -1750,7 +1750,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id10",
@@ -1871,7 +1871,7 @@ exports[`regression tests Drags selected element when hitting only bounding box 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -1925,7 +1925,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -1964,7 +1964,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2088,7 +2088,7 @@ exports[`regression tests adjusts z order when grouping: [end of test] element 0
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -2115,7 +2115,7 @@ exports[`regression tests adjusts z order when grouping: [end of test] element 1
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id5",
@@ -2144,7 +2144,7 @@ exports[`regression tests adjusts z order when grouping: [end of test] element 2
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id5",
@@ -2200,7 +2200,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2238,7 +2238,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2262,7 +2262,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2300,7 +2300,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2324,7 +2324,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2348,7 +2348,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2391,7 +2391,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2415,7 +2415,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id5",
@@ -2441,7 +2441,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id5",
@@ -2562,7 +2562,7 @@ exports[`regression tests alt-drag duplicates an element: [end of test] element 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -2589,7 +2589,7 @@ exports[`regression tests alt-drag duplicates an element: [end of test] element 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -2643,7 +2643,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2682,7 +2682,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2706,7 +2706,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2822,7 +2822,7 @@ exports[`regression tests arrow keys: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -2876,7 +2876,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -2995,7 +2995,7 @@ exports[`regression tests can drag element that covers another element, while an
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 200,
@@ -3022,7 +3022,7 @@ exports[`regression tests can drag element that covers another element, while an
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 200,
@@ -3049,7 +3049,7 @@ exports[`regression tests can drag element that covers another element, while an
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 350,
@@ -3103,7 +3103,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 200,
@@ -3141,7 +3141,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 200,
@@ -3165,7 +3165,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 200,
@@ -3203,7 +3203,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 200,
@@ -3227,7 +3227,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 200,
@@ -3251,7 +3251,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 350,
@@ -3290,7 +3290,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 200,
@@ -3314,7 +3314,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 200,
@@ -3338,7 +3338,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 350,
@@ -3454,7 +3454,7 @@ exports[`regression tests change the properties of a shape: [end of test] elemen
 Object {
   "angle": 0,
   "backgroundColor": "#fa5252",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -3508,7 +3508,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -3546,7 +3546,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#fa5252",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -3584,7 +3584,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#fa5252",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -3703,7 +3703,7 @@ exports[`regression tests click on an element and drag it: [dragged] element 0 1
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -3757,7 +3757,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -3796,7 +3796,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -3917,7 +3917,7 @@ exports[`regression tests click on an element and drag it: [end of test] element
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -3971,7 +3971,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4010,7 +4010,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4050,7 +4050,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4169,7 +4169,7 @@ exports[`regression tests click to select a shape: [end of test] element 0 1`] =
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -4196,7 +4196,7 @@ exports[`regression tests click to select a shape: [end of test] element 1 1`] =
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -4250,7 +4250,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4288,7 +4288,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4312,7 +4312,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4432,7 +4432,7 @@ exports[`regression tests click-drag to select a group: [end of test] element 0 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -4459,7 +4459,7 @@ exports[`regression tests click-drag to select a group: [end of test] element 1 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -4486,7 +4486,7 @@ exports[`regression tests click-drag to select a group: [end of test] element 2 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -4540,7 +4540,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4578,7 +4578,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4602,7 +4602,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4640,7 +4640,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4664,7 +4664,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4688,7 +4688,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4741,7 +4741,7 @@ Object {
   "draggingElement": Object {
     "angle": 0,
     "backgroundColor": "transparent",
-    "boundElementIds": null,
+    "boundElements": null,
     "fillStyle": "hachure",
     "groupIds": Array [],
     "height": 0,
@@ -4806,7 +4806,7 @@ Object {
   "selectionElement": Object {
     "angle": 0,
     "backgroundColor": "transparent",
-    "boundElementIds": null,
+    "boundElements": null,
     "fillStyle": "hachure",
     "groupIds": Array [],
     "height": 0,
@@ -4852,7 +4852,7 @@ exports[`regression tests deselects group of selected elements on pointer down w
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -4879,7 +4879,7 @@ exports[`regression tests deselects group of selected elements on pointer down w
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -4933,7 +4933,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4971,7 +4971,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4995,7 +4995,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -5048,7 +5048,7 @@ Object {
   "draggingElement": Object {
     "angle": 0,
     "backgroundColor": "transparent",
-    "boundElementIds": null,
+    "boundElements": null,
     "fillStyle": "hachure",
     "groupIds": Array [],
     "height": 0,
@@ -5136,7 +5136,7 @@ exports[`regression tests deselects group of selected elements on pointer up whe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -5163,7 +5163,7 @@ exports[`regression tests deselects group of selected elements on pointer up whe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -5217,7 +5217,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -5255,7 +5255,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -5279,7 +5279,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -5332,7 +5332,7 @@ Object {
   "draggingElement": Object {
     "angle": 0,
     "backgroundColor": "transparent",
-    "boundElementIds": null,
+    "boundElements": null,
     "fillStyle": "hachure",
     "groupIds": Array [],
     "height": 0,
@@ -5395,7 +5395,7 @@ Object {
   "selectionElement": Object {
     "angle": 0,
     "backgroundColor": "transparent",
-    "boundElementIds": null,
+    "boundElements": null,
     "fillStyle": "hachure",
     "groupIds": Array [],
     "height": 0,
@@ -5441,7 +5441,7 @@ exports[`regression tests deselects selected element on pointer down when pointe
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -5495,7 +5495,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -5548,7 +5548,7 @@ Object {
   "draggingElement": Object {
     "angle": 0,
     "backgroundColor": "transparent",
-    "boundElementIds": null,
+    "boundElements": null,
     "fillStyle": "hachure",
     "groupIds": Array [],
     "height": 0,
@@ -5634,7 +5634,7 @@ exports[`regression tests deselects selected element, on pointer up, when click 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 100,
@@ -5688,7 +5688,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -5804,7 +5804,7 @@ exports[`regression tests double click to edit a group: [end of test] element 0 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id3",
@@ -5833,7 +5833,7 @@ exports[`regression tests double click to edit a group: [end of test] element 1 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id3",
@@ -5862,7 +5862,7 @@ exports[`regression tests double click to edit a group: [end of test] element 2 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id3",
@@ -5918,7 +5918,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -5956,7 +5956,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -5980,7 +5980,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -6018,7 +6018,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -6042,7 +6042,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -6066,7 +6066,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -6108,7 +6108,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -6134,7 +6134,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -6160,7 +6160,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -6285,7 +6285,7 @@ exports[`regression tests drags selected elements from point inside common bound
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -6312,7 +6312,7 @@ exports[`regression tests drags selected elements from point inside common bound
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -6366,7 +6366,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -6404,7 +6404,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -6428,7 +6428,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -6469,7 +6469,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -6493,7 +6493,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -6609,7 +6609,7 @@ exports[`regression tests draw every type of shape: [end of test] element 0 1`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -6636,7 +6636,7 @@ exports[`regression tests draw every type of shape: [end of test] element 1 1`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -6663,7 +6663,7 @@ exports[`regression tests draw every type of shape: [end of test] element 2 1`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -6690,7 +6690,7 @@ exports[`regression tests draw every type of shape: [end of test] element 3 1`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
@@ -6732,7 +6732,7 @@ exports[`regression tests draw every type of shape: [end of test] element 4 1`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
@@ -6774,7 +6774,7 @@ exports[`regression tests draw every type of shape: [end of test] element 5 1`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
@@ -6823,7 +6823,7 @@ exports[`regression tests draw every type of shape: [end of test] element 6 1`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
@@ -6872,7 +6872,7 @@ exports[`regression tests draw every type of shape: [end of test] element 7 1`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -6950,7 +6950,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -6988,7 +6988,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7012,7 +7012,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7050,7 +7050,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7074,7 +7074,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7098,7 +7098,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7136,7 +7136,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7160,7 +7160,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7184,7 +7184,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7208,7 +7208,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -7261,7 +7261,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7285,7 +7285,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7309,7 +7309,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7333,7 +7333,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -7372,7 +7372,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
@@ -7425,7 +7425,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7449,7 +7449,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7473,7 +7473,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7497,7 +7497,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -7536,7 +7536,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
@@ -7575,7 +7575,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -7631,7 +7631,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7655,7 +7655,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7679,7 +7679,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7703,7 +7703,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -7742,7 +7742,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
@@ -7781,7 +7781,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -7841,7 +7841,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7865,7 +7865,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7889,7 +7889,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -7913,7 +7913,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -7952,7 +7952,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
@@ -7991,7 +7991,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -8037,7 +8037,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
@@ -8093,7 +8093,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -8117,7 +8117,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -8141,7 +8141,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -8165,7 +8165,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -8204,7 +8204,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
@@ -8243,7 +8243,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -8289,7 +8289,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
@@ -8349,7 +8349,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -8373,7 +8373,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -8397,7 +8397,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -8421,7 +8421,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -8460,7 +8460,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
@@ -8499,7 +8499,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -8545,7 +8545,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
@@ -8591,7 +8591,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -8736,7 +8736,7 @@ exports[`regression tests given a group of selected elements with an element tha
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -8763,7 +8763,7 @@ exports[`regression tests given a group of selected elements with an element tha
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 100,
@@ -8790,7 +8790,7 @@ exports[`regression tests given a group of selected elements with an element tha
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 100,
@@ -8844,7 +8844,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -8882,7 +8882,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -8906,7 +8906,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -8944,7 +8944,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -8968,7 +8968,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -8992,7 +8992,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -9114,7 +9114,7 @@ exports[`regression tests given a selected element A and a not selected element 
 Object {
   "angle": 0,
   "backgroundColor": "#fa5252",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 0,
@@ -9141,7 +9141,7 @@ exports[`regression tests given a selected element A and a not selected element 
 Object {
   "angle": 0,
   "backgroundColor": "#fa5252",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 1000,
@@ -9193,7 +9193,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#fa5252",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 0,
@@ -9231,7 +9231,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#fa5252",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 0,
@@ -9255,7 +9255,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#fa5252",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 1000,
@@ -9375,7 +9375,7 @@ exports[`regression tests given selected element A with lower z-index than unsel
 Object {
   "angle": 0,
   "backgroundColor": "red",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 1000,
@@ -9402,7 +9402,7 @@ exports[`regression tests given selected element A with lower z-index than unsel
 Object {
   "angle": 0,
   "backgroundColor": "red",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 500,
@@ -9457,7 +9457,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "red",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 1000,
@@ -9481,7 +9481,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "red",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 500,
@@ -9602,7 +9602,7 @@ exports[`regression tests given selected element A with lower z-index than unsel
 Object {
   "angle": 0,
   "backgroundColor": "red",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 1000,
@@ -9629,7 +9629,7 @@ exports[`regression tests given selected element A with lower z-index than unsel
 Object {
   "angle": 0,
   "backgroundColor": "red",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 500,
@@ -9684,7 +9684,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "red",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 1000,
@@ -9708,7 +9708,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "red",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 500,
@@ -9748,7 +9748,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "red",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 1000,
@@ -9772,7 +9772,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "red",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 500,
@@ -9888,7 +9888,7 @@ exports[`regression tests key 2 selects rectangle tool: [end of test] element 0 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -9942,7 +9942,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -10058,7 +10058,7 @@ exports[`regression tests key 3 selects diamond tool: [end of test] element 0 1`
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -10112,7 +10112,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -10228,7 +10228,7 @@ exports[`regression tests key 4 selects ellipse tool: [end of test] element 0 1`
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -10282,7 +10282,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -10398,7 +10398,7 @@ exports[`regression tests key 5 selects arrow tool: [end of test] element 0 1`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
@@ -10467,7 +10467,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -10598,7 +10598,7 @@ exports[`regression tests key 6 selects line tool: [end of test] element 0 1`] =
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
@@ -10667,7 +10667,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
@@ -10798,7 +10798,7 @@ exports[`regression tests key 7 selects freedraw tool: [end of test] element 0 1
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -10876,7 +10876,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -11016,7 +11016,7 @@ exports[`regression tests key a selects arrow tool: [end of test] element 0 1`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
@@ -11085,7 +11085,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -11216,7 +11216,7 @@ exports[`regression tests key d selects diamond tool: [end of test] element 0 1`
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -11270,7 +11270,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -11386,7 +11386,7 @@ exports[`regression tests key e selects ellipse tool: [end of test] element 0 1`
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -11440,7 +11440,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -11556,7 +11556,7 @@ exports[`regression tests key l selects line tool: [end of test] element 0 1`] =
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
@@ -11625,7 +11625,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
@@ -11756,7 +11756,7 @@ exports[`regression tests key r selects rectangle tool: [end of test] element 0 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -11810,7 +11810,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -11926,7 +11926,7 @@ exports[`regression tests key x selects freedraw tool: [end of test] element 0 1
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -12004,7 +12004,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -12155,7 +12155,7 @@ exports[`regression tests make a group and duplicate it: [end of test] element 0
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id6",
@@ -12184,7 +12184,7 @@ exports[`regression tests make a group and duplicate it: [end of test] element 1
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id6",
@@ -12213,7 +12213,7 @@ exports[`regression tests make a group and duplicate it: [end of test] element 2
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id6",
@@ -12242,7 +12242,7 @@ exports[`regression tests make a group and duplicate it: [end of test] element 3
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id4",
@@ -12271,7 +12271,7 @@ exports[`regression tests make a group and duplicate it: [end of test] element 4
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id4",
@@ -12300,7 +12300,7 @@ exports[`regression tests make a group and duplicate it: [end of test] element 5
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id4",
@@ -12356,7 +12356,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -12394,7 +12394,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -12418,7 +12418,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -12456,7 +12456,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -12480,7 +12480,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -12504,7 +12504,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -12547,7 +12547,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -12573,7 +12573,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -12599,7 +12599,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -12645,7 +12645,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id6",
@@ -12671,7 +12671,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id6",
@@ -12697,7 +12697,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id6",
@@ -12723,7 +12723,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -12749,7 +12749,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -12775,7 +12775,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -12897,7 +12897,7 @@ exports[`regression tests noop interaction after undo shouldn't create history e
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -12924,7 +12924,7 @@ exports[`regression tests noop interaction after undo shouldn't create history e
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -12978,7 +12978,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -13016,7 +13016,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -13040,7 +13040,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -13367,7 +13367,7 @@ exports[`regression tests shift click on selected element should deselect it on 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -13421,7 +13421,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -13546,7 +13546,7 @@ exports[`regression tests shift-click to multiselect, then drag: [end of test] e
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -13573,7 +13573,7 @@ exports[`regression tests shift-click to multiselect, then drag: [end of test] e
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -13627,7 +13627,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -13665,7 +13665,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -13689,7 +13689,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -13731,7 +13731,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -13755,7 +13755,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -13871,7 +13871,7 @@ exports[`regression tests should show fill icons when element has non transparen
 Object {
   "angle": 0,
   "backgroundColor": "#fa5252",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -13925,7 +13925,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -13963,7 +13963,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#fa5252",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -14090,7 +14090,7 @@ exports[`regression tests single-clicking on a subgroup of a selected group shou
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id4",
@@ -14120,7 +14120,7 @@ exports[`regression tests single-clicking on a subgroup of a selected group shou
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id4",
@@ -14150,7 +14150,7 @@ exports[`regression tests single-clicking on a subgroup of a selected group shou
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id9",
@@ -14180,7 +14180,7 @@ exports[`regression tests single-clicking on a subgroup of a selected group shou
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id9",
@@ -14237,7 +14237,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -14275,7 +14275,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -14299,7 +14299,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -14342,7 +14342,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -14368,7 +14368,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -14408,7 +14408,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -14434,7 +14434,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -14460,7 +14460,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -14498,7 +14498,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -14524,7 +14524,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -14550,7 +14550,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -14574,7 +14574,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -14617,7 +14617,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -14643,7 +14643,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -14669,7 +14669,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id9",
@@ -14695,7 +14695,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id9",
@@ -14740,7 +14740,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -14767,7 +14767,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -14794,7 +14794,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id9",
@@ -14821,7 +14821,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id9",
@@ -15045,7 +15045,7 @@ exports[`regression tests supports nested groups: [end of test] element 0 1`] = 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id3",
@@ -15074,7 +15074,7 @@ exports[`regression tests supports nested groups: [end of test] element 1 1`] = 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id5",
@@ -15104,7 +15104,7 @@ exports[`regression tests supports nested groups: [end of test] element 2 1`] = 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id5",
@@ -15161,7 +15161,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 50,
@@ -15199,7 +15199,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 50,
@@ -15223,7 +15223,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 50,
@@ -15261,7 +15261,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 50,
@@ -15285,7 +15285,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 50,
@@ -15309,7 +15309,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 50,
@@ -15351,7 +15351,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -15377,7 +15377,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -15403,7 +15403,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -15445,7 +15445,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -15471,7 +15471,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -15497,7 +15497,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -15541,7 +15541,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -15567,7 +15567,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id5",
@@ -15594,7 +15594,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id5",
@@ -15640,7 +15640,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -15666,7 +15666,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id5",
@@ -15693,7 +15693,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id5",
@@ -15749,7 +15749,7 @@ Object {
   "draggingElement": Object {
     "angle": 0,
     "backgroundColor": "transparent",
-    "boundElementIds": null,
+    "boundElements": null,
     "fillStyle": "hachure",
     "groupIds": Array [],
     "height": 0,
@@ -15816,7 +15816,7 @@ Object {
   "selectionElement": Object {
     "angle": 0,
     "backgroundColor": "transparent",
-    "boundElementIds": null,
+    "boundElements": null,
     "fillStyle": "hachure",
     "groupIds": Array [],
     "height": 0,
@@ -15862,7 +15862,7 @@ exports[`regression tests switches from group of selected elements to another el
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -15889,7 +15889,7 @@ exports[`regression tests switches from group of selected elements to another el
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 100,
@@ -15916,7 +15916,7 @@ exports[`regression tests switches from group of selected elements to another el
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 100,
@@ -15970,7 +15970,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -16008,7 +16008,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -16032,7 +16032,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -16070,7 +16070,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -16094,7 +16094,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -16118,7 +16118,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 100,
@@ -16171,7 +16171,7 @@ Object {
   "draggingElement": Object {
     "angle": 0,
     "backgroundColor": "transparent",
-    "boundElementIds": null,
+    "boundElements": null,
     "fillStyle": "hachure",
     "groupIds": Array [],
     "height": 0,
@@ -16236,7 +16236,7 @@ Object {
   "selectionElement": Object {
     "angle": 0,
     "backgroundColor": "transparent",
-    "boundElementIds": null,
+    "boundElements": null,
     "fillStyle": "hachure",
     "groupIds": Array [],
     "height": 0,
@@ -16282,7 +16282,7 @@ exports[`regression tests switches selected element on pointer down: [end of tes
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -16309,7 +16309,7 @@ exports[`regression tests switches selected element on pointer down: [end of tes
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -16363,7 +16363,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -16401,7 +16401,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -16425,7 +16425,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -16646,7 +16646,7 @@ exports[`regression tests undo/redo drawing an element: [end of test] element 0 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -16673,7 +16673,7 @@ exports[`regression tests undo/redo drawing an element: [end of test] element 1 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -16700,7 +16700,7 @@ exports[`regression tests undo/redo drawing an element: [end of test] element 2 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
@@ -16760,7 +16760,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -16784,7 +16784,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -16808,7 +16808,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -16868,7 +16868,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -16892,7 +16892,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -16916,7 +16916,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
@@ -16985,7 +16985,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -17023,7 +17023,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -17047,7 +17047,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,

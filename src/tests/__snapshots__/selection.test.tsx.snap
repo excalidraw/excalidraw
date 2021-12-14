@@ -4,7 +4,7 @@ exports[`select single element on the scene arrow 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
@@ -46,7 +46,7 @@ exports[`select single element on the scene arrow escape 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
@@ -88,7 +88,7 @@ exports[`select single element on the scene diamond 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
@@ -115,7 +115,7 @@ exports[`select single element on the scene ellipse 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
@@ -142,7 +142,7 @@ exports[`select single element on the scene rectangle 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,

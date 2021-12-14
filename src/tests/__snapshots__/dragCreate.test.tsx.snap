@@ -6,7 +6,7 @@ exports[`Test dragCreate add element to the scene when pointer dragging long eno
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
@@ -50,7 +50,7 @@ exports[`Test dragCreate add element to the scene when pointer dragging long eno
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
@@ -79,7 +79,7 @@ exports[`Test dragCreate add element to the scene when pointer dragging long eno
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
@@ -106,7 +106,7 @@ exports[`Test dragCreate add element to the scene when pointer dragging long eno
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
@@ -150,7 +150,7 @@ exports[`Test dragCreate add element to the scene when pointer dragging long eno
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
