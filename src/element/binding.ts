@@ -8,7 +8,11 @@ import {
 } from "./types";
 import { getElementAtPosition } from "../scene";
 import { AppState } from "../types";
-import { isBindableElement, isBindingElement } from "./typeChecks";
+import {
+  isBindableElement,
+  isBindingElement,
+  isLinearElement,
+} from "./typeChecks";
 import {
   bindingBorderTest,
   distanceToBindableElement,
@@ -75,7 +79,8 @@ export const bindOrUnbindLinearElement = (
     .forEach((element) => {
       mutateElement(element, {
         boundElements: element.boundElements?.filter(
-          (element) => element.id !== linearElement.id,
+          (element) =>
+            element.type !== "arrow" || element.id !== linearElement.id,
         ),
       });
     });
@@ -289,7 +294,9 @@ export const updateBoundElements = (
     newSize?: { width: number; height: number };
   },
 ) => {
-  const boundElements = changedElement.boundElements ?? [];
+  const boundElements = (changedElement.boundElements ?? []).filter(
+    (el) => el.type === "arrow",
+  );
   if (boundElements.length === 0) {
     return;
   }
@@ -297,44 +304,46 @@ export const updateBoundElements = (
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
-  (
-    Scene.getScene(changedElement)!.getNonDeletedElements(
-      boundElements.map((el) => el.id),
-    ) as NonDeleted<ExcalidrawLinearElement>[]
-  ).forEach((linearElement) => {
-    const bindableElement = changedElement as ExcalidrawBindableElement;
-    // In case the boundElements are stale
-    if (!doesNeedUpdate(linearElement, bindableElement)) {
-      return;
-    }
-    const startBinding = maybeCalculateNewGapWhenScaling(
-      bindableElement,
-      linearElement.startBinding,
-      newSize,
-    );
-    const endBinding = maybeCalculateNewGapWhenScaling(
-      bindableElement,
-      linearElement.endBinding,
-      newSize,
-    );
-    // `linearElement` is being moved/scaled already, just update the binding
-    if (simultaneouslyUpdatedElementIds.has(linearElement.id)) {
-      mutateElement(linearElement, { startBinding, endBinding });
-      return;
-    }
-    updateBoundPoint(
-      linearElement,
-      "start",
-      startBinding,
-      changedElement as ExcalidrawBindableElement,
-    );
-    updateBoundPoint(
-      linearElement,
-      "end",
-      endBinding,
-      changedElement as ExcalidrawBindableElement,
-    );
-  });
+  Scene.getScene(changedElement)!
+    .getNonDeletedElements(boundElements.map((el) => el.id))
+    .forEach((element) => {
+      if (!isLinearElement(element)) {
+        return;
+      }
+
+      const bindableElement = changedElement as ExcalidrawBindableElement;
+      // In case the boundElements are stale
+      if (!doesNeedUpdate(element, bindableElement)) {
+        return;
+      }
+      const startBinding = maybeCalculateNewGapWhenScaling(
+        bindableElement,
+        element.startBinding,
+        newSize,
+      );
+      const endBinding = maybeCalculateNewGapWhenScaling(
+        bindableElement,
+        element.endBinding,
+        newSize,
+      );
+      // `linearElement` is being moved/scaled already, just update the binding
+      if (simultaneouslyUpdatedElementIds.has(element.id)) {
+        mutateElement(element, { startBinding, endBinding });
+        return;
+      }
+      updateBoundPoint(
+        element,
+        "start",
+        startBinding,
+        changedElement as ExcalidrawBindableElement,
+      );
+      updateBoundPoint(
+        element,
+        "end",
+        endBinding,
+        changedElement as ExcalidrawBindableElement,
+      );
+    });
 };
 
 const doesNeedUpdate = (
