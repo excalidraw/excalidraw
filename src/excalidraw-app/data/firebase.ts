@@ -11,7 +11,15 @@ import { MIME_TYPES } from "../../constants";
 // private
 // -----------------------------------------------------------------------------
 
-const FIREBASE_CONFIG = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
+let FIREBASE_CONFIG: Record<string, any>;
+try {
+  FIREBASE_CONFIG = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
+} catch (error: any) {
+  console.warn(
+    `Error JSON parsing firebase config. Supplied value: ${process.env.REACT_APP_FIREBASE_CONFIG}`,
+  );
+  FIREBASE_CONFIG = {};
+}
 
 let firebasePromise: Promise<typeof import("firebase/app").default> | null =
   null;

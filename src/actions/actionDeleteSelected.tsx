@@ -62,7 +62,7 @@ export const actionDeleteSelected = register({
     if (appState.editingLinearElement) {
       const {
         elementId,
-        activePointIndex,
+        selectedPointsIndices,
         startBindingElement,
         endBindingElement,
       } = appState.editingLinearElement;
@@ -72,8 +72,7 @@ export const actionDeleteSelected = register({
       }
       if (
         // case: no point selected → delete whole element
-        activePointIndex == null ||
-        activePointIndex === -1 ||
+        selectedPointsIndices == null ||
         // case: deleting last remaining point
         element.points.length < 2
       ) {
@@ -93,15 +92,17 @@ export const actionDeleteSelected = register({
       // We cannot do this inside `movePoint` because it is also called
       // when deleting the uncommitted point (which hasn't caused any binding)
       const binding = {
-        startBindingElement:
-          activePointIndex === 0 ? null : startBindingElement,
-        endBindingElement:
-          activePointIndex === element.points.length - 1
-            ? null
-            : endBindingElement,
+        startBindingElement: selectedPointsIndices?.includes(0)
+          ? null
+          : startBindingElement,
+        endBindingElement: selectedPointsIndices?.includes(
+          element.points.length - 1,
+        )
+          ? null
+          : endBindingElement,
       };
 
-      LinearElementEditor.movePoint(element, activePointIndex, "delete");
+      LinearElementEditor.deletePoints(element, selectedPointsIndices);
 
       return {
         elements,
@@ -110,7 +111,10 @@ export const actionDeleteSelected = register({
           editingLinearElement: {
             ...appState.editingLinearElement,
             ...binding,
-            activePointIndex: activePointIndex > 0 ? activePointIndex - 1 : 0,
+            selectedPointsIndices:
+              selectedPointsIndices?.[0] > 0
+                ? [selectedPointsIndices[0] - 1]
+                : [0],
           },
         },
         commitToHistory: true,
