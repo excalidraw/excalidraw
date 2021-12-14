@@ -409,13 +409,17 @@ export const textWysiwyg = ({
           appState,
         );
         if (isTextElement(updateElement) && updateElement.textContainerId) {
-          mutateElement(updateElement, {
-            y,
-            height: Number(editable.style.height.slice(0, -2)),
-            width: Number(editable.style.width.slice(0, -2)),
-            x,
-          });
-          mutateElement(textContainer, { boundTextElementId: element.id });
+          if (editable.value) {
+            mutateElement(updateElement, {
+              y,
+              height: Number(editable.style.height.slice(0, -2)),
+              width: Number(editable.style.width.slice(0, -2)),
+              x,
+            });
+            mutateElement(textContainer, { boundTextElementId: element.id });
+          } else {
+            mutateElement(textContainer, { boundTextElementId: undefined });
+          }
         }
       }
     } else {
