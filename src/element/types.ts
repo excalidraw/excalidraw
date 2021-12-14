@@ -45,7 +45,10 @@ type _ExcalidrawElementBase = Readonly<{
   groupIds: readonly GroupId[];
   /** other elements that are bound to this element */
   boundElements:
-    | readonly { id: ExcalidrawLinearElement["id"]; type: "arrow" | "text" }[]
+    | readonly Readonly<{
+        id: ExcalidrawLinearElement["id"];
+        type: "arrow" | "text";
+      }>[]
     | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
