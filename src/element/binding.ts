@@ -294,10 +294,10 @@ export const updateBoundElements = (
     newSize?: { width: number; height: number };
   },
 ) => {
-  const boundElements = (changedElement.boundElements ?? []).filter(
+  const boundLinearElements = (changedElement.boundElements ?? []).filter(
     (el) => el.type === "arrow",
   );
-  if (boundElements.length === 0) {
+  if (boundLinearElements.length === 0) {
     return;
   }
   const { newSize, simultaneouslyUpdated } = options ?? {};
@@ -305,7 +305,7 @@ export const updateBoundElements = (
     simultaneouslyUpdated,
   );
   Scene.getScene(changedElement)!
-    .getNonDeletedElements(boundElements.map((el) => el.id))
+    .getNonDeletedElements(boundLinearElements.map((el) => el.id))
     .forEach((element) => {
       if (!isLinearElement(element)) {
         return;
