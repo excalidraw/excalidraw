@@ -3,27 +3,13 @@
 @mixin toolbarButtonColorStates {
   .ToolIcon_type_radio,
   .ToolIcon_type_checkbox {
-    & + .ToolIcon__icon:hover {
-      svg {
-        fill: var(--color-primary);
-        color: var(--color-primary);
-      }
-      .ToolIcon__keybinding {
-        color: var(--color-primary);
-      }
-    }
     & + .ToolIcon__icon:active {
       background: var(--color-primary-light);
     }
     &:checked + .ToolIcon__icon {
       background: var(--color-primary);
-      svg {
-        fill: $oc-white;
-        color: $oc-white;
-      }
-      .ToolIcon__keybinding {
-        color: $oc-white;
-      }
+      --icon-fill-color: #{$oc-white};
+      --keybinding-color: #{$oc-white};
     }
     &:checked + .ToolIcon__icon:active {
       background: var(--color-primary-dark);
@@ -90,6 +76,15 @@
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.01), 1px 1px 5px rgb(0 0 0 / 15%);
 
     .ToolIcon {
+      &:hover {
+        --icon-fill-color: var(--color-primary-chubb);
+        --keybinding-color: var(--color-primary-chubb);
+      }
+      &:active {
+        --icon-fill-color: #{$oc-gray-9};
+        --keybinding-color: #{$oc-gray-9};
+      }
+
       .ToolIcon__icon {
         background: transparent;
         border-radius: var(--border-radius-lg);
@@ -104,5 +99,10 @@
         display: none;
       }
     }
+  }
+
+  &.theme--dark .App-toolbar .ToolIcon:active {
+    --icon-fill-color: #{$oc-gray-3};
+    --keybinding-color: #{$oc-gray-3};
   }
 }
