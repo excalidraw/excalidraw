@@ -13,7 +13,7 @@ export const Card: React.FC<{
           color === "primary" ? "var(--color-primary)" : OpenColor[color][7],
         ["--card-color-darker" as any]:
           color === "primary"
-            ? "var(--color-primary-dark)"
+            ? "var(--color-primary-darker)"
             : OpenColor[color][8],
         ["--card-color-darkest" as any]:
           color === "primary"

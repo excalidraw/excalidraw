@@ -12,7 +12,7 @@
       --keybinding-color: #{$oc-white};
     }
     &:checked + .ToolIcon__icon:active {
-      background: var(--color-primary-dark);
+      background: var(--color-primary-darker);
     }
   }
 
