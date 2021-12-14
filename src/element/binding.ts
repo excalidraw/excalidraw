@@ -20,7 +20,7 @@ import {
 import { mutateElement } from "./mutateElement";
 import Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
-import { tupleToCoors } from "../utils";
+import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
 
 export type SuggestedBinding =
@@ -74,8 +74,8 @@ export const bindOrUnbindLinearElement = (
     .getNonDeletedElements(onlyUnbound)
     .forEach((element) => {
       mutateElement(element, {
-        boundElementIds: element.boundElementIds?.filter(
-          (id) => id !== linearElement.id,
+        boundElements: element.boundElements?.filter(
+          (element) => element.id !== linearElement.id,
         ),
       });
     });
@@ -180,11 +180,16 @@ const bindLinearElement = (
       ...calculateFocusAndGap(linearElement, hoveredElement, startOrEnd),
     } as PointBinding,
   });
-  mutateElement(hoveredElement, {
-    boundElementIds: Array.from(
-      new Set([...(hoveredElement.boundElementIds ?? []), linearElement.id]),
-    ),
-  });
+
+  const boundElementsMap = arrayToMap(hoveredElement.boundElements || []);
+  if (!boundElementsMap.has(linearElement.id)) {
+    mutateElement(hoveredElement, {
+      boundElements: (hoveredElement.boundElements || []).concat({
+        id: linearElement.id,
+        type: "arrow",
+      }),
+    });
+  }
 };
 
 // Don't bind both ends of a simple segment
@@ -284,8 +289,8 @@ export const updateBoundElements = (
     newSize?: { width: number; height: number };
   },
 ) => {
-  const boundElementIds = changedElement.boundElementIds ?? [];
-  if (boundElementIds.length === 0) {
+  const boundElements = changedElement.boundElements ?? [];
+  if (boundElements.length === 0) {
     return;
   }
   const { newSize, simultaneouslyUpdated } = options ?? {};
@@ -294,11 +299,11 @@ export const updateBoundElements = (
   );
   (
     Scene.getScene(changedElement)!.getNonDeletedElements(
-      boundElementIds,
+      boundElements.map((el) => el.id),
     ) as NonDeleted<ExcalidrawLinearElement>[]
   ).forEach((linearElement) => {
     const bindableElement = changedElement as ExcalidrawBindableElement;
-    // In case the boundElementIds are stale
+    // In case the boundElements are stale
     if (!doesNeedUpdate(linearElement, bindableElement)) {
       return;
     }
@@ -552,11 +557,11 @@ export const fixBindingsAfterDuplication = (
   const allBindableElementIds: Set<ExcalidrawElement["id"]> = new Set();
   const shouldReverseRoles = duplicatesServeAsOld === "duplicatesServeAsOld";
   oldElements.forEach((oldElement) => {
-    const { boundElementIds } = oldElement;
-    if (boundElementIds != null && boundElementIds.length > 0) {
-      boundElementIds.forEach((boundElementId) => {
-        if (shouldReverseRoles && !oldIdToDuplicatedId.has(boundElementId)) {
-          allBoundElementIds.add(boundElementId);
+    const { boundElements } = oldElement;
+    if (boundElements != null && boundElements.length > 0) {
+      boundElements.forEach((boundElement) => {
+        if (shouldReverseRoles && !oldIdToDuplicatedId.has(boundElement.id)) {
+          allBoundElementIds.add(boundElement.id);
         }
       });
       allBindableElementIds.add(oldIdToDuplicatedId.get(oldElement.id)!);
@@ -600,12 +605,16 @@ export const fixBindingsAfterDuplication = (
   sceneElements
     .filter(({ id }) => allBindableElementIds.has(id))
     .forEach((bindableElement) => {
-      const { boundElementIds } = bindableElement;
-      if (boundElementIds != null && boundElementIds.length > 0) {
+      const { boundElements } = bindableElement;
+      if (boundElements != null && boundElements.length > 0) {
         mutateElement(bindableElement, {
-          boundElementIds: boundElementIds.map(
-            (boundElementId) =>
-              oldIdToDuplicatedId.get(boundElementId) ?? boundElementId,
+          boundElements: boundElements.map((boundElement) =>
+            oldIdToDuplicatedId.has(boundElement.id)
+              ? {
+                  id: oldIdToDuplicatedId.get(boundElement.id)!,
+                  type: boundElement.type,
+                }
+              : boundElement,
           ),
         });
       }
@@ -638,9 +647,9 @@ export const fixBindingsAfterDeletion = (
   const boundElementIds: Set<ExcalidrawElement["id"]> = new Set();
   deletedElements.forEach((deletedElement) => {
     if (isBindableElement(deletedElement)) {
-      deletedElement.boundElementIds?.forEach((id) => {
-        if (!deletedElementIds.has(id)) {
-          boundElementIds.add(id);
+      deletedElement.boundElements?.forEach((element) => {
+        if (!deletedElementIds.has(element.id)) {
+          boundElementIds.add(element.id);
         }
       });
     }

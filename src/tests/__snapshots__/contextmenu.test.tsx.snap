@@ -85,7 +85,7 @@ exports[`contextMenu element selecting 'Add to library' in context menu adds ele
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -139,7 +139,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -255,7 +255,7 @@ exports[`contextMenu element selecting 'Bring forward' in context menu brings el
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -282,7 +282,7 @@ exports[`contextMenu element selecting 'Bring forward' in context menu brings el
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -336,7 +336,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -374,7 +374,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -398,7 +398,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -436,7 +436,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -460,7 +460,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -576,7 +576,7 @@ exports[`contextMenu element selecting 'Bring to front' in context menu brings e
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -603,7 +603,7 @@ exports[`contextMenu element selecting 'Bring to front' in context menu brings e
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -657,7 +657,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -695,7 +695,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -719,7 +719,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -757,7 +757,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -781,7 +781,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -897,7 +897,7 @@ exports[`contextMenu element selecting 'Copy styles' in context menu copies styl
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -951,7 +951,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -1065,7 +1065,7 @@ exports[`contextMenu element selecting 'Delete' in context menu deletes element:
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -1119,7 +1119,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -1155,7 +1155,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -1271,7 +1271,7 @@ exports[`contextMenu element selecting 'Duplicate' in context menu duplicates el
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -1298,7 +1298,7 @@ exports[`contextMenu element selecting 'Duplicate' in context menu duplicates el
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -1352,7 +1352,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -1390,7 +1390,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -1414,7 +1414,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -1536,7 +1536,7 @@ exports[`contextMenu element selecting 'Group selection' in context menu groups 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id3",
@@ -1565,7 +1565,7 @@ exports[`contextMenu element selecting 'Group selection' in context menu groups 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id3",
@@ -1621,7 +1621,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -1659,7 +1659,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -1683,7 +1683,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -1725,7 +1725,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -1751,7 +1751,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -1869,7 +1869,7 @@ exports[`contextMenu element selecting 'Paste styles' in context menu pastes sty
 Object {
   "angle": 0,
   "backgroundColor": "#e64980",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "cross-hatch",
   "groupIds": Array [],
   "height": 20,
@@ -1896,7 +1896,7 @@ exports[`contextMenu element selecting 'Paste styles' in context menu pastes sty
 Object {
   "angle": 0,
   "backgroundColor": "#e64980",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "cross-hatch",
   "groupIds": Array [],
   "height": 20,
@@ -1950,7 +1950,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -1988,7 +1988,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2012,7 +2012,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2050,7 +2050,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2074,7 +2074,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2112,7 +2112,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2136,7 +2136,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#e64980",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2174,7 +2174,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2198,7 +2198,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#e64980",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "cross-hatch",
           "groupIds": Array [],
           "height": 20,
@@ -2236,7 +2236,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2260,7 +2260,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#e64980",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "cross-hatch",
           "groupIds": Array [],
           "height": 20,
@@ -2298,7 +2298,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2322,7 +2322,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#e64980",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "cross-hatch",
           "groupIds": Array [],
           "height": 20,
@@ -2360,7 +2360,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2384,7 +2384,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#e64980",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "cross-hatch",
           "groupIds": Array [],
           "height": 20,
@@ -2422,7 +2422,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2446,7 +2446,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#e64980",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "cross-hatch",
           "groupIds": Array [],
           "height": 20,
@@ -2484,7 +2484,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#e64980",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "cross-hatch",
           "groupIds": Array [],
           "height": 20,
@@ -2508,7 +2508,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "#e64980",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "cross-hatch",
           "groupIds": Array [],
           "height": 20,
@@ -2624,7 +2624,7 @@ exports[`contextMenu element selecting 'Send backward' in context menu sends ele
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -2651,7 +2651,7 @@ exports[`contextMenu element selecting 'Send backward' in context menu sends ele
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -2705,7 +2705,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2743,7 +2743,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2767,7 +2767,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2805,7 +2805,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2829,7 +2829,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -2945,7 +2945,7 @@ exports[`contextMenu element selecting 'Send to back' in context menu sends elem
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -2972,7 +2972,7 @@ exports[`contextMenu element selecting 'Send to back' in context menu sends elem
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -3026,7 +3026,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -3064,7 +3064,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -3088,7 +3088,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -3126,7 +3126,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -3150,7 +3150,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -3270,7 +3270,7 @@ exports[`contextMenu element selecting 'Ungroup selection' in context menu ungro
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -3297,7 +3297,7 @@ exports[`contextMenu element selecting 'Ungroup selection' in context menu ungro
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -3351,7 +3351,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -3389,7 +3389,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -3413,7 +3413,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -3455,7 +3455,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -3481,7 +3481,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id3",
@@ -3523,7 +3523,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -3547,7 +3547,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
@@ -3669,7 +3669,7 @@ exports[`contextMenu element shows 'Group selection' in context menu for multipl
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -3696,7 +3696,7 @@ exports[`contextMenu element shows 'Group selection' in context menu for multipl
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -3750,7 +3750,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -3788,7 +3788,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -3812,7 +3812,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -3936,7 +3936,7 @@ exports[`contextMenu element shows 'Ungroup selection' in context menu for group
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id4",
@@ -3965,7 +3965,7 @@ exports[`contextMenu element shows 'Ungroup selection' in context menu for group
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [
     "id4",
@@ -4021,7 +4021,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4059,7 +4059,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4083,7 +4083,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -4126,7 +4126,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -4152,7 +4152,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [
             "id4",
@@ -4454,7 +4454,7 @@ exports[`contextMenu element shows context menu for element: [end of test] eleme
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 20,
@@ -4481,7 +4481,7 @@ exports[`contextMenu element shows context menu for element: [end of test] eleme
 Object {
   "angle": 0,
   "backgroundColor": "red",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 200,
@@ -4508,7 +4508,7 @@ exports[`contextMenu element shows context menu for element: [end of test] eleme
 Object {
   "angle": 0,
   "backgroundColor": "red",
-  "boundElementIds": null,
+  "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 200,
@@ -4562,7 +4562,7 @@ Object {
         Object {
           "angle": 0,
           "backgroundColor": "transparent",
-          "boundElementIds": null,
+          "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 20,
