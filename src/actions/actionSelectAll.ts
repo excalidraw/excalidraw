@@ -17,7 +17,7 @@ export const actionSelectAll = register({
           selectedElementIds: elements.reduce((map, element) => {
             if (
               !element.isDeleted &&
-              !(isTextElement(element) && element.textContainerId)
+              !(isTextElement(element) && element.containerId)
             ) {
               map[element.id] = true;
             }

@@ -95,20 +95,18 @@ export const textWysiwyg = ({
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
-      let textContainer = updatedElement?.textContainerId
-        ? Scene.getScene(updatedElement)!.getElement(
-            updatedElement.textContainerId,
-          )
+      let textContainer = updatedElement?.containerId
+        ? Scene.getScene(updatedElement)!.getElement(updatedElement.containerId)
         : null;
       let maxWidth = updatedElement.width;
 
       let maxHeight = updatedElement.height;
       let width = updatedElement.width;
       let height = updatedElement.height;
-      if (textContainer && updatedElement.textContainerId) {
+      if (textContainer && updatedElement.containerId) {
         if (textPropertiesUpdated(updatedElement, editable)) {
           const container = Scene.getScene(updatedElement)?.getElement(
-            updatedElement.textContainerId,
+            updatedElement.containerId,
           ) as ExcalidrawBoundTextElement;
           approxLineHeight = isTextElement(updatedElement)
             ? getApproxLineHeight(getFontString(updatedElement))
@@ -174,7 +172,7 @@ export const textWysiwyg = ({
 
       editable.value = updatedElement.originalText || updatedElement.text;
       const lines = updatedElement.originalText.split("\n");
-      const lineHeight = updatedElement.textContainerId
+      const lineHeight = updatedElement.containerId
         ? approxLineHeight
         : updatedElement.height / lines.length;
       if (!textContainer) {
@@ -217,7 +215,7 @@ export const textWysiwyg = ({
 
   let whiteSpace = "pre";
   if (isTextElement(element)) {
-    whiteSpace = element.textContainerId ? "normal" : "pre";
+    whiteSpace = element.containerId ? "normal" : "pre";
   }
   Object.assign(editable.style, {
     position: "absolute",
@@ -390,9 +388,9 @@ export const textWysiwyg = ({
       return;
     }
     let wrappedText = "";
-    if (isTextElement(updateElement) && updateElement?.textContainerId) {
+    if (isTextElement(updateElement) && updateElement?.containerId) {
       const textContainer = Scene.getScene(updateElement)!.getElement(
-        updateElement.textContainerId,
+        updateElement.containerId,
       ) as ExcalidrawBoundTextElement;
 
       if (textContainer) {
@@ -408,7 +406,7 @@ export const textWysiwyg = ({
           },
           appState,
         );
-        if (isTextElement(updateElement) && updateElement.textContainerId) {
+        if (isTextElement(updateElement) && updateElement.containerId) {
           if (editable.value) {
             mutateElement(updateElement, {
               y,

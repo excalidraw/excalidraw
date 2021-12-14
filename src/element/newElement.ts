@@ -124,7 +124,7 @@ export const newTextElement = (
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    textContainerId?: ExcalidrawRectangleElement["id"];
+    containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const metrics = measureText(opts.text, getFontString(opts));
@@ -142,7 +142,7 @@ export const newTextElement = (
       width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
-      textContainerId: opts.textContainerId || null,
+      containerId: opts.containerId || null,
       originalText: opts.text,
     },
     {},
@@ -160,7 +160,7 @@ const getAdjustedDimensions = (
   height: number;
   baseline: number;
 } => {
-  const maxWidth = element.textContainerId ? element.width : null;
+  const maxWidth = element.containerId ? element.width : null;
   const {
     width: nextWidth,
     height: nextHeight,
@@ -172,7 +172,7 @@ const getAdjustedDimensions = (
   if (
     textAlign === "center" &&
     verticalAlign === "middle" &&
-    !element.textContainerId
+    !element.containerId
   ) {
     const prevMetrics = measureText(
       element.text,

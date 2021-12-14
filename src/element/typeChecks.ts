@@ -90,7 +90,7 @@ export const isBindableElement = (
       element.type === "diamond" ||
       element.type === "ellipse" ||
       element.type === "image" ||
-      (element.type === "text" && !element.textContainerId))
+      (element.type === "text" && !element.containerId))
   );
 };
 
@@ -129,12 +129,10 @@ export const isExcalidrawElementWithBindText = (
     element.type === "diamond" ||
     element.type === "ellipse");
 
-export const hasBoundTextContainer = (
+export const isBoundByContainer = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawTextElementWithContainer => {
   return (
-    element !== null &&
-    isTextElement(element) &&
-    element.textContainerId !== null
+    element !== null && isTextElement(element) && element.containerId !== null
   );
 };

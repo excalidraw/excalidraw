@@ -122,7 +122,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     baseline: number;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    textContainerId: ExcalidrawGenericElement["id"] | null;
+    containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
   }>;
 
@@ -145,7 +145,7 @@ export type ExcalidrawElementWithBindText =
   | ExcalidrawRectangleElement;
 
 export type ExcalidrawTextElementWithContainer = {
-  textContainerId: string;
+  containerId: ExcalidrawGenericElement["id"];
 } & ExcalidrawTextElement;
 
 export type PointBinding = {

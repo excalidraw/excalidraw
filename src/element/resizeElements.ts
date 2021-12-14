@@ -286,7 +286,7 @@ const measureFontSizeFromWH = (
   const metrics = measureText(
     element.text,
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
-    element.textContainerId ? element.width : null,
+    element.containerId ? element.width : null,
   );
   return {
     size: nextFontSize,

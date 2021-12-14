@@ -1402,7 +1402,7 @@ class App extends React.Component<AppProps, AppState> {
           ...this.state,
           isLibraryOpen: false,
           selectedElementIds: newElements.reduce((map, element) => {
-            if (isTextElement(element) && !element.textContainerId) {
+            if (isTextElement(element) && !element.containerId) {
               map[element.id] = true;
             }
             return map;
@@ -1917,7 +1917,7 @@ class App extends React.Component<AppProps, AppState> {
         return [viewportX, viewportY];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text, text, false, !element.textContainerId);
+        updateElement(text, text, false, !element.containerId);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
@@ -1928,8 +1928,8 @@ class App extends React.Component<AppProps, AppState> {
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
-          const elementIdToSelect = element.textContainerId
-            ? element.textContainerId
+          const elementIdToSelect = element.containerId
+            ? element.containerId
             : element.id;
           this.setState((prevState) => ({
             selectedElementIds: {
@@ -2040,7 +2040,7 @@ class App extends React.Component<AppProps, AppState> {
       : this.scene
           .getElements()
           .filter(
-            (element) => !(isTextElement(element) && element.textContainerId),
+            (element) => !(isTextElement(element) && element.containerId),
           );
     return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, x, y),
@@ -2060,23 +2060,23 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter?: boolean;
   }) => {
     const existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
-    const textContainer = getElementContainingPosition(
+    const container = getElementContainingPosition(
       this.scene.getElements(),
       sceneX,
       sceneY,
     );
-    if (!existingTextElement && textContainer) {
+    if (!existingTextElement && container) {
       const fontString = {
         fontSize: this.state.currentItemFontSize,
         fontFamily: this.state.currentItemFontFamily,
       };
       const minWidth = getApproxMinLineWidth(getFontString(fontString));
       const minHeight = getApproxMinLineHeight(getFontString(fontString));
-      const newHeight = Math.max(textContainer.height, minHeight);
-      const newWidth = Math.max(textContainer.width, minWidth);
-      mutateElement(textContainer, { height: newHeight, width: newWidth });
-      sceneX = textContainer.x + newWidth / 2;
-      sceneY = textContainer.y + newHeight / 2;
+      const newHeight = Math.max(container.height, minHeight);
+      const newWidth = Math.max(container.width, minWidth);
+      mutateElement(container, { height: newHeight, width: newWidth });
+      sceneX = container.x + newWidth / 2;
+      sceneY = container.y + newHeight / 2;
     }
     const parentCenterPosition =
       insertAtParentCenter &&
@@ -2114,7 +2114,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
-          textContainerId: textContainer?.id ?? undefined,
+          containerId: container?.id ?? undefined,
         });
 
     this.setState({ editingElement: element });

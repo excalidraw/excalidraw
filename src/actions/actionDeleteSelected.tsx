@@ -4,13 +4,14 @@ import { ToolButton } from "../components/ToolButton";
 import { trash } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
-import { getNonDeletedElements, isTextElement } from "../element";
+import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { newElementWith } from "../element/mutateElement";
 import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
+import { isBoundByContainer } from "../element/typeChecks";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
@@ -22,9 +23,8 @@ const deleteSelectedElements = (
         return newElementWith(el, { isDeleted: true });
       }
       if (
-        isTextElement(el) &&
-        el.textContainerId &&
-        appState.selectedElementIds[el.textContainerId]
+        isBoundByContainer(el) &&
+        appState.selectedElementIds[el.containerId]
       ) {
         return newElementWith(el, { isDeleted: true });
       }

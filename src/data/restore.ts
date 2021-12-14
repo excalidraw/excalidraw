@@ -130,7 +130,7 @@ const restoreElement = (
         baseline: element.baseline,
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
-        textContainerId: element.textContainerId ?? null,
+        containerId: element.containerId ?? null,
         originalText: element.originalText ?? "",
       });
     case "freedraw": {

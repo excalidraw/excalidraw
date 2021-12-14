@@ -17,7 +17,7 @@ import Scene from "../scene/Scene";
 
 export const redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
   let maxWidth;
-  if (element.textContainerId) {
+  if (element.containerId) {
     maxWidth = element.width;
   }
   const metrics = measureText(element.text, getFontString(element), maxWidth);
@@ -56,7 +56,7 @@ export const bindTextToShapeAfterDuplication = (
       mutateElement(
         sceneElementMap.get(newTextElementId) as ExcalidrawTextElement,
         {
-          textContainerId: newElementId,
+          containerId: newElementId,
         },
       );
     }
