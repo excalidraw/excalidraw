@@ -120,7 +120,6 @@ import {
 } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
-  getBoundTextElementId,
   hasBoundTextElement,
   isBindingElement,
   isBindingElementType,
@@ -235,6 +234,7 @@ import {
   bindTextToShapeAfterDuplication,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
+  getBoundTextElementId,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 
@@ -2088,10 +2088,13 @@ class App extends React.Component<AppProps, AppState> {
     let existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
 
     // consider bounded text element if container present
-    if (container && hasBoundTextElement(container)) {
-      existingTextElement = this.scene.getElement(
-        getBoundTextElementId(container),
-      ) as ExcalidrawTextElement;
+    if (container) {
+      const boundTextElementId = getBoundTextElementId(container);
+      if (boundTextElementId) {
+        existingTextElement = this.scene.getElement(
+          boundTextElementId,
+        ) as ExcalidrawTextElement;
+      }
     }
     if (!existingTextElement && container) {
       const fontString = {

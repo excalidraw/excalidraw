@@ -19,8 +19,6 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 import {
-  getBoundTextElementId,
-  hasBoundTextElement,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
@@ -38,6 +36,7 @@ import { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
   getApproxMinLineWidth,
+  getBoundTextElementId,
   handleBindTextResize,
   measureText,
 } from "./textElement";
@@ -163,11 +162,10 @@ const rotateSingleElement = (
   }
   angle = normalizeAngle(angle);
   mutateElement(element, { angle });
-  if (hasBoundTextElement(element)) {
-    const textElement = Scene.getScene(element)!.getElement(
-      getBoundTextElementId(element),
-    ) as ExcalidrawTextElement;
-    mutateElement(textElement, { angle });
+  const boundTextElementId = getBoundTextElementId(element);
+  if (boundTextElementId) {
+    const textElement = Scene.getScene(element)!.getElement(boundTextElementId);
+    mutateElement(textElement!, { angle });
   }
 };
 
@@ -581,16 +579,15 @@ export const resizeSingleElement = (
       ],
     });
   }
+  const boundTextElementId = getBoundTextElementId(element);
+  let minWidth = 0;
+  if (boundTextElementId) {
+    const boundTextElement = Scene.getScene(element)!.getElement(
+      boundTextElementId,
+    ) as ExcalidrawTextElement;
+    minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
+  }
 
-  const boundTextElement = hasBoundTextElement(element)
-    ? (Scene.getScene(element)!.getElement(
-        getBoundTextElementId(element),
-      ) as ExcalidrawTextElement)
-    : null;
-
-  const minWidth = boundTextElement
-    ? getApproxMinLineWidth(getFontString(boundTextElement))
-    : 0;
   if (
     resizedElement.width > minWidth &&
     resizedElement.height !== 0 &&
@@ -754,10 +751,10 @@ const rotateMultipleElements = (
       y: element.y + (rotatedCY - cy),
       angle: normalizeAngle(centerAngle + origAngle),
     });
-    if (hasBoundTextElement(element)) {
-      const textElement = Scene.getScene(element)!.getElement(
-        getBoundTextElementId(element),
-      ) as ExcalidrawTextElement;
+    const boundTextElementId = getBoundTextElementId(element);
+    if (boundTextElementId) {
+      const textElement =
+        Scene.getScene(element)!.getElement(boundTextElementId)!;
       mutateElement(textElement, {
         x: textElement.x + (rotatedCX - cx),
         y: textElement.y + (rotatedCY - cy),

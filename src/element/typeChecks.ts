@@ -119,7 +119,3 @@ export const isBoundToContainer = (
     element !== null && isTextElement(element) && element.containerId !== null
   );
 };
-
-export const getBoundTextElementId = (element: ExcalidrawBindableElement) => {
-  return element.boundElements!.filter((ele) => ele.type === "text")[0].id;
-};
