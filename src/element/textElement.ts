@@ -109,11 +109,12 @@ export const handleBindTextResize = (
         // increase height in case text element height exceeds
         if (nextHeight > element.height - PADDING * 2) {
           containerHeight = nextHeight + PADDING * 2;
-
           const diff = containerHeight - element.height;
-          // fix the sw/se coords when resizing from ne/nw
+          // fix the y coord when resizing from ne/nw/n
           const updatedY =
-            transformHandleType === "ne" || transformHandleType === "nw"
+            transformHandleType === "ne" ||
+            transformHandleType === "nw" ||
+            transformHandleType === "n"
               ? element.y - diff
               : element.y;
           mutateElement(element, {
