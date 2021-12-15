@@ -2063,10 +2063,22 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter?: boolean;
   }) => {
     const existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
+    const parentCenterPosition =
+      insertAtParentCenter &&
+      this.getTextWysiwygSnappedToCenterPosition(
+        sceneX,
+        sceneY,
+        this.state,
+        this.canvas,
+        window.devicePixelRatio,
+      );
 
-    const container = shouldBind
-      ? getElementContainingPosition(this.scene.getElements(), sceneX, sceneY)
-      : null;
+    // bind to container when shouldBind is true or
+    // clicked on center of container
+    const container =
+      shouldBind || parentCenterPosition
+        ? getElementContainingPosition(this.scene.getElements(), sceneX, sceneY)
+        : null;
     if (!existingTextElement && container) {
       const fontString = {
         fontSize: this.state.currentItemFontSize,
@@ -2080,15 +2092,6 @@ class App extends React.Component<AppProps, AppState> {
       sceneX = container.x + newWidth / 2;
       sceneY = container.y + newHeight / 2;
     }
-    const parentCenterPosition =
-      insertAtParentCenter &&
-      this.getTextWysiwygSnappedToCenterPosition(
-        sceneX,
-        sceneY,
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
-      );
 
     const element = existingTextElement
       ? existingTextElement
