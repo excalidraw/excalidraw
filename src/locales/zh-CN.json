@@ -204,8 +204,8 @@
     "resizeImage": "按住SHIFT可以自由缩放，\n按住ALT可以从中间缩放",
     "rotate": "旋转时可以按住 Shift 来约束角度",
     "lineEditor_info": "双击或按回车键编辑",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，拖动以移动",
+    "lineEditor_nothingSelected": "选择要编辑的点 (按住 SHIFT 选择多个)，\n或按住 Alt 并点击以添加新点",
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
     "publishLibrary": "发布您自己的库"
   },
