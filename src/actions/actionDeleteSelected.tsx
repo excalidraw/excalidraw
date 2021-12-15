@@ -11,7 +11,7 @@ import { newElementWith } from "../element/mutateElement";
 import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
-import { isBoundByContainer } from "../element/typeChecks";
+import { isBoundToContainer } from "../element/typeChecks";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
@@ -23,7 +23,7 @@ const deleteSelectedElements = (
         return newElementWith(el, { isDeleted: true });
       }
       if (
-        isBoundByContainer(el) &&
+        isBoundToContainer(el) &&
         appState.selectedElementIds[el.containerId]
       ) {
         return newElementWith(el, { isDeleted: true });

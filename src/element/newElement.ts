@@ -88,7 +88,6 @@ export const newElement = (
     type: ExcalidrawGenericElement["type"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawGenericElement> =>
-  //@ts-ignore
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
 /** computes element x/y offset based on textAlign/verticalAlign */

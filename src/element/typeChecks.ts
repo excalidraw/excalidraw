@@ -7,7 +7,6 @@ import {
   ExcalidrawFreeDrawElement,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
-  ExcalidrawRectangleElement,
   ExcalidrawTextElementWithContainer,
 } from "./types";
 
@@ -104,22 +103,16 @@ export const isExcalidrawElement = (element: any): boolean => {
   );
 };
 
-export const isRectangleElement = (
-  element: ExcalidrawElement | null,
-): element is ExcalidrawRectangleElement => {
-  return element != null && element.type === "rectangle";
-};
-
 export const hasBoundTextElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawBindableElement => {
   return (
     isBindableElement(element) &&
-    !!element.boundElements?.filter(({ type }) => type === "text").length
+    !!element.boundElements?.some(({ type }) => type === "text")
   );
 };
 
-export const isBoundByContainer = (
+export const isBoundToContainer = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawTextElementWithContainer => {
   return (

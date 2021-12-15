@@ -4,7 +4,7 @@ import {
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
-import { isBoundByContainer } from "../element/typeChecks";
+import { isBoundToContainer } from "../element/typeChecks";
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -18,7 +18,7 @@ export const getElementsWithinSelection = (
 
     return (
       element.type !== "selection" &&
-      !isBoundByContainer(element) &&
+      !isBoundToContainer(element) &&
       selectionX1 <= elementX1 &&
       selectionY1 <= elementY1 &&
       selectionX2 >= elementX2 &&
@@ -63,7 +63,7 @@ export const getSelectedElements = (
     }
     if (
       includeBoundTextElement &&
-      isBoundByContainer(element) &&
+      isBoundToContainer(element) &&
       appState.selectedElementIds[element?.containerId]
     ) {
       return element;
