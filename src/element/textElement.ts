@@ -164,7 +164,7 @@ export const measureText = (
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
     container.style.lineHeight = `${String(lineHeight)}px`;
-    container.style.whiteSpace = "normal";
+    container.style.whiteSpace = "pre-wrap";
   }
   document.body.appendChild(container);
   container.innerText = text;

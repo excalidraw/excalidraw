@@ -120,6 +120,7 @@ import {
 } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
+  getBoundTextElementId,
   hasBoundTextElement,
   isBindingElement,
   isBindingElementType,
@@ -2062,7 +2063,6 @@ class App extends React.Component<AppProps, AppState> {
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
   }) => {
-    const existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     const parentCenterPosition =
       insertAtParentCenter &&
       this.getTextWysiwygSnappedToCenterPosition(
@@ -2077,8 +2077,22 @@ class App extends React.Component<AppProps, AppState> {
     // clicked on center of container
     const container =
       shouldBind || parentCenterPosition
-        ? getElementContainingPosition(this.scene.getElements(), sceneX, sceneY)
+        ? getElementContainingPosition(
+            this.scene.getElements(),
+            sceneX,
+            sceneY,
+            "text",
+          )
         : null;
+
+    let existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
+
+    // consider bounded text element if container present
+    if (container && hasBoundTextElement(container)) {
+      existingTextElement = this.scene.getElement(
+        getBoundTextElementId(container),
+      ) as ExcalidrawTextElement;
+    }
     if (!existingTextElement && container) {
       const fontString = {
         fontSize: this.state.currentItemFontSize,
