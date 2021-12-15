@@ -66,8 +66,8 @@ export const MobileMenu = ({
         <Section heading="shapes">
           {(heading) => (
             <Stack.Col gap={4} align="center">
-              <Stack.Row gap={1}>
-                <Island padding={1}>
+              <Stack.Row gap={1} className="App-toolbar-container">
+                <Island padding={1} className="App-toolbar">
                   {heading}
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
@@ -92,8 +92,13 @@ export const MobileMenu = ({
                   checked={appState.elementLocked}
                   onChange={onLockToggle}
                   title={t("toolBar.lock")}
+                  isMobile
                 />
-                <LibraryButton appState={appState} setAppState={setAppState} />
+                <LibraryButton
+                  appState={appState}
+                  setAppState={setAppState}
+                  isMobile
+                />
               </Stack.Row>
               {libraryMenu}
             </Stack.Col>

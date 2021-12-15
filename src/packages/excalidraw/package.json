@@ -1,6 +1,6 @@
 {
   "name": "@databutton/excalidraw",
-  "version": "0.12.1-24",
+  "version": "0.12.1-25-draft-1",
   "main": "main.js",
   "types": "types/packages/excalidraw/index.d.ts",
   "files": [
