@@ -122,7 +122,6 @@ import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   isBindingElement,
   isBindingElementType,
-  isExcalidrawElementWithBindText,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -2223,7 +2222,7 @@ class App extends React.Component<AppProps, AppState> {
       );
       if (selectedElements.length === 1) {
         const selectedElement = selectedElements[0];
-        const canBindText = isExcalidrawElementWithBindText(selectedElement);
+        const canBindText = isBindingElement(selectedElement);
         if (canBindText) {
           sceneX = selectedElement.x + selectedElement.width / 2;
           sceneY = selectedElement.y + selectedElement.height / 2;

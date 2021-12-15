@@ -19,6 +19,7 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 import {
+  getBoundTextElementId,
   hasBoundTextElement,
   isFreeDrawElement,
   isLinearElement,
@@ -164,7 +165,7 @@ const rotateSingleElement = (
   mutateElement(element, { angle });
   if (hasBoundTextElement(element)) {
     const textElement = Scene.getScene(element)!.getElement(
-      element.boundTextElementId,
+      getBoundTextElementId(element),
     ) as ExcalidrawTextElement;
     mutateElement(textElement, { angle });
   }
@@ -583,7 +584,7 @@ export const resizeSingleElement = (
 
   const boundTextElement = hasBoundTextElement(element)
     ? (Scene.getScene(element)!.getElement(
-        element.boundTextElementId,
+        getBoundTextElementId(element),
       ) as ExcalidrawTextElement)
     : null;
 
@@ -755,7 +756,7 @@ const rotateMultipleElements = (
     });
     if (hasBoundTextElement(element)) {
       const textElement = Scene.getScene(element)!.getElement(
-        element.boundTextElementId,
+        getBoundTextElementId(element),
       ) as ExcalidrawTextElement;
       mutateElement(textElement, {
         x: textElement.x + (rotatedCX - cx),

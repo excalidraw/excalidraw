@@ -8,8 +8,6 @@ import {
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
   ExcalidrawRectangleElement,
-  ExcalidrawBoundTextElement,
-  ExcalidrawElementWithBindText,
   ExcalidrawTextElementWithContainer,
 } from "./types";
 
@@ -114,20 +112,12 @@ export const isRectangleElement = (
 
 export const hasBoundTextElement = (
   element: ExcalidrawElement | null,
-): element is ExcalidrawBoundTextElement => {
+): element is ExcalidrawBindableElement => {
   return (
-    isExcalidrawElementWithBindText(element) &&
-    element.boundTextElementId !== null
+    isBindableElement(element) &&
+    !!element.boundElements?.filter(({ type }) => type === "text").length
   );
 };
-
-export const isExcalidrawElementWithBindText = (
-  element: any,
-): element is ExcalidrawElementWithBindText =>
-  element !== null &&
-  (element.type === "rectangle" ||
-    element.type === "diamond" ||
-    element.type === "ellipse");
 
 export const isBoundByContainer = (
   element: ExcalidrawElement | null,
@@ -135,4 +125,8 @@ export const isBoundByContainer = (
   return (
     element !== null && isTextElement(element) && element.containerId !== null
   );
+};
+
+export const getBoundTextElementId = (element: ExcalidrawBindableElement) => {
+  return element.boundElements!.filter((ele) => ele.type === "text")[0].id;
 };

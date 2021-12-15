@@ -47,7 +47,6 @@ Object {
   "angle": 0,
   "backgroundColor": "blue",
   "boundElements": Array [],
-  "boundTextElementId": null,
   "fillStyle": "cross-hatch",
   "groupIds": Array [
     "1",
@@ -79,7 +78,6 @@ Object {
   "angle": 0,
   "backgroundColor": "blue",
   "boundElements": Array [],
-  "boundTextElementId": null,
   "fillStyle": "cross-hatch",
   "groupIds": Array [
     "1",
@@ -111,7 +109,6 @@ Object {
   "angle": 0,
   "backgroundColor": "blue",
   "boundElements": Array [],
-  "boundTextElementId": null,
   "fillStyle": "cross-hatch",
   "groupIds": Array [
     "1",

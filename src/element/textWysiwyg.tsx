@@ -9,7 +9,7 @@ import Scene from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES, PADDING } from "../constants";
 import {
-  ExcalidrawBoundTextElement,
+  ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawTextElement,
 } from "./types";
@@ -95,7 +95,7 @@ export const textWysiwyg = ({
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
-      let textContainer = updatedElement?.containerId
+      let container = updatedElement?.containerId
         ? Scene.getScene(updatedElement)!.getElement(updatedElement.containerId)
         : null;
       let maxWidth = updatedElement.width;
@@ -103,36 +103,36 @@ export const textWysiwyg = ({
       let maxHeight = updatedElement.height;
       let width = updatedElement.width;
       let height = updatedElement.height;
-      if (textContainer && updatedElement.containerId) {
+      if (container && updatedElement.containerId) {
         const propertiesUpdated = textPropertiesUpdated(
           updatedElement,
           editable,
         );
         if (propertiesUpdated) {
-          const container = Scene.getScene(updatedElement)?.getElement(
+          const currentContainer = Scene.getScene(updatedElement)?.getElement(
             updatedElement.containerId,
-          ) as ExcalidrawBoundTextElement;
+          ) as ExcalidrawBindableElement;
           approxLineHeight = isTextElement(updatedElement)
             ? getApproxLineHeight(getFontString(updatedElement))
             : 0;
-          if (updatedElement.height > container.height - PADDING * 2) {
+          if (updatedElement.height > currentContainer.height - PADDING * 2) {
             const nextHeight = updatedElement.height + PADDING * 2;
             originalContainerHeight = nextHeight;
-            mutateElement(textContainer, { height: nextHeight });
-            textContainer = { ...textContainer, height: nextHeight };
+            mutateElement(container, { height: nextHeight });
+            container = { ...container, height: nextHeight };
           }
           editable.style.height = `${updatedElement.height}px`;
         }
         if (!originalContainerHeight) {
-          originalContainerHeight = textContainer.height;
+          originalContainerHeight = container.height;
         }
-        maxWidth = textContainer.width - PADDING * 2;
-        maxHeight = textContainer.height - PADDING * 2;
+        maxWidth = container.width - PADDING * 2;
+        maxHeight = container.height - PADDING * 2;
         width = maxWidth;
         height = Math.min(height, maxHeight);
         // The coordinates of text box set a distance of
         // 30px to preserve padding
-        coordX = textContainer.x + PADDING;
+        coordX = container.x + PADDING;
 
         // autogrow container height if text exceeds
         if (editable.clientHeight > maxHeight) {
@@ -140,19 +140,19 @@ export const textWysiwyg = ({
             editable.clientHeight - maxHeight,
             approxLineHeight,
           );
-          mutateElement(textContainer, { height: textContainer.height + diff });
+          mutateElement(container, { height: container.height + diff });
           return;
         } else if (
           // autoshrink container height until original container height
           // is reached when text is removed
-          textContainer.height > originalContainerHeight &&
+          container.height > originalContainerHeight &&
           editable.clientHeight < maxHeight
         ) {
           const diff = Math.min(
             maxHeight - editable.clientHeight,
             approxLineHeight,
           );
-          mutateElement(textContainer, { height: textContainer.height - diff });
+          mutateElement(container, { height: container.height - diff });
         }
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
@@ -164,9 +164,7 @@ export const textWysiwyg = ({
           if (lines > 2 || propertiesUpdated) {
             // vertically center align the text
             coordY =
-              textContainer.y +
-              textContainer.height / 2 -
-              editable.clientHeight / 2;
+              container.y + container.height / 2 - editable.clientHeight / 2;
           }
         }
       }
@@ -179,7 +177,7 @@ export const textWysiwyg = ({
       const lineHeight = updatedElement.containerId
         ? approxLineHeight
         : updatedElement.height / lines.length;
-      if (!textContainer) {
+      if (!container) {
         maxWidth =
           (appState.offsetLeft + appState.width - viewportX - 8) /
             appState.zoom.value -
@@ -394,15 +392,15 @@ export const textWysiwyg = ({
     }
     let wrappedText = "";
     if (isTextElement(updateElement) && updateElement?.containerId) {
-      const textContainer = Scene.getScene(updateElement)!.getElement(
+      const container = Scene.getScene(updateElement)!.getElement(
         updateElement.containerId,
-      ) as ExcalidrawBoundTextElement;
+      ) as ExcalidrawBindableElement;
 
-      if (textContainer) {
+      if (container) {
         wrappedText = wrapText(
           editable.value,
           getFontString(updateElement),
-          textContainer.width,
+          container.width,
         );
         const { x, y } = viewportCoordsToSceneCoords(
           {
@@ -419,9 +417,18 @@ export const textWysiwyg = ({
               width: Number(editable.style.width.slice(0, -2)),
               x,
             });
-            mutateElement(textContainer, { boundTextElementId: element.id });
+            mutateElement(container, {
+              boundElements: (container.boundElements || []).concat({
+                type: "text",
+                id: element.id,
+              }),
+            });
           } else {
-            mutateElement(textContainer, { boundTextElementId: undefined });
+            mutateElement(container, {
+              boundElements: container.boundElements?.filter(
+                (ele) => ele.type !== "text",
+              ),
+            });
           }
         }
       }

@@ -21,7 +21,6 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
-import { isExcalidrawElementWithBindText } from "./typeChecks";
 import { measureText } from "./textElement";
 
 type ElementConstructorOpts = MarkOptional<
@@ -81,9 +80,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     boundElements,
     updated: getUpdatedTimestamp(),
   };
-  if (isExcalidrawElementWithBindText(element)) {
-    element.boundTextElementId = null;
-  }
   return element;
 };
 

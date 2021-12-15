@@ -6,7 +6,7 @@ import { getPerfectElementSize } from "./sizeHelpers";
 import Scene from "../scene/Scene";
 import { NonDeletedExcalidrawElement } from "./types";
 import { PointerDownState } from "../types";
-import { hasBoundTextElement } from "./typeChecks";
+import { getBoundTextElementId, hasBoundTextElement } from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -30,16 +30,15 @@ export const dragSelectedElements = (
     );
     if (!element.groupIds.length && hasBoundTextElement(element)) {
       const textElement = Scene.getScene(element)!.getElement(
-        element.boundTextElementId,
+        getBoundTextElementId(element),
       );
-
       if (textElement) {
         updateElementCoords(
           lockDirection,
           distanceX,
           distanceY,
           pointerDownState,
-          Scene.getScene(element)!.getElement(element.boundTextElementId)!,
+          Scene.getScene(element)!.getElement(getBoundTextElementId(element))!,
           offset,
         );
       }
