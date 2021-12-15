@@ -28,7 +28,7 @@ type ToolButtonBaseProps = {
   isLoading?: boolean;
 };
 
-type ToolButtonProps =
+export type ToolButtonProps =
   | (ToolButtonBaseProps & {
       type: "button";
       children?: React.ReactNode;

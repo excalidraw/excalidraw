@@ -19,6 +19,7 @@ import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
+import TableDropdownButton from "./TableDropdownButton";
 
 export const SelectedShapeActions = ({
   appState,
@@ -176,7 +177,11 @@ export const ShapesSwitcher = ({
   elementType: ExcalidrawElement["type"];
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
-  onTableAction: (data: { pointerType: PointerType | null }) => void;
+  onTableAction: (data: {
+    pointerType: PointerType | null;
+    isNew?: boolean;
+    tablename?: string;
+  }) => void;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
@@ -185,19 +190,49 @@ export const ShapesSwitcher = ({
       const shortcut = letter
         ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
         : `${index + 1}`;
+      const toolButtonProps = {
+        className: "Shape",
+        icon,
+        name: "editor-current-shape",
+        title: `${capitalizeString(label)} — ${shortcut}`,
+        keyBindingLabel: `${index + 1}`,
+        "aria-label": capitalizeString(label),
+        "aria-keyshortcuts": shortcut,
+        "data-testid": value,
+      };
+      if (value === "table") {
+        return (
+          <TableDropdownButton
+            {...toolButtonProps}
+            key={value}
+            type="button"
+            onUploadCSV={() => {
+              setAppState({
+                elementType: value,
+                multiElement: null,
+                selectedElementIds: {},
+              });
+              setCursorForShape(canvas, value);
+              onTableAction({ pointerType: "mouse" });
+            }}
+            onNewTable={(tablename) => {
+              setAppState({
+                elementType: value,
+                multiElement: null,
+                selectedElementIds: {},
+              });
+              setCursorForShape(canvas, value);
+              onTableAction({ pointerType: "mouse", isNew: true, tablename });
+            }}
+          />
+        );
+      }
       return (
         <ToolButton
-          className="Shape"
+          {...toolButtonProps}
           key={value}
           type="radio"
-          icon={icon}
           checked={elementType === value}
-          name="editor-current-shape"
-          title={`${capitalizeString(label)} — ${shortcut}`}
-          keyBindingLabel={`${index + 1}`}
-          aria-label={capitalizeString(label)}
-          aria-keyshortcuts={shortcut}
-          data-testid={value}
           onChange={({ pointerType }) => {
             setAppState({
               elementType: value,
@@ -207,9 +242,6 @@ export const ShapesSwitcher = ({
             setCursorForShape(canvas, value);
             if (value === "image") {
               onImageAction({ pointerType });
-            }
-            if (value === "table") {
-              onTableAction({ pointerType });
             }
           }}
         />

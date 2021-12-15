@@ -85,6 +85,7 @@ export type ExcalidrawTableElement = _ExcalidrawElementBase & {
   fileId: FileId | null;
   status: "pending" | "saved" | "error";
   scale: [number, number];
+  tableId: FileId | null;
 };
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<

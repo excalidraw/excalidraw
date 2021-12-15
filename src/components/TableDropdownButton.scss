@@ -1,0 +1,30 @@
+.excalidraw {
+  .table-dropdown {
+    background-color: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
+    border-radius: 4px;
+    padding: 16px 12px;
+    position: relative;
+    transition: box-shadow 0.5s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: var(--text-primary-color);
+
+    .item {
+      &:hover {
+        text-decoration: underline;
+        color: var(--text-secondary-color);
+        cursor: pointer;
+      }
+    }
+
+    hr {
+      border-top: 1px solid var(--text-primary-color);
+      margin: 12px 0px;
+      width: 90%;
+    }
+  }
+}

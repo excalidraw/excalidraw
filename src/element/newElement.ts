@@ -280,6 +280,7 @@ export const newTableElement = (
     status: "pending",
     fileId: null,
     scale: [1, 1],
+    tableId: null,
   };
 };
 

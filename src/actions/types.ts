@@ -101,7 +101,9 @@ export type ActionName =
   | "flipVertical"
   | "viewMode"
   | "exportWithDarkMode"
-  | "toggleTheme";
+  | "toggleTheme"
+  | "renameTable"
+  | "toggleRenameTableDialog";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

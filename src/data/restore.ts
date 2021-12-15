@@ -156,6 +156,7 @@ const restoreElement = (
         status: element.status || "pending",
         fileId: element.fileId,
         scale: element.scale || [1, 1],
+        tableId: element.tableId,
       });
 
     case "line":
