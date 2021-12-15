@@ -109,7 +109,17 @@ export const handleBindTextResize = (
         // increase height in case text element height exceeds
         if (nextHeight > element.height - PADDING * 2) {
           containerHeight = nextHeight + PADDING * 2;
-          mutateElement(element, { height: containerHeight });
+
+          const diff = containerHeight - element.height;
+          // fix the sw/se coords when resizing from ne/nw
+          const updatedY =
+            transformHandleType === "ne" || transformHandleType === "nw"
+              ? element.y - diff
+              : element.y;
+          mutateElement(element, {
+            height: containerHeight,
+            y: updatedY,
+          });
         }
 
         const updatedY = element!.y + containerHeight / 2 - nextHeight / 2;
@@ -184,7 +194,7 @@ const getTextWidth = (text: string, font: FontString) => {
   if (!canvas) {
     canvas = document.createElement("canvas");
   }
-  const canvas2dContext = canvas.getContext("2d") as CanvasRenderingContext2D;
+  const canvas2dContext = canvas.getContext("2d")!;
   canvas2dContext.font = font;
 
   const metrics = canvas2dContext.measureText(text);
