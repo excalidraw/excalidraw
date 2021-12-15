@@ -62,9 +62,13 @@
         .ToolIcon__icon {
           box-shadow: none;
           transform: scale(0.9);
-          svg {
-            fill: $oc-gray-5;
-            color: $oc-gray-5;
+        }
+        .ToolIcon_type_checkbox:not(:checked):not(:hover):not(:active) {
+          & + .ToolIcon__icon {
+            svg {
+              fill: $oc-gray-5;
+              color: $oc-gray-5;
+            }
           }
         }
       }
