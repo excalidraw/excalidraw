@@ -93,8 +93,8 @@
     "centerHorizontally": "Centruoti horizontaliai",
     "distributeHorizontally": "",
     "distributeVertically": "",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Apversti horizontaliai",
+    "flipVertical": "Apversti vertikaliai",
     "viewMode": "",
     "toggleExportColorScheme": "",
     "share": "Dalintis",
@@ -129,19 +129,19 @@
     "edit": "Redaguoti",
     "undo": "Anuliuoti",
     "redo": "",
-    "resetLibrary": "",
-    "createNewRoom": "",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
+    "resetLibrary": "Atstatyti biblioteką",
+    "createNewRoom": "Sukurti naują kambarį",
+    "fullScreen": "Visas ekranas",
+    "darkMode": "Tamsus režimas",
+    "lightMode": "Šviesus režimas",
     "zenMode": "„Zen“ režimas",
-    "exitZenMode": "",
-    "cancel": "",
+    "exitZenMode": "Išeiti iš „Zen“ režimo",
+    "cancel": "Atšaukti",
     "clear": "Išvalyti",
     "remove": "Pašalinti",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "publishLibrary": "Paskelbti",
+    "submit": "Pateikti",
+    "confirm": "Patvirtinti"
   },
   "alerts": {
     "clearReset": "",
@@ -181,15 +181,15 @@
     "ellipse": "",
     "arrow": "",
     "line": "",
-    "freedraw": "",
-    "text": "",
-    "library": "",
+    "freedraw": "Piešti",
+    "text": "Tekstas",
+    "library": "Biblioteka",
     "lock": ""
   },
   "headings": {
     "canvasActions": "",
     "selectedShapeActions": "",
-    "shapes": ""
+    "shapes": "Figūros"
   },
   "hints": {
     "canvasPanning": "",
@@ -230,21 +230,21 @@
   "roomDialog": {
     "desc_intro": "",
     "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
+    "button_startSession": "Pradėti seansą",
+    "button_stopSession": "Sustabdyti seansą",
     "desc_inProgressIntro": "",
     "desc_shareLink": "",
     "desc_exitSession": "",
     "shareTitle": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "Klaida"
   },
   "exportDialog": {
-    "disk_title": "",
+    "disk_title": "Įrašyti į diską",
     "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
+    "disk_button": "Įrašyti į failą",
+    "link_title": "Nuoroda dalinimuisi",
     "link_details": "",
     "link_button": "",
     "excalidrawplus_description": "",
@@ -258,14 +258,14 @@
     "curvedLine": "",
     "documentation": "",
     "doubleClick": "",
-    "drag": "",
+    "drag": "vilkti",
     "editor": "",
     "editSelectedShape": "",
     "github": "",
     "howto": "",
     "or": "",
     "preventBinding": "",
-    "shapes": "",
+    "shapes": "Figūros",
     "shortcuts": "",
     "textFinish": "",
     "textNewLine": "",
@@ -285,7 +285,7 @@
     "twitterUsername": "",
     "libraryName": "",
     "libraryDesc": "",
-    "website": "",
+    "website": "Tinklalapis",
     "placeholder": {
       "authorName": "",
       "libraryName": "",
@@ -319,7 +319,7 @@
   "publishSuccessDialog": {
     "title": "",
     "content": "",
-    "link": ""
+    "link": "čia"
   },
   "confirmDialog": {
     "resetLibrary": "",
