@@ -10,6 +10,7 @@ type LockIconProps = {
   checked: boolean;
   onChange?(): void;
   zenModeEnabled?: boolean;
+  isMobile?: boolean;
 };
 
 const DEFAULT_SIZE: ToolButtonSize = "medium";
@@ -42,10 +43,10 @@ export const LockButton = (props: LockIconProps) => {
   return (
     <label
       className={clsx(
-        "ToolIcon ToolIcon__lock ToolIcon_type_floating zen-mode-visibility",
+        "ToolIcon ToolIcon__lock ToolIcon_type_floating",
         `ToolIcon_size_${DEFAULT_SIZE}`,
         {
-          "zen-mode-visibility--hidden": props.zenModeEnabled,
+          "is-mobile": props.isMobile,
         },
       )}
       title={`${props.title} — Q`}
