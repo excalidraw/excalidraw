@@ -217,7 +217,7 @@ export const textWysiwyg = ({
 
   let whiteSpace = "pre";
   if (isTextElement(element)) {
-    whiteSpace = element.containerId ? "normal" : "pre";
+    whiteSpace = element.containerId ? "pre-wrap" : "pre";
   }
   Object.assign(editable.style, {
     position: "absolute",
