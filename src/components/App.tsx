@@ -120,6 +120,7 @@ import {
 } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
+  hasBoundTextElement,
   isBindingElement,
   isBindingElementType,
   isImageElement,
@@ -1723,6 +1724,7 @@ class App extends React.Component<AppProps, AppState> {
           this.startTextEditing({
             sceneX: selectedElement.x + selectedElement.width / 2,
             sceneY: selectedElement.y + selectedElement.height / 2,
+            shouldBind: true,
           });
           event.preventDefault();
           return;
@@ -2049,21 +2051,22 @@ class App extends React.Component<AppProps, AppState> {
   private startTextEditing = ({
     sceneX,
     sceneY,
+    shouldBind,
     insertAtParentCenter = true,
   }: {
     /** X position to insert text at */
     sceneX: number;
     /** Y position to insert text at */
     sceneY: number;
+    shouldBind: boolean;
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
   }) => {
     const existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
-    const container = getElementContainingPosition(
-      this.scene.getElements(),
-      sceneX,
-      sceneY,
-    );
+
+    const container = shouldBind
+      ? getElementContainingPosition(this.scene.getElements(), sceneX, sceneY)
+      : null;
     if (!existingTextElement && container) {
       const fontString = {
         fontSize: this.state.currentItemFontSize,
@@ -2222,7 +2225,7 @@ class App extends React.Component<AppProps, AppState> {
       );
       if (selectedElements.length === 1) {
         const selectedElement = selectedElements[0];
-        const canBindText = isBindingElement(selectedElement);
+        const canBindText = hasBoundTextElement(selectedElement);
         if (canBindText) {
           sceneX = selectedElement.x + selectedElement.width / 2;
           sceneY = selectedElement.y + selectedElement.height / 2;
@@ -2231,6 +2234,7 @@ class App extends React.Component<AppProps, AppState> {
       this.startTextEditing({
         sceneX,
         sceneY,
+        shouldBind: false,
         insertAtParentCenter: !event.altKey,
       });
     }
@@ -3104,10 +3108,22 @@ class App extends React.Component<AppProps, AppState> {
     if (isTextElement(this.state.editingElement)) {
       return;
     }
+    let sceneX = pointerDownState.origin.x;
+    let sceneY = pointerDownState.origin.y;
 
+    const element = this.getElementAtPosition(sceneX, sceneY, {
+      includeBoundTextElement: true,
+    });
+
+    const canBindText = hasBoundTextElement(element);
+    if (canBindText) {
+      sceneX = element.x + element.width / 2;
+      sceneY = element.y + element.height / 2;
+    }
     this.startTextEditing({
-      sceneX: pointerDownState.origin.x,
-      sceneY: pointerDownState.origin.y,
+      sceneX,
+      sceneY,
+      shouldBind: false,
       insertAtParentCenter: !event.altKey,
     });
 
