@@ -12,7 +12,7 @@
   --dialog-border-color: #{$oc-gray-6};
   --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
   --focus-highlight-color: #{$oc-blue-2};
-  --icon-fill-color: #{$oc-black};
+  --icon-fill-color: #{$oc-gray-9};
   --icon-green-fill-color: #{$oc-green-9};
   --default-bg-color: #{$oc-white};
   --input-bg-color: #{$oc-white};
@@ -32,9 +32,19 @@
   --sar: env(safe-area-inset-right);
   --sat: env(safe-area-inset-top);
   --select-highlight-color: #{$oc-blue-5};
-  --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
+  --shadow-island: 0 0 0 1px rgba(0, 0, 0, 0.01), 1px 1px 5px rgb(0 0 0 / 12%);
+
   --space-factor: 0.25rem;
   --text-primary-color: #{$oc-gray-8};
+
+  --color-primary: #6965db;
+  --color-primary-chubb: #625ee0; // to offset Chubb illusion
+  --color-primary-darker: #5b57d1;
+  --color-primary-darkest: #4a47b1;
+  --color-primary-light: #e2e1fc;
+
+  --border-radius-md: 0.375rem;
+  --border-radius-lg: 0.5rem;
 
   &.theme--dark {
     background: $oc-black;
@@ -71,7 +81,13 @@
     --popup-text-color: #{$oc-gray-4};
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$oc-blue-4};
-    --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.7)};
+    --shadow-island: 1px 1px 5px #{transparentize($oc-black, 0.7)};
     --text-primary-color: #{$oc-gray-4};
+
+    --color-primary: #5650f0;
+    --color-primary-chubb: #726dff; // to offset Chubb illusion
+    --color-primary-darker: #4b46d8;
+    --color-primary-darkest: #3e39be;
+    --color-primary-light: #3f3d64;
   }
 }
