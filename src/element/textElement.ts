@@ -398,5 +398,5 @@ export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
 };
 
 export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
-  return container?.boundElements!.filter((ele) => ele.type === "text")[0].id;
+  return container?.boundElements?.filter((ele) => ele.type === "text")[0]?.id;
 };
