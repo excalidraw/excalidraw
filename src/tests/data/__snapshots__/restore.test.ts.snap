@@ -4,7 +4,7 @@ exports[`restoreElements should restore arrow element correctly 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": Array [],
+  "boundElements": Array [],
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
@@ -46,7 +46,7 @@ exports[`restoreElements should restore correctly with rectangle, ellipse and di
 Object {
   "angle": 0,
   "backgroundColor": "blue",
-  "boundElementIds": Array [],
+  "boundElements": Array [],
   "boundTextElementId": null,
   "fillStyle": "cross-hatch",
   "groupIds": Array [
@@ -78,7 +78,7 @@ exports[`restoreElements should restore correctly with rectangle, ellipse and di
 Object {
   "angle": 0,
   "backgroundColor": "blue",
-  "boundElementIds": Array [],
+  "boundElements": Array [],
   "boundTextElementId": null,
   "fillStyle": "cross-hatch",
   "groupIds": Array [
@@ -110,7 +110,7 @@ exports[`restoreElements should restore correctly with rectangle, ellipse and di
 Object {
   "angle": 0,
   "backgroundColor": "blue",
-  "boundElementIds": Array [],
+  "boundElements": Array [],
   "boundTextElementId": null,
   "fillStyle": "cross-hatch",
   "groupIds": Array [
@@ -142,7 +142,7 @@ exports[`restoreElements should restore freedraw element correctly 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": Array [],
+  "boundElements": Array [],
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 0,
@@ -173,7 +173,7 @@ exports[`restoreElements should restore line and draw elements correctly 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": Array [],
+  "boundElements": Array [],
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
@@ -215,7 +215,7 @@ exports[`restoreElements should restore line and draw elements correctly 2`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": Array [],
+  "boundElements": Array [],
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
@@ -258,7 +258,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
-  "boundElementIds": Array [],
+  "boundElements": Array [],
   "containerId": null,
   "fillStyle": "hachure",
   "fontFamily": 1,
@@ -293,7 +293,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
-  "boundElementIds": Array [],
+  "boundElements": Array [],
   "containerId": null,
   "fillStyle": "hachure",
   "fontFamily": 1,

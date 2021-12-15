@@ -4,7 +4,7 @@ exports[`duplicate element on move when ALT is clicked rectangle 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "boundTextElementId": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -32,7 +32,7 @@ exports[`duplicate element on move when ALT is clicked rectangle 2`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "boundTextElementId": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -60,7 +60,7 @@ exports[`move element rectangle 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "boundTextElementId": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -88,8 +88,11 @@ exports[`move element rectangles with binding arrow 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": Array [
-    "id2",
+  "boundElements": Array [
+    Object {
+      "id": "id2",
+      "type": "arrow",
+    },
   ],
   "boundTextElementId": null,
   "fillStyle": "hachure",
@@ -118,8 +121,11 @@ exports[`move element rectangles with binding arrow 2`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": Array [
-    "id2",
+  "boundElements": Array [
+    Object {
+      "id": "id2",
+      "type": "arrow",
+    },
   ],
   "boundTextElementId": null,
   "fillStyle": "hachure",
@@ -148,7 +154,7 @@ exports[`move element rectangles with binding arrow 3`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElementIds": null,
+  "boundElements": null,
   "endArrowhead": null,
   "endBinding": Object {
     "elementId": "id1",

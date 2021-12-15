@@ -43,8 +43,13 @@ type _ExcalidrawElementBase = Readonly<{
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
-  /** Ids of (linear) elements that are bound to this element. */
-  boundElementIds: readonly ExcalidrawLinearElement["id"][] | null;
+  /** other elements that are bound to this element */
+  boundElements:
+    | readonly Readonly<{
+        id: ExcalidrawLinearElement["id"];
+        type: "arrow" | "text";
+      }>[]
+    | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
 }>;
