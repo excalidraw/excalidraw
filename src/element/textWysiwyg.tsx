@@ -15,7 +15,11 @@ import {
 } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
-import { getApproxLineHeight, wrapText } from "./textElement";
+import {
+  getApproxLineHeight,
+  getBoundTextElementId,
+  wrapText,
+} from "./textElement";
 
 const normalizeText = (text: string) => {
   return (
@@ -417,12 +421,15 @@ export const textWysiwyg = ({
               width: Number(editable.style.width.slice(0, -2)),
               x,
             });
-            mutateElement(container, {
-              boundElements: (container.boundElements || []).concat({
-                type: "text",
-                id: element.id,
-              }),
-            });
+            const boundTextElementId = getBoundTextElementId(container);
+            if (!boundTextElementId || boundTextElementId !== element.id) {
+              mutateElement(container, {
+                boundElements: (container.boundElements || []).concat({
+                  type: "text",
+                  id: element.id,
+                }),
+              });
+            }
           } else {
             mutateElement(container, {
               boundElements: container.boundElements?.filter(
