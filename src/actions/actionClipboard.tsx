@@ -42,6 +42,7 @@ export const actionCopyAsSvg = register({
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
+      true,
     );
     try {
       await exportCanvas(
@@ -81,6 +82,7 @@ export const actionCopyAsPng = register({
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
+      true,
     );
     try {
       await exportCanvas(

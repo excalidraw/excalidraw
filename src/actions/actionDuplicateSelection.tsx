@@ -2,11 +2,11 @@ import { KEYS } from "../keys";
 import { register } from "./register";
 import { ExcalidrawElement } from "../element/types";
 import { duplicateElement, getNonDeletedElements } from "../element";
-import { isSomeElementSelected } from "../scene";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
 import { clone } from "../components/icons";
 import { t } from "../i18n";
-import { getShortcutKey } from "../utils";
+import { arrayToMap, getShortcutKey } from "../utils";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   selectGroupsForSelectedElements,
@@ -17,6 +17,8 @@ import { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
 import { ActionResult } from "./types";
 import { GRID_SIZE } from "../constants";
+import { bindTextToShapeAfterDuplication } from "../element/textElement";
+import { isBoundToContainer } from "../element/typeChecks";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -85,9 +87,12 @@ const duplicateElements = (
   const finalElements: ExcalidrawElement[] = [];
 
   let index = 0;
+  const selectedElementIds = arrayToMap(
+    getSelectedElements(elements, appState, true),
+  );
   while (index < elements.length) {
     const element = elements[index];
-    if (appState.selectedElementIds[element.id]) {
+    if (selectedElementIds.get(element.id)) {
       if (element.groupIds.length) {
         const groupId = getSelectedGroupForElement(appState, element);
         // if group selected, duplicate it atomically
@@ -109,7 +114,11 @@ const duplicateElements = (
     }
     index++;
   }
-
+  bindTextToShapeAfterDuplication(
+    finalElements,
+    oldElements,
+    oldIdToDuplicatedId,
+  );
   fixBindingsAfterDuplication(finalElements, oldElements, oldIdToDuplicatedId);
 
   return {
@@ -119,7 +128,9 @@ const duplicateElements = (
         ...appState,
         selectedGroupIds: {},
         selectedElementIds: newElements.reduce((acc, element) => {
-          acc[element.id] = true;
+          if (!isBoundToContainer(element)) {
+            acc[element.id] = true;
+          }
           return acc;
         }, {} as any),
       },

@@ -102,7 +102,7 @@ const ImageExportModal = ({
   const { exportBackground, viewBackgroundColor } = appState;
 
   const exportedElements = exportSelected
-    ? getSelectedElements(elements, appState)
+    ? getSelectedElements(elements, appState, true)
     : elements;
 
   useEffect(() => {
