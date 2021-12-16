@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": "Publiceer je eigen bibliotheek"
+    "publishLibrary": "Publiceer je eigen bibliotheek",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan voorbeeld niet tonen",
