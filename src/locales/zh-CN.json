@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，拖动以移动",
     "lineEditor_nothingSelected": "选择要编辑的点 (按住 SHIFT 选择多个)，\n或按住 Alt 并点击以添加新点",
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
-    "publishLibrary": "发布您自己的库"
+    "publishLibrary": "发布您自己的库",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
