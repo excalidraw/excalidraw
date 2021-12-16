@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
-    "publishLibrary": "Julkaise oma kirjasto"
+    "publishLibrary": "Julkaise oma kirjasto",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
