@@ -192,6 +192,10 @@ export const textWysiwyg = ({
             ).marginRight.slice(0, -2),
           );
       }
+      // Make sure text editor height doesn't go beyond viewport
+      const editorMaxHeight =
+        (appState.offsetTop + appState.height - viewportY) /
+        appState.zoom.value;
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -206,6 +210,7 @@ export const textWysiwyg = ({
         opacity: updatedElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxWidth: `${maxWidth}px`,
+        maxHeight: `${editorMaxHeight}px`,
       });
     }
   };

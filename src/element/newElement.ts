@@ -15,13 +15,16 @@ import {
 } from "../element/types";
 import { getFontString, getUpdatedTimestamp } from "../utils";
 import { randomInteger, randomId } from "../random";
-import { newElementWith } from "./mutateElement";
+import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import { measureText } from "./textElement";
+import { isBoundToContainer } from "./typeChecks";
+import Scene from "../scene/Scene";
+import { PADDING } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -210,6 +213,22 @@ const getAdjustedDimensions = (
     );
   }
 
+  // make sure container dimensions are set properly when
+  // text editor overflows beyond viewport dimensions
+  if (isBoundToContainer(element)) {
+    const container = Scene.getScene(element)!.getElement(element.containerId)!;
+    let height = container.height;
+    let width = container.width;
+    if (nextHeight > height - PADDING * 2) {
+      height = nextHeight + PADDING * 2;
+    }
+    if (nextWidth > width - PADDING * 2) {
+      width = nextWidth + PADDING * 2;
+    }
+    if (height !== container.height || width !== container.width) {
+      mutateElement(container, { height, width });
+    }
+  }
   return {
     width: nextWidth,
     height: nextHeight,
