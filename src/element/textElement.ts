@@ -125,7 +125,7 @@ export const handleBindTextResize = (
           });
         }
 
-        const updatedY = element!.y + containerHeight / 2 - nextHeight / 2;
+        const updatedY = element.y + containerHeight / 2 - nextHeight / 2;
         mutateElement(textElement, {
           text,
           // preserve padding and set width correctly
@@ -256,7 +256,7 @@ export const wrapText = (
 
             if (currentLineWidthTillNow >= maxWidth) {
               // only remove last trailing space which we have added when joining words
-              if (currentLine.slice(0, -1) === " ") {
+              if (currentLine.slice(-1) === " ") {
                 currentLine = currentLine.slice(0, -1);
               }
               lines.push(currentLine);
@@ -310,7 +310,7 @@ export const wrapText = (
       }
       if (currentLine) {
         // only remove last trailing space which we have added when joining words
-        if (currentLine.slice(0, -1) === " ") {
+        if (currentLine.slice(-1) === " ") {
           currentLine = currentLine.slice(0, -1);
         }
         lines.push(currentLine);
