@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Klikk for å plassere biletet, eller klikk og drag for å velje storleik manuelt",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikkje vise førehandsvising",
