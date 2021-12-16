@@ -91,6 +91,16 @@ export const isBindableElement = (
   );
 };
 
+export const isTextBindableContainer = (element: ExcalidrawElement | null) => {
+  return (
+    element != null &&
+    (element.type === "rectangle" ||
+      element.type === "diamond" ||
+      element.type === "ellipse" ||
+      element.type === "image")
+  );
+};
+
 export const isExcalidrawElement = (element: any): boolean => {
   return (
     element?.type === "text" ||

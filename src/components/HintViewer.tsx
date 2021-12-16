@@ -5,9 +5,9 @@ import { getSelectedElements } from "../scene";
 import "./HintViewer.scss";
 import { AppState } from "../types";
 import {
-  isBindableElement,
   isImageElement,
   isLinearElement,
+  isTextBindableContainer,
   isTextElement,
 } from "../element/typeChecks";
 import { getShortcutKey } from "../utils";
@@ -70,7 +70,7 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
       }
       return t("hints.lineEditor_info");
     }
-    if (isBindableElement(selectedElements[0])) {
+    if (isTextBindableContainer(selectedElements[0])) {
       return t("hints.bindTextToElement");
     }
   }
