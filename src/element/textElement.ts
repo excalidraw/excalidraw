@@ -131,6 +131,7 @@ export const handleBindTextResize = (
           // preserve padding and set width correctly
           width: element.width - PADDING * 2,
           height: nextHeight,
+          x: element.x + PADDING,
           y: updatedY,
           baseline: nextBaseLine,
         });
