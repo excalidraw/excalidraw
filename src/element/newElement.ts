@@ -261,7 +261,7 @@ export const updateTextElement = (
     : undefined;
   return newElementWith(element, {
     text,
-    rawText: rawText ? rawText : text, //should this be rather originalText??
+    rawText: rawText ? rawText : originalText, //should this be rather originalText??
     originalText,
     isDeleted: isDeleted ?? element.isDeleted,
     ...dimensions,
