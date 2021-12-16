@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Resmi yerleştirmek için tıklayın ya da boyutunu manuel olarak ayarlamak için tıklayıp sürükleyin",
-    "publishLibrary": "Kendi kitaplığınızı yayınlayın"
+    "publishLibrary": "Kendi kitaplığınızı yayınlayın",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
