@@ -11,15 +11,20 @@ import {
   Arrowhead,
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
+  ExcalidrawRectangleElement,
 } from "../element/types";
-import { measureText, getFontString, getUpdatedTimestamp } from "../utils";
+import { getFontString, getUpdatedTimestamp } from "../utils";
 import { randomInteger, randomId } from "../random";
-import { newElementWith } from "./mutateElement";
+import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
+import { measureText } from "./textElement";
+import { isBoundToContainer } from "./typeChecks";
+import Scene from "../scene/Scene";
+import { PADDING } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -53,30 +58,33 @@ const _newElementBase = <T extends ExcalidrawElement>(
     boundElements = null,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
-) => ({
-  id: rest.id || randomId(),
-  type,
-  x,
-  y,
-  width,
-  height,
-  angle,
-  strokeColor,
-  backgroundColor,
-  fillStyle,
-  strokeWidth,
-  strokeStyle,
-  roughness,
-  opacity,
-  groupIds,
-  strokeSharpness,
-  seed: rest.seed ?? randomInteger(),
-  version: rest.version || 1,
-  versionNonce: rest.versionNonce ?? 0,
-  isDeleted: false as false,
-  boundElements,
-  updated: getUpdatedTimestamp(),
-});
+) => {
+  const element = {
+    id: rest.id || randomId(),
+    type,
+    x,
+    y,
+    width,
+    height,
+    angle,
+    strokeColor,
+    backgroundColor,
+    fillStyle,
+    strokeWidth,
+    strokeStyle,
+    roughness,
+    opacity,
+    groupIds,
+    strokeSharpness,
+    seed: rest.seed ?? randomInteger(),
+    version: rest.version || 1,
+    versionNonce: rest.versionNonce ?? 0,
+    isDeleted: false as false,
+    boundElements,
+    updated: getUpdatedTimestamp(),
+  };
+  return element;
+};
 
 export const newElement = (
   opts: {
@@ -115,6 +123,7 @@ export const newTextElement = (
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
+    containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const metrics = measureText(opts.text, getFontString(opts));
@@ -133,6 +142,8 @@ export const newTextElement = (
       width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
+      containerId: opts.containerId || null,
+      originalText: opts.text,
     },
     {},
   );
@@ -149,18 +160,25 @@ const getAdjustedDimensions = (
   height: number;
   baseline: number;
 } => {
+  const maxWidth = element.containerId ? element.width : null;
   const {
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureText(nextText, getFontString(element));
+  } = measureText(nextText, getFontString(element), maxWidth);
   const { textAlign, verticalAlign } = element;
-
   let x: number;
   let y: number;
-
-  if (textAlign === "center" && verticalAlign === "middle") {
-    const prevMetrics = measureText(element.text, getFontString(element));
+  if (
+    textAlign === "center" &&
+    verticalAlign === "middle" &&
+    !element.containerId
+  ) {
+    const prevMetrics = measureText(
+      element.text,
+      getFontString(element),
+      maxWidth,
+    );
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
       height: nextHeight - prevMetrics.height,
@@ -197,6 +215,22 @@ const getAdjustedDimensions = (
     );
   }
 
+  // make sure container dimensions are set properly when
+  // text editor overflows beyond viewport dimensions
+  if (isBoundToContainer(element)) {
+    const container = Scene.getScene(element)!.getElement(element.containerId)!;
+    let height = container.height;
+    let width = container.width;
+    if (nextHeight > height - PADDING * 2) {
+      height = nextHeight + PADDING * 2;
+    }
+    if (nextWidth > width - PADDING * 2) {
+      width = nextWidth + PADDING * 2;
+    }
+    if (height !== container.height || width !== container.width) {
+      mutateElement(container, { height, width });
+    }
+  }
   return {
     width: nextWidth,
     height: nextHeight,
@@ -210,15 +244,27 @@ export const updateTextElement = (
   element: ExcalidrawTextElement,
   {
     text,
-    rawText,
     isDeleted,
-  }: { text: string; rawText?: string; isDeleted?: boolean },
+    originalText,
+    rawText,
+  }: {
+    text: string;
+    isDeleted?: boolean;
+    originalText: string;
+    rawText?: string;
+  },
+
+  updateDimensions: boolean,
 ): ExcalidrawTextElement => {
+  const dimensions = updateDimensions
+    ? getAdjustedDimensions(element, text)
+    : undefined;
   return newElementWith(element, {
     text,
-    rawText: rawText ? rawText : text,
+    rawText: rawText ? rawText : text, //should this be rather originalText??
+    originalText,
     isDeleted: isDeleted ?? element.isDeleted,
-    ...getAdjustedDimensions(element, text),
+    ...dimensions,
   });
 };
 

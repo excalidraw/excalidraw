@@ -121,6 +121,7 @@ import {
 } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
+  hasBoundTextElement,
   isBindingElement,
   isBindingElementType,
   isImageElement,
@@ -195,6 +196,7 @@ import {
 import {
   debounce,
   distance,
+  getFontString,
   getNearestScrollableContainer,
   isInputLike,
   isToolIcon,
@@ -229,6 +231,12 @@ import {
 } from "../element/image";
 import throttle from "lodash.throttle";
 import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
+import {
+  bindTextToShapeAfterDuplication,
+  getApproxMinLineHeight,
+  getApproxMinLineWidth,
+  getBoundTextElementId,
+} from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 
 const IsMobileContext = React.createContext(false);
@@ -1136,7 +1144,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     const scrolledOutside =
       // hide when editing text
-      this.state.editingElement?.type === "text"
+      isTextElement(this.state.editingElement)
         ? false
         : !atLeastOneVisibleElement && renderingElements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
@@ -1378,6 +1386,7 @@ class App extends React.Component<AppProps, AppState> {
       oldIdToDuplicatedId.set(element.id, newElement.id);
       return newElement;
     });
+    bindTextToShapeAfterDuplication(newElements, elements, oldIdToDuplicatedId);
     const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
@@ -1396,7 +1405,9 @@ class App extends React.Component<AppProps, AppState> {
           ...this.state,
           isLibraryOpen: false,
           selectedElementIds: newElements.reduce((map, element) => {
-            map[element.id] = true;
+            if (isTextElement(element) && !element.containerId) {
+              map[element.id] = true;
+            }
             return map;
           }, {} as any),
           selectedGroupIds: {},
@@ -1729,9 +1740,11 @@ class App extends React.Component<AppProps, AppState> {
           !isLinearElement(selectedElements[0])
         ) {
           const selectedElement = selectedElements[0];
+
           this.startTextEditing({
             sceneX: selectedElement.x + selectedElement.width / 2,
             sceneY: selectedElement.y + selectedElement.height / 2,
+            shouldBind: true,
           });
           event.preventDefault();
           return;
@@ -1888,17 +1901,24 @@ class App extends React.Component<AppProps, AppState> {
   ) {
     const updateElement = (
       text: string,
-      rawText?: string,
+      originalText: string,
       isDeleted = false,
+      updateDimensions = false,
+      rawText?: string,
     ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            return updateTextElement(_element, {
-              text,
-              rawText: rawText ? rawText : text,
-              isDeleted,
-            });
+            return updateTextElement(
+              _element,
+              {
+                text,
+                isDeleted,
+                originalText,
+                rawText: rawText ? rawText : text, //should this be originalText??
+              },
+              updateDimensions,
+            );
           }
           return _element;
         }),
@@ -1911,10 +1931,15 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.replaceAllElements([
           ...this.scene.getElementsIncludingDeleted().map((_element) => {
             if (_element.id === element.id && isTextElement(_element)) {
-              element = updateTextElement(_element, {
-                text,
-                isDeleted: false,
-              });
+              element = updateTextElement(
+                _element,
+                {
+                  text,
+                  isDeleted: false,
+                  originalText: text,
+                },
+                true,
+              );
               return element;
             }
             return _element;
@@ -1935,20 +1960,17 @@ class App extends React.Component<AppProps, AppState> {
           },
           this.state,
         );
-        return [
-          viewportX - this.state.offsetLeft,
-          viewportY - this.state.offsetTop,
-        ];
+        return [viewportX, viewportY];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text);
+        updateElement(text, text, false, !element.containerId);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
       }),
-      onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
+      onSubmit: withBatchedUpdates(({ text, viaKeyboard, originalText }) => {
         const isDeleted = !text.trim();
-        const rawText = text;
+        const rawText = text; //should this be originalText??
         if (this.props.onBeforeTextSubmit) {
           const updatedText = this.props.onBeforeTextSubmit(
             element,
@@ -1957,14 +1979,17 @@ class App extends React.Component<AppProps, AppState> {
           );
           text = updatedText ?? text;
         }
-        updateElement(text, rawText, isDeleted);
+        updateElement(text, originalText, isDeleted, true, rawText);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
+          const elementIdToSelect = element.containerId
+            ? element.containerId
+            : element.id;
           this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
-              [element.id]: true,
+              [elementIdToSelect]: true,
             },
           }));
         }
@@ -1993,7 +2018,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text);
+    updateElement(element.text, element.originalText);
   }
 
   private deselectElements() {
@@ -2008,7 +2033,9 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
   ): NonDeleted<ExcalidrawTextElement> | null {
-    const element = this.getElementAtPosition(x, y);
+    const element = this.getElementAtPosition(x, y, {
+      includeBoundTextElement: true,
+    });
 
     if (element && isTextElement(element) && !element.isDeleted) {
       return element;
@@ -2023,9 +2050,14 @@ class App extends React.Component<AppProps, AppState> {
       /** if true, returns the first selected element (with highest z-index)
         of all hit elements */
       preferSelected?: boolean;
+      includeBoundTextElement?: boolean;
     },
   ): NonDeleted<ExcalidrawElement> | null {
-    const allHitElements = this.getElementsAtPosition(x, y);
+    const allHitElements = this.getElementsAtPosition(
+      x,
+      y,
+      opts?.includeBoundTextElement,
+    );
     if (allHitElements.length > 1) {
       if (opts?.preferSelected) {
         for (let index = allHitElements.length - 1; index > -1; index--) {
@@ -2056,8 +2088,16 @@ class App extends React.Component<AppProps, AppState> {
   private getElementsAtPosition(
     x: number,
     y: number,
+    includeBoundTextElement: boolean = false,
   ): NonDeleted<ExcalidrawElement>[] {
-    return getElementsAtPosition(this.scene.getElements(), (element) =>
+    const elements = includeBoundTextElement
+      ? this.scene.getElements()
+      : this.scene
+          .getElements()
+          .filter(
+            (element) => !(isTextElement(element) && element.containerId),
+          );
+    return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, x, y),
     );
   }
@@ -2065,17 +2105,17 @@ class App extends React.Component<AppProps, AppState> {
   private startTextEditing = ({
     sceneX,
     sceneY,
+    shouldBind,
     insertAtParentCenter = true,
   }: {
     /** X position to insert text at */
     sceneX: number;
     /** Y position to insert text at */
     sceneY: number;
+    shouldBind: boolean;
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
   }) => {
-    const existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
-
     const parentCenterPosition =
       insertAtParentCenter &&
       this.getTextWysiwygSnappedToCenterPosition(
@@ -2085,6 +2125,43 @@ class App extends React.Component<AppProps, AppState> {
         this.canvas,
         window.devicePixelRatio,
       );
+
+    // bind to container when shouldBind is true or
+    // clicked on center of container
+    const container =
+      shouldBind || parentCenterPosition
+        ? getElementContainingPosition(
+            this.scene.getElements(),
+            sceneX,
+            sceneY,
+            "text",
+          )
+        : null;
+
+    let existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
+
+    // consider bounded text element if container present
+    if (container) {
+      const boundTextElementId = getBoundTextElementId(container);
+      if (boundTextElementId) {
+        existingTextElement = this.scene.getElement(
+          boundTextElementId,
+        ) as ExcalidrawTextElement;
+      }
+    }
+    if (!existingTextElement && container) {
+      const fontString = {
+        fontSize: this.state.currentItemFontSize,
+        fontFamily: this.state.currentItemFontFamily,
+      };
+      const minWidth = getApproxMinLineWidth(getFontString(fontString));
+      const minHeight = getApproxMinLineHeight(getFontString(fontString));
+      const newHeight = Math.max(container.height, minHeight);
+      const newWidth = Math.max(container.width, minWidth);
+      mutateElement(container, { height: newHeight, width: newWidth });
+      sceneX = container.x + newWidth / 2;
+      sceneY = container.y + newHeight / 2;
+    }
 
     const element = existingTextElement
       ? existingTextElement
@@ -2113,6 +2190,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
+          containerId: container?.id ?? undefined,
         });
 
     this.setState({ editingElement: element });
@@ -2183,7 +2261,7 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.canvas);
 
-    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+    let { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
       this.state,
     );
@@ -2215,9 +2293,22 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.canvas);
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
+      const selectedElements = getSelectedElements(
+        this.scene.getElements(),
+        this.state,
+      );
+      if (selectedElements.length === 1) {
+        const selectedElement = selectedElements[0];
+        const canBindText = hasBoundTextElement(selectedElement);
+        if (canBindText) {
+          sceneX = selectedElement.x + selectedElement.width / 2;
+          sceneY = selectedElement.y + selectedElement.height / 2;
+        }
+      }
       this.startTextEditing({
         sceneX,
         sceneY,
+        shouldBind: false,
         insertAtParentCenter: !event.altKey,
       });
     }
@@ -3088,13 +3179,25 @@ class App extends React.Component<AppProps, AppState> {
     // if we're currently still editing text, clicking outside
     // should only finalize it, not create another (irrespective
     // of state.elementLocked)
-    if (this.state.editingElement?.type === "text") {
+    if (isTextElement(this.state.editingElement)) {
       return;
     }
+    let sceneX = pointerDownState.origin.x;
+    let sceneY = pointerDownState.origin.y;
 
+    const element = this.getElementAtPosition(sceneX, sceneY, {
+      includeBoundTextElement: true,
+    });
+
+    const canBindText = hasBoundTextElement(element);
+    if (canBindText) {
+      sceneX = element.x + element.width / 2;
+      sceneY = element.y + element.height / 2;
+    }
     this.startTextEditing({
-      sceneX: pointerDownState.origin.x,
-      sceneY: pointerDownState.origin.y,
+      sceneX,
+      sceneY,
+      shouldBind: false,
       insertAtParentCenter: !event.altKey,
     });
 
@@ -3494,7 +3597,6 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements,
             dragX,
             dragY,
-            this.scene,
             lockDirection,
             dragDistanceX,
             dragDistanceY,
@@ -3514,9 +3616,15 @@ class App extends React.Component<AppProps, AppState> {
             const groupIdMap = new Map();
             const oldIdToDuplicatedId = new Map();
             const hitElement = pointerDownState.hit.element;
-            for (const element of this.scene.getElementsIncludingDeleted()) {
+            const elements = this.scene.getElementsIncludingDeleted();
+            const selectedElementIds: Array<ExcalidrawElement["id"]> =
+              getSelectedElements(elements, this.state, true).map(
+                (element) => element.id,
+              );
+
+            for (const element of elements) {
               if (
-                this.state.selectedElementIds[element.id] ||
+                selectedElementIds.includes(element.id) ||
                 // case: the state.selectedElementIds might not have been
                 // updated yet by the time this mousemove event is fired
                 (element.id === hitElement?.id &&
@@ -3544,6 +3652,11 @@ class App extends React.Component<AppProps, AppState> {
               }
             }
             const nextSceneElements = [...nextElements, ...elementsToAppend];
+            bindTextToShapeAfterDuplication(
+              nextElements,
+              elementsToAppend,
+              oldIdToDuplicatedId,
+            );
             fixBindingsAfterDuplication(
               nextSceneElements,
               elementsToAppend,
@@ -3994,6 +4107,7 @@ class App extends React.Component<AppProps, AppState> {
           } else {
             // add element to selection while
             // keeping prev elements selected
+
             this.setState((_prevState) => ({
               selectedElementIds: {
                 ..._prevState.selectedElementIds,
