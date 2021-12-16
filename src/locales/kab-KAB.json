@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Ssit akken ad tserseḍ tugna, neɣ ssit u zuɣer akken ad tesbaduḍ tiddi-ines s ufus",
-    "publishLibrary": "Siẓreg tamkarḍit-inek•inem"
+    "publishLibrary": "Siẓreg tamkarḍit-inek•inem",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "Ulamek abeqqeḍ n teskant",
