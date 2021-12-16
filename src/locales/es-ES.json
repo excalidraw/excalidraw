@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Haga clic para colocar la imagen o haga clic y arrastre para establecer su tamaño manualmente",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
