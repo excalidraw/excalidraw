@@ -254,7 +254,11 @@ export const wrapText = (
             words[index] = words[index].slice(1);
 
             if (currentLineWidthTillNow >= maxWidth) {
-              lines.push(currentLine.trim());
+              // only remove last trailing space which we have added when joining words
+              if (currentLine.slice(0, -1) === " ") {
+                currentLine = currentLine.slice(0, -1);
+              }
+              lines.push(currentLine);
               currentLine = currentChar;
               currentLineWidthTillNow = width;
               if (currentLineWidthTillNow === maxWidth) {
@@ -304,7 +308,11 @@ export const wrapText = (
         }
       }
       if (currentLine) {
-        lines.push(currentLine.trim());
+        // only remove last trailing space which we have added when joining words
+        if (currentLine.slice(0, -1) === " ") {
+          currentLine = currentLine.slice(0, -1);
+        }
+        lines.push(currentLine);
       }
     }
   });
