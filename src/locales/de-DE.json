@@ -208,7 +208,7 @@
     "lineEditor_nothingSelected": "Wähle einen zu bearbeitenden Punkt (halte SHIFT gedrückt um mehrere Punkte auszuwählen),\noder halte Alt gedrückt und klicke um neue Punkte hinzuzufügen",
     "placeImage": "Klicken, um das Bild zu platzieren oder klicken und ziehen um seine Größe manuell zu setzen",
     "publishLibrary": "Veröffentliche deine eigene Bibliothek",
-    "bindTextToElement": ""
+    "bindTextToElement": "Zum Hinzufügen Eingabetaste drücken"
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
