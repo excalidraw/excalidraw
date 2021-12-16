@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
-    "publishLibrary": "Terbitkan pustaka Anda"
+    "publishLibrary": "Terbitkan pustaka Anda",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
