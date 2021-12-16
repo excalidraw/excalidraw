@@ -182,3 +182,5 @@ export const VERSIONS = {
   excalidraw: 2,
   excalidrawLibrary: 2,
 } as const;
+
+export const PADDING = 30;
