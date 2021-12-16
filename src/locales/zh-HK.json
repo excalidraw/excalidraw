@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
