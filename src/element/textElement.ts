@@ -82,7 +82,6 @@ export const handleBindTextResize = (
         let containerHeight = element.height;
         let nextBaseLine = textElement.baseline;
         if (transformHandleType !== "n" && transformHandleType !== "s") {
-          console.info("attempt to call wrap text");
           let minCharWidthTillNow = 0;
           if (text) {
             minCharWidthTillNow = getMinCharWidth(getFontString(textElement));
@@ -96,7 +95,6 @@ export const handleBindTextResize = (
                 getFontString(textElement),
                 element.width,
               );
-              console.info("called wrap text");
             }
           }
 
@@ -204,22 +202,12 @@ const getTextWidth = (text: string, font: FontString) => {
   return metrics.width;
 };
 
-let totalTime = 0;
-let count = 0;
 export const wrapText = (
   text: string,
   font: FontString,
   containerWidth: number,
 ) => {
-  const startTime = performance.now();
   const maxWidth = containerWidth - PADDING * 2;
-  console.info(
-    "maxWidth",
-    maxWidth,
-    text.length,
-    "container width",
-    containerWidth,
-  );
 
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
@@ -235,7 +223,6 @@ export const wrapText = (
 
       let index = 0;
       while (index < words.length) {
-        count++;
         const currentWordWidth = getTextWidth(words[index], font);
 
         // Start breaking longer words exceeding max width
@@ -248,7 +235,6 @@ export const wrapText = (
           currentLine = "";
           currentLineWidthTillNow = 0;
           while (words[index].length > 0) {
-            count++;
             const currentChar = words[index][0];
             const width = charWidth.calculate(currentChar, font);
             currentLineWidthTillNow += width;
@@ -289,7 +275,6 @@ export const wrapText = (
           while (currentLineWidthTillNow < maxWidth && index < words.length) {
             const word = words[index];
             currentLineWidthTillNow = getTextWidth(currentLine + word, font);
-            count++;
 
             if (currentLineWidthTillNow >= maxWidth) {
               lines.push(currentLine);
@@ -317,13 +302,6 @@ export const wrapText = (
       }
     }
   });
-  const endTime = performance.now();
-  const timeTaken = (endTime - startTime) / 1000;
-  totalTime += timeTaken;
-  console.info("Time taken", timeTaken);
-  console.info("total Time taken,", totalTime);
-  console.info("Total runs = ", count);
-  console.info("cacheed char", charWidth.getCache(font));
   return lines.join("\n");
 };
 
