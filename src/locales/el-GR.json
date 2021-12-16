@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": "Δημοσιεύστε τη δική σας βιβλιοθήκη"
+    "publishLibrary": "Δημοσιεύστε τη δική σας βιβλιοθήκη",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "Αδυναμία εμφάνισης προεπισκόπησης",
