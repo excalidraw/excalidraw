@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
-    "publishLibrary": "自分のライブラリを公開"
+    "publishLibrary": "自分のライブラリを公開",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
