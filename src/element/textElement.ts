@@ -78,7 +78,6 @@ export const handleBindTextResize = (
           return;
         }
         let text = textElement.text;
-        let nextWidth = textElement.width;
         let nextHeight = textElement.height;
         let containerHeight = element.height;
         let nextBaseLine = textElement.baseline;
@@ -101,8 +100,11 @@ export const handleBindTextResize = (
             }
           }
 
-          const dimensions = measureText(text, getFontString(textElement));
-          nextWidth = dimensions.width;
+          const dimensions = measureText(
+            text,
+            getFontString(textElement),
+            element.width,
+          );
           nextHeight = dimensions.height;
           nextBaseLine = dimensions.baseline;
         }
@@ -124,14 +126,12 @@ export const handleBindTextResize = (
         }
 
         const updatedY = element!.y + containerHeight / 2 - nextHeight / 2;
-
-        const updatedX = element!.x + element!.width / 2 - nextWidth / 2;
         mutateElement(textElement, {
           text,
-          width: nextWidth,
+          // preserve padding and set width correctly
+          width: element.width - PADDING * 2,
           height: nextHeight,
           y: updatedY,
-          x: updatedX,
           baseline: nextBaseLine,
         });
       }
