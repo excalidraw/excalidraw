@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Щелкните, чтобы разместить изображение, или нажмите и перетащите, чтобы установить его размер вручную",
-    "publishLibrary": "Опубликовать свою собственную библиотеку"
+    "publishLibrary": "Опубликовать свою собственную библиотеку",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не удается отобразить предпросмотр",
