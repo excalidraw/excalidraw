@@ -427,6 +427,9 @@ export const resizeSingleElement = (
     element.width,
     element.height,
   );
+
+  const boundTextElementId = getBoundTextElementId(element);
+
   const boundsCurrentWidth = esx2 - esx1;
   const boundsCurrentHeight = esy2 - esy1;
 
@@ -486,6 +489,11 @@ export const resizeSingleElement = (
     );
   const newBoundsWidth = newBoundsX2 - newBoundsX1;
   const newBoundsHeight = newBoundsY2 - newBoundsY1;
+
+  // don't allow resize to negative dimensions when text is bounded to container
+  if ((newBoundsWidth < 0 || newBoundsHeight < 0) && boundTextElementId) {
+    return;
+  }
 
   // Calculate new topLeft based on fixed corner during resize
   let newTopLeft = [...startTopLeft] as [number, number];
@@ -579,7 +587,6 @@ export const resizeSingleElement = (
       ],
     });
   }
-  const boundTextElementId = getBoundTextElementId(element);
   let minWidth = 0;
   if (boundTextElementId) {
     const boundTextElement = Scene.getScene(element)!.getElement(
