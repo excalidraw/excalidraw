@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Kliknij, aby umieścić obraz, lub kliknij i przeciągnij, aby ustawić jego rozmiar ręcznie",
-    "publishLibrary": "Opublikuj własną bibliotekę"
+    "publishLibrary": "Opublikuj własną bibliotekę",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
