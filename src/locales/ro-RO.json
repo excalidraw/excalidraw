@@ -207,7 +207,8 @@
     "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctele,\ncombinația de taste Ctrl sau Cmd + D pentru a le duplica sau glisează-le pentru a le schimba poziția",
     "lineEditor_nothingSelected": "Selectează un punct pentru a-l edita (ține apăsată tasta SHIFT pentru a selecta mai multe),\nsau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi",
     "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
-    "publishLibrary": "Publică propria bibliotecă"
+    "publishLibrary": "Publică propria bibliotecă",
+    "bindTextToElement": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
