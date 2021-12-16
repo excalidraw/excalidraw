@@ -64,7 +64,10 @@ const restoreElementWithProperties = <
   T extends ExcalidrawElement,
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
-  element: Required<T>,
+  element: Required<T> & {
+    /** @deprecated */
+    boundElementIds?: readonly ExcalidrawElement["id"][];
+  },
   extra: Pick<
     T,
     // This extra Pick<T, keyof K> ensure no excess properties are passed.
@@ -98,7 +101,9 @@ const restoreElementWithProperties = <
     strokeSharpness:
       element.strokeSharpness ??
       (isLinearElementType(element.type) ? "round" : "sharp"),
-    boundElementIds: element.boundElementIds ?? [],
+    boundElements: element.boundElementIds
+      ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
+      : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
   };
 
@@ -131,6 +136,8 @@ const restoreElement = (
         baseline: element.baseline,
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
+        containerId: element.containerId ?? null,
+        originalText: element.originalText ?? "",
       });
     case "freedraw": {
       return restoreElementWithProperties(element, {

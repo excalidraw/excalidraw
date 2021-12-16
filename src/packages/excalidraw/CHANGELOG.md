@@ -19,6 +19,8 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Introduced primary colors to the app. The colors can be overriden. Check [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#customizing-styles) on how to do so.
+
 - #### BREAKING CHANGE
 
   Removed `getElementMap` util method.
