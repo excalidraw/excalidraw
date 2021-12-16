@@ -208,7 +208,7 @@
     "lineEditor_nothingSelected": "選擇要編輯的錨點（按住 SHIFT 可多選），\n或按住 Alt 並點擊以增加新錨點。",
     "placeImage": "點擊以放置圖片，或點擊並拖曳以手動調整其尺寸。",
     "publishLibrary": "發布個人資料庫",
-    "bindTextToElement": ""
+    "bindTextToElement": "按下 Enter 以加入文字。"
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
