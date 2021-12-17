@@ -1961,8 +1961,8 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
         return [
-          viewportX - this.state.offsetLeft,
-          viewportY - this.state.offsetTop,
+          viewportX - this.state.offsetLeft * (2 - this.state.zoom.value),
+          viewportY - this.state.offsetTop * (2 - this.state.zoom.value),
         ];
       },
       onChange: withBatchedUpdates((text) => {
