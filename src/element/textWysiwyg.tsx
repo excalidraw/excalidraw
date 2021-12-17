@@ -488,18 +488,21 @@ export const textWysiwyg = ({
     // in that same tick.
     setTimeout(() => {
       editable.onblur = handleSubmit;
-      // case: clicking on the same property → no change → no update → no focus
-      editable.focus();
     });
   };
 
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
+    const isTargetColorPicker =
+      event.target instanceof HTMLInputElement &&
+      event.target.closest(".color-picker-input") &&
+      isWritableElement(event.target);
     if (
-      (event.target instanceof HTMLElement ||
+      ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-      event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
-      !isWritableElement(event.target)
+        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
+        !isWritableElement(event.target)) ||
+      isTargetColorPicker
     ) {
       editable.onblur = null;
       window.addEventListener("pointerup", bindBlurEvent);
