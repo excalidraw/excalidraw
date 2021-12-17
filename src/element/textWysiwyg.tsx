@@ -6,7 +6,7 @@ import {
   getFontFamilyString,
 } from "../utils";
 import Scene from "../scene/Scene";
-import { isTextElement } from "./typeChecks";
+import { isBoundToContainer, isTextElement } from "./typeChecks";
 import { CLASSES, PADDING } from "../constants";
 import {
   ExcalidrawBindableElement,
@@ -225,8 +225,11 @@ export const textWysiwyg = ({
   editable.classList.add("excalidraw-wysiwyg");
 
   let whiteSpace = "pre";
-  if (isTextElement(element)) {
-    whiteSpace = element.containerId ? "pre-wrap" : "pre";
+  let wordBreak = "normal";
+
+  if (isBoundToContainer(element)) {
+    whiteSpace = "pre-wrap";
+    wordBreak = "break-word";
   }
   Object.assign(editable.style, {
     position: "absolute",
@@ -242,7 +245,7 @@ export const textWysiwyg = ({
     overflow: "hidden",
     // must be specified because in dark mode canvas creates a stacking context
     zIndex: "var(--zIndex-wysiwyg)",
-    wordBreak: "break-word",
+    wordBreak,
     // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
     whiteSpace,
     overflowWrap: "break-word",
@@ -251,8 +254,10 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.oninput = () => {
-      editable.style.height = "auto";
-      editable.style.height = `${editable.scrollHeight}px`;
+      if (isBoundToContainer(element)) {
+        editable.style.height = "auto";
+        editable.style.height = `${editable.scrollHeight}px`;
+      }
       onChange(normalizeText(editable.value));
     };
   }
