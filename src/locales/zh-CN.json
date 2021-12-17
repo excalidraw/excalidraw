@@ -20,7 +20,7 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "描边宽度",
-    "strokeStyle": "描边样式",
+    "strokeStyle": "边框样式",
     "strokeStyle_solid": "实线",
     "strokeStyle_dashed": "虚线",
     "strokeStyle_dotted": "点虚线",
@@ -32,7 +32,7 @@
     "round": "圆润",
     "arrowheads": "端点",
     "arrowhead_none": "无",
-    "arrowhead_arrow": "线条箭头",
+    "arrowhead_arrow": "箭头",
     "arrowhead_bar": "条",
     "arrowhead_dot": "圆点",
     "arrowhead_triangle": "三角箭头",
@@ -314,7 +314,7 @@
       "link": "MIT 许可证， ",
       "post": "简而言之，任何人都可以不受限制地使用它们。"
     },
-    "noteItems": "每个库都有互相独立的名称可供筛选。以下库将被包含：",
+    "noteItems": "库中每个项目都有互相独立的名称以供筛选。以下项目将被包含：",
     "atleastOneLibItem": "请选择至少一个库以开始"
   },
   "publishSuccessDialog": {
