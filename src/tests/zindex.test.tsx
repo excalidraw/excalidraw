@@ -50,7 +50,7 @@ const populateElements = (
       containerId = null,
     }) => {
       const element = API.createElement({
-        type: containerId != null ? "text" : "rectangle",
+        type: containerId ? "text" : "rectangle",
         id,
         isDeleted,
         x,
