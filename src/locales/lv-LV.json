@@ -208,7 +208,7 @@
     "lineEditor_nothingSelected": "Atlasiet punktu, lai labotu (turiet nospiestu SHIFT, lai atlasītu vairākus),\nvai turiet Alt un clikšķiniet, lai pievienotu jaunus punktus",
     "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru",
     "publishLibrary": "Publicēt savu bibliotēku",
-    "bindTextToElement": ""
+    "bindTextToElement": "Spiediet ievades taustiņu, lai pievienotu tekstu"
   },
   "canvasError": {
     "cannotShowPreview": "Nevar rādīt priekšskatījumu",
