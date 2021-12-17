@@ -1,6 +1,4 @@
-import { isTextElement } from "./element";
 import { bumpVersion } from "./element/mutateElement";
-import { getBoundTextElementId } from "./element/textElement";
 import { ExcalidrawElement } from "./element/types";
 import { getElementsInGroup } from "./groups";
 import { getSelectedElements } from "./scene";
