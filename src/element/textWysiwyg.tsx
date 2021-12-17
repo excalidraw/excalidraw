@@ -480,14 +480,27 @@ export const textWysiwyg = ({
     editable.remove();
   };
 
-  const bindBlurEvent = () => {
+  const bindBlurEvent = (event?: MouseEvent) => {
     window.removeEventListener("pointerup", bindBlurEvent);
     // Deferred so that the pointerdown that initiates the wysiwyg doesn't
     // trigger the blur on ensuing pointerup.
     // Also to handle cases such as picking a color which would trigger a blur
     // in that same tick.
+
+    const isTargetColorPicker =
+      event?.target instanceof HTMLInputElement &&
+      event.target.closest(".color-picker-input") &&
+      isWritableElement(event.target);
+    if (isTargetColorPicker) {
+      event.target.onblur = handleSubmit;
+    }
     setTimeout(() => {
       editable.onblur = handleSubmit;
+
+      // case: clicking on the same property → no change → no update → no focus
+      if (!isTargetColorPicker) {
+        editable.focus();
+      }
     });
   };
 
