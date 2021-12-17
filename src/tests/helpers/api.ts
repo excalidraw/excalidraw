@@ -96,6 +96,10 @@ export class API {
     verticalAlign?: T extends "text"
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
+    boundElements?: ExcalidrawGenericElement["boundElements"];
+    containerId?: T extends "text"
+      ? ExcalidrawTextElement["containerId"]
+      : never;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
@@ -120,6 +124,7 @@ export class API {
         rest.strokeSharpness ?? appState.currentItemStrokeSharpness,
       roughness: rest.roughness ?? appState.currentItemRoughness,
       opacity: rest.opacity ?? appState.currentItemOpacity,
+      boundElements: rest.boundElements ?? null,
     };
     switch (type) {
       case "rectangle":
@@ -141,6 +146,7 @@ export class API {
           fontFamily: rest.fontFamily ?? appState.currentItemFontFamily,
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
+          containerId: rest.containerId ?? undefined,
         });
         element.width = width;
         element.height = height;

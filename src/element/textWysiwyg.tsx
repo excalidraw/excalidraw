@@ -6,7 +6,7 @@ import {
   getFontFamilyString,
 } from "../utils";
 import Scene from "../scene/Scene";
-import { isTextElement } from "./typeChecks";
+import { isBoundToContainer, isTextElement } from "./typeChecks";
 import { CLASSES, PADDING } from "../constants";
 import {
   ExcalidrawBindableElement,
@@ -225,8 +225,11 @@ export const textWysiwyg = ({
   editable.classList.add("excalidraw-wysiwyg");
 
   let whiteSpace = "pre";
-  if (isTextElement(element)) {
-    whiteSpace = element.containerId ? "pre-wrap" : "pre";
+  let wordBreak = "normal";
+
+  if (isBoundToContainer(element)) {
+    whiteSpace = "pre-wrap";
+    wordBreak = "break-word";
   }
   Object.assign(editable.style, {
     position: "absolute",
@@ -242,7 +245,7 @@ export const textWysiwyg = ({
     overflow: "hidden",
     // must be specified because in dark mode canvas creates a stacking context
     zIndex: "var(--zIndex-wysiwyg)",
-    wordBreak: "break-word",
+    wordBreak,
     // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
     whiteSpace,
     overflowWrap: "break-word",
@@ -251,8 +254,10 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.oninput = () => {
-      editable.style.height = "auto";
-      editable.style.height = `${editable.scrollHeight}px`;
+      if (isBoundToContainer(element)) {
+        editable.style.height = "auto";
+        editable.style.height = `${editable.scrollHeight}px`;
+      }
       onChange(normalizeText(editable.value));
     };
   }
@@ -421,10 +426,10 @@ export const textWysiwyg = ({
         if (isTextElement(updateElement) && updateElement.containerId) {
           if (editable.value) {
             mutateElement(updateElement, {
-              y,
+              y: y + appState.offsetTop,
               height: Number(editable.style.height.slice(0, -2)),
               width: Number(editable.style.width.slice(0, -2)),
-              x,
+              x: x + appState.offsetLeft,
             });
             const boundTextElementId = getBoundTextElementId(container);
             if (!boundTextElementId || boundTextElementId !== element.id) {
@@ -480,26 +485,45 @@ export const textWysiwyg = ({
     editable.remove();
   };
 
-  const bindBlurEvent = () => {
+  const bindBlurEvent = (event?: MouseEvent) => {
     window.removeEventListener("pointerup", bindBlurEvent);
     // Deferred so that the pointerdown that initiates the wysiwyg doesn't
     // trigger the blur on ensuing pointerup.
     // Also to handle cases such as picking a color which would trigger a blur
     // in that same tick.
+    const target = event?.target;
+
+    const isTargetColorPicker =
+      target instanceof HTMLInputElement &&
+      target.closest(".color-picker-input") &&
+      isWritableElement(target);
+
     setTimeout(() => {
       editable.onblur = handleSubmit;
+      if (target && isTargetColorPicker) {
+        target.onblur = () => {
+          editable.focus();
+        };
+      }
       // case: clicking on the same property → no change → no update → no focus
-      editable.focus();
+      if (!isTargetColorPicker) {
+        editable.focus();
+      }
     });
   };
 
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
+    const isTargetColorPicker =
+      event.target instanceof HTMLInputElement &&
+      event.target.closest(".color-picker-input") &&
+      isWritableElement(event.target);
     if (
-      (event.target instanceof HTMLElement ||
+      ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-      event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
-      !isWritableElement(event.target)
+        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
+        !isWritableElement(event.target)) ||
+      isTargetColorPicker
     ) {
       editable.onblur = null;
       window.addEventListener("pointerup", bindBlurEvent);
@@ -512,7 +536,12 @@ export const textWysiwyg = ({
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
     updateWysiwygStyle();
-    editable.focus();
+    const isColorPickerActive = !!document.activeElement?.closest(
+      ".color-picker-input",
+    );
+    if (!isColorPickerActive) {
+      editable.focus();
+    }
   });
 
   // ---------------------------------------------------------------------------
