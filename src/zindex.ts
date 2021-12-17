@@ -1,8 +1,9 @@
 import { bumpVersion } from "./element/mutateElement";
 import { ExcalidrawElement } from "./element/types";
 import { getElementsInGroup } from "./groups";
+import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
-import { findIndex, findLastIndex } from "./utils";
+import { arrayToMap, findIndex, findLastIndex } from "./utils";
 
 /**
  * Returns indices of elements to move based on selected elements.
@@ -17,8 +18,11 @@ const getIndicesToMove = (
   let deletedIndices: number[] = [];
   let includeDeletedIndex = null;
   let index = -1;
+  const selectedElementIds = arrayToMap(
+    getSelectedElements(elements, appState, true),
+  );
   while (++index < elements.length) {
-    if (appState.selectedElementIds[elements[index].id]) {
+    if (selectedElementIds.get(elements[index].id)) {
       if (deletedIndices.length) {
         selectedIndices = selectedIndices.concat(deletedIndices);
         deletedIndices = [];
