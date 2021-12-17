@@ -208,7 +208,7 @@
     "lineEditor_nothingSelected": "选择要编辑的点 (按住 SHIFT 选择多个)，\n或按住 Alt 并点击以添加新点",
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
     "publishLibrary": "发布您自己的库",
-    "bindTextToElement": ""
+    "bindTextToElement": "按下 Enter 以添加文本"
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -291,7 +291,7 @@
       "authorName": "您的名字或用户名",
       "libraryName": "库名称",
       "libraryDesc": "介绍您的库，让人们了解其用途",
-      "githubHandle": "GitHub handle（可选），填写后，您可以编辑已提交待审的库",
+      "githubHandle": "GitHub 用户名（可选），填写后，您可以编辑已提交待审的库",
       "twitterHandle": "Twitter 用户名（可选），填写后，当我们在Twitter发布推广信息时便可提及您",
       "website": "您个人网站的或任意的链接（可选）"
     },
