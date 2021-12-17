@@ -54,15 +54,16 @@ const toContiguousGroups = (array: number[]) => {
 };
 
 /**
- * @returns index of target element, considering bound text as part of the
- * container element. If no bound text present, returns undefined.
+ * @returns index of target element, consindering tightly-bound elements
+ * (currently non-linear elements bound to a container) as a one unit.
+ * If no binding present, returns `undefined`.
  */
-const getTargetIndexSkippingBoundText = (
+const getTargetIndexAccountingForBinding = (
   nextElement: ExcalidrawElement,
   elements: readonly ExcalidrawElement[],
   direction: "left" | "right",
 ) => {
-  if (isTextElement(nextElement) && nextElement.containerId) {
+  if ("containerId" in nextElement && nextElement.containerId) {
     if (direction === "left") {
       const containerElement = Scene.getScene(nextElement)!.getElement(
         nextElement.containerId,
@@ -74,13 +75,15 @@ const getTargetIndexSkippingBoundText = (
       return elements.indexOf(nextElement);
     }
   } else {
-    const boundTextElementId = getBoundTextElementId(nextElement);
-    if (boundTextElementId) {
+    const boundElementId = nextElement.boundElements?.find(
+      (binding) => binding.type !== "arrow",
+    )?.id;
+    if (boundElementId) {
       if (direction === "left") {
         return elements.indexOf(nextElement);
       }
       const boundTextElement =
-        Scene.getScene(nextElement)!.getElement(boundTextElementId);
+        Scene.getScene(nextElement)!.getElement(boundElementId);
 
       if (boundTextElement) {
         return elements.indexOf(boundTextElement);
@@ -130,7 +133,7 @@ const getTargetIndex = (
       sourceElement?.groupIds.join("") === nextElement?.groupIds.join("")
     ) {
       return (
-        getTargetIndexSkippingBoundText(nextElement, elements, direction) ??
+        getTargetIndexAccountingForBinding(nextElement, elements, direction) ??
         candidateIndex
       );
     } else if (!nextElement?.groupIds.includes(appState.editingGroupId)) {
@@ -141,7 +144,7 @@ const getTargetIndex = (
 
   if (!nextElement.groupIds.length) {
     return (
-      getTargetIndexSkippingBoundText(nextElement, elements, direction) ??
+      getTargetIndexAccountingForBinding(nextElement, elements, direction) ??
       candidateIndex
     );
   }
