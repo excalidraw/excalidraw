@@ -485,26 +485,45 @@ export const textWysiwyg = ({
     editable.remove();
   };
 
-  const bindBlurEvent = () => {
+  const bindBlurEvent = (event?: MouseEvent) => {
     window.removeEventListener("pointerup", bindBlurEvent);
     // Deferred so that the pointerdown that initiates the wysiwyg doesn't
     // trigger the blur on ensuing pointerup.
     // Also to handle cases such as picking a color which would trigger a blur
     // in that same tick.
+    const target = event?.target;
+
+    const isTargetColorPicker =
+      target instanceof HTMLInputElement &&
+      target.closest(".color-picker-input") &&
+      isWritableElement(target);
+
     setTimeout(() => {
       editable.onblur = handleSubmit;
+      if (target && isTargetColorPicker) {
+        target.onblur = () => {
+          editable.focus();
+        };
+      }
       // case: clicking on the same property → no change → no update → no focus
-      editable.focus();
+      if (!isTargetColorPicker) {
+        editable.focus();
+      }
     });
   };
 
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
+    const isTargetColorPicker =
+      event.target instanceof HTMLInputElement &&
+      event.target.closest(".color-picker-input") &&
+      isWritableElement(event.target);
     if (
-      (event.target instanceof HTMLElement ||
+      ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-      event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
-      !isWritableElement(event.target)
+        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
+        !isWritableElement(event.target)) ||
+      isTargetColorPicker
     ) {
       editable.onblur = null;
       window.addEventListener("pointerup", bindBlurEvent);
@@ -517,7 +536,12 @@ export const textWysiwyg = ({
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
     updateWysiwygStyle();
-    editable.focus();
+    const isColorPickerActive = !!document.activeElement?.closest(
+      ".color-picker-input",
+    );
+    if (!isColorPickerActive) {
+      editable.focus();
+    }
   });
 
   // ---------------------------------------------------------------------------
