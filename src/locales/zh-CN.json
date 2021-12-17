@@ -305,9 +305,9 @@
       "post": "供其他人在绘图中使用。"
     },
     "noteGuidelines": {
-      "pre": "库需先经人工审核。请先阅读 ",
+      "pre": "库需先经人工审核。在提交之前，请先阅读 ",
       "link": "指南",
-      "post": " 在提交之前, 您需要一个 GitHub 帐号来与他人联系和更改库, 但这并不是必要项。"
+      "post": " 后续沟通和对库的修改需要 GitHub 帐号，但这不是必须的。"
     },
     "noteLicense": {
       "pre": "提交时，表明您已同意库将遵循 ",
@@ -319,7 +319,7 @@
   },
   "publishSuccessDialog": {
     "title": "库已提交",
-    "content": "谢谢你 {{authorName}}。您的库已被提交审核。您可以跟踪此次提交的状态",
+    "content": "谢谢你 {{authorName}}。您的库已被提交审核。跟进此次提交的状态请点击",
     "link": "此处"
   },
   "confirmDialog": {
