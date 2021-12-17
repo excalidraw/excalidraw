@@ -1,7 +1,10 @@
+import { isTextElement } from "./element";
 import { bumpVersion } from "./element/mutateElement";
+import { getBoundTextElementId } from "./element/textElement";
 import { ExcalidrawElement } from "./element/types";
 import { getElementsInGroup } from "./groups";
 import { getSelectedElements } from "./scene";
+import Scene from "./scene/Scene";
 import { AppState } from "./types";
 import { arrayToMap, findIndex, findLastIndex } from "./utils";
 
@@ -51,6 +54,42 @@ const toContiguousGroups = (array: number[]) => {
 };
 
 /**
+ * @returns index of target element, considering bound text as part of the
+ * container element. If no bound text present, returns undefined.
+ */
+const getTargetIndexSkippingBoundText = (
+  nextElement: ExcalidrawElement,
+  elements: readonly ExcalidrawElement[],
+  direction: "left" | "right",
+) => {
+  if (isTextElement(nextElement) && nextElement.containerId) {
+    if (direction === "left") {
+      const containerElement = Scene.getScene(nextElement)!.getElement(
+        nextElement.containerId,
+      );
+      if (containerElement) {
+        return elements.indexOf(containerElement);
+      }
+    } else {
+      return elements.indexOf(nextElement);
+    }
+  } else {
+    const boundTextElementId = getBoundTextElementId(nextElement);
+    if (boundTextElementId) {
+      if (direction === "left") {
+        return elements.indexOf(nextElement);
+      }
+      const boundTextElement =
+        Scene.getScene(nextElement)!.getElement(boundTextElementId);
+
+      if (boundTextElement) {
+        return elements.indexOf(boundTextElement);
+      }
+    }
+  }
+};
+
+/**
  * Returns next candidate index that's available to be moved to. Currently that
  *  is a non-deleted element, and not inside a group (unless we're editing it).
  */
@@ -90,7 +129,10 @@ const getTargetIndex = (
       // candidate element is a sibling in current editing group → return
       sourceElement?.groupIds.join("") === nextElement?.groupIds.join("")
     ) {
-      return candidateIndex;
+      return (
+        getTargetIndexSkippingBoundText(nextElement, elements, direction) ??
+        candidateIndex
+      );
     } else if (!nextElement?.groupIds.includes(appState.editingGroupId)) {
       // candidate element is outside current editing group → prevent
       return -1;
@@ -98,7 +140,10 @@ const getTargetIndex = (
   }
 
   if (!nextElement.groupIds.length) {
-    return candidateIndex;
+    return (
+      getTargetIndexSkippingBoundText(nextElement, elements, direction) ??
+      candidateIndex
+    );
   }
 
   const siblingGroupId = appState.editingGroupId
