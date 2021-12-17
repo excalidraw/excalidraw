@@ -486,17 +486,20 @@ export const textWysiwyg = ({
     // trigger the blur on ensuing pointerup.
     // Also to handle cases such as picking a color which would trigger a blur
     // in that same tick.
+    const target = event?.target;
 
     const isTargetColorPicker =
-      event?.target instanceof HTMLInputElement &&
-      event.target.closest(".color-picker-input") &&
-      isWritableElement(event.target);
-    if (isTargetColorPicker) {
-      event.target.onblur = handleSubmit;
-    }
+      target instanceof HTMLInputElement &&
+      target.closest(".color-picker-input") &&
+      isWritableElement(target);
+
     setTimeout(() => {
       editable.onblur = handleSubmit;
-
+      if (target && isTargetColorPicker) {
+        target.onblur = () => {
+          editable.focus();
+        };
+      }
       // case: clicking on the same property → no change → no update → no focus
       if (!isTargetColorPicker) {
         editable.focus();
