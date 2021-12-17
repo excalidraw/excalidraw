@@ -531,7 +531,12 @@ export const textWysiwyg = ({
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
     updateWysiwygStyle();
-    editable.focus();
+    const isColorPickerActive = !!document.activeElement?.closest(
+      ".color-picker-input",
+    );
+    if (!isColorPickerActive) {
+      editable.focus();
+    }
   });
 
   // ---------------------------------------------------------------------------
