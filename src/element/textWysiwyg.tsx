@@ -426,10 +426,10 @@ export const textWysiwyg = ({
         if (isTextElement(updateElement) && updateElement.containerId) {
           if (editable.value) {
             mutateElement(updateElement, {
-              y,
+              y: y + appState.offsetTop,
               height: Number(editable.style.height.slice(0, -2)),
               width: Number(editable.style.width.slice(0, -2)),
-              x,
+              x: x + appState.offsetLeft,
             });
             const boundTextElementId = getBoundTextElementId(container);
             if (!boundTextElementId || boundTextElementId !== element.id) {
