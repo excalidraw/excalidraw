@@ -1,8 +1,10 @@
 import { bumpVersion } from "./element/mutateElement";
 import { ExcalidrawElement } from "./element/types";
 import { getElementsInGroup } from "./groups";
+import { getSelectedElements } from "./scene";
+import Scene from "./scene/Scene";
 import { AppState } from "./types";
-import { findIndex, findLastIndex } from "./utils";
+import { arrayToMap, findIndex, findLastIndex } from "./utils";
 
 /**
  * Returns indices of elements to move based on selected elements.
@@ -17,8 +19,11 @@ const getIndicesToMove = (
   let deletedIndices: number[] = [];
   let includeDeletedIndex = null;
   let index = -1;
+  const selectedElementIds = arrayToMap(
+    getSelectedElements(elements, appState, true),
+  );
   while (++index < elements.length) {
-    if (appState.selectedElementIds[elements[index].id]) {
+    if (selectedElementIds.get(elements[index].id)) {
       if (deletedIndices.length) {
         selectedIndices = selectedIndices.concat(deletedIndices);
         deletedIndices = [];
@@ -44,6 +49,45 @@ const toContiguousGroups = (array: number[]) => {
     (acc[cursor] || (acc[cursor] = [])).push(value);
     return acc;
   }, [] as number[][]);
+};
+
+/**
+ * @returns index of target element, consindering tightly-bound elements
+ * (currently non-linear elements bound to a container) as a one unit.
+ * If no binding present, returns `undefined`.
+ */
+const getTargetIndexAccountingForBinding = (
+  nextElement: ExcalidrawElement,
+  elements: readonly ExcalidrawElement[],
+  direction: "left" | "right",
+) => {
+  if ("containerId" in nextElement && nextElement.containerId) {
+    if (direction === "left") {
+      const containerElement = Scene.getScene(nextElement)!.getElement(
+        nextElement.containerId,
+      );
+      if (containerElement) {
+        return elements.indexOf(containerElement);
+      }
+    } else {
+      return elements.indexOf(nextElement);
+    }
+  } else {
+    const boundElementId = nextElement.boundElements?.find(
+      (binding) => binding.type !== "arrow",
+    )?.id;
+    if (boundElementId) {
+      if (direction === "left") {
+        return elements.indexOf(nextElement);
+      }
+      const boundTextElement =
+        Scene.getScene(nextElement)!.getElement(boundElementId);
+
+      if (boundTextElement) {
+        return elements.indexOf(boundTextElement);
+      }
+    }
+  }
 };
 
 /**
@@ -86,7 +130,10 @@ const getTargetIndex = (
       // candidate element is a sibling in current editing group → return
       sourceElement?.groupIds.join("") === nextElement?.groupIds.join("")
     ) {
-      return candidateIndex;
+      return (
+        getTargetIndexAccountingForBinding(nextElement, elements, direction) ??
+        candidateIndex
+      );
     } else if (!nextElement?.groupIds.includes(appState.editingGroupId)) {
       // candidate element is outside current editing group → prevent
       return -1;
@@ -94,7 +141,10 @@ const getTargetIndex = (
   }
 
   if (!nextElement.groupIds.length) {
-    return candidateIndex;
+    return (
+      getTargetIndexAccountingForBinding(nextElement, elements, direction) ??
+      candidateIndex
+    );
   }
 
   const siblingGroupId = appState.editingGroupId
