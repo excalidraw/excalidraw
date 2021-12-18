@@ -25,7 +25,7 @@ const SetTableNameDialog: React.FC<Props> = (props) => {
           setErrorMessage("");
           props.onConfirm(tablename);
         } else {
-          setErrorMessage("Invalid name of the table, please try again");
+          setErrorMessage("Make sure to end the table name with .csv");
         }
       }}
     >
