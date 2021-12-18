@@ -3,7 +3,7 @@
     --padding: 0;
     background-color: var(--island-bg-color);
     box-shadow: var(--shadow-island);
-    border-radius: 4px;
+    border-radius: var(--border-radius-lg);
     padding: calc(var(--padding) * var(--space-factor));
     position: relative;
     transition: box-shadow 0.5s ease-in-out;
