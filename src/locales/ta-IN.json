@@ -213,7 +213,7 @@
   "canvasError": {
     "cannotShowPreview": "முன்னோட்டம் காட்ட இயலவில்லை",
     "canvasTooBig": "கித்தான் மிகப்பெரிதாக இருக்கலாம்.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "துணுக்குதவி: தூரத்திலுள்ள உறுப்புகளைப் நெருக்கமாக நகர்த்தப்பார்."
   },
   "errorSplash": {
     "headingMain_pre": "பிழையைச் சந்தித்தீரா. முயலவும் ",
