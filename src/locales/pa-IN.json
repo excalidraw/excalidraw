@@ -139,9 +139,9 @@
     "cancel": "ਰੱਦ ਕਰੋ",
     "clear": "ਸਾਫ਼ ਕਰੋ",
     "remove": "ਹਟਾਓ",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "publishLibrary": "ਪ੍ਰਕਾਸ਼ਤ ਕਰੋ",
+    "submit": "ਜਮ੍ਹਾ ਕਰਵਾਓ",
+    "confirm": "ਪੁਸ਼ਟੀ ਕਰੋ"
   },
   "alerts": {
     "clearReset": "ਇਹ ਸਾਰਾ ਕੈਨਵਸ ਸਾਫ ਕਰ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
@@ -171,11 +171,11 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।"
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
-    "image": "",
+    "image": "ਤਸਵੀਰ ਸ਼ਾਮਲ ਕਰੋ",
     "rectangle": "ਆਇਤ",
     "diamond": "ਹੀਰਾ",
     "ellipse": "ਅੰਡਾਕਾਰ",
@@ -276,13 +276,13 @@
     "zoomToSelection": "ਚੋਣ ਤੱਕ ਜ਼ੂਮ ਕਰੋ"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "ਕੈਨਵਸ ਨੂੰ ਸਾਫ਼ ਕਰੋ"
   },
   "publishDialog": {
-    "title": "",
+    "title": "ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਪ੍ਰਕਾਸ਼ਤ ਕਰੋ",
     "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
+    "authorName": "ਲੇਖਕ ਦਾ ਨਾਂ",
+    "githubUsername": "ਗਿੱਟਹੱਬ ਵਰਤੋਂਕਾਰ ਨਾਂ",
     "twitterUsername": "",
     "libraryName": "",
     "libraryDesc": "",
@@ -296,8 +296,8 @@
       "website": ""
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "ਲੋੜੀਂਦਾ",
+      "website": "ਜਾਇਜ਼ URL ਭਰੋ"
     },
     "noteDescription": {
       "pre": "",
@@ -306,12 +306,12 @@
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "ਦਿਸ਼ਾ ਨਿਰਦੇਸ਼",
       "post": ""
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
+      "link": "MIT ਲਾਇਸੈਂਸ, ",
       "post": ""
     },
     "noteItems": "",
@@ -320,11 +320,11 @@
   "publishSuccessDialog": {
     "title": "",
     "content": "",
-    "link": ""
+    "link": "ਇੱਥੇ"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਰੀਸੈੱਟ ਕਰੋ",
+    "removeItemsFromLib": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ ਚੁਣੀਆਂ ਹੋਈਆਂ ਆਈਟਮਾਂ ਹਟਾਓ"
   },
   "encrypted": {
     "tooltip": "ਤੁਹਾਡੀ ਡਰਾਇੰਗਾਂ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਟ ਕੀਤੀਆਂ ਹੋਈਆਂ ਹਨ, ਇਸ ਲਈ Excalidraw ਦੇ ਸਰਵਰ ਉਹਨਾਂ ਨੂੰ ਕਦੇ ਵੀ ਨਹੀਂ ਦੇਖਣਗੇ।",
@@ -346,7 +346,7 @@
     "width": "ਚੌੜਾਈ"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਜੋੜਿਆ",
     "copyStyles": "ਕਾਪੀ ਕੀਤੇ ਸਟਾਇਲ।",
     "copyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕੀਤਾ।",
     "copyToClipboardAsPng": "{{exportSelection}} ਨੂੰ ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕੀਤਾ ({{exportColorScheme}})",
