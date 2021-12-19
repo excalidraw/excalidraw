@@ -4,6 +4,7 @@ import { useIsMobile } from "../components/App";
 import { AppState } from "../types";
 import { Island } from "./Island";
 import "./TextSearch.scss";
+import { KEYS } from "../keys";
 
 export const TextSearch = (props: {
   appState: AppState;
@@ -16,6 +17,12 @@ export const TextSearch = (props: {
     return null;
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === KEYS.ESCAPE) {
+      props.setAppState({ textSearchActive: false });
+    }
+  };
+
   return (
     <div className="TextSearch">
       <Island padding={2}>
@@ -26,6 +33,7 @@ export const TextSearch = (props: {
           onChange={(event) => {
             props.setAppState({ searchMatchText: event.target.value });
           }}
+          onKeyDown={handleKeyDown}
         />
       </Island>
     </div>
