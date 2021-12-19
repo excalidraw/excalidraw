@@ -35,7 +35,7 @@
     "arrowhead_arrow": "ਤੀਰ",
     "arrowhead_bar": "ਡੰਡੀ",
     "arrowhead_dot": "ਬਿੰਦੀ",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "ਤਿਕੋਣ",
     "fontSize": "ਫੌਂਟ ਅਕਾਰ",
     "fontFamily": "ਫੌਂਟ ਪਰਿਵਾਰ",
     "onlySelected": "ਸਿਰਫ ਚੁਣੇ ਹੋਏ ਹੀ",
@@ -101,8 +101,8 @@
     "showStroke": "ਰੇਖਾ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
     "showBackground": "ਬੈਕਗਰਾਉਂਡ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
     "toggleTheme": "ਥੀਮ ਬਦਲੋ",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "ਨਿੱਜੀ ਲਾਇਬ੍ਰੇਰੀ",
+    "excalidrawLib": "ਐਕਸਕਲੀਡਰਾਅ ਲਾਇਬ੍ਰੇਰੀ"
   },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
@@ -136,9 +136,9 @@
     "lightMode": "ਲਾਇਟ ਮੋਡ",
     "zenMode": "ਜ਼ੈੱਨ ਮੋਡ",
     "exitZenMode": "ਜ਼ੈੱਨ ਮੋਡ 'ਚੋਂ ਬਾਹਰ ਨਿਕਲੋ",
-    "cancel": "",
-    "clear": "",
-    "remove": "",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "clear": "ਸਾਫ਼ ਕਰੋ",
+    "remove": "ਹਟਾਓ",
     "publishLibrary": "",
     "submit": "",
     "confirm": ""
