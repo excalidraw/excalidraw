@@ -101,8 +101,8 @@
     "showStroke": "إظهار منتقي لون الخط",
     "showBackground": "إظهار منتقي لون الخلفية",
     "toggleTheme": "غير النمط",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "المكتبة الشخصية",
+    "excalidrawLib": "مكتبتنا"
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -138,10 +138,10 @@
     "exitZenMode": "إلغاء الوضع الليلى",
     "cancel": "إلغاء",
     "clear": "مسح",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "remove": "إزالة",
+    "publishLibrary": "انشر",
+    "submit": "أرسل",
+    "confirm": "تأكيد"
   },
   "alerts": {
     "clearReset": "هذا سيُزيل كامل اللوحة. هل أنت متأكد؟",
@@ -324,7 +324,7 @@
   },
   "confirmDialog": {
     "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "removeItemsFromLib": "إزالة العناصر المحددة من المكتبة"
   },
   "encrypted": {
     "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا.",
@@ -346,7 +346,7 @@
     "width": "العرض"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "تمت الاضافة الى المكتبة!",
     "copyStyles": "نسخت الانماط.",
     "copyToClipboard": "نسخ إلى الحافظة.",
     "copyToClipboardAsPng": "تم نسخ {{exportSelection}} إلى الحافظة بصيغة PNG\n({{exportColorScheme}})",
