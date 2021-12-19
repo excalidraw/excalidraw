@@ -204,11 +204,11 @@
     "resizeImage": "Anda dapat mengubah secara bebas dengan menekan SHIFT,\nTekan ALT untuk mengubah dari tengah",
     "rotate": "Anda dapat menjaga sudut dengan menahan SHIFT sambil memutar",
     "lineEditor_info": "Klik ganda atau tekan Enter untuk mengedit titik",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Tekan Delete untuk menghapus titik, Ctrl/Cmd + D untuk menduplikasi, atau seret untuk memindahkan",
+    "lineEditor_nothingSelected": "Pilih titik untuk mengedit (tekan SHIFT untuk pilih banyak), atau tekan Alt dan klik untuk tambahkan titik baru",
     "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
     "publishLibrary": "Terbitkan pustaka Anda",
-    "bindTextToElement": ""
+    "bindTextToElement": "Tekan enter untuk tambahkan teks"
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
