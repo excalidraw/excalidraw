@@ -18,7 +18,7 @@ export const TextSearch = (props: {
 
   return (
     <div className="TextSearch">
-      <Island padding={1}>
+      <Island padding={2}>
         <input
           type="text"
           className="searchInput"

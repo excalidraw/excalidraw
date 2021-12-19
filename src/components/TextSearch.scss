@@ -3,8 +3,12 @@
 .excalidraw {
   .TextSearch {
     position: absolute;
-    top: 20px;
-    right: 250px;
+    top: 90px;
+    right: 50px;
+    font-size: 15px;
     z-index: 10;
+  }
+  .searchInput {
+    font-size: 20px;
   }
 }
