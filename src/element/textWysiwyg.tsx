@@ -431,15 +431,11 @@ export const textWysiwyg = ({
           if (editable.value) {
             mutateElement(updateElement, {
               // vertically center align
-              y:
-                container.y +
-                container.height / 2 -
-                editorHeight / 2 +
-                appState.offsetTop,
+              y: container.y + container.height / 2 - editorHeight / 2,
               height: editorHeight,
               width: Number(editable.style.width.slice(0, -2)),
               // preserve padding
-              x: container.x + PADDING + appState.offsetLeft,
+              x: container.x + PADDING,
             });
             const boundTextElementId = getBoundTextElementId(container);
             if (!boundTextElementId || boundTextElementId !== element.id) {
