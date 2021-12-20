@@ -34,6 +34,7 @@ export const TextSearch = (props: {
             props.setAppState({ searchMatchText: event.target.value });
           }}
           onKeyDown={handleKeyDown}
+          autoFocus
         />
       </Island>
     </div>
