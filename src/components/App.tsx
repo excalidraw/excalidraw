@@ -987,8 +987,10 @@ class App extends React.Component<AppProps, AppState> {
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
-    window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
-    window.addEventListener(EVENT.DROP, this.disableEvent, false);
+    if (this.props.handleKeyboardGlobally) {
+      window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
+      window.addEventListener(EVENT.DROP, this.disableEvent, false);
+    }
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
