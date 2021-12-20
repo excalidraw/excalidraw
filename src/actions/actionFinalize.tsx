@@ -14,10 +14,60 @@ import {
   bindOrUnbindLinearElement,
 } from "../element/binding";
 import { isBindingElement } from "../element/typeChecks";
+import { ExcalidrawImageElement } from "../element/types";
+import { imageFromImageData } from "../element/image";
 
 export const actionFinalize = register({
   name: "finalize",
-  perform: (elements, appState, _, { canvas, focusContainer }) => {
+  perform: (
+    elements,
+    appState,
+    _,
+    { canvas, focusContainer, imageCache, addFiles },
+  ) => {
+    if (appState.editingImageElement) {
+      const { elementId, imageData } = appState.editingImageElement;
+      const editingImageElement = elements.find((el) => el.id === elementId) as
+        | ExcalidrawImageElement
+        | undefined;
+      if (editingImageElement?.fileId) {
+        const cachedImageData = imageCache.get(editingImageElement.fileId);
+        if (cachedImageData) {
+          const { image, dataURL } = imageFromImageData(imageData);
+
+          imageCache.set(editingImageElement.fileId, {
+            ...cachedImageData,
+            image,
+          });
+
+          addFiles([
+            {
+              id: editingImageElement.fileId,
+              dataURL,
+              mimeType: cachedImageData.mimeType,
+              created: Date.now(),
+            },
+          ]);
+
+          return {
+            appState: {
+              ...appState,
+              editingImageElement: null,
+            },
+            commitToHistory: false,
+          };
+        }
+      }
+
+      return {
+        appState: {
+          ...appState,
+          editingImageElement: null,
+        },
+        commitToHistory: false,
+      };
+    }
+
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
         appState.editingLinearElement;
@@ -162,6 +212,7 @@ export const actionFinalize = register({
   keyTest: (event, appState) =>
     (event.key === KEYS.ESCAPE &&
       (appState.editingLinearElement !== null ||
+        appState.editingImageElement !== null ||
         (!appState.draggingElement && appState.multiElement === null))) ||
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),

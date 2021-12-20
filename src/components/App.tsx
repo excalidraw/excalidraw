@@ -237,6 +237,7 @@ import {
   getBoundTextElementId,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
+import { ImageEditor } from "../element/imageEditor";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -281,7 +282,7 @@ class App extends React.Component<AppProps, AppState> {
     UIOptions: DEFAULT_UI_OPTIONS,
   };
 
-  private scene: Scene;
+  public scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
@@ -1031,8 +1032,14 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (
-      this.state.editingLinearElement &&
-      !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
+      (this.state.editingLinearElement &&
+        !this.state.selectedElementIds[
+          this.state.editingLinearElement.elementId
+        ]) ||
+      (this.state.editingImageElement &&
+        !this.state.selectedElementIds[
+          this.state.editingImageElement.elementId
+        ])
     ) {
       // defer so that the commitToHistory flag isn't reset via current update
       setTimeout(() => {
@@ -1135,6 +1142,7 @@ class App extends React.Component<AppProps, AppState> {
         imageCache: this.imageCache,
         isExporting: false,
         renderScrollbars: !this.isMobile,
+        editingImageElement: this.state.editingImageElement,
       },
     );
     if (scrollBars) {
@@ -2330,6 +2338,10 @@ class App extends React.Component<AppProps, AppState> {
     const scenePointer = viewportCoordsToSceneCoords(event, this.state);
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
 
+    if (this.state.editingImageElement) {
+      return;
+    }
+
     if (
       this.state.editingLinearElement &&
       !this.state.editingLinearElement.isDragging
@@ -2920,6 +2932,14 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): boolean => {
     if (this.state.elementType === "selection") {
+      if (this.state.editingImageElement) {
+        ImageEditor.handlePointerDown(
+          this.state.editingImageElement,
+          pointerDownState.origin,
+        );
+        return false;
+      }
+
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
@@ -3480,6 +3500,22 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      if (this.state.editingImageElement) {
+        const newImageData = ImageEditor.handlePointerMove(
+          this.state.editingImageElement,
+          pointerCoords,
+        );
+        if (newImageData) {
+          this.setState({
+            editingImageElement: {
+              ...this.state.editingImageElement,
+              imageData: newImageData,
+            },
+          });
+        }
+        return;
+      }
+
       if (this.state.editingLinearElement) {
         const didDrag = LinearElementEditor.handlePointDragging(
           this.state,
@@ -3801,6 +3837,10 @@ class App extends React.Component<AppProps, AppState> {
       });
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
+
+      if (this.state.editingImageElement) {
+        ImageEditor.handlePointerUp(this.state.editingImageElement);
+      }
 
       // Handle end of dragging a point of a linear element, might close a loop
       // and sets binding element
