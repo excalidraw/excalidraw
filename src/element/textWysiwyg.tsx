@@ -2,7 +2,6 @@ import { CODES, KEYS } from "../keys";
 import {
   isWritableElement,
   getFontString,
-  viewportCoordsToSceneCoords,
   getFontFamilyString,
 } from "../utils";
 import Scene from "../scene/Scene";
@@ -37,15 +36,19 @@ const getTransform = (
   angle: number,
   appState: AppState,
   maxWidth: number,
+  maxHeight: number,
 ) => {
   const { zoom, offsetTop, offsetLeft } = appState;
   const degree = (180 * angle) / Math.PI;
   // offsets must be multiplied by 2 to account for the division by 2 of
   // the whole expression afterwards
   let translateX = ((width - offsetLeft * 2) * (zoom.value - 1)) / 2;
-  const translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
+  let translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
   if (width > maxWidth && zoom.value !== 1) {
     translateX = ((maxWidth - offsetLeft * 2) * (zoom.value - 1)) / 2;
+  }
+  if (height > maxHeight) {
+    translateY = (maxHeight / 2) * (zoom.value - 1);
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
@@ -93,6 +96,7 @@ export const textWysiwyg = ({
   let approxLineHeight = isTextElement(element)
     ? getApproxLineHeight(getFontString(element))
     : 0;
+  let editorMaxHeight: number;
 
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
@@ -106,12 +110,13 @@ export const textWysiwyg = ({
 
       let maxHeight = updatedElement.height;
       let width = updatedElement.width;
-      let height = updatedElement.height;
+      const height = Math.max(editable.scrollHeight, updatedElement.height);
       if (container && updatedElement.containerId) {
         const propertiesUpdated = textPropertiesUpdated(
           updatedElement,
           editable,
         );
+
         if (propertiesUpdated) {
           const currentContainer = Scene.getScene(updatedElement)?.getElement(
             updatedElement.containerId,
@@ -133,15 +138,14 @@ export const textWysiwyg = ({
         maxWidth = container.width - PADDING * 2;
         maxHeight = container.height - PADDING * 2;
         width = maxWidth;
-        height = Math.min(height, maxHeight);
         // The coordinates of text box set a distance of
         // 30px to preserve padding
         coordX = container.x + PADDING;
 
         // autogrow container height if text exceeds
-        if (editable.clientHeight > maxHeight) {
+        if (editable.scrollHeight > maxHeight) {
           const diff = Math.min(
-            editable.clientHeight - maxHeight,
+            editable.scrollHeight - maxHeight,
             approxLineHeight,
           );
           mutateElement(container, { height: container.height + diff });
@@ -150,10 +154,10 @@ export const textWysiwyg = ({
           // autoshrink container height until original container height
           // is reached when text is removed
           container.height > originalContainerHeight &&
-          editable.clientHeight < maxHeight
+          editable.scrollHeight < maxHeight
         ) {
           const diff = Math.min(
-            maxHeight - editable.clientHeight,
+            maxHeight - editable.scrollHeight,
             approxLineHeight,
           );
           mutateElement(container, { height: container.height - diff });
@@ -161,18 +165,17 @@ export const textWysiwyg = ({
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
         else {
-          const lines = editable.clientHeight / approxLineHeight;
+          const lines = editable.scrollHeight / approxLineHeight;
           // For some reason the scrollHeight gets set to twice the lineHeight
           // when you start typing for first time  and thus line count is 2
           // hence this check
           if (lines > 2 || propertiesUpdated) {
             // vertically center align the text
             coordY =
-              container.y + container.height / 2 - editable.clientHeight / 2;
+              container.y + container.height / 2 - editable.scrollHeight / 2;
           }
         }
       }
-
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
       const { textAlign, angle } = updatedElement;
 
@@ -193,7 +196,7 @@ export const textWysiwyg = ({
           );
       }
       // Make sure text editor height doesn't go beyond viewport
-      const editorMaxHeight =
+      editorMaxHeight =
         (appState.offsetTop + appState.height - viewportY) /
         appState.zoom.value;
       Object.assign(editable.style, {
@@ -201,10 +204,17 @@ export const textWysiwyg = ({
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
         width: `${width}px`,
-        height: `${Math.max(editable.clientHeight, updatedElement.height)}px`,
+        height: `${height}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
-        transform: getTransform(width, height, angle, appState, maxWidth),
+        transform: getTransform(
+          width,
+          height,
+          angle,
+          appState,
+          maxWidth,
+          editorMaxHeight,
+        ),
         textAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
@@ -416,20 +426,16 @@ export const textWysiwyg = ({
           getFontString(updateElement),
           container.width,
         );
-        const { x, y } = viewportCoordsToSceneCoords(
-          {
-            clientX: Number(editable.style.left.slice(0, -2)),
-            clientY: Number(editable.style.top.slice(0, -2)),
-          },
-          appState,
-        );
         if (isTextElement(updateElement) && updateElement.containerId) {
+          const editorHeight = Number(editable.style.height.slice(0, -2));
           if (editable.value) {
             mutateElement(updateElement, {
-              y: y + appState.offsetTop,
-              height: Number(editable.style.height.slice(0, -2)),
+              // vertically center align
+              y: container.y + container.height / 2 - editorHeight / 2,
+              height: editorHeight,
               width: Number(editable.style.width.slice(0, -2)),
-              x: x + appState.offsetLeft,
+              // preserve padding
+              x: container.x + PADDING,
             });
             const boundTextElementId = getBoundTextElementId(container);
             if (!boundTextElementId || boundTextElementId !== element.id) {
