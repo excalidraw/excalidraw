@@ -4,7 +4,7 @@ import { useIsMobile } from "../components/App";
 import { AppState } from "../types";
 import { Island } from "./Island";
 import "./TextSearch.scss";
-import { close } from "./icons";
+import { close, back, start } from "./icons";
 import { KEYS } from "../keys";
 
 export const TextSearch = (props: {
@@ -30,6 +30,8 @@ export const TextSearch = (props: {
         <div className="close" onClick={props.onClose}>
           {close}
         </div>
+        <div className="next">{start}</div>
+        <div class="last">{back}</div>
         <input
           type="text"
           className="searchInput"
