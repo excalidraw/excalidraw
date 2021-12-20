@@ -2697,6 +2697,7 @@ class App extends React.Component<AppProps, AppState> {
         gesture.pointers.size === 0 &&
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
+          event.button === POINTER_BUTTON.SECONDARY ||
           this.state.viewModeEnabled)
       )
     ) {
