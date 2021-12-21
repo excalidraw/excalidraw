@@ -255,10 +255,11 @@ export interface ExcalidrawProps {
   onBeforeTextSubmit?: (
     textElement: ExcalidrawTextElement,
     textToSubmit: string,
+    originalText: string,
     isDeleted: boolean,
-  ) => string;
+  ) => [string, string];
   generateIdForFile?: (file: File) => string | Promise<string>;
-  onThemeChange?: (newTheme: string) => void;  
+  onThemeChange?: (newTheme: string) => void;
 }
 
 export type SceneData = {

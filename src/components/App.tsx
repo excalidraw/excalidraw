@@ -1931,7 +1931,7 @@ class App extends React.Component<AppProps, AppState> {
                 text,
                 isDeleted,
                 originalText,
-                rawText: rawText ? rawText : originalText, //should this be originalText??
+                rawText: rawText ?? originalText, //should this be originalText??
               },
               updateDimensions,
             );
@@ -1991,13 +1991,15 @@ class App extends React.Component<AppProps, AppState> {
         const isDeleted = !text.trim();
         const rawText = originalText; //should this be originalText??
         if (this.props.onBeforeTextSubmit) {
-          const updatedText = this.props.onBeforeTextSubmit(
-            element,
-            originalText,
-            isDeleted,
-          );
-          originalText = updatedText ?? originalText;
+          const [updatedText, updatedOriginalText] =
+            this.props.onBeforeTextSubmit(
+              element,
+              text,
+              originalText,
+              isDeleted,
+            );
           text = updatedText ?? text;
+          originalText = updatedOriginalText ?? originalText;
         }
         updateElement(text, originalText, isDeleted, true, rawText);
         // select the created text element only if submitting via keyboard
