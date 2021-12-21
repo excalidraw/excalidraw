@@ -191,7 +191,10 @@ export const textWysiwyg = ({
         : updatedElement.height / lines.length;
       if (!container) {
         maxWidth =
-          (appState.offsetLeft + appState.width - viewportX - 8) /
+          (appState.width -
+            8 -
+            ((appState.scrollX + updatedElement.x) * appState.zoom.value +
+              appState.zoom.translation.x)) /
             appState.zoom.value -
           // margin-right of parent if any
           Number(
