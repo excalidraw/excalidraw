@@ -47,8 +47,8 @@ const getTransform = (
   if (width > maxWidth && zoom.value !== 1) {
     translateX = (maxWidth / 2) * (zoom.value - 1);
   }
-  if (height > maxHeight) {
-    translateY = (maxHeight / 2) * (zoom.value - 1);
+  if (height > maxHeight && zoom.value !== 1) {
+    translateY = ((maxHeight - offsetTop * 2) * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
@@ -195,9 +195,18 @@ export const textWysiwyg = ({
             ).marginRight.slice(0, -2),
           );
       }
+
       // Make sure text editor height doesn't go beyond viewport
       editorMaxHeight =
-        (appState.offsetTop + appState.height - viewportY) /
+        (appState.height -
+          viewportY -
+          // There is a ~14px difference which keeps on increasing
+          // with every zoom when offset present hence I am substracting it here
+          // However this is not the best fix and breaks in
+          // few scenarios
+          (appState.offsetTop
+            ? ((appState.zoom.value * 100 - 100) / 10) * 14
+            : 0)) /
         appState.zoom.value;
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
