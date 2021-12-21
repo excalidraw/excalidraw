@@ -96,7 +96,6 @@ export const textWysiwyg = ({
   let approxLineHeight = isTextElement(element)
     ? getApproxLineHeight(getFontString(element))
     : 0;
-  let editorMaxHeight: number;
 
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
@@ -197,7 +196,7 @@ export const textWysiwyg = ({
       }
 
       // Make sure text editor height doesn't go beyond viewport
-      editorMaxHeight =
+      const editorMaxHeight =
         (appState.height -
           viewportY -
           // There is a ~14px difference which keeps on increasing
