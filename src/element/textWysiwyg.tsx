@@ -109,7 +109,10 @@ export const textWysiwyg = ({
 
       let maxHeight = updatedElement.height;
       let width = updatedElement.width;
-      const height = Math.max(editable.scrollHeight, updatedElement.height);
+      const height =
+        editable.scrollHeight === 0
+          ? updatedElement.height
+          : editable.scrollHeight;
       if (container && updatedElement.containerId) {
         const propertiesUpdated = textPropertiesUpdated(
           updatedElement,
