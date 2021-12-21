@@ -201,7 +201,7 @@ export const textWysiwyg = ({
         (appState.height -
           viewportY -
           // There is a ~14px difference which keeps on increasing
-          // with every zoom when offset present hence I am substracting it here
+          // with every zoom step when offset present hence I am subtracting it here
           // However this is not the best fix and breaks in
           // few scenarios
           (appState.offsetTop
