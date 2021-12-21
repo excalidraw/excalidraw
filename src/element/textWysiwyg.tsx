@@ -270,6 +270,15 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.oninput = () => {
+      const lines = editable.scrollHeight / approxLineHeight;
+      // auto increase height only when lines  > 1 so its
+      // measured correctly and vertically alignes for
+      // first line as well as setting height to "auto"
+      // doubles the height as soon as user starts typing
+      if (isBoundToContainer(element) && lines > 1) {
+        editable.style.height = "auto";
+        editable.style.height = `${editable.scrollHeight}px`;
+      }
       onChange(normalizeText(editable.value));
     };
   }
