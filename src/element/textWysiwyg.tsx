@@ -109,10 +109,6 @@ export const textWysiwyg = ({
 
       let maxHeight = updatedElement.height;
       let width = updatedElement.width;
-      const height =
-        editable.scrollHeight === 0
-          ? updatedElement.height
-          : editable.scrollHeight;
       if (container && updatedElement.containerId) {
         const propertiesUpdated = textPropertiesUpdated(
           updatedElement,
@@ -172,7 +168,7 @@ export const textWysiwyg = ({
           if (lines > 1 || propertiesUpdated) {
             // vertically center align the text
             coordY =
-              container.y + container.height / 2 - editable.scrollHeight / 2;
+              container.y + container.height / 2 - editable.clientHeight / 2;
           }
         }
       }
@@ -208,6 +204,10 @@ export const textWysiwyg = ({
             ? ((appState.zoom.value * 100 - 100) / 10) * 14
             : 0)) /
         appState.zoom.value;
+      const height =
+        editable.clientHeight === 0
+          ? updatedElement.height
+          : editable.clientHeight;
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
