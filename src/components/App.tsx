@@ -140,6 +140,7 @@ import {
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
   FileId,
+  NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -238,6 +239,7 @@ import {
   getBoundTextElementId,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
+import { resizeSingleElement } from "../element/resizeElements";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -346,6 +348,7 @@ class App extends React.Component<AppProps, AppState> {
         refresh: this.refresh,
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
+        updateContainerSize: this.updateContainerSize,
         id: this.id,
       } as const;
       if (typeof excalidrawRef === "function") {
@@ -1540,6 +1543,22 @@ class App extends React.Component<AppProps, AppState> {
       zoomToFitElements(target, this.state, false, maxZoom, margin).appState,
     );
   };
+
+  updateContainerSize = withBatchedUpdates(
+    (containers: NonDeletedExcalidrawElement[]) => {
+      containers.forEach((el: ExcalidrawElement) => {
+        resizeSingleElement(
+          el,
+          true,
+          el,
+          "se",
+          true,
+          el.x + el.width + 0.01,
+          el.y + el.height + 0.01,
+        );
+      });
+    },
+  );
 
   clearToast = () => {
     this.setState({ toastMessage: null });

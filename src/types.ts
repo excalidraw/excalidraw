@@ -409,6 +409,7 @@ export type ExcalidrawImperativeAPI = {
   importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
   setToastMessage: InstanceType<typeof App>["setToastMessage"];
   addFiles: (data: BinaryFileData[]) => void;
+  updateContainerSize: InstanceType<typeof App>["updateContainerSize"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
   id: string;
