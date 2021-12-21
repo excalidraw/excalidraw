@@ -165,10 +165,8 @@ export const textWysiwyg = ({
         // is reached
         else {
           const lines = editable.scrollHeight / approxLineHeight;
-          // For some reason the scrollHeight gets set to twice the lineHeight
-          // when you start typing for first time  and thus line count is 2
-          // hence this check
-          if (lines > 2 || propertiesUpdated) {
+
+          if (lines > 1 || propertiesUpdated) {
             // vertically center align the text
             coordY =
               container.y + container.height / 2 - editable.scrollHeight / 2;
@@ -272,7 +270,12 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.oninput = () => {
-      if (isBoundToContainer(element)) {
+      const lines = editable.scrollHeight / approxLineHeight;
+      // auto increase height only when lines  > 1 so its
+      // measured correctly and vertically alignes for
+      // first line as well as setting height to "auto"
+      // doubles the height as soon as user starts typing
+      if (isBoundToContainer(element) && lines > 1) {
         editable.style.height = "auto";
         editable.style.height = `${editable.scrollHeight}px`;
       }
