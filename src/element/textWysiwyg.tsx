@@ -53,6 +53,9 @@ const getTransform = (
   if (height > maxHeight && zoom.value !== 1) {
     translateY = ((maxHeight - offsetTop * 2) * (zoom.value - 1)) / 2;
   }
+  if (height > maxHeight && zoom.value !== 1) {
+    translateY = ((maxHeight - offsetTop * 2) * (zoom.value - 1)) / 2;
+  }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
