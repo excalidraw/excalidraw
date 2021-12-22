@@ -72,7 +72,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- Scope drag and drop events to Excalidraw container to prevent overriding host application drag&drop events.
+- Scope drag and drop events to Excalidraw container to prevent overriding host application drag and drop events.
 
 ---
 
