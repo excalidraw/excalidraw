@@ -3558,6 +3558,7 @@ class App extends React.Component<AppProps, AppState> {
             lockDirection,
             dragDistanceX,
             dragDistanceY,
+            this.state,
           );
           this.maybeSuggestBindingForAll(selectedElements);
 
