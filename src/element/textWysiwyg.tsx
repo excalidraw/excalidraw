@@ -47,12 +47,6 @@ const getTransform = (
   if (width > maxWidth && zoom.value !== 1) {
     translateX = ((maxWidth - offsetLeft * 2) * (zoom.value - 1)) / 2;
   }
-  if (height > maxHeight) {
-    translateY = (maxHeight / 2) * (zoom.value - 1);
-  }
-  if (height > maxHeight && zoom.value !== 1) {
-    translateY = ((maxHeight - offsetTop * 2) * (zoom.value - 1)) / 2;
-  }
   if (height > maxHeight && zoom.value !== 1) {
     translateY = ((maxHeight - offsetTop * 2) * (zoom.value - 1)) / 2;
   }
