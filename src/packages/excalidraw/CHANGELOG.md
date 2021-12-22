@@ -70,6 +70,10 @@ Please add the latest change on the top under the correct section.
 
 - We're now compiling to `es2017` target. Notably, `async/await` is not compiled down to generators. [#4341](https://github.com/excalidraw/excalidraw/pull/4341)
 
+### Fixes
+
+- changed scope of DRAG_OVER and DROP event listners from `window` to `excalidrawContainerRef.current` to prevent Excalidraw overriding host application drag&drop events.
+
 ---
 
 ## 0.10.0 (2021-10-13)
