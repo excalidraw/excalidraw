@@ -109,12 +109,19 @@ export const textWysiwyg = ({
 
       let maxHeight = updatedElement.height;
       let width = updatedElement.width;
+      // Set to element height by default since thats
+      // what is going to be used for unbounded text
+      let height = updatedElement.height;
       if (container && updatedElement.containerId) {
         const propertiesUpdated = textPropertiesUpdated(
           updatedElement,
           editable,
         );
-
+        // using editor.style.height to get the accurate height of text editor
+        const editorHeight = Number(editable.style.height.slice(0, -2));
+        if (editorHeight > 0) {
+          height = editorHeight;
+        }
         if (propertiesUpdated) {
           const currentContainer = Scene.getScene(updatedElement)?.getElement(
             updatedElement.containerId,
@@ -128,7 +135,8 @@ export const textWysiwyg = ({
             mutateElement(container, { height: nextHeight });
             container = { ...container, height: nextHeight };
           }
-          editable.style.height = `${updatedElement.height}px`;
+          // update height of the editor after properties updated
+          height = updatedElement.height;
         }
         if (!originalContainerHeight) {
           originalContainerHeight = container.height;
@@ -139,36 +147,28 @@ export const textWysiwyg = ({
         // The coordinates of text box set a distance of
         // 30px to preserve padding
         coordX = container.x + PADDING;
-
         // autogrow container height if text exceeds
-        if (editable.scrollHeight > maxHeight) {
-          const diff = Math.min(
-            editable.scrollHeight - maxHeight,
-            approxLineHeight,
-          );
+        if (height > maxHeight) {
+          const diff = Math.min(height - maxHeight, approxLineHeight);
           mutateElement(container, { height: container.height + diff });
           return;
         } else if (
           // autoshrink container height until original container height
           // is reached when text is removed
           container.height > originalContainerHeight &&
-          editable.scrollHeight < maxHeight
+          height < maxHeight
         ) {
-          const diff = Math.min(
-            maxHeight - editable.scrollHeight,
-            approxLineHeight,
-          );
+          const diff = Math.min(maxHeight - height, approxLineHeight);
           mutateElement(container, { height: container.height - diff });
         }
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
         else {
-          const lines = editable.scrollHeight / approxLineHeight;
+          const lines = height / approxLineHeight;
 
           if (lines > 1 || propertiesUpdated) {
             // vertically center align the text
-            coordY =
-              container.y + container.height / 2 - editable.clientHeight / 2;
+            coordY = container.y + container.height / 2 - height / 2;
           }
         }
       }
@@ -204,10 +204,6 @@ export const textWysiwyg = ({
             ? ((appState.zoom.value * 100 - 100) / 10) * 14
             : 0)) /
         appState.zoom.value;
-      const height =
-        editable.clientHeight === 0
-          ? updatedElement.height
-          : editable.clientHeight;
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -260,7 +256,7 @@ export const textWysiwyg = ({
     border: 0,
     outline: 0,
     resize: "none",
-    background: "transparent",
+    background: "#fff",
     overflow: "hidden",
     // must be specified because in dark mode canvas creates a stacking context
     zIndex: "var(--zIndex-wysiwyg)",
