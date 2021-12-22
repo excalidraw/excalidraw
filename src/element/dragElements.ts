@@ -5,8 +5,9 @@ import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import Scene from "../scene/Scene";
 import { NonDeletedExcalidrawElement } from "./types";
-import { PointerDownState } from "../types";
+import { AppState, PointerDownState } from "../types";
 import { getBoundTextElementId } from "./textElement";
+import { isSelectedViaGroup } from "../groups";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -16,6 +17,7 @@ export const dragSelectedElements = (
   lockDirection: boolean = false,
   distanceX: number = 0,
   distanceY: number = 0,
+  appState: AppState,
 ) => {
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
@@ -28,7 +30,15 @@ export const dragSelectedElements = (
       element,
       offset,
     );
-    if (!element.groupIds.length) {
+    // update coords of bound text only if we're dragging the container directly
+    // (we don't drag the group that it's part of)
+    if (
+      // container isn't part of any group
+      // (perf optim so we don't check `isSelectedViaGroup()` in every case)
+      !element.groupIds.length ||
+      // container is part of a group, but we're dragging the container directly
+      (appState.editingGroupId && !isSelectedViaGroup(appState, element))
+    ) {
       const boundTextElementId = getBoundTextElementId(element);
       if (boundTextElementId) {
         const textElement =
