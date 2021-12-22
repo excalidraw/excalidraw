@@ -64,6 +64,10 @@ Please add the latest change on the top under the correct section.
 
   The `Appearance` type is now removed and renamed to `Theme` so `Theme` type needs to be used.
 
+### Fixes
+
+- Scope drag and drop events to Excalidraw container to prevent overriding host application drag and drop events.
+
 ### Build
 
 - Remove `file-loader` so font assets are not duplicated by webpack and use webpack asset modules for font generation [#4380](https://github.com/excalidraw/excalidraw/pull/4380)
