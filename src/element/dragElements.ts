@@ -30,14 +30,13 @@ export const dragSelectedElements = (
       element,
       offset,
     );
-    // update coords of bounded text only when element doesn't belong
-    // to any group or element in a group / nested group is selected
+    // update coords of bound text only if we're dragging the container directly
+    // (we don't drag the group that it's part of)
     if (
+      // container isn't part of any group
+      // (perf optim so we don't check `isSelectedViaGroup()` in every case)
       !element.groupIds.length ||
-      // Note: editingGroupId is set whenever editing elements
-      // or nested group but isSelectedViaGroup is true only
-      // when a group is selected so we need avoid updating coords
-      // when nested group is selected
+      // container is part of a group, but we're dragging the container directly
       (appState.editingGroupId && !isSelectedViaGroup(appState, element))
     ) {
       const boundTextElementId = getBoundTextElementId(element);
