@@ -7,7 +7,6 @@ import Scene from "../scene/Scene";
 import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState } from "../types";
 import { getBoundTextElementId } from "./textElement";
-import { isSelectedViaGroup } from "../groups";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -30,9 +29,9 @@ export const dragSelectedElements = (
       element,
       offset,
     );
-    // update coords of bounded text only when selection is
-    // not via group
-    if (!isSelectedViaGroup(appState, element)) {
+    // update coords of bounded text only when element doesn't belong
+    // to any group or element in a group is selected
+    if (!element.groupIds.length || appState.editingGroupId) {
       const boundTextElementId = getBoundTextElementId(element);
       if (boundTextElementId) {
         const textElement =
