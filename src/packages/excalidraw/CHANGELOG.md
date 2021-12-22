@@ -63,7 +63,7 @@ Please add the latest change on the top under the correct section.
   #### BREAKING CHANGE
 
   The `Appearance` type is now removed and renamed to `Theme` so `Theme` type needs to be used.
-  
+
 ### Fixes
 
 - Scope drag and drop events to Excalidraw container to prevent overriding host application drag and drop events.
