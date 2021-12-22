@@ -72,7 +72,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- changed scope of DRAG_OVER and DROP event listners from `window` to `excalidrawContainerRef.current` to prevent Excalidraw overriding host application drag&drop events.
+- Scope drag and drop events to Excalidraw container to prevent overriding host application drag&drop events.
 
 ---
 
