@@ -32,6 +32,8 @@ import { getDefaultAppState } from "../appState";
 import { MAX_DECIMALS_FOR_SVG_EXPORT, MIME_TYPES, SVG_NS } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import { getApproxLineHeight } from "../element/textElement";
+import * as JsSearch from "js-search";
+import { mutateElement } from "../element/mutateElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -80,6 +82,7 @@ const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
   renderConfig: RenderConfig,
+  appState: AppState,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -132,7 +135,7 @@ const generateElementCanvas = (
     context.filter = IMAGE_INVERT_FILTER;
   }
 
-  drawElementOnCanvas(element, rc, context, renderConfig);
+  drawElementOnCanvas(element, rc, context, renderConfig, appState);
   context.restore();
 
   return {
@@ -186,6 +189,7 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
+  appState: AppState,
 ) => {
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
@@ -239,8 +243,24 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
-        console.info("yo is this a text element?");
+        // highlighting text start
         console.info(element.text);
+        console.info(appState.textSearchActive);
+        console.info(appState.searchMatchText);
+        const tokenHL = new JsSearch.TokenHighlighter(
+          new JsSearch.PrefixIndexStrategy(),
+          new JsSearch.LowerCaseSanitizer(),
+          "mark",
+        );
+        const tokens = [appState.searchMatchText];
+        //element.text = tokenHL.highlight(element.text, tokens);
+        mutateElement(element, {
+          text: tokenHL.highlight(element.text, tokens),
+        });
+
+        // highlighting text end
+        context.save();
+
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {
@@ -599,6 +619,7 @@ const generateElementShape = (
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   renderConfig: RenderConfig,
+  appState: AppState,
 ) => {
   const zoom: Zoom = renderConfig ? renderConfig.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
@@ -616,6 +637,7 @@ const generateElementWithCanvas = (
       element,
       zoom,
       renderConfig,
+      appState,
     );
 
     elementWithCanvasCache.set(element, elementWithCanvas);
@@ -684,6 +706,7 @@ export const renderElement = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
+  appState: AppState,
 ) => {
   const generator = rc.generator;
   switch (element.type) {
@@ -705,6 +728,7 @@ export const renderElement = (
         const elementWithCanvas = generateElementWithCanvas(
           element,
           renderConfig,
+          appState,
         );
         drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
       } else {
@@ -717,7 +741,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig);
+        drawElementOnCanvas(element, rc, context, renderConfig, appState);
         context.restore();
       }
 
@@ -746,7 +770,7 @@ export const renderElement = (
           context.filter = "none";
         }
 
-        drawElementOnCanvas(element, rc, context, renderConfig);
+        drawElementOnCanvas(element, rc, context, renderConfig, appState);
         context.restore();
         // not exporting → optimized rendering (cache & render from element
         // canvases)
@@ -754,6 +778,7 @@ export const renderElement = (
         const elementWithCanvas = generateElementWithCanvas(
           element,
           renderConfig,
+          appState,
         );
         drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
       }
