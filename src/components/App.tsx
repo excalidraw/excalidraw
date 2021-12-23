@@ -162,7 +162,7 @@ import {
   isArrowKey,
   KEYS,
 } from "../keys";
-import { distance2d, getGridPoint, isPathALoop } from "../math";
+import { distance2d, getGridPoint, isPathALoop, rotate } from "../math";
 import { renderScene } from "../renderer";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
@@ -1547,15 +1547,14 @@ class App extends React.Component<AppProps, AppState> {
   updateContainerSize = withBatchedUpdates(
     (containers: NonDeletedExcalidrawElement[]) => {
       containers.forEach((el: ExcalidrawElement) => {
-        resizeSingleElement(
-          el,
-          true,
-          el,
-          "se",
-          true,
-          el.x + el.width + 0.01,
-          el.y + el.height + 0.01,
+        const [x, y] = rotate(
+          el.x + el.width,
+          el.y + el.height,
+          el.x + el.width / 2,
+          el.y + el.height / 2,
+          el.angle,
         );
+        resizeSingleElement(el, true, el, "se", true, x, y);
       });
     },
   );
