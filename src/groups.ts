@@ -1,6 +1,13 @@
-import { GroupId, ExcalidrawElement, NonDeleted } from "./element/types";
+import {
+  GroupId,
+  ExcalidrawElement,
+  NonDeleted,
+  ExcalidrawTextElementWithContainer,
+} from "./element/types";
 import { AppState } from "./types";
 import { getSelectedElements } from "./scene";
+import { getBoundTextElementId } from "./element/textElement";
+import Scene from "./scene/Scene";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -158,3 +165,33 @@ export const removeFromSelectedGroups = (
   groupIds: ExcalidrawElement["groupIds"],
   selectedGroupIds: { [groupId: string]: boolean },
 ) => groupIds.filter((groupId) => !selectedGroupIds[groupId]);
+
+export const getMaximumGroups = (
+  elements: ExcalidrawElement[],
+): ExcalidrawElement[][] => {
+  const groups: Map<String, ExcalidrawElement[]> = new Map<
+    String,
+    ExcalidrawElement[]
+  >();
+
+  elements.forEach((element: ExcalidrawElement) => {
+    const groupId =
+      element.groupIds.length === 0
+        ? element.id
+        : element.groupIds[element.groupIds.length - 1];
+
+    const currentGroupMembers = groups.get(groupId) || [];
+
+    // Include bounded text if present when grouping
+    const boundTextElementId = getBoundTextElementId(element);
+    if (boundTextElementId) {
+      const textElement = Scene.getScene(element)!.getElement(
+        boundTextElementId,
+      ) as ExcalidrawTextElementWithContainer;
+      currentGroupMembers.push(textElement);
+    }
+    groups.set(groupId, [...currentGroupMembers, element]);
+  });
+
+  return Array.from(groups.values());
+};
