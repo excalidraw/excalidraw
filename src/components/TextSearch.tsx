@@ -31,7 +31,7 @@ export const TextSearch = (props: {
           {close}
         </div>
         <div className="next">{start}</div>
-        <div class="last">{back}</div>
+        <div className="last">{back}</div>
         <input
           type="text"
           className="searchInput"

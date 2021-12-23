@@ -239,6 +239,8 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
+        console.info("yo is this a text element?");
+        console.info(element.text);
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {
