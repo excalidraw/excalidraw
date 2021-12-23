@@ -24,7 +24,7 @@ import { getResizedElementAbsoluteCoords } from "./bounds";
 import { measureText } from "./textElement";
 import { isBoundToContainer } from "./typeChecks";
 import Scene from "../scene/Scene";
-import { PADDING } from "../constants";
+import { BOUND_TEXT_PADDING } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -219,11 +219,11 @@ const getAdjustedDimensions = (
     const container = Scene.getScene(element)!.getElement(element.containerId)!;
     let height = container.height;
     let width = container.width;
-    if (nextHeight > height - PADDING * 2) {
-      height = nextHeight + PADDING * 2;
+    if (nextHeight > height - BOUND_TEXT_PADDING * 2) {
+      height = nextHeight + BOUND_TEXT_PADDING * 2;
     }
-    if (nextWidth > width - PADDING * 2) {
-      width = nextWidth + PADDING * 2;
+    if (nextWidth > width - BOUND_TEXT_PADDING * 2) {
+      width = nextWidth + BOUND_TEXT_PADDING * 2;
     }
     if (height !== container.height || width !== container.width) {
       mutateElement(container, { height, width });
