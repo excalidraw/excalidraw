@@ -6,7 +6,7 @@ import {
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
-import { CLASSES, PADDING } from "../constants";
+import { CLASSES, BOUND_TEXT_PADDING } from "../constants";
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -129,8 +129,11 @@ export const textWysiwyg = ({
           approxLineHeight = isTextElement(updatedElement)
             ? getApproxLineHeight(getFontString(updatedElement))
             : 0;
-          if (updatedElement.height > currentContainer.height - PADDING * 2) {
-            const nextHeight = updatedElement.height + PADDING * 2;
+          if (
+            updatedElement.height >
+            currentContainer.height - BOUND_TEXT_PADDING * 2
+          ) {
+            const nextHeight = updatedElement.height + BOUND_TEXT_PADDING * 2;
             originalContainerHeight = nextHeight;
             mutateElement(container, { height: nextHeight });
             container = { ...container, height: nextHeight };
@@ -141,12 +144,12 @@ export const textWysiwyg = ({
         if (!originalContainerHeight) {
           originalContainerHeight = container.height;
         }
-        maxWidth = container.width - PADDING * 2;
-        maxHeight = container.height - PADDING * 2;
+        maxWidth = container.width - BOUND_TEXT_PADDING * 2;
+        maxHeight = container.height - BOUND_TEXT_PADDING * 2;
         width = maxWidth;
         // The coordinates of text box set a distance of
         // 30px to preserve padding
-        coordX = container.x + PADDING;
+        coordX = container.x + BOUND_TEXT_PADDING;
         // autogrow container height if text exceeds
         if (height > maxHeight) {
           const diff = Math.min(height - maxHeight, approxLineHeight);
@@ -465,7 +468,7 @@ export const textWysiwyg = ({
               height: editorHeight,
               width: Number(editable.style.width.slice(0, -2)),
               // preserve padding
-              x: container.x + PADDING,
+              x: container.x + BOUND_TEXT_PADDING,
             });
             const boundTextElementId = getBoundTextElementId(container);
             if (!boundTextElementId || boundTextElementId !== element.id) {
