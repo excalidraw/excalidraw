@@ -11,11 +11,11 @@ import { PADDING } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 
-export const redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
-  let maxWidth;
-  if (element.containerId) {
-    maxWidth = element.width;
-  }
+export const redrawTextBoundingBox = (
+  element: ExcalidrawTextElement,
+  container: ExcalidrawElement | null,
+) => {
+  const maxWidth = container ? container.width - PADDING * 2 : undefined;
   const metrics = measureText(
     element.originalText,
     getFontString(element),
