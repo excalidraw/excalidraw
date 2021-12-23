@@ -7,15 +7,17 @@ import {
   NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
-import { PADDING } from "../constants";
+import { BOUND_TEXT_PADDING } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 
-export const redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
-  let maxWidth;
-  if (element.containerId) {
-    maxWidth = element.width;
-  }
+export const redrawTextBoundingBox = (
+  element: ExcalidrawTextElement,
+  container: ExcalidrawElement | null,
+) => {
+  const maxWidth = container
+    ? container.width - BOUND_TEXT_PADDING * 2
+    : undefined;
   const metrics = measureText(
     element.originalText,
     getFontString(element),
@@ -87,7 +89,7 @@ export const handleBindTextResize = (
             minCharWidthTillNow = getMinCharWidth(getFontString(textElement));
             // check if the diff has exceeded min char width needed
             const diff = Math.abs(
-              element.width - textElement.width + PADDING * 2,
+              element.width - textElement.width + BOUND_TEXT_PADDING * 2,
             );
             if (diff >= minCharWidthTillNow) {
               text = wrapText(
@@ -107,8 +109,8 @@ export const handleBindTextResize = (
           nextBaseLine = dimensions.baseline;
         }
         // increase height in case text element height exceeds
-        if (nextHeight > element.height - PADDING * 2) {
-          containerHeight = nextHeight + PADDING * 2;
+        if (nextHeight > element.height - BOUND_TEXT_PADDING * 2) {
+          containerHeight = nextHeight + BOUND_TEXT_PADDING * 2;
           const diff = containerHeight - element.height;
           // fix the y coord when resizing from ne/nw/n
           const updatedY =
@@ -127,9 +129,9 @@ export const handleBindTextResize = (
         mutateElement(textElement, {
           text,
           // preserve padding and set width correctly
-          width: element.width - PADDING * 2,
+          width: element.width - BOUND_TEXT_PADDING * 2,
           height: nextHeight,
-          x: element.x + PADDING,
+          x: element.x + BOUND_TEXT_PADDING,
           y: updatedY,
           baseline: nextBaseLine,
         });
@@ -207,7 +209,7 @@ export const wrapText = (
   font: FontString,
   containerWidth: number,
 ) => {
-  const maxWidth = containerWidth - PADDING * 2;
+  const maxWidth = containerWidth - BOUND_TEXT_PADDING * 2;
 
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
@@ -343,11 +345,14 @@ export const charWidth = (() => {
   };
 })();
 export const getApproxMinLineWidth = (font: FontString) => {
-  return measureText(DUMMY_TEXT.split("").join("\n"), font).width + PADDING * 2;
+  return (
+    measureText(DUMMY_TEXT.split("").join("\n"), font).width +
+    BOUND_TEXT_PADDING * 2
+  );
 };
 
 export const getApproxMinLineHeight = (font: FontString) => {
-  return getApproxLineHeight(font) + PADDING * 2;
+  return getApproxLineHeight(font) + BOUND_TEXT_PADDING * 2;
 };
 
 export const getMinCharWidth = (font: FontString) => {
