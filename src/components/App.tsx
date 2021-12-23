@@ -125,6 +125,7 @@ import {
   hasBoundTextElement,
   isBindingElement,
   isBindingElementType,
+  isBoundToContainer,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -929,8 +930,16 @@ class App extends React.Component<AppProps, AppState> {
     window.removeEventListener(EVENT.RESIZE, this.onResize, false);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.removeEventListener(EVENT.BLUR, this.onBlur, false);
-    window.removeEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
-    window.removeEventListener(EVENT.DROP, this.disableEvent, false);
+    this.excalidrawContainerRef.current?.removeEventListener(
+      EVENT.DRAG_OVER,
+      this.disableEvent,
+      false,
+    );
+    this.excalidrawContainerRef.current?.removeEventListener(
+      EVENT.DROP,
+      this.disableEvent,
+      false,
+    );
 
     document.removeEventListener(
       EVENT.GESTURE_START,
@@ -999,8 +1008,16 @@ class App extends React.Component<AppProps, AppState> {
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
-    window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
-    window.addEventListener(EVENT.DROP, this.disableEvent, false);
+    this.excalidrawContainerRef.current?.addEventListener(
+      EVENT.DRAG_OVER,
+      this.disableEvent,
+      false,
+    );
+    this.excalidrawContainerRef.current?.addEventListener(
+      EVENT.DROP,
+      this.disableEvent,
+      false,
+    );
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
@@ -1415,7 +1432,7 @@ class App extends React.Component<AppProps, AppState> {
           ...this.state,
           isLibraryOpen: false,
           selectedElementIds: newElements.reduce((map, element) => {
-            if (isTextElement(element) && !element.containerId) {
+            if (!isBoundToContainer(element)) {
               map[element.id] = true;
             }
             return map;
@@ -1679,9 +1696,11 @@ class App extends React.Component<AppProps, AppState> {
             ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
             : ELEMENT_TRANSLATE_AMOUNT);
 
-        const selectedElements = this.scene
-          .getElements()
-          .filter((element) => this.state.selectedElementIds[element.id]);
+        const selectedElements = getSelectedElements(
+          this.scene.getElements(),
+          this.state,
+          true,
+        );
 
         let offsetX = 0;
         let offsetY = 0;
@@ -2096,7 +2115,7 @@ class App extends React.Component<AppProps, AppState> {
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
   }) => {
-    const parentCenterPosition =
+    let parentCenterPosition =
       insertAtParentCenter &&
       this.getTextWysiwygSnappedToCenterPosition(
         sceneX,
@@ -2141,6 +2160,15 @@ class App extends React.Component<AppProps, AppState> {
       mutateElement(container, { height: newHeight, width: newWidth });
       sceneX = container.x + newWidth / 2;
       sceneY = container.y + newHeight / 2;
+      if (parentCenterPosition) {
+        parentCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+          sceneX,
+          sceneY,
+          this.state,
+          this.canvas,
+          window.devicePixelRatio,
+        );
+      }
     }
 
     const element = existingTextElement
@@ -3579,6 +3607,7 @@ class App extends React.Component<AppProps, AppState> {
             lockDirection,
             dragDistanceX,
             dragDistanceY,
+            this.state,
           );
           this.maybeSuggestBindingForAll(selectedElements);
 
