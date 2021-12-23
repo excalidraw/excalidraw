@@ -123,6 +123,7 @@ import {
   hasBoundTextElement,
   isBindingElement,
   isBindingElementType,
+  isBoundToContainer,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -1419,7 +1420,7 @@ class App extends React.Component<AppProps, AppState> {
           ...this.state,
           isLibraryOpen: false,
           selectedElementIds: newElements.reduce((map, element) => {
-            if (isTextElement(element) && !element.containerId) {
+            if (!isBoundToContainer(element)) {
               map[element.id] = true;
             }
             return map;
