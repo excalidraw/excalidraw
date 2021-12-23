@@ -17,8 +17,9 @@ import {
 import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
 import { ToolButton } from "../components/ToolButton";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { AppState } from "../types";
+import { isBoundToContainer } from "../element/typeChecks";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -151,7 +152,12 @@ export const actionUngroup = register({
     if (groupIds.length === 0) {
       return { appState, elements, commitToHistory: false };
     }
+
+    const boundTextElementIds: ExcalidrawTextElement["id"][] = [];
     const nextElements = elements.map((element) => {
+      if (isBoundToContainer(element)) {
+        boundTextElementIds.push(element.id);
+      }
       const nextGroupIds = removeFromSelectedGroups(
         element.groupIds,
         appState.selectedGroupIds,
@@ -163,11 +169,19 @@ export const actionUngroup = register({
         groupIds: nextGroupIds,
       });
     });
+
+    const updateAppState = selectGroupsForSelectedElements(
+      { ...appState, selectedGroupIds: {} },
+      getNonDeletedElements(nextElements),
+    );
+
+    // remove binded text elements from selection
+    boundTextElementIds.forEach(
+      (id) => (updateAppState.selectedElementIds[id] = false),
+    );
     return {
-      appState: selectGroupsForSelectedElements(
-        { ...appState, selectedGroupIds: {} },
-        getNonDeletedElements(nextElements),
-      ),
+      appState: updateAppState,
+
       elements: nextElements,
       commitToHistory: true,
     };
