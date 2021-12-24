@@ -41,14 +41,8 @@ export const centerScrollOn = ({
   zoom: Zoom;
 }) => {
   return {
-    scrollX:
-      (viewportDimensions.width / 2) * (1 / zoom.value) -
-      scenePoint.x -
-      zoom.translation.x * (1 / zoom.value),
-    scrollY:
-      (viewportDimensions.height / 2) * (1 / zoom.value) -
-      scenePoint.y -
-      zoom.translation.y * (1 / zoom.value),
+    scrollX: (viewportDimensions.width / 2) * (1 / zoom.value) - scenePoint.x,
+    scrollY: (viewportDimensions.height / 2) * (1 / zoom.value) - scenePoint.y,
   };
 };
 
