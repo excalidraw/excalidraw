@@ -1,17 +1,7 @@
 import { ExcalidrawElement } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
-import { getCommonBounds } from "./element";
-
-interface Box {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
-  midX: number;
-  midY: number;
-  width: number;
-  height: number;
-}
+import { getMaximumGroups } from "./groups";
+import { getCommonBoundingBox } from "./element/bounds";
 
 export interface Distribution {
   space: "between";
@@ -97,40 +87,4 @@ export const distributeElements = (
       }),
     );
   });
-};
-
-export const getMaximumGroups = (
-  elements: ExcalidrawElement[],
-): ExcalidrawElement[][] => {
-  const groups: Map<String, ExcalidrawElement[]> = new Map<
-    String,
-    ExcalidrawElement[]
-  >();
-
-  elements.forEach((element: ExcalidrawElement) => {
-    const groupId =
-      element.groupIds.length === 0
-        ? element.id
-        : element.groupIds[element.groupIds.length - 1];
-
-    const currentGroupMembers = groups.get(groupId) || [];
-
-    groups.set(groupId, [...currentGroupMembers, element]);
-  });
-
-  return Array.from(groups.values());
-};
-
-const getCommonBoundingBox = (elements: ExcalidrawElement[]): Box => {
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  return {
-    minX,
-    minY,
-    maxX,
-    maxY,
-    width: maxX - minX,
-    height: maxY - minY,
-    midX: (minX + maxX) / 2,
-    midY: (minY + maxY) / 2,
-  };
 };
