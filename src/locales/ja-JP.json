@@ -204,11 +204,11 @@
     "resizeImage": "SHIFTを長押しすると自由にサイズを変更できます。\n中央からサイズを変更するにはALTを長押しします",
     "rotate": "回転中にSHIFT キーを押すと角度を制限することができます",
     "lineEditor_info": "ポイントを編集するには、ダブルクリックまたはEnterキーを押します",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Deleteキーを押すと点を削除、CtrlOrCmd+Dで複製、マウスドラッグで移動",
+    "lineEditor_nothingSelected": "編集する点を選択（SHIFTを押したままで複数選択）、\nAltキーを押しながらクリックすると新しい点を追加",
     "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
     "publishLibrary": "自分のライブラリを公開",
-    "bindTextToElement": ""
+    "bindTextToElement": "Enterを押してテキストを追加"
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
@@ -293,7 +293,7 @@
       "libraryDesc": "ライブラリの使い方を理解するための説明",
       "githubHandle": "GitHubハンドル(任意)。一度レビューのために送信されると、ライブラリを編集できます",
       "twitterHandle": "Twitterのユーザー名 (任意)。Twitterでプロモーションする際にクレジットする人を知っておくためのものです",
-      "website": "個人のウェブサイトまたは他のサイトへのリンク (オプション)"
+      "website": "個人のウェブサイトまたは他のサイトへのリンク (任意)"
     },
     "errors": {
       "required": "必須項目",
