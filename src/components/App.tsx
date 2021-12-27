@@ -5293,9 +5293,7 @@ class App extends React.Component<AppProps, AppState> {
       penOpacity: number;
     }) => void,
   ) {
-    const tempPens: [
-      { penStrokeColor: string; penStrokeWidth: number; penOpacity: number },
-    ] = [...this.state.pens];
+    const tempPens = [...this.state.pens];
     modifier(tempPens[this.state.currentPen]);
     this.setState({ pens: tempPens });
   }
