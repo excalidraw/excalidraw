@@ -19,6 +19,8 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Introduced pen presets which can be overriden just by changing the current pen. Each pen has its own stroke-color, stroke-width and opacity. Visit https://github.com/excalidraw/excalidraw/pull/4492 or check out https://excalidraw-39s1ty7kp-excalidraw.vercel.app/ to try it interactively by choosing the drawing-pen. It also works by selecting something drawn and then changing the pen afterwards.
+
 - Introduced primary colors to the app. The colors can be overriden. Check [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#customizing-styles) on how to do so.
 
 - #### BREAKING CHANGE
