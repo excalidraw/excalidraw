@@ -320,7 +320,9 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
     };
+
     this.id = nanoid();
+
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
