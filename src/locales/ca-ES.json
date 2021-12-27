@@ -279,25 +279,25 @@
     "title": "Neteja el llenç"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "Publica la biblioteca",
+    "itemName": "Nom de l'element",
+    "authorName": "Nom de l'autor/a",
+    "githubUsername": "Nom d'usuari de GitHub",
+    "twitterUsername": "Nom d'usuari de Twitter",
+    "libraryName": "Nom de la biblioteca",
+    "libraryDesc": "Descripció de la biblioteca",
+    "website": "Lloc web",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
+      "authorName": "Nom o usuari",
+      "libraryName": "Nom de la vostra biblioteca",
       "libraryDesc": "",
       "githubHandle": "",
       "twitterHandle": "",
       "website": ""
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Requerit",
+      "website": "Introduïu una URL vàlida"
     },
     "noteDescription": {
       "pre": "",
@@ -311,7 +311,7 @@
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
+      "link": "Llicència MIT, ",
       "post": ""
     },
     "noteItems": "",
