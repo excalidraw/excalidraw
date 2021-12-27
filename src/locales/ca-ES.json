@@ -35,7 +35,7 @@
     "arrowhead_arrow": "Fletxa",
     "arrowhead_bar": "Barra",
     "arrowhead_dot": "Punt",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "Triangle",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "onlySelected": "Només seleccionats",
@@ -101,8 +101,8 @@
     "showStroke": "Mostra el selector de color del traç",
     "showBackground": "Mostra el selector de color de fons",
     "toggleTheme": "Activa o desactiva el tema",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Biblioteca personal",
+    "excalidrawLib": "Biblioteca d'Excalidraw"
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
@@ -136,12 +136,12 @@
     "lightMode": "Mode clar",
     "zenMode": "Mode zen",
     "exitZenMode": "Surt de mode zen",
-    "cancel": "",
-    "clear": "",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "cancel": "Cancel·la",
+    "clear": "Neteja",
+    "remove": "Suprimeix",
+    "publishLibrary": "Publica",
+    "submit": "Envia",
+    "confirm": "Confirma"
   },
   "alerts": {
     "clearReset": "S'esborrarà tot el llenç. N'esteu segur?",
@@ -163,12 +163,12 @@
     "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge",
     "invalidSceneUrl": "No s'ha pogut importar l'escena des de l'adreça URL proporcionada. Està malformada o no conté dades Excalidraw JSON vàlides.",
     "resetLibrary": "Això buidarà la biblioteca. N'esteu segur?",
-    "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la biblioteca?",
+    "invalidEncryptionKey": "La clau d'encriptació ha de tenir 22 caràcters. La col·laboració en directe està desactivada."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
+    "unsupportedFileType": "Tipus de fitxer no suportat.",
+    "imageInsertError": "No s'ha pogut insertar la imatge, torneu-ho a provar més tard...",
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": ""
