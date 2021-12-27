@@ -20,6 +20,7 @@
     "background": "Background",
     "fill": "Fill",
     "strokeWidth": "Stroke width",
+    "pen": "Pen",
     "strokeStyle": "Stroke style",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Dashed",

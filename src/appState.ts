@@ -18,7 +18,10 @@ export const getDefaultAppState = (): Omit<
   AppState,
   "offsetTop" | "offsetLeft" | "width" | "height"
 > => {
-  return {
+  const defaultValues: Omit<
+    AppState,
+    "offsetTop" | "offsetLeft" | "width" | "height" | "pens"
+  > = {
     theme: THEME.LIGHT,
     collaborators: new Map(),
     currentChartType: "bar",
@@ -80,6 +83,17 @@ export const getDefaultAppState = (): Omit<
     zoom: { value: 1 as NormalizedZoomValue, translation: { x: 0, y: 0 } },
     viewModeEnabled: false,
     pendingImageElement: null,
+    currentPen: 0,
+  };
+  return {
+    ...defaultValues,
+    pens: [...Array(5).keys()].map((_) => {
+      return {
+        penStrokeColor: defaultValues.currentItemStrokeColor,
+        penStrokeWidth: defaultValues.currentItemStrokeWidth,
+        penOpacity: defaultValues.currentItemOpacity,
+      };
+    }),
   };
 };
 
@@ -102,6 +116,8 @@ const APP_STATE_STORAGE_CONF = (<
   theme: { browser: true, export: false, server: false },
   collaborators: { browser: false, export: false, server: false },
   currentChartType: { browser: true, export: false, server: false },
+  currentPen: { browser: true, export: false, server: false },
+  pens: { browser: true, export: false, server: false },
   currentItemBackgroundColor: { browser: true, export: false, server: false },
   currentItemEndArrowhead: { browser: true, export: false, server: false },
   currentItemFillStyle: { browser: true, export: false, server: false },
