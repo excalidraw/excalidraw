@@ -302,29 +302,29 @@
     "noteDescription": {
       "pre": "Envieu la vostra biblioteca perquè sigui inclosa al ",
       "link": "repositori públic",
-      "post": ""
+      "post": "per tal que altres persones puguin fer-ne ús en els seus dibuixos."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "La biblioteca ha de ser aprovada manualment. Si us plau, llegiu les ",
+      "link": "directrius",
+      "post": " abans d'enviar-hi res. Necessitareu un compte de GitHub per a comunicar i fer-hi canvis si cal, però no és requisit imprescindible."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "Llicència MIT, ",
-      "post": ""
+      "pre": "Quan l'envieu, accepteu que la biblioteca sigui publicada sota la ",
+      "link": "llicència MIT, ",
+      "post": "que, en resum, vol dir que qualsevol persona pot fer-ne ús sense restriccions."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Cada element de la biblioteca ha de tenir el seu propi nom per tal que sigui filtrable. S'hi inclouran els elements següents:",
+    "atleastOneLibItem": "Si us plau, seleccioneu si més no un element de la biblioteca per a començar"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Biblioteca enviada",
+    "content": "Gràcies, {{authorName}}. La vostra biblioteca ha estat enviada per a ser revisada. Podeu comprovar-ne l'estat",
+    "link": "aquí"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Restableix la biblioteca",
+    "removeItemsFromLib": "Suprimeix els elements seleccionats de la llibreria"
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai.",
