@@ -290,18 +290,18 @@
     "placeholder": {
       "authorName": "Nom o usuari",
       "libraryName": "Nom de la vostra biblioteca",
-      "libraryDesc": "",
+      "libraryDesc": "Descripció de la biblioteca per a ajudar a la gent a entendre'n el funcionament",
       "githubHandle": "",
       "twitterHandle": "",
-      "website": ""
+      "website": "Enllaç al vostre lloc web personal o a qualsevol altre (opcional)"
     },
     "errors": {
       "required": "Requerit",
       "website": "Introduïu una URL vàlida"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
+      "pre": "Envieu la vostra biblioteca perquè sigui inclosa al ",
+      "link": "repositori públic",
       "post": ""
     },
     "noteGuidelines": {
