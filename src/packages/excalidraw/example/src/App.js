@@ -1,14 +1,15 @@
 import { useEffect, useState, useRef } from "react";
-import Excalidraw, {
-  exportToCanvas,
-  exportToSvg,
-  exportToBlob,
-} from "../../../excalidraw/index";
+
 import InitialData from "./initialData";
 import Sidebar from "./sidebar/Sidebar";
 
-import "./App.css";
+import "./App.scss";
 import initialData from "./initialData";
+
+// This is so that we use the bundled excalidraw.developement.js file instead
+// of the actual source code
+const { exportToCanvas, exportToSvg, exportToBlob } = window.Excalidraw;
+const Excalidraw = window.Excalidraw.default;
 
 const renderTopRightUI = () => {
   return (
