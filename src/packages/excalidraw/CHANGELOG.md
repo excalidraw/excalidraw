@@ -70,6 +70,8 @@ Please add the latest change on the top under the correct section.
 
 ### Build
 
+- Added an example to test and develop the package [locally](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Development) using `yarn start`
+
 - Remove `file-loader` so font assets are not duplicated by webpack and use webpack asset modules for font generation [#4380](https://github.com/excalidraw/excalidraw/pull/4380)
 
 - We're now compiling to `es2017` target. Notably, `async/await` is not compiled down to generators. [#4341](https://github.com/excalidraw/excalidraw/pull/4341)
