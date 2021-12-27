@@ -170,7 +170,7 @@
     "unsupportedFileType": "Tipus de fitxer no suportat.",
     "imageInsertError": "No s'ha pogut insertar la imatge, torneu-ho a provar més tard...",
     "fileTooBig": "El fitxer és massa gros. La mida màxima permesa és {{maxSize}}.",
-    "svgImageInsertError": "",
+    "svgImageInsertError": "No ha estat possible inserir la imatge SVG. Les marques SVG semblen invàlides.",
     "invalidSVGString": "SVG no vàlid."
   },
   "toolBar": {
@@ -206,7 +206,7 @@
     "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
-    "placeImage": "",
+    "placeImage": "Feu clic per a col·locar la imatge o clic i arrossegar per a establir-ne la mida manualment",
     "publishLibrary": "Publiqueu la vostra pròpia llibreria",
     "bindTextToElement": "Premeu enter per a afegir-hi text"
   },
