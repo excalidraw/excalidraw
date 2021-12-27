@@ -169,13 +169,13 @@
   "errors": {
     "unsupportedFileType": "Tipus de fitxer no suportat.",
     "imageInsertError": "No s'ha pogut insertar la imatge, torneu-ho a provar més tard...",
-    "fileTooBig": "",
+    "fileTooBig": "El fitxer és massa gros. La mida màxima permesa és {{maxSize}}.",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG no vàlid."
   },
   "toolBar": {
     "selection": "Selecció",
-    "image": "",
+    "image": "Insereix imatge",
     "rectangle": "Rectangle",
     "diamond": "Rombe",
     "ellipse": "El·lipse",
@@ -207,8 +207,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": "",
-    "bindTextToElement": ""
+    "publishLibrary": "Publiqueu la vostra pròpia llibreria",
+    "bindTextToElement": "Premeu enter per a afegir-hi text"
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
@@ -276,7 +276,7 @@
     "zoomToSelection": "Zoom per veure la selecció"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Neteja el llenç"
   },
   "publishDialog": {
     "title": "",
