@@ -1851,6 +1851,31 @@ class App extends React.Component<AppProps, AppState> {
 
       const matchedText = textMatchSearch.search(searchMatchText);
       console.info(matchedText);
+
+      if (matchedText.length > 0) {
+        const rect1 = newElement({
+          type: "rectangle",
+          x: 1100,
+          y: 400,
+          width: 50,
+          height: 50,
+          angle: 0,
+          strokeColor: "yellow",
+          backgroundColor: "red",
+          fillStyle: "solid",
+          strokeWidth: 1,
+          strokeStyle: "solid",
+          roughness: 5,
+          opacity: 80,
+          groupIds: [],
+          strokeSharpness: "sharp",
+        });
+
+        this.scene.replaceAllElements([
+          ...this.scene.getElementsIncludingDeleted(),
+          rect1,
+        ]);
+      }
     }
   });
 
