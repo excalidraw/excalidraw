@@ -322,25 +322,11 @@ export const charWidth = (() => {
     return cachedCharWidth[font][ascii];
   };
 
-  const updateCache = (char: string, font: FontString) => {
-    const ascii = char.charCodeAt(0);
-
-    if (!cachedCharWidth[font][ascii]) {
-      cachedCharWidth[font][ascii] = calculate(char, font);
-    }
-  };
-
-  const clearCacheforFont = (font: FontString) => {
-    cachedCharWidth[font] = [];
-  };
-
   const getCache = (font: FontString) => {
     return cachedCharWidth[font];
   };
   return {
     calculate,
-    updateCache,
-    clearCacheforFont,
     getCache,
   };
 })();
