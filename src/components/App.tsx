@@ -2100,10 +2100,9 @@ class App extends React.Component<AppProps, AppState> {
     const container =
       shouldBind || parentCenterPosition
         ? getElementContainingPosition(
-            this.scene.getElements(),
+            this.scene.getElements().filter((ele) => !isTextElement(ele)),
             sceneX,
             sceneY,
-            "text",
           )
         : null;
 
