@@ -1812,6 +1812,7 @@ class App extends React.Component<AppProps, AppState> {
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
         setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+        event.preventDefault();
       }
 
       if (event.key === KEYS.G || event.key === KEYS.S) {
@@ -2808,6 +2809,7 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     }
     isPanning = true;
+    event.preventDefault();
 
     let nextPastePrevented = false;
     const isLinux = /Linux/.test(window.navigator.platform);
