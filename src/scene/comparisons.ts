@@ -75,7 +75,6 @@ export const getElementContainingPosition = (
   elements: readonly ExcalidrawElement[],
   x: number,
   y: number,
-  excludedType?: ExcalidrawElement["type"],
 ) => {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
@@ -84,13 +83,7 @@ export const getElementContainingPosition = (
       continue;
     }
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
-    if (
-      x1 < x &&
-      x < x2 &&
-      y1 < y &&
-      y < y2 &&
-      elements[index].type !== excludedType
-    ) {
+    if (x1 < x && x < x2 && y1 < y && y < y2) {
       hitElement = elements[index];
       break;
     }
