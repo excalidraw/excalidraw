@@ -510,7 +510,6 @@ class App extends React.Component<AppProps, AppState> {
               />
             )}
             {this.state.textSearchActive && (
-              // TODO: remove second condition when search component is ready
               <TextSearch
                 appState={this.state}
                 setAppState={this.setAppState}

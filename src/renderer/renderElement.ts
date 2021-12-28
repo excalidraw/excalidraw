@@ -32,8 +32,8 @@ import { getDefaultAppState } from "../appState";
 import { MAX_DECIMALS_FOR_SVG_EXPORT, MIME_TYPES, SVG_NS } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import { getApproxLineHeight } from "../element/textElement";
-import * as JsSearch from "js-search";
-import { mutateElement } from "../element/mutateElement";
+//import * as JsSearch from "js-search";
+//import { mutateElement } from "../element/mutateElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -243,23 +243,6 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
-        // highlighting text start
-        console.info(element.text);
-        console.info(appState.textSearchActive);
-        console.info(appState.searchMatchText);
-        const tokenHL = new JsSearch.TokenHighlighter(
-          new JsSearch.PrefixIndexStrategy(),
-          new JsSearch.LowerCaseSanitizer(),
-          "mark",
-        );
-        const tokens = [appState.searchMatchText];
-        mutateElement(element, {
-          strokeColor: "blue",
-          originalText: tokenHL.highlight(element.originalText, tokens),
-        });
-
-        // highlighting text end
-
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {
