@@ -1,4 +1,4 @@
-import { getFontString, arrayToMap } from "../utils";
+import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -200,6 +200,12 @@ const getTextWidth = (text: string, font: FontString) => {
   canvas2dContext.font = font;
 
   const metrics = canvas2dContext.measureText(text);
+  // since in test env the canvas measureText algo
+  // doesn't measure text and instead just returns number of
+  // characters hence we assume that each letteris 10px
+  if (isTestEnv()) {
+    return metrics.width * 10;
+  }
 
   return metrics.width;
 };
@@ -322,25 +328,11 @@ export const charWidth = (() => {
     return cachedCharWidth[font][ascii];
   };
 
-  const updateCache = (char: string, font: FontString) => {
-    const ascii = char.charCodeAt(0);
-
-    if (!cachedCharWidth[font][ascii]) {
-      cachedCharWidth[font][ascii] = calculate(char, font);
-    }
-  };
-
-  const clearCacheforFont = (font: FontString) => {
-    cachedCharWidth[font] = [];
-  };
-
   const getCache = (font: FontString) => {
     return cachedCharWidth[font];
   };
   return {
     calculate,
-    updateCache,
-    clearCacheforFont,
     getCache,
   };
 })();

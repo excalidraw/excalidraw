@@ -443,8 +443,7 @@ export const bytesToHexString = (bytes: Uint8Array) => {
     .join("");
 };
 
-export const getUpdatedTimestamp = () =>
-  process.env.NODE_ENV === "test" ? 1 : Date.now();
+export const getUpdatedTimestamp = () => (isTestEnv() ? 1 : Date.now());
 
 /**
  * Transforms array of objects containing `id` attribute,
@@ -458,3 +457,6 @@ export const arrayToMap = <T extends { id: string } | string>(
     return acc;
   }, new Map());
 };
+
+export const isTestEnv = () =>
+  typeof process !== "undefined" && process.env?.NODE_ENV === "test";
