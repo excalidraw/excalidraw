@@ -458,3 +458,5 @@ export const arrayToMap = <T extends { id: string } | string>(
     return acc;
   }, new Map());
 };
+
+export const isTestEnv = () => process?.env?.NODE_ENV === "test";
