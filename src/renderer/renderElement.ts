@@ -253,13 +253,12 @@ const drawElementOnCanvas = (
           "mark",
         );
         const tokens = [appState.searchMatchText];
-        //element.text = tokenHL.highlight(element.text, tokens);
         mutateElement(element, {
-          text: tokenHL.highlight(element.text, tokens),
+          strokeColor: "blue",
+          originalText: tokenHL.highlight(element.originalText, tokens),
         });
 
         // highlighting text end
-        context.save();
 
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
