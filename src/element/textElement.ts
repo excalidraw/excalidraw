@@ -10,24 +10,52 @@ import { mutateElement } from "./mutateElement";
 import { BOUND_TEXT_PADDING } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
+import { AppState } from "../types";
+import { isTextElement } from ".";
 
 export const redrawTextBoundingBox = (
   element: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
+  appState: AppState,
 ) => {
   const maxWidth = container
     ? container.width - BOUND_TEXT_PADDING * 2
     : undefined;
+  let text = element.originalText;
+
+  // Call wrapText only when updating text properties
+  // By clicking on the container
+  if (container && !isTextElement(appState.editingElement)) {
+    text = wrapText(
+      element.originalText,
+      getFontString(element),
+      container.width,
+    );
+  }
   const metrics = measureText(
     element.originalText,
     getFontString(element),
     maxWidth,
   );
 
+  let coordY = element.y;
+  // Resize container and vertically center align the text
+  if (container) {
+    coordY = container.y + container.height / 2 - metrics.height / 2;
+    let nextHeight = container.height;
+    if (metrics.height > container.height - BOUND_TEXT_PADDING * 2) {
+      nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
+      coordY = container.y + nextHeight / 2 - metrics.height / 2;
+    }
+    mutateElement(container, { height: nextHeight });
+  }
+
   mutateElement(element, {
     width: metrics.width,
     height: metrics.height,
     baseline: metrics.baseline,
+    y: coordY,
+    text,
   });
 };
 
