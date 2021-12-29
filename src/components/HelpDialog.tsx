@@ -261,6 +261,18 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   shortcuts={[getShortcutKey(`Shift+${t("helpDialog.click")}`)]}
                 />
                 <Shortcut
+                  label={t("helpDialog.deepSelect")}
+                  shortcuts={[
+                    getShortcutKey(`CtrlOrCmd+${t("helpDialog.click")}`),
+                  ]}
+                />
+                <Shortcut
+                  label={t("helpDialog.deepBoxSelect")}
+                  shortcuts={[
+                    getShortcutKey(`CtrlOrCmd+${t("helpDialog.drag")}`),
+                  ]}
+                />
+                <Shortcut
                   label={t("labels.moveCanvas")}
                   shortcuts={[
                     getShortcutKey(`Space+${t("helpDialog.drag")}`),

@@ -256,6 +256,8 @@
   "helpDialog": {
     "blog": "Read our blog",
     "click": "click",
+    "deepSelect": "Deep select",
+    "deepBoxSelect": "Deep select within box, and prevent dragging",
     "curvedArrow": "Curved arrow",
     "curvedLine": "Curved line",
     "documentation": "Documentation",
