@@ -83,8 +83,13 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
     return t("hints.text_editing");
   }
 
-  if (elementType === "selection" && !selectedElements.length && !isMobile) {
-    return t("hints.canvasPanning");
+  if (elementType === "selection") {
+    if (appState.draggingElement?.type === "selection") {
+      return t("hints.deepBoxSelect");
+    }
+    if (!selectedElements.length && !isMobile) {
+      return t("hints.canvasPanning");
+    }
   }
 
   return null;
