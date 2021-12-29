@@ -102,7 +102,7 @@ export const textWysiwyg = ({
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
-      let container = updatedElement?.containerId
+      const container = updatedElement?.containerId
         ? Scene.getScene(updatedElement)!.getElement(updatedElement.containerId)
         : null;
       let maxWidth = updatedElement.width;
@@ -123,21 +123,12 @@ export const textWysiwyg = ({
           height = editorHeight;
         }
         if (propertiesUpdated) {
-          const currentContainer = Scene.getScene(updatedElement)?.getElement(
-            updatedElement.containerId,
-          ) as ExcalidrawBindableElement;
           approxLineHeight = isTextElement(updatedElement)
             ? getApproxLineHeight(getFontString(updatedElement))
             : 0;
-          if (
-            updatedElement.height >
-            currentContainer.height - BOUND_TEXT_PADDING * 2
-          ) {
-            const nextHeight = updatedElement.height + BOUND_TEXT_PADDING * 2;
-            originalContainerHeight = nextHeight;
-            mutateElement(container, { height: nextHeight });
-            container = { ...container, height: nextHeight };
-          }
+
+          originalContainerHeight = container.height;
+
           // update height of the editor after properties updated
           height = updatedElement.height;
         }
