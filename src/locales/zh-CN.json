@@ -157,13 +157,13 @@
     "collabStopOverridePrompt": "停止会话将覆盖您先前本地存储的绘图。 您确定吗？\n\n(如果您想保持本地绘图，只需关闭浏览器选项卡。)",
     "errorLoadingLibrary": "加载第三方库时出错。",
     "errorAddingToLibrary": "无法将项目添加到素材库中",
-    "errorRemovingFromLibrary": "无法从库中移除项目",
-    "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
+    "errorRemovingFromLibrary": "无法从素材库中移除项目",
+    "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的素材库中。您确定吗？",
     "imageDoesNotContainScene": "此图像似乎不包含任何画布数据。您是否在导出时启用了画布嵌入功能？",
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
     "invalidSceneUrl": "无法从提供的 URL 导入场景。它或者格式不正确，或者不包含有效的 Excalidraw JSON 数据。",
     "resetLibrary": "这将会清除你的素材库。你确定要这么做吗？",
-    "removeItemsFromsLibrary": "要从库中删除 {{count}} 个项目吗？",
+    "removeItemsFromsLibrary": "确定要从素材库中删除 {{count}} 个项目吗？",
     "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。"
   },
   "errors": {
@@ -183,7 +183,7 @@
     "line": "线条",
     "freedraw": "自由书写",
     "text": "文字",
-    "library": "库",
+    "library": "素材库",
     "lock": "绘制后保持所选的工具栏状态"
   },
   "headings": {
@@ -207,7 +207,7 @@
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，拖动以移动",
     "lineEditor_nothingSelected": "选择要编辑的点 (按住 SHIFT 选择多个)，\n或按住 Alt 并点击以添加新点",
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
-    "publishLibrary": "发布您自己的库",
+    "publishLibrary": "发布您自己的素材库",
     "bindTextToElement": "按下 Enter 以添加文本"
   },
   "canvasError": {
@@ -279,7 +279,7 @@
     "title": "清除画布"
   },
   "publishDialog": {
-    "title": "发布库",
+    "title": "发布素材库",
     "itemName": "项目名称",
     "authorName": "作者名",
     "githubUsername": "GitHub 用户名",
@@ -289,9 +289,9 @@
     "website": "网址",
     "placeholder": {
       "authorName": "您的名字或用户名",
-      "libraryName": "库名称",
-      "libraryDesc": "介绍您的库，让人们了解其用途",
-      "githubHandle": "GitHub 用户名（可选），填写后，您可以编辑已提交待审的库",
+      "libraryName": "素材库名称",
+      "libraryDesc": "介绍您的素材库，让人们了解其用途",
+      "githubHandle": "GitHub 用户名（可选），填写后，您可以编辑已提交待审的素材库",
       "twitterHandle": "Twitter 用户名（可选），填写后，当我们在Twitter发布推广信息时便可提及您",
       "website": "您个人网站的或任意的链接（可选）"
     },
@@ -300,7 +300,7 @@
       "website": "输入一个有效的URL"
     },
     "noteDescription": {
-      "pre": "您的库提交后将被包含在 ",
+      "pre": "提交后，您的素材库将被包含在 ",
       "link": "公共库仓库",
       "post": "供其他人在绘图中使用。"
     },
