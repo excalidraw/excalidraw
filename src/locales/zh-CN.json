@@ -101,8 +101,8 @@
     "showStroke": "显示描边颜色选择器",
     "showBackground": "显示背景颜色选择器",
     "toggleTheme": "切换主题",
-    "personalLib": "个人库",
-    "excalidrawLib": "Excalidraw 库"
+    "personalLib": "个人素材库",
+    "excalidrawLib": "Excalidraw 素材库"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -129,7 +129,7 @@
     "edit": "编辑",
     "undo": "撤销",
     "redo": "重做",
-    "resetLibrary": "重置资源库",
+    "resetLibrary": "重置素材库",
     "createNewRoom": "新建会议室",
     "fullScreen": "全屏",
     "darkMode": "深色模式",
@@ -162,7 +162,7 @@
     "imageDoesNotContainScene": "此图像似乎不包含任何画布数据。您是否在导出时启用了画布嵌入功能？",
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
     "invalidSceneUrl": "无法从提供的 URL 导入场景。它或者格式不正确，或者不包含有效的 Excalidraw JSON 数据。",
-    "resetLibrary": "这将会清除你的资源库。你确定这么做吗？",
+    "resetLibrary": "这将会清除你的素材库。你确定要这么做吗？",
     "removeItemsFromsLibrary": "要从库中删除 {{count}} 个项目吗？",
     "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。"
   },
