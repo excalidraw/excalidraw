@@ -77,4 +77,4 @@ export const getTargetElements = (
 ) =>
   appState.editingElement
     ? [appState.editingElement]
-    : getSelectedElements(elements, appState);
+    : getSelectedElements(elements, appState, true);
