@@ -262,7 +262,7 @@ export const wrapText = (
         const currentWordWidth = getTextWidth(words[index], font);
 
         // Start breaking longer words exceeding max width
-        if (currentWordWidth > maxWidth) {
+        if (currentWordWidth >= maxWidth) {
           // push current line since the current word exceeds the max width
           // so will be appended in next line
           if (currentLine) {
