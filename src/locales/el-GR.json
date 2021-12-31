@@ -101,8 +101,8 @@
     "showStroke": "Εμφάνιση επιλογέα χρωμάτων πινελιάς",
     "showBackground": "Εμφάνιση επιλογέα χρώματος φόντου",
     "toggleTheme": "Εναλλαγή θέματος",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Προσωπική Βιβλιοθήκη",
+    "excalidrawLib": "Βιβλιοθήκη Excalidraw"
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
