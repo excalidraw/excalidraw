@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "Klikk for å plassere biletet, eller klikk og drag for å velje storleik manuelt",
     "publishLibrary": "",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikkje vise førehandsvising",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Les bloggen vår",
     "click": "klikk",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Boga pil",
     "curvedLine": "Boga linje",
     "documentation": "Dokumentasjon",
