@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не вдається показати попередній перегляд",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Наш блог",
     "click": "натиснути",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Крива стрілка",
     "curvedLine": "Крива лінія",
     "documentation": "Документація",
