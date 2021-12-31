@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
     "publishLibrary": "Julkaise oma kirjasto",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Lue blogiamme",
     "click": "klikkaa",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Kaareva nuoli",
     "curvedLine": "Kaareva viiva",
     "documentation": "Käyttöohjeet",
