@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "Välj en punkt att redigera (håll SHIFT för att välja flera),\neller håll ned Alt och klicka för att lägga till nya punkter",
     "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt",
     "publishLibrary": "Publicera ditt eget bibliotek",
-    "bindTextToElement": "Tryck på Enter för att lägga till text"
+    "bindTextToElement": "Tryck på Enter för att lägga till text",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Läs vår blogg",
     "click": "klicka",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Böjd pil",
     "curvedLine": "Böjd linje",
     "documentation": "Dokumentation",
