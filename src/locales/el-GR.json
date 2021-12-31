@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "Δημοσιεύστε τη δική σας βιβλιοθήκη",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Αδυναμία εμφάνισης προεπισκόπησης",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Διαβάστε το Blog μας",
     "click": "κλικ",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Κυρτό βέλος",
     "curvedLine": "Κυρτή γραμμή",
     "documentation": "Εγχειρίδιο",
