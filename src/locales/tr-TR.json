@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "Resmi yerleştirmek için tıklayın ya da boyutunu manuel olarak ayarlamak için tıklayıp sürükleyin",
     "publishLibrary": "Kendi kitaplığınızı yayınlayın",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Blog'umuzu okuyun",
     "click": "tıkla",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Eğri ok",
     "curvedLine": "Eğri çizgi",
     "documentation": "Dokümantasyon",
