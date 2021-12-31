@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "לא הצלחנו להציג את התצוגה המקדימה",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "קרא את הבלוג שלנו",
     "click": "קליק",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "חץ מעוגל",
     "curvedLine": "קו מעוגל",
     "documentation": "תיעוד",
