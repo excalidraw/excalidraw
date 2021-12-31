@@ -1865,9 +1865,12 @@ class App extends React.Component<AppProps, AppState> {
         const matchedElemJson = JSON.parse(JSON.stringify(matchedElement));
         const matchHighlightRect = newElement({
           type: "rectangle",
-          x: matchedElemJson.x,
+          x: matchedElemJson.x - 2,
           y: matchedElemJson.y,
-          width: matchedElemJson.width,
+          width:
+            (matchedElemJson.width / matchedElemJson.text.length) *
+              this.state.searchMatchText.length +
+            4,
           height: matchedElemJson.height,
           angle: matchedElemJson.angle,
           strokeColor: "yellow",
@@ -1875,7 +1878,7 @@ class App extends React.Component<AppProps, AppState> {
           fillStyle: "solid",
           strokeWidth: 1,
           strokeStyle: "solid",
-          roughness: 1,
+          roughness: 0,
           opacity: 50,
           groupIds: ["highlight_rectangles"],
           strokeSharpness: "sharp",
