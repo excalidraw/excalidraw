@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "हमारा ब्लॉग पढे",
     "click": "क्लिक करें",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "वक्र तीर",
     "curvedLine": "वक्र रेखा",
     "documentation": "",
