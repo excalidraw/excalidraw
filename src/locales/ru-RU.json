@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "Щелкните, чтобы разместить изображение, или нажмите и перетащите, чтобы установить его размер вручную",
     "publishLibrary": "Опубликовать свою собственную библиотеку",
-    "bindTextToElement": "Нажмите Enter для добавления текста"
+    "bindTextToElement": "Нажмите Enter для добавления текста",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не удается отобразить предпросмотр",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Прочитайте наш блог",
     "click": "нажать",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Изогнутая стрелка",
     "curvedLine": "Изогнутая линия",
     "documentation": "Документация",
