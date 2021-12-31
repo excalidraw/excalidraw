@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "Velg et punkt å redigere (hold SHIFT for å velge flere),\neller hold Alt og klikk for å legge til nye punkter",
     "placeImage": "Klikk for å plassere bildet, eller klikk og dra for å angi størrelsen manuelt",
     "publishLibrary": "Publiser ditt eget bibliotek",
-    "bindTextToElement": "Trykk Enter for å legge til tekst"
+    "bindTextToElement": "Trykk Enter for å legge til tekst",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Les bloggen vår",
     "click": "klikk",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Buet pil",
     "curvedLine": "Buet linje",
     "documentation": "Dokumentasjon",
