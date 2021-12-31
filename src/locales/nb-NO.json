@@ -209,7 +209,7 @@
     "placeImage": "Klikk for å plassere bildet, eller klikk og dra for å angi størrelsen manuelt",
     "publishLibrary": "Publiser ditt eget bibliotek",
     "bindTextToElement": "Trykk Enter for å legge til tekst",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Hold CTRL/CMD for å markere dypt og forhindre flytting"
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
@@ -256,8 +256,8 @@
   "helpDialog": {
     "blog": "Les bloggen vår",
     "click": "klikk",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Marker dypt",
+    "deepBoxSelect": "Marker dypt innad i boks og forhindre flytting",
     "curvedArrow": "Buet pil",
     "curvedLine": "Buet linje",
     "documentation": "Dokumentasjon",
