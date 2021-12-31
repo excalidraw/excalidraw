@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "Zvoľte bod na upravovanie (podržte SHIFT pre zvolenie viacerých bodov) alebo podržte Alt a kliknite na pridanie nového bodu",
     "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
     "publishLibrary": "Uverejniť vašu knižnicu",
-    "bindTextToElement": "Stlačte enter na pridanie textu"
+    "bindTextToElement": "Stlačte enter na pridanie textu",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Prečítajte si náš blog",
     "click": "kliknutie",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Zakrivená šípka",
     "curvedLine": "Zakrivená čiara",
     "documentation": "Dokumentácia",
