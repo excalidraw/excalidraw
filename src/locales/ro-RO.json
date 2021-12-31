@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "Selectează un punct pentru a-l edita (ține apăsată tasta SHIFT pentru a selecta mai multe),\nsau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi",
     "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
     "publishLibrary": "Publică propria bibliotecă",
-    "bindTextToElement": "Apasă tasta Enter pentru a adăuga text"
+    "bindTextToElement": "Apasă tasta Enter pentru a adăuga text",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Citește blogul nostru",
     "click": "clic",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Săgeată curbată",
     "curvedLine": "Linie curbată",
     "documentation": "Documentație",
