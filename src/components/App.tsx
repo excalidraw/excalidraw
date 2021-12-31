@@ -1852,28 +1852,31 @@ class App extends React.Component<AppProps, AppState> {
       const matchedElements = textMatchSearch.search(searchMatchText);
       console.info(matchedElements);
 
-      // delete the highlight rectangles
-      const rectangles = this.scene
-        .getElements()
-        .filter((element) => element.groupIds.includes("highlight_rectangles"));
-
-      console.info(rectangles);
+      this.scene.replaceAllElements(
+        this.scene
+          .getElements()
+          .filter(
+            (element) => !element.groupIds.includes("highlight_rectangles"),
+          ),
+      );
 
       matchedElements.forEach((matchedElement) => {
+        console.info(matchedElement);
+        const matchedElemJson = JSON.parse(JSON.stringify(matchedElement));
         const matchHighlightRect = newElement({
           type: "rectangle",
-          x: 1100,
-          y: 400,
-          width: 50,
-          height: 50,
-          angle: 0,
+          x: matchedElemJson.x,
+          y: matchedElemJson.y,
+          width: matchedElemJson.width,
+          height: matchedElemJson.height,
+          angle: matchedElemJson.angle,
           strokeColor: "yellow",
-          backgroundColor: "red",
+          backgroundColor: "yellow",
           fillStyle: "solid",
           strokeWidth: 1,
           strokeStyle: "solid",
-          roughness: 5,
-          opacity: 80,
+          roughness: 1,
+          opacity: 50,
           groupIds: ["highlight_rectangles"],
           strokeSharpness: "sharp",
         });
