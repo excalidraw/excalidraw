@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "Kliknij, aby umieścić obraz, lub kliknij i przeciągnij, aby ustawić jego rozmiar ręcznie",
     "publishLibrary": "Opublikuj własną bibliotekę",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Przeczytaj na naszym blogu",
     "click": "kliknięcie",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "Zakrzywiona linia",
     "documentation": "Dokumentacja",
