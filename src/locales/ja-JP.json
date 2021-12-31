@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "編集する点を選択（SHIFTを押したままで複数選択）、\nAltキーを押しながらクリックすると新しい点を追加",
     "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
     "publishLibrary": "自分のライブラリを公開",
-    "bindTextToElement": "Enterを押してテキストを追加"
+    "bindTextToElement": "Enterを押してテキストを追加",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "公式ブログを読む",
     "click": "クリック",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "カーブした矢印",
     "curvedLine": "曲線",
     "documentation": "ドキュメント",
