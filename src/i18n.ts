@@ -20,6 +20,7 @@ const allLanguages: Language[] = [
   { code: "de-DE", label: "Deutsch" },
   { code: "el-GR", label: "Ελληνικά" },
   { code: "es-ES", label: "Español" },
+  { code: "eu-ES", label: "Euskara" },
   { code: "fa-IR", label: "فارسی", rtl: true },
   { code: "fi-FI", label: "Suomi" },
   { code: "fr-FR", label: "Français" },
