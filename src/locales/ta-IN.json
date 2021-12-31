@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "திருத்த புள்ளியைத் தேர்ந்தெடு (பலவற்றை தேர SHIFTஐ அழுத்திப்பிடி),\nஅ புதிய புள்ளிகளைச் சேர்க்க Altஐ அழுத்திப்பிடித்துச் சொடுக்கு",
     "placeImage": "படத்தை வைக்கச் சொடுக்கு, அ கைமுறையாக அளவு அமைக்க சொடுக்கி பிடித்திழு",
     "publishLibrary": "உம் சொந்த நூலகத்தைப் பிரசுரி",
-    "bindTextToElement": "உரையைச் சேர்க்க enterஐ அழுத்து"
+    "bindTextToElement": "உரையைச் சேர்க்க enterஐ அழுத்து",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "முன்னோட்டம் காட்ட இயலவில்லை",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "எமது வலைப்பூவை வாசி",
     "click": "சொடுக்கு",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "வளைந்த அம்பு",
     "curvedLine": "வளைந்த வரி",
     "documentation": "ஆவணமாக்கல்",
