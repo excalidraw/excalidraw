@@ -16,6 +16,7 @@ const allLanguages: Language[] = [
   { code: "ar-SA", label: "العربية", rtl: true },
   { code: "bg-BG", label: "Български" },
   { code: "ca-ES", label: "Català" },
+  { code: "cs-CZ", label: "Česky" },
   { code: "de-DE", label: "Deutsch" },
   { code: "el-GR", label: "Ελληνικά" },
   { code: "es-ES", label: "Español" },
@@ -29,7 +30,10 @@ const allLanguages: Language[] = [
   { code: "it-IT", label: "Italiano" },
   { code: "ja-JP", label: "日本語" },
   { code: "kab-KAB", label: "Taqbaylit" },
+  { code: "kk-KZ", label: "Қазақ тілі" },
   { code: "ko-KR", label: "한국어" },
+  { code: "lt-LT", Label :"Lietuvių" },
+  { code: "lv-LV", label: "Latviešu" },
   { code: "my-MM", label: "Burmese" },
   { code: "nb-NO", label: "Norsk bokmål" },
   { code: "nl-NL", label: "Nederlands" },
@@ -47,9 +51,6 @@ const allLanguages: Language[] = [
   { code: "uk-UA", label: "Українська" },
   { code: "zh-CN", label: "简体中文" },
   { code: "zh-TW", label: "繁體中文" },
-  { code: "lv-LV", label: "Latviešu" },
-  { code: "cs-CZ", label: "Česky" },
-  { code: "kk-KZ", label: "Қазақ тілі" },
 ].concat([defaultLang]);
 
 export const languages: Language[] = allLanguages
