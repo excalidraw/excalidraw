@@ -299,7 +299,7 @@
       "website": ""
     },
     "errors": {
-      "required": "",
+      "required": "Απαιτείται",
       "website": "Εισάγετε μια έγκυρη διεύθυνση URL"
     },
     "noteDescription": {
