@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "Atlasiet punktu, lai labotu (turiet nospiestu SHIFT, lai atlasītu vairākus),\nvai turiet Alt un clikšķiniet, lai pievienotu jaunus punktus",
     "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru",
     "publishLibrary": "Publicēt savu bibliotēku",
-    "bindTextToElement": "Spiediet ievades taustiņu, lai pievienotu tekstu"
+    "bindTextToElement": "Spiediet ievades taustiņu, lai pievienotu tekstu",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nevar rādīt priekšskatījumu",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Lasīt mūsu blogu",
     "click": "klikšķis",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Liekta bulta",
     "curvedLine": "Liekta līnija",
     "documentation": "Dokumentācija",
