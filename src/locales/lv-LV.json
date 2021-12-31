@@ -209,7 +209,7 @@
     "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru",
     "publishLibrary": "Publicēt savu bibliotēku",
     "bindTextToElement": "Spiediet ievades taustiņu, lai pievienotu tekstu",
-    "deepBoxSelect": "Turient nospiestu CtrlOrCmd, lai atlasītu dziļumā un lai nepieļautu objektu pavilkšanu"
+    "deepBoxSelect": "Turient nospiestu Ctrl vai Cmd, lai atlasītu dziļumā un lai nepieļautu objektu pavilkšanu"
   },
   "canvasError": {
     "cannotShowPreview": "Nevar rādīt priekšskatījumu",
@@ -256,8 +256,8 @@
   "helpDialog": {
     "blog": "Lasīt mūsu blogu",
     "click": "klikšķis",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Atlasīt dziļumā",
+    "deepBoxSelect": "Atlasīt dziļumā kastes ietvaros, un nepieļaut pavilkšanu",
     "curvedArrow": "Liekta bulta",
     "curvedLine": "Liekta līnija",
     "documentation": "Dokumentācija",
