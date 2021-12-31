@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "Haga clic para colocar la imagen o haga clic y arrastre para establecer su tamaño manualmente",
     "publishLibrary": "",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Lea nuestro blog",
     "click": "clic",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Flecha curva",
     "curvedLine": "Línea curva",
     "documentation": "Documentación",
