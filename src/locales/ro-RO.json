@@ -209,7 +209,7 @@
     "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
     "publishLibrary": "Publică propria bibliotecă",
     "bindTextToElement": "Apasă tasta Enter pentru a adăuga text",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea"
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -256,8 +256,8 @@
   "helpDialog": {
     "blog": "Citește blogul nostru",
     "click": "clic",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Selectare de adâncime",
+    "deepBoxSelect": "Selectare de adâncime în casetă și prevenire glisare",
     "curvedArrow": "Săgeată curbată",
     "curvedLine": "Linie curbată",
     "documentation": "Documentație",
