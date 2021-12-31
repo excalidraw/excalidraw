@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "Selecione um ponto para editar (segure SHIFT para selecionar vários) ou segure Alt e clique para adicionar novos pontos",
     "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
     "publishLibrary": "Publicar sua própria biblioteca",
-    "bindTextToElement": "Pressione Enter para adicionar o texto"
+    "bindTextToElement": "Pressione Enter para adicionar o texto",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Leia o nosso blog",
     "click": "clicar",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Seta curva",
     "curvedLine": "Linha curva",
     "documentation": "Documentação",
