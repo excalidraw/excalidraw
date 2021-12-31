@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "Sélectionner un point pour éditer (maintenir la touche MAJ pour en sélectionner plusieurs),\nou maintenir la touche Alt enfoncée et cliquer pour ajouter de nouveaux points",
     "placeImage": "Cliquez pour placer l'image, ou cliquez et faites glisser pour définir sa taille manuellement",
     "publishLibrary": "Publier votre propre bibliothèque",
-    "bindTextToElement": "Appuyer sur Entrée pour ajouter du texte"
+    "bindTextToElement": "Appuyer sur Entrée pour ajouter du texte",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Lire notre blog",
     "click": "clic",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Flèche courbée",
     "curvedLine": "Ligne courbée",
     "documentation": "Documentation",
