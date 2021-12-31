@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "Feu clic per a col·locar la imatge o clic i arrossegar per a establir-ne la mida manualment",
     "publishLibrary": "Publiqueu la vostra pròpia llibreria",
-    "bindTextToElement": "Premeu enter per a afegir-hi text"
+    "bindTextToElement": "Premeu enter per a afegir-hi text",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Llegiu el nostre blog",
     "click": "clic",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Fletxa corba",
     "curvedLine": "Línia corba",
     "documentation": "Documentació",
