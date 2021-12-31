@@ -209,7 +209,7 @@
     "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt",
     "publishLibrary": "Publicera ditt eget bibliotek",
     "bindTextToElement": "Tryck på Enter för att lägga till text",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra"
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
@@ -256,8 +256,8 @@
   "helpDialog": {
     "blog": "Läs vår blogg",
     "click": "klicka",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Djupval",
+    "deepBoxSelect": "Djupval inom boxen, och förhindra att dra",
     "curvedArrow": "Böjd pil",
     "curvedLine": "Böjd linje",
     "documentation": "Dokumentation",
