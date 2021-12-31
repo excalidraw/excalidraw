@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Irakurri gure bloga",
     "click": "sakatu",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Gezi kurbatua",
     "curvedLine": "Lerro kurbatua",
     "documentation": "Dokumentazioa",
