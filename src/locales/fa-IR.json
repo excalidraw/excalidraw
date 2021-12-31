@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "بلاگ ما را بخوانید",
     "click": "کلیک",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "فلش خمیده",
     "curvedLine": "منحنی",
     "documentation": "مستندات",
