@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "Pilih titik untuk mengedit (tekan SHIFT untuk pilih banyak), atau tekan Alt dan klik untuk tambahkan titik baru",
     "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
     "publishLibrary": "Terbitkan pustaka Anda",
-    "bindTextToElement": "Tekan enter untuk tambahkan teks"
+    "bindTextToElement": "Tekan enter untuk tambahkan teks",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "Baca blog kami",
     "click": "klik",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Panah lengkung",
     "curvedLine": "Garis lengkung",
     "documentation": "Dokumentasi",
