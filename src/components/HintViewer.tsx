@@ -61,6 +61,27 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
     return t("hints.rotate");
   }
 
+  if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
+    return t("hints.text_selected");
+  }
+
+  if (appState.editingElement && isTextElement(appState.editingElement)) {
+    return t("hints.text_editing");
+  }
+
+  if (elementType === "selection") {
+    if (
+      appState.draggingElement?.type === "selection" &&
+      !appState.editingElement &&
+      !appState.editingLinearElement
+    ) {
+      return t("hints.deepBoxSelect");
+    }
+    if (!selectedElements.length && !isMobile) {
+      return t("hints.canvasPanning");
+    }
+  }
+
   if (selectedElements.length === 1) {
     if (isLinearElement(selectedElements[0])) {
       if (appState.editingLinearElement) {
@@ -73,18 +94,6 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
     if (isTextBindableContainer(selectedElements[0])) {
       return t("hints.bindTextToElement");
     }
-  }
-
-  if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
-    return t("hints.text_selected");
-  }
-
-  if (appState.editingElement && isTextElement(appState.editingElement)) {
-    return t("hints.text_editing");
-  }
-
-  if (elementType === "selection" && !selectedElements.length && !isMobile) {
-    return t("hints.canvasPanning");
   }
 
   return null;
