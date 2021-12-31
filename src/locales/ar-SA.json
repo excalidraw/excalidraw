@@ -208,7 +208,8 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
-    "bindTextToElement": ""
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
@@ -255,6 +256,8 @@
   "helpDialog": {
     "blog": "اقرأ مدونتنا",
     "click": "انقر",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "سهم مائل",
     "curvedLine": "خط مائل",
     "documentation": "دليل الاستخدام",
