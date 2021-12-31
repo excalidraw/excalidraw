@@ -1849,11 +1849,18 @@ class App extends React.Component<AppProps, AppState> {
       textMatchSearch.addIndex("text");
       textMatchSearch.addDocuments(textElements);
 
-      const matchedText = textMatchSearch.search(searchMatchText);
-      console.info(matchedText);
+      const matchedElements = textMatchSearch.search(searchMatchText);
+      console.info(matchedElements);
 
-      if (matchedText.length > 0) {
-        const rect1 = newElement({
+      // delete the highlight rectangles
+      const rectangles = this.scene
+        .getElements()
+        .filter((element) => element.groupIds.includes("highlight_rectangles"));
+
+      console.info(rectangles);
+
+      matchedElements.forEach((matchedElement) => {
+        const matchHighlightRect = newElement({
           type: "rectangle",
           x: 1100,
           y: 400,
@@ -1867,15 +1874,15 @@ class App extends React.Component<AppProps, AppState> {
           strokeStyle: "solid",
           roughness: 5,
           opacity: 80,
-          groupIds: [],
+          groupIds: ["highlight_rectangles"],
           strokeSharpness: "sharp",
         });
 
         this.scene.replaceAllElements([
           ...this.scene.getElementsIncludingDeleted(),
-          rect1,
+          matchHighlightRect,
         ]);
-      }
+      });
     }
   });
 
