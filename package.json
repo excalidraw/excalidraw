@@ -70,7 +70,7 @@
     "jest-canvas-mock": "2.3.1",
     "lint-staged": "12.1.4",
     "pepjs": "0.5.3",
-    "prettier": "2.5.0",
+    "prettier": "2.5.1",
     "rewire": "5.0.0"
   },
   "resolutions": {
