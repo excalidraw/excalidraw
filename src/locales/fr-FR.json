@@ -256,8 +256,8 @@
   "helpDialog": {
     "blog": "Lire notre blog",
     "click": "clic",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Sélection dans les groupes",
+    "deepBoxSelect": "Sélectionner dans les groupes, et empêcher le déplacement",
     "curvedArrow": "Flèche courbée",
     "curvedLine": "Ligne courbée",
     "documentation": "Documentation",
