@@ -155,7 +155,7 @@
     "uploadedSecurly": "上传已被端到端加密保护，这意味着 Excalidraw 的服务器和第三方都无法读取内容。",
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
     "collabStopOverridePrompt": "停止会话将覆盖您先前本地存储的绘图。 您确定吗？\n\n(如果您想保持本地绘图，只需关闭浏览器选项卡。)",
-    "errorLoadingLibrary": "加载第三方库时出错。",
+    "errorLoadingLibrary": "加载第三方素材库时出错。",
     "errorAddingToLibrary": "无法将项目添加到素材库中",
     "errorRemovingFromLibrary": "无法从素材库中移除项目",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的素材库中。您确定吗？",
@@ -313,21 +313,21 @@
       "post": " 后续沟通和对库的修改需要 GitHub 帐号，但这不是必须的。"
     },
     "noteLicense": {
-      "pre": "提交时，表明您已同意库将遵循 ",
+      "pre": "提交即表明您已同意素材库将遵循 ",
       "link": "MIT 许可证， ",
       "post": "简而言之，任何人都可以不受限制地使用它们。"
     },
-    "noteItems": "库中每个项目都有互相独立的名称以供筛选。以下项目将被包含：",
-    "atleastOneLibItem": "请选择至少一个库以开始"
+    "noteItems": "素材库中每个项目都有各自的名称以供筛选。以下项目将被包含：",
+    "atleastOneLibItem": "请选择至少一个素材库以开始"
   },
   "publishSuccessDialog": {
-    "title": "库已提交",
-    "content": "谢谢你 {{authorName}}。您的库已被提交审核。跟进此次提交的状态请点击",
+    "title": "素材库已提交",
+    "content": "谢谢你 {{authorName}}。您的素材库已被提交审核。跟进此次提交的状态请点击",
     "link": "此处"
   },
   "confirmDialog": {
-    "resetLibrary": "重置库",
-    "removeItemsFromLib": "从库中删除选中的项目"
+    "resetLibrary": "重置素材库",
+    "removeItemsFromLib": "从素材库中删除选中的项目"
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
@@ -349,7 +349,7 @@
     "width": "宽度"
   },
   "toast": {
-    "addedToLibrary": "添加到库中",
+    "addedToLibrary": "添加到素材库中",
     "copyStyles": "复制样式",
     "copyToClipboard": "已复制到剪切板。",
     "copyToClipboardAsPng": "已将 {{exportSelection}} 作为 PNG 复制到剪贴板\n({{exportColorScheme}})",
