@@ -209,7 +209,7 @@
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
     "publishLibrary": "发布您自己的素材库",
     "bindTextToElement": "按下 Enter 以添加文本",
-    "deepBoxSelect": "按住 Ctrl 或 Cmd 键以深度选择，并防止拖拽"
+    "deepBoxSelect": "按住 CtrlOrCmd 以深度选择，并避免拖拽"
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -257,7 +257,7 @@
     "blog": "浏览我们的博客",
     "click": "单击",
     "deepSelect": "深度选择",
-    "deepBoxSelect": "请在方框内深入选择并避免拖拽",
+    "deepBoxSelect": "在方框内深度选择并避免拖拽",
     "curvedArrow": "曲线箭头",
     "curvedLine": "曲线",
     "documentation": "文档",
