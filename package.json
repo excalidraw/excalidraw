@@ -21,12 +21,12 @@
   "dependencies": {
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
-    "@testing-library/jest-dom": "5.15.1",
+    "@testing-library/jest-dom": "5.16.1",
     "@testing-library/react": "12.1.2",
-    "@tldraw/vec": "1.1.5",
+    "@tldraw/vec": "1.4.0",
     "@types/jest": "27.0.3",
     "@types/pica": "5.1.3",
-    "@types/react": "17.0.37",
+    "@types/react": "17.0.38",
     "@types/react-dom": "17.0.11",
     "@types/socket.io-client": "1.4.36",
     "browser-fs-access": "0.23.0",
@@ -50,16 +50,16 @@
     "react-dom": "17.0.2",
     "react-scripts": "4.0.3",
     "roughjs": "4.5.2",
-    "sass": "1.43.5",
+    "sass": "1.45.2",
     "socket.io-client": "2.3.1",
-    "typescript": "4.5.2"
+    "typescript": "4.5.4"
   },
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.0",
     "@excalidraw/prettier-config": "1.0.2",
-    "@types/chai": "4.2.22",
+    "@types/chai": "4.3.0",
     "@types/lodash.throttle": "4.1.6",
-    "@types/pako": "1.0.2",
+    "@types/pako": "1.0.3",
     "@types/resize-observer-browser": "0.1.6",
     "chai": "4.3.4",
     "dotenv": "10.0.0",
@@ -68,9 +68,9 @@
     "firebase-tools": "9.23.0",
     "husky": "7.0.4",
     "jest-canvas-mock": "2.3.1",
-    "lint-staged": "12.1.2",
+    "lint-staged": "12.1.4",
     "pepjs": "0.5.3",
-    "prettier": "2.5.0",
+    "prettier": "2.5.1",
     "rewire": "5.0.0"
   },
   "resolutions": {

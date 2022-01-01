@@ -2168,6 +2168,7 @@ class App extends React.Component<AppProps, AppState> {
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
           containerId: container?.id ?? undefined,
+          groupIds: container?.groupIds ?? [],
         });
 
     this.setState({ editingElement: element });
