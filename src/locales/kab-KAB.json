@@ -204,12 +204,12 @@
     "resizeImage": "Tzemreḍ ad talseḍ tiddi s tilelli s tuṭṭfa n SHIFT,\nṭṭef ALT akken ad talseḍ tiddi si tlemmast",
     "rotate": "Tzemreḍ ad tḥettemeḍ tiɣemmar s tuṭṭfa n SHIFT di tuzzya",
     "lineEditor_info": "Ssit snat n tikkal neɣ ssed taqeffalt Kcem akken ad tẓergeḍ tinqiḍin",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Ssed taqeffalt kkes akken ad tekkseḍ tanqiḍ (tinqiḍin),\nCtrlOrCmd+D akken ad tsiselgeḍ, neɣ zuɣer akken ad tesmuttiḍ",
+    "lineEditor_nothingSelected": "Fren tanqiḍt akken ad tẓergeḍ (ṭṭef SHIFT akken ad tferneḍ aṭas),\nneɣ ṭṭef Alt akken ad ternuḍ tinqiḍin timaynutin",
     "placeImage": "Ssit akken ad tserseḍ tugna, neɣ ssit u zuɣer akken ad tesbaduḍ tiddi-ines s ufus",
     "publishLibrary": "Siẓreg tamkarḍit-inek•inem",
-    "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "bindTextToElement": "Ssed ɣef kcem akken ad ternuḍ aḍris",
+    "deepBoxSelect": "Ṭṭef CtrlOrCmd akken ad tferneḍ s telqey, yerna ad trewleḍ i uzuɣer"
   },
   "canvasError": {
     "cannotShowPreview": "Ulamek abeqqeḍ n teskant",
@@ -256,8 +256,8 @@
   "helpDialog": {
     "blog": "Ɣeṛ ablug-nneɣ",
     "click": "ssit",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Afran s telqey",
+    "deepBoxSelect": "Afran s telqey s tnaka, yerna ad tyrewleḍ i uzuɣer",
     "curvedArrow": "Taneccabt izelgen",
     "curvedLine": "Izirig izelgen",
     "documentation": "Tasemlit",
