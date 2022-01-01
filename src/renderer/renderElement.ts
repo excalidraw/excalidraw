@@ -22,7 +22,8 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
-import { SceneState } from "../scene/types";
+
+import { RenderConfig } from "../scene/types";
 import { distance, isRTL } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
@@ -42,10 +43,22 @@ const defaultAppState = getDefaultAppState();
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
-  sceneState: SceneState,
+  renderConfig: RenderConfig,
 ) =>
   isInitializedImageElement(element) &&
-  !sceneState.imageCache.has(element.fileId);
+  !renderConfig.imageCache.has(element.fileId);
+
+const shouldResetImageFilter = (
+  element: ExcalidrawElement,
+  renderConfig: RenderConfig,
+) => {
+  return (
+    renderConfig.theme === "dark" &&
+    isInitializedImageElement(element) &&
+    !isPendingImageElement(element, renderConfig) &&
+    renderConfig.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
+  );
+};
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -57,7 +70,7 @@ const getCanvasPadding = (element: ExcalidrawElement) =>
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
-  theme: SceneState["theme"];
+  theme: RenderConfig["theme"];
   canvasZoom: Zoom["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
@@ -66,8 +79,7 @@ export interface ExcalidrawElementWithCanvas {
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
-  sceneState: SceneState,
-  renderCb?: () => void,
+  renderConfig: RenderConfig,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -77,12 +89,7 @@ const generateElementCanvas = (
   let canvasOffsetY = 0;
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-
-    x1 = Math.floor(x1);
-    x2 = Math.ceil(x2);
-    y1 = Math.floor(y1);
-    y2 = Math.ceil(y2);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
     canvas.width =
       distance(x1, x2) * window.devicePixelRatio * zoom.value +
@@ -93,16 +100,12 @@ const generateElementCanvas = (
 
     canvasOffsetX =
       element.x > x1
-        ? Math.floor(distance(element.x, x1)) *
-          window.devicePixelRatio *
-          zoom.value
+        ? distance(element.x, x1) * window.devicePixelRatio * zoom.value
         : 0;
 
     canvasOffsetY =
       element.y > y1
-        ? Math.floor(distance(element.y, y1)) *
-          window.devicePixelRatio *
-          zoom.value
+        ? distance(element.y, y1) * window.devicePixelRatio * zoom.value
         : 0;
 
     context.translate(canvasOffsetX, canvasOffsetY);
@@ -125,22 +128,17 @@ const generateElementCanvas = (
   const rc = rough.canvas(canvas);
 
   // in dark theme, revert the image color filter
-  if (
-    sceneState.theme === "dark" &&
-    isInitializedImageElement(element) &&
-    !isPendingImageElement(element, sceneState) &&
-    sceneState.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
-  ) {
+  if (shouldResetImageFilter(element, renderConfig)) {
     context.filter = IMAGE_INVERT_FILTER;
   }
 
-  drawElementOnCanvas(element, rc, context, sceneState, renderCb);
+  drawElementOnCanvas(element, rc, context, renderConfig);
   context.restore();
 
   return {
     element,
     canvas,
-    theme: sceneState.theme,
+    theme: renderConfig.theme,
     canvasZoom: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
@@ -187,8 +185,7 @@ const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  sceneState: SceneState,
-  renderCb?: () => void,
+  renderConfig: RenderConfig,
 ) => {
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
@@ -225,7 +222,7 @@ const drawElementOnCanvas = (
     }
     case "image": {
       const img = isInitializedImageElement(element)
-        ? sceneState.imageCache.get(element.fileId)?.image
+        ? renderConfig.imageCache.get(element.fileId)?.image
         : undefined;
       if (img != null && !(img instanceof Promise)) {
         context.drawImage(
@@ -236,7 +233,7 @@ const drawElementOnCanvas = (
           element.height,
         );
       } else {
-        drawImagePlaceholder(element, context, sceneState.zoom.value);
+        drawImagePlaceholder(element, context, renderConfig.zoom.value);
       }
       break;
     }
@@ -249,7 +246,7 @@ const drawElementOnCanvas = (
           // to the DOM
           document.body.appendChild(context.canvas);
         }
-        renderTextElement(element, context, renderCb);
+        renderTextElement(element, context, renderConfig.renderCb);
         if (shouldTemporarilyAttach) {
           context.canvas.remove();
         }
@@ -306,8 +303,6 @@ export const generateRoughOptions = (
     roughness: element.roughness,
     stroke: element.strokeColor,
     preserveVertices: continuousPath,
-    // disable decimals to fix Skia rendering issues #4046
-    fixedDecimalPlaceDigits: 0,
   };
 
   switch (element.type) {
@@ -384,15 +379,45 @@ const generateElementShape = (
       case "diamond": {
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
           getDiamondPoints(element);
-        shape = generator.polygon(
-          [
-            [topX, topY],
-            [rightX, rightY],
-            [bottomX, bottomY],
-            [leftX, leftY],
-          ],
-          generateRoughOptions(element),
-        );
+        if (element.strokeSharpness === "round") {
+          shape = generator.path(
+            `M ${topX + (rightX - topX) * 0.25} ${
+              topY + (rightY - topY) * 0.25
+            } L ${rightX - (rightX - topX) * 0.25} ${
+              rightY - (rightY - topY) * 0.25
+            } 
+            C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
+              rightX - (rightX - bottomX) * 0.25
+            } ${rightY + (bottomY - rightY) * 0.25} 
+            L ${bottomX + (rightX - bottomX) * 0.25} ${
+              bottomY - (bottomY - rightY) * 0.25
+            }  
+            C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
+              bottomX - (bottomX - leftX) * 0.25
+            } ${bottomY - (bottomY - leftY) * 0.25} 
+            L ${leftX + (bottomX - leftX) * 0.25} ${
+              leftY + (bottomY - leftY) * 0.25
+            } 
+            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${
+              leftX + (topX - leftX) * 0.25
+            } ${leftY - (leftY - topY) * 0.25} 
+            L ${topX - (topX - leftX) * 0.25} ${topY + (leftY - topY) * 0.25} 
+            C ${topX} ${topY}, ${topX} ${topY}, ${
+              topX + (rightX - topX) * 0.25
+            } ${topY + (rightY - topY) * 0.25}`,
+            generateRoughOptions(element, true),
+          );
+        } else {
+          shape = generator.polygon(
+            [
+              [topX, topY],
+              [rightX, rightY],
+              [bottomX, bottomY],
+              [leftX, leftY],
+            ],
+            generateRoughOptions(element),
+          );
+        }
         break;
       }
       case "ellipse":
@@ -546,26 +571,24 @@ const generateElementShape = (
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
-  sceneState: SceneState,
-  renderCb?: () => void,
+  renderConfig: RenderConfig,
 ) => {
-  const zoom: Zoom = sceneState ? sceneState.zoom : defaultAppState.zoom;
+  const zoom: Zoom = renderConfig ? renderConfig.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
     prevElementWithCanvas.canvasZoom !== zoom.value &&
-    !sceneState?.shouldCacheIgnoreZoom;
+    !renderConfig?.shouldCacheIgnoreZoom;
 
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
-    prevElementWithCanvas.theme !== sceneState.theme
+    prevElementWithCanvas.theme !== renderConfig.theme
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
       zoom,
-      sceneState,
-      renderCb,
+      renderConfig,
     );
 
     elementWithCanvasCache.set(element, elementWithCanvas);
@@ -579,7 +602,7 @@ const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  sceneState: SceneState,
+  renderConfig: RenderConfig,
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
@@ -593,10 +616,10 @@ const drawElementFromCanvas = (
     y2 = Math.ceil(y2);
   }
 
-  const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
-  const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
+  const cx = ((x1 + x2) / 2 + renderConfig.scrollX) * window.devicePixelRatio;
+  const cy = ((y1 + y2) / 2 + renderConfig.scrollY) * window.devicePixelRatio;
 
-  const _isPendingImageElement = isPendingImageElement(element, sceneState);
+  const _isPendingImageElement = isPendingImageElement(element, renderConfig);
 
   const scaleXFactor =
     "scale" in elementWithCanvas.element && !_isPendingImageElement
@@ -633,17 +656,15 @@ export const renderElement = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderOptimizations: boolean,
-  sceneState: SceneState,
-  renderCb?: () => void,
+  renderConfig: RenderConfig,
 ) => {
   const generator = rc.generator;
   switch (element.type) {
     case "selection": {
       context.save();
       context.translate(
-        element.x + sceneState.scrollX,
-        element.y + sceneState.scrollY,
+        element.x + renderConfig.scrollX,
+        element.y + renderConfig.scrollY,
       );
       context.fillStyle = "rgba(0, 0, 255, 0.10)";
       context.fillRect(0, 0, element.width, element.height);
@@ -653,24 +674,23 @@ export const renderElement = (
     case "freedraw": {
       generateElementShape(element, generator);
 
-      if (renderOptimizations) {
+      if (renderConfig.isExporting) {
         const elementWithCanvas = generateElementWithCanvas(
           element,
-          sceneState,
-          renderCb,
+          renderConfig,
         );
-        drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
+        drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
       } else {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-        const cx = (x1 + x2) / 2 + sceneState.scrollX;
-        const cy = (y1 + y2) / 2 + sceneState.scrollY;
+        const cx = (x1 + x2) / 2 + renderConfig.scrollX;
+        const cy = (y1 + y2) / 2 + renderConfig.scrollY;
         const shiftX = (x2 - x1) / 2 - (element.x - x1);
         const shiftY = (y2 - y1) / 2 - (element.y - y1);
         context.save();
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, sceneState, renderCb);
+        drawElementOnCanvas(element, rc, context, renderConfig);
         context.restore();
       }
 
@@ -684,25 +704,31 @@ export const renderElement = (
     case "image":
     case "text": {
       generateElementShape(element, generator);
-      if (renderOptimizations) {
-        const elementWithCanvas = generateElementWithCanvas(
-          element,
-          sceneState,
-          renderCb,
-        );
-        drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
-      } else {
+      if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-        const cx = (x1 + x2) / 2 + sceneState.scrollX;
-        const cy = (y1 + y2) / 2 + sceneState.scrollY;
+        const cx = (x1 + x2) / 2 + renderConfig.scrollX;
+        const cy = (y1 + y2) / 2 + renderConfig.scrollY;
         const shiftX = (x2 - x1) / 2 - (element.x - x1);
         const shiftY = (y2 - y1) / 2 - (element.y - y1);
         context.save();
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, sceneState, renderCb);
+
+        if (shouldResetImageFilter(element, renderConfig)) {
+          context.filter = "none";
+        }
+
+        drawElementOnCanvas(element, rc, context, renderConfig);
         context.restore();
+        // not exporting → optimized rendering (cache & render from element
+        // canvases)
+      } else {
+        const elementWithCanvas = generateElementWithCanvas(
+          element,
+          renderConfig,
+        );
+        drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
       }
       break;
     }

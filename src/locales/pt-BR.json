@@ -100,7 +100,9 @@
     "share": "Compartilhar",
     "showStroke": "Exibir seletor de cores do traço",
     "showBackground": "Exibir seletor de cores do fundo",
-    "toggleTheme": "Alternar tema"
+    "toggleTheme": "Alternar tema",
+    "personalLib": "Biblioteca Pessoal",
+    "excalidrawLib": "Biblioteca do Excalidraw"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -135,7 +137,11 @@
     "zenMode": "Modo Zen",
     "exitZenMode": "Sair do modo zen",
     "cancel": "Cancelar",
-    "clear": "Limpar"
+    "clear": "Limpar",
+    "remove": "Remover",
+    "publishLibrary": "Publicar",
+    "submit": "Enviar",
+    "confirm": "Confirmar"
   },
   "alerts": {
     "clearReset": "Isto irá limpar toda a tela. Você tem certeza?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem",
     "invalidSceneUrl": "Não foi possível importar a cena da URL fornecida. Ela está incompleta ou não contém dados JSON válidos do Excalidraw.",
     "resetLibrary": "Isto limpará a sua biblioteca. Você tem certeza?",
+    "removeItemsFromsLibrary": "Excluir {{count}} item(ns) da biblioteca?",
     "invalidEncryptionKey": "A chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desabilitada."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Clique duas vezes ou pressione Enter para editar os pontos",
     "lineEditor_pointSelected": "Pressione Deletar para remover o ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
     "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos",
-    "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho"
+    "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
+    "publishLibrary": "Publicar sua própria biblioteca"
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Limpar a tela"
   },
+  "publishDialog": {
+    "title": "Publicar biblioteca",
+    "itemName": "Nome do item",
+    "authorName": "Nome do autor",
+    "githubUsername": "Nome de usuário do GitHub",
+    "twitterUsername": "Nome de usuário do Twitter",
+    "libraryName": "Nome da Biblioteca",
+    "libraryDesc": "Descrição da biblioteca",
+    "website": "Site",
+    "placeholder": {
+      "authorName": "Seu nome ou nome de usuário",
+      "libraryName": "Nome da sua biblioteca",
+      "libraryDesc": "Descrição para ajudar as pessoas a entenderem o uso da sua da sua biblioteca",
+      "githubHandle": "",
+      "twitterHandle": "Nome de usuário do Twitter (opcional), para que saibamos quem deve ser creditado se promovermos no Twitter",
+      "website": "Link para o seu site pessoal ou outro lugar (opcional)"
+    },
+    "errors": {
+      "required": "Obrigatório",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "Envie sua biblioteca para ser incluída no ",
+      "link": "repositório de biblioteca pública",
+      "post": "para outras pessoas usarem em seus desenhos."
+    },
+    "noteGuidelines": {
+      "pre": "A biblioteca precisa ser aprovada manualmente primeiro. Por favor leia o ",
+      "link": "orientações",
+      "post": " antes de enviar. Você precisará de uma conta do GitHub para se comunicar e fazer alterações quando solicitado, mas não é estritamente necessário."
+    },
+    "noteLicense": {
+      "pre": "Ao enviar, você concorda que a biblioteca será publicada sob a ",
+      "link": "Licença MIT, ",
+      "post": "o que, em suma, significa que qualquer pessoa pode utilizá-los sem restrições."
+    },
+    "noteItems": "Cada item da biblioteca deve ter seu próprio nome para que seja filtrável. Os seguintes itens da biblioteca serão incluídos:",
+    "atleastOneLibItem": "Por favor, selecione pelo menos um item da biblioteca para começar"
+  },
+  "publishSuccessDialog": {
+    "title": "Biblioteca enviada",
+    "content": "Obrigado {{authorName}}. Sua biblioteca foi enviada para análise. Você pode acompanhar o status",
+    "link": "aqui"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Redefinir biblioteca",
+    "removeItemsFromLib": "Remover itens selecionados da biblioteca"
+  },
   "encrypted": {
     "tooltip": "Seus desenhos são criptografados de ponta a ponta, então os servidores do Excalidraw nunca os verão.",
     "link": "Publicação de blog com criptografia de ponta a ponta no Excalidraw"
@@ -289,6 +345,7 @@
     "width": "Largura"
   },
   "toast": {
+    "addedToLibrary": "Adicionado à biblioteca",
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado para área de transferência.",
     "copyToClipboardAsPng": "{{exportSelection}} copiado para a área de transferência como PNG ({{exportColorScheme}})",

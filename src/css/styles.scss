@@ -180,7 +180,7 @@
   }
 
   .buttonList label:focus-within,
-  input:focus {
+  input:focus-visible {
     outline: transparent;
     box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
@@ -190,14 +190,14 @@
     user-select: none;
     background-color: var(--button-gray-1);
     border: 0;
-    border-radius: 4px;
+    border-radius: var(--border-radius-md);
     margin: 0.125rem 0;
     padding: 0.25rem;
     white-space: nowrap;
 
     cursor: pointer;
 
-    &:focus {
+    &:focus-visible {
       outline: transparent;
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
     }
@@ -217,14 +217,16 @@
 
   .active,
   .buttonList label.active {
-    background-color: var(--button-gray-2);
+    background-color: var(--color-primary);
+
+    --icon-fill-color: #{$oc-white};
 
     &:hover {
-      background-color: var(--button-gray-2);
+      background-color: var(--color-primary-darker);
     }
 
     &:active {
-      background-color: var(--button-gray-3);
+      background-color: var(--color-primary-darkest);
     }
   }
 
@@ -234,7 +236,7 @@
       justify-content: center;
       align-items: center;
       svg {
-        width: 36px;
+        width: 35px;
         height: 14px;
         padding: 2px;
         opacity: 0.6;
@@ -311,7 +313,7 @@
   }
 
   .App-menu_top {
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: auto max-content auto;
     grid-gap: 4px;
     align-items: flex-start;
     cursor: default;

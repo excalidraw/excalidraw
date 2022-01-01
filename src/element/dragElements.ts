@@ -5,45 +5,86 @@ import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import Scene from "../scene/Scene";
 import { NonDeletedExcalidrawElement } from "./types";
-import { PointerDownState } from "../types";
+import { AppState, PointerDownState } from "../types";
+import { getBoundTextElementId } from "./textElement";
+import { isSelectedViaGroup } from "../groups";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
   selectedElements: NonDeletedExcalidrawElement[],
   pointerX: number,
   pointerY: number,
-  scene: Scene,
   lockDirection: boolean = false,
   distanceX: number = 0,
   distanceY: number = 0,
+  appState: AppState,
 ) => {
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
   selectedElements.forEach((element) => {
-    let x: number;
-    let y: number;
-    if (lockDirection) {
-      const lockX = lockDirection && distanceX < distanceY;
-      const lockY = lockDirection && distanceX > distanceY;
-      const original = pointerDownState.originalElements.get(element.id);
-      x = lockX && original ? original.x : element.x + offset.x;
-      y = lockY && original ? original.y : element.y + offset.y;
-    } else {
-      x = element.x + offset.x;
-      y = element.y + offset.y;
+    updateElementCoords(
+      lockDirection,
+      distanceX,
+      distanceY,
+      pointerDownState,
+      element,
+      offset,
+    );
+    // update coords of bound text only if we're dragging the container directly
+    // (we don't drag the group that it's part of)
+    if (
+      // container isn't part of any group
+      // (perf optim so we don't check `isSelectedViaGroup()` in every case)
+      !element.groupIds.length ||
+      // container is part of a group, but we're dragging the container directly
+      (appState.editingGroupId && !isSelectedViaGroup(appState, element))
+    ) {
+      const boundTextElementId = getBoundTextElementId(element);
+      if (boundTextElementId) {
+        const textElement =
+          Scene.getScene(element)!.getElement(boundTextElementId);
+        updateElementCoords(
+          lockDirection,
+          distanceX,
+          distanceY,
+          pointerDownState,
+          textElement!,
+          offset,
+        );
+      }
     }
-
-    mutateElement(element, {
-      x,
-      y,
-    });
-
     updateBoundElements(element, {
       simultaneouslyUpdated: selectedElements,
     });
   });
 };
 
+const updateElementCoords = (
+  lockDirection: boolean,
+  distanceX: number,
+  distanceY: number,
+  pointerDownState: PointerDownState,
+  element: NonDeletedExcalidrawElement,
+  offset: { x: number; y: number },
+) => {
+  let x: number;
+  let y: number;
+  if (lockDirection) {
+    const lockX = lockDirection && distanceX < distanceY;
+    const lockY = lockDirection && distanceX > distanceY;
+    const original = pointerDownState.originalElements.get(element.id);
+    x = lockX && original ? original.x : element.x + offset.x;
+    y = lockY && original ? original.y : element.y + offset.y;
+  } else {
+    x = element.x + offset.x;
+    y = element.y + offset.y;
+  }
+
+  mutateElement(element, {
+    x,
+    y,
+  });
+};
 export const getDragOffsetXY = (
   selectedElements: NonDeletedExcalidrawElement[],
   x: number,

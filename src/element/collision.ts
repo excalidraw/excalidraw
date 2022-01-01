@@ -31,7 +31,9 @@ import { Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
-import { isImageElement } from "./typeChecks";
+import { hasBoundTextElement, isImageElement } from "./typeChecks";
+import { isTextElement } from ".";
+import { isTransparent } from "../utils";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -43,9 +45,8 @@ const isElementDraggableFromInside = (
   if (element.type === "freedraw") {
     return true;
   }
-
-  const isDraggableFromInside = element.backgroundColor !== "transparent";
-
+  const isDraggableFromInside =
+    !isTransparent(element.backgroundColor) || hasBoundTextElement(element);
   if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
@@ -83,19 +84,18 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
   );
 };
 
-const isHittingElementNotConsideringBoundingBox = (
+export const isHittingElementNotConsideringBoundingBox = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   point: Point,
 ): boolean => {
   const threshold = 10 / appState.zoom.value;
 
-  const check =
-    element.type === "text"
-      ? isStrictlyInside
-      : isElementDraggableFromInside(element)
-      ? isInsideCheck
-      : isNearCheck;
+  const check = isTextElement(element)
+    ? isStrictlyInside
+    : isElementDraggableFromInside(element)
+    ? isInsideCheck
+    : isNearCheck;
 
   return hitTestPointAgainstElement({ element, point, threshold, check });
 };

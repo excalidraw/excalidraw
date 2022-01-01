@@ -27,6 +27,8 @@
 
   .library-unit__dragger {
     display: flex;
+    align-items: center;
+    justify-content: center;
     height: 100%;
     width: 100%;
   }
@@ -99,8 +101,13 @@
     margin-top: -10px;
     pointer-events: none;
   }
-  .library-unit--hover .library-unit__adder {
-    color: $oc-blue-7;
+  .library-unit:hover .library-unit__adder {
+    fill: $oc-blue-7;
+  }
+  .library-unit:active .library-unit__adder {
+    animation: none;
+    transform: scale(0.8);
+    fill: $oc-black;
   }
 
   .library-unit__active {

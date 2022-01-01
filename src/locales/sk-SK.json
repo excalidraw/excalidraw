@@ -100,7 +100,9 @@
     "share": "Zdieľať",
     "showStroke": "Zobraziť výber farby pre obrys",
     "showBackground": "Zobraziť výber farby pre pozadie",
-    "toggleTheme": "Prepnúť tému"
+    "toggleTheme": "Prepnúť tému",
+    "personalLib": "Moja knižnica",
+    "excalidrawLib": "Excalidraw knižnica"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -135,7 +137,11 @@
     "zenMode": "Režim zen",
     "exitZenMode": "Zrušiť režim zen",
     "cancel": "Zrušiť",
-    "clear": "Vymazať"
+    "clear": "Vymazať",
+    "remove": "Odstrániť",
+    "publishLibrary": "Uverejniť",
+    "submit": "Potvrdiť",
+    "confirm": "Potvrdiť"
   },
   "alerts": {
     "clearReset": "Týmto sa vyčistí celé plátno. Ste si istí?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru",
     "invalidSceneUrl": "Nepodarilo sa načítať scénu z poskytnutej URL. Je nevalidná alebo neobsahuje žiadne validné Excalidraw JSON dáta.",
     "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?",
+    "removeItemsFromsLibrary": "Odstrániť {{count}} položiek z knižnice?",
     "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Použite dvojklik alebo stlačte Enter na editáciu bodov",
     "lineEditor_pointSelected": "Stačte Delete na vymazanie bodu, CtrlOrCmd+D na jeho duplikovanie, alebo potiahnite na jeho presunutie",
     "lineEditor_nothingSelected": "Zvoľte bod na jeho presunutie alebo vymazanie, alebo podržte Alt a kliknite na pridanie nového bodu",
-    "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti"
+    "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
+    "publishLibrary": "Uverejniť vašu knižnicu"
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Vyčistiť plátno"
   },
+  "publishDialog": {
+    "title": "Uverejniť knižnicu",
+    "itemName": "Názov položky",
+    "authorName": "Meno autora",
+    "githubUsername": "Github užívateľské meno",
+    "twitterUsername": "Twitter užívateľské meno",
+    "libraryName": "Názov knižnice",
+    "libraryDesc": "Popis knižnice",
+    "website": "Webová stránka",
+    "placeholder": {
+      "authorName": "Vaše meno alebo užívateľské meno",
+      "libraryName": "Názov vašej knižnice",
+      "libraryDesc": "",
+      "githubHandle": "GitHub užívateľské meno (nepovinné), aby ste mohli robiť úpravy po tom, čo bude knižnica uverejnená na schválenie",
+      "twitterHandle": "Twitter užívateľské meno (nepovinné), aby sme vedeli komu pripísať zásluhu pri propagovaní cez Twitter",
+      "website": "Odkaz na vašu osobnú webovú stránku alebo niekam inam (nepovinné)"
+    },
+    "errors": {
+      "required": "Povinné",
+      "website": "Zadajte platnú adresu URL"
+    },
+    "noteDescription": {
+      "pre": "Uverejnite vašu knižnicu vo ",
+      "link": "verejnom zozname knižníc",
+      "post": "aby ju aj ostatní mohli použiť v ich náčrtoch."
+    },
+    "noteGuidelines": {
+      "pre": "Knižnica musí byť najprv manuálne schválená. Prosím prečítajte si ",
+      "link": "pokyny",
+      "post": " pred uverejnením. Budete potrebovať Github účet na komunikáciu a vykonanie zmien, ak budú potrebné, avšak nie je to úplne povinné."
+    },
+    "noteLicense": {
+      "pre": "Potvrdením súhlasíte, že knižnica bude zverejnená s ",
+      "link": "MIT licenciou, ",
+      "post": "čo v skratke znamená, že ju môže použiť hocikto bez obmedzení."
+    },
+    "noteItems": "Každá položka v knižnici musí mať svoje vlastné meno, aby sa dala vyhľadať. Súčasťou knižnice budú nasledujúce položky:",
+    "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice"
+  },
+  "publishSuccessDialog": {
+    "title": "Knižnica uverejnená",
+    "content": "Ďakujeme vám {{authorName}}. Vaša knižnica bola uverejnená na posúdenie. Stav môžete skontrolovať",
+    "link": "tu"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Obnoviť knižnicu",
+    "removeItemsFromLib": "Odstrániť zvolené položky z knižnice"
+  },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať.",
     "link": "Blog o end-to-end šifrovaní v Excalidraw"
@@ -289,6 +345,7 @@
     "width": "Šírka"
   },
   "toast": {
+    "addedToLibrary": "Pridané do knižnice",
     "copyStyles": "Štýly skopírované.",
     "copyToClipboard": "Skopírované do schránky.",
     "copyToClipboardAsPng": "Kopírovanie {{exportSelection}} do schránky ako PNG prebehlo úspešne\n({{exportColorScheme}})",

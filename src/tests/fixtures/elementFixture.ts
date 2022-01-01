@@ -20,7 +20,8 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   version: 120,
   versionNonce: 1188004276,
   isDeleted: false,
-  boundElementIds: null,
+  boundElements: null,
+  updated: 1,
 };
 
 export const rectangleFixture: ExcalidrawElement = {

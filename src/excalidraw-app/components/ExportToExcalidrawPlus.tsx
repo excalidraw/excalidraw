@@ -78,7 +78,7 @@ export const ExportToExcalidrawPlus: React.FC<{
   onError: (error: Error) => void;
 }> = ({ elements, appState, files, onError }) => {
   return (
-    <Card color="indigo">
+    <Card color="primary">
       <div className="Card-icon">{excalidrawPlusIcon}</div>
       <h2>Excalidraw+</h2>
       <div className="Card-details">

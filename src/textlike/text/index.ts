@@ -1,12 +1,8 @@
 import { SVG_NS } from "../../constants";
-import {
-  measureText,
-  getFontFamilyString,
-  getFontString,
-  isRTL,
-} from "../../utils";
+import { getFontFamilyString, getFontString, isRTL } from "../../utils";
 import { ExcalidrawTextElement, NonDeleted } from "../../element/types";
 import { ElementUpdate } from "../../element/mutateElement";
+import { getApproxLineHeight, measureText } from "../../element/textElement";
 import {
   registerTextLikeDisabledPanelComponents,
   registerTextLikeMethod,
@@ -56,12 +52,16 @@ const measureTextElementText = (
     | "version"
     | "versionNonce"
     | "groupIds"
-    | "boundElementIds"
+    | "boundElements"
+    | "containerId"
+    | "originalText"
+    | "updated"
   >,
   next?: {
     fontSize?: number;
     text?: string;
   },
+  maxWidth?: number | null,
 ) => {
   const fontSize =
     next?.fontSize !== undefined ? next.fontSize : element.fontSize;
@@ -70,6 +70,7 @@ const measureTextElementText = (
   return measureText(
     text,
     getFontString({ fontSize, fontFamily: element.fontFamily }),
+    maxWidth,
   );
 };
 
@@ -87,7 +88,9 @@ const renderTextElementText = (
 
   // Canvas does not support multiline text by default
   const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-  const lineHeight = element.height / lines.length;
+  const lineHeight = element.containerId
+    ? getApproxLineHeight(getFontString(element))
+    : element.height / lines.length;
   const verticalOffset = element.height - element.baseline;
   const horizontalOffset =
     element.textAlign === "center"

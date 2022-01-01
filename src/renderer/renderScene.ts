@@ -21,7 +21,7 @@ import {
 } from "../element";
 
 import { roundRect } from "./roundRect";
-import { SceneState } from "../scene/types";
+import { RenderConfig } from "../scene/types";
 import {
   getScrollBars,
   SCROLLBAR_COLOR,
@@ -146,19 +146,19 @@ const strokeGrid = (
 const renderLinearPointHandles = (
   context: CanvasRenderingContext2D,
   appState: AppState,
-  sceneState: SceneState,
+  renderConfig: RenderConfig,
   element: NonDeleted<ExcalidrawLinearElement>,
 ) => {
   context.save();
-  context.translate(sceneState.scrollX, sceneState.scrollY);
-  context.lineWidth = 1 / sceneState.zoom.value;
+  context.translate(renderConfig.scrollX, renderConfig.scrollY);
+  context.lineWidth = 1 / renderConfig.zoom.value;
 
   LinearElementEditor.getPointsGlobalCoordinates(element).forEach(
     (point, idx) => {
       context.strokeStyle = "red";
       context.setLineDash([]);
       context.fillStyle =
-        appState.editingLinearElement?.activePointIndex === idx
+        appState.editingLinearElement?.selectedPointsIndices?.includes(idx)
           ? "rgba(255, 127, 127, 0.9)"
           : "rgba(255, 255, 255, 0.9)";
       const { POINT_HANDLE_SIZE } = LinearElementEditor;
@@ -166,7 +166,7 @@ const renderLinearPointHandles = (
         context,
         point[0],
         point[1],
-        POINT_HANDLE_SIZE / 2 / sceneState.zoom.value,
+        POINT_HANDLE_SIZE / 2 / renderConfig.zoom.value,
       );
     },
   );
@@ -180,32 +180,19 @@ export const renderScene = (
   scale: number,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
-  sceneState: SceneState,
+  renderConfig: RenderConfig,
   // extra options passed to the renderer
-  {
-    renderScrollbars = true,
-    renderSelection = true,
-    // Whether to employ render optimizations to improve performance.
-    // Should not be turned on for export operations and similar, because it
-    // doesn't guarantee pixel-perfect output.
-    renderOptimizations = false,
-    renderGrid = true,
-    renderCb = () => {},
-    /** when exporting the behavior is slightly different (e.g. we can't use
-        CSS filters) */
-    isExport = false,
-  }: {
-    renderScrollbars?: boolean;
-    renderSelection?: boolean;
-    renderOptimizations?: boolean;
-    renderGrid?: boolean;
-    renderCb?: () => void;
-    isExport?: boolean;
-  } = {},
 ) => {
   if (canvas === null) {
     return { atLeastOneVisibleElement: false };
   }
+
+  const {
+    renderScrollbars = true,
+    renderSelection = true,
+    renderGrid = true,
+    isExporting,
+  } = renderConfig;
 
   const context = canvas.getContext("2d")!;
 
@@ -217,22 +204,22 @@ export const renderScene = (
   const normalizedCanvasWidth = canvas.width / scale;
   const normalizedCanvasHeight = canvas.height / scale;
 
-  if (isExport && sceneState.theme === "dark") {
+  if (isExporting && renderConfig.theme === "dark") {
     context.filter = THEME_FILTER;
   }
 
   // Paint background
-  if (typeof sceneState.viewBackgroundColor === "string") {
+  if (typeof renderConfig.viewBackgroundColor === "string") {
     const hasTransparence =
-      sceneState.viewBackgroundColor === "transparent" ||
-      sceneState.viewBackgroundColor.length === 5 || // #RGBA
-      sceneState.viewBackgroundColor.length === 9 || // #RRGGBBA
-      /(hsla|rgba)\(/.test(sceneState.viewBackgroundColor);
+      renderConfig.viewBackgroundColor === "transparent" ||
+      renderConfig.viewBackgroundColor.length === 5 || // #RGBA
+      renderConfig.viewBackgroundColor.length === 9 || // #RRGGBBA
+      /(hsla|rgba)\(/.test(renderConfig.viewBackgroundColor);
     if (hasTransparence) {
       context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
     }
     context.save();
-    context.fillStyle = sceneState.viewBackgroundColor;
+    context.fillStyle = renderConfig.viewBackgroundColor;
     context.fillRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
     context.restore();
   } else {
@@ -240,49 +227,46 @@ export const renderScene = (
   }
 
   // Apply zoom
-  const zoomTranslationX = sceneState.zoom.translation.x;
-  const zoomTranslationY = sceneState.zoom.translation.y;
+  const zoomTranslationX = renderConfig.zoom.translation.x;
+  const zoomTranslationY = renderConfig.zoom.translation.y;
   context.save();
   context.translate(zoomTranslationX, zoomTranslationY);
-  context.scale(sceneState.zoom.value, sceneState.zoom.value);
+  context.scale(renderConfig.zoom.value, renderConfig.zoom.value);
 
   // Grid
   if (renderGrid && appState.gridSize) {
     strokeGrid(
       context,
       appState.gridSize,
-      -Math.ceil(zoomTranslationX / sceneState.zoom.value / appState.gridSize) *
+      -Math.ceil(
+        zoomTranslationX / renderConfig.zoom.value / appState.gridSize,
+      ) *
         appState.gridSize +
-        (sceneState.scrollX % appState.gridSize),
-      -Math.ceil(zoomTranslationY / sceneState.zoom.value / appState.gridSize) *
+        (renderConfig.scrollX % appState.gridSize),
+      -Math.ceil(
+        zoomTranslationY / renderConfig.zoom.value / appState.gridSize,
+      ) *
         appState.gridSize +
-        (sceneState.scrollY % appState.gridSize),
-      normalizedCanvasWidth / sceneState.zoom.value,
-      normalizedCanvasHeight / sceneState.zoom.value,
+        (renderConfig.scrollY % appState.gridSize),
+      normalizedCanvasWidth / renderConfig.zoom.value,
+      normalizedCanvasHeight / renderConfig.zoom.value,
     );
   }
 
   // Paint visible elements
   const visibleElements = elements.filter((element) =>
     isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, {
-      zoom: sceneState.zoom,
+      zoom: renderConfig.zoom,
       offsetLeft: appState.offsetLeft,
       offsetTop: appState.offsetTop,
-      scrollX: sceneState.scrollX,
-      scrollY: sceneState.scrollY,
+      scrollX: renderConfig.scrollX,
+      scrollY: renderConfig.scrollY,
     }),
   );
 
   visibleElements.forEach((element) => {
     try {
-      renderElement(
-        element,
-        rc,
-        context,
-        renderOptimizations,
-        sceneState,
-        renderCb,
-      );
+      renderElement(element, rc, context, renderConfig);
     } catch (error: any) {
       console.error(error);
     }
@@ -293,20 +277,14 @@ export const renderScene = (
       appState.editingLinearElement.elementId,
     );
     if (element) {
-      renderLinearPointHandles(context, appState, sceneState, element);
+      renderLinearPointHandles(context, appState, renderConfig, element);
     }
   }
 
   // Paint selection element
   if (selectionElement) {
     try {
-      renderElement(
-        selectionElement,
-        rc,
-        context,
-        renderOptimizations,
-        sceneState,
-      );
+      renderElement(selectionElement, rc, context, renderConfig);
     } catch (error: any) {
       console.error(error);
     }
@@ -316,7 +294,7 @@ export const renderScene = (
     appState.suggestedBindings
       .filter((binding) => binding != null)
       .forEach((suggestedBinding) => {
-        renderBindingHighlight(context, sceneState, suggestedBinding!);
+        renderBindingHighlight(context, renderConfig, suggestedBinding!);
       });
   }
 
@@ -336,12 +314,14 @@ export const renderScene = (
         selectionColors.push(oc.black);
       }
       // remote users
-      if (sceneState.remoteSelectedElementIds[element.id]) {
+      if (renderConfig.remoteSelectedElementIds[element.id]) {
         selectionColors.push(
-          ...sceneState.remoteSelectedElementIds[element.id].map((socketId) => {
-            const { background } = getClientColors(socketId, appState);
-            return background;
-          }),
+          ...renderConfig.remoteSelectedElementIds[element.id].map(
+            (socketId) => {
+              const { background } = getClientColors(socketId, appState);
+              return background;
+            },
+          ),
         );
       }
       if (selectionColors.length) {
@@ -383,37 +363,37 @@ export const renderScene = (
     }
 
     selections.forEach((selection) =>
-      renderSelectionBorder(context, sceneState, selection),
+      renderSelectionBorder(context, renderConfig, selection),
     );
 
     const locallySelectedElements = getSelectedElements(elements, appState);
 
     // Paint resize transformHandles
     context.save();
-    context.translate(sceneState.scrollX, sceneState.scrollY);
+    context.translate(renderConfig.scrollX, renderConfig.scrollY);
     if (locallySelectedElements.length === 1) {
       context.fillStyle = oc.white;
       const transformHandles = getTransformHandles(
         locallySelectedElements[0],
-        sceneState.zoom,
+        renderConfig.zoom,
         "mouse", // when we render we don't know which pointer type so use mouse
       );
       if (!appState.viewModeEnabled) {
         renderTransformHandles(
           context,
-          sceneState,
+          renderConfig,
           transformHandles,
           locallySelectedElements[0].angle,
         );
       }
     } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
-      const dashedLinePadding = 4 / sceneState.zoom.value;
+      const dashedLinePadding = 4 / renderConfig.zoom.value;
       context.fillStyle = oc.white;
       const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
       const initialLineDash = context.getLineDash();
-      context.setLineDash([2 / sceneState.zoom.value]);
+      context.setLineDash([2 / renderConfig.zoom.value]);
       const lineWidth = context.lineWidth;
-      context.lineWidth = 1 / sceneState.zoom.value;
+      context.lineWidth = 1 / renderConfig.zoom.value;
       strokeRectWithRotation(
         context,
         x1 - dashedLinePadding,
@@ -429,11 +409,11 @@ export const renderScene = (
       const transformHandles = getTransformHandlesFromCoords(
         [x1, y1, x2, y2],
         0,
-        sceneState.zoom,
+        renderConfig.zoom,
         "mouse",
         OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
       );
-      renderTransformHandles(context, sceneState, transformHandles, 0);
+      renderTransformHandles(context, renderConfig, transformHandles, 0);
     }
     context.restore();
   }
@@ -442,8 +422,8 @@ export const renderScene = (
   context.restore();
 
   // Paint remote pointers
-  for (const clientId in sceneState.remotePointerViewportCoords) {
-    let { x, y } = sceneState.remotePointerViewportCoords[clientId];
+  for (const clientId in renderConfig.remotePointerViewportCoords) {
+    let { x, y } = renderConfig.remotePointerViewportCoords[clientId];
 
     x -= appState.offsetLeft;
     y -= appState.offsetTop;
@@ -468,14 +448,14 @@ export const renderScene = (
     context.strokeStyle = stroke;
     context.fillStyle = background;
 
-    const userState = sceneState.remotePointerUserStates[clientId];
+    const userState = renderConfig.remotePointerUserStates[clientId];
     if (isOutOfBounds || userState === UserIdleState.AWAY) {
       context.globalAlpha = 0.48;
     }
 
     if (
-      sceneState.remotePointerButton &&
-      sceneState.remotePointerButton[clientId] === "down"
+      renderConfig.remotePointerButton &&
+      renderConfig.remotePointerButton[clientId] === "down"
     ) {
       context.beginPath();
       context.arc(x, y, 15, 0, 2 * Math.PI, false);
@@ -501,7 +481,7 @@ export const renderScene = (
     context.fill();
     context.stroke();
 
-    const username = sceneState.remotePointerUsernames[clientId];
+    const username = renderConfig.remotePointerUsernames[clientId];
 
     let idleState = "";
     if (userState === UserIdleState.AWAY) {
@@ -561,7 +541,7 @@ export const renderScene = (
       elements,
       normalizedCanvasWidth,
       normalizedCanvasHeight,
-      sceneState,
+      renderConfig,
     );
 
     context.save();
@@ -588,7 +568,7 @@ export const renderScene = (
 
 const renderTransformHandles = (
   context: CanvasRenderingContext2D,
-  sceneState: SceneState,
+  renderConfig: RenderConfig,
   transformHandles: TransformHandles,
   angle: number,
 ): void => {
@@ -596,7 +576,7 @@ const renderTransformHandles = (
     const transformHandle = transformHandles[key as TransformHandleType];
     if (transformHandle !== undefined) {
       context.save();
-      context.lineWidth = 1 / sceneState.zoom.value;
+      context.lineWidth = 1 / renderConfig.zoom.value;
       if (key === "rotation") {
         fillCircle(
           context,
@@ -624,7 +604,7 @@ const renderTransformHandles = (
 
 const renderSelectionBorder = (
   context: CanvasRenderingContext2D,
-  sceneState: SceneState,
+  renderConfig: RenderConfig,
   elementProperties: {
     angle: number;
     elementX1: number;
@@ -639,13 +619,13 @@ const renderSelectionBorder = (
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
 
-  const dashedLinePadding = 4 / sceneState.zoom.value;
-  const dashWidth = 8 / sceneState.zoom.value;
-  const spaceWidth = 4 / sceneState.zoom.value;
+  const dashedLinePadding = 4 / renderConfig.zoom.value;
+  const dashWidth = 8 / renderConfig.zoom.value;
+  const spaceWidth = 4 / renderConfig.zoom.value;
 
   context.save();
-  context.translate(sceneState.scrollX, sceneState.scrollY);
-  context.lineWidth = 1 / sceneState.zoom.value;
+  context.translate(renderConfig.scrollX, renderConfig.scrollY);
+  context.lineWidth = 1 / renderConfig.zoom.value;
 
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {
@@ -671,7 +651,7 @@ const renderSelectionBorder = (
 
 const renderBindingHighlight = (
   context: CanvasRenderingContext2D,
-  sceneState: SceneState,
+  renderConfig: RenderConfig,
   suggestedBinding: SuggestedBinding,
 ) => {
   const renderHighlight = Array.isArray(suggestedBinding)
@@ -679,7 +659,7 @@ const renderBindingHighlight = (
     : renderBindingHighlightForBindableElement;
 
   context.save();
-  context.translate(sceneState.scrollX, sceneState.scrollY);
+  context.translate(renderConfig.scrollX, renderConfig.scrollY);
   renderHighlight(context, suggestedBinding as any);
 
   context.restore();
@@ -703,6 +683,7 @@ const renderBindingHighlightForBindableElement = (
   switch (element.type) {
     case "rectangle":
     case "text":
+    case "image":
       strokeRectWithRotation(
         context,
         x1 - padding,

@@ -100,7 +100,9 @@
     "share": "分享",
     "showStroke": "显示描边颜色选择器",
     "showBackground": "显示背景颜色选择器",
-    "toggleTheme": "切换主题"
+    "toggleTheme": "切换主题",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -130,12 +132,16 @@
     "resetLibrary": "重置资源库",
     "createNewRoom": "新建会议室",
     "fullScreen": "全屏",
-    "darkMode": "暗色主题",
+    "darkMode": "深色模式",
     "lightMode": "浅色模式",
     "zenMode": "禅模式",
     "exitZenMode": "退出禅模式",
     "cancel": "取消",
-    "clear": "清除"
+    "clear": "清除",
+    "remove": "",
+    "publishLibrary": "发布",
+    "submit": "提交",
+    "confirm": "确定"
   },
   "alerts": {
     "clearReset": "这将会清除整个画布。您是否要继续?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
     "invalidSceneUrl": "无法从提供的 URL 导入场景。它或者格式不正确，或者不包含有效的 Excalidraw JSON 数据。",
     "resetLibrary": "这将会清除你的资源库。你确定这么做吗？",
+    "removeItemsFromsLibrary": "要从库中删除 {{count}} 个项目吗？",
     "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。"
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "双击或按回车键编辑",
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，或拖动以移动",
     "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点",
-    "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小"
+    "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "清除画布"
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "项目名称",
+    "authorName": "作者名",
+    "githubUsername": "GitHub 用户名",
+    "twitterUsername": "",
+    "libraryName": "名称",
+    "libraryDesc": "简介",
+    "website": "网址",
+    "placeholder": {
+      "authorName": "您的名字或用户名",
+      "libraryName": "库的名称",
+      "libraryDesc": "介绍您的库，让人们了解其用途",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": "您个人网站的或任意的链接（可选）"
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": "从库中删除选中的项目"
+  },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
     "link": "Excalidraw 中关于端到端加密的博客"
@@ -289,6 +345,7 @@
     "width": "宽度"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "复制样式",
     "copyToClipboard": "已复制到剪切板。",
     "copyToClipboardAsPng": "已将 {{exportSelection}} 作为 PNG 复制到剪贴板\n({{exportColorScheme}})",

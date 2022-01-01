@@ -251,24 +251,28 @@ export const measureTextElement = (
     | "version"
     | "versionNonce"
     | "groupIds"
-    | "boundElementIds"
+    | "boundElements"
+    | "containerId"
+    | "originalText"
+    | "updated"
   >,
   next?: {
     fontSize?: number;
     text?: string;
     textOpts?: TextOpts;
   },
+  maxWidth?: number | null,
 ): { width: number; height: number; baseline: number } => {
   for (let i = 0; i < measureMethodsA.length; i++) {
     if (measureMethodsA[i].subtype === element.subtype) {
-      return measureMethodsA[i].method(element, next);
+      return measureMethodsA[i].method(element, next, maxWidth);
     }
   }
   return measureMethodsA
     .find((value, index, measureMethodsA) => {
       return value.default !== undefined && value.default === true;
     })!
-    .method(element, next);
+    .method(element, next, maxWidth);
 };
 
 export const renderTextElement = (

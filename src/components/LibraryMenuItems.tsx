@@ -21,6 +21,7 @@ import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 
 import "./LibraryMenuItems.scss";
+import { VERSIONS } from "../constants";
 
 const LibraryMenuItems = ({
   libraryItems,
@@ -51,7 +52,7 @@ const LibraryMenuItems = ({
   library: Library;
   id: string;
   selectedItems: LibraryItem["id"][];
-  onToggle: (id: LibraryItem["id"]) => void;
+  onToggle: (id: LibraryItem["id"], event: React.MouseEvent) => void;
   onPublish: () => void;
   resetLibrary: () => void;
 }) => {
@@ -212,10 +213,8 @@ const LibraryMenuItems = ({
           onClick={params.onClick || (() => {})}
           id={params.item?.id || null}
           selected={!!params.item?.id && selectedItems.includes(params.item.id)}
-          onToggle={() => {
-            if (params.item?.id) {
-              onToggle(params.item.id);
-            }
+          onToggle={(id, event) => {
+            onToggle(id, event);
           }}
         />
       </Stack.Col>
@@ -293,7 +292,9 @@ const LibraryMenuItems = ({
         <a
           href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
             window.name || "_blank"
-          }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}`}
+          }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+            VERSIONS.excalidrawLibrary
+          }`}
           target="_excalidraw_libraries"
         >
           {t("labels.libraries")}

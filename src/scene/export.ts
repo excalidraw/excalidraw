@@ -51,7 +51,9 @@ export const exportToCanvas = async (
     files,
   });
 
-  const sceneState = {
+  let refreshTimer = 0;
+
+  const renderConfig = {
     viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
     scrollX: -minX + exportPadding,
     scrollY: -minY + exportPadding,
@@ -63,16 +65,10 @@ export const exportToCanvas = async (
     remotePointerUserStates: {},
     theme: appState.exportWithDarkMode ? "dark" : "light",
     imageCache,
-  };
-
-  let refreshTimer = 0;
-
-  const extraOpts = {
     renderScrollbars: false,
     renderSelection: false,
-    renderOptimizations: true,
     renderGrid: false,
-    isExport: true,
+    isExporting: true,
     renderCb: () => {
       // If a scene refresh is cued, restart the countdown.
       // This way we are not calling renderScene once per
@@ -83,7 +79,7 @@ export const exportToCanvas = async (
         window.clearTimeout(refreshTimer);
       }
       refreshTimer = window.setTimeout(() => {
-        extraOpts.renderCb = () => {};
+        renderConfig.renderCb = () => {};
         window.clearTimeout(refreshTimer);
         renderScene(
           elements,
@@ -92,8 +88,7 @@ export const exportToCanvas = async (
           scale,
           rough.canvas(canvas),
           canvas,
-          sceneState,
-          extraOpts,
+          renderConfig,
         );
       }, 50);
     },
@@ -106,8 +101,7 @@ export const exportToCanvas = async (
     scale,
     rough.canvas(canvas),
     canvas,
-    sceneState,
-    extraOpts,
+    renderConfig,
   );
 
   return canvas;

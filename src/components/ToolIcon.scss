@@ -8,17 +8,7 @@
     position: relative;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    border-radius: var(--space-factor);
     user-select: none;
-
-    background-color: var(--button-gray-1);
-
-    &:hover {
-      background-color: var(--button-gray-2);
-    }
-    &:active {
-      background-color: var(--button-gray-3);
-    }
   }
 
   .ToolIcon--plain {
@@ -26,6 +16,20 @@
     .ToolIcon__icon {
       width: 2rem;
       height: 2rem;
+    }
+  }
+
+  .ToolIcon_type_radio,
+  .ToolIcon_type_checkbox {
+    & + .ToolIcon__icon {
+      background-color: var(--button-gray-1);
+
+      &:hover {
+        background-color: var(--button-gray-2);
+      }
+      &:active {
+        background-color: var(--button-gray-3);
+      }
     }
   }
 
@@ -38,17 +42,17 @@
     justify-content: center;
     align-items: center;
 
-    border-radius: var(--space-factor);
+    border-radius: var(--border-radius-lg);
+
+    & + .ToolIcon__label {
+      margin-inline-start: 0;
+    }
 
     svg {
       position: relative;
       height: 1em;
       fill: var(--icon-fill-color);
       color: var(--icon-fill-color);
-    }
-
-    & + .ToolIcon__label {
-      margin-inline-start: 0;
     }
   }
 
@@ -79,7 +83,7 @@
     margin: 0;
     font-size: inherit;
 
-    &:focus {
+    &:focus-visible {
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
     }
 
@@ -121,7 +125,7 @@
       }
     }
 
-    &:focus + .ToolIcon__icon {
+    &:focus-visible + .ToolIcon__icon {
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
     }
 
@@ -141,10 +145,6 @@
       background-color: transparent;
     }
 
-    &:focus {
-      box-shadow: none;
-    }
-
     .ToolIcon__icon {
       background-color: var(--button-gray-1);
       &:hover {
@@ -156,13 +156,6 @@
 
       width: 2rem;
       height: 2em;
-    }
-  }
-
-  .ToolIcon.ToolIcon__lock {
-    margin-inline-end: var(--space-factor);
-    &.ToolIcon_type_floating {
-      margin-left: 0.1rem;
     }
   }
 

@@ -22,7 +22,7 @@
     align-items: center;
     justify-content: center;
 
-    &:focus {
+    &:focus-visible {
       outline: transparent;
       background-color: var(--button-gray-2);
       & svg {

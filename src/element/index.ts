@@ -59,15 +59,6 @@ export {
 } from "./sizeHelpers";
 export { showSelectedShapeActions } from "./showSelectedShapeActions";
 
-export const getElementMap = (elements: readonly ExcalidrawElement[]) =>
-  elements.reduce(
-    (acc: { [key: string]: ExcalidrawElement }, element: ExcalidrawElement) => {
-      acc[element.id] = element;
-      return acc;
-    },
-    {},
-  );
-
 export const getSceneVersion = (elements: readonly ExcalidrawElement[]) =>
   elements.reduce((acc, el) => acc + el.version, 0);
 

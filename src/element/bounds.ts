@@ -520,11 +520,24 @@ export interface Box {
   minY: number;
   maxX: number;
   maxY: number;
+  midX: number;
+  midY: number;
+  width: number;
+  height: number;
 }
 
 export const getCommonBoundingBox = (
   elements: ExcalidrawElement[] | readonly NonDeleted<ExcalidrawElement>[],
 ): Box => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  return { minX, minY, maxX, maxY };
+  return {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width: maxX - minX,
+    height: maxY - minY,
+    midX: (minX + maxX) / 2,
+    midY: (minY + maxY) / 2,
+  };
 };
