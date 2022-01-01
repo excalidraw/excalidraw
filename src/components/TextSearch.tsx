@@ -12,6 +12,7 @@ export const TextSearch = (props: {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onClose: () => void;
+  onKeyUp: (event: KeyboardEvent) => void;
 }) => {
   const isMobile = useIsMobile();
   if (isMobile) {
@@ -22,13 +23,6 @@ export const TextSearch = (props: {
     if (event.key === KEYS.ESCAPE) {
       props.setAppState({ textSearchActive: false });
     }
-    if (event.key === KEYS.ENTER) {
-      props.setAppState(({ scrollX, scrollY }) => ({
-        scrollX: 100,
-        scrollY: 100,
-      }));
-    }
-    console.info(props.appState.searchMatchText);
   };
 
   return (

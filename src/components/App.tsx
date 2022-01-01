@@ -515,6 +515,7 @@ class App extends React.Component<AppProps, AppState> {
                 setAppState={this.setAppState}
                 elements={this.scene.getElements()}
                 onClose={this.toggleTextSearch}
+                onKeyUp={this.onKeyUp}
               />
             )}
             {this.state.toastMessage !== null && (
@@ -1889,6 +1890,24 @@ class App extends React.Component<AppProps, AppState> {
           matchHighlightRect,
         ]);
       });
+
+      const testMoveElem = matchedElements[0];
+      const testMoveMatched = JSON.parse(JSON.stringify(testMoveElem));
+
+      const { x: viewportX2, y: viewportY2 } = viewportCoordsToSceneCoords(
+        { clientX: testMoveMatched.x, clientY: testMoveMatched.y },
+        this.state,
+      );
+
+      console.info(viewportX2);
+      console.info(viewportY2);
+
+      if (event.key === KEYS.ENTER) {
+        this.setState(({ scrollX, scrollY }) => ({
+          scrollX: viewportX2,
+          scrollY: viewportY2,
+        }));
+      }
     }
   });
 
