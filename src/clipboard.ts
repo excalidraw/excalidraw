@@ -58,7 +58,8 @@ export const copyToClipboard = async (
   appState: AppState,
   files: BinaryFiles,
 ) => {
-  const selectedElements = getSelectedElements(elements, appState);
+  // select binded text elements when copying
+  const selectedElements = getSelectedElements(elements, appState, true);
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
     elements: selectedElements,

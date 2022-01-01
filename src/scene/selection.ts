@@ -4,6 +4,7 @@ import {
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
+import { isBoundToContainer } from "../element/typeChecks";
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -17,6 +18,7 @@ export const getElementsWithinSelection = (
 
     return (
       element.type !== "selection" &&
+      !isBoundToContainer(element) &&
       selectionX1 <= elementX1 &&
       selectionY1 <= elementY1 &&
       selectionX2 >= elementX2 &&
@@ -53,7 +55,21 @@ export const getCommonAttributeOfSelectedElements = <T>(
 export const getSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-) => elements.filter((element) => appState.selectedElementIds[element.id]);
+  includeBoundTextElement: boolean = false,
+) =>
+  elements.filter((element) => {
+    if (appState.selectedElementIds[element.id]) {
+      return element;
+    }
+    if (
+      includeBoundTextElement &&
+      isBoundToContainer(element) &&
+      appState.selectedElementIds[element?.containerId]
+    ) {
+      return element;
+    }
+    return null;
+  });
 
 export const getTargetElements = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -61,4 +77,4 @@ export const getTargetElements = (
 ) =>
   appState.editingElement
     ? [appState.editingElement]
-    : getSelectedElements(elements, appState);
+    : getSelectedElements(elements, appState, true);

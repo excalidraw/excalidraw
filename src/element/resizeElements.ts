@@ -26,6 +26,7 @@ import {
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { measureTextElement } from "../textlike";
+import { getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
   TransformHandleType,
@@ -33,6 +34,12 @@ import {
   TransformHandleDirection,
 } from "./transformHandles";
 import { Point, PointerDownState } from "../types";
+import Scene from "../scene/Scene";
+import {
+  getApproxMinLineWidth,
+  getBoundTextElementId,
+  handleBindTextResize,
+} from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -132,6 +139,7 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
+      handleBindTextResize(selectedElements, transformHandleType);
       return true;
     }
   }
@@ -154,6 +162,11 @@ const rotateSingleElement = (
   }
   angle = normalizeAngle(angle);
   mutateElement(element, { angle });
+  const boundTextElementId = getBoundTextElementId(element);
+  if (boundTextElementId) {
+    const textElement = Scene.getScene(element)!.getElement(boundTextElementId);
+    mutateElement(textElement!, { angle });
+  }
 };
 
 // used in DEV only
@@ -269,7 +282,11 @@ const measureFontSizeFromWH = (
   if (nextFontSize < MIN_FONT_SIZE) {
     return null;
   }
-  const metrics = measureTextElement(element, { fontSize: nextFontSize });
+  const metrics = measureTextElement(
+    element,
+    { fontSize: nextFontSize },
+    element.containerId ? element.width : null,
+  );
   return {
     size: nextFontSize,
     baseline: metrics.baseline + (nextHeight - metrics.height),
@@ -410,6 +427,9 @@ export const resizeSingleElement = (
     element.width,
     element.height,
   );
+
+  const boundTextElementId = getBoundTextElementId(element);
+
   const boundsCurrentWidth = esx2 - esx1;
   const boundsCurrentHeight = esy2 - esy1;
 
@@ -469,6 +489,11 @@ export const resizeSingleElement = (
     );
   const newBoundsWidth = newBoundsX2 - newBoundsX1;
   const newBoundsHeight = newBoundsY2 - newBoundsY1;
+
+  // don't allow resize to negative dimensions when text is bounded to container
+  if ((newBoundsWidth < 0 || newBoundsHeight < 0) && boundTextElementId) {
+    return;
+  }
 
   // Calculate new topLeft based on fixed corner during resize
   let newTopLeft = [...startTopLeft] as [number, number];
@@ -562,9 +587,16 @@ export const resizeSingleElement = (
       ],
     });
   }
+  let minWidth = 0;
+  if (boundTextElementId) {
+    const boundTextElement = Scene.getScene(element)!.getElement(
+      boundTextElementId,
+    ) as ExcalidrawTextElement;
+    minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
+  }
 
   if (
-    resizedElement.width !== 0 &&
+    resizedElement.width > minWidth &&
     resizedElement.height !== 0 &&
     Number.isFinite(resizedElement.x) &&
     Number.isFinite(resizedElement.y)
@@ -573,6 +605,7 @@ export const resizeSingleElement = (
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
     mutateElement(element, resizedElement);
+    handleBindTextResize([element], transformHandleDirection);
   }
 };
 
@@ -644,7 +677,7 @@ const resizeMultipleElements = (
         const width = element.width * scale;
         const height = element.height * scale;
         let font: { fontSize?: number; baseline?: number } = {};
-        if (element.type === "text") {
+        if (isTextElement(element)) {
           const nextFont = measureFontSizeFromWH(element, width, height);
           if (nextFont === null) {
             return null;
@@ -725,6 +758,16 @@ const rotateMultipleElements = (
       y: element.y + (rotatedCY - cy),
       angle: normalizeAngle(centerAngle + origAngle),
     });
+    const boundTextElementId = getBoundTextElementId(element);
+    if (boundTextElementId) {
+      const textElement =
+        Scene.getScene(element)!.getElement(boundTextElementId)!;
+      mutateElement(textElement, {
+        x: textElement.x + (rotatedCX - cx),
+        y: textElement.y + (rotatedCY - cy),
+        angle: normalizeAngle(centerAngle + origAngle),
+      });
+    }
   });
 };
 

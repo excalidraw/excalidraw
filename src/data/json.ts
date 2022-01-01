@@ -1,6 +1,11 @@
 import { fileOpen, fileSave } from "./filesystem";
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
-import { EXPORT_DATA_TYPES, EXPORT_SOURCE, MIME_TYPES } from "../constants";
+import {
+  EXPORT_DATA_TYPES,
+  EXPORT_SOURCE,
+  MIME_TYPES,
+  VERSIONS,
+} from "../constants";
 import { clearElementsForDatabase, clearElementsForExport } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState, BinaryFiles, LibraryItems } from "../types";
@@ -42,7 +47,7 @@ export const serializeAsJSON = (
 ): string => {
   const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,
-    version: 2,
+    version: VERSIONS.excalidraw,
     source: EXPORT_SOURCE,
     elements:
       type === "local"
@@ -121,7 +126,7 @@ export const isValidLibrary = (json: any) => {
 export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
   const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
-    version: 2,
+    version: VERSIONS.excalidrawLibrary,
     source: EXPORT_SOURCE,
     libraryItems,
   };

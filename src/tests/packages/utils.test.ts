@@ -42,6 +42,9 @@ describe("exportToBlob", () => {
         getDimensions: (width, height) => ({ width, height, scale: 1 }),
         // testing typo in MIME type (jpg → jpeg)
         mimeType: "image/jpg",
+        appState: {
+          exportBackground: true,
+        },
       });
       expect(blob?.type).toBe(MIME_TYPES.jpg);
     });

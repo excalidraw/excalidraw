@@ -12,6 +12,9 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
+import Scene from "../scene/Scene";
+import { isBoundToContainer } from "../element/typeChecks";
+import { ExcalidrawTextElement } from "../element/types";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";
@@ -61,7 +64,18 @@ export const actionPasteStyles = register({
               fontFamily: pastedElement?.fontFamily || DEFAULT_FONT_FAMILY,
               textAlign: pastedElement?.textAlign || DEFAULT_TEXT_ALIGN,
             });
-            redrawTextBoundingBox(newElement);
+            let container = null;
+
+            if (isBoundToContainer(element)) {
+              container = Scene.getScene(element)!.getElement(
+                element.containerId,
+              );
+            }
+            redrawTextBoundingBox(
+              element as ExcalidrawTextElement,
+              container,
+              appState,
+            );
           }
           return newElement;
         }

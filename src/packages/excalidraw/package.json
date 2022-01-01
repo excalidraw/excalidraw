@@ -45,35 +45,40 @@
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
-    "@babel/plugin-transform-arrow-functions": "7.16.0",
+    "@babel/plugin-transform-arrow-functions": "7.16.7",
     "@babel/plugin-transform-async-to-generator": "7.16.0",
-    "@babel/plugin-transform-runtime": "7.16.0",
+    "@babel/plugin-transform-runtime": "7.16.4",
     "@babel/plugin-transform-typescript": "7.16.1",
-    "@babel/preset-env": "7.16.0",
-    "@babel/preset-react": "7.16.0",
-    "@babel/preset-typescript": "7.16.0",
+    "@babel/preset-env": "7.16.7",
+    "@babel/preset-react": "7.16.7",
+    "@babel/preset-typescript": "7.16.7",
     "autoprefixer": "10.4.0",
     "babel-loader": "8.2.3",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
     "css-loader": "6.5.1",
-    "file-loader": "6.2.0",
-    "mini-css-extract-plugin": "2.4.4",
-    "postcss-loader": "6.2.0",
-    "sass-loader": "12.3.0",
-    "terser-webpack-plugin": "5.2.5",
+    "mini-css-extract-plugin": "2.4.5",
+    "postcss-loader": "6.2.1",
+    "sass-loader": "12.4.0",
+    "terser-webpack-plugin": "5.3.0",
     "ts-loader": "9.2.6",
-    "typescript": "4.5.2",
-    "webpack": "5.64.0",
+    "typescript": "4.5.3",
+    "webpack": "5.65.0",
     "webpack-bundle-analyzer": "4.5.0",
-    "webpack-cli": "4.9.1"
+    "webpack-cli": "4.9.1",
+    "webpack-dev-server": "4.7.1",
+    "webpack-merge": "5.8.0"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/excalidraw",
   "scripts": {
     "gen:types": "tsc --project ../../../tsconfig-types.json",
-    "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",
+    "build:umd": "rm -rf dist && cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
-    "pack": "yarn build:umd && yarn pack"
+    "pack": "yarn build:umd && yarn pack",
+    "start": "webpack serve --config webpack.dev-server.config.js "
+  },
+  "dependencies": {
+    "dotenv": "10.0.0"
   }
 }

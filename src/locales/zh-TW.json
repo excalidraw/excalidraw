@@ -100,7 +100,9 @@
     "share": "共享",
     "showStroke": "顯示線條檢色器",
     "showBackground": "顯示背景檢色器",
-    "toggleTheme": "切換主題"
+    "toggleTheme": "切換主題",
+    "personalLib": "個人資料庫",
+    "excalidrawLib": "Excalidraw 資料庫"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -135,7 +137,11 @@
     "zenMode": "專注模式",
     "exitZenMode": "離開專注模式",
     "cancel": "取消",
-    "clear": "清除"
+    "clear": "清除",
+    "remove": "刪除",
+    "publishLibrary": "發布",
+    "submit": "送出",
+    "confirm": "確認"
   },
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "無法由此檔案回復場景。",
     "invalidSceneUrl": "無法由提供的 URL 匯入場景。可能是發生異常，或未包含有效的 Excalidraw JSON 資料。",
     "resetLibrary": "這會清除您的資料庫，是否確定？",
+    "removeItemsFromsLibrary": "從資料庫刪除 {{count}} 項？",
     "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。"
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "雙擊滑鼠左鍵或按 Enter 來編輯控制點",
     "lineEditor_pointSelected": "按下 Delete 可移除錨點；Ctrl 或 Cmd + D 可複製；或可拖曳來移動",
     "lineEditor_nothingSelected": "點選想移動或刪除的控制點；或按住 Alt 再點擊以增加新控制點",
-    "placeImage": "點擊以放置圖片，或點擊並拖曳以手動調整其尺寸。"
+    "placeImage": "點擊以放置圖片，或點擊並拖曳以手動調整其尺寸。",
+    "publishLibrary": "發布個人資料庫"
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "清除畫布"
   },
+  "publishDialog": {
+    "title": "發布資料庫",
+    "itemName": "項目名稱",
+    "authorName": "作者名稱",
+    "githubUsername": "GitHub 帳號",
+    "twitterUsername": "Twitter 帳號",
+    "libraryName": "資料庫名稱",
+    "libraryDesc": "資料庫說明",
+    "website": "網站",
+    "placeholder": {
+      "authorName": "您的名稱或帳號",
+      "libraryName": "您的資料庫名稱",
+      "libraryDesc": "提供您的資料庫說明以利他人理解其用途",
+      "githubHandle": "Github handle（選填），填寫後您可編輯已送出待審查的資料庫",
+      "twitterHandle": "Twitter 帳號（選填），填寫後若我們在 Twitter 推廣時可提及您",
+      "website": "您個人網站或其他網站的連結（選填）"
+    },
+    "errors": {
+      "required": "必填",
+      "website": "請輸入有效的 URL"
+    },
+    "noteDescription": {
+      "pre": "送出您的資料庫後將被包含於",
+      "link": "公開資料庫 repository",
+      "post": "以利他人在其繪圖中使用。"
+    },
+    "noteGuidelines": {
+      "pre": "資料庫需先經人工審查。請閱讀",
+      "link": "說明文件",
+      "post": "再送出。若需溝通與修改時要透過 GitHub 帳號來進行，但並非強制需求。"
+    },
+    "noteLicense": {
+      "pre": "送出即代表您同意此資料庫將發布時使用 ",
+      "link": "MIT 授權，",
+      "post": "簡單來說是指任何人都能不受限制的使用。"
+    },
+    "noteItems": "每個資料庫項目都有獨立的名稱故可篩選。會包含下列資料庫項目：",
+    "atleastOneLibItem": "請選擇至少一項資料庫項目"
+  },
+  "publishSuccessDialog": {
+    "title": "資料庫已送出",
+    "content": "感謝 {{authorName}} 。您的資料庫已送出待審查。您可查看目前狀態",
+    "link": "在此"
+  },
+  "confirmDialog": {
+    "resetLibrary": "重設資料庫",
+    "removeItemsFromLib": "從資料庫移除所選的項目"
+  },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。",
     "link": "Excalidraw 端到端加密的相關部落格文章"
@@ -289,6 +345,7 @@
     "width": "寬度"
   },
   "toast": {
+    "addedToLibrary": "加入資料庫",
     "copyStyles": "已複製樣式",
     "copyToClipboard": "複製至剪貼簿。",
     "copyToClipboardAsPng": "以 PNG 格式將 {{exportSelection}} 複製至剪貼簿\n({{exportColorScheme}})",

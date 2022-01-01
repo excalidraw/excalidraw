@@ -7,6 +7,7 @@ import { AppState } from "../types";
 import {
   isImageElement,
   isLinearElement,
+  isTextBindableContainer,
   isTextElement,
 } from "../element/typeChecks";
 import { getShortcutKey } from "../utils";
@@ -60,15 +61,6 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
     return t("hints.rotate");
   }
 
-  if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
-    if (appState.editingLinearElement) {
-      return appState.editingLinearElement.activePointIndex
-        ? t("hints.lineEditor_pointSelected")
-        : t("hints.lineEditor_nothingSelected");
-    }
-    return t("hints.lineEditor_info");
-  }
-
   if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
     return t("hints.text_selected");
   }
@@ -77,8 +69,31 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
     return t("hints.text_editing");
   }
 
-  if (elementType === "selection" && !selectedElements.length && !isMobile) {
-    return t("hints.canvasPanning");
+  if (elementType === "selection") {
+    if (
+      appState.draggingElement?.type === "selection" &&
+      !appState.editingElement &&
+      !appState.editingLinearElement
+    ) {
+      return t("hints.deepBoxSelect");
+    }
+    if (!selectedElements.length && !isMobile) {
+      return t("hints.canvasPanning");
+    }
+  }
+
+  if (selectedElements.length === 1) {
+    if (isLinearElement(selectedElements[0])) {
+      if (appState.editingLinearElement) {
+        return appState.editingLinearElement.selectedPointsIndices
+          ? t("hints.lineEditor_pointSelected")
+          : t("hints.lineEditor_nothingSelected");
+      }
+      return t("hints.lineEditor_info");
+    }
+    if (isTextBindableContainer(selectedElements[0])) {
+      return t("hints.bindTextToElement");
+    }
   }
 
   return null;

@@ -100,7 +100,9 @@
     "share": "Deel",
     "showStroke": "Toon lijn kleur kiezer",
     "showBackground": "Toon achtergrondkleur kiezer",
-    "toggleTheme": "Thema aan/uit"
+    "toggleTheme": "Thema aan/uit",
+    "personalLib": "Persoonlijke bibliotheek",
+    "excalidrawLib": "Excalidraw bibliotheek"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -135,7 +137,11 @@
     "zenMode": "Zen modus",
     "exitZenMode": "Verlaat zen modus",
     "cancel": "Annuleren",
-    "clear": "Wissen"
+    "clear": "Wissen",
+    "remove": "Verwijderen",
+    "publishLibrary": "Publiceren",
+    "submit": "Versturen",
+    "confirm": "Bevestigen"
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Weet je het zeker?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand",
     "invalidSceneUrl": "Kan scène niet importeren vanuit de opgegeven URL. Het is onjuist of bevat geen geldige Excalidraw JSON-gegevens.",
     "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?",
+    "removeItemsFromsLibrary": "Verwijder {{count}} item(s) uit bibliotheek?",
     "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Dubbelklik of druk op Enter om punten te bewerken",
     "lineEditor_pointSelected": "Druk op Delete om een punt te verwijderen, op CtrlOrCmd+D om te kopiëren, of sleeg om te verplaatsen",
     "lineEditor_nothingSelected": "Selecteer een punt om te verplaatsen of te verwijderen, of houd Alt ingedrukt en klik om nieuwe punten toe te voegen",
-    "placeImage": ""
+    "placeImage": "",
+    "publishLibrary": "Publiceer je eigen bibliotheek"
   },
   "canvasError": {
     "cannotShowPreview": "Kan voorbeeld niet tonen",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": ""
   },
+  "publishDialog": {
+    "title": "Publiceer bibliotheek",
+    "itemName": "Itemnaam",
+    "authorName": "Naam auteur",
+    "githubUsername": "GitHub gebruikersnaam",
+    "twitterUsername": "Twitter gebruikersnaam",
+    "libraryName": "Bibliotheek naam",
+    "libraryDesc": "Bibliotheek beschrijving",
+    "website": "Website",
+    "placeholder": {
+      "authorName": "Uw naam of gebruikersnaam:",
+      "libraryName": "Naam van je bibliotheek",
+      "libraryDesc": "Beschrijving van uw bibliotheek om mensen te helpen het gebruik ervan te begrijpen",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": "Link naar je persoonlijke website of elders (optioneel)"
+    },
+    "errors": {
+      "required": "Vereist",
+      "website": "Vul een geldige URL in"
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": "Hier"
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent.",
     "link": "Blog post over end-to-end versleuteling in Excalidraw"
@@ -289,6 +345,7 @@
     "width": "Breedte"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "Stijlen gekopieerd.",
     "copyToClipboard": "Gekopieerd naar het klembord.",
     "copyToClipboardAsPng": "{{exportSelection}} naar klembord gekopieerd als PNG\n({{exportColorScheme}})",

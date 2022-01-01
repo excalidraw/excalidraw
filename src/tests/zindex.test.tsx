@@ -32,11 +32,12 @@ const populateElements = (
     x?: number;
     width?: number;
     height?: number;
+    containerId?: string;
   }[],
 ) => {
   const selectedElementIds: any = {};
 
-  h.elements = elements.map(
+  const newElements = elements.map(
     ({
       id,
       isDeleted = false,
@@ -46,9 +47,10 @@ const populateElements = (
       x = 100,
       width = 100,
       height = 100,
+      containerId = null,
     }) => {
       const element = API.createElement({
-        type: "rectangle",
+        type: containerId ? "text" : "rectangle",
         id,
         isDeleted,
         x,
@@ -56,6 +58,7 @@ const populateElements = (
         width,
         height,
         groupIds,
+        containerId,
       });
       if (isSelected) {
         selectedElementIds[element.id] = true;
@@ -63,6 +66,22 @@ const populateElements = (
       return element;
     },
   );
+
+  // initialize `boundElements` on containers, if applicable
+  h.elements = newElements.map((element, index, elements) => {
+    const nextElement = elements[index + 1];
+    if (
+      nextElement &&
+      "containerId" in nextElement &&
+      element.id === nextElement.containerId
+    ) {
+      return {
+        ...element,
+        boundElements: [{ type: "text", id: nextElement.id }],
+      };
+    }
+    return element;
+  });
 
   h.setState({
     selectedElementIds,
@@ -87,6 +106,7 @@ const assertZindex = ({
     isDeleted?: true;
     isSelected?: true;
     groupIds?: string[];
+    containerId?: string;
   }[];
   appState?: Partial<AppState>;
   operations: [Actions, string[]][];
@@ -1050,5 +1070,74 @@ describe("z-index manipulation", () => {
       "C",
       "C_copy",
     ]);
+  });
+
+  it("text-container binding should be atomic", () => {
+    assertZindex({
+      elements: [
+        { id: "A", isSelected: true },
+        { id: "B" },
+        { id: "C", containerId: "B" },
+      ],
+      operations: [
+        [actionBringForward, ["B", "C", "A"]],
+        [actionSendBackward, ["A", "B", "C"]],
+      ],
+    });
+
+    assertZindex({
+      elements: [
+        { id: "A" },
+        { id: "B", isSelected: true },
+        { id: "C", containerId: "B" },
+      ],
+      operations: [
+        [actionSendBackward, ["B", "C", "A"]],
+        [actionBringForward, ["A", "B", "C"]],
+      ],
+    });
+
+    assertZindex({
+      elements: [
+        { id: "A", isSelected: true, groupIds: ["g1"] },
+        { id: "B", groupIds: ["g1"] },
+        { id: "C", containerId: "B", groupIds: ["g1"] },
+      ],
+      appState: {
+        editingGroupId: "g1",
+      },
+      operations: [
+        [actionBringForward, ["B", "C", "A"]],
+        [actionSendBackward, ["A", "B", "C"]],
+      ],
+    });
+
+    assertZindex({
+      elements: [
+        { id: "A", groupIds: ["g1"] },
+        { id: "B", groupIds: ["g1"], isSelected: true },
+        { id: "C", containerId: "B", groupIds: ["g1"] },
+      ],
+      appState: {
+        editingGroupId: "g1",
+      },
+      operations: [
+        [actionSendBackward, ["B", "C", "A"]],
+        [actionBringForward, ["A", "B", "C"]],
+      ],
+    });
+
+    assertZindex({
+      elements: [
+        { id: "A", groupIds: ["g1"] },
+        { id: "B", isSelected: true, groupIds: ["g1"] },
+        { id: "C" },
+        { id: "D", containerId: "C" },
+      ],
+      appState: {
+        editingGroupId: "g1",
+      },
+      operations: [[actionBringForward, ["A", "B", "C", "D"]]],
+    });
   });
 });

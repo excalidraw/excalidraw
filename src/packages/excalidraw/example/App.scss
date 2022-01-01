@@ -1,0 +1,42 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.button-wrapper button {
+  z-index: 1;
+  height: 40px;
+  max-width: 200px;
+  margin: 10px;
+  padding: 5px;
+}
+
+.excalidraw .App-menu_top .buttonList {
+  display: flex;
+}
+
+.excalidraw-wrapper {
+  height: 800px;
+  margin: 50px;
+}
+
+:root[dir="ltr"]
+  .excalidraw
+  .layer-ui__wrapper
+  .zen-mode-transition.App-menu_bottom--transition-left {
+  transform: none;
+}
+
+.excalidraw .panelColumn {
+  text-align: left;
+}
+
+.export-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin: 50px;
+
+  &__checkbox {
+    display: flex;
+  }
+}

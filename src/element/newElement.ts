@@ -11,6 +11,7 @@ import {
   Arrowhead,
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
+  ExcalidrawRectangleElement,
 } from "../element/types";
 import {
   applyTextOpts,
@@ -18,21 +19,25 @@ import {
   measureTextElement,
 } from "../textlike";
 import { TextOpts } from "../textlike/types";
+import { getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
-import { newElementWith } from "./mutateElement";
+import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
+import { isBoundToContainer } from "./typeChecks";
+import Scene from "../scene/Scene";
+import { BOUND_TEXT_PADDING } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
-  Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted">,
+  Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
   | "width"
   | "height"
   | "angle"
   | "groupIds"
-  | "boundElementIds"
+  | "boundElements"
   | "seed"
   | "version"
   | "versionNonce"
@@ -55,32 +60,36 @@ const _newElementBase = <T extends ExcalidrawElement>(
     angle = 0,
     groupIds = [],
     strokeSharpness,
-    boundElementIds = null,
+    boundElements = null,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
-) => ({
-  id: rest.id || randomId(),
-  type,
-  x,
-  y,
-  width,
-  height,
-  angle,
-  strokeColor,
-  backgroundColor,
-  fillStyle,
-  strokeWidth,
-  strokeStyle,
-  roughness,
-  opacity,
-  groupIds,
-  strokeSharpness,
-  seed: rest.seed ?? randomInteger(),
-  version: rest.version || 1,
-  versionNonce: rest.versionNonce ?? 0,
-  isDeleted: false as false,
-  boundElementIds,
-});
+) => {
+  const element = {
+    id: rest.id || randomId(),
+    type,
+    x,
+    y,
+    width,
+    height,
+    angle,
+    strokeColor,
+    backgroundColor,
+    fillStyle,
+    strokeWidth,
+    strokeStyle,
+    roughness,
+    opacity,
+    groupIds,
+    strokeSharpness,
+    seed: rest.seed ?? randomInteger(),
+    version: rest.version || 1,
+    versionNonce: rest.versionNonce ?? 0,
+    isDeleted: false as false,
+    boundElements,
+    updated: getUpdatedTimestamp(),
+  };
+  return element;
+};
 
 export const newElement = (
   opts: {
@@ -120,6 +129,7 @@ export const newTextElement = (
     verticalAlign: VerticalAlign;
     subtype: string;
     textOpts?: TextOpts;
+    containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const cleanedOpts = cleanTextOptUpdates(opts.subtype, opts);
@@ -139,6 +149,8 @@ export const newTextElement = (
       height: metrics.height,
       baseline: metrics.baseline,
       subtype: opts.subtype,
+      containerId: opts.containerId || null,
+      originalText: opts.text,
     },
     {},
   );
@@ -158,18 +170,25 @@ const getAdjustedDimensions = (
   height: number;
   baseline: number;
 } => {
+  const maxWidth = element.containerId ? element.width : null;
   const {
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureTextElement(element, { text: nextText });
+  } = measureTextElement(element, { text: nextText }, maxWidth);
   const { textAlign, verticalAlign } = element;
-
   let x: number;
   let y: number;
-
-  if (textAlign === "center" && verticalAlign === "middle") {
-    const prevMetrics = measureTextElement(element);
+  if (
+    textAlign === "center" &&
+    verticalAlign === "middle" &&
+    !element.containerId
+  ) {
+    const prevMetrics = measureTextElement(
+      element,
+      { fontSize: element.fontSize },
+      maxWidth,
+    );
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
       height: nextHeight - prevMetrics.height,
@@ -206,6 +225,22 @@ const getAdjustedDimensions = (
     );
   }
 
+  // make sure container dimensions are set properly when
+  // text editor overflows beyond viewport dimensions
+  if (isBoundToContainer(element)) {
+    const container = Scene.getScene(element)!.getElement(element.containerId)!;
+    let height = container.height;
+    let width = container.width;
+    if (nextHeight > height - BOUND_TEXT_PADDING * 2) {
+      height = nextHeight + BOUND_TEXT_PADDING * 2;
+    }
+    if (nextWidth > width - BOUND_TEXT_PADDING * 2) {
+      width = nextWidth + BOUND_TEXT_PADDING * 2;
+    }
+    if (height !== container.height || width !== container.width) {
+      mutateElement(container, { height, width });
+    }
+  }
   return {
     width: nextWidth,
     height: nextHeight,
@@ -217,12 +252,22 @@ const getAdjustedDimensions = (
 
 export const updateTextElement = (
   element: ExcalidrawTextElement,
-  { text, isDeleted }: { text: string; isDeleted?: boolean },
+  {
+    text,
+    isDeleted,
+    originalText,
+  }: { text: string; isDeleted?: boolean; originalText: string },
+
+  updateDimensions: boolean,
 ): ExcalidrawTextElement => {
+  const dimensions = updateDimensions
+    ? getAdjustedDimensions(element, text)
+    : undefined;
   return newElementWith(element, {
     text,
+    originalText,
     isDeleted: isDeleted ?? element.isDeleted,
-    ...getAdjustedDimensions(element, text),
+    ...dimensions,
   });
 };
 
@@ -336,7 +381,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   overrides?: Partial<TElement>,
 ): TElement => {
   let copy: TElement = deepCopyElement(element);
-  if (process.env.NODE_ENV === "test") {
+  if (isTestEnv()) {
     copy.id = `${copy.id}_copy`;
     // `window.h` may not be defined in some unit tests
     if (
@@ -349,6 +394,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   } else {
     copy.id = randomId();
   }
+  copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();
   copy.groupIds = getNewGroupIdsForDuplication(
     copy.groupIds,

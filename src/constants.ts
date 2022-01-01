@@ -176,3 +176,10 @@ export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
 export const ENCRYPTION_KEY_BITS = 128;
+
+export const VERSIONS = {
+  excalidraw: 2,
+  excalidrawLibrary: 2,
+} as const;
+
+export const BOUND_TEXT_PADDING = 30;

@@ -100,7 +100,9 @@
     "share": "Поделиться",
     "showStroke": "Показать выбор цвета обводки",
     "showBackground": "Показать выбор цвета фона",
-    "toggleTheme": "Переключить тему"
+    "toggleTheme": "Переключить тему",
+    "personalLib": "",
+    "excalidrawLib": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -135,7 +137,11 @@
     "zenMode": "Режим Дзен",
     "exitZenMode": "Выключить режим концентрации внимания",
     "cancel": "Отменить",
-    "clear": "Очистить"
+    "clear": "Очистить",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
+    "confirm": "Подтвердить"
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Сцена не может быть восстановлена из этого изображения",
     "invalidSceneUrl": "Невозможно импортировать сцену с предоставленного URL. Неверный формат, или не содержит верных Excalidraw JSON данных.",
     "resetLibrary": "Это очистит вашу библиотеку. Вы уверены?",
+    "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": ""
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Дважды кликните или нажмите Enter, чтобы редактировать точки",
     "lineEditor_pointSelected": "Нажмите Delete для удаления точки, Ctrl или Cmd + D для дублирования, перетащите для перемещения",
     "lineEditor_nothingSelected": "Выберите точку для перемещения или удаления. Alt + клик чтобы добавить новые точки",
-    "placeImage": ""
+    "placeImage": "",
+    "publishLibrary": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не удается отобразить предпросмотр",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": ""
   },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
+  },
   "encrypted": {
     "tooltip": "Ваши данные защищены сквозным (End-to-end) шифрованием. Серверы Excalidraw никогда не получат доступ к ним.",
     "link": "Запись блога о сквозном шифровании в Excalidraw"
@@ -289,6 +345,7 @@
     "width": "Ширина"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "Скопированы стили.",
     "copyToClipboard": "Скопировано в буфер обмена.",
     "copyToClipboardAsPng": "{{exportSelection}} скопировано как PNG ({{exportColorScheme}})",

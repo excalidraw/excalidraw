@@ -100,7 +100,9 @@
     "share": "Distribuie",
     "showStroke": "Afișare selector culoare contur",
     "showBackground": "Afișare selector culoare fundal",
-    "toggleTheme": "Comutare temă"
+    "toggleTheme": "Comutare temă",
+    "personalLib": "Biblioteca personală",
+    "excalidrawLib": "Biblioteca Excalidraw"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -135,7 +137,11 @@
     "zenMode": "Mod zen",
     "exitZenMode": "Ieșire din modul zen",
     "cancel": "Anulare",
-    "clear": "Ștergere"
+    "clear": "Ștergere",
+    "remove": "Eliminare",
+    "publishLibrary": "Publicare",
+    "submit": "Trimitere",
+    "confirm": "Confirmare"
   },
   "alerts": {
     "clearReset": "Această opțiune va șterge întreaga pânză. Confirmi?",
@@ -157,6 +163,7 @@
     "cannotRestoreFromImage": "Scena nu a putut fi restaurată din acest fișier de imagine",
     "invalidSceneUrl": "Scena nu a putut fi importată din URL-ul furnizat. Este fie incorect formată, fie nu conține date JSON Excalidraw valide.",
     "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?",
+    "removeItemsFromsLibrary": "Ștergi {{count}} element(e) din bibliotecă?",
     "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată."
   },
   "errors": {
@@ -199,7 +206,8 @@
     "lineEditor_info": "Dă dublu clic sau apasă tasta Enter pentru a edita punctele",
     "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctul, combinația de taste Ctrl sau Cmd + D pentru a-l duplica sau glisează-l pentru a-i schimba poziția",
     "lineEditor_nothingSelected": "Selectează un punct pentru a-l muta sau elimina sau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi",
-    "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii"
+    "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
+    "publishLibrary": "Publică propria bibliotecă"
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -269,6 +277,54 @@
   "clearCanvasDialog": {
     "title": "Ștergere pânză"
   },
+  "publishDialog": {
+    "title": "Publicare bibliotecă",
+    "itemName": "Denumirea elementului",
+    "authorName": "Numele autorului",
+    "githubUsername": "Numele de utilizator GitHub",
+    "twitterUsername": "Numele de utilizator Twitter",
+    "libraryName": "Denumirea bibliotecii",
+    "libraryDesc": "Descrierea bibliotecii",
+    "website": "Pagină de internet",
+    "placeholder": {
+      "authorName": "Numele sau numele tău de utilizator",
+      "libraryName": "Numele bibliotecii tale",
+      "libraryDesc": "Descrierea bibliotecii tale pentru a ajuta oamenii să înțeleagă utilizarea acesteia",
+      "githubHandle": "Numele de utilizator GitHub (opțional), pentru a putea edita biblioteca odată ce este trimisă spre revizuire",
+      "twitterHandle": "Numele de utilizator Twitter (opțional), pentru a indica sursa la promovarea pe Twitter",
+      "website": "Trimitere către pagina ta personală de internet sau altundeva (opțional)"
+    },
+    "errors": {
+      "required": "Obligatoriu",
+      "website": "Introdu un URL valid"
+    },
+    "noteDescription": {
+      "pre": "Trimite-ți biblioteca pentru fi inclus în ",
+      "link": "depozitul de biblioteci publice",
+      "post": "pentru utilizarea de către alte persoane în desenele lor."
+    },
+    "noteGuidelines": {
+      "pre": "Biblioteca trebuie aprobată manual. Citește ",
+      "link": "orientările",
+      "post": " înainte de trimitere. Vei avea nevoie de un cont GitHub pentru a comunica și efectua modificări, dacă este cazul, însă nu este strict necesar."
+    },
+    "noteLicense": {
+      "pre": "Prin trimiterea bibliotecii, ești de acord că aceasta va fi publicată sub ",
+      "link": "Licența MIT, ",
+      "post": "care, pe scurt, înseamnă că oricine o poate folosi fără restricții."
+    },
+    "noteItems": "Fiecare element din bibliotecă trebuie să aibă propriul nume astfel încât să fie filtrabil. Următoarele elemente din bibliotecă vor fi incluse:",
+    "atleastOneLibItem": "Selectează cel puțin un element din bibliotecă pentru a începe"
+  },
+  "publishSuccessDialog": {
+    "title": "Bibliotecă trimisă",
+    "content": "Îți mulțumim, {{authorName}}. Biblioteca ta a fost trimisă spre revizuire. Poți urmări starea",
+    "link": "aici"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Resetare bibliotecă",
+    "removeItemsFromLib": "Elimină elementele selectate din bibliotecă"
+  },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată.",
     "link": "Articol de blog pe criptarea integrală din Excalidraw"
@@ -289,6 +345,7 @@
     "width": "Lățime"
   },
   "toast": {
+    "addedToLibrary": "Adăugat în bibliotecă",
     "copyStyles": "Stiluri copiate.",
     "copyToClipboard": "Copiat în memoria temporară.",
     "copyToClipboardAsPng": "S-a copiat {{exportSelection}} în memoria temporară sub formă de PNG\n({{exportColorScheme}})",
