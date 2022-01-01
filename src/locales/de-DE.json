@@ -209,7 +209,7 @@
     "placeImage": "Klicken, um das Bild zu platzieren oder klicken und ziehen um seine Größe manuell zu setzen",
     "publishLibrary": "Veröffentliche deine eigene Bibliothek",
     "bindTextToElement": "Zum Hinzufügen Eingabetaste drücken",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Halte StrgOrCmd gedrückt, um innerhalb der Gruppe auszuwählen, und um Ziehen zu vermeiden"
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
@@ -256,8 +256,8 @@
   "helpDialog": {
     "blog": "Lies unseren Blog",
     "click": "klicken",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Auswahl innerhalb der Gruppe",
+    "deepBoxSelect": "Tiefe Auswahl innerhalb des Bereichs, und Ziehen verhindern",
     "curvedArrow": "Gebogener Pfeil",
     "curvedLine": "Gebogene Linie",
     "documentation": "Dokumentation",
