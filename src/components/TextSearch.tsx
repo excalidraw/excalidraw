@@ -22,6 +22,13 @@ export const TextSearch = (props: {
     if (event.key === KEYS.ESCAPE) {
       props.setAppState({ textSearchActive: false });
     }
+    if (event.key === KEYS.ENTER) {
+      props.setAppState(({ scrollX, scrollY }) => ({
+        scrollX: 100,
+        scrollY: 100,
+      }));
+    }
+    console.info(props.appState.searchMatchText);
   };
 
   return (
