@@ -209,7 +209,7 @@
     "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
     "publishLibrary": "Terbitkan pustaka Anda",
     "bindTextToElement": "Tekan enter untuk tambahkan teks",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran"
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -256,7 +256,7 @@
   "helpDialog": {
     "blog": "Baca blog kami",
     "click": "klik",
-    "deepSelect": "",
+    "deepSelect": "Pilih dalam",
     "deepBoxSelect": "",
     "curvedArrow": "Panah lengkung",
     "curvedLine": "Garis lengkung",
