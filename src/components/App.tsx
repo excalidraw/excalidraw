@@ -177,6 +177,7 @@ import {
   isOverScrollBars,
   isSomeElementSelected,
 } from "../scene";
+import { centerScrollOn } from "../scene/scroll";
 import Scene from "../scene/Scene";
 import { RenderConfig, ScrollBars } from "../scene/types";
 import { getNewZoom } from "../scene/zoom";
@@ -1894,19 +1895,27 @@ class App extends React.Component<AppProps, AppState> {
       const testMoveElem = matchedElements[0];
       const testMoveMatched = JSON.parse(JSON.stringify(testMoveElem));
 
-      const { x: viewportX2, y: viewportY2 } = viewportCoordsToSceneCoords(
-        { clientX: testMoveMatched.x, clientY: testMoveMatched.y },
+      const { x: viewportX2, y: viewportY2 } = sceneCoordsToViewportCoords(
+        { sceneX: testMoveMatched.x, sceneY: testMoveMatched.y },
         this.state,
       );
 
       console.info(viewportX2);
       console.info(viewportY2);
+      console.info(testMoveMatched.x);
+      console.info(testMoveMatched.y);
 
       if (event.key === KEYS.ENTER) {
-        this.setState(({ scrollX, scrollY }) => ({
-          scrollX: viewportX2,
-          scrollY: viewportY2,
-        }));
+        this.setState({
+          ...centerScrollOn({
+            scenePoint: { x: testMoveMatched.x, y: testMoveMatched.y },
+            viewportDimensions: {
+              width: this.state.width,
+              height: this.state.height,
+            },
+            zoom: this.state.zoom,
+          }),
+        });
       }
     }
   });
