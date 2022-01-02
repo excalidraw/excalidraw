@@ -217,7 +217,6 @@ import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { getTextLikeActions, registerTextElementSubtypes } from "../textlike";
-import { redrawTextBoundingBox } from "../element/textElement";
 import {
   dataURLToFile,
   generateIdFromFile,
@@ -377,11 +376,6 @@ class App extends React.Component<AppProps, AppState> {
         // registered, update the element's dimensions, mark the
         // element for a re-render, and mark the scene for a refresh.
         if (isTextElementSubtype(element)) {
-          const textElement = element as ExcalidrawTextElement;
-          const container = textElement.containerId
-            ? this.scene.getElement(textElement.containerId)
-            : null;
-          redrawTextBoundingBox(textElement, container, this.state);
           invalidateShapeForElement(element);
           refreshNeeded = true;
         }

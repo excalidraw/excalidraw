@@ -60,6 +60,7 @@ const measureTextElementText = (
   next?: {
     fontSize?: number;
     text?: string;
+    textOpts?: TextOptsText;
   },
   maxWidth?: number | null,
 ) => {
