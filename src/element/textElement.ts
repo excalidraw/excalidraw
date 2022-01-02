@@ -112,20 +112,12 @@ export const handleBindTextResize = (
         let containerHeight = element.height;
         let nextBaseLine = textElement.baseline;
         if (transformHandleType !== "n" && transformHandleType !== "s") {
-          let minCharWidthTillNow = 0;
           if (text) {
-            minCharWidthTillNow = getMinCharWidth(getFontString(textElement));
-            // check if the diff has exceeded min char width needed
-            const diff = Math.abs(
-              element.width - textElement.width + BOUND_TEXT_PADDING * 2,
+            text = wrapText(
+              textElement.originalText,
+              getFontString(textElement),
+              element.width,
             );
-            if (diff >= minCharWidthTillNow) {
-              text = wrapText(
-                textElement.originalText,
-                getFontString(textElement),
-                element.width,
-              );
-            }
           }
 
           const dimensions = measureText(
