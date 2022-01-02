@@ -192,7 +192,7 @@
     "shapes": "Tvary"
   },
   "hints": {
-    "canvasPanning": "Pre pohyb plátna podržte koliesko myši ale medzerník počas ťahania",
+    "canvasPanning": "Pre pohyb plátna podržte koliesko myši alebo medzerník počas ťahania",
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
@@ -209,7 +209,7 @@
     "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
     "publishLibrary": "Uverejniť vašu knižnicu",
     "bindTextToElement": "Stlačte enter na pridanie textu",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Podržte CtrlOrCmd na výber v skupine alebo zamedzeniu poťiahnutia"
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -256,8 +256,8 @@
   "helpDialog": {
     "blog": "Prečítajte si náš blog",
     "click": "kliknutie",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Výber v skupine",
+    "deepBoxSelect": "Výber v skupine alebo zamedzenie poťiahnutia",
     "curvedArrow": "Zakrivená šípka",
     "curvedLine": "Zakrivená čiara",
     "documentation": "Dokumentácia",
