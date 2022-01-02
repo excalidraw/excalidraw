@@ -143,7 +143,11 @@ export const actionChangeTextElementSubtype = register({
       <ButtonIconSelect
         group="subtype"
         options={TEXT_SUBTYPE_ICONS.map(({ icon, value }) => {
-          return { value, icon, text: t(`toolBar.${value}`) };
+          return {
+            value,
+            icon: icon.call(this, { theme: appState.theme })!,
+            text: t(`toolBar.${value}`),
+          };
         })}
         value={getFormValue(
           elements,
