@@ -9,14 +9,14 @@ describe("Test wrapText", () => {
     [
       {
         desc: "break all words when width of each word is less than container width",
-        width: 140,
+        width: 90,
         res: `Hello 
 whats 
 up`,
       },
       {
         desc: "break all characters when width of each character is less than container width",
-        width: 75,
+        width: 25,
         res: `H
 e
 l
@@ -33,7 +33,7 @@ p`,
       {
         desc: "break words as per the width",
 
-        width: 200,
+        width: 150,
         res: `Hello whats 
 up`,
       },
@@ -56,14 +56,14 @@ whats up`;
     [
       {
         desc: "break all words when width of each word is less than container width",
-        width: 140,
+        width: 90,
         res: `Hello
 whats 
 up`,
       },
       {
         desc: "break all characters when width of each character is less than container width",
-        width: 75,
+        width: 25,
         res: `H
 e
 l
@@ -80,7 +80,7 @@ p`,
       {
         desc: "break words as per the width",
 
-        width: 200,
+        width: 150,
         res: `Hello
 whats up`,
       },
@@ -103,7 +103,7 @@ whats up`,
     [
       {
         desc: "fit characters of long string as per container width",
-        width: 220,
+        width: 170,
         res: `hellolongtextth
 isiswhatsupwith
 youIamtypingggg
@@ -114,7 +114,7 @@ break it now`,
       {
         desc: "fit characters of long string as per container width and break words as per the width",
 
-        width: 180,
+        width: 130,
         res: `hellolongte
 xtthisiswha
 tsupwithyou
@@ -126,7 +126,7 @@ now`,
       {
         desc: "fit the long text when container width is greater than text length and move the rest to next line",
 
-        width: 650,
+        width: 600,
         res: `hellolongtextthisiswhatsupwithyouIamtypingggggandtypinggg 
 break it now`,
       },
