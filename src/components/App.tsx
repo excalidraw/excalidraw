@@ -1852,7 +1852,6 @@ class App extends React.Component<AppProps, AppState> {
       textMatchSearch.addDocuments(textElements);
 
       const matchedElements = textMatchSearch.search(searchMatchText);
-      console.info(matchedElements);
 
       this.scene.replaceAllElements(
         this.scene
@@ -1863,7 +1862,6 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       matchedElements.forEach((matchedElement) => {
-        console.info(matchedElement);
         const matchedElemJson = JSON.parse(JSON.stringify(matchedElement));
         const matchHighlightRect = newElement({
           type: "rectangle",
@@ -1892,23 +1890,18 @@ class App extends React.Component<AppProps, AppState> {
         ]);
       });
 
-      const testMoveElem = matchedElements[0];
-      const testMoveMatched = JSON.parse(JSON.stringify(testMoveElem));
-
-      const { x: viewportX2, y: viewportY2 } = sceneCoordsToViewportCoords(
-        { sceneX: testMoveMatched.x, sceneY: testMoveMatched.y },
-        this.state,
+      const matchedElementsJSON = matchedElements.map((elem) =>
+        JSON.parse(JSON.stringify(elem)),
       );
 
-      console.info(viewportX2);
-      console.info(viewportY2);
-      console.info(testMoveMatched.x);
-      console.info(testMoveMatched.y);
-
+      let i = 0;
       if (event.key === KEYS.ENTER) {
         this.setState({
           ...centerScrollOn({
-            scenePoint: { x: testMoveMatched.x, y: testMoveMatched.y },
+            scenePoint: {
+              x: matchedElementsJSON[i].x,
+              y: matchedElementsJSON[i].y,
+            },
             viewportDimensions: {
               width: this.state.width,
               height: this.state.height,
@@ -1916,6 +1909,12 @@ class App extends React.Component<AppProps, AppState> {
             zoom: this.state.zoom,
           }),
         });
+        console.info(i);
+        if (i === matchedElementsJSON.length) {
+          i = 0;
+        } else {
+          i++;
+        }
       }
     }
   });
