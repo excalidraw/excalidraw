@@ -209,7 +209,7 @@
     "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
     "publishLibrary": "Publicar sua própria biblioteca",
     "bindTextToElement": "Pressione Enter para adicionar o texto",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Segure Ctrl/Cmd para seleção profunda e para evitar arrastar"
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -256,8 +256,8 @@
   "helpDialog": {
     "blog": "Leia o nosso blog",
     "click": "clicar",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Seleção profunda",
+    "deepBoxSelect": "Use a seleção profunda dentro da caixa para previnir arrastar",
     "curvedArrow": "Seta curva",
     "curvedLine": "Linha curva",
     "documentation": "Documentação",
