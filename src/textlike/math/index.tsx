@@ -6,8 +6,8 @@ import {
   getFontFamilyString,
   getShortcutKey,
   isRTL,
-  measureText,
 } from "../../utils";
+import { getApproxLineHeight, measureText } from "../../element/textElement";
 import { isTextElement } from "../../element/typeChecks";
 import {
   ExcalidrawElement,
@@ -34,7 +34,7 @@ import { Action } from "../../actions/types";
 import { AppState } from "../../types";
 import { getFormValue } from "../../actions/actionProperties";
 import { getSelectedElements } from "../../scene";
-import { getElementMap, getNonDeletedElements } from "../../element";
+import { getNonDeletedElements } from "../../element";
 import { invalidateShapeForElement } from "../../renderer/renderElement";
 import { ButtonSelect } from "../../components/ButtonSelect";
 
@@ -226,16 +226,32 @@ const metricsCache = {} as {
   };
 };
 
-const measureHTML = (text: string, font: FontString) => {
-  const line = document.createElement("div");
-  const body = document.body;
-  line.style.position = "absolute";
-  line.style.whiteSpace = "pre";
-  line.style.font = font;
-  body.appendChild(line);
-  line.innerHTML = text;
-  const width = line.offsetWidth;
-  const height = line.offsetHeight;
+const measureHTML = (
+  text: string,
+  font: FontString,
+  maxWidth?: number | null,
+) => {
+  const container = document.createElement("div");
+  container.style.position = "absolute";
+  container.style.whiteSpace = "pre";
+  container.style.font = font;
+  container.style.minHeight = "1em";
+
+  if (maxWidth) {
+    const lineHeight = getApproxLineHeight(font);
+    container.style.width = `${String(maxWidth)}px`;
+    container.style.maxWidth = `${String(maxWidth)}px`;
+    container.style.overflow = "hidden";
+    container.style.wordBreak = "break-word";
+    container.style.lineHeight = `${String(lineHeight)}px`;
+    container.style.whiteSpace = "pre-wrap";
+  }
+  document.body.appendChild(container);
+
+  container.innerHTML = text;
+  const width = container.offsetWidth;
+  const height = container.offsetHeight;
+
   // Now creating 1px sized item that will be aligned to baseline
   // to calculate baseline shift
   const span = document.createElement("span");
@@ -243,27 +259,32 @@ const measureHTML = (text: string, font: FontString) => {
   span.style.overflow = "hidden";
   span.style.width = "1px";
   span.style.height = "1px";
-  line.appendChild(span);
+  container.appendChild(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
 
   // Compute for each SVG child element of line (the last
   // child is the span element for the baseline).
   const childOffsets = [];
-  for (let i = 0; i < line.children.length - 1; i++) {
+  for (let i = 0; i < container.children.length - 1; i++) {
     // The mji-container element
-    const child = line.children[i] as HTMLElement;
+    const child = container.children[i] as HTMLElement;
     // The svg element
     const grandchild = child.firstChild as HTMLElement;
     // How far the svg element is offset from the top of the rendered text
     const childOffsetHeight =
-      line.getBoundingClientRect().y - grandchild.getBoundingClientRect().y;
+      container.getBoundingClientRect().y -
+      grandchild.getBoundingClientRect().y;
     childOffsets.push({
       width: child.offsetWidth,
       height: childOffsetHeight,
     });
   }
-  document.body.removeChild(line);
+  if (childOffsets.length === 0) {
+    // Avoid crashes in measureOutputs()
+    childOffsets.push({ width: 0, height: 0 });
+  }
+  document.body.removeChild(container);
   return { width, height, baseline, childOffsets };
 };
 
@@ -271,6 +292,7 @@ const measureOutputs = (
   outputs: string[][],
   fontString: FontString,
   isMathJaxLoaded: boolean,
+  maxWidth?: number | null,
 ) => {
   let key = fontString as string;
   for (let index = 0; index < outputs.length; index++) {
@@ -319,7 +341,7 @@ const measureOutputs = (
       height: lineHeight,
       baseline: lineBaseline,
       childOffsets: lineChildOffsets,
-    } = measureHTML(html, fontString);
+    } = measureHTML(html, fontString, maxWidth);
 
     for (let i = 0; i < outputs[index].length; i++) {
       if (isMathJaxLoaded && i % 2 === 1) {
@@ -482,11 +504,13 @@ const measureMath = (
   fontSize: number,
   useTex: boolean,
   isMathJaxLoaded: boolean,
+  maxWidth?: number | null,
 ) => {
   return measureOutputs(
     markupText(text, useTex, isMathJaxLoaded),
     getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH }),
     isMathJaxLoaded,
+    maxWidth,
   ).imageMetrics;
 };
 
@@ -542,13 +566,17 @@ const measureTextElementMath = (
     | "version"
     | "versionNonce"
     | "groupIds"
-    | "boundElementIds"
+    | "boundElements"
+    | "containerId"
+    | "originalText"
+    | "updated"
   >,
   next?: {
     fontSize?: number;
     text?: string;
     textOpts?: TextOptsMath;
   },
+  maxWidth?: number | null,
 ) => {
   const isMathJaxLoaded = mathJaxLoaded;
   const fontSize =
@@ -558,7 +586,7 @@ const measureTextElementMath = (
     next?.textOpts !== undefined && next.textOpts.useTex !== undefined
       ? next.textOpts.useTex
       : element.useTex;
-  return measureMath(text, fontSize, useTex, isMathJaxLoaded);
+  return measureMath(text, fontSize, useTex, isMathJaxLoaded, maxWidth);
 };
 
 const renderTextElementMath = (
@@ -775,13 +803,11 @@ const setUseTexForSelectedElements = (
     mutateElement(element, metrics);
   });
 
-  // Return an array of the elements which were updated
-  const updatedElementsMap = getElementMap(elements);
-
   // Set the default value for new math-text elements.
   return {
     elements: elements.map(
-      (element) => updatedElementsMap[element.id] || element,
+      (element) =>
+        selectedElements.find((ele) => ele.id === element.id) || element,
     ),
     appState: { ...appState, textOpts: { useTex } },
   };
@@ -862,6 +888,7 @@ const registerActionsMath = () => {
             getUseTex(appState),
           )}
           onChange={(value) => updateData(value)}
+          theme={appState.theme}
         />
       </fieldset>
     ),
