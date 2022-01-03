@@ -261,6 +261,7 @@ let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
+let currentMatchedElementIdx = 0;
 let invalidateContextMenu = false;
 
 let lastPointerUp: ((event: any) => void) | null = null;
@@ -1523,6 +1524,14 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   toggleTextSearch = () => {
+    this.scene.replaceAllElements(
+      this.scene
+        .getElements()
+        .filter(
+          (element) => !element.groupIds.includes("highlight_rectangles"),
+        ),
+    );
+    this.setState({ searchMatchText: "" });
     this.actionManager.executeAction(actionToggleTextSearch);
   };
 
@@ -1894,13 +1903,15 @@ class App extends React.Component<AppProps, AppState> {
         JSON.parse(JSON.stringify(elem)),
       );
 
-      let i = 0;
       if (event.key === KEYS.ENTER) {
+        if (currentMatchedElementIdx === matchedElementsJSON.length) {
+          currentMatchedElementIdx = 0;
+        }
         this.setState({
           ...centerScrollOn({
             scenePoint: {
-              x: matchedElementsJSON[i].x,
-              y: matchedElementsJSON[i].y,
+              x: matchedElementsJSON[currentMatchedElementIdx].x,
+              y: matchedElementsJSON[currentMatchedElementIdx].y,
             },
             viewportDimensions: {
               width: this.state.width,
@@ -1909,12 +1920,19 @@ class App extends React.Component<AppProps, AppState> {
             zoom: this.state.zoom,
           }),
         });
-        console.info(i);
-        if (i === matchedElementsJSON.length) {
-          i = 0;
-        } else {
-          i++;
-        }
+        currentMatchedElementIdx++;
+      }
+
+      if (event.key === KEYS.ESCAPE) {
+        this.scene.replaceAllElements(
+          this.scene
+            .getElements()
+            .filter(
+              (element) => !element.groupIds.includes("highlight_rectangles"),
+            ),
+        );
+        this.setState({ searchMatchText: "" });
+        this.setState({ textSearchActive: false });
       }
     }
   });

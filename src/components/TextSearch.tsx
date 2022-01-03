@@ -5,7 +5,6 @@ import { AppState } from "../types";
 import { Island } from "./Island";
 import "./TextSearch.scss";
 import { close, back, start } from "./icons";
-import { KEYS } from "../keys";
 
 export const TextSearch = (props: {
   appState: AppState;
@@ -18,12 +17,6 @@ export const TextSearch = (props: {
   if (isMobile) {
     return null;
   }
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === KEYS.ESCAPE) {
-      props.setAppState({ textSearchActive: false });
-    }
-  };
 
   return (
     <div className="TextSearch">
@@ -40,7 +33,6 @@ export const TextSearch = (props: {
           onChange={(event) => {
             props.setAppState({ searchMatchText: event.target.value });
           }}
-          onKeyDown={handleKeyDown}
           autoFocus
         />
       </Island>
