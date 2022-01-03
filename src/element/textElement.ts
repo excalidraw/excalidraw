@@ -22,7 +22,6 @@ export const redrawTextBoundingBox = (
     ? container.width - BOUND_TEXT_PADDING * 2
     : undefined;
   let text = element.originalText;
-
   // Call wrapText only when updating text properties
   // By clicking on the container
   if (container && !isTextElement(appState.editingElement)) {
@@ -112,20 +111,12 @@ export const handleBindTextResize = (
         let containerHeight = element.height;
         let nextBaseLine = textElement.baseline;
         if (transformHandleType !== "n" && transformHandleType !== "s") {
-          let minCharWidthTillNow = 0;
           if (text) {
-            minCharWidthTillNow = getMinCharWidth(getFontString(textElement));
-            // check if the diff has exceeded min char width needed
-            const diff = Math.abs(
-              element.width - textElement.width + BOUND_TEXT_PADDING * 2,
+            text = wrapText(
+              textElement.originalText,
+              getFontString(textElement),
+              element.width,
             );
-            if (diff >= minCharWidthTillNow) {
-              text = wrapText(
-                textElement.originalText,
-                getFontString(textElement),
-                element.width,
-              );
-            }
           }
 
           const dimensions = measureText(
@@ -293,7 +284,7 @@ export const wrapText = (
             }
           }
           // push current line if appending space exceeds max width
-          if (currentLineWidthTillNow + spaceWidth > maxWidth) {
+          if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
             lines.push(currentLine);
             currentLine = "";
             currentLineWidthTillNow = 0;
@@ -321,8 +312,15 @@ export const wrapText = (
             }
             index++;
             currentLine += `${word} `;
-          }
 
+            // Push the word if appending space exceeds max width
+            if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
+              lines.push(currentLine.slice(0, -1));
+              currentLine = "";
+              currentLineWidthTillNow = 0;
+              break;
+            }
+          }
           if (currentLineWidthTillNow === maxWidth) {
             currentLine = "";
             currentLineWidthTillNow = 0;
