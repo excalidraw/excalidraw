@@ -86,6 +86,8 @@ let mathJaxLoadedCallback:
   | ((isTextElementSubtype: Function) => void)
   | undefined;
 
+let errorSvg: string;
+
 const loadMathJax = async () => {
   if (
     !mathJaxLoaded &&
@@ -105,6 +107,22 @@ const loadMathJax = async () => {
       "mathjax-full/js/handlers/html/HTMLDocument.js"
     );
 
+    // Import some TeX packages
+    await import("mathjax-full/js/input/tex/ams/AmsConfiguration");
+    await import(
+      "mathjax-full/js/input/tex/boldsymbol/BoldsymbolConfiguration"
+    );
+
+    // Set the following to "true" to import the "mhchem" and "physics" packages.
+    const includeMhchemPhysics = false;
+    if (includeMhchemPhysics) {
+      await import("mathjax-full/js/input/tex/mhchem/MhchemConfiguration");
+      await import("mathjax-full/js/input/tex/physics/PhysicsConfiguration");
+    }
+    const texPackages = includeMhchemPhysics
+      ? ["base", "ams", "boldsymbol", "mhchem", "physics"]
+      : ["base", "ams", "boldsymbol"];
+
     // Types needed to lazy-load MathJax
     const LiteElement = (
       await import("mathjax-full/js/adaptors/lite/Element.js")
@@ -121,7 +139,7 @@ const loadMathJax = async () => {
       typeof LiteText,
       typeof LiteDocument
     >({ displaystyle: false });
-    const tex = new TeX.TeX({});
+    const tex = new TeX.TeX({ packages: texPackages });
     const svg = new SVG.SVG({ fontCache: "local" });
     mathJax.adaptor = liteAdaptor.liteAdaptor();
     mathJax.amHtml = new HTMLDocument.HTMLDocument("", mathJax.adaptor, {
@@ -133,6 +151,9 @@ const loadMathJax = async () => {
       OutputJax: svg,
     });
     mathJaxLoaded = true;
+    errorSvg = mathJax.adaptor.outerHTML(
+      mathJax.texHtml.convert("ERR", { display: false }),
+    );
     if (mathJaxLoadedCallback !== undefined) {
       mathJaxLoadedCallback(isMathElement);
     }
@@ -169,6 +190,9 @@ const math2Svg = (text: string, useTex: boolean, isMathJaxLoaded: boolean) => {
     }
     return htmlString;
   } catch {
+    if (isMathJaxLoaded) {
+      return errorSvg;
+    }
     return text;
   }
 };
