@@ -120,7 +120,7 @@ xtthisiswha
 tsupwithyou
 Iamtypinggg
 ggandtyping
-gg break it 
+gg break it
 now`,
       },
       {
