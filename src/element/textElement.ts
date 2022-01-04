@@ -11,7 +11,6 @@ import { BOUND_TEXT_PADDING } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { AppState } from "../types";
-import { isTextElement } from ".";
 
 export const redrawTextBoundingBox = (
   element: ExcalidrawTextElement,
@@ -21,10 +20,9 @@ export const redrawTextBoundingBox = (
   const maxWidth = container
     ? container.width - BOUND_TEXT_PADDING * 2
     : undefined;
-  let text = element.originalText;
-  // Call wrapText only when updating text properties
-  // By clicking on the container
-  if (container && !isTextElement(appState.editingElement)) {
+  let text = element.text;
+
+  if (container) {
     text = wrapText(
       element.originalText,
       getFontString(element),
