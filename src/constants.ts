@@ -182,4 +182,4 @@ export const VERSIONS = {
   excalidrawLibrary: 2,
 } as const;
 
-export const BOUND_TEXT_PADDING = 30;
+export const BOUND_TEXT_PADDING = 5;
