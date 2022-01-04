@@ -171,8 +171,7 @@ export const textWysiwyg = ({
           coordY = container.y + container.height / 2 - height / 2;
         }
       }
-      const { textAlign, angle } = updatedElement;
-
+      const { textAlign } = updatedElement;
       editable.value = updatedElement.originalText || updatedElement.text;
       const lines = updatedElement.originalText
         .replace(/\r\n?/g, "\n")
@@ -212,6 +211,7 @@ export const textWysiwyg = ({
             ? ((appState.zoom.value * 100 - 100) / 10) * 14
             : 0)) /
         appState.zoom.value;
+      const angle = container ? container.angle : updatedElement.angle;
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -481,6 +481,7 @@ export const textWysiwyg = ({
               width: Number(editable.style.width.slice(0, -2)),
               // preserve padding
               x: container.x + BOUND_TEXT_PADDING,
+              angle: container.angle,
             });
             const boundTextElementId = getBoundTextElementId(container);
             if (!boundTextElementId || boundTextElementId !== element.id) {
