@@ -256,8 +256,8 @@
   "helpDialog": {
     "blog": "எமது வலைப்பூவை வாசி",
     "click": "சொடுக்கு",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "ஆழ்ந்துத் தேர்",
+    "deepBoxSelect": "பெட்டியினுள் ஆழ்ந்துத் தேர், மற்றும் பிடித்திழுத்தலைத் தவிர்",
     "curvedArrow": "வளைந்த அம்பு",
     "curvedLine": "வளைந்த வரி",
     "documentation": "ஆவணமாக்கல்",
