@@ -42,7 +42,7 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { newElementWith } from "../element/mutateElement";
-import { getBoundedTextElement } from "../element/textElement";
+import { getBoundTextElement } from "../element/textElement";
 import { isLinearElement, isLinearElementType } from "../element/typeChecks";
 import {
   Arrowhead,
@@ -495,9 +495,9 @@ export const actionChangeFontSize = register({
             if (isTextElement(element)) {
               return element.fontSize;
             }
-            const boundedTextElement = getBoundedTextElement(element);
-            if (boundedTextElement) {
-              return boundedTextElement.fontSize;
+            const boundTextElement = getBoundTextElement(element);
+            if (boundTextElement) {
+              return boundTextElement.fontSize;
             }
             return null;
           },
@@ -576,9 +576,9 @@ export const actionChangeFontFamily = register({
               if (isTextElement(element)) {
                 return element.fontFamily;
               }
-              const boundedTextElement = getBoundedTextElement(element);
-              if (boundedTextElement) {
-                return boundedTextElement.fontFamily;
+              const boundTextElement = getBoundTextElement(element);
+              if (boundTextElement) {
+                return boundTextElement.fontFamily;
               }
               return null;
             },
@@ -651,9 +651,9 @@ export const actionChangeTextAlign = register({
             if (isTextElement(element)) {
               return element.textAlign;
             }
-            const boundedTextElement = getBoundedTextElement(element);
-            if (boundedTextElement) {
-              return boundedTextElement.textAlign;
+            const boundTextElement = getBoundTextElement(element);
+            if (boundTextElement) {
+              return boundTextElement.textAlign;
             }
             return null;
           },

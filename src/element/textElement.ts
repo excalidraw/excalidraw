@@ -410,7 +410,7 @@ export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
   return container?.boundElements?.filter((ele) => ele.type === "text")[0]?.id;
 };
 
-export const getBoundedTextElement = (element: ExcalidrawElement | null) => {
+export const getBoundTextElement = (element: ExcalidrawElement | null) => {
   if (!element) {
     return null;
   }
