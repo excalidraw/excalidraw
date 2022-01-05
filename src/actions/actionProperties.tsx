@@ -42,6 +42,7 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { newElementWith } from "../element/mutateElement";
+import { getBoundedTextElement } from "../element/textElement";
 import { isLinearElement, isLinearElementType } from "../element/typeChecks";
 import {
   Arrowhead,
@@ -490,7 +491,16 @@ export const actionChangeFontSize = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => isTextElement(element) && element.fontSize,
+          (element) => {
+            if (isTextElement(element)) {
+              return element.fontSize;
+            }
+            const boundedTextElement = getBoundedTextElement(element);
+            if (boundedTextElement) {
+              return boundedTextElement.fontSize;
+            }
+            return null;
+          },
           appState.currentItemFontSize || DEFAULT_FONT_SIZE,
         )}
         onChange={(value) => updateData(value)}
@@ -562,7 +572,16 @@ export const actionChangeFontFamily = register({
           value={getFormValue(
             elements,
             appState,
-            (element) => isTextElement(element) && element.fontFamily,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.fontFamily;
+              }
+              const boundedTextElement = getBoundedTextElement(element);
+              if (boundedTextElement) {
+                return boundedTextElement.fontFamily;
+              }
+              return null;
+            },
             appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
           )}
           onChange={(value) => updateData(value)}
@@ -628,7 +647,16 @@ export const actionChangeTextAlign = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => isTextElement(element) && element.textAlign,
+          (element) => {
+            if (isTextElement(element)) {
+              return element.textAlign;
+            }
+            const boundedTextElement = getBoundedTextElement(element);
+            if (boundedTextElement) {
+              return boundedTextElement.textAlign;
+            }
+            return null;
+          },
           appState.currentItemTextAlign,
         )}
         onChange={(value) => updateData(value)}
