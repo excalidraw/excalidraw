@@ -112,13 +112,18 @@ export const actionChangeStrokeColor = register({
   perform: (elements, appState, value) => {
     return {
       ...(value.currentItemStrokeColor && {
-        elements: changeProperty(elements, appState, (el) => {
-          return hasStrokeColor(el.type)
-            ? newElementWith(el, {
-                strokeColor: value.currentItemStrokeColor,
-              })
-            : el;
-        }),
+        elements: changeProperty(
+          elements,
+          appState,
+          (el) => {
+            return hasStrokeColor(el.type)
+              ? newElementWith(el, {
+                  strokeColor: value.currentItemStrokeColor,
+                })
+              : el;
+          },
+          true,
+        ),
       }),
       appState: {
         ...appState,
