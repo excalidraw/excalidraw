@@ -453,15 +453,18 @@ export const textWysiwyg = ({
         if (isTextElement(updateElement) && updateElement.containerId) {
           const editorHeight = Number(editable.style.height.slice(0, -2));
           if (editable.value) {
-            mutateElement(updateElement, {
-              // vertically center align
-              y: container.y + container.height / 2 - editorHeight / 2,
-              height: editorHeight,
-              width: Number(editable.style.width.slice(0, -2)),
-              // preserve padding
-              x: container.x + BOUND_TEXT_PADDING,
-              angle: container.angle,
-            });
+            // Don't mutate if text is not updated
+            if (updateElement.text !== wrappedText) {
+              mutateElement(updateElement, {
+                // vertically center align
+                y: container.y + container.height / 2 - editorHeight / 2,
+                height: editorHeight,
+                width: Number(editable.style.width.slice(0, -2)),
+                // preserve padding
+                x: container.x + BOUND_TEXT_PADDING,
+                angle: container.angle,
+              });
+            }
             const boundTextElementId = getBoundTextElementId(container);
             if (!boundTextElementId || boundTextElementId !== element.id) {
               mutateElement(container, {
