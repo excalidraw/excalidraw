@@ -3,6 +3,7 @@ import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawTextElement,
+  ExcalidrawTextElementWithContainer,
   FontString,
   NonDeletedExcalidrawElement,
 } from "./types";
@@ -407,4 +408,17 @@ export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
 
 export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
   return container?.boundElements?.filter((ele) => ele.type === "text")[0]?.id;
+};
+
+export const getBoundTextElement = (element: ExcalidrawElement | null) => {
+  if (!element) {
+    return null;
+  }
+  const boundTextElementId = getBoundTextElementId(element);
+  if (boundTextElementId) {
+    return Scene.getScene(element)!.getElement(
+      boundTextElementId,
+    ) as ExcalidrawTextElementWithContainer;
+  }
+  return null;
 };
