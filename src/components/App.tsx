@@ -98,6 +98,7 @@ import {
   textWysiwyg,
   transformElements,
   updateTextElement,
+  getSceneVersion,
 } from "../element";
 import {
   bindOrUnbindSelectedElements,
@@ -238,6 +239,7 @@ import {
   getBoundTextElementId,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
+import { getELementsFromStorage } from "../excalidraw-app/data/localStorage";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -627,6 +629,18 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ isBindingEnabled: true });
   });
 
+  private onVisibilityChange = () => {
+    if (!document.hidden) {
+      const sceneVersion = getSceneVersion(
+        this.scene.getElementsIncludingDeleted(),
+      );
+      const localStorageVersion = getSceneVersion(getELementsFromStorage());
+      // Sync local storage tab states when mismatch
+      if (sceneVersion !== localStorageVersion) {
+        this.scene.replaceAllElements(getELementsFromStorage());
+      }
+    }
+  };
   private onUnload = () => {
     this.onBlur();
   };
@@ -918,6 +932,11 @@ class App extends React.Component<AppProps, AppState> {
     window.removeEventListener(EVENT.RESIZE, this.onResize, false);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.removeEventListener(EVENT.BLUR, this.onBlur, false);
+    document.removeEventListener(
+      EVENT.VISIBILITY_CHANGE,
+      this.onVisibilityChange,
+      false,
+    );
     this.excalidrawContainerRef.current?.removeEventListener(
       EVENT.DRAG_OVER,
       this.disableEvent,
@@ -996,6 +1015,11 @@ class App extends React.Component<AppProps, AppState> {
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
+    document.addEventListener(
+      EVENT.VISIBILITY_CHANGE,
+      this.onVisibilityChange,
+      false,
+    );
     this.excalidrawContainerRef.current?.addEventListener(
       EVENT.DRAG_OVER,
       this.disableEvent,
