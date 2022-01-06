@@ -1582,6 +1582,7 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
+      libraryItems?: SceneData["libraryItems"];
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1597,6 +1598,12 @@ class App extends React.Component<AppProps, AppState> {
 
       if (sceneData.collaborators) {
         this.setState({ collaborators: sceneData.collaborators });
+      }
+
+      if (sceneData.libraryItems) {
+        this.library.saveLibrary(
+          restoreLibraryItems(sceneData.libraryItems, "unpublished"),
+        );
       }
     },
   );
