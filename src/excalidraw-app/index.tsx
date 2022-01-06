@@ -7,7 +7,6 @@ import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import {
   APP_NAME,
   EVENT,
-  STORAGE_KEYS,
   TITLE_TIMEOUT,
   URL_HASH_KEYS,
   VERSION_TIMEOUT,
@@ -54,6 +53,7 @@ import {
   importFromLocalStorage,
   importUsernameFromLocalStorage,
   saveToLocalStorage,
+  STORAGE_KEYS,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { restoreAppState, RestoredDataState } from "../data/restore";
