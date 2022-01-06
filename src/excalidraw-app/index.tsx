@@ -52,6 +52,7 @@ import { LanguageList } from "./components/LanguageList";
 import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
 import {
   importFromLocalStorage,
+  importUsernameFromLocalStorage,
   saveToLocalStorage,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
@@ -420,7 +421,9 @@ const ExcalidrawWrapper = () => {
       if (!document.hidden) {
         // Sync local storage tab states when mismatch
         const localDataState = importFromLocalStorage();
+        const username = importUsernameFromLocalStorage();
         excalidrawAPI.updateScene(localDataState);
+        collabAPI.setUsername(username || "");
       }
     };
 

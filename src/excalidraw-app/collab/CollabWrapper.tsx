@@ -86,6 +86,7 @@ export interface CollabAPI {
   onCollabButtonClick: CollabInstance["onCollabButtonClick"];
   broadcastElements: CollabInstance["broadcastElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
+  setUsername: (username: string) => void;
 }
 
 interface Props {
@@ -677,8 +678,12 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.setState({ modalIsShown: false });
   };
 
-  onUsernameChange = (username: string) => {
+  setUsername = (username: string) => {
     this.setState({ username });
+  };
+
+  onUsernameChange = (username: string) => {
+    this.setUsername(username);
     saveUsernameToLocalStorage(username);
   };
 
@@ -712,6 +717,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.contextValue.broadcastElements = this.broadcastElements;
     this.contextValue.fetchImageFilesFromFirebase =
       this.fetchImageFilesFromFirebase;
+    this.contextValue.setUsername = this.setUsername;
     return this.contextValue;
   };
 
