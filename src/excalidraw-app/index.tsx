@@ -422,6 +422,11 @@ const ExcalidrawWrapper = () => {
         // Sync local storage tab states when mismatch
         const localDataState = importFromLocalStorage();
         const username = importUsernameFromLocalStorage();
+        let langCode = languageDetector.detect() || defaultLang.code;
+        if (Array.isArray(langCode)) {
+          langCode = langCode[0];
+        }
+        setLangCode(langCode);
         excalidrawAPI.updateScene(localDataState);
         collabAPI.setUsername(username || "");
       }
