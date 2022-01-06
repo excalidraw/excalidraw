@@ -322,6 +322,7 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.id = nanoid();
+    this.library = new Library(this);
 
     if (excalidrawRef) {
       const readyPromise =
@@ -361,7 +362,6 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.scene = new Scene();
-    this.library = new Library(this);
     this.history = new History();
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -1582,6 +1582,7 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
+      libraryItems?: SceneData["libraryItems"];
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1597,6 +1598,12 @@ class App extends React.Component<AppProps, AppState> {
 
       if (sceneData.collaborators) {
         this.setState({ collaborators: sceneData.collaborators });
+      }
+
+      if (sceneData.libraryItems) {
+        this.library.saveLibrary(
+          restoreLibraryItems(sceneData.libraryItems, "unpublished"),
+        );
       }
     },
   );
