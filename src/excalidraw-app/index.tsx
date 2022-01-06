@@ -50,6 +50,7 @@ import CollabWrapper, {
 import { LanguageList } from "./components/LanguageList";
 import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
 import {
+  getLibraryItemsFromStorage,
   importFromLocalStorage,
   importUsernameFromLocalStorage,
   saveToLocalStorage,
@@ -373,14 +374,7 @@ const ExcalidrawWrapper = () => {
         }
       }
 
-      try {
-        data.scene.libraryItems =
-          JSON.parse(
-            localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
-          ) || [];
-      } catch (error: any) {
-        console.error(error);
-      }
+      data.scene.libraryItems = getLibraryItemsFromStorage();
     };
 
     initializeScene({ collabAPI }).then((data) => {
@@ -427,7 +421,10 @@ const ExcalidrawWrapper = () => {
           langCode = langCode[0];
         }
         setLangCode(langCode);
-        excalidrawAPI.updateScene(localDataState);
+        excalidrawAPI.updateScene({
+          ...localDataState,
+          libraryItems: getLibraryItemsFromStorage(),
+        });
         collabAPI.setUsername(username || "");
       }
     };

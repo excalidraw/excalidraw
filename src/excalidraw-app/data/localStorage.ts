@@ -126,16 +126,14 @@ export const getTotalStorageSize = () => {
   }
 };
 
-export const getELementsFromStorage = () => {
+export const getLibraryItemsFromStorage = () => {
   try {
-    const savedElements = localStorage.getItem(
-      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-    );
-    if (savedElements) {
-      const elements = clearElementsForLocalStorage(JSON.parse(savedElements));
-      return elements;
-    }
-    return [];
+    const libraryItems =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
+      ) || [];
+
+    return libraryItems;
   } catch (e) {
     console.error(e);
     return [];
