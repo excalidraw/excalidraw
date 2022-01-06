@@ -415,13 +415,32 @@ const ExcalidrawWrapper = () => {
       () => (document.title = APP_NAME),
       TITLE_TIMEOUT,
     );
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) {
+        // Sync local storage tab states when mismatch
+        const localDataState = importFromLocalStorage();
+        excalidrawAPI.updateScene(localDataState);
+      }
+    };
+
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
     window.addEventListener(EVENT.UNLOAD, onBlur, false);
     window.addEventListener(EVENT.BLUR, onBlur, false);
+    document.addEventListener(
+      EVENT.VISIBILITY_CHANGE,
+      onVisibilityChange,
+      false,
+    );
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
       window.removeEventListener(EVENT.UNLOAD, onBlur, false);
       window.removeEventListener(EVENT.BLUR, onBlur, false);
+      document.removeEventListener(
+        EVENT.VISIBILITY_CHANGE,
+        onVisibilityChange,
+        false,
+      );
       clearTimeout(titleTimeout);
     };
   }, [collabAPI, excalidrawAPI]);
