@@ -996,7 +996,6 @@ class App extends React.Component<AppProps, AppState> {
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
-
     this.excalidrawContainerRef.current?.addEventListener(
       EVENT.DRAG_OVER,
       this.disableEvent,
