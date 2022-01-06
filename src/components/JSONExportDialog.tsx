@@ -50,6 +50,7 @@ const JSONExportModal = ({
             <ToolButton
               className="Card-button"
               type="button"
+              id="SB-save"
               title={t("exportDialog.disk_button")}
               aria-label={t("exportDialog.disk_button")}
               showAriaLabel={true}
@@ -111,6 +112,7 @@ export const JSONExportDialog = ({
           setModalIsShown(true);
         }}
         data-testid="json-export-button"
+        id="SB-export"
         icon={exportFile}
         type="button"
         aria-label={t("buttons.export")}

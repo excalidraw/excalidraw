@@ -91,6 +91,7 @@ export const Dialog = (props: DialogProps) => {
           <span className="Dialog__titleContent">{props.title}</span>
           <button
             className="Modal__close"
+            id="SB-modal-close"
             onClick={onClose}
             aria-label={t("buttons.close")}
           >
