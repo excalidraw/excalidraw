@@ -48,10 +48,12 @@
     "pwacompat": "2.0.17",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-joyride": "2.3.2",
     "react-scripts": "4.0.3",
     "roughjs": "4.5.2",
     "sass": "1.45.2",
     "socket.io-client": "2.3.1",
+    "switchboard": "ssh://git@github.com:switchboardcc/switchboard.git#carlos-extend-sdk",
     "typescript": "4.5.4"
   },
   "devDependencies": {
@@ -112,6 +114,8 @@
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --updateSnapshot --watchAll=false",
     "test": "yarn test:app",
-    "autorelease": "node scripts/autorelease.js"
+    "autorelease": "node scripts/autorelease.js",
+    "build-switchboard": "cd node_modules/switchboard/packages/sdk/ && yarn install && yarn build:cjs",
+    "upgrade-switchboard": "yarn upgrade switchboard && cd node_modules/switchboard/packages/sdk/ && yarn install && yarn build:cjs"
   }
 }

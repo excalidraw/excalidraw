@@ -67,6 +67,12 @@ import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
+import Joyride from "react-joyride";
+import React from "react";
+import {
+  Consumer as SBConsumer,
+  SBProvider,
+} from "switchboard/packages/sdk/lib/cjs/packages/@react";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -685,11 +691,33 @@ const ExcalidrawWrapper = () => {
 
 const ExcalidrawApp = () => {
   return (
-    <TopErrorBoundary>
-      <CollabContextConsumer>
-        <ExcalidrawWrapper />
-      </CollabContextConsumer>
-    </TopErrorBoundary>
+    <SBProvider clientId={"1"} user={"1"}>
+      <TopErrorBoundary>
+        <Joyride
+          run={true}
+          debug={true}
+          steps={[
+            {
+              target: "#root",
+              content: (
+                <React.Fragment>
+                  Welcome to Excalidraw the best way to digitally sketch ideas.
+                  Let's start sketching
+                  <SBConsumer>
+                    {(value) => JSON.stringify(value, null, 2)}
+                  </SBConsumer>
+                </React.Fragment>
+              ),
+              event: "hover",
+              placement: "center",
+            },
+          ]}
+        />
+        <CollabContextConsumer>
+          <ExcalidrawWrapper />
+        </CollabContextConsumer>
+      </TopErrorBoundary>
+    </SBProvider>
   );
 };
 

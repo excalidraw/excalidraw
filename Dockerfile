@@ -14,4 +14,4 @@ FROM nginx:1.21-alpine
 
 COPY --from=build /opt/node_app/build /usr/share/nginx/html
 
-HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1
+HEALTHCHECK CMD wget -q -O /dev/null http://0.0.0.0 || exit 1
