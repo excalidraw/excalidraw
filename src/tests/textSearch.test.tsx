@@ -68,8 +68,8 @@ it("centers on second matched element after pressing enter twice", () => {
   const textOne = API.createElement({
     type: "text",
     text: "test",
-    x: 60,
-    y: 0,
+    x: 200,
+    y: 200,
     width: 100,
     height: 100,
   });
@@ -86,8 +86,8 @@ it("centers on second matched element after pressing enter twice", () => {
   Keyboard.keyPress(KEYS.ENTER);
   const testNewCenter = centerScrollOn({
     scenePoint: {
-      x: textTwo.x,
-      y: textTwo.y,
+      x: textOne.x,
+      y: textOne.y,
     },
     viewportDimensions: {
       width: h.state.width,
@@ -97,4 +97,11 @@ it("centers on second matched element after pressing enter twice", () => {
   });
   expect(testNewCenter.scrollX).toEqual(h.state.scrollX);
   expect(testNewCenter.scrollY).toEqual(h.state.scrollY);
+});
+
+it("resets searchMatchText to blank after pressing escape to close input", () => {
+  h.app.setState({ textSearchActive: true, searchMatchText: "test" });
+  Keyboard.keyPress(KEYS.ESCAPE);
+  expect(h.state.searchMatchText).toEqual("");
+  expect(h.state.textSearchActive).toEqual(false);
 });
