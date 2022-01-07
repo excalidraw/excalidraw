@@ -246,11 +246,17 @@ export const updateTextElement = (
     originalText,
   }: { text: string; isDeleted?: boolean; originalText: string },
 
-  updateDimensions: boolean,
+  isSubmit: boolean,
 ): ExcalidrawTextElement => {
-  const dimensions = updateDimensions
-    ? getAdjustedDimensions(element, text)
-    : undefined;
+  const boundToContainer = isBoundToContainer(element);
+
+  // Don't update dimensions and text value for bounded text unless submitted
+  const dimensions =
+    boundToContainer && !isSubmit
+      ? undefined
+      : getAdjustedDimensions(element, text);
+
+  text = boundToContainer && !isSubmit ? element.text : text;
   return newElementWith(element, {
     text,
     originalText,

@@ -164,7 +164,7 @@ export const textWysiwyg = ({
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
       const { textAlign } = updatedElement;
-      editable.value = updatedElement.originalText || updatedElement.text;
+      editable.value = updatedElement.originalText;
       const lines = updatedElement.originalText.split("\n");
       const lineHeight = updatedElement.containerId
         ? approxLineHeight
