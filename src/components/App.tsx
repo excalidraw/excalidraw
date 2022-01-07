@@ -1531,7 +1531,6 @@ class App extends React.Component<AppProps, AppState> {
           (element) => !element.groupIds.includes("highlight_rectangles"),
         ),
     );
-    this.setState({ searchMatchText: "" });
     this.actionManager.executeAction(actionToggleTextSearch);
   };
 

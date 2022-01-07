@@ -8,6 +8,7 @@ export const actionToggleTextSearch = register({
       appState: {
         ...appState,
         textSearchActive: !this.checked!(appState),
+        searchMatchText: "",
       },
       commitToHistory: false,
     };
