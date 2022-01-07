@@ -80,7 +80,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "freedraw",
-    key: KEYS.X,
+    key: [KEYS.X, KEYS.P.toUpperCase()],
   },
   {
     icon: (
@@ -117,5 +117,6 @@ export const findShapeByKey = (key: string) => {
           : (shape.key as readonly string[]).includes(key)))
     );
   });
+
   return shape?.value || null;
 };
