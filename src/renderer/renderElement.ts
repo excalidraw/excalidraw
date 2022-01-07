@@ -82,7 +82,6 @@ const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
   renderConfig: RenderConfig,
-  appState: AppState,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -135,7 +134,7 @@ const generateElementCanvas = (
     context.filter = IMAGE_INVERT_FILTER;
   }
 
-  drawElementOnCanvas(element, rc, context, renderConfig, appState);
+  drawElementOnCanvas(element, rc, context, renderConfig);
   context.restore();
 
   return {
@@ -189,7 +188,6 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
-  appState: AppState,
 ) => {
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
@@ -601,7 +599,6 @@ const generateElementShape = (
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   renderConfig: RenderConfig,
-  appState: AppState,
 ) => {
   const zoom: Zoom = renderConfig ? renderConfig.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
@@ -619,7 +616,6 @@ const generateElementWithCanvas = (
       element,
       zoom,
       renderConfig,
-      appState,
     );
 
     elementWithCanvasCache.set(element, elementWithCanvas);
@@ -688,7 +684,6 @@ export const renderElement = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
-  appState: AppState,
 ) => {
   const generator = rc.generator;
   switch (element.type) {
@@ -710,7 +705,6 @@ export const renderElement = (
         const elementWithCanvas = generateElementWithCanvas(
           element,
           renderConfig,
-          appState,
         );
         drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
       } else {
@@ -723,7 +717,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig, appState);
+        drawElementOnCanvas(element, rc, context, renderConfig);
         context.restore();
       }
 
@@ -752,7 +746,7 @@ export const renderElement = (
           context.filter = "none";
         }
 
-        drawElementOnCanvas(element, rc, context, renderConfig, appState);
+        drawElementOnCanvas(element, rc, context, renderConfig);
         context.restore();
         // not exporting → optimized rendering (cache & render from element
         // canvases)
@@ -760,7 +754,6 @@ export const renderElement = (
         const elementWithCanvas = generateElementWithCanvas(
           element,
           renderConfig,
-          appState,
         );
         drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
       }
