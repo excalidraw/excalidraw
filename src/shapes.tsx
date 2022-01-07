@@ -117,6 +117,5 @@ export const findShapeByKey = (key: string) => {
           : (shape.key as readonly string[]).includes(key)))
     );
   });
-
   return shape?.value || null;
 };
