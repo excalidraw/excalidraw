@@ -7,7 +7,6 @@ import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import {
   APP_NAME,
   EVENT,
-  STORAGE_KEYS,
   TITLE_TIMEOUT,
   URL_HASH_KEYS,
   VERSION_TIMEOUT,
@@ -53,6 +52,7 @@ import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
 import {
   importFromLocalStorage,
   saveToLocalStorage,
+  STORAGE_KEYS,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { restoreAppState, RestoredDataState } from "../data/restore";
@@ -262,7 +262,7 @@ const PlusLinkJSX = (
     Introducing Excalidraw+
     <br />
     <a
-      href="https://plus.excalidraw.com/?utm_source=excalidraw&utm_medium=banner&utm_campaign=launch"
+      href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=banner&utm_campaign=launch"
       target="_blank"
       rel="noreferrer"
     >
