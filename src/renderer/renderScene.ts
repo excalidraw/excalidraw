@@ -266,7 +266,7 @@ export const renderScene = (
 
   visibleElements.forEach((element) => {
     try {
-      renderElement(element, rc, context, renderConfig, appState);
+      renderElement(element, rc, context, renderConfig);
     } catch (error: any) {
       console.error(error);
     }
@@ -284,7 +284,7 @@ export const renderScene = (
   // Paint selection element
   if (selectionElement) {
     try {
-      renderElement(selectionElement, rc, context, renderConfig, appState);
+      renderElement(selectionElement, rc, context, renderConfig);
     } catch (error: any) {
       console.error(error);
     }
