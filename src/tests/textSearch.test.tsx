@@ -62,3 +62,39 @@ it("centers canvas on matched element", () => {
   expect(testNewCenter.scrollX).toEqual(h.state.scrollX);
   expect(testNewCenter.scrollY).toEqual(h.state.scrollY);
 });
+
+it("centers on second matched element after pressing enter twice", () => {
+  h.app.setState({ textSearchActive: true, searchMatchText: "test" });
+  const textOne = API.createElement({
+    type: "text",
+    text: "test",
+    x: 60,
+    y: 0,
+    width: 100,
+    height: 100,
+  });
+  const textTwo = API.createElement({
+    type: "text",
+    text: "test",
+    x: 100,
+    y: 100,
+    width: 100,
+    height: 100,
+  });
+  h.elements = [textOne, textTwo];
+  Keyboard.keyPress(KEYS.ENTER);
+  Keyboard.keyPress(KEYS.ENTER);
+  const testNewCenter = centerScrollOn({
+    scenePoint: {
+      x: textTwo.x,
+      y: textTwo.y,
+    },
+    viewportDimensions: {
+      width: h.state.width,
+      height: h.state.height,
+    },
+    zoom: h.state.zoom,
+  });
+  expect(testNewCenter.scrollX).toEqual(h.state.scrollX);
+  expect(testNewCenter.scrollY).toEqual(h.state.scrollY);
+});
