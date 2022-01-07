@@ -1883,10 +1883,7 @@ class App extends React.Component<AppProps, AppState> {
           type: "rectangle",
           x: matchedElemJson.x - 2,
           y: matchedElemJson.y,
-          width:
-            (matchedElemJson.width / matchedElemJson.text.length) *
-              this.state.searchMatchText.length +
-            4,
+          width: matchedElemJson.width + 3,
           height: matchedElemJson.height,
           angle: matchedElemJson.angle,
           strokeColor: "yellow",
