@@ -42,6 +42,7 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { newElementWith } from "../element/mutateElement";
+import { getBoundTextElement } from "../element/textElement";
 import { isLinearElement, isLinearElementType } from "../element/typeChecks";
 import {
   Arrowhead,
@@ -169,13 +170,18 @@ export const actionChangeStrokeColor = register({
   perform: (elements, appState, value) => {
     return {
       ...(value.currentItemStrokeColor && {
-        elements: changeProperty(elements, appState, (el) => {
-          return hasStrokeColor(el.type)
-            ? newElementWith(el, {
-                strokeColor: value.currentItemStrokeColor,
-              })
-            : el;
-        }),
+        elements: changeProperty(
+          elements,
+          appState,
+          (el) => {
+            return hasStrokeColor(el.type)
+              ? newElementWith(el, {
+                  strokeColor: value.currentItemStrokeColor,
+                })
+              : el;
+          },
+          true,
+        ),
       }),
       appState: {
         ...appState,
@@ -553,7 +559,16 @@ export const actionChangeFontSize = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => isTextElement(element) && element.fontSize,
+          (element) => {
+            if (isTextElement(element)) {
+              return element.fontSize;
+            }
+            const boundTextElement = getBoundTextElement(element);
+            if (boundTextElement) {
+              return boundTextElement.fontSize;
+            }
+            return null;
+          },
           appState.currentItemFontSize || DEFAULT_FONT_SIZE,
         )}
         onChange={(value) => updateData(value)}
@@ -631,7 +646,16 @@ export const actionChangeFontFamily = register({
           value={getFormValue(
             elements,
             appState,
-            (element) => isTextElement(element) && element.fontFamily,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.fontFamily;
+              }
+              const boundTextElement = getBoundTextElement(element);
+              if (boundTextElement) {
+                return boundTextElement.fontFamily;
+              }
+              return null;
+            },
             appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
           )}
           onChange={(value) => updateData(value)}
@@ -703,7 +727,16 @@ export const actionChangeTextAlign = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => isTextElement(element) && element.textAlign,
+          (element) => {
+            if (isTextElement(element)) {
+              return element.textAlign;
+            }
+            const boundTextElement = getBoundTextElement(element);
+            if (boundTextElement) {
+              return boundTextElement.textAlign;
+            }
+            return null;
+          },
           appState.currentItemTextAlign,
         )}
         onChange={(value) => updateData(value)}
