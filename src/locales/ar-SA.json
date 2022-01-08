@@ -321,12 +321,12 @@
     "atleastOneLibItem": ""
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "تم إرسال المكتبة",
+    "content": "شكرا لك {{authorName}}. لقد تم إرسال مكتبتك للمراجعة. يمكنك تتبع الحالة",
+    "link": "هنا"
   },
   "confirmDialog": {
-    "resetLibrary": "",
+    "resetLibrary": "إعادة ضبط المكتبة",
     "removeItemsFromLib": "إزالة العناصر المحددة من المكتبة"
   },
   "encrypted": {
