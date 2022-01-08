@@ -509,6 +509,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L18) | The `appState` to be updated in the scene. |
 | `collaborators` | <pre>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L29">Collaborator></a></pre> | The list of collaborators to be updated in the scene. |
 | `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
+| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L258) | The `libraryItems` to be update in the scene. |
 
 ### `addFiles`
 
