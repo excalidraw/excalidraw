@@ -41,8 +41,11 @@ import {
   isTextElement,
   redrawTextBoundingBox,
 } from "../element";
-import { newElementWith } from "../element/mutateElement";
-import { getBoundTextElement } from "../element/textElement";
+import { mutateElement, newElementWith } from "../element/mutateElement";
+import {
+  getBoundTextElement,
+  getContainerElement,
+} from "../element/textElement";
 import { isLinearElement, isLinearElementType } from "../element/typeChecks";
 import {
   Arrowhead,
@@ -53,6 +56,7 @@ import {
   TextAlign,
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
+import { KEYS } from "../keys";
 import { randomInteger } from "../random";
 import {
   canChangeSharpness,
@@ -107,6 +111,34 @@ const getFormValue = function <T>(
     null
   );
 };
+
+const offsetElementAfterFontResize = (
+  prevElement: ExcalidrawTextElement,
+  nextElement: ExcalidrawTextElement,
+) => {
+  if (prevElement.textAlign === "right") {
+    return mutateElement(
+      nextElement,
+      {
+        x: prevElement.x + (prevElement.width - nextElement.width),
+        y: prevElement.y + (prevElement.height - nextElement.height),
+      },
+      false,
+    );
+  } else if (prevElement.textAlign === "center") {
+    return mutateElement(
+      nextElement,
+      {
+        x: prevElement.x + (prevElement.width - nextElement.width) / 2,
+        y: prevElement.y + (prevElement.height - nextElement.height) / 2,
+      },
+      false,
+    );
+  }
+  return nextElement;
+};
+
+// -----------------------------------------------------------------------------
 
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
@@ -512,6 +544,74 @@ export const actionChangeFontSize = register({
       />
     </fieldset>
   ),
+});
+
+export const actionDecreaseFontSize = register({
+  name: "decreaseFontSize",
+  perform: (elements, appState, value) => {
+    const selectedElements = arrayToMap(
+      getSelectedElements(elements, appState, true),
+    );
+
+    return {
+      elements: elements.map((element) => {
+        if (isTextElement(element) && selectedElements.has(element.id)) {
+          let newElement = newElementWith(element, {
+            fontSize: element.fontSize * 0.9,
+          });
+
+          redrawTextBoundingBox(
+            newElement,
+            getContainerElement(element),
+            appState,
+          );
+
+          newElement = offsetElementAfterFontResize(element, newElement);
+
+          return newElement;
+        }
+        return element;
+      }),
+      commitToHistory: true,
+    };
+  },
+  keyTest: (event) => {
+    return event[KEYS.CTRL_OR_CMD] && event.key === KEYS.CHEVRON_LEFT;
+  },
+});
+
+export const actionIncreaseFontSize = register({
+  name: "increaseFontSize",
+  perform: (elements, appState, value) => {
+    const selectedElements = arrayToMap(
+      getSelectedElements(elements, appState, true),
+    );
+
+    return {
+      elements: elements.map((element) => {
+        if (isTextElement(element) && selectedElements.has(element.id)) {
+          let newElement = newElementWith(element, {
+            fontSize: element.fontSize * 1.1,
+          });
+
+          redrawTextBoundingBox(
+            newElement,
+            getContainerElement(element),
+            appState,
+          );
+
+          newElement = offsetElementAfterFontResize(element, newElement);
+
+          return newElement;
+        }
+        return element;
+      }),
+      commitToHistory: true,
+    };
+  },
+  keyTest: (event) => {
+    return event[KEYS.CTRL_OR_CMD] && event.key === KEYS.CHEVRON_RIGHT;
+  },
 });
 
 export const actionChangeFontFamily = register({

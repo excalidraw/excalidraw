@@ -40,6 +40,8 @@ export const KEYS = {
   QUESTION_MARK: "?",
   SPACE: " ",
   TAB: "Tab",
+  CHEVRON_LEFT: "<",
+  CHEVRON_RIGHT: ">",
 
   A: "a",
   D: "d",
