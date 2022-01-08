@@ -77,7 +77,7 @@
     "@typescript-eslint/typescript-estree": "5.3.0"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "r": ">=14.0.0"
   },
   "homepage": ".",
   "jest": {
