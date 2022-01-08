@@ -67,6 +67,7 @@ export const exportToCanvas = async (
     renderSelection: false,
     renderGrid: false,
     isExporting: true,
+    editingImageElement: null,
   });
 
   return canvas;

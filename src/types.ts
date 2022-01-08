@@ -29,6 +29,8 @@ import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
+import { EditingImageElement } from "./element/imageEditor";
+import Scene from "./scene/Scene";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -77,6 +79,7 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
+  editingImageElement: EditingImageElement | null;
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
   exportBackground: boolean;
@@ -317,6 +320,8 @@ export type AppClassProperties = {
     }
   >;
   files: BinaryFiles;
+  scene: Scene;
+  addFiles: App["addFiles"];
 };
 
 export type PointerDownState = Readonly<{

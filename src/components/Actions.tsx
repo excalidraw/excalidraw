@@ -19,6 +19,7 @@ import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
+import { isImageElement } from "../element/typeChecks";
 
 export const SelectedShapeActions = ({
   appState,
@@ -104,6 +105,13 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
       )}
+
+      <fieldset>
+        <div className="buttonList">
+          {targetElements.some((element) => isImageElement(element)) &&
+            renderAction("editImageAlpha")}
+        </div>
+      </fieldset>
 
       {renderAction("changeOpacity")}
 

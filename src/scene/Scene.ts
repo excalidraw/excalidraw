@@ -4,15 +4,13 @@ import {
   NonDeleted,
 } from "../element/types";
 import { getNonDeletedElements, isNonDeletedElement } from "../element";
-import { LinearElementEditor } from "../element/linearElementEditor";
 
-type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
-type ElementKey = ExcalidrawElement | ElementIdKey;
+type ElementKey = ExcalidrawElement | ExcalidrawElement["id"];
 
 type SceneStateCallback = () => void;
 type SceneStateCallbackRemover = () => void;
 
-const isIdKey = (elementKey: ElementKey): elementKey is ElementIdKey => {
+const isIdKey = (elementKey: ElementKey): elementKey is string => {
   if (typeof elementKey === "string") {
     return true;
   }

@@ -12,6 +12,7 @@ import {
   isLinearElement,
   isFreeDrawElement,
   isInitializedImageElement,
+  isImageElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -221,19 +222,31 @@ const drawElementOnCanvas = (
       break;
     }
     case "image": {
-      const img = isInitializedImageElement(element)
-        ? renderConfig.imageCache.get(element.fileId)?.image
-        : undefined;
-      if (img != null && !(img instanceof Promise)) {
-        context.drawImage(
-          img,
-          0 /* hardcoded for the selection box*/,
-          0,
-          element.width,
-          element.height,
-        );
+      if (renderConfig.editingImageElement) {
+        const { imageData } = renderConfig.editingImageElement;
+
+        const imgCanvas = document.createElement("canvas");
+        imgCanvas.width = imageData.width;
+        imgCanvas.height = imageData.height;
+        const imgContext = imgCanvas.getContext("2d")!;
+        imgContext.putImageData(imageData, 0, 0);
+
+        context.drawImage(imgCanvas, 0, 0, element.width, element.height);
       } else {
-        drawImagePlaceholder(element, context, renderConfig.zoom.value);
+        const img = isInitializedImageElement(element)
+          ? renderConfig.imageCache.get(element.fileId)?.image
+          : undefined;
+        if (img != null && !(img instanceof Promise)) {
+          context.drawImage(
+            img,
+            0 /* hardcoded for the selection box*/,
+            0,
+            element.width,
+            element.height,
+          );
+        } else {
+          drawImagePlaceholder(element, context, renderConfig.zoom.value);
+        }
       }
       break;
     }
@@ -410,23 +423,23 @@ const generateElementShape = (
               topY + (rightY - topY) * 0.25
             } L ${rightX - (rightX - topX) * 0.25} ${
               rightY - (rightY - topY) * 0.25
-            } 
+            }
             C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
               rightX - (rightX - bottomX) * 0.25
-            } ${rightY + (bottomY - rightY) * 0.25} 
+            } ${rightY + (bottomY - rightY) * 0.25}
             L ${bottomX + (rightX - bottomX) * 0.25} ${
               bottomY - (bottomY - rightY) * 0.25
-            }  
+            }
             C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
               bottomX - (bottomX - leftX) * 0.25
-            } ${bottomY - (bottomY - leftY) * 0.25} 
+            } ${bottomY - (bottomY - leftY) * 0.25}
             L ${leftX + (bottomX - leftX) * 0.25} ${
               leftY + (bottomY - leftY) * 0.25
-            } 
+            }
             C ${leftX} ${leftY}, ${leftX} ${leftY}, ${
               leftX + (topX - leftX) * 0.25
-            } ${leftY - (leftY - topY) * 0.25} 
-            L ${topX - (topX - leftX) * 0.25} ${topY + (leftY - topY) * 0.25} 
+            } ${leftY - (leftY - topY) * 0.25}
+            L ${topX - (topX - leftX) * 0.25} ${topY + (leftY - topY) * 0.25}
             C ${topX} ${topY}, ${topX} ${topY}, ${
               topX + (rightX - topX) * 0.25
             } ${topY + (rightY - topY) * 0.25}`,
@@ -608,7 +621,10 @@ const generateElementWithCanvas = (
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
-    prevElementWithCanvas.theme !== renderConfig.theme
+    prevElementWithCanvas.theme !== renderConfig.theme ||
+    (renderConfig.editingImageElement &&
+      isImageElement(element) &&
+      element.id === renderConfig.editingImageElement.elementId)
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,

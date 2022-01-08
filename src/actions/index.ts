@@ -80,3 +80,4 @@ export { actionToggleGridMode } from "./actionToggleGridMode";
 export { actionToggleZenMode } from "./actionToggleZenMode";
 
 export { actionToggleStats } from "./actionToggleStats";
+export { actionEditImageAlpha } from "./actionImageEditing";
