@@ -102,7 +102,7 @@ export const textWysiwyg = ({
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
-      let container = updatedElement?.containerId
+      const container = updatedElement?.containerId
         ? Scene.getScene(updatedElement)!.getElement(updatedElement.containerId)
         : null;
       let maxWidth = updatedElement.width;
@@ -123,21 +123,12 @@ export const textWysiwyg = ({
           height = editorHeight;
         }
         if (propertiesUpdated) {
-          const currentContainer = Scene.getScene(updatedElement)?.getElement(
-            updatedElement.containerId,
-          ) as ExcalidrawBindableElement;
           approxLineHeight = isTextElement(updatedElement)
             ? getApproxLineHeight(getFontString(updatedElement))
             : 0;
-          if (
-            updatedElement.height >
-            currentContainer.height - BOUND_TEXT_PADDING * 2
-          ) {
-            const nextHeight = updatedElement.height + BOUND_TEXT_PADDING * 2;
-            originalContainerHeight = nextHeight;
-            mutateElement(container, { height: nextHeight });
-            container = { ...container, height: nextHeight };
-          }
+
+          originalContainerHeight = container.height;
+
           // update height of the editor after properties updated
           height = updatedElement.height;
         }
@@ -172,8 +163,7 @@ export const textWysiwyg = ({
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
-      const { textAlign, angle } = updatedElement;
-
+      const { textAlign } = updatedElement;
       editable.value = updatedElement.originalText || updatedElement.text;
       const lines = updatedElement.originalText.split("\n");
       const lineHeight = updatedElement.containerId
@@ -203,6 +193,7 @@ export const textWysiwyg = ({
             ? ((appState.zoom.value * 100 - 100) / 10) * 14
             : 0)) /
         appState.zoom.value;
+      const angle = container ? container.angle : updatedElement.angle;
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -469,6 +460,7 @@ export const textWysiwyg = ({
               width: Number(editable.style.width.slice(0, -2)),
               // preserve padding
               x: container.x + BOUND_TEXT_PADDING,
+              angle: container.angle,
             });
             const boundTextElementId = getBoundTextElementId(container);
             if (!boundTextElementId || boundTextElementId !== element.id) {

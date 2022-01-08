@@ -71,7 +71,11 @@ export const actionPasteStyles = register({
                 element.containerId,
               );
             }
-            redrawTextBoundingBox(element as ExcalidrawTextElement, container);
+            redrawTextBoundingBox(
+              element as ExcalidrawTextElement,
+              container,
+              appState,
+            );
           }
           return newElement;
         }

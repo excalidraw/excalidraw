@@ -1,5 +1,6 @@
 import { Random } from "roughjs/bin/math";
 import { nanoid } from "nanoid";
+import { isTestEnv } from "./utils";
 
 let random = new Random(Date.now());
 let testIdBase = 0;
@@ -11,5 +12,4 @@ export const reseed = (seed: number) => {
   testIdBase = 0;
 };
 
-export const randomId = () =>
-  process.env.NODE_ENV === "test" ? `id${testIdBase++}` : nanoid();
+export const randomId = () => (isTestEnv() ? `id${testIdBase++}` : nanoid());

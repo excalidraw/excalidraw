@@ -5,13 +5,13 @@ import {
   getDefaultAppState,
 } from "../../appState";
 import { clearElementsForLocalStorage } from "../../element";
-import { STORAGE_KEYS as APP_STORAGE_KEYS } from "../../constants";
 
 export const STORAGE_KEYS = {
   LOCAL_STORAGE_ELEMENTS: "excalidraw",
   LOCAL_STORAGE_APP_STATE: "excalidraw-state",
   LOCAL_STORAGE_COLLAB: "excalidraw-collab",
   LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG: "collabLinkForceLoadFlag",
+  LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 };
 
 export const saveUsernameToLocalStorage = (username: string) => {
@@ -112,9 +112,7 @@ export const getTotalStorageSize = () => {
   try {
     const appState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
     const collab = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
-    const library = localStorage.getItem(
-      APP_STORAGE_KEYS.LOCAL_STORAGE_LIBRARY,
-    );
+    const library = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
 
     const appStateSize = appState?.length || 0;
     const collabSize = collab?.length || 0;

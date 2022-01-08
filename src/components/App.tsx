@@ -1351,7 +1351,8 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (isSupportedImageFile(file)) {
+      // prefer spreadsheet data over image file (MS Office/Libre Office)
+      if (isSupportedImageFile(file) && !data.spreadsheet) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
           this.state,
@@ -1629,6 +1630,7 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
+      libraryItems?: SceneData["libraryItems"];
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1644,6 +1646,12 @@ class App extends React.Component<AppProps, AppState> {
 
       if (sceneData.collaborators) {
         this.setState({ collaborators: sceneData.collaborators });
+      }
+
+      if (sceneData.libraryItems) {
+        this.library.saveLibrary(
+          restoreLibraryItems(sceneData.libraryItems, "unpublished"),
+        );
       }
     },
   );
@@ -2151,10 +2159,9 @@ class App extends React.Component<AppProps, AppState> {
     const container =
       shouldBind || parentCenterPosition
         ? getElementContainingPosition(
-            this.scene.getElements(),
+            this.scene.getElements().filter((ele) => !isTextElement(ele)),
             sceneX,
             sceneY,
-            "text",
           )
         : null;
 
@@ -2219,6 +2226,7 @@ class App extends React.Component<AppProps, AppState> {
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
           containerId: container?.id ?? undefined,
+          groupIds: container?.groupIds ?? [],
         });
 
     this.setState({ editingElement: element });
