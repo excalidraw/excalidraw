@@ -476,7 +476,7 @@ export const actionChangeFontSize = register({
         appState,
         (el) => {
           if (isTextElement(el)) {
-            const element: ExcalidrawTextElement = newElementWith(el, {
+            let element: ExcalidrawTextElement = newElementWith(el, {
               fontSize: value,
             });
             let container = null;
@@ -484,6 +484,9 @@ export const actionChangeFontSize = register({
               container = Scene.getScene(el)!.getElement(el.containerId);
             }
             redrawTextBoundingBox(element, container, appState);
+
+            element = offsetElementAfterFontResize(el, element);
+
             return element;
           }
 
