@@ -67,7 +67,6 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import Scene from "../scene/Scene";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
@@ -479,13 +478,11 @@ export const actionChangeFontSize = register({
             let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
               fontSize: value,
             });
-            let container = null;
-            if (oldElement.containerId) {
-              container = Scene.getScene(oldElement)!.getElement(
-                oldElement.containerId,
-              );
-            }
-            redrawTextBoundingBox(newElement, container, appState);
+            redrawTextBoundingBox(
+              newElement,
+              getContainerElement(oldElement),
+              appState,
+            );
 
             newElement = offsetElementAfterFontResize(oldElement, newElement);
 
@@ -634,13 +631,11 @@ export const actionChangeFontFamily = register({
                 fontFamily: value,
               },
             );
-            let container = null;
-            if (oldElement.containerId) {
-              container = Scene.getScene(oldElement)!.getElement(
-                oldElement.containerId,
-              );
-            }
-            redrawTextBoundingBox(newElement, container, appState);
+            redrawTextBoundingBox(
+              newElement,
+              getContainerElement(oldElement),
+              appState,
+            );
             return newElement;
           }
 
@@ -721,13 +716,11 @@ export const actionChangeTextAlign = register({
                 textAlign: value,
               },
             );
-            let container = null;
-            if (oldElement.containerId) {
-              container = Scene.getScene(oldElement)!.getElement(
-                oldElement.containerId,
-              );
-            }
-            redrawTextBoundingBox(newElement, container, appState);
+            redrawTextBoundingBox(
+              newElement,
+              getContainerElement(oldElement),
+              appState,
+            );
             return newElement;
           }
 
