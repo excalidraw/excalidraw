@@ -416,8 +416,14 @@ export const getBoundTextElement = (element: ExcalidrawElement | null) => {
   }
   const boundTextElementId = getBoundTextElementId(element);
   if (boundTextElementId) {
-    return Scene.getScene(element)!.getElement(
-      boundTextElementId,
+    return (
+      (Scene.getScene(element)?.getElement(
+        boundTextElementId,
+      ) as ExcalidrawTextElementWithContainer) || null
+    );
+  }
+  return null;
+};
 
 export const getContainerElement = (
   element:
