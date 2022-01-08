@@ -474,23 +474,25 @@ export const actionChangeFontSize = register({
       elements: changeProperty(
         elements,
         appState,
-        (el) => {
-          if (isTextElement(el)) {
-            let element: ExcalidrawTextElement = newElementWith(el, {
+        (oldElement) => {
+          if (isTextElement(oldElement)) {
+            let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
               fontSize: value,
             });
             let container = null;
-            if (el.containerId) {
-              container = Scene.getScene(el)!.getElement(el.containerId);
+            if (oldElement.containerId) {
+              container = Scene.getScene(oldElement)!.getElement(
+                oldElement.containerId,
+              );
             }
-            redrawTextBoundingBox(element, container, appState);
+            redrawTextBoundingBox(newElement, container, appState);
 
-            element = offsetElementAfterFontResize(el, element);
+            newElement = offsetElementAfterFontResize(oldElement, newElement);
 
-            return element;
+            return newElement;
           }
 
-          return el;
+          return oldElement;
         },
         true,
       ),
@@ -624,20 +626,25 @@ export const actionChangeFontFamily = register({
       elements: changeProperty(
         elements,
         appState,
-        (el) => {
-          if (isTextElement(el)) {
-            const element: ExcalidrawTextElement = newElementWith(el, {
-              fontFamily: value,
-            });
+        (oldElement) => {
+          if (isTextElement(oldElement)) {
+            const newElement: ExcalidrawTextElement = newElementWith(
+              oldElement,
+              {
+                fontFamily: value,
+              },
+            );
             let container = null;
-            if (el.containerId) {
-              container = Scene.getScene(el)!.getElement(el.containerId);
+            if (oldElement.containerId) {
+              container = Scene.getScene(oldElement)!.getElement(
+                oldElement.containerId,
+              );
             }
-            redrawTextBoundingBox(element, container, appState);
-            return element;
+            redrawTextBoundingBox(newElement, container, appState);
+            return newElement;
           }
 
-          return el;
+          return oldElement;
         },
         true,
       ),
@@ -706,20 +713,25 @@ export const actionChangeTextAlign = register({
       elements: changeProperty(
         elements,
         appState,
-        (el) => {
-          if (isTextElement(el)) {
-            const element: ExcalidrawTextElement = newElementWith(el, {
-              textAlign: value,
-            });
+        (oldElement) => {
+          if (isTextElement(oldElement)) {
+            const newElement: ExcalidrawTextElement = newElementWith(
+              oldElement,
+              {
+                textAlign: value,
+              },
+            );
             let container = null;
-            if (el.containerId) {
-              container = Scene.getScene(el)!.getElement(el.containerId);
+            if (oldElement.containerId) {
+              container = Scene.getScene(oldElement)!.getElement(
+                oldElement.containerId,
+              );
             }
-            redrawTextBoundingBox(element, container, appState);
-            return element;
+            redrawTextBoundingBox(newElement, container, appState);
+            return newElement;
           }
 
-          return el;
+          return oldElement;
         },
         true,
       ),
