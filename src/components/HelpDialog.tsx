@@ -154,7 +154,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut label={t("toolBar.line")} shortcuts={["P", "6"]} />
                 <Shortcut
                   label={t("toolBar.freedraw")}
-                  shortcuts={["X", "7", "Shift + P"]}
+                  shortcuts={["Shift + P", "X", "7"]}
                 />
                 <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
                 <Shortcut label={t("toolBar.image")} shortcuts={["9"]} />
