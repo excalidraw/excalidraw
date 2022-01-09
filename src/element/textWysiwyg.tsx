@@ -290,13 +290,16 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
-    event.stopPropagation();
+    if (!event[KEYS.CTRL_OR_CMD]) {
+      event.stopPropagation();
+    }
     if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       submittedViaKeyboard = true;
       handleSubmit();
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
+      event.stopPropagation();
       if (event.isComposing || event.keyCode === 229) {
         return;
       }
@@ -309,6 +312,7 @@ export const textWysiwyg = ({
           event.code === CODES.BRACKET_RIGHT))
     ) {
       event.preventDefault();
+      event.stopPropagation();
       if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
         outdent();
       } else {
