@@ -115,6 +115,9 @@ const offsetElementAfterFontResize = (
   prevElement: ExcalidrawTextElement,
   nextElement: ExcalidrawTextElement,
 ) => {
+  if (isBoundToContainer(nextElement)) {
+    return nextElement;
+  }
   if (prevElement.textAlign === "right") {
     return mutateElement(
       nextElement,
