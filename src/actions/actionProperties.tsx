@@ -563,7 +563,7 @@ export const actionDecreaseFontSize = register({
     return {
       elements: elements.map((element) => {
         if (isTextElement(element) && selectedElements.has(element.id)) {
-          const newFontSize = element.fontSize * 0.9;
+          const newFontSize = Math.round(element.fontSize * 0.9);
           let newElement = newElementWith(element, {
             fontSize: newFontSize,
           });
@@ -616,7 +616,7 @@ export const actionIncreaseFontSize = register({
     return {
       elements: elements.map((element) => {
         if (isTextElement(element) && selectedElements.has(element.id)) {
-          const newFontSize = element.fontSize * 1.1;
+          const newFontSize = Math.round(element.fontSize * 1.1);
 
           let newElement = newElementWith(element, {
             fontSize: newFontSize,
