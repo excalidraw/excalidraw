@@ -43,6 +43,7 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { newElementWith } from "../element/mutateElement";
+import { getBoundTextElement } from "../element/textElement";
 import { isLinearElement, isLinearElementType } from "../element/typeChecks";
 import {
   Arrowhead,
@@ -58,21 +59,27 @@ import {
   canChangeSharpness,
   canHaveArrowheads,
   getCommonAttributeOfSelectedElements,
+  getSelectedElements,
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
 import Scene from "../scene/Scene";
+import { arrayToMap } from "../utils";
 import { register } from "./register";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   callback: (element: ExcalidrawElement) => ExcalidrawElement,
+  includeBoundText = false,
 ) => {
+  const selectedElementIds = arrayToMap(
+    getSelectedElements(elements, appState, includeBoundText),
+  );
   return elements.map((element) => {
     if (
-      appState.selectedElementIds[element.id] ||
+      selectedElementIds.get(element.id) ||
       element.id === appState.editingElement?.id
     ) {
       return callback(element);
@@ -107,13 +114,18 @@ export const actionChangeStrokeColor = register({
   perform: (elements, appState, value) => {
     return {
       ...(value.currentItemStrokeColor && {
-        elements: changeProperty(elements, appState, (el) => {
-          return hasStrokeColor(el.type)
-            ? newElementWith(el, {
-                strokeColor: value.currentItemStrokeColor,
-              })
-            : el;
-        }),
+        elements: changeProperty(
+          elements,
+          appState,
+          (el) => {
+            return hasStrokeColor(el.type)
+              ? newElementWith(el, {
+                  strokeColor: value.currentItemStrokeColor,
+                })
+              : el;
+          },
+          true,
+        ),
       }),
       appState: {
         ...appState,
@@ -483,21 +495,26 @@ export const actionChangeFontSize = register({
   name: "changeFontSize",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = newElementWith(el, {
-            fontSize: value,
-          });
-          let container = null;
-          if (el.containerId) {
-            container = Scene.getScene(el)!.getElement(el.containerId);
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) => {
+          if (isTextElement(el)) {
+            const element: ExcalidrawTextElement = newElementWith(el, {
+              fontSize: value,
+            });
+            let container = null;
+            if (el.containerId) {
+              container = Scene.getScene(el)!.getElement(el.containerId);
+            }
+            redrawTextBoundingBox(element, container, appState);
+            return element;
           }
-          redrawTextBoundingBox(element, container);
-          return element;
-        }
 
-        return el;
-      }),
+          return el;
+        },
+        true,
+      ),
       appState: {
         ...appState,
         currentItemFontSize: value,
@@ -535,7 +552,16 @@ export const actionChangeFontSize = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => isTextElement(element) && element.fontSize,
+          (element) => {
+            if (isTextElement(element)) {
+              return element.fontSize;
+            }
+            const boundTextElement = getBoundTextElement(element);
+            if (boundTextElement) {
+              return boundTextElement.fontSize;
+            }
+            return null;
+          },
           appState.currentItemFontSize || DEFAULT_FONT_SIZE,
         )}
         onChange={(value) => updateData(value)}
@@ -548,21 +574,26 @@ export const actionChangeFontFamily = register({
   name: "changeFontFamily",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = newElementWith(el, {
-            fontFamily: value,
-          });
-          let container = null;
-          if (el.containerId) {
-            container = Scene.getScene(el)!.getElement(el.containerId);
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) => {
+          if (isTextElement(el)) {
+            const element: ExcalidrawTextElement = newElementWith(el, {
+              fontFamily: value,
+            });
+            let container = null;
+            if (el.containerId) {
+              container = Scene.getScene(el)!.getElement(el.containerId);
+            }
+            redrawTextBoundingBox(element, container, appState);
+            return element;
           }
-          redrawTextBoundingBox(element, container);
-          return element;
-        }
 
-        return el;
-      }),
+          return el;
+        },
+        true,
+      ),
       appState: {
         ...appState,
         currentItemFontFamily: value,
@@ -602,7 +633,16 @@ export const actionChangeFontFamily = register({
           value={getFormValue(
             elements,
             appState,
-            (element) => isTextElement(element) && element.fontFamily,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.fontFamily;
+              }
+              const boundTextElement = getBoundTextElement(element);
+              if (boundTextElement) {
+                return boundTextElement.fontFamily;
+              }
+              return null;
+            },
             appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
           )}
           onChange={(value) => updateData(value)}
@@ -616,21 +656,26 @@ export const actionChangeTextAlign = register({
   name: "changeTextAlign",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = newElementWith(el, {
-            textAlign: value,
-          });
-          let container = null;
-          if (el.containerId) {
-            container = Scene.getScene(el)!.getElement(el.containerId);
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) => {
+          if (isTextElement(el)) {
+            const element: ExcalidrawTextElement = newElementWith(el, {
+              textAlign: value,
+            });
+            let container = null;
+            if (el.containerId) {
+              container = Scene.getScene(el)!.getElement(el.containerId);
+            }
+            redrawTextBoundingBox(element, container, appState);
+            return element;
           }
-          redrawTextBoundingBox(element, container);
-          return element;
-        }
 
-        return el;
-      }),
+          return el;
+        },
+        true,
+      ),
       appState: {
         ...appState,
         currentItemTextAlign: value,
@@ -663,7 +708,16 @@ export const actionChangeTextAlign = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => isTextElement(element) && element.textAlign,
+          (element) => {
+            if (isTextElement(element)) {
+              return element.textAlign;
+            }
+            const boundTextElement = getBoundTextElement(element);
+            if (boundTextElement) {
+              return boundTextElement.textAlign;
+            }
+            return null;
+          },
           appState.currentItemTextAlign,
         )}
         onChange={(value) => updateData(value)}
