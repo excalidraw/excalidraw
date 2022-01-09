@@ -551,6 +551,8 @@ export const actionChangeFontSize = register({
   ),
 });
 
+const RELATIVE_INCREASE_STEP = 0.1;
+
 export const actionDecreaseFontSize = register({
   name: "decreaseFontSize",
   perform: (elements, appState, value) => {
@@ -563,7 +565,11 @@ export const actionDecreaseFontSize = register({
     return {
       elements: elements.map((element) => {
         if (isTextElement(element) && selectedElements.has(element.id)) {
-          const newFontSize = Math.round(element.fontSize * 0.9);
+          const newFontSize = Math.round(
+            // get previous value before relative increase (doesn't work fully
+            // due to rounding and float precision issues)
+            (1 / (1 + RELATIVE_INCREASE_STEP)) * element.fontSize,
+          );
           let newElement = newElementWith(element, {
             fontSize: newFontSize,
           });
@@ -616,7 +622,9 @@ export const actionIncreaseFontSize = register({
     return {
       elements: elements.map((element) => {
         if (isTextElement(element) && selectedElements.has(element.id)) {
-          const newFontSize = Math.round(element.fontSize * 1.1);
+          const newFontSize = Math.round(
+            element.fontSize * (1 + RELATIVE_INCREASE_STEP),
+          );
 
           let newElement = newElementWith(element, {
             fontSize: newFontSize,
