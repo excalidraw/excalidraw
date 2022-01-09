@@ -555,12 +555,17 @@ export const actionDecreaseFontSize = register({
       getSelectedElements(elements, appState, true),
     );
 
+    const newFontSizes = new Set<number>();
+
     return {
       elements: elements.map((element) => {
         if (isTextElement(element) && selectedElements.has(element.id)) {
+          const newFontSize = element.fontSize * 0.9;
           let newElement = newElementWith(element, {
-            fontSize: element.fontSize * 0.9,
+            fontSize: newFontSize,
           });
+
+          newFontSizes.add(newFontSize);
 
           redrawTextBoundingBox(
             newElement,
@@ -574,6 +579,15 @@ export const actionDecreaseFontSize = register({
         }
         return element;
       }),
+      appState: {
+        ...appState,
+        // update state only if we've set all select text elements to
+        // the same font size
+        currentItemFontSize:
+          newFontSizes.size === 1
+            ? [...newFontSizes][0]
+            : appState.currentItemFontSize,
+      },
       commitToHistory: true,
     };
   },
@@ -594,12 +608,18 @@ export const actionIncreaseFontSize = register({
       getSelectedElements(elements, appState, true),
     );
 
+    const newFontSizes = new Set<number>();
+
     return {
       elements: elements.map((element) => {
         if (isTextElement(element) && selectedElements.has(element.id)) {
+          const newFontSize = element.fontSize * 1.1;
+
           let newElement = newElementWith(element, {
-            fontSize: element.fontSize * 1.1,
+            fontSize: newFontSize,
           });
+
+          newFontSizes.add(newFontSize);
 
           redrawTextBoundingBox(
             newElement,
@@ -613,6 +633,15 @@ export const actionIncreaseFontSize = register({
         }
         return element;
       }),
+      appState: {
+        ...appState,
+        // update state only if we've set all select text elements to
+        // the same font size
+        currentItemFontSize:
+          newFontSizes.size === 1
+            ? [...newFontSizes][0]
+            : appState.currentItemFontSize,
+      },
       commitToHistory: true,
     };
   },
