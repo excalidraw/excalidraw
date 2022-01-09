@@ -42,6 +42,8 @@ export const KEYS = {
   TAB: "Tab",
   CHEVRON_LEFT: "<",
   CHEVRON_RIGHT: ">",
+  PERIOD: ".",
+  COMMA: ",",
 
   A: "a",
   D: "d",
