@@ -46,7 +46,11 @@ import {
   getBoundTextElement,
   getContainerElement,
 } from "../element/textElement";
-import { isLinearElement, isLinearElementType } from "../element/typeChecks";
+import {
+  isBoundToContainer,
+  isLinearElement,
+  isLinearElementType,
+} from "../element/typeChecks";
 import {
   Arrowhead,
   ExcalidrawElement,
@@ -69,6 +73,8 @@ import {
 import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
+
+const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -138,6 +144,53 @@ const offsetElementAfterFontResize = (
     );
   }
   return nextElement;
+};
+
+const changeFontSize = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  getNewFontSize: (element: ExcalidrawTextElement) => number,
+) => {
+  const newFontSizes = new Set<number>();
+
+  return {
+    elements: changeProperty(
+      elements,
+      appState,
+      (oldElement) => {
+        if (isTextElement(oldElement)) {
+          const newFontSize = getNewFontSize(oldElement);
+          newFontSizes.add(newFontSize);
+
+          let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
+            fontSize: newFontSize,
+          });
+          redrawTextBoundingBox(
+            newElement,
+            getContainerElement(oldElement),
+            appState,
+          );
+
+          newElement = offsetElementAfterFontResize(oldElement, newElement);
+
+          return newElement;
+        }
+
+        return oldElement;
+      },
+      true,
+    ),
+    appState: {
+      ...appState,
+      // update state only if we've set all select text elements to
+      // the same font size
+      currentItemFontSize:
+        newFontSizes.size === 1
+          ? [...newFontSizes][0]
+          : appState.currentItemFontSize,
+    },
+    commitToHistory: true,
+  };
 };
 
 // -----------------------------------------------------------------------------
@@ -472,36 +525,7 @@ export const actionChangeOpacity = register({
 export const actionChangeFontSize = register({
   name: "changeFontSize",
   perform: (elements, appState, value) => {
-    return {
-      elements: changeProperty(
-        elements,
-        appState,
-        (oldElement) => {
-          if (isTextElement(oldElement)) {
-            let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
-              fontSize: value,
-            });
-            redrawTextBoundingBox(
-              newElement,
-              getContainerElement(oldElement),
-              appState,
-            );
-
-            newElement = offsetElementAfterFontResize(oldElement, newElement);
-
-            return newElement;
-          }
-
-          return oldElement;
-        },
-        true,
-      ),
-      appState: {
-        ...appState,
-        currentItemFontSize: value,
-      },
-      commitToHistory: true,
-    };
+    return changeFontSize(elements, appState, () => value);
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
@@ -551,54 +575,16 @@ export const actionChangeFontSize = register({
   ),
 });
 
-const RELATIVE_INCREASE_STEP = 0.1;
-
 export const actionDecreaseFontSize = register({
   name: "decreaseFontSize",
   perform: (elements, appState, value) => {
-    const selectedElements = arrayToMap(
-      getSelectedElements(elements, appState, true),
+    return changeFontSize(elements, appState, (element) =>
+      Math.round(
+        // get previous value before relative increase (doesn't work fully
+        // due to rounding and float precision issues)
+        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) * element.fontSize,
+      ),
     );
-
-    const newFontSizes = new Set<number>();
-
-    return {
-      elements: elements.map((element) => {
-        if (isTextElement(element) && selectedElements.has(element.id)) {
-          const newFontSize = Math.round(
-            // get previous value before relative increase (doesn't work fully
-            // due to rounding and float precision issues)
-            (1 / (1 + RELATIVE_INCREASE_STEP)) * element.fontSize,
-          );
-          let newElement = newElementWith(element, {
-            fontSize: newFontSize,
-          });
-
-          newFontSizes.add(newFontSize);
-
-          redrawTextBoundingBox(
-            newElement,
-            getContainerElement(element),
-            appState,
-          );
-
-          newElement = offsetElementAfterFontResize(element, newElement);
-
-          return newElement;
-        }
-        return element;
-      }),
-      appState: {
-        ...appState,
-        // update state only if we've set all select text elements to
-        // the same font size
-        currentItemFontSize:
-          newFontSizes.size === 1
-            ? [...newFontSizes][0]
-            : appState.currentItemFontSize,
-      },
-      commitToHistory: true,
-    };
   },
   keyTest: (event) => {
     return (
@@ -613,48 +599,9 @@ export const actionDecreaseFontSize = register({
 export const actionIncreaseFontSize = register({
   name: "increaseFontSize",
   perform: (elements, appState, value) => {
-    const selectedElements = arrayToMap(
-      getSelectedElements(elements, appState, true),
+    return changeFontSize(elements, appState, (element) =>
+      Math.round(element.fontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)),
     );
-
-    const newFontSizes = new Set<number>();
-
-    return {
-      elements: elements.map((element) => {
-        if (isTextElement(element) && selectedElements.has(element.id)) {
-          const newFontSize = Math.round(
-            element.fontSize * (1 + RELATIVE_INCREASE_STEP),
-          );
-
-          let newElement = newElementWith(element, {
-            fontSize: newFontSize,
-          });
-
-          newFontSizes.add(newFontSize);
-
-          redrawTextBoundingBox(
-            newElement,
-            getContainerElement(element),
-            appState,
-          );
-
-          newElement = offsetElementAfterFontResize(element, newElement);
-
-          return newElement;
-        }
-        return element;
-      }),
-      appState: {
-        ...appState,
-        // update state only if we've set all select text elements to
-        // the same font size
-        currentItemFontSize:
-          newFontSizes.size === 1
-            ? [...newFontSizes][0]
-            : appState.currentItemFontSize,
-      },
-      commitToHistory: true,
-    };
   },
   keyTest: (event) => {
     return (
