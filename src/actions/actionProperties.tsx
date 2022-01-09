@@ -124,26 +124,21 @@ const offsetElementAfterFontResize = (
   if (isBoundToContainer(nextElement)) {
     return nextElement;
   }
-  if (prevElement.textAlign === "right") {
-    return mutateElement(
-      nextElement,
-      {
-        x: prevElement.x + (prevElement.width - nextElement.width),
-        y: prevElement.y + (prevElement.height - nextElement.height),
-      },
-      false,
-    );
-  } else if (prevElement.textAlign === "center") {
-    return mutateElement(
-      nextElement,
-      {
-        x: prevElement.x + (prevElement.width - nextElement.width) / 2,
-        y: prevElement.y + (prevElement.height - nextElement.height) / 2,
-      },
-      false,
-    );
-  }
-  return nextElement;
+  return mutateElement(
+    nextElement,
+    {
+      x:
+        prevElement.textAlign === "left"
+          ? prevElement.x
+          : prevElement.x +
+            (prevElement.width - nextElement.width) /
+              (prevElement.textAlign === "center" ? 2 : 1),
+      // centering vertically is non-standard, but for Excalidraw I think
+      // it makes sense
+      y: prevElement.y + (prevElement.height - nextElement.height) / 2,
+    },
+    false,
+  );
 };
 
 const changeFontSize = (
