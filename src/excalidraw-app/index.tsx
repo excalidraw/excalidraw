@@ -67,7 +67,7 @@ import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
-import Joyride, { EVENTS } from "react-joyride";
+import Joyride, { EVENTS, ACTIONS } from "react-joyride";
 import React from "react";
 import {
   Consumer as SBConsumer,
@@ -724,20 +724,46 @@ const ExcalidrawApp = () => {
                     run={tour1?.component?.active === true}
                     continuous={true}
                     showProgress={true}
+                    debug={true}
                     callback={(operation) => {
-                      const { step, type } = operation;
+                      const { step, action, type } = operation;
+                      if (
+                        (window.performance.navigation &&
+                          window.performance.navigation.type === 1) ||
+                        window.performance
+                          .getEntriesByType("naviagation")
+                          .map((nav) => nav.type)
+                          .includes("reload")
+                      ) {
+                        window.sessionStorage.setItem(
+                          "priorTarget",
+                          "blahblah",
+                        );
+                      }
                       if (
                         [
                           EVENTS.STEP_AFTER.valueOf(),
                           EVENTS.TARGET_NOT_FOUND.valueOf(),
                         ].includes(type) &&
                         JSON.stringify(step.target) !==
-                          window.sessionStorage.getItem("priorTarget")
+                          window.sessionStorage.getItem("priorTarget") &&
+                        [ACTIONS.NEXT.valueOf()].includes(action)
                       ) {
                         sbState.progressTour(tour1.componentName);
                         window.sessionStorage.setItem(
                           "priorTarget",
                           JSON.stringify(step.target),
+                        );
+                      } else if (
+                        [EVENTS.STEP_AFTER.valueOf()].includes(type) &&
+                        JSON.stringify(step.target) !==
+                          window.sessionStorage.getItem("priorTarget") &&
+                        [ACTIONS.PREV.valueOf()].includes(action)
+                      ) {
+                        sbState.regressTour(tour1.componentName);
+                        window.sessionStorage.setItem(
+                          "priorTarget",
+                          "foooobaaarrr",
                         );
                       }
                     }}
