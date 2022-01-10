@@ -23,7 +23,7 @@
     "@sentry/integrations": "6.2.5",
     "@testing-library/jest-dom": "5.16.1",
     "@testing-library/react": "12.1.2",
-    "@tldraw/vec": "1.4.0",
+    "@tldraw/vec": "1.4.3",
     "@types/jest": "27.4.0",
     "@types/pica": "5.1.3",
     "@types/react": "17.0.38",
@@ -50,7 +50,7 @@
     "react-dom": "17.0.2",
     "react-scripts": "4.0.3",
     "roughjs": "4.5.2",
-    "sass": "1.45.2",
+    "sass": "1.47.0",
     "socket.io-client": "2.3.1",
     "typescript": "4.5.4"
   },
@@ -68,7 +68,7 @@
     "firebase-tools": "9.23.0",
     "husky": "7.0.4",
     "jest-canvas-mock": "2.3.1",
-    "lint-staged": "12.1.4",
+    "lint-staged": "12.1.7",
     "pepjs": "0.5.3",
     "prettier": "2.5.1",
     "rewire": "5.0.0"
