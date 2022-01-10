@@ -187,6 +187,7 @@ export const ShapesSwitcher = ({
         <ToolButton
           className="Shape"
           key={value}
+          id={`SB-${value}`}
           type="radio"
           icon={icon}
           checked={elementType === value}

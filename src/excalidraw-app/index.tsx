@@ -67,7 +67,7 @@ import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
-import Joyride from "react-joyride";
+import Joyride, { EVENTS, ACTIONS } from "react-joyride";
 import React from "react";
 import {
   Consumer as SBConsumer,
@@ -690,29 +690,145 @@ const ExcalidrawWrapper = () => {
 };
 
 const ExcalidrawApp = () => {
+  const user = "1";
   return (
-    <SBProvider clientId={"1"} user={"1"}>
+    //User 1 shows tour
+    //User 4 shows component
+    <SBProvider clientId={"1"} user={user}>
       <TopErrorBoundary>
-        <Joyride
-          run={true}
-          debug={true}
-          steps={[
-            {
-              target: "#root",
-              content: (
-                <React.Fragment>
-                  Welcome to Excalidraw the best way to digitally sketch ideas.
-                  Let's start sketching
-                  <SBConsumer>
-                    {(value) => JSON.stringify(value, null, 2)}
-                  </SBConsumer>
-                </React.Fragment>
-              ),
-              event: "hover",
-              placement: "center",
-            },
-          ]}
-        />
+        <SBConsumer>
+          {(sbState) => {
+            if (sbState?.surfaces && sbState?.tours) {
+              const tour1 = sbState?.tours.tour_1;
+              const welcomeModal = sbState?.surfaces.welcome_modal;
+              return (
+                <div>
+                  <Joyride
+                    run={welcomeModal?.component?.active === true}
+                    steps={[
+                      {
+                        target: "#root",
+                        content: (
+                          <React.Fragment>
+                            Welcome to Excalidraw the best way to digitally
+                            sketch ideas. Let's start
+                          </React.Fragment>
+                        ),
+                        event: "hover",
+                        placement: "center",
+                        hideFooter: true,
+                      },
+                    ]}
+                  />
+                  <Joyride
+                    run={tour1?.component?.active === true}
+                    continuous={true}
+                    showProgress={true}
+                    debug={true}
+                    callback={(operation) => {
+                      const { step, action, type } = operation;
+                      if (
+                        (window.performance.navigation &&
+                          window.performance.navigation.type === 1) ||
+                        window.performance
+                          .getEntriesByType("naviagation")
+                          .map((nav) => nav.type)
+                          .includes("reload")
+                      ) {
+                        window.sessionStorage.setItem(
+                          "priorTarget",
+                          "blahblah",
+                        );
+                      }
+                      if (
+                        [
+                          EVENTS.STEP_AFTER.valueOf(),
+                          EVENTS.TARGET_NOT_FOUND.valueOf(),
+                        ].includes(type) &&
+                        JSON.stringify(step.target) !==
+                          window.sessionStorage.getItem("priorTarget") &&
+                        [ACTIONS.NEXT.valueOf()].includes(action)
+                      ) {
+                        sbState.progressTour(tour1.componentName);
+                        window.sessionStorage.setItem(
+                          "priorTarget",
+                          JSON.stringify(step.target),
+                        );
+                      } else if (
+                        [EVENTS.STEP_AFTER.valueOf()].includes(type) &&
+                        JSON.stringify(step.target) !==
+                          window.sessionStorage.getItem("priorTarget") &&
+                        [ACTIONS.PREV.valueOf()].includes(action)
+                      ) {
+                        sbState.regressTour(tour1.componentName);
+                        window.sessionStorage.setItem(
+                          "priorTarget",
+                          "foooobaaarrr",
+                        );
+                      }
+                    }}
+                    stepIndex={tour1?.currentStep}
+                    steps={[
+                      {
+                        target: "#root",
+                        content: (
+                          <React.Fragment>
+                            Welcome to Excalidraw the best way to digitally
+                            sketch ideas. Let's start
+                          </React.Fragment>
+                        ),
+                        event: "hover",
+                        placement: "center",
+                        hideCloseButton: true,
+                      },
+                      {
+                        target: "#SB-rectangle",
+                        content: (
+                          <React.Fragment>
+                            Let's start by creating your first shape. Click the
+                            square and click and drag to draw.
+                          </React.Fragment>
+                        ),
+                        placement: "top",
+                        event: "hover",
+                        spotlightClicks: true,
+                        hideCloseButton: true,
+                      },
+                      {
+                        target: "body",
+                        content: (
+                          <React.Fragment>
+                            After drawing the squarelet's add some text to it.
+                            Double click the square text
+                          </React.Fragment>
+                        ),
+                        event: "click",
+                        spotlightClicks: true,
+                        placement: "bottom-end",
+                        placementBeacon: "right",
+                        disableOverlayClose: true,
+                        offset: -450,
+                        hideCloseButton: true,
+                      },
+                      {
+                        target: "#SB-export",
+                        content: (
+                          <React.Fragment>
+                            Great now let's share with a coworker
+                          </React.Fragment>
+                        ),
+                        event: "hover",
+                        placement: "auto",
+                        hideCloseButton: true,
+                      },
+                    ]}
+                  />
+                </div>
+              );
+            }
+          }}
+        </SBConsumer>
+
         <CollabContextConsumer>
           <ExcalidrawWrapper />
         </CollabContextConsumer>
