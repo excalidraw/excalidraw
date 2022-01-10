@@ -305,7 +305,7 @@ describe("textWysiwyg", () => {
       expect(h.elements[1].fontFamily).toEqual(FONT_FAMILY.Cascadia);
     });
 
-    it.only("should vertcially center align once text submitted", async () => {
+    it("should vertcially center align once text submitted", async () => {
       jest
         .spyOn(textElementUtils, "measureText")
         .mockImplementation((text, font, maxWidth) => {
