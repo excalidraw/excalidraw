@@ -69,6 +69,7 @@ import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
+import throttle from "lodash.throttle";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -411,7 +412,7 @@ const ExcalidrawWrapper = () => {
       TITLE_TIMEOUT,
     );
 
-    const onVisibilityChange = () => {
+    const onVisibilityChange = throttle(() => {
       if (!document.hidden) {
         // Sync local storage tab states when mismatch
         const localDataState = importFromLocalStorage();
@@ -427,11 +428,12 @@ const ExcalidrawWrapper = () => {
         });
         collabAPI.setUsername(username || "");
       }
-    };
+    }, 50);
 
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
     window.addEventListener(EVENT.UNLOAD, onBlur, false);
     window.addEventListener(EVENT.BLUR, onBlur, false);
+    window.addEventListener(EVENT.FOCUS, onVisibilityChange, false);
     document.addEventListener(
       EVENT.VISIBILITY_CHANGE,
       onVisibilityChange,
@@ -441,6 +443,7 @@ const ExcalidrawWrapper = () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
       window.removeEventListener(EVENT.UNLOAD, onBlur, false);
       window.removeEventListener(EVENT.BLUR, onBlur, false);
+      window.removeEventListener(EVENT.FOCUS, onVisibilityChange, false);
       document.removeEventListener(
         EVENT.VISIBILITY_CHANGE,
         onVisibilityChange,
