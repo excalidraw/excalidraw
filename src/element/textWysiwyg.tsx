@@ -72,7 +72,7 @@ export const textWysiwyg = ({
     originalText: string;
   }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
-  element: ExcalidrawElement;
+  element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement | null;
   excalidrawContainer: HTMLDivElement | null;
 }) => {
@@ -93,10 +93,8 @@ export const textWysiwyg = ({
     return false;
   };
   let originalContainerHeight: number;
-  let approxLineHeight = isTextElement(element)
-    ? getApproxLineHeight(getFontString(element))
-    : 0;
-  let prevText = isTextElement(element) ? element.text : "";
+  let approxLineHeight = getApproxLineHeight(getFontString(element));
+  let prevText = element.text;
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
     if (updatedElement && isTextElement(updatedElement)) {
@@ -123,9 +121,7 @@ export const textWysiwyg = ({
           height = editorHeight;
         }
         if (propertiesUpdated) {
-          approxLineHeight = isTextElement(updatedElement)
-            ? getApproxLineHeight(getFontString(updatedElement))
-            : 0;
+          approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
 
           originalContainerHeight = container.height;
 
@@ -451,7 +447,7 @@ export const textWysiwyg = ({
           container.width,
         );
 
-        if (isTextElement(updateElement) && updateElement.containerId) {
+        if (updateElement.containerId) {
           const editorHeight = Number(editable.style.height.slice(0, -2));
           if (editable.value) {
             // Don't mutate if text is not updated
