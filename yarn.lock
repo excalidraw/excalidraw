@@ -14026,9 +14026,9 @@ svgo@^1.0.0, svgo@^1.2.2:
     unquote "~1.1.1"
     util.promisify "~1.0.0"
 
-"switchboard@ssh://git@github.com:switchboardcc/switchboard.git#carlos-extend-sdk":
+"switchboard@ssh://git@github.com:switchboardcc/switchboard.git#main":
   version "0.0.0"
-  resolved "ssh://git@github.com:switchboardcc/switchboard.git#abbf0139eb5e030e8af827b74c6ab374e7acc0de"
+  resolved "ssh://git@github.com:switchboardcc/switchboard.git#30bc38ef94b5888fbfd06940eaa6f2277dbd9cae"
   dependencies:
     dotenv-flow "^3.2.0"
     dotenv-flow-cli "^1.0.0"

@@ -727,18 +727,26 @@ const ExcalidrawApp = () => {
                     debug={true}
                     callback={(operation) => {
                       const { step, action, type } = operation;
-                      if (
-                        (window.performance.navigation &&
-                          window.performance.navigation.type === 1) ||
-                        window.performance
-                          .getEntriesByType("naviagation")
-                          .map((nav) => nav.type)
-                          .includes("reload")
-                      ) {
-                        window.sessionStorage.setItem(
-                          "priorTarget",
-                          "blahblah",
-                        );
+                      if (window.performance) {
+                      }
+                      if (performance.navigation.type === 1) {
+                        console.info("reload");
+                        if (
+                          window.sessionStorage.getItem("firstReload") ===
+                            "true" ||
+                          window.sessionStorage.getItem("firstReload") ===
+                            "null"
+                        ) {
+                          window.sessionStorage.setItem(
+                            "priorTarget",
+                            "blahblah",
+                          );
+                          window.sessionStorage.setItem("firstReload", "false");
+                        }
+                      } else {
+                        console.info("!reload");
+
+                        window.sessionStorage.setItem("firstReload", "true");
                       }
                       if (
                         [
