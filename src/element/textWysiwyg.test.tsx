@@ -4,9 +4,9 @@ import { render, screen } from "../tests/test-utils";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { KEYS } from "../keys";
 import { fireEvent } from "../tests/test-utils";
-import { FONT_FAMILY } from "../constants";
+import { BOUND_TEXT_PADDING, FONT_FAMILY } from "../constants";
 import { ExcalidrawTextElementWithContainer } from "./types";
-
+import * as textElementUtils from "./textElement";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -181,12 +181,26 @@ describe("textWysiwyg", () => {
         elements: any;
       };
     } = window;
+
+    const DUMMY_HEIGHT = 240;
+    const DUMMY_WIDTH = 160;
+    const DUMMY_SCROLL_HEIGHT = 25;
+    const APPROX_LINE_HEIGHT = 25;
+    const INITIAL_WIDTH = 10;
+
+    beforeAll(() => {
+      jest
+        .spyOn(textElementUtils, "getApproxLineHeight")
+        .mockReturnValue(APPROX_LINE_HEIGHT);
+    });
+
     beforeEach(async () => {
       await render(<ExcalidrawApp />);
+
       rectangle = UI.createElement("rectangle", {
-        x: 0,
-        y: 0,
-        width: 100,
+        x: 10,
+        y: 20,
+        width: 150,
         height: 100,
       });
     });
@@ -231,7 +245,6 @@ describe("textWysiwyg", () => {
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(rectangle.id);
-      mouse.down();
       const editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
@@ -275,7 +288,7 @@ describe("textWysiwyg", () => {
       editor.select();
       fireEvent.click(screen.getByTitle(/code/i));
 
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise((r) => setTimeout(r, 0));
       editor.blur();
       expect(h.elements[1].fontFamily).toEqual(FONT_FAMILY.Cascadia);
 
@@ -290,6 +303,67 @@ describe("textWysiwyg", () => {
         Keyboard.keyPress(KEYS.Z);
       });
       expect(h.elements[1].fontFamily).toEqual(FONT_FAMILY.Cascadia);
+    });
+
+    it.only("should vertcially center align once text submitted", async () => {
+      jest
+        .spyOn(textElementUtils, "measureText")
+        .mockImplementation((text, font, maxWidth) => {
+          let width = INITIAL_WIDTH;
+          let height = APPROX_LINE_HEIGHT;
+          let baseline = 10;
+          if (!text) {
+            return {
+              width,
+              height,
+              baseline,
+            };
+          }
+          baseline = 30;
+          width = DUMMY_WIDTH;
+          if (maxWidth) {
+            width = maxWidth;
+            // To capture cases where maxWidth passed is initial width
+            // due to which the text is not wrapped correctly
+            if (maxWidth === INITIAL_WIDTH) {
+              height = DUMMY_HEIGHT;
+            }
+          }
+          return {
+            width,
+            height,
+            baseline,
+          };
+        });
+      Keyboard.withModifierKeys({}, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+
+      let text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      // mock scroll height
+      jest
+        .spyOn(editor, "scrollHeight", "get")
+        .mockImplementation(() => DUMMY_SCROLL_HEIGHT);
+
+      fireEvent.change(editor, {
+        target: {
+          value: "Hello World!",
+        },
+      });
+      editor.dispatchEvent(new Event("input"));
+
+      await new Promise((r) => setTimeout(r, 0));
+      editor.blur();
+      text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.y).toBe(
+        rectangle.y + rectangle.height / 2 - APPROX_LINE_HEIGHT / 2,
+      );
+      expect(text.x).toBe(rectangle.x + BOUND_TEXT_PADDING);
+      expect(text.height).toBe(DUMMY_SCROLL_HEIGHT);
+      expect(text.width).toBe(rectangle.width - BOUND_TEXT_PADDING * 2);
     });
   });
 });

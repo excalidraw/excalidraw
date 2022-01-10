@@ -96,7 +96,7 @@ export const textWysiwyg = ({
   let approxLineHeight = isTextElement(element)
     ? getApproxLineHeight(getFontString(element))
     : 0;
-
+  const prevText = isTextElement(element) ? element.text : "";
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
     if (updatedElement && isTextElement(updatedElement)) {
@@ -450,11 +450,12 @@ export const textWysiwyg = ({
           getFontString(updateElement),
           container.width,
         );
+
         if (isTextElement(updateElement) && updateElement.containerId) {
           const editorHeight = Number(editable.style.height.slice(0, -2));
           if (editable.value) {
             // Don't mutate if text is not updated
-            if (updateElement.text !== wrappedText) {
+            if (prevText !== wrappedText) {
               mutateElement(updateElement, {
                 // vertically center align
                 y: container.y + container.height / 2 - editorHeight / 2,
@@ -465,6 +466,7 @@ export const textWysiwyg = ({
                 angle: container.angle,
               });
             }
+
             const boundTextElementId = getBoundTextElementId(container);
             if (!boundTextElementId || boundTextElementId !== element.id) {
               mutateElement(container, {

@@ -158,7 +158,11 @@ const getAdjustedDimensions = (
   height: number;
   baseline: number;
 } => {
-  const maxWidth = element.containerId ? element.width : null;
+  let maxWidth = null;
+  if (element.containerId) {
+    const container = Scene.getScene(element)!.getElement(element.containerId)!;
+    maxWidth = container.width - BOUND_TEXT_PADDING * 2;
+  }
   const {
     width: nextWidth,
     height: nextHeight,
@@ -255,8 +259,6 @@ export const updateTextElement = (
     boundToContainer && !isSubmit
       ? undefined
       : getAdjustedDimensions(element, text);
-
-  text = boundToContainer && !isSubmit ? element.text : text;
   return newElementWith(element, {
     text,
     originalText,
