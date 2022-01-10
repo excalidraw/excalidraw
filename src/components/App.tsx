@@ -1306,7 +1306,8 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (isSupportedImageFile(file)) {
+      // prefer spreadsheet data over image file (MS Office/Libre Office)
+      if (isSupportedImageFile(file) && !data.spreadsheet) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
           this.state,
@@ -2734,7 +2735,8 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           this.state.viewModeEnabled)
-      )
+      ) ||
+      isTextElement(this.state.editingElement)
     ) {
       return false;
     }
