@@ -96,7 +96,7 @@ export const textWysiwyg = ({
   let approxLineHeight = isTextElement(element)
     ? getApproxLineHeight(getFontString(element))
     : 0;
-  const prevText = isTextElement(element) ? element.text : "";
+  let prevText = isTextElement(element) ? element.text : "";
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
     if (updatedElement && isTextElement(updatedElement)) {
@@ -571,6 +571,12 @@ export const textWysiwyg = ({
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
+    if (isTextElement(element)) {
+      const updatedElement = Scene.getScene(element)!.getElement(
+        element.id,
+      ) as ExcalidrawTextElement;
+      prevText = updatedElement.text;
+    }
     updateWysiwygStyle();
     const isColorPickerActive = !!document.activeElement?.closest(
       ".color-picker-input",
