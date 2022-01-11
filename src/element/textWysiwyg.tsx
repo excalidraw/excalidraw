@@ -3,6 +3,7 @@ import {
   isWritableElement,
   getFontString,
   getFontFamilyString,
+  isTestEnv,
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
@@ -94,7 +95,8 @@ export const textWysiwyg = ({
   };
   let originalContainerHeight: number;
   let approxLineHeight = getApproxLineHeight(getFontString(element));
-  let prevText = element.text;
+
+  const prevText = element.originalText;
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
     if (updatedElement && isTextElement(updatedElement)) {
@@ -213,6 +215,11 @@ export const textWysiwyg = ({
         maxWidth: `${maxWidth}px`,
         maxHeight: `${editorMaxHeight}px`,
       });
+      // For some reason updating font attribute doesn't set font family
+      // hence updating font family explicitly for test environment
+      if (isTestEnv()) {
+        editable.style.fontFamily = getFontFamilyString(updatedElement);
+      }
     }
   };
 
@@ -451,7 +458,7 @@ export const textWysiwyg = ({
           const editorHeight = Number(editable.style.height.slice(0, -2));
           if (editable.value) {
             // Don't mutate if text is not updated
-            if (prevText !== wrappedText) {
+            if (prevText !== editable.value) {
               mutateElement(updateElement, {
                 // vertically center align
                 y: container.y + container.height / 2 - editorHeight / 2,
@@ -567,12 +574,6 @@ export const textWysiwyg = ({
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
-    if (isTextElement(element)) {
-      const updatedElement = Scene.getScene(element)!.getElement(
-        element.id,
-      ) as ExcalidrawTextElement;
-      prevText = updatedElement.text;
-    }
     updateWysiwygStyle();
     const isColorPickerActive = !!document.activeElement?.closest(
       ".color-picker-input",

@@ -184,7 +184,6 @@ describe("textWysiwyg", () => {
 
     const DUMMY_HEIGHT = 240;
     const DUMMY_WIDTH = 160;
-    const DUMMY_SCROLL_HEIGHT = 25;
     const APPROX_LINE_HEIGHT = 25;
     const INITIAL_WIDTH = 10;
 
@@ -200,8 +199,8 @@ describe("textWysiwyg", () => {
       rectangle = UI.createElement("rectangle", {
         x: 10,
         y: 20,
-        width: 150,
-        height: 100,
+        width: 90,
+        height: 75,
       });
     });
 
@@ -305,7 +304,7 @@ describe("textWysiwyg", () => {
       expect(h.elements[1].fontFamily).toEqual(FONT_FAMILY.Cascadia);
     });
 
-    it("should vertcially center align once text submitted", async () => {
+    it("should wrap text and vertcially center align once text submitted", async () => {
       jest
         .spyOn(textElementUtils, "measureText")
         .mockImplementation((text, font, maxWidth) => {
@@ -321,6 +320,9 @@ describe("textWysiwyg", () => {
           }
           baseline = 30;
           width = DUMMY_WIDTH;
+          if (text === "Hello \nWorld!") {
+            height = APPROX_LINE_HEIGHT * 2;
+          }
           if (maxWidth) {
             width = maxWidth;
             // To capture cases where maxWidth passed is initial width
@@ -335,34 +337,76 @@ describe("textWysiwyg", () => {
             baseline,
           };
         });
+
       Keyboard.withModifierKeys({}, () => {
         Keyboard.keyPress(KEYS.ENTER);
       });
 
       let text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      const editor = document.querySelector(
+      let editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
+
       // mock scroll height
       jest
         .spyOn(editor, "scrollHeight", "get")
-        .mockImplementation(() => DUMMY_SCROLL_HEIGHT);
+        .mockImplementation(() => APPROX_LINE_HEIGHT * 2);
 
       fireEvent.change(editor, {
         target: {
           value: "Hello World!",
         },
       });
+
+      editor.dispatchEvent(new Event("input"));
+
+      await new Promise((cb) => setTimeout(cb, 0));
+      editor.blur();
+      text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.text).toBe("Hello \nWorld!");
+      expect(text.originalText).toBe("Hello World!");
+      expect(text.y).toBe(
+        rectangle.y + rectangle.height / 2 - (APPROX_LINE_HEIGHT * 2) / 2,
+      );
+      expect(text.x).toBe(rectangle.x + BOUND_TEXT_PADDING);
+      expect(text.height).toBe(APPROX_LINE_HEIGHT * 2);
+      expect(text.width).toBe(rectangle.width - BOUND_TEXT_PADDING * 2);
+
+      // Edit and text by removing second line and it should
+      // still vertically align correctly
+      mouse.select(rectangle);
+      Keyboard.withModifierKeys({}, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+      editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      fireEvent.change(editor, {
+        target: {
+          value: "Hello",
+        },
+      });
+
+      // mock scroll height
+      jest
+        .spyOn(editor, "scrollHeight", "get")
+        .mockImplementation(() => APPROX_LINE_HEIGHT);
+      editor.style.height = "25px";
       editor.dispatchEvent(new Event("input"));
 
       await new Promise((r) => setTimeout(r, 0));
+
       editor.blur();
       text = h.elements[1] as ExcalidrawTextElementWithContainer;
+
+      expect(text.text).toBe("Hello");
+      expect(text.originalText).toBe("Hello");
       expect(text.y).toBe(
         rectangle.y + rectangle.height / 2 - APPROX_LINE_HEIGHT / 2,
       );
       expect(text.x).toBe(rectangle.x + BOUND_TEXT_PADDING);
-      expect(text.height).toBe(DUMMY_SCROLL_HEIGHT);
+      expect(text.height).toBe(APPROX_LINE_HEIGHT);
       expect(text.width).toBe(rectangle.width - BOUND_TEXT_PADDING * 2);
     });
   });
