@@ -118,6 +118,10 @@ yarn start
 
 Now you can open [http://localhost:3000](http://localhost:3000) and start coding in your favorite code editor.
 
+#### Collaboration
+
+For collaboration, you will need to set up [collab server](https://github.com/excalidraw/excalidraw-room) in local.
+
 #### Commands
 
 | Command            | Description                       |
