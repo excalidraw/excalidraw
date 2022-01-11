@@ -96,7 +96,7 @@ export const textWysiwyg = ({
   let originalContainerHeight: number;
   let approxLineHeight = getApproxLineHeight(getFontString(element));
 
-  const prevText = element.originalText;
+  const initialText = element.originalText;
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
     if (updatedElement && isTextElement(updatedElement)) {
@@ -458,7 +458,7 @@ export const textWysiwyg = ({
           const editorHeight = Number(editable.style.height.slice(0, -2));
           if (editable.value) {
             // Don't mutate if text is not updated
-            if (prevText !== editable.value) {
+            if (initialText !== editable.value) {
               mutateElement(updateElement, {
                 // vertically center align
                 y: container.y + container.height / 2 - editorHeight / 2,
