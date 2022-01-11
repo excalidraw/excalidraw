@@ -690,10 +690,10 @@ const ExcalidrawWrapper = () => {
 };
 
 const ExcalidrawApp = () => {
-  const user = "2";
+  const user = "1";
   return (
     //User 1 shows tour
-    //User 2 shows inline tour
+    //User 2 shows inline surface
     //User 3 control
     //User 4 shows component
     <SBProvider clientId={"1"} user={user}>
@@ -701,29 +701,11 @@ const ExcalidrawApp = () => {
         <SBConsumer>
           {(sbState) => {
             if (sbState?.surfaces && sbState?.tours) {
-              const tour1 = sbState?.tours.tour_1;
-              const welcomeModal = sbState?.surfaces.welcome_modal;
+              const welcome_tour = sbState?.tours.welcome_tour;
               return (
                 <div>
                   <Joyride
-                    run={welcomeModal?.component?.active === true}
-                    steps={[
-                      {
-                        target: "#root",
-                        content: (
-                          <React.Fragment>
-                            Welcome to Excalidraw the best way to digitally
-                            sketch ideas. Let's start
-                          </React.Fragment>
-                        ),
-                        event: "hover",
-                        placement: "center",
-                        hideFooter: true,
-                      },
-                    ]}
-                  />
-                  <Joyride
-                    run={tour1?.component?.active === true}
+                    run={welcome_tour?.component?.active === true}
                     continuous={true}
                     showProgress={true}
                     debug={true}
@@ -759,7 +741,7 @@ const ExcalidrawApp = () => {
                           window.sessionStorage.getItem("priorTarget") &&
                         [ACTIONS.NEXT.valueOf()].includes(action)
                       ) {
-                        sbState.progressTour(tour1.componentName);
+                        sbState.progressTour(welcome_tour.componentName);
                         window.sessionStorage.setItem(
                           "priorTarget",
                           JSON.stringify(step.target),
@@ -770,14 +752,14 @@ const ExcalidrawApp = () => {
                           window.sessionStorage.getItem("priorTarget") &&
                         [ACTIONS.PREV.valueOf()].includes(action)
                       ) {
-                        sbState.regressTour(tour1.componentName);
+                        sbState.regressTour(welcome_tour.componentName);
                         window.sessionStorage.setItem(
                           "priorTarget",
                           "foooobaaarrr",
                         );
                       }
                     }}
-                    stepIndex={tour1?.currentStep}
+                    stepIndex={welcome_tour?.currentStep}
                     steps={[
                       {
                         target: "#root",
