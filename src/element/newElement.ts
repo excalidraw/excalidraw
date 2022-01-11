@@ -24,6 +24,7 @@ import { getResizedElementAbsoluteCoords } from "./bounds";
 import { getContainerElement, measureText } from "./textElement";
 import { isBoundToContainer } from "./typeChecks";
 import { BOUND_TEXT_PADDING } from "../constants";
+import Scene from "../scene/Scene";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -157,7 +158,11 @@ const getAdjustedDimensions = (
   height: number;
   baseline: number;
 } => {
-  const maxWidth = element.containerId ? element.width : null;
+  let maxWidth = null;
+  if (element.containerId) {
+    const container = Scene.getScene(element)!.getElement(element.containerId)!;
+    maxWidth = container.width - BOUND_TEXT_PADDING * 2;
+  }
   const {
     width: nextWidth,
     height: nextHeight,
@@ -245,11 +250,15 @@ export const updateTextElement = (
     originalText,
   }: { text: string; isDeleted?: boolean; originalText: string },
 
-  updateDimensions: boolean,
+  isSubmit: boolean,
 ): ExcalidrawTextElement => {
-  const dimensions = updateDimensions
-    ? getAdjustedDimensions(element, text)
-    : undefined;
+  const boundToContainer = isBoundToContainer(element);
+
+  // Don't update dimensions and text value for bounded text unless submitted
+  const dimensions =
+    boundToContainer && !isSubmit
+      ? undefined
+      : getAdjustedDimensions(element, text);
   return newElementWith(element, {
     text,
     originalText,
