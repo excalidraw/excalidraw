@@ -690,9 +690,11 @@ const ExcalidrawWrapper = () => {
 };
 
 const ExcalidrawApp = () => {
-  const user = "1";
+  const user = "2";
   return (
     //User 1 shows tour
+    //User 2 shows inline tour
+    //User 3 control
     //User 4 shows component
     <SBProvider clientId={"1"} user={user}>
       <TopErrorBoundary>
@@ -806,7 +808,7 @@ const ExcalidrawApp = () => {
                         target: "body",
                         content: (
                           <React.Fragment>
-                            After drawing the squarelet's add some text to it.
+                            After drawing the square let's add some text to it.
                             Double click the square text
                           </React.Fragment>
                         ),

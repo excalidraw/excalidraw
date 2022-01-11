@@ -70,6 +70,7 @@ export type ActionName =
   | "changeExportScale"
   | "saveToActiveFile"
   | "saveFileToDisk"
+  | "showStrokeToolTip"
   | "loadScene"
   | "duplicateSelection"
   | "deleteSelectedElements"
