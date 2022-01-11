@@ -657,7 +657,6 @@ const renderBindingHighlight = (
   const renderHighlight = Array.isArray(suggestedBinding)
     ? renderBindingHighlightForSuggestedPointBinding
     : renderBindingHighlightForBindableElement;
-
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
   renderHighlight(context, suggestedBinding as any);

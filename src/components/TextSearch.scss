@@ -1,0 +1,61 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .TextSearch .Island {
+    position: absolute;
+    top: 90px;
+    right: 50px;
+    padding-left: #{"max(calc(var(--padding) * var(--space-factor)), var(--sal))"};
+    padding-right: #{"max(calc(var(--padding) * var(--space-factor)), var(--sar))"};
+    padding-bottom: #{"max(calc(var(--padding) * var(--space-factor)), var(--sab))"};
+    z-index: 10;
+  }
+
+  .searchInput {
+    font-size: 20px;
+  }
+
+  .close {
+    float: right;
+    height: 18px;
+    width: 18px;
+    cursor: pointer;
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+    padding-top: #{"max(calc(var(--padding) * var(--space-factor)), var(--sat))"};
+    padding-left: #{"max(calc(var(--padding) * var(--space-factor)), var(--sal))"};
+    padding-right: #{"max(calc(var(--padding) * var(--space-factor)), var(--sar))"};
+    padding-bottom: #{"max(calc(var(--padding) * var(--space-factor)), var(--sab))"};
+  }
+
+  .next {
+    float: right;
+    height: 18px;
+    width: 18px;
+    cursor: pointer;
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+    padding-top: #{"max(calc(var(--padding) * var(--space-factor)), var(--sat))"};
+    padding-left: #{"max(calc(var(--padding) * var(--space-factor)), var(--sal))"};
+    padding-right: #{"max(calc(var(--padding) * var(--space-factor)), var(--sar))"};
+    padding-bottom: #{"max(calc(var(--padding) * var(--space-factor)), var(--sab))"};
+  }
+  .last {
+    float: right;
+    height: 18px;
+    width: 18px;
+    cursor: pointer;
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+    padding-top: #{"max(calc(var(--padding) * var(--space-factor)), var(--sat))"};
+    padding-left: #{"max(calc(var(--padding) * var(--space-factor)), var(--sal))"};
+    padding-right: #{"max(calc(var(--padding) * var(--space-factor)), var(--sar))"};
+    padding-bottom: #{"max(calc(var(--padding) * var(--space-factor)), var(--sab))"};
+  }
+}
