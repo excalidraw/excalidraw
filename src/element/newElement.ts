@@ -24,7 +24,6 @@ import { getResizedElementAbsoluteCoords } from "./bounds";
 import { getContainerElement, measureText } from "./textElement";
 import { isBoundToContainer } from "./typeChecks";
 import { BOUND_TEXT_PADDING } from "../constants";
-import Scene from "../scene/Scene";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -159,8 +158,8 @@ const getAdjustedDimensions = (
   baseline: number;
 } => {
   let maxWidth = null;
-  if (element.containerId) {
-    const container = Scene.getScene(element)!.getElement(element.containerId)!;
+  const container = getContainerElement(element);
+  if (container) {
     maxWidth = container.width - BOUND_TEXT_PADDING * 2;
   }
   const {
