@@ -66,7 +66,7 @@ import { hasStrokeColor } from "../scene/comparisons";
 import Scene from "../scene/Scene";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
-
+import { Consumer as SBConsumer } from "switchboard/packages/sdk/lib/cjs/packages/@react";
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -151,6 +151,55 @@ export const actionChangeStrokeColor = register({
           updateData({ openPopup: active ? "strokeColorPicker" : null })
         }
       />
+    </>
+  ),
+});
+
+export const actionShowStrokeToolTip = register({
+  name: "showStrokeToolTip",
+  perform: () => {
+    throw new Error("not implemented");
+  },
+  PanelComponent: () => (
+    <>
+      <SBConsumer>
+        {(sbState) => {
+          if (
+            sbState?.surfaces &&
+            sbState?.surfaces.strokeToolTip &&
+            sbState?.surfaces.strokeToolTip?.component?.active === true
+          ) {
+            return (
+              <p
+                style={{
+                  direction: "ltr",
+                  unicodeBidi: "embed",
+                  fontSize: "0.8em",
+                }}
+                id="strokeToolTip"
+              >
+                We redesigned the shape panel <br></br>to give you more stroke
+                styles &ensp;
+                <button
+                  type="button"
+                  style={{ alignSelf: "end" }}
+                  onClick={() => {
+                    const toolTip = document.getElementById("strokeToolTip");
+                    if (toolTip) {
+                      toolTip.style.display = "none";
+                      sbState.setComponentInactive(
+                        sbState.surfaces?.strokeToolTip.componentName,
+                      );
+                    }
+                  }}
+                >
+                  x
+                </button>
+              </p>
+            );
+          }
+        }}
+      </SBConsumer>
     </>
   ),
 });

@@ -14028,7 +14028,7 @@ svgo@^1.0.0, svgo@^1.2.2:
 
 "switchboard@ssh://git@github.com:switchboardcc/switchboard.git#main":
   version "0.0.0"
-  resolved "ssh://git@github.com:switchboardcc/switchboard.git#30bc38ef94b5888fbfd06940eaa6f2277dbd9cae"
+  resolved "ssh://git@github.com:switchboardcc/switchboard.git#eea209a28a03923c669af82195cf901c93fd0943"
   dependencies:
     dotenv-flow "^3.2.0"
     dotenv-flow-cli "^1.0.0"

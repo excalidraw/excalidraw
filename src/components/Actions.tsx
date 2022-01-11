@@ -64,6 +64,11 @@ export const SelectedShapeActions = ({
         elementType !== "image" &&
         commonSelectedType !== "image") ||
         targetElements.some((element) => hasStrokeColor(element.type))) &&
+        renderAction("showStrokeToolTip")}
+      {((hasStrokeColor(elementType) &&
+        elementType !== "image" &&
+        commonSelectedType !== "image") ||
+        targetElements.some((element) => hasStrokeColor(element.type))) &&
         renderAction("changeStrokeColor")}
       {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
       {showFillIcons && renderAction("changeFillStyle")}
