@@ -103,8 +103,8 @@
     "toggleTheme": "Design umschalten",
     "personalLib": "Persönliche Bibliothek",
     "excalidrawLib": "Excalidraw-Bibliothek",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Schrift verkleinern",
+    "increaseFontSize": "Schrift vergrößern"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
