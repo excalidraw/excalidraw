@@ -1649,7 +1649,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
+        (isWritableElement(event.target) &&
+          event.key !== KEYS.ESCAPE &&
+          // handle cmd/ctrl-modifier shortcuts even inside inputs
+          !event[KEYS.CTRL_OR_CMD]) ||
         // case: using arrows to move between buttons
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {
@@ -1911,8 +1914,8 @@ class App extends React.Component<AppProps, AppState> {
     const updateElement = (
       text: string,
       originalText: string,
-      isDeleted = false,
-      updateDimensions = false,
+      isDeleted: boolean,
+      isSubmit: boolean,
     ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
@@ -1924,7 +1927,7 @@ class App extends React.Component<AppProps, AppState> {
                 isDeleted,
                 originalText,
               },
-              updateDimensions,
+              isSubmit,
             );
           }
           return _element;
@@ -1950,7 +1953,7 @@ class App extends React.Component<AppProps, AppState> {
         ];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text, text, false, !element.containerId);
+        updateElement(text, text, false, false);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
@@ -1996,7 +1999,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text, element.originalText);
+    updateElement(element.text, element.originalText, false, false);
   }
 
   private deselectElements() {
