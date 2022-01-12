@@ -102,7 +102,9 @@
     "showBackground": "பின்னணி நிற எடுப்பானைக் காட்டு",
     "toggleTheme": "தோற்றத்தை நிலைமாற்று",
     "personalLib": "தனக்குரிய நூலகம்",
-    "excalidrawLib": "எக்ஸ்கேலிட்ரா நூலகம்"
+    "excalidrawLib": "எக்ஸ்கேலிட்ரா நூலகம்",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "கித்தானை அகரமாக்கு",
