@@ -102,7 +102,9 @@
     "showBackground": "إظهار منتقي لون الخلفية",
     "toggleTheme": "غير النمط",
     "personalLib": "المكتبة الشخصية",
-    "excalidrawLib": "مكتبتنا"
+    "excalidrawLib": "مكتبتنا",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
