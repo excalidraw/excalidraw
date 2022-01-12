@@ -102,7 +102,9 @@
     "showBackground": "Mostra el selector de color de fons",
     "toggleTheme": "Activa o desactiva el tema",
     "personalLib": "Biblioteca personal",
-    "excalidrawLib": "Biblioteca d'Excalidraw"
+    "excalidrawLib": "Biblioteca d'Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
