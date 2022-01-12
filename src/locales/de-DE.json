@@ -102,7 +102,9 @@
     "showBackground": "Hintergrundfarbe auswählen",
     "toggleTheme": "Design umschalten",
     "personalLib": "Persönliche Bibliothek",
-    "excalidrawLib": "Excalidraw-Bibliothek"
+    "excalidrawLib": "Excalidraw-Bibliothek",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
