@@ -102,7 +102,9 @@
     "showBackground": "Afișare selector culoare fundal",
     "toggleTheme": "Comutare temă",
     "personalLib": "Biblioteca personală",
-    "excalidrawLib": "Biblioteca Excalidraw"
+    "excalidrawLib": "Biblioteca Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Resetare pânză",
