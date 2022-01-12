@@ -103,8 +103,8 @@
     "toggleTheme": "Veksle tema",
     "personalLib": "Personlig bibliotek",
     "excalidrawLib": "Excalidraw-bibliotek",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Reduser skriftstørrelse",
+    "increaseFontSize": "Øk skriftstørrelse"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
