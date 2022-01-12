@@ -102,7 +102,9 @@
     "showBackground": "Rādīt fona krāsas atlasītāju",
     "toggleTheme": "Pārslēgt krāsu tēmu",
     "personalLib": "Personīgā bibliotēka",
-    "excalidrawLib": "Excalidraw bibliotēka"
+    "excalidrawLib": "Excalidraw bibliotēka",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
