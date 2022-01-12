@@ -102,7 +102,9 @@
     "showBackground": "Exibir seletor de cores do fundo",
     "toggleTheme": "Alternar tema",
     "personalLib": "Biblioteca Pessoal",
-    "excalidrawLib": "Biblioteca do Excalidraw"
+    "excalidrawLib": "Biblioteca do Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
