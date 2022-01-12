@@ -102,7 +102,9 @@
     "showBackground": "顯示背景檢色器",
     "toggleTheme": "切換主題",
     "personalLib": "個人資料庫",
-    "excalidrawLib": "Excalidraw 資料庫"
+    "excalidrawLib": "Excalidraw 資料庫",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
