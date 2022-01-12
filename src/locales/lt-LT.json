@@ -102,7 +102,9 @@
     "showBackground": "",
     "toggleTheme": "",
     "personalLib": "Asmeninė biblioteka",
-    "excalidrawLib": "Exaclidraw biblioteka"
+    "excalidrawLib": "Exaclidraw biblioteka",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "",
