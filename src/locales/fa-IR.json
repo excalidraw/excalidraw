@@ -102,7 +102,9 @@
     "showBackground": "نمایش انتخاب کننده رنگ پس زمینه",
     "toggleTheme": "تغییر تم",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
