@@ -102,7 +102,9 @@
     "showBackground": "显示背景颜色选择器",
     "toggleTheme": "切换主题",
     "personalLib": "个人素材库",
-    "excalidrawLib": "Excalidraw 素材库"
+    "excalidrawLib": "Excalidraw 素材库",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "重置画布",
