@@ -103,8 +103,8 @@
     "toggleTheme": "切換主題",
     "personalLib": "個人資料庫",
     "excalidrawLib": "Excalidraw 資料庫",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "縮小文字",
+    "increaseFontSize": "放大文字"
   },
   "buttons": {
     "clearReset": "重置 canvas",
