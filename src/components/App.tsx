@@ -3,6 +3,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 import { nanoid } from "nanoid";
+import * as JsSearch from "js-search";
 
 import {
   actionAddToLibrary,
@@ -25,6 +26,7 @@ import {
   actionSendToBack,
   actionToggleGridMode,
   actionToggleStats,
+  actionToggleTextSearch,
   actionToggleZenMode,
   actionUngroup,
 } from "../actions";
@@ -175,6 +177,7 @@ import {
   isOverScrollBars,
   isSomeElementSelected,
 } from "../scene";
+import { centerScrollOn } from "../scene/scroll";
 import Scene from "../scene/Scene";
 import { RenderConfig, ScrollBars } from "../scene/types";
 import { getNewZoom } from "../scene/zoom";
@@ -214,6 +217,7 @@ import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
+import { TextSearch } from "./TextSearch";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
   dataURLToFile,
@@ -257,6 +261,7 @@ let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
+let currentMatchedElementIdx = 0;
 let invalidateContextMenu = false;
 
 let lastPointerUp: ((event: any) => void) | null = null;
@@ -504,6 +509,15 @@ class App extends React.Component<AppProps, AppState> {
                 elements={this.scene.getElements()}
                 onClose={this.toggleStats}
                 renderCustomStats={renderCustomStats}
+              />
+            )}
+            {this.state.textSearchActive && (
+              <TextSearch
+                appState={this.state}
+                setAppState={this.setAppState}
+                elements={this.scene.getElements()}
+                onClose={this.toggleTextSearch}
+                onKeyUp={this.onKeyUp}
               />
             )}
             {this.state.toastMessage !== null && (
@@ -1510,6 +1524,17 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.executeAction(actionToggleStats);
   };
 
+  toggleTextSearch = () => {
+    this.scene.replaceAllElements(
+      this.scene
+        .getElements()
+        .filter(
+          (element) => !element.groupIds.includes("highlight_rectangles"),
+        ),
+    );
+    this.actionManager.executeAction(actionToggleTextSearch);
+  };
+
   scrollToContent = (
     target:
       | ExcalidrawElement
@@ -1830,6 +1855,89 @@ class App extends React.Component<AppProps, AppState> {
         ? bindOrUnbindSelectedElements(selectedElements)
         : unbindLinearElements(selectedElements);
       this.setState({ suggestedBindings: [] });
+    }
+
+    if (this.state.textSearchActive) {
+      const searchMatchText = this.state.searchMatchText;
+      const textElements = this.scene
+        .getElements()
+        .filter((element) => isTextElement(element));
+
+      const textMatchSearch = new JsSearch.Search("id");
+      textMatchSearch.addIndex("text");
+      textMatchSearch.addDocuments(textElements);
+
+      const matchedElements = textMatchSearch.search(searchMatchText);
+
+      this.scene.replaceAllElements(
+        this.scene
+          .getElements()
+          .filter(
+            (element) => !element.groupIds.includes("highlight_rectangles"),
+          ),
+      );
+
+      matchedElements.forEach((matchedElement) => {
+        const matchedElemJson = JSON.parse(JSON.stringify(matchedElement));
+        const matchHighlightRect = newElement({
+          type: "rectangle",
+          x: matchedElemJson.x - 2,
+          y: matchedElemJson.y,
+          width: matchedElemJson.width + 3,
+          height: matchedElemJson.height,
+          angle: matchedElemJson.angle,
+          strokeColor: "yellow",
+          backgroundColor: "yellow",
+          fillStyle: "solid",
+          strokeWidth: 1,
+          strokeStyle: "solid",
+          roughness: 0,
+          opacity: 50,
+          groupIds: ["highlight_rectangles"],
+          strokeSharpness: "sharp",
+        });
+
+        this.scene.replaceAllElements([
+          ...this.scene.getElementsIncludingDeleted(),
+          matchHighlightRect,
+        ]);
+      });
+
+      const matchedElementsJSON = matchedElements.map((elem) =>
+        JSON.parse(JSON.stringify(elem)),
+      );
+
+      if (event.key === KEYS.ENTER) {
+        if (currentMatchedElementIdx === matchedElementsJSON.length) {
+          currentMatchedElementIdx = 0;
+        }
+        this.setState({
+          ...centerScrollOn({
+            scenePoint: {
+              x: matchedElementsJSON[currentMatchedElementIdx].x,
+              y: matchedElementsJSON[currentMatchedElementIdx].y,
+            },
+            viewportDimensions: {
+              width: this.state.width,
+              height: this.state.height,
+            },
+            zoom: this.state.zoom,
+          }),
+        });
+        currentMatchedElementIdx++;
+      }
+
+      if (event.key === KEYS.ESCAPE) {
+        this.scene.replaceAllElements(
+          this.scene
+            .getElements()
+            .filter(
+              (element) => !element.groupIds.includes("highlight_rectangles"),
+            ),
+        );
+        this.setState({ searchMatchText: "" });
+        this.setState({ textSearchActive: false });
+      }
     }
   });
 

@@ -32,6 +32,8 @@ import { getDefaultAppState } from "../appState";
 import { MAX_DECIMALS_FOR_SVG_EXPORT, MIME_TYPES, SVG_NS } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import { getApproxLineHeight } from "../element/textElement";
+//import * as JsSearch from "js-search";
+//import { mutateElement } from "../element/mutateElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
