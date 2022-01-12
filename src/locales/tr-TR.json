@@ -102,7 +102,9 @@
     "showBackground": "Arkaplan için renk seçiciyi göster",
     "toggleTheme": "Temayı etkinleştir/devre dışı bırak",
     "personalLib": "Kişisel Kitaplık",
-    "excalidrawLib": "Excalidraw Kitaplığı"
+    "excalidrawLib": "Excalidraw Kitaplığı",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
