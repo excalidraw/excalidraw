@@ -102,7 +102,9 @@
     "showBackground": "Mostrar el selector de color de fondo",
     "toggleTheme": "Alternar tema",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
