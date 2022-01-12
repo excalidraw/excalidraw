@@ -103,8 +103,8 @@
     "toggleTheme": "Alternar tema",
     "personalLib": "Biblioteca Pessoal",
     "excalidrawLib": "Biblioteca do Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Diminuir o tamanho da fonte",
+    "increaseFontSize": "Aumentar o tamanho da fonte"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
