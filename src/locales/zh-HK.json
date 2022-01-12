@@ -102,7 +102,9 @@
     "showBackground": "",
     "toggleTheme": "",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "清空畫布",
