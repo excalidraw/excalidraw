@@ -102,7 +102,9 @@
     "showBackground": "Показати палітру для фону",
     "toggleTheme": "Перемкнути тему",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
