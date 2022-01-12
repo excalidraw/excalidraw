@@ -102,7 +102,9 @@
     "showBackground": "Показать выбор цвета фона",
     "toggleTheme": "Переключить тему",
     "personalLib": "Личная библиотека",
-    "excalidrawLib": "Библиотека Excalidraw"
+    "excalidrawLib": "Библиотека Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
