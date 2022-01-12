@@ -102,7 +102,9 @@
     "showBackground": "Näytä taustavärin valitsin",
     "toggleTheme": "Vaihda teema",
     "personalLib": "Oma kirjasto",
-    "excalidrawLib": "Excalidraw kirjasto"
+    "excalidrawLib": "Excalidraw kirjasto",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
