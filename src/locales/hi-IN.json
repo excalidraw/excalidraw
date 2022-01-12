@@ -102,7 +102,9 @@
     "showBackground": "",
     "toggleTheme": "",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
