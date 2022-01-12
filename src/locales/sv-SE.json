@@ -102,7 +102,9 @@
     "showBackground": "Visa färgväljare för bakgrundsfärg",
     "toggleTheme": "Växla tema",
     "personalLib": "Personligt bibliotek",
-    "excalidrawLib": "Excalidraw bibliotek"
+    "excalidrawLib": "Excalidraw bibliotek",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
