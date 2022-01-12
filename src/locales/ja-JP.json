@@ -102,7 +102,9 @@
     "showBackground": "背景色ピッカーを表示",
     "toggleTheme": "テーマの切り替え",
     "personalLib": "個人ライブラリ",
-    "excalidrawLib": "Excalidrawライブラリ"
+    "excalidrawLib": "Excalidrawライブラリ",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
