@@ -103,8 +103,8 @@
     "toggleTheme": "Comutare temă",
     "personalLib": "Biblioteca personală",
     "excalidrawLib": "Biblioteca Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Micșorează dimensiunea fontului",
+    "increaseFontSize": "Mărește dimensiunea fontului"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
