@@ -102,7 +102,9 @@
     "showBackground": "Mostrar lo selector de color de fons",
     "toggleTheme": "Alternar tèma",
     "personalLib": "Bibliotèca personala",
-    "excalidrawLib": "Bibliotèca Excalidraw"
+    "excalidrawLib": "Bibliotèca Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
