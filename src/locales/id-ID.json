@@ -102,7 +102,9 @@
     "showBackground": "Tampilkan latar pengambil warna",
     "toggleTheme": "Ubah tema",
     "personalLib": "Pustaka Pribadi",
-    "excalidrawLib": "Pustaka Excalidraw"
+    "excalidrawLib": "Pustaka Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
