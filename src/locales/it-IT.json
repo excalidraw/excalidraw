@@ -102,7 +102,9 @@
     "showBackground": "Mostra selettore colore di sfondo",
     "toggleTheme": "Cambia tema",
     "personalLib": "Libreria Personale",
-    "excalidrawLib": "Libreria di Excalidraw"
+    "excalidrawLib": "Libreria di Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Svuota la tela",
