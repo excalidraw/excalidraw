@@ -102,7 +102,9 @@
     "showBackground": "Zobraziť výber farby pre pozadie",
     "toggleTheme": "Prepnúť tému",
     "personalLib": "Moja knižnica",
-    "excalidrawLib": "Excalidraw knižnica"
+    "excalidrawLib": "Excalidraw knižnica",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
