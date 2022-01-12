@@ -103,8 +103,8 @@
     "toggleTheme": "Changer le thème",
     "personalLib": "Bibliothèque personnelle",
     "excalidrawLib": "Bibliothèque Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Réduire la taille de police",
+    "increaseFontSize": "Augmenter la taille de police"
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
