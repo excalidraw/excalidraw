@@ -102,7 +102,9 @@
     "showBackground": "Erakutsi atzeko planoaren kolore-hautatzailea",
     "toggleTheme": "Aldatu gaia",
     "personalLib": "Liburutegi pertsonala",
-    "excalidrawLib": "Excalidraw liburutegia"
+    "excalidrawLib": "Excalidraw liburutegia",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Garbitu oihala",
