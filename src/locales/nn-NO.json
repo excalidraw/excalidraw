@@ -102,7 +102,9 @@
     "showBackground": "Vis fargeveljar for bakgrunn",
     "toggleTheme": "Veksle tema",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
