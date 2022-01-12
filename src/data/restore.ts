@@ -136,7 +136,7 @@ const restoreElement = (
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
-        originalText: element.originalText ?? "",
+        originalText: element.originalText || element.text,
       });
     case "freedraw": {
       return restoreElementWithProperties(element, {
