@@ -103,8 +103,8 @@
     "toggleTheme": "切换主题",
     "personalLib": "个人素材库",
     "excalidrawLib": "Excalidraw 素材库",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "缩小字体大小",
+    "increaseFontSize": "放大字体大小"
   },
   "buttons": {
     "clearReset": "重置画布",
