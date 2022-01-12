@@ -102,7 +102,9 @@
     "showBackground": "Vis fargevelger for bakgrunnsfarge",
     "toggleTheme": "Veksle tema",
     "personalLib": "Personlig bibliotek",
-    "excalidrawLib": "Excalidraw-bibliotek"
+    "excalidrawLib": "Excalidraw-bibliotek",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
