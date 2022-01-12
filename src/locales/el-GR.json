@@ -102,7 +102,9 @@
     "showBackground": "Εμφάνιση επιλογέα χρώματος φόντου",
     "toggleTheme": "Εναλλαγή θέματος",
     "personalLib": "Προσωπική Βιβλιοθήκη",
-    "excalidrawLib": "Βιβλιοθήκη Excalidraw"
+    "excalidrawLib": "Βιβλιοθήκη Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
