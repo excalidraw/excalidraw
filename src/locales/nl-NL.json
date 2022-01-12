@@ -102,7 +102,9 @@
     "showBackground": "Toon achtergrondkleur kiezer",
     "toggleTheme": "Thema aan/uit",
     "personalLib": "Persoonlijke bibliotheek",
-    "excalidrawLib": "Excalidraw bibliotheek"
+    "excalidrawLib": "Excalidraw bibliotheek",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
