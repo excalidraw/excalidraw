@@ -102,7 +102,9 @@
     "showBackground": "",
     "toggleTheme": "Přepnout tmavý řežim",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "",
