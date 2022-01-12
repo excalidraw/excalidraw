@@ -102,7 +102,9 @@
     "showBackground": "Afficher le sélecteur de couleur d'arrière-plan",
     "toggleTheme": "Changer le thème",
     "personalLib": "Bibliothèque personnelle",
-    "excalidrawLib": "Bibliothèque Excalidraw"
+    "excalidrawLib": "Bibliothèque Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
