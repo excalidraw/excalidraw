@@ -102,7 +102,9 @@
     "showBackground": "Beqqeḍ amelqaḍ n yini n ugilal",
     "toggleTheme": "Snifel asentel",
     "personalLib": "Tamkarḍit tudmawant",
-    "excalidrawLib": "Tamkarḍit n Excalidraw"
+    "excalidrawLib": "Tamkarḍit n Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
