@@ -102,7 +102,9 @@
     "showBackground": "Pokaż próbnik koloru tła",
     "toggleTheme": "Przełącz motyw",
     "personalLib": "Biblioteka prywatna",
-    "excalidrawLib": "Biblioteka Excalidraw"
+    "excalidrawLib": "Biblioteka Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
