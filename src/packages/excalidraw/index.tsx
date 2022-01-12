@@ -17,7 +17,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     initialData,
     excalidrawRef,
     onCollabButtonClick,
-    isCollaborating,
+    isCollaborating = false,
     onPointerUpdate,
     renderTopRightUI,
     renderFooter,

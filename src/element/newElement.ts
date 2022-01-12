@@ -21,7 +21,7 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
-import { measureText } from "./textElement";
+import { measureText, wrapText } from "./textElement";
 import { isBoundToContainer } from "./typeChecks";
 import Scene from "../scene/Scene";
 import { BOUND_TEXT_PADDING } from "../constants";
@@ -248,15 +248,23 @@ export const updateTextElement = (
     text,
     isDeleted,
     originalText,
-  }: { text: string; isDeleted?: boolean; originalText: string },
+  }: {
+    text: string;
+    isDeleted?: boolean;
+    originalText: string;
+  },
 
   isSubmit: boolean,
+  isCollaborating: boolean,
 ): ExcalidrawTextElement => {
   const boundToContainer = isBoundToContainer(element);
-
+  if (boundToContainer && isCollaborating) {
+    const container = Scene.getScene(element)!.getElement(element.containerId);
+    text = wrapText(text, getFontString(element), container!.width);
+  }
   // Don't update dimensions and text value for bounded text unless submitted
   const dimensions =
-    boundToContainer && !isSubmit
+    boundToContainer && !isSubmit && !isCollaborating
       ? undefined
       : getAdjustedDimensions(element, text);
   return newElementWith(element, {
