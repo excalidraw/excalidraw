@@ -5,7 +5,10 @@ import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { KEYS } from "../keys";
 import { fireEvent } from "../tests/test-utils";
 import { BOUND_TEXT_PADDING, FONT_FAMILY } from "../constants";
-import { ExcalidrawTextElementWithContainer } from "./types";
+import {
+  ExcalidrawTextElement,
+  ExcalidrawTextElementWithContainer,
+} from "./types";
 import * as textElementUtils from "./textElement";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -16,12 +19,13 @@ const mouse = new Pointer("mouse");
 describe("textWysiwyg", () => {
   describe("Test unbounded text", () => {
     let textarea: HTMLTextAreaElement;
+    let textElement: ExcalidrawTextElement;
     beforeEach(async () => {
       await render(<ExcalidrawApp />);
 
-      const element = UI.createElement("text");
+      textElement = UI.createElement("text");
 
-      mouse.clickOn(element);
+      mouse.clickOn(textElement);
       textarea = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       )!;
@@ -171,7 +175,30 @@ describe("textWysiwyg", () => {
 
       expect(textarea.value).toEqual(`Line#1\nLine#2`);
     });
+
+    it("resizing text via shortcuts while in wysiwyg", () => {
+      textarea.value = "abc def";
+      const origFontSize = textElement.fontSize;
+      textarea.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: KEYS.CHEVRON_RIGHT,
+          ctrlKey: true,
+          shiftKey: true,
+        }),
+      );
+      expect(textElement.fontSize).toBe(origFontSize * 1.1);
+
+      textarea.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: KEYS.CHEVRON_LEFT,
+          ctrlKey: true,
+          shiftKey: true,
+        }),
+      );
+      expect(textElement.fontSize).toBe(origFontSize);
+    });
   });
+
   describe("Test bounded text", () => {
     let rectangle: any;
     const {
