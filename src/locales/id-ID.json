@@ -103,8 +103,8 @@
     "toggleTheme": "Ubah tema",
     "personalLib": "Pustaka Pribadi",
     "excalidrawLib": "Pustaka Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Kecilkan ukuran font",
+    "increaseFontSize": "Besarkan ukuran font"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
