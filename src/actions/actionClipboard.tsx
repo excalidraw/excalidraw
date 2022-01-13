@@ -25,7 +25,7 @@ export const actionCut = register({
   name: "cut",
   perform: (elements, appState, data, app) => {
     actionCopy.perform(elements, appState, data, app);
-    return actionDeleteSelected.perform(elements, appState, data, app);
+    return actionDeleteSelected.perform(elements, appState);
   },
   contextItemLabel: "labels.cut",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.X,
@@ -42,6 +42,7 @@ export const actionCopyAsSvg = register({
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
+      true,
     );
     try {
       await exportCanvas(
@@ -81,6 +82,7 @@ export const actionCopyAsPng = register({
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
+      true,
     );
     try {
       await exportCanvas(

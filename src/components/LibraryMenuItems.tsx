@@ -52,7 +52,7 @@ const LibraryMenuItems = ({
   library: Library;
   id: string;
   selectedItems: LibraryItem["id"][];
-  onToggle: (id: LibraryItem["id"]) => void;
+  onToggle: (id: LibraryItem["id"], event: React.MouseEvent) => void;
   onPublish: () => void;
   resetLibrary: () => void;
 }) => {
@@ -213,10 +213,8 @@ const LibraryMenuItems = ({
           onClick={params.onClick || (() => {})}
           id={params.item?.id || null}
           selected={!!params.item?.id && selectedItems.includes(params.item.id)}
-          onToggle={() => {
-            if (params.item?.id) {
-              onToggle(params.item.id);
-            }
+          onToggle={(id, event) => {
+            onToggle(id, event);
           }}
         />
       </Stack.Col>

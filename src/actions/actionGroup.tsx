@@ -1,6 +1,6 @@
 import { CODES, KEYS } from "../keys";
 import { t } from "../i18n";
-import { getShortcutKey } from "../utils";
+import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 import { UngroupIcon, GroupIcon } from "../components/icons";
 import { newElementWith } from "../element/mutateElement";
@@ -17,8 +17,9 @@ import {
 import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
 import { ToolButton } from "../components/ToolButton";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { AppState } from "../types";
+import { isBoundToContainer } from "../element/typeChecks";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -44,6 +45,7 @@ const enableActionGroup = (
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
     appState,
+    true,
   );
   return (
     selectedElements.length >= 2 && !allElementsInSameGroup(selectedElements)
@@ -56,6 +58,7 @@ export const actionGroup = register({
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
+      true,
     );
     if (selectedElements.length < 2) {
       // nothing to group
@@ -83,8 +86,9 @@ export const actionGroup = register({
       }
     }
     const newGroupId = randomId();
+    const selectElementIds = arrayToMap(selectedElements);
     const updatedElements = elements.map((element) => {
-      if (!appState.selectedElementIds[element.id]) {
+      if (!selectElementIds.get(element.id)) {
         return element;
       }
       return newElementWith(element, {
@@ -148,7 +152,12 @@ export const actionUngroup = register({
     if (groupIds.length === 0) {
       return { appState, elements, commitToHistory: false };
     }
+
+    const boundTextElementIds: ExcalidrawTextElement["id"][] = [];
     const nextElements = elements.map((element) => {
+      if (isBoundToContainer(element)) {
+        boundTextElementIds.push(element.id);
+      }
       const nextGroupIds = removeFromSelectedGroups(
         element.groupIds,
         appState.selectedGroupIds,
@@ -160,11 +169,19 @@ export const actionUngroup = register({
         groupIds: nextGroupIds,
       });
     });
+
+    const updateAppState = selectGroupsForSelectedElements(
+      { ...appState, selectedGroupIds: {} },
+      getNonDeletedElements(nextElements),
+    );
+
+    // remove binded text elements from selection
+    boundTextElementIds.forEach(
+      (id) => (updateAppState.selectedElementIds[id] = false),
+    );
     return {
-      appState: selectGroupsForSelectedElements(
-        { ...appState, selectedGroupIds: {} },
-        getNonDeletedElements(nextElements),
-      ),
+      appState: updateAppState,
+
       elements: nextElements,
       commitToHistory: true,
     };

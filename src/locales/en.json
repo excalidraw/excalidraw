@@ -102,7 +102,9 @@
     "showBackground": "Show background color picker",
     "toggleTheme": "Toggle theme",
     "personalLib": "Personal Library",
-    "excalidrawLib": "Excalidraw Library"
+    "excalidrawLib": "Excalidraw Library",
+    "decreaseFontSize": "Decrease font size",
+    "increaseFontSize": "Increase font size"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -204,10 +206,12 @@
     "resizeImage": "You can resize freely by holding SHIFT,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating",
     "lineEditor_info": "Double-click or press Enter to edit points",
-    "lineEditor_pointSelected": "Press Delete to remove point, CtrlOrCmd+D to duplicate, or drag to move",
-    "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points",
+    "lineEditor_pointSelected": "Press Delete to remove point(s),\nCtrlOrCmd+D to duplicate, or drag to move",
+    "lineEditor_nothingSelected": "Select a point to edit (hold SHIFT to select multiple),\nor hold Alt and click to add new points",
     "placeImage": "Click to place the image, or click and drag to set its size manually",
-    "publishLibrary": "Publish your own library"
+    "publishLibrary": "Publish your own library",
+    "bindTextToElement": "Press enter to add text",
+    "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Read our blog",
     "click": "click",
+    "deepSelect": "Deep select",
+    "deepBoxSelect": "Deep select within box, and prevent dragging",
     "curvedArrow": "Curved arrow",
     "curvedLine": "Curved line",
     "documentation": "Documentation",

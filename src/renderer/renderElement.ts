@@ -22,6 +22,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
+
 import { RenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { isPathALoop } from "../math";
@@ -30,6 +31,7 @@ import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import { MAX_DECIMALS_FOR_SVG_EXPORT, MIME_TYPES, SVG_NS } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
+import { getApproxLineHeight } from "../element/textElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -87,12 +89,7 @@ const generateElementCanvas = (
   let canvasOffsetY = 0;
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-
-    x1 = Math.floor(x1);
-    x2 = Math.ceil(x2);
-    y1 = Math.floor(y1);
-    y2 = Math.ceil(y2);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
     canvas.width =
       distance(x1, x2) * window.devicePixelRatio * zoom.value +
@@ -103,16 +100,12 @@ const generateElementCanvas = (
 
     canvasOffsetX =
       element.x > x1
-        ? Math.floor(distance(element.x, x1)) *
-          window.devicePixelRatio *
-          zoom.value
+        ? distance(element.x, x1) * window.devicePixelRatio * zoom.value
         : 0;
 
     canvasOffsetY =
       element.y > y1
-        ? Math.floor(distance(element.y, y1)) *
-          window.devicePixelRatio *
-          zoom.value
+        ? distance(element.y, y1) * window.devicePixelRatio * zoom.value
         : 0;
 
     context.translate(canvasOffsetX, canvasOffsetY);
@@ -261,7 +254,9 @@ const drawElementOnCanvas = (
 
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        const lineHeight = element.height / lines.length;
+        const lineHeight = element.containerId
+          ? getApproxLineHeight(getFontString(element))
+          : element.height / lines.length;
         const verticalOffset = element.height - element.baseline;
         const horizontalOffset =
           element.textAlign === "center"
@@ -333,8 +328,6 @@ export const generateRoughOptions = (
     roughness: element.roughness,
     stroke: element.strokeColor,
     preserveVertices: continuousPath,
-    // disable decimals to fix Skia rendering issues #4046
-    fixedDecimalPlaceDigits: 0,
   };
 
   switch (element.type) {
@@ -411,15 +404,45 @@ const generateElementShape = (
       case "diamond": {
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
           getDiamondPoints(element);
-        shape = generator.polygon(
-          [
-            [topX, topY],
-            [rightX, rightY],
-            [bottomX, bottomY],
-            [leftX, leftY],
-          ],
-          generateRoughOptions(element),
-        );
+        if (element.strokeSharpness === "round") {
+          shape = generator.path(
+            `M ${topX + (rightX - topX) * 0.25} ${
+              topY + (rightY - topY) * 0.25
+            } L ${rightX - (rightX - topX) * 0.25} ${
+              rightY - (rightY - topY) * 0.25
+            } 
+            C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
+              rightX - (rightX - bottomX) * 0.25
+            } ${rightY + (bottomY - rightY) * 0.25} 
+            L ${bottomX + (rightX - bottomX) * 0.25} ${
+              bottomY - (bottomY - rightY) * 0.25
+            }  
+            C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
+              bottomX - (bottomX - leftX) * 0.25
+            } ${bottomY - (bottomY - leftY) * 0.25} 
+            L ${leftX + (bottomX - leftX) * 0.25} ${
+              leftY + (bottomY - leftY) * 0.25
+            } 
+            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${
+              leftX + (topX - leftX) * 0.25
+            } ${leftY - (leftY - topY) * 0.25} 
+            L ${topX - (topX - leftX) * 0.25} ${topY + (leftY - topY) * 0.25} 
+            C ${topX} ${topY}, ${topX} ${topY}, ${
+              topX + (rightX - topX) * 0.25
+            } ${topY + (rightY - topY) * 0.25}`,
+            generateRoughOptions(element, true),
+          );
+        } else {
+          shape = generator.polygon(
+            [
+              [topX, topY],
+              [rightX, rightY],
+              [bottomX, bottomY],
+              [leftX, leftY],
+            ],
+            generateRoughOptions(element),
+          );
+        }
         break;
       }
       case "ellipse":

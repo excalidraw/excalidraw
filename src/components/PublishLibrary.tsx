@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useEffect, useState } from "react";
-import oc from "open-color";
+import OpenColor from "open-color";
 
 import { Dialog } from "./Dialog";
 import { t } from "../i18n";
@@ -7,16 +7,19 @@ import { t } from "../i18n";
 import { ToolButton } from "./ToolButton";
 
 import { AppState, LibraryItems, LibraryItem } from "../types";
-import { exportToBlob } from "../packages/utils";
-import { EXPORT_DATA_TYPES, EXPORT_SOURCE, VERSIONS } from "../constants";
+import { exportToCanvas } from "../packages/utils";
+import {
+  EXPORT_DATA_TYPES,
+  EXPORT_SOURCE,
+  MIME_TYPES,
+  VERSIONS,
+} from "../constants";
 import { ExportedLibraryData } from "../data/types";
 
 import "./PublishLibrary.scss";
-import { ExcalidrawElement } from "../element/types";
-import { newElement } from "../element";
-import { mutateElement } from "../element/mutateElement";
-import { getCommonBoundingBox } from "../element/bounds";
 import SingleLibraryItem from "./SingleLibraryItem";
+import { canvasToBlob, resizeImageFile } from "../data/blob";
+import { chunk } from "../utils";
 
 interface PublishLibraryDataParams {
   authorName: string;
@@ -53,6 +56,75 @@ const importPublishLibDataFromStorage = () => {
   }
 
   return null;
+};
+
+const generatePreviewImage = async (libraryItems: LibraryItems) => {
+  const MAX_ITEMS_PER_ROW = 6;
+  const BOX_SIZE = 128;
+  const BOX_PADDING = Math.round(BOX_SIZE / 16);
+  const BORDER_WIDTH = Math.max(Math.round(BOX_SIZE / 64), 2);
+
+  const rows = chunk(libraryItems, MAX_ITEMS_PER_ROW);
+
+  const canvas = document.createElement("canvas");
+
+  canvas.width =
+    rows[0].length * BOX_SIZE +
+    (rows[0].length + 1) * (BOX_PADDING * 2) -
+    BOX_PADDING * 2;
+  canvas.height =
+    rows.length * BOX_SIZE +
+    (rows.length + 1) * (BOX_PADDING * 2) -
+    BOX_PADDING * 2;
+
+  const ctx = canvas.getContext("2d")!;
+
+  ctx.fillStyle = OpenColor.white;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // draw items
+  // ---------------------------------------------------------------------------
+  for (const [index, item] of libraryItems.entries()) {
+    const itemCanvas = await exportToCanvas({
+      elements: item.elements,
+      files: null,
+      maxWidthOrHeight: BOX_SIZE,
+    });
+
+    const { width, height } = itemCanvas;
+
+    // draw item
+    // -------------------------------------------------------------------------
+    const rowOffset =
+      Math.floor(index / MAX_ITEMS_PER_ROW) * (BOX_SIZE + BOX_PADDING * 2);
+    const colOffset =
+      (index % MAX_ITEMS_PER_ROW) * (BOX_SIZE + BOX_PADDING * 2);
+
+    ctx.drawImage(
+      itemCanvas,
+      colOffset + (BOX_SIZE - width) / 2 + BOX_PADDING,
+      rowOffset + (BOX_SIZE - height) / 2 + BOX_PADDING,
+    );
+
+    // draw item border
+    // -------------------------------------------------------------------------
+    ctx.lineWidth = BORDER_WIDTH;
+    ctx.strokeStyle = OpenColor.gray[4];
+    ctx.strokeRect(
+      colOffset + BOX_PADDING / 2,
+      rowOffset + BOX_PADDING / 2,
+      BOX_SIZE + BOX_PADDING,
+      BOX_SIZE + BOX_PADDING,
+    );
+  }
+
+  return await resizeImageFile(
+    new File([await canvasToBlob(canvas)], "preview", { type: MIME_TYPES.png }),
+    {
+      outputType: MIME_TYPES.jpg,
+      maxWidthOrHeight: 5000,
+    },
+  );
 };
 
 const PublishLibrary = ({
@@ -129,55 +201,8 @@ const PublishLibrary = ({
       setIsSubmitting(false);
       return;
     }
-    const elements: ExcalidrawElement[] = [];
-    const prevBoundingBox = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
-    clonedLibItems.forEach((libItem) => {
-      const boundingBox = getCommonBoundingBox(libItem.elements);
-      const width = boundingBox.maxX - boundingBox.minX + 30;
-      const height = boundingBox.maxY - boundingBox.minY + 30;
-      const offset = {
-        x: prevBoundingBox.maxX - boundingBox.minX,
-        y: prevBoundingBox.maxY - boundingBox.minY,
-      };
 
-      const itemsWithUpdatedCoords = libItem.elements.map((element) => {
-        element = mutateElement(element, {
-          x: element.x + offset.x + 15,
-          y: element.y + offset.y + 15,
-        });
-        return element;
-      });
-      const items = [
-        ...itemsWithUpdatedCoords,
-        newElement({
-          type: "rectangle",
-          width,
-          height,
-          x: prevBoundingBox.maxX,
-          y: prevBoundingBox.maxY,
-          strokeColor: "#ced4da",
-          backgroundColor: "transparent",
-          strokeStyle: "solid",
-          opacity: 100,
-          roughness: 0,
-          strokeSharpness: "sharp",
-          fillStyle: "solid",
-          strokeWidth: 1,
-        }),
-      ];
-      elements.push(...items);
-      prevBoundingBox.maxX = prevBoundingBox.maxX + width + 30;
-    });
-    const png = await exportToBlob({
-      elements,
-      mimeType: "image/png",
-      appState: {
-        ...appState,
-        viewBackgroundColor: oc.white,
-        exportBackground: true,
-      },
-      files: null,
-    });
+    const previewImage = await generatePreviewImage(clonedLibItems);
 
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
@@ -190,7 +215,8 @@ const PublishLibrary = ({
 
     const formData = new FormData();
     formData.append("excalidrawLib", lib);
-    formData.append("excalidrawPng", png!);
+    formData.append("previewImage", previewImage);
+    formData.append("previewImageType", previewImage.type);
     formData.append("title", libraryData.name);
     formData.append("authorName", libraryData.authorName);
     formData.append("githubHandle", libraryData.githubHandle);

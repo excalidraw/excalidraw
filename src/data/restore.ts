@@ -10,11 +10,7 @@ import {
   NormalizedZoomValue,
 } from "../types";
 import { ImportedDataState } from "./types";
-import {
-  getElementMap,
-  getNormalizedDimensions,
-  isInvisiblySmallElement,
-} from "../element";
+import { getNormalizedDimensions, isInvisiblySmallElement } from "../element";
 import { isLinearElementType } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
@@ -27,6 +23,7 @@ import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp } from "../utils";
+import { arrayToMap } from "../utils";
 
 type RestoredAppState = Omit<
   AppState,
@@ -67,7 +64,10 @@ const restoreElementWithProperties = <
   T extends ExcalidrawElement,
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
-  element: Required<T>,
+  element: Required<T> & {
+    /** @deprecated */
+    boundElementIds?: readonly ExcalidrawElement["id"][];
+  },
   extra: Pick<
     T,
     // This extra Pick<T, keyof K> ensure no excess properties are passed.
@@ -101,7 +101,9 @@ const restoreElementWithProperties = <
     strokeSharpness:
       element.strokeSharpness ??
       (isLinearElementType(element.type) ? "round" : "sharp"),
-    boundElementIds: element.boundElementIds ?? [],
+    boundElements: element.boundElementIds
+      ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
+      : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
   };
 
@@ -133,6 +135,8 @@ const restoreElement = (
         baseline: element.baseline,
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
+        containerId: element.containerId ?? null,
+        originalText: element.originalText || element.text,
       });
     case "freedraw": {
       return restoreElementWithProperties(element, {
@@ -206,14 +210,14 @@ export const restoreElements = (
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
 ): ExcalidrawElement[] => {
-  const localElementsMap = localElements ? getElementMap(localElements) : null;
+  const localElementsMap = localElements ? arrayToMap(localElements) : null;
   return (elements || []).reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
     // and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
       let migratedElement: ExcalidrawElement | null = restoreElement(element);
       if (migratedElement) {
-        const localElement = localElementsMap?.[element.id];
+        const localElement = localElementsMap?.get(element.id);
         if (localElement && localElement.version > migratedElement.version) {
           migratedElement = bumpVersion(migratedElement, localElement.version);
         }

@@ -1,0 +1,112 @@
+@import "open-color/open-color.scss";
+
+@mixin toolbarButtonColorStates {
+  .ToolIcon_type_radio,
+  .ToolIcon_type_checkbox {
+    & + .ToolIcon__icon:active {
+      background: var(--color-primary-light);
+    }
+    &:checked + .ToolIcon__icon {
+      background: var(--color-primary);
+      --icon-fill-color: #{$oc-white};
+      --keybinding-color: #{$oc-white};
+    }
+    &:checked + .ToolIcon__icon:active {
+      background: var(--color-primary-darker);
+    }
+  }
+
+  .ToolIcon__keybinding {
+    bottom: 4px;
+    right: 4px;
+  }
+}
+
+.excalidraw {
+  .App-toolbar-container {
+    .ToolIcon_type_floating {
+      @include toolbarButtonColorStates;
+
+      &:not(.is-mobile) {
+        .ToolIcon__icon {
+          padding: 1px;
+          background-color: var(--island-bg-color);
+          box-shadow: 1px 3px 4px 0px rgb(0 0 0 / 15%);
+          border-radius: 50%;
+          transition: box-shadow 0.5s ease, transform 0.5s ease;
+        }
+      }
+
+      .ToolIcon_type_radio,
+      .ToolIcon_type_checkbox {
+        &:focus-within + .ToolIcon__icon {
+          // override for custom floating button shadow
+          box-shadow: 0 0 0 2px var(--focus-highlight-color);
+        }
+      }
+    }
+
+    .ToolIcon.ToolIcon__lock {
+      margin-inline-end: var(--space-factor);
+      &.ToolIcon_type_floating {
+        margin-left: 0.1rem;
+      }
+    }
+
+    .ToolIcon__library {
+      margin-inline-start: var(--space-factor);
+    }
+
+    &.zen-mode {
+      .ToolIcon_type_floating {
+        .ToolIcon__icon {
+          box-shadow: none;
+          transform: scale(0.9);
+        }
+        .ToolIcon_type_checkbox:not(:checked):not(:hover):not(:active) {
+          & + .ToolIcon__icon {
+            svg {
+              fill: $oc-gray-5;
+              color: $oc-gray-5;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .App-toolbar {
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.01), 1px 1px 5px rgb(0 0 0 / 15%);
+
+    .ToolIcon {
+      &:hover {
+        --icon-fill-color: var(--color-primary-chubb);
+        --keybinding-color: var(--color-primary-chubb);
+      }
+      &:active {
+        --icon-fill-color: #{$oc-gray-9};
+        --keybinding-color: #{$oc-gray-9};
+      }
+
+      .ToolIcon__icon {
+        background: transparent;
+        border-radius: var(--border-radius-lg);
+      }
+
+      @include toolbarButtonColorStates;
+    }
+
+    &.zen-mode {
+      .ToolIcon__keybinding,
+      .HintViewer {
+        display: none;
+      }
+    }
+  }
+
+  &.theme--dark .App-toolbar .ToolIcon:active {
+    --icon-fill-color: #{$oc-gray-3};
+    --keybinding-color: #{$oc-gray-3};
+  }
+}

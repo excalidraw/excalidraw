@@ -106,10 +106,6 @@ export const EXPORT_DATA_TYPES = {
 
 export const EXPORT_SOURCE = window.location.origin;
 
-export const STORAGE_KEYS = {
-  LOCAL_STORAGE_LIBRARY: "excalidraw-library",
-} as const;
-
 // time in milliseconds
 export const IMAGE_RENDER_TIMEOUT = 500;
 export const TAP_TWICE_TIMEOUT = 300;
@@ -181,3 +177,5 @@ export const VERSIONS = {
   excalidraw: 2,
   excalidrawLibrary: 2,
 } as const;
+
+export const BOUND_TEXT_PADDING = 5;

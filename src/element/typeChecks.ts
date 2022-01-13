@@ -7,6 +7,7 @@ import {
   ExcalidrawFreeDrawElement,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
+  ExcalidrawTextElementWithContainer,
 } from "./types";
 
 export const isGenericElement = (
@@ -85,7 +86,18 @@ export const isBindableElement = (
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
-      element.type === "text")
+      element.type === "image" ||
+      (element.type === "text" && !element.containerId))
+  );
+};
+
+export const isTextBindableContainer = (element: ExcalidrawElement | null) => {
+  return (
+    element != null &&
+    (element.type === "rectangle" ||
+      element.type === "diamond" ||
+      element.type === "ellipse" ||
+      element.type === "image")
   );
 };
 
@@ -98,5 +110,22 @@ export const isExcalidrawElement = (element: any): boolean => {
     element?.type === "arrow" ||
     element?.type === "freedraw" ||
     element?.type === "line"
+  );
+};
+
+export const hasBoundTextElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawBindableElement => {
+  return (
+    isBindableElement(element) &&
+    !!element.boundElements?.some(({ type }) => type === "text")
+  );
+};
+
+export const isBoundToContainer = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawTextElementWithContainer => {
+  return (
+    element !== null && isTextElement(element) && element.containerId !== null
   );
 };

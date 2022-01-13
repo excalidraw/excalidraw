@@ -120,8 +120,10 @@ import {
 } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
+  hasBoundTextElement,
   isBindingElement,
   isBindingElementType,
+  isBoundToContainer,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -194,6 +196,7 @@ import {
 import {
   debounce,
   distance,
+  getFontString,
   getNearestScrollableContainer,
   isInputLike,
   isToolIcon,
@@ -228,6 +231,13 @@ import {
 } from "../element/image";
 import throttle from "lodash.throttle";
 import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
+import {
+  bindTextToShapeAfterDuplication,
+  getApproxMinLineHeight,
+  getApproxMinLineWidth,
+  getBoundTextElementId,
+} from "../element/textElement";
+import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -908,8 +918,16 @@ class App extends React.Component<AppProps, AppState> {
     window.removeEventListener(EVENT.RESIZE, this.onResize, false);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.removeEventListener(EVENT.BLUR, this.onBlur, false);
-    window.removeEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
-    window.removeEventListener(EVENT.DROP, this.disableEvent, false);
+    this.excalidrawContainerRef.current?.removeEventListener(
+      EVENT.DRAG_OVER,
+      this.disableEvent,
+      false,
+    );
+    this.excalidrawContainerRef.current?.removeEventListener(
+      EVENT.DROP,
+      this.disableEvent,
+      false,
+    );
 
     document.removeEventListener(
       EVENT.GESTURE_START,
@@ -978,8 +996,16 @@ class App extends React.Component<AppProps, AppState> {
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
-    window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
-    window.addEventListener(EVENT.DROP, this.disableEvent, false);
+    this.excalidrawContainerRef.current?.addEventListener(
+      EVENT.DRAG_OVER,
+      this.disableEvent,
+      false,
+    );
+    this.excalidrawContainerRef.current?.addEventListener(
+      EVENT.DROP,
+      this.disableEvent,
+      false,
+    );
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
@@ -1133,7 +1159,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     const scrolledOutside =
       // hide when editing text
-      this.state.editingElement?.type === "text"
+      isTextElement(this.state.editingElement)
         ? false
         : !atLeastOneVisibleElement && renderingElements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
@@ -1280,7 +1306,8 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (isSupportedImageFile(file)) {
+      // prefer spreadsheet data over image file (MS Office/Libre Office)
+      if (isSupportedImageFile(file) && !data.spreadsheet) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
           this.state,
@@ -1375,6 +1402,7 @@ class App extends React.Component<AppProps, AppState> {
       oldIdToDuplicatedId.set(element.id, newElement.id);
       return newElement;
     });
+    bindTextToShapeAfterDuplication(newElements, elements, oldIdToDuplicatedId);
     const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
@@ -1393,7 +1421,9 @@ class App extends React.Component<AppProps, AppState> {
           ...this.state,
           isLibraryOpen: false,
           selectedElementIds: newElements.reduce((map, element) => {
-            map[element.id] = true;
+            if (!isBoundToContainer(element)) {
+              map[element.id] = true;
+            }
             return map;
           }, {} as any),
           selectedGroupIds: {},
@@ -1553,6 +1583,7 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
+      libraryItems?: SceneData["libraryItems"];
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1568,6 +1599,12 @@ class App extends React.Component<AppProps, AppState> {
 
       if (sceneData.collaborators) {
         this.setState({ collaborators: sceneData.collaborators });
+      }
+
+      if (sceneData.libraryItems) {
+        this.library.saveLibrary(
+          restoreLibraryItems(sceneData.libraryItems, "unpublished"),
+        );
       }
     },
   );
@@ -1651,9 +1688,11 @@ class App extends React.Component<AppProps, AppState> {
             ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
             : ELEMENT_TRANSLATE_AMOUNT);
 
-        const selectedElements = this.scene
-          .getElements()
-          .filter((element) => this.state.selectedElementIds[element.id]);
+        const selectedElements = getSelectedElements(
+          this.scene.getElements(),
+          this.state,
+          true,
+        );
 
         let offsetX = 0;
         let offsetY = 0;
@@ -1709,9 +1748,11 @@ class App extends React.Component<AppProps, AppState> {
           !isLinearElement(selectedElements[0])
         ) {
           const selectedElement = selectedElements[0];
+
           this.startTextEditing({
             sceneX: selectedElement.x + selectedElement.width / 2,
             sceneY: selectedElement.y + selectedElement.height / 2,
+            shouldBind: true,
           });
           event.preventDefault();
           return;
@@ -1732,6 +1773,7 @@ class App extends React.Component<AppProps, AppState> {
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
         setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+        event.preventDefault();
       }
 
       if (event.key === KEYS.G || event.key === KEYS.S) {
@@ -1866,14 +1908,24 @@ class App extends React.Component<AppProps, AppState> {
       isExistingElement?: boolean;
     },
   ) {
-    const updateElement = (text: string, isDeleted = false) => {
+    const updateElement = (
+      text: string,
+      originalText: string,
+      isDeleted: boolean,
+      isSubmit: boolean,
+    ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            return updateTextElement(_element, {
-              text,
-              isDeleted,
-            });
+            return updateTextElement(
+              _element,
+              {
+                text,
+                isDeleted,
+                originalText,
+              },
+              isSubmit,
+            );
           }
           return _element;
         }),
@@ -1898,21 +1950,24 @@ class App extends React.Component<AppProps, AppState> {
         ];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text);
+        updateElement(text, text, false, false);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
       }),
-      onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
+      onSubmit: withBatchedUpdates(({ text, viaKeyboard, originalText }) => {
         const isDeleted = !text.trim();
-        updateElement(text, isDeleted);
+        updateElement(text, originalText, isDeleted, true);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
+          const elementIdToSelect = element.containerId
+            ? element.containerId
+            : element.id;
           this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
-              [element.id]: true,
+              [elementIdToSelect]: true,
             },
           }));
         }
@@ -1935,13 +1990,14 @@ class App extends React.Component<AppProps, AppState> {
       }),
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
+      app: this,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text);
+    updateElement(element.text, element.originalText, false, false);
   }
 
   private deselectElements() {
@@ -1956,7 +2012,9 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
   ): NonDeleted<ExcalidrawTextElement> | null {
-    const element = this.getElementAtPosition(x, y);
+    const element = this.getElementAtPosition(x, y, {
+      includeBoundTextElement: true,
+    });
 
     if (element && isTextElement(element) && !element.isDeleted) {
       return element;
@@ -1971,9 +2029,14 @@ class App extends React.Component<AppProps, AppState> {
       /** if true, returns the first selected element (with highest z-index)
         of all hit elements */
       preferSelected?: boolean;
+      includeBoundTextElement?: boolean;
     },
   ): NonDeleted<ExcalidrawElement> | null {
-    const allHitElements = this.getElementsAtPosition(x, y);
+    const allHitElements = this.getElementsAtPosition(
+      x,
+      y,
+      opts?.includeBoundTextElement,
+    );
     if (allHitElements.length > 1) {
       if (opts?.preferSelected) {
         for (let index = allHitElements.length - 1; index > -1; index--) {
@@ -2004,8 +2067,16 @@ class App extends React.Component<AppProps, AppState> {
   private getElementsAtPosition(
     x: number,
     y: number,
+    includeBoundTextElement: boolean = false,
   ): NonDeleted<ExcalidrawElement>[] {
-    return getElementsAtPosition(this.scene.getElements(), (element) =>
+    const elements = includeBoundTextElement
+      ? this.scene.getElements()
+      : this.scene
+          .getElements()
+          .filter(
+            (element) => !(isTextElement(element) && element.containerId),
+          );
+    return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, x, y),
     );
   }
@@ -2013,18 +2084,18 @@ class App extends React.Component<AppProps, AppState> {
   private startTextEditing = ({
     sceneX,
     sceneY,
+    shouldBind,
     insertAtParentCenter = true,
   }: {
     /** X position to insert text at */
     sceneX: number;
     /** Y position to insert text at */
     sceneY: number;
+    shouldBind: boolean;
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
   }) => {
-    const existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
-
-    const parentCenterPosition =
+    let parentCenterPosition =
       insertAtParentCenter &&
       this.getTextWysiwygSnappedToCenterPosition(
         sceneX,
@@ -2033,6 +2104,51 @@ class App extends React.Component<AppProps, AppState> {
         this.canvas,
         window.devicePixelRatio,
       );
+
+    // bind to container when shouldBind is true or
+    // clicked on center of container
+    const container =
+      shouldBind || parentCenterPosition
+        ? getElementContainingPosition(
+            this.scene.getElements().filter((ele) => !isTextElement(ele)),
+            sceneX,
+            sceneY,
+          )
+        : null;
+
+    let existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
+
+    // consider bounded text element if container present
+    if (container) {
+      const boundTextElementId = getBoundTextElementId(container);
+      if (boundTextElementId) {
+        existingTextElement = this.scene.getElement(
+          boundTextElementId,
+        ) as ExcalidrawTextElement;
+      }
+    }
+    if (!existingTextElement && container) {
+      const fontString = {
+        fontSize: this.state.currentItemFontSize,
+        fontFamily: this.state.currentItemFontFamily,
+      };
+      const minWidth = getApproxMinLineWidth(getFontString(fontString));
+      const minHeight = getApproxMinLineHeight(getFontString(fontString));
+      const newHeight = Math.max(container.height, minHeight);
+      const newWidth = Math.max(container.width, minWidth);
+      mutateElement(container, { height: newHeight, width: newWidth });
+      sceneX = container.x + newWidth / 2;
+      sceneY = container.y + newHeight / 2;
+      if (parentCenterPosition) {
+        parentCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+          sceneX,
+          sceneY,
+          this.state,
+          this.canvas,
+          window.devicePixelRatio,
+        );
+      }
+    }
 
     const element = existingTextElement
       ? existingTextElement
@@ -2060,6 +2176,8 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
+          containerId: container?.id ?? undefined,
+          groupIds: container?.groupIds ?? [],
         });
 
     this.setState({ editingElement: element });
@@ -2130,7 +2248,7 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.canvas);
 
-    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+    let { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
       this.state,
     );
@@ -2162,9 +2280,22 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.canvas);
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
+      const selectedElements = getSelectedElements(
+        this.scene.getElements(),
+        this.state,
+      );
+      if (selectedElements.length === 1) {
+        const selectedElement = selectedElements[0];
+        const canBindText = hasBoundTextElement(selectedElement);
+        if (canBindText) {
+          sceneX = selectedElement.x + selectedElement.width / 2;
+          sceneY = selectedElement.y + selectedElement.height / 2;
+        }
+      }
       this.startTextEditing({
         sceneX,
         sceneY,
+        shouldBind: false,
         insertAtParentCenter: !event.altKey,
       });
     }
@@ -2263,10 +2394,9 @@ class App extends React.Component<AppProps, AppState> {
       // and point
       const { draggingElement } = this.state;
       if (isBindingElement(draggingElement)) {
-        this.maybeSuggestBindingForLinearElementAtCursor(
+        this.maybeSuggestBindingsForLinearElementAtCoords(
           draggingElement,
-          "end",
-          scenePointer,
+          [scenePointer],
           this.state.startBoundElement,
         );
       } else {
@@ -2399,6 +2529,21 @@ class App extends React.Component<AppProps, AppState> {
       setCursor(this.canvas, CURSOR_TYPE.GRAB);
     } else if (isOverScrollBar) {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
+    } else if (this.state.editingLinearElement) {
+      const element = LinearElementEditor.getElement(
+        this.state.editingLinearElement.elementId,
+      );
+      if (
+        element &&
+        isHittingElementNotConsideringBoundingBox(element, this.state, [
+          scenePointer.x,
+          scenePointer.y,
+        ])
+      ) {
+        setCursor(this.canvas, CURSOR_TYPE.MOVE);
+      } else {
+        setCursor(this.canvas, CURSOR_TYPE.AUTO);
+      }
     } else if (
       // if using cmd/ctrl, we're not dragging
       !event[KEYS.CTRL_OR_CMD] &&
@@ -2591,11 +2736,13 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           this.state.viewModeEnabled)
-      )
+      ) ||
+      isTextElement(this.state.editingElement)
     ) {
       return false;
     }
     isPanning = true;
+    event.preventDefault();
 
     let nextPastePrevented = false;
     const isLinux = /Linux/.test(window.navigator.platform);
@@ -2736,6 +2883,7 @@ class App extends React.Component<AppProps, AppState> {
             origin,
             selectedElements,
           ),
+        hasHitElementInside: false,
       },
       drag: {
         hasOccurred: false,
@@ -2746,6 +2894,9 @@ class App extends React.Component<AppProps, AppState> {
         onUp: null,
         onKeyUp: null,
         onKeyDown: null,
+      },
+      boxSelection: {
+        hasOccurred: false,
       },
     };
   }
@@ -2888,6 +3039,15 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.y,
           );
 
+        if (pointerDownState.hit.element) {
+          pointerDownState.hit.hasHitElementInside =
+            isHittingElementNotConsideringBoundingBox(
+              pointerDownState.hit.element,
+              this.state,
+              [pointerDownState.origin.x, pointerDownState.origin.y],
+            );
+        }
+
         // For overlapped elements one position may hit
         // multiple elements
         pointerDownState.hit.allHitElements = this.getElementsAtPosition(
@@ -2908,8 +3068,14 @@ class App extends React.Component<AppProps, AppState> {
           this.clearSelection(hitElement);
         }
 
-        // If we click on something
-        if (hitElement != null) {
+        if (this.state.editingLinearElement) {
+          this.setState({
+            selectedElementIds: {
+              [this.state.editingLinearElement.elementId]: true,
+            },
+          });
+          // If we click on something
+        } else if (hitElement != null) {
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
             if (!this.state.selectedElementIds[hitElement.id]) {
@@ -3002,13 +3168,25 @@ class App extends React.Component<AppProps, AppState> {
     // if we're currently still editing text, clicking outside
     // should only finalize it, not create another (irrespective
     // of state.elementLocked)
-    if (this.state.editingElement?.type === "text") {
+    if (isTextElement(this.state.editingElement)) {
       return;
     }
+    let sceneX = pointerDownState.origin.x;
+    let sceneY = pointerDownState.origin.y;
 
+    const element = this.getElementAtPosition(sceneX, sceneY, {
+      includeBoundTextElement: true,
+    });
+
+    const canBindText = hasBoundTextElement(element);
+    if (canBindText) {
+      sceneX = element.x + element.width / 2;
+      sceneY = element.y + element.height / 2;
+    }
     this.startTextEditing({
-      sceneX: pointerDownState.origin.x,
-      sceneY: pointerDownState.origin.y,
+      sceneX,
+      sceneY,
+      shouldBind: false,
       insertAtParentCenter: !event.altKey,
     });
 
@@ -3348,11 +3526,10 @@ class App extends React.Component<AppProps, AppState> {
           (appState) => this.setState(appState),
           pointerCoords.x,
           pointerCoords.y,
-          (element, startOrEnd) => {
-            this.maybeSuggestBindingForLinearElementAtCursor(
+          (element, pointsSceneCoords) => {
+            this.maybeSuggestBindingsForLinearElementAtCoords(
               element,
-              startOrEnd,
-              pointerCoords,
+              pointsSceneCoords,
             );
           },
         );
@@ -3369,8 +3546,16 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       if (
-        hasHitASelectedElement ||
-        pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+        (hasHitASelectedElement ||
+          pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
+        // this allows for box-selecting points when clicking inside the
+        // line's bounding box
+        (!this.state.editingLinearElement || !event.shiftKey) &&
+        // box-selecting without shift when editing line, not clicking on a line
+        (!this.state.editingLinearElement ||
+          this.state.editingLinearElement?.elementId !==
+            pointerDownState.hit.element?.id ||
+          pointerDownState.hit.hasHitElementInside)
       ) {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
@@ -3401,10 +3586,10 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements,
             dragX,
             dragY,
-            this.scene,
             lockDirection,
             dragDistanceX,
             dragDistanceY,
+            this.state,
           );
           this.maybeSuggestBindingForAll(selectedElements);
 
@@ -3421,9 +3606,15 @@ class App extends React.Component<AppProps, AppState> {
             const groupIdMap = new Map();
             const oldIdToDuplicatedId = new Map();
             const hitElement = pointerDownState.hit.element;
-            for (const element of this.scene.getElementsIncludingDeleted()) {
+            const elements = this.scene.getElementsIncludingDeleted();
+            const selectedElementIds: Array<ExcalidrawElement["id"]> =
+              getSelectedElements(elements, this.state, true).map(
+                (element) => element.id,
+              );
+
+            for (const element of elements) {
               if (
-                this.state.selectedElementIds[element.id] ||
+                selectedElementIds.includes(element.id) ||
                 // case: the state.selectedElementIds might not have been
                 // updated yet by the time this mousemove event is fired
                 (element.id === hitElement?.id &&
@@ -3451,6 +3642,11 @@ class App extends React.Component<AppProps, AppState> {
               }
             }
             const nextSceneElements = [...nextElements, ...elementsToAppend];
+            bindTextToShapeAfterDuplication(
+              nextElements,
+              elementsToAppend,
+              oldIdToDuplicatedId,
+            );
             fixBindingsAfterDuplication(
               nextSceneElements,
               elementsToAppend,
@@ -3507,10 +3703,9 @@ class App extends React.Component<AppProps, AppState> {
 
         if (isBindingElement(draggingElement)) {
           // When creating a linear element by dragging
-          this.maybeSuggestBindingForLinearElementAtCursor(
+          this.maybeSuggestBindingsForLinearElementAtCoords(
             draggingElement,
-            "end",
-            pointerCoords,
+            [pointerCoords],
             this.state.startBoundElement,
           );
         }
@@ -3521,8 +3716,15 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.elementType === "selection") {
+        pointerDownState.boxSelection.hasOccurred = true;
+
         const elements = this.scene.getElements();
-        if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
+        if (
+          !event.shiftKey &&
+          // allows for box-selecting points (without shift)
+          !this.state.editingLinearElement &&
+          isSomeElementSelected(elements, this.state)
+        ) {
           if (pointerDownState.withCmdOrCtrl && pointerDownState.hit.element) {
             this.setState((prevState) =>
               selectGroupsForSelectedElements(
@@ -3543,33 +3745,43 @@ class App extends React.Component<AppProps, AppState> {
             });
           }
         }
-        const elementsWithinSelection = getElementsWithinSelection(
-          elements,
-          draggingElement,
-        );
-        this.setState((prevState) =>
-          selectGroupsForSelectedElements(
-            {
-              ...prevState,
-              selectedElementIds: {
-                ...prevState.selectedElementIds,
-                ...elementsWithinSelection.reduce((map, element) => {
-                  map[element.id] = true;
-                  return map;
-                }, {} as any),
-                ...(pointerDownState.hit.element
-                  ? {
-                      // if using ctrl/cmd, select the hitElement only if we
-                      // haven't box-selected anything else
-                      [pointerDownState.hit.element.id]:
-                        !elementsWithinSelection.length,
-                    }
-                  : null),
+        // box-select line editor points
+        if (this.state.editingLinearElement) {
+          LinearElementEditor.handleBoxSelection(
+            event,
+            this.state,
+            this.setState.bind(this),
+          );
+          // regular box-select
+        } else {
+          const elementsWithinSelection = getElementsWithinSelection(
+            elements,
+            draggingElement,
+          );
+          this.setState((prevState) =>
+            selectGroupsForSelectedElements(
+              {
+                ...prevState,
+                selectedElementIds: {
+                  ...prevState.selectedElementIds,
+                  ...elementsWithinSelection.reduce((map, element) => {
+                    map[element.id] = true;
+                    return map;
+                  }, {} as any),
+                  ...(pointerDownState.hit.element
+                    ? {
+                        // if using ctrl/cmd, select the hitElement only if we
+                        // haven't box-selected anything else
+                        [pointerDownState.hit.element.id]:
+                          !elementsWithinSelection.length,
+                      }
+                    : null),
+                },
               },
-            },
-            this.scene.getElements(),
-          ),
-        );
+              this.scene.getElements(),
+            ),
+          );
+        }
       }
     });
   }
@@ -3634,16 +3846,25 @@ class App extends React.Component<AppProps, AppState> {
       // Handle end of dragging a point of a linear element, might close a loop
       // and sets binding element
       if (this.state.editingLinearElement) {
-        const editingLinearElement = LinearElementEditor.handlePointerUp(
-          childEvent,
-          this.state.editingLinearElement,
-          this.state,
-        );
-        if (editingLinearElement !== this.state.editingLinearElement) {
-          this.setState({
-            editingLinearElement,
-            suggestedBindings: [],
-          });
+        if (
+          !pointerDownState.boxSelection.hasOccurred &&
+          (pointerDownState.hit?.element?.id !==
+            this.state.editingLinearElement.elementId ||
+            !pointerDownState.hit.hasHitElementInside)
+        ) {
+          this.actionManager.executeAction(actionFinalize);
+        } else {
+          const editingLinearElement = LinearElementEditor.handlePointerUp(
+            childEvent,
+            this.state.editingLinearElement,
+            this.state,
+          );
+          if (editingLinearElement !== this.state.editingLinearElement) {
+            this.setState({
+              editingLinearElement,
+              suggestedBindings: [],
+            });
+          }
         }
       }
 
@@ -3825,9 +4046,14 @@ class App extends React.Component<AppProps, AppState> {
       if (
         hitElement &&
         !pointerDownState.drag.hasOccurred &&
-        !pointerDownState.hit.wasAddedToSelection
+        !pointerDownState.hit.wasAddedToSelection &&
+        // if we're editing a line, pointerup shouldn't switch selection if
+        // box selected
+        (!this.state.editingLinearElement ||
+          !pointerDownState.boxSelection.hasOccurred)
       ) {
-        if (childEvent.shiftKey) {
+        // when inside line editor, shift selects points instead
+        if (childEvent.shiftKey && !this.state.editingLinearElement) {
           if (this.state.selectedElementIds[hitElement.id]) {
             if (isSelectedViaGroup(this.state, hitElement)) {
               // We want to unselect all groups hitElement is part of
@@ -3871,6 +4097,7 @@ class App extends React.Component<AppProps, AppState> {
           } else {
             // add element to selection while
             // keeping prev elements selected
+
             this.setState((_prevState) => ({
               selectedElementIds: {
                 ..._prevState.selectedElementIds,
@@ -4001,10 +4228,9 @@ class App extends React.Component<AppProps, AppState> {
     const existingFileData = this.files[fileId];
     if (!existingFileData?.dataURL) {
       try {
-        imageFile = await resizeImageFile(
-          imageFile,
-          DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-        );
+        imageFile = await resizeImageFile(imageFile, {
+          maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+        });
       } catch (error: any) {
         console.error("error trying to resing image file on insertion", error);
       }
@@ -4113,7 +4339,9 @@ class App extends React.Component<AppProps, AppState> {
     // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Basic_User_Interface/Using_URL_values_for_the_cursor_property
     const cursorImageSizePx = 96;
 
-    const imagePreview = await resizeImageFile(imageFile, cursorImageSizePx);
+    const imagePreview = await resizeImageFile(imageFile, {
+      maxWidthOrHeight: cursorImageSizePx,
+    });
 
     let previewDataURL = await getDataURL(imagePreview);
 
@@ -4351,32 +4579,43 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private maybeSuggestBindingForLinearElementAtCursor = (
+  private maybeSuggestBindingsForLinearElementAtCoords = (
     linearElement: NonDeleted<ExcalidrawLinearElement>,
-    startOrEnd: "start" | "end",
+    /** scene coords */
     pointerCoords: {
       x: number;
       y: number;
-    },
+    }[],
     // During line creation the start binding hasn't been written yet
     // into `linearElement`
     oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
   ): void => {
-    const hoveredBindableElement = getHoveredElementForBinding(
-      pointerCoords,
-      this.scene,
+    if (!pointerCoords.length) {
+      return;
+    }
+
+    const suggestedBindings = pointerCoords.reduce(
+      (acc: NonDeleted<ExcalidrawBindableElement>[], coords) => {
+        const hoveredBindableElement = getHoveredElementForBinding(
+          coords,
+          this.scene,
+        );
+        if (
+          hoveredBindableElement != null &&
+          !isLinearElementSimpleAndAlreadyBound(
+            linearElement,
+            oppositeBindingBoundElement?.id,
+            hoveredBindableElement,
+          )
+        ) {
+          acc.push(hoveredBindableElement);
+        }
+        return acc;
+      },
+      [],
     );
-    this.setState({
-      suggestedBindings:
-        hoveredBindableElement != null &&
-        !isLinearElementSimpleAndAlreadyBound(
-          linearElement,
-          oppositeBindingBoundElement?.id,
-          hoveredBindableElement,
-        )
-          ? [hoveredBindableElement]
-          : [],
-    });
+
+    this.setState({ suggestedBindings });
   };
 
   private maybeSuggestBindingForAll(

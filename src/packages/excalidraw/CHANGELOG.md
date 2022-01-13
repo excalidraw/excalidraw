@@ -13,6 +13,25 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+## Excalidraw API
+
+- [`exportToBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToBlob) now automatically sets `appState.exportBackground` to `true` if exporting to `image/jpeg` MIME type (to ensure that alpha channel is not compressed to black color).
+
+### Features
+
+- Support updating library using [`updateScene`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene) API [#4546](https://github.com/excalidraw/excalidraw/pull/4546).
+
+- Introduced primary colors to the app. The colors can be overriden. Check [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#customizing-styles) on how to do so.
+
+- #### BREAKING CHANGE
+
+  Removed `getElementMap` util method.
+
+- Changes to [`exportToCanvas`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToCanvas) util function:
+
+  - Add `maxWidthOrHeight?: number` attribute.
+  - `scale` returned from `getDimensions()` is now optional (default to `1`).
+
 - Image support.
 
   NOTE: the unreleased API is highly unstable and may change significantly before the next stable release. As such it's largely undocumented at this point. You are encouraged to read through the [PR](https://github.com/excalidraw/excalidraw/pull/4011) description if you want to know more about the internals.
@@ -37,10 +56,6 @@ Please add the latest change on the top under the correct section.
   - `.excalidraw` files may now contain top-level `files` key in format of `Record<FileId, BinaryFileData>` when exporting any (image) elements.
   - Changes were made to various export utilityies exported from the package so that they take `files`. For now, TypeScript should help you figure the changes out.
 
-## Excalidraw API
-
-### Features
-
 - Export [`isLinearElement`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#isLinearElement) and [`getNonDeletedElements`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#getNonDeletedElements).
 
 - Support [`renderTopRightUI`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRightUI) in mobile UI.
@@ -50,6 +65,19 @@ Please add the latest change on the top under the correct section.
   #### BREAKING CHANGE
 
   The `Appearance` type is now removed and renamed to `Theme` so `Theme` type needs to be used.
+
+### Fixes
+
+- Panning the canvas using `mousewheel-drag` and `space-drag` now prevents the browser from scrolling the container/page [#4489](https://github.com/excalidraw/excalidraw/pull/4489).
+- Scope drag and drop events to Excalidraw container to prevent overriding host application drag and drop events.
+
+### Build
+
+- Added an example to test and develop the package [locally](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Development) using `yarn start`
+
+- Remove `file-loader` so font assets are not duplicated by webpack and use webpack asset modules for font generation [#4380](https://github.com/excalidraw/excalidraw/pull/4380)
+
+- We're now compiling to `es2017` target. Notably, `async/await` is not compiled down to generators. [#4341](https://github.com/excalidraw/excalidraw/pull/4341)
 
 ---
 

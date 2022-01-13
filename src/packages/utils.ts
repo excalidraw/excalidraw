@@ -13,17 +13,19 @@ type ExportOpts = {
   elements: readonly NonDeleted<ExcalidrawElement>[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
+  maxWidthOrHeight?: number;
   getDimensions?: (
     width: number,
     height: number,
-  ) => { width: number; height: number; scale: number };
+  ) => { width: number; height: number; scale?: number };
 };
 
 export const exportToCanvas = ({
   elements,
   appState,
   files,
-  getDimensions = (width, height) => ({ width, height, scale: 1 }),
+  maxWidthOrHeight,
+  getDimensions,
 }: ExportOpts) => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
@@ -38,12 +40,36 @@ export const exportToCanvas = ({
     { exportBackground, viewBackgroundColor },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
-      const ret = getDimensions(width, height);
+
+      if (maxWidthOrHeight) {
+        if (typeof getDimensions === "function") {
+          console.warn(
+            "`getDimensions()` is ignored when `maxWidthOrHeight` is supplied.",
+          );
+        }
+
+        const max = Math.max(width, height);
+
+        const scale = maxWidthOrHeight / max;
+
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+
+        return {
+          canvas,
+          scale,
+        };
+      }
+
+      const ret = getDimensions?.(width, height) || { width, height };
 
       canvas.width = ret.width;
       canvas.height = ret.height;
 
-      return { canvas, scale: ret.scale };
+      return {
+        canvas,
+        scale: ret.scale ?? 1,
+      };
     },
   );
 };
@@ -54,8 +80,6 @@ export const exportToBlob = async (
     quality?: number;
   },
 ): Promise<Blob | null> => {
-  const canvas = await exportToCanvas(opts);
-
   let { mimeType = MIME_TYPES.png, quality } = opts;
 
   if (mimeType === MIME_TYPES.png && typeof quality === "number") {
@@ -66,6 +90,18 @@ export const exportToBlob = async (
   if (mimeType === "image/jpg") {
     mimeType = MIME_TYPES.jpg;
   }
+
+  if (mimeType === MIME_TYPES.jpg && !opts.appState?.exportBackground) {
+    console.warn(
+      `Defaulting "exportBackground" to "true" for "${MIME_TYPES.jpg}" mimeType`,
+    );
+    opts = {
+      ...opts,
+      appState: { ...opts.appState, exportBackground: true },
+    };
+  }
+
+  const canvas = await exportToCanvas(opts);
 
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 

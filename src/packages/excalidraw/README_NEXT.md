@@ -353,6 +353,31 @@ To view the full example visit :point_down:
 
 </details>
 
+### Customizing styles
+
+Excalidraw is using CSS variables to style certain components. To override them, you should set your own on the `.excalidraw` and `.excalidraw.theme--dark` (for dark mode variables) selectors.
+
+Make sure the selector has higher specificity, e.g. by prefixing it with your app's selector:
+
+```css
+.your-app .excalidraw {
+  --color-primary: red;
+}
+.your-app .excalidraw.theme--dark {
+  --color-primary: pink;
+}
+```
+
+Most notably, you can customize the primary colors, by overriding these variables:
+
+- `--color-primary`
+- `--color-primary-darker`
+- `--color-primary-darkest`
+- `--color-primary-light`
+- `--color-primary-chubb` — a slightly darker (in light mode), or lighter (in dark mode) `--color-primary` color to account for [Chubb illusion](https://en.wikipedia.org/wiki/Chubb_illusion).
+
+For a complete list of variables, check [theme.scss](https://github.com/excalidraw/excalidraw/blob/master/src/css/theme.scss), though most of them will not make sense to override.
+
 ### Props
 
 | Name | Type | Default | Description |
@@ -484,6 +509,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L18) | The `appState` to be updated in the scene. |
 | `collaborators` | <pre>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L29">Collaborator></a></pre> | The list of collaborators to be updated in the scene. |
 | `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
+| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L258) | The `libraryItems` to be update in the scene. |
 
 ### `addFiles`
 
@@ -756,7 +782,8 @@ This function makes sure elements and state is set to appropriate values and set
 | --- | --- | --- | --- |
 | elements | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/src/element/types) |  | The elements to be exported to canvas |
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L12) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
-| getDimensions | `(width: number, height: number) => {width: number, height: number, scale: number)` | `(width, height) => ({ width, height, scale: 1 })` | A function which returns the width, height and scale with which canvas is to be exported. |
+| getDimensions | `(width: number, height: number) => { width: number, height: number, scale?: number }` | undefined | A function which returns the `width`, `height`, and optionally `scale` (defaults `1`), with which canvas is to be exported. |
+| maxWidthOrHeight | `number` | undefined | The maximum width or height of the exported image. If provided, `getDimensions` is ignored. |
 
 **How to use**
 
@@ -863,22 +890,6 @@ import { isInvisiblySmallElement } from "@excalidraw/excalidraw-next";
 ```
 
 Returns `true` if element is invisibly small (e.g. width & height are zero).
-
-#### `getElementMap`
-
-**_Signature_**
-
-<pre>
-getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
-</pre>
-
-**How to use**
-
-```js
-import { getElementsMap } from "@excalidraw/excalidraw-next";
-```
-
-This function returns an object where each element is mapped to its id.
 
 #### `loadLibraryFromBlob`
 
@@ -998,3 +1009,21 @@ Defaults to `THEME.LIGHT` unless passed in `initialData.appState.theme`
 ## Need help?
 
 Check out the existing [Q&A](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw). If you have any queries or need help, ask us [here](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw).
+
+### Development
+
+#### Install the dependencies
+
+```bash
+yarn
+```
+
+#### Start the server
+
+```bash
+yarn start
+```
+
+[http://localhost:3001](http://localhost:3001) will open in your default browser.
+
+The example is same as the [codesandbox example](https://ehlz3.csb.app/)
