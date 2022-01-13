@@ -1649,7 +1649,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
+        (isWritableElement(event.target) &&
+          event.key !== KEYS.ESCAPE &&
+          // handle cmd/ctrl-modifier shortcuts even inside inputs
+          !event[KEYS.CTRL_OR_CMD]) ||
         // case: using arrows to move between buttons
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {

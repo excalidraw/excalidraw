@@ -8,16 +8,13 @@ import {
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
 import { CLASSES, BOUND_TEXT_PADDING } from "../constants";
-import {
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-} from "./types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
+  getContainerElement,
   wrapText,
 } from "./textElement";
 
@@ -102,9 +99,7 @@ export const textWysiwyg = ({
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
-      const container = updatedElement?.containerId
-        ? Scene.getScene(updatedElement)!.getElement(updatedElement.containerId)
-        : null;
+      const container = getContainerElement(updatedElement);
       let maxWidth = updatedElement.width;
 
       let maxHeight = updatedElement.height;
@@ -275,9 +270,7 @@ export const textWysiwyg = ({
         let height = "auto";
 
         if (lines === 2) {
-          const container = Scene.getScene(element)!.getElement(
-            element.containerId,
-          );
+          const container = getContainerElement(element);
           const actualLineCount = wrapText(
             editable.value,
             getFontString(element),
@@ -301,13 +294,16 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
-    event.stopPropagation();
+    if (!event[KEYS.CTRL_OR_CMD]) {
+      event.stopPropagation();
+    }
     if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       submittedViaKeyboard = true;
       handleSubmit();
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
+      event.stopPropagation();
       if (event.isComposing || event.keyCode === 229) {
         return;
       }
@@ -320,6 +316,7 @@ export const textWysiwyg = ({
           event.code === CODES.BRACKET_RIGHT))
     ) {
       event.preventDefault();
+      event.stopPropagation();
       if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
         outdent();
       } else {
@@ -444,9 +441,7 @@ export const textWysiwyg = ({
     }
     let wrappedText = "";
     if (isTextElement(updateElement) && updateElement?.containerId) {
-      const container = Scene.getScene(updateElement)!.getElement(
-        updateElement.containerId,
-      ) as ExcalidrawBindableElement;
+      const container = getContainerElement(updateElement);
 
       if (container) {
         wrappedText = wrapText(
