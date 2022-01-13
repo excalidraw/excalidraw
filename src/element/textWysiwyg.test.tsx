@@ -176,7 +176,7 @@ describe("textWysiwyg", () => {
       expect(textarea.value).toEqual(`Line#1\nLine#2`);
     });
 
-    it("resizing text via shortcuts while in wysiwyg", () => {
+    it("should resize text via shortcuts while in wysiwyg", () => {
       textarea.value = "abc def";
       const origFontSize = textElement.fontSize;
       textarea.dispatchEvent(
