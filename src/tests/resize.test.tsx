@@ -147,7 +147,7 @@ const resize = (
   });
 };
 
-describe("text element", () => {
+describe("Test text element", () => {
   it("changing fontSize via keyboard", async () => {
     await render(<ExcalidrawApp />);
 
