@@ -362,10 +362,14 @@ export const charWidth = (() => {
   };
 })();
 export const getApproxMinLineWidth = (font: FontString) => {
-  return (
-    measureText(DUMMY_TEXT.split("").join("\n"), font).width +
-    BOUND_TEXT_PADDING * 2
-  );
+  const minCharWidth = getMinCharWidth(font);
+  if (minCharWidth === 0) {
+    return (
+      measureText(DUMMY_TEXT.split("").join("\n"), font).width +
+      BOUND_TEXT_PADDING * 2
+    );
+  }
+  return minCharWidth + BOUND_TEXT_PADDING * 2;
 };
 
 export const getApproxMinLineHeight = (font: FontString) => {
