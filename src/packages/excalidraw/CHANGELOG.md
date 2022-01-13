@@ -19,6 +19,8 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Support updating library using [`updateScene`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene) API [#4546](https://github.com/excalidraw/excalidraw/pull/4546).
+
 - Introduced primary colors to the app. The colors can be overriden. Check [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#customizing-styles) on how to do so.
 
 - #### BREAKING CHANGE
@@ -64,7 +66,14 @@ Please add the latest change on the top under the correct section.
 
   The `Appearance` type is now removed and renamed to `Theme` so `Theme` type needs to be used.
 
+### Fixes
+
+- Panning the canvas using `mousewheel-drag` and `space-drag` now prevents the browser from scrolling the container/page [#4489](https://github.com/excalidraw/excalidraw/pull/4489).
+- Scope drag and drop events to Excalidraw container to prevent overriding host application drag and drop events.
+
 ### Build
+
+- Added an example to test and develop the package [locally](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Development) using `yarn start`
 
 - Remove `file-loader` so font assets are not duplicated by webpack and use webpack asset modules for font generation [#4380](https://github.com/excalidraw/excalidraw/pull/4380)
 

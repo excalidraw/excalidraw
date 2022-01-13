@@ -123,6 +123,7 @@ import {
   hasBoundTextElement,
   isBindingElement,
   isBindingElementType,
+  isBoundToContainer,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -917,8 +918,16 @@ class App extends React.Component<AppProps, AppState> {
     window.removeEventListener(EVENT.RESIZE, this.onResize, false);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.removeEventListener(EVENT.BLUR, this.onBlur, false);
-    window.removeEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
-    window.removeEventListener(EVENT.DROP, this.disableEvent, false);
+    this.excalidrawContainerRef.current?.removeEventListener(
+      EVENT.DRAG_OVER,
+      this.disableEvent,
+      false,
+    );
+    this.excalidrawContainerRef.current?.removeEventListener(
+      EVENT.DROP,
+      this.disableEvent,
+      false,
+    );
 
     document.removeEventListener(
       EVENT.GESTURE_START,
@@ -987,8 +996,16 @@ class App extends React.Component<AppProps, AppState> {
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
-    window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
-    window.addEventListener(EVENT.DROP, this.disableEvent, false);
+    this.excalidrawContainerRef.current?.addEventListener(
+      EVENT.DRAG_OVER,
+      this.disableEvent,
+      false,
+    );
+    this.excalidrawContainerRef.current?.addEventListener(
+      EVENT.DROP,
+      this.disableEvent,
+      false,
+    );
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
@@ -1289,7 +1306,8 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (isSupportedImageFile(file)) {
+      // prefer spreadsheet data over image file (MS Office/Libre Office)
+      if (isSupportedImageFile(file) && !data.spreadsheet) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
           this.state,
@@ -1403,7 +1421,7 @@ class App extends React.Component<AppProps, AppState> {
           ...this.state,
           isLibraryOpen: false,
           selectedElementIds: newElements.reduce((map, element) => {
-            if (isTextElement(element) && !element.containerId) {
+            if (!isBoundToContainer(element)) {
               map[element.id] = true;
             }
             return map;
@@ -1565,6 +1583,7 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
+      libraryItems?: SceneData["libraryItems"];
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1580,6 +1599,12 @@ class App extends React.Component<AppProps, AppState> {
 
       if (sceneData.collaborators) {
         this.setState({ collaborators: sceneData.collaborators });
+      }
+
+      if (sceneData.libraryItems) {
+        this.library.saveLibrary(
+          restoreLibraryItems(sceneData.libraryItems, "unpublished"),
+        );
       }
     },
   );
@@ -1663,9 +1688,11 @@ class App extends React.Component<AppProps, AppState> {
             ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
             : ELEMENT_TRANSLATE_AMOUNT);
 
-        const selectedElements = this.scene
-          .getElements()
-          .filter((element) => this.state.selectedElementIds[element.id]);
+        const selectedElements = getSelectedElements(
+          this.scene.getElements(),
+          this.state,
+          true,
+        );
 
         let offsetX = 0;
         let offsetY = 0;
@@ -1746,6 +1773,7 @@ class App extends React.Component<AppProps, AppState> {
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
         setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+        event.preventDefault();
       }
 
       if (event.key === KEYS.G || event.key === KEYS.S) {
@@ -1883,8 +1911,8 @@ class App extends React.Component<AppProps, AppState> {
     const updateElement = (
       text: string,
       originalText: string,
-      isDeleted = false,
-      updateDimensions = false,
+      isDeleted: boolean,
+      isSubmit: boolean,
     ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
@@ -1896,7 +1924,7 @@ class App extends React.Component<AppProps, AppState> {
                 isDeleted,
                 originalText,
               },
-              updateDimensions,
+              isSubmit,
             );
           }
           return _element;
@@ -1922,7 +1950,7 @@ class App extends React.Component<AppProps, AppState> {
         ];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text, text, false, !element.containerId);
+        updateElement(text, text, false, false);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
@@ -1962,13 +1990,14 @@ class App extends React.Component<AppProps, AppState> {
       }),
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
+      app: this,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text, element.originalText);
+    updateElement(element.text, element.originalText, false, false);
   }
 
   private deselectElements() {
@@ -2066,7 +2095,7 @@ class App extends React.Component<AppProps, AppState> {
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
   }) => {
-    const parentCenterPosition =
+    let parentCenterPosition =
       insertAtParentCenter &&
       this.getTextWysiwygSnappedToCenterPosition(
         sceneX,
@@ -2081,10 +2110,9 @@ class App extends React.Component<AppProps, AppState> {
     const container =
       shouldBind || parentCenterPosition
         ? getElementContainingPosition(
-            this.scene.getElements(),
+            this.scene.getElements().filter((ele) => !isTextElement(ele)),
             sceneX,
             sceneY,
-            "text",
           )
         : null;
 
@@ -2111,6 +2139,15 @@ class App extends React.Component<AppProps, AppState> {
       mutateElement(container, { height: newHeight, width: newWidth });
       sceneX = container.x + newWidth / 2;
       sceneY = container.y + newHeight / 2;
+      if (parentCenterPosition) {
+        parentCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
+          sceneX,
+          sceneY,
+          this.state,
+          this.canvas,
+          window.devicePixelRatio,
+        );
+      }
     }
 
     const element = existingTextElement
@@ -2140,6 +2177,7 @@ class App extends React.Component<AppProps, AppState> {
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
           containerId: container?.id ?? undefined,
+          groupIds: container?.groupIds ?? [],
         });
 
     this.setState({ editingElement: element });
@@ -2698,11 +2736,13 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           this.state.viewModeEnabled)
-      )
+      ) ||
+      isTextElement(this.state.editingElement)
     ) {
       return false;
     }
     isPanning = true;
+    event.preventDefault();
 
     let nextPastePrevented = false;
     const isLinux = /Linux/.test(window.navigator.platform);
@@ -3549,6 +3589,7 @@ class App extends React.Component<AppProps, AppState> {
             lockDirection,
             dragDistanceX,
             dragDistanceY,
+            this.state,
           );
           this.maybeSuggestBindingForAll(selectedElements);
 
