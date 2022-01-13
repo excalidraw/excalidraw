@@ -413,7 +413,7 @@ const ExcalidrawWrapper = () => {
     );
 
     const onVisibilityChange = throttle(() => {
-      if (!document.hidden && !collabAPI.isCollaborating) {
+      if (!document.hidden && !collabAPI.isCollaborating()) {
         // Sync local storage tab states when mismatch
         const localDataState = importFromLocalStorage();
         const username = importUsernameFromLocalStorage();
