@@ -253,20 +253,14 @@ export const updateTextElement = (
     isDeleted?: boolean;
     originalText: string;
   },
-
-  isSubmit: boolean,
-  isCollaborating: boolean,
 ): ExcalidrawTextElement => {
   const boundToContainer = isBoundToContainer(element);
-  if (boundToContainer && isCollaborating) {
+  if (boundToContainer) {
     const container = Scene.getScene(element)!.getElement(element.containerId);
     text = wrapText(text, getFontString(element), container!.width);
   }
   // Don't update dimensions and text value for bounded text unless submitted
-  const dimensions =
-    boundToContainer && !isSubmit && !isCollaborating
-      ? undefined
-      : getAdjustedDimensions(element, text);
+  const dimensions = getAdjustedDimensions(element, text);
   return newElementWith(element, {
     text,
     originalText,

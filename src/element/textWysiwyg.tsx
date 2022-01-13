@@ -63,7 +63,6 @@ export const textWysiwyg = ({
   element,
   canvas,
   excalidrawContainer,
-  isCollaborating,
 }: {
   id: ExcalidrawElement["id"];
   appState: AppState;
@@ -77,7 +76,6 @@ export const textWysiwyg = ({
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement | null;
   excalidrawContainer: HTMLDivElement | null;
-  isCollaborating: boolean;
 }) => {
   const textPropertiesUpdated = (
     updatedElement: ExcalidrawTextElement,
@@ -222,9 +220,7 @@ export const textWysiwyg = ({
       if (isTestEnv()) {
         editable.style.fontFamily = getFontFamilyString(updatedElement);
       }
-      if (isCollaborating) {
-        mutateElement(updatedElement, { x: coordX, y: coordY });
-      }
+      mutateElement(updatedElement, { x: coordX, y: coordY });
     }
   };
 
