@@ -17,6 +17,11 @@ import {
   getContainerElement,
   wrapText,
 } from "./textElement";
+import {
+  actionDecreaseFontSize,
+  actionIncreaseFontSize,
+} from "../actions/actionProperties";
+import App from "../components/App";
 
 const normalizeText = (text: string) => {
   return (
@@ -60,6 +65,7 @@ export const textWysiwyg = ({
   element,
   canvas,
   excalidrawContainer,
+  app,
 }: {
   id: ExcalidrawElement["id"];
   appState: AppState;
@@ -73,6 +79,7 @@ export const textWysiwyg = ({
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement | null;
   excalidrawContainer: HTMLDivElement | null;
+  app: App;
 }) => {
   const textPropertiesUpdated = (
     updatedElement: ExcalidrawTextElement,
@@ -293,16 +300,18 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
-    if (!event[KEYS.CTRL_OR_CMD]) {
-      event.stopPropagation();
-    }
-    if (event.key === KEYS.ESCAPE) {
+    event.stopPropagation();
+
+    if (actionDecreaseFontSize.keyTest(event)) {
+      app.actionManager.executeAction(actionDecreaseFontSize);
+    } else if (actionIncreaseFontSize.keyTest(event)) {
+      app.actionManager.executeAction(actionIncreaseFontSize);
+    } else if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       submittedViaKeyboard = true;
       handleSubmit();
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
-      event.stopPropagation();
       if (event.isComposing || event.keyCode === 229) {
         return;
       }
@@ -315,7 +324,6 @@ export const textWysiwyg = ({
           event.code === CODES.BRACKET_RIGHT))
     ) {
       event.preventDefault();
-      event.stopPropagation();
       if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
         outdent();
       } else {

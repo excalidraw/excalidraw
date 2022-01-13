@@ -1649,10 +1649,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        (isWritableElement(event.target) &&
-          event.key !== KEYS.ESCAPE &&
-          // handle cmd/ctrl-modifier shortcuts even inside inputs
-          !event[KEYS.CTRL_OR_CMD]) ||
+        (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
         // case: using arrows to move between buttons
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {
@@ -1993,6 +1990,7 @@ class App extends React.Component<AppProps, AppState> {
       }),
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
+      app: this,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
