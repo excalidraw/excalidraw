@@ -33,7 +33,7 @@ const allLanguages: Language[] = [
   { code: "kab-KAB", label: "Taqbaylit" },
   { code: "kk-KZ", label: "Қазақ тілі" },
   { code: "ko-KR", label: "한국어" },
-  { code: "lt-LT", Label: "Lietuvių" },
+  { code: "lt-LT", label: "Lietuvių" },
   { code: "lv-LV", label: "Latviešu" },
   { code: "my-MM", label: "Burmese" },
   { code: "nb-NO", label: "Norsk bokmål" },
