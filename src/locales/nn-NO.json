@@ -102,7 +102,9 @@
     "showBackground": "Vis fargeveljar for bakgrunn",
     "toggleTheme": "Veksle tema",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -204,10 +206,12 @@
     "resizeImage": "Du kan endre storleiken fritt ved å halde inne SHIFT,\nhald ALT for å endre storleik frå sentrum",
     "rotate": "Du kan låse vinklane ved å halde SHIFT medan du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkt",
-    "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, CtrlOrCmd+D for å duplisere, eller dra for å flytte",
-    "lineEditor_nothingSelected": "Vel eit punkt å flytte eller fjerne, eller hald Alt og klikk for å legge til nye punkt",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "Klikk for å plassere biletet, eller klikk og drag for å velje storleik manuelt",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikkje vise førehandsvising",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Les bloggen vår",
     "click": "klikk",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Boga pil",
     "curvedLine": "Boga linje",
     "documentation": "Dokumentasjon",
