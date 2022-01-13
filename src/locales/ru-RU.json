@@ -103,8 +103,8 @@
     "toggleTheme": "Переключить тему",
     "personalLib": "Личная библиотека",
     "excalidrawLib": "Библиотека Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Уменьшить шрифт",
+    "increaseFontSize": "Увеличить шрифт"
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
