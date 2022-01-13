@@ -36,6 +36,7 @@ import { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
   getApproxMinLineWidth,
+  getBoundTextElement,
   getBoundTextElementId,
   handleBindTextResize,
   measureText,
@@ -588,15 +589,12 @@ export const resizeSingleElement = (
     });
   }
   let minWidth = 0;
-  if (boundTextElementId) {
-    const boundTextElement = Scene.getScene(element)!.getElement(
-      boundTextElementId,
-    ) as ExcalidrawTextElement;
+  const boundTextElement = getBoundTextElement(element);
+  if (boundTextElement) {
     minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
   }
-
   if (
-    resizedElement.width > minWidth &&
+    resizedElement.width >= minWidth &&
     resizedElement.height !== 0 &&
     Number.isFinite(resizedElement.x) &&
     Number.isFinite(resizedElement.y)
