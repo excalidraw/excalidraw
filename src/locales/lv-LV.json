@@ -65,7 +65,7 @@
     "fileTitle": "Datnes nosaukums",
     "colorPicker": "Krāsu atlasītājs",
     "canvasBackground": "Ainas fons",
-    "drawingCanvas": "Zīmējuma laukums",
+    "drawingCanvas": "Tāfele",
     "layers": "Slāņi",
     "actions": "Darbības",
     "language": "Valoda",
@@ -103,8 +103,8 @@
     "toggleTheme": "Pārslēgt krāsu tēmu",
     "personalLib": "Personīgā bibliotēka",
     "excalidrawLib": "Excalidraw bibliotēka",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Samazināt fonta izmēru",
+    "increaseFontSize": "Palielināt fonta izmēru"
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
