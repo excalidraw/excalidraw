@@ -102,7 +102,9 @@
     "showBackground": "Exibir seletor de cores do fundo",
     "toggleTheme": "Alternar tema",
     "personalLib": "Biblioteca Pessoal",
-    "excalidrawLib": "Biblioteca do Excalidraw"
+    "excalidrawLib": "Biblioteca do Excalidraw",
+    "decreaseFontSize": "Diminuir o tamanho da fonte",
+    "increaseFontSize": "Aumentar o tamanho da fonte"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -204,10 +206,12 @@
     "resizeImage": "Você pode redimensionar livremente segurando SHIFT,\nsegure ALT para redimensionar a partir do centro",
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",
     "lineEditor_info": "Clique duas vezes ou pressione Enter para editar os pontos",
-    "lineEditor_pointSelected": "Pressione Deletar para remover o ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
-    "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos",
+    "lineEditor_pointSelected": "Pressione Delete para remover o(s) ponto(s),\nCtrl/Cmd+D para duplicar ou arraste para mover",
+    "lineEditor_nothingSelected": "Selecione um ponto para editar (segure SHIFT para selecionar vários) ou segure Alt e clique para adicionar novos pontos",
     "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
-    "publishLibrary": "Publicar sua própria biblioteca"
+    "publishLibrary": "Publicar sua própria biblioteca",
+    "bindTextToElement": "Pressione Enter para adicionar o texto",
+    "deepBoxSelect": "Segure Ctrl/Cmd para seleção profunda e para evitar arrastar"
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Leia o nosso blog",
     "click": "clicar",
+    "deepSelect": "Seleção profunda",
+    "deepBoxSelect": "Use a seleção profunda dentro da caixa para previnir arrastar",
     "curvedArrow": "Seta curva",
     "curvedLine": "Linha curva",
     "documentation": "Documentação",
@@ -290,13 +296,13 @@
       "authorName": "Seu nome ou nome de usuário",
       "libraryName": "Nome da sua biblioteca",
       "libraryDesc": "Descrição para ajudar as pessoas a entenderem o uso da sua da sua biblioteca",
-      "githubHandle": "",
+      "githubHandle": "Identificador do GitHub (opcional), para que você possa editar a biblioteca depois de enviar para revisão",
       "twitterHandle": "Nome de usuário do Twitter (opcional), para que saibamos quem deve ser creditado se promovermos no Twitter",
       "website": "Link para o seu site pessoal ou outro lugar (opcional)"
     },
     "errors": {
       "required": "Obrigatório",
-      "website": ""
+      "website": "Informe uma URL válida"
     },
     "noteDescription": {
       "pre": "Envie sua biblioteca para ser incluída no ",

@@ -102,7 +102,9 @@
     "showBackground": "Hintergrundfarbe auswählen",
     "toggleTheme": "Design umschalten",
     "personalLib": "Persönliche Bibliothek",
-    "excalidrawLib": "Excalidraw-Bibliothek"
+    "excalidrawLib": "Excalidraw-Bibliothek",
+    "decreaseFontSize": "Schrift verkleinern",
+    "increaseFontSize": "Schrift vergrößern"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -197,17 +199,19 @@
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
     "text_selected": "Doppelklicken oder Eingabetaste drücken, um Text zu bearbeiten",
-    "text_editing": "Drücke Escape oder Strg/Cmd+Eingabetaste, um die Bearbeitung abzuschließen",
+    "text_editing": "Drücke Escape oder CtrlOrCmd+Eingabetaste, um die Bearbeitung abzuschließen",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
     "lockAngle": "Du kannst Winkel einschränken, indem du SHIFT gedrückt hältst",
     "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
     "resizeImage": "Du kannst die Größe frei ändern, indem du SHIFT gedrückt hältst; halte ALT, um die Größe vom Zentrum aus zu ändern",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
     "lineEditor_info": "Doppelklicken oder Eingabetaste drücken, um Punkte zu bearbeiten",
-    "lineEditor_pointSelected": "Drücke Löschen, um Punkt zu entfernen, Strg+D oder Cmd+D zum Duplizieren oder ziehe zum Verschieben",
-    "lineEditor_nothingSelected": "Wähle einen Punkt zum Verschieben oder Löschen oder halte die Alt-Taste gedrückt und klicke, um neue Punkte hinzuzufügen",
+    "lineEditor_pointSelected": "Drücke Löschen, um Punkt(e) zu entfernen, CtrlOrCmd+D zum Duplizieren oder ziehe zum Verschieben",
+    "lineEditor_nothingSelected": "Wähle einen zu bearbeitenden Punkt (halte SHIFT gedrückt um mehrere Punkte auszuwählen),\noder halte Alt gedrückt und klicke um neue Punkte hinzuzufügen",
     "placeImage": "Klicken, um das Bild zu platzieren oder klicken und ziehen um seine Größe manuell zu setzen",
-    "publishLibrary": "Veröffentliche deine eigene Bibliothek"
+    "publishLibrary": "Veröffentliche deine eigene Bibliothek",
+    "bindTextToElement": "Zum Hinzufügen Eingabetaste drücken",
+    "deepBoxSelect": "Halte CtrlOrCmd gedrückt, um innerhalb der Gruppe auszuwählen, und um Ziehen zu vermeiden"
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Lies unseren Blog",
     "click": "klicken",
+    "deepSelect": "Auswahl innerhalb der Gruppe",
+    "deepBoxSelect": "Auswahl innerhalb der Gruppe, und Ziehen vermeiden",
     "curvedArrow": "Gebogener Pfeil",
     "curvedLine": "Gebogene Linie",
     "documentation": "Dokumentation",

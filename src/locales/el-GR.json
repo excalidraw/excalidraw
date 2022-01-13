@@ -101,8 +101,10 @@
     "showStroke": "Εμφάνιση επιλογέα χρωμάτων πινελιάς",
     "showBackground": "Εμφάνιση επιλογέα χρώματος φόντου",
     "toggleTheme": "Εναλλαγή θέματος",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Προσωπική Βιβλιοθήκη",
+    "excalidrawLib": "Βιβλιοθήκη Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -204,10 +206,12 @@
     "resizeImage": "",
     "rotate": "Μπορείς να περιορίσεις τις γωνίες κρατώντας πατημένο το πλήκτρο SHIFT κατά την περιστροφή",
     "lineEditor_info": "Διπλό-κλικ ή πιέστε Enter για να επεξεργαστείτε τα σημεία",
-    "lineEditor_pointSelected": "Πιέστε Διαγραφή για να αφαιρέσετε το σημείου, CtrlOrCmd+D για να το αντιγράψετε ή σύρτε το για να το μετακινήσετε",
-    "lineEditor_nothingSelected": "Επιλέξτε ένα σημείο για μετακίνηση ή αφαίρεση, ή κρατήστε παρατεταμένα το Alt και κάντε κλικ για να προσθέσετε νέα σημεία",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": "Δημοσιεύστε τη δική σας βιβλιοθήκη"
+    "publishLibrary": "Δημοσιεύστε τη δική σας βιβλιοθήκη",
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Αδυναμία εμφάνισης προεπισκόπησης",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Διαβάστε το Blog μας",
     "click": "κλικ",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Κυρτό βέλος",
     "curvedLine": "Κυρτή γραμμή",
     "documentation": "Εγχειρίδιο",
@@ -295,7 +301,7 @@
       "website": ""
     },
     "errors": {
-      "required": "",
+      "required": "Απαιτείται",
       "website": "Εισάγετε μια έγκυρη διεύθυνση URL"
     },
     "noteDescription": {
@@ -305,7 +311,7 @@
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "οδηγίες",
       "post": ""
     },
     "noteLicense": {
@@ -319,11 +325,11 @@
   "publishSuccessDialog": {
     "title": "",
     "content": "",
-    "link": ""
+    "link": "εδώ"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Καθαρισμός βιβλιοθήκης",
+    "removeItemsFromLib": "Αφαίρεση επιλεγμένων αντικειμένων από τη βιβλιοθήκη"
   },
   "encrypted": {
     "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα είναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw.",
@@ -345,7 +351,7 @@
     "width": "Πλάτος"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Προστέθηκε στη βιβλιοθήκη",
     "copyStyles": "Αντιγράφηκαν στυλ.",
     "copyToClipboard": "Αντιγράφηκε στο πρόχειρο.",
     "copyToClipboardAsPng": "Αντιγράφηκε {{exportSelection}} στο πρόχειρο ως PNG\n({{exportColorScheme}})",

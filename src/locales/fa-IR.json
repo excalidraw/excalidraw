@@ -102,7 +102,9 @@
     "showBackground": "نمایش انتخاب کننده رنگ پس زمینه",
     "toggleTheme": "تغییر تم",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -204,10 +206,12 @@
     "resizeImage": "",
     "rotate": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
     "lineEditor_info": "دوبار کلیک کنید یا Enter را فشار دهید تا نقاط را ویرایش کنید",
-    "lineEditor_pointSelected": "برای حذف نقطه Delete برای کپی زدن Ctrl یا Cmd+D را بزنید و یا برای جابجایی بکشید.",
-    "lineEditor_nothingSelected": "یک نقطه را برای جابجایی یا حذف انتخاب کنید یا کلید Alt بگیرید و کلیک کنید تا بتوانید یک نقطه جدید اضافه کنید",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "بلاگ ما را بخوانید",
     "click": "کلیک",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "فلش خمیده",
     "curvedLine": "منحنی",
     "documentation": "مستندات",

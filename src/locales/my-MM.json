@@ -102,7 +102,9 @@
     "showBackground": "",
     "toggleTheme": "",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
@@ -204,10 +206,12 @@
     "resizeImage": "",
     "rotate": "Shift ကိုနှိပ်ထားခြင်းဖြင့် ထောင့်အလိုက်လှည့်နိုင်သည်",
     "lineEditor_info": "အမှတ်များပြင်ဆင်သတ်မှတ်ရင် ကလစ်နှစ်ချက် (သို့) Enter ကိုနှိပ်ပါ",
-    "lineEditor_pointSelected": "အမှတ်များအား ဖျက်ရန် Delete နှင့် ပွားရန် Ctrl/Cmd + D သုံးပါ၊ ရွှေ့လိုပါက တရွတ်ဆွဲပါ",
-    "lineEditor_nothingSelected": "ရွှေ့လို (သို့) ဖယ်ရှားလိုသောအမှတ်ကိုရွေးပါ၊ Alt နှင့် ကလစ်တွဲနှိပ်၍လည်းအမှတ်အသစ်ထပ်ထည့်နိုင်သည်",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "နမူနာမပြသနိုင်ပါ",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "",
     "click": "",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "",

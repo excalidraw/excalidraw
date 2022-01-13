@@ -102,7 +102,9 @@
     "showBackground": "Mostra selettore colore di sfondo",
     "toggleTheme": "Cambia tema",
     "personalLib": "Libreria Personale",
-    "excalidrawLib": "Libreria di Excalidraw"
+    "excalidrawLib": "Libreria di Excalidraw",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -204,10 +206,12 @@
     "resizeImage": "Puoi ridimensionare liberamente tenendo premuto SHIFT,\ntieni premuto ALT per ridimensionare dal centro",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
-    "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
-    "lineEditor_nothingSelected": "Seleziona un punto per spostare o rimuovere, oppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente",
-    "publishLibrary": "Pubblica la tua libreria"
+    "publishLibrary": "Pubblica la tua libreria",
+    "bindTextToElement": "Premi invio per aggiungere il testo",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Leggi il nostro blog",
     "click": "click",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Freccia curva",
     "curvedLine": "Linea curva",
     "documentation": "Documentazione",

@@ -35,7 +35,7 @@
     "arrowhead_arrow": "Taneccabt",
     "arrowhead_bar": "Afeggag",
     "arrowhead_dot": "Tanqiḍt",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "Akerdis",
     "fontSize": "Tiddi n tsefsit",
     "fontFamily": "Tawacult n tsefsiyin",
     "onlySelected": "Tafrayt kan",
@@ -101,8 +101,10 @@
     "showStroke": "Beqqeḍ amelqaḍ n yini n yizirig",
     "showBackground": "Beqqeḍ amelqaḍ n yini n ugilal",
     "toggleTheme": "Snifel asentel",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "Tamkarḍit tudmawant",
+    "excalidrawLib": "Tamkarḍit n Excalidraw",
+    "decreaseFontSize": "Senqes tiddi n tsefsit",
+    "increaseFontSize": "Sali tiddi n tsefsit"
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
@@ -138,10 +140,10 @@
     "exitZenMode": "Ffeɣ seg uskar Zen",
     "cancel": "Sefsex",
     "clear": "Sfeḍ",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "remove": "Kkes",
+    "publishLibrary": "Ẓreg",
+    "submit": "Azen",
+    "confirm": "Sentem"
   },
   "alerts": {
     "clearReset": "Ayagi ad isfeḍ akk taɣzut n usuneɣ. Tetḥeqqeḍ?",
@@ -163,7 +165,7 @@
     "cannotRestoreFromImage": "Asayes ulamek ara d-yettwarr seg ufaylu-agi n tugna",
     "invalidSceneUrl": "Ulamek taktert n usayes seg URL i d-ittunefken. Ahat mačči d tameɣtut neɣ ur tegbir ara isefka JSON n Excalidraw.",
     "resetLibrary": "Ayagi ad isfeḍ tamkarḍit-inek•m. Tetḥeqqeḍ?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "Ad tekkseḍ {{count}} n uferdis (en) si temkarḍit?",
     "invalidEncryptionKey": "Tasarut n uwgelhen isefk ad tesɛu 22 n yiekkilen. Amɛiwen srid yensa."
   },
   "errors": {
@@ -171,7 +173,7 @@
     "imageInsertError": "D awezɣi tugra n tugna. Eɛreḍ tikkelt-nniḍen ardeqqal...",
     "fileTooBig": "Afaylu meqqer aṭas. Tiddi tafellayt yurgen d {{maxSize}}.",
     "svgImageInsertError": "D awezɣi tugra n tugna SVG. Acraḍ SVG yettban-d d armeɣtu.",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG armeɣtu."
   },
   "toolBar": {
     "selection": "Tafrayt",
@@ -192,7 +194,7 @@
     "shapes": "Talɣiwin"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Akken ad tesmuttiḍ taɣzut n usuneɣ, ṭṭef ṛṛuda n umumed, neɣ afeggag n tallunt mi ara tzuɣreḍ",
     "linearElement": "Ssit akken ad tebduḍ aṭas n tenqiḍin, zuɣer i yiwen n yizirig",
     "freeDraw": "Ssit yerna zuɣer, serreḥ ticki tfukeḍ",
     "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
@@ -204,10 +206,12 @@
     "resizeImage": "Tzemreḍ ad talseḍ tiddi s tilelli s tuṭṭfa n SHIFT,\nṭṭef ALT akken ad talseḍ tiddi si tlemmast",
     "rotate": "Tzemreḍ ad tḥettemeḍ tiɣemmar s tuṭṭfa n SHIFT di tuzzya",
     "lineEditor_info": "Ssit snat n tikkal neɣ ssed taqeffalt Kcem akken ad tẓergeḍ tinqiḍin",
-    "lineEditor_pointSelected": "Ssed taqeffalt kkes akken ad tekkseḍ tanqiḍt, CtrlOrCmd+D akken ad tsiselgeḍ, neɣ zuɣer akken ad tesmuttiḍ",
-    "lineEditor_nothingSelected": "Fren tanqiḍt ara tesmuttiḍ neɣ ara tekkseḍ, neɣ ṭṭef taqeffalt Alt akken ad ternuḍ tinqiḍin timaynutin",
+    "lineEditor_pointSelected": "Ssed taqeffalt kkes akken ad tekkseḍ tanqiḍ (tinqiḍin),\nCtrlOrCmd+D akken ad tsiselgeḍ, neɣ zuɣer akken ad tesmuttiḍ",
+    "lineEditor_nothingSelected": "Fren tanqiḍt akken ad tẓergeḍ (ṭṭef SHIFT akken ad tferneḍ aṭas),\nneɣ ṭṭef Alt akken ad ternuḍ tinqiḍin timaynutin",
     "placeImage": "Ssit akken ad tserseḍ tugna, neɣ ssit u zuɣer akken ad tesbaduḍ tiddi-ines s ufus",
-    "publishLibrary": ""
+    "publishLibrary": "Siẓreg tamkarḍit-inek•inem",
+    "bindTextToElement": "Ssed ɣef kcem akken ad ternuḍ aḍris",
+    "deepBoxSelect": "Ṭṭef CtrlOrCmd akken ad tferneḍ s telqey, yerna ad trewleḍ i uzuɣer"
   },
   "canvasError": {
     "cannotShowPreview": "Ulamek abeqqeḍ n teskant",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Ɣeṛ ablug-nneɣ",
     "click": "ssit",
+    "deepSelect": "Afran s telqey",
+    "deepBoxSelect": "Afran s telqey s tnaka, yerna ad tyrewleḍ i uzuɣer",
     "curvedArrow": "Taneccabt izelgen",
     "curvedLine": "Izirig izelgen",
     "documentation": "Tasemlit",
@@ -275,55 +281,55 @@
     "zoomToSelection": "Simɣur ɣer tefrayt"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Sfeḍ taɣzut n usuneɣ"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "Suffeɣ-d tamkarḍit",
+    "itemName": "Isem n uferdis",
+    "authorName": "Isem n umeskar",
+    "githubUsername": "Isem n useqdac n GitHub",
+    "twitterUsername": "Isem n useqdac n Twitter",
+    "libraryName": "Isem n temkarḍit",
+    "libraryDesc": "Aglam n temkarḍit",
+    "website": "Asmel n web",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "authorName": "Isem neɣ isem n useqdac inek•inem",
+      "libraryName": "Isem n temkarḍit-inek•inem",
+      "libraryDesc": "Aglam n temkarḍit-inek•inem akken ad tɛiwneḍ medden ad fehmen aseqdec-inec",
+      "githubHandle": "Isem n useqdac n GitHub ( d anefrunan) akken ad tizmireḍ ad tisẓrigeḍ tamkarḍit ticki tuzneḍ-tt i uselken",
+      "twitterHandle": "Isem n useqdac n Twitter (d anefrunan) akken ad nẓer anwa ara nsenmer deg udellel di Twitter",
+      "website": "Aseɣwen ɣer usmel-inek•inem neɣ wayeḍ (d anefrunan)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Yettwasra",
+      "website": "Sekcem URL ameɣtu"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Azen tamkarḍit-inek•inem akken ad teddu di ",
+      "link": "akaram azayez n temkarḍit",
+      "post": "i yimdanen-nniḍen ara isqedcen deg wunuɣen-nnsen."
     },
     "noteGuidelines": {
-      "pre": "",
+      "pre": "Tamkarḍit teḥwaǧ ad tettwaqbel s ufus qbel. Ma ulac uɣilif ɣer ",
       "link": "",
-      "post": ""
+      "post": " send ad tazneḍ. Tesriḍ amiḍan n GitHub akken ad tmmeslayeḍ yerna ad tgeḍ ibeddilen ma yelaq, maca mačči d ayen yettwaḥetmen."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Mi tuzneḍ ad tqebleḍ akken tamkarḍit ad d-teffeɣ s ",
+      "link": "Turagt MIT, ",
+      "post": "ayen yebɣan ad d-yini belli yal yiwen izmer ad ten-iseqdec war tilist."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Yal aferdis n temkarḍit isefk ad isɛu isem-is i yiman-is akken ad yili wamek ara yettusizdeg. Iferdisen-agi n temkarḍit ad ddun:",
+    "atleastOneLibItem": "Ma ulac uɣilif fern ma drus yiwen n uferdis n temkarḍit akken ad tebduḍ"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Tamkarḍit tettwazen",
+    "content": "Tanemmirt-ik•im {{authorName}}. Tamkarḍit-inek•inem tettwazen i weselken. Tzemreḍ ad tḍefreḍ aẓayer",
+    "link": "dagi"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Ales awennez n temkarḍit",
+    "removeItemsFromLib": "Kkes iferdisen yettafernen si temkarḍit"
   },
   "encrypted": {
     "tooltip": "Unuɣen-inek (m) ttuwgelhnen seg yixef s ixef dɣa iqeddacen n Excalidraw werǧin ad ten-walin. ",
@@ -345,7 +351,7 @@
     "width": "Tehri"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Yettwarna ɣer temkarḍit",
     "copyStyles": "Iɣunab yettwaneɣlen.",
     "copyToClipboard": "Yettwaɣel ɣer tecfawit.",
     "copyToClipboardAsPng": "{{exportSelection}} yettwanɣel ɣer tecfawit am PNG\n({{exportColorScheme}})",
@@ -360,14 +366,14 @@
     "f1f3f5": "Aɣiɣdi 1",
     "fff5f5": "Azeggaɣ",
     "fff0f6": "Axuxi 0",
-    "f8f0fc": "",
+    "f8f0fc": "Tiẓurin 0",
     "f3f0ff": "Amidadi 0",
     "edf2ff": "",
     "e7f5ff": "Anili 0",
     "e3fafc": "",
     "e6fcf5": "",
     "ebfbee": "Azegzaw 0",
-    "f4fce3": "",
+    "f4fce3": "Llim 0",
     "fff9db": "Awraɣ 0",
     "fff4e6": "Aččinawi 0",
     "transparent": "Afrawan",
@@ -382,7 +388,7 @@
     "15aabf": "",
     "12b886": "",
     "40c057": "Azegzaw 0",
-    "82c91e": "",
+    "82c91e": "Llim 6",
     "fab005": "Awraɣ 6",
     "fd7e14": "Aččinawi 6",
     "000000": "Aberkan",
@@ -390,14 +396,14 @@
     "495057": "Aɣiɣdi 7",
     "c92a2a": "Azeggaɣ 9",
     "a61e4d": "Axuxi 9",
-    "862e9c": "",
+    "862e9c": "Tiẓurin 9",
     "5f3dc4": "Amidadi 9",
     "364fc7": "",
     "1864ab": "Anili 9",
     "0b7285": "",
     "087f5b": "",
     "2b8a3e": "Azegzaw 9",
-    "5c940d": "",
+    "5c940d": "Llim 9",
     "e67700": "Awraɣ 9",
     "d9480f": "Aččinawi 9"
   }

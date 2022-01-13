@@ -102,7 +102,9 @@
     "showBackground": "",
     "toggleTheme": "",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -204,10 +206,12 @@
     "resizeImage": "",
     "rotate": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को विवश कर सकते हैं",
     "lineEditor_info": "बिंदुओं को संपादित करने के लिए Enter पर डबल-क्लिक करें या दबाएँ",
-    "lineEditor_pointSelected": "बिंदु हटाने के लिए डिलीट दबाएं, प्रतिरूपित करने के लिए कण्ट्रोल या कमांड डी दबाएं या स्थानांतरित करने के लिए खींचे",
-    "lineEditor_nothingSelected": "स्थानांतरित करने या हटाने के लिए एक बिंदु का चयन करें, या Alt दबाए रखें और नए बिंदुओं को जोड़ने के लिए क्लिक करें",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "हमारा ब्लॉग पढे",
     "click": "क्लिक करें",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "वक्र तीर",
     "curvedLine": "वक्र रेखा",
     "documentation": "",

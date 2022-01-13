@@ -102,7 +102,9 @@
     "showBackground": "Näytä taustavärin valitsin",
     "toggleTheme": "Vaihda teema",
     "personalLib": "Oma kirjasto",
-    "excalidrawLib": "Excalidraw kirjasto"
+    "excalidrawLib": "Excalidraw kirjasto",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -204,10 +206,12 @@
     "resizeImage": "Voit muuttaa kokoa vapaasti pitämällä SHIFTiä pohjassa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen ympäri",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
-    "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, Ctrl tai Cmd+D monistaaksesi, tai raahaa liikuttaaksesi",
-    "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä ALT-näppäintä alaspainettuna ja napsauta lisätäksesi uusia pisteitä",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
-    "publishLibrary": "Julkaise oma kirjasto"
+    "publishLibrary": "Julkaise oma kirjasto",
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Lue blogiamme",
     "click": "klikkaa",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Kaareva nuoli",
     "curvedLine": "Kaareva viiva",
     "documentation": "Käyttöohjeet",

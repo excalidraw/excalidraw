@@ -102,7 +102,9 @@
     "showBackground": "Vis fargevelger for bakgrunnsfarge",
     "toggleTheme": "Veksle tema",
     "personalLib": "Personlig bibliotek",
-    "excalidrawLib": "Excalidraw-bibliotek"
+    "excalidrawLib": "Excalidraw-bibliotek",
+    "decreaseFontSize": "Reduser skriftstørrelse",
+    "increaseFontSize": "Øk skriftstørrelse"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -205,9 +207,11 @@
     "rotate": "Du kan låse vinklene ved å holde SHIFT mens du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkter",
     "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, Ctrl / Cmd+D for å duplisere, eller dra for å flytte",
-    "lineEditor_nothingSelected": "Velg et punkt å flytte eller fjerne, eller hold Alt og klikk for å legge til nye punkter",
+    "lineEditor_nothingSelected": "Velg et punkt å redigere (hold SHIFT for å velge flere),\neller hold Alt og klikk for å legge til nye punkter",
     "placeImage": "Klikk for å plassere bildet, eller klikk og dra for å angi størrelsen manuelt",
-    "publishLibrary": "Publiser ditt eget bibliotek"
+    "publishLibrary": "Publiser ditt eget bibliotek",
+    "bindTextToElement": "Trykk Enter for å legge til tekst",
+    "deepBoxSelect": "Hold CTRL/CMD for å markere dypt og forhindre flytting"
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Les bloggen vår",
     "click": "klikk",
+    "deepSelect": "Marker dypt",
+    "deepBoxSelect": "Marker dypt innad i boks og forhindre flytting",
     "curvedArrow": "Buet pil",
     "curvedLine": "Buet linje",
     "documentation": "Dokumentasjon",
