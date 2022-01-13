@@ -148,7 +148,7 @@ const resize = (
 };
 
 describe("Test text element", () => {
-  it("changing fontSize via keyboard", async () => {
+  it("should update font size via keyboard", async () => {
     await render(<ExcalidrawApp />);
 
     const textElement = API.createElement({
