@@ -103,8 +103,8 @@
     "toggleTheme": "தோற்றத்தை நிலைமாற்று",
     "personalLib": "தனக்குரிய நூலகம்",
     "excalidrawLib": "எக்ஸ்கேலிட்ரா நூலகம்",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "எழுத்துரு அளவைக் குறை",
+    "increaseFontSize": "எழுத்துரு அளவை அதிகரி"
   },
   "buttons": {
     "clearReset": "கித்தானை அகரமாக்கு",
@@ -211,7 +211,7 @@
     "placeImage": "படத்தை வைக்கச் சொடுக்கு, அ கைமுறையாக அளவு அமைக்க சொடுக்கி பிடித்திழு",
     "publishLibrary": "உம் சொந்த நூலகத்தைப் பிரசுரி",
     "bindTextToElement": "உரையைச் சேர்க்க enterஐ அழுத்து",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "ஆழ்ந்துத் தேரவும் பிடித்திழுத்தலைத் தவிர்க்கவும் CtrlOrCmdஐ அழுத்திப்பிடி"
   },
   "canvasError": {
     "cannotShowPreview": "முன்னோட்டம் காட்ட இயலவில்லை",
