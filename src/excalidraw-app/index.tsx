@@ -69,7 +69,6 @@ import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
-import throttle from "lodash.throttle";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -412,9 +411,8 @@ const ExcalidrawWrapper = () => {
       TITLE_TIMEOUT,
     );
 
-    const onVisibilityChange = throttle(() => {
-      if (!document.hidden && !collabAPI.isCollaborating()) {
-        // Sync local storage tab states when mismatch
+    const syncData = () => {
+      if (!collabAPI.isCollaborating()) {
         const localDataState = importFromLocalStorage();
         const username = importUsernameFromLocalStorage();
         let langCode = languageDetector.detect() || defaultLang.code;
@@ -428,27 +426,18 @@ const ExcalidrawWrapper = () => {
         });
         collabAPI.setUsername(username || "");
       }
-    }, 50);
+    };
 
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
     window.addEventListener(EVENT.UNLOAD, onBlur, false);
     window.addEventListener(EVENT.BLUR, onBlur, false);
-    window.addEventListener(EVENT.FOCUS, onVisibilityChange, false);
-    document.addEventListener(
-      EVENT.VISIBILITY_CHANGE,
-      onVisibilityChange,
-      false,
-    );
+
+    window.addEventListener(EVENT.STORAGE, syncData, false);
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
       window.removeEventListener(EVENT.UNLOAD, onBlur, false);
       window.removeEventListener(EVENT.BLUR, onBlur, false);
-      window.removeEventListener(EVENT.FOCUS, onVisibilityChange, false);
-      document.removeEventListener(
-        EVENT.VISIBILITY_CHANGE,
-        onVisibilityChange,
-        false,
-      );
+
       clearTimeout(titleTimeout);
     };
   }, [collabAPI, excalidrawAPI]);

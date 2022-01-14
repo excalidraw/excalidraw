@@ -52,6 +52,7 @@ export enum EVENT {
   HASHCHANGE = "hashchange",
   VISIBILITY_CHANGE = "visibilitychange",
   SCROLL = "scroll",
+  STORAGE = "storage",
 }
 
 export const ENV = {
