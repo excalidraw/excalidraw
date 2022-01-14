@@ -103,8 +103,8 @@
     "toggleTheme": "Växla tema",
     "personalLib": "Personligt bibliotek",
     "excalidrawLib": "Excalidraw bibliotek",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Minska fontstorleken",
+    "increaseFontSize": "Öka fontstorleken"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
