@@ -14026,9 +14026,9 @@ svgo@^1.0.0, svgo@^1.2.2:
     unquote "~1.1.1"
     util.promisify "~1.0.0"
 
-"switchboard@ssh://git@github.com:switchboardcc/switchboard.git#main":
+"switchboard@ssh://git@github.com:switchboardcc/switchboard.git#carlos-excalidraw-prototype":
   version "0.0.0"
-  resolved "ssh://git@github.com:switchboardcc/switchboard.git#eea209a28a03923c669af82195cf901c93fd0943"
+  resolved "ssh://git@github.com:switchboardcc/switchboard.git#b874a2b6982619154d2b3cb8e15780075efca802"
   dependencies:
     dotenv-flow "^3.2.0"
     dotenv-flow-cli "^1.0.0"

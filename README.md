@@ -27,7 +27,11 @@ yarn
 yarn build-switchboard
 ```
 
-#### Start the server
+#### Start the switchboard server
+
+Go to the switchboard repo make sure to be on the `carlos-excalidraw-prototype` branch and follow the readme to the server
+
+#### Start the excalidraw server
 
 ```bash
 yarn start
@@ -35,7 +39,11 @@ yarn start
 
 Important: Now you can open [http://0.0.0.0:3000](http://0.0.0.0:3000) (NOT localhost:3000)
 
-#### Pull recent changes from switchboard
+#### How to reset state after finishing a tour
+
+Use postman collection to reset state (ping carlos if you don't have it)
+
+#### How to pull recent changes from switchboard
 
 ```bash
 yarn upgrade-switchboard
