@@ -12,6 +12,7 @@ export const STORAGE_KEYS = {
   LOCAL_STORAGE_COLLAB: "excalidraw-collab",
   LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG: "collabLinkForceLoadFlag",
   LOCAL_STORAGE_LIBRARY: "excalidraw-library",
+  STATE_UPDATED: "stateUpdated",
 };
 
 export const saveUsernameToLocalStorage = (username: string) => {
@@ -137,5 +138,22 @@ export const getLibraryItemsFromStorage = () => {
   } catch (e) {
     console.error(e);
     return [];
+  }
+};
+
+export const saveStateUpdatedTimeStampToStorage = (timeStamp: number) => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.STATE_UPDATED, timeStamp.toString());
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export const getStateUpdatedTimeStampFromStorage = () => {
+  try {
+    const timestamp = Number(localStorage.getItem(STORAGE_KEYS.STATE_UPDATED));
+    return timestamp;
+  } catch (e) {
+    console.error(e);
   }
 };

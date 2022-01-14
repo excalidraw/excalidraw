@@ -51,8 +51,10 @@ import { LanguageList } from "./components/LanguageList";
 import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
 import {
   getLibraryItemsFromStorage,
+  getStateUpdatedTimeStampFromStorage,
   importFromLocalStorage,
   importUsernameFromLocalStorage,
+  saveStateUpdatedTimeStampToStorage,
   saveToLocalStorage,
   STORAGE_KEYS,
 } from "./data/localStorage";
@@ -69,6 +71,7 @@ import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
+import { throttle } from "lodash";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -130,29 +133,6 @@ languageDetector.init({
   },
   checkWhitelist: false,
 });
-
-const saveDebounced = debounce(
-  async (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    files: BinaryFiles,
-    onFilesSaved: () => void,
-  ) => {
-    saveToLocalStorage(elements, appState);
-
-    await localFileStorage.saveFiles({
-      elements,
-      files,
-    });
-
-    onFilesSaved();
-  },
-  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
-);
-
-const onBlur = () => {
-  saveDebounced.flush();
-};
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
@@ -280,7 +260,7 @@ const ExcalidrawWrapper = () => {
     currentLangCode = currentLangCode[0];
   }
   const [langCode, setLangCode] = useState(currentLangCode);
-
+  const stateUpdated = useRef<number>(-1);
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -291,6 +271,30 @@ const ExcalidrawWrapper = () => {
     initialStatePromiseRef.current.promise =
       resolvablePromise<ImportedDataState | null>();
   }
+
+  const saveDebounced = debounce(
+    async (
+      elements: readonly ExcalidrawElement[],
+      appState: AppState,
+      files: BinaryFiles,
+      onFilesSaved: () => void,
+    ) => {
+      saveToLocalStorage(elements, appState);
+
+      await localFileStorage.saveFiles({
+        elements,
+        files,
+      });
+      stateUpdated.current = Date.now();
+      saveStateUpdatedTimeStampToStorage(stateUpdated.current);
+      onFilesSaved();
+    },
+    SAVE_TO_LOCAL_STORAGE_TIMEOUT,
+  );
+
+  const onBlur = useCallback(() => {
+    saveDebounced.flush();
+  }, [saveDebounced]);
 
   useEffect(() => {
     // Delayed so that the app has a time to load the latest SW
@@ -411,8 +415,14 @@ const ExcalidrawWrapper = () => {
       TITLE_TIMEOUT,
     );
 
-    const syncData = () => {
-      if (!collabAPI.isCollaborating()) {
+    const syncData = throttle(() => {
+      if (!document.hidden && !collabAPI.isCollaborating()) {
+        const stateUpdatedFromStorage = getStateUpdatedTimeStampFromStorage();
+
+        // Don't sync if timestamp is same
+        if (stateUpdated.current === stateUpdatedFromStorage) {
+          return;
+        }
         const localDataState = importFromLocalStorage();
         const username = importUsernameFromLocalStorage();
         let langCode = languageDetector.detect() || defaultLang.code;
@@ -426,21 +436,24 @@ const ExcalidrawWrapper = () => {
         });
         collabAPI.setUsername(username || "");
       }
-    };
+    }, 50);
 
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
     window.addEventListener(EVENT.UNLOAD, onBlur, false);
     window.addEventListener(EVENT.BLUR, onBlur, false);
-
+    document.addEventListener(EVENT.VISIBILITY_CHANGE, syncData, false);
+    window.addEventListener(EVENT.FOCUS, syncData, false);
     window.addEventListener(EVENT.STORAGE, syncData, false);
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
       window.removeEventListener(EVENT.UNLOAD, onBlur, false);
       window.removeEventListener(EVENT.BLUR, onBlur, false);
-
+      window.removeEventListener(EVENT.FOCUS, syncData, false);
+      document.removeEventListener(EVENT.VISIBILITY_CHANGE, syncData, false);
+      window.removeEventListener(EVENT.STORAGE, syncData, false);
       clearTimeout(titleTimeout);
     };
-  }, [collabAPI, excalidrawAPI]);
+  }, [collabAPI, excalidrawAPI, onBlur]);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
@@ -457,7 +470,7 @@ const ExcalidrawWrapper = () => {
     return () => {
       window.removeEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
     };
-  }, [excalidrawAPI]);
+  }, [excalidrawAPI, saveDebounced]);
 
   useEffect(() => {
     languageDetector.cacheUserLanguage(langCode);
