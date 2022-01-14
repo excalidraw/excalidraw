@@ -68,6 +68,10 @@ import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
 import Joyride, { EVENTS, ACTIONS } from "react-joyride";
+import {
+  CallBackProps as JoyrideCallBackProps,
+  Step as JoyrideStep,
+} from "react-joyride/types";
 import React from "react";
 import {
   Consumer as SBConsumer,
@@ -691,6 +695,7 @@ const ExcalidrawWrapper = () => {
 
 const ExcalidrawApp = () => {
   const user = "1";
+
   return (
     //User 1 shows tour
     //User 2 shows inline surface
@@ -702,6 +707,105 @@ const ExcalidrawApp = () => {
           {(sbState) => {
             if (sbState?.surfaces && sbState?.tours) {
               const welcome_tour = sbState?.tours.welcome_tour;
+
+              const tourCallback = (operation: JoyrideCallBackProps) => {
+                const { step, action, type } = operation;
+                if (window.performance) {
+                }
+                if (performance.navigation.type === 1) {
+                  console.info("reload");
+                  if (
+                    window.sessionStorage.getItem("firstReload") === "true" ||
+                    window.sessionStorage.getItem("firstReload") === "null"
+                  ) {
+                    window.sessionStorage.setItem("priorTarget", "blahblah");
+                    window.sessionStorage.setItem("firstReload", "false");
+                  }
+                } else {
+                  console.info("!reload");
+
+                  window.sessionStorage.setItem("firstReload", "true");
+                }
+                if (
+                  [
+                    EVENTS.STEP_AFTER.valueOf(),
+                    EVENTS.TARGET_NOT_FOUND.valueOf(),
+                  ].includes(type) &&
+                  JSON.stringify(step.target) !==
+                    window.sessionStorage.getItem("priorTarget") &&
+                  [ACTIONS.NEXT.valueOf()].includes(action)
+                ) {
+                  sbState.progressTour(welcome_tour.componentName);
+                  window.sessionStorage.setItem(
+                    "priorTarget",
+                    JSON.stringify(step.target),
+                  );
+                } else if (
+                  [EVENTS.STEP_AFTER.valueOf()].includes(type) &&
+                  JSON.stringify(step.target) !==
+                    window.sessionStorage.getItem("priorTarget") &&
+                  [ACTIONS.PREV.valueOf()].includes(action)
+                ) {
+                  sbState.regressTour(welcome_tour.componentName);
+                  window.sessionStorage.setItem("priorTarget", "foooobaaarrr");
+                }
+              };
+
+              const tourSteps: Array<JoyrideStep> = [
+                {
+                  target: "#root",
+                  content: (
+                    <React.Fragment>
+                      Welcome to Excalidraw the best way to digitally sketch
+                      ideas. Let's start sketching...
+                    </React.Fragment>
+                  ),
+                  event: "hover",
+                  placement: "center",
+                  hideCloseButton: true,
+                },
+                {
+                  target: "#SB-rectangle",
+                  content: (
+                    <React.Fragment>
+                      Let's start by creating your first shape. Click the square
+                      and click and drag to draw.
+                    </React.Fragment>
+                  ),
+                  placement: "top",
+                  event: "hover",
+                  spotlightClicks: true,
+                  hideCloseButton: true,
+                },
+                {
+                  target: "body",
+                  content: (
+                    <React.Fragment>
+                      After drawing the square let's add some text to it. Double
+                      click the square text.
+                    </React.Fragment>
+                  ),
+                  event: "click",
+                  spotlightClicks: true,
+                  placement: "bottom-end",
+                  placementBeacon: "right",
+                  disableOverlayClose: true,
+                  offset: -450,
+                  hideCloseButton: true,
+                },
+                {
+                  target: "#SB-export",
+                  content: (
+                    <React.Fragment>
+                      Great now let's share this work of art with a coworker.
+                    </React.Fragment>
+                  ),
+                  event: "hover",
+                  placement: "auto",
+                  hideCloseButton: true,
+                },
+              ];
+
               return (
                 <div>
                   <Joyride
@@ -709,111 +813,9 @@ const ExcalidrawApp = () => {
                     continuous={true}
                     showProgress={true}
                     debug={true}
-                    callback={(operation) => {
-                      const { step, action, type } = operation;
-                      if (window.performance) {
-                      }
-                      if (performance.navigation.type === 1) {
-                        console.info("reload");
-                        if (
-                          window.sessionStorage.getItem("firstReload") ===
-                            "true" ||
-                          window.sessionStorage.getItem("firstReload") ===
-                            "null"
-                        ) {
-                          window.sessionStorage.setItem(
-                            "priorTarget",
-                            "blahblah",
-                          );
-                          window.sessionStorage.setItem("firstReload", "false");
-                        }
-                      } else {
-                        console.info("!reload");
-
-                        window.sessionStorage.setItem("firstReload", "true");
-                      }
-                      if (
-                        [
-                          EVENTS.STEP_AFTER.valueOf(),
-                          EVENTS.TARGET_NOT_FOUND.valueOf(),
-                        ].includes(type) &&
-                        JSON.stringify(step.target) !==
-                          window.sessionStorage.getItem("priorTarget") &&
-                        [ACTIONS.NEXT.valueOf()].includes(action)
-                      ) {
-                        sbState.progressTour(welcome_tour.componentName);
-                        window.sessionStorage.setItem(
-                          "priorTarget",
-                          JSON.stringify(step.target),
-                        );
-                      } else if (
-                        [EVENTS.STEP_AFTER.valueOf()].includes(type) &&
-                        JSON.stringify(step.target) !==
-                          window.sessionStorage.getItem("priorTarget") &&
-                        [ACTIONS.PREV.valueOf()].includes(action)
-                      ) {
-                        sbState.regressTour(welcome_tour.componentName);
-                        window.sessionStorage.setItem(
-                          "priorTarget",
-                          "foooobaaarrr",
-                        );
-                      }
-                    }}
+                    callback={tourCallback}
                     stepIndex={welcome_tour?.currentStep}
-                    steps={[
-                      {
-                        target: "#root",
-                        content: (
-                          <React.Fragment>
-                            Welcome to Excalidraw the best way to digitally
-                            sketch ideas. Let's start
-                          </React.Fragment>
-                        ),
-                        event: "hover",
-                        placement: "center",
-                        hideCloseButton: true,
-                      },
-                      {
-                        target: "#SB-rectangle",
-                        content: (
-                          <React.Fragment>
-                            Let's start by creating your first shape. Click the
-                            square and click and drag to draw.
-                          </React.Fragment>
-                        ),
-                        placement: "top",
-                        event: "hover",
-                        spotlightClicks: true,
-                        hideCloseButton: true,
-                      },
-                      {
-                        target: "body",
-                        content: (
-                          <React.Fragment>
-                            After drawing the square let's add some text to it.
-                            Double click the square text
-                          </React.Fragment>
-                        ),
-                        event: "click",
-                        spotlightClicks: true,
-                        placement: "bottom-end",
-                        placementBeacon: "right",
-                        disableOverlayClose: true,
-                        offset: -450,
-                        hideCloseButton: true,
-                      },
-                      {
-                        target: "#SB-export",
-                        content: (
-                          <React.Fragment>
-                            Great now let's share with a coworker
-                          </React.Fragment>
-                        ),
-                        event: "hover",
-                        placement: "auto",
-                        hideCloseButton: true,
-                      },
-                    ]}
+                    steps={tourSteps}
                   />
                 </div>
               );
