@@ -435,61 +435,54 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
-    const updateElement = Scene.getScene(element)?.getElement(element.id);
+    const updateElement = Scene.getScene(element)?.getElement(
+      element.id,
+    ) as ExcalidrawTextElement;
     if (!updateElement) {
       return;
     }
-    let wrappedText = "";
-    if (isTextElement(updateElement) && updateElement?.containerId) {
-      const container = getContainerElement(updateElement);
+    let text = editable.value;
+    const container = getContainerElement(updateElement);
 
-      if (container) {
-        wrappedText = wrapText(
-          editable.value,
-          getFontString(updateElement),
-          container.width,
-        );
-
-        if (updateElement.containerId) {
-          const editorHeight = Number(editable.style.height.slice(0, -2));
-          if (editable.value) {
-            // Don't mutate if text is not updated
-            if (initialText !== editable.value) {
-              mutateElement(updateElement, {
-                // vertically center align
-                y: container.y + container.height / 2 - editorHeight / 2,
-                height: editorHeight,
-                width: Number(editable.style.width.slice(0, -2)),
-                // preserve padding
-                x: container.x + BOUND_TEXT_PADDING,
-                angle: container.angle,
-              });
-            }
-
-            const boundTextElementId = getBoundTextElementId(container);
-            if (!boundTextElementId || boundTextElementId !== element.id) {
-              mutateElement(container, {
-                boundElements: (container.boundElements || []).concat({
-                  type: "text",
-                  id: element.id,
-                }),
-              });
-            }
-          } else {
-            mutateElement(container, {
-              boundElements: container.boundElements?.filter(
-                (ele) => ele.type !== "text",
-              ),
-            });
-          }
+    if (container) {
+      text = updateElement.text;
+      const editorHeight = Number(editable.style.height.slice(0, -2));
+      if (editable.value) {
+        // Don't mutate if text is not updated, this happens when text
+        // properties updated since vertically align is taken care in
+        // redrawTextBoundingBox already
+        if (initialText !== editable.value) {
+          mutateElement(updateElement, {
+            // vertically center align
+            y: container.y + container.height / 2 - editorHeight / 2,
+            height: editorHeight,
+            width: Number(editable.style.width.slice(0, -2)),
+            // preserve padding
+            x: container.x + BOUND_TEXT_PADDING,
+            angle: container.angle,
+          });
         }
+
+        const boundTextElementId = getBoundTextElementId(container);
+        if (!boundTextElementId || boundTextElementId !== element.id) {
+          mutateElement(container, {
+            boundElements: (container.boundElements || []).concat({
+              type: "text",
+              id: element.id,
+            }),
+          });
+        }
+      } else {
+        mutateElement(container, {
+          boundElements: container.boundElements?.filter(
+            (ele) => ele.type !== "text",
+          ),
+        });
       }
-    } else {
-      wrappedText = editable.value;
     }
 
     onSubmit({
-      text: normalizeText(wrappedText),
+      text,
       viaKeyboard: submittedViaKeyboard,
       originalText: editable.value,
     });
