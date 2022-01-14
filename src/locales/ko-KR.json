@@ -62,7 +62,7 @@
     "architect": "건축가",
     "artist": "예술가",
     "cartoonist": "만화가",
-    "fileTitle": "",
+    "fileTitle": "파일 이름",
     "colorPicker": "색상 선택기",
     "canvasBackground": "캔버스 배경",
     "drawingCanvas": "캔버스 그리기",
@@ -97,7 +97,7 @@
     "flipVertical": "",
     "viewMode": "보기 모드",
     "toggleExportColorScheme": "",
-    "share": "",
+    "share": "공유",
     "showStroke": "",
     "showBackground": "",
     "toggleTheme": "",
@@ -109,7 +109,7 @@
   "buttons": {
     "clearReset": "캔버스 초기화",
     "exportJSON": "",
-    "exportImage": "",
+    "exportImage": "이미지로 저장",
     "export": "내보내기",
     "exportToPng": "PNG로 내보내기",
     "exportToSvg": "SVG로 내보내기",
@@ -138,12 +138,12 @@
     "lightMode": "밝은 모드",
     "zenMode": "젠 모드",
     "exitZenMode": "젠 모드 종료하기",
-    "cancel": "",
+    "cancel": "취소",
     "clear": "",
     "remove": "",
     "publishLibrary": "",
     "submit": "",
-    "confirm": ""
+    "confirm": "확인"
   },
   "alerts": {
     "clearReset": "모든 작업 내용이 초기화됩니다. 계속하시겠습니까?",
