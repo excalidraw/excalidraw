@@ -101,7 +101,7 @@
     "showStroke": "",
     "showBackground": "",
     "toggleTheme": "",
-    "personalLib": "",
+    "personalLib": "개인 라이브러리",
     "excalidrawLib": "Excalidraw 라이브러리",
     "decreaseFontSize": "폰트 사이즈 줄이기",
     "increaseFontSize": "폰트 사이즈 키우기"
@@ -142,7 +142,7 @@
     "clear": "지우기",
     "remove": "삭제",
     "publishLibrary": "게시하기",
-    "submit": "",
+    "submit": "제출",
     "confirm": "확인"
   },
   "alerts": {
@@ -158,8 +158,8 @@
     "loadSceneOverridePrompt": "외부 파일을 불러 오면 기존 콘텐츠가 대체됩니다. 계속 진행할까요?",
     "collabStopOverridePrompt": "협업 세션을 종료하면 로컬 저장소에 있는 그림이 협업 세션의 그림으로 대체됩니다. 진행하겠습니까?\n\n(로컬 저장소에 있는 그림을 유지하려면 현재 브라우저 탭을 닫아주세요.)",
     "errorLoadingLibrary": "외부 라이브러리를 불러오는 중에 문제가 발생했습니다.",
-    "errorAddingToLibrary": "",
-    "errorRemovingFromLibrary": "",
+    "errorAddingToLibrary": "아이템을 라이브러리에 추가 할수 없습니다",
+    "errorRemovingFromLibrary": "라이브러리에서 아이템을 삭제할수 없습니다",
     "confirmAddLibrary": "{{numShapes}}개의 모양이 라이브러리에 추가됩니다. 계속하시겠어요?",
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "이미지 파일에서 화면을 복구할 수 없었습니다",
@@ -274,7 +274,7 @@
     "shapes": "도형",
     "shortcuts": "키보드 단축키",
     "textFinish": "편집 완료 (텍스트 에디터)",
-    "textNewLine": "",
+    "textNewLine": "줄바꿈(텍스트 에디터)",
     "title": "도움말",
     "view": "보기",
     "zoomToFit": "모든 요소가 보이도록 확대/축소",
@@ -285,7 +285,7 @@
   },
   "publishDialog": {
     "title": "",
-    "itemName": "",
+    "itemName": "아이템 이름",
     "authorName": "",
     "githubUsername": "",
     "twitterUsername": "",
