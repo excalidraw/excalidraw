@@ -417,7 +417,8 @@ const ExcalidrawWrapper = () => {
 
     const syncData = throttle(() => {
       if (!document.hidden && !collabAPI.isCollaborating()) {
-        const stateUpdatedFromStorage = getStateUpdatedTimeStampFromStorage();
+        const stateUpdatedFromStorage =
+          getStateUpdatedTimeStampFromStorage() || -1;
 
         // Don't sync if timestamp is same
         if (stateUpdated.current === stateUpdatedFromStorage) {
@@ -435,6 +436,27 @@ const ExcalidrawWrapper = () => {
           libraryItems: getLibraryItemsFromStorage(),
         });
         collabAPI.setUsername(username || "");
+        const fileIds =
+          localDataState.elements?.reduce((acc, element) => {
+            if (isInitializedImageElement(element)) {
+              return acc.concat(element.fileId);
+            }
+            return acc;
+          }, [] as FileId[]) || [];
+        if (fileIds.length) {
+          localFileStorage
+            .getFiles(fileIds)
+            .then(({ loadedFiles, erroredFiles }) => {
+              if (loadedFiles.length) {
+                excalidrawAPI.addFiles(loadedFiles);
+              }
+              updateStaleImageStatuses({
+                excalidrawAPI,
+                erroredFiles,
+                elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+              });
+            });
+        }
       }
     }, 50);
 
