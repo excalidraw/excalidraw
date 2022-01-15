@@ -27,8 +27,8 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
+import { getContainerElement } from "./textElement";
 import { isBoundToContainer } from "./typeChecks";
-import Scene from "../scene/Scene";
 import { BOUND_TEXT_PADDING } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
@@ -170,7 +170,11 @@ const getAdjustedDimensions = (
   height: number;
   baseline: number;
 } => {
-  const maxWidth = element.containerId ? element.width : null;
+  let maxWidth = null;
+  const container = getContainerElement(element);
+  if (container) {
+    maxWidth = container.width - BOUND_TEXT_PADDING * 2;
+  }
   const {
     width: nextWidth,
     height: nextHeight,
@@ -228,7 +232,7 @@ const getAdjustedDimensions = (
   // make sure container dimensions are set properly when
   // text editor overflows beyond viewport dimensions
   if (isBoundToContainer(element)) {
-    const container = Scene.getScene(element)!.getElement(element.containerId)!;
+    const container = getContainerElement(element)!;
     let height = container.height;
     let width = container.width;
     if (nextHeight > height - BOUND_TEXT_PADDING * 2) {
@@ -258,11 +262,15 @@ export const updateTextElement = (
     originalText,
   }: { text: string; isDeleted?: boolean; originalText: string },
 
-  updateDimensions: boolean,
+  isSubmit: boolean,
 ): ExcalidrawTextElement => {
-  const dimensions = updateDimensions
-    ? getAdjustedDimensions(element, text)
-    : undefined;
+  const boundToContainer = isBoundToContainer(element);
+
+  // Don't update dimensions and text value for bounded text unless submitted
+  const dimensions =
+    boundToContainer && !isSubmit
+      ? undefined
+      : getAdjustedDimensions(element, text);
   return newElementWith(element, {
     text,
     originalText,

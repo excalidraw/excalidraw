@@ -102,7 +102,9 @@
     "showBackground": "Visa färgväljare för bakgrundsfärg",
     "toggleTheme": "Växla tema",
     "personalLib": "Personligt bibliotek",
-    "excalidrawLib": "Excalidraw bibliotek"
+    "excalidrawLib": "Excalidraw bibliotek",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -204,10 +206,12 @@
     "resizeImage": "Du kan ändra storlek fritt genom att hålla SHIFT,\nhåll ALT för att ändra storlek från mitten",
     "rotate": "Du kan begränsa vinklar genom att hålla SHIFT medan du roterar",
     "lineEditor_info": "Dubbelklicka eller tryck på Enter för att redigera punkter",
-    "lineEditor_pointSelected": "Tryck på Ta bort för att ta bort punkt, Ctrl + D eller Cmd + D för att duplicera, eller dra för att flytta",
-    "lineEditor_nothingSelected": "Välj en punkt att flytta eller ta bort, eller håll ned ALT och klicka för att lägga till nya punkter",
+    "lineEditor_pointSelected": "Tryck på Ta bort för att ta bort punkt(er), Ctrl + D eller Cmd + D för att duplicera, eller dra för att flytta",
+    "lineEditor_nothingSelected": "Välj en punkt att redigera (håll SHIFT för att välja flera),\neller håll ned Alt och klicka för att lägga till nya punkter",
     "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt",
-    "publishLibrary": "Publicera ditt eget bibliotek"
+    "publishLibrary": "Publicera ditt eget bibliotek",
+    "bindTextToElement": "Tryck på Enter för att lägga till text",
+    "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra"
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Läs vår blogg",
     "click": "klicka",
+    "deepSelect": "Djupval",
+    "deepBoxSelect": "Djupval inom boxen, och förhindra att dra",
     "curvedArrow": "Böjd pil",
     "curvedLine": "Böjd linje",
     "documentation": "Dokumentation",
@@ -296,7 +302,7 @@
     },
     "errors": {
       "required": "Obligatoriskt",
-      "website": ""
+      "website": "Ange en giltig URL"
     },
     "noteDescription": {
       "pre": "Skicka ditt bibliotek för att inkluderas i ",

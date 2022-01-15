@@ -41,9 +41,16 @@ import {
   isTextElement,
   redrawTextBoundingBox,
 } from "../element";
-import { newElementWith } from "../element/mutateElement";
-import { getBoundTextElement } from "../element/textElement";
-import { isLinearElement, isLinearElementType } from "../element/typeChecks";
+import { mutateElement, newElementWith } from "../element/mutateElement";
+import {
+  getBoundTextElement,
+  getContainerElement,
+} from "../element/textElement";
+import {
+  isBoundToContainer,
+  isLinearElement,
+  isLinearElementType,
+} from "../element/typeChecks";
 import {
   Arrowhead,
   ExcalidrawElement,
@@ -53,6 +60,7 @@ import {
   TextAlign,
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
+import { KEYS } from "../keys";
 import { randomInteger } from "../random";
 import {
   canChangeSharpness,
@@ -63,13 +71,14 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import Scene from "../scene/Scene";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 import { applyTextOpts, isPanelComponentDisabled } from "../textlike";
 import { TEXT_SUBTYPE_ICONS } from "../textlike/icons";
 
-export const changeProperty = (
+const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
+
+const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   callback: (element: ExcalidrawElement) => ExcalidrawElement,
@@ -114,22 +123,23 @@ export const actionChangeTextElementSubtype = register({
   name: "changeTextSubtype",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = applyTextOpts(
-            newElementWith(el, {
+      elements: changeProperty(elements, appState, (oldElement) => {
+        if (isTextElement(oldElement)) {
+          const newElement: ExcalidrawTextElement = applyTextOpts(
+            newElementWith(oldElement, {
               subtype: value,
             }),
             appState.textOpts,
           );
-          const container = element.containerId
-            ? Scene.getScene(element)!.getElement(element.containerId)
-            : null;
-          redrawTextBoundingBox(element, container, appState);
-          return element;
+          redrawTextBoundingBox(
+            newElement,
+            getContainerElement(oldElement),
+            appState,
+          );
+          return newElement;
         }
 
-        return el;
+        return oldElement;
       }),
       appState: {
         ...appState,
@@ -160,10 +170,86 @@ export const actionChangeTextElementSubtype = register({
       />
     </>
   ),
-  PanelComponentPredicate: (elements, appState) => {
+  PanelComponentPredicate: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => {
     return TEXT_SUBTYPE_ICONS.length > 1;
   },
 });
+
+const offsetElementAfterFontResize = (
+  prevElement: ExcalidrawTextElement,
+  nextElement: ExcalidrawTextElement,
+) => {
+  if (isBoundToContainer(nextElement)) {
+    return nextElement;
+  }
+  return mutateElement(
+    nextElement,
+    {
+      x:
+        prevElement.textAlign === "left"
+          ? prevElement.x
+          : prevElement.x +
+            (prevElement.width - nextElement.width) /
+              (prevElement.textAlign === "center" ? 2 : 1),
+      // centering vertically is non-standard, but for Excalidraw I think
+      // it makes sense
+      y: prevElement.y + (prevElement.height - nextElement.height) / 2,
+    },
+    false,
+  );
+};
+
+const changeFontSize = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  getNewFontSize: (element: ExcalidrawTextElement) => number,
+) => {
+  const newFontSizes = new Set<number>();
+
+  return {
+    elements: changeProperty(
+      elements,
+      appState,
+      (oldElement) => {
+        if (isTextElement(oldElement)) {
+          const newFontSize = getNewFontSize(oldElement);
+          newFontSizes.add(newFontSize);
+
+          let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
+            fontSize: newFontSize,
+          });
+          redrawTextBoundingBox(
+            newElement,
+            getContainerElement(oldElement),
+            appState,
+          );
+
+          newElement = offsetElementAfterFontResize(oldElement, newElement);
+
+          return newElement;
+        }
+
+        return oldElement;
+      },
+      true,
+    ),
+    appState: {
+      ...appState,
+      // update state only if we've set all select text elements to
+      // the same font size
+      currentItemFontSize:
+        newFontSizes.size === 1
+          ? [...newFontSizes][0]
+          : appState.currentItemFontSize,
+    },
+    commitToHistory: true,
+  };
+};
+
+// -----------------------------------------------------------------------------
 
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
@@ -495,33 +581,7 @@ export const actionChangeOpacity = register({
 export const actionChangeFontSize = register({
   name: "changeFontSize",
   perform: (elements, appState, value) => {
-    return {
-      elements: changeProperty(
-        elements,
-        appState,
-        (el) => {
-          if (isTextElement(el)) {
-            const element: ExcalidrawTextElement = newElementWith(el, {
-              fontSize: value,
-            });
-            let container = null;
-            if (el.containerId) {
-              container = Scene.getScene(el)!.getElement(el.containerId);
-            }
-            redrawTextBoundingBox(element, container, appState);
-            return element;
-          }
-
-          return el;
-        },
-        true,
-      ),
-      appState: {
-        ...appState,
-        currentItemFontSize: value,
-      },
-      commitToHistory: true,
-    };
+    return changeFontSize(elements, appState, () => value);
   },
   PanelComponentPredicate: (
     elements: readonly ExcalidrawElement[],
@@ -577,6 +637,44 @@ export const actionChangeFontSize = register({
   ),
 });
 
+export const actionDecreaseFontSize = register({
+  name: "decreaseFontSize",
+  perform: (elements, appState, value) => {
+    return changeFontSize(elements, appState, (element) =>
+      Math.round(
+        // get previous value before relative increase (doesn't work fully
+        // due to rounding and float precision issues)
+        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) * element.fontSize,
+      ),
+    );
+  },
+  keyTest: (event) => {
+    return (
+      event[KEYS.CTRL_OR_CMD] &&
+      event.shiftKey &&
+      // KEYS.COMMA needed for MacOS
+      (event.key === KEYS.CHEVRON_LEFT || event.key === KEYS.COMMA)
+    );
+  },
+});
+
+export const actionIncreaseFontSize = register({
+  name: "increaseFontSize",
+  perform: (elements, appState, value) => {
+    return changeFontSize(elements, appState, (element) =>
+      Math.round(element.fontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)),
+    );
+  },
+  keyTest: (event) => {
+    return (
+      event[KEYS.CTRL_OR_CMD] &&
+      event.shiftKey &&
+      // KEYS.PERIOD needed for MacOS
+      (event.key === KEYS.CHEVRON_RIGHT || event.key === KEYS.PERIOD)
+    );
+  },
+});
+
 export const actionChangeFontFamily = register({
   name: "changeFontFamily",
   perform: (elements, appState, value) => {
@@ -584,20 +682,23 @@ export const actionChangeFontFamily = register({
       elements: changeProperty(
         elements,
         appState,
-        (el) => {
-          if (isTextElement(el)) {
-            const element: ExcalidrawTextElement = newElementWith(el, {
-              fontFamily: value,
-            });
-            let container = null;
-            if (el.containerId) {
-              container = Scene.getScene(el)!.getElement(el.containerId);
-            }
-            redrawTextBoundingBox(element, container, appState);
-            return element;
+        (oldElement) => {
+          if (isTextElement(oldElement)) {
+            const newElement: ExcalidrawTextElement = newElementWith(
+              oldElement,
+              {
+                fontFamily: value,
+              },
+            );
+            redrawTextBoundingBox(
+              newElement,
+              getContainerElement(oldElement),
+              appState,
+            );
+            return newElement;
           }
 
-          return el;
+          return oldElement;
         },
         true,
       ),
@@ -672,20 +773,23 @@ export const actionChangeTextAlign = register({
       elements: changeProperty(
         elements,
         appState,
-        (el) => {
-          if (isTextElement(el)) {
-            const element: ExcalidrawTextElement = newElementWith(el, {
-              textAlign: value,
-            });
-            let container = null;
-            if (el.containerId) {
-              container = Scene.getScene(el)!.getElement(el.containerId);
-            }
-            redrawTextBoundingBox(element, container, appState);
-            return element;
+        (oldElement) => {
+          if (isTextElement(oldElement)) {
+            const newElement: ExcalidrawTextElement = newElementWith(
+              oldElement,
+              {
+                textAlign: value,
+              },
+            );
+            redrawTextBoundingBox(
+              newElement,
+              getContainerElement(oldElement),
+              appState,
+            );
+            return newElement;
           }
 
-          return el;
+          return oldElement;
         },
         true,
       ),
