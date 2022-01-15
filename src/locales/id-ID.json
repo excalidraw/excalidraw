@@ -102,7 +102,9 @@
     "showBackground": "Tampilkan latar pengambil warna",
     "toggleTheme": "Ubah tema",
     "personalLib": "Pustaka Pribadi",
-    "excalidrawLib": "Pustaka Excalidraw"
+    "excalidrawLib": "Pustaka Excalidraw",
+    "decreaseFontSize": "Kecilkan ukuran font",
+    "increaseFontSize": "Besarkan ukuran font"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -205,9 +207,11 @@
     "rotate": "Anda dapat menjaga sudut dengan menahan SHIFT sambil memutar",
     "lineEditor_info": "Klik ganda atau tekan Enter untuk mengedit titik",
     "lineEditor_pointSelected": "Tekan Delete untuk menghapus titik, Ctrl/Cmd + D untuk menduplikasi, atau seret untuk memindahkan",
-    "lineEditor_nothingSelected": "Pilih sebuah titik untuk memindah atau menghapus, atau tekan Alt dan klik untuk menambahkan titik baru",
+    "lineEditor_nothingSelected": "Pilih titik untuk mengedit (tekan SHIFT untuk pilih banyak), atau tekan Alt dan klik untuk tambahkan titik baru",
     "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
-    "publishLibrary": "Terbitkan pustaka Anda"
+    "publishLibrary": "Terbitkan pustaka Anda",
+    "bindTextToElement": "Tekan enter untuk tambahkan teks",
+    "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran"
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Baca blog kami",
     "click": "klik",
+    "deepSelect": "Pilih dalam",
+    "deepBoxSelect": "Pilih dalam kotak, dan cegah penggeseran",
     "curvedArrow": "Panah lengkung",
     "curvedLine": "Garis lengkung",
     "documentation": "Dokumentasi",

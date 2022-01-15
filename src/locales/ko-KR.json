@@ -102,7 +102,9 @@
     "showBackground": "",
     "toggleTheme": "",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -204,10 +206,12 @@
     "resizeImage": "",
     "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
     "lineEditor_info": "지점을 수정하려면 두 번 클릭하거나 Enter 키를 누르세요.",
-    "lineEditor_pointSelected": "제거하려면 Delete 키, 복제하려면 CtrlOrCmd+D, 이동하려면 드래그하세요.",
-    "lineEditor_nothingSelected": "옮기거나 지울 지점을 선택하거나, Alt를 누른 상태로 클릭해 새 지점을 만드세요",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "미리보기를 볼 수 없습니다",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "블로그 읽어보기",
     "click": "클릭",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "곡선 화살표",
     "curvedLine": "곡선",
     "documentation": "설명서",
