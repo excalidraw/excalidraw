@@ -469,14 +469,12 @@ const ExcalidrawWrapper = () => {
     window.addEventListener(EVENT.BLUR, onBlur, false);
     document.addEventListener(EVENT.VISIBILITY_CHANGE, syncData, false);
     window.addEventListener(EVENT.FOCUS, syncData, false);
-    window.addEventListener(EVENT.STORAGE, syncData, false);
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
       window.removeEventListener(EVENT.UNLOAD, onBlur, false);
       window.removeEventListener(EVENT.BLUR, onBlur, false);
       window.removeEventListener(EVENT.FOCUS, syncData, false);
       document.removeEventListener(EVENT.VISIBILITY_CHANGE, syncData, false);
-      window.removeEventListener(EVENT.STORAGE, syncData, false);
       clearTimeout(titleTimeout);
     };
   }, [collabAPI, excalidrawAPI, onBlur]);
