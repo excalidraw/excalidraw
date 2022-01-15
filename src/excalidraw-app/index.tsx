@@ -34,6 +34,7 @@ import {
 import {
   debounce,
   getVersion,
+  isTestEnv,
   preventUnload,
   ResolvablePromise,
   resolvablePromise,
@@ -416,6 +417,9 @@ const ExcalidrawWrapper = () => {
     );
 
     const syncData = throttle(() => {
+      if (isTestEnv()) {
+        return;
+      }
       if (!document.hidden && !collabAPI.isCollaborating()) {
         const stateUpdatedFromStorage =
           getStateUpdatedTimeStampFromStorage() || -1;

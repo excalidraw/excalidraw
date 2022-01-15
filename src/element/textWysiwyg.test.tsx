@@ -249,9 +249,9 @@ describe("textWysiwyg", () => {
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
 
-      await new Promise((r) => setTimeout(r, 0));
-
       fireEvent.change(editor, { target: { value: "Hello World!" } });
+
+      await new Promise((r) => setTimeout(r, 0));
       editor.blur();
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
