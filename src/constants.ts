@@ -68,6 +68,7 @@ export const FONT_FAMILY = {
   Virgil: 1,
   Helvetica: 2,
   Cascadia: 3,
+  LocalFont: 4,
 };
 
 export const THEME = {

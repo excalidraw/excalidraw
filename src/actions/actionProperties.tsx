@@ -16,6 +16,7 @@ import {
   FontFamilyCodeIcon,
   FontFamilyHandDrawnIcon,
   FontFamilyNormalIcon,
+  FontFamilyLocalFontIcon,
   FontSizeExtraLargeIcon,
   FontSizeLargeIcon,
   FontSizeMediumIcon,
@@ -565,6 +566,11 @@ export const actionChangeFontFamily = register({
         value: FONT_FAMILY.Cascadia,
         text: t("labels.code"),
         icon: <FontFamilyCodeIcon theme={appState.theme} />,
+      },
+      {
+        value: FONT_FAMILY.LocalFont,
+        text: t("labels.localFont"),
+        icon: <FontFamilyLocalFontIcon theme={appState.theme} />,
       },
     ];
 
