@@ -102,7 +102,9 @@
     "showBackground": "Mostrar seletor de cores do fundo",
     "toggleTheme": "Alternar tema",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Limpar a área de desenho e redefinir a cor de fundo",
@@ -204,10 +206,12 @@
     "resizeImage": "Pode redimensionar livremente mantendo pressionada a tecla SHIFT,\nmantenha pressionada a tecla ALT para redimensionar do centro",
     "rotate": "Pode restringir os ângulos mantendo a tecla SHIFT premida enquanto roda",
     "lineEditor_info": "Clique duas vezes ou pressione a tecla Enter para editar os pontos",
-    "lineEditor_pointSelected": "Pressione a tecla Delete para remover o ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
-    "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou mantenha premida a tecla Alt e clique para adicionar novos pontos",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "Clique para colocar a imagem ou clique e arraste para definir o seu tamanho manualmente",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar uma pré-visualização",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Leia o nosso blogue",
     "click": "clicar",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Seta curva",
     "curvedLine": "Linha curva",
     "documentation": "Documentação",

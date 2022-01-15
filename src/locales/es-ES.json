@@ -102,7 +102,9 @@
     "showBackground": "Mostrar el selector de color de fondo",
     "toggleTheme": "Alternar tema",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -204,10 +206,12 @@
     "resizeImage": "Puede redimensionar libremente pulsando SHIFT,\npulse ALT para redimensionar desde el centro",
     "rotate": "Puedes restringir los ángulos manteniendo presionado SHIFT mientras giras",
     "lineEditor_info": "Doble clic o pulse Enter para editar puntos",
-    "lineEditor_pointSelected": "Presione Suprimir para eliminar el punto, CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
-    "lineEditor_nothingSelected": "Selecciona un punto sea para mover o eliminar, o mantén pulsado Alt y haz clic para añadir nuevos puntos",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "Haga clic para colocar la imagen o haga clic y arrastre para establecer su tamaño manualmente",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Lea nuestro blog",
     "click": "clic",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Flecha curva",
     "curvedLine": "Línea curva",
     "documentation": "Documentación",

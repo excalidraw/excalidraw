@@ -102,7 +102,9 @@
     "showBackground": "Afișare selector culoare fundal",
     "toggleTheme": "Comutare temă",
     "personalLib": "Biblioteca personală",
-    "excalidrawLib": "Biblioteca Excalidraw"
+    "excalidrawLib": "Biblioteca Excalidraw",
+    "decreaseFontSize": "Micșorează dimensiunea fontului",
+    "increaseFontSize": "Mărește dimensiunea fontului"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -204,10 +206,12 @@
     "resizeImage": "Poți redimensiona liber ținând apăsată tasta SHIFT,\nține apăsată tasta ALT pentru a redimensiona din centru",
     "rotate": "Poți constrânge unghiurile, ținând apăsată tasta SHIFT în timp ce rotești",
     "lineEditor_info": "Dă dublu clic sau apasă tasta Enter pentru a edita punctele",
-    "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctul, combinația de taste Ctrl sau Cmd + D pentru a-l duplica sau glisează-l pentru a-i schimba poziția",
-    "lineEditor_nothingSelected": "Selectează un punct pentru a-l muta sau elimina sau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi",
+    "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctele,\ncombinația de taste Ctrl sau Cmd + D pentru a le duplica sau glisează-le pentru a le schimba poziția",
+    "lineEditor_nothingSelected": "Selectează un punct pentru a-l edita (ține apăsată tasta SHIFT pentru a selecta mai multe),\nsau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi",
     "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
-    "publishLibrary": "Publică propria bibliotecă"
+    "publishLibrary": "Publică propria bibliotecă",
+    "bindTextToElement": "Apasă tasta Enter pentru a adăuga text",
+    "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea"
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Citește blogul nostru",
     "click": "clic",
+    "deepSelect": "Selectare de adâncime",
+    "deepBoxSelect": "Selectare de adâncime în casetă și prevenire glisare",
     "curvedArrow": "Săgeată curbată",
     "curvedLine": "Linie curbată",
     "documentation": "Documentație",
