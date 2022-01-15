@@ -244,7 +244,7 @@ const PlusLinkJSX = (
     Introducing Excalidraw+
     <br />
     <a
-      href="https://plus.excalidraw.com/?utm_source=excalidraw&utm_medium=banner&utm_campaign=launch"
+      href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=banner&utm_campaign=launch"
       target="_blank"
       rel="noreferrer"
     >

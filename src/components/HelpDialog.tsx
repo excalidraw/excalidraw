@@ -154,7 +154,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut label={t("toolBar.line")} shortcuts={["P", "6"]} />
                 <Shortcut
                   label={t("toolBar.freedraw")}
-                  shortcuts={["Shift+P", "7"]}
+                  shortcuts={["Shift + P", "X", "7"]}
                 />
                 <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
                 <Shortcut label={t("toolBar.image")} shortcuts={["9"]} />
@@ -393,6 +393,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut
                   label={t("labels.showBackground")}
                   shortcuts={[getShortcutKey("G")]}
+                />
+                <Shortcut
+                  label={t("labels.decreaseFontSize")}
+                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+<")]}
+                />
+                <Shortcut
+                  label={t("labels.increaseFontSize")}
+                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+>")]}
                 />
               </ShortcutIsland>
             </Column>

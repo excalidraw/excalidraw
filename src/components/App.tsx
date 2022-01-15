@@ -1306,7 +1306,8 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (isSupportedImageFile(file)) {
+      // prefer spreadsheet data over image file (MS Office/Libre Office)
+      if (isSupportedImageFile(file) && !data.spreadsheet) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
           this.state,
@@ -1910,8 +1911,8 @@ class App extends React.Component<AppProps, AppState> {
     const updateElement = (
       text: string,
       originalText: string,
-      isDeleted = false,
-      updateDimensions = false,
+      isDeleted: boolean,
+      isSubmit: boolean,
     ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
@@ -1923,7 +1924,7 @@ class App extends React.Component<AppProps, AppState> {
                 isDeleted,
                 originalText,
               },
-              updateDimensions,
+              isSubmit,
             );
           }
           return _element;
@@ -1949,7 +1950,7 @@ class App extends React.Component<AppProps, AppState> {
         ];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text, text, false, !element.containerId);
+        updateElement(text, text, false, false);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
@@ -1989,13 +1990,14 @@ class App extends React.Component<AppProps, AppState> {
       }),
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
+      app: this,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text, element.originalText);
+    updateElement(element.text, element.originalText, false, false);
   }
 
   private deselectElements() {
@@ -2734,7 +2736,8 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           this.state.viewModeEnabled)
-      )
+      ) ||
+      isTextElement(this.state.editingElement)
     ) {
       return false;
     }
