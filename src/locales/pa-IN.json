@@ -35,7 +35,7 @@
     "arrowhead_arrow": "ਤੀਰ",
     "arrowhead_bar": "ਡੰਡੀ",
     "arrowhead_dot": "ਬਿੰਦੀ",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "ਤਿਕੋਣ",
     "fontSize": "ਫੌਂਟ ਅਕਾਰ",
     "fontFamily": "ਫੌਂਟ ਪਰਿਵਾਰ",
     "onlySelected": "ਸਿਰਫ ਚੁਣੇ ਹੋਏ ਹੀ",
@@ -101,8 +101,10 @@
     "showStroke": "ਰੇਖਾ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
     "showBackground": "ਬੈਕਗਰਾਉਂਡ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
     "toggleTheme": "ਥੀਮ ਬਦਲੋ",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "ਨਿੱਜੀ ਲਾਇਬ੍ਰੇਰੀ",
+    "excalidrawLib": "ਐਕਸਕਲੀਡਰਾਅ ਲਾਇਬ੍ਰੇਰੀ",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
@@ -136,12 +138,12 @@
     "lightMode": "ਲਾਇਟ ਮੋਡ",
     "zenMode": "ਜ਼ੈੱਨ ਮੋਡ",
     "exitZenMode": "ਜ਼ੈੱਨ ਮੋਡ 'ਚੋਂ ਬਾਹਰ ਨਿਕਲੋ",
-    "cancel": "",
-    "clear": "",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "clear": "ਸਾਫ਼ ਕਰੋ",
+    "remove": "ਹਟਾਓ",
+    "publishLibrary": "ਪ੍ਰਕਾਸ਼ਤ ਕਰੋ",
+    "submit": "ਜਮ੍ਹਾ ਕਰਵਾਓ",
+    "confirm": "ਪੁਸ਼ਟੀ ਕਰੋ"
   },
   "alerts": {
     "clearReset": "ਇਹ ਸਾਰਾ ਕੈਨਵਸ ਸਾਫ ਕਰ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
@@ -171,11 +173,11 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।"
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
-    "image": "",
+    "image": "ਤਸਵੀਰ ਸ਼ਾਮਲ ਕਰੋ",
     "rectangle": "ਆਇਤ",
     "diamond": "ਹੀਰਾ",
     "ellipse": "ਅੰਡਾਕਾਰ",
@@ -204,10 +206,12 @@
     "resizeImage": "",
     "rotate": "ਤੁਸੀਂ ਘੁਮਾਉਂਦੇ ਹੋਏ SHIFT ਦਬਾਈ ਰੱਖ ਕੇ ਕੋਣਾਂ ਨੂੰ ਕਾਬੂ ਕਰ ਸਕਦੇ ਹੋ",
     "lineEditor_info": "ਬਿੰਦੂਆਂ ਨੂੰ ਸੋਧਣ ਲਈ ਡਬਲ-ਕਲਿੱਕ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
-    "lineEditor_pointSelected": "ਬਿੰਦੀ ਹਟਾਉਣ ਲਈ ਡਲੀਟ ਦਬਾਓ, ਡੁਪਲੀਕੇਟ ਬਣਾਉਣ ਲਈ CtrlOrCmd+D, ਜਾਂ ਹਿਲਾਉਣ ਲਈ ਘਸੀਟੋ",
-    "lineEditor_nothingSelected": "ਹਿਲਾਉਣ ਜਾਂ ਹਟਾਉਣ ਲਈ ਬਿੰਦੂ ਚੁਣੋ, ਜਾਂ ਨਵਾਂ ਬਿੰਦੂ ਜੋੜਨ ਲਈ Alt ਦਬਾਕੇ ਕਲਿੱਕ ਕਰੋ",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "ਝਲਕ ਨਹੀਂ ਦਿਖਾ ਸਕਦੇ",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "ਸਾਡਾ ਬਲੌਗ ਪੜ੍ਹੋ",
     "click": "ਕਲਿੱਕ",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "ਵਿੰਗਾ ਤੀਰ",
     "curvedLine": "ਵਿੰਗੀ ਲਕੀਰ",
     "documentation": "ਕਾਗਜ਼ਾਤ",
@@ -275,13 +281,13 @@
     "zoomToSelection": "ਚੋਣ ਤੱਕ ਜ਼ੂਮ ਕਰੋ"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "ਕੈਨਵਸ ਨੂੰ ਸਾਫ਼ ਕਰੋ"
   },
   "publishDialog": {
-    "title": "",
+    "title": "ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਪ੍ਰਕਾਸ਼ਤ ਕਰੋ",
     "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
+    "authorName": "ਲੇਖਕ ਦਾ ਨਾਂ",
+    "githubUsername": "ਗਿੱਟਹੱਬ ਵਰਤੋਂਕਾਰ ਨਾਂ",
     "twitterUsername": "",
     "libraryName": "",
     "libraryDesc": "",
@@ -295,8 +301,8 @@
       "website": ""
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "ਲੋੜੀਂਦਾ",
+      "website": "ਜਾਇਜ਼ URL ਭਰੋ"
     },
     "noteDescription": {
       "pre": "",
@@ -305,12 +311,12 @@
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "ਦਿਸ਼ਾ ਨਿਰਦੇਸ਼",
       "post": ""
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
+      "link": "MIT ਲਾਇਸੈਂਸ, ",
       "post": ""
     },
     "noteItems": "",
@@ -319,11 +325,11 @@
   "publishSuccessDialog": {
     "title": "",
     "content": "",
-    "link": ""
+    "link": "ਇੱਥੇ"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਰੀਸੈੱਟ ਕਰੋ",
+    "removeItemsFromLib": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ ਚੁਣੀਆਂ ਹੋਈਆਂ ਆਈਟਮਾਂ ਹਟਾਓ"
   },
   "encrypted": {
     "tooltip": "ਤੁਹਾਡੀ ਡਰਾਇੰਗਾਂ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਟ ਕੀਤੀਆਂ ਹੋਈਆਂ ਹਨ, ਇਸ ਲਈ Excalidraw ਦੇ ਸਰਵਰ ਉਹਨਾਂ ਨੂੰ ਕਦੇ ਵੀ ਨਹੀਂ ਦੇਖਣਗੇ।",
@@ -345,7 +351,7 @@
     "width": "ਚੌੜਾਈ"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਜੋੜਿਆ",
     "copyStyles": "ਕਾਪੀ ਕੀਤੇ ਸਟਾਇਲ।",
     "copyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕੀਤਾ।",
     "copyToClipboardAsPng": "{{exportSelection}} ਨੂੰ ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕੀਤਾ ({{exportColorScheme}})",
