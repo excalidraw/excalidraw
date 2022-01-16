@@ -250,7 +250,7 @@
     "disk_button": "파일로 저장",
     "link_title": "공유 가능한 링크 생성",
     "link_details": "",
-    "link_button": "",
+    "link_button": "링크로 내보내기",
     "excalidrawplus_description": "",
     "excalidrawplus_button": "내보내기",
     "excalidrawplus_exportError": ""
