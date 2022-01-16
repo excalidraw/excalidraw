@@ -252,7 +252,7 @@
     "link_details": "",
     "link_button": "",
     "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
+    "excalidrawplus_button": "내보내기",
     "excalidrawplus_exportError": ""
   },
   "helpDialog": {
@@ -287,8 +287,8 @@
     "title": "",
     "itemName": "아이템 이름",
     "authorName": "저자명",
-    "githubUsername": "",
-    "twitterUsername": "",
+    "githubUsername": "깃허브 사용자이름",
+    "twitterUsername": "트위터 사용자이름",
     "libraryName": "라이브러리 이름",
     "libraryDesc": "",
     "website": "웹사이트",
@@ -311,12 +311,12 @@
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "가이드라인",
       "post": ""
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
+      "link": "MIT 라이선스, ",
       "post": ""
     },
     "noteItems": "",
@@ -325,10 +325,10 @@
   "publishSuccessDialog": {
     "title": "",
     "content": "",
-    "link": ""
+    "link": "여기"
   },
   "confirmDialog": {
-    "resetLibrary": "",
+    "resetLibrary": "라이브러리 리셋",
     "removeItemsFromLib": ""
   },
   "encrypted": {
@@ -351,12 +351,12 @@
     "width": "너비"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "라이브러리에 추가되었습니다",
     "copyStyles": "스타일 복사.",
     "copyToClipboard": "클립보드로 복사.",
     "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
+    "fileSaved": "파일이 저장되었습니다.",
+    "fileSavedToFilename": "{filename} 로 저장되었습니다",
     "canvas": "캔버스",
     "selection": "선택"
   },
