@@ -245,10 +245,10 @@
     "title": "오류"
   },
   "exportDialog": {
-    "disk_title": "",
+    "disk_title": "디스크에 저장",
     "disk_details": "",
     "disk_button": "파일로 저장",
-    "link_title": "",
+    "link_title": "공유 가능한 링크 생성",
     "link_details": "",
     "link_button": "",
     "excalidrawplus_description": "",
@@ -286,12 +286,12 @@
   "publishDialog": {
     "title": "",
     "itemName": "아이템 이름",
-    "authorName": "",
+    "authorName": "저자명",
     "githubUsername": "",
     "twitterUsername": "",
     "libraryName": "라이브러리 이름",
     "libraryDesc": "",
-    "website": "",
+    "website": "웹사이트",
     "placeholder": {
       "authorName": "",
       "libraryName": "",
@@ -301,7 +301,7 @@
       "website": ""
     },
     "errors": {
-      "required": "",
+      "required": "필수사항",
       "website": ""
     },
     "noteDescription": {
@@ -357,15 +357,15 @@
     "copyToClipboardAsPng": "",
     "fileSaved": "",
     "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": ""
+    "canvas": "캔버스",
+    "selection": "선택"
   },
   "colors": {
-    "ffffff": "",
-    "f8f9fa": "",
-    "f1f3f5": "",
-    "fff5f5": "",
-    "fff0f6": "",
+    "ffffff": "화이트",
+    "f8f9fa": "그레이 0",
+    "f1f3f5": "그레이 1",
+    "fff5f5": "레드 0",
+    "fff0f6": "핑크 0",
     "f8f0fc": "",
     "f3f0ff": "",
     "edf2ff": "",
