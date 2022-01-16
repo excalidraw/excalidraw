@@ -242,7 +242,7 @@ import {
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import { resizeSingleElement } from "../element/resizeElements";
 
-export showFourthFont: boolean = false;
+export let showFourthFont: boolean = false;
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
 const ExcalidrawContainerContext = React.createContext<{
@@ -1618,8 +1618,9 @@ class App extends React.Component<AppProps, AppState> {
 
   public setLocalFont: ExcalidrawImperativeAPI["setLocalFont"] = (
     url: string,
+    showOnPanel: boolean,
   ) => {
-    this.setLocalFontUrl(url);
+    this.setLocalFontUrl(url, showOnPanel);
   };
 
   private setLocalFontUrl(url: string, showOnPanel: boolean) {
