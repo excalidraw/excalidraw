@@ -201,13 +201,7 @@ describe("textWysiwyg", () => {
 
   describe("Test bounded text", () => {
     let rectangle: any;
-    const {
-      h,
-    }: {
-      h: {
-        elements: any;
-      };
-    } = window;
+    const { h } = window;
 
     const DUMMY_HEIGHT = 240;
     const DUMMY_WIDTH = 160;
@@ -222,6 +216,7 @@ describe("textWysiwyg", () => {
 
     beforeEach(async () => {
       await render(<ExcalidrawApp />);
+      h.elements = [];
 
       rectangle = UI.createElement("rectangle", {
         x: 10,
@@ -285,6 +280,8 @@ describe("textWysiwyg", () => {
     });
 
     it("should update font family correctly on undo/redo by selecting bounded text when font family was updated", async () => {
+      expect(h.elements.length).toBe(1);
+
       mouse.doubleClickAt(
         rectangle.x + rectangle.width / 2,
         rectangle.y + rectangle.height / 2,
@@ -365,10 +362,9 @@ describe("textWysiwyg", () => {
           };
         });
 
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      expect(h.elements.length).toBe(1);
 
+      Keyboard.keyDown(KEYS.ENTER);
       let text = h.elements[1] as ExcalidrawTextElementWithContainer;
       let editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
