@@ -242,6 +242,7 @@ import {
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import { resizeSingleElement } from "../element/resizeElements";
 
+export showFourthFont: boolean = false;
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
 const ExcalidrawContainerContext = React.createContext<{
@@ -351,6 +352,7 @@ class App extends React.Component<AppProps, AppState> {
         setToastMessage: this.setToastMessage,
         updateContainerSize: this.updateContainerSize,
         id: this.id,
+        setLocalFont: this.setLocalFont,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1613,6 +1615,36 @@ class App extends React.Component<AppProps, AppState> {
       this.addNewImagesToImageCache();
     },
   );
+
+  public setLocalFont: ExcalidrawImperativeAPI["setLocalFont"] = (
+    url: string,
+  ) => {
+    this.setLocalFontUrl(url);
+  };
+
+  private setLocalFontUrl(url: string, showOnPanel: boolean) {
+    showFourthFont = showOnPanel;
+    /** @tswwe NOTE: the url argument should be a string like "data:<MIME TYPE>;charset=utf-8;base64,<BASE64>",
+                                   where <MIME TYPE> can be font/ttf, font/otf, font/woff or font/woff2, depending on the local font file,
+                                   and <BASE64> is the base64-encoded code of the local font file.
+    **/
+    // create a <style> element defining our local font
+    const newStylesheet = document.createElement("style");
+    newStylesheet.id = "local-font-stylesheet";
+    newStylesheet.textContent = `
+      @font-face {
+        font-family: 'LocalFont';
+        src: url("${url}");
+        font-display: swap;
+      }
+    `;
+    // replace the old local font <style> element with the one we just created
+    const oldStylesheet = document.getElementById(newStylesheet.id);
+    document.head.appendChild(newStylesheet);
+    if (oldStylesheet) {
+      document.head.removeChild(oldStylesheet);
+    }
+  }
 
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
