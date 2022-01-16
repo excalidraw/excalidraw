@@ -30,7 +30,11 @@ import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import { MAX_DECIMALS_FOR_SVG_EXPORT, MIME_TYPES, SVG_NS } from "../constants";
-import { getStroke, StrokeOptions } from "perfect-freehand";
+import {
+  getStrokeOutlinePoints,
+  getStrokePoints,
+  StrokeOptions,
+} from "perfect-freehand";
 import { getApproxLineHeight } from "../element/textElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
@@ -212,10 +216,16 @@ const drawElementOnCanvas = (
       context.save();
       context.fillStyle = element.strokeColor;
 
-      const path = getFreeDrawPath2D(element) as Path2D;
+      const strokePath = getFreeDrawStrokePath2D(element) as Path2D;
+      const fillPath = getFreeDrawFillPath2D(element) as Path2D;
+
+      if (isPathALoop(element.points)) {
+        context.fillStyle = element.backgroundColor;
+        context.fill(fillPath);
+      }
 
       context.fillStyle = element.strokeColor;
-      context.fill(path);
+      context.fill(strokePath);
 
       context.restore();
       break;
@@ -873,11 +883,17 @@ export const renderElementToSvg = (
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
-      const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
-      node.setAttribute("stroke", "none");
-      node.setAttribute("fill", element.strokeColor);
-      path.setAttribute("d", getFreeDrawSvgPath(element));
-      node.appendChild(path);
+      const strokePath = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
+      const fillPath = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
+
+      strokePath.setAttribute("fill", element.strokeColor);
+      strokePath.setAttribute("d", getFreeDrawSvgPath(element).strokePath);
+
+      fillPath.setAttribute("fill", element.backgroundColor);
+      fillPath.setAttribute("d", getFreeDrawSvgPath(element).fillPath);
+
+      node.appendChild(fillPath);
+      node.appendChild(strokePath);
       svgRoot.appendChild(node);
       break;
     }
@@ -976,17 +992,30 @@ export const renderElementToSvg = (
   }
 };
 
-export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);
+export const strokePathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>(
+  [],
+);
+export const fillPathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>(
+  [],
+);
 
 export function generateFreeDrawShape(element: ExcalidrawFreeDrawElement) {
   const svgPathData = getFreeDrawSvgPath(element);
-  const path = new Path2D(svgPathData);
-  pathsCache.set(element, path);
-  return path;
+  const strokePath = new Path2D(svgPathData.strokePath);
+  const fillPath = new Path2D(svgPathData.fillPath);
+
+  strokePathsCache.set(element, strokePath);
+  fillPathsCache.set(element, fillPath);
+
+  return strokePath;
 }
 
-export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
-  return pathsCache.get(element);
+export function getFreeDrawStrokePath2D(element: ExcalidrawFreeDrawElement) {
+  return strokePathsCache.get(element);
+}
+
+export function getFreeDrawFillPath2D(element: ExcalidrawFreeDrawElement) {
+  return fillPathsCache.get(element);
 }
 
 export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
@@ -1008,7 +1037,16 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
   };
 
-  return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
+  const strokePoints = getStrokePoints(inputPoints as number[][], options);
+
+  return {
+    strokePath: getSvgPathFromStroke(
+      getStrokeOutlinePoints(strokePoints, options),
+    ),
+    fillPath: isPathALoop(element.points)
+      ? getSvgPathFromStroke(strokePoints.map((pt) => pt.point))
+      : "",
+  };
 }
 
 function med(A: number[], B: number[]) {
