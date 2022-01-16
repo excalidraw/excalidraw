@@ -414,5 +414,5 @@ export type ExcalidrawImperativeAPI = {
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
   id: string;
-  setLocalFont: (url: string) => void;
+  setLocalFont: (url: string, showOnPanel: boolean) => void;
 };
