@@ -169,21 +169,21 @@
     "invalidEncryptionKey": ""
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
+    "unsupportedFileType": "지원하지 않는 파일 형식 입니다.",
+    "imageInsertError": "이미지를 삽입할 수 없습니다. 나중에 다시 시도 하십시오",
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "선택",
-    "image": "",
+    "image": "이미지 삽입",
     "rectangle": "사각형",
     "diamond": "다이아몬드",
     "ellipse": "타원",
     "arrow": "화살표",
     "line": "선",
-    "freedraw": "",
+    "freedraw": "그리기",
     "text": "텍스트",
     "library": "라이브러리",
     "lock": "선택된 도구 유지하기"
@@ -281,7 +281,7 @@
     "zoomToSelection": "선택 영역으로 확대/축소"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "캔버스 지우기"
   },
   "publishDialog": {
     "title": "",
