@@ -97,7 +97,6 @@ export const textWysiwyg = ({
   let originalContainerHeight: number;
   let approxLineHeight = getApproxLineHeight(getFontString(element));
 
-  const initialText = element.originalText;
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
     if (updatedElement && isTextElement(updatedElement)) {
@@ -450,23 +449,7 @@ export const textWysiwyg = ({
 
     if (container) {
       text = updateElement.text;
-      const editorHeight = Number(editable.style.height.slice(0, -2));
       if (editable.value) {
-        // Don't mutate if text is not updated, this happens when text
-        // properties updated since vertically align is taken care in
-        // redrawTextBoundingBox already
-        if (initialText !== editable.value) {
-          mutateElement(updateElement, {
-            // vertically center align
-            y: container.y + container.height / 2 - editorHeight / 2,
-            height: editorHeight,
-            width: Number(editable.style.width.slice(0, -2)),
-            // preserve padding
-            x: container.x + BOUND_TEXT_PADDING,
-            angle: container.angle,
-          });
-        }
-
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
           mutateElement(container, {
