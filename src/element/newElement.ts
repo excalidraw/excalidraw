@@ -253,12 +253,10 @@ export const updateTextElement = (
     originalText: string;
   },
 ): ExcalidrawTextElement => {
-  const boundToContainer = isBoundToContainer(element);
-  if (boundToContainer) {
-    const container = getContainerElement(element);
-    text = wrapText(text, getFontString(element), container!.width);
+  const container = getContainerElement(element);
+  if (container) {
+    text = wrapText(text, getFontString(element), container.width);
   }
-  // Don't update dimensions and text value for bounded text unless submitted
   const dimensions = getAdjustedDimensions(element, text);
   return newElementWith(element, {
     text,
