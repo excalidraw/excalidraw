@@ -123,6 +123,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
+    link: string | null;
   }>;
 
 export type ExcalidrawBindableElement =

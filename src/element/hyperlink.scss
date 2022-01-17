@@ -1,0 +1,44 @@
+@import "../css/variables.module";
+
+.excalidraw-hyperlinkContainer {
+  display: flex;
+  position: absolute;
+  box-shadow: 0 2px 4px 0 rgb(0 0 0 / 30%);
+  padding: 15px;
+  z-index: 100;
+  justify-content: space-between;
+  min-width: 14rem;
+  &-input,
+  button {
+    z-index: 100;
+  }
+  &-input {
+    height: 24px;
+    max-width: 200px;
+    font-size: 16px;
+    border: none;
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border: none;
+      box-shadow: none !important;
+    }
+  }
+  button {
+    color: $oc-blue-6;
+    background-color: $oc-white !important;
+    font-weight: 500;
+    &.excalidraw-hyperlinkContainer--remove {
+      color: $oc-red-9;
+    }
+  }
+
+  .d-none {
+    display: none;
+  }
+
+  * {
+    padding: 4px;
+  }
+}

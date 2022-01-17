@@ -238,6 +238,7 @@ import {
   getBoundTextElementId,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
+import { hyperlink } from "../element/hyperlink";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -273,6 +274,8 @@ class App extends React.Component<AppProps, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
   isMobile = false;
+  hyperlinkContainer: { updatePosition: (state: AppState) => void } | null =
+    null;
   detachIsMobileMqHandler?: () => void;
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
@@ -424,6 +427,7 @@ class App extends React.Component<AppProps, AppState> {
         onPointerUp={this.removePointer}
         onPointerCancel={this.removePointer}
         onTouchMove={this.handleTouchMove}
+        onClick={this.handleClick}
       >
         {t("labels.drawingCanvas")}
       </canvas>
@@ -1154,6 +1158,7 @@ class App extends React.Component<AppProps, AppState> {
         renderScrollbars: !this.isMobile,
       },
     );
+
     if (scrollBars) {
       currentScrollBars = scrollBars;
     }
@@ -2574,7 +2579,6 @@ class App extends React.Component<AppProps, AppState> {
     if (selection?.anchorNode) {
       selection.removeAllRanges();
     }
-
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
     this.maybeCleanupAfterMissingPointerUp(event);
 
@@ -2690,6 +2694,20 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private handleClick = () => {
+    const selectedElements = getSelectedElements(
+      this.scene.getElements(),
+      this.state,
+    );
+
+    if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
+      hyperlink({
+        textElement: selectedElements[0],
+        appState: this.state,
+        excalidrawContainer: this.excalidrawContainerRef.current,
+      });
+    }
+  };
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ): void => {

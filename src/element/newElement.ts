@@ -141,6 +141,7 @@ export const newTextElement = (
       baseline: metrics.baseline,
       containerId: opts.containerId || null,
       originalText: opts.text,
+      link: null,
     },
     {},
   );
