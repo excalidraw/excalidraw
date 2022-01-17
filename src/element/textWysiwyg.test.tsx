@@ -313,19 +313,25 @@ describe("textWysiwyg", () => {
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
-      expect(h.elements[1].fontFamily).toEqual(FONT_FAMILY.Cascadia);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
+      ).toEqual(FONT_FAMILY.Cascadia);
 
       //undo
       Keyboard.withModifierKeys({ ctrl: true }, () => {
         Keyboard.keyPress(KEYS.Z);
       });
-      expect(h.elements[1].fontFamily).toEqual(FONT_FAMILY.Virgil);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
+      ).toEqual(FONT_FAMILY.Virgil);
 
       //redo
       Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
         Keyboard.keyPress(KEYS.Z);
       });
-      expect(h.elements[1].fontFamily).toEqual(FONT_FAMILY.Cascadia);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
+      ).toEqual(FONT_FAMILY.Cascadia);
     });
 
     it("should wrap text and vertcially center align once text submitted", async () => {
