@@ -4,7 +4,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for tacking the time to request a new feature :pray:
+        Thank you for taking the time to request a new feature :pray:
 
         This form for suggesting new feature's or enhancements for [excalidraw](https://github.com/excalidraw/excalidraw)
         If you have a question about how to achieve something and are struggling, please post a question
