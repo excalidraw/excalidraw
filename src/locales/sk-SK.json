@@ -103,8 +103,8 @@
     "toggleTheme": "Prepnúť tému",
     "personalLib": "Moja knižnica",
     "excalidrawLib": "Excalidraw knižnica",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Zmenšiť veľkosť písma",
+    "increaseFontSize": "Zväčšiť veľkosť písma"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
