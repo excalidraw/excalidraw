@@ -22,8 +22,8 @@ body:
       label: Describe the feature you would like see in Excalidraw
       description: Provide a clear and concise description.
       placeholder: |
-        Ex. I'm always frustrated when [...]
-        Ex. I wish there was a way to do [...]
+        eg. It would be great if [...]
+        eg. I wish there was a way to do [...]
     validations:
       required: true
   - type: textarea

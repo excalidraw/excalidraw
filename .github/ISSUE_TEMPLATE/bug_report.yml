@@ -38,7 +38,7 @@ body:
       placeholder: |
         A link to your excalidraw file: https://gist.github.com/....
     validations:
-      required: true
+      required: false
   - type: textarea
     id: steps
     attributes:
