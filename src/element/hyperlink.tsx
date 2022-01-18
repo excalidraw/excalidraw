@@ -57,6 +57,7 @@ export const hyperlink = ({
       applyBtn.classList.add("d-none");
     } else {
       removeBtn.classList.add("d-none");
+      editButn.classList.add("d-none");
     }
   };
 
