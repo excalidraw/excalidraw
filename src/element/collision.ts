@@ -362,6 +362,14 @@ const hitTestFreeDrawElement = (
     B = element.points[i + 1];
   }
 
+  const shape = getShapeForElement(element) as Drawable;
+
+  // for filled freedraw shapes, support
+  // selecting from inside
+  if (shape && shape.sets.length) {
+    return hitTestRoughShape(shape, x, y, threshold);
+  }
+
   return false;
 };
 
