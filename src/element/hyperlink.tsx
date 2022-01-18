@@ -61,25 +61,19 @@ export const hyperlink = ({
     }
   };
 
-  const bindBlurEvent = () => {
-    window.removeEventListener(EVENT.POINTER_UP, bindBlurEvent, false);
-    linkInput.onblur = handleSubmit;
-  };
   const onPointerDown = (event: MouseEvent) => {
     if (
       event.target instanceof Element &&
       !event.target.closest(".excalidraw-hyperlinkContainer")
     ) {
-      window.addEventListener(EVENT.POINTER_UP, bindBlurEvent);
       window.addEventListener(EVENT.BLUR, handleSubmit, false);
-      div.remove();
     }
   };
-  const cleanup = () => {
-    div.remove();
 
+  const cleanup = () => {
     window.removeEventListener("pointerdown", onPointerDown, false);
     window.removeEventListener(EVENT.BLUR, handleSubmit, false);
+    div.remove();
   };
   const handleSubmit = () => {
     let link = linkInput.value;
@@ -117,6 +111,7 @@ export const hyperlink = ({
     applyBtn.classList.remove("d-none");
     editButn.classList.add("d-none");
   };
+  linkInput.onblur = handleSubmit;
 
   applyBtn.onclick = handleSubmit;
 
