@@ -3332,8 +3332,10 @@ class App extends React.Component<AppProps, AppState> {
           multiElement.points[multiElement.points.length - 2];
         const [currentX, currentY] =
           multiElement.points[multiElement.points.length - 1];
-        // if last two points are the same, skip last committed point update
-        if (prevX === currentX && prevY === currentY) {
+        // if last two points are close, skip last committed point update
+        if (
+          distance2d(prevX, prevY, currentX, currentY) < LINE_CONFIRM_THRESHOLD
+        ) {
           return;
         }
       }
