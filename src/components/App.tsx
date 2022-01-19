@@ -428,7 +428,6 @@ class App extends React.Component<AppProps, AppState> {
         onPointerUp={this.removePointer}
         onPointerCancel={this.removePointer}
         onTouchMove={this.handleTouchMove}
-        onClick={this.handleClick}
       >
         {t("labels.drawingCanvas")}
       </canvas>
@@ -507,7 +506,6 @@ class App extends React.Component<AppProps, AppState> {
             <div className="excalidraw-contextMenuContainer" />
             {selectedElement.length === 1 && this.state.showHyperlinkPopup && (
               <Hyperlink
-                key={selectedElement[0].id}
                 element={selectedElement[0]}
                 appState={this.state}
                 onSubmit={() => this.setState({ showHyperlinkPopup: false })}
@@ -1503,6 +1501,15 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     gesture.pointers.delete(event.pointerId);
+    const selectedElements = getSelectedElements(
+      this.scene.getElements(),
+      this.state,
+    );
+    if (selectedElements.length === 1 && selectedElements[0].link) {
+      this.setState({ showHyperlinkPopup: true });
+    } else {
+      this.setState({ showHyperlinkPopup: false });
+    }
   };
 
   toggleLock = () => {
@@ -2601,6 +2608,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
+      showHyperlinkPopup: false,
     });
     this.savePointer(event.clientX, event.clientY, "down");
 
@@ -2706,18 +2714,6 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private handleClick = () => {
-    const selectedElements = getSelectedElements(
-      this.scene.getElements(),
-      this.state,
-    );
-
-    if (selectedElements.length === 1 && selectedElements[0].link) {
-      this.setState({ showHyperlinkPopup: true });
-    } else {
-      this.setState({ showHyperlinkPopup: false });
-    }
-  };
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ): void => {
