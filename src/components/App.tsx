@@ -3322,12 +3322,24 @@ class App extends React.Component<AppProps, AppState> {
           [multiElement.id]: true,
         },
       }));
+
       // clicking outside commit zone → update reference for last committed
       // point
+      setCursor(this.canvas, CURSOR_TYPE.POINTER);
+
+      if (!multiElement.lastCommittedPoint && multiElement.points.length > 1) {
+        const [prevX, prevY] =
+          multiElement.points[multiElement.points.length - 2];
+        const [currentX, currentY] =
+          multiElement.points[multiElement.points.length - 1];
+        // if last two points are the same, skip last committed point update
+        if (prevX === currentX && prevY === currentY) {
+          return;
+        }
+      }
       mutateElement(multiElement, {
         lastCommittedPoint: multiElement.points[multiElement.points.length - 1],
       });
-      setCursor(this.canvas, CURSOR_TYPE.POINTER);
     } else {
       const [gridX, gridY] = getGridPoint(
         pointerDownState.origin.x,
