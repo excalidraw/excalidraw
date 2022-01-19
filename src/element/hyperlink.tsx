@@ -83,6 +83,7 @@ export const Hyperlink = ({
           ref={inputRef}
           value={inputVal}
           onChange={(event) => setInputVal(event.target.value)}
+          autoFocus
         />
       ) : (
         <a

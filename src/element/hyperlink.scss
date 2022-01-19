@@ -17,7 +17,7 @@
   }
   &-input {
     height: 24px;
-    max-width: 200px;
+    width: 16rem;
     font-size: 16px;
     border: none;
 
@@ -34,6 +34,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 8px;
+    max-width: 12rem;
   }
   button {
     color: $oc-blue-6;
