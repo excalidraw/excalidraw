@@ -80,7 +80,6 @@ export const Hyperlink = ({
         <input
           className={clsx("excalidraw-hyperlinkContainer-input")}
           placeholder="Type or paste your link here"
-          onBlur={handleSubmit}
           ref={inputRef}
           value={inputVal}
           onChange={(event) => setInputVal(event.target.value)}

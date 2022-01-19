@@ -507,9 +507,8 @@ class App extends React.Component<AppProps, AppState> {
             <div className="excalidraw-contextMenuContainer" />
             {selectedElement.length === 1 && this.state.showHyperlinkPopup && (
               <Hyperlink
-                element={
-                  getSelectedElements(this.scene.getElements(), this.state)[0]
-                }
+                key={selectedElement[0].id}
+                element={selectedElement[0]}
                 appState={this.state}
                 onSubmit={() => this.setState({ showHyperlinkPopup: false })}
               />
