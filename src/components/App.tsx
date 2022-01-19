@@ -3952,15 +3952,13 @@ class App extends React.Component<AppProps, AppState> {
           draggingElement &&
           !multiElement
         ) {
-          mutateElement(draggingElement, {
-            points: [
-              ...draggingElement.points,
-              [
-                pointerCoords.x - draggingElement.x,
-                pointerCoords.y - draggingElement.y,
-              ],
-            ],
-          });
+          const dx = pointerCoords.x - draggingElement.x;
+          const dy = pointerCoords.y - draggingElement.y;
+          if (dx > 0 || dy > 0) {
+            mutateElement(draggingElement, {
+              points: [...draggingElement.points, [dx, dy]],
+            });
+          }
           this.setState({
             multiElement: draggingElement,
             editingElement: this.state.draggingElement,
