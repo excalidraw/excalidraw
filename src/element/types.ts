@@ -52,6 +52,7 @@ type _ExcalidrawElementBase = Readonly<{
     | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
+  link: string | null;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
@@ -123,7 +124,6 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
-    link: string | null;
   }>;
 
 export type ExcalidrawBindableElement =

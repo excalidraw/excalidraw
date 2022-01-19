@@ -105,6 +105,7 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
+    link: element.link ?? null,
   };
 
   return {
@@ -137,7 +138,6 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || element.text,
-        link: element.link ?? null,
       });
     case "freedraw": {
       return restoreElementWithProperties(element, {

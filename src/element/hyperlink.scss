@@ -4,11 +4,13 @@
   display: flex;
   position: absolute;
   box-shadow: 0 2px 4px 0 rgb(0 0 0 / 30%);
-  padding: 15px;
+  padding: 4px;
   z-index: 100;
   justify-content: space-between;
-  min-width: 14rem;
-
+  width: 20rem;
+  * {
+    padding: 4px;
+  }
   &-input,
   button {
     z-index: 100;
@@ -26,6 +28,13 @@
       box-shadow: none !important;
     }
   }
+
+  &-link {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 8px;
+  }
   button {
     color: $oc-blue-6;
     background-color: $oc-white !important;
@@ -37,9 +46,5 @@
 
   .d-none {
     display: none;
-  }
-
-  * {
-    padding: 4px;
   }
 }

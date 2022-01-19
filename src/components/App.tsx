@@ -238,7 +238,7 @@ import {
   getBoundTextElementId,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
-import { hyperlink } from "../element/hyperlink";
+import { Hyperlink } from "../element/hyperlink";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -322,6 +322,7 @@ class App extends React.Component<AppProps, AppState> {
       name,
       width: window.innerWidth,
       height: window.innerHeight,
+      showHyperlinkPopup: false,
     };
 
     this.id = nanoid();
@@ -436,7 +437,10 @@ class App extends React.Component<AppProps, AppState> {
 
   public render() {
     const { zenModeEnabled, viewModeEnabled } = this.state;
-
+    const selectedElement = getSelectedElements(
+      this.scene.getElements(),
+      this.state,
+    );
     const {
       onCollabButtonClick,
       renderTopRightUI,
@@ -501,6 +505,15 @@ class App extends React.Component<AppProps, AppState> {
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
+            {selectedElement.length === 1 && this.state.showHyperlinkPopup && (
+              <Hyperlink
+                element={
+                  getSelectedElements(this.scene.getElements(), this.state)[0]
+                }
+                appState={this.state}
+                onSubmit={() => this.setState({ showHyperlinkPopup: false })}
+              />
+            )}
             {this.state.showStats && (
               <Stats
                 appState={this.state}
@@ -2700,12 +2713,10 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
 
-    if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
-      hyperlink({
-        textElement: selectedElements[0],
-        appState: this.state,
-        excalidrawContainer: this.excalidrawContainerRef.current,
-      });
+    if (selectedElements.length === 1 && selectedElements[0].link) {
+      this.setState({ showHyperlinkPopup: true });
+    } else {
+      this.setState({ showHyperlinkPopup: false });
     }
   };
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (

@@ -80,6 +80,7 @@ export const getDefaultAppState = (): Omit<
     zoom: { value: 1 as NormalizedZoomValue, translation: { x: 0, y: 0 } },
     viewModeEnabled: false,
     pendingImageElement: null,
+    showHyperlinkPopup: false,
   };
 };
 
@@ -168,6 +169,7 @@ const APP_STATE_STORAGE_CONF = (<
   zoom: { browser: true, export: false, server: false },
   viewModeEnabled: { browser: false, export: false, server: false },
   pendingImageElement: { browser: false, export: false, server: false },
+  showHyperlinkPopup: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

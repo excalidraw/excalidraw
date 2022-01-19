@@ -1,130 +1,144 @@
-import { EVENT } from "../constants";
 import { AppState } from "../types";
 import { sceneCoordsToViewportCoords } from "../utils";
 import { mutateElement } from "./mutateElement";
-import { ExcalidrawTextElement } from "./types";
+import { ExcalidrawTextElement, NonDeletedExcalidrawElement } from "./types";
 
 import "./hyperlink.scss";
 import Scene from "../scene/Scene";
+import { register } from "../actions/register";
+import { ToolButton } from "../components/ToolButton";
+import { link } from "../components/icons";
+import { t } from "../i18n";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import clsx from "clsx";
+
 const PREFIX = "https://";
 
-export const hyperlink = ({
-  textElement,
+export const Hyperlink = ({
+  element,
   appState,
-  excalidrawContainer,
+  onSubmit,
 }: {
-  textElement: ExcalidrawTextElement;
+  element: NonDeletedExcalidrawElement;
   appState: AppState;
-  excalidrawContainer: HTMLDivElement | null;
+  onSubmit: () => void;
 }) => {
-  const isEditable = !!textElement.link;
+  let linkVal = "";
+  if (element.link) {
+    linkVal = element.link.split(PREFIX).pop()!;
+  }
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputVal, setInputVal] = useState(linkVal);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const showInput = isEditing || !linkVal;
 
-  const updateHyperlinkStyle = () => {
-    const updatedTextElement = Scene.getScene(textElement)!.getElement(
-      textElement.id,
-    )!;
-
-    const { x: viewPortX, y: viewPortY } = sceneCoordsToViewportCoords(
-      { sceneX: updatedTextElement.x, sceneY: updatedTextElement.y },
-      appState,
-    );
-    Object.assign(div.style, {
-      top: `${viewPortY - 100}px`,
-      left: `${viewPortX - 20}px`,
-    });
-    linkInput.placeholder = "Type or paste your link here";
-    if (isEditable) {
-      link.setAttribute("href", textElement.link!);
-      link.innerText = textElement.link;
-      link.setAttribute("target", "_blank");
+  const handleSubmit = useCallback(() => {
+    if (!inputRef.current) {
+      return;
     }
-    let linkVal = "";
-    if (textElement.link) {
-      linkVal = textElement.link.split(PREFIX).pop()!;
-    }
-    linkInput.value = linkVal;
-    applyBtn.innerText = "Apply";
-    editButn.innerText = "Edit";
-    removeBtn.innerText = "Remove";
-    linkInput.classList.add("excalidraw-hyperlinkContainer-input");
-    editButn.classList.add("excalidraw-hyperlinkContainer--edit");
-    applyBtn.classList.add("excalidraw-hyperlinkContainer--apply");
-    removeBtn.classList.add("excalidraw-hyperlinkContainer--remove");
-    link.classList.add("excalidraw-hyperlinkContainer-link");
 
-    if (isEditable) {
-      linkInput.classList.add("d-none");
-      applyBtn.classList.add("d-none");
-    } else {
-      removeBtn.classList.add("d-none");
-      editButn.classList.add("d-none");
-    }
-  };
-
-  const onPointerDown = (event: MouseEvent) => {
-    if (
-      event.target instanceof Element &&
-      !event.target.closest(".excalidraw-hyperlinkContainer")
-    ) {
-      window.addEventListener(EVENT.BLUR, handleSubmit, false);
-    }
-  };
-
-  const cleanup = () => {
-    window.removeEventListener("pointerdown", onPointerDown, false);
-    window.removeEventListener(EVENT.BLUR, handleSubmit, false);
-    div.remove();
-  };
-  const handleSubmit = () => {
-    let link = linkInput.value;
-    cleanup();
+    let link = inputRef.current.value;
     if (link && link.substr(0, PREFIX.length) !== PREFIX) {
       link = `${PREFIX}${link}`;
     }
-    const updatedTextElement = Scene.getScene(textElement)!.getElement(
-      textElement.id,
+    const updatedTextElement = Scene.getScene(element)!.getElement(
+      element.id,
     )! as ExcalidrawTextElement;
     mutateElement(updatedTextElement, { link });
-  };
+    onSubmit();
+  }, [element, onSubmit]);
 
-  const handleRemove = () => {
-    cleanup();
-    const updatedTextElement = Scene.getScene(textElement)!.getElement(
-      textElement.id,
+  useLayoutEffect(() => {
+    return () => {
+      handleSubmit();
+    };
+  }, [handleSubmit]);
+
+  const handleRemove = useCallback(() => {
+    const updatedTextElement = Scene.getScene(element)!.getElement(
+      element.id,
     )! as ExcalidrawTextElement;
     mutateElement(updatedTextElement, { link: null });
+    onSubmit();
+  }, [onSubmit, element]);
+
+  const onEdit = () => {
+    setIsEditing(true);
   };
-  window.addEventListener("pointerdown", onPointerDown, false);
-  const div = document.createElement("div");
-  div.classList.add("excalidraw-hyperlinkContainer");
-  const editButn = document.createElement("button");
-  const applyBtn = document.createElement("button");
-  const removeBtn = document.createElement("button");
-  const linkInput = document.createElement("input");
-  const link = document.createElement("a");
 
-  editButn.onclick = () => {
-    linkInput.readOnly = false;
-    linkInput.classList.remove("d-none");
-    link.classList.add("d-none");
-    removeBtn.classList.add("d-none");
-    applyBtn.classList.remove("d-none");
-    editButn.classList.add("d-none");
-  };
-  linkInput.onblur = handleSubmit;
+  const updatedTextElement = Scene.getScene(element)!.getElement(element.id)!;
+  const { x: viewPortX, y: viewPortY } = sceneCoordsToViewportCoords(
+    { sceneX: updatedTextElement.x, sceneY: updatedTextElement.y },
+    appState,
+  );
+  return (
+    <div
+      className="excalidraw-hyperlinkContainer"
+      style={{ top: `${viewPortY - 85}px`, left: `${viewPortX - 50}px` }}
+    >
+      {showInput ? (
+        <input
+          className={clsx("excalidraw-hyperlinkContainer-input")}
+          placeholder="Type or paste your link here"
+          onBlur={handleSubmit}
+          ref={inputRef}
+          value={inputVal}
+          onChange={(event) => setInputVal(event.target.value)}
+        />
+      ) : (
+        <a
+          href={element.link || ""}
+          className={clsx("excalidraw-hyperlinkContainer-link", {
+            "d-none": isEditing,
+          })}
+        >
+          {element.link}
+        </a>
+      )}
 
-  applyBtn.onclick = handleSubmit;
-
-  removeBtn.onclick = handleRemove;
-
-  updateHyperlinkStyle();
-
-  div.appendChild(link);
-  div.appendChild(linkInput);
-  div.appendChild(editButn);
-  div.appendChild(applyBtn);
-  div.appendChild(removeBtn);
-  excalidrawContainer
-    ?.querySelector(".excalidraw-textEditorContainer")!
-    .appendChild(div);
+      {!showInput && (
+        <div>
+          <button
+            className={clsx("excalidraw-hyperlinkContainer--edit")}
+            onClick={onEdit}
+          >
+            Edit
+          </button>
+          <button
+            className={clsx("excalidraw-hyperlinkContainer--remove")}
+            onClick={handleRemove}
+          >
+            Remove
+          </button>
+        </div>
+      )}
+      {showInput && (
+        <button
+          className={clsx("excalidraw-hyperlinkContainer--apply")}
+          onClick={handleSubmit}
+        >
+          Apply
+        </button>
+      )}
+    </div>
+  );
 };
+
+export const actionLink = register({
+  name: "link",
+  perform: (elements, appState) => {
+    return {
+      elements,
+      appState: { ...appState, showHyperlinkPopup: true },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <ToolButton
+      type="button"
+      icon={link}
+      aria-label={t("labels.link")}
+      onClick={() => updateData(null)}
+    />
+  ),
+});
