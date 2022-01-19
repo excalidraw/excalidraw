@@ -21,6 +21,7 @@ import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
   LOAD_IMAGES_TIMEOUT,
   SCENE,
+  STORAGE_KEYS,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
 import {
@@ -39,7 +40,6 @@ import {
 import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
-  STORAGE_KEYS,
 } from "../data/localStorage";
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";

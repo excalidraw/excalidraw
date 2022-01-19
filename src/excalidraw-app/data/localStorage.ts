@@ -5,15 +5,8 @@ import {
   getDefaultAppState,
 } from "../../appState";
 import { clearElementsForLocalStorage } from "../../element";
-
-export const STORAGE_KEYS = {
-  LOCAL_STORAGE_ELEMENTS: "excalidraw",
-  LOCAL_STORAGE_APP_STATE: "excalidraw-state",
-  LOCAL_STORAGE_COLLAB: "excalidraw-collab",
-  LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG: "collabLinkForceLoadFlag",
-  LOCAL_STORAGE_LIBRARY: "excalidraw-library",
-  STATE_UPDATED: "stateUpdated",
-};
+import { updateBrowserStateVersion } from "./tabSync";
+import { STORAGE_KEYS } from "../app_constants";
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -54,6 +47,7 @@ export const saveToLocalStorage = (
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
       JSON.stringify(clearAppStateForLocalStorage(appState)),
     );
+    updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
   } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
@@ -138,22 +132,5 @@ export const getLibraryItemsFromStorage = () => {
   } catch (e) {
     console.error(e);
     return [];
-  }
-};
-
-export const saveStateUpdatedTimeStampToStorage = (timeStamp: number) => {
-  try {
-    localStorage.setItem(STORAGE_KEYS.STATE_UPDATED, timeStamp.toString());
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-export const getStateUpdatedTimeStampFromStorage = () => {
-  try {
-    const timestamp = Number(localStorage.getItem(STORAGE_KEYS.STATE_UPDATED));
-    return timestamp;
-  } catch (e) {
-    console.error(e);
   }
 };
