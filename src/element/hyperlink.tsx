@@ -11,6 +11,7 @@ import { link } from "../components/icons";
 import { t } from "../i18n";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import clsx from "clsx";
+import { KEYS } from "../keys";
 
 const PREFIX = "https://";
 
@@ -84,6 +85,12 @@ export const Hyperlink = ({
           value={inputVal}
           onChange={(event) => setInputVal(event.target.value)}
           autoFocus
+          onKeyDown={(event) => {
+            event.stopPropagation();
+            if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {
+              handleSubmit();
+            }
+          }}
         />
       ) : (
         <a
