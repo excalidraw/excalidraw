@@ -65,6 +65,7 @@ import {
   reconcileElements as _reconcileElements,
 } from "./reconciliation";
 import { decryptData } from "../../data/encryption";
+import { resetBrowserStateVersions } from "../data/tabSync";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -247,6 +248,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     this.saveCollabRoomToFirebase();
     if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
+      // hack to ensure that we prefer we disregard any new browser state
+      // that could have been saved in other tabs while we were collaborating
+      resetBrowserStateVersions();
+
       window.history.pushState({}, APP_NAME, window.location.origin);
       this.destroySocketClient();
       trackEvent("share", "room closed");
