@@ -70,7 +70,6 @@ import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
-import { throttle } from "lodash";
 import {
   isBrowserStorageStateNewer,
   updateBrowserStateVersion,
@@ -420,7 +419,7 @@ const ExcalidrawWrapper = () => {
       TITLE_TIMEOUT,
     );
 
-    const syncData = throttle(() => {
+    const syncData = debounce(() => {
       if (isTestEnv()) {
         return;
       }
