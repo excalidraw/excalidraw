@@ -3954,7 +3954,7 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           const dx = pointerCoords.x - draggingElement.x;
           const dy = pointerCoords.y - draggingElement.y;
-          if (dx > 0 || dy > 0) {
+          if (dx || dy) {
             mutateElement(draggingElement, {
               points: [...draggingElement.points, [dx, dy]],
             });
