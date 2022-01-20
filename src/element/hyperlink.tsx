@@ -1,6 +1,6 @@
 import { AppState } from "../types";
 import { sceneCoordsToViewportCoords } from "../utils";
-import { mutateElement } from "./mutateElement";
+import { mutateElement, newElementWith } from "./mutateElement";
 import { ExcalidrawTextElement, NonDeletedExcalidrawElement } from "./types";
 
 import "./hyperlink.scss";
@@ -45,7 +45,8 @@ export const Hyperlink = ({
     const updatedTextElement = Scene.getScene(element)!.getElement(
       element.id,
     )! as ExcalidrawTextElement;
-    mutateElement(updatedTextElement, { link });
+    const elementWithLink = newElementWith(updatedTextElement, { link });
+    mutateElement(updatedTextElement, elementWithLink);
     onSubmit();
   }, [element, onSubmit]);
 
@@ -59,7 +60,10 @@ export const Hyperlink = ({
     const updatedTextElement = Scene.getScene(element)!.getElement(
       element.id,
     )! as ExcalidrawTextElement;
-    mutateElement(updatedTextElement, { link: null });
+    const elementWithoutLink = newElementWith(updatedTextElement, {
+      link: null,
+    });
+    mutateElement(updatedTextElement, elementWithoutLink);
     onSubmit();
   }, [onSubmit, element]);
 
