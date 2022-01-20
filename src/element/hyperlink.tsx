@@ -7,7 +7,7 @@ import "./hyperlink.scss";
 import Scene from "../scene/Scene";
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import { link } from "../components/icons";
+import { checkCircleIcon, editIcon, link, trash } from "../components/icons";
 import { t } from "../i18n";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import clsx from "clsx";
@@ -102,6 +102,8 @@ export const Hyperlink = ({
           className={clsx("excalidraw-hyperlinkContainer-link", {
             "d-none": isEditing,
           })}
+          target="_blank"
+          rel="noreferrer"
         >
           {element.link}
         </a>
@@ -109,27 +111,36 @@ export const Hyperlink = ({
 
       {!showInput && (
         <div>
-          <button
-            className={clsx("excalidraw-hyperlinkContainer--edit")}
+          <ToolButton
+            type="button"
+            title={t("buttons.edit")}
+            aria-label={t("buttons.edit")}
+            label={t("buttons.edit")}
             onClick={onEdit}
-          >
-            Edit
-          </button>
-          <button
-            className={clsx("excalidraw-hyperlinkContainer--remove")}
+            className="excalidraw-hyperlinkContainer--edit"
+            icon={editIcon}
+          />
+          <ToolButton
+            type="button"
+            title={t("buttons.remove")}
+            aria-label={t("buttons.remove")}
+            label={t("buttons.remove")}
             onClick={handleRemove}
-          >
-            Remove
-          </button>
+            className="excalidraw-hyperlinkContainer--remove"
+            icon={trash}
+          />
         </div>
       )}
       {showInput && (
-        <button
-          className={clsx("excalidraw-hyperlinkContainer--apply")}
+        <ToolButton
+          type="button"
+          title={t("buttons.save")}
+          aria-label={t("buttons.save")}
+          label={t("buttons.save")}
           onClick={handleSubmit}
-        >
-          Apply
-        </button>
+          className="excalidraw-hyperlinkContainer--save"
+          icon={checkCircleIcon}
+        />
       )}
     </div>
   );

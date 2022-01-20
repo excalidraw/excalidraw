@@ -9,18 +9,17 @@
   justify-content: space-between;
   width: 20rem;
   background: $oc-white;
-  * {
-    padding: 4px;
-  }
+
   &-input,
   button {
     z-index: 100;
   }
   &-input {
     height: 24px;
-    width: 16rem;
+    width: 18rem;
     font-size: 16px;
     border: none;
+    padding: 4px;
 
     &:focus,
     &:focus-visible {
@@ -35,7 +34,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 8px;
-    max-width: 12rem;
+    max-width: 15rem;
   }
   button {
     color: $oc-blue-6;
@@ -48,5 +47,24 @@
 
   .d-none {
     display: none;
+  }
+
+  &--edit .ToolIcon__icon svg {
+    color: $oc-green-7;
+    fill: $oc-green-7;
+  }
+
+  &--remove .ToolIcon__icon svg {
+    color: $oc-red-7;
+    fill: $oc-red-7;
+  }
+  &--save .ToolIcon__icon svg {
+    color: $oc-green-7;
+    fill: $oc-green-7;
+  }
+
+  .ToolIcon__icon {
+    width: 2rem;
+    height: 2rem;
   }
 }
