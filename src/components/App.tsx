@@ -485,7 +485,7 @@ class App extends React.Component<AppProps, AppState> {
               zenModeEnabled={zenModeEnabled}
               toggleZenMode={this.toggleZenMode}
               langCode={getLanguage().code}
-              isCollaborating={this.props.isCollaborating || false}
+              isCollaborating={this.props.isCollaborating}
               renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
               viewModeEnabled={viewModeEnabled}
@@ -1961,21 +1961,16 @@ class App extends React.Component<AppProps, AppState> {
     const updateElement = (
       text: string,
       originalText: string,
-      isDeleted = false,
-      updateDimensions = false,
+      isDeleted: boolean,
     ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            return updateTextElement(
-              _element,
-              {
-                text,
-                isDeleted,
-                originalText,
-              },
-              updateDimensions,
-            );
+            return updateTextElement(_element, {
+              text,
+              isDeleted,
+              originalText,
+            });
           }
           return _element;
         }),
@@ -2000,14 +1995,14 @@ class App extends React.Component<AppProps, AppState> {
         ];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text, text, false, !element.containerId);
+        updateElement(text, text, false);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
       }),
       onSubmit: withBatchedUpdates(({ text, viaKeyboard, originalText }) => {
         const isDeleted = !text.trim();
-        updateElement(text, originalText, isDeleted, true);
+        updateElement(text, originalText, isDeleted);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -2040,13 +2035,14 @@ class App extends React.Component<AppProps, AppState> {
       }),
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
+      app: this,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text, element.originalText);
+    updateElement(element.text, element.originalText, false);
   }
 
   private deselectElements() {
@@ -2812,7 +2808,8 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           this.state.viewModeEnabled)
-      )
+      ) ||
+      isTextElement(this.state.editingElement)
     ) {
       return false;
     }

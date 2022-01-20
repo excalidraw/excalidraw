@@ -103,7 +103,9 @@
     "toggleTheme": "Toggle theme",
     "personalLib": "Personal Library",
     "excalidrawLib": "Excalidraw Library",
-    "renameTable": "Rename table"
+    "renameTable": "Rename table",
+    "decreaseFontSize": "Decrease font size",
+    "increaseFontSize": "Increase font size"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

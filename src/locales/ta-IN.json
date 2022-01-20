@@ -102,7 +102,9 @@
     "showBackground": "பின்னணி நிற எடுப்பானைக் காட்டு",
     "toggleTheme": "தோற்றத்தை நிலைமாற்று",
     "personalLib": "தனக்குரிய நூலகம்",
-    "excalidrawLib": "எக்ஸ்கேலிட்ரா நூலகம்"
+    "excalidrawLib": "எக்ஸ்கேலிட்ரா நூலகம்",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "கித்தானை அகரமாக்கு",
@@ -204,15 +206,17 @@
     "resizeImage": "SHIFTஐ நீண்டழுத்தி கட்டற்று அளவுமாற்றலாம்,\nமையத்திலிருந்து அளவுமாற்ற ALTஐ நீண்டழுத்துக",
     "rotate": "",
     "lineEditor_info": "புள்ளிகளைத் திருத்த இரு-சொடுக்கு அ Enterஐ அழுத்து",
-    "lineEditor_pointSelected": "புள்ளியை நீக்க Deleteஐ அழுத்து, நகலாக்க CtrlOrCmd+D, அ நகர்த்த பிடித்திழு",
-    "lineEditor_nothingSelected": "நகர்த்தவோ நீக்கவோ புள்ளியைத் தேர், அ புதிய புள்ளிகளைச் சேர்க்க Altஐ அழுத்திப்பிடித்துச் சொடுக்கு",
+    "lineEditor_pointSelected": "புள்ளி(கள்)ஐ நீக்க Deleteஐ அழுத்து,\nநகலாக்க CtrlOrCmd+D, அ நகர்த்த பிடித்திழு",
+    "lineEditor_nothingSelected": "திருத்த புள்ளியைத் தேர்ந்தெடு (பலவற்றை தேர SHIFTஐ அழுத்திப்பிடி),\nஅ புதிய புள்ளிகளைச் சேர்க்க Altஐ அழுத்திப்பிடித்துச் சொடுக்கு",
     "placeImage": "படத்தை வைக்கச் சொடுக்கு, அ கைமுறையாக அளவு அமைக்க சொடுக்கி பிடித்திழு",
-    "publishLibrary": "உம் சொந்த நூலகத்தைப் பிரசுரி"
+    "publishLibrary": "உம் சொந்த நூலகத்தைப் பிரசுரி",
+    "bindTextToElement": "உரையைச் சேர்க்க enterஐ அழுத்து",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "முன்னோட்டம் காட்ட இயலவில்லை",
     "canvasTooBig": "கித்தான் மிகப்பெரிதாக இருக்கலாம்.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "துணுக்குதவி: தூரத்திலுள்ள உறுப்புகளைப் நெருக்கமாக நகர்த்தப்பார்."
   },
   "errorSplash": {
     "headingMain_pre": "பிழையைச் சந்தித்தீரா. முயலவும் ",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "எமது வலைப்பூவை வாசி",
     "click": "சொடுக்கு",
+    "deepSelect": "ஆழ்ந்துத் தேர்",
+    "deepBoxSelect": "பெட்டியினுள் ஆழ்ந்துத் தேர், மற்றும் பிடித்திழுத்தலைத் தவிர்",
     "curvedArrow": "வளைந்த அம்பு",
     "curvedLine": "வளைந்த வரி",
     "documentation": "ஆவணமாக்கல்",

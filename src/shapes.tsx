@@ -86,7 +86,7 @@ export const SHAPES: readonly {
       </svg>
     ),
     value: "freedraw",
-    key: KEYS.X,
+    key: [KEYS.X, KEYS.P.toUpperCase()],
   },
   {
     icon: (

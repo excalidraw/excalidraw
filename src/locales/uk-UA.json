@@ -102,7 +102,9 @@
     "showBackground": "Показати палітру для фону",
     "toggleTheme": "Перемкнути тему",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -204,10 +206,12 @@
     "resizeImage": "",
     "rotate": "Ви можете обмежити кути, утримуючи SHIFT під час обертання",
     "lineEditor_info": "Двічі клацніть або натисніть Enter щоб редагувати точки",
-    "lineEditor_pointSelected": "Натисніть Видалити, щоб видалити точку, CtrlOrCmd+D для дублювання, або перетягніть, щоб переміститися",
-    "lineEditor_nothingSelected": "Виберіть точку для переміщення чи видалення, або утримуйте Alt і натисніть, щоб додати нові точки",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не вдається показати попередній перегляд",
@@ -254,6 +258,8 @@
   "helpDialog": {
     "blog": "Наш блог",
     "click": "натиснути",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "Крива стрілка",
     "curvedLine": "Крива лінія",
     "documentation": "Документація",

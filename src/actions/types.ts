@@ -103,7 +103,9 @@ export type ActionName =
   | "exportWithDarkMode"
   | "toggleTheme"
   | "renameTable"
-  | "toggleRenameTableDialog";
+  | "toggleRenameTableDialog"
+  | "increaseFontSize"
+  | "decreaseFontSize";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
