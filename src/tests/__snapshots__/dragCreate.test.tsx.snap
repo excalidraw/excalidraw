@@ -15,6 +15,7 @@ Object {
   "id": "id0",
   "isDeleted": false,
   "lastCommittedPoint": null,
+  "link": null,
   "opacity": 100,
   "points": Array [
     Array [
@@ -56,6 +57,7 @@ Object {
   "height": 50,
   "id": "id0",
   "isDeleted": false,
+  "link": null,
   "opacity": 100,
   "roughness": 1,
   "seed": 337897,
@@ -85,6 +87,7 @@ Object {
   "height": 50,
   "id": "id0",
   "isDeleted": false,
+  "link": null,
   "opacity": 100,
   "roughness": 1,
   "seed": 337897,
@@ -115,6 +118,7 @@ Object {
   "id": "id0",
   "isDeleted": false,
   "lastCommittedPoint": null,
+  "link": null,
   "opacity": 100,
   "points": Array [
     Array [
@@ -156,6 +160,7 @@ Object {
   "height": 50,
   "id": "id0",
   "isDeleted": false,
+  "link": null,
   "opacity": 100,
   "roughness": 1,
   "seed": 337897,

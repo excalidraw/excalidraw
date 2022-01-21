@@ -58,6 +58,7 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
+  "showHyperlinkPopup": false,
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
