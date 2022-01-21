@@ -274,8 +274,7 @@ class App extends React.Component<AppProps, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
   isMobile = false;
-  hyperlinkContainer: { updatePosition: (state: AppState) => void } | null =
-    null;
+  hideHyperlinkPopupUntilClicked: boolean = false;
   detachIsMobileMqHandler?: () => void;
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
@@ -1505,7 +1504,13 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.getElements(),
       this.state,
     );
-    if (selectedElements.length === 1 && selectedElements[0].link) {
+    if (
+      !this.hideHyperlinkPopupUntilClicked &&
+      selectedElements.length === 1 &&
+      selectedElements[0].link &&
+      !this.state.previousSelectedElementIds[selectedElements[0].id] &&
+      this.state.selectedElementIds[selectedElements[0].id]
+    ) {
       this.setState({ showHyperlinkPopup: true });
     } else {
       this.setState({ showHyperlinkPopup: false });
@@ -2603,6 +2608,11 @@ class App extends React.Component<AppProps, AppState> {
 
     if (isPanning) {
       return;
+    }
+    if (this.state.showHyperlinkPopup) {
+      this.hideHyperlinkPopupUntilClicked = true;
+    } else {
+      this.hideHyperlinkPopupUntilClicked = false;
     }
 
     this.setState({
