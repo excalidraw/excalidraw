@@ -80,4 +80,4 @@ export { actionToggleGridMode } from "./actionToggleGridMode";
 export { actionToggleZenMode } from "./actionToggleZenMode";
 
 export { actionToggleStats } from "./actionToggleStats";
-export { actionLink } from "../element/hyperlink";
+export { actionLink } from "../element/Hyperlink";

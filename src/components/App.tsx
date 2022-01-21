@@ -238,7 +238,7 @@ import {
   getBoundTextElementId,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
-import { Hyperlink } from "../element/hyperlink";
+import { Hyperlink } from "../element/Hyperlink";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);

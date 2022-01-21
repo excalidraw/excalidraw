@@ -1,9 +1,9 @@
 import { AppState } from "../types";
 import { sceneCoordsToViewportCoords } from "../utils";
 import { mutateElement, newElementWith } from "./mutateElement";
-import { ExcalidrawTextElement, NonDeletedExcalidrawElement } from "./types";
+import { NonDeletedExcalidrawElement } from "./types";
 
-import "./hyperlink.scss";
+import "./Hyperlink.scss";
 import Scene from "../scene/Scene";
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
@@ -42,11 +42,12 @@ export const Hyperlink = ({
     if (link && link.substr(0, PREFIX.length) !== PREFIX) {
       link = `${PREFIX}${link}`;
     }
-    const updatedTextElement = Scene.getScene(element)!.getElement(
-      element.id,
-    )! as ExcalidrawTextElement;
-    const elementWithLink = newElementWith(updatedTextElement, { link });
-    mutateElement(updatedTextElement, elementWithLink);
+
+    if (link === element.link) {
+      return;
+    }
+    const elementWithLink = newElementWith(element, { link });
+    mutateElement(element, elementWithLink);
     onSubmit();
   }, [element, onSubmit]);
 
@@ -57,13 +58,10 @@ export const Hyperlink = ({
   }, [handleSubmit]);
 
   const handleRemove = useCallback(() => {
-    const updatedTextElement = Scene.getScene(element)!.getElement(
-      element.id,
-    )! as ExcalidrawTextElement;
-    const elementWithoutLink = newElementWith(updatedTextElement, {
+    const elementWithoutLink = newElementWith(element, {
       link: null,
     });
-    mutateElement(updatedTextElement, elementWithoutLink);
+    mutateElement(element, elementWithoutLink);
     onSubmit();
   }, [onSubmit, element]);
 
