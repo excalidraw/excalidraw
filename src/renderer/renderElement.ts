@@ -112,12 +112,10 @@ const generateElementCanvas = (
   } else {
     canvas.width =
       element.width * window.devicePixelRatio * zoom.value +
-      padding * zoom.value * 2 +
-      100;
+      padding * zoom.value * 2;
     canvas.height =
       element.height * window.devicePixelRatio * zoom.value +
-      padding * zoom.value * 2 +
-      100;
+      padding * zoom.value * 2;
   }
 
   context.save();
@@ -284,7 +282,7 @@ const drawElementOnCanvas = (
             ? element.width / 2
             : element.textAlign === "right"
             ? element.width
-            : 30;
+            : 0;
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
