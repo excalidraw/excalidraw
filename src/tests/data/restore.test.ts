@@ -55,7 +55,6 @@ describe("restoreElements", () => {
       fontSize: 14,
       fontFamily: FONT_FAMILY.Virgil,
       text: "text",
-      rawText: "text",
       textAlign: "center",
       verticalAlign: "middle",
       id: "id-text01",

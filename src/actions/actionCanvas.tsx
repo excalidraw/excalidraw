@@ -183,7 +183,6 @@ export const actionResetZoom = register({
 const zoomValueToFitBoundsOnViewport = (
   bounds: [number, number, number, number],
   viewportDimensions: { width: number; height: number },
-  maxZoom: number = 1,
 ) => {
   const [x1, y1, x2, y2] = bounds;
   const commonBoundsWidth = x2 - x1;
@@ -195,17 +194,15 @@ const zoomValueToFitBoundsOnViewport = (
     Math.floor(smallestZoomValue / ZOOM_STEP) * ZOOM_STEP;
   const clampedZoomValueToFitElements = Math.min(
     Math.max(zoomAdjustedToSteps, ZOOM_STEP),
-    maxZoom,
+    1,
   );
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
-export const zoomToFitElements = (
+const zoomToFitElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   zoomToSelection: boolean,
-  maxZoom: number = 1,
-  margin: number = 0,
 ) => {
   const nonDeletedElements = getNonDeletedElements(elements);
   const selectedElements = getSelectedElements(nonDeletedElements, appState);
@@ -215,14 +212,10 @@ export const zoomToFitElements = (
       ? getCommonBounds(selectedElements)
       : getCommonBounds(nonDeletedElements);
 
-  const zoomValue = zoomValueToFitBoundsOnViewport(
-    commonBounds,
-    {
-      width: appState.width - appState.width * margin,
-      height: appState.height - appState.height * margin,
-    },
-    maxZoom,
-  );
+  const zoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
+    width: appState.width,
+    height: appState.height,
+  });
   const newZoom = getNewZoom(zoomValue, appState.zoom, {
     left: appState.offsetLeft,
     top: appState.offsetTop,
@@ -270,12 +263,7 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
-  perform: (_, appState, value, app) => {
-    if (app.props.onThemeChange) {
-      app.props.onThemeChange(
-        value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
-      );
-    }
+  perform: (_, appState, value) => {
     return {
       appState: {
         ...appState,

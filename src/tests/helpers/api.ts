@@ -14,7 +14,6 @@ import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
 import { newFreeDrawElement } from "../../element/newElement";
-import { Excalidraw } from "../../packages/excalidraw/dist/excalidraw.production.min";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -89,7 +88,6 @@ export class API {
     opacity?: ExcalidrawGenericElement["opacity"];
     // text props
     text?: T extends "text" ? ExcalidrawTextElement["text"] : never;
-    rawText?: T extends "text" ? ExcalidrawTextElement["rawText"] : never;
     fontSize?: T extends "text" ? ExcalidrawTextElement["fontSize"] : never;
     fontFamily?: T extends "text" ? ExcalidrawTextElement["fontFamily"] : never;
     textAlign?: T extends "text" ? ExcalidrawTextElement["textAlign"] : never;
@@ -141,7 +139,6 @@ export class API {
         element = newTextElement({
           ...base,
           text: rest.text || "test",
-          rawText: rest.rawText || "test",
           fontSize: rest.fontSize ?? appState.currentItemFontSize,
           fontFamily: rest.fontFamily ?? appState.currentItemFontFamily,
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,

@@ -73,7 +73,7 @@ module.exports = {
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        type: "asset/inline",
+        type: "asset/resource",
       },
     ],
   },
@@ -96,7 +96,6 @@ module.exports = {
   },
   plugins: [
     ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
-    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
     new webpack.DefinePlugin({
       "process.env": parseEnvVariables(
         path.resolve(__dirname, "../../../.env.production"),

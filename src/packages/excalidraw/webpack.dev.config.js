@@ -1,12 +1,11 @@
 const path = require("path");
-const autoprefixer = require("autoprefixer");
 const webpack = require("webpack");
-const BundleAnalyzerPlugin =
-  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const autoprefixer = require("autoprefixer");
 const { parseEnvVariables } = require("./env");
 
 module.exports = {
   mode: "development",
+  devtool: false,
   entry: {
     "excalidraw.development": "./entry.js",
   },
@@ -30,9 +29,7 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           "style-loader",
-          {
-            loader: "css-loader",
-          },
+          { loader: "css-loader" },
           {
             loader: "postcss-loader",
             options: {
@@ -55,28 +52,11 @@ module.exports = {
               configFile: path.resolve(__dirname, "../tsconfig.dev.json"),
             },
           },
-          {
-            loader: "babel-loader",
-            options: {
-              presets: [
-                "@babel/preset-env",
-                ["@babel/preset-react", { runtime: "automatic" }],
-                "@babel/preset-typescript",
-              ],
-              plugins: [
-                "@babel/plugin-proposal-object-rest-spread",
-                "@babel/plugin-transform-arrow-functions",
-                "transform-class-properties",
-                "@babel/plugin-transform-async-to-generator",
-                "@babel/plugin-transform-runtime",
-              ],
-            },
-          },
         ],
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        type: "asset/inline",
+        type: "asset/resource",
       },
     ],
   },
@@ -92,8 +72,6 @@ module.exports = {
     },
   },
   plugins: [
-    ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
-    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
     new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ }),
     new webpack.DefinePlugin({
       "process.env": parseEnvVariables(

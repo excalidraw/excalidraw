@@ -79,7 +79,6 @@ it("clones text element", () => {
     roughness: 1,
     opacity: 100,
     text: "hello",
-    rawText: "hello",
     fontSize: 20,
     fontFamily: FONT_FAMILY.Virgil,
     textAlign: "left",

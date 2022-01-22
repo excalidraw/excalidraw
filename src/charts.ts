@@ -185,7 +185,6 @@ const chartXLabels = (
         backgroundColor,
         ...commonProps,
         text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
-        rawText: label.length > 8 ? `${label.slice(0, 5)}...` : label,
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
         y: y + BAR_GAP / 2,
         width: BAR_WIDTH,
@@ -212,7 +211,6 @@ const chartYLabels = (
     x: x - BAR_GAP,
     y: y - BAR_GAP,
     text: "0",
-    rawText: "0",
     textAlign: "right",
   });
 
@@ -223,7 +221,6 @@ const chartYLabels = (
     x: x - BAR_GAP,
     y: y - BAR_HEIGHT - minYLabel.height / 2,
     text: Math.max(...spreadsheet.values).toLocaleString(),
-    rawText: Math.max(...spreadsheet.values).toLocaleString(),
     textAlign: "right",
   });
 
@@ -308,7 +305,6 @@ const chartBaseElements = (
         groupIds: [groupId],
         ...commonProps,
         text: spreadsheet.title,
-        rawText: spreadsheet.title,
         x: x + chartWidth / 2,
         y: y - BAR_HEIGHT - BAR_GAP * 2 - DEFAULT_FONT_SIZE,
         strokeSharpness: "sharp",
