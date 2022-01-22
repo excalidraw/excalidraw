@@ -47,8 +47,6 @@ const getTransform = (
 ) => {
   const { zoom } = appState;
   const degree = (180 * angle) / Math.PI;
-  // offsets must be multiplied by 2 to account for the division by 2 of
-  // the whole expression afterwards
   let translateX = (width * (zoom.value - 1)) / 2;
   let translateY = (height * (zoom.value - 1)) / 2;
   if (width > maxWidth && zoom.value !== 1) {
@@ -173,18 +171,7 @@ export const textWysiwyg = ({
         ? approxLineHeight
         : updatedElement.height / lines.length;
       if (!container) {
-        maxWidth =
-          (appState.width -
-            8 -
-            ((appState.scrollX + updatedElement.x) * appState.zoom.value +
-              appState.zoom.translation.x)) /
-            appState.zoom.value -
-          // margin-right of parent if any
-          Number(
-            getComputedStyle(
-              excalidrawContainer?.parentNode as Element,
-            ).marginRight.slice(0, -2),
-          );
+        maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
       }
 
       // Make sure text editor height doesn't go beyond viewport
