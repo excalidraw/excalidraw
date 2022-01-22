@@ -45,17 +45,17 @@ const getTransform = (
   maxWidth: number,
   maxHeight: number,
 ) => {
-  const { zoom, offsetTop, offsetLeft } = appState;
+  const { zoom } = appState;
   const degree = (180 * angle) / Math.PI;
   // offsets must be multiplied by 2 to account for the division by 2 of
   // the whole expression afterwards
-  let translateX = ((width - offsetLeft * 2) * (zoom.value - 1)) / 2;
-  let translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
+  let translateX = (width * (zoom.value - 1)) / 2;
+  let translateY = (height * (zoom.value - 1)) / 2;
   if (width > maxWidth && zoom.value !== 1) {
-    translateX = ((maxWidth - offsetLeft * 2) * (zoom.value - 1)) / 2;
+    translateX = (maxWidth * (zoom.value - 1)) / 2;
   }
   if (height > maxHeight && zoom.value !== 1) {
-    translateY = ((maxHeight - offsetTop * 2) * (zoom.value - 1)) / 2;
+    translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
@@ -189,16 +189,7 @@ export const textWysiwyg = ({
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
-        (appState.height -
-          viewportY -
-          // There is a ~14px difference which keeps on increasing
-          // with every zoom step when offset present hence I am subtracting it here
-          // However this is not the best fix and breaks in
-          // few scenarios
-          (appState.offsetTop
-            ? ((appState.zoom.value * 100 - 100) / 10) * 14
-            : 0)) /
-        appState.zoom.value;
+        (appState.height - viewportY) / appState.zoom.value;
       const angle = container ? container.angle : updatedElement.angle;
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
