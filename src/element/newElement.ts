@@ -17,9 +17,10 @@ import {
   applyTextOpts,
   cleanTextOptUpdates,
   measureTextElement,
+  wrapTextElement,
 } from "../textlike";
 import { TextOpts } from "../textlike/types";
-import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
+import { getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -27,7 +28,7 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
-import { getContainerElement, wrapText } from "./textElement";
+import { getContainerElement } from "./textElement";
 import { isBoundToContainer } from "./typeChecks";
 import { BOUND_TEXT_PADDING } from "../constants";
 
@@ -268,7 +269,7 @@ export const updateTextElement = (
 ): ExcalidrawTextElement => {
   const container = getContainerElement(element);
   if (container) {
-    text = wrapText(text, getFontString(element), container.width);
+    text = wrapTextElement(element, container.width, { text: originalText });
   }
   const dimensions = getAdjustedDimensions(element, text);
   return newElementWith(element, {

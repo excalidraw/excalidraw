@@ -14,6 +14,8 @@ import { TextActionName, TextOpts, TextShortcutName } from "./types";
 
 import { Action, ActionName } from "../actions/types";
 import { register } from "../actions/register";
+import { hasBoundTextElement } from "../element/typeChecks";
+import { getBoundTextElement } from "../element/textElement";
 
 type TextLikeMethodName =
   | "apply"
@@ -21,7 +23,8 @@ type TextLikeMethodName =
   | "measure"
   | "render"
   | "renderSvg"
-  | "restore";
+  | "restore"
+  | "wrap";
 
 type TextLikeMethod = {
   subtype: string;
@@ -37,6 +40,7 @@ const measureMethodsA = [] as TextLikeMethods;
 const renderMethodsA = [] as TextLikeMethods;
 const renderSvgMethodsA = [] as TextLikeMethods;
 const restoreMethodsA = [] as TextLikeMethods;
+const wrapMethodsA = [] as TextLikeMethods;
 
 // One element for each ExcalidrawTextElement subtype.
 // ShortcutMap arrays, then typeguards for these.
@@ -106,6 +110,9 @@ export const registerTextLikeMethod = (
     case "renderSvg":
       methodsA = renderSvgMethodsA;
       break;
+    case "wrap":
+      methodsA = wrapMethodsA;
+      break;
   }
   if (!methodsA.includes(textLikeMethod)) {
     methodsA.push(textLikeMethod);
@@ -157,6 +164,16 @@ export const isPanelComponentDisabled = (
   selectedElements.forEach((element) => {
     if (isTextElement(element)) {
       if (isPanelComponentDisabledForSubtype(element.subtype, actionName)) {
+        disabled = true;
+      }
+    }
+    if (hasBoundTextElement(element)) {
+      if (
+        isPanelComponentDisabledForSubtype(
+          getBoundTextElement(element)!.subtype,
+          actionName,
+        )
+      ) {
         disabled = true;
       }
     }
@@ -323,6 +340,43 @@ export const restoreTextElement = (
       return value.default !== undefined && value.default === true;
     })!
     .method(element, elementRestored);
+};
+
+export const wrapTextElement = (
+  element: Omit<
+    ExcalidrawTextElement,
+    | "id"
+    | "isDeleted"
+    | "type"
+    | "baseline"
+    | "width"
+    | "height"
+    | "angle"
+    | "seed"
+    | "version"
+    | "versionNonce"
+    | "groupIds"
+    | "boundElements"
+    | "containerId"
+    | "updated"
+  >,
+  containerWidth: number,
+  next?: {
+    fontSize?: number;
+    text?: string;
+    textOpts?: TextOpts;
+  },
+): string => {
+  for (let i = 0; i < wrapMethodsA.length; i++) {
+    if (wrapMethodsA[i].subtype === element.subtype) {
+      return wrapMethodsA[i].method(element, containerWidth, next);
+    }
+  }
+  return wrapMethodsA
+    .find((value, index, wrapMethodsA) => {
+      return value.default !== undefined && value.default === true;
+    })!
+    .method(element, containerWidth, next);
 };
 
 export const registerTextElementSubtypes = (

@@ -2,7 +2,11 @@ import { SVG_NS } from "../../constants";
 import { getFontFamilyString, getFontString, isRTL } from "../../utils";
 import { ExcalidrawTextElement, NonDeleted } from "../../element/types";
 import { ElementUpdate } from "../../element/mutateElement";
-import { getApproxLineHeight, measureText } from "../../element/textElement";
+import {
+  getApproxLineHeight,
+  measureText,
+  wrapText,
+} from "../../element/textElement";
 import {
   registerTextLikeDisabledPanelComponents,
   registerTextLikeMethod,
@@ -152,6 +156,42 @@ const restoreTextElementText = (
   return elementRestored;
 };
 
+export const wrapTextElementText = (
+  element: Omit<
+    ExcalidrawTextElementText,
+    | "id"
+    | "isDeleted"
+    | "type"
+    | "baseline"
+    | "width"
+    | "height"
+    | "angle"
+    | "seed"
+    | "version"
+    | "versionNonce"
+    | "groupIds"
+    | "boundElements"
+    | "containerId"
+    | "updated"
+  >,
+  containerWidth: number,
+  next?: {
+    fontSize?: number;
+    text?: string;
+    textOpts?: TextOptsText;
+  },
+): string => {
+  const fontSize =
+    next?.fontSize !== undefined ? next.fontSize : element.fontSize;
+  const text = next?.text !== undefined ? next.text : element.originalText;
+
+  return wrapText(
+    text,
+    getFontString({ fontSize, fontFamily: element.fontFamily }),
+    containerWidth,
+  );
+};
+
 export const registerTextElementSubtypeText = (
   onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
 ) => {
@@ -186,6 +226,11 @@ export const registerTextElementSubtypeText = (
   registerTextLikeMethod("restore", {
     subtype: TEXT_SUBTYPE_DEFAULT,
     method: restoreTextElementText,
+    default: true,
+  });
+  registerTextLikeMethod("wrap", {
+    subtype: TEXT_SUBTYPE_DEFAULT,
+    method: wrapTextElementText,
     default: true,
   });
 };

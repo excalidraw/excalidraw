@@ -47,6 +47,7 @@ import {
   getContainerElement,
 } from "../element/textElement";
 import {
+  hasBoundTextElement,
   isBoundToContainer,
   isLinearElement,
   isLinearElementType,
@@ -123,24 +124,29 @@ export const actionChangeTextElementSubtype = register({
   name: "changeTextSubtype",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (oldElement) => {
-        if (isTextElement(oldElement)) {
-          const newElement: ExcalidrawTextElement = applyTextOpts(
-            newElementWith(oldElement, {
-              subtype: value,
-            }),
-            appState.textOpts,
-          );
-          redrawTextBoundingBox(
-            newElement,
-            getContainerElement(oldElement),
-            appState,
-          );
-          return newElement;
-        }
+      elements: changeProperty(
+        elements,
+        appState,
+        (oldElement) => {
+          if (isTextElement(oldElement)) {
+            const newElement: ExcalidrawTextElement = applyTextOpts(
+              newElementWith(oldElement, {
+                subtype: value,
+              }),
+              appState.textOpts,
+            );
+            redrawTextBoundingBox(
+              newElement,
+              getContainerElement(oldElement),
+              appState,
+            );
+            return newElement;
+          }
 
-        return oldElement;
-      }),
+          return oldElement;
+        },
+        true,
+      ),
       appState: {
         ...appState,
         textElementSubtype: value,
@@ -163,7 +169,11 @@ export const actionChangeTextElementSubtype = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => isTextElement(element) && element.subtype,
+          (element) =>
+            isTextElement(element)
+              ? element.subtype
+              : hasBoundTextElement(element) &&
+                getBoundTextElement(element)!.subtype,
           appState.textElementSubtype,
         )}
         onChange={(value) => updateData(value)}
