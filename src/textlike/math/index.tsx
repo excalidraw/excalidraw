@@ -1,14 +1,21 @@
 // Some imports
 import { FontString } from "../../element/types";
-import { FONT_FAMILY, SVG_NS } from "../../constants";
+import { BOUND_TEXT_PADDING, FONT_FAMILY, SVG_NS } from "../../constants";
 import {
   getFontString,
   getFontFamilyString,
   getShortcutKey,
   isRTL,
 } from "../../utils";
-import { getApproxLineHeight, measureText } from "../../element/textElement";
-import { isTextElement } from "../../element/typeChecks";
+import {
+  getApproxLineHeight,
+  getBoundTextElement,
+  getContainerElement,
+  getTextWidth,
+  measureText,
+  wrapText,
+} from "../../element/textElement";
+import { hasBoundTextElement, isTextElement } from "../../element/typeChecks";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -34,7 +41,7 @@ import { Action } from "../../actions/types";
 import { AppState } from "../../types";
 import { getFormValue } from "../../actions/actionProperties";
 import { getSelectedElements } from "../../scene";
-import { getNonDeletedElements } from "../../element";
+import { getNonDeletedElements, redrawTextBoundingBox } from "../../element";
 import { invalidateShapeForElement } from "../../renderer/renderElement";
 import { ButtonSelect } from "../../components/ButtonSelect";
 
@@ -550,9 +557,10 @@ const getSelectedMathElements = (
     selectedElements.push(appState.editingElement);
   }
   const eligibleElements = selectedElements.filter(
-    (element, index, eligibleElements) => {
-      return isMathElement(element);
-    },
+    (element, index, eligibleElements) =>
+      isMathElement(element) ||
+      (hasBoundTextElement(element) &&
+        isMathElement(getBoundTextElement(element))),
   ) as NonDeleted<ExcalidrawTextElementMath>[];
   return eligibleElements;
 };
@@ -746,6 +754,179 @@ const restoreTextElementMath = (
   return elementRestored;
 };
 
+export const wrapTextElementMath = (
+  element: Omit<
+    ExcalidrawTextElementMath,
+    | "id"
+    | "isDeleted"
+    | "type"
+    | "baseline"
+    | "width"
+    | "height"
+    | "angle"
+    | "seed"
+    | "version"
+    | "versionNonce"
+    | "groupIds"
+    | "boundElements"
+    | "containerId"
+    | "updated"
+  >,
+  containerWidth: number,
+  next?: {
+    fontSize?: number;
+    text?: string;
+    textOpts?: TextOptsMath;
+  },
+): string => {
+  const isMathJaxLoaded = mathJaxLoaded;
+  const fontSize =
+    next?.fontSize !== undefined ? next.fontSize : element.fontSize;
+  const text = next?.text !== undefined ? next.text : element.originalText;
+  const useTex =
+    next?.textOpts !== undefined && next.textOpts.useTex !== undefined
+      ? next.textOpts.useTex
+      : element.useTex;
+
+  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
+
+  const maxWidth = containerWidth - BOUND_TEXT_PADDING * 2;
+
+  const outputs = markupText(text, useTex, isMathJaxLoaded);
+  const outputMetrics = measureOutputs(outputs, font, isMathJaxLoaded);
+
+  const delimiter = useTex ? "$$" : "`";
+  const lines = text.replace(/\r\n?/g, "\n").split("\n");
+  const lineText: string[][] = [];
+  const lineWidth: number[][] = [];
+  const newText: string[] = [];
+  let newTextIndex = 0;
+  newText.push("");
+  for (let index = 0; index < outputs.length; index++) {
+    let lineIndex = 0;
+    let itemWidth = 0;
+    let pushNew = false;
+    lineText.push([]);
+    lineWidth.push([]);
+    lineText[index].push("");
+    lineWidth[index].push(0);
+    const lineArray = lines[index].split(delimiter);
+    for (let i = 0; i < outputs[index].length; i++) {
+      const isSvg = i % 2 === 1;
+      itemWidth = 0;
+      let lineItem = lineArray[i];
+      if (isSvg) {
+        itemWidth = outputMetrics.outputMetrics[index][i].width;
+        lineItem = delimiter + lineItem + delimiter;
+      }
+      if (pushNew) {
+        lineText[index].push(lineItem);
+        lineWidth[index].push(itemWidth);
+        lineIndex++;
+      } else {
+        lineText[index][lineIndex] += lineItem; // should always be text
+      }
+      pushNew = true;
+    }
+    if (outputs[index].length % 2 === 1) {
+      // Last one was text
+      pushNew = false;
+    }
+
+    for (let i = 0; i < lineText[index].length; i++) {
+      // Now get the widths for all the concatenated text strings
+      if (lineIndex % 2 === 0) {
+        lineWidth[index][i] = getTextWidth(lineText[index][i], font);
+      }
+    }
+
+    // Now move onto wrapping
+    let curWidth = 0;
+    for (let i = 0; i < lineText[index].length; i++) {
+      if (i % 2 === 1) {
+        // lineText[index][i] is math here
+        if (lineWidth[index][i] > maxWidth) {
+          // If the math svg is greater than maxWidth, make it its
+          // own, new line.  Don't try to split the math rendering
+          // into multiple lines.
+          newText.push(lineText[index][i]);
+          newTextIndex++;
+          curWidth = 0;
+        } else if (
+          curWidth <= maxWidth &&
+          curWidth + lineWidth[index][i] > maxWidth
+        ) {
+          // If the math svg would push us past maxWidth, start a
+          // new line.  Store the math svg's width in curWidth.
+          newText.push(lineText[index][i]);
+          newTextIndex++;
+          curWidth = lineWidth[index][i];
+        } else {
+          // If the math svg would not push us past maxWidth, then
+          // just append it to the current line.  Add the math
+          // svg's width to curWidth.
+          newText[newTextIndex] += lineText[index][i];
+          curWidth += lineWidth[index][i];
+        }
+      } else if (
+        curWidth <= maxWidth &&
+        curWidth + lineWidth[index][i] > maxWidth
+      ) {
+        // lineText[index][i] is text from here on in the if blocks
+        const spaceWidth = getTextWidth(" ", font);
+        const words = lineText[index][i].split(" ");
+        let wordsIndex = 0;
+        // Append words one-by-one until we would be over maxWidth;
+        // then let wrapText() take effect.
+        while (curWidth <= maxWidth) {
+          const tempWidth =
+            getTextWidth(words[wordsIndex], font) +
+            (wordsIndex > 0 ? spaceWidth : 0);
+          if (curWidth + tempWidth <= maxWidth) {
+            if (wordsIndex > 0) {
+              newText[newTextIndex] += " ";
+            }
+            newText[newTextIndex] += words[wordsIndex];
+            curWidth += tempWidth;
+            wordsIndex++;
+          } else {
+            break;
+          }
+        }
+        let toWrap = "";
+        let addSpace = false;
+        for (; wordsIndex < words.length; wordsIndex++) {
+          if (addSpace) {
+            toWrap += " ";
+          }
+          addSpace = true;
+          toWrap += words[wordsIndex];
+        }
+        const wrappedText = wrapText(toWrap, font, maxWidth);
+        const lastNewline = wrappedText.lastIndexOf("\n");
+        if (lastNewline >= 0) {
+          newText.push("");
+          newTextIndex++;
+          newText[newTextIndex] += wrappedText.substring(0, lastNewline);
+        }
+        newText.push(wrappedText.substring(lastNewline + 1));
+        newTextIndex++;
+        curWidth = getTextWidth(wrappedText.substring(lastNewline + 1), font);
+      } else {
+        newText[newTextIndex] += lineText[index][i];
+        curWidth += lineWidth[index][i];
+      }
+    }
+  }
+
+  // Get the metrics for the newly wrapped text.
+  // Since we cache, no need to do anything with the return value
+  // of measureMath().
+  const wrappedText = newText.join("\n");
+  measureMath(wrappedText, fontSize, useTex, isMathJaxLoaded);
+  return wrappedText;
+};
+
 export const registerTextElementSubtypeMath = (
   onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
 ) => {
@@ -781,6 +962,10 @@ export const registerTextElementSubtypeMath = (
     subtype: TEXT_SUBTYPE_MATH,
     method: restoreTextElementMath,
   });
+  registerTextLikeMethod("wrap", {
+    subtype: TEXT_SUBTYPE_MATH,
+    method: wrapTextElementMath,
+  });
   registerActionsMath();
   registerAuxLangData(`./textlike/${TEXT_SUBTYPE_MATH}`);
   // Call loadMathJax() here if we want to be sure it's loaded.
@@ -794,7 +979,11 @@ const enableActionChangeUseTex = (
 
   let enabled = false;
   eligibleElements.forEach((element) => {
-    if (isMathElement(element)) {
+    if (
+      isMathElement(element) ||
+      (hasBoundTextElement(element) &&
+        isMathElement(getBoundTextElement(element)))
+    ) {
       enabled = true;
     }
   });
@@ -811,20 +1000,27 @@ const setUseTexForSelectedElements = (
   const selectedElements = getSelectedMathElements(elements, appState);
 
   selectedElements.forEach((element) => {
+    const el = (
+      getBoundTextElement(element) &&
+      isMathElement(getBoundTextElement(element))
+        ? getBoundTextElement(element)
+        : element
+    ) as NonDeleted<ExcalidrawTextElementMath>;
     const isMathJaxLoaded = mathJaxLoaded;
 
     // Set the useTex field
-    mutateElement(element, { useTex });
+    mutateElement(el, { useTex });
     // Mark the element for re-rendering
-    invalidateShapeForElement(element);
+    invalidateShapeForElement(el);
     // Update the width/height of the element
     const metrics = measureMath(
-      element.text,
-      element.fontSize,
-      element.useTex,
+      el.text,
+      el.fontSize,
+      el.useTex,
       isMathJaxLoaded,
     );
-    mutateElement(element, metrics);
+    mutateElement(el, metrics);
+    redrawTextBoundingBox(el, getContainerElement(element), appState);
   });
 
   // Set the default value for new math-text elements.
@@ -843,11 +1039,12 @@ const registerActionsMath = () => {
     name: "changeUseTex",
     perform: (elements, appState, useTex) => {
       if (useTex === null) {
-        useTex = getFormValue(
-          elements,
-          appState,
-          (element) => isMathElement(element) && element.useTex,
-        );
+        useTex = getFormValue(elements, appState, (element) => {
+          const el = hasBoundTextElement(element)
+            ? getBoundTextElement(element)
+            : element;
+          return isMathElement(el) && el.useTex;
+        });
         if (useTex === null) {
           useTex = getUseTex(appState);
         }
@@ -872,7 +1069,10 @@ const registerActionsMath = () => {
       getSelectedElements(getNonDeletedElements(elements), appState).forEach(
         (element) => {
           if (
-            !isTextElement(element) ||
+            (!isTextElement(element) && !hasBoundTextElement(element)) ||
+            (!isTextElement(element) &&
+              hasBoundTextElement(element) &&
+              !isMathElement(getBoundTextElement(element))) ||
             (isTextElement(element) && element.subtype !== TEXT_SUBTYPE_MATH)
           ) {
             enabled = false;
@@ -908,7 +1108,12 @@ const registerActionsMath = () => {
           value={getFormValue(
             elements,
             appState,
-            (element) => isMathElement(element) && element.useTex,
+            (element) => {
+              const el = hasBoundTextElement(element)
+                ? getBoundTextElement(element)
+                : element;
+              return isMathElement(el) && el.useTex;
+            },
             getUseTex(appState),
           )}
           onChange={(value) => updateData(value)}
