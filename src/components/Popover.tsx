@@ -8,6 +8,8 @@ type Props = {
   children?: React.ReactNode;
   onCloseRequest?(event: PointerEvent): void;
   fitInViewport?: boolean;
+  offsetLeft?: number;
+  offsetTop?: number;
   viewportWidth?: number;
   viewportHeight?: number;
 };
@@ -18,6 +20,8 @@ export const Popover = ({
   top,
   onCloseRequest,
   fitInViewport = false,
+  offsetLeft = 0,
+  offsetTop = 0,
   viewportWidth = window.innerWidth,
   viewportHeight = window.innerHeight,
 }: Props) => {
@@ -28,14 +32,14 @@ export const Popover = ({
     if (fitInViewport && popoverRef.current) {
       const element = popoverRef.current;
       const { x, y, width, height } = element.getBoundingClientRect();
-      if (x + width > viewportWidth) {
+      if (x + width - offsetLeft > viewportWidth) {
         element.style.left = `${viewportWidth - width}px`;
       }
-      if (y + height > viewportHeight) {
+      if (y + height - offsetTop > viewportHeight) {
         element.style.top = `${viewportHeight - height}px`;
       }
     }
-  }, [fitInViewport, viewportWidth, viewportHeight]);
+  }, [fitInViewport, viewportWidth, viewportHeight, offsetLeft, offsetTop]);
 
   useEffect(() => {
     if (onCloseRequest) {
