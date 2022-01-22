@@ -1,5 +1,5 @@
-import { measureTextElement } from "../textlike";
-import { getFontString, arrayToMap, isTestEnv } from "../utils";
+import { measureTextElement, wrapTextElement } from "../textlike";
+import { arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -25,11 +25,7 @@ export const redrawTextBoundingBox = (
   let text = element.text;
 
   if (container) {
-    text = wrapText(
-      element.originalText,
-      getFontString(element),
-      container.width,
-    );
+    text = wrapTextElement(element, container.width);
   }
   const metrics = measureTextElement(
     element,
@@ -115,16 +111,15 @@ export const handleBindTextResize = (
         let nextBaseLine = textElement.baseline;
         if (transformHandleType !== "n" && transformHandleType !== "s") {
           if (text) {
-            text = wrapText(
-              textElement.originalText,
-              getFontString(textElement),
-              element.width,
-            );
+            text = wrapTextElement(textElement, element.width);
           }
 
-          const dimensions = measureText(
-            text,
-            getFontString(textElement),
+          const dimensions = measureTextElement(
+            textElement,
+            {
+              text,
+              fontSize: textElement.fontSize,
+            },
             element.width,
           );
           nextHeight = dimensions.height;
@@ -214,7 +209,7 @@ export const getApproxLineHeight = (font: FontString) => {
 };
 
 let canvas: HTMLCanvasElement | undefined;
-const getTextWidth = (text: string, font: FontString) => {
+export const getTextWidth = (text: string, font: FontString) => {
   if (!canvas) {
     canvas = document.createElement("canvas");
   }

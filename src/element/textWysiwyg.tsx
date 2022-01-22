@@ -114,7 +114,7 @@ export const textWysiwyg = ({
       const container = getContainerElement(updatedElement);
 
       const metrics = measureText(
-        updatedElement.originalText || updatedElement.text,
+        container ? updatedElement.text : updatedElement.originalText,
         getFontString(updatedElement),
       );
       let maxWidth = metrics.width;
