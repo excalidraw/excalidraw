@@ -27,6 +27,7 @@ import {
   actionToggleStats,
   actionToggleZenMode,
   actionUngroup,
+  zoomToFitElements,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -140,6 +141,7 @@ import {
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
   FileId,
+  NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -161,7 +163,7 @@ import {
   isArrowKey,
   KEYS,
 } from "../keys";
-import { distance2d, getGridPoint, isPathALoop } from "../math";
+import { distance2d, getGridPoint, isPathALoop, rotate } from "../math";
 import { renderScene } from "../renderer";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
@@ -238,7 +240,9 @@ import {
   getBoundTextElementId,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
+import { resizeSingleElement } from "../element/resizeElements";
 
+export let showFourthFont: boolean = false;
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
 const ExcalidrawContainerContext = React.createContext<{
@@ -339,13 +343,16 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
+        zoomToFit: this.zoomToFit,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
         refresh: this.refresh,
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
+        updateContainerSize: this.updateContainerSize,
         id: this.id,
+        setLocalFont: this.setLocalFont,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1457,6 +1464,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
       text,
+      rawText: text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
@@ -1524,6 +1532,37 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  zoomToFit = (
+    target: readonly ExcalidrawElement[] = this.scene.getElements(),
+    maxZoom: number = 1, //null will zoom to max based on viewport
+    margin: number = 0.03, //percentage of viewport width&height
+  ) => {
+    if (!target) {
+      target = this.scene.getElements();
+    }
+    if (target.length === 0) {
+      maxZoom = 1;
+    }
+    this.setState(
+      zoomToFitElements(target, this.state, false, maxZoom, margin).appState,
+    );
+  };
+
+  updateContainerSize = withBatchedUpdates(
+    (containers: NonDeletedExcalidrawElement[]) => {
+      containers.forEach((el: ExcalidrawElement) => {
+        const [x, y] = rotate(
+          el.x + el.width,
+          el.y + el.height,
+          el.x + el.width / 2,
+          el.y + el.height / 2,
+          el.angle,
+        );
+        resizeSingleElement(el, true, el, "se", true, x, y);
+      });
+    },
+  );
+
   clearToast = () => {
     this.setState({ toastMessage: null });
   };
@@ -1576,6 +1615,12 @@ class App extends React.Component<AppProps, AppState> {
       this.addNewImagesToImageCache();
     },
   );
+
+  public setLocalFont: ExcalidrawImperativeAPI["setLocalFont"] = (
+    showOnPanel: boolean,
+  ) => {
+    showFourthFont = showOnPanel;
+  };
 
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
@@ -1912,6 +1957,7 @@ class App extends React.Component<AppProps, AppState> {
       text: string,
       originalText: string,
       isDeleted: boolean,
+      rawText?: string,
     ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
@@ -1920,12 +1966,32 @@ class App extends React.Component<AppProps, AppState> {
               text,
               isDeleted,
               originalText,
+              rawText: rawText ?? originalText,
             });
           }
           return _element;
         }),
       ]);
     };
+
+    if (isExistingElement && this.props.onBeforeTextEdit) {
+      const text = this.props.onBeforeTextEdit(element);
+      if (text) {
+        this.scene.replaceAllElements([
+          ...this.scene.getElementsIncludingDeleted().map((_element) => {
+            if (_element.id === element.id && isTextElement(_element)) {
+              element = updateTextElement(_element, {
+                text,
+                isDeleted: false,
+                originalText: text,
+              });
+              return element;
+            }
+            return _element;
+          }),
+        ]);
+      }
+    }
 
     textWysiwyg({
       id: element.id,
@@ -1952,7 +2018,19 @@ class App extends React.Component<AppProps, AppState> {
       }),
       onSubmit: withBatchedUpdates(({ text, viaKeyboard, originalText }) => {
         const isDeleted = !text.trim();
-        updateElement(text, originalText, isDeleted);
+        const rawText = originalText; //should this be originalText??
+        if (this.props.onBeforeTextSubmit) {
+          const [updatedText, updatedOriginalText] =
+            this.props.onBeforeTextSubmit(
+              element,
+              text,
+              originalText,
+              isDeleted,
+            );
+          text = updatedText ?? text;
+          originalText = updatedOriginalText ?? originalText;
+        }
+        updateElement(text, originalText, isDeleted, rawText);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -2163,6 +2241,7 @@ class App extends React.Component<AppProps, AppState> {
           opacity: this.state.currentItemOpacity,
           strokeSharpness: this.state.currentItemStrokeSharpness,
           text: "",
+          rawText: "",
           fontSize: this.state.currentItemFontSize,
           fontFamily: this.state.currentItemFontFamily,
           textAlign: parentCenterPosition
@@ -4659,6 +4738,15 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     try {
+      if (this.props.onDrop) {
+        try {
+          if ((await this.props.onDrop(event)) === false) {
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
       const file = event.dataTransfer.files[0];
 
       if (isSupportedImageFile(file)) {

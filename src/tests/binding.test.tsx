@@ -130,6 +130,7 @@ describe("element binding", () => {
     const text = API.createElement({
       type: "text",
       text: "ola",
+      rawText: "ola",
       x: 60,
       y: 0,
       width: 100,
@@ -171,6 +172,7 @@ describe("element binding", () => {
     const text = API.createElement({
       type: "text",
       text: "ola",
+      rawText: "ola",
       x: 60,
       y: 0,
       width: 100,

@@ -30,11 +30,15 @@ const Excalidraw = (props: ExcalidrawProps) => {
     name,
     renderCustomStats,
     onPaste,
+    onDrop,
     detectScroll = true,
     handleKeyboardGlobally = false,
     onLibraryChange,
     autoFocus = false,
+    onBeforeTextEdit,
+    onBeforeTextSubmit,
     generateIdForFile,
+    onThemeChange,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -91,11 +95,15 @@ const Excalidraw = (props: ExcalidrawProps) => {
         renderCustomStats={renderCustomStats}
         UIOptions={UIOptions}
         onPaste={onPaste}
+        onDrop={onDrop}
         detectScroll={detectScroll}
         handleKeyboardGlobally={handleKeyboardGlobally}
         onLibraryChange={onLibraryChange}
         autoFocus={autoFocus}
+        onBeforeTextEdit={onBeforeTextEdit}
+        onBeforeTextSubmit={onBeforeTextSubmit}
         generateIdForFile={generateIdForFile}
+        onThemeChange={onThemeChange}
       />
     </InitializeApp>
   );
@@ -184,6 +192,10 @@ export {
   loadLibraryFromBlob,
   loadFromBlob,
   getFreeDrawSvgPath,
+  getCommonBoundingBox,
+  getMaximumGroups,
+  intersectElementWithLine,
+  determineFocusDistance,
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
 

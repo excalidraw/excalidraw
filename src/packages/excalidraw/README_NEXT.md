@@ -400,10 +400,13 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`name`](#name) | string |  | Name of the drawing |
 | [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
 | [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L17">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
+| [`onDrop`](#onDrop) | `(event: React.DragEvent<HTMLDivElement>) => Promise<boolean> \| boolean` |  | Callback to be triggered if passed when the something is dropped in to the scene |
 | [`detectScroll`](#detectScroll) | boolean | true | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handleKeyboardGlobally) | boolean | false | Indicates whether to bind the keyboard events to document. |
 | [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
+| [`onBeforeTextEdit`](#onBeforeTextEdit) | (textElement: ExcalidrawTextElement) => string |  | Callback to be triggered when a text element is about to be edited. |
+| [`onBeforeTextSubmit`](#onBeforeTextSubmit) | (textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string |  | Callback to be triggered when the editing of a text element is finished. |
 | [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
 
 ### Dimensions of Excalidraw
@@ -482,6 +485,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | getAppState | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a></pre> | Returns current appState |
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
 | scrollToContent | <pre> (target?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a> &#124; <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>[]) => void </pre> | Scroll the nearest element out of the elements supplied to the center. Defaults to the elements on the scene. |
+| zoomToFit | `(target?:ExcalidrawElement[], maxZoom:number=1, margin:number=0.03) => void` | Zoom to fit elements on viewport. If no elements are supplied, the function will zoom to fit all elements. `maxZoom` is the maximum zoom level allowed (default 100%). `margin` is understood in % of viewport width and height. Default value is a minimum of 1.5% margin around the image compared to viewport . |
 | refresh | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you should call this API. |
 | [importLibrary](#importlibrary) | `(url: string, token?: string) => void` | Imports library from given URL |
 | setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. |
@@ -646,7 +650,23 @@ This callback must return a `boolean` value or a [promise](https://developer.moz
 
 In case you want to prevent the excalidraw paste action you must return `false`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
 
-#### `importLibrary`
+#### `onDrop`
+
+This callback is triggered if passed when something is dropped into the scene. You can use this callback in case you want to do something additional when the drop event occurs.
+
+<pre>
+(event: React.DragEvent<HTMLDivElement>) => Promise<boolean> | boolean
+</pre>
+
+This callback must return a `boolean` value or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to a boolean value.
+
+In case you want to prevent the excalidraw drop action you must return `false`, it will stop the native excalidraw onDrop flow (nothing will be added into the scene).
+
+### Does it support collaboration ?
+
+No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
+
+### `importLibrary`
 
 Imports library from given URL. You should call this on `hashchange`, passing the `addLibrary` value if you detect it as shown below. Optionally pass a CSRF `token` to skip prompting during installation (retrievable via `token` key from the url coming from [https://libraries.excalidraw.com](https://libraries.excalidraw.com/)).
 
@@ -696,12 +716,73 @@ The unique id of the excalidraw component. This can be used to identify the exca
 
 This prop implies whether to focus the Excalidraw component on page load. Defaults to false.
 
+### onBeforeTextEdit
+
+Callback to be triggered when a text element is about to be edited. The string returned will replace the element's text. If `null` is returned, the TextElement will not be changed. Use this to pre-process text before editing.
+
+<pre>
+(textElement: ExcalidrawTextElement) => string
+</pre>
+
+### onBeforeTextSubmit
+
+Callback to be triggered when the editing of a TextElement is finished, but right before the result is submitted. The string returned will replace the text element's text. Use this to post-process text after editing has finished.
+
+<pre>
+(textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string
+</pre>
+
+### Extra API's
+
+#### `getSceneVersion`
+
+**How to use**
+
+<pre>
+import { getSceneVersion } from "@excalidraw/excalidraw-next";
+getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>)
+</pre>
+
+This function returns the current scene version.
+
+#### `isInvisiblySmallElement`
+
+**_Signature_**
+
+<pre>
+isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>): boolean
+</pre>
+
+**How to use**
+
+```js
+import { isInvisiblySmallElement } from "@excalidraw/excalidraw-next";
+```
+
+Returns `true` if element is invisibly small (e.g. width & height are zero).
+
+#### `getElementMap`
+
+**_Signature_**
+
+<pre>
+getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
+</pre>
+
+**How to use**
+
+```js
+import { getElementsMap } from "@excalidraw/excalidraw-next";
+```
+
 #### `generateIdForFile`
 
 Allows you to override `id` generation for files added on canvas (images). By default, an SHA-1 digest of the file is used.
 
 ```
+
 (file: File) => string | Promise<string>
+
 ```
 
 ### Does it support collaboration ?

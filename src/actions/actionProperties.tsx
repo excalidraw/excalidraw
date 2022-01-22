@@ -2,6 +2,7 @@ import { AppState } from "../../src/types";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
+import { showFourthFont } from "../components/App";
 import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
@@ -16,6 +17,7 @@ import {
   FontFamilyCodeIcon,
   FontFamilyHandDrawnIcon,
   FontFamilyNormalIcon,
+  FontFamilyLocalFontIcon,
   FontSizeExtraLargeIcon,
   FontSizeLargeIcon,
   FontSizeMediumIcon,
@@ -663,6 +665,11 @@ export const actionChangeFontFamily = register({
         text: t("labels.code"),
         icon: <FontFamilyCodeIcon theme={appState.theme} />,
       },
+      ... showFourthFont ? [{
+        value: FONT_FAMILY.LocalFont,
+        text: t("labels.localFont"),
+        icon: <FontFamilyLocalFontIcon theme={appState.theme} />,
+      }] : [],
     ];
 
     return (

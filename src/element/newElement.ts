@@ -117,6 +117,7 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
+    rawText: string;
     fontSize: number;
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
@@ -130,6 +131,7 @@ export const newTextElement = (
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
       text: opts.text,
+      rawText: opts.rawText,
       fontSize: opts.fontSize,
       fontFamily: opts.fontFamily,
       textAlign: opts.textAlign,
@@ -247,10 +249,12 @@ export const updateTextElement = (
     text,
     isDeleted,
     originalText,
+    rawText,
   }: {
     text: string;
     isDeleted?: boolean;
     originalText: string;
+    rawText?: string;
   },
 ): ExcalidrawTextElement => {
   const container = getContainerElement(element);
@@ -260,6 +264,7 @@ export const updateTextElement = (
   const dimensions = getAdjustedDimensions(element, text);
   return newElementWith(element, {
     text,
+    rawText: rawText ?? originalText, //should this be rather originalText??
     originalText,
     isDeleted: isDeleted ?? element.isDeleted,
     ...dimensions,

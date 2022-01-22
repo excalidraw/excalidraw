@@ -16,6 +16,7 @@ const testElements = [
       type: "text",
       id: "A",
       text: "😀",
+      rawText: "😀",
     }),
     // can't get jsdom text measurement to work so this is a temp hack
     // to ensure the element isn't stripped as invisible
