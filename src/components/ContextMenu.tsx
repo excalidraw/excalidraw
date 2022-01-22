@@ -37,6 +37,8 @@ const ContextMenu = ({
       top={top}
       left={left}
       fitInViewport={true}
+      viewportWidth={appState.width}
+      viewportHeight={appState.height}
     >
       <ul
         className="context-menu"
