@@ -483,7 +483,7 @@ class App extends React.Component<AppProps, AppState> {
               zenModeEnabled={zenModeEnabled}
               toggleZenMode={this.toggleZenMode}
               langCode={getLanguage().code}
-              isCollaborating={this.props.isCollaborating || false}
+              isCollaborating={this.props.isCollaborating}
               renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
               viewModeEnabled={viewModeEnabled}
@@ -1957,22 +1957,17 @@ class App extends React.Component<AppProps, AppState> {
       text: string,
       originalText: string,
       isDeleted: boolean,
-      isSubmit: boolean,
       rawText?: string,
     ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            return updateTextElement(
-              _element,
-              {
-                text,
-                isDeleted,
-                originalText,
-                rawText: rawText ?? originalText, //should this be originalText??
-              },
-              isSubmit,
-            );
+            return updateTextElement(_element, {
+              text,
+              isDeleted,
+              originalText,
+              rawText: rawText ?? originalText,
+            });
           }
           return _element;
         }),
@@ -1985,15 +1980,11 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.replaceAllElements([
           ...this.scene.getElementsIncludingDeleted().map((_element) => {
             if (_element.id === element.id && isTextElement(_element)) {
-              element = updateTextElement(
-                _element,
-                {
-                  text,
-                  isDeleted: false,
-                  originalText: text,
-                },
-                true,
-              );
+              element = updateTextElement(_element, {
+                text,
+                isDeleted: false,
+                originalText: text,
+              });
               return element;
             }
             return _element;
@@ -2020,7 +2011,7 @@ class App extends React.Component<AppProps, AppState> {
         ];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text, text, false, false);
+        updateElement(text, text, false);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
@@ -2039,7 +2030,7 @@ class App extends React.Component<AppProps, AppState> {
           text = updatedText ?? text;
           originalText = updatedOriginalText ?? originalText;
         }
-        updateElement(text, originalText, isDeleted, true, rawText);
+        updateElement(text, originalText, isDeleted, rawText);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -2079,7 +2070,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text, element.originalText, false, false);
+    updateElement(element.text, element.originalText, false);
   }
 
   private deselectElements() {
