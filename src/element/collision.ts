@@ -905,7 +905,29 @@ const hitTestRoughShape = (
       // position of the previous operation
       return retVal;
     } else if (op === "lineTo") {
-      // TODO: Implement this
+      const p0 = currentP;
+      const p1 = [data[0], data[1]] as Point;
+
+      // formula for a 2-points curve
+      const equation = (t: number, idx: number) =>
+        (1 - t) * p0[idx] + t * p1[idx];
+
+      let t = 0;
+
+      while (t <= 1.0) {
+        const tx = equation(t, 0);
+        const ty = equation(t, 1);
+
+        const diff = Math.sqrt(Math.pow(tx - x, 2) + Math.pow(ty - y, 2));
+
+        if (diff < lineThreshold) {
+          return true;
+        }
+
+        t += 0.01;
+      }
+
+      return false;
     } else if (op === "qcurveTo") {
       // TODO: Implement this
     }
