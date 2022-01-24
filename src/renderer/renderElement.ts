@@ -114,7 +114,9 @@ const generateElementCanvas = (
       element.width * window.devicePixelRatio * zoom.value +
       padding * zoom.value * 2;
     canvas.height =
-      element.height * window.devicePixelRatio * zoom.value +
+      (element.height + DEFAULT_CANVAS_TOP) *
+        window.devicePixelRatio *
+        zoom.value +
       padding * zoom.value * 2;
   }
 
@@ -145,15 +147,16 @@ const generateElementCanvas = (
   };
 };
 
-const DEFAULT_LINK_SIZE = 16;
+export const DEFAULT_LINK_SIZE = 16;
+export const DEFAULT_CANVAS_TOP = 22;
 
 export const getLinkSize = (element: ExcalidrawElement) => {
   if (!element.link) {
     return 0;
   }
-  if (isTextElement(element)) {
-    return element.fontSize / 2;
-  }
+  // if (isTextElement(element)) {
+  //   return element.fontSize / 2;
+  // }
   return DEFAULT_LINK_SIZE;
 };
 
@@ -178,7 +181,7 @@ const drawImagePlaceholder = (
   zoomValue: AppState["zoom"]["value"],
 ) => {
   context.fillStyle = "#E7E7E7";
-  context.fillRect(0, 0, element.width, element.height);
+  context.fillRect(0, DEFAULT_CANVAS_TOP, element.width, element.height);
 
   const imageMinWidthOrHeight = Math.min(element.width, element.height);
 
@@ -192,7 +195,7 @@ const drawImagePlaceholder = (
       ? IMAGE_ERROR_PLACEHOLDER_IMG
       : IMAGE_PLACEHOLDER_IMG,
     element.width / 2 - size / 2,
-    element.height / 2 - size / 2,
+    element.height / 2 - size / 2 + DEFAULT_CANVAS_TOP,
     size,
     size,
   );
@@ -247,7 +250,7 @@ const drawElementOnCanvas = (
         context.drawImage(
           img,
           0 /* hardcoded for the selection box*/,
-          0,
+          DEFAULT_CANVAS_TOP,
           element.width,
           element.height,
         );
@@ -287,7 +290,7 @@ const drawElementOnCanvas = (
           context.fillText(
             lines[index],
             horizontalOffset,
-            (index + 1) * lineHeight - verticalOffset,
+            (index + 1) * lineHeight - verticalOffset + DEFAULT_CANVAS_TOP,
           );
         }
         context.restore();
@@ -412,20 +415,24 @@ const generateElementShape = (
       case "rectangle":
         if (element.strokeSharpness === "round") {
           const w = element.width;
-          const h = element.height;
+          const h = element.height + DEFAULT_CANVAS_TOP;
           const r = Math.min(w, h) * 0.25;
           shape = generator.path(
-            `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
-              h - r
-            } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
-              h - r
-            } L 0 ${r} Q 0 0, ${r} 0`,
+            `M ${r} ${DEFAULT_CANVAS_TOP}  L ${
+              w - r
+            } ${DEFAULT_CANVAS_TOP}  Q ${w} ${DEFAULT_CANVAS_TOP}, ${w} ${
+              r + DEFAULT_CANVAS_TOP
+            } L ${w} ${h - r} Q ${w} ${h}, ${
+              w - r
+            } ${h} L ${r} ${h} Q 0 ${h}, 0 ${h - r} L 0 ${
+              r + DEFAULT_CANVAS_TOP
+            } Q 0 ${DEFAULT_CANVAS_TOP}, ${r} ${DEFAULT_CANVAS_TOP}`,
             generateRoughOptions(element, true),
           );
         } else {
           shape = generator.rectangle(
             0,
-            0,
+            DEFAULT_CANVAS_TOP,
             element.width,
             element.height,
             generateRoughOptions(element),
@@ -479,7 +486,7 @@ const generateElementShape = (
       case "ellipse":
         shape = generator.ellipse(
           element.width / 2,
-          element.height / 2,
+          element.height / 2 + DEFAULT_CANVAS_TOP,
           element.width,
           element.height,
           generateRoughOptions(element),
@@ -723,7 +730,7 @@ export const renderElement = (
         element.y + renderConfig.scrollY,
       );
       context.fillStyle = "rgba(0, 0, 255, 0.10)";
-      context.fillRect(0, 0, element.width, element.height);
+      context.fillRect(0, DEFAULT_CANVAS_TOP, element.width, element.height);
       context.restore();
       break;
     }
@@ -966,7 +973,7 @@ export const renderElementToSvg = (
         node.setAttribute(
           "transform",
           `translate(${offsetX || 0} ${
-            offsetY || 0
+            offsetY || DEFAULT_CANVAS_TOP
           }) rotate(${degree} ${cx} ${cy})`,
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");

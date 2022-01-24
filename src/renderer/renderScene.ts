@@ -29,7 +29,11 @@ import {
 } from "../scene/scrollbars";
 import { getSelectedElements } from "../scene/selection";
 
-import { renderElement, renderElementToSvg } from "./renderElement";
+import {
+  DEFAULT_CANVAS_TOP,
+  renderElement,
+  renderElementToSvg,
+} from "./renderElement";
 import { getClientColors } from "../clients";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -638,7 +642,7 @@ const renderSelectionBorder = (
     strokeRectWithRotation(
       context,
       elementX1 - dashedLinePadding,
-      elementY1 - dashedLinePadding,
+      elementY1 - dashedLinePadding + DEFAULT_CANVAS_TOP,
       elementWidth + dashedLinePadding * 2,
       elementHeight + dashedLinePadding * 2,
       elementX1 + elementWidth / 2,

@@ -163,7 +163,10 @@ import {
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer";
-import { invalidateShapeForElement } from "../renderer/renderElement";
+import {
+  DEFAULT_CANVAS_TOP,
+  invalidateShapeForElement,
+} from "../renderer/renderElement";
 import {
   calculateScrollCenter,
   getElementContainingPosition,
@@ -1975,7 +1978,7 @@ class App extends React.Component<AppProps, AppState> {
         );
         return [
           viewportX - this.state.offsetLeft,
-          viewportY - this.state.offsetTop,
+          viewportY - this.state.offsetTop + DEFAULT_CANVAS_TOP,
         ];
       },
       onChange: withBatchedUpdates((text) => {

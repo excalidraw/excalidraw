@@ -30,7 +30,10 @@ import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
 import { Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
-import { getShapeForElement } from "../renderer/renderElement";
+import {
+  DEFAULT_CANVAS_TOP,
+  getShapeForElement,
+} from "../renderer/renderElement";
 import { hasBoundTextElement, isImageElement } from "./typeChecks";
 import { isTextElement } from ".";
 import { isTransparent } from "../utils";
@@ -125,8 +128,8 @@ const isPointHittingElementBoundingBox = (
   return (
     rotatedX > x1 - threshold &&
     rotatedX < x2 + threshold &&
-    rotatedY > y1 - threshold &&
-    rotatedY < y2 + threshold
+    rotatedY > y1 + DEFAULT_CANVAS_TOP - threshold &&
+    rotatedY < y2 + DEFAULT_CANVAS_TOP + threshold
   );
 };
 
