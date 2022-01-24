@@ -299,18 +299,7 @@ const drawElementOnCanvas = (
       }
     }
   }
-  // if (element.link) {
-  //   context.fillStyle = "#fff";
-  //   context.fillRect(element.width - linkSize, 1, linkSize, linkSize);
 
-  //   context.drawImage(
-  //     EXTERNAL_LINK_IMG,
-  //     element.width - linkSize,
-  //     0,
-  //     linkSize,
-  //     linkSize,
-  //   );
-  // }
   context.globalAlpha = 1;
 };
 
