@@ -2109,7 +2109,7 @@ class App extends React.Component<AppProps, AppState> {
             (element) => !(isTextElement(element) && element.containerId),
           );
     return getElementsAtPosition(elements, (element) =>
-      hitTest(element, this.state, x, y),
+      hitTest(element, this.state, x, y - DEFAULT_CANVAS_TOP),
     );
   }
 
