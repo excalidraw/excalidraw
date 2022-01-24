@@ -114,9 +114,7 @@ const generateElementCanvas = (
       element.width * window.devicePixelRatio * zoom.value +
       padding * zoom.value * 2;
     canvas.height =
-      (element.height + DEFAULT_CANVAS_TOP) *
-        window.devicePixelRatio *
-        zoom.value +
+      element.height * window.devicePixelRatio * zoom.value +
       padding * zoom.value * 2;
   }
 
