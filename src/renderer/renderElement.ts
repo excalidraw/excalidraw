@@ -145,8 +145,8 @@ const generateElementCanvas = (
   };
 };
 
-export const DEFAULT_LINK_SIZE = 16;
-export const DEFAULT_CANVAS_TOP = 22;
+export const DEFAULT_LINK_SIZE = 14;
+export const DEFAULT_CANVAS_TOP = 16;
 
 export const getLinkSize = (element: ExcalidrawElement) => {
   if (!element.link) {

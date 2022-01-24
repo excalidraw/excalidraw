@@ -772,7 +772,7 @@ const renderHyperlink = (
 
     context.fillStyle = "#fff";
     context.fillRect(
-      element.x + element.width - linkSize,
+      element.x + element.width,
       element.y - DEFAULT_CANVAS_TOP,
       linkSize,
       linkSize,
@@ -780,7 +780,7 @@ const renderHyperlink = (
 
     context.drawImage(
       EXTERNAL_LINK_IMG,
-      element.x + element.width - linkSize,
+      element.x + element.width,
       element.y - DEFAULT_CANVAS_TOP,
       linkSize,
       linkSize,
