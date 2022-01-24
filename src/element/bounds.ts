@@ -12,7 +12,6 @@ import { Point } from "../types";
 import {
   getShapeForElement,
   generateRoughOptions,
-  DEFAULT_CANVAS_TOP,
 } from "../renderer/renderElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { rescalePoints } from "../points";
@@ -49,11 +48,11 @@ export const getDiamondPoints = (element: ExcalidrawElement) => {
   // Here we add +1 to avoid these numbers to be 0
   // otherwise rough.js will throw an error complaining about it
   const topX = Math.floor(element.width / 2) + 1;
-  const topY = DEFAULT_CANVAS_TOP;
+  const topY = 0;
   const rightX = element.width;
-  const rightY = Math.floor(element.height / 2 + DEFAULT_CANVAS_TOP) + 1;
+  const rightY = Math.floor(element.height / 2) + 1;
   const bottomX = topX;
-  const bottomY = element.height + DEFAULT_CANVAS_TOP;
+  const bottomY = element.height;
   const leftX = 0;
   const leftY = rightY;
 

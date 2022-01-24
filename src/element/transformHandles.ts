@@ -4,7 +4,6 @@ import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
 import { Zoom } from "../types";
 import { isTextElement } from ".";
-import { DEFAULT_CANVAS_TOP } from "../renderer/renderElement";
 
 export type TransformHandleDirection =
   | "n"
@@ -105,11 +104,7 @@ export const getTransformHandlesFromCoords = (
       ? undefined
       : generateTransformHandle(
           x1 - dashedLineMargin - handleMarginX + centeringOffset,
-          y1 -
-            dashedLineMargin -
-            handleMarginY +
-            centeringOffset +
-            DEFAULT_CANVAS_TOP,
+          y1 - dashedLineMargin - handleMarginY + centeringOffset,
           handleWidth,
           handleHeight,
           cx,
@@ -120,11 +115,7 @@ export const getTransformHandlesFromCoords = (
       ? undefined
       : generateTransformHandle(
           x2 + dashedLineMargin - centeringOffset,
-          y1 -
-            dashedLineMargin -
-            handleMarginY +
-            centeringOffset +
-            DEFAULT_CANVAS_TOP,
+          y1 - dashedLineMargin - handleMarginY + centeringOffset,
           handleWidth,
           handleHeight,
           cx,
@@ -135,7 +126,7 @@ export const getTransformHandlesFromCoords = (
       ? undefined
       : generateTransformHandle(
           x1 - dashedLineMargin - handleMarginX + centeringOffset,
-          y2 + dashedLineMargin - centeringOffset + DEFAULT_CANVAS_TOP,
+          y2 + dashedLineMargin - centeringOffset,
           handleWidth,
           handleHeight,
           cx,
@@ -146,7 +137,7 @@ export const getTransformHandlesFromCoords = (
       ? undefined
       : generateTransformHandle(
           x2 + dashedLineMargin - centeringOffset,
-          y2 + dashedLineMargin - centeringOffset + DEFAULT_CANVAS_TOP,
+          y2 + dashedLineMargin - centeringOffset,
           handleWidth,
           handleHeight,
           cx,
@@ -161,8 +152,7 @@ export const getTransformHandlesFromCoords = (
             dashedLineMargin -
             handleMarginY +
             centeringOffset -
-            ROTATION_RESIZE_HANDLE_GAP / zoom.value +
-            DEFAULT_CANVAS_TOP,
+            ROTATION_RESIZE_HANDLE_GAP / zoom.value,
           handleWidth,
           handleHeight,
           cx,
@@ -179,11 +169,7 @@ export const getTransformHandlesFromCoords = (
     if (!omitSides.n) {
       transformHandles.n = generateTransformHandle(
         x1 + width / 2 - handleWidth / 2,
-        y1 -
-          dashedLineMargin -
-          handleMarginY +
-          centeringOffset +
-          DEFAULT_CANVAS_TOP,
+        y1 - dashedLineMargin - handleMarginY + centeringOffset,
         handleWidth,
         handleHeight,
         cx,
@@ -194,7 +180,7 @@ export const getTransformHandlesFromCoords = (
     if (!omitSides.s) {
       transformHandles.s = generateTransformHandle(
         x1 + width / 2 - handleWidth / 2,
-        y2 + dashedLineMargin - centeringOffset + DEFAULT_CANVAS_TOP,
+        y2 + dashedLineMargin - centeringOffset,
         handleWidth,
         handleHeight,
         cx,
@@ -207,7 +193,7 @@ export const getTransformHandlesFromCoords = (
     if (!omitSides.w) {
       transformHandles.w = generateTransformHandle(
         x1 - dashedLineMargin - handleMarginX + centeringOffset,
-        y1 + height / 2 - handleHeight / 2 + DEFAULT_CANVAS_TOP,
+        y1 + height / 2 - handleHeight / 2,
         handleWidth,
         handleHeight,
         cx,
@@ -218,7 +204,7 @@ export const getTransformHandlesFromCoords = (
     if (!omitSides.e) {
       transformHandles.e = generateTransformHandle(
         x2 + dashedLineMargin - centeringOffset,
-        y1 + height / 2 - handleHeight / 2 + DEFAULT_CANVAS_TOP,
+        y1 + height / 2 - handleHeight / 2,
         handleWidth,
         handleHeight,
         cx,

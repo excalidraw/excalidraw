@@ -163,10 +163,7 @@ import {
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer";
-import {
-  DEFAULT_CANVAS_TOP,
-  invalidateShapeForElement,
-} from "../renderer/renderElement";
+import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
   getElementContainingPosition,
@@ -1168,6 +1165,7 @@ class App extends React.Component<AppProps, AppState> {
         imageCache: this.imageCache,
         isExporting: false,
         renderScrollbars: !this.isMobile,
+        selectedElementIds: this.state.selectedElementIds,
       },
     );
 
@@ -1978,7 +1976,7 @@ class App extends React.Component<AppProps, AppState> {
         );
         return [
           viewportX - this.state.offsetLeft,
-          viewportY - this.state.offsetTop + DEFAULT_CANVAS_TOP,
+          viewportY - this.state.offsetTop,
         ];
       },
       onChange: withBatchedUpdates((text) => {
@@ -2109,7 +2107,7 @@ class App extends React.Component<AppProps, AppState> {
             (element) => !(isTextElement(element) && element.containerId),
           );
     return getElementsAtPosition(elements, (element) =>
-      hitTest(element, this.state, x, y - DEFAULT_CANVAS_TOP),
+      hitTest(element, this.state, x, y),
     );
   }
 

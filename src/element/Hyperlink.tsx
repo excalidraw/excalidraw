@@ -77,7 +77,7 @@ export const Hyperlink = ({
   return (
     <div
       className="excalidraw-hyperlinkContainer"
-      style={{ top: `${viewPortY - 63}px`, left: `${viewPortX - 50}px` }}
+      style={{ top: `${viewPortY - 85}px`, left: `${viewPortX - 50}px` }}
     >
       {showInput ? (
         <input

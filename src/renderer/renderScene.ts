@@ -31,6 +31,8 @@ import { getSelectedElements } from "../scene/selection";
 
 import {
   DEFAULT_CANVAS_TOP,
+  EXTERNAL_LINK_IMG,
+  getLinkSize,
   renderElement,
   renderElementToSvg,
 } from "./renderElement";
@@ -301,6 +303,10 @@ export const renderScene = (
         renderBindingHighlight(context, renderConfig, suggestedBinding!);
       });
   }
+
+  visibleElements.forEach((element) => {
+    renderHyperlink(element, context, renderConfig, appState);
+  });
 
   // Paint selected elements
   if (
@@ -642,7 +648,7 @@ const renderSelectionBorder = (
     strokeRectWithRotation(
       context,
       elementX1 - dashedLinePadding,
-      elementY1 - dashedLinePadding + DEFAULT_CANVAS_TOP,
+      elementY1 - dashedLinePadding,
       elementWidth + dashedLinePadding * 2,
       elementHeight + dashedLinePadding * 2,
       elementX1 + elementWidth / 2,
@@ -749,6 +755,38 @@ const renderBindingHighlightForSuggestedPointBinding = (
     );
     fillCircle(context, x, y, threshold);
   });
+};
+
+const renderHyperlink = (
+  element: NonDeletedExcalidrawElement,
+  context: CanvasRenderingContext2D,
+  renderConfig: RenderConfig,
+  appState: AppState,
+) => {
+  if (element.link && !appState.selectedElementIds[element.id]) {
+    context.save();
+
+    context.translate(renderConfig.scrollX, renderConfig.scrollY);
+
+    const linkSize = getLinkSize(element);
+
+    context.fillStyle = "#fff";
+    context.fillRect(
+      element.x + element.width - linkSize,
+      element.y - DEFAULT_CANVAS_TOP,
+      linkSize,
+      linkSize,
+    );
+
+    context.drawImage(
+      EXTERNAL_LINK_IMG,
+      element.x + element.width - linkSize,
+      element.y - DEFAULT_CANVAS_TOP,
+      linkSize,
+      linkSize,
+    );
+    context.restore();
+  }
 };
 
 const isVisibleElement = (

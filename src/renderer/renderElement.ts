@@ -170,7 +170,7 @@ IMAGE_ERROR_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
   `<svg viewBox="0 0 668 668" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2"><path d="M464 448H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h416c26.51 0 48 21.49 48 48v288c0 26.51-21.49 48-48 48ZM112 120c-30.928 0-56 25.072-56 56s25.072 56 56 56 56-25.072 56-56-25.072-56-56-56ZM64 384h384V272l-87.515-87.515c-4.686-4.686-12.284-4.686-16.971 0L208 320l-55.515-55.515c-4.686-4.686-12.284-4.686-16.971 0L64 336v48Z" style="fill:#888;fill-rule:nonzero" transform="matrix(.81709 0 0 .81709 124.825 145.825)"/><path d="M256 8C119.034 8 8 119.033 8 256c0 136.967 111.034 248 248 248s248-111.034 248-248S392.967 8 256 8Zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676ZM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676Z" style="fill:#888;fill-rule:nonzero" transform="matrix(.30366 0 0 .30366 506.822 60.065)"/></svg>`,
 )}`;
 
-const EXTERNAL_LINK_IMG = document.createElement("img");
+export const EXTERNAL_LINK_IMG = document.createElement("img");
 EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1971c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`,
 )}`;
@@ -181,7 +181,7 @@ const drawImagePlaceholder = (
   zoomValue: AppState["zoom"]["value"],
 ) => {
   context.fillStyle = "#E7E7E7";
-  context.fillRect(0, DEFAULT_CANVAS_TOP, element.width, element.height);
+  context.fillRect(0, 0, element.width, element.height);
 
   const imageMinWidthOrHeight = Math.min(element.width, element.height);
 
@@ -195,7 +195,7 @@ const drawImagePlaceholder = (
       ? IMAGE_ERROR_PLACEHOLDER_IMG
       : IMAGE_PLACEHOLDER_IMG,
     element.width / 2 - size / 2,
-    element.height / 2 - size / 2 + DEFAULT_CANVAS_TOP,
+    element.height / 2 - size / 2,
     size,
     size,
   );
@@ -208,7 +208,6 @@ const drawElementOnCanvas = (
   renderConfig: RenderConfig,
 ) => {
   context.globalAlpha = element.opacity / 100;
-  const linkSize = getLinkSize(element);
 
   switch (element.type) {
     case "rectangle":
@@ -250,7 +249,7 @@ const drawElementOnCanvas = (
         context.drawImage(
           img,
           0 /* hardcoded for the selection box*/,
-          DEFAULT_CANVAS_TOP,
+          0,
           element.width,
           element.height,
         );
@@ -290,7 +289,7 @@ const drawElementOnCanvas = (
           context.fillText(
             lines[index],
             horizontalOffset,
-            (index + 1) * lineHeight - verticalOffset + DEFAULT_CANVAS_TOP,
+            (index + 1) * lineHeight - verticalOffset,
           );
         }
         context.restore();
@@ -302,18 +301,18 @@ const drawElementOnCanvas = (
       }
     }
   }
-  if (element.link) {
-    context.fillStyle = "#fff";
-    context.fillRect(element.width - linkSize, 1, linkSize, linkSize);
+  // if (element.link) {
+  //   context.fillStyle = "#fff";
+  //   context.fillRect(element.width - linkSize, 1, linkSize, linkSize);
 
-    context.drawImage(
-      EXTERNAL_LINK_IMG,
-      element.width - linkSize,
-      0,
-      linkSize,
-      linkSize,
-    );
-  }
+  //   context.drawImage(
+  //     EXTERNAL_LINK_IMG,
+  //     element.width - linkSize,
+  //     0,
+  //     linkSize,
+  //     linkSize,
+  //   );
+  // }
   context.globalAlpha = 1;
 };
 
@@ -415,24 +414,20 @@ const generateElementShape = (
       case "rectangle":
         if (element.strokeSharpness === "round") {
           const w = element.width;
-          const h = element.height + DEFAULT_CANVAS_TOP;
+          const h = element.height;
           const r = Math.min(w, h) * 0.25;
           shape = generator.path(
-            `M ${r} ${DEFAULT_CANVAS_TOP}  L ${
-              w - r
-            } ${DEFAULT_CANVAS_TOP}  Q ${w} ${DEFAULT_CANVAS_TOP}, ${w} ${
-              r + DEFAULT_CANVAS_TOP
-            } L ${w} ${h - r} Q ${w} ${h}, ${
-              w - r
-            } ${h} L ${r} ${h} Q 0 ${h}, 0 ${h - r} L 0 ${
-              r + DEFAULT_CANVAS_TOP
-            } Q 0 ${DEFAULT_CANVAS_TOP}, ${r} ${DEFAULT_CANVAS_TOP}`,
+            `M ${r} 0  L ${w - r} 0  Q ${w} 0, ${w} ${r} L ${w} ${
+              h - r
+            } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
+              h - r
+            } L 0 ${r} Q 0 0, ${r} 0`,
             generateRoughOptions(element, true),
           );
         } else {
           shape = generator.rectangle(
             0,
-            DEFAULT_CANVAS_TOP,
+            0,
             element.width,
             element.height,
             generateRoughOptions(element),
@@ -486,7 +481,7 @@ const generateElementShape = (
       case "ellipse":
         shape = generator.ellipse(
           element.width / 2,
-          element.height / 2 + DEFAULT_CANVAS_TOP,
+          element.height / 2,
           element.width,
           element.height,
           generateRoughOptions(element),
@@ -638,6 +633,7 @@ const generateElementWithCanvas = (
 ) => {
   const zoom: Zoom = renderConfig ? renderConfig.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
+
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
     prevElementWithCanvas.canvasZoom !== zoom.value &&
@@ -730,7 +726,7 @@ export const renderElement = (
         element.y + renderConfig.scrollY,
       );
       context.fillStyle = "rgba(0, 0, 255, 0.10)";
-      context.fillRect(0, DEFAULT_CANVAS_TOP, element.width, element.height);
+      context.fillRect(0, 0, element.width, element.height);
       context.restore();
       break;
     }
@@ -972,9 +968,7 @@ export const renderElementToSvg = (
         }
         node.setAttribute(
           "transform",
-          `translate(${offsetX || 0} ${
-            offsetY || DEFAULT_CANVAS_TOP
-          }) rotate(${degree} ${cx} ${cy})`,
+          `translate(${offsetX || 0} ${offsetY}) rotate(${degree} ${cx} ${cy})`,
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
