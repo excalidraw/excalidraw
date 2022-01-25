@@ -2106,6 +2106,7 @@ class App extends React.Component<AppProps, AppState> {
           .filter(
             (element) => !(isTextElement(element) && element.containerId),
           );
+
     return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, x, y),
     );

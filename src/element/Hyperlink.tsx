@@ -14,8 +14,8 @@ import clsx from "clsx";
 import { KEYS } from "../keys";
 import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
 import { rotate } from "../math";
-import { getElementAbsoluteCoords } from ".";
 import { MIME_TYPES } from "../constants";
+import { Bounds } from "./bounds";
 
 const PREFIX = "https://";
 
@@ -169,14 +169,14 @@ export const actionLink = register({
 });
 
 export const getLinkHandleFromCoords = (
-  element: NonDeletedExcalidrawElement,
+  [x1, y1, x2, y2]: Bounds,
+  angle: number,
   appState: AppState,
 ): [number, number, number, number] => {
   const size = DEFAULT_LINK_SIZE;
   const linkWidth = size / appState.zoom.value;
   const linkHeight = size / appState.zoom.value;
   const linkMarginY = size / appState.zoom.value;
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
   const centeringOffset = (size - 8) / (2 * appState.zoom.value);
@@ -191,7 +191,7 @@ export const getLinkHandleFromCoords = (
     y + linkHeight / 2,
     centerX,
     centerY,
-    element.angle,
+    angle,
   );
   return [
     rotatedX - linkWidth / 2,

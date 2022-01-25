@@ -764,12 +764,28 @@ const renderLinkIcon = (
     context.save();
 
     context.translate(appState.scrollX, appState.scrollY);
-    const [x, y, width, height] = getLinkHandleFromCoords(element, appState);
-
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const [x, y, width, height] = getLinkHandleFromCoords(
+      [x1, y1, x2, y2],
+      element.angle,
+      appState,
+    );
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    context.save();
+    context.restore();
+    context.translate(centerX, centerY);
+    context.rotate(element.angle);
     context.fillStyle = "#fff";
-    context.fillRect(x, y, width, height);
+    context.fillRect(x - centerX, y - centerY, width, height);
 
-    context.drawImage(EXTERNAL_LINK_IMG, x, y, width, height);
+    context.drawImage(
+      EXTERNAL_LINK_IMG,
+      x - centerX,
+      y - centerY,
+      width,
+      height,
+    );
     context.restore();
   }
 };
