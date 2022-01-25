@@ -238,7 +238,7 @@ import {
   getBoundTextElementId,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
-import { Hyperlink } from "../element/Hyperlink";
+import { Hyperlink, isPointHittingLinkIcon } from "../element/Hyperlink";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -2332,6 +2332,20 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private isHittingElementLinkIcon = (
+    scenePointer: Readonly<{ x: number; y: number }>,
+  ): boolean => {
+    const elements = this.scene.getElements();
+    return elements.some(
+      (element) =>
+        element.link &&
+        isPointHittingLinkIcon(element, this.state, [
+          scenePointer.x,
+          scenePointer.y,
+        ]),
+    );
+  };
+
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -2564,6 +2578,7 @@ class App extends React.Component<AppProps, AppState> {
       const element = LinearElementEditor.getElement(
         this.state.editingLinearElement.elementId,
       );
+
       if (
         element &&
         isHittingElementNotConsideringBoundingBox(element, this.state, [
@@ -2585,6 +2600,8 @@ class App extends React.Component<AppProps, AppState> {
         ))
     ) {
       setCursor(this.canvas, CURSOR_TYPE.MOVE);
+    } else if (this.isHittingElementLinkIcon(scenePointer)) {
+      setCursor(this.canvas, CURSOR_TYPE.POINTER);
     } else {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
     }

@@ -1,4 +1,4 @@
-import { AppState } from "../types";
+import { AppState, Point } from "../types";
 import { sceneCoordsToViewportCoords } from "../utils";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
@@ -16,6 +16,7 @@ import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
 import { rotate } from "../math";
 import { MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
+import { getElementAbsoluteCoords } from ".";
 
 const PREFIX = "https://";
 
@@ -199,4 +200,27 @@ export const getLinkHandleFromCoords = (
     linkWidth,
     linkHeight,
   ];
+};
+
+export const isPointHittingLinkIcon = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+  [x, y]: Point,
+) => {
+  const threshold = 10 / appState.zoom.value;
+
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+  const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
+    [x1, y1, x2, y2],
+    element.angle,
+    appState,
+  );
+  const hitLink =
+    x > linkX - threshold &&
+    x < linkX + threshold + linkWidth &&
+    y > linkY - threshold &&
+    y < linkY + linkHeight + threshold;
+
+  return hitLink;
 };
