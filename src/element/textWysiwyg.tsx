@@ -102,10 +102,12 @@ export const textWysiwyg = ({
     return false;
   };
   let originalContainerHeight: number;
-  let approxLineHeight = getApproxLineHeight(getFontString(element));
 
   const updateWysiwygStyle = () => {
-    const updatedElement = Scene.getScene(element)?.getElement(id);
+    const updatedElement = Scene.getScene(element)?.getElement(
+      id,
+    ) as ExcalidrawTextElement;
+    const approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
@@ -128,8 +130,6 @@ export const textWysiwyg = ({
           height = editorHeight;
         }
         if (propertiesUpdated) {
-          approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
-
           originalContainerHeight = container.height;
 
           // update height of the editor after properties updated
@@ -268,10 +268,14 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.oninput = () => {
+      const updatedElement = Scene.getScene(element)?.getElement(
+        id,
+      ) as ExcalidrawTextElement;
+      const font = getFontString(updatedElement);
       // using scrollHeight here since we need to calculate
       // number of lines so cannot use editable.style.height
       // as that gets updated below
-      const lines = editable.scrollHeight / approxLineHeight;
+      const lines = editable.scrollHeight / getApproxLineHeight(font);
       // auto increase height only when lines  > 1 so its
       // measured correctly and vertically alignes for
       // first line as well as setting height to "auto"
@@ -283,7 +287,7 @@ export const textWysiwyg = ({
           const container = getContainerElement(element);
           const actualLineCount = wrapText(
             editable.value,
-            getFontString(element),
+            font,
             container!.width,
           ).split("\n").length;
 
