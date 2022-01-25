@@ -29,11 +29,7 @@ import {
 } from "../scene/scrollbars";
 import { getSelectedElements } from "../scene/selection";
 
-import {
-  EXTERNAL_LINK_IMG,
-  renderElement,
-  renderElementToSvg,
-} from "./renderElement";
+import { renderElement, renderElementToSvg } from "./renderElement";
 import { getClientColors } from "../clients";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -54,7 +50,10 @@ import {
 import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
 import { UserIdleState } from "../types";
 import { THEME_FILTER } from "../constants";
-import { getLinkHandleFromCoords } from "../element/Hyperlink";
+import {
+  EXTERNAL_LINK_IMG,
+  getLinkHandleFromCoords,
+} from "../element/Hyperlink";
 
 const hasEmojiSupport = supportsEmoji();
 

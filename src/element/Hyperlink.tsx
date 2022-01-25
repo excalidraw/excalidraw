@@ -1,6 +1,6 @@
 import { AppState } from "../types";
 import { sceneCoordsToViewportCoords } from "../utils";
-import { mutateElement, newElementWith } from "./mutateElement";
+import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
 
 import "./Hyperlink.scss";
@@ -15,8 +15,14 @@ import { KEYS } from "../keys";
 import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
 import { rotate } from "../math";
 import { getElementAbsoluteCoords } from ".";
+import { MIME_TYPES } from "../constants";
 
 const PREFIX = "https://";
+
+export const EXTERNAL_LINK_IMG = document.createElement("img");
+EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1971c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`,
+)}`;
 
 export const Hyperlink = ({
   element,
@@ -49,8 +55,7 @@ export const Hyperlink = ({
     if (link === element.link) {
       return;
     }
-    const elementWithLink = newElementWith(element, { link });
-    mutateElement(element, elementWithLink);
+    mutateElement(element, { link });
     onSubmit();
   }, [element, onSubmit]);
 
@@ -61,10 +66,7 @@ export const Hyperlink = ({
   }, [handleSubmit]);
 
   const handleRemove = useCallback(() => {
-    const elementWithoutLink = newElementWith(element, {
-      link: null,
-    });
-    mutateElement(element, elementWithoutLink);
+    mutateElement(element, { link: null });
     onSubmit();
   }, [onSubmit, element]);
 
@@ -175,8 +177,8 @@ export const getLinkHandleFromCoords = (
   const linkHeight = size / appState.zoom.value;
   const linkMarginY = size / appState.zoom.value;
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
+  const centerX = (x1 + x2) / 2;
+  const centerY = (y1 + y2) / 2;
   const centeringOffset = (size - 8) / (2 * appState.zoom.value);
   const dashedLineMargin = 4 / appState.zoom.value;
 
@@ -184,12 +186,17 @@ export const getLinkHandleFromCoords = (
   const x = x2 + dashedLineMargin - centeringOffset;
   const y = y1 - dashedLineMargin - linkMarginY + centeringOffset;
 
-  const [newX, newY] = rotate(
+  const [rotatedX, rotatedY] = rotate(
     x + linkWidth / 2,
     y + linkHeight / 2,
-    cx,
-    cy,
+    centerX,
+    centerY,
     element.angle,
   );
-  return [newX - linkWidth / 2, newY - linkHeight / 2, linkWidth, linkHeight];
+  return [
+    rotatedX - linkWidth / 2,
+    rotatedY - linkHeight / 2,
+    linkWidth,
+    linkHeight,
+  ];
 };
