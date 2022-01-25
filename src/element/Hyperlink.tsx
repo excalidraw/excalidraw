@@ -12,6 +12,9 @@ import { t } from "../i18n";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { KEYS } from "../keys";
+import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
+import { rotate } from "../math";
+import { getElementAbsoluteCoords } from ".";
 
 const PREFIX = "https://";
 
@@ -162,3 +165,31 @@ export const actionLink = register({
     />
   ),
 });
+
+export const getLinkHandleFromCoords = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+): [number, number, number, number] => {
+  const size = DEFAULT_LINK_SIZE;
+  const linkWidth = size / appState.zoom.value;
+  const linkHeight = size / appState.zoom.value;
+  const linkMarginY = size / appState.zoom.value;
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const centeringOffset = (size - 8) / (2 * appState.zoom.value);
+  const dashedLineMargin = 4 / appState.zoom.value;
+
+  // Same as `ne` resize handle
+  const x = x2 + dashedLineMargin - centeringOffset;
+  const y = y1 - dashedLineMargin - linkMarginY + centeringOffset;
+
+  const [newX, newY] = rotate(
+    x + linkWidth / 2,
+    y + linkHeight / 2,
+    cx,
+    cy,
+    element.angle,
+  );
+  return [newX - linkWidth / 2, newY - linkHeight / 2, linkWidth, linkHeight];
+};

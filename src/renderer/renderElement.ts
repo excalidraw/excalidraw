@@ -146,17 +146,6 @@ const generateElementCanvas = (
 };
 
 export const DEFAULT_LINK_SIZE = 14;
-export const DEFAULT_CANVAS_TOP = 16;
-
-export const getLinkSize = (element: ExcalidrawElement) => {
-  if (!element.link) {
-    return 0;
-  }
-  // if (isTextElement(element)) {
-  //   return element.fontSize / 2;
-  // }
-  return DEFAULT_LINK_SIZE;
-};
 
 const IMAGE_PLACEHOLDER_IMG = document.createElement("img");
 IMAGE_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
