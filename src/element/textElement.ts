@@ -205,8 +205,14 @@ export const measureText = (
 };
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
+const cacheApproxLineHeight: { [key: FontString]: number } = {};
+
 export const getApproxLineHeight = (font: FontString) => {
-  return measureText(DUMMY_TEXT, font, null).height;
+  if (cacheApproxLineHeight[font]) {
+    return cacheApproxLineHeight[font];
+  }
+  cacheApproxLineHeight[font] = measureText(DUMMY_TEXT, font, null).height;
+  return cacheApproxLineHeight[font];
 };
 
 let canvas: HTMLCanvasElement | undefined;
