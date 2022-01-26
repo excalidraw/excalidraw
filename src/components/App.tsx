@@ -238,7 +238,11 @@ import {
   getBoundTextElementId,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
-import { Hyperlink, isPointHittingLinkIcon } from "../element/Hyperlink";
+import {
+  getAbsoluteLink,
+  Hyperlink,
+  isPointHittingLinkIcon,
+} from "../element/Hyperlink";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -299,6 +303,7 @@ class App extends React.Component<AppProps, AppState> {
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
 
+  hitLinkElement: any;
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -2332,11 +2337,11 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private isHittingElementLinkIcon = (
+  private getElementLinkAtPosition = (
     scenePointer: Readonly<{ x: number; y: number }>,
-  ): boolean => {
+  ): ExcalidrawElement | undefined => {
     const elements = this.scene.getElements();
-    return elements.some(
+    return elements.find(
       (element) =>
         element.link &&
         isPointHittingLinkIcon(element, this.state, [
@@ -2344,6 +2349,16 @@ class App extends React.Component<AppProps, AppState> {
           scenePointer.y,
         ]),
     );
+  };
+
+  private redirectToLink = () => {
+    window.open(getAbsoluteLink(this.hitLinkElement.link!));
+  };
+  private attachLinkListener = () => {
+    this.canvas?.addEventListener("click", this.redirectToLink);
+  };
+  private detachLinkListener = () => {
+    this.canvas?.removeEventListener("click", this.redirectToLink);
   };
 
   private handleCanvasPointerMove = (
@@ -2565,45 +2580,52 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer.x,
       scenePointer.y,
     );
-    if (this.state.elementType === "text") {
-      setCursor(
-        this.canvas,
-        isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
-      );
-    } else if (this.state.viewModeEnabled) {
-      setCursor(this.canvas, CURSOR_TYPE.GRAB);
-    } else if (isOverScrollBar) {
-      setCursor(this.canvas, CURSOR_TYPE.AUTO);
-    } else if (this.state.editingLinearElement) {
-      const element = LinearElementEditor.getElement(
-        this.state.editingLinearElement.elementId,
-      );
 
-      if (
-        element &&
-        isHittingElementNotConsideringBoundingBox(element, this.state, [
-          scenePointer.x,
-          scenePointer.y,
-        ])
+    this.hitLinkElement = this.getElementLinkAtPosition(scenePointer);
+
+    if (this.hitLinkElement) {
+      setCursor(this.canvas, CURSOR_TYPE.POINTER);
+      this.attachLinkListener();
+    } else {
+      this.detachLinkListener();
+      if (this.state.elementType === "text") {
+        setCursor(
+          this.canvas,
+          isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
+        );
+      } else if (this.state.viewModeEnabled) {
+        setCursor(this.canvas, CURSOR_TYPE.GRAB);
+      } else if (isOverScrollBar) {
+        setCursor(this.canvas, CURSOR_TYPE.AUTO);
+      } else if (this.state.editingLinearElement) {
+        const element = LinearElementEditor.getElement(
+          this.state.editingLinearElement.elementId,
+        );
+
+        if (
+          element &&
+          isHittingElementNotConsideringBoundingBox(element, this.state, [
+            scenePointer.x,
+            scenePointer.y,
+          ])
+        ) {
+          setCursor(this.canvas, CURSOR_TYPE.MOVE);
+        } else {
+          setCursor(this.canvas, CURSOR_TYPE.AUTO);
+        }
+      } else if (
+        // if using cmd/ctrl, we're not dragging
+        !event[KEYS.CTRL_OR_CMD] &&
+        (hitElement ||
+          this.isHittingCommonBoundingBoxOfSelectedElements(
+            scenePointer,
+            selectedElements,
+          ))
       ) {
         setCursor(this.canvas, CURSOR_TYPE.MOVE);
       } else {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
       }
-    } else if (
-      // if using cmd/ctrl, we're not dragging
-      !event[KEYS.CTRL_OR_CMD] &&
-      (hitElement ||
-        this.isHittingCommonBoundingBoxOfSelectedElements(
-          scenePointer,
-          selectedElements,
-        ))
-    ) {
-      setCursor(this.canvas, CURSOR_TYPE.MOVE);
-    } else if (this.isHittingElementLinkIcon(scenePointer)) {
-      setCursor(this.canvas, CURSOR_TYPE.POINTER);
-    } else {
-      setCursor(this.canvas, CURSOR_TYPE.AUTO);
     }
   };
 

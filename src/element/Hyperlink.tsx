@@ -48,10 +48,7 @@ export const Hyperlink = ({
       return;
     }
 
-    let link = inputRef.current.value;
-    if (link && link.substr(0, PREFIX.length) !== PREFIX) {
-      link = `${PREFIX}${link}`;
-    }
+    const link = getAbsoluteLink(inputRef.current.value);
 
     if (link === element.link) {
       return;
@@ -148,6 +145,13 @@ export const Hyperlink = ({
       )}
     </div>
   );
+};
+
+export const getAbsoluteLink = (link?: string) => {
+  if (link && link.substr(0, PREFIX.length) !== PREFIX) {
+    link = `${PREFIX}${link}`;
+  }
+  return link;
 };
 
 export const actionLink = register({
