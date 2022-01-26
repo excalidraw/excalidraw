@@ -17,6 +17,7 @@ import { rotate } from "../math";
 import { MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from ".";
+import { getTooltipDiv } from "../components/Tooltip";
 
 const PREFIX = "https://";
 
@@ -227,4 +228,35 @@ export const isPointHittingLinkIcon = (
     y < linkY + linkHeight + threshold;
 
   return hitLink;
+};
+
+export const showHyperlinkTooltip = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+) => {
+  const tooltipDiv = getTooltipDiv();
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+  const [linkX, linkY] = getLinkHandleFromCoords(
+    [x1, y1, x2, y2],
+    element.angle,
+    appState,
+  );
+  const { x, y } = sceneCoordsToViewportCoords(
+    { sceneX: linkX, sceneY: linkY },
+    appState,
+  );
+
+  const tooltipX = x - 80;
+  const tooltipY = y - 40;
+
+  tooltipDiv.style.top = `${tooltipY}px`;
+  tooltipDiv.style.left = `${tooltipX}px`;
+  tooltipDiv.classList.add("excalidraw-tooltip--visible");
+  tooltipDiv.style.maxWidth = "20rem";
+  tooltipDiv.innerHTML = element.link!;
+};
+
+export const hideHyperlinkToolip = () => {
+  getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
 };

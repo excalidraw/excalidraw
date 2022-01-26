@@ -240,6 +240,8 @@ import {
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
   getAbsoluteLink,
+  showHyperlinkTooltip,
+  hideHyperlinkToolip,
   Hyperlink,
   isPointHittingLinkIcon,
 } from "../element/Hyperlink";
@@ -2583,10 +2585,15 @@ class App extends React.Component<AppProps, AppState> {
 
     this.hitLinkElement = this.getElementLinkAtPosition(scenePointer);
 
-    if (this.hitLinkElement) {
+    if (
+      this.hitLinkElement &&
+      !this.state.selectedElementIds[this.hitLinkElement.id]
+    ) {
       setCursor(this.canvas, CURSOR_TYPE.POINTER);
+      showHyperlinkTooltip(this.hitLinkElement, this.state);
       this.attachLinkListener();
     } else {
+      hideHyperlinkToolip();
       this.detachLinkListener();
       if (this.state.elementType === "text") {
         setCursor(

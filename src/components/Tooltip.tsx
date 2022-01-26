@@ -2,7 +2,7 @@ import "./Tooltip.scss";
 
 import React, { useEffect } from "react";
 
-const getTooltipDiv = () => {
+export const getTooltipDiv = () => {
   const existingDiv = document.querySelector<HTMLDivElement>(
     ".excalidraw-tooltip",
   );
@@ -75,7 +75,6 @@ export const Tooltip = ({
     return () =>
       getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
   }, []);
-
   return (
     <div
       className="excalidraw-tooltip-wrapper"
