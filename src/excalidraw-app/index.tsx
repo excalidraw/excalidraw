@@ -442,9 +442,14 @@ const ExcalidrawWrapper = () => {
 
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_FILES)) {
           const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
+          const currFiles = excalidrawAPI.getFiles();
           const fileIds =
             elements?.reduce((acc, element) => {
-              if (isInitializedImageElement(element)) {
+              if (
+                isInitializedImageElement(element) &&
+                // only load and update images that aren't already loaded
+                !currFiles[element.fileId]
+              ) {
                 return acc.concat(element.fileId);
               }
               return acc;
