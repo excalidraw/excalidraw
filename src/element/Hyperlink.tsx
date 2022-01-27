@@ -53,8 +53,8 @@ export const Hyperlink = ({
       return;
     }
     mutateElement(element, { link });
-    onSubmit();
-  }, [element, onSubmit]);
+    setIsEditing(false);
+  }, [element]);
 
   useLayoutEffect(() => {
     return () => {
