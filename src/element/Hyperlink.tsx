@@ -163,10 +163,14 @@ export const actionLink = register({
   perform: (elements, appState) => {
     return {
       elements,
-      appState: { ...appState, showHyperlinkPopup: true },
+      appState: {
+        ...appState,
+        showHyperlinkPopup: !appState.showHyperlinkPopup,
+      },
       commitToHistory: true,
     };
   },
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
   PanelComponent: ({ elements, appState, updateData }) => {
     return (
       <ToolButton

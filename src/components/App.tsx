@@ -1514,14 +1514,13 @@ class App extends React.Component<AppProps, AppState> {
     );
     if (
       !this.hideHyperlinkPopupUntilClicked &&
+      !this.state.showHyperlinkPopup &&
       selectedElements.length === 1 &&
       selectedElements[0].link &&
       !this.state.previousSelectedElementIds[selectedElements[0].id] &&
       this.state.selectedElementIds[selectedElements[0].id]
     ) {
       this.setState({ showHyperlinkPopup: true });
-    } else {
-      this.setState({ showHyperlinkPopup: false });
     }
   };
 
