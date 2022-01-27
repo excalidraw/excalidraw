@@ -27,6 +27,7 @@ import {
   actionToggleStats,
   actionToggleZenMode,
   actionUngroup,
+  actionLink,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -5147,6 +5148,7 @@ class App extends React.Component<AppProps, AppState> {
             (maybeFlipHorizontal || maybeFlipVertical) && separator,
             actionDuplicateSelection,
             actionDeleteSelected,
+            actionLink,
           ],
           top,
           left,

@@ -18,6 +18,7 @@ import { MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from ".";
 import { getTooltipDiv } from "../components/Tooltip";
+import { getSelectedElements } from "../scene";
 
 const VALID_PREFIXES = ["https://", "http://", "ftp://"];
 
@@ -171,18 +172,30 @@ export const actionLink = register({
     };
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
+  contextItemLabel: (elements, appState) =>
+    getContextMenuLabel(elements, appState),
   PanelComponent: ({ elements, appState, updateData }) => {
     return (
       <ToolButton
         type="button"
         icon={link}
-        aria-label={t("labels.link")}
+        aria-label={t(getContextMenuLabel(elements, appState))}
         onClick={() => updateData(null)}
       />
     );
   },
 });
 
+export const getContextMenuLabel = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+) => {
+  const selectedElements = getSelectedElements(elements, appState);
+  const label = selectedElements[0]!.link
+    ? "labels.link.edit"
+    : "labels.link.create";
+  return label;
+};
 export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,

@@ -105,7 +105,10 @@
     "excalidrawLib": "Excalidraw Library",
     "decreaseFontSize": "Decrease font size",
     "increaseFontSize": "Increase font size",
-    "link": "Link"
+    "link": {
+      "edit": "Edit link",
+      "create": "Create link"
+    }
   },
   "buttons": {
     "clearReset": "Reset the canvas",
