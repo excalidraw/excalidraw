@@ -43,6 +43,7 @@ import {
   FIREBASE_STORAGE_PREFIXES,
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
   STORAGE_KEYS,
+  SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
 import CollabWrapper, {
   CollabAPI,
@@ -470,7 +471,7 @@ const ExcalidrawWrapper = () => {
           }
         }
       }
-    }, 50);
+    }, SYNC_BROWSER_TABS_TIMEOUT);
 
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
     window.addEventListener(EVENT.UNLOAD, onBlur, false);
