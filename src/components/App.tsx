@@ -4974,6 +4974,7 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       } else {
         ContextMenu.push({
@@ -5014,6 +5015,7 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       }
     } else if (type === "element") {
@@ -5025,6 +5027,7 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       } else {
         ContextMenu.push({
@@ -5069,6 +5072,7 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       }
     }
