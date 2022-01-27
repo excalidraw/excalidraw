@@ -21,6 +21,7 @@ import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
   LOAD_IMAGES_TIMEOUT,
   SCENE,
+  STORAGE_KEYS,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
 import {
@@ -39,7 +40,6 @@ import {
 import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
-  STORAGE_KEYS,
 } from "../data/localStorage";
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
@@ -65,6 +65,7 @@ import {
   reconcileElements as _reconcileElements,
 } from "./reconciliation";
 import { decryptData } from "../../data/encryption";
+import { resetBrowserStateVersions } from "../data/tabSync";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -86,6 +87,7 @@ export interface CollabAPI {
   onCollabButtonClick: CollabInstance["onCollabButtonClick"];
   broadcastElements: CollabInstance["broadcastElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
+  setUsername: (username: string) => void;
 }
 
 interface Props {
@@ -246,6 +248,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     this.saveCollabRoomToFirebase();
     if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
+      // hack to ensure that we prefer we disregard any new browser state
+      // that could have been saved in other tabs while we were collaborating
+      resetBrowserStateVersions();
+
       window.history.pushState({}, APP_NAME, window.location.origin);
       this.destroySocketClient();
       trackEvent("share", "room closed");
@@ -677,8 +683,12 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.setState({ modalIsShown: false });
   };
 
-  onUsernameChange = (username: string) => {
+  setUsername = (username: string) => {
     this.setState({ username });
+  };
+
+  onUsernameChange = (username: string) => {
+    this.setUsername(username);
     saveUsernameToLocalStorage(username);
   };
 
@@ -712,6 +722,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.contextValue.broadcastElements = this.broadcastElements;
     this.contextValue.fetchImageFilesFromFirebase =
       this.fetchImageFilesFromFirebase;
+    this.contextValue.setUsername = this.setUsername;
     return this.contextValue;
   };
 
