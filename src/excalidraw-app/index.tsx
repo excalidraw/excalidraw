@@ -141,6 +141,28 @@ languageDetector.init({
   checkWhitelist: false,
 });
 
+const saveDebounced = debounce(
+  async (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    files: BinaryFiles,
+    onFilesSaved: () => void,
+  ) => {
+    saveToLocalStorage(elements, appState);
+
+    await localFileStorage.saveFiles({
+      elements,
+      files,
+    });
+    onFilesSaved();
+  },
+  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
+);
+
+const onBlur = () => {
+  saveDebounced.flush();
+};
+
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
 }): Promise<
@@ -277,28 +299,6 @@ const ExcalidrawWrapper = () => {
     initialStatePromiseRef.current.promise =
       resolvablePromise<ImportedDataState | null>();
   }
-
-  const saveDebounced = debounce(
-    async (
-      elements: readonly ExcalidrawElement[],
-      appState: AppState,
-      files: BinaryFiles,
-      onFilesSaved: () => void,
-    ) => {
-      saveToLocalStorage(elements, appState);
-
-      await localFileStorage.saveFiles({
-        elements,
-        files,
-      });
-      onFilesSaved();
-    },
-    SAVE_TO_LOCAL_STORAGE_TIMEOUT,
-  );
-
-  const onBlur = useCallback(() => {
-    saveDebounced.flush();
-  }, [saveDebounced]);
 
   useEffect(() => {
     // Delayed so that the app has a time to load the latest SW
