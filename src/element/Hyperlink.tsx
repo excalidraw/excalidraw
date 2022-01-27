@@ -7,7 +7,7 @@ import "./Hyperlink.scss";
 import Scene from "../scene/Scene";
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import { checkCircleIcon, editIcon, link, trash } from "../components/icons";
+import { editIcon, link, trash } from "../components/icons";
 import { t } from "../i18n";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import clsx from "clsx";
@@ -65,8 +65,11 @@ export const Hyperlink = ({
 
   const handleRemove = useCallback(() => {
     mutateElement(element, { link: null });
+    if (showInput) {
+      inputRef.current!.value = "";
+    }
     onSubmit();
-  }, [onSubmit, element]);
+  }, [onSubmit, element, showInput]);
 
   const onEdit = () => {
     setIsEditing(true);
@@ -109,9 +112,8 @@ export const Hyperlink = ({
           {element.link}
         </a>
       )}
-
-      {!showInput && (
-        <div>
+      <div>
+        {!showInput && (
           <ToolButton
             type="button"
             title={t("buttons.edit")}
@@ -121,6 +123,9 @@ export const Hyperlink = ({
             className="excalidraw-hyperlinkContainer--edit"
             icon={editIcon}
           />
+        )}
+
+        {linkVal && (
           <ToolButton
             type="button"
             title={t("buttons.remove")}
@@ -130,19 +135,8 @@ export const Hyperlink = ({
             className="excalidraw-hyperlinkContainer--remove"
             icon={trash}
           />
-        </div>
-      )}
-      {showInput && (
-        <ToolButton
-          type="button"
-          title={t("buttons.save")}
-          aria-label={t("buttons.save")}
-          label={t("buttons.save")}
-          onClick={handleSubmit}
-          className="excalidraw-hyperlinkContainer--save"
-          icon={checkCircleIcon}
-        />
-      )}
+        )}
+      </div>
     </div>
   );
 };
