@@ -502,7 +502,7 @@ const ExcalidrawWrapper = () => {
     return () => {
       window.removeEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
     };
-  }, [excalidrawAPI, saveDebounced]);
+  }, [excalidrawAPI]);
 
   useEffect(() => {
     languageDetector.cacheUserLanguage(langCode);
