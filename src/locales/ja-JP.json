@@ -103,8 +103,8 @@
     "toggleTheme": "テーマの切り替え",
     "personalLib": "個人ライブラリ",
     "excalidrawLib": "Excalidrawライブラリ",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "フォントサイズを縮小",
+    "increaseFontSize": "フォントサイズを拡大"
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
