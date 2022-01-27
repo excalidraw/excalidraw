@@ -19,7 +19,7 @@ import { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from ".";
 import { getTooltipDiv } from "../components/Tooltip";
 
-const PREFIX = "https://";
+const VALID_PREFIXES = ["https://", "http://", "ftp://"];
 
 export const EXTERNAL_LINK_IMG = document.createElement("img");
 EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
@@ -35,10 +35,8 @@ export const Hyperlink = ({
   appState: AppState;
   onSubmit: () => void;
 }) => {
-  let linkVal = "";
-  if (element.link) {
-    linkVal = element.link.split(PREFIX).pop()!;
-  }
+  const linkVal = element.link || "";
+
   const [isEditing, setIsEditing] = useState(false);
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -149,8 +147,13 @@ export const Hyperlink = ({
 };
 
 export const getAbsoluteLink = (link?: string) => {
-  if (link && link.substr(0, PREFIX.length) !== PREFIX) {
-    link = `${PREFIX}${link}`;
+  if (link) {
+    const match = VALID_PREFIXES.find((prefix) => link!.startsWith(prefix));
+
+    // prefix with https if no match
+    if (!match) {
+      link = `${VALID_PREFIXES[0]}${link}`;
+    }
   }
   return link;
 };
