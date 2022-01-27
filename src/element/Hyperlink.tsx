@@ -31,14 +31,16 @@ export const Hyperlink = ({
   element,
   appState,
   onSubmit,
+  editView = false,
 }: {
   element: NonDeletedExcalidrawElement;
   appState: AppState;
   onSubmit: () => void;
+  editView: boolean;
 }) => {
   const linkVal = element.link || "";
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(editView);
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
   const showInput = isEditing || !linkVal;
@@ -161,6 +163,7 @@ export const actionLink = register({
       appState: {
         ...appState,
         showHyperlinkPopup: !appState.showHyperlinkPopup,
+        showEditViewInLinkPopup: true,
       },
       commitToHistory: true,
     };

@@ -330,6 +330,7 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
       showHyperlinkPopup: false,
+      showEditViewInLinkPopup: false,
     };
 
     this.id = nanoid();
@@ -515,7 +516,13 @@ class App extends React.Component<AppProps, AppState> {
               <Hyperlink
                 element={selectedElement[0]}
                 appState={this.state}
-                onSubmit={() => this.setState({ showHyperlinkPopup: false })}
+                onSubmit={() =>
+                  this.setState({
+                    showHyperlinkPopup: false,
+                    showEditViewInLinkPopup: false,
+                  })
+                }
+                editView={this.state.showEditViewInLinkPopup}
               />
             )}
             {this.state.showStats && (
@@ -2662,6 +2669,7 @@ class App extends React.Component<AppProps, AppState> {
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
       showHyperlinkPopup: false,
+      showEditViewInLinkPopup: false,
     });
     this.savePointer(event.clientX, event.clientY, "down");
 
