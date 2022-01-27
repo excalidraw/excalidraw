@@ -123,7 +123,12 @@ export interface Action {
     appState: AppState,
     elements: readonly ExcalidrawElement[],
   ) => boolean;
-  contextItemLabel?: string;
+  contextItemLabel?:
+    | string
+    | ((
+        elements: readonly ExcalidrawElement[],
+        appState: Readonly<AppState>,
+      ) => string);
   contextItemPredicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
