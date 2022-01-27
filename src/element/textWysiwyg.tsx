@@ -8,7 +8,11 @@ import {
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
 import { CLASSES, BOUND_TEXT_PADDING } from "../constants";
-import { ExcalidrawElement, ExcalidrawTextElement } from "./types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  ExcalidrawLinearElement,
+} from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
@@ -98,11 +102,12 @@ export const textWysiwyg = ({
     return false;
   };
   let originalContainerHeight: number;
-  let approxLineHeight = getApproxLineHeight(getFontString(element));
 
-  const initialText = element.originalText;
   const updateWysiwygStyle = () => {
-    const updatedElement = Scene.getScene(element)?.getElement(id);
+    const updatedElement = Scene.getScene(element)?.getElement(
+      id,
+    ) as ExcalidrawTextElement;
+    const approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
@@ -125,8 +130,6 @@ export const textWysiwyg = ({
           height = editorHeight;
         }
         if (propertiesUpdated) {
-          approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
-
           originalContainerHeight = container.height;
 
           // update height of the editor after properties updated
@@ -222,6 +225,7 @@ export const textWysiwyg = ({
       if (isTestEnv()) {
         editable.style.fontFamily = getFontFamilyString(updatedElement);
       }
+      mutateElement(updatedElement, { x: coordX, y: coordY });
     }
   };
 
@@ -264,10 +268,14 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.oninput = () => {
+      const updatedElement = Scene.getScene(element)?.getElement(
+        id,
+      ) as ExcalidrawTextElement;
+      const font = getFontString(updatedElement);
       // using scrollHeight here since we need to calculate
       // number of lines so cannot use editable.style.height
       // as that gets updated below
-      const lines = editable.scrollHeight / approxLineHeight;
+      const lines = editable.scrollHeight / getApproxLineHeight(font);
       // auto increase height only when lines  > 1 so its
       // measured correctly and vertically alignes for
       // first line as well as setting height to "auto"
@@ -279,7 +287,7 @@ export const textWysiwyg = ({
           const container = getContainerElement(element);
           const actualLineCount = wrapText(
             editable.value,
-            getFontString(element),
+            font,
             container!.width,
           ).split("\n").length;
 
@@ -442,61 +450,41 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
-    const updateElement = Scene.getScene(element)?.getElement(element.id);
+    const updateElement = Scene.getScene(element)?.getElement(
+      element.id,
+    ) as ExcalidrawTextElement;
     if (!updateElement) {
       return;
     }
-    let wrappedText = "";
-    if (isTextElement(updateElement) && updateElement?.containerId) {
-      const container = getContainerElement(updateElement);
+    let text = editable.value;
+    const container = getContainerElement(updateElement);
 
-      if (container) {
-        wrappedText = wrapText(
-          editable.value,
-          getFontString(updateElement),
-          container.width,
-        );
-
-        if (updateElement.containerId) {
-          const editorHeight = Number(editable.style.height.slice(0, -2));
-          if (editable.value) {
-            // Don't mutate if text is not updated
-            if (initialText !== editable.value) {
-              mutateElement(updateElement, {
-                // vertically center align
-                y: container.y + container.height / 2 - editorHeight / 2,
-                height: editorHeight,
-                width: Number(editable.style.width.slice(0, -2)),
-                // preserve padding
-                x: container.x + BOUND_TEXT_PADDING,
-                angle: container.angle,
-              });
-            }
-
-            const boundTextElementId = getBoundTextElementId(container);
-            if (!boundTextElementId || boundTextElementId !== element.id) {
-              mutateElement(container, {
-                boundElements: (container.boundElements || []).concat({
-                  type: "text",
-                  id: element.id,
-                }),
-              });
-            }
-          } else {
-            mutateElement(container, {
-              boundElements: container.boundElements?.filter(
-                (ele) => ele.type !== "text",
-              ),
-            });
-          }
+    if (container) {
+      text = updateElement.text;
+      if (editable.value) {
+        const boundTextElementId = getBoundTextElementId(container);
+        if (!boundTextElementId || boundTextElementId !== element.id) {
+          mutateElement(container, {
+            boundElements: (container.boundElements || []).concat({
+              type: "text",
+              id: element.id,
+            }),
+          });
         }
+      } else {
+        mutateElement(container, {
+          boundElements: container.boundElements?.filter(
+            (ele) =>
+              !isTextElement(
+                ele as ExcalidrawTextElement | ExcalidrawLinearElement,
+              ),
+          ),
+        });
       }
-    } else {
-      wrappedText = editable.value;
     }
 
     onSubmit({
-      text: normalizeText(wrappedText),
+      text,
       viaKeyboard: submittedViaKeyboard,
       originalText: editable.value,
     });

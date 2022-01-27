@@ -301,6 +301,7 @@ export type AppProps = ExcalidrawProps & {
   };
   detectScroll: boolean;
   handleKeyboardGlobally: boolean;
+  isCollaborating: boolean;
 };
 
 /** A subset of App class properties that we need to use elsewhere
