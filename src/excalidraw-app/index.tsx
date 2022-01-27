@@ -485,7 +485,7 @@ const ExcalidrawWrapper = () => {
       document.removeEventListener(EVENT.VISIBILITY_CHANGE, syncData, false);
       clearTimeout(titleTimeout);
     };
-  }, [collabAPI, excalidrawAPI, onBlur]);
+  }, [collabAPI, excalidrawAPI]);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
