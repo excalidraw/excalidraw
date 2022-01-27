@@ -164,14 +164,16 @@ export const actionLink = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
-      type="button"
-      icon={link}
-      aria-label={t("labels.link")}
-      onClick={() => updateData(null)}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    return (
+      <ToolButton
+        type="button"
+        icon={link}
+        aria-label={t("labels.link")}
+        onClick={() => updateData(null)}
+      />
+    );
+  },
 });
 
 export const getLinkHandleFromCoords = (
