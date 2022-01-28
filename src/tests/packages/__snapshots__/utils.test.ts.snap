@@ -57,6 +57,7 @@ Object {
   "selectedGroupIds": Object {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showEditViewInLinkPopup": false,
   "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
