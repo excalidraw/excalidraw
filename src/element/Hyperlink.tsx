@@ -21,6 +21,8 @@ import { getTooltipDiv } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
 
 const VALID_PREFIXES = ["https://", "http://", "ftp://"];
+const CONTAINER_WIDTH = 320;
+const SPACE_BOTTOM = 85;
 
 export const EXTERNAL_LINK_IMG = document.createElement("img");
 EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
@@ -82,10 +84,15 @@ export const Hyperlink = ({
     { sceneX: updatedTextElement.x, sceneY: updatedTextElement.y },
     appState,
   );
+  const left = viewPortX + element.width / 2 - CONTAINER_WIDTH / 2;
   return (
     <div
       className="excalidraw-hyperlinkContainer"
-      style={{ top: `${viewPortY - 85}px`, left: `${viewPortX - 50}px` }}
+      style={{
+        top: `${viewPortY - SPACE_BOTTOM}px`,
+        left: `${left}px`,
+        width: CONTAINER_WIDTH,
+      }}
     >
       {showInput ? (
         <input
