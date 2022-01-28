@@ -348,6 +348,11 @@ export const actionChangeStrokeWidth = register({
         group="stroke-width"
         options={[
           {
+            value: 0.5,
+            text: t("labels.extraThin"),
+            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={1} />,
+          },
+          {
             value: 1,
             text: t("labels.thin"),
             icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={2} />,
