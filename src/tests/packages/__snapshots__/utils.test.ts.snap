@@ -47,7 +47,6 @@ Object {
     "data": null,
     "shown": false,
   },
-  "penLocked": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,

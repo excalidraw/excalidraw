@@ -17,7 +17,6 @@ import { LockButton } from "./LockButton";
 import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { LibraryButton } from "./LibraryButton";
-import { PenLockButton } from "./PenModeButton";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -29,7 +28,6 @@ type MobileMenuProps = {
   libraryMenu: JSX.Element | null;
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
-  onPenLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
   renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
@@ -52,7 +50,6 @@ export const MobileMenu = ({
   setAppState,
   onCollabButtonClick,
   onLockToggle,
-  onPenLockToggle,
   canvas,
   isCollaborating,
   renderCustomFooter,
@@ -84,13 +81,6 @@ export const MobileMenu = ({
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
-                <PenLockButton
-                  checked={appState.penLocked}
-                  onChange={onPenLockToggle}
-                  title={t("toolBar.penLock")}
-                  isMobile
-                  elementType={appState.elementType}
-                />
                 <LockButton
                   checked={appState.elementLocked}
                   onChange={onLockToggle}
