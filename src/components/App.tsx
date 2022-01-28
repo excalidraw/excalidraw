@@ -466,6 +466,7 @@ class App extends React.Component<AppProps, AppState> {
               elements={this.scene.getElements()}
               onCollabButtonClick={onCollabButtonClick}
               onLockToggle={this.toggleLock}
+              onPenLockToggle={this.togglePenLock}
               onInsertElements={(elements) =>
                 this.addElementsFromPasteOrLibrary({
                   elements,
@@ -1495,6 +1496,14 @@ class App extends React.Component<AppProps, AppState> {
         elementType: prevState.elementLocked
           ? "selection"
           : prevState.elementType,
+      };
+    });
+  };
+
+  togglePenLock = () => {
+    this.setState((prevState) => {
+      return {
+        penLocked: !prevState.penLocked,
       };
     });
   };
@@ -2650,11 +2659,16 @@ class App extends React.Component<AppProps, AppState> {
         y,
       });
     } else if (this.state.elementType === "freedraw") {
-      this.handleFreeDrawElementOnPointerDown(
-        event,
-        this.state.elementType,
-        pointerDownState,
-      );
+      if (
+        (this.state.penLocked && event.pointerType === "pen") ||
+        !this.state.penLocked
+      ) {
+        this.handleFreeDrawElementOnPointerDown(
+          event,
+          this.state.elementType,
+          pointerDownState,
+        );
+      }
     } else {
       this.createGenericElementOnPointerDown(
         this.state.elementType,
