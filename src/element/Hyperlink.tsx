@@ -4,7 +4,6 @@ import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
 
 import "./Hyperlink.scss";
-import Scene from "../scene/Scene";
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
 import { editIcon, link, trash } from "../components/icons";
@@ -23,6 +22,8 @@ import { getSelectedElements } from "../scene";
 const VALID_PREFIXES = ["https://", "http://", "ftp://"];
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
+const CONTAINER_PADDING = 8;
+const CONTAINER_HEIGHT = 42;
 
 export const EXTERNAL_LINK_IMG = document.createElement("img");
 EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
@@ -78,20 +79,16 @@ export const Hyperlink = ({
   const onEdit = () => {
     setIsEditing(true);
   };
+  const { x, y } = getCoordsForPopover(element, appState);
 
-  const updatedTextElement = Scene.getScene(element)!.getElement(element.id)!;
-  const { x: viewPortX, y: viewPortY } = sceneCoordsToViewportCoords(
-    { sceneX: updatedTextElement.x, sceneY: updatedTextElement.y },
-    appState,
-  );
-  const left = viewPortX + element.width / 2 - CONTAINER_WIDTH / 2;
   return (
     <div
       className="excalidraw-hyperlinkContainer"
       style={{
-        top: `${viewPortY - SPACE_BOTTOM}px`,
-        left: `${left}px`,
+        top: `${y}px`,
+        left: `${x}px`,
         width: CONTAINER_WIDTH,
+        padding: CONTAINER_PADDING,
       }}
     >
       {showInput ? (
@@ -148,6 +145,20 @@ export const Hyperlink = ({
       </div>
     </div>
   );
+};
+
+const getCoordsForPopover = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+) => {
+  const { x: viewPortX, y: viewPortY } = sceneCoordsToViewportCoords(
+    { sceneX: element.x, sceneY: element.y },
+    appState,
+  );
+  const x = viewPortX + element.width / 2 - CONTAINER_WIDTH / 2;
+
+  const y = viewPortY - SPACE_BOTTOM;
+  return { x, y };
 };
 
 export const getAbsoluteLink = (link?: string) => {
@@ -285,4 +296,37 @@ export const showHyperlinkTooltip = (
 
 export const hideHyperlinkToolip = () => {
   getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+};
+
+export const shouldHideLinkPopup = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+  [clientX, clientY]: Point,
+): Boolean => {
+  const { x, y } = sceneCoordsToViewportCoords(
+    { sceneX: element.x, sceneY: element.y },
+    appState,
+  );
+  const threshold = 15;
+  // hit box to prevent hiding when hovered in the vertical area between element and popover
+  if (
+    clientX >= x - threshold &&
+    clientX <= x + element.width + threshold &&
+    clientY <= y &&
+    clientY <= y + SPACE_BOTTOM
+  ) {
+    return false;
+  }
+  // hit box to prevent hiding when hovered around popover within threshold
+  const { x: popoverX, y: popoverY } = getCoordsForPopover(element, appState);
+
+  if (
+    clientX >= popoverX - threshold &&
+    clientX <= popoverX + CONTAINER_WIDTH + CONTAINER_PADDING * 2 + threshold &&
+    clientY >= popoverY - threshold &&
+    clientY <= popoverY + threshold + CONTAINER_PADDING * 2 + CONTAINER_HEIGHT
+  ) {
+    return false;
+  }
+  return true;
 };

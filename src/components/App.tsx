@@ -245,6 +245,7 @@ import {
   hideHyperlinkToolip,
   Hyperlink,
   isPointHittingLinkIcon,
+  shouldHideLinkPopup,
 } from "../element/Hyperlink";
 
 const IsMobileContext = React.createContext(false);
@@ -1516,20 +1517,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     gesture.pointers.delete(event.pointerId);
-    const selectedElements = getSelectedElements(
-      this.scene.getElements(),
-      this.state,
-    );
-    if (
-      !this.hideHyperlinkPopupUntilClicked &&
-      !this.state.showHyperlinkPopup &&
-      selectedElements.length === 1 &&
-      selectedElements[0].link &&
-      !this.state.previousSelectedElementIds[selectedElements[0].id] &&
-      this.state.selectedElementIds[selectedElements[0].id]
-    ) {
-      this.setState({ showHyperlinkPopup: true });
-    }
   };
 
   toggleLock = () => {
@@ -2597,6 +2584,17 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       hideHyperlinkToolip();
       this.detachLinkListener();
+      if (hitElement) {
+        this.setState({ showHyperlinkPopup: true });
+      } else if (
+        selectedElements.length === 1 &&
+        shouldHideLinkPopup(selectedElements[0], this.state, [
+          event.clientX,
+          event.clientY,
+        ])
+      ) {
+        this.setState({ showHyperlinkPopup: false });
+      }
       if (this.state.elementType === "text") {
         setCursor(
           this.canvas,
@@ -2658,11 +2656,6 @@ class App extends React.Component<AppProps, AppState> {
 
     if (isPanning) {
       return;
-    }
-    if (this.state.showHyperlinkPopup) {
-      this.hideHyperlinkPopupUntilClicked = true;
-    } else {
-      this.hideHyperlinkPopupUntilClicked = false;
     }
 
     this.setState({
@@ -3206,6 +3199,7 @@ class App extends React.Component<AppProps, AppState> {
                       ...prevState.selectedElementIds,
                       [hitElement.id]: true,
                     },
+                    showHyperlinkPopup: true,
                   },
                   this.scene.getElements(),
                 );
@@ -3862,6 +3856,7 @@ class App extends React.Component<AppProps, AppState> {
                       }
                     : null),
                 },
+                showHyperlinkPopup: true,
               },
               this.scene.getElements(),
             ),
