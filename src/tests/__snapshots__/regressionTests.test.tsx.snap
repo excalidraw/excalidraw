@@ -16316,8 +16316,8 @@ Object {
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
-  "scrollX": -19.849246231155778,
-  "scrollY": -28.000106917566555,
+  "scrollX": 10,
+  "scrollY": -10,
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": true,
@@ -16336,7 +16336,7 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "value": 1.99,
+    "value": 1,
   },
 }
 `;

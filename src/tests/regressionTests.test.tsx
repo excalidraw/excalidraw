@@ -287,22 +287,39 @@ describe("regression tests", () => {
   });
 
   it("two-finger scroll works", () => {
-    const startScrollY = h.state.scrollY;
-    finger1.down(50, 50);
-    finger2.down(60, 50);
+    // scroll horizontally vertically
 
-    finger1.up(0, -10);
-    finger2.up(0, -10);
+    const startScrollY = h.state.scrollY;
+
+    finger1.downAt(0, 0);
+    finger2.downAt(10, 0);
+
+    finger1.clientY -= 10;
+    finger2.clientY -= 10;
+
+    finger1.moveTo();
+    finger2.moveTo();
+
+    finger1.upAt();
+    finger2.upAt();
     expect(h.state.scrollY).toBeLessThan(startScrollY);
+
+    // scroll horizontally
 
     const startScrollX = h.state.scrollX;
 
-    finger1.restorePosition(50, 50);
-    finger2.restorePosition(50, 60);
-    finger1.down();
-    finger2.down();
-    finger1.up(10, 0);
-    finger2.up(10, 0);
+    finger1.downAt();
+    finger2.downAt();
+
+    finger1.clientX += 10;
+    finger2.clientX += 10;
+
+    finger1.moveTo();
+    finger2.moveTo();
+
+    finger1.upAt();
+    finger2.upAt();
+
     expect(h.state.scrollX).toBeGreaterThan(startScrollX);
   });
 
