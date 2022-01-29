@@ -124,6 +124,7 @@ import {
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
+  isFreeDrawElement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
