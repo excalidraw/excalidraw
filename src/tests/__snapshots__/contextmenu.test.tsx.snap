@@ -72,10 +72,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -242,10 +238,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -563,10 +555,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -884,10 +872,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -1052,10 +1036,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -1258,10 +1238,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -1523,10 +1499,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -1856,10 +1828,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -2611,10 +2579,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -2932,10 +2896,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -3257,10 +3217,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -3656,10 +3612,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -3923,10 +3875,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -4255,10 +4203,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -4360,10 +4304,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -4441,10 +4381,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
