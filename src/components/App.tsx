@@ -125,6 +125,7 @@ import {
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
+  isFreeDrawElement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -2825,7 +2826,8 @@ class App extends React.Component<AppProps, AppState> {
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           this.state.viewModeEnabled)
       ) ||
-      isTextElement(this.state.editingElement)
+      isTextElement(this.state.editingElement) ||
+      isFreeDrawElement(this.state.editingElement)
     ) {
       return false;
     }
