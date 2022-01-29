@@ -2836,7 +2836,6 @@ class App extends React.Component<AppProps, AppState> {
       x: event.clientX,
       y: event.clientY,
     });
-    // console.log("PointerDown", event.pointerId, "size:", gesture.pointers.size);
 
     if (gesture.pointers.size === 2) {
       gesture.lastCenter = getCenter(gesture.pointers);
@@ -2844,7 +2843,6 @@ class App extends React.Component<AppProps, AppState> {
       gesture.initialDistance = getDistance(
         Array.from(gesture.pointers.values()),
       );
-      // console.log("gesture >>>>", gesture);
     }
   }
 
