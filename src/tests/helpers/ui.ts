@@ -87,8 +87,8 @@ export class Keyboard {
 }
 
 export class Pointer {
-  private clientX = 0;
-  private clientY = 0;
+  public clientX = 0;
+  public clientY = 0;
 
   constructor(
     private readonly pointerType: "mouse" | "touch" | "pen",
@@ -156,7 +156,7 @@ export class Pointer {
   // absolute coords
   // ---------------------------------------------------------------------------
 
-  moveTo(x: number, y: number) {
+  moveTo(x: number = this.clientX, y: number = this.clientY) {
     this.clientX = x;
     this.clientY = y;
     fireEvent.pointerMove(GlobalTestState.canvas, this.getEvent());
