@@ -124,7 +124,6 @@ import {
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
-  isFreeDrawElement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -2331,7 +2330,10 @@ class App extends React.Component<AppProps, AppState> {
       gesture.lastCenter = center;
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
-      const scaleFactor = distance / gesture.initialDistance;
+      const scaleFactor =
+        this.state.elementType === "freedraw" && this.state.penLocked
+          ? 1
+          : distance / gesture.initialDistance;
 
       this.setState(({ zoom, scrollX, scrollY, offsetLeft, offsetTop }) => ({
         scrollX: scrollX + deltaX / zoom.value,
@@ -2747,8 +2749,7 @@ class App extends React.Component<AppProps, AppState> {
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           this.state.viewModeEnabled)
       ) ||
-      isTextElement(this.state.editingElement) ||
-      isFreeDrawElement(this.state.editingElement)
+      isTextElement(this.state.editingElement)
     ) {
       return false;
     }
