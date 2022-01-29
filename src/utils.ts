@@ -245,8 +245,8 @@ export const sceneCoordsToViewportCoords = (
     scrollY: number;
   },
 ) => {
-  const x = (sceneX + scrollX + offsetLeft) * zoom.value;
-  const y = (sceneY + scrollY + offsetTop) * zoom.value;
+  const x = (sceneX + scrollX) * zoom.value + offsetLeft;
+  const y = (sceneY + scrollY) * zoom.value + offsetTop;
   return { x, y };
 };
 
@@ -444,8 +444,7 @@ export const bytesToHexString = (bytes: Uint8Array) => {
     .join("");
 };
 
-export const getUpdatedTimestamp = () =>
-  process.env.NODE_ENV === "test" ? 1 : Date.now();
+export const getUpdatedTimestamp = () => (isTestEnv() ? 1 : Date.now());
 
 /**
  * Transforms array of objects containing `id` attribute,
@@ -459,3 +458,6 @@ export const arrayToMap = <T extends { id: string } | string>(
     return acc;
   }, new Map());
 };
+
+export const isTestEnv = () =>
+  typeof process !== "undefined" && process.env?.NODE_ENV === "test";

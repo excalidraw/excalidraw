@@ -5,14 +5,8 @@ import {
   getDefaultAppState,
 } from "../../appState";
 import { clearElementsForLocalStorage } from "../../element";
-import { STORAGE_KEYS as APP_STORAGE_KEYS } from "../../constants";
-
-export const STORAGE_KEYS = {
-  LOCAL_STORAGE_ELEMENTS: "excalidraw",
-  LOCAL_STORAGE_APP_STATE: "excalidraw-state",
-  LOCAL_STORAGE_COLLAB: "excalidraw-collab",
-  LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG: "collabLinkForceLoadFlag",
-};
+import { updateBrowserStateVersion } from "./tabSync";
+import { STORAGE_KEYS } from "../app_constants";
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -53,6 +47,7 @@ export const saveToLocalStorage = (
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
       JSON.stringify(clearAppStateForLocalStorage(appState)),
     );
+    updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
   } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
@@ -113,9 +108,7 @@ export const getTotalStorageSize = () => {
   try {
     const appState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
     const collab = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
-    const library = localStorage.getItem(
-      APP_STORAGE_KEYS.LOCAL_STORAGE_LIBRARY,
-    );
+    const library = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
 
     const appStateSize = appState?.length || 0;
     const collabSize = collab?.length || 0;
@@ -125,5 +118,19 @@ export const getTotalStorageSize = () => {
   } catch (error: any) {
     console.error(error);
     return 0;
+  }
+};
+
+export const getLibraryItemsFromStorage = () => {
+  try {
+    const libraryItems =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
+      ) || [];
+
+    return libraryItems;
+  } catch (e) {
+    console.error(e);
+    return [];
   }
 };

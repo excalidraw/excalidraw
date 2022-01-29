@@ -509,6 +509,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L18) | The `appState` to be updated in the scene. |
 | `collaborators` | <pre>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L29">Collaborator></a></pre> | The list of collaborators to be updated in the scene. |
 | `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
+| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L258) | The `libraryItems` to be update in the scene. |
 
 ### `addFiles`
 
@@ -1008,3 +1009,21 @@ Defaults to `THEME.LIGHT` unless passed in `initialData.appState.theme`
 ## Need help?
 
 Check out the existing [Q&A](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw). If you have any queries or need help, ask us [here](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw).
+
+### Development
+
+#### Install the dependencies
+
+```bash
+yarn
+```
+
+#### Start the server
+
+```bash
+yarn start
+```
+
+[http://localhost:3001](http://localhost:3001) will open in your default browser.
+
+The example is same as the [codesandbox example](https://ehlz3.csb.app/)

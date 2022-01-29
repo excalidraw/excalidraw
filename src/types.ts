@@ -251,6 +251,7 @@ export type SceneData = {
   appState?: ImportedDataState["appState"];
   collaborators?: Map<string, Collaborator>;
   commitToHistory?: boolean;
+  libraryItems?: LibraryItems | LibraryItems_v1;
 };
 
 export enum UserIdleState {
@@ -295,6 +296,7 @@ export type AppProps = ExcalidrawProps & {
   };
   detectScroll: boolean;
   handleKeyboardGlobally: boolean;
+  isCollaborating: boolean;
 };
 
 /** A subset of App class properties that we need to use elsewhere
