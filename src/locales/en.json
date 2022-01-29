@@ -187,7 +187,7 @@
     "text": "Text",
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
-    "penLock": "Only accept freehand input from pen/pencil"
+    "penLock": "Prevent pinch-zoom and accept freedraw input only from pen"
   },
   "headings": {
     "canvasActions": "Canvas actions",
