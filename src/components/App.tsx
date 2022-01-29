@@ -2325,7 +2325,9 @@ class App extends React.Component<AppProps, AppState> {
       const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor = distance / gesture.initialDistance;
 
-      const nextZoom = getNormalizedZoom(initialScale * scaleFactor);
+      const nextZoom = scaleFactor
+        ? getNormalizedZoom(initialScale * scaleFactor)
+        : this.state.zoom.value;
 
       this.setState((state) => {
         const zoomState = getStateForZoom(
@@ -2834,6 +2836,7 @@ class App extends React.Component<AppProps, AppState> {
       x: event.clientX,
       y: event.clientY,
     });
+    // console.log("PointerDown", event.pointerId, "size:", gesture.pointers.size);
 
     if (gesture.pointers.size === 2) {
       gesture.lastCenter = getCenter(gesture.pointers);
@@ -2841,6 +2844,7 @@ class App extends React.Component<AppProps, AppState> {
       gesture.initialDistance = getDistance(
         Array.from(gesture.pointers.values()),
       );
+      // console.log("gesture >>>>", gesture);
     }
   }
 
