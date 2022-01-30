@@ -84,13 +84,6 @@ export const MobileMenu = ({
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
-                <PenModeButton
-                  checked={appState.penMode}
-                  onChange={onPenModeToggle}
-                  title={t("toolBar.penMode")}
-                  isMobile
-                  penDetected={appState.penDetected}
-                />
                 <LockButton
                   checked={appState.elementLocked}
                   onChange={onLockToggle}
@@ -101,6 +94,13 @@ export const MobileMenu = ({
                   appState={appState}
                   setAppState={setAppState}
                   isMobile
+                />
+                <PenModeButton
+                  checked={appState.penMode}
+                  onChange={onPenModeToggle}
+                  title={t("toolBar.penMode")}
+                  isMobile
+                  penDetected={appState.penDetected}
                 />
               </Stack.Row>
               {libraryMenu}
