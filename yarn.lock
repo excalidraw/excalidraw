@@ -9276,10 +9276,10 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.npmjs.org/lines-and-columns/-/lines-and-columns-1.1.6.tgz"
   integrity sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
 
-lint-staged@12.1.7:
-  version "12.1.7"
-  resolved "https://registry.yarnpkg.com/lint-staged/-/lint-staged-12.1.7.tgz#fe9137992ac18a456422bb8484dd30be0140629f"
-  integrity sha512-bltv/ejiLWtowExpjU+s5z8j1Byjg9AlmaAjMmqNbIicY69u6sYIwXGg0dCn0TlkrrY2CphtHIXAkbZ+1VoWQQ==
+lint-staged@12.3.2:
+  version "12.3.2"
+  resolved "https://registry.yarnpkg.com/lint-staged/-/lint-staged-12.3.2.tgz#c87fe59dca475b7d1cb56863c5faa03c145e1446"
+  integrity sha512-gtw4Cbj01SuVSfAOXC6ivd/7VKHTj51yj5xV8TgktFmYNMsZzXuSd5/brqJEA93v63wL7R6iDlunMANOechC0A==
   dependencies:
     cli-truncate "^3.1.0"
     colorette "^2.0.16"
@@ -9287,10 +9287,10 @@ lint-staged@12.1.7:
     debug "^4.3.3"
     execa "^5.1.1"
     lilconfig "2.0.4"
-    listr2 "^3.13.5"
+    listr2 "^4.0.1"
     micromatch "^4.0.4"
     normalize-path "^3.0.0"
-    object-inspect "^1.11.1"
+    object-inspect "^1.12.0"
     string-argv "^0.3.1"
     supports-color "^9.2.1"
     yaml "^1.10.2"
@@ -9300,17 +9300,17 @@ listenercount@~1.0.1:
   resolved "https://registry.npmjs.org/listenercount/-/listenercount-1.0.1.tgz"
   integrity sha1-hMinKrWcRyUyFIDJdeZQg0LnCTc=
 
-listr2@^3.13.5:
-  version "3.13.5"
-  resolved "https://registry.yarnpkg.com/listr2/-/listr2-3.13.5.tgz#105a813f2eb2329c4aae27373a281d610ee4985f"
-  integrity sha512-3n8heFQDSk+NcwBn3CgxEibZGaRzx+pC64n3YjpMD1qguV4nWus3Al+Oo3KooqFKTQEJ1v7MmnbnyyNspgx3NA==
+listr2@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/listr2/-/listr2-4.0.1.tgz#e050c1fd390276e191f582603d6e3531cd6fd2b3"
+  integrity sha512-D65Nl+zyYHL2jQBGmxtH/pU8koPZo5C8iCNE8EoB04RwPgQG1wuaKwVbeZv9LJpiH4Nxs0FCp+nNcG8OqpniiA==
   dependencies:
     cli-truncate "^2.1.0"
     colorette "^2.0.16"
     log-update "^4.0.0"
     p-map "^4.0.0"
     rfdc "^1.3.0"
-    rxjs "^7.4.0"
+    rxjs "^7.5.2"
     through "^2.3.8"
     wrap-ansi "^7.0.0"
 
@@ -10403,7 +10403,7 @@ object-copy@^0.1.0:
     define-property "^0.2.5"
     kind-of "^3.0.3"
 
-object-inspect@^1.11.1, object-inspect@^1.9.0:
+object-inspect@^1.12.0, object-inspect@^1.9.0:
   version "1.12.0"
   resolved "https://registry.yarnpkg.com/object-inspect/-/object-inspect-1.12.0.tgz#6e2c120e868fd1fd18cb4f18c31741d0d6e776f0"
   integrity sha512-Ho2z80bVIvJloH+YzRmpZVQe87+qASmBUKZDWgx9cu+KDrX2ZDH/3tMy+gXbZETVGs2M8YdxObOh7XAtim9Y0g==
@@ -12850,12 +12850,12 @@ rxjs@^6.4.0, rxjs@^6.6.0:
   dependencies:
     tslib "^1.9.0"
 
-rxjs@^7.4.0:
-  version "7.4.0"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.4.0.tgz#a12a44d7eebf016f5ff2441b87f28c9a51cebc68"
-  integrity sha512-7SQDi7xeTMCJpqViXh8gL/lebcwlp3d831F05+9B44A4B0WfsEwUQHR64gsH1kvJ+Ep/J9K2+n1hVl1CsGN23w==
+rxjs@^7.5.2:
+  version "7.5.2"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.5.2.tgz#11e4a3a1dfad85dbf7fb6e33cbba17668497490b"
+  integrity sha512-PwDt186XaL3QN5qXj/H9DGyHhP3/RYYgZZwqBv9Tv8rsAaiwFH1IsJJlcgD37J7UW5a6O67qX0KWKS3/pu0m4w==
   dependencies:
-    tslib "~2.1.0"
+    tslib "^2.1.0"
 
 safari-14-idb-fix@^3.0.0:
   version "3.0.0"
@@ -14266,7 +14266,7 @@ tslib@^1.8.1, tslib@^1.9.0, tslib@^1.9.3:
   resolved "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@~2.1.0:
+tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.1.0.tgz"
   integrity sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==
