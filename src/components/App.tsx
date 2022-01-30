@@ -763,7 +763,14 @@ class App extends React.Component<AppProps, AppState> {
       };
     }
 
-    const scene = restore(initialData, null, null);
+    const scene = restore(
+      initialData,
+      {
+        penDetected: false,
+        penMode: false,
+      },
+      null,
+    );
 
     scene.appState = {
       ...scene.appState,

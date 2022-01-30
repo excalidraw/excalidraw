@@ -47,6 +47,9 @@ const ICONS = {
 
 export const PenModeButton = (props: PenModeIconProps) => {
   if (!props.penDetected) {
+    if (props.isMobile) {
+      return null;
+    }
     return (
       <label
         className={clsx(
