@@ -727,8 +727,6 @@ class App extends React.Component<AppProps, AppState> {
                 appState: {
                   ...(scene.appState || this.state),
                   isLoading: false,
-                  penDetected: false,
-                  penMode: false,
                 },
                 commitToHistory: true,
               });
@@ -763,14 +761,7 @@ class App extends React.Component<AppProps, AppState> {
       };
     }
 
-    const scene = restore(
-      initialData,
-      {
-        penDetected: false,
-        penMode: false,
-      },
-      null,
-    );
+    const scene = restore(initialData, null, null);
 
     scene.appState = {
       ...scene.appState,
@@ -779,6 +770,8 @@ class App extends React.Component<AppProps, AppState> {
           ? "selection"
           : scene.appState.elementType,
       isLoading: false,
+      penDetected: false,
+      penMode: false,
     };
     if (initialData?.scrollToContent) {
       scene.appState = {
