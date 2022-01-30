@@ -4802,6 +4802,15 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     event.preventDefault();
 
+    if (
+      (event.nativeEvent.pointerType === "touch" ||
+        (event.nativeEvent.pointerType === "pen" &&
+          event.button !== POINTER_BUTTON.SECONDARY)) &&
+      this.state.elementType !== "selection"
+    ) {
+      return;
+    }
+
     const { x, y } = viewportCoordsToSceneCoords(event, this.state);
     const element = this.getElementAtPosition(x, y, { preferSelected: true });
 
