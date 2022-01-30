@@ -4194,7 +4194,7 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
-      if (!elementLocked) {
+      if (!elementLocked && elementType !== "freedraw") {
         resetCursor(this.canvas);
         this.setState({
           draggingElement: null,
