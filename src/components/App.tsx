@@ -727,6 +727,8 @@ class App extends React.Component<AppProps, AppState> {
                 appState: {
                   ...(scene.appState || this.state),
                   isLoading: false,
+                  penDetected: false,
+                  penMode: false,
                 },
                 commitToHistory: true,
               });
