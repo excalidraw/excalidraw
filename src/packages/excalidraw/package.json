@@ -79,6 +79,6 @@
     "start": "webpack serve --config webpack.dev-server.config.js "
   },
   "dependencies": {
-    "dotenv": "10.0.0"
+    "dotenv": "14.3.2"
   }
 }
