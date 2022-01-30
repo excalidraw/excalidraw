@@ -7666,10 +7666,10 @@ husky@7.0.4:
   resolved "https://registry.yarnpkg.com/husky/-/husky-7.0.4.tgz#242048245dc49c8fb1bf0cc7cfb98dd722531535"
   integrity sha512-vbaCKN2QLtP/vD4yvs6iz6hBEo6wkSzs8HpRah1Z6aGmF2KW5PdYuAd7uX5a+OyBZHBhd+TFLqgjUgytQr4RvQ==
 
-i18next-browser-languagedetector@6.1.2:
-  version "6.1.2"
-  resolved "https://registry.yarnpkg.com/i18next-browser-languagedetector/-/i18next-browser-languagedetector-6.1.2.tgz#68565a28b929cbc98ab6a56826ef2faf0e927ff8"
-  integrity sha512-YDzIGHhMRvr7M+c8B3EQUKyiMBhfqox4o1qkFvt4QXuu5V2cxf74+NCr+VEkUuU0y+RwcupA238eeolW1Yn80g==
+i18next-browser-languagedetector@6.1.3:
+  version "6.1.3"
+  resolved "https://registry.yarnpkg.com/i18next-browser-languagedetector/-/i18next-browser-languagedetector-6.1.3.tgz#9bc47fb4a5db86d567318895df343d2d1b9692f3"
+  integrity sha512-T+oGXHXtrur14CGnZZ7qQ07X38XJQEI00b/4ILrtO6xPbwTlQ1wtMZC2H+tBULixHuVUXv8LKbxfjyITJkezUg==
   dependencies:
     "@babel/runtime" "^7.14.6"
 
