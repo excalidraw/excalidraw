@@ -466,7 +466,7 @@ class App extends React.Component<AppProps, AppState> {
               elements={this.scene.getElements()}
               onCollabButtonClick={onCollabButtonClick}
               onLockToggle={this.toggleLock}
-              onPenLockToggle={this.togglePenLock}
+              onPenModeToggle={this.togglePenMode}
               onInsertElements={(elements) =>
                 this.addElementsFromPasteOrLibrary({
                   elements,
@@ -1500,10 +1500,10 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  togglePenLock = () => {
+  togglePenMode = () => {
     this.setState((prevState) => {
       return {
-        penLocked: !prevState.penLocked,
+        penMode: !prevState.penMode,
       };
     });
   };
@@ -2331,7 +2331,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor =
-        this.state.elementType === "freedraw" && this.state.penLocked
+        this.state.elementType === "freedraw" && this.state.penMode
           ? 1
           : distance / gesture.initialDistance;
 
@@ -2585,6 +2585,17 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
     this.maybeCleanupAfterMissingPointerUp(event);
 
+    //fires only once, if pen is detected, penMode is enabled
+    //the user can disable this by toggling the penMode button
+    if (!this.state.penDetected && event.pointerType === "pen") {
+      this.setState((prevState) => {
+        return {
+          penMode: !prevState.penMode,
+          penDetected: true,
+        };
+      });
+    }
+
     if (isPanning) {
       return;
     }
@@ -2629,6 +2640,10 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    const allowOnPointerDown =
+      (this.state.penMode && event.pointerType === "pen") ||
+      !this.state.penMode;
+
     if (this.state.elementType === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
       return;
@@ -2636,11 +2651,13 @@ class App extends React.Component<AppProps, AppState> {
       this.state.elementType === "arrow" ||
       this.state.elementType === "line"
     ) {
-      this.handleLinearElementOnPointerDown(
-        event,
-        this.state.elementType,
-        pointerDownState,
-      );
+      if (allowOnPointerDown) {
+        this.handleLinearElementOnPointerDown(
+          event,
+          this.state.elementType,
+          pointerDownState,
+        );
+      }
     } else if (this.state.elementType === "image") {
       // reset image preview on pointerdown
       setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
@@ -2662,17 +2679,14 @@ class App extends React.Component<AppProps, AppState> {
         y,
       });
     } else if (this.state.elementType === "freedraw") {
-      if (
-        (this.state.penLocked && event.pointerType === "pen") ||
-        !this.state.penLocked
-      ) {
+      if (allowOnPointerDown) {
         this.handleFreeDrawElementOnPointerDown(
           event,
           this.state.elementType,
           pointerDownState,
         );
       }
-    } else {
+    } else if (allowOnPointerDown) {
       this.createGenericElementOnPointerDown(
         this.state.elementType,
         pointerDownState,

@@ -3,14 +3,14 @@ import "./ToolIcon.scss";
 import clsx from "clsx";
 import { ToolButtonSize } from "./ToolButton";
 
-type PenLockIconProps = {
+type PenModeIconProps = {
   title?: string;
   name?: string;
   checked: boolean;
   onChange?(): void;
   zenModeEnabled?: boolean;
   isMobile?: boolean;
-  elementType: string;
+  penDetected: boolean;
 };
 
 const DEFAULT_SIZE: ToolButtonSize = "medium";
@@ -45,14 +45,26 @@ const ICONS = {
   ),
 };
 
-export const PenLockButton = (props: PenLockIconProps) => {
-  if (props.elementType !== "freedraw") {
-    return null;
+export const PenModeButton = (props: PenModeIconProps) => {
+  if (!props.penDetected) {
+    return (
+      <label
+        className={clsx(
+          "ToolIcon ToolIcon__penMode ToolIcon_type_floating",
+          `ToolIcon_size_${DEFAULT_SIZE}`,
+          {
+            "is-mobile": props.isMobile,
+          },
+        )}
+      >
+        <div className="ToolIcon__icon ToolIcon__hidden" />
+      </label>
+    );
   }
   return (
     <label
       className={clsx(
-        "ToolIcon ToolIcon__penLock ToolIcon_type_floating",
+        "ToolIcon ToolIcon__penMode ToolIcon_type_floating",
         `ToolIcon_size_${DEFAULT_SIZE}`,
         {
           "is-mobile": props.isMobile,
