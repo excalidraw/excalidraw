@@ -2701,7 +2701,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ): void => {
     // deal with opening context menu on touch devices
-    if (event.pointerType === "touch" || event.pointerType === "pen") {
+    if (event.pointerType === "touch") {
       invalidateContextMenu = false;
 
       if (touchTimeout) {
