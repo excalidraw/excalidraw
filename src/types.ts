@@ -417,4 +417,9 @@ export type ExcalidrawImperativeAPI = {
   ready: true;
   id: string;
   setLocalFont: (showOnPanel: boolean) => void;
+  selectElements: (elements: readonly ExcalidrawElement[]) => void;
+  sendBackward: (elements: readonly ExcalidrawElement[]) => void;
+  bringForward: (elements: readonly ExcalidrawElement[]) => void;
+  sendToBack: (elements: readonly ExcalidrawElement[]) => void;
+  bringToFront: (elements: readonly ExcalidrawElement[]) => void;
 };

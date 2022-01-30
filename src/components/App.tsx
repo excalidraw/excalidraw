@@ -353,6 +353,11 @@ class App extends React.Component<AppProps, AppState> {
         updateContainerSize: this.updateContainerSize,
         id: this.id,
         setLocalFont: this.setLocalFont,
+        selectElements: this.selectElements,
+        sendBackward: this.sendBackward,
+        bringForward: this.bringForward,
+        sendToBack: this.sendToBack,
+        bringToFront: this.bringToFront,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1629,6 +1634,58 @@ class App extends React.Component<AppProps, AppState> {
     showOnPanel: boolean,
   ) => {
     showFourthFont = showOnPanel;
+  };
+
+  public selectElements: ExcalidrawImperativeAPI["selectElements"] = (
+    elements: readonly ExcalidrawElement[],
+  ) => {
+    this.updateScene({
+      appState: {
+        ...this.state,
+        editingGroupId: null,
+        selectedElementIds: elements.reduce((map, element) => {
+          map[element.id] = true;
+          return map;
+        }, {} as any),
+      },
+      commitToHistory: true,
+    });
+  };
+
+  public bringToFront: ExcalidrawImperativeAPI["bringToFront"] = (
+    elements: readonly ExcalidrawElement[],
+  ) => {
+    this.selectElements(elements);
+    this.updateScene(
+      actionBringToFront.perform(this.scene.getElements(), this.state),
+    );
+  };
+
+  public bringForward: ExcalidrawImperativeAPI["bringForward"] = (
+    elements: readonly ExcalidrawElement[],
+  ) => {
+    this.selectElements(elements);
+    this.updateScene(
+      actionBringForward.perform(this.scene.getElements(), this.state),
+    );
+  };
+
+  public sendToBack: ExcalidrawImperativeAPI["sendToBack"] = (
+    elements: readonly ExcalidrawElement[],
+  ) => {
+    this.selectElements(elements);
+    this.updateScene(
+      actionSendToBack.perform(this.scene.getElements(), this.state),
+    );
+  };
+
+  public sendBackward: ExcalidrawImperativeAPI["sendBackward"] = (
+    elements: readonly ExcalidrawElement[],
+  ) => {
+    this.selectElements(elements);
+    this.updateScene(
+      actionSendBackward.perform(this.scene.getElements(), this.state),
+    );
   };
 
   public updateScene = withBatchedUpdates(
