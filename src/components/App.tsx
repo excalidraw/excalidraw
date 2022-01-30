@@ -4805,6 +4805,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       (event.nativeEvent.pointerType === "touch" ||
         (event.nativeEvent.pointerType === "pen" &&
+          // always allow if user uses a pen secondary button
           event.button !== POINTER_BUTTON.SECONDARY)) &&
       this.state.elementType !== "selection"
     ) {
