@@ -130,7 +130,7 @@ const APP_STATE_STORAGE_CONF = (<
   elementLocked: { browser: true, export: false, server: false },
   elementType: { browser: false, export: false, server: false },
   penMode: { browser: false, export: false, server: false },
-  penDetected: { browser: true, export: false, server: false },
+  penDetected: { browser: false, export: false, server: false },
   errorMessage: { browser: false, export: false, server: false },
   exportBackground: { browser: true, export: false, server: false },
   exportEmbedScene: { browser: true, export: false, server: false },

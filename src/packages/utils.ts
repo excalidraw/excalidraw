@@ -11,7 +11,9 @@ import { MIME_TYPES } from "../constants";
 
 type ExportOpts = {
   elements: readonly NonDeleted<ExcalidrawElement>[];
-  appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
+  appState?: Partial<
+    Omit<AppState, "offsetTop" | "offsetLeft" | "penMode" | "penDetected">
+  >;
   files: BinaryFiles | null;
   maxWidthOrHeight?: number;
   getDimensions?: (
@@ -35,7 +37,15 @@ export const exportToCanvas = ({
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
     getNonDeletedElements(restoredElements),
-    { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
+    {
+      ...restoredAppState,
+      offsetTop: 0,
+      offsetLeft: 0,
+      width: 0,
+      height: 0,
+      penMode: false,
+      penDetected: false,
+    },
     files || {},
     { exportBackground, viewBackgroundColor },
     (width: number, height: number) => {

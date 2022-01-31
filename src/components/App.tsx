@@ -770,8 +770,6 @@ class App extends React.Component<AppProps, AppState> {
           ? "selection"
           : scene.appState.elementType,
       isLoading: false,
-      penDetected: false,
-      penMode: false,
     };
     if (initialData?.scrollToContent) {
       scene.appState = {
@@ -2592,7 +2590,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.state.penDetected && event.pointerType === "pen") {
       this.setState((prevState) => {
         return {
-          penMode: !prevState.penMode,
+          penMode: true,
           penDetected: true,
         };
       });
