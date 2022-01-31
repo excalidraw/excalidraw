@@ -25,7 +25,6 @@ import { getElementAbsoluteCoords } from ".";
 import { getTooltipDiv } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
 
-const VALID_PREFIXES = ["https://", "http://", "ftp://"];
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
 const CONTAINER_PADDING = 8;
@@ -203,11 +202,11 @@ const getCoordsForPopover = (
 
 export const getAbsoluteLink = (link?: string) => {
   if (link) {
-    const match = VALID_PREFIXES.find((prefix) => link!.startsWith(prefix));
+    const protocolIndex = link.indexOf("://");
 
-    // prefix with https if no match
-    if (!match) {
-      link = `${VALID_PREFIXES[0]}${link}`;
+    // prefix with https if no protocol
+    if (protocolIndex === -1) {
+      link = `https://${link}`;
     }
   }
   return link;
