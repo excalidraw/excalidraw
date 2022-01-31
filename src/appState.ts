@@ -128,7 +128,7 @@ const APP_STATE_STORAGE_CONF = (<
   editingGroupId: { browser: true, export: false, server: false },
   editingLinearElement: { browser: false, export: false, server: false },
   elementLocked: { browser: true, export: false, server: false },
-  elementType: { browser: false, export: false, server: false },
+  elementType: { browser: true, export: false, server: false },
   penMode: { browser: false, export: false, server: false },
   penDetected: { browser: false, export: false, server: false },
   errorMessage: { browser: false, export: false, server: false },
