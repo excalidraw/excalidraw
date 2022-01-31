@@ -291,11 +291,11 @@ export const textWysiwyg = ({
   editable.onkeydown = (event) => {
     event.stopPropagation();
 
-    if (actionZoomIn.keyTest(event)) {
+    if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomIn);
       updateWysiwygStyle();
-    } else if (actionZoomOut.keyTest(event)) {
+    } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomOut);
       updateWysiwygStyle();
