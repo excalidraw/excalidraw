@@ -245,7 +245,6 @@ import {
   hideHyperlinkToolip,
   Hyperlink,
   isPointHittingLinkIcon,
-  shouldHideLinkPopup,
 } from "../element/Hyperlink";
 
 const IsMobileContext = React.createContext(false);
@@ -2584,18 +2583,7 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       hideHyperlinkToolip();
       this.detachLinkListener();
-      if (hitElement && hitElement.link) {
-        this.setState({ showHyperlinkPopup: true });
-      } else if (
-        selectedElements.length === 1 &&
-        selectedElements[0].link &&
-        shouldHideLinkPopup(selectedElements[0], this.state, [
-          event.clientX,
-          event.clientY,
-        ])
-      ) {
-        this.setState({ showHyperlinkPopup: false });
-      }
+
       if (this.state.elementType === "text") {
         setCursor(
           this.canvas,
@@ -2662,7 +2650,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
-      showHyperlinkPopup: false,
       showEditViewInLinkPopup: false,
     });
     this.savePointer(event.clientX, event.clientY, "down");

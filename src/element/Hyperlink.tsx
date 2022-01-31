@@ -8,12 +8,18 @@ import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
 import { editIcon, link, trash } from "../components/icons";
 import { t } from "../i18n";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import clsx from "clsx";
 import { KEYS } from "../keys";
 import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
 import { rotate } from "../math";
-import { MIME_TYPES } from "../constants";
+import { EVENT, MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from ".";
 import { getTooltipDiv } from "../components/Tooltip";
@@ -45,6 +51,7 @@ export const Hyperlink = ({
 
   const [isEditing, setIsEditing] = useState(editView);
   const [inputVal, setInputVal] = useState(linkVal);
+  const [autoHide, setAutoHide] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const showInput = isEditing || !linkVal;
 
@@ -68,6 +75,23 @@ export const Hyperlink = ({
     };
   }, [handleSubmit]);
 
+  useEffect(() => {
+    const handlePointerMove = (event: PointerEvent) => {
+      if (isEditing) {
+        return;
+      }
+      const shouldHide = shouldHideLinkPopup(element, appState, [
+        event.clientX,
+        event.clientY,
+      ]) as boolean;
+      setAutoHide(shouldHide);
+    };
+    window.addEventListener(EVENT.POINTER_MOVE, handlePointerMove, false);
+    return () => {
+      window.removeEventListener(EVENT.POINTER_MOVE, handlePointerMove, false);
+    };
+  }, [appState, element, isEditing]);
+
   const handleRemove = useCallback(() => {
     mutateElement(element, { link: null });
     if (showInput) {
@@ -80,7 +104,9 @@ export const Hyperlink = ({
     setIsEditing(true);
   };
   const { x, y } = getCoordsForPopover(element, appState);
-
+  if (autoHide) {
+    return null;
+  }
   return (
     <div
       className="excalidraw-hyperlinkContainer"
@@ -307,12 +333,24 @@ export const shouldHideLinkPopup = (
     { sceneX: element.x, sceneY: element.y },
     appState,
   );
-  const threshold = 15;
+
+  const threshold = 15 / appState.zoom.value;
+
+  // hitbox to prevent hiding when hovered in element bounding box
+  if (
+    clientX >= x - threshold &&
+    clientX <= x + element.width + threshold &&
+    clientY >= y - threshold &&
+    clientY <= y + element.height + threshold
+  ) {
+    return false;
+  }
+
   // hit box to prevent hiding when hovered in the vertical area between element and popover
   if (
     clientX >= x - threshold &&
     clientX <= x + element.width + threshold &&
-    clientY <= y &&
+    clientY >= y &&
     clientY <= y + SPACE_BOTTOM
   ) {
     return false;
