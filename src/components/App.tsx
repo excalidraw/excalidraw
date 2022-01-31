@@ -2583,7 +2583,9 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       hideHyperlinkToolip();
       this.detachLinkListener();
-
+      if (hitElement && hitElement.link && !this.state.showHyperlinkPopup) {
+        this.setState({ showHyperlinkPopup: true });
+      }
       if (this.state.elementType === "text") {
         setCursor(
           this.canvas,

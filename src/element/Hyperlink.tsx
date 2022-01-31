@@ -51,7 +51,6 @@ export const Hyperlink = ({
 
   const [isEditing, setIsEditing] = useState(editView);
   const [inputVal, setInputVal] = useState(linkVal);
-  const [autoHide, setAutoHide] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const showInput = isEditing || !linkVal;
 
@@ -84,13 +83,15 @@ export const Hyperlink = ({
         event.clientX,
         event.clientY,
       ]) as boolean;
-      setAutoHide(shouldHide);
+      if (shouldHide) {
+        onSubmit();
+      }
     };
     window.addEventListener(EVENT.POINTER_MOVE, handlePointerMove, false);
     return () => {
       window.removeEventListener(EVENT.POINTER_MOVE, handlePointerMove, false);
     };
-  }, [appState, element, isEditing]);
+  }, [appState, element, isEditing, onSubmit]);
 
   const handleRemove = useCallback(() => {
     mutateElement(element, { link: null });
@@ -104,9 +105,7 @@ export const Hyperlink = ({
     setIsEditing(true);
   };
   const { x, y } = getCoordsForPopover(element, appState);
-  if (autoHide) {
-    return null;
-  }
+
   return (
     <div
       className="excalidraw-hyperlinkContainer"
