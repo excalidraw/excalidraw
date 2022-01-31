@@ -191,11 +191,10 @@ const getCoordsForPopover = (
   appState: AppState,
 ) => {
   const { x: viewPortX, y: viewPortY } = sceneCoordsToViewportCoords(
-    { sceneX: element.x, sceneY: element.y },
+    { sceneX: element.x + element.width / 2, sceneY: element.y },
     appState,
   );
-  const x = viewPortX + element.width / 2 - CONTAINER_WIDTH / 2;
-
+  const x = viewPortX - CONTAINER_WIDTH / 2;
   const y = viewPortY - SPACE_BOTTOM;
   return { x, y };
 };
