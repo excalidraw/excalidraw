@@ -2584,10 +2584,11 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       hideHyperlinkToolip();
       this.detachLinkListener();
-      if (hitElement) {
+      if (hitElement && hitElement.link) {
         this.setState({ showHyperlinkPopup: true });
       } else if (
         selectedElements.length === 1 &&
+        selectedElements[0].link &&
         shouldHideLinkPopup(selectedElements[0], this.state, [
           event.clientX,
           event.clientY,
@@ -3199,7 +3200,7 @@ class App extends React.Component<AppProps, AppState> {
                       ...prevState.selectedElementIds,
                       [hitElement.id]: true,
                     },
-                    showHyperlinkPopup: true,
+                    showHyperlinkPopup: !!hitElement.link,
                   },
                   this.scene.getElements(),
                 );
@@ -3856,7 +3857,10 @@ class App extends React.Component<AppProps, AppState> {
                       }
                     : null),
                 },
-                showHyperlinkPopup: true,
+                showHyperlinkPopup: !!(
+                  elementsWithinSelection.length === 1 &&
+                  elementsWithinSelection[0].link
+                ),
               },
               this.scene.getElements(),
             ),
