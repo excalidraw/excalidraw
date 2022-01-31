@@ -329,6 +329,13 @@ export const shouldHideLinkPopup = (
   appState: AppState,
   [clientX, clientY]: Point,
 ): Boolean => {
+  if (
+    appState.draggingElement ||
+    appState.resizingElement ||
+    appState.isRotating
+  ) {
+    return true;
+  }
   const { x, y } = sceneCoordsToViewportCoords(
     { sceneX: element.x, sceneY: element.y },
     appState,
