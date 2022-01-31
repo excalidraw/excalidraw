@@ -140,6 +140,11 @@ export const Hyperlink = ({
           autoFocus
           onKeyDown={(event) => {
             event.stopPropagation();
+
+            // prevent cmd/ctrl+k shortcut when editing link
+            if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K) {
+              event.preventDefault();
+            }
             if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {
               handleSubmit();
             }
