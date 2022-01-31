@@ -25,6 +25,7 @@ import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
+import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 
 const normalizeText = (text: string) => {
@@ -60,7 +61,6 @@ const getTransform = (
 
 export const textWysiwyg = ({
   id,
-  appState,
   onChange,
   onSubmit,
   getViewportCoords,
@@ -70,7 +70,6 @@ export const textWysiwyg = ({
   app,
 }: {
   id: ExcalidrawElement["id"];
-  appState: AppState;
   onChange?: (text: string) => void;
   onSubmit: (data: {
     text: string;
@@ -102,6 +101,7 @@ export const textWysiwyg = ({
   let originalContainerHeight: number;
 
   const updateWysiwygStyle = () => {
+    const appState = app.state;
     const updatedElement = Scene.getScene(element)?.getElement(
       id,
     ) as ExcalidrawTextElement;
@@ -291,7 +291,15 @@ export const textWysiwyg = ({
   editable.onkeydown = (event) => {
     event.stopPropagation();
 
-    if (actionDecreaseFontSize.keyTest(event)) {
+    if (actionZoomIn.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionZoomIn);
+      updateWysiwygStyle();
+    } else if (actionZoomOut.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionZoomOut);
+      updateWysiwygStyle();
+    } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionIncreaseFontSize);

@@ -2,7 +2,7 @@ import ReactDOM from "react-dom";
 import ExcalidrawApp from "../excalidraw-app";
 import { render, screen } from "../tests/test-utils";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { fireEvent } from "../tests/test-utils";
 import { BOUND_TEXT_PADDING, FONT_FAMILY } from "../constants";
 import {
@@ -18,6 +18,8 @@ const mouse = new Pointer("mouse");
 
 describe("textWysiwyg", () => {
   describe("Test unbounded text", () => {
+    const { h } = window;
+
     let textarea: HTMLTextAreaElement;
     let textElement: ExcalidrawTextElement;
     beforeEach(async () => {
@@ -196,6 +198,38 @@ describe("textWysiwyg", () => {
         }),
       );
       expect(textElement.fontSize).toBe(origFontSize);
+    });
+
+    it("zooming via keyboard should zoom canvas", () => {
+      expect(h.state.zoom.value).toBe(1);
+      textarea.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          code: CODES.MINUS,
+          ctrlKey: true,
+        }),
+      );
+      expect(h.state.zoom.value).toBe(0.9);
+      textarea.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          code: CODES.NUM_SUBTRACT,
+          ctrlKey: true,
+        }),
+      );
+      expect(h.state.zoom.value).toBe(0.8);
+      textarea.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          code: CODES.NUM_ADD,
+          ctrlKey: true,
+        }),
+      );
+      expect(h.state.zoom.value).toBe(0.9);
+      textarea.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          code: CODES.EQUAL,
+          ctrlKey: true,
+        }),
+      );
+      expect(h.state.zoom.value).toBe(1);
     });
   });
 
