@@ -61,9 +61,6 @@ export const Hyperlink = ({
 
     const link = getAbsoluteLink(inputRef.current.value);
 
-    if (link === element.link) {
-      return;
-    }
     mutateElement(element, { link });
     setIsEditing(false);
   }, [element]);
@@ -103,11 +100,11 @@ export const Hyperlink = ({
 
   const handleRemove = useCallback(() => {
     mutateElement(element, { link: null });
-    if (showInput) {
+    if (isEditing) {
       inputRef.current!.value = "";
     }
     onSubmit();
-  }, [onSubmit, element, showInput]);
+  }, [onSubmit, element, isEditing]);
 
   const onEdit = () => {
     setIsEditing(true);
@@ -140,7 +137,6 @@ export const Hyperlink = ({
           autoFocus
           onKeyDown={(event) => {
             event.stopPropagation();
-
             // prevent cmd/ctrl+k shortcut when editing link
             if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K) {
               event.preventDefault();
