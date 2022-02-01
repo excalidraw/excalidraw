@@ -105,7 +105,7 @@
     "excalidrawLib": "Excalidraw-Bibliothek",
     "decreaseFontSize": "Schrift verkleinern",
     "increaseFontSize": "Schrift vergrößern",
-    "unbindText": ""
+    "unbindText": "Text lösen"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
