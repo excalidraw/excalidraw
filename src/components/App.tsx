@@ -26,6 +26,7 @@ import {
   actionToggleGridMode,
   actionToggleStats,
   actionToggleZenMode,
+  actionUnbindText,
   actionUngroup,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
@@ -5031,6 +5032,10 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
     } else if (type === "element") {
+      const elementsWithUnbindedText = getSelectedElements(
+        elements,
+        this.state,
+      ).some((element) => !hasBoundTextElement(element));
       if (this.state.viewModeEnabled) {
         ContextMenu.push({
           options: [navigator.clipboard && actionCopy, ...options],
@@ -5064,6 +5069,7 @@ class App extends React.Component<AppProps, AppState> {
             actionPasteStyles,
             separator,
             maybeGroupAction && actionGroup,
+            !elementsWithUnbindedText && actionUnbindText,
             maybeUngroupAction && actionUngroup,
             (maybeGroupAction || maybeUngroupAction) && separator,
             actionAddToLibrary,
