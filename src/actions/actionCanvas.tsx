@@ -9,7 +9,7 @@ import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
-import { getNewZoom } from "../scene/zoom";
+import { getStateForZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
@@ -74,17 +74,18 @@ export const actionClearCanvas = register({
 
 export const actionZoomIn = register({
   name: "zoomIn",
-  perform: (_elements, appState) => {
-    const zoom = getNewZoom(
-      getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
-      appState.zoom,
-      { left: appState.offsetLeft, top: appState.offsetTop },
-      { x: appState.width / 2, y: appState.height / 2 },
-    );
+  perform: (_elements, appState, _, app) => {
     return {
       appState: {
         ...appState,
-        zoom,
+        ...getStateForZoom(
+          {
+            viewportX: appState.width / 2 + appState.offsetLeft,
+            viewportY: appState.height / 2 + appState.offsetTop,
+            nextZoom: getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
+          },
+          appState,
+        ),
       },
       commitToHistory: false,
     };
@@ -108,18 +109,18 @@ export const actionZoomIn = register({
 
 export const actionZoomOut = register({
   name: "zoomOut",
-  perform: (_elements, appState) => {
-    const zoom = getNewZoom(
-      getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
-      appState.zoom,
-      { left: appState.offsetLeft, top: appState.offsetTop },
-      { x: appState.width / 2, y: appState.height / 2 },
-    );
-
+  perform: (_elements, appState, _, app) => {
     return {
       appState: {
         ...appState,
-        zoom,
+        ...getStateForZoom(
+          {
+            viewportX: appState.width / 2 + appState.offsetLeft,
+            viewportY: appState.height / 2 + appState.offsetTop,
+            nextZoom: getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
+          },
+          appState,
+        ),
       },
       commitToHistory: false,
     };
@@ -143,18 +144,17 @@ export const actionZoomOut = register({
 
 export const actionResetZoom = register({
   name: "resetZoom",
-  perform: (_elements, appState) => {
+  perform: (_elements, appState, _, app) => {
     return {
       appState: {
         ...appState,
-        zoom: getNewZoom(
-          1 as NormalizedZoomValue,
-          appState.zoom,
-          { left: appState.offsetLeft, top: appState.offsetTop },
+        ...getStateForZoom(
           {
-            x: appState.width / 2,
-            y: appState.height / 2,
+            viewportX: appState.width / 2 + appState.offsetLeft,
+            viewportY: appState.height / 2 + appState.offsetTop,
+            nextZoom: getNormalizedZoom(1),
           },
+          appState,
         ),
       },
       commitToHistory: false,
@@ -216,18 +216,13 @@ export const zoomToFitElements = (
       ? getCommonBounds(selectedElements)
       : getCommonBounds(nonDeletedElements);
 
-  const zoomValue = zoomValueToFitBoundsOnViewport(
-    commonBounds,
-    {
+  const newZoom = {
+    value: zoomValueToFitBoundsOnViewport(commonBounds, {
       width: appState.width - appState.width * margin,
       height: appState.height - appState.height * margin,
-    },
+    }),
     maxZoom,
-  );
-  const newZoom = getNewZoom(zoomValue, appState.zoom, {
-    left: appState.offsetLeft,
-    top: appState.offsetTop,
-  });
+  };
 
   const [x1, y1, x2, y2] = commonBounds;
   const centerX = (x1 + x2) / 2;
