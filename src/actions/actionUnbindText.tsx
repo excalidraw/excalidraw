@@ -1,8 +1,9 @@
 import { getNonDeletedElements } from "../element";
 import { mutateElement } from "../element/mutateElement";
-import { getBoundTextElement } from "../element/textElement";
+import { getBoundTextElement, measureText } from "../element/textElement";
 import { ExcalidrawTextElement } from "../element/types";
 import { getSelectedElements } from "../scene";
+import { getFontString } from "../utils";
 import { register } from "./register";
 
 export const actionUnbindText = register({
@@ -16,9 +17,16 @@ export const actionUnbindText = register({
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
+        const { width, height, baseline } = measureText(
+          boundTextElement.originalText,
+          getFontString(boundTextElement),
+        );
         mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
-          originalText: boundTextElement.text,
+          width,
+          height,
+          baseline,
+          text: boundTextElement.originalText,
         });
         mutateElement(element, {
           boundElements: element.boundElements?.filter(
