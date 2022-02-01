@@ -105,7 +105,7 @@
     "excalidrawLib": "Excalidraw bibliotek",
     "decreaseFontSize": "Minska fontstorleken",
     "increaseFontSize": "Öka fontstorleken",
-    "unbindText": ""
+    "unbindText": "Koppla bort text"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
