@@ -104,7 +104,8 @@
     "personalLib": "Bibliotèca personala",
     "excalidrawLib": "Bibliotèca Excalidraw",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
