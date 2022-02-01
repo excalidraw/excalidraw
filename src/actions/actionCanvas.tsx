@@ -217,11 +217,14 @@ export const zoomToFitElements = (
       : getCommonBounds(nonDeletedElements);
 
   const newZoom = {
-    value: zoomValueToFitBoundsOnViewport(commonBounds, {
-      width: appState.width - appState.width * margin,
-      height: appState.height - appState.height * margin,
-    }),
-    maxZoom,
+    value: zoomValueToFitBoundsOnViewport(
+      commonBounds,
+      {
+        width: appState.width - appState.width * margin,
+        height: appState.height - appState.height * margin,
+      },
+      maxZoom,
+    ),
   };
 
   const [x1, y1, x2, y2] = commonBounds;
