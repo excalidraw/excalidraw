@@ -104,7 +104,8 @@
     "personalLib": "Liburutegi pertsonala",
     "excalidrawLib": "Excalidraw liburutegia",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Garbitu oihala",
