@@ -104,7 +104,8 @@
     "personalLib": "Biblioteca Pessoal",
     "excalidrawLib": "Biblioteca do Excalidraw",
     "decreaseFontSize": "Diminuir o tamanho da fonte",
-    "increaseFontSize": "Aumentar o tamanho da fonte"
+    "increaseFontSize": "Aumentar o tamanho da fonte",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
