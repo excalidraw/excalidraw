@@ -105,7 +105,7 @@
     "excalidrawLib": "Excalidraw bibliotheek",
     "decreaseFontSize": "",
     "increaseFontSize": "",
-    "unbindText": ""
+    "unbindText": "Ontkoppel tekst"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
