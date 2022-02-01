@@ -104,7 +104,8 @@
     "personalLib": "Pustaka Pribadi",
     "excalidrawLib": "Pustaka Excalidraw",
     "decreaseFontSize": "Kecilkan ukuran font",
-    "increaseFontSize": "Besarkan ukuran font"
+    "increaseFontSize": "Besarkan ukuran font",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
