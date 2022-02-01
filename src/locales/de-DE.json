@@ -104,7 +104,8 @@
     "personalLib": "Persönliche Bibliothek",
     "excalidrawLib": "Excalidraw-Bibliothek",
     "decreaseFontSize": "Schrift verkleinern",
-    "increaseFontSize": "Schrift vergrößern"
+    "increaseFontSize": "Schrift vergrößern",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
