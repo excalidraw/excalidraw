@@ -104,7 +104,8 @@
     "personalLib": "المكتبة الشخصية",
     "excalidrawLib": "مكتبتنا",
     "decreaseFontSize": "تصغير حجم الخط",
-    "increaseFontSize": "تكبير حجم الخط"
+    "increaseFontSize": "تكبير حجم الخط",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
