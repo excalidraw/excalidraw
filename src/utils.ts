@@ -223,8 +223,9 @@ export const viewportCoordsToSceneCoords = (
   },
 ) => {
   const invScale = 1 / zoom.value;
-  const x = (clientX - zoom.translation.x - offsetLeft) * invScale - scrollX;
-  const y = (clientY - zoom.translation.y - offsetTop) * invScale - scrollY;
+  const x = (clientX - offsetLeft) * invScale - scrollX;
+  const y = (clientY - offsetTop) * invScale - scrollY;
+
   return { x, y };
 };
 
@@ -244,8 +245,8 @@ export const sceneCoordsToViewportCoords = (
     scrollY: number;
   },
 ) => {
-  const x = (sceneX + scrollX) * zoom.value + zoom.translation.x + offsetLeft;
-  const y = (sceneY + scrollY) * zoom.value + zoom.translation.y + offsetTop;
+  const x = (sceneX + scrollX) * zoom.value + offsetLeft;
+  const y = (sceneY + scrollY) * zoom.value + offsetTop;
   return { x, y };
 };
 
