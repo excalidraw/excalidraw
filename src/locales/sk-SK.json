@@ -104,7 +104,8 @@
     "personalLib": "Moja knižnica",
     "excalidrawLib": "Excalidraw knižnica",
     "decreaseFontSize": "Zmenšiť veľkosť písma",
-    "increaseFontSize": "Zväčšiť veľkosť písma"
+    "increaseFontSize": "Zväčšiť veľkosť písma",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
