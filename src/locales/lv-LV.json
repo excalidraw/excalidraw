@@ -104,7 +104,8 @@
     "personalLib": "Personīgā bibliotēka",
     "excalidrawLib": "Excalidraw bibliotēka",
     "decreaseFontSize": "Samazināt fonta izmēru",
-    "increaseFontSize": "Palielināt fonta izmēru"
+    "increaseFontSize": "Palielināt fonta izmēru",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
@@ -151,7 +152,7 @@
     "couldNotCreateShareableLinkTooBig": "Nevarēja izveidot kopīgojamo saiti – aina ir par lielu",
     "couldNotLoadInvalidFile": "Nevarēja ielādēt nederīgu datni",
     "importBackendFailed": "Ielāde no krātuves neizdevās.",
-    "cannotExportEmptyCanvas": "Nevar eksportēt tukšu zīmējumu.",
+    "cannotExportEmptyCanvas": "Nevar eksportēt tukšu tāfeli.",
     "couldNotCopyToClipboard": "Neizdevās kopēt starpliktuvē. Mēģiniet vēlreiz, izmantojot pārlūku Chrome.",
     "decryptFailed": "Nevarēja atšifrēt datus.",
     "uploadedSecurly": "Augšuplāde nodrošināta ar šifrēšanu no gala līdz galam, kas nozīmē, ka Excalidraw serveri un trešās puses nevar lasīt saturu.",
