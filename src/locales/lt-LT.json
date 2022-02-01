@@ -104,7 +104,8 @@
     "personalLib": "Asmeninė biblioteka",
     "excalidrawLib": "Exaclidraw biblioteka",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "",
