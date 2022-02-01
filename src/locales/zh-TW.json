@@ -104,7 +104,8 @@
     "personalLib": "個人資料庫",
     "excalidrawLib": "Excalidraw 資料庫",
     "decreaseFontSize": "縮小文字",
-    "increaseFontSize": "放大文字"
+    "increaseFontSize": "放大文字",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
