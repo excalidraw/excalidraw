@@ -104,7 +104,8 @@
     "personalLib": "개인 라이브러리",
     "excalidrawLib": "Excalidraw 라이브러리",
     "decreaseFontSize": "폰트 사이즈 줄이기",
-    "increaseFontSize": "폰트 사이즈 키우기"
+    "increaseFontSize": "폰트 사이즈 키우기",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
