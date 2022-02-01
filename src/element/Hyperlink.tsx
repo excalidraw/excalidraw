@@ -62,7 +62,7 @@ export const Hyperlink = ({
       return;
     }
 
-    const link = getAbsoluteLink(inputRef.current.value);
+    const link = normalizeLink(inputRef.current.value);
 
     mutateElement(element, { link });
     setIsEditing(false);
@@ -203,12 +203,11 @@ const getCoordsForPopover = (
   return { x, y };
 };
 
-export const getAbsoluteLink = (link?: string) => {
+export const normalizeLink = (link: string) => {
+  link = link.trim();
   if (link) {
-    const protocolIndex = link.indexOf("://");
-
-    // prefix with https if no protocol
-    if (protocolIndex === -1) {
+    // prefix with protocol if not fully-qualified
+    if (!link.includes("://") && !link.startsWith("[")) {
       link = `https://${link}`;
     }
   }

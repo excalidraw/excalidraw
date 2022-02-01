@@ -241,7 +241,7 @@ import {
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
-  getAbsoluteLink,
+  normalizeLink,
   showHyperlinkTooltip,
   hideHyperlinkToolip,
   Hyperlink,
@@ -2345,7 +2345,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private redirectToLink = () => {
-    window.open(getAbsoluteLink(this.hitLinkElement.link!));
+    window.open(normalizeLink(this.hitLinkElement.link!));
   };
   private attachLinkListener = () => {
     this.canvas?.addEventListener("click", this.redirectToLink);
