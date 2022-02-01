@@ -104,7 +104,8 @@
     "personalLib": "Persoonlijke bibliotheek",
     "excalidrawLib": "Excalidraw bibliotheek",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
