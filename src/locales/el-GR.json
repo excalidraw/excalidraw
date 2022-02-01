@@ -104,7 +104,8 @@
     "personalLib": "Προσωπική Βιβλιοθήκη",
     "excalidrawLib": "Βιβλιοθήκη Excalidraw",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
