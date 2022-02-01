@@ -104,7 +104,8 @@
     "personalLib": "Personligt bibliotek",
     "excalidrawLib": "Excalidraw bibliotek",
     "decreaseFontSize": "Minska fontstorleken",
-    "increaseFontSize": "Öka fontstorleken"
+    "increaseFontSize": "Öka fontstorleken",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
