@@ -104,7 +104,8 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Limpar a área de desenho e redefinir a cor de fundo",
