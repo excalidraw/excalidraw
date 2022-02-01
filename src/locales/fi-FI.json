@@ -104,7 +104,8 @@
     "personalLib": "Oma kirjasto",
     "excalidrawLib": "Excalidraw kirjasto",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
