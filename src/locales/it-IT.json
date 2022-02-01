@@ -104,7 +104,8 @@
     "personalLib": "Libreria Personale",
     "excalidrawLib": "Libreria di Excalidraw",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Svuota la tela",
