@@ -104,7 +104,8 @@
     "personalLib": "Bibliothèque personnelle",
     "excalidrawLib": "Bibliothèque Excalidraw",
     "decreaseFontSize": "Réduire la taille de police",
-    "increaseFontSize": "Augmenter la taille de police"
+    "increaseFontSize": "Augmenter la taille de police",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
