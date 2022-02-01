@@ -104,7 +104,8 @@
     "personalLib": "Tamkarḍit tudmawant",
     "excalidrawLib": "Tamkarḍit n Excalidraw",
     "decreaseFontSize": "Senqes tiddi n tsefsit",
-    "increaseFontSize": "Sali tiddi n tsefsit"
+    "increaseFontSize": "Sali tiddi n tsefsit",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
