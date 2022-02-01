@@ -104,7 +104,8 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
