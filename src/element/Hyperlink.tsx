@@ -27,6 +27,7 @@ import { Bounds } from "./bounds";
 import { getTooltipDiv } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
 import { isPointHittingElementBoundingBox } from "./collision";
+import { getElementAbsoluteCoords } from "./";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
