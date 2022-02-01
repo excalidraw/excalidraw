@@ -104,7 +104,8 @@
     "personalLib": "個人ライブラリ",
     "excalidrawLib": "Excalidrawライブラリ",
     "decreaseFontSize": "フォントサイズを縮小",
-    "increaseFontSize": "フォントサイズを拡大"
+    "increaseFontSize": "フォントサイズを拡大",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
