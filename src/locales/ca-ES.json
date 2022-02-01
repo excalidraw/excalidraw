@@ -104,7 +104,8 @@
     "personalLib": "Biblioteca personal",
     "excalidrawLib": "Biblioteca d'Excalidraw",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
