@@ -104,7 +104,8 @@
     "personalLib": "Personlig bibliotek",
     "excalidrawLib": "Excalidraw-bibliotek",
     "decreaseFontSize": "Reduser skriftstørrelse",
-    "increaseFontSize": "Øk skriftstørrelse"
+    "increaseFontSize": "Øk skriftstørrelse",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
