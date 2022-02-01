@@ -104,7 +104,8 @@
     "personalLib": "தனக்குரிய நூலகம்",
     "excalidrawLib": "எக்ஸ்கேலிட்ரா நூலகம்",
     "decreaseFontSize": "எழுத்துரு அளவைக் குறை",
-    "increaseFontSize": "எழுத்துரு அளவை அதிகரி"
+    "increaseFontSize": "எழுத்துரு அளவை அதிகரி",
+    "unbindText": ""
   },
   "buttons": {
     "clearReset": "கித்தானை அகரமாக்கு",
