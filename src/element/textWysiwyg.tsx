@@ -25,6 +25,7 @@ import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
+import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 
 const normalizeText = (text: string) => {
@@ -45,24 +46,21 @@ const getTransform = (
   maxWidth: number,
   maxHeight: number,
 ) => {
-  const { zoom, offsetTop, offsetLeft } = appState;
+  const { zoom } = appState;
   const degree = (180 * angle) / Math.PI;
-  // offsets must be multiplied by 2 to account for the division by 2 of
-  // the whole expression afterwards
-  let translateX = ((width - offsetLeft * 2) * (zoom.value - 1)) / 2;
-  let translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
+  let translateX = (width * (zoom.value - 1)) / 2;
+  let translateY = (height * (zoom.value - 1)) / 2;
   if (width > maxWidth && zoom.value !== 1) {
-    translateX = (maxWidth / 2) * (zoom.value - 1);
+    translateX = (maxWidth * (zoom.value - 1)) / 2;
   }
   if (height > maxHeight && zoom.value !== 1) {
-    translateY = ((maxHeight - offsetTop * 2) * (zoom.value - 1)) / 2;
+    translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
 export const textWysiwyg = ({
   id,
-  appState,
   onChange,
   onSubmit,
   getViewportCoords,
@@ -72,7 +70,6 @@ export const textWysiwyg = ({
   app,
 }: {
   id: ExcalidrawElement["id"];
-  appState: AppState;
   onChange?: (text: string) => void;
   onSubmit: (data: {
     text: string;
@@ -104,6 +101,7 @@ export const textWysiwyg = ({
   let originalContainerHeight: number;
 
   const updateWysiwygStyle = () => {
+    const appState = app.state;
     const updatedElement = Scene.getScene(element)?.getElement(
       id,
     ) as ExcalidrawTextElement;
@@ -173,29 +171,12 @@ export const textWysiwyg = ({
         ? approxLineHeight
         : updatedElement.height / lines.length;
       if (!container) {
-        maxWidth =
-          (appState.offsetLeft + appState.width - viewportX - 8) /
-            appState.zoom.value -
-          // margin-right of parent if any
-          Number(
-            getComputedStyle(
-              excalidrawContainer?.parentNode as Element,
-            ).marginRight.slice(0, -2),
-          );
+        maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
       }
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
-        (appState.height -
-          viewportY -
-          // There is a ~14px difference which keeps on increasing
-          // with every zoom step when offset present hence I am subtracting it here
-          // However this is not the best fix and breaks in
-          // few scenarios
-          (appState.offsetTop
-            ? ((appState.zoom.value * 100 - 100) / 10) * 14
-            : 0)) /
-        appState.zoom.value;
+        (appState.height - viewportY) / appState.zoom.value;
       const angle = container ? container.angle : updatedElement.angle;
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
@@ -310,7 +291,15 @@ export const textWysiwyg = ({
   editable.onkeydown = (event) => {
     event.stopPropagation();
 
-    if (actionDecreaseFontSize.keyTest(event)) {
+    if (!event.shiftKey && actionZoomIn.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionZoomIn);
+      updateWysiwygStyle();
+    } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionZoomOut);
+      updateWysiwygStyle();
+    } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionIncreaseFontSize);
