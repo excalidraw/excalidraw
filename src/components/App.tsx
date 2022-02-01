@@ -809,6 +809,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public async componentDidMount() {
+    this.unmounted = false;
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
