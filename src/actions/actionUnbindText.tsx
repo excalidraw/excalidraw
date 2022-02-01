@@ -1,10 +1,7 @@
-import { getNonDeletedElements, isTextElement } from "../element";
+import { getNonDeletedElements } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import { getBoundTextElement } from "../element/textElement";
-import {
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-} from "../element/types";
+import { ExcalidrawTextElement } from "../element/types";
 import { getSelectedElements } from "../scene";
 import { register } from "./register";
 
@@ -24,10 +21,7 @@ export const actionUnbindText = register({
         });
         mutateElement(element, {
           boundElements: element.boundElements?.filter(
-            (ele) =>
-              !isTextElement(
-                ele as ExcalidrawTextElement | ExcalidrawLinearElement,
-              ),
+            (ele) => ele.id !== boundTextElement.id,
           ),
         });
       }
