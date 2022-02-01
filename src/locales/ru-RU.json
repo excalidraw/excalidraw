@@ -105,7 +105,7 @@
     "excalidrawLib": "Библиотека Excalidraw",
     "decreaseFontSize": "Уменьшить шрифт",
     "increaseFontSize": "Увеличить шрифт",
-    "unbindText": ""
+    "unbindText": "Отвязать текст"
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
