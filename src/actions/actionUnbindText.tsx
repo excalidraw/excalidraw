@@ -1,6 +1,6 @@
 import { getNonDeletedElements, isTextElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
-import { hasBoundTextElement } from "../element/typeChecks";
+import { getBoundTextElement } from "../element/textElement";
 import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -17,7 +17,11 @@ export const actionUnbindText = register({
       appState,
     );
     selectedElements.forEach((element) => {
-      if (hasBoundTextElement(element)) {
+      const boundTextElement = getBoundTextElement(element);
+      if (boundTextElement) {
+        mutateElement(boundTextElement as ExcalidrawTextElement, {
+          containerId: null,
+        });
         mutateElement(element, {
           boundElements: element.boundElements?.filter(
             (ele) =>
