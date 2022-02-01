@@ -18,6 +18,7 @@ export const actionUnbindText = register({
       if (boundTextElement) {
         mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
+          originalText: boundTextElement.text,
         });
         mutateElement(element, {
           boundElements: element.boundElements?.filter(
