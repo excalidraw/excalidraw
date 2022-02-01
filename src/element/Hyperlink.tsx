@@ -1,5 +1,8 @@
 import { AppState, Point } from "../types";
-import { sceneCoordsToViewportCoords } from "../utils";
+import {
+  sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
+} from "../utils";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
 
@@ -21,9 +24,9 @@ import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
 import { rotate } from "../math";
 import { EVENT, MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
-import { getElementAbsoluteCoords } from ".";
 import { getTooltipDiv } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
+import { isPointHittingElementBoundingBox } from "./collision";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -341,29 +344,23 @@ export const shouldHideLinkPopup = (
   appState: AppState,
   [clientX, clientY]: Point,
 ): Boolean => {
-  const { x, y } = sceneCoordsToViewportCoords(
-    { sceneX: element.x, sceneY: element.y },
+  const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+    { clientX, clientY },
     appState,
   );
 
   const threshold = 15 / appState.zoom.value;
-
   // hitbox to prevent hiding when hovered in element bounding box
-  if (
-    clientX >= x - threshold &&
-    clientX <= x + element.width + threshold &&
-    clientY >= y - threshold &&
-    clientY <= y + element.height + threshold
-  ) {
+  if (isPointHittingElementBoundingBox(element, [sceneX, sceneY], threshold)) {
     return false;
   }
 
   // hit box to prevent hiding when hovered in the vertical area between element and popover
   if (
-    clientX >= x - threshold &&
-    clientX <= x + element.width + threshold &&
-    clientY >= y &&
-    clientY <= y + SPACE_BOTTOM
+    sceneX >= element.x &&
+    sceneX <= element.x + element.width &&
+    sceneY <= element.y &&
+    sceneY >= element.y - SPACE_BOTTOM
   ) {
     return false;
   }
