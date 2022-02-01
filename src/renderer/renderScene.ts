@@ -231,10 +231,7 @@ export const renderScene = (
   }
 
   // Apply zoom
-  const zoomTranslationX = renderConfig.zoom.translation.x;
-  const zoomTranslationY = renderConfig.zoom.translation.y;
   context.save();
-  context.translate(zoomTranslationX, zoomTranslationY);
   context.scale(renderConfig.zoom.value, renderConfig.zoom.value);
 
   // Grid
@@ -242,14 +239,10 @@ export const renderScene = (
     strokeGrid(
       context,
       appState.gridSize,
-      -Math.ceil(
-        zoomTranslationX / renderConfig.zoom.value / appState.gridSize,
-      ) *
+      -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
         appState.gridSize +
         (renderConfig.scrollX % appState.gridSize),
-      -Math.ceil(
-        zoomTranslationY / renderConfig.zoom.value / appState.gridSize,
-      ) *
+      -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
         appState.gridSize +
         (renderConfig.scrollY % appState.gridSize),
       normalizedCanvasWidth / renderConfig.zoom.value,

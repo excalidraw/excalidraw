@@ -262,7 +262,6 @@ export const restoreAppState = (
       typeof appState.zoom === "number"
         ? {
             value: appState.zoom as NormalizedZoomValue,
-            translation: defaultAppState.zoom.translation,
           }
         : appState.zoom || defaultAppState.zoom,
   };

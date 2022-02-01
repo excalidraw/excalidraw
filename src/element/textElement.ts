@@ -175,7 +175,6 @@ export const measureText = (
   container.style.whiteSpace = "pre";
   container.style.font = font;
   container.style.minHeight = "1em";
-
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
     container.style.width = `${String(maxWidth)}px`;

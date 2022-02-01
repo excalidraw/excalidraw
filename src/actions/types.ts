@@ -104,6 +104,7 @@ export type ActionName =
   | "toggleTheme"
   | "increaseFontSize"
   | "decreaseFontSize"
+  | "unbindText"
   | "link";
 
 export type PanelComponentProps = {
