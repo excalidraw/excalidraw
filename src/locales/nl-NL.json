@@ -188,7 +188,7 @@
     "text": "Tekst",
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
-    "penMode": ""
+    "penMode": "Voorkom pinch-zoom en accepteer freedraw invoer alleen van pen"
   },
   "headings": {
     "canvasActions": "Canvasacties",
