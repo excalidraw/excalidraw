@@ -1040,6 +1040,14 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    // Hide hyperlink popup if shown when element type is not selection
+    if (
+      prevState.elementType === "selection" &&
+      this.state.elementType !== "selection" &&
+      this.state.showHyperlinkPopup
+    ) {
+      this.setState({ showHyperlinkPopup: false });
+    }
     if (prevProps.langCode !== this.props.langCode) {
       this.updateLanguage();
     }
@@ -2609,7 +2617,12 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       hideHyperlinkToolip();
       this.detachLinkListener();
-      if (hitElement && hitElement.link && !this.state.showHyperlinkPopup) {
+      if (
+        hitElement &&
+        hitElement.link &&
+        this.state.selectedElementIds[hitElement.id] &&
+        !this.state.showHyperlinkPopup
+      ) {
         this.setState({ showHyperlinkPopup: true });
       }
       if (this.state.elementType === "text") {

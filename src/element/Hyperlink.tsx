@@ -78,7 +78,6 @@ export const Hyperlink = ({
 
   useEffect(() => {
     let timeoutId: number | null = null;
-
     const handlePointerMove = (event: PointerEvent) => {
       if (isEditing) {
         return;
