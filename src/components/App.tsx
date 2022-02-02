@@ -2643,7 +2643,8 @@ class App extends React.Component<AppProps, AppState> {
     const allowOnPointerDown =
       !this.state.penMode ||
       event.pointerType !== "touch" ||
-      this.state.elementType === "selection";
+      this.state.elementType === "selection" ||
+      this.state.elementType === "text";
 
     if (!allowOnPointerDown) {
       return;
