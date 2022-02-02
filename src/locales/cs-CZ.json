@@ -187,7 +187,8 @@
     "freedraw": "Kreslení",
     "text": "Text",
     "library": "",
-    "lock": ""
+    "lock": "",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "",
