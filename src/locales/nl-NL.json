@@ -187,7 +187,8 @@
     "freedraw": "Tekenen",
     "text": "Tekst",
     "library": "Bibliotheek",
-    "lock": "Geselecteerde tool actief houden na tekenen"
+    "lock": "Geselecteerde tool actief houden na tekenen",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Canvasacties",
