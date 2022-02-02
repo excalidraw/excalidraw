@@ -187,7 +187,8 @@
     "freedraw": "Desenare",
     "text": "Text",
     "library": "Bibliotecă",
-    "lock": "Menține activ instrumentul selectat după desenare"
+    "lock": "Menține activ instrumentul selectat după desenare",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
