@@ -46,6 +46,8 @@ export const getDefaultAppState = (): Omit<
     elementType: "selection",
     textElementSubtype: TEXT_SUBTYPE_DEFAULT,
     textOpts: {},
+    penMode: false,
+    penDetected: false,
     errorMessage: null,
     exportBackground: true,
     exportScale: defaultExportScale,
@@ -80,7 +82,9 @@ export const getDefaultAppState = (): Omit<
     toastMessage: null,
     viewBackgroundColor: oc.white,
     zenModeEnabled: false,
-    zoom: { value: 1 as NormalizedZoomValue, translation: { x: 0, y: 0 } },
+    zoom: {
+      value: 1 as NormalizedZoomValue,
+    },
     viewModeEnabled: false,
     pendingImageElement: null,
   };
@@ -132,6 +136,8 @@ const APP_STATE_STORAGE_CONF = (<
   elementType: { browser: true, export: false, server: false },
   textElementSubtype: { browser: true, export: false, server: false },
   textOpts: { browser: true, export: false, server: false },
+  penMode: { browser: false, export: false, server: false },
+  penDetected: { browser: false, export: false, server: false },
   errorMessage: { browser: false, export: false, server: false },
   exportBackground: { browser: true, export: false, server: false },
   exportEmbedScene: { browser: true, export: false, server: false },

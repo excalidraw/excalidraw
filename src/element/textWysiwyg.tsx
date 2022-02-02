@@ -26,6 +26,7 @@ import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
+import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 
 const normalizeText = (text: string) => {
@@ -47,24 +48,21 @@ const getTransform = (
   maxWidth: number,
   maxHeight: number,
 ) => {
-  const { zoom, offsetTop, offsetLeft } = appState;
+  const { zoom } = appState;
   const degree = (180 * angle) / Math.PI;
-  // offsets must be multiplied by 2 to account for the division by 2 of
-  // the whole expression afterwards
-  let translateX = ((width - offsetLeft * 2) * (zoom.value - 1)) / 2;
-  let translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
+  let translateX = (width * (zoom.value - 1)) / 2;
+  let translateY = (height * (zoom.value - 1)) / 2;
   if (width > maxWidth && zoom.value !== 1) {
-    translateX = (maxWidth / 2) * (zoom.value - 1);
+    translateX = (maxWidth * (zoom.value - 1)) / 2;
   }
   if (height > maxHeight && zoom.value !== 1) {
-    translateY = ((maxHeight - offsetTop * 2) * (zoom.value - 1)) / 2;
+    translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg) translate(${offsetX}px, 0px)`;
 };
 
 export const textWysiwyg = ({
   id,
-  appState,
   onChange,
   onSubmit,
   getViewportCoords,
@@ -74,7 +72,6 @@ export const textWysiwyg = ({
   app,
 }: {
   id: ExcalidrawElement["id"];
-  appState: AppState;
   onChange?: (text: string) => void;
   onSubmit: (data: {
     text: string;
@@ -104,10 +101,13 @@ export const textWysiwyg = ({
     return false;
   };
   let originalContainerHeight: number;
-  let approxLineHeight = getApproxLineHeight(getFontString(element));
 
   const updateWysiwygStyle = () => {
-    const updatedElement = Scene.getScene(element)?.getElement(id);
+    const appState = app.state;
+    const updatedElement = Scene.getScene(element)?.getElement(
+      id,
+    ) as ExcalidrawTextElement;
+    const approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
@@ -134,8 +134,6 @@ export const textWysiwyg = ({
           height = editorHeight;
         }
         if (propertiesUpdated) {
-          approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
-
           originalContainerHeight = container.height;
 
           // update height of the editor after properties updated
@@ -189,29 +187,12 @@ export const textWysiwyg = ({
         ? approxLineHeight
         : metrics.height / lines.length;
       if (!container) {
-        maxWidth =
-          (appState.offsetLeft + appState.width - viewportX - 8) /
-            appState.zoom.value -
-          // margin-right of parent if any
-          Number(
-            getComputedStyle(
-              excalidrawContainer?.parentNode as Element,
-            ).marginRight.slice(0, -2),
-          );
+        maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
       }
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
-        (appState.height -
-          viewportY -
-          // There is a ~14px difference which keeps on increasing
-          // with every zoom step when offset present hence I am subtracting it here
-          // However this is not the best fix and breaks in
-          // few scenarios
-          (appState.offsetTop
-            ? ((appState.zoom.value * 100 - 100) / 10) * 14
-            : 0)) /
-        appState.zoom.value;
+        (appState.height - viewportY) / appState.zoom.value;
       const angle = container ? container.angle : updatedElement.angle;
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
@@ -287,10 +268,14 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.oninput = () => {
+      const updatedElement = Scene.getScene(element)?.getElement(
+        id,
+      ) as ExcalidrawTextElement;
+      const font = getFontString(updatedElement);
       // using scrollHeight here since we need to calculate
       // number of lines so cannot use editable.style.height
       // as that gets updated below
-      const lines = editable.scrollHeight / approxLineHeight;
+      const lines = editable.scrollHeight / getApproxLineHeight(font);
       // auto increase height only when lines  > 1 so its
       // measured correctly and vertically alignes for
       // first line as well as setting height to "auto"
@@ -302,7 +287,7 @@ export const textWysiwyg = ({
           const container = getContainerElement(element);
           const actualLineCount = wrapText(
             editable.value,
-            getFontString(element),
+            font,
             container!.width,
           ).split("\n").length;
 
@@ -325,7 +310,15 @@ export const textWysiwyg = ({
   editable.onkeydown = (event) => {
     event.stopPropagation();
 
-    if (actionDecreaseFontSize.keyTest(event)) {
+    if (!event.shiftKey && actionZoomIn.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionZoomIn);
+      updateWysiwygStyle();
+    } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionZoomOut);
+      updateWysiwygStyle();
+    } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionIncreaseFontSize);

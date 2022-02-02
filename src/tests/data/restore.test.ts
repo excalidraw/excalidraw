@@ -423,16 +423,12 @@ describe("restoreAppState", () => {
       );
 
       expect(restoredAppState.zoom.value).toBe(10);
-      expect(restoredAppState.zoom.translation).toMatchObject(
-        getDefaultAppState().zoom.translation,
-      );
     });
 
     it("when the zoom of imported data state is not a number", () => {
       const stubImportedAppState = getDefaultAppState();
       stubImportedAppState.zoom = {
         value: 10 as NormalizedZoomValue,
-        translation: { x: 5, y: 3 },
       };
 
       const stubLocalAppState = getDefaultAppState();

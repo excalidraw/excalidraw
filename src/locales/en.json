@@ -105,7 +105,8 @@
     "personalLib": "Personal Library",
     "excalidrawLib": "Excalidraw Library",
     "decreaseFontSize": "Decrease font size",
-    "increaseFontSize": "Increase font size"
+    "increaseFontSize": "Increase font size",
+    "unbindText": "Unbind text"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -187,7 +188,8 @@
     "freedraw": "Draw",
     "text": "Text",
     "library": "Library",
-    "lock": "Keep selected tool active after drawing"
+    "lock": "Keep selected tool active after drawing",
+    "penMode": "Prevent pinch-zoom and accept freedraw input only from pen"
   },
   "headings": {
     "canvasActions": "Canvas actions",

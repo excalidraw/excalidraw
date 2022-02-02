@@ -49,6 +49,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -85,10 +87,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -533,6 +531,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -576,10 +576,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -1023,6 +1019,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -1049,10 +1047,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -1838,6 +1832,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -1866,10 +1862,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -2052,6 +2044,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -2085,10 +2079,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -2533,6 +2523,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -2561,10 +2553,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -2798,6 +2786,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -2823,10 +2813,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -2970,6 +2956,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id2": true,
@@ -2998,10 +2986,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -3434,6 +3418,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -3459,10 +3445,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -3682,6 +3664,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -3710,10 +3694,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -3896,6 +3876,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -3926,10 +3908,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -4152,6 +4130,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id1": true,
@@ -4180,10 +4160,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -4416,6 +4392,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id2": true,
@@ -4445,10 +4423,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -4817,6 +4791,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -4867,10 +4843,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -5126,6 +5098,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -5153,10 +5127,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -5412,6 +5382,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -5460,10 +5432,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -5630,6 +5598,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -5655,10 +5625,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -5802,6 +5768,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5827,10 +5795,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -6278,6 +6242,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -6310,10 +6276,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -6611,6 +6573,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -6636,10 +6600,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -8735,6 +8695,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -8765,10 +8727,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -9114,6 +9072,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -9145,10 +9105,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -9379,6 +9335,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -9408,10 +9366,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -9607,6 +9561,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -9637,10 +9593,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -9900,6 +9852,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -9925,10 +9879,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -10072,6 +10022,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -10097,10 +10049,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -10244,6 +10192,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -10269,10 +10219,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -10416,6 +10362,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -10441,10 +10389,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -10618,6 +10562,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -10643,10 +10589,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -10820,6 +10762,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -10845,10 +10789,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -11040,6 +10980,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -11065,10 +11007,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -11242,6 +11180,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -11267,10 +11207,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -11414,6 +11350,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -11439,10 +11377,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -11586,6 +11520,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -11611,10 +11547,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -11788,6 +11720,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -11813,10 +11747,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -11960,6 +11890,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -11985,10 +11917,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -12180,6 +12108,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -12216,10 +12146,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -12931,6 +12857,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -12960,10 +12888,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -13196,10 +13120,12 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
-  "scrollX": -5.416666666666667,
+  "scrollX": -2.916666666666668,
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
@@ -13221,10 +13147,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0.4166666666666714,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -13303,6 +13225,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -13326,10 +13250,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -13408,6 +13328,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -13436,10 +13358,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -13583,6 +13501,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -13617,10 +13537,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -13919,6 +13835,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -13944,10 +13862,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -14129,6 +14043,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -14165,10 +14081,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -14992,6 +14904,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -15015,10 +14929,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -15097,6 +15007,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -15124,10 +15036,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -15891,6 +15799,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id1": true,
@@ -15943,10 +15853,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -16315,6 +16221,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id1": true,
@@ -16365,10 +16273,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -16601,11 +16505,13 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
-  "scrollX": 11.046099290780141,
-  "scrollY": -5,
+  "scrollX": 10,
+  "scrollY": -10,
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": true,
@@ -16626,11 +16532,7 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": -59.425,
-      "y": -48.66347517730496,
-    },
-    "value": 1.99,
+    "value": 1,
   },
 }
 `;
@@ -16708,6 +16610,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -16733,10 +16637,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -17227,6 +17127,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -17250,10 +17152,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -17332,6 +17230,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -17355,10 +17255,6 @@ Object {
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }

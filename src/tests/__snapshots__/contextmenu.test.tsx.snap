@@ -49,6 +49,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -74,10 +76,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -221,6 +219,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -246,10 +246,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -544,6 +540,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -569,10 +567,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -867,6 +861,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -892,10 +888,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -1039,6 +1031,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -1062,10 +1056,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -1245,6 +1235,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -1270,10 +1262,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -1506,6 +1494,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id1": true,
@@ -1537,10 +1527,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -1847,6 +1833,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -1872,10 +1860,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -2604,6 +2588,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -2629,10 +2615,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -2927,6 +2909,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -2952,10 +2936,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -3250,6 +3230,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id1": true,
@@ -3279,10 +3261,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -3649,6 +3627,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -3680,10 +3660,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -3916,6 +3892,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -3949,10 +3927,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -4260,6 +4234,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4283,10 +4259,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -4365,6 +4337,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4390,10 +4364,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
@@ -4448,6 +4418,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4473,10 +4445,6 @@ Object {
   "width": 200,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }
