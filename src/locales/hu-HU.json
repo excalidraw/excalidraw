@@ -187,7 +187,8 @@
     "freedraw": "",
     "text": "Szöveg",
     "library": "Könyvtár",
-    "lock": "Rajzolás után az aktív eszközt tartsa kijelölve"
+    "lock": "Rajzolás után az aktív eszközt tartsa kijelölve",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Vászon műveletek",
