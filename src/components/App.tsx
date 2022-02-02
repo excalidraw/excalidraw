@@ -26,6 +26,7 @@ import {
   actionToggleGridMode,
   actionToggleStats,
   actionToggleZenMode,
+  actionUnbindText,
   actionUngroup,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
@@ -178,7 +179,7 @@ import {
 } from "../scene";
 import Scene from "../scene/Scene";
 import { RenderConfig, ScrollBars } from "../scene/types";
-import { getNewZoom } from "../scene/zoom";
+import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
 import {
   AppClassProperties,
@@ -493,6 +494,7 @@ class App extends React.Component<AppProps, AppState> {
               elements={this.scene.getElements()}
               onCollabButtonClick={onCollabButtonClick}
               onLockToggle={this.toggleLock}
+              onPenModeToggle={this.togglePenMode}
               onInsertElements={(elements) =>
                 this.addElementsFromPasteOrLibrary({
                   elements,
@@ -836,6 +838,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public async componentDidMount() {
+    this.unmounted = false;
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
@@ -1543,6 +1546,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  togglePenMode = () => {
+    this.setState((prevState) => {
+      return {
+        penMode: !prevState.penMode,
+      };
+    });
+  };
+
   toggleZenMode = () => {
     this.actionManager.executeAction(actionToggleZenMode);
   };
@@ -1924,12 +1935,14 @@ class App extends React.Component<AppProps, AppState> {
 
     const initialScale = gesture.initialScale;
     if (initialScale) {
-      this.setState(({ zoom, offsetLeft, offsetTop }) => ({
-        zoom: getNewZoom(
-          getNormalizedZoom(initialScale * event.scale),
-          zoom,
-          { left: offsetLeft, top: offsetTop },
-          { x: cursorX, y: cursorY },
+      this.setState((state) => ({
+        ...getStateForZoom(
+          {
+            viewportX: cursorX,
+            viewportY: cursorY,
+            nextZoom: getNormalizedZoom(initialScale * event.scale),
+          },
+          state,
         ),
       }));
     }
@@ -1973,7 +1986,6 @@ class App extends React.Component<AppProps, AppState> {
 
     textWysiwyg({
       id: element.id,
-      appState: this.state,
       canvas: this.canvas,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
@@ -2367,19 +2379,32 @@ class App extends React.Component<AppProps, AppState> {
       gesture.lastCenter = center;
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
-      const scaleFactor = distance / gesture.initialDistance;
+      const scaleFactor =
+        this.state.elementType === "freedraw" && this.state.penMode
+          ? 1
+          : distance / gesture.initialDistance;
 
-      this.setState(({ zoom, scrollX, scrollY, offsetLeft, offsetTop }) => ({
-        scrollX: scrollX + deltaX / zoom.value,
-        scrollY: scrollY + deltaY / zoom.value,
-        zoom: getNewZoom(
-          getNormalizedZoom(initialScale * scaleFactor),
-          zoom,
-          { left: offsetLeft, top: offsetTop },
-          center,
-        ),
-        shouldCacheIgnoreZoom: true,
-      }));
+      const nextZoom = scaleFactor
+        ? getNormalizedZoom(initialScale * scaleFactor)
+        : this.state.zoom.value;
+
+      this.setState((state) => {
+        const zoomState = getStateForZoom(
+          {
+            viewportX: center.x,
+            viewportY: center.y,
+            nextZoom,
+          },
+          state,
+        );
+
+        return {
+          zoom: zoomState.zoom,
+          scrollX: zoomState.scrollX + deltaX / nextZoom,
+          scrollY: zoomState.scrollY + deltaY / nextZoom,
+          shouldCacheIgnoreZoom: true,
+        };
+      });
       this.resetShouldCacheIgnoreZoomDebounced();
     } else {
       gesture.lastCenter =
@@ -2619,6 +2644,17 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
     this.maybeCleanupAfterMissingPointerUp(event);
 
+    //fires only once, if pen is detected, penMode is enabled
+    //the user can disable this by toggling the penMode button
+    if (!this.state.penDetected && event.pointerType === "pen") {
+      this.setState((prevState) => {
+        return {
+          penMode: true,
+          penDetected: true,
+        };
+      });
+    }
+
     if (isPanning) {
       return;
     }
@@ -2660,6 +2696,17 @@ class App extends React.Component<AppProps, AppState> {
     this.updateBindingEnabledOnPointerMove(event);
 
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
+      return;
+    }
+
+    const allowOnPointerDown =
+      !this.state.penMode ||
+      event.pointerType !== "touch" ||
+      this.state.elementType === "selection" ||
+      this.state.elementType === "text" ||
+      this.state.elementType === "image";
+
+    if (!allowOnPointerDown) {
       return;
     }
 
@@ -5032,6 +5079,7 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       } else {
         ContextMenu.push({
@@ -5072,9 +5120,14 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       }
     } else if (type === "element") {
+      const elementsWithUnbindedText = getSelectedElements(
+        elements,
+        this.state,
+      ).some((element) => !hasBoundTextElement(element));
       if (this.state.viewModeEnabled) {
         ContextMenu.push({
           options: [navigator.clipboard && actionCopy, ...options],
@@ -5083,6 +5136,7 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       } else {
         let firstAdded = true;
@@ -5117,6 +5171,7 @@ class App extends React.Component<AppProps, AppState> {
             actionPasteStyles,
             separator,
             maybeGroupAction && actionGroup,
+            !elementsWithUnbindedText && actionUnbindText,
             maybeUngroupAction && actionUngroup,
             (maybeGroupAction || maybeUngroupAction) && separator,
             actionAddToLibrary,
@@ -5137,6 +5192,7 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       }
     }
@@ -5175,15 +5231,14 @@ class App extends React.Component<AppProps, AppState> {
       // round to nearest step
       newZoom = Math.round(newZoom * ZOOM_STEP * 100) / (ZOOM_STEP * 100);
 
-      this.setState(({ zoom, offsetLeft, offsetTop }) => ({
-        zoom: getNewZoom(
-          getNormalizedZoom(newZoom),
-          zoom,
-          { left: offsetLeft, top: offsetTop },
+      this.setState((state) => ({
+        ...getStateForZoom(
           {
-            x: cursorX,
-            y: cursorY,
+            viewportX: cursorX,
+            viewportY: cursorY,
+            nextZoom: getNormalizedZoom(newZoom),
           },
+          state,
         ),
         selectedElementIds: {},
         previousSelectedElementIds:

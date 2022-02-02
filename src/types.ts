@@ -82,6 +82,8 @@ export type AppState = {
   textElementSubtype: TextSubtype;
   textOpts: TextOpts;
   elementLocked: boolean;
+  penMode: boolean;
+  penDetected: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
@@ -158,10 +160,6 @@ export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
 
 export type Zoom = Readonly<{
   value: NormalizedZoomValue;
-  translation: Readonly<{
-    x: number;
-    y: number;
-  }>;
 }>;
 
 export type PointerCoords = Readonly<{

@@ -46,6 +46,10 @@
       }
     }
 
+    .ToolIcon__hidden {
+      box-shadow: none !important;
+    }
+
     .ToolIcon.ToolIcon__lock {
       margin-inline-end: var(--space-factor);
       &.ToolIcon_type_floating {

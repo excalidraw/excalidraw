@@ -76,6 +76,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
+- Reset `unmounted` state on the component once component mounts to fix the mounting/unmounting repeatedly when used with `useEffect` [#4682](https://github.com/excalidraw/excalidraw/pull/4682).
 - Panning the canvas using `mousewheel-drag` and `space-drag` now prevents the browser from scrolling the container/page [#4489](https://github.com/excalidraw/excalidraw/pull/4489).
 - Scope drag and drop events to Excalidraw container to prevent overriding host application drag and drop events.
 

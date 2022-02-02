@@ -47,6 +47,8 @@ Object {
     "data": null,
     "shown": false,
   },
+  "penDetected": false,
+  "penMode": false,
   "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -69,10 +71,6 @@ Object {
   "viewModeEnabled": false,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }

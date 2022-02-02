@@ -1,9 +1,11 @@
 import ReactDOM from "react-dom";
 import ExcalidrawApp from "../excalidraw-app";
-import { render, screen } from "../tests/test-utils";
+import { GlobalTestState, render, screen } from "../tests/test-utils";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { fireEvent } from "../tests/test-utils";
+import { queryByText } from "@testing-library/react";
+
 import { BOUND_TEXT_PADDING, FONT_FAMILY } from "../constants";
 import {
   ExcalidrawTextElement,
@@ -18,6 +20,8 @@ const mouse = new Pointer("mouse");
 
 describe("textWysiwyg", () => {
   describe("Test unbounded text", () => {
+    const { h } = window;
+
     let textarea: HTMLTextAreaElement;
     let textElement: ExcalidrawTextElement;
     beforeEach(async () => {
@@ -197,17 +201,43 @@ describe("textWysiwyg", () => {
       );
       expect(textElement.fontSize).toBe(origFontSize);
     });
+
+    it("zooming via keyboard should zoom canvas", () => {
+      expect(h.state.zoom.value).toBe(1);
+      textarea.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          code: CODES.MINUS,
+          ctrlKey: true,
+        }),
+      );
+      expect(h.state.zoom.value).toBe(0.9);
+      textarea.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          code: CODES.NUM_SUBTRACT,
+          ctrlKey: true,
+        }),
+      );
+      expect(h.state.zoom.value).toBe(0.8);
+      textarea.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          code: CODES.NUM_ADD,
+          ctrlKey: true,
+        }),
+      );
+      expect(h.state.zoom.value).toBe(0.9);
+      textarea.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          code: CODES.EQUAL,
+          ctrlKey: true,
+        }),
+      );
+      expect(h.state.zoom.value).toBe(1);
+    });
   });
 
   describe("Test bounded text", () => {
     let rectangle: any;
-    const {
-      h,
-    }: {
-      h: {
-        elements: any;
-      };
-    } = window;
+    const { h } = window;
 
     const DUMMY_HEIGHT = 240;
     const DUMMY_WIDTH = 160;
@@ -222,6 +252,7 @@ describe("textWysiwyg", () => {
 
     beforeEach(async () => {
       await render(<ExcalidrawApp />);
+      h.elements = [];
 
       rectangle = UI.createElement("rectangle", {
         x: 10,
@@ -249,9 +280,9 @@ describe("textWysiwyg", () => {
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
 
-      await new Promise((r) => setTimeout(r, 0));
-
       fireEvent.change(editor, { target: { value: "Hello World!" } });
+
+      await new Promise((r) => setTimeout(r, 0));
       editor.blur();
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
@@ -285,6 +316,8 @@ describe("textWysiwyg", () => {
     });
 
     it("should update font family correctly on undo/redo by selecting bounded text when font family was updated", async () => {
+      expect(h.elements.length).toBe(1);
+
       mouse.doubleClickAt(
         rectangle.x + rectangle.width / 2,
         rectangle.y + rectangle.height / 2,
@@ -316,19 +349,25 @@ describe("textWysiwyg", () => {
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
-      expect(h.elements[1].fontFamily).toEqual(FONT_FAMILY.Cascadia);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
+      ).toEqual(FONT_FAMILY.Cascadia);
 
       //undo
       Keyboard.withModifierKeys({ ctrl: true }, () => {
         Keyboard.keyPress(KEYS.Z);
       });
-      expect(h.elements[1].fontFamily).toEqual(FONT_FAMILY.Virgil);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
+      ).toEqual(FONT_FAMILY.Virgil);
 
       //redo
       Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
         Keyboard.keyPress(KEYS.Z);
       });
-      expect(h.elements[1].fontFamily).toEqual(FONT_FAMILY.Cascadia);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
+      ).toEqual(FONT_FAMILY.Cascadia);
     });
 
     it("should wrap text and vertcially center align once text submitted", async () => {
@@ -365,10 +404,9 @@ describe("textWysiwyg", () => {
           };
         });
 
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      expect(h.elements.length).toBe(1);
 
+      Keyboard.keyDown(KEYS.ENTER);
       let text = h.elements[1] as ExcalidrawTextElementWithContainer;
       let editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
@@ -435,6 +473,48 @@ describe("textWysiwyg", () => {
       expect(text.x).toBe(rectangle.x + BOUND_TEXT_PADDING);
       expect(text.height).toBe(APPROX_LINE_HEIGHT);
       expect(text.width).toBe(rectangle.width - BOUND_TEXT_PADDING * 2);
+    });
+
+    it("should unbind bound text when unbind action from context menu is triggred", async () => {
+      expect(h.elements.length).toBe(1);
+      expect(h.elements[0].id).toBe(rectangle.id);
+
+      Keyboard.withModifierKeys({}, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+
+      expect(h.elements.length).toBe(2);
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.containerId).toBe(rectangle.id);
+
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      await new Promise((r) => setTimeout(r, 0));
+
+      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      editor.blur();
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
+      mouse.reset();
+      UI.clickTool("selection");
+      mouse.clickAt(10, 20);
+      mouse.down();
+      mouse.up();
+      fireEvent.contextMenu(GlobalTestState.canvas, {
+        button: 2,
+        clientX: 20,
+        clientY: 30,
+      });
+      const contextMenu = document.querySelector(".context-menu");
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Unbind text")!);
+      expect(h.elements[0].boundElements).toEqual([]);
+      expect((h.elements[1] as ExcalidrawTextElement).containerId).toEqual(
+        null,
+      );
     });
   });
 });
