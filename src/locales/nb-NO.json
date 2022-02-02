@@ -188,7 +188,7 @@
     "text": "Tekst",
     "library": "Bibliotek",
     "lock": "Behold merket verktøy som aktivt",
-    "penMode": ""
+    "penMode": "Forhindre zoom ved kniping og godta frihåndstegning kun fra penn"
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
