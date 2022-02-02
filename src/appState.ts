@@ -77,7 +77,9 @@ export const getDefaultAppState = (): Omit<
     toastMessage: null,
     viewBackgroundColor: oc.white,
     zenModeEnabled: false,
-    zoom: { value: 1 as NormalizedZoomValue, translation: { x: 0, y: 0 } },
+    zoom: {
+      value: 1 as NormalizedZoomValue,
+    },
     viewModeEnabled: false,
     pendingImageElement: null,
     showRenameTableDialog: false,

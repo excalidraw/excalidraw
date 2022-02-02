@@ -42,6 +42,7 @@ import {
 import {
   debounce,
   getVersion,
+  isTestEnv,
   preventUnload,
   ResolvablePromise,
   resolvablePromise,
@@ -49,6 +50,8 @@ import {
 import {
   FIREBASE_STORAGE_PREFIXES,
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
+  STORAGE_KEYS,
+  SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
 import CollabWrapper, {
   CollabAPI,
@@ -62,10 +65,15 @@ import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
 import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
 import { loadFilesFromFirebase } from "./data/firebase";
 import {
+  getLibraryItemsFromStorage,
   importFromLocalStorage,
+  importUsernameFromLocalStorage,
   saveToLocalStorage,
-  STORAGE_KEYS,
 } from "./data/localStorage";
+import {
+  isBrowserStorageStateNewer,
+  updateBrowserStateVersion,
+} from "./data/tabSync";
 import "./index.scss";
 
 const filesStore = createStore("files-db", "files-store");
@@ -103,6 +111,11 @@ const localFileStorage = new FileManager({
   async saveFiles({ addedFiles }) {
     const savedFiles = new Map<FileId, true>();
     const erroredFiles = new Map<FileId, true>();
+
+    // before we use `storage` event synchronization, let's update the flag
+    // optimistically. Hopefully nothing fails, and an IDB read executed
+    // before an IDB write finishes will read the latest value.
+    updateBrowserStateVersion(STORAGE_KEYS.VERSION_FILES);
 
     await Promise.all(
       [...addedFiles].map(async ([id, fileData]) => {
@@ -142,7 +155,6 @@ const saveDebounced = debounce(
       elements,
       files,
     });
-
     onFilesSaved();
   },
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
@@ -277,7 +289,6 @@ const ExcalidrawWrapper = () => {
     currentLangCode = currentLangCode[0];
   }
   const [langCode, setLangCode] = useState(currentLangCode);
-
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -371,14 +382,7 @@ const ExcalidrawWrapper = () => {
         }
       }
 
-      try {
-        data.scene.libraryItems =
-          JSON.parse(
-            localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
-          ) || [];
-      } catch (error: any) {
-        console.error(error);
-      }
+      data.scene.libraryItems = getLibraryItemsFromStorage();
     };
 
     initializeScene({ collabAPI }).then((data) => {
@@ -420,13 +424,71 @@ const ExcalidrawWrapper = () => {
       () => (document.title = APP_NAME),
       TITLE_TIMEOUT,
     );
+
+    const syncData = debounce(() => {
+      if (isTestEnv()) {
+        return;
+      }
+      if (!document.hidden && !collabAPI.isCollaborating()) {
+        // don't sync if local state is newer or identical to browser state
+        if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
+          const localDataState = importFromLocalStorage();
+          const username = importUsernameFromLocalStorage();
+          let langCode = languageDetector.detect() || defaultLang.code;
+          if (Array.isArray(langCode)) {
+            langCode = langCode[0];
+          }
+          setLangCode(langCode);
+          excalidrawAPI.updateScene({
+            ...localDataState,
+            libraryItems: getLibraryItemsFromStorage(),
+          });
+          collabAPI.setUsername(username || "");
+        }
+
+        if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_FILES)) {
+          const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
+          const currFiles = excalidrawAPI.getFiles();
+          const fileIds =
+            elements?.reduce((acc, element) => {
+              if (
+                isInitializedImageElement(element) &&
+                // only load and update images that aren't already loaded
+                !currFiles[element.fileId]
+              ) {
+                return acc.concat(element.fileId);
+              }
+              return acc;
+            }, [] as FileId[]) || [];
+          if (fileIds.length) {
+            localFileStorage
+              .getFiles(fileIds)
+              .then(({ loadedFiles, erroredFiles }) => {
+                if (loadedFiles.length) {
+                  excalidrawAPI.addFiles(loadedFiles);
+                }
+                updateStaleImageStatuses({
+                  excalidrawAPI,
+                  erroredFiles,
+                  elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+                });
+              });
+          }
+        }
+      }
+    }, SYNC_BROWSER_TABS_TIMEOUT);
+
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
     window.addEventListener(EVENT.UNLOAD, onBlur, false);
     window.addEventListener(EVENT.BLUR, onBlur, false);
+    document.addEventListener(EVENT.VISIBILITY_CHANGE, syncData, false);
+    window.addEventListener(EVENT.FOCUS, syncData, false);
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
       window.removeEventListener(EVENT.UNLOAD, onBlur, false);
       window.removeEventListener(EVENT.BLUR, onBlur, false);
+      window.removeEventListener(EVENT.FOCUS, syncData, false);
+      document.removeEventListener(EVENT.VISIBILITY_CHANGE, syncData, false);
       clearTimeout(titleTimeout);
     };
   }, [collabAPI, excalidrawAPI]);

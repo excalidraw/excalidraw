@@ -105,7 +105,8 @@
     "excalidrawLib": "Excalidraw Library",
     "renameTable": "Rename table",
     "decreaseFontSize": "Decrease font size",
-    "increaseFontSize": "Increase font size"
+    "increaseFontSize": "Increase font size",
+    "unbindText": "Unbind text"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
