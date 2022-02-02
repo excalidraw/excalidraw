@@ -187,7 +187,8 @@
     "freedraw": "Dibujar",
     "text": "Texto",
     "library": "Biblioteca",
-    "lock": "Mantener la herramienta seleccionada activa después de dibujar"
+    "lock": "Mantener la herramienta seleccionada activa después de dibujar",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
