@@ -167,6 +167,19 @@ const loadMathJax = async () => {
   }
 };
 
+// This lets math input run across multiple newlines.
+// Basically, replace with a space each newline between the delimiters.
+const consumeMathNewlines = (text: string, useTex: boolean) => {
+  const delimiter = useTex ? "$$" : "`";
+  const tempText = text.replace(/\r\n?/g, "\n").split(delimiter);
+  for (let i = 0; i < tempText.length; i++) {
+    if (i % 2 === 1) {
+      tempText[i] = tempText[i].replace(/\n/g, " ");
+    }
+  }
+  return tempText.join(delimiter);
+};
+
 // Cache the SVGs from MathJax
 const mathJaxSvgCacheAM = {} as { [key: string]: string };
 const mathJaxSvgCacheTex = {} as { [key: string]: string };
@@ -209,7 +222,7 @@ const markupText = (
   useTex: boolean,
   isMathJaxLoaded: boolean,
 ) => {
-  const lines = text.replace(/\r\n?/g, "\n").split("\n");
+  const lines = consumeMathNewlines(text, useTex).split("\n");
   const outputs = [] as Array<string>[];
   for (let index = 0; index < lines.length; index++) {
     outputs.push([]);
@@ -429,7 +442,7 @@ const createSvg = (
     useTex,
   );
 
-  const mathLines = text.replace(/\r\n?/g, "\n").split("\n");
+  const mathLines = consumeMathNewlines(text, useTex).split("\n");
   const processed = markupText(text, useTex, isMathJaxLoaded);
 
   const fontFamily = FONT_FAMILY_MATH;
@@ -796,7 +809,7 @@ export const wrapTextElementMath = (
   const outputMetrics = measureOutputs(outputs, font, isMathJaxLoaded);
 
   const delimiter = useTex ? "$$" : "`";
-  const lines = text.replace(/\r\n?/g, "\n").split("\n");
+  const lines = consumeMathNewlines(text, useTex).split("\n");
   const lineText: string[][] = [];
   const lineWidth: number[][] = [];
   const newText: string[] = [];
