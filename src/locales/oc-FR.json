@@ -187,7 +187,8 @@
     "freedraw": "Dessenhar",
     "text": "Tèxt",
     "library": "Bibliotèca",
-    "lock": "Mantenir activa l’aisina aprèp dessenhar"
+    "lock": "Mantenir activa l’aisina aprèp dessenhar",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
