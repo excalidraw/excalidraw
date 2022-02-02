@@ -187,7 +187,8 @@
     "freedraw": "Marraztu",
     "text": "Testua",
     "library": "Liburutegia",
-    "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren"
+    "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
