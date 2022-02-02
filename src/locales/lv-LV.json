@@ -188,7 +188,7 @@
     "text": "Teksts",
     "library": "Bibliotēka",
     "lock": "Paturēt izvēlēto rīku pēc darbības",
-    "penMode": ""
+    "penMode": "Lietojot pildspalvu, bloķēt tuvināšanu un atļaut tikai zīmēšanu"
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
