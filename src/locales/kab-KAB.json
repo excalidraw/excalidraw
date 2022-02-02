@@ -187,7 +187,8 @@
     "freedraw": "Suneɣ",
     "text": "Aḍris",
     "library": "Tamkarḍit",
-    "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ"
+    "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",
