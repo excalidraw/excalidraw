@@ -187,7 +187,8 @@
     "freedraw": "Rysuj",
     "text": "Tekst",
     "library": "Biblioteka",
-    "lock": "Zablokuj wybrane narzędzie"
+    "lock": "Zablokuj wybrane narzędzie",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Narzędzia",
