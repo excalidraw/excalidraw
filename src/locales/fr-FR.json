@@ -187,7 +187,8 @@
     "freedraw": "Dessiner",
     "text": "Texte",
     "library": "Bibliothèque",
-    "lock": "Garder l'outil sélectionné actif après le dessin"
+    "lock": "Garder l'outil sélectionné actif après le dessin",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Actions du canevas",
