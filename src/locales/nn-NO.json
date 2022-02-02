@@ -187,7 +187,8 @@
     "freedraw": "Teikn",
     "text": "Tekst",
     "library": "Bibliotek",
-    "lock": "Hald fram med valt verktøy"
+    "lock": "Hald fram med valt verktøy",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Handlingar: lerret",
