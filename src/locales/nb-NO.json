@@ -187,7 +187,8 @@
     "freedraw": "Tegn",
     "text": "Tekst",
     "library": "Bibliotek",
-    "lock": "Behold merket verktøy som aktivt"
+    "lock": "Behold merket verktøy som aktivt",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
