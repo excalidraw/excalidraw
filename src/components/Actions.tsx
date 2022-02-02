@@ -1,9 +1,9 @@
 import React from "react";
 import { ActionManager } from "../actions/manager";
+import { useIsMobile } from "../components/App";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
-import { useIsMobile } from "../components/App";
 import {
   canChangeSharpness,
   canHaveArrowheads,
@@ -13,13 +13,15 @@ import {
   hasStrokeWidth,
   hasText,
 } from "../scene";
+import { hasStrokeColor } from "../scene/comparisons";
 import { SHAPES } from "../shapes";
 import { AppState, Zoom } from "../types";
 import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
+import SetImageNameDialog from "./SetImageNameDialog";
+import SetTableNameDialog from "./SetTableNameDialog";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
-import { hasStrokeColor } from "../scene/comparisons";
-import TableDropdownButton from "./TableDropdownButton";
+import ToolDropdownButton, { ToolDropdownOption } from "./ToolDropdownButton";
 
 export const SelectedShapeActions = ({
   appState,
@@ -176,7 +178,11 @@ export const ShapesSwitcher = ({
   canvas: HTMLCanvasElement | null;
   elementType: ExcalidrawElement["type"];
   setAppState: React.Component<any, AppState>["setState"];
-  onImageAction: (data: { pointerType: PointerType | null }) => void;
+  onImageAction: (data: {
+    pointerType: PointerType | null;
+    isNew?: boolean;
+    imagename?: string;
+  }) => void;
   onTableAction: (data: {
     pointerType: PointerType | null;
     isNew?: boolean;
@@ -201,12 +207,34 @@ export const ShapesSwitcher = ({
         "data-testid": value,
       };
       if (value === "table") {
-        return (
-          <TableDropdownButton
-            {...toolButtonProps}
-            key={value}
-            type="button"
-            onUploadCSV={() => {
+        const dropdownOptions = [
+          {
+            label: "New table container",
+            confirmDialog: (closeDialog) => {
+              return (
+                <SetTableNameDialog
+                  onConfirm={(tablename) => {
+                    closeDialog();
+                    setAppState({
+                      elementType: value,
+                      multiElement: null,
+                      selectedElementIds: {},
+                    });
+                    setCursorForShape(canvas, value);
+                    onTableAction({
+                      pointerType: "mouse",
+                      isNew: true,
+                      tablename,
+                    });
+                  }}
+                  onCancel={() => closeDialog()}
+                />
+              );
+            },
+          },
+          {
+            label: "Upload CSV",
+            onClick: () => {
               setAppState({
                 elementType: value,
                 multiElement: null,
@@ -214,16 +242,62 @@ export const ShapesSwitcher = ({
               });
               setCursorForShape(canvas, value);
               onTableAction({ pointerType: "mouse" });
-            }}
-            onNewTable={(tablename) => {
+            },
+          },
+        ] as ToolDropdownOption[];
+        return (
+          <ToolDropdownButton
+            {...toolButtonProps}
+            key={value}
+            type="button"
+            options={dropdownOptions}
+          />
+        );
+      } else if (value === "image") {
+        const dropdownOptions = [
+          {
+            label: "New image container",
+            confirmDialog: (closeDialog) => {
+              return (
+                <SetImageNameDialog
+                  onConfirm={(imagename) => {
+                    closeDialog();
+                    setAppState({
+                      elementType: value,
+                      multiElement: null,
+                      selectedElementIds: {},
+                    });
+                    setCursorForShape(canvas, value);
+                    onImageAction({
+                      pointerType: "mouse",
+                      isNew: true,
+                      imagename,
+                    });
+                  }}
+                  onCancel={() => closeDialog()}
+                />
+              );
+            },
+          },
+          {
+            label: "Upload Image",
+            onClick: () => {
               setAppState({
                 elementType: value,
                 multiElement: null,
                 selectedElementIds: {},
               });
               setCursorForShape(canvas, value);
-              onTableAction({ pointerType: "mouse", isNew: true, tablename });
-            }}
+              onImageAction({ pointerType: "mouse" });
+            },
+          },
+        ] as ToolDropdownOption[];
+        return (
+          <ToolDropdownButton
+            {...toolButtonProps}
+            key={value}
+            type="button"
+            options={dropdownOptions}
           />
         );
       }
@@ -240,9 +314,6 @@ export const ShapesSwitcher = ({
               selectedElementIds: {},
             });
             setCursorForShape(canvas, value);
-            if (value === "image") {
-              onImageAction({ pointerType });
-            }
           }}
         />
       );

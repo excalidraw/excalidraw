@@ -64,7 +64,11 @@ interface LayerUIProps {
   focusContainer: () => void;
   library: Library;
   id: string;
-  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
+  onImageAction: (data: {
+    insertOnCanvasDirectly: boolean;
+    isNew?: boolean;
+    imagename?: string;
+  }) => void;
   onTableAction: (data: {
     insertOnCanvasDirectly: boolean;
     isNew?: boolean;
@@ -342,9 +346,15 @@ const LayerUI = ({
                           canvas={canvas}
                           elementType={appState.elementType}
                           setAppState={setAppState}
-                          onImageAction={({ pointerType }) => {
+                          onImageAction={({
+                            pointerType,
+                            isNew,
+                            imagename,
+                          }) => {
                             onImageAction({
                               insertOnCanvasDirectly: pointerType !== "mouse",
+                              isNew,
+                              imagename,
                             });
                           }}
                           onTableAction={({

@@ -188,7 +188,7 @@ import {
 import Scene from "../scene/Scene";
 import { RenderConfig, ScrollBars } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
-import { findShapeByKey } from "../shapes";
+import { findShapeByKey, placeholderImageDataURL } from "../shapes";
 import {
   AppClassProperties,
   AppProps,
@@ -4696,7 +4696,17 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private onImageAction = async (
-    { insertOnCanvasDirectly } = { insertOnCanvasDirectly: false },
+    {
+      insertOnCanvasDirectly,
+      isNew,
+      imagename,
+    }: {
+      insertOnCanvasDirectly: boolean;
+      isNew?: boolean;
+      imagename?: string;
+    } = {
+      insertOnCanvasDirectly: false,
+    },
   ) => {
     try {
       const clientX = this.state.width / 2 + this.state.offsetLeft;
@@ -4706,11 +4716,12 @@ class App extends React.Component<AppProps, AppState> {
         { clientX, clientY },
         this.state,
       );
-
-      const imageFile = await fileOpen({
-        description: "Image",
-        extensions: ["jpg", "png", "svg", "gif"],
-      });
+      const imageFile = isNew
+        ? dataURLToFile(placeholderImageDataURL, imagename)
+        : await fileOpen({
+            description: "Image",
+            extensions: ["jpg", "png", "svg", "gif"],
+          });
 
       const imageElement = this.createImageElement({
         sceneX: x,

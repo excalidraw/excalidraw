@@ -78,6 +78,7 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     status: "pending" | "saved" | "error";
     /** X and Y scale factors <-1, 1>, used for image axis flipping */
     scale: [number, number];
+    /** Unclear what to do with this */
   }>;
 
 export type ExcalidrawTableElement = _ExcalidrawElementBase & {

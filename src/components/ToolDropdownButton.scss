@@ -1,0 +1,42 @@
+.excalidraw {
+  .toolbar-dropdown {
+    div {
+      display: flex;
+    }
+
+    background-color: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
+    border-radius: 4px;
+    position: relative;
+    transition: box-shadow 0.5s ease-in-out;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: var(--text-primary-color);
+    padding: 8px 0;
+
+    .item {
+      width: 100%;
+      // padding: 4px 8px;
+      color: var(--text-secondary-color);
+
+      span {
+        width: 100%;
+        padding: 8px 12px;
+      }
+
+      &:hover {
+        cursor: pointer;
+        background: var(--color-primary);
+        color: var(--text-primary-color);
+      }
+    }
+
+    hr {
+      border-top: 1px solid var(--text-primary-color);
+      margin: 12px 0px;
+      width: 100%;
+    }
+  }
+}

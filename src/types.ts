@@ -257,6 +257,7 @@ export interface ExcalidrawProps {
   generateIdForFile?: (file: File) => string | Promise<string>;
   onDoubleClick?: (elements: readonly NonDeletedExcalidrawElement[]) => boolean;
   generateThumbnailForTable?: (file: File) => DataURL | Promise<DataURL>;
+  generatePlaceholderForImage?: () => File | Promise<File>;
 }
 
 export type SceneData = {

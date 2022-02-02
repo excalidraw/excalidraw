@@ -4,16 +4,16 @@ import { DialogProps } from "./Dialog";
 
 interface Props
   extends Omit<DialogProps, "onCloseRequest" | "title" | "children"> {
-  onConfirm: (tablename: string) => void;
+  onConfirm: (imagename: string) => void;
   onCancel: () => void;
   confirmText?: string;
   cancelText?: string;
   initialValue?: string;
 }
 
-const SetTableNameDialog: React.FC<Props> = (props) => {
-  const [tablename, setTablename] = useState<string>(
-    props.initialValue ?? "new-table.csv",
+const SetImageNameDialog: React.FC<Props> = (props) => {
+  const [imagename, setImagename] = useState<string>(
+    props.initialValue ?? "new-image",
   );
   const [errorMessage, setErrorMessage] = useState<string>();
   return (
@@ -21,12 +21,11 @@ const SetTableNameDialog: React.FC<Props> = (props) => {
       title="Set table name"
       onCancel={props.onCancel}
       onConfirm={() => {
-        if (tablename.endsWith(".csv")) {
-          setErrorMessage(undefined);
-          props.onConfirm(tablename);
-        } else {
-          setErrorMessage("Make sure to end the table name with .csv");
+        if (imagename.trim().length === 0) {
+          setErrorMessage("Please name your image :-)");
+          return;
         }
+        props.onConfirm(imagename);
       }}
     >
       <div
@@ -42,12 +41,12 @@ const SetTableNameDialog: React.FC<Props> = (props) => {
       >
         <input
           type="text"
-          name="tablename"
+          name="imagename"
           className="TextInput"
-          placeholder="filename.csv"
-          value={tablename}
+          placeholder="new-image"
+          value={imagename}
           style={{ width: "80%" }}
-          onChange={(event) => setTablename(event.target.value)}
+          onChange={(event) => setImagename(event.target.value)}
         />
         {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
       </div>
@@ -55,4 +54,4 @@ const SetTableNameDialog: React.FC<Props> = (props) => {
   );
 };
 
-export default SetTableNameDialog;
+export default SetImageNameDialog;
