@@ -187,7 +187,8 @@
     "freedraw": "描画",
     "text": "テキスト",
     "library": "ライブラリ",
-    "lock": "描画後も使用中のツールを選択したままにする"
+    "lock": "描画後も使用中のツールを選択したままにする",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "キャンバス操作",
