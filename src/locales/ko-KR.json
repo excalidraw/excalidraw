@@ -187,7 +187,8 @@
     "freedraw": "그리기",
     "text": "텍스트",
     "library": "라이브러리",
-    "lock": "선택된 도구 유지하기"
+    "lock": "선택된 도구 유지하기",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "캔버스 동작",
