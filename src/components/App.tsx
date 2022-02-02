@@ -309,6 +309,8 @@ class App extends React.Component<AppProps, AppState> {
   public imageCache: AppClassProperties["imageCache"] = new Map();
 
   hitLinkElement: any;
+  lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
+  lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -1519,6 +1521,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
+    this.lastPointerUp = event;
     // remove touch handler for context menu on touch devices
     if (event.pointerType === "touch" && touchTimeout) {
       clearTimeout(touchTimeout);
@@ -2364,7 +2367,27 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private redirectToLink = () => {
-    window.open(normalizeLink(this.hitLinkElement.link!));
+    const lastPointerDownCoords = viewportCoordsToSceneCoords(
+      this.lastPointerDown!,
+      this.state,
+    );
+    const lastPointerDownHittingLinkIcon = isPointHittingLinkIcon(
+      this.hitLinkElement,
+      this.state,
+      [lastPointerDownCoords.x, lastPointerDownCoords.y],
+    );
+    const lastPointerUpCoords = viewportCoordsToSceneCoords(
+      this.lastPointerUp!,
+      this.state,
+    );
+    const LastPointerUpHittingLinkIcon = isPointHittingLinkIcon(
+      this.hitLinkElement,
+      this.state,
+      [lastPointerUpCoords.x, lastPointerUpCoords.y],
+    );
+    if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
+      window.open(normalizeLink(this.hitLinkElement.link!));
+    }
   };
   private attachLinkListener = () => {
     this.canvas?.addEventListener("click", this.redirectToLink);
@@ -2687,7 +2710,7 @@ class App extends React.Component<AppProps, AppState> {
     if (isPanning) {
       return;
     }
-
+    this.lastPointerDown = event;
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
