@@ -187,7 +187,8 @@
     "freedraw": "Dibuix",
     "text": "Text",
     "library": "Biblioteca",
-    "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar"
+    "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Accions del llenç",
