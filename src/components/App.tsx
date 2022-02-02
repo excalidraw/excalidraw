@@ -2645,6 +2645,10 @@ class App extends React.Component<AppProps, AppState> {
       event.pointerType !== "touch" ||
       this.state.elementType === "selection";
 
+    if (!allowOnPointerDown) {
+      return;
+    }
+
     if (this.state.elementType === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
       return;
@@ -2652,13 +2656,11 @@ class App extends React.Component<AppProps, AppState> {
       this.state.elementType === "arrow" ||
       this.state.elementType === "line"
     ) {
-      if (allowOnPointerDown) {
-        this.handleLinearElementOnPointerDown(
-          event,
-          this.state.elementType,
-          pointerDownState,
-        );
-      }
+      this.handleLinearElementOnPointerDown(
+        event,
+        this.state.elementType,
+        pointerDownState,
+      );
     } else if (this.state.elementType === "image") {
       // reset image preview on pointerdown
       setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
@@ -2680,14 +2682,12 @@ class App extends React.Component<AppProps, AppState> {
         y,
       });
     } else if (this.state.elementType === "freedraw") {
-      if (allowOnPointerDown) {
-        this.handleFreeDrawElementOnPointerDown(
-          event,
-          this.state.elementType,
-          pointerDownState,
-        );
-      }
-    } else if (allowOnPointerDown) {
+      this.handleFreeDrawElementOnPointerDown(
+        event,
+        this.state.elementType,
+        pointerDownState,
+      );
+    } else {
       this.createGenericElementOnPointerDown(
         this.state.elementType,
         pointerDownState,
