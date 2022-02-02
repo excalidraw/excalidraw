@@ -187,7 +187,8 @@
     "freedraw": "繪圖",
     "text": "文字",
     "library": "資料庫",
-    "lock": "可連續使用選取的工具"
+    "lock": "可連續使用選取的工具",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "canvas 動作",
