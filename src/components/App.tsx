@@ -467,6 +467,7 @@ class App extends React.Component<AppProps, AppState> {
               elements={this.scene.getElements()}
               onCollabButtonClick={onCollabButtonClick}
               onLockToggle={this.toggleLock}
+              onPenModeToggle={this.togglePenMode}
               onInsertElements={(elements) =>
                 this.addElementsFromPasteOrLibrary({
                   elements,
@@ -1501,6 +1502,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  togglePenMode = () => {
+    this.setState((prevState) => {
+      return {
+        penMode: !prevState.penMode,
+      };
+    });
+  };
+
   toggleZenMode = () => {
     this.actionManager.executeAction(actionToggleZenMode);
   };
@@ -2324,7 +2333,10 @@ class App extends React.Component<AppProps, AppState> {
       gesture.lastCenter = center;
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
-      const scaleFactor = distance / gesture.initialDistance;
+      const scaleFactor =
+        this.state.elementType === "freedraw" && this.state.penMode
+          ? 1
+          : distance / gesture.initialDistance;
 
       const nextZoom = scaleFactor
         ? getNormalizedZoom(initialScale * scaleFactor)
@@ -2586,6 +2598,17 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
     this.maybeCleanupAfterMissingPointerUp(event);
 
+    //fires only once, if pen is detected, penMode is enabled
+    //the user can disable this by toggling the penMode button
+    if (!this.state.penDetected && event.pointerType === "pen") {
+      this.setState((prevState) => {
+        return {
+          penMode: true,
+          penDetected: true,
+        };
+      });
+    }
+
     if (isPanning) {
       return;
     }
@@ -2627,6 +2650,17 @@ class App extends React.Component<AppProps, AppState> {
     this.updateBindingEnabledOnPointerMove(event);
 
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
+      return;
+    }
+
+    const allowOnPointerDown =
+      !this.state.penMode ||
+      event.pointerType !== "touch" ||
+      this.state.elementType === "selection" ||
+      this.state.elementType === "text" ||
+      this.state.elementType === "image";
+
+    if (!allowOnPointerDown) {
       return;
     }
 
