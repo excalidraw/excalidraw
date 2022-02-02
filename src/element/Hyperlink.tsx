@@ -24,7 +24,7 @@ import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
 import { rotate } from "../math";
 import { EVENT, MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
-import { getTooltipDiv } from "../components/Tooltip";
+import { getTooltipDiv, updateTooltipPosition } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
 import { isPointHittingElementBoundingBox } from "./collision";
 import { getElementAbsoluteCoords } from "./";
@@ -257,7 +257,7 @@ export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
   appState: AppState,
-): [number, number, number, number] => {
+): [x: number, y: number, width: number, height: number] => {
   const size = DEFAULT_LINK_SIZE;
   const linkWidth = size / appState.zoom.value;
   const linkHeight = size / appState.zoom.value;
@@ -313,27 +313,40 @@ export const showHyperlinkTooltip = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
 ) => {
+  if (!element.link) {
+    return;
+  }
+
   const tooltipDiv = getTooltipDiv();
+
+  tooltipDiv.classList.add("excalidraw-tooltip--visible");
+  tooltipDiv.style.maxWidth = "20rem";
+  tooltipDiv.textContent = element.link;
+
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
-  const [linkX, linkY] = getLinkHandleFromCoords(
+  const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
     [x1, y1, x2, y2],
     element.angle,
     appState,
   );
-  const { x, y } = sceneCoordsToViewportCoords(
+
+  const linkViewportCoords = sceneCoordsToViewportCoords(
     { sceneX: linkX, sceneY: linkY },
     appState,
   );
 
-  const tooltipX = x - 80;
-  const tooltipY = y - 40;
+  updateTooltipPosition(
+    tooltipDiv,
+    {
+      left: linkViewportCoords.x,
+      top: linkViewportCoords.y,
+      width: linkWidth,
+      height: linkHeight,
+    },
+    "top",
+  );
 
-  tooltipDiv.style.top = `${tooltipY}px`;
-  tooltipDiv.style.left = `${tooltipX}px`;
-  tooltipDiv.classList.add("excalidraw-tooltip--visible");
-  tooltipDiv.style.maxWidth = "20rem";
-  tooltipDiv.innerHTML = element.link!;
   IS_HYPERLINK_TOOLTIP_VISIBLE = true;
 };
 
