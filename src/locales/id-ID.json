@@ -187,7 +187,8 @@
     "freedraw": "Gambar",
     "text": "Teks",
     "library": "Pustaka",
-    "lock": "Biarkan alat yang dipilih aktif setelah menggambar"
+    "lock": "Biarkan alat yang dipilih aktif setelah menggambar",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
