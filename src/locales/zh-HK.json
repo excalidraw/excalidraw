@@ -187,7 +187,8 @@
     "freedraw": "",
     "text": "",
     "library": "",
-    "lock": ""
+    "lock": "",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "畫布動作",
