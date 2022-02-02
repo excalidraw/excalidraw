@@ -187,7 +187,8 @@
     "freedraw": "Kresliť",
     "text": "Text",
     "library": "Knižnica",
-    "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia"
+    "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Akcie plátna",
