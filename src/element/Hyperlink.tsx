@@ -292,7 +292,7 @@ export const isPointHittingLinkIcon = (
   appState: AppState,
   [x, y]: Point,
 ) => {
-  const threshold = 10 / appState.zoom.value;
+  const threshold = 4 / appState.zoom.value;
 
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 

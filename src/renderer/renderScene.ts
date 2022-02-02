@@ -264,6 +264,7 @@ export const renderScene = (
   visibleElements.forEach((element) => {
     try {
       renderElement(element, rc, context, renderConfig);
+      renderLinkIcon(element, context, appState);
     } catch (error: any) {
       console.error(error);
     }
@@ -294,10 +295,6 @@ export const renderScene = (
         renderBindingHighlight(context, renderConfig, suggestedBinding!);
       });
   }
-
-  visibleElements.forEach((element) => {
-    renderLinkIcon(element, context, appState);
-  });
 
   // Paint selected elements
   if (
