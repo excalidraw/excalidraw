@@ -85,3 +85,4 @@ export {
   actionRenameTable,
   actionToggleRenameTableDialog,
 } from "./actionRenameTable";
+export { actionUnbindText } from "./actionUnbindText";

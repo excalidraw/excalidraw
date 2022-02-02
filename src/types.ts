@@ -166,10 +166,6 @@ export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
 
 export type Zoom = Readonly<{
   value: NormalizedZoomValue;
-  translation: Readonly<{
-    x: number;
-    y: number;
-  }>;
 }>;
 
 export type PointerCoords = Readonly<{
