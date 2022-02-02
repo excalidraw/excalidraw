@@ -187,7 +187,8 @@
     "freedraw": "Zīmēt",
     "text": "Teksts",
     "library": "Bibliotēka",
-    "lock": "Paturēt izvēlēto rīku pēc darbības"
+    "lock": "Paturēt izvēlēto rīku pēc darbības",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
