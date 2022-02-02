@@ -187,7 +187,8 @@
     "freedraw": "Çiz",
     "text": "Yazı",
     "library": "Kütüphane",
-    "lock": "Seçilen aracı çizimden sonra aktif tut"
+    "lock": "Seçilen aracı çizimden sonra aktif tut",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Tuval eylemleri",
