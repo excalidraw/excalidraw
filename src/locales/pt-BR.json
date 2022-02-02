@@ -105,7 +105,7 @@
     "excalidrawLib": "Biblioteca do Excalidraw",
     "decreaseFontSize": "Diminuir o tamanho da fonte",
     "increaseFontSize": "Aumentar o tamanho da fonte",
-    "unbindText": ""
+    "unbindText": "Desvincular texto"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -188,7 +188,7 @@
     "text": "Texto",
     "library": "Biblioteca",
     "lock": "Manter ativa a ferramenta selecionada após desenhar",
-    "penMode": ""
+    "penMode": "Prevenir a ação de tocar-ampliar e permitir apenas interações da caneta"
   },
   "headings": {
     "canvasActions": "Ações da tela",
