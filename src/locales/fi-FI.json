@@ -187,7 +187,8 @@
     "freedraw": "Piirrä",
     "text": "Teksti",
     "library": "Kirjasto",
-    "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen"
+    "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
