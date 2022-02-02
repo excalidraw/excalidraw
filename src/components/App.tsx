@@ -142,6 +142,7 @@ import {
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
   FileId,
+  NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -2332,16 +2333,26 @@ class App extends React.Component<AppProps, AppState> {
 
   private getElementLinkAtPosition = (
     scenePointer: Readonly<{ x: number; y: number }>,
+    hitElement: NonDeletedExcalidrawElement | null,
   ): ExcalidrawElement | undefined => {
-    const elements = this.scene.getElements();
-    return elements.find(
-      (element) =>
+    // Reversing so we traverse the elements in decreasing order
+    // of z-index
+    const elements = this.scene.getElements().slice().reverse();
+    let hitElementIndex = Infinity;
+
+    return elements.find((element, index) => {
+      if (hitElement && element.id === hitElement.id) {
+        hitElementIndex = index;
+      }
+      return (
         element.link &&
         isPointHittingLinkIcon(element, this.state, [
           scenePointer.x,
           scenePointer.y,
-        ]),
-    );
+        ]) &&
+        index < hitElementIndex
+      );
+    });
   };
 
   private redirectToLink = () => {
@@ -2583,8 +2594,10 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer.x,
       scenePointer.y,
     );
-
-    this.hitLinkElement = this.getElementLinkAtPosition(scenePointer);
+    this.hitLinkElement = this.getElementLinkAtPosition(
+      scenePointer,
+      hitElement,
+    );
 
     if (
       this.hitLinkElement &&
