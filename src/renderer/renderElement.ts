@@ -414,23 +414,23 @@ const generateElementShape = (
               topY + (rightY - topY) * 0.25
             } L ${rightX - (rightX - topX) * 0.25} ${
               rightY - (rightY - topY) * 0.25
-            } 
+            }
             C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
               rightX - (rightX - bottomX) * 0.25
-            } ${rightY + (bottomY - rightY) * 0.25} 
+            } ${rightY + (bottomY - rightY) * 0.25}
             L ${bottomX + (rightX - bottomX) * 0.25} ${
               bottomY - (bottomY - rightY) * 0.25
-            }  
+            }
             C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
               bottomX - (bottomX - leftX) * 0.25
-            } ${bottomY - (bottomY - leftY) * 0.25} 
+            } ${bottomY - (bottomY - leftY) * 0.25}
             L ${leftX + (bottomX - leftX) * 0.25} ${
               leftY + (bottomY - leftY) * 0.25
-            } 
+            }
             C ${leftX} ${leftY}, ${leftX} ${leftY}, ${
               leftX + (topX - leftX) * 0.25
-            } ${leftY - (leftY - topY) * 0.25} 
-            L ${topX - (topX - leftX) * 0.25} ${topY + (leftY - topY) * 0.25} 
+            } ${leftY - (leftY - topY) * 0.25}
+            L ${topX - (topX - leftX) * 0.25} ${topY + (leftY - topY) * 0.25}
             C ${topX} ${topY}, ${topX} ${topY}, ${
               topX + (rightX - topX) * 0.25
             } ${topY + (rightY - topY) * 0.25}`,
