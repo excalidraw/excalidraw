@@ -105,7 +105,7 @@
     "excalidrawLib": "Excalidraw 素材库",
     "decreaseFontSize": "缩小字体大小",
     "increaseFontSize": "放大字体大小",
-    "unbindText": ""
+    "unbindText": "取消文本绑定"
   },
   "buttons": {
     "clearReset": "重置画布",
