@@ -187,7 +187,8 @@
     "freedraw": "Rita",
     "text": "Text",
     "library": "Bibliotek",
-    "lock": "Håll valt verktyg aktivt efter ritande"
+    "lock": "Håll valt verktyg aktivt efter ritande",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",
