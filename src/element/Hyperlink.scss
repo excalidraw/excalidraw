@@ -2,23 +2,31 @@
 
 .excalidraw-hyperlinkContainer {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: absolute;
   box-shadow: 0 2px 4px 0 rgb(0 0 0 / 30%);
   z-index: 100;
-  justify-content: space-between;
   background: $oc-white;
 
   &-input,
   button {
     z-index: 100;
   }
-  &-input {
+
+  &-input,
+  &-link {
     height: 24px;
-    width: 18rem;
-    font-size: 16px;
+    padding: 0 8px;
+    line-height: 24px;
+    font-size: 1rem;
     font-weight: 500;
+    font-family: var(--ui-font);
+  }
+
+  &-input {
+    width: 18rem;
     border: none;
-    padding: 5px 8px;
 
     &:focus,
     &:focus-visible {
@@ -32,9 +40,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 8px;
     max-width: 15rem;
   }
+
   button {
     color: $oc-blue-6;
     background-color: $oc-white !important;
