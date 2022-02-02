@@ -22,7 +22,7 @@ import clsx from "clsx";
 import { KEYS } from "../keys";
 import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
 import { rotate } from "../math";
-import { EVENT, MIME_TYPES } from "../constants";
+import { EVENT, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
 import { getTooltipDiv, updateTooltipPosition } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
@@ -309,7 +309,21 @@ export const isPointHittingLinkIcon = (
   return hitLink;
 };
 
+let HYPERLINK_TOOLTIP_TIMEOUT_ID: number | null = null;
 export const showHyperlinkTooltip = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+) => {
+  if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
+    clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
+  }
+  HYPERLINK_TOOLTIP_TIMEOUT_ID = window.setTimeout(
+    () => renderTooltip(element, appState),
+    HYPERLINK_TOOLTIP_DELAY,
+  );
+};
+
+const renderTooltip = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
 ) => {
@@ -349,8 +363,10 @@ export const showHyperlinkTooltip = (
 
   IS_HYPERLINK_TOOLTIP_VISIBLE = true;
 };
-
 export const hideHyperlinkToolip = () => {
+  if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
+    clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
+  }
   if (IS_HYPERLINK_TOOLTIP_VISIBLE) {
     IS_HYPERLINK_TOOLTIP_VISIBLE = false;
     getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
