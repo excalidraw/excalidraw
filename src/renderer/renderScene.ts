@@ -745,15 +745,13 @@ const renderBindingHighlightForSuggestedPointBinding = (
   });
 };
 
+let linkCanvasCache: HTMLCanvasElement;
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
   appState: AppState,
 ) => {
   if (element.link && !appState.selectedElementIds[element.id]) {
-    context.save();
-
-    context.translate(appState.scrollX, appState.scrollY);
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const [x, y, width, height] = getLinkHandleFromCoords(
       [x1, y1, x2, y2],
@@ -763,19 +761,47 @@ const renderLinkIcon = (
     const centerX = x + width / 2;
     const centerY = y + height / 2;
     context.save();
+    context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
+    context.save();
     context.restore();
-    context.translate(centerX, centerY);
     context.rotate(element.angle);
-    context.fillStyle = "#fff";
-    context.fillRect(x - centerX, y - centerY, width, height);
+    if (!linkCanvasCache) {
+      const linkCanvasCache = document.createElement("canvas");
+      linkCanvasCache.width = width;
+      linkCanvasCache.height = height;
+      const linkCanvasCacheContext = linkCanvasCache.getContext("2d")!;
 
-    context.drawImage(
-      EXTERNAL_LINK_IMG,
-      x - centerX,
-      y - centerY,
-      width,
-      height,
-    );
+      linkCanvasCacheContext.fillStyle = "#fff";
+      linkCanvasCacheContext.fillRect(
+        0,
+        0,
+        linkCanvasCache.width,
+        linkCanvasCache.height,
+      );
+      linkCanvasCacheContext.drawImage(
+        EXTERNAL_LINK_IMG,
+        0,
+        0,
+        linkCanvasCache.width,
+        linkCanvasCache.height,
+      );
+
+      context.drawImage(
+        linkCanvasCache,
+        x - centerX,
+        y - centerY,
+        linkCanvasCache.width,
+        linkCanvasCache.height,
+      );
+    } else {
+      context.drawImage(
+        linkCanvasCache,
+        x - centerX,
+        y - centerY,
+        linkCanvasCache.width,
+        linkCanvasCache.height,
+      );
+    }
     context.restore();
   }
 };
