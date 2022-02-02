@@ -188,7 +188,7 @@
     "text": "Text",
     "library": "Bibliotecă",
     "lock": "Menține activ instrumentul selectat după desenare",
-    "penMode": ""
+    "penMode": "Împiedică mărirea prin ciupire și acceptă desenarea liberă doar de la stilou"
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
