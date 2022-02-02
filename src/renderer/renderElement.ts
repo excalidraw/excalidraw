@@ -939,7 +939,9 @@ export const renderElementToSvg = (
         }
         node.setAttribute(
           "transform",
-          `translate(${offsetX || 0} ${offsetY}) rotate(${degree} ${cx} ${cy})`,
+          `translate(${offsetX || 0} ${
+            offsetY || 0
+          }) rotate(${degree} ${cx} ${cy})`,
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
