@@ -187,7 +187,8 @@
     "freedraw": "自由书写",
     "text": "文字",
     "library": "素材库",
-    "lock": "绘制后保持所选的工具栏状态"
+    "lock": "绘制后保持所选的工具栏状态",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "画布动作",
