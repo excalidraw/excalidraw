@@ -187,7 +187,8 @@
     "freedraw": "Zeichnen",
     "text": "Text",
     "library": "Bibliothek",
-    "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen"
+    "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
