@@ -187,7 +187,8 @@
     "freedraw": "Piešti",
     "text": "Tekstas",
     "library": "Biblioteka",
-    "lock": ""
+    "lock": "",
+    "penMode": ""
   },
   "headings": {
     "canvasActions": "",
