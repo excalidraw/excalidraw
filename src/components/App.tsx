@@ -247,6 +247,7 @@ import {
   hideHyperlinkToolip,
   Hyperlink,
   isPointHittingLinkIcon,
+  isLocalLink,
 } from "../element/Hyperlink";
 
 const IsMobileContext = React.createContext(false);
@@ -2386,7 +2387,8 @@ class App extends React.Component<AppProps, AppState> {
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement?.link;
       if (url) {
-        const newWindow = window.open();
+        const target = isLocalLink(url) ? "_self" : "_blank";
+        const newWindow = window.open(undefined, target);
         // https://mathiasbynens.github.io/rel-noopener/
         if (newWindow) {
           newWindow.opener = null;

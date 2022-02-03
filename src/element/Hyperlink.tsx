@@ -158,8 +158,8 @@ export const Hyperlink = ({
           className={clsx("excalidraw-hyperlinkContainer-link", {
             "d-none": isEditing,
           })}
-          target="_blank"
-          rel="noreferrer"
+          target={isLocalLink(element.link) ? "_self" : "_blank"}
+          rel="noopener noreferrer"
         >
           {element.link}
         </a>
@@ -210,11 +210,15 @@ export const normalizeLink = (link: string) => {
   link = link.trim();
   if (link) {
     // prefix with protocol if not fully-qualified
-    if (!link.includes("://") && !link.startsWith("[")) {
+    if (!link.includes("://") && !/^[[\\/]/.test(link)) {
       link = `https://${link}`;
     }
   }
   return link;
+};
+
+export const isLocalLink = (link: string | null) => {
+  return !!(link?.includes(location.origin) || link?.startsWith("/"));
 };
 
 export const actionLink = register({
