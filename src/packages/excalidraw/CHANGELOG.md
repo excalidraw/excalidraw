@@ -17,10 +17,6 @@ Please add the latest change on the top under the correct section.
 
 - [`exportToBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToBlob) now automatically sets `appState.exportBackground` to `true` if exporting to `image/jpeg` MIME type (to ensure that alpha channel is not compressed to black color).
 
-## Excalidraw App Props
-
-- `handleLinkNavigation (url: string) => void`. If provided Excalidraw will call this function to open element hyperlinks.
-
 ### Features
 
 - Support updating library using [`updateScene`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene) API [#4546](https://github.com/excalidraw/excalidraw/pull/4546).
