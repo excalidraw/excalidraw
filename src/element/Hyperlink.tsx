@@ -229,15 +229,14 @@ export const isLocalLink = (link: string | null) => {
 export const actionLink = register({
   name: "link",
   perform: (elements, appState) => {
+    if (appState.showHyperlinkPopup === "editor") {
+      return false;
+    }
     return {
       elements,
       appState: {
         ...appState,
-        showHyperlinkPopup: !appState.showHyperlinkPopup
-          ? "info"
-          : appState.showHyperlinkPopup === "info"
-          ? "editor"
-          : false,
+        showHyperlinkPopup: "editor",
       },
       commitToHistory: true,
     };
