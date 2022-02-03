@@ -105,7 +105,12 @@
     "excalidrawLib": "Excalidraw knižnica",
     "decreaseFontSize": "Zmenšiť veľkosť písma",
     "increaseFontSize": "Zväčšiť veľkosť písma",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -188,7 +193,8 @@
     "text": "Text",
     "library": "Knižnica",
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Akcie plátna",
