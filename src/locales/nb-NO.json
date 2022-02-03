@@ -107,9 +107,9 @@
     "increaseFontSize": "Øk skriftstørrelse",
     "unbindText": "Avbind tekst",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Rediger lenke",
+      "create": "Opprett lenke",
+      "label": "Lenke"
     }
   },
   "buttons": {
@@ -194,7 +194,7 @@
     "library": "Bibliotek",
     "lock": "Behold merket verktøy som aktivt",
     "penMode": "Forhindre zoom ved kniping og godta frihåndstegning kun fra penn",
-    "link": ""
+    "link": "Legg til / oppdater link for en valgt figur"
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
