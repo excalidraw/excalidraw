@@ -2367,7 +2367,7 @@ class App extends React.Component<AppProps, AppState> {
           scenePointer.x,
           scenePointer.y,
         ]) &&
-        index < hitElementIndex
+        index <= hitElementIndex
       );
     });
   };
