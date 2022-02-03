@@ -154,6 +154,7 @@ export type AppState = {
       };
   /** imageElement waiting to be placed on canvas */
   pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
+  showHyperlinkPopup: false | "info" | "editor";
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

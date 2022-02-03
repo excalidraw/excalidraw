@@ -30,7 +30,8 @@ export type ShortcutName =
   | "addToLibrary"
   | "viewMode"
   | "flipHorizontal"
-  | "flipVertical";
+  | "flipVertical"
+  | "link";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   cut: [getShortcutKey("CtrlOrCmd+X")],
@@ -67,6 +68,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   flipHorizontal: [getShortcutKey("Shift+H")],
   flipVertical: [getShortcutKey("Shift+V")],
   viewMode: [getShortcutKey("Alt+R")],
+  link: [getShortcutKey("CtrlOrCmd+K")],
 };
 
 export const getShortcutFromShortcutName = (
