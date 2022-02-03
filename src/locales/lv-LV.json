@@ -107,9 +107,9 @@
     "increaseFontSize": "Palielināt fonta izmēru",
     "unbindText": "Atdalīt tekstu",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Rediģēt saiti",
+      "create": "Izveidot saiti",
+      "label": "Saite"
     }
   },
   "buttons": {
@@ -194,7 +194,7 @@
     "library": "Bibliotēka",
     "lock": "Paturēt izvēlēto rīku pēc darbības",
     "penMode": "Lietojot pildspalvu, bloķēt tuvināšanu un atļaut tikai zīmēšanu",
-    "link": ""
+    "link": "Pievienot/rediģēt atlasītās figūras saiti"
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
@@ -274,12 +274,12 @@
     "doubleClick": "dubultklikšķis",
     "drag": "vilkt",
     "editor": "Redaktors",
-    "editSelectedShape": "Rediģēt atlasīto formu (tekstu/bultu/līniju)",
+    "editSelectedShape": "Rediģēt atlasīto figūru (tekstu/bultu/līniju)",
     "github": "Sastapāt kļūdu? Ziņot",
     "howto": "Sekojiet mūsu instrukcijām",
     "or": "vai",
     "preventBinding": "Novērst bultu piesaistīšanos",
-    "shapes": "Formas",
+    "shapes": "Figūras",
     "shortcuts": "Tastatūras saīsnes",
     "textFinish": "Pabeigt rediģēšanu (teksta redaktorā)",
     "textNewLine": "Nākamā rindiņa (teksta redaktorā)",
