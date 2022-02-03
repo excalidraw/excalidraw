@@ -264,7 +264,9 @@ export const renderScene = (
   visibleElements.forEach((element) => {
     try {
       renderElement(element, rc, context, renderConfig);
-      renderLinkIcon(element, context, appState);
+      if (!isExporting) {
+        renderLinkIcon(element, context, appState);
+      }
     } catch (error: any) {
       console.error(error);
     }
