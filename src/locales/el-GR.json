@@ -105,7 +105,12 @@
     "excalidrawLib": "Βιβλιοθήκη Excalidraw",
     "decreaseFontSize": "",
     "increaseFontSize": "",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -188,7 +193,8 @@
     "text": "Κείμενο",
     "library": "Βιβλιοθήκη",
     "lock": "Κράτησε επιλεγμένο το εργαλείο μετά το σχέδιο",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Ενέργειες καμβά",
