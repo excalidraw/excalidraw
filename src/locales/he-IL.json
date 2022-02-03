@@ -105,7 +105,12 @@
     "excalidrawLib": "",
     "decreaseFontSize": "",
     "increaseFontSize": "",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -188,7 +193,8 @@
     "text": "טקסט",
     "library": "ספריה",
     "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "פעולות הלוח",
