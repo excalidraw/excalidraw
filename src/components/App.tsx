@@ -2384,7 +2384,15 @@ class App extends React.Component<AppProps, AppState> {
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
     );
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
-      window.open(normalizeLink(this.hitLinkElement!.link!));
+      const url = this.hitLinkElement?.link;
+      if (url) {
+        const newWindow = window.open();
+        // https://mathiasbynens.github.io/rel-noopener/
+        if (newWindow) {
+          newWindow.opener = null;
+          newWindow.location = normalizeLink(url);
+        }
+      }
     }
   };
   private attachLinkListener = () => {
