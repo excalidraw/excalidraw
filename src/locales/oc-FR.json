@@ -105,7 +105,12 @@
     "excalidrawLib": "Bibliotèca Excalidraw",
     "decreaseFontSize": "Reduire talha poliça",
     "increaseFontSize": "Aumentar talha poliça",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
@@ -188,7 +193,8 @@
     "text": "Tèxt",
     "library": "Bibliotèca",
     "lock": "Mantenir activa l’aisina aprèp dessenhar",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
