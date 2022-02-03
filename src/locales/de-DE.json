@@ -105,7 +105,12 @@
     "excalidrawLib": "Excalidraw-Bibliothek",
     "decreaseFontSize": "Schrift verkleinern",
     "increaseFontSize": "Schrift vergrößern",
-    "unbindText": "Text lösen"
+    "unbindText": "Text lösen",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -188,7 +193,8 @@
     "text": "Text",
     "library": "Bibliothek",
     "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
