@@ -145,6 +145,7 @@ export const Hyperlink = ({
             event.stopPropagation();
             // prevent cmd/ctrl+k shortcut when editing link
             if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K) {
+              handleSubmit();
               event.preventDefault();
             }
             if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {
