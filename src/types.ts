@@ -259,6 +259,7 @@ export interface ExcalidrawProps {
   ) => [string, string];
   generateIdForFile?: (file: File) => string | Promise<string>;
   onThemeChange?: (newTheme: string) => void;
+  onLinkOpen?: (link: string, event: MouseEvent) => void;
 }
 
 export type SceneData = {

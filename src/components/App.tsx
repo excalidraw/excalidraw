@@ -535,6 +535,7 @@ class App extends React.Component<AppProps, AppState> {
                 element={selectedElement[0]}
                 appState={this.state}
                 setAppState={this.setAppState}
+                onLinkOpen={this.props.onLinkOpen}
               />
             )}
             {this.state.showStats && (
@@ -2507,7 +2508,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private redirectToLink = () => {
+  private redirectToLink = (event: MouseEvent) => {
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
       this.lastPointerDown!,
       this.state,
@@ -2529,12 +2530,16 @@ class App extends React.Component<AppProps, AppState> {
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement?.link;
       if (url) {
-        const target = isLocalLink(url) ? "_self" : "_blank";
-        const newWindow = window.open(undefined, target);
-        // https://mathiasbynens.github.io/rel-noopener/
-        if (newWindow) {
-          newWindow.opener = null;
-          newWindow.location = normalizeLink(url);
+        if (this.props.onLinkOpen) {
+          this.props.onLinkOpen(url, event);
+        } else {
+          const target = isLocalLink(url) ? "_self" : "_blank";
+          const newWindow = window.open(undefined, target);
+          // https://mathiasbynens.github.io/rel-noopener/
+          if (newWindow) {
+            newWindow.opener = null;
+            newWindow.location = normalizeLink(url);
+          }
         }
       }
     }
