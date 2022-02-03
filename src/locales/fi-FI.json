@@ -103,13 +103,13 @@
     "toggleTheme": "Vaihda teema",
     "personalLib": "Oma kirjasto",
     "excalidrawLib": "Excalidraw kirjasto",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
+    "decreaseFontSize": "Pienennä kirjasinkokoa",
+    "increaseFontSize": "Kasvata kirjasinkokoa",
     "unbindText": "",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Muokkaa linkkiä",
+      "create": "Luo linkki",
+      "label": "Linkki"
     }
   },
   "buttons": {
@@ -193,8 +193,8 @@
     "text": "Teksti",
     "library": "Kirjasto",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen",
-    "penMode": "",
-    "link": ""
+    "penMode": "Estä nipistyszoomaus ja vastaanota ainoastaan kynällä piirretty",
+    "link": "Lisää/päivitä linkki valitulle muodolle"
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
@@ -214,11 +214,11 @@
     "resizeImage": "Voit muuttaa kokoa vapaasti pitämällä SHIFTiä pohjassa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen ympäri",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Poista piste(et) painamalla delete, monista painamalla CtrlOrCmd+D, tai liikuta raahaamalla",
+    "lineEditor_nothingSelected": "Valitse muokattava piste (monivalinta pitämällä SHIFT pohjassa), tai paina Alt ja klikkaa lisätäksesi uusia pisteitä",
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
     "publishLibrary": "Julkaise oma kirjasto",
-    "bindTextToElement": "",
+    "bindTextToElement": "Lisää tekstiä painamalla enter",
     "deepBoxSelect": ""
   },
   "canvasError": {
