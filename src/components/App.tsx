@@ -520,6 +520,7 @@ class App extends React.Component<AppProps, AppState> {
             <div className="excalidraw-contextMenuContainer" />
             {selectedElement.length === 1 && this.state.showHyperlinkPopup && (
               <Hyperlink
+                key={selectedElement[0].id}
                 element={selectedElement[0]}
                 appState={this.state}
                 setAppState={this.setAppState}
