@@ -107,9 +107,9 @@
     "increaseFontSize": "Augmenter la taille de police",
     "unbindText": "Délier le texte",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Modifier le lien",
+      "create": "Créer un lien",
+      "label": "Lien"
     }
   },
   "buttons": {
@@ -194,7 +194,7 @@
     "library": "Bibliothèque",
     "lock": "Garder l'outil sélectionné actif après le dessin",
     "penMode": "Empêcher le zoom tactile et accepter la saisie libre uniquement à partir du stylet",
-    "link": ""
+    "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée"
   },
   "headings": {
     "canvasActions": "Actions du canevas",
