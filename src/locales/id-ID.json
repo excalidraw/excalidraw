@@ -105,7 +105,12 @@
     "excalidrawLib": "Pustaka Excalidraw",
     "decreaseFontSize": "Kecilkan ukuran font",
     "increaseFontSize": "Besarkan ukuran font",
-    "unbindText": "Lepas teks"
+    "unbindText": "Lepas teks",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -188,7 +193,8 @@
     "text": "Teks",
     "library": "Pustaka",
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
