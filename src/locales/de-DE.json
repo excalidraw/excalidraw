@@ -107,9 +107,9 @@
     "increaseFontSize": "Schrift vergrößern",
     "unbindText": "Text lösen",
     "link": {
-      "edit": "Verknüpfung bearbeiten",
-      "create": "Verknüpfung erstellen",
-      "label": "Verknüpfung"
+      "edit": "Link bearbeiten",
+      "create": "Link erstellen",
+      "label": "Link"
     }
   },
   "buttons": {
@@ -194,7 +194,7 @@
     "library": "Bibliothek",
     "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen",
     "penMode": "",
-    "link": ""
+    "link": "Link für ausgewählte Form hinzufügen / aktualisieren"
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
