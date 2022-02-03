@@ -5,9 +5,13 @@
   align-items: center;
   justify-content: space-between;
   position: absolute;
-  box-shadow: 0 2px 4px 0 rgb(0 0 0 / 30%);
+  box-shadow: 0px 2px 4px 0 rgb(0 0 0 / 30%);
   z-index: 100;
-  background: $oc-white;
+  background: var(--island-bg-color);
+  border-radius: var(--border-radius-md);
+  box-sizing: border-box;
+  // to account for LS due to rendering icons after new link created
+  min-height: 42px;
 
   &-input,
   button {
@@ -19,7 +23,7 @@
     height: 24px;
     padding: 0 8px;
     line-height: 24px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     font-family: var(--ui-font);
   }
@@ -27,6 +31,8 @@
   &-input {
     width: 18rem;
     border: none;
+    background-color: transparent;
+    color: var(--text-primary-color);
 
     &:focus,
     &:focus-visible {
@@ -45,7 +51,7 @@
 
   button {
     color: $oc-blue-6;
-    background-color: $oc-white !important;
+    background-color: transparent !important;
     font-weight: 500;
     &.excalidraw-hyperlinkContainer--remove {
       color: $oc-red-9;
@@ -56,18 +62,8 @@
     display: none;
   }
 
-  &--edit .ToolIcon__icon svg {
-    color: $oc-green-7;
-    fill: $oc-green-7;
-  }
-
   &--remove .ToolIcon__icon svg {
-    color: $oc-red-7;
-    fill: $oc-red-7;
-  }
-  &--save .ToolIcon__icon svg {
-    color: $oc-green-7;
-    fill: $oc-green-7;
+    color: $oc-red-6;
   }
 
   .ToolIcon__icon {
