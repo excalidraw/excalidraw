@@ -188,7 +188,7 @@
     "text": "文字",
     "library": "資料庫",
     "lock": "可連續使用選取的工具",
-    "penMode": ""
+    "penMode": "停止使用手勢縮放並接受以繪圖筆繪圖輸入"
   },
   "headings": {
     "canvasActions": "canvas 動作",
