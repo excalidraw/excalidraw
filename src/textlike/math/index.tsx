@@ -615,6 +615,7 @@ const measureTextElementMath = (
     | "containerId"
     | "originalText"
     | "updated"
+    | "link"
   >,
   next?: {
     fontSize?: number;
@@ -784,6 +785,7 @@ export const wrapTextElementMath = (
     | "boundElements"
     | "containerId"
     | "updated"
+    | "link"
   >,
   containerWidth: number,
   next?: {
