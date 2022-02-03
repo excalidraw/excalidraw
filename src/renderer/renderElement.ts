@@ -386,7 +386,7 @@ const generateElementShape = (
           const h = element.height;
           const r = Math.min(w, h) * 0.25;
           shape = generator.path(
-            `M ${r} 0  L ${w - r} 0  Q ${w} 0, ${w} ${r} L ${w} ${
+            `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
               h - r
             } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
               h - r
