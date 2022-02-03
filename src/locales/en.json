@@ -191,7 +191,8 @@
     "freedraw": "Draw",
     "text": "Text",
     "library": "Library",
-    "lock": "Keep selected tool active after drawing"
+    "lock": "Keep selected tool active after drawing",
+    "link": "Add/ Update link for a selected shape"
   },
   "headings": {
     "canvasActions": "Canvas actions",
