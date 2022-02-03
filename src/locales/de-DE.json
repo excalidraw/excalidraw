@@ -107,9 +107,9 @@
     "increaseFontSize": "Schrift vergrößern",
     "unbindText": "Text lösen",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Verknüpfung bearbeiten",
+      "create": "Verknüpfung erstellen",
+      "label": "Verknüpfung"
     }
   },
   "buttons": {
