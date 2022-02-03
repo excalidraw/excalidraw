@@ -105,7 +105,12 @@
     "excalidrawLib": "Excalidraw 素材库",
     "decreaseFontSize": "缩小字体大小",
     "increaseFontSize": "放大字体大小",
-    "unbindText": "取消文本绑定"
+    "unbindText": "取消文本绑定",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -188,7 +193,8 @@
     "text": "文字",
     "library": "素材库",
     "lock": "绘制后保持所选的工具栏状态",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "画布动作",
