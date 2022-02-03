@@ -107,9 +107,9 @@
     "increaseFontSize": "Öka fontstorleken",
     "unbindText": "Koppla bort text",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Redigera länk",
+      "create": "Skapa länk",
+      "label": "Länk"
     }
   },
   "buttons": {
@@ -194,7 +194,7 @@
     "library": "Bibliotek",
     "lock": "Håll valt verktyg aktivt efter ritande",
     "penMode": "Förhindra nypzoom och acceptera endast frihandsteckning från penna",
-    "link": ""
+    "link": "Lägg till / Uppdatera länk för en vald form"
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",
