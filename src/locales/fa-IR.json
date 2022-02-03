@@ -105,7 +105,12 @@
     "excalidrawLib": "",
     "decreaseFontSize": "",
     "increaseFontSize": "",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -188,7 +193,8 @@
     "text": "متن",
     "library": "کتابخانه",
     "lock": "ابزار انتخاب شده را بعد از کشیدن نگه دار",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
