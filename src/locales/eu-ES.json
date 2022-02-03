@@ -105,7 +105,12 @@
     "excalidrawLib": "Excalidraw liburutegia",
     "decreaseFontSize": "Txikitu letra tamaina",
     "increaseFontSize": "Handitu letra tamaina",
-    "unbindText": "Askatu testua"
+    "unbindText": "Askatu testua",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Garbitu oihala",
@@ -188,7 +193,8 @@
     "text": "Testua",
     "library": "Liburutegia",
     "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
