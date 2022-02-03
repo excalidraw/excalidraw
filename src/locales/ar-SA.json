@@ -105,7 +105,12 @@
     "excalidrawLib": "مكتبتنا",
     "decreaseFontSize": "تصغير حجم الخط",
     "increaseFontSize": "تكبير حجم الخط",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -188,7 +193,8 @@
     "text": "نص",
     "library": "مكتبة",
     "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
