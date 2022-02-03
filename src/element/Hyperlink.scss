@@ -34,12 +34,9 @@
     background-color: transparent;
     color: var(--text-primary-color);
 
-    &:focus,
-    &:focus-visible {
-      outline: none;
-      border: none;
-      box-shadow: none !important;
-    }
+    outline: none;
+    border: none;
+    box-shadow: none !important;
   }
 
   &-link {
