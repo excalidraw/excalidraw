@@ -3202,7 +3202,6 @@ class App extends React.Component<AppProps, AppState> {
             return true;
           }
         }
-
         // hitElement may already be set above, so check first
         pointerDownState.hit.element =
           pointerDownState.hit.element ??
@@ -3212,6 +3211,15 @@ class App extends React.Component<AppProps, AppState> {
           );
 
         if (pointerDownState.hit.element) {
+          // Early return if pointer is hitting link icon
+          if (
+            isPointHittingLinkIcon(pointerDownState.hit.element, this.state, [
+              pointerDownState.origin.x,
+              pointerDownState.origin.y,
+            ])
+          ) {
+            return false;
+          }
           pointerDownState.hit.hasHitElementInside =
             isHittingElementNotConsideringBoundingBox(
               pointerDownState.hit.element,
