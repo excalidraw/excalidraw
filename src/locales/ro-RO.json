@@ -105,7 +105,12 @@
     "excalidrawLib": "Biblioteca Excalidraw",
     "decreaseFontSize": "Micșorează dimensiunea fontului",
     "increaseFontSize": "Mărește dimensiunea fontului",
-    "unbindText": "Deconectare text"
+    "unbindText": "Deconectare text",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -188,7 +193,8 @@
     "text": "Text",
     "library": "Bibliotecă",
     "lock": "Menține activ instrumentul selectat după desenare",
-    "penMode": "Împiedică mărirea prin ciupire și acceptă desenarea liberă doar de la stilou"
+    "penMode": "Împiedică mărirea prin ciupire și acceptă desenarea liberă doar de la stilou",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
