@@ -105,7 +105,12 @@
     "excalidrawLib": "Excalidraw bibliotēka",
     "decreaseFontSize": "Samazināt fonta izmēru",
     "increaseFontSize": "Palielināt fonta izmēru",
-    "unbindText": "Atdalīt tekstu"
+    "unbindText": "Atdalīt tekstu",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
@@ -188,7 +193,8 @@
     "text": "Teksts",
     "library": "Bibliotēka",
     "lock": "Paturēt izvēlēto rīku pēc darbības",
-    "penMode": "Lietojot pildspalvu, bloķēt tuvināšanu un atļaut tikai zīmēšanu"
+    "penMode": "Lietojot pildspalvu, bloķēt tuvināšanu un atļaut tikai zīmēšanu",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
