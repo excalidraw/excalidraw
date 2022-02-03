@@ -105,7 +105,12 @@
     "excalidrawLib": "Excalidraw 라이브러리",
     "decreaseFontSize": "폰트 사이즈 줄이기",
     "increaseFontSize": "폰트 사이즈 키우기",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -188,7 +193,8 @@
     "text": "텍스트",
     "library": "라이브러리",
     "lock": "선택된 도구 유지하기",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "캔버스 동작",
