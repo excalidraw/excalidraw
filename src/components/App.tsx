@@ -520,12 +520,7 @@ class App extends React.Component<AppProps, AppState> {
               <Hyperlink
                 element={selectedElement[0]}
                 appState={this.state}
-                onSubmit={() =>
-                  this.setState({
-                    showHyperlinkPopup: false,
-                  })
-                }
-                editView={this.state.showHyperlinkPopup === "editor"}
+                setAppState={this.setAppState}
               />
             )}
             {this.state.showStats && (

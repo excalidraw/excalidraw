@@ -47,20 +47,17 @@ let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
 export const Hyperlink = ({
   element,
   appState,
-  onSubmit,
-  editView = false,
+  setAppState,
 }: {
   element: NonDeletedExcalidrawElement;
   appState: AppState;
-  onSubmit: () => void;
-  editView: boolean;
+  setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const linkVal = element.link || "";
 
-  const [isEditing, setIsEditing] = useState(editView);
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
-  const showInput = isEditing || !linkVal;
+  const isEditing = appState.showHyperlinkPopup === "editor" || !linkVal;
 
   const handleSubmit = useCallback(() => {
     if (!inputRef.current) {
@@ -70,8 +67,8 @@ export const Hyperlink = ({
     const link = normalizeLink(inputRef.current.value);
 
     mutateElement(element, { link });
-    setIsEditing(false);
-  }, [element]);
+    setAppState({ showHyperlinkPopup: "info" });
+  }, [element, setAppState]);
 
   useLayoutEffect(() => {
     return () => {
@@ -93,7 +90,9 @@ export const Hyperlink = ({
         event.clientY,
       ]) as boolean;
       if (shouldHide) {
-        timeoutId = window.setTimeout(onSubmit, AUTO_HIDE_TIMEOUT);
+        timeoutId = window.setTimeout(() => {
+          setAppState({ showHyperlinkPopup: false });
+        }, AUTO_HIDE_TIMEOUT);
       }
     };
     window.addEventListener(EVENT.POINTER_MOVE, handlePointerMove, false);
@@ -103,22 +102,18 @@ export const Hyperlink = ({
         clearTimeout(timeoutId);
       }
     };
-  }, [appState, element, isEditing, onSubmit]);
-
-  useEffect(() => {
-    setIsEditing(editView);
-  }, [editView]);
+  }, [appState, element, isEditing, setAppState]);
 
   const handleRemove = useCallback(() => {
     mutateElement(element, { link: null });
     if (isEditing) {
       inputRef.current!.value = "";
     }
-    onSubmit();
-  }, [onSubmit, element, isEditing]);
+    setAppState({ showHyperlinkPopup: false });
+  }, [setAppState, element, isEditing]);
 
   const onEdit = () => {
-    setIsEditing(true);
+    setAppState({ showHyperlinkPopup: "editor" });
   };
   const { x, y } = getCoordsForPopover(element, appState);
   if (
@@ -138,7 +133,7 @@ export const Hyperlink = ({
         padding: CONTAINER_PADDING,
       }}
     >
-      {showInput ? (
+      {isEditing ? (
         <input
           className={clsx("excalidraw-hyperlinkContainer-input")}
           placeholder="Type or paste your link here"
@@ -170,7 +165,7 @@ export const Hyperlink = ({
         </a>
       )}
       <div>
-        {!showInput && (
+        {!isEditing && (
           <ToolButton
             type="button"
             title={t("buttons.edit")}
