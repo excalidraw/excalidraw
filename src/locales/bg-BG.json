@@ -105,7 +105,12 @@
     "excalidrawLib": "",
     "decreaseFontSize": "",
     "increaseFontSize": "",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -188,7 +193,8 @@
     "text": "Текст",
     "library": "Библиотека",
     "lock": "Поддържайте избрания инструмент активен след рисуване",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Действия по платното",
