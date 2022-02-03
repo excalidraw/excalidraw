@@ -105,7 +105,12 @@
     "excalidrawLib": "Excalidraw Kitaplığı",
     "decreaseFontSize": "",
     "increaseFontSize": "",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -188,7 +193,8 @@
     "text": "Yazı",
     "library": "Kütüphane",
     "lock": "Seçilen aracı çizimden sonra aktif tut",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Tuval eylemleri",
