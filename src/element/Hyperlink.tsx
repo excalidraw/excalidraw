@@ -32,7 +32,7 @@ import "./Hyperlink.scss";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
-const CONTAINER_PADDING = 8;
+const CONTAINER_PADDING = 5;
 const CONTAINER_HEIGHT = 42;
 const AUTO_HIDE_TIMEOUT = 500;
 
