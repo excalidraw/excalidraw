@@ -244,6 +244,8 @@ export const actionLink = register({
     return selectedElements.length === 1;
   },
   PanelComponent: ({ elements, appState, updateData }) => {
+    const selectedElements = getSelectedElements(elements, appState);
+
     return (
       <ToolButton
         type="button"
@@ -251,6 +253,7 @@ export const actionLink = register({
         aria-label={t(getContextMenuLabel(elements, appState))}
         title={`${t("labels.link.label")} - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}
+        selected={selectedElements.length === 1 && !!selectedElements[0].link}
       />
     );
   },
