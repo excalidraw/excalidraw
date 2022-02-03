@@ -105,7 +105,12 @@
     "excalidrawLib": "",
     "decreaseFontSize": "",
     "increaseFontSize": "",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -188,7 +193,8 @@
     "text": "Szöveg",
     "library": "Könyvtár",
     "lock": "Rajzolás után az aktív eszközt tartsa kijelölve",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Vászon műveletek",
