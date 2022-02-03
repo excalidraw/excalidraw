@@ -334,7 +334,6 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
       showHyperlinkPopup: false,
-      showEditViewInLinkPopup: false,
     };
 
     this.id = nanoid();
@@ -524,10 +523,9 @@ class App extends React.Component<AppProps, AppState> {
                 onSubmit={() =>
                   this.setState({
                     showHyperlinkPopup: false,
-                    showEditViewInLinkPopup: false,
                   })
                 }
-                editView={this.state.showEditViewInLinkPopup}
+                editView={this.state.showHyperlinkPopup === "editor"}
               />
             )}
             {this.state.showStats && (
@@ -2666,7 +2664,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedElementIds[hitElement.id] &&
         !this.state.showHyperlinkPopup
       ) {
-        this.setState({ showHyperlinkPopup: true });
+        this.setState({ showHyperlinkPopup: "info" });
       }
       if (this.state.elementType === "text") {
         setCursor(
@@ -2745,7 +2743,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
-      showEditViewInLinkPopup: false,
     });
     this.savePointer(event.clientX, event.clientY, "down");
 
@@ -3293,7 +3290,7 @@ class App extends React.Component<AppProps, AppState> {
                       ...prevState.selectedElementIds,
                       [hitElement.id]: true,
                     },
-                    showHyperlinkPopup: !!hitElement.link,
+                    showHyperlinkPopup: hitElement.link ? "info" : false,
                   },
                   this.scene.getElements(),
                 );
@@ -3950,10 +3947,11 @@ class App extends React.Component<AppProps, AppState> {
                       }
                     : null),
                 },
-                showHyperlinkPopup: !!(
+                showHyperlinkPopup:
                   elementsWithinSelection.length === 1 &&
                   elementsWithinSelection[0].link
-                ),
+                    ? "info"
+                    : false,
               },
               this.scene.getElements(),
             ),

@@ -85,7 +85,6 @@ export const getDefaultAppState = (): Omit<
     viewModeEnabled: false,
     pendingImageElement: null,
     showHyperlinkPopup: false,
-    showEditViewInLinkPopup: false,
   };
 };
 
@@ -177,7 +176,6 @@ const APP_STATE_STORAGE_CONF = (<
   viewModeEnabled: { browser: false, export: false, server: false },
   pendingImageElement: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
-  showEditViewInLinkPopup: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

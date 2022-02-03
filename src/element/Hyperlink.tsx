@@ -229,8 +229,11 @@ export const actionLink = register({
       elements,
       appState: {
         ...appState,
-        showHyperlinkPopup: !appState.showHyperlinkPopup,
-        showEditViewInLinkPopup: true,
+        showHyperlinkPopup: !appState.showHyperlinkPopup
+          ? "info"
+          : appState.showHyperlinkPopup === "info"
+          ? "editor"
+          : false,
       },
       commitToHistory: true,
     };
