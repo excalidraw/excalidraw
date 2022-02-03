@@ -107,9 +107,9 @@
     "increaseFontSize": "Mărește dimensiunea fontului",
     "unbindText": "Deconectare text",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Editare URL",
+      "create": "Creare URL",
+      "label": "URL"
     }
   },
   "buttons": {
@@ -194,7 +194,7 @@
     "library": "Bibliotecă",
     "lock": "Menține activ instrumentul selectat după desenare",
     "penMode": "Împiedică mărirea prin ciupire și acceptă desenarea liberă doar de la stilou",
-    "link": ""
+    "link": "Adăugare/actualizare URL pentru forma selectată"
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
