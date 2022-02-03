@@ -136,6 +136,7 @@ describe("contextMenu element", () => {
       "sendToBack",
       "bringToFront",
       "duplicateSelection",
+      "link",
     ];
 
     expect(contextMenu).not.toBeNull();

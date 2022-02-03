@@ -205,6 +205,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   label={t("helpDialog.preventBinding")}
                   shortcuts={[getShortcutKey("CtrlOrCmd")]}
                 />
+                <Shortcut
+                  label={t("toolBar.link")}
+                  shortcuts={[getShortcutKey("CtrlOrCmd+K")]}
+                />
               </ShortcutIsland>
               <ShortcutIsland caption={t("helpDialog.view")}>
                 <Shortcut

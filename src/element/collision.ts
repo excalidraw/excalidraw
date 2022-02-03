@@ -96,7 +96,6 @@ export const isHittingElementNotConsideringBoundingBox = (
     : isElementDraggableFromInside(element)
     ? isInsideCheck
     : isNearCheck;
-
   return hitTestPointAgainstElement({ element, point, threshold, check });
 };
 
@@ -105,7 +104,7 @@ const isElementSelected = (
   element: NonDeleted<ExcalidrawElement>,
 ) => appState.selectedElementIds[element.id];
 
-const isPointHittingElementBoundingBox = (
+export const isPointHittingElementBoundingBox = (
   element: NonDeleted<ExcalidrawElement>,
   [x, y]: Point,
   threshold: number,

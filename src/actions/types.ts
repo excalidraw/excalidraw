@@ -104,7 +104,8 @@ export type ActionName =
   | "toggleTheme"
   | "increaseFontSize"
   | "decreaseFontSize"
-  | "unbindText";
+  | "unbindText"
+  | "link";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
