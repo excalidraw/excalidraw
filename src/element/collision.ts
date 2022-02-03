@@ -96,12 +96,7 @@ export const isHittingElementNotConsideringBoundingBox = (
     : isElementDraggableFromInside(element)
     ? isInsideCheck
     : isNearCheck;
-  return hitTestPointAgainstElement({
-    element,
-    point,
-    threshold,
-    check,
-  });
+  return hitTestPointAgainstElement({ element, point, threshold, check });
 };
 
 const isElementSelected = (
