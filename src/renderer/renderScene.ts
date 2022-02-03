@@ -762,8 +762,6 @@ const renderLinkIcon = (
     const centerY = y + height / 2;
     context.save();
     context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
-    context.save();
-    context.restore();
     context.rotate(element.angle);
 
     if (!linkCanvasCache || linkCanvasCache.zoom !== appState.zoom.value) {
