@@ -283,7 +283,6 @@ class App extends React.Component<AppProps, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
   isMobile = false;
-  hideHyperlinkPopupUntilClicked: boolean = false;
   detachIsMobileMqHandler?: () => void;
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
@@ -308,7 +307,7 @@ class App extends React.Component<AppProps, AppState> {
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
 
-  hitLinkElement: any;
+  hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   constructor(props: AppProps) {
@@ -2372,7 +2371,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
     const lastPointerDownHittingLinkIcon = isPointHittingLinkIcon(
-      this.hitLinkElement,
+      this.hitLinkElement!,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
     );
@@ -2381,12 +2380,12 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
     const LastPointerUpHittingLinkIcon = isPointHittingLinkIcon(
-      this.hitLinkElement,
+      this.hitLinkElement!,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
     );
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
-      window.open(normalizeLink(this.hitLinkElement.link!));
+      window.open(normalizeLink(this.hitLinkElement!.link!));
     }
   };
   private attachLinkListener = () => {

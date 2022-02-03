@@ -190,7 +190,6 @@ const drawElementOnCanvas = (
   renderConfig: RenderConfig,
 ) => {
   context.globalAlpha = element.opacity / 100;
-
   switch (element.type) {
     case "rectangle":
     case "diamond":
@@ -283,7 +282,6 @@ const drawElementOnCanvas = (
       }
     }
   }
-
   context.globalAlpha = 1;
 };
 
@@ -604,7 +602,6 @@ const generateElementWithCanvas = (
 ) => {
   const zoom: Zoom = renderConfig ? renderConfig.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
-
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
     prevElementWithCanvas.canvasZoom !== zoom.value &&

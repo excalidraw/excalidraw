@@ -6,7 +6,6 @@ import {
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
 
-import "./Hyperlink.scss";
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
 import { editIcon, link, trash } from "../components/icons";
@@ -29,11 +28,14 @@ import { getSelectedElements } from "../scene";
 import { isPointHittingElementBoundingBox } from "./collision";
 import { getElementAbsoluteCoords } from "./";
 
+import "./Hyperlink.scss";
+
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
 const CONTAINER_PADDING = 8;
 const CONTAINER_HEIGHT = 42;
 const AUTO_HIDE_TIMEOUT = 500;
+
 export const EXTERNAL_LINK_IMG = document.createElement("img");
 EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1971c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`,
