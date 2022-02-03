@@ -2394,6 +2394,14 @@ class App extends React.Component<AppProps, AppState> {
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement?.link;
       if (url) {
+        if (this.props.handleLinkNavigation) {
+          try {
+            this.props.handleLinkNavigation(url);
+            return;
+          } catch (error: any) {
+            console.error(error);
+          }
+        }
         const target = isLocalLink(url) ? "_self" : "_blank";
         const newWindow = window.open(undefined, target);
         // https://mathiasbynens.github.io/rel-noopener/
