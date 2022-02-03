@@ -39,6 +39,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onBeforeTextSubmit,
     generateIdForFile,
     onThemeChange,
+    onLinkOpen,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -104,6 +105,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         onBeforeTextSubmit={onBeforeTextSubmit}
         generateIdForFile={generateIdForFile}
         onThemeChange={onThemeChange}
+        onLinkOpen={onLinkOpen}
       />
     </InitializeApp>
   );
