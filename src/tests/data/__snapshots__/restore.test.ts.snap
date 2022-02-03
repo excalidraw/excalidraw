@@ -13,6 +13,7 @@ Object {
   "id": "id-arrow01",
   "isDeleted": false,
   "lastCommittedPoint": null,
+  "link": null,
   "opacity": 100,
   "points": Array [
     Array [
@@ -56,6 +57,7 @@ Object {
   "height": 200,
   "id": "1",
   "isDeleted": false,
+  "link": null,
   "opacity": 10,
   "roughness": 2,
   "seed": Any<Number>,
@@ -87,6 +89,7 @@ Object {
   "height": 200,
   "id": "2",
   "isDeleted": false,
+  "link": null,
   "opacity": 10,
   "roughness": 2,
   "seed": Any<Number>,
@@ -118,6 +121,7 @@ Object {
   "height": 200,
   "id": "3",
   "isDeleted": false,
+  "link": null,
   "opacity": 10,
   "roughness": 2,
   "seed": Any<Number>,
@@ -146,6 +150,7 @@ Object {
   "id": "id-freedraw01",
   "isDeleted": false,
   "lastCommittedPoint": null,
+  "link": null,
   "opacity": 100,
   "points": Array [],
   "pressures": Array [],
@@ -179,6 +184,7 @@ Object {
   "id": "id-line01",
   "isDeleted": false,
   "lastCommittedPoint": null,
+  "link": null,
   "opacity": 100,
   "points": Array [
     Array [
@@ -221,6 +227,7 @@ Object {
   "id": "id-draw01",
   "isDeleted": false,
   "lastCommittedPoint": null,
+  "link": null,
   "opacity": 100,
   "points": Array [
     Array [
@@ -264,6 +271,7 @@ Object {
   "height": 100,
   "id": "id-text01",
   "isDeleted": false,
+  "link": null,
   "opacity": 100,
   "originalText": "text",
   "roughness": 1,
@@ -300,6 +308,7 @@ Object {
   "height": 100,
   "id": "id-text01",
   "isDeleted": false,
+  "link": null,
   "opacity": 100,
   "originalText": "test",
   "roughness": 1,
