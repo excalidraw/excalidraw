@@ -745,7 +745,7 @@ const renderBindingHighlightForSuggestedPointBinding = (
   });
 };
 
-let linkCanvasCache: HTMLCanvasElement;
+let linkCanvasCache: any;
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
@@ -765,24 +765,23 @@ const renderLinkIcon = (
     context.save();
     context.restore();
     context.rotate(element.angle);
-    if (!linkCanvasCache) {
-      const linkCanvasCache = document.createElement("canvas");
+
+    if (!linkCanvasCache || linkCanvasCache.zoom !== appState.zoom.value) {
+      linkCanvasCache = document.createElement("canvas");
+      linkCanvasCache.zoom = appState.zoom.value;
       linkCanvasCache.width =
         width * window.devicePixelRatio * appState.zoom.value;
       linkCanvasCache.height =
         height * window.devicePixelRatio * appState.zoom.value;
       const linkCanvasCacheContext = linkCanvasCache.getContext("2d")!;
-
-      linkCanvasCacheContext.fillStyle = "#fff";
-      linkCanvasCacheContext.fillRect(0, 0, width, width);
-      linkCanvasCacheContext.drawImage(
-        EXTERNAL_LINK_IMG,
-        0,
-        0,
-        linkCanvasCache.width,
-        linkCanvasCache.height,
+      linkCanvasCacheContext.scale(
+        window.devicePixelRatio * appState.zoom.value,
+        window.devicePixelRatio * appState.zoom.value,
       );
-
+      linkCanvasCacheContext.fillStyle = "#fff";
+      linkCanvasCacheContext.fillRect(0, 0, width, height);
+      linkCanvasCacheContext.drawImage(EXTERNAL_LINK_IMG, 0, 0, width, height);
+      linkCanvasCacheContext.restore();
       context.drawImage(
         linkCanvasCache,
         x - centerX,
@@ -795,8 +794,8 @@ const renderLinkIcon = (
         linkCanvasCache,
         x - centerX,
         y - centerY,
-        linkCanvasCache.width,
-        linkCanvasCache.height,
+        width,
+        height,
       );
     }
     context.restore();
