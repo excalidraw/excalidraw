@@ -105,7 +105,12 @@
     "excalidrawLib": "Exaclidraw biblioteka",
     "decreaseFontSize": "",
     "increaseFontSize": "",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "",
@@ -188,7 +193,8 @@
     "text": "Tekstas",
     "library": "Biblioteka",
     "lock": "",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "",
