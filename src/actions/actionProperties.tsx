@@ -20,6 +20,7 @@ import {
   FontSizeLargeIcon,
   FontSizeMediumIcon,
   FontSizeSmallIcon,
+  PenIcon,
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
@@ -371,6 +372,61 @@ export const actionChangeStrokeWidth = register({
       />
     </fieldset>
   ),
+});
+
+export const actionSelectPen = register({
+  name: "changePen",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          strokeWidth: appState.pens[value].penStrokeWidth,
+          strokeColor: appState.pens[value].penStrokeColor,
+          opacity: appState.pens[value].penOpacity,
+        }),
+      ),
+      appState: {
+        ...appState,
+        currentPen: value,
+        currentItemStrokeWidth: appState.pens[value].penStrokeWidth,
+        currentItemStrokeColor: appState.pens[value].penStrokeColor,
+        currentItemOpacity: appState.pens[value].penOpacity,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const buttonValues: { value: number; text: string; icon: JSX.Element }[] =
+      [];
+
+    for (let i: number = 0; i < 5; i++) {
+      buttonValues.push({
+        value: i,
+        text: `${t("labels.pen")} ${i + 1}`,
+        icon: (
+          <PenIcon
+            theme={appState.theme}
+            strokeWidth={appState.pens[i].penStrokeWidth}
+            fillColor={appState.pens[i].penStrokeColor}
+          />
+        ),
+      });
+    }
+
+    return (
+      <fieldset>
+        <legend>{t("labels.pen")}</legend>
+        <div className="penSelection">
+          <ButtonIconSelect
+            group="pen-width"
+            options={buttonValues}
+            value={appState.currentPen}
+            onChange={(value) => updateData(value)}
+          />
+        </div>
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeSloppiness = register({

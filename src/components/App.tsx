@@ -1012,6 +1012,24 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    if (
+      prevState.currentItemStrokeColor !== this.state.currentItemStrokeColor
+    ) {
+      this.updatePen(
+        (p) => (p.penStrokeColor = this.state.currentItemStrokeColor),
+      );
+    }
+    if (prevState.currentItemOpacity !== this.state.currentItemOpacity) {
+      this.updatePen((p) => (p.penOpacity = this.state.currentItemOpacity));
+    }
+    if (
+      prevState.currentItemStrokeWidth !== this.state.currentItemStrokeWidth
+    ) {
+      this.updatePen(
+        (p) => (p.penStrokeWidth = this.state.currentItemStrokeWidth),
+      );
+    }
+
     if (prevProps.langCode !== this.props.langCode) {
       this.updateLanguage();
     }
@@ -5326,6 +5344,18 @@ class App extends React.Component<AppProps, AppState> {
       defaultLang;
     await setLanguage(currentLang);
     this.setAppState({});
+  }
+
+  private updatePen(
+    modifier: (penToModify: {
+      penStrokeColor: string;
+      penStrokeWidth: number;
+      penOpacity: number;
+    }) => void,
+  ) {
+    const tempPens = [...this.state.pens];
+    modifier(tempPens[this.state.currentPen]);
+    this.setState({ pens: tempPens });
   }
 }
 

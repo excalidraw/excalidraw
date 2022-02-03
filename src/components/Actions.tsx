@@ -60,6 +60,10 @@ export const SelectedShapeActions = ({
 
   return (
     <div className="panelColumn">
+      {(elementType === "freedraw" ||
+        targetElements.some((element) => element.type === "freedraw")) &&
+        renderAction("changePen")}
+
       {((hasStrokeColor(elementType) &&
         elementType !== "image" &&
         commonSelectedType !== "image") ||

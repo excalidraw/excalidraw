@@ -247,6 +247,26 @@
     }
   }
 
+  .penSelection {
+    .buttonList.buttonListIcon {
+      label {
+        background-color: var(--button-gray-1);
+        svg {
+          width: 20px;
+          height: 14px;
+          opacity: 0.7;
+        }
+        &.active svg {
+          opacity: 1;
+          background-color: var(--button-gray-1);
+        }
+      }
+      label.active {
+        box-shadow: 0 0 0 1px var(--select-highlight-color) inset;
+      }
+    }
+  }
+
   .App-top-bar {
     z-index: var(--zIndex-layerUI);
     display: flex;

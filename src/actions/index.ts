@@ -17,6 +17,7 @@ export {
   actionChangeFontSize,
   actionChangeFontFamily,
   actionChangeTextAlign,
+  actionSelectPen,
 } from "./actionProperties";
 
 export {

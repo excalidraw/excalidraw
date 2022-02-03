@@ -140,6 +140,12 @@ export type AppState = {
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
   currentChartType: ChartType;
+  currentPen: number;
+  pens: {
+    penStrokeColor: string;
+    penStrokeWidth: number;
+    penOpacity: number;
+  }[];
   pasteDialog:
     | {
         shown: false;
