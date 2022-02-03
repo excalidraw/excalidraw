@@ -247,6 +247,7 @@ export interface ExcalidrawProps {
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
+  handleLinkNavigation?: (url: string) => void;
 }
 
 export type SceneData = {
