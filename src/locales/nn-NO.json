@@ -105,7 +105,12 @@
     "excalidrawLib": "",
     "decreaseFontSize": "",
     "increaseFontSize": "",
-    "unbindText": ""
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -188,7 +193,8 @@
     "text": "Tekst",
     "library": "Bibliotek",
     "lock": "Hald fram med valt verktøy",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Handlingar: lerret",
