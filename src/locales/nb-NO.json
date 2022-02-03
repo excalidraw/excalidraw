@@ -105,7 +105,12 @@
     "excalidrawLib": "Excalidraw-bibliotek",
     "decreaseFontSize": "Reduser skriftstørrelse",
     "increaseFontSize": "Øk skriftstørrelse",
-    "unbindText": "Avbind tekst"
+    "unbindText": "Avbind tekst",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -188,7 +193,8 @@
     "text": "Tekst",
     "library": "Bibliotek",
     "lock": "Behold merket verktøy som aktivt",
-    "penMode": "Forhindre zoom ved kniping og godta frihåndstegning kun fra penn"
+    "penMode": "Forhindre zoom ved kniping og godta frihåndstegning kun fra penn",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
