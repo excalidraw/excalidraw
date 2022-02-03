@@ -40,6 +40,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     generateIdForFile,
     onThemeChange,
     onLinkOpen,
+    onLinkHover,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -106,6 +107,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         generateIdForFile={generateIdForFile}
         onThemeChange={onThemeChange}
         onLinkOpen={onLinkOpen}
+        onLinkHover={onLinkHover}
       />
     </InitializeApp>
   );

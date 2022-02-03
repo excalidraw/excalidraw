@@ -2067,6 +2067,7 @@ class App extends React.Component<AppProps, AppState> {
       originalText: string,
       isDeleted: boolean,
       rawText?: string,
+      link?: string,
     ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
@@ -2076,6 +2077,7 @@ class App extends React.Component<AppProps, AppState> {
               isDeleted,
               originalText,
               rawText: rawText ?? originalText,
+              link,
             });
           }
           return _element;
@@ -2127,8 +2129,9 @@ class App extends React.Component<AppProps, AppState> {
       onSubmit: withBatchedUpdates(({ text, viaKeyboard, originalText }) => {
         const isDeleted = !text.trim();
         const rawText = originalText; //should this be originalText??
+        let link = undefined;
         if (this.props.onBeforeTextSubmit) {
-          const [updatedText, updatedOriginalText] =
+          const [updatedText, updatedOriginalText, l] =
             this.props.onBeforeTextSubmit(
               element,
               text,
@@ -2137,8 +2140,9 @@ class App extends React.Component<AppProps, AppState> {
             );
           text = updatedText ?? text;
           originalText = updatedOriginalText ?? originalText;
+          link = l;
         }
-        updateElement(text, originalText, isDeleted, rawText);
+        updateElement(text, originalText, isDeleted, rawText, link);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -2794,6 +2798,10 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       setCursor(this.canvas, CURSOR_TYPE.POINTER);
       showHyperlinkTooltip(this.hitLinkElement, this.state);
+      if (this.props.onLinkHover) {
+        this.props.onLinkHover(this.hitLinkElement, event);
+      }
+
       this.attachLinkListener();
     } else {
       hideHyperlinkToolip();

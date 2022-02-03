@@ -256,10 +256,14 @@ export interface ExcalidrawProps {
     textToSubmit: string,
     originalText: string,
     isDeleted: boolean,
-  ) => [string, string];
+  ) => [string, string, string];
   generateIdForFile?: (file: File) => string | Promise<string>;
   onThemeChange?: (newTheme: string) => void;
   onLinkOpen?: (link: string, event: MouseEvent) => void;
+  onLinkHover?: (
+    element: NonDeletedExcalidrawElement,
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => void;
 }
 
 export type SceneData = {

@@ -253,11 +253,13 @@ export const updateTextElement = (
     isDeleted,
     originalText,
     rawText,
+    link,
   }: {
     text: string;
     isDeleted?: boolean;
     originalText: string;
     rawText?: string;
+    link?: string;
   },
 ): ExcalidrawTextElement => {
   const container = getContainerElement(element);
@@ -270,6 +272,7 @@ export const updateTextElement = (
     rawText: rawText ?? originalText, //should this be rather originalText??
     originalText,
     isDeleted: isDeleted ?? element.isDeleted,
+    ...(link ? { link } : {}),
     ...dimensions,
   });
 };
