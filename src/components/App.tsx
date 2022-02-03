@@ -563,6 +563,8 @@ class App extends React.Component<AppProps, AppState> {
 
   private syncActionResult = withBatchedUpdates(
     (actionResult: ActionResult) => {
+      // Since context menu closes when action triggered so setting to false
+      this.contextMenuOpen = false;
       if (this.unmounted || actionResult === false) {
         return;
       }
@@ -2773,7 +2775,6 @@ class App extends React.Component<AppProps, AppState> {
 
     // Since context menu closes on pointer down so setting to false
     this.contextMenuOpen = false;
-
     this.clearSelectionIfNotUsingSelection();
     this.updateBindingEnabledOnPointerMove(event);
 
