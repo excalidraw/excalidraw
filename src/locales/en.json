@@ -108,7 +108,8 @@
     "unbindText": "Unbind text",
     "link": {
       "edit": "Edit link",
-      "create": "Create link"
+      "create": "Create link",
+      "label": "Link"
     }
   },
   "buttons": {

@@ -1,5 +1,6 @@
 import { AppState, Point } from "../types";
 import {
+  getShortcutKey,
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
 } from "../utils";
@@ -247,6 +248,7 @@ export const actionLink = register({
         type="button"
         icon={link}
         aria-label={t(getContextMenuLabel(elements, appState))}
+        title={`${t("labels.link.label")} - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}
       />
     );
