@@ -105,7 +105,12 @@
     "excalidrawLib": "Excalidraw bibliotheek",
     "decreaseFontSize": "",
     "increaseFontSize": "",
-    "unbindText": "Ontkoppel tekst"
+    "unbindText": "Ontkoppel tekst",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -188,7 +193,8 @@
     "text": "Tekst",
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
-    "penMode": "Voorkom pinch-zoom en accepteer freedraw invoer alleen van pen"
+    "penMode": "Voorkom pinch-zoom en accepteer freedraw invoer alleen van pen",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Canvasacties",
