@@ -1192,7 +1192,6 @@ class App extends React.Component<AppProps, AppState> {
         imageCache: this.imageCache,
         isExporting: false,
         renderScrollbars: !this.isMobile,
-        selectedElementIds: this.state.selectedElementIds,
       },
     );
 

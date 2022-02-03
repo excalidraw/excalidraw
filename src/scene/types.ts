@@ -27,7 +27,6 @@ export type RenderConfig = {
   /** when exporting the behavior is slightly different (e.g. we can't use
     CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
-  selectedElementIds: AppState["selectedElementIds"];
 };
 
 export type SceneScroll = {
