@@ -164,7 +164,7 @@ export const Hyperlink = ({
           {element.link}
         </a>
       )}
-      <div>
+      <div className="excalidraw-hyperlinkContainer__buttons">
         {!isEditing && (
           <ToolButton
             type="button"
