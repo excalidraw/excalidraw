@@ -767,17 +767,14 @@ const renderLinkIcon = (
     context.rotate(element.angle);
     if (!linkCanvasCache) {
       const linkCanvasCache = document.createElement("canvas");
-      linkCanvasCache.width = width;
-      linkCanvasCache.height = height;
+      linkCanvasCache.width =
+        width * window.devicePixelRatio * appState.zoom.value;
+      linkCanvasCache.height =
+        height * window.devicePixelRatio * appState.zoom.value;
       const linkCanvasCacheContext = linkCanvasCache.getContext("2d")!;
 
       linkCanvasCacheContext.fillStyle = "#fff";
-      linkCanvasCacheContext.fillRect(
-        0,
-        0,
-        linkCanvasCache.width,
-        linkCanvasCache.height,
-      );
+      linkCanvasCacheContext.fillRect(0, 0, width, width);
       linkCanvasCacheContext.drawImage(
         EXTERNAL_LINK_IMG,
         0,
@@ -790,8 +787,8 @@ const renderLinkIcon = (
         linkCanvasCache,
         x - centerX,
         y - centerY,
-        linkCanvasCache.width,
-        linkCanvasCache.height,
+        width,
+        height,
       );
     } else {
       context.drawImage(
