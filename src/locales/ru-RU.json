@@ -105,7 +105,12 @@
     "excalidrawLib": "Библиотека Excalidraw",
     "decreaseFontSize": "Уменьшить шрифт",
     "increaseFontSize": "Увеличить шрифт",
-    "unbindText": "Отвязать текст"
+    "unbindText": "Отвязать текст",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -188,7 +193,8 @@
     "text": "Текст",
     "library": "Библиотека",
     "lock": "Сохранять выбранный инструмент активным после рисования",
-    "penMode": ""
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Операции холста",
