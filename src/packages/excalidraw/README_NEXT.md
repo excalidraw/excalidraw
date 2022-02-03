@@ -408,6 +408,7 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`onBeforeTextEdit`](#onBeforeTextEdit) | (textElement: ExcalidrawTextElement) => string |  | Callback to be triggered when a text element is about to be edited. |
 | [`onBeforeTextSubmit`](#onBeforeTextSubmit) | (textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string |  | Callback to be triggered when the editing of a text element is finished. |
 | [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
+| [`handleLinkNavigation`](#handleLinkNavigation) | `(url: string) => void` | If provided Excalidraw will call this function to open element hyperlinks |
 
 ### Dimensions of Excalidraw
 
