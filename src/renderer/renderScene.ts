@@ -50,6 +50,10 @@ import {
 import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
 import { UserIdleState } from "../types";
 import { THEME_FILTER } from "../constants";
+import {
+  EXTERNAL_LINK_IMG,
+  getLinkHandleFromCoords,
+} from "../element/Hyperlink";
 
 const hasEmojiSupport = supportsEmoji();
 
@@ -260,6 +264,9 @@ export const renderScene = (
   visibleElements.forEach((element) => {
     try {
       renderElement(element, rc, context, renderConfig);
+      if (!isExporting) {
+        renderLinkIcon(element, context, appState);
+      }
     } catch (error: any) {
       console.error(error);
     }
@@ -738,6 +745,61 @@ const renderBindingHighlightForSuggestedPointBinding = (
     );
     fillCircle(context, x, y, threshold);
   });
+};
+
+let linkCanvasCache: any;
+const renderLinkIcon = (
+  element: NonDeletedExcalidrawElement,
+  context: CanvasRenderingContext2D,
+  appState: AppState,
+) => {
+  if (element.link && !appState.selectedElementIds[element.id]) {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const [x, y, width, height] = getLinkHandleFromCoords(
+      [x1, y1, x2, y2],
+      element.angle,
+      appState,
+    );
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    context.save();
+    context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
+    context.rotate(element.angle);
+
+    if (!linkCanvasCache || linkCanvasCache.zoom !== appState.zoom.value) {
+      linkCanvasCache = document.createElement("canvas");
+      linkCanvasCache.zoom = appState.zoom.value;
+      linkCanvasCache.width =
+        width * window.devicePixelRatio * appState.zoom.value;
+      linkCanvasCache.height =
+        height * window.devicePixelRatio * appState.zoom.value;
+      const linkCanvasCacheContext = linkCanvasCache.getContext("2d")!;
+      linkCanvasCacheContext.scale(
+        window.devicePixelRatio * appState.zoom.value,
+        window.devicePixelRatio * appState.zoom.value,
+      );
+      linkCanvasCacheContext.fillStyle = "#fff";
+      linkCanvasCacheContext.fillRect(0, 0, width, height);
+      linkCanvasCacheContext.drawImage(EXTERNAL_LINK_IMG, 0, 0, width, height);
+      linkCanvasCacheContext.restore();
+      context.drawImage(
+        linkCanvasCache,
+        x - centerX,
+        y - centerY,
+        width,
+        height,
+      );
+    } else {
+      context.drawImage(
+        linkCanvasCache,
+        x - centerX,
+        y - centerY,
+        width,
+        height,
+      );
+    }
+    context.restore();
+  }
 };
 
 const isVisibleElement = (
