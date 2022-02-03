@@ -105,7 +105,12 @@
     "excalidrawLib": "Bibliothèque Excalidraw",
     "decreaseFontSize": "Réduire la taille de police",
     "increaseFontSize": "Augmenter la taille de police",
-    "unbindText": "Délier le texte"
+    "unbindText": "Délier le texte",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
@@ -188,7 +193,8 @@
     "text": "Texte",
     "library": "Bibliothèque",
     "lock": "Garder l'outil sélectionné actif après le dessin",
-    "penMode": "Empêcher le zoom tactile et accepter la saisie libre uniquement à partir du stylet"
+    "penMode": "Empêcher le zoom tactile et accepter la saisie libre uniquement à partir du stylet",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Actions du canevas",
