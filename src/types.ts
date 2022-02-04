@@ -79,6 +79,8 @@ export type AppState = {
   editingLinearElement: LinearElementEditor | null;
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
+  penMode: boolean;
+  penDetected: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
@@ -149,16 +151,13 @@ export type AppState = {
       };
   /** imageElement waiting to be placed on canvas */
   pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
+  showHyperlinkPopup: false | "info" | "editor";
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
 
 export type Zoom = Readonly<{
   value: NormalizedZoomValue;
-  translation: Readonly<{
-    x: number;
-    y: number;
-  }>;
 }>;
 
 export type PointerCoords = Readonly<{
@@ -300,6 +299,7 @@ export type AppProps = ExcalidrawProps & {
   };
   detectScroll: boolean;
   handleKeyboardGlobally: boolean;
+  isCollaborating: boolean;
 };
 
 /** A subset of App class properties that we need to use elsewhere

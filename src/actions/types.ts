@@ -103,7 +103,9 @@ export type ActionName =
   | "exportWithDarkMode"
   | "toggleTheme"
   | "increaseFontSize"
-  | "decreaseFontSize";
+  | "decreaseFontSize"
+  | "unbindText"
+  | "link";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -123,7 +125,12 @@ export interface Action {
     appState: AppState,
     elements: readonly ExcalidrawElement[],
   ) => boolean;
-  contextItemLabel?: string;
+  contextItemLabel?:
+    | string
+    | ((
+        elements: readonly ExcalidrawElement[],
+        appState: Readonly<AppState>,
+      ) => string);
   contextItemPredicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
