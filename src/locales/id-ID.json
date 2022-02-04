@@ -107,9 +107,9 @@
     "increaseFontSize": "Besarkan ukuran font",
     "unbindText": "Lepas teks",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Edit tautan",
+      "create": "Buat tautan",
+      "label": "Tautan"
     }
   },
   "buttons": {
@@ -193,8 +193,8 @@
     "text": "Teks",
     "library": "Pustaka",
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar",
-    "penMode": "",
-    "link": ""
+    "penMode": "Cegah jepit perbesar dan terima hanya input freedraw dari pena",
+    "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih"
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
