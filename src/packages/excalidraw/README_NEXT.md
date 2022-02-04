@@ -405,6 +405,7 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
+| [`onLinkOpen`](#onLinkOpen) | <pre>(link: string, element: element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78"> NonDeletedExcalidrawElement</a>, event: MouseEvent) </pre> | This prop if passed will be triggered when link of an element is clicked |
 
 ### Dimensions of Excalidraw
 
@@ -703,6 +704,10 @@ Allows you to override `id` generation for files added on canvas (images). By de
 ```
 (file: File) => string | Promise<string>
 ```
+
+#### `onLinkOpen`
+
+This prop if passed will be triggered when clicked on link. The host will be responsible to redirect to the link when using this prop.
 
 ### Does it support collaboration ?
 
