@@ -115,7 +115,7 @@ export const Hyperlink = ({
   }, [setAppState, element, isEditing]);
 
   const onEdit = () => {
-    trackEvent("link", "Edit");
+    trackEvent("link", "Update");
     setAppState({ showHyperlinkPopup: "editor" });
   };
   const { x, y } = getCoordsForPopover(element, appState);
