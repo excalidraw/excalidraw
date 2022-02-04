@@ -715,7 +715,7 @@ This prop if passed will be triggered when clicked on link. The host will be res
 
 Example:
 
-```ts
+```
 const history = useHistory();
 
 // open internal links using the app's router, but opens external links in
