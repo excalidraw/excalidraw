@@ -107,9 +107,9 @@
     "increaseFontSize": "放大字体大小",
     "unbindText": "取消文本绑定",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "编辑链接",
+      "create": "新建链接",
+      "label": "链接"
     }
   },
   "buttons": {
@@ -194,7 +194,7 @@
     "library": "素材库",
     "lock": "绘制后保持所选的工具栏状态",
     "penMode": "",
-    "link": ""
+    "link": "为选中的形状添加/更新链接"
   },
   "headings": {
     "canvasActions": "画布动作",
