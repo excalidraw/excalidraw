@@ -259,7 +259,10 @@ export interface ExcalidrawProps {
   ) => [string, string, string];
   generateIdForFile?: (file: File) => string | Promise<string>;
   onThemeChange?: (newTheme: string) => void;
-  onLinkOpen?: (link: string, event: MouseEvent) => void;
+  onLinkOpen?: (
+    link: string,
+    event: React.PointerEvent<HTMLElement> | PointerEvent,
+  ) => void;
   onLinkHover?: (
     element: NonDeletedExcalidrawElement,
     event: React.PointerEvent<HTMLCanvasElement>,
