@@ -248,9 +248,10 @@ export interface ExcalidrawProps {
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
   onLinkOpen?: (
-    link: string,
     element: NonDeletedExcalidrawElement,
-    event: MouseEvent,
+    event: CustomEvent<{
+      nativeEvent: MouseEvent;
+    }>,
   ) => void;
 }
 

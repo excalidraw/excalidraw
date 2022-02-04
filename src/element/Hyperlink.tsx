@@ -3,6 +3,7 @@ import {
   getShortcutKey,
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
+  wrapEvent,
 } from "../utils";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
@@ -163,8 +164,14 @@ export const Hyperlink = ({
           target={isLocalLink(element.link) ? "_self" : "_blank"}
           onClick={(event) => {
             if (element.link && onLinkOpen) {
-              event.preventDefault();
-              onLinkOpen(element.link, element, event.nativeEvent);
+              const customEvent = wrapEvent(
+                EVENT.EXCALIDRAW_LINK,
+                event.nativeEvent,
+              );
+              onLinkOpen(element, customEvent);
+              if (customEvent.defaultPrevented) {
+                event.preventDefault();
+              }
             }
           }}
           rel="noopener noreferrer"

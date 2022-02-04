@@ -212,6 +212,7 @@ import {
   tupleToCoors,
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
+  wrapEvent,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -2398,9 +2399,12 @@ class App extends React.Component<AppProps, AppState> {
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement.link;
       if (url) {
+        let customEvent;
         if (this.props.onLinkOpen) {
-          this.props.onLinkOpen(url, this.hitLinkElement, event);
-        } else {
+          customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event);
+          this.props.onLinkOpen(this.hitLinkElement, customEvent);
+        }
+        if (!customEvent?.defaultPrevented) {
           const target = isLocalLink(url) ? "_self" : "_blank";
           const newWindow = window.open(undefined, target);
           // https://mathiasbynens.github.io/rel-noopener/

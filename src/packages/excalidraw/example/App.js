@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 import InitialData from "./initialData";
 import Sidebar from "./sidebar/Sidebar";
@@ -86,6 +86,21 @@ export default function App() {
     };
     excalidrawRef.current.updateScene(sceneData);
   };
+
+  const onLinkOpen = useCallback((element, event) => {
+    const link = element.link;
+    const { nativeEvent } = event.detail;
+    const isNewTab = nativeEvent.ctrlKey || nativeEvent.metaKey;
+    const isNewWindow = nativeEvent.shiftKey;
+    const isInternalLink =
+      link.startsWith("/") || link.includes(window.location.origin);
+    if (isInternalLink && !isNewTab && !isNewWindow) {
+      // signal that we're handling the redirect ourselves
+      event.preventDefault();
+      // do a custom redirect, such as passing to react-router
+      // ...
+    }
+  }, []);
 
   return (
     <div className="App">
@@ -179,6 +194,7 @@ export default function App() {
             UIOptions={{ canvasActions: { loadScene: false } }}
             renderTopRightUI={renderTopRightUI}
             renderFooter={renderFooter}
+            onLinkOpen={onLinkOpen}
           />
         </div>
 

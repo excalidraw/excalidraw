@@ -52,6 +52,8 @@ export enum EVENT {
   HASHCHANGE = "hashchange",
   VISIBILITY_CHANGE = "visibilitychange",
   SCROLL = "scroll",
+  // custom events
+  EXCALIDRAW_LINK = "excalidraw-link",
 }
 
 export const ENV = {
