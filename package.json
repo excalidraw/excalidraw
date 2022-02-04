@@ -74,7 +74,7 @@
     "rewire": "5.0.0"
   },
   "resolutions": {
-    "@typescript-eslint/typescript-estree": "5.3.0"
+    "@typescript-eslint/typescript-estree": "5.10.2"
   },
   "engines": {
     "node": ">=14.0.0"
