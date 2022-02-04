@@ -2653,6 +2653,8 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
       setCursor(this.canvas, CURSOR_TYPE.POINTER);
+      trackEvent("link", "tooltip");
+
       showHyperlinkTooltip(this.hitLinkElement, this.state);
       this.attachLinkListener();
     } else {
