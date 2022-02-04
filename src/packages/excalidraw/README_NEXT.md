@@ -707,7 +707,7 @@ Allows you to override `id` generation for files added on canvas (images). By de
 
 #### `onLinkOpen`
 
-This prop if passed will be triggered when clicked on link. The host will be responsible to redirect to the link when using this prop.
+This prop if passed will be triggered when clicked on link. To handle the redirect yourself (such as when using your own router for internal links), you must call `event.preventDefault()`.
 
 ```
 (element: ExcalidrawElement, event: CustomEvent<{ nativeEvent: MouseEvent }>) => void
@@ -715,7 +715,7 @@ This prop if passed will be triggered when clicked on link. The host will be res
 
 Example:
 
-```
+```ts
 const history = useHistory();
 
 // open internal links using the app's router, but opens external links in
