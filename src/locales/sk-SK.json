@@ -105,11 +105,11 @@
     "excalidrawLib": "Excalidraw knižnica",
     "decreaseFontSize": "Zmenšiť veľkosť písma",
     "increaseFontSize": "Zväčšiť veľkosť písma",
-    "unbindText": "",
+    "unbindText": "Zrušiť previazanie textu",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Upraviť odkaz",
+      "create": "Vytvoriť odkaz",
+      "label": "Odkaz"
     }
   },
   "buttons": {
@@ -193,8 +193,8 @@
     "text": "Text",
     "library": "Knižnica",
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia",
-    "penMode": "",
-    "link": ""
+    "penMode": "Zabrániť priblíženiu potiahnutím a povoliť vstup voľnou rokou iba z pera",
+    "link": "Pridať/ Upraviť odkaz pre vybraný tvar"
   },
   "headings": {
     "canvasActions": "Akcie plátna",
