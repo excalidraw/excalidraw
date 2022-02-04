@@ -408,6 +408,7 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`onBeforeTextEdit`](#onBeforeTextEdit) | (textElement: ExcalidrawTextElement) => string |  | Callback to be triggered when a text element is about to be edited. |
 | [`onBeforeTextSubmit`](#onBeforeTextSubmit) | (textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string |  | Callback to be triggered when the editing of a text element is finished. |
 | [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
+| [`onLinkOpen`](#onLinkOpen) | <pre>(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">NonDeletedExcalidrawElement</a>, event: CustomEvent) </pre> |  | This prop if passed will be triggered when link of an element is clicked |
 
 ### Dimensions of Excalidraw
 
@@ -783,6 +784,39 @@ Allows you to override `id` generation for files added on canvas (images). By de
 
 (file: File) => string | Promise<string>
 
+```
+
+#### `onLinkOpen`
+
+This prop if passed will be triggered when clicked on link. To handle the redirect yourself (such as when using your own router for internal links), you must call `event.preventDefault()`.
+
+```
+(element: ExcalidrawElement, event: CustomEvent<{ nativeEvent: MouseEvent }>) => void
+```
+
+Example:
+
+```ts
+const history = useHistory();
+
+// open internal links using the app's router, but opens external links in
+// a new tab/window
+const onLinkOpen: ExcalidrawProps["onLinkOpen"] = useCallback(
+  (element, event) => {
+    const link = element.link;
+    const { nativeEvent } = event.detail;
+    const isNewTab = nativeEvent.ctrlKey || nativeEvent.metaKey;
+    const isNewWindow = nativeEvent.shiftKey;
+    const isInternalLink =
+      link.startsWith("/") || link.includes(window.location.origin);
+    if (isInternalLink && !isNewTab && !isNewWindow) {
+      history.push(link.replace(window.location.origin, ""));
+      // signal that we're handling the redirect ourselves
+      event.preventDefault();
+    }
+  },
+  [history],
+);
 ```
 
 ### Does it support collaboration ?
