@@ -212,12 +212,12 @@ const getCoordsForPopover = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
 ) => {
-  const { x: viewPortX, y: viewPortY } = sceneCoordsToViewportCoords(
+  const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
     { sceneX: element.x + element.width / 2, sceneY: element.y },
     appState,
   );
-  const x = viewPortX - CONTAINER_WIDTH / 2;
-  const y = viewPortY - SPACE_BOTTOM;
+  const x = viewportX - appState.offsetLeft - CONTAINER_WIDTH / 2;
+  const y = viewportY - appState.offsetTop - SPACE_BOTTOM;
   return { x, y };
 };
 
