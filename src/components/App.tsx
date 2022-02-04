@@ -2374,6 +2374,9 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private redirectToLink = (event: MouseEvent) => {
+    if (!this.hitLinkElement) {
+      return;
+    }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
       this.lastPointerDown!,
       this.state,
@@ -2393,10 +2396,10 @@ class App extends React.Component<AppProps, AppState> {
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
     );
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
-      const url = this.hitLinkElement?.link;
+      const url = this.hitLinkElement.link;
       if (url) {
         if (this.props.onLinkOpen) {
-          this.props.onLinkOpen(url, event);
+          this.props.onLinkOpen(url, this.hitLinkElement, event);
         } else {
           const target = isLocalLink(url) ? "_self" : "_blank";
           const newWindow = window.open(undefined, target);

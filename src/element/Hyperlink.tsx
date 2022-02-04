@@ -162,9 +162,9 @@ export const Hyperlink = ({
           })}
           target={isLocalLink(element.link) ? "_self" : "_blank"}
           onClick={(event) => {
-            if (onLinkOpen && element.link) {
+            if (element.link && onLinkOpen) {
               event.preventDefault();
-              onLinkOpen(element.link, event.nativeEvent);
+              onLinkOpen(element.link, element, event.nativeEvent);
             }
           }}
           rel="noopener noreferrer"
