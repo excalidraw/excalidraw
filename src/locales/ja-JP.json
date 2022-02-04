@@ -107,9 +107,9 @@
     "increaseFontSize": "フォントサイズを拡大",
     "unbindText": "",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "リンクを編集",
+      "create": "リンクを作成",
+      "label": "リンク"
     }
   },
   "buttons": {
@@ -193,7 +193,7 @@
     "text": "テキスト",
     "library": "ライブラリ",
     "lock": "描画後も使用中のツールを選択したままにする",
-    "penMode": "",
+    "penMode": "ピンチとズームを抑止し、ペンからのみ自由な入力を受け付けます",
     "link": ""
   },
   "headings": {
