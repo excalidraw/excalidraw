@@ -1520,6 +1520,14 @@ class App extends React.Component<AppProps, AppState> {
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
     this.lastPointerUp = event;
+
+    if (
+      this.hitLinkElement &&
+      !this.state.selectedElementIds[this.hitLinkElement.id]
+    ) {
+      this.redirectToLink();
+    }
+
     // remove touch handler for context menu on touch devices
     if (event.pointerType === "touch" && touchTimeout) {
       clearTimeout(touchTimeout);
@@ -2404,12 +2412,12 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
   };
-  private attachLinkListener = () => {
-    this.canvas?.addEventListener("click", this.redirectToLink);
-  };
-  private detachLinkListener = () => {
-    this.canvas?.removeEventListener("click", this.redirectToLink);
-  };
+  // private attachLinkListener = () => {
+  //   this.canvas?.addEventListener("click", this.redirectToLink);
+  // };
+  // private detachLinkListener = () => {
+  //   this.canvas?.removeEventListener("click", this.redirectToLink);
+  // };
 
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
@@ -2647,17 +2655,14 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer,
       hitElement,
     );
-
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
       setCursor(this.canvas, CURSOR_TYPE.POINTER);
       showHyperlinkTooltip(this.hitLinkElement, this.state);
-      this.attachLinkListener();
     } else {
       hideHyperlinkToolip();
-      this.detachLinkListener();
       if (
         hitElement &&
         hitElement.link &&
