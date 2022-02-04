@@ -1533,6 +1533,14 @@ class App extends React.Component<AppProps, AppState> {
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
     this.lastPointerUp = event;
+
+    if (
+      this.hitLinkElement &&
+      !this.state.selectedElementIds[this.hitLinkElement.id]
+    ) {
+      this.redirectToLink(event);
+    }
+
     // remove touch handler for context menu on touch devices
     if (event.pointerType === "touch" && touchTimeout) {
       clearTimeout(touchTimeout);
@@ -2512,7 +2520,9 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private redirectToLink = (event: MouseEvent) => {
+  private redirectToLink = (
+    event: React.PointerEvent<HTMLElement> | PointerEvent,
+  ) => {
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
       this.lastPointerDown!,
       this.state,
@@ -2547,12 +2557,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
     }
-  };
-  private attachLinkListener = () => {
-    this.canvas?.addEventListener("click", this.redirectToLink);
-  };
-  private detachLinkListener = () => {
-    this.canvas?.removeEventListener("click", this.redirectToLink);
   };
 
   private handleCanvasPointerMove = (
@@ -2801,11 +2805,8 @@ class App extends React.Component<AppProps, AppState> {
       if (this.props.onLinkHover) {
         this.props.onLinkHover(this.hitLinkElement, event);
       }
-
-      this.attachLinkListener();
     } else {
       hideHyperlinkToolip();
-      this.detachLinkListener();
       if (
         hitElement &&
         hitElement.link &&

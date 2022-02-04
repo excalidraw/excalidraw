@@ -329,7 +329,6 @@ export const isPointHittingLinkIcon = (
     x < linkX + threshold + linkWidth &&
     y > linkY - threshold &&
     y < linkY + linkHeight + threshold;
-
   return hitLink;
 };
 
