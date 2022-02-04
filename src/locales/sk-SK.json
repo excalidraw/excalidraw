@@ -303,7 +303,7 @@
     "placeholder": {
       "authorName": "Vaše meno alebo užívateľské meno",
       "libraryName": "Názov vašej knižnice",
-      "libraryDesc": "",
+      "libraryDesc": "Popis vašej knižnice, ktorý ostatným pomôže porozumieť jej vhodnému použitiu",
       "githubHandle": "GitHub užívateľské meno (nepovinné), aby ste mohli robiť úpravy po tom, čo bude knižnica uverejnená na schválenie",
       "twitterHandle": "Twitter užívateľské meno (nepovinné), aby sme vedeli komu pripísať zásluhu pri propagovaní cez Twitter",
       "website": "Odkaz na vašu osobnú webovú stránku alebo niekam inam (nepovinné)"
