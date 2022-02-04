@@ -405,7 +405,7 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
-| [`onLinkOpen`](#onLinkOpen) | <pre>(link: string, element: element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78"> NonDeletedExcalidrawElement</a>, event: MouseEvent) </pre> |  | This prop if passed will be triggered when link of an element is clicked |
+| [`onLinkOpen`](#onLinkOpen) | <pre>(link: string, element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">NonDeletedExcalidrawElement</a>, event: MouseEvent) </pre> |  | This prop if passed will be triggered when link of an element is clicked |
 
 ### Dimensions of Excalidraw
 
@@ -708,6 +708,39 @@ Allows you to override `id` generation for files added on canvas (images). By de
 #### `onLinkOpen`
 
 This prop if passed will be triggered when clicked on link. The host will be responsible to redirect to the link when using this prop.
+
+```
+(link: string, element: ExcalidrawElement, event: MouseEvent) => void
+```
+
+Example:
+
+```ts
+const history = useHistory();
+
+// open internal links using the app's router, but opens external links in
+// a new tab/window
+const onLinkOpen = useCallback(
+  (link: string, element: ExcalidrawElement, event: MouseEvent) => {
+    link = normalizeLink(link);
+    const isNewTab = event.ctrlKey || event.metaKey;
+    const isNewWindow = event.shiftKey;
+    const isInternalLink =
+      link.startsWith("/") || link.includes(window.location.origin);
+    if (isInternalLink && !isNewTab && !isNewWindow) {
+      history.push(link.replace(window.location.origin, ""));
+    } else {
+      const newWindow = window.open(undefined);
+      // https://mathiasbynens.github.io/rel-noopener/
+      if (newWindow) {
+        newWindow.opener = null;
+        newWindow.location = link;
+      }
+    }
+  },
+  [history],
+);
+```
 
 ### Does it support collaboration ?
 
