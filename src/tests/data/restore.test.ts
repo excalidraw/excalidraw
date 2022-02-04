@@ -12,10 +12,8 @@ import { ImportedDataState } from "../../data/types";
 import { NormalizedZoomValue } from "../../types";
 import { FONT_FAMILY } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
-import {
-  registerTextElementSubtypes,
-  TEXT_SUBTYPE_DEFAULT,
-} from "../../textlike";
+import { registerTextElementSubtypes } from "../../textlike";
+import { TEXT_SUBTYPE_DEFAULT } from "../../textlike/types";
 
 registerTextElementSubtypes();
 
