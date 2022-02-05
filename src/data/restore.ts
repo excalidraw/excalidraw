@@ -105,6 +105,7 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
+    link: element.link ?? null,
   };
 
   return {
@@ -261,7 +262,6 @@ export const restoreAppState = (
       typeof appState.zoom === "number"
         ? {
             value: appState.zoom as NormalizedZoomValue,
-            translation: defaultAppState.zoom.translation,
           }
         : appState.zoom || defaultAppState.zoom,
   };
