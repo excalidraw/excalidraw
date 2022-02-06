@@ -1932,7 +1932,7 @@ class App extends React.Component<AppProps, AppState> {
     // zoom in at the right location on the touchMove handler already.
     // On Macbook, we don't have those events so will zoom in at the
     // current location instead.
-    if (gesture.pointers.size === 2) {
+    if (gesture.pointers.size >= 2) {
       return;
     }
 
