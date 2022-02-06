@@ -2444,8 +2444,8 @@ class App extends React.Component<AppProps, AppState> {
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor =
-        this.state.elementType === "freedraw" && this.state.penMode
-          ? 1
+        this.state.penMode && isExcalidrawElement(this.state.elementType)
+          ? null
           : distance / gesture.initialDistance;
 
       const nextZoom = scaleFactor
