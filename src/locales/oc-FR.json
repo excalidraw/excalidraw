@@ -107,9 +107,9 @@
     "increaseFontSize": "Aumentar talha poliça",
     "unbindText": "",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Modificar lo ligam",
+      "create": "Crear un ligam",
+      "label": "Ligam"
     }
   },
   "buttons": {
