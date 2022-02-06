@@ -1919,6 +1919,14 @@ class App extends React.Component<AppProps, AppState> {
 
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    if (
+      this.state.penMode &&
+      isExcalidrawElement(this.state.elementType) &&
+      gesture.pointers.size >= 2
+    ) {
+      gesture.initialScale = null;
+      return;
+    }
     this.setState({
       selectedElementIds: {},
     });
