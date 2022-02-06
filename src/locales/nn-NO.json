@@ -104,7 +104,13 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -186,7 +192,9 @@
     "freedraw": "Teikn",
     "text": "Tekst",
     "library": "Bibliotek",
-    "lock": "Hald fram med valt verktøy"
+    "lock": "Hald fram med valt verktøy",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Handlingar: lerret",

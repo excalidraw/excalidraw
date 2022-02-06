@@ -100,11 +100,17 @@
     "share": "Teilen",
     "showStroke": "Auswahl für Strichfarbe anzeigen",
     "showBackground": "Hintergrundfarbe auswählen",
-    "toggleTheme": "Design umschalten",
+    "toggleTheme": "Thema umschalten",
     "personalLib": "Persönliche Bibliothek",
     "excalidrawLib": "Excalidraw-Bibliothek",
     "decreaseFontSize": "Schrift verkleinern",
-    "increaseFontSize": "Schrift vergrößern"
+    "increaseFontSize": "Schrift vergrößern",
+    "unbindText": "Text lösen",
+    "link": {
+      "edit": "Link bearbeiten",
+      "create": "Link erstellen",
+      "label": "Link"
+    }
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -186,7 +192,9 @@
     "freedraw": "Zeichnen",
     "text": "Text",
     "library": "Bibliothek",
-    "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen"
+    "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen",
+    "penMode": "",
+    "link": "Link für ausgewählte Form hinzufügen / aktualisieren"
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
@@ -247,7 +255,7 @@
   "exportDialog": {
     "disk_title": "Auf Festplatte speichern",
     "disk_details": "Exportiere die Zeichnungsdaten in eine Datei, die Du später importieren kannst.",
-    "disk_button": "In Datei speichern",
+    "disk_button": "Als Datei speichern",
     "link_title": "Teilbarer Link",
     "link_details": "Als schreibgeschützten Link exportieren.",
     "link_button": "Als Link exportieren",
