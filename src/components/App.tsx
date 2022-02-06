@@ -1919,14 +1919,6 @@ class App extends React.Component<AppProps, AppState> {
 
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    if (
-      this.state.penMode &&
-      isExcalidrawElement(this.state.elementType) &&
-      gesture.pointers.size >= 2
-    ) {
-      gesture.initialScale = null;
-      return;
-    }
     this.setState({
       selectedElementIds: {},
     });
@@ -1948,7 +1940,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       this.state.penMode &&
       isExcalidrawElement(this.state.elementType) &&
-      gesture.pointers.size >= 2
+      gesture.pointers.size > 2
     ) {
       return;
     }
@@ -2433,14 +2425,6 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    if (
-      this.state.penMode &&
-      isExcalidrawElement(this.state.elementType) &&
-      gesture.pointers.size >= 2
-    ) {
-      return;
-    }
-
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
 
     if (gesture.pointers.has(event.pointerId)) {
