@@ -1936,6 +1936,15 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    if (
+      this.state.penMode &&
+      ["ellipse", "rectangle", "diamond", "line", "arrow", "freedraw"].includes(
+        this.state.elementType,
+      )
+    ) {
+      return;
+    }
+
     const initialScale = gesture.initialScale;
     if (initialScale) {
       this.setState((state) => ({
