@@ -1543,14 +1543,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(
-        new MouseEvent("click", {
-          altKey: event.altKey,
-          ctrlKey: event.ctrlKey,
-          metaKey: event.metaKey,
-          shiftKey: event.shiftKey,
-        }),
-      );
+      this.redirectToLink(event as MouseEvent);
     }
 
     // remove touch handler for context menu on touch devices
