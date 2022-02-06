@@ -126,7 +126,6 @@ import {
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
-  isExcalidrawElement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -1937,7 +1936,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.state.penMode && isExcalidrawElement(this.state.elementType)) {
+    if (this.state.penMode && this.state.elementType === "freedraw") {
       return;
     }
 
