@@ -2435,14 +2435,11 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const initialScale = gesture.initialScale;
-    const allowZoom =
-      !this.state.penMode || !isExcalidrawElement(this.state.elementType);
     if (
       gesture.pointers.size === 2 &&
       gesture.lastCenter &&
       initialScale &&
-      gesture.initialDistance &&
-      allowZoom
+      gesture.initialDistance
     ) {
       const center = getCenter(gesture.pointers);
       const deltaX = center.x - gesture.lastCenter.x;
