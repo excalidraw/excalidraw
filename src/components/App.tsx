@@ -127,7 +127,6 @@ import {
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
-  isExcalidrawElement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -2043,11 +2042,7 @@ class App extends React.Component<AppProps, AppState> {
     // zoom in at the right location on the touchMove handler already.
     // On Macbook, we don't have those events so will zoom in at the
     // current location instead.
-    if (gesture.pointers.size === 2) {
-      return;
-    }
-
-    if (this.state.penMode && isExcalidrawElement(this.state.elementType)) {
+    if (gesture.pointers.size >= 2) {
       return;
     }
 
@@ -2601,10 +2596,7 @@ class App extends React.Component<AppProps, AppState> {
       gesture.lastCenter = center;
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
-      const scaleFactor =
-        this.state.elementType === "freedraw" && this.state.penMode
-          ? 1
-          : distance / gesture.initialDistance;
+      const scaleFactor = distance / gesture.initialDistance;
 
       const nextZoom = scaleFactor
         ? getNormalizedZoom(initialScale * scaleFactor)
