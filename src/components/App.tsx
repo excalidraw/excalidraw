@@ -2431,6 +2431,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const initialScale = gesture.initialScale;
+    const disableZoom =
+      this.state.penMode && isExcalidrawElement(this.state.elementType);
     if (
       gesture.pointers.size === 2 &&
       gesture.lastCenter &&
@@ -2443,10 +2445,7 @@ class App extends React.Component<AppProps, AppState> {
       gesture.lastCenter = center;
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
-      const scaleFactor =
-        this.state.penMode && isExcalidrawElement(this.state.elementType)
-          ? null
-          : distance / gesture.initialDistance;
+      const scaleFactor = distance / gesture.initialDistance;
 
       const nextZoom = scaleFactor
         ? getNormalizedZoom(initialScale * scaleFactor)
@@ -2463,7 +2462,7 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         return {
-          zoom: zoomState.zoom,
+          zoom: disableZoom ? this.state.zoom : zoomState.zoom,
           scrollX: zoomState.scrollX + deltaX / nextZoom,
           scrollY: zoomState.scrollY + deltaY / nextZoom,
           shouldCacheIgnoreZoom: true,
