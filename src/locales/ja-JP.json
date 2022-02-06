@@ -103,8 +103,14 @@
     "toggleTheme": "テーマの切り替え",
     "personalLib": "個人ライブラリ",
     "excalidrawLib": "Excalidrawライブラリ",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "フォントサイズを縮小",
+    "increaseFontSize": "フォントサイズを拡大",
+    "unbindText": "",
+    "link": {
+      "edit": "リンクを編集",
+      "create": "リンクを作成",
+      "label": "リンク"
+    }
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -186,7 +192,9 @@
     "freedraw": "描画",
     "text": "テキスト",
     "library": "ライブラリ",
-    "lock": "描画後も使用中のツールを選択したままにする"
+    "lock": "描画後も使用中のツールを選択したままにする",
+    "penMode": "ピンチとズームを抑止し、ペンからのみ自由な入力を受け付けます",
+    "link": ""
   },
   "headings": {
     "canvasActions": "キャンバス操作",

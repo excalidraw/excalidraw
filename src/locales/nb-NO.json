@@ -104,7 +104,13 @@
     "personalLib": "Personlig bibliotek",
     "excalidrawLib": "Excalidraw-bibliotek",
     "decreaseFontSize": "Reduser skriftstørrelse",
-    "increaseFontSize": "Øk skriftstørrelse"
+    "increaseFontSize": "Øk skriftstørrelse",
+    "unbindText": "Avbind tekst",
+    "link": {
+      "edit": "Rediger lenke",
+      "create": "Opprett lenke",
+      "label": "Lenke"
+    }
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -186,7 +192,9 @@
     "freedraw": "Tegn",
     "text": "Tekst",
     "library": "Bibliotek",
-    "lock": "Behold merket verktøy som aktivt"
+    "lock": "Behold merket verktøy som aktivt",
+    "penMode": "Forhindre zoom ved kniping og godta frihåndstegning kun fra penn",
+    "link": "Legg til / oppdater link for en valgt figur"
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",

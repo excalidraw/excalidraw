@@ -104,7 +104,13 @@
     "personalLib": "Biblioteka prywatna",
     "excalidrawLib": "Biblioteka Excalidraw",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -186,7 +192,9 @@
     "freedraw": "Rysuj",
     "text": "Tekst",
     "library": "Biblioteka",
-    "lock": "Zablokuj wybrane narzędzie"
+    "lock": "Zablokuj wybrane narzędzie",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Narzędzia",

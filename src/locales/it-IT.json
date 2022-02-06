@@ -104,7 +104,13 @@
     "personalLib": "Libreria Personale",
     "excalidrawLib": "Libreria di Excalidraw",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -186,7 +192,9 @@
     "freedraw": "Disegno",
     "text": "Testo",
     "library": "Libreria",
-    "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
+    "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",

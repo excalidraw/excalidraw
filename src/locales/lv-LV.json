@@ -104,7 +104,13 @@
     "personalLib": "Personīgā bibliotēka",
     "excalidrawLib": "Excalidraw bibliotēka",
     "decreaseFontSize": "Samazināt fonta izmēru",
-    "increaseFontSize": "Palielināt fonta izmēru"
+    "increaseFontSize": "Palielināt fonta izmēru",
+    "unbindText": "Atdalīt tekstu",
+    "link": {
+      "edit": "Rediģēt saiti",
+      "create": "Izveidot saiti",
+      "label": "Saite"
+    }
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
@@ -151,7 +157,7 @@
     "couldNotCreateShareableLinkTooBig": "Nevarēja izveidot kopīgojamo saiti – aina ir par lielu",
     "couldNotLoadInvalidFile": "Nevarēja ielādēt nederīgu datni",
     "importBackendFailed": "Ielāde no krātuves neizdevās.",
-    "cannotExportEmptyCanvas": "Nevar eksportēt tukšu zīmējumu.",
+    "cannotExportEmptyCanvas": "Nevar eksportēt tukšu tāfeli.",
     "couldNotCopyToClipboard": "Neizdevās kopēt starpliktuvē. Mēģiniet vēlreiz, izmantojot pārlūku Chrome.",
     "decryptFailed": "Nevarēja atšifrēt datus.",
     "uploadedSecurly": "Augšuplāde nodrošināta ar šifrēšanu no gala līdz galam, kas nozīmē, ka Excalidraw serveri un trešās puses nevar lasīt saturu.",
@@ -186,7 +192,9 @@
     "freedraw": "Zīmēt",
     "text": "Teksts",
     "library": "Bibliotēka",
-    "lock": "Paturēt izvēlēto rīku pēc darbības"
+    "lock": "Paturēt izvēlēto rīku pēc darbības",
+    "penMode": "Lietojot pildspalvu, bloķēt tuvināšanu un atļaut tikai zīmēšanu",
+    "link": "Pievienot/rediģēt atlasītās figūras saiti"
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
@@ -266,12 +274,12 @@
     "doubleClick": "dubultklikšķis",
     "drag": "vilkt",
     "editor": "Redaktors",
-    "editSelectedShape": "Rediģēt atlasīto formu (tekstu/bultu/līniju)",
+    "editSelectedShape": "Rediģēt atlasīto figūru (tekstu/bultu/līniju)",
     "github": "Sastapāt kļūdu? Ziņot",
     "howto": "Sekojiet mūsu instrukcijām",
     "or": "vai",
     "preventBinding": "Novērst bultu piesaistīšanos",
-    "shapes": "Formas",
+    "shapes": "Figūras",
     "shortcuts": "Tastatūras saīsnes",
     "textFinish": "Pabeigt rediģēšanu (teksta redaktorā)",
     "textNewLine": "Nākamā rindiņa (teksta redaktorā)",

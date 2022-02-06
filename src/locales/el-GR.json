@@ -104,7 +104,13 @@
     "personalLib": "Προσωπική Βιβλιοθήκη",
     "excalidrawLib": "Βιβλιοθήκη Excalidraw",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -186,7 +192,9 @@
     "freedraw": "Σχεδίαση",
     "text": "Κείμενο",
     "library": "Βιβλιοθήκη",
-    "lock": "Κράτησε επιλεγμένο το εργαλείο μετά το σχέδιο"
+    "lock": "Κράτησε επιλεγμένο το εργαλείο μετά το σχέδιο",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Ενέργειες καμβά",

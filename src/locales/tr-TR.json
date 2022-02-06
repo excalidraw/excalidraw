@@ -104,7 +104,13 @@
     "personalLib": "Kişisel Kitaplık",
     "excalidrawLib": "Excalidraw Kitaplığı",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -186,7 +192,9 @@
     "freedraw": "Çiz",
     "text": "Yazı",
     "library": "Kütüphane",
-    "lock": "Seçilen aracı çizimden sonra aktif tut"
+    "lock": "Seçilen aracı çizimden sonra aktif tut",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Tuval eylemleri",

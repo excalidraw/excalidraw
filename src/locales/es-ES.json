@@ -104,7 +104,13 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -186,7 +192,9 @@
     "freedraw": "Dibujar",
     "text": "Texto",
     "library": "Biblioteca",
-    "lock": "Mantener la herramienta seleccionada activa después de dibujar"
+    "lock": "Mantener la herramienta seleccionada activa después de dibujar",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",

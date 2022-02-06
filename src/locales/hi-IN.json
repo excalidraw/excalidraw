@@ -104,7 +104,13 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -186,7 +192,9 @@
     "freedraw": "",
     "text": "पाठ",
     "library": "लाइब्रेरी",
-    "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें"
+    "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",

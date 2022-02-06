@@ -104,7 +104,13 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -186,7 +192,9 @@
     "freedraw": "Рисуване",
     "text": "Текст",
     "library": "Библиотека",
-    "lock": "Поддържайте избрания инструмент активен след рисуване"
+    "lock": "Поддържайте избрания инструмент активен след рисуване",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Действия по платното",

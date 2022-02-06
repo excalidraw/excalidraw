@@ -104,7 +104,13 @@
     "personalLib": "Pustaka Pribadi",
     "excalidrawLib": "Pustaka Excalidraw",
     "decreaseFontSize": "Kecilkan ukuran font",
-    "increaseFontSize": "Besarkan ukuran font"
+    "increaseFontSize": "Besarkan ukuran font",
+    "unbindText": "Lepas teks",
+    "link": {
+      "edit": "Edit tautan",
+      "create": "Buat tautan",
+      "label": "Tautan"
+    }
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -186,7 +192,9 @@
     "freedraw": "Gambar",
     "text": "Teks",
     "library": "Pustaka",
-    "lock": "Biarkan alat yang dipilih aktif setelah menggambar"
+    "lock": "Biarkan alat yang dipilih aktif setelah menggambar",
+    "penMode": "Cegah jepit perbesar dan terima hanya input freedraw dari pena",
+    "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih"
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
