@@ -104,7 +104,13 @@
     "personalLib": "Biblioteca personal",
     "excalidrawLib": "Biblioteca d'Excalidraw",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
@@ -186,7 +192,9 @@
     "freedraw": "Dibuix",
     "text": "Text",
     "library": "Biblioteca",
-    "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar"
+    "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Accions del llenç",
