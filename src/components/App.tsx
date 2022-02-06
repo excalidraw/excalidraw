@@ -3852,11 +3852,12 @@ class App extends React.Component<AppProps, AppState> {
         const dx = pointerCoords.x - draggingElement.x;
         const dy = pointerCoords.y - draggingElement.y;
 
-        const discardPoint = points.length > 0 &&
-          points[points.length-1][0] === dx &&
-          points[points.length-1][1] === dy;
+        const discardPoint =
+          points.length > 0 &&
+          points[points.length - 1][0] === dx &&
+          points[points.length - 1][1] === dy;
 
-        if(!discardPoint) {
+        if (!discardPoint) {
           const pressures = draggingElement.simulatePressure
             ? draggingElement.pressures
             : [...draggingElement.pressures, event.pressure];
