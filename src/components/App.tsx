@@ -2593,7 +2593,10 @@ class App extends React.Component<AppProps, AppState> {
       gesture.lastCenter = center;
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
-      const scaleFactor = distance / gesture.initialDistance;
+      const scaleFactor =
+        this.state.elementType === "freedraw" && this.state.penMode
+          ? 1
+          : distance / gesture.initialDistance;
 
       const nextZoom = scaleFactor
         ? getNormalizedZoom(initialScale * scaleFactor)
