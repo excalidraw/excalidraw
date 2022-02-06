@@ -107,9 +107,9 @@
     "increaseFontSize": "Sali tiddi n tsefsit",
     "unbindText": "",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Ẓreg aseɣwen",
+      "create": "Snulfu-d aseɣwen",
+      "label": "Aseɣwen"
     }
   },
   "buttons": {
@@ -194,7 +194,7 @@
     "library": "Tamkarḍit",
     "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ",
     "penMode": "",
-    "link": ""
+    "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen"
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",
