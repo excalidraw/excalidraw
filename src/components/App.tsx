@@ -127,6 +127,7 @@ import {
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
+  isExcalidrawElement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -2043,6 +2044,10 @@ class App extends React.Component<AppProps, AppState> {
     // On Macbook, we don't have those events so will zoom in at the
     // current location instead.
     if (gesture.pointers.size === 2) {
+      return;
+    }
+
+    if (this.state.penMode && isExcalidrawElement(this.state.elementType)) {
       return;
     }
 
