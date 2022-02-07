@@ -163,6 +163,7 @@ import {
   shouldRotateWithDiscreteAngle,
   isArrowKey,
   KEYS,
+  isAndroid,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer";
@@ -1274,7 +1275,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private onTapStart = (event: TouchEvent) => {
     // fix for Apple Pencil Scribble
-    event.preventDefault();
+    if (!isAndroid) {
+      event.preventDefault();
+    }
 
     if (!didTapTwice) {
       didTapTwice = true;
@@ -1296,6 +1299,9 @@ class App extends React.Component<AppProps, AppState> {
       });
       didTapTwice = false;
       clearTimeout(tappedTwiceTimer);
+    }
+    if (isAndroid) {
+      event.preventDefault();
     }
 
     if (event.touches.length === 2) {
