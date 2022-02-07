@@ -321,9 +321,16 @@ export const isPointHittingLinkIcon = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   [x, y]: Point,
+  isMobile: boolean,
 ) => {
   const threshold = 4 / appState.zoom.value;
-
+  if (
+    !isMobile &&
+    appState.viewModeEnabled &&
+    isPointHittingElementBoundingBox(element, [x, y], threshold)
+  ) {
+    return true;
+  }
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
   const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
