@@ -2388,10 +2388,12 @@ class App extends React.Component<AppProps, AppState> {
       }
       return (
         element.link &&
-        isPointHittingLinkIcon(element, this.state, [
-          scenePointer.x,
-          scenePointer.y,
-        ]) &&
+        isPointHittingLinkIcon(
+          element,
+          this.state,
+          [scenePointer.x, scenePointer.y],
+          this.isMobile,
+        ) &&
         index <= hitElementIndex
       );
     });
@@ -2412,6 +2414,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
+      this.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUp!,
@@ -2421,6 +2424,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
+      this.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement?.link;
@@ -3238,10 +3242,12 @@ class App extends React.Component<AppProps, AppState> {
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
           if (
-            isPointHittingLinkIcon(pointerDownState.hit.element, this.state, [
-              pointerDownState.origin.x,
-              pointerDownState.origin.y,
-            ])
+            isPointHittingLinkIcon(
+              pointerDownState.hit.element,
+              this.state,
+              [pointerDownState.origin.x, pointerDownState.origin.y],
+              this.isMobile,
+            )
           ) {
             return false;
           }
