@@ -1275,6 +1275,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private onTapStart = (event: TouchEvent) => {
     // fix for Apple Pencil Scribble
+    // On Android, preventing the event would disable contextMenu on tap-hold
     if (!isAndroid) {
       event.preventDefault();
     }
