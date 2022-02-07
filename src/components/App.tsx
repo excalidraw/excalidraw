@@ -2385,6 +2385,12 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private redirectToLink = () => {
+    if (
+      this.lastPointerDown!.clientX !== this.lastPointerUp!.clientX ||
+      this.lastPointerDown!.clientY !== this.lastPointerUp!.clientY
+    ) {
+      return;
+    }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
       this.lastPointerDown!,
       this.state,
