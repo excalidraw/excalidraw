@@ -107,9 +107,9 @@
     "increaseFontSize": "Aumentar o tamanho da fonte",
     "unbindText": "Desvincular texto",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Editar link",
+      "create": "Criar link",
+      "label": "Link"
     }
   },
   "buttons": {
@@ -194,7 +194,7 @@
     "library": "Biblioteca",
     "lock": "Manter ativa a ferramenta selecionada após desenhar",
     "penMode": "Prevenir a ação de tocar-ampliar e permitir apenas interações da caneta",
-    "link": ""
+    "link": "Adicionar/Atualizar link para uma forma selecionada"
   },
   "headings": {
     "canvasActions": "Ações da tela",
