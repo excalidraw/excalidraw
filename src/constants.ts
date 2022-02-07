@@ -24,7 +24,7 @@ export const POINTER_BUTTON = {
   WHEEL: 1,
   SECONDARY: 2,
   TOUCH: -1,
-};
+} as const;
 
 export enum EVENT {
   COPY = "copy",
