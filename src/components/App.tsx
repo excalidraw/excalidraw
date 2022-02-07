@@ -2386,8 +2386,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private redirectToLink = () => {
     if (
-      this.lastPointerDown!.clientX !== this.lastPointerUp!.clientX ||
-      this.lastPointerDown!.clientY !== this.lastPointerUp!.clientY
+      Math.abs(this.lastPointerDown!.clientX - this.lastPointerUp!.clientX) >
+        10 ||
+      Math.abs(this.lastPointerDown!.clientY - this.lastPointerUp!.clientY) > 10
     ) {
       return;
     }
