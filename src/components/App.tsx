@@ -1524,7 +1524,20 @@ class App extends React.Component<AppProps, AppState> {
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
     this.lastPointerUp = event;
-
+    if (this.isMobile) {
+      const scenePointer = viewportCoordsToSceneCoords(
+        { clientX: event.clientX, clientY: event.clientY },
+        this.state,
+      );
+      const hitElement = this.getElementAtPosition(
+        scenePointer.x,
+        scenePointer.y,
+      );
+      this.hitLinkElement = this.getElementLinkAtPosition(
+        scenePointer,
+        hitElement,
+      );
+    }
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
