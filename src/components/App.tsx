@@ -163,6 +163,7 @@ import {
   shouldRotateWithDiscreteAngle,
   isArrowKey,
   KEYS,
+  isAndroid,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer";
@@ -416,7 +417,7 @@ class App extends React.Component<AppProps, AppState> {
           ref={this.handleCanvasRef}
           onContextMenu={this.handleCanvasContextMenu}
           onPointerMove={this.handleCanvasPointerMove}
-          onPointerUp={this.removePointer}
+          onPointerUp={this.handleCanvasPointerUp}
           onPointerCancel={this.removePointer}
           onTouchMove={this.handleTouchMove}
           onPointerDown={this.handleCanvasPointerDown}
@@ -439,7 +440,7 @@ class App extends React.Component<AppProps, AppState> {
         onPointerDown={this.handleCanvasPointerDown}
         onDoubleClick={this.handleCanvasDoubleClick}
         onPointerMove={this.handleCanvasPointerMove}
-        onPointerUp={this.removePointer}
+        onPointerUp={this.handleCanvasPointerUp}
         onPointerCancel={this.removePointer}
         onTouchMove={this.handleTouchMove}
       >
@@ -1274,7 +1275,10 @@ class App extends React.Component<AppProps, AppState> {
 
   private onTapStart = (event: TouchEvent) => {
     // fix for Apple Pencil Scribble
-    event.preventDefault();
+    // On Android, preventing the event would disable contextMenu on tap-hold
+    if (!isAndroid) {
+      event.preventDefault();
+    }
 
     if (!didTapTwice) {
       didTapTwice = true;
@@ -1296,6 +1300,9 @@ class App extends React.Component<AppProps, AppState> {
       });
       didTapTwice = false;
       clearTimeout(tappedTwiceTimer);
+    }
+    if (isAndroid) {
+      event.preventDefault();
     }
 
     if (event.touches.length === 2) {
@@ -1523,15 +1530,6 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
-    this.lastPointerUp = event;
-
-    if (
-      this.hitLinkElement &&
-      !this.state.selectedElementIds[this.hitLinkElement.id]
-    ) {
-      this.redirectToLink();
-    }
-
     // remove touch handler for context menu on touch devices
     if (event.pointerType === "touch" && touchTimeout) {
       clearTimeout(touchTimeout);
@@ -2375,16 +2373,24 @@ class App extends React.Component<AppProps, AppState> {
       }
       return (
         element.link &&
-        isPointHittingLinkIcon(element, this.state, [
-          scenePointer.x,
-          scenePointer.y,
-        ]) &&
+        isPointHittingLinkIcon(
+          element,
+          this.state,
+          [scenePointer.x, scenePointer.y],
+          this.isMobile,
+        ) &&
         index <= hitElementIndex
       );
     });
   };
 
   private redirectToLink = () => {
+    if (
+      this.lastPointerDown!.clientX !== this.lastPointerUp!.clientX ||
+      this.lastPointerDown!.clientY !== this.lastPointerUp!.clientY
+    ) {
+      return;
+    }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
       this.lastPointerDown!,
       this.state,
@@ -2393,6 +2399,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
+      this.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUp!,
@@ -2402,6 +2409,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
+      this.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement?.link;
@@ -2866,6 +2874,34 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private handleCanvasPointerUp = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    this.lastPointerUp = event;
+    if (this.isMobile) {
+      const scenePointer = viewportCoordsToSceneCoords(
+        { clientX: event.clientX, clientY: event.clientY },
+        this.state,
+      );
+      const hitElement = this.getElementAtPosition(
+        scenePointer.x,
+        scenePointer.y,
+      );
+      this.hitLinkElement = this.getElementLinkAtPosition(
+        scenePointer,
+        hitElement,
+      );
+    }
+    if (
+      this.hitLinkElement &&
+      !this.state.selectedElementIds[this.hitLinkElement.id]
+    ) {
+      this.redirectToLink();
+    }
+
+    this.removePointer(event);
+  };
+
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ): void => {
@@ -3219,10 +3255,12 @@ class App extends React.Component<AppProps, AppState> {
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
           if (
-            isPointHittingLinkIcon(pointerDownState.hit.element, this.state, [
-              pointerDownState.origin.x,
-              pointerDownState.origin.y,
-            ])
+            isPointHittingLinkIcon(
+              pointerDownState.hit.element,
+              this.state,
+              [pointerDownState.origin.x, pointerDownState.origin.y],
+              this.isMobile,
+            )
           ) {
             return false;
           }
