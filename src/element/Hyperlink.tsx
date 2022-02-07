@@ -308,7 +308,12 @@ export const isPointHittingLinkIcon = (
   [x, y]: Point,
 ) => {
   const threshold = 4 / appState.zoom.value;
-
+  if (
+    appState.viewModeEnabled &&
+    isPointHittingElementBoundingBox(element, [x, y], threshold)
+  ) {
+    return true;
+  }
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
   const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
