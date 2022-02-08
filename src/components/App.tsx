@@ -214,6 +214,7 @@ import {
   tupleToCoors,
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
+  wrapEvent,
   withBatchedUpdatesThrottled,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
@@ -527,6 +528,7 @@ class App extends React.Component<AppProps, AppState> {
                 element={selectedElement[0]}
                 appState={this.state}
                 setAppState={this.setAppState}
+                onLinkOpen={this.props.onLinkOpen}
               />
             )}
             {this.state.showStats && (
@@ -2385,7 +2387,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private redirectToLink = () => {
+  private redirectToLink = (event: React.PointerEvent<HTMLCanvasElement>) => {
     const draggedDistance = distance2d(
       this.lastPointerDown!.clientX,
       this.lastPointerDown!.clientY,
@@ -2421,14 +2423,21 @@ class App extends React.Component<AppProps, AppState> {
       this.isMobile || isIPad,
     );
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
-      const url = this.hitLinkElement?.link;
+      const url = this.hitLinkElement.link;
       if (url) {
-        const target = isLocalLink(url) ? "_self" : "_blank";
-        const newWindow = window.open(undefined, target);
-        // https://mathiasbynens.github.io/rel-noopener/
-        if (newWindow) {
-          newWindow.opener = null;
-          newWindow.location = normalizeLink(url);
+        let customEvent;
+        if (this.props.onLinkOpen) {
+          customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event.nativeEvent);
+          this.props.onLinkOpen(this.hitLinkElement, customEvent);
+        }
+        if (!customEvent?.defaultPrevented) {
+          const target = isLocalLink(url) ? "_self" : "_blank";
+          const newWindow = window.open(undefined, target);
+          // https://mathiasbynens.github.io/rel-noopener/
+          if (newWindow) {
+            newWindow.opener = null;
+            newWindow.location = normalizeLink(url);
+          }
         }
       }
     }
@@ -2905,7 +2914,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink();
+      this.redirectToLink(event);
     }
 
     this.removePointer(event);
