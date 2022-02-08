@@ -20,7 +20,7 @@ import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import type App from "./components/App";
-import type { ResolvablePromise } from "./utils";
+import type { ResolvablePromise, throttleRAF } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
@@ -250,7 +250,7 @@ export interface ExcalidrawProps {
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
     event: CustomEvent<{
-      nativeEvent: MouseEvent;
+      nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
   ) => void;
 }
@@ -373,7 +373,7 @@ export type PointerDownState = Readonly<{
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {
     // It's defined on the initial pointer down event
-    onMove: null | ((event: PointerEvent) => void);
+    onMove: null | ReturnType<typeof throttleRAF>;
     // It's defined on the initial pointer down event
     onUp: null | ((event: PointerEvent) => void);
     // It's defined on the initial pointer down event

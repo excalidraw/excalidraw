@@ -103,8 +103,14 @@
     "toggleTheme": "Växla tema",
     "personalLib": "Personligt bibliotek",
     "excalidrawLib": "Excalidraw bibliotek",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Minska fontstorleken",
+    "increaseFontSize": "Öka fontstorleken",
+    "unbindText": "Koppla bort text",
+    "link": {
+      "edit": "Redigera länk",
+      "create": "Skapa länk",
+      "label": "Länk"
+    }
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -186,7 +192,9 @@
     "freedraw": "Rita",
     "text": "Text",
     "library": "Bibliotek",
-    "lock": "Håll valt verktyg aktivt efter ritande"
+    "lock": "Håll valt verktyg aktivt efter ritande",
+    "penMode": "Förhindra nypzoom och acceptera endast frihandsteckning från penna",
+    "link": "Lägg till / Uppdatera länk för en vald form"
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",

@@ -163,6 +163,7 @@ import {
   shouldRotateWithDiscreteAngle,
   isArrowKey,
   KEYS,
+  isAndroid,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer";
@@ -213,6 +214,7 @@ import {
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
   wrapEvent,
+  withBatchedUpdatesThrottled,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -416,7 +418,7 @@ class App extends React.Component<AppProps, AppState> {
           ref={this.handleCanvasRef}
           onContextMenu={this.handleCanvasContextMenu}
           onPointerMove={this.handleCanvasPointerMove}
-          onPointerUp={this.removePointer}
+          onPointerUp={this.handleCanvasPointerUp}
           onPointerCancel={this.removePointer}
           onTouchMove={this.handleTouchMove}
           onPointerDown={this.handleCanvasPointerDown}
@@ -439,7 +441,7 @@ class App extends React.Component<AppProps, AppState> {
         onPointerDown={this.handleCanvasPointerDown}
         onDoubleClick={this.handleCanvasDoubleClick}
         onPointerMove={this.handleCanvasPointerMove}
-        onPointerUp={this.removePointer}
+        onPointerUp={this.handleCanvasPointerUp}
         onPointerCancel={this.removePointer}
         onTouchMove={this.handleTouchMove}
       >
@@ -1274,6 +1276,12 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private onTapStart = (event: TouchEvent) => {
+    // fix for Apple Pencil Scribble
+    // On Android, preventing the event would disable contextMenu on tap-hold
+    if (!isAndroid) {
+      event.preventDefault();
+    }
+
     if (!didTapTwice) {
       didTapTwice = true;
       clearTimeout(tappedTwiceTimer);
@@ -1295,7 +1303,10 @@ class App extends React.Component<AppProps, AppState> {
       didTapTwice = false;
       clearTimeout(tappedTwiceTimer);
     }
-    event.preventDefault();
+    if (isAndroid) {
+      event.preventDefault();
+    }
+
     if (event.touches.length === 2) {
       this.setState({
         selectedElementIds: {},
@@ -1521,7 +1532,6 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
-    this.lastPointerUp = event;
     // remove touch handler for context menu on touch devices
     if (event.pointerType === "touch" && touchTimeout) {
       clearTimeout(touchTimeout);
@@ -1926,7 +1936,7 @@ class App extends React.Component<AppProps, AppState> {
     // zoom in at the right location on the touchMove handler already.
     // On Macbook, we don't have those events so will zoom in at the
     // current location instead.
-    if (gesture.pointers.size === 2) {
+    if (gesture.pointers.size >= 2) {
       return;
     }
 
@@ -2365,17 +2375,23 @@ class App extends React.Component<AppProps, AppState> {
       }
       return (
         element.link &&
-        isPointHittingLinkIcon(element, this.state, [
-          scenePointer.x,
-          scenePointer.y,
-        ]) &&
+        isPointHittingLinkIcon(
+          element,
+          this.state,
+          [scenePointer.x, scenePointer.y],
+          this.isMobile,
+        ) &&
         index <= hitElementIndex
       );
     });
   };
 
-  private redirectToLink = (event: MouseEvent) => {
-    if (!this.hitLinkElement) {
+  private redirectToLink = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (
+      !this.hitLinkElement ||
+      this.lastPointerDown!.clientX !== this.lastPointerUp!.clientX ||
+      this.lastPointerDown!.clientY !== this.lastPointerUp!.clientY
+    ) {
       return;
     }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
@@ -2386,6 +2402,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
+      this.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUp!,
@@ -2395,6 +2412,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
+      this.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement.link;
@@ -2415,12 +2433,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
     }
-  };
-  private attachLinkListener = () => {
-    this.canvas?.addEventListener("click", this.redirectToLink);
-  };
-  private detachLinkListener = () => {
-    this.canvas?.removeEventListener("click", this.redirectToLink);
   };
 
   private handleCanvasPointerMove = (
@@ -2666,10 +2678,8 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       setCursor(this.canvas, CURSOR_TYPE.POINTER);
       showHyperlinkTooltip(this.hitLinkElement, this.state);
-      this.attachLinkListener();
     } else {
       hideHyperlinkToolip();
-      this.detachLinkListener();
       if (
         hitElement &&
         hitElement.link &&
@@ -2874,6 +2884,34 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private handleCanvasPointerUp = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    this.lastPointerUp = event;
+    if (this.isMobile) {
+      const scenePointer = viewportCoordsToSceneCoords(
+        { clientX: event.clientX, clientY: event.clientY },
+        this.state,
+      );
+      const hitElement = this.getElementAtPosition(
+        scenePointer.x,
+        scenePointer.y,
+      );
+      this.hitLinkElement = this.getElementLinkAtPosition(
+        scenePointer,
+        hitElement,
+      );
+    }
+    if (
+      this.hitLinkElement &&
+      !this.state.selectedElementIds[this.hitLinkElement.id]
+    ) {
+      this.redirectToLink(event);
+    }
+
+    this.removePointer(event);
+  };
+
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ): void => {
@@ -2933,7 +2971,7 @@ class App extends React.Component<AppProps, AppState> {
 
     setCursor(this.canvas, CURSOR_TYPE.GRABBING);
     let { clientX: lastX, clientY: lastY } = event;
-    const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
+    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const deltaX = lastX - event.clientX;
       const deltaY = lastY - event.clientY;
       lastX = event.clientX;
@@ -2996,6 +3034,7 @@ class App extends React.Component<AppProps, AppState> {
         window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
         window.removeEventListener(EVENT.POINTER_UP, teardown);
         window.removeEventListener(EVENT.BLUR, teardown);
+        onPointerMove.flush();
       }),
     );
     window.addEventListener(EVENT.BLUR, teardown);
@@ -3098,7 +3137,7 @@ class App extends React.Component<AppProps, AppState> {
     isDraggingScrollBar = true;
     pointerDownState.lastCoords.x = event.clientX;
     pointerDownState.lastCoords.y = event.clientY;
-    const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
+    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) {
         return;
@@ -3117,6 +3156,7 @@ class App extends React.Component<AppProps, AppState> {
       this.savePointer(event.clientX, event.clientY, "up");
       window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
+      onPointerMove.flush();
     });
 
     lastPointerUp = onPointerUp;
@@ -3225,10 +3265,12 @@ class App extends React.Component<AppProps, AppState> {
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
           if (
-            isPointHittingLinkIcon(pointerDownState.hit.element, this.state, [
-              pointerDownState.origin.x,
-              pointerDownState.origin.y,
-            ])
+            isPointHittingLinkIcon(
+              pointerDownState.hit.element,
+              this.state,
+              [pointerDownState.origin.x, pointerDownState.origin.y],
+              this.isMobile,
+            )
           ) {
             return false;
           }
@@ -3652,8 +3694,8 @@ class App extends React.Component<AppProps, AppState> {
 
   private onPointerMoveFromPointerDownHandler(
     pointerDownState: PointerDownState,
-  ): (event: PointerEvent) => void {
-    return withBatchedUpdates((event: PointerEvent) => {
+  ) {
+    return withBatchedUpdatesThrottled((event: PointerEvent) => {
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
       // event handler should hopefully ensure we're already working with
@@ -3864,14 +3906,20 @@ class App extends React.Component<AppProps, AppState> {
         const dx = pointerCoords.x - draggingElement.x;
         const dy = pointerCoords.y - draggingElement.y;
 
-        const pressures = draggingElement.simulatePressure
-          ? draggingElement.pressures
-          : [...draggingElement.pressures, event.pressure];
+        const lastPoint = points.length > 0 && points[points.length - 1];
+        const discardPoint =
+          lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
 
-        mutateElement(draggingElement, {
-          points: [...points, [dx, dy]],
-          pressures,
-        });
+        if (!discardPoint) {
+          const pressures = draggingElement.simulatePressure
+            ? draggingElement.pressures
+            : [...draggingElement.pressures, event.pressure];
+
+          mutateElement(draggingElement, {
+            points: [...points, [dx, dy]],
+            pressures,
+          });
+        }
       } else if (isLinearElement(draggingElement)) {
         pointerDownState.drag.hasOccurred = true;
         const points = draggingElement.points;
@@ -4067,6 +4115,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       lastPointerUp = null;
+
+      if (pointerDownState.eventListeners.onMove) {
+        pointerDownState.eventListeners.onMove.flush();
+      }
 
       window.removeEventListener(
         EVENT.POINTER_MOVE,
@@ -4992,6 +5044,16 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.preventDefault();
+
+    if (
+      (event.nativeEvent.pointerType === "touch" ||
+        (event.nativeEvent.pointerType === "pen" &&
+          // always allow if user uses a pen secondary button
+          event.button !== POINTER_BUTTON.SECONDARY)) &&
+      this.state.elementType !== "selection"
+    ) {
+      return;
+    }
 
     const { x, y } = viewportCoordsToSceneCoords(event, this.state);
     const element = this.getElementAtPosition(x, y, { preferSelected: true });
