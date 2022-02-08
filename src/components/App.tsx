@@ -2419,7 +2419,7 @@ class App extends React.Component<AppProps, AppState> {
       if (url) {
         let customEvent;
         if (this.props.onLinkOpen) {
-          customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event);
+          customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event.nativeEvent);
           this.props.onLinkOpen(this.hitLinkElement, customEvent);
         }
         if (!customEvent?.defaultPrevented) {

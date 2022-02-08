@@ -525,12 +525,7 @@ export const arrayToMap = <T extends { id: string } | string>(
 export const isTestEnv = () =>
   typeof process !== "undefined" && process.env?.NODE_ENV === "test";
 
-export const wrapEvent = <
-  T extends Event | React.PointerEvent<HTMLCanvasElement>,
->(
-  name: EVENT,
-  nativeEvent: T,
-) => {
+export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {
     detail: {
       nativeEvent,
