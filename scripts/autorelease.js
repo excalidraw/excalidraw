@@ -49,7 +49,12 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   fs.writeFileSync(excalidrawPackage, JSON.stringify(pkg, null, 2), "utf8");
 
   // update readme
-  const data = fs.readFileSync(`${excalidrawDir}/README_NEXT.md`, "utf8");
+  let data = fs.readFileSync(`${excalidrawDir}/README_NEXT.md`, "utf8");
+  // replace "excalidraw-next" with "excalidraw-preview"
+  if (isPreview) {
+    data = data.replace(/excalidraw-next/g, "excalidraw-preview");
+    data = data.trim();
+  }
   fs.writeFileSync(`${excalidrawDir}/README.md`, data, "utf8");
   publish();
 });
