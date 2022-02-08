@@ -104,7 +104,13 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "",
@@ -186,7 +192,9 @@
     "freedraw": "",
     "text": "",
     "library": "",
-    "lock": ""
+    "lock": "",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "",
