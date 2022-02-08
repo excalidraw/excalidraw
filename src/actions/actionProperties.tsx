@@ -145,6 +145,7 @@ const changeFontSize = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getNewFontSize: (element: ExcalidrawTextElement) => number,
+  value: number,
 ) => {
   const newFontSizes = new Set<number>();
 
@@ -180,9 +181,7 @@ const changeFontSize = (
       // update state only if we've set all select text elements to
       // the same font size
       currentItemFontSize:
-        newFontSizes.size === 1
-          ? [...newFontSizes][0]
-          : appState.currentItemFontSize,
+        newFontSizes.size === 1 ? [...newFontSizes][0] : value,
     },
     commitToHistory: true,
   };
@@ -520,7 +519,7 @@ export const actionChangeOpacity = register({
 export const actionChangeFontSize = register({
   name: "changeFontSize",
   perform: (elements, appState, value) => {
-    return changeFontSize(elements, appState, () => value);
+    return changeFontSize(elements, appState, () => value, value);
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
@@ -573,12 +572,16 @@ export const actionChangeFontSize = register({
 export const actionDecreaseFontSize = register({
   name: "decreaseFontSize",
   perform: (elements, appState, value) => {
-    return changeFontSize(elements, appState, (element) =>
-      Math.round(
-        // get previous value before relative increase (doesn't work fully
-        // due to rounding and float precision issues)
-        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) * element.fontSize,
-      ),
+    return changeFontSize(
+      elements,
+      appState,
+      (element) =>
+        Math.round(
+          // get previous value before relative increase (doesn't work fully
+          // due to rounding and float precision issues)
+          (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) * element.fontSize,
+        ),
+      value,
     );
   },
   keyTest: (event) => {
@@ -594,8 +597,12 @@ export const actionDecreaseFontSize = register({
 export const actionIncreaseFontSize = register({
   name: "increaseFontSize",
   perform: (elements, appState, value) => {
-    return changeFontSize(elements, appState, (element) =>
-      Math.round(element.fontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)),
+    return changeFontSize(
+      elements,
+      appState,
+      (element) =>
+        Math.round(element.fontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)),
+      value,
     );
   },
   keyTest: (event) => {
