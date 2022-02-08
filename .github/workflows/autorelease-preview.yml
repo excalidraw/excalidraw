@@ -8,8 +8,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
       - name: Setup Node.js 14.x
         uses: actions/setup-node@v2
         with:
