@@ -1,8 +1,9 @@
-import { AppState, Point } from "../types";
+import { AppState, ExcalidrawProps, Point } from "../types";
 import {
   getShortcutKey,
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
+  wrapEvent,
 } from "../utils";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
@@ -48,10 +49,12 @@ export const Hyperlink = ({
   element,
   appState,
   setAppState,
+  onLinkOpen,
 }: {
   element: NonDeletedExcalidrawElement;
   appState: AppState;
   setAppState: React.Component<any, AppState>["setState"];
+  onLinkOpen: ExcalidrawProps["onLinkOpen"];
 }) => {
   const linkVal = element.link || "";
 
@@ -159,6 +162,18 @@ export const Hyperlink = ({
             "d-none": isEditing,
           })}
           target={isLocalLink(element.link) ? "_self" : "_blank"}
+          onClick={(event) => {
+            if (element.link && onLinkOpen) {
+              const customEvent = wrapEvent(
+                EVENT.EXCALIDRAW_LINK,
+                event.nativeEvent,
+              );
+              onLinkOpen(element, customEvent);
+              if (customEvent.defaultPrevented) {
+                event.preventDefault();
+              }
+            }
+          }}
           rel="noopener noreferrer"
         >
           {element.link}

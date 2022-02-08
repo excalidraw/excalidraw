@@ -405,6 +405,7 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
+| [`onLinkOpen`](#onLinkOpen) | <pre>(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">NonDeletedExcalidrawElement</a>, event: CustomEvent) </pre> |  | This prop if passed will be triggered when link of an element is clicked |
 
 ### Dimensions of Excalidraw
 
@@ -702,6 +703,39 @@ Allows you to override `id` generation for files added on canvas (images). By de
 
 ```
 (file: File) => string | Promise<string>
+```
+
+#### `onLinkOpen`
+
+This prop if passed will be triggered when clicked on link. To handle the redirect yourself (such as when using your own router for internal links), you must call `event.preventDefault()`.
+
+```
+(element: ExcalidrawElement, event: CustomEvent<{ nativeEvent: MouseEvent }>) => void
+```
+
+Example:
+
+```ts
+const history = useHistory();
+
+// open internal links using the app's router, but opens external links in
+// a new tab/window
+const onLinkOpen: ExcalidrawProps["onLinkOpen"] = useCallback(
+  (element, event) => {
+    const link = element.link;
+    const { nativeEvent } = event.detail;
+    const isNewTab = nativeEvent.ctrlKey || nativeEvent.metaKey;
+    const isNewWindow = nativeEvent.shiftKey;
+    const isInternalLink =
+      link.startsWith("/") || link.includes(window.location.origin);
+    if (isInternalLink && !isNewTab && !isNewWindow) {
+      history.push(link.replace(window.location.origin, ""));
+      // signal that we're handling the redirect ourselves
+      event.preventDefault();
+    }
+  },
+  [history],
+);
 ```
 
 ### Does it support collaboration ?
