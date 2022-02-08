@@ -2393,10 +2393,10 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerUp!.clientY,
     );
     if (
-      ((this.isMobile || isIPad) && draggedDistance > DRAGGING_THRESHOLD) ||
-      // strict check otherwise to ensure pointerdown and pointerup is
-      // same point
-      draggedDistance !== 0
+      // strict check if not on iPad or Mobile to ensure pointerdown
+      //  and pointerup is same point
+      (!(this.isMobile || isIPad) && draggedDistance !== 0) ||
+      draggedDistance > DRAGGING_THRESHOLD
     ) {
       return;
     }
