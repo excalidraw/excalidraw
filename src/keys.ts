@@ -1,11 +1,6 @@
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
 export const isWindows = /^Win/.test(window.navigator.platform);
 export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
-//https://stackoverflow.com/questions/57776001/how-to-detect-ipad-pro-as-ipad-using-javascript
-export const isIPad =
-  (/MacIntel/.test(window.navigator.platform) &&
-    window.navigator.maxTouchPoints > 0) ||
-  /iPad/.test(window.navigator.platform);
 
 export const CODES = {
   EQUAL: "Equal",

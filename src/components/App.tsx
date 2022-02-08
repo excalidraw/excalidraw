@@ -164,7 +164,6 @@ import {
   isArrowKey,
   KEYS,
   isAndroid,
-  isIPad,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer";
@@ -273,6 +272,7 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+const isTouchScreen = false;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -2380,7 +2380,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
-          this.isMobile || isIPad,
+          this.isMobile || isTouchScreen,
         ) &&
         index <= hitElementIndex
       );
@@ -2405,7 +2405,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
-      this.isMobile || isIPad,
+      this.isMobile || isTouchScreen,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUp!,
@@ -2415,7 +2415,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
-      this.isMobile || isIPad,
+      this.isMobile || isTouchScreen,
     );
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement.link;
@@ -2761,6 +2761,10 @@ class App extends React.Component<AppProps, AppState> {
         };
       });
     }
+
+    //if (event.pointerType === "touch" || event.pointerType === "pen") {
+    //  isTouchScreen = true;
+    //}
 
     if (isPanning) {
       return;
@@ -3272,7 +3276,7 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState.hit.element,
               this.state,
               [pointerDownState.origin.x, pointerDownState.origin.y],
-              this.isMobile || isIPad,
+              this.isMobile || isTouchScreen,
             )
           ) {
             return false;
