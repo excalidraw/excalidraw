@@ -262,7 +262,7 @@ export interface ExcalidrawProps {
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
     event: CustomEvent<{
-      nativeEvent: MouseEvent;
+      nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
   ) => void;
   onLinkHover?: (

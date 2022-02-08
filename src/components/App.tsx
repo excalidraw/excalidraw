@@ -1544,15 +1544,6 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
-    this.lastPointerUp = event;
-
-    if (
-      this.hitLinkElement &&
-      !this.state.selectedElementIds[this.hitLinkElement.id]
-    ) {
-      this.redirectToLink(event as MouseEvent);
-    }
-
     // remove touch handler for context menu on touch devices
     if (event.pointerType === "touch" && touchTimeout) {
       clearTimeout(touchTimeout);
@@ -2534,15 +2525,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private redirectToLink = (event: MouseEvent) => {
-    if (!this.hitLinkElement) {
-      return;
-    }
-    if (
-      Math.abs(this.lastPointerDown!.clientX - this.lastPointerUp!.clientX) >
-        10 ||
-      Math.abs(this.lastPointerDown!.clientY - this.lastPointerUp!.clientY) > 10
-    ) {
+  private redirectToLink = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    const draggedDistance = distance2d(
+      this.lastPointerDown!.clientX,
+      this.lastPointerDown!.clientY,
+      this.lastPointerUp!.clientX,
+      this.lastPointerUp!.clientY,
+    );
+    if (!this.hitLinkElement || draggedDistance > DRAGGING_THRESHOLD) {
       return;
     }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
@@ -2570,7 +2560,7 @@ class App extends React.Component<AppProps, AppState> {
       if (url) {
         let customEvent;
         if (this.props.onLinkOpen) {
-          customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event);
+          customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event.nativeEvent);
           this.props.onLinkOpen(this.hitLinkElement, customEvent);
         }
         if (!customEvent?.defaultPrevented) {
@@ -3060,7 +3050,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event as unknown as MouseEvent);
+      this.redirectToLink(event);
     }
 
     this.removePointer(event);

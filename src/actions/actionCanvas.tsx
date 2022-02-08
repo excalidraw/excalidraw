@@ -65,6 +65,8 @@ export const actionClearCanvas = register({
         gridSize: appState.gridSize,
         showStats: appState.showStats,
         pasteDialog: appState.pasteDialog,
+        elementType:
+          appState.elementType === "image" ? "selection" : appState.elementType,
       },
       commitToHistory: true,
     };
