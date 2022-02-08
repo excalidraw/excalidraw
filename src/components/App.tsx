@@ -2408,7 +2408,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
-      this.isMobile,
+      this.isMobile || isIPad,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUp!,
@@ -2418,7 +2418,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
-      this.isMobile,
+      this.isMobile || isIPad,
     );
     if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement?.link;
@@ -3268,7 +3268,7 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState.hit.element,
               this.state,
               [pointerDownState.origin.x, pointerDownState.origin.y],
-              this.isMobile,
+              this.isMobile || isIPad,
             )
           ) {
             return false;
