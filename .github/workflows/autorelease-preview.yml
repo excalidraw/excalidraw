@@ -1,0 +1,24 @@
+name: Auto release preview @excalidraw/excalidraw-preview
+on:
+  pull_request:
+
+jobs:
+  Auto-release-excalidraw-preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Setup Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - name: Set up publish access
+        run: |
+          npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Auto release preview
+        run: |
+          yarn autorelease:preview
