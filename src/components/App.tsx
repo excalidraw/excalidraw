@@ -2394,12 +2394,7 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerUp!.clientX,
       this.lastPointerUp!.clientY,
     );
-    if (
-      // strict check if not on iPad or Mobile to ensure pointerdown
-      //  and pointerup is same point
-      (!(this.isMobile || isIPad) && draggedDistance !== 0) ||
-      draggedDistance > DRAGGING_THRESHOLD
-    ) {
+    if (!this.hitLinkElement || draggedDistance > DRAGGING_THRESHOLD) {
       return;
     }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
@@ -2896,20 +2891,20 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
-    if (this.isMobile || isIPad) {
-      const scenePointer = viewportCoordsToSceneCoords(
-        { clientX: event.clientX, clientY: event.clientY },
-        this.state,
-      );
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-      );
-      this.hitLinkElement = this.getElementLinkAtPosition(
-        scenePointer,
-        hitElement,
-      );
-    }
+
+    const scenePointer = viewportCoordsToSceneCoords(
+      { clientX: event.clientX, clientY: event.clientY },
+      this.state,
+    );
+    const hitElement = this.getElementAtPosition(
+      scenePointer.x,
+      scenePointer.y,
+    );
+    this.hitLinkElement = this.getElementLinkAtPosition(
+      scenePointer,
+      hitElement,
+    );
+
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
