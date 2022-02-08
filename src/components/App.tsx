@@ -164,6 +164,7 @@ import {
   isArrowKey,
   KEYS,
   isAndroid,
+  isIPad,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer";
@@ -2385,16 +2386,17 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private redirectToLink = () => {
+    const draggedDistance = distance2d(
+      this.lastPointerDown!.clientX,
+      this.lastPointerDown!.clientY,
+      this.lastPointerUp!.clientX,
+      this.lastPointerUp!.clientY,
+    );
     if (
-      (!this.isMobile &&
-        (this.lastPointerDown!.clientX !== this.lastPointerUp!.clientX ||
-          this.lastPointerDown!.clientY !== this.lastPointerUp!.clientY)) ||
-      distance2d(
-        this.lastPointerDown!.clientX,
-        this.lastPointerDown!.clientY,
-        this.lastPointerUp!.clientX,
-        this.lastPointerUp!.clientY,
-      ) > DRAGGING_THRESHOLD
+      ((this.isMobile || isIPad) && draggedDistance > DRAGGING_THRESHOLD) ||
+      // strict check otherwise to ensure pointerdown and pointerup is
+      // same point
+      draggedDistance !== 0
     ) {
       return;
     }
@@ -2885,7 +2887,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
-    if (this.isMobile) {
+    if (this.isMobile || isIPad) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
