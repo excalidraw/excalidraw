@@ -75,6 +75,8 @@ Please add the latest change on the top under the correct section.
 
 ### Build
 
+- Autorelease [@excalidraw/excalidraw-preview](https://www.npmjs.com/package/@excalidraw/excalidraw-preview) on every commit [#4750](https://github.com/excalidraw/excalidraw/pull/4750).
+
 - Added an example to test and develop the package [locally](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Development) using `yarn start` [#4488](https://github.com/excalidraw/excalidraw/pull/4488)
 
 - Remove `file-loader` so font assets are not duplicated by webpack and use webpack asset modules for font generation [#4380](https://github.com/excalidraw/excalidraw/pull/4380).
