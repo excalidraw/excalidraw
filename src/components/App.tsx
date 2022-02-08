@@ -2386,7 +2386,10 @@ class App extends React.Component<AppProps, AppState> {
 
   private redirectToLink = () => {
     if (
-      distance2d(
+      (!this.isMobile &&
+       (this.lastPointerDown!.clientX !== this.lastPointerUp!.clientX ||
+        this.lastPointerDown!.clientY !== this.lastPointerUp!.clientY)
+       ) || distance2d(
         this.lastPointerDown!.clientX,
         this.lastPointerDown!.clientY,
         this.lastPointerUp!.clientX,
