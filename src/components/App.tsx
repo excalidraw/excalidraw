@@ -2378,7 +2378,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
-          this.isMobile,
+          this.isMobile || isIPad,
         ) &&
         index <= hitElementIndex
       );
