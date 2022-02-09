@@ -1315,11 +1315,14 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private onTapEnd = (event: TouchEvent) => {
+    this.resetContextMenuTimer();
     if (event.touches.length > 0) {
       this.setState({
         previousSelectedElementIds: {},
         selectedElementIds: this.state.previousSelectedElementIds,
       });
+    } else {
+      gesture.pointers.clear();
     }
   };
 
@@ -1532,11 +1535,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
-    // remove touch handler for context menu on touch devices
-    if (event.pointerType === "touch" && touchTimeout) {
-      clearTimeout(touchTimeout);
-      touchTimeout = 0;
-      invalidateContextMenu = false;
+    if (touchTimeout) {
+      this.resetContextMenuTimer();
     }
 
     gesture.pointers.delete(event.pointerId);
@@ -2935,6 +2935,12 @@ class App extends React.Component<AppProps, AppState> {
         }, TOUCH_CTX_MENU_TIMEOUT);
       }
     }
+  };
+
+  private resetContextMenuTimer = () => {
+    clearTimeout(touchTimeout);
+    touchTimeout = 0;
+    invalidateContextMenu = false;
   };
 
   private maybeCleanupAfterMissingPointerUp(
