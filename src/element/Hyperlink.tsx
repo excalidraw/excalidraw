@@ -212,8 +212,9 @@ const getCoordsForPopover = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
 ) => {
+  const [x1, y1] = getElementAbsoluteCoords(element);
   const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
-    { sceneX: element.x + element.width / 2, sceneY: element.y },
+    { sceneX: x1 + element.width / 2, sceneY: y1 },
     appState,
   );
   const x = viewportX - appState.offsetLeft - CONTAINER_WIDTH / 2;
@@ -425,13 +426,13 @@ export const shouldHideLinkPopup = (
   if (isPointHittingElementBoundingBox(element, [sceneX, sceneY], threshold)) {
     return false;
   }
-
+  const [x1, y1, x2] = getElementAbsoluteCoords(element);
   // hit box to prevent hiding when hovered in the vertical area between element and popover
   if (
-    sceneX >= element.x &&
-    sceneX <= element.x + element.width &&
-    sceneY <= element.y &&
-    sceneY >= element.y - SPACE_BOTTOM
+    sceneX >= x1 &&
+    sceneX <= x2 &&
+    sceneY >= y1 - SPACE_BOTTOM &&
+    sceneY <= y1
   ) {
     return false;
   }
