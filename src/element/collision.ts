@@ -362,7 +362,7 @@ const hitTestFreeDrawElement = (
     B = element.points[i + 1];
   }
 
-  const shape = getShapeForElement(element) as Drawable;
+  const shape = getShapeForElement(element);
 
   // for filled freedraw shapes, support
   // selecting from inside
