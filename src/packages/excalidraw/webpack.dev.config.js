@@ -3,6 +3,7 @@ const webpack = require("webpack");
 const autoprefixer = require("autoprefixer");
 const { parseEnvVariables } = require("./env");
 
+const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
 module.exports = {
   mode: "development",
   devtool: false,
@@ -10,7 +11,7 @@ module.exports = {
     "excalidraw.development": "./entry.js",
   },
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, outputDir),
     library: "Excalidraw",
     libraryTarget: "umd",
     filename: "[name].js",
