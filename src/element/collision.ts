@@ -874,7 +874,6 @@ const hitTestRoughShape = (
   let currentP: Point = [0, 0];
 
   return ops.some(({ op, data }, idx) => {
-    console.log(op);
     // There are only four operation types:
     // move, bcurveTo, lineTo, and curveTo
     if (op === "move") {
