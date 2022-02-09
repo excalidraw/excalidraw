@@ -428,6 +428,16 @@ const LayerUI = ({
                   {actionManager.renderAction("redo", { size: "small" })}
                 </div>
               )}
+              {!viewModeEnabled && appState.multiElement && (
+                <div
+                  className={clsx("finalize-button zen-mode-transition", {
+                    "layer-ui__wrapper__footer-left--transition-left":
+                      zenModeEnabled,
+                  })}
+                >
+                  {actionManager.renderAction("finalize", { size: "small" })}
+                </div>
+              )}
             </Section>
           </Stack.Col>
         </div>

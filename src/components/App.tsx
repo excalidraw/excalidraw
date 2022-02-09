@@ -275,6 +275,7 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+let isTouchScreen = false;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -2532,7 +2533,11 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerUp!.clientX,
       this.lastPointerUp!.clientY,
     );
-    if (!this.hitLinkElement || draggedDistance > DRAGGING_THRESHOLD) {
+    if (
+      !this.hitLinkElement ||
+      (isTouchScreen && draggedDistance > DRAGGING_THRESHOLD) ||
+      (!isTouchScreen && draggedDistance === 0)
+    ) {
       return;
     }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
@@ -2903,6 +2908,10 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
+    if (event.pointerType === "touch" || event.pointerType === "pen") {
+      isTouchScreen = true;
+    }
+
     if (isPanning) {
       return;
     }
@@ -3032,7 +3041,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
-    if (this.isMobile) {
+    if (isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
