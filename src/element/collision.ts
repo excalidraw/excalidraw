@@ -24,6 +24,7 @@ import {
   NonDeleted,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
+  ExcalidrawLinearElement,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -392,7 +393,11 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
   }
   const [relX, relY] = GAPoint.toTuple(point);
 
-  const shape = getShapeForElement(element) as Drawable[];
+  const shape = getShapeForElement(element as ExcalidrawLinearElement);
+
+  if (!shape) {
+    return false;
+  }
 
   if (args.check === isInsideCheck) {
     const hit = shape.some((subshape) =>
@@ -870,6 +875,7 @@ const hitTestRoughShape = (
   let currentP: Point = [0, 0];
 
   return ops.some(({ op, data }, idx) => {
+    console.log(op);
     // There are only four operation types:
     // move, bcurveTo, lineTo, and curveTo
     if (op === "move") {
@@ -930,6 +936,7 @@ const hitTestRoughShape = (
       return false;
     } else if (op === "qcurveTo") {
       // TODO: Implement this
+      console.warn("qcurveTo is not implemented yet");
     }
 
     return false;
