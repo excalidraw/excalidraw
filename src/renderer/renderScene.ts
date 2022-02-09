@@ -778,10 +778,12 @@ const renderLinkIcon = (
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
       );
-      linkCanvasCacheContext.fillStyle = "#fff";
-      linkCanvasCacheContext.fillRect(0, 0, width, height);
+      /*linkCanvasCacheContext.fillStyle = "#fff";
+      linkCanvasCacheContext.fillRect(0, 0, width, height);*/
+      //linkCanvasCacheContext.globalAlpha = appState.linkOpacity;
       linkCanvasCacheContext.drawImage(EXTERNAL_LINK_IMG, 0, 0, width, height);
       linkCanvasCacheContext.restore();
+      context.globalAlpha = appState.linkOpacity;
       context.drawImage(
         linkCanvasCache,
         x - centerX,
@@ -790,6 +792,7 @@ const renderLinkIcon = (
         height,
       );
     } else {
+      context.globalAlpha = appState.linkOpacity;
       context.drawImage(
         linkCanvasCache,
         x - centerX,

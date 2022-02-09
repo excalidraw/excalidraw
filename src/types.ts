@@ -153,6 +153,7 @@ export type AppState = {
   /** imageElement waiting to be placed on canvas */
   pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
   showHyperlinkPopup: false | "info" | "editor";
+  linkOpacity: number;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -269,6 +270,7 @@ export interface ExcalidrawProps {
     element: NonDeletedExcalidrawElement,
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => void;
+  linkOpacity?: number;
 }
 
 export type SceneData = {
