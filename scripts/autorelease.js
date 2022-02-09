@@ -28,7 +28,6 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   }
 
   const changedFiles = stdout.trim().split("\n");
-  console.log(changedFiles, "changed files");
   const filesToIgnoreRegex = /src\/excalidraw-app|packages\/utils/;
 
   const excalidrawPackageFiles = changedFiles.filter((file) => {
