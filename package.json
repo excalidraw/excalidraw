@@ -21,7 +21,7 @@
   "dependencies": {
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
-    "@testing-library/jest-dom": "5.16.1",
+    "@testing-library/jest-dom": "5.16.2",
     "@testing-library/react": "12.1.2",
     "@tldraw/vec": "1.4.3",
     "@types/jest": "27.4.0",
