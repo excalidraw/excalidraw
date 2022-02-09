@@ -290,14 +290,14 @@ export const getLinkHandleFromCoords = (
   appState: AppState,
 ): [x: number, y: number, width: number, height: number] => {
   const size = DEFAULT_LINK_SIZE;
-  const sizeZoom = appState.zoom.value > 1 ? appState.zoom.value : 1;
-  const linkWidth = size / sizeZoom;
-  const linkHeight = size / sizeZoom;
-  const linkMarginY = size / appState.zoom.value;
+  const zoom = appState.zoom.value > 1 ? appState.zoom.value : 1;
+  const linkWidth = size / zoom;
+  const linkHeight = size / zoom;
+  const linkMarginY = size / zoom;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
-  const centeringOffset = (size - 8) / (2 * sizeZoom);
-  const dashedLineMargin = 4 / sizeZoom;
+  const centeringOffset = (size - 8) / (2 * zoom);
+  const dashedLineMargin = 4 / zoom;
 
   // Same as `ne` resize handle
   const x = x2 + dashedLineMargin - centeringOffset;
