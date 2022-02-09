@@ -7,7 +7,6 @@ const devServerConfig = {
   entry: {
     bundle: "./example/index.js",
   },
-
   // Server Configuration options
   devServer: {
     port: 3001,
@@ -17,7 +16,6 @@ const devServerConfig = {
     static: {
       directory: path.join(__dirname, "./example/public"),
     },
-
     client: {
       progress: true,
       logging: "info",
@@ -26,4 +24,5 @@ const devServerConfig = {
     open: ["./"],
   },
 };
+
 module.exports = merge(devServerConfig, devConfig);
