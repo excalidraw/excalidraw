@@ -2,6 +2,7 @@ import colors from "./colors";
 import {
   CURSOR_TYPE,
   DEFAULT_VERSION,
+  EVENT,
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
@@ -115,6 +116,53 @@ export const debounce = <T extends any[]>(
   ret.cancel = () => {
     lastArgs = null;
     clearTimeout(handle);
+  };
+  return ret;
+};
+
+// throttle callback to execute once per animation frame
+export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
+  let handle: number | null = null;
+  let lastArgs: T | null = null;
+  let callback: ((...args: T) => void) | null = null;
+  const ret = (...args: T) => {
+    if (process.env.NODE_ENV === "test") {
+      fn(...args);
+      return;
+    }
+    lastArgs = args;
+    callback = fn;
+    if (handle === null) {
+      handle = window.requestAnimationFrame(() => {
+        handle = null;
+        lastArgs = null;
+        callback = null;
+        fn(...args);
+      });
+    }
+  };
+  ret.flush = () => {
+    if (handle !== null) {
+      cancelAnimationFrame(handle);
+      handle = null;
+    }
+    if (lastArgs) {
+      const _lastArgs = lastArgs;
+      const _callback = callback;
+      lastArgs = null;
+      callback = null;
+      if (_callback !== null) {
+        _callback(..._lastArgs);
+      }
+    }
+  };
+  ret.cancel = () => {
+    lastArgs = null;
+    callback = null;
+    if (handle !== null) {
+      cancelAnimationFrame(handle);
+      handle = null;
+    }
   };
   return ret;
 };
@@ -356,6 +404,21 @@ export const withBatchedUpdates = <
     unstable_batchedUpdates(func as TFunction, event);
   }) as TFunction;
 
+/**
+ * barches React state updates and throttles the calls to a single call per
+ * animation frame
+ */
+export const withBatchedUpdatesThrottled = <
+  TFunction extends ((event: any) => void) | (() => void),
+>(
+  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
+) => {
+  // @ts-ignore
+  return throttleRAF<Parameters<TFunction>>(((event) => {
+    unstable_batchedUpdates(func, event);
+  }) as TFunction);
+};
+
 //https://stackoverflow.com/a/9462382/8418
 export const nFormatter = (num: number, digits: number): string => {
   const si = [
@@ -461,3 +524,12 @@ export const arrayToMap = <T extends { id: string } | string>(
 
 export const isTestEnv = () =>
   typeof process !== "undefined" && process.env?.NODE_ENV === "test";
+
+export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
+  return new CustomEvent(name, {
+    detail: {
+      nativeEvent,
+    },
+    cancelable: true,
+  });
+};
