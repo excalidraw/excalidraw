@@ -23,3 +23,6 @@ jobs:
       - name: Auto release preview
         run: |
           yarn autorelease:preview
+      - name: Pull request number
+        run: |
+          echo "PR number = ${{ github.event.pull_request.number }}"
