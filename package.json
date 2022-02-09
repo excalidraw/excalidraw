@@ -68,7 +68,7 @@
     "firebase-tools": "9.23.0",
     "husky": "7.0.4",
     "jest-canvas-mock": "2.3.1",
-    "lint-staged": "12.1.7",
+    "lint-staged": "12.3.3",
     "pepjs": "0.5.3",
     "prettier": "2.5.1",
     "rewire": "5.0.0"
