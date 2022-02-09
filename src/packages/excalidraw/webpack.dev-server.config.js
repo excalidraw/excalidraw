@@ -14,7 +14,7 @@ const devServerConfig = {
     hot: true,
     compress: true,
     static: {
-      directory: path.join(__dirname, "example"),
+      directory: path.join(__dirname, "./example/public"),
     },
     client: {
       progress: true,

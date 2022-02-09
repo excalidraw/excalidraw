@@ -5,13 +5,14 @@ const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const { parseEnvVariables } = require("./env");
 
+const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
 module.exports = {
   mode: "development",
   entry: {
     "excalidraw.development": "./entry.js",
   },
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, outputDir),
     library: "Excalidraw",
     libraryTarget: "umd",
     filename: "[name].js",
