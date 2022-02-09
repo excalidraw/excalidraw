@@ -21,7 +21,7 @@
   "dependencies": {
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
-    "@testing-library/jest-dom": "5.16.1",
+    "@testing-library/jest-dom": "5.16.2",
     "@testing-library/react": "12.1.2",
     "@tldraw/vec": "1.4.3",
     "@types/jest": "27.4.0",
@@ -37,7 +37,7 @@
     "idb-keyval": "6.0.3",
     "image-blob-reduce": "3.0.1",
     "lodash.throttle": "4.1.1",
-    "nanoid": "3.1.30",
+    "nanoid": "3.1.32",
     "open-color": "1.9.1",
     "pako": "1.0.11",
     "perfect-freehand": "1.0.16",
@@ -50,9 +50,9 @@
     "react-dom": "17.0.2",
     "react-scripts": "4.0.3",
     "roughjs": "4.5.2",
-    "sass": "1.47.0",
+    "sass": "1.49.7",
     "socket.io-client": "2.3.1",
-    "typescript": "4.5.4"
+    "typescript": "4.5.5"
   },
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.0",
@@ -61,20 +61,20 @@
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.3",
     "@types/resize-observer-browser": "0.1.6",
-    "chai": "4.3.4",
+    "chai": "4.3.6",
     "dotenv": "10.0.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.3.1",
     "firebase-tools": "9.23.0",
     "husky": "7.0.4",
     "jest-canvas-mock": "2.3.1",
-    "lint-staged": "12.1.7",
+    "lint-staged": "12.3.3",
     "pepjs": "0.5.3",
     "prettier": "2.5.1",
     "rewire": "5.0.0"
   },
   "resolutions": {
-    "@typescript-eslint/typescript-estree": "5.3.0"
+    "@typescript-eslint/typescript-estree": "5.10.2"
   },
   "engines": {
     "node": ">=14.0.0"

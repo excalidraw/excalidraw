@@ -21,7 +21,7 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
-import { getContainerElement, measureText } from "./textElement";
+import { getContainerElement, measureText, wrapText } from "./textElement";
 import { isBoundToContainer } from "./typeChecks";
 import { BOUND_TEXT_PADDING } from "../constants";
 
@@ -35,6 +35,7 @@ type ElementConstructorOpts = MarkOptional<
   | "seed"
   | "version"
   | "versionNonce"
+  | "link"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -55,6 +56,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     groupIds = [],
     strokeSharpness,
     boundElements = null,
+    link = null,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
@@ -81,6 +83,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     isDeleted: false as false,
     boundElements,
     updated: getUpdatedTimestamp(),
+    link,
   };
   return element;
 };
@@ -247,17 +250,17 @@ export const updateTextElement = (
     text,
     isDeleted,
     originalText,
-  }: { text: string; isDeleted?: boolean; originalText: string },
-
-  isSubmit: boolean,
+  }: {
+    text: string;
+    isDeleted?: boolean;
+    originalText: string;
+  },
 ): ExcalidrawTextElement => {
-  const boundToContainer = isBoundToContainer(element);
-
-  // Don't update dimensions and text value for bounded text unless submitted
-  const dimensions =
-    boundToContainer && !isSubmit
-      ? undefined
-      : getAdjustedDimensions(element, text);
+  const container = getContainerElement(element);
+  if (container) {
+    text = wrapText(text, getFontString(element), container.width);
+  }
+  const dimensions = getAdjustedDimensions(element, text);
   return newElementWith(element, {
     text,
     originalText,

@@ -46,6 +46,12 @@
       }
     }
 
+    .ToolIcon__hidden {
+      box-shadow: none !important;
+      background-color: transparent !important;
+      pointer-events: none !important;
+    }
+
     .ToolIcon.ToolIcon__lock {
       margin-inline-end: var(--space-factor);
       &.ToolIcon_type_floating {

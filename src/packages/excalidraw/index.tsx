@@ -17,7 +17,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     initialData,
     excalidrawRef,
     onCollabButtonClick,
-    isCollaborating,
+    isCollaborating = false,
     onPointerUpdate,
     renderTopRightUI,
     renderFooter,
@@ -35,6 +35,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onLibraryChange,
     autoFocus = false,
     generateIdForFile,
+    onLinkOpen,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -96,6 +97,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         onLibraryChange={onLibraryChange}
         autoFocus={autoFocus}
         generateIdForFile={generateIdForFile}
+        onLinkOpen={onLinkOpen}
       />
     </InitializeApp>
   );

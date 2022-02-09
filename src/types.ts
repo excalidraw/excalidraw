@@ -20,7 +20,7 @@ import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import type App from "./components/App";
-import type { ResolvablePromise } from "./utils";
+import type { ResolvablePromise, throttleRAF } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
@@ -79,6 +79,8 @@ export type AppState = {
   editingLinearElement: LinearElementEditor | null;
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
+  penMode: boolean;
+  penDetected: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
@@ -149,16 +151,13 @@ export type AppState = {
       };
   /** imageElement waiting to be placed on canvas */
   pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
+  showHyperlinkPopup: false | "info" | "editor";
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
 
 export type Zoom = Readonly<{
   value: NormalizedZoomValue;
-  translation: Readonly<{
-    x: number;
-    y: number;
-  }>;
 }>;
 
 export type PointerCoords = Readonly<{
@@ -248,6 +247,12 @@ export interface ExcalidrawProps {
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
+  onLinkOpen?: (
+    element: NonDeletedExcalidrawElement,
+    event: CustomEvent<{
+      nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
+    }>,
+  ) => void;
 }
 
 export type SceneData = {
@@ -300,6 +305,7 @@ export type AppProps = ExcalidrawProps & {
   };
   detectScroll: boolean;
   handleKeyboardGlobally: boolean;
+  isCollaborating: boolean;
 };
 
 /** A subset of App class properties that we need to use elsewhere
@@ -367,7 +373,7 @@ export type PointerDownState = Readonly<{
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {
     // It's defined on the initial pointer down event
-    onMove: null | ((event: PointerEvent) => void);
+    onMove: null | ReturnType<typeof throttleRAF>;
     // It's defined on the initial pointer down event
     onUp: null | ((event: PointerEvent) => void);
     // It's defined on the initial pointer down event

@@ -43,6 +43,8 @@ export const getDefaultAppState = (): Omit<
     editingLinearElement: null,
     elementLocked: false,
     elementType: "selection",
+    penMode: false,
+    penDetected: false,
     errorMessage: null,
     exportBackground: true,
     exportScale: defaultExportScale,
@@ -77,9 +79,12 @@ export const getDefaultAppState = (): Omit<
     toastMessage: null,
     viewBackgroundColor: oc.white,
     zenModeEnabled: false,
-    zoom: { value: 1 as NormalizedZoomValue, translation: { x: 0, y: 0 } },
+    zoom: {
+      value: 1 as NormalizedZoomValue,
+    },
     viewModeEnabled: false,
     pendingImageElement: null,
+    showHyperlinkPopup: false,
   };
 };
 
@@ -127,6 +132,8 @@ const APP_STATE_STORAGE_CONF = (<
   editingLinearElement: { browser: false, export: false, server: false },
   elementLocked: { browser: true, export: false, server: false },
   elementType: { browser: true, export: false, server: false },
+  penMode: { browser: false, export: false, server: false },
+  penDetected: { browser: false, export: false, server: false },
   errorMessage: { browser: false, export: false, server: false },
   exportBackground: { browser: true, export: false, server: false },
   exportEmbedScene: { browser: true, export: false, server: false },
@@ -168,6 +175,7 @@ const APP_STATE_STORAGE_CONF = (<
   zoom: { browser: true, export: false, server: false },
   viewModeEnabled: { browser: false, export: false, server: false },
   pendingImageElement: { browser: false, export: false, server: false },
+  showHyperlinkPopup: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <
