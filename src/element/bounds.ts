@@ -185,7 +185,7 @@ const getLinearElementAbsoluteCoords = (
       maxY + element.y,
     ];
   } else {
-    const shape = getShapeForElement(element) as Drawable[];
+    const shape = getShapeForElement(element)!;
 
     // first element is always the curve
     const ops = getCurvePathOps(shape[0]);
@@ -326,7 +326,7 @@ const getLinearElementRotatedBounds = (
     return [minX, minY, maxX, maxY];
   }
 
-  const shape = getShapeForElement(element) as Drawable[];
+  const shape = getShapeForElement(element)!;
 
   // first element is always the curve
   const ops = getCurvePathOps(shape[0]);
