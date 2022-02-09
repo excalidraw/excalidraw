@@ -2395,9 +2395,9 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerUp!.clientY,
     );
     if (
-      !this.hitLinkElement || 
+      !this.hitLinkElement ||
       (isTouchScreen && draggedDistance > DRAGGING_THRESHOLD) ||
-      (!isTouchScreen && draggedDistance === 0) 
+      (!isTouchScreen && draggedDistance === 0)
     ) {
       return;
     }
