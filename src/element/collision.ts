@@ -834,7 +834,7 @@ const hitTestCurveInside = (
   sharpness: ExcalidrawElement["strokeSharpness"],
 ) => {
   const ops = getCurvePathOps(drawable);
-  const points: Point[] = [];
+  const points: Mutable<Point>[] = [];
   let odd = false; // select one line out of double lines
   for (const operation of ops) {
     if (operation.op === "move") {
@@ -848,13 +848,17 @@ const hitTestCurveInside = (
         points.push([operation.data[2], operation.data[3]]);
         points.push([operation.data[4], operation.data[5]]);
       }
+    } else if (operation.op === "lineTo") {
+      if (odd) {
+        points.push([operation.data[0], operation.data[1]]);
+      }
     }
   }
   if (points.length >= 4) {
     if (sharpness === "sharp") {
       return isPointInPolygon(points, x, y);
     }
-    const polygonPoints = pointsOnBezierCurves(points as any, 10, 5);
+    const polygonPoints = pointsOnBezierCurves(points, 10, 5);
     return isPointInPolygon(polygonPoints, x, y);
   }
   return false;
@@ -909,29 +913,7 @@ const hitTestRoughShape = (
       // position of the previous operation
       return retVal;
     } else if (op === "lineTo") {
-      const p0 = currentP;
-      const p1 = [data[0], data[1]] as Point;
-
-      // formula for a 2-points curve
-      const equation = (t: number, idx: number) =>
-        (1 - t) * p0[idx] + t * p1[idx];
-
-      let t = 0;
-
-      while (t <= 1.0) {
-        const tx = equation(t, 0);
-        const ty = equation(t, 1);
-
-        const diff = Math.sqrt(Math.pow(tx - x, 2) + Math.pow(ty - y, 2));
-
-        if (diff < lineThreshold) {
-          return true;
-        }
-
-        t += 0.01;
-      }
-
-      return false;
+      return hitTestCurveInside(drawable, x, y, "sharp");
     } else if (op === "qcurveTo") {
       // TODO: Implement this
       console.warn("qcurveTo is not implemented yet");
