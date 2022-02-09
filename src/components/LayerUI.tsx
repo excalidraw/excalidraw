@@ -427,6 +427,11 @@ const LayerUI = ({
                   {actionManager.renderAction("undo", { size: "small" })}
                   {actionManager.renderAction("redo", { size: "small" })}
                 </div>
+                {appState.multiElement && (
+                  <div>
+                    {actionManager.renderAction("finalize")}
+                  </div>
+                )}
               )}
             </Section>
           </Stack.Col>
