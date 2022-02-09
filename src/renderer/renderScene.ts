@@ -778,7 +778,7 @@ const renderLinkIcon = (
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
       );
-      linkCanvasCacheContext.fillStyle = "#fff";
+      linkCanvasCacheContext.fillStyle = "transparent";
       linkCanvasCacheContext.fillRect(0, 0, width, height);
       linkCanvasCacheContext.drawImage(EXTERNAL_LINK_IMG, 0, 0, width, height);
       linkCanvasCacheContext.restore();
