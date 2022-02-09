@@ -15,19 +15,20 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
-- [`exportToBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToBlob) now automatically sets `appState.exportBackground` to `true` if exporting to `image/jpeg` MIME type (to ensure that alpha channel is not compressed to black color).
-
 ### Features
 
+- Add `onLinkOpen` prop which will be triggered when clicked on element hyperlink if present [#4694](https://github.com/excalidraw/excalidraw/pull/4694).
 - Support updating library using [`updateScene`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene) API [#4546](https://github.com/excalidraw/excalidraw/pull/4546).
 
-- Introduced primary colors to the app. The colors can be overriden. Check [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#customizing-styles) on how to do so.
+- Introduced primary colors to the app. The colors can be overriden. Check [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#customizing-styles) on how to do so [#4387](https://github.com/excalidraw/excalidraw/pull/4387).
 
-- #### BREAKING CHANGE
+- [`exportToBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToBlob) now automatically sets `appState.exportBackground` to `true` if exporting to `image/jpeg` MIME type (to ensure that alpha channel is not compressed to black color) [#4342](https://github.com/excalidraw/excalidraw/pull/4342).
 
-  Removed `getElementMap` util method.
+  #### BREAKING CHANGE
 
-- Changes to [`exportToCanvas`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToCanvas) util function:
+  Remove `getElementMap` util [#4306](https://github.com/excalidraw/excalidraw/pull/4306).
+
+- Changes to [`exportToCanvas`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToCanvas) util function [#4321](https://github.com/excalidraw/excalidraw/pull/4321):
 
   - Add `maxWidthOrHeight?: number` attribute.
   - `scale` returned from `getDimensions()` is now optional (default to `1`).
@@ -64,11 +65,11 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- Export [`isLinearElement`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#isLinearElement) and [`getNonDeletedElements`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#getNonDeletedElements).
+- Export [`isLinearElement`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#isLinearElement) and [`getNonDeletedElements`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#getNonDeletedElements) [#4072](https://github.com/excalidraw/excalidraw/pull/4072).
 
-- Support [`renderTopRightUI`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRightUI) in mobile UI.
+- Support [`renderTopRightUI`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRightUI) in mobile UI [#4065](https://github.com/excalidraw/excalidraw/pull/4065).
 
-- Export `THEME` constant from the package so host can use this when passing the theme.
+- Export `THEME` constant from the package so host can use this when passing the theme [#4055](https://github.com/excalidraw/excalidraw/pull/4055).
 
   #### BREAKING CHANGE
 
@@ -78,15 +79,15 @@ Please add the latest change on the top under the correct section.
 
 - Reset `unmounted` state on the component once component mounts to fix the mounting/unmounting repeatedly when used with `useEffect` [#4682](https://github.com/excalidraw/excalidraw/pull/4682).
 - Panning the canvas using `mousewheel-drag` and `space-drag` now prevents the browser from scrolling the container/page [#4489](https://github.com/excalidraw/excalidraw/pull/4489).
-- Scope drag and drop events to Excalidraw container to prevent overriding host application drag and drop events.
+- Scope drag and drop events to Excalidraw container to prevent overriding host application drag and drop events [#4445](https://github.com/excalidraw/excalidraw/pull/4445).
 
 ### Build
 
-- Added an example to test and develop the package [locally](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Development) using `yarn start`
+- Added an example to test and develop the package [locally](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Development) using `yarn start` [#4488](https://github.com/excalidraw/excalidraw/pull/4488)
 
-- Remove `file-loader` so font assets are not duplicated by webpack and use webpack asset modules for font generation [#4380](https://github.com/excalidraw/excalidraw/pull/4380)
+- Remove `file-loader` so font assets are not duplicated by webpack and use webpack asset modules for font generation [#4380](https://github.com/excalidraw/excalidraw/pull/4380).
 
-- We're now compiling to `es2017` target. Notably, `async/await` is not compiled down to generators. [#4341](https://github.com/excalidraw/excalidraw/pull/4341)
+- We're now compiling to `es2017` target. Notably, `async/await` is not compiled down to generators. [#4341](https://github.com/excalidraw/excalidraw/pull/4341).
 
 ---
 
@@ -96,7 +97,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- Don't show save file to disk button in export dialog when `saveFileToDisk` passed as `false` in [`UIOptions.canvasActions.export`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportOpts).
+- Don't show save file to disk button in export dialog when `saveFileToDisk` passed as `false` in [`UIOptions.canvasActions.export`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportOpts) [#4073](https://github.com/excalidraw/excalidraw/pull/4073).
 
 - [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) prop should return false to prevent the native excalidraw paste action [#3974](https://github.com/excalidraw/excalidraw/pull/3974).
 

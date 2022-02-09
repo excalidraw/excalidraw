@@ -91,7 +91,7 @@ export const textWysiwyg = ({
     // FIXME: Why is this try-catch block needed to keep tests
     // for unbinding subtyped text from failing due to exceptions?
     try {
-      const currentFont = editable.style.fontFamily.replaceAll('"', "");
+      const currentFont = editable.style.fontFamily.replace(/"/g, "");
       if (
         getFontFamilyString({ fontFamily: updatedElement.fontFamily }) !==
         currentFont

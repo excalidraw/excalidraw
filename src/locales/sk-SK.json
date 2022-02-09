@@ -103,8 +103,14 @@
     "toggleTheme": "Prepnúť tému",
     "personalLib": "Moja knižnica",
     "excalidrawLib": "Excalidraw knižnica",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Zmenšiť veľkosť písma",
+    "increaseFontSize": "Zväčšiť veľkosť písma",
+    "unbindText": "Zrušiť previazanie textu",
+    "link": {
+      "edit": "Upraviť odkaz",
+      "create": "Vytvoriť odkaz",
+      "label": "Odkaz"
+    }
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -186,7 +192,9 @@
     "freedraw": "Kresliť",
     "text": "Text",
     "library": "Knižnica",
-    "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia"
+    "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia",
+    "penMode": "Zabrániť priblíženiu potiahnutím a povoliť vstup voľnou rokou iba z pera",
+    "link": "Pridať/ Upraviť odkaz pre vybraný tvar"
   },
   "headings": {
     "canvasActions": "Akcie plátna",
@@ -295,7 +303,7 @@
     "placeholder": {
       "authorName": "Vaše meno alebo užívateľské meno",
       "libraryName": "Názov vašej knižnice",
-      "libraryDesc": "",
+      "libraryDesc": "Popis vašej knižnice, ktorý ostatným pomôže porozumieť jej vhodnému použitiu",
       "githubHandle": "GitHub užívateľské meno (nepovinné), aby ste mohli robiť úpravy po tom, čo bude knižnica uverejnená na schválenie",
       "twitterHandle": "Twitter užívateľské meno (nepovinné), aby sme vedeli komu pripísať zásluhu pri propagovaní cez Twitter",
       "website": "Odkaz na vašu osobnú webovú stránku alebo niekam inam (nepovinné)"

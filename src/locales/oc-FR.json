@@ -103,8 +103,14 @@
     "toggleTheme": "Alternar tèma",
     "personalLib": "Bibliotèca personala",
     "excalidrawLib": "Bibliotèca Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Reduire talha poliça",
+    "increaseFontSize": "Aumentar talha poliça",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
@@ -186,7 +192,9 @@
     "freedraw": "Dessenhar",
     "text": "Tèxt",
     "library": "Bibliotèca",
-    "lock": "Mantenir activa l’aisina aprèp dessenhar"
+    "lock": "Mantenir activa l’aisina aprèp dessenhar",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -302,7 +310,7 @@
     },
     "errors": {
       "required": "Requerit",
-      "website": ""
+      "website": "Picatz una URL valida"
     },
     "noteDescription": {
       "pre": "Enviatz vòstra bibliotèca per èsser compresa al ",

@@ -216,6 +216,7 @@ const changeFontSize = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getNewFontSize: (element: ExcalidrawTextElement) => number,
+  fallbackValue?: ExcalidrawTextElement["fontSize"],
 ) => {
   const newFontSizes = new Set<number>();
 
@@ -253,7 +254,7 @@ const changeFontSize = (
       currentItemFontSize:
         newFontSizes.size === 1
           ? [...newFontSizes][0]
-          : appState.currentItemFontSize,
+          : fallbackValue ?? appState.currentItemFontSize,
     },
     commitToHistory: true,
   };
@@ -591,7 +592,7 @@ export const actionChangeOpacity = register({
 export const actionChangeFontSize = register({
   name: "changeFontSize",
   perform: (elements, appState, value) => {
-    return changeFontSize(elements, appState, () => value);
+    return changeFontSize(elements, appState, () => value, value);
   },
   PanelComponentPredicate: (
     elements: readonly ExcalidrawElement[],
@@ -609,21 +610,25 @@ export const actionChangeFontSize = register({
             value: 16,
             text: t("labels.small"),
             icon: <FontSizeSmallIcon theme={appState.theme} />,
+            testId: "fontSize-small",
           },
           {
             value: 20,
             text: t("labels.medium"),
             icon: <FontSizeMediumIcon theme={appState.theme} />,
+            testId: "fontSize-medium",
           },
           {
             value: 28,
             text: t("labels.large"),
             icon: <FontSizeLargeIcon theme={appState.theme} />,
+            testId: "fontSize-large",
           },
           {
             value: 36,
             text: t("labels.veryLarge"),
             icon: <FontSizeExtraLargeIcon theme={appState.theme} />,
+            testId: "fontSize-veryLarge",
           },
         ]}
         value={getFormValue(
