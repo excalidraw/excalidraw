@@ -290,8 +290,8 @@ export const getLinkHandleFromCoords = (
   appState: AppState,
 ): [x: number, y: number, width: number, height: number] => {
   const size = DEFAULT_LINK_SIZE;
-  const linkWidth = size / appState.zoom.value;
-  const linkHeight = size / appState.zoom.value;
+  const linkWidth = size;// / appState.zoom.value;
+  const linkHeight = size;// / appState.zoom.value;
   const linkMarginY = size / appState.zoom.value;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
