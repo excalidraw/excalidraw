@@ -2767,7 +2767,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (event.pointerType === "touch" || event.pointerType === "pen") {
-      isTouchScreen = true; 
+      isTouchScreen = true;
     }
 
     if (isPanning) {
@@ -2913,7 +2913,6 @@ class App extends React.Component<AppProps, AppState> {
         hitElement,
       );
     }
-
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
