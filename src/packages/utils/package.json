@@ -50,7 +50,7 @@
     "ts-loader": "9.2.6",
     "webpack": "5.66.0",
     "webpack-bundle-analyzer": "4.5.0",
-    "webpack-cli": "4.9.1"
+    "webpack-cli": "4.9.2"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
