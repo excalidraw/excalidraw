@@ -15,8 +15,10 @@ const publish = () => {
     execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
     execSync(`yarn run build:umd`, { cwd: excalidrawDir });
     execSync(`yarn --cwd ${excalidrawDir} publish`);
+    console.info("Published 🎉");
   } catch (error) {
     console.error(error);
+    process.exit(1);
   }
 };
 // get files changed between prev and head commit
@@ -36,6 +38,7 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
     );
   });
   if (!excalidrawPackageFiles.length) {
+    console.info("Skipping release as no valid diff found");
     process.exit(0);
   }
 
@@ -46,11 +49,12 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   let data = fs.readFileSync(`${excalidrawDir}/README_NEXT.md`, "utf8");
 
   const isPreview = process.argv.slice(2)[0] === "preview";
-  console.log(process.argv, isPreview);
+  console.info("isPreview", isPreview);
   if (isPreview) {
     // use pullNumber-commithash as the version for preview
     const pullRequestNumber = process.argv.slice(3)[0];
-    pkg.version = `${pullRequestNumber}-${getShortCommitHash()}`;
+    pkg.version = `${pkg.version}-${pullRequestNumber}-${getShortCommitHash()}`;
+    console.info("version=", pkg.version);
     // replace "excalidraw-next" with "excalidraw-preview"
     pkg.name = "@excalidraw/excalidraw-preview";
     data = data.replace(/excalidraw-next/g, "excalidraw-preview");
@@ -60,5 +64,6 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   fs.writeFileSync(excalidrawPackage, JSON.stringify(pkg, null, 2), "utf8");
 
   fs.writeFileSync(`${excalidrawDir}/README.md`, data, "utf8");
+  console.info("Publish in progress...");
   publish();
 });
