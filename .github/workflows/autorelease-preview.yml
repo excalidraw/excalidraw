@@ -22,5 +22,4 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Auto release preview
         run: |
-          yarn autorelease:preview PR number=${{ github.event.pull_request.number }}
-        
+          yarn autorelease preview ${{ github.event.pull_request.number }}
