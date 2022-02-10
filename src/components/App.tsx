@@ -2687,7 +2687,6 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
       setCursor(this.canvas, CURSOR_TYPE.POINTER);
-
       showHyperlinkTooltip(this.hitLinkElement, this.state);
     } else {
       hideHyperlinkToolip();
