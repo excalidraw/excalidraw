@@ -904,7 +904,9 @@ class App extends React.Component<AppProps, AppState> {
           this.excalidrawContainerRef.current!.getBoundingClientRect();
         this.isMobile =
           width < MQ_MAX_WIDTH_PORTRAIT ||
-          (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE);
+          (height < MQ_MAX_HEIGHT_LANDSCAPE &&
+            width < MQ_MAX_WIDTH_LANDSCAPE) ||
+          this.state.isMobile; //zsviczian
         // refresh offsets
         // ---------------------------------------------------------------------
         this.updateDOMRect();
@@ -914,7 +916,8 @@ class App extends React.Component<AppProps, AppState> {
       const mediaQuery = window.matchMedia(
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
-      const handler = () => (this.isMobile = mediaQuery.matches);
+      const handler = () =>
+        (this.isMobile = mediaQuery.matches || this.state.isMobile); //zsviczian
       mediaQuery.addListener(handler);
       this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
     }
@@ -1756,6 +1759,11 @@ class App extends React.Component<AppProps, AppState> {
       if (sceneData.appState) {
         this.setState(sceneData.appState);
       }
+
+      if (this.state.isMobile) {
+        //zsviczian
+        this.isMobile = true; //zsviczian
+      } //zsviczian
 
       if (sceneData.elements) {
         this.scene.replaceAllElements(sceneData.elements);
@@ -2826,7 +2834,7 @@ class App extends React.Component<AppProps, AppState> {
       showHyperlinkTooltip(this.hitLinkElement, this.state);
       if (this.props.onLinkHover) {
         this.props.onLinkHover(this.hitLinkElement, event);
-      }
+      } //zsviczian
     } else {
       hideHyperlinkToolip();
       if (

@@ -153,7 +153,13 @@ export type AppState = {
   /** imageElement waiting to be placed on canvas */
   pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
   showHyperlinkPopup: false | "info" | "editor";
-  linkOpacity: number;
+  linkOpacity: number; //zsviczian
+  isMobile: boolean; //zsviczian
+  colorPalette: {
+    canvasBackground?: string[];
+    elementBackground?: string[];
+    elementStroke?: string[];
+  };
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -229,7 +235,7 @@ export interface ExcalidrawProps {
   ) => Promise<boolean> | boolean;
   onDrop?: (
     event: React.DragEvent<HTMLDivElement>,
-  ) => Promise<boolean> | boolean;
+  ) => Promise<boolean> | boolean; //zsviczian
   renderTopRightUI?: (
     isMobile: boolean,
     appState: AppState,
@@ -251,15 +257,15 @@ export interface ExcalidrawProps {
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
-  onBeforeTextEdit?: (textElement: ExcalidrawTextElement) => string;
+  onBeforeTextEdit?: (textElement: ExcalidrawTextElement) => string; //zsviczian
   onBeforeTextSubmit?: (
     textElement: ExcalidrawTextElement,
     textToSubmit: string,
     originalText: string,
     isDeleted: boolean,
-  ) => [string, string, string];
+  ) => [string, string, string]; //zsviczian
   generateIdForFile?: (file: File) => string | Promise<string>;
-  onThemeChange?: (newTheme: string) => void;
+  onThemeChange?: (newTheme: string) => void; //zsviczian
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
     event: CustomEvent<{
@@ -269,8 +275,7 @@ export interface ExcalidrawProps {
   onLinkHover?: (
     element: NonDeletedExcalidrawElement,
     event: React.PointerEvent<HTMLCanvasElement>,
-  ) => void;
-  linkOpacity?: number;
+  ) => void; //zsviczian
 }
 
 export type SceneData = {

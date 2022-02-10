@@ -39,6 +39,7 @@ const keyBindings = [
 
 const Picker = ({
   colors,
+  customPalette, //zsviczian
   color,
   onChange,
   onClose,
@@ -47,6 +48,7 @@ const Picker = ({
   type,
 }: {
   colors: string[];
+  customPalette: boolean; //zsviczian
   color: string | null;
   onChange: (color: string) => void;
   onClose: () => void;
@@ -147,10 +149,15 @@ const Picker = ({
                 (event.currentTarget as HTMLButtonElement).focus();
                 onChange(_color);
               }}
-              title={`${t(`colors.${_colorWithoutHash}`)}${
+              title={`${
+                customPalette ? _color : t(`colors.${_colorWithoutHash}`)
+              }${
+                //zsviczian
                 !isTransparent(_color) ? ` (${_color})` : ""
               } — ${keyBindings[i].toUpperCase()}`}
-              aria-label={t(`colors.${_colorWithoutHash}`)}
+              aria-label={
+                customPalette ? _color : t(`colors.${_colorWithoutHash}`)
+              } //zsviczian
               aria-keyshortcuts={keyBindings[i]}
               style={{ color: _color }}
               key={_color}
@@ -246,6 +253,7 @@ export const ColorPicker = ({
   label,
   isActive,
   setActive,
+  colorPalette, //zsviczian
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   color: string | null;
@@ -253,6 +261,11 @@ export const ColorPicker = ({
   label: string;
   isActive: boolean;
   setActive: (active: boolean) => void;
+  colorPalette: {
+    canvasBackground?: string[];
+    elementBackground?: string[];
+    elementStroke?: string[];
+  }; //zsviczian
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
 
@@ -282,7 +295,8 @@ export const ColorPicker = ({
             }
           >
             <Picker
-              colors={colors[type]}
+              colors={colorPalette[type] ?? colors[type]} //zsviczian
+              customPalette={!!colorPalette[type]} //zsviczian
               color={color || null}
               onChange={(changedColor) => {
                 onChange(changedColor);

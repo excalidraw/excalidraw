@@ -97,17 +97,17 @@ const Excalidraw = (props: ExcalidrawProps) => {
         renderCustomStats={renderCustomStats}
         UIOptions={UIOptions}
         onPaste={onPaste}
-        onDrop={onDrop}
+        onDrop={onDrop} //zsviczian
         detectScroll={detectScroll}
         handleKeyboardGlobally={handleKeyboardGlobally}
         onLibraryChange={onLibraryChange}
         autoFocus={autoFocus}
-        onBeforeTextEdit={onBeforeTextEdit}
-        onBeforeTextSubmit={onBeforeTextSubmit}
+        onBeforeTextEdit={onBeforeTextEdit} //zsviczian
+        onBeforeTextSubmit={onBeforeTextSubmit} //zsviczian
         generateIdForFile={generateIdForFile}
-        onThemeChange={onThemeChange}
+        onThemeChange={onThemeChange} //zsviczian
         onLinkOpen={onLinkOpen}
-        onLinkHover={onLinkHover}
+        onLinkHover={onLinkHover} //zsviczian
       />
     </InitializeApp>
   );
