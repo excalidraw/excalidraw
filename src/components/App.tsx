@@ -2386,11 +2386,21 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private redirectToLink = (event: React.PointerEvent<HTMLCanvasElement>) => {
+  private redirectToLink = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    isTouchScreen: boolean,
+  ) => {
+    const draggedDistance = distance2d(
+      this.lastPointerDown!.clientX,
+      this.lastPointerDown!.clientY,
+      this.lastPointerUp!.clientX,
+      this.lastPointerUp!.clientY,
+    );
     if (
       !this.hitLinkElement ||
-      this.lastPointerDown!.clientX !== this.lastPointerUp!.clientX ||
-      this.lastPointerDown!.clientY !== this.lastPointerUp!.clientY
+      // For touch screen allow dragging threshold else strict check
+      (isTouchScreen && draggedDistance > DRAGGING_THRESHOLD) ||
+      (!isTouchScreen && draggedDistance !== 0)
     ) {
       return;
     }
@@ -2888,7 +2898,8 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
-    if (this.isMobile) {
+    const isTouchScreen = ["pen", "touch"].includes(event.pointerType);
+    if (isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
@@ -2906,7 +2917,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event);
+      this.redirectToLink(event, isTouchScreen);
     }
 
     this.removePointer(event);
