@@ -268,7 +268,12 @@ export const ColorPicker = ({
   }; //zsviczian
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
-
+  const customPalette =
+    typeof colorPalette[type] !== "undefined" &&
+    colorPalette[type]?.length === 15; //zsviczian
+  const palette = customPalette
+    ? colorPalette[type] ?? colors[type]
+    : colors[type]; //zsviczian
   return (
     <div>
       <div className="color-picker-control-container">
@@ -295,8 +300,8 @@ export const ColorPicker = ({
             }
           >
             <Picker
-              colors={colorPalette[type] ?? colors[type]} //zsviczian
-              customPalette={!!colorPalette[type]} //zsviczian
+              colors={palette} //zsviczian
+              customPalette={customPalette} //zsviczian
               color={color || null}
               onChange={(changedColor) => {
                 onChange(changedColor);
