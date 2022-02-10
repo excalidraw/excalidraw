@@ -45,11 +45,11 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   // update readme
   let data = fs.readFileSync(`${excalidrawDir}/README_NEXT.md`, "utf8");
 
-  const isPreview = process.argv.slice(3)[0] === "preview";
+  const isPreview = process.argv.slice(2)[0] === "preview";
   console.log(process.argv, isPreview);
   if (isPreview) {
     // use pullNumber-commithash as the version for preview
-    const pullRequestNumber = process.argv.slice(2)[0];
+    const pullRequestNumber = process.argv.slice(3)[0];
     pkg.version = `${pullRequestNumber}-${getShortCommitHash()}`;
     // replace "excalidraw-next" with "excalidraw-preview"
     pkg.name = "@excalidraw/excalidraw-preview";
@@ -60,5 +60,5 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   fs.writeFileSync(excalidrawPackage, JSON.stringify(pkg, null, 2), "utf8");
 
   fs.writeFileSync(`${excalidrawDir}/README.md`, data, "utf8");
-  //publish();
+  publish();
 });
