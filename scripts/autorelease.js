@@ -19,6 +19,7 @@ const publish = () => {
     console.error(error);
   }
 };
+console.log(process.argv);
 
 // get files changed between prev and head commit
 exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
@@ -40,7 +41,7 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
     process.exit(0);
   }
 
-  const isPreview = process.argv.slice(2)[0] === "preview";
+  const isPreview = process.argv.slice(3)[0] === "preview";
   // update package.json
   pkg.version = `${pkg.version}-${getShortCommitHash()}`;
   pkg.name = isPreview
@@ -56,5 +57,5 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
     data = data.trim();
   }
   fs.writeFileSync(`${excalidrawDir}/README.md`, data, "utf8");
-  publish();
+  //publish();
 });
