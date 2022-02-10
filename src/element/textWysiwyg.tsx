@@ -86,7 +86,7 @@ export const textWysiwyg = ({
     updatedElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
   ) => {
-    const currentFont = editable.style.fontFamily.replaceAll('"', "");
+    const currentFont = editable.style.fontFamily.replace(/"/g, "");
     if (
       getFontFamilyString({ fontFamily: updatedElement.fontFamily }) !==
       currentFont

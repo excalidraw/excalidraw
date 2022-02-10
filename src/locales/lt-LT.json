@@ -104,7 +104,13 @@
     "personalLib": "Asmeninė biblioteka",
     "excalidrawLib": "Exaclidraw biblioteka",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "",
@@ -186,7 +192,9 @@
     "freedraw": "Piešti",
     "text": "Tekstas",
     "library": "Biblioteka",
-    "lock": ""
+    "lock": "",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "",

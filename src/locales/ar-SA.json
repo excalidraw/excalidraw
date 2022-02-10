@@ -103,8 +103,14 @@
     "toggleTheme": "غير النمط",
     "personalLib": "المكتبة الشخصية",
     "excalidrawLib": "مكتبتنا",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "تصغير حجم الخط",
+    "increaseFontSize": "تكبير حجم الخط",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -173,7 +179,7 @@
     "imageInsertError": "تعذر إدراج الصورة. حاول مرة أخرى لاحقاً...",
     "fileTooBig": "الملف كبير جداً. الحد الأقصى المسموح به للحجم هو {{maxSize}}.",
     "svgImageInsertError": "تعذر إدراج صورة SVG. يبدو أن ترميز SVG غير صحيح.",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG غير صالح."
   },
   "toolBar": {
     "selection": "تحديد",
@@ -186,7 +192,9 @@
     "freedraw": "رسم",
     "text": "نص",
     "library": "مكتبة",
-    "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم"
+    "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
@@ -194,7 +202,7 @@
     "shapes": "الأشكال"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "لتحريك لوحة الرسم ، استمر في الضغط على عجلة الماوس أو مفتاح المسافة أثناء السحب",
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
     "freeDraw": "انقر واسحب، افرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
@@ -301,7 +309,7 @@
       "website": ""
     },
     "errors": {
-      "required": "",
+      "required": "مطلوب",
       "website": ""
     },
     "noteDescription": {

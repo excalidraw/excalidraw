@@ -104,7 +104,13 @@
     "personalLib": "個人資料庫",
     "excalidrawLib": "Excalidraw 資料庫",
     "decreaseFontSize": "縮小文字",
-    "increaseFontSize": "放大文字"
+    "increaseFontSize": "放大文字",
+    "unbindText": "取消綁定文字",
+    "link": {
+      "edit": "編輯連結",
+      "create": "建立連結",
+      "label": "連結"
+    }
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -186,7 +192,9 @@
     "freedraw": "繪圖",
     "text": "文字",
     "library": "資料庫",
-    "lock": "可連續使用選取的工具"
+    "lock": "可連續使用選取的工具",
+    "penMode": "停止使用手勢縮放並接受以繪圖筆繪圖輸入",
+    "link": "為所選的形狀增加\b/更新連結"
   },
   "headings": {
     "canvasActions": "canvas 動作",

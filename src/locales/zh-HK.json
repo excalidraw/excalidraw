@@ -104,7 +104,13 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    }
   },
   "buttons": {
     "clearReset": "清空畫布",
@@ -186,7 +192,9 @@
     "freedraw": "",
     "text": "",
     "library": "",
-    "lock": ""
+    "lock": "",
+    "penMode": "",
+    "link": ""
   },
   "headings": {
     "canvasActions": "畫布動作",
