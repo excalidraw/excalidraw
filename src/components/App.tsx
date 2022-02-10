@@ -2536,7 +2536,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       !this.hitLinkElement ||
       (isTouchScreen && draggedDistance > DRAGGING_THRESHOLD) ||
-      (!isTouchScreen && draggedDistance === 0)
+      (!isTouchScreen && draggedDistance != 0)
     ) {
       return;
     }
