@@ -53,7 +53,7 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   if (isPreview) {
     // use pullNumber-commithash as the version for preview
     const pullRequestNumber = process.argv.slice(3)[0];
-    pkg.version = `${pkg.version}-${pullRequestNumber}-${getShortCommitHash()}`;
+    pkg.version = `${pkg.version}-${pullRequestNumber}`;
     console.info("version=", pkg.version);
     // replace "excalidraw-next" with "excalidraw-preview"
     pkg.name = "@excalidraw/excalidraw-preview";
