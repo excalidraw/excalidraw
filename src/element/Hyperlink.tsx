@@ -405,6 +405,7 @@ const renderTooltip = (
     },
     "top",
   );
+  trackEvent("link", "tooltip");
 
   IS_HYPERLINK_TOOLTIP_VISIBLE = true;
 };
