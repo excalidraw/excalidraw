@@ -34,18 +34,18 @@ jobs:
           comment-author: "github-actions[bot]"
           body-includes: Preview version released
       - name: Create release comment
-        if: ${{ steps.autorelease.outputs.version }} && !${{ steps.fc.outputs.comment-id }}
+        if: steps.autorelease.outputs.version != '' && steps.fc.outputs.comment-id == ''
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            *Preview version has been shipped* :rocket:
+            **Preview version has been shipped** :rocket:
             You can use [@excalidraw/excalidraw-preview](https://npmjs.com/@excalidraw/excalidraw-preview) for testing! 
-            Below are the shipped versions :down:
+            Below are the shipped versions :pointer_down:
             [@excalidraw/excalidraw-preview@${{ steps.autorelease.outputs.version }}](https://www.npmjs.com/package/@excalidraw/excalidraw-preview/v/${{ steps.autorelease.outputs.version }})
 
       - name: Update release comment
-        if: ${{ steps.autorelease.outputs.version }} && ${{ steps.fc.outputs.comment-id }}
+        if: steps.autorelease.outputs.version != '' steps.fc.outputs.comment-id != ''
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
