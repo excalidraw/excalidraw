@@ -24,12 +24,14 @@ jobs:
         id: "autorelease"
         run: |
           yarn autorelease preview ${{ github.event.pull_request.number }}
+          echo version is ${{ steps.autorelease.outputs.version }}
+
       - name: Find Comment
         uses: peter-evans/find-comment@v1
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "excalibot"
+          comment-author: "github-actions[bot]"
           body-includes: Preview version released
       - name: Create or update comment
         uses: peter-evans/create-or-update-comment@v1
