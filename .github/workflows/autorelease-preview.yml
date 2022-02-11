@@ -26,15 +26,15 @@ jobs:
           yarn add @actions/core
           yarn autorelease preview ${{ github.event.pull_request.number }}
 
-      - name: Find Comment
+      - name: Find release comment
         uses: peter-evans/find-comment@v1
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "excalibot"
+          comment-author: "github-actions[bot]"
           body-includes: Preview version released
       - name: Create release comment
-        if: steps.autorelease.outputs.version !='' && steps.fc.outputs.comment-id == ''
+        if: ${{ steps.autorelease.outputs.version }} && !${{ steps.fc.outputs.comment-id }}
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -45,7 +45,7 @@ jobs:
             [@excalidraw/excalidraw-preview@${{ steps.autorelease.outputs.version }}](https://www.npmjs.com/package/@excalidraw/excalidraw-preview/v/${{ steps.autorelease.outputs.version }})
 
       - name: Update release comment
-        if: steps.autorelease.outputs.version !='' && steps.fc.outputs.comment-id != ''
+        if: ${{ steps.autorelease.outputs.version }} && ${{ steps.fc.outputs.comment-id }}
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
