@@ -32,9 +32,9 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: "github-actions[bot]"
-          body-includes: Preview version released
+          body-includes: Preview version has been shipped
       - name: Create release comment
-        if: ${{ steps.autorelease.outputs.version != '' && steps.fc.outputs.comment-id == '' }}
+        if: steps.autorelease.outputs.version != '' && steps.fc.outputs.comment-id == ''
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -45,10 +45,10 @@ jobs:
             [@excalidraw/excalidraw-preview@${{ steps.autorelease.outputs.version }}](https://www.npmjs.com/package/@excalidraw/excalidraw-preview/v/${{ steps.autorelease.outputs.version }})
 
       - name: Update release comment
-        if: ${{ steps.autorelease.outputs.version != '' && steps.fc.outputs.comment-id != '' }}
+        if: steps.autorelease.outputs.version != '' && steps.fc.outputs.comment-id != ''
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           body: |
-            ${{ steps.autorelease.outputs.version }}
+            [@excalidraw/excalidraw-preview@${{ steps.autorelease.outputs.version }}](https://www.npmjs.com/package/@excalidraw/excalidraw-preview/v/${{ steps.autorelease.outputs.version }})
           reactions: hooray
