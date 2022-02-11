@@ -45,7 +45,7 @@ jobs:
             [@excalidraw/excalidraw-preview@${{ steps.autorelease.outputs.version }}](https://www.npmjs.com/package/@excalidraw/excalidraw-preview/v/${{ steps.autorelease.outputs.version }})
 
       - name: Update release comment
-        if: steps.autorelease.outputs.version != '' steps.fc.outputs.comment-id != ''
+        if: steps.autorelease.outputs.version != '' && steps.fc.outputs.comment-id != ''
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
