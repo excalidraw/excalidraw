@@ -479,7 +479,7 @@ class App extends React.Component<AppProps, AppState> {
       <div
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": viewModeEnabled,
-          "excalidraw--mobile": this.isMobile,
+          "excalidraw--mobile": this.isMobile || this.state.isMobile, //zsviczian
         })}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -491,7 +491,11 @@ class App extends React.Component<AppProps, AppState> {
         <ExcalidrawContainerContext.Provider
           value={this.excalidrawContainerValue}
         >
-          <IsMobileContext.Provider value={this.isMobile}>
+          <IsMobileContext.Provider
+            value={
+              this.isMobile || this.state.isMobile //zsviczian
+            }
+          >
             <LayerUI
               canvas={this.canvas}
               appState={this.state}
@@ -1759,11 +1763,6 @@ class App extends React.Component<AppProps, AppState> {
       if (sceneData.appState) {
         this.setState(sceneData.appState);
       }
-
-      if (this.state.isMobile) {
-        //zsviczian
-        this.isMobile = true; //zsviczian
-      } //zsviczian
 
       if (sceneData.elements) {
         this.scene.replaceAllElements(sceneData.elements);
