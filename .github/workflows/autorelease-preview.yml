@@ -42,7 +42,7 @@ jobs:
             *Preview version has been shipped* :rocket:
             You can use [@excalidraw/excalidraw-preview](https://npmjs.com/@excalidraw/excalidraw-preview) for testing! 
             Below are the shipped versions :down:
-            [@excalidraw/excalidraw-preview@${{ steps.autorelease.outputs.version }}](https://www.npmjs.com/package/@excalidraw/excalidraw-preview/v/${{ steps.autorelease.outputs.version })
+            [@excalidraw/excalidraw-preview@${{ steps.autorelease.outputs.version }}](https://www.npmjs.com/package/@excalidraw/excalidraw-preview/v/${{ steps.autorelease.outputs.version }})
 
       - name: Update release comment
         if: steps.autorelease.outputs.version !='' && steps.fc.outputs.comment-id != ''
