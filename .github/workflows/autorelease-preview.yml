@@ -15,8 +15,8 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: "@excalibot trigger release"
-          run: |
-            echo "Commit found! ${{ steps.fc.outputs.comment-id }}"
+        run: |
+          echo "Commit found! ${{ steps.fc.outputs.comment-id }}"
       - uses: actions/checkout@v2
         if: steps.fc.outputs.comment-id != ''
         with:
