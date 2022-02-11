@@ -55,6 +55,7 @@
     "typescript": "4.5.5"
   },
   "devDependencies": {
+    "@actions/core": "1.6.0",
     "@excalidraw/eslint-config": "1.0.0",
     "@excalidraw/prettier-config": "1.0.2",
     "@types/chai": "4.3.0",

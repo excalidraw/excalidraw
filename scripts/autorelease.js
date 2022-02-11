@@ -1,5 +1,6 @@
 const fs = require("fs");
 const { exec, execSync } = require("child_process");
+const core = require("@actions/core");
 
 const excalidrawDir = `${__dirname}/../src/packages/excalidraw`;
 const excalidrawPackage = `${excalidrawDir}/package.json`;
@@ -16,7 +17,7 @@ const publish = () => {
     execSync(`yarn run build:umd`, { cwd: excalidrawDir });
     execSync(`yarn --cwd ${excalidrawDir} publish`);
     console.info("Published 🎉");
-    execSync(`echo '::set-output name=version::${pkg.version}'`);
+    core.setOutput("version", pkg.version);
   } catch (error) {
     console.error(error);
     process.exit(1);
