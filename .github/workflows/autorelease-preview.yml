@@ -35,6 +35,7 @@ jobs:
           body-includes: Preview version released
       - name: Create release comment
         if: (steps.autorelease.outputs.version != '' && steps.fc.outputs.comment-id == '')
+        run: echo "create commit"
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -46,6 +47,7 @@ jobs:
 
       - name: Update release comment
         if: (steps.autorelease.outputs.version != '' && steps.fc.outputs.comment-id != '')
+        run: echo "update commit"
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
