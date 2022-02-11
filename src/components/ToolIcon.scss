@@ -80,7 +80,7 @@
   .ToolIcon_type_button {
     padding: 0;
     border: none;
-    margin: 0;
+    margin: 0px 3px; /* //zsviczian */
     font-size: inherit;
 
     &:focus-visible {

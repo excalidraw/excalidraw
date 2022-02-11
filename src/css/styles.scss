@@ -271,9 +271,9 @@
     pointer-events: none;
 
     > .Island {
-      width: 100%;
+      /*width: 100%; //zsviczian*/
       max-width: 100%;
-      min-width: 100%;
+      /*min-width: 100%; //zsviczian*/
       box-sizing: border-box;
       max-height: 100%;
       display: flex;
