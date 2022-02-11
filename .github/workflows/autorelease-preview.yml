@@ -51,4 +51,3 @@ jobs:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           body: |
             [@excalidraw/excalidraw-preview@${{ steps.autorelease.outputs.version }}](https://www.npmjs.com/package/@excalidraw/excalidraw-preview/v/${{ steps.autorelease.outputs.version }})
-          reactions: hooray
