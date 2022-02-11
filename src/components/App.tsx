@@ -1045,7 +1045,6 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
-    console.info("Dummychange to trigger release!");
     // Hide hyperlink popup if shown when element type is not selection
     if (
       prevState.elementType === "selection" &&
