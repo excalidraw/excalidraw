@@ -16,6 +16,7 @@ const publish = () => {
     execSync(`yarn run build:umd`, { cwd: excalidrawDir });
     execSync(`yarn --cwd ${excalidrawDir} publish`);
     console.info("Published 🎉");
+    execSync(`echo '::set-output version=${pkg.version}`);
   } catch (error) {
     console.error(error);
     process.exit(1);
