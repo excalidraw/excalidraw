@@ -23,6 +23,7 @@ jobs:
       - name: Auto release preview
         id: "autorelease"
         run: |
+          yarn add @actions/core
           yarn autorelease preview ${{ github.event.pull_request.number }}
           echo version is ${{ steps.autorelease.outputs.version }}
 
