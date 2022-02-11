@@ -1,26 +1,40 @@
 name: Auto release preview @excalidraw/excalidraw-preview
 on:
   pull_request:
+  issue_comment:
+    types: [created]
 
 jobs:
   Auto-release-excalidraw-preview:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check trigger commit
+        uses: peter-evans/find-comment@v1
+        id: tc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "@excalibot trigger release"
+          run: |
+            echo "Commit found! ${{ steps.fc.outputs.comment-id }}"
       - uses: actions/checkout@v2
+        if: steps.fc.outputs.comment-id != ''
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 2
       - name: Setup Node.js 14.x
+        if: steps.fc.outputs.comment-id != ''
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
       - name: Set up publish access
+        if: steps.fc.outputs.comment-id != ''
         run: |
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Auto release preview
+        if: steps.fc.outputs.comment-id != ''
         id: "autorelease"
         run: |
           yarn add @actions/core
