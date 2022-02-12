@@ -14,6 +14,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
+          cache: yarn
       - name: Install and build
         run: |
           yarn --frozen-lockfile

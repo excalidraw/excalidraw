@@ -5,7 +5,6 @@ on:
     branches:
       - master
   pull_request:
-
 jobs:
   packages:
     runs-on: ubuntu-latest
@@ -16,6 +15,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
+          cache: yarn
       - name: Install dependencies
         run: |
           yarn --frozen-lockfile
