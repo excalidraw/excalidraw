@@ -17,8 +17,13 @@ const publish = () => {
     execSync(`yarn run build:umd`, { cwd: excalidrawDir });
     execSync(`yarn --cwd ${excalidrawDir} publish`);
     console.info("Published 🎉");
-    core.setOutput("version", pkg.version);
+    core.setOutput(
+      "result",
+      `**Preview version has been shipped** :rocket:
+    You can use [@excalidraw/excalidraw-preview@${pkg.version}](https://www.npmjs.com/package/@excalidraw/excalidraw-preview/v/${pkg.version}) for testing!`,
+    );
   } catch (error) {
+    core.setOutput("result", "package couldn't be published :warning:!");
     console.error(error);
     process.exit(1);
   }
@@ -27,9 +32,10 @@ const publish = () => {
 exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   if (error || stderr) {
     console.error(error);
+    core.setOutput("result", ":warning: Package couldn't be published!");
     process.exit(1);
   }
-
+  console.info(stdout, "stdout");
   const changedFiles = stdout.trim().split("\n");
   const filesToIgnoreRegex = /src\/excalidraw-app|packages\/utils/;
 
@@ -41,6 +47,7 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   });
   if (!excalidrawPackageFiles.length) {
     console.info("Skipping release as no valid diff found");
+    core.setOutput("result", "Skipping release as no valid diff found");
     process.exit(0);
   }
 

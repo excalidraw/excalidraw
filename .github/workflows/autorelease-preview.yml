@@ -1,65 +1,55 @@
 name: Auto release preview @excalidraw/excalidraw-preview
 on:
-  pull_request:
   issue_comment:
-    types: [created]
+    types: [created, edited]
 
 jobs:
   Auto-release-excalidraw-preview:
+    name: Auto release preview
+    if: github.event.comment.body == '@excalibot trigger release' && github.event.issue.pull_request
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check trigger commit
-        uses: peter-evans/find-comment@v1
-        id: tc
+      - name: React to trigger comment
+        uses: peter-evans/create-or-update-comment@v1
         with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body-includes: "@excalibot trigger release"
+          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
+          comment-id: ${{ github.event.comment.id }}
+          reactions: "+1"
+      - name: Get PR SHA
+        id: sha
+        uses: actions/github-script@v4
+        with:
+          result-encoding: string
+          script: |
+            const { owner, repo, number } = context.issue;
+            const pr = await github.pulls.get({
+              owner,
+              repo,
+              pull_number: number,
+            });
+            return pr.data.head.sha
       - uses: actions/checkout@v2
-        if: steps.fc.outputs.comment-id != ''
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ steps.sha.outputs.result }}
           fetch-depth: 2
       - name: Setup Node.js 14.x
-        if: steps.fc.outputs.comment-id != ''
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
       - name: Set up publish access
-        if: steps.fc.outputs.comment-id != ''
         run: |
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Auto release preview
-        if: steps.fc.outputs.comment-id != ''
         id: "autorelease"
         run: |
           yarn add @actions/core
-          yarn autorelease preview ${{ github.event.pull_request.number }}
-
-      - name: Find release comment
-        uses: peter-evans/find-comment@v1
-        id: fc
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
-          body-includes: Preview version has been shipped
-      - name: Create release comment
-        if: steps.autorelease.outputs.version != '' && steps.fc.outputs.comment-id == ''
+          yarn autorelease preview ${{ github.event.issue.number }}
+      - name: Post comment post release
+        if: always()
         uses: peter-evans/create-or-update-comment@v1
         with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            **Preview version has been shipped** :rocket:
-            You can use [@excalidraw/excalidraw-preview](https://npmjs.com/@excalidraw/excalidraw-preview) for testing! 
-            Below are the shipped versions :point_down:
-            [@excalidraw/excalidraw-preview@${{ steps.autorelease.outputs.version }}](https://www.npmjs.com/package/@excalidraw/excalidraw-preview/v/${{ steps.autorelease.outputs.version }})
-
-      - name: Update release comment
-        if: steps.autorelease.outputs.version != '' && steps.fc.outputs.comment-id != ''
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          comment-id: ${{ steps.fc.outputs.comment-id }}
-          body: |
-            [@excalidraw/excalidraw-preview@${{ steps.autorelease.outputs.version }}](https://www.npmjs.com/package/@excalidraw/excalidraw-preview/v/${{ steps.autorelease.outputs.version }})
+          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
+          issue-number: ${{ github.event.issue.number }}
+          body: "@${{ github.event.comment.user.login }} ${{ steps.autorelease.outputs.result }}"
