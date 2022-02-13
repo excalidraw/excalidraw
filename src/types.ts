@@ -154,7 +154,7 @@ export type AppState = {
   pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
   showHyperlinkPopup: false | "info" | "editor";
   linkOpacity: number; //zsviczian
-  isMobile: boolean; //zsviczian
+  trayModeEnabled: boolean; //zsviczian
   colorPalette: {
     canvasBackground?: string[];
     elementBackground?: string[];

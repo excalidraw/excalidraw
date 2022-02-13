@@ -479,7 +479,7 @@ class App extends React.Component<AppProps, AppState> {
       <div
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": viewModeEnabled,
-          "excalidraw--mobile": this.isMobile || this.state.isMobile, //zsviczian
+          "excalidraw--mobile": this.isMobile || this.state.trayModeEnabled, //zsviczian
         })}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -493,7 +493,7 @@ class App extends React.Component<AppProps, AppState> {
         >
           <IsMobileContext.Provider
             value={
-              this.isMobile || this.state.isMobile //zsviczian
+              this.isMobile || this.state.trayModeEnabled //zsviczian
             }
           >
             <LayerUI
@@ -910,7 +910,7 @@ class App extends React.Component<AppProps, AppState> {
           width < MQ_MAX_WIDTH_PORTRAIT ||
           (height < MQ_MAX_HEIGHT_LANDSCAPE &&
             width < MQ_MAX_WIDTH_LANDSCAPE) ||
-          this.state.isMobile; //zsviczian
+          this.state.trayModeEnabled; //zsviczian
         // refresh offsets
         // ---------------------------------------------------------------------
         this.updateDOMRect();
@@ -921,7 +921,7 @@ class App extends React.Component<AppProps, AppState> {
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
       const handler = () =>
-        (this.isMobile = mediaQuery.matches || this.state.isMobile); //zsviczian
+        (this.isMobile = mediaQuery.matches || this.state.trayModeEnabled); //zsviczian
       mediaQuery.addListener(handler);
       this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
     }
@@ -2894,6 +2894,8 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    this.focusContainer(); //zsviczian
+
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)

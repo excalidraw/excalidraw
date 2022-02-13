@@ -86,7 +86,7 @@ export const getDefaultAppState = (): Omit<
     pendingImageElement: null,
     showHyperlinkPopup: false,
     linkOpacity: 1, //zsviczian
-    isMobile: false, //zsviczian
+    trayModeEnabled: false, //zsviczian
     colorPalette: {}, //zsviczian
   };
 };
@@ -180,7 +180,7 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElement: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
   linkOpacity: { browser: false, export: false, server: false }, //zsviczian
-  isMobile: { browser: false, export: false, server: false }, //zsviczian
+  trayModeEnabled: { browser: false, export: false, server: false }, //zsviczian
   colorPalette: { browser: false, export: false, server: false }, //zsviczian
 });
 
