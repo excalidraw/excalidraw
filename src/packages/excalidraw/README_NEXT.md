@@ -1069,3 +1069,5 @@ You can create a test release by posting the below comment in your pull request
 ```
 @excalibot trigger release
 ```
+
+Once the version is released `@excalibot` will post a comment with the release version.
