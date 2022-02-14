@@ -6,10 +6,10 @@ on:
 jobs:
   Auto-release-excalidraw-preview:
     name: Auto release preview
-    if: github.event.comment.body == '@excalibot trigger release' && github.event.issue.pull_request
+    if: github.event.comment.body == '@excalibot release package' && github.event.issue.pull_request
     runs-on: ubuntu-latest
     steps:
-      - name: React to trigger comment
+      - name: React to release comment
         uses: peter-evans/create-or-update-comment@v1
         with:
           token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
