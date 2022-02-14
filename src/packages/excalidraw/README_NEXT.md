@@ -1061,3 +1061,13 @@ yarn start
 [http://localhost:3001](http://localhost:3001) will open in your default browser.
 
 The example is same as the [codesandbox example](https://ehlz3.csb.app/)
+
+#### Create a test release
+
+You can create a test release by posting the below comment in your pull request
+
+```
+@excalibot trigger release
+```
+
+Once the version is released `@excalibot` will post a comment with the release version.
