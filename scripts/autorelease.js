@@ -35,7 +35,6 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
     core.setOutput("result", ":warning: Package couldn't be published!");
     process.exit(1);
   }
-  console.info(stdout, "stdout");
   const changedFiles = stdout.trim().split("\n");
   const filesToIgnoreRegex = /src\/excalidraw-app|packages\/utils/;
 
