@@ -1046,6 +1046,7 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     // Hide hyperlink popup if shown when element type is not selection
+    console.info("Testing the package release");
     if (
       prevState.elementType === "selection" &&
       this.state.elementType !== "selection" &&
