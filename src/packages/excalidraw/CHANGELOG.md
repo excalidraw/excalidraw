@@ -53,7 +53,7 @@ Please add the latest change on the top under the correct section.
   Other notes:
 
   - `.excalidraw` files may now contain top-level `files` key in format of `Record<FileId, BinaryFileData>` when exporting any (image) elements.
-  - Changes were made to various export utilities exported from the package so that they take `files`. For now, TypeScript should help you figure the changes out.
+  - Changes were made to various export utilities exported from the package so that they take `files`, you can refer to the docs for the same.
 
 - Export [`isLinearElement`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#isLinearElement) and [`getNonDeletedElements`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#getNonDeletedElements) [#4072](https://github.com/excalidraw/excalidraw/pull/4072).
 

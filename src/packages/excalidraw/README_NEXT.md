@@ -813,7 +813,8 @@ This function makes sure elements and state is set to appropriate values and set
   elements,
   appState
   getDimensions,
-}: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L10">ExportOpts</a>
+  files
+}: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L12">ExportOpts</a>
 </pre>
 
 | Name | Type | Default | Description |
@@ -822,6 +823,7 @@ This function makes sure elements and state is set to appropriate values and set
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L12) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
 | getDimensions | `(width: number, height: number) => { width: number, height: number, scale?: number }` | undefined | A function which returns the `width`, `height`, and optionally `scale` (defaults `1`), with which canvas is to be exported. |
 | maxWidthOrHeight | `number` | undefined | The maximum width or height of the exported image. If provided, `getDimensions` is ignored. |
+| files | [BinaryFiles](The [`BinaryFiles`](<[BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64)>) | undefined | The files added to the scene. |
 
 **How to use**
 
@@ -867,6 +869,7 @@ exportToSvg({
   appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a>,
   exportPadding?: number,
   metadata?: string,
+  files?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64">BinaryFiles</a>
 })
 </pre>
 
@@ -875,6 +878,7 @@ exportToSvg({
 | elements | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |  | The elements to exported as svg |
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
 | exportPadding | number | 10 | The padding to be added on canvas |
+| files | [BinaryFiles](The [`BinaryFiles`](<[BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64)>) | undefined | The files added to the scene. |
 
 This function returns a promise which resolves to svg of the exported drawing.
 
