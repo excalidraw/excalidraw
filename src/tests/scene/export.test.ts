@@ -120,10 +120,7 @@ describe("exportToSvg", () => {
   it("with elements that have a link", async () => {
     const svgElement = await exportUtils.exportToSvg(
       [rectangleWithLinkFixture],
-      {
-        ...DEFAULT_OPTIONS,
-        exportEmbedScene: true,
-      },
+      DEFAULT_OPTIONS,
       null,
     );
     expect(svgElement.innerHTML).toMatchSnapshot();

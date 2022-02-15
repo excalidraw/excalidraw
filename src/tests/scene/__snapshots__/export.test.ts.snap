@@ -74,7 +74,7 @@ exports[`exportToSvg with default arguments 1`] = `
 exports[`exportToSvg with elements that have a link 1`] = `
 "
   <!-- svg-source:excalidraw -->
-  <!-- payload-type:application/vnd.excalidraw+json --><!-- payload-version:2 --><!-- payload-start -->eyJ2ZXJzaW9uIjoiMSIsImVuY29kaW5nIjoiYnN0cmluZyIsImNvbXByZXNzZWQiOnRydWUsImVuY29kZWQiOiJ4nG1Sy07DMFx1MDAxMLz3K1wic0VcdTAwMTCHtCm9XHUwMDE1ilx1MDAxMFx1MDAxMoJDXHUwMDBmlUBcdTAwMWPcZJNYce3UdvpQlX/HdkrcRvhgaXdndmdcdTAwMWanUVx1MDAxMCB9rFx1MDAwMc1cdTAwMDJcdTAwMDSHlDCaSbJHt9a/XHUwMDAzqajgJlx1MDAxNDlbiUamXHUwMDBlWWpdz+7vmTCEUijd4YHBXHUwMDA2uFZcdTAwMDbxbewgOLnfRGhmWbuV3H7O84ryLNqmm+R9MX/9clRcdTAwMDc6XHUwMDE4TIzj3j7awlx1MDAwZklv72mmS+u7wJRAi1JcdTAwMGachFx1MDAxN8zKXGZ7j9JSVPAsmJBWyE3oni+9JmlVSNHwzGPwmJB17jE5ZWypj6xcdTAwMWJcdTAwMDBJy0ZcdTAwMDJcdTAwMWFUWJ0l4oG/5ylhXHUwMDA27FmmZFFyUOqKI2qSUm3bx6Hvweqr3zI33Z9h/pLI+pxcdTAwMDcpa1xcKFx1MDAwM8hcXKpcdTAwMThPxsljOO0jfr84XG6H3lx1MDAwZsHdrjGeTsMwjpJJj6BqYVatXdqcMFx1MDAwNX6OdoQv/lxmeMNYXHUwMDFmbOqMdCTfKqO8uj69u1RsvPi/05SQ6m6tLtKa381cdTAwMDCRul5qk9aAumtDO1xu+6d/9pm7Z/mtY5p9gtV4akftL0NcdTAwMGLK4CJ9<!-- payload-end -->
+  
   <defs>
     <style>
       @font-face {
