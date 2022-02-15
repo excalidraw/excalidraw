@@ -2418,13 +2418,13 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerUp!,
       this.state,
     );
-    const LastPointerUpHittingLinkIcon = isPointHittingLinkIcon(
+    const lastPointerUpHittingLinkIcon = isPointHittingLinkIcon(
       this.hitLinkElement!,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
       this.isMobile,
     );
-    if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
+    if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement.link;
       if (url) {
         let customEvent;
