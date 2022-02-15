@@ -51,7 +51,6 @@ export default function App() {
   const [blobUrl, setBlobUrl] = useState(null);
   const [canvasUrl, setCanvasUrl] = useState(null);
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
-  const [shouldAddWatermark, setShouldAddWatermark] = useState(false);
   const [theme, setTheme] = useState("light");
 
   const initialStatePromiseRef = useRef({ promise: null });
@@ -246,14 +245,6 @@ export default function App() {
             />
             Export with dark mode
           </label>
-          <label className="export-wrapper__checkbox">
-            <input
-              type="checkbox"
-              checked={shouldAddWatermark}
-              onChange={() => setShouldAddWatermark(!shouldAddWatermark)}
-            />
-            Add Watermark
-          </label>
           <button
             onClick={async () => {
               const svg = await exportToSvg({
@@ -261,11 +252,11 @@ export default function App() {
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,
-                  shouldAddWatermark,
                   width: 300,
                   height: 100,
                 },
                 embedScene: true,
+                files: excalidrawRef.current.getFiles(),
               });
               document.querySelector(".export-svg").innerHTML = svg.outerHTML;
             }}
@@ -282,8 +273,8 @@ export default function App() {
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,
-                  shouldAddWatermark,
                 },
+                files: excalidrawRef.current.getFiles(),
               });
               setBlobUrl(window.URL.createObjectURL(blob));
             }}
@@ -295,14 +286,14 @@ export default function App() {
           </div>
 
           <button
-            onClick={() => {
-              const canvas = exportToCanvas({
+            onClick={async () => {
+              const canvas = await exportToCanvas({
                 elements: excalidrawRef.current.getSceneElements(),
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,
-                  shouldAddWatermark,
                 },
+                files: excalidrawRef.current.getFiles(),
               });
               const ctx = canvas.getContext("2d");
               ctx.font = "30px Virgil";
