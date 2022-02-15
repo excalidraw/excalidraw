@@ -399,7 +399,7 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`theme`](#theme) | [THEME.LIGHT](#THEME-1) &#124; [THEME.LIGHT](#THEME-1) | [THEME.LIGHT](#THEME-1) | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
 | [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
-| [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L17">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
+| [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L21">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
 | [`detectScroll`](#detectScroll) | boolean | true | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handleKeyboardGlobally) | boolean | false | Indicates whether to bind the keyboard events to document. |
 | [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
@@ -416,12 +416,14 @@ Excalidraw takes `100%` of `width` and `height` of the containing block so make 
 Every time component updates, this callback if passed will get triggered and has the below signature.
 
 ```js
-(excalidrawElements, appState) => void;
+(excalidrawElements, appState, files) => void;
 ```
 
 1.`excalidrawElements`: Array of [excalidrawElements](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) in the scene.
 
-2.`appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) of the scene
+2.`appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) of the scene.
+
+3. `files`: The [`BinaryFiles`]([BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) which are added to the scene.
 
 Here you can try saving the data to your backend or local storage for example.
 
@@ -435,6 +437,7 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 | `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) | The App state with which Excalidraw should be mounted. |
 | `scrollToContent` | boolean | This attribute implies whether to scroll to the nearest element to center once Excalidraw is mounted. By default, it will not scroll the nearest element to the center. Make sure you pass `initialData.appState.scrollX` and `initialData.appState.scrollY` when `scrollToContent` is false so that scroll positions are retained |
 | `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L151) | This library items with which Excalidraw should be mounted. |
+| `files` | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) | The files added to the scene. |
 
 ```json
 {
@@ -487,6 +490,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | [importLibrary](#importlibrary) | `(url: string, token?: string) => void` | Imports library from given URL |
 | setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. |
 | [id](#id) | string | Unique ID for the excalidraw component. |
+| [getFiles](#getFiles) | <pre>() => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64">files</a> </pre> | This API can be used to get the files present in the scene. It may contain files that aren't referenced by any element, so if you're persisting the files to a storage, you should compare them against stored elements. |
 
 #### `readyPromise`
 
@@ -516,7 +520,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 
 <pre>(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void </pre>
 
-Adds supplied files data to the `appState.files` cache, on top of existing files present in the cache.
+Adds supplied files data to the `appState.files` cache on top of existing files present in the cache.
 
 #### `onCollabButtonClick`
 
@@ -640,7 +644,7 @@ The below attributes can be set in `UIOptions.canvasActions.export` to customize
 This callback is triggered if passed when something is pasted into the scene. You can use this callback in case you want to do something additional when the paste event occurs.
 
 <pre>
-(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L17">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean
+(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L21">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean
 </pre>
 
 This callback must return a `boolean` value or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to a boolean value.
