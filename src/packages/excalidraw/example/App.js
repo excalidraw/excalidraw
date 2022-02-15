@@ -5,11 +5,24 @@ import Sidebar from "./sidebar/Sidebar";
 
 import "./App.scss";
 import initialData from "./initialData";
+import { MIME_TYPES } from "../../../constants";
 
 // This is so that we use the bundled excalidraw.developement.js file instead
 // of the actual source code
 const { exportToCanvas, exportToSvg, exportToBlob } = window.Excalidraw;
 const Excalidraw = window.Excalidraw.default;
+
+const resolvablePromise = () => {
+  let resolve;
+  let reject;
+  const promise = new Promise((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  promise.resolve = resolve;
+  promise.reject = reject;
+  return promise;
+};
 
 const renderTopRightUI = () => {
   return (
@@ -41,7 +54,33 @@ export default function App() {
   const [shouldAddWatermark, setShouldAddWatermark] = useState(false);
   const [theme, setTheme] = useState("light");
 
+  const initialStatePromiseRef = useRef({ promise: null });
+  if (!initialStatePromiseRef.current.promise) {
+    initialStatePromiseRef.current.promise = resolvablePromise();
+  }
   useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("/rocket.jpeg");
+      const imageData = await res.blob();
+      const reader = new FileReader();
+      reader.readAsDataURL(imageData);
+
+      reader.onload = function () {
+        const imagesArray = [
+          {
+            id: "rocket",
+            dataURL: reader.result,
+            mimeType: MIME_TYPES.jpg,
+            created: 1644915140367,
+          },
+        ];
+
+        initialStatePromiseRef.current.promise.resolve(InitialData);
+        excalidrawRef.current.addFiles(imagesArray);
+      };
+    };
+    fetchData();
+
     const onHashChange = () => {
       const hash = new URLSearchParams(window.location.hash.slice(1));
       const libraryUrl = hash.get("addLibrary");
@@ -178,7 +217,7 @@ export default function App() {
         <div className="excalidraw-wrapper">
           <Excalidraw
             ref={excalidrawRef}
-            initialData={InitialData}
+            initialData={initialStatePromiseRef.current.promise}
             onChange={(elements, state) =>
               console.info("Elements :", elements, "State : ", state)
             }
