@@ -14,5 +14,5 @@ export const trackEvent =
     ? (category: string, action: string, label?: string, value?: number) => {}
     : (category: string, action: string, label?: string, value?: number) => {
         // Uncomment the next line to track locally
-        console.info("Track Event", category, action, label, value);
+        // console.info("Track Event", category, action, label, value);
       };
