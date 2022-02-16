@@ -87,8 +87,8 @@
 
     .ToolIcon {
       &:hover {
-        --icon-fill-color: var(--color-primary-chubb);
-        --keybinding-color: var(--color-primary-chubb);
+        --icon-fill-color: var(--color-primary-chubb, var(--color-primary));
+        --keybinding-color: var(--color-primary-chubb, var(--color-primary));
       }
       &:active {
         --icon-fill-color: #{$oc-gray-9};

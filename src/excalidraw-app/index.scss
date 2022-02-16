@@ -1,4 +1,9 @@
 .excalidraw {
+  --color-primary-chubb: #625ee0; // to offset Chubb illusion
+
+  &.theme--dark {
+    --color-primary-chubb: #726dff; // to offset Chubb illusion
+  }
   .layer-ui__wrapper__footer-center {
     display: flex;
     justify-content: space-between;
