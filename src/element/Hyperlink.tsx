@@ -122,7 +122,8 @@ export const Hyperlink = ({
   if (
     appState.draggingElement ||
     appState.resizingElement ||
-    appState.isRotating
+    appState.isRotating ||
+    appState.openMenu
   ) {
     return null;
   }
@@ -248,6 +249,7 @@ export const actionLink = register({
       appState: {
         ...appState,
         showHyperlinkPopup: "editor",
+        openMenu: null,
       },
       commitToHistory: true,
     };
