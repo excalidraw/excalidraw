@@ -122,7 +122,7 @@ export const Hyperlink = ({
   }, [setAppState, element, isEditing]);
 
   const onEdit = () => {
-    trackEvent("hyperlink", "edit", "popup-button");
+    trackEvent("hyperlink", "edit", "popup-ui");
     setAppState({ showHyperlinkPopup: "editor" });
   };
   const { x, y } = getCoordsForPopover(element, appState);
@@ -409,7 +409,7 @@ const renderTooltip = (
     },
     "top",
   );
-  trackEvent("hyperlink", "tooltip", "link-icon tooltip");
+  trackEvent("hyperlink", "tooltip", "link-icon");
 
   IS_HYPERLINK_TOOLTIP_VISIBLE = true;
 };
