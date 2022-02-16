@@ -115,11 +115,7 @@ import {
   updateBoundElements,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import {
-  bumpVersion,
-  mutateElement,
-  newElementWith,
-} from "../element/mutateElement";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   hasBoundTextElement,
@@ -1620,9 +1616,6 @@ class App extends React.Component<AppProps, AppState> {
 
       this.files = { ...this.files, ...Object.fromEntries(filesMap) };
 
-      // bump versions for elements that reference added files so that
-      // we/host apps can detect the change, and invalidate the image & shape
-      // cache
       this.scene.getElements().forEach((element) => {
         if (
           isInitializedImageElement(element) &&
@@ -1630,7 +1623,6 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           this.imageCache.delete(element.fileId);
           invalidateShapeForElement(element);
-          bumpVersion(element);
         }
       });
       this.scene.informMutation();
