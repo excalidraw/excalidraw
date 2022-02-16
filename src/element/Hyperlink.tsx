@@ -70,6 +70,10 @@ export const Hyperlink = ({
 
     const link = normalizeLink(inputRef.current.value);
 
+    if (!element.link && link) {
+      trackEvent("hyperlink", "create");
+    }
+
     mutateElement(element, { link });
     setAppState({ showHyperlinkPopup: "info" });
   }, [element, setAppState]);
@@ -109,7 +113,7 @@ export const Hyperlink = ({
   }, [appState, element, isEditing, setAppState]);
 
   const handleRemove = useCallback(() => {
-    trackEvent("link", "Delete");
+    trackEvent("hyperlink", "delete");
     mutateElement(element, { link: null });
     if (isEditing) {
       inputRef.current!.value = "";
@@ -118,7 +122,7 @@ export const Hyperlink = ({
   }, [setAppState, element, isEditing]);
 
   const onEdit = () => {
-    trackEvent("link", "Update");
+    trackEvent("hyperlink", "edit");
     setAppState({ showHyperlinkPopup: "editor" });
   };
   const { x, y } = getCoordsForPopover(element, appState);
@@ -244,11 +248,8 @@ export const actionLink = register({
   name: "link",
   perform: (elements, appState) => {
     if (appState.showHyperlinkPopup === "editor") {
-      trackEvent("link", "close");
-
       return false;
     }
-    trackEvent("link", "Add / Update");
 
     return {
       elements,
@@ -405,7 +406,7 @@ const renderTooltip = (
     },
     "top",
   );
-  trackEvent("link", "tooltip");
+  trackEvent("hyperlink", "tooltip", "link-icon tooltip");
 
   IS_HYPERLINK_TOOLTIP_VISIBLE = true;
 };
