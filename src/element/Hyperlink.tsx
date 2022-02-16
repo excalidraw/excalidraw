@@ -122,7 +122,7 @@ export const Hyperlink = ({
   }, [setAppState, element, isEditing]);
 
   const onEdit = () => {
-    trackEvent("hyperlink", "edit");
+    trackEvent("hyperlink", "edit", "popup-button");
     setAppState({ showHyperlinkPopup: "editor" });
   };
   const { x, y } = getCoordsForPopover(element, appState);
@@ -245,7 +245,7 @@ export const isLocalLink = (link: string | null) => {
 };
 
 export const actionLink = register({
-  name: "link",
+  name: "hyperlink",
   perform: (elements, appState) => {
     if (appState.showHyperlinkPopup === "editor") {
       return false;
@@ -259,6 +259,9 @@ export const actionLink = register({
       },
       commitToHistory: true,
     };
+  },
+  trackEvent: (action, source) => {
+    trackEvent("hyperlink", "edit", source);
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
   contextItemLabel: (elements, appState) =>
