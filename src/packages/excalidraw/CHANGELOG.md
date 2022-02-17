@@ -133,7 +133,7 @@ Please add the latest change on the top under the correct section.
 
 - Support selecting multiple points when editing line [#4373](https://github.com/excalidraw/excalidraw/pull/4373)
 
-- Horizontally center toolbar menu
+- Horizontally center toolbar menu [commit link](https://github.com/excalidraw/excalidraw/commit/9b8ee3cacfec239617c357693cf2a3ca9972d2cb)
 
 - Add support for rounded corners in diamond [#4369](https://github.com/excalidraw/excalidraw/pull/4369)
 
