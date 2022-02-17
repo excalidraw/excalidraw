@@ -374,7 +374,7 @@ Most notably, you can customize the primary colors, by overriding these variable
 - `--color-primary-darker`
 - `--color-primary-darkest`
 - `--color-primary-light`
-- `--color-primary-chubb` — a slightly darker (in light mode), or lighter (in dark mode) `--color-primary` color to account for [Chubb illusion](https://en.wikipedia.org/wiki/Chubb_illusion).
+- `--color-primary-contrast-offset` — a slightly darker (in light mode), or lighter (in dark mode) `--color-primary` color to fix contrast issues (see [Chubb illusion](https://en.wikipedia.org/wiki/Chubb_illusion)).
 
 For a complete list of variables, check [theme.scss](https://github.com/excalidraw/excalidraw/blob/master/src/css/theme.scss), though most of them will not make sense to override.
 
