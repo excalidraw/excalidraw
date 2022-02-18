@@ -454,18 +454,7 @@ export const resizeSingleElement = (
   }
 
   const boundTextElement = getBoundTextElement(element);
-  if (boundTextElement) {
-    if (scaleX < 0) {
-      scaleX =
-        getApproxMinLineWidth(getFontString(boundTextElement)) /
-        boundTextElement.width;
-    }
-    if (scaleY < 0) {
-      scaleY =
-        getApproxMinLineHeight(getFontString(boundTextElement)) /
-        boundTextElement.height;
-    }
-  }
+
   // Linear elements dimensions differ from bounds dimensions
   const eleInitialWidth = stateAtResizeStart.width;
   const eleInitialHeight = stateAtResizeStart.height;
@@ -493,6 +482,13 @@ export const resizeSingleElement = (
       eleNewWidth = eleInitialWidth * ratio * Math.sign(eleNewWidth);
       eleNewHeight = eleInitialHeight * ratio * Math.sign(eleNewHeight);
     }
+  }
+
+  if (boundTextElement) {
+    const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
+    const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
+    eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
+    eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
   }
 
   const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
@@ -596,12 +592,9 @@ export const resizeSingleElement = (
       ],
     });
   }
-  let minWidth = 0;
-  if (boundTextElement) {
-    minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
-  }
+
   if (
-    resizedElement.width >= minWidth &&
+    resizedElement.width !== 0 &&
     resizedElement.height !== 0 &&
     Number.isFinite(resizedElement.x) &&
     Number.isFinite(resizedElement.y)
