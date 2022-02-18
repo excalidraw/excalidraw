@@ -35,6 +35,7 @@ import {
 import { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
+  getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
@@ -429,8 +430,6 @@ export const resizeSingleElement = (
     element.height,
   );
 
-  const boundTextElementId = getBoundTextElementId(element);
-
   const boundsCurrentWidth = esx2 - esx1;
   const boundsCurrentHeight = esy2 - esy1;
 
@@ -452,6 +451,21 @@ export const resizeSingleElement = (
   }
   if (transformHandleDirection.includes("n")) {
     scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsCurrentHeight;
+  }
+
+  const boundTextElement = getBoundTextElement(element);
+  if (boundTextElement) {
+    if (scaleX < 0) {
+      scaleX =
+        getApproxMinLineWidth(getFontString(element as ExcalidrawTextElement)) /
+        element.width;
+    }
+    if (scaleY < 0) {
+      scaleY =
+        getApproxMinLineHeight(
+          getFontString(element as ExcalidrawTextElement),
+        ) / element.height;
+    }
   }
   // Linear elements dimensions differ from bounds dimensions
   const eleInitialWidth = stateAtResizeStart.width;
@@ -490,11 +504,6 @@ export const resizeSingleElement = (
     );
   const newBoundsWidth = newBoundsX2 - newBoundsX1;
   const newBoundsHeight = newBoundsY2 - newBoundsY1;
-
-  // don't allow resize to negative dimensions when text is bounded to container
-  if ((newBoundsWidth < 0 || newBoundsHeight < 0) && boundTextElementId) {
-    return;
-  }
 
   // Calculate new topLeft based on fixed corner during resize
   let newTopLeft = [...startTopLeft] as [number, number];
@@ -589,7 +598,6 @@ export const resizeSingleElement = (
     });
   }
   let minWidth = 0;
-  const boundTextElement = getBoundTextElement(element);
   if (boundTextElement) {
     minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
   }
