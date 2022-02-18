@@ -475,7 +475,9 @@ export const getNearestScrollableContainer = (
     const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
     if (
       hasScrollableContent &&
-      (overflowY === "auto" || overflowY === "scroll" || overflowY === "overlay")
+      (overflowY === "auto" ||
+        overflowY === "scroll" ||
+        overflowY === "overlay")
     ) {
       return parent;
     }
