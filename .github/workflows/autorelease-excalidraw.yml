@@ -23,4 +23,5 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Auto release
         run: |
+          yarn add @actions/core
           yarn autorelease

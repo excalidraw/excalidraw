@@ -116,11 +116,7 @@ import {
   updateBoundElements,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import {
-  bumpVersion,
-  mutateElement,
-  newElementWith,
-} from "../element/mutateElement";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   hasBoundTextElement,
@@ -275,7 +271,6 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
-let isTouchScreen = false;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -1334,11 +1329,14 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private onTapEnd = (event: TouchEvent) => {
+    this.resetContextMenuTimer();
     if (event.touches.length > 0) {
       this.setState({
         previousSelectedElementIds: {},
         selectedElementIds: this.state.previousSelectedElementIds,
       });
+    } else {
+      gesture.pointers.clear();
     }
   };
 
@@ -1552,11 +1550,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
-    // remove touch handler for context menu on touch devices
-    if (event.pointerType === "touch" && touchTimeout) {
-      clearTimeout(touchTimeout);
-      touchTimeout = 0;
-      invalidateContextMenu = false;
+    if (touchTimeout) {
+      this.resetContextMenuTimer();
     }
 
     gesture.pointers.delete(event.pointerId);
@@ -1671,9 +1666,6 @@ class App extends React.Component<AppProps, AppState> {
 
       this.files = { ...this.files, ...Object.fromEntries(filesMap) };
 
-      // bump versions for elements that reference added files so that
-      // we/host apps can detect the change, and invalidate the image & shape
-      // cache
       this.scene.getElements().forEach((element) => {
         if (
           isInitializedImageElement(element) &&
@@ -1681,7 +1673,6 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           this.imageCache.delete(element.fileId);
           invalidateShapeForElement(element);
-          bumpVersion(element);
         }
       });
       this.scene.informMutation();
@@ -2533,7 +2524,10 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private redirectToLink = (event: React.PointerEvent<HTMLCanvasElement>) => {
+  private redirectToLink = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    isTouchScreen: boolean,
+  ) => {
     const draggedDistance = distance2d(
       this.lastPointerDown!.clientX,
       this.lastPointerDown!.clientY,
@@ -2542,6 +2536,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     if (
       !this.hitLinkElement ||
+      // For touch screen allow dragging threshold else strict check
       (isTouchScreen && draggedDistance > DRAGGING_THRESHOLD) ||
       (!isTouchScreen && draggedDistance !== 0)
     ) {
@@ -2561,13 +2556,13 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerUp!,
       this.state,
     );
-    const LastPointerUpHittingLinkIcon = isPointHittingLinkIcon(
+    const lastPointerUpHittingLinkIcon = isPointHittingLinkIcon(
       this.hitLinkElement!,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
       this.isMobile,
     );
-    if (lastPointerDownHittingLinkIcon && LastPointerUpHittingLinkIcon) {
+    if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement.link;
       if (url) {
         let customEvent;
@@ -2917,10 +2912,6 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    if (event.pointerType === "touch" || event.pointerType === "pen") {
-      isTouchScreen = true;
-    }
-
     if (isPanning) {
       return;
     }
@@ -3050,6 +3041,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
+    const isTouchScreen = ["pen", "touch"].includes(event.pointerType);
     if (isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
@@ -3068,7 +3060,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event);
+      this.redirectToLink(event, isTouchScreen);
     }
 
     this.removePointer(event);
@@ -3097,6 +3089,12 @@ class App extends React.Component<AppProps, AppState> {
         }, TOUCH_CTX_MENU_TIMEOUT);
       }
     }
+  };
+
+  private resetContextMenuTimer = () => {
+    clearTimeout(touchTimeout);
+    touchTimeout = 0;
+    invalidateContextMenu = false;
   };
 
   private maybeCleanupAfterMissingPointerUp(
