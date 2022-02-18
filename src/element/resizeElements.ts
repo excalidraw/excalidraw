@@ -457,14 +457,13 @@ export const resizeSingleElement = (
   if (boundTextElement) {
     if (scaleX < 0) {
       scaleX =
-        getApproxMinLineWidth(getFontString(element as ExcalidrawTextElement)) /
-        element.width;
+        getApproxMinLineWidth(getFontString(boundTextElement)) /
+        boundTextElement.width;
     }
     if (scaleY < 0) {
       scaleY =
-        getApproxMinLineHeight(
-          getFontString(element as ExcalidrawTextElement),
-        ) / element.height;
+        getApproxMinLineHeight(getFontString(boundTextElement)) /
+        boundTextElement.height;
     }
   }
   // Linear elements dimensions differ from bounds dimensions
