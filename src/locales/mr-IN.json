@@ -1,8 +1,8 @@
 {
   "labels": {
-    "paste": "",
-    "pasteCharts": "",
-    "selectAll": "",
+    "paste": "चिपकवा",
+    "pasteCharts": "चार्ट चिपकवा",
+    "selectAll": "समस्त निवडा",
     "multiSelect": "",
     "moveCanvas": "",
     "cut": "",
