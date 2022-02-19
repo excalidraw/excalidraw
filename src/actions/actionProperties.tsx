@@ -221,22 +221,29 @@ export const actionChangeStrokeColor = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
-      <ColorPicker
-        type="elementStroke"
-        label={t("labels.stroke")}
-        color={getFormValue(
-          elements,
-          appState,
-          (element) => element.strokeColor,
-          appState.currentItemStrokeColor,
-        )}
-        onChange={(color) => updateData({ currentItemStrokeColor: color })}
-        isActive={appState.openPopup === "strokeColorPicker"}
-        setActive={(active) =>
-          updateData({ openPopup: active ? "strokeColorPicker" : null })
-        }
-        colorPalette={appState.colorPalette} //zsviczian
-      />
+      {
+        //zsviczian added div flex and relative to ensure oversized colorpicker is scrollable
+      }
+      <div style={{ display: "flex" }}>
+        <div style={{ position: "relative" }}>
+          <ColorPicker
+            type="elementStroke"
+            label={t("labels.stroke")}
+            color={getFormValue(
+              elements,
+              appState,
+              (element) => element.strokeColor,
+              appState.currentItemStrokeColor,
+            )}
+            onChange={(color) => updateData({ currentItemStrokeColor: color })}
+            isActive={appState.openPopup === "strokeColorPicker"}
+            setActive={(active) =>
+              updateData({ openPopup: active ? "strokeColorPicker" : null })
+            }
+            colorPalette={appState.colorPalette} //zsviczian
+          />
+        </div>
+      </div>
     </>
   ),
 });
@@ -262,22 +269,31 @@ export const actionChangeBackgroundColor = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
-      <ColorPicker
-        type="elementBackground"
-        label={t("labels.background")}
-        color={getFormValue(
-          elements,
-          appState,
-          (element) => element.backgroundColor,
-          appState.currentItemBackgroundColor,
-        )}
-        onChange={(color) => updateData({ currentItemBackgroundColor: color })}
-        isActive={appState.openPopup === "backgroundColorPicker"}
-        setActive={(active) =>
-          updateData({ openPopup: active ? "backgroundColorPicker" : null })
-        }
-        colorPalette={appState.colorPalette} //zsviczian
-      />
+      {
+        //zsviczian added div flex and relative to make oversized colorpicker is scrollable
+      }
+      <div style={{ display: "flex" }}>
+        <div style={{ position: "relative" }}>
+          <ColorPicker
+            type="elementBackground"
+            label={t("labels.background")}
+            color={getFormValue(
+              elements,
+              appState,
+              (element) => element.backgroundColor,
+              appState.currentItemBackgroundColor,
+            )}
+            onChange={(color) =>
+              updateData({ currentItemBackgroundColor: color })
+            }
+            isActive={appState.openPopup === "backgroundColorPicker"}
+            setActive={(active) =>
+              updateData({ openPopup: active ? "backgroundColorPicker" : null })
+            }
+            colorPalette={appState.colorPalette} //zsviczian
+          />
+        </div>
+      </div>
     </>
   ),
 });

@@ -35,6 +35,7 @@ const keyBindings = [
   ["1", "2", "3", "4", "5"],
   ["q", "w", "e", "r", "t"],
   ["a", "s", "d", "f", "g"],
+  ["z", "x", "c", "v", "b"], //zsviczian
 ].flat();
 
 const Picker = ({
@@ -150,17 +151,16 @@ const Picker = ({
                 onChange(_color);
               }}
               title={`${
-                customPalette ? _color : t(`colors.${_colorWithoutHash}`)
-              }${
-                //zsviczian
-                !isTransparent(_color) ? ` (${_color})` : ""
-              } — ${keyBindings[i].toUpperCase()}`}
+                customPalette ? _color : t(`colors.${_colorWithoutHash}`) //zsviczian
+              }${!isTransparent(_color) ? ` (${_color})` : ""} — ${
+                keyBindings.length > i ? keyBindings[i].toUpperCase() : ""
+              }`} //zsviczian
               aria-label={
-                customPalette ? _color : t(`colors.${_colorWithoutHash}`)
-              } //zsviczian
-              aria-keyshortcuts={keyBindings[i]}
+                customPalette ? _color : t(`colors.${_colorWithoutHash}`) //zsviczian
+              }
+              aria-keyshortcuts={keyBindings.length > i ? keyBindings[i] : ""} //zsviczian
               style={{ color: _color }}
-              key={_color}
+              key={customPalette ? type + _color : _color} //zsviczian
               ref={(el) => {
                 if (el && i === 0) {
                   firstItem.current = el;
@@ -176,7 +176,11 @@ const Picker = ({
               {isTransparent(_color) ? (
                 <div className="color-picker-transparent"></div>
               ) : undefined}
-              <span className="color-picker-keybinding">{keyBindings[i]}</span>
+              <span className="color-picker-keybinding">
+                {
+                  keyBindings.length > i ? keyBindings[i] : "" //zsviczian
+                }
+              </span>
             </button>
           );
         })}
@@ -268,9 +272,7 @@ export const ColorPicker = ({
   }; //zsviczian
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
-  const customPalette =
-    typeof colorPalette[type] !== "undefined" &&
-    colorPalette[type]?.length === 15; //zsviczian
+  const customPalette = typeof colorPalette[type] !== "undefined"; //zsviczian
   const palette = customPalette
     ? colorPalette[type] ?? colors[type]
     : colors[type]; //zsviczian

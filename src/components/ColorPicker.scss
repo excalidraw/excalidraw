@@ -160,14 +160,14 @@
   }
 
   .color-picker-input {
-    width: 11ch; /* length of `transparent` */
+    width: 17ch; /* length of `transparent` */ /* //zsviczian */
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.7rem; /* //zsviczian */
     background-color: var(--input-bg-color);
     color: var(--text-primary-color);
     border: 0;
     outline: none;
-    height: 1.75em;
+    /*height: 1.75em; //zsvician*/
     box-shadow: var(--input-border-color) 0 0 0 1px inset;
 
     :root[dir="ltr"] & {

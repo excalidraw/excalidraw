@@ -305,6 +305,7 @@
     overflow-y: auto;
     box-sizing: border-box;
     margin-bottom: var(--bar-padding);
+    min-height: 250px; /* //zsviczian */
   }
 
   .App-menu {
