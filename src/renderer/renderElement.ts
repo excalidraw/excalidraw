@@ -196,7 +196,7 @@ const drawElementOnCanvas = (
     case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
-      rc.draw(getShapeForElement(element) as Drawable);
+      rc.draw(getShapeForElement(element)!);
       break;
     }
     case "arrow":
@@ -204,7 +204,7 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      (getShapeForElement(element) as Drawable[]).forEach((shape) => {
+      getShapeForElement(element)!.forEach((shape) => {
         rc.draw(shape);
       });
       break;
@@ -215,6 +215,11 @@ const drawElementOnCanvas = (
       context.fillStyle = element.strokeColor;
 
       const path = getFreeDrawPath2D(element) as Path2D;
+      const fillShape = getShapeForElement(element);
+
+      if (fillShape) {
+        rc.draw(fillShape);
+      }
 
       context.fillStyle = element.strokeColor;
       context.fill(path);
@@ -265,13 +270,29 @@ const elementWithCanvasCache = new WeakMap<
   ExcalidrawElementWithCanvas
 >();
 
-const shapeCache = new WeakMap<
-  ExcalidrawElement,
-  Drawable | Drawable[] | null
->();
+const shapeCache = new WeakMap<ExcalidrawElement, ElementShape>();
 
-export const getShapeForElement = (element: ExcalidrawElement) =>
-  shapeCache.get(element);
+type ElementShape = Drawable | Drawable[] | null;
+
+type ElementShapes = {
+  freedraw: Drawable | null;
+  arrow: Drawable[];
+  line: Drawable[];
+  text: null;
+  image: null;
+};
+
+export const getShapeForElement = <T extends ExcalidrawElement>(element: T) =>
+  shapeCache.get(element) as T["type"] extends keyof ElementShapes
+    ? ElementShapes[T["type"]] | undefined
+    : Drawable | null | undefined;
+
+export const setShapeForElement = <T extends ExcalidrawElement>(
+  element: T,
+  shape: T["type"] extends keyof ElementShapes
+    ? ElementShapes[T["type"]]
+    : Drawable,
+) => shapeCache.set(element, shape);
 
 export const invalidateShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.delete(element);
@@ -321,7 +342,8 @@ export const generateRoughOptions = (
       }
       return options;
     }
-    case "line": {
+    case "line":
+    case "freedraw": {
       if (isPathALoop(element.points)) {
         options.fillStyle = element.fillStyle;
         options.fill =
@@ -331,7 +353,6 @@ export const generateRoughOptions = (
       }
       return options;
     }
-    case "freedraw":
     case "arrow":
       return options;
     default: {
@@ -349,9 +370,11 @@ const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
 ) => {
-  let shape = shapeCache.get(element) || null;
+  let shape = shapeCache.get(element);
 
-  if (!shape) {
+  // `null` indicates no rc shape applicable for this element type
+  // (= do not generate anything)
+  if (shape === undefined) {
     elementWithCanvasCache.delete(element);
 
     switch (element.type) {
@@ -377,6 +400,8 @@ const generateElementShape = (
             generateRoughOptions(element),
           );
         }
+        setShapeForElement(element, shape);
+
         break;
       case "diamond": {
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
@@ -420,6 +445,8 @@ const generateElementShape = (
             generateRoughOptions(element),
           );
         }
+        setShapeForElement(element, shape);
+
         break;
       }
       case "ellipse":
@@ -430,6 +457,8 @@ const generateElementShape = (
           element.height,
           generateRoughOptions(element),
         );
+        setShapeForElement(element, shape);
+
         break;
       case "line":
       case "arrow": {
@@ -553,21 +582,32 @@ const generateElementShape = (
           }
         }
 
+        setShapeForElement(element, shape);
+
         break;
       }
       case "freedraw": {
         generateFreeDrawShape(element);
-        shape = [];
+
+        if (isPathALoop(element.points)) {
+          // generate rough polygon to fill freedraw shape
+          shape = generator.polygon(element.points as [number, number][], {
+            ...generateRoughOptions(element),
+            stroke: "none",
+          });
+        } else {
+          shape = null;
+        }
+        setShapeForElement(element, shape);
         break;
       }
       case "text":
       case "image": {
         // just to ensure we don't regenerate element.canvas on rerenders
-        shape = [];
+        setShapeForElement(element, null);
         break;
       }
     }
-    shapeCache.set(element, shape);
   }
 };
 
@@ -783,7 +823,7 @@ export const renderElementToSvg = (
       generateElementShape(element, generator);
       const node = roughSVGDrawWithPrecision(
         rsvg,
-        getShapeForElement(element) as Drawable,
+        getShapeForElement(element)!,
         MAX_DECIMALS_FOR_SVG_EXPORT,
       );
       const opacity = element.opacity / 100;
@@ -808,7 +848,7 @@ export const renderElementToSvg = (
       const opacity = element.opacity / 100;
       group.setAttribute("stroke-linecap", "round");
 
-      (getShapeForElement(element) as Drawable[]).forEach((shape) => {
+      getShapeForElement(element)!.forEach((shape) => {
         const node = roughSVGDrawWithPrecision(
           rsvg,
           shape,
@@ -839,7 +879,10 @@ export const renderElementToSvg = (
     case "freedraw": {
       generateFreeDrawShape(element);
       const opacity = element.opacity / 100;
-      const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+      const shape = getShapeForElement(element);
+      const node = shape
+        ? roughSVGDrawWithPrecision(rsvg, shape, MAX_DECIMALS_FOR_SVG_EXPORT)
+        : svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       if (opacity !== 1) {
         node.setAttribute("stroke-opacity", `${opacity}`);
         node.setAttribute("fill-opacity", `${opacity}`);
@@ -850,9 +893,9 @@ export const renderElementToSvg = (
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
-      const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
       node.setAttribute("stroke", "none");
-      node.setAttribute("fill", element.strokeColor);
+      const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
+      path.setAttribute("fill", element.strokeColor);
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
       svgRoot.appendChild(node);

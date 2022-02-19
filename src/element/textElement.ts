@@ -143,6 +143,7 @@ export const handleBindTextResize = (
         }
 
         const updatedY = element.y + containerHeight / 2 - nextHeight / 2;
+
         mutateElement(textElement, {
           text,
           // preserve padding and set width correctly
@@ -354,6 +355,7 @@ export const charWidth = (() => {
       const width = getTextWidth(char, font);
       cachedCharWidth[font][ascii] = width;
     }
+
     return cachedCharWidth[font][ascii];
   };
 
@@ -366,14 +368,14 @@ export const charWidth = (() => {
   };
 })();
 export const getApproxMinLineWidth = (font: FontString) => {
-  const minCharWidth = getMinCharWidth(font);
-  if (minCharWidth === 0) {
+  const maxCharWidth = getMaxCharWidth(font);
+  if (maxCharWidth === 0) {
     return (
       measureText(DUMMY_TEXT.split("").join("\n"), font).width +
       BOUND_TEXT_PADDING * 2
     );
   }
-  return minCharWidth + BOUND_TEXT_PADDING * 2;
+  return maxCharWidth + BOUND_TEXT_PADDING * 2;
 };
 
 export const getApproxMinLineHeight = (font: FontString) => {
@@ -388,6 +390,15 @@ export const getMinCharWidth = (font: FontString) => {
   const cacheWithOutEmpty = cache.filter((val) => val !== undefined);
 
   return Math.min(...cacheWithOutEmpty);
+};
+
+export const getMaxCharWidth = (font: FontString) => {
+  const cache = charWidth.getCache(font);
+  if (!cache) {
+    return 0;
+  }
+  const cacheWithOutEmpty = cache.filter((val) => val !== undefined);
+  return Math.max(...cacheWithOutEmpty);
 };
 
 export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
