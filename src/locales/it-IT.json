@@ -103,13 +103,13 @@
     "toggleTheme": "Cambia tema",
     "personalLib": "Libreria Personale",
     "excalidrawLib": "Libreria di Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
-    "unbindText": "",
+    "decreaseFontSize": "Riduci dimensione dei caratteri",
+    "increaseFontSize": "Aumenta la dimensione dei caratteri",
+    "unbindText": "Scollega testo",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Modifica link",
+      "create": "Crea link",
+      "label": "Link"
     }
   },
   "buttons": {
@@ -194,7 +194,7 @@
     "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato",
     "penMode": "",
-    "link": ""
+    "link": "Aggiungi/ aggiorna il link per una forma selezionata"
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
