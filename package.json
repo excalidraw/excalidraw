@@ -65,7 +65,7 @@
     "dotenv": "10.0.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.3.1",
-    "firebase-tools": "9.23.0",
+    "firebase-tools": "10.2.1",
     "husky": "7.0.4",
     "jest-canvas-mock": "2.3.1",
     "lint-staged": "12.3.3",
