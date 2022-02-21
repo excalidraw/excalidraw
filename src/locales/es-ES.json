@@ -266,8 +266,8 @@
   "helpDialog": {
     "blog": "Lea nuestro blog",
     "click": "clic",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Selección profunda",
+    "deepBoxSelect": "Seleccione en profundidad dentro de la caja, y evite arrastrar",
     "curvedArrow": "Flecha curva",
     "curvedLine": "Línea curva",
     "documentation": "Documentación",
@@ -302,42 +302,42 @@
     "website": "Sitio Web",
     "placeholder": {
       "authorName": "Nombre o nombre de usuario",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "libraryName": "Nombre de tu biblioteca",
+      "libraryDesc": "Descripción de su biblioteca para ayudar a la gente a entender su uso",
+      "githubHandle": "GitHub maneja (opcional), así que puede editar la biblioteca una vez enviada para su revisión",
+      "twitterHandle": "Nombre de usuario de Twitter (opcional), así que sabemos a quién acreditar cuando se promociona en Twitter",
+      "website": "Enlace a su sitio web personal o en cualquier otro lugar (opcional)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Requerido",
+      "website": "Introduce una URL válida"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Envía tu biblioteca para ser incluida en el ",
+      "link": "repositorio de librería pública",
+      "post": "para que otras personas utilicen en sus dibujos."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "La biblioteca debe ser aprobada manualmente primero. Por favor, lea la ",
+      "link": "pautas",
+      "post": " antes de enviar. Necesitará una cuenta de GitHub para comunicarse y hacer cambios si se solicita, pero no es estrictamente necesario."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Al enviar, usted acepta que la biblioteca se publicará bajo el ",
+      "link": "Licencia MIT ",
+      "post": "que en breve significa que cualquiera puede utilizarlos sin restricciones."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Cada elemento de la biblioteca debe tener su propio nombre para que sea filtrable. Los siguientes elementos de la biblioteca serán incluidos:",
+    "atleastOneLibItem": "Por favor, seleccione al menos un elemento de la biblioteca para empezar"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Biblioteca enviada",
+    "content": "Gracias {{authorName}}. Su biblioteca ha sido enviada para ser revisada. Puede seguir el estado",
+    "link": "aquí"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Reiniciar biblioteca",
+    "removeItemsFromLib": "Eliminar elementos seleccionados de la biblioteca"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",
@@ -359,7 +359,7 @@
     "width": "Ancho"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Añadido a la biblioteca",
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado en el portapapeles.",
     "copyToClipboardAsPng": "Copiado {{exportSelection}} al portapapeles como PNG\n({{exportColorScheme}})",
