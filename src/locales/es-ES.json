@@ -101,15 +101,15 @@
     "showStroke": "Mostrar selector de color de trazo",
     "showBackground": "Mostrar el selector de color de fondo",
     "toggleTheme": "Alternar tema",
-    "personalLib": "",
-    "excalidrawLib": "",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
-    "unbindText": "",
+    "personalLib": "Biblioteca personal",
+    "excalidrawLib": "Biblioteca Excalidraw",
+    "decreaseFontSize": "Disminuir tamaño de letra",
+    "increaseFontSize": "Aumentar el tamaño de letra",
+    "unbindText": "Desvincular texto",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Editar enlace",
+      "create": "Crear enlace",
+      "label": "Enlace"
     }
   },
   "buttons": {
@@ -146,10 +146,10 @@
     "exitZenMode": "Salir del modo Zen",
     "cancel": "Cancelar",
     "clear": "Borrar",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "remove": "Eliminar",
+    "publishLibrary": "Publicar",
+    "submit": "Enviar",
+    "confirm": "Confirmar"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -171,7 +171,7 @@
     "cannotRestoreFromImage": "No se pudo restaurar la escena desde este archivo de imagen",
     "invalidSceneUrl": "No se ha podido importar la escena desde la URL proporcionada. Está mal formada, o no contiene datos de Excalidraw JSON válidos.",
     "resetLibrary": "Esto borrará tu biblioteca. ¿Estás seguro?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "¿Eliminar {{count}} elemento(s) de la biblioteca?",
     "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada."
   },
   "errors": {
@@ -193,8 +193,8 @@
     "text": "Texto",
     "library": "Biblioteca",
     "lock": "Mantener la herramienta seleccionada activa después de dibujar",
-    "penMode": "",
-    "link": ""
+    "penMode": "Evitar el zoom de pellizco y aceptar la entrada libre sólo desde el lápiz",
+    "link": "Añadir/Actualizar enlace para una forma seleccionada"
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
