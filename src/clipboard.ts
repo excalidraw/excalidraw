@@ -8,8 +8,6 @@ import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "./constants";
 import { isInitializedImageElement } from "./element/typeChecks";
-import { trackEvent } from "./analytics";
-import { ActionSource } from "./actions/types";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
