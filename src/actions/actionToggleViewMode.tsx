@@ -1,11 +1,10 @@
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
-import { trackEvent } from "../analytics";
 
 export const actionToggleViewMode = register({
   name: "viewMode",
+  trackEvent: { category: "canvas" },
   perform(elements, appState) {
-    trackEvent("view", "mode", "view");
     return {
       appState: {
         ...appState,

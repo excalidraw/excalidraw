@@ -19,6 +19,7 @@ import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
+import { trackEvent } from "../analytics";
 
 export const SelectedShapeActions = ({
   appState,
@@ -198,6 +199,7 @@ export const ShapesSwitcher = ({
           aria-keyshortcuts={shortcut}
           data-testid={value}
           onChange={({ pointerType }) => {
+            trackEvent("toolbar", value, "ui");
             setAppState({
               elementType: value,
               multiElement: null,

@@ -3,6 +3,7 @@ import { CODES, KEYS } from "../keys";
 
 export const actionToggleStats = register({
   name: "stats",
+  trackEvent: { category: "canvas" },
   perform(elements, appState) {
     return {
       appState: {

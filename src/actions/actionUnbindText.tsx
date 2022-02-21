@@ -9,6 +9,7 @@ import { register } from "./register";
 export const actionUnbindText = register({
   name: "unbindText",
   contextItemLabel: "labels.unbindText",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),

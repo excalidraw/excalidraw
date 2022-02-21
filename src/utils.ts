@@ -535,3 +535,8 @@ export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
     cancelable: true,
   });
 };
+
+export const isPrimitive = (val: any) => {
+  const type = typeof val;
+  return val == null || (type !== "object" && type !== "function");
+};

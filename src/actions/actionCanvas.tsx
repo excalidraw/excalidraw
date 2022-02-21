@@ -47,6 +47,7 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     app.imageCache.clear();
     return {
@@ -77,6 +78,7 @@ export const actionClearCanvas = register({
 
 export const actionZoomIn = register({
   name: "zoomIn",
+  trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
       appState: {
@@ -112,6 +114,7 @@ export const actionZoomIn = register({
 
 export const actionZoomOut = register({
   name: "zoomOut",
+  trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
       appState: {
@@ -147,6 +150,7 @@ export const actionZoomOut = register({
 
 export const actionResetZoom = register({
   name: "resetZoom",
+  trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
       appState: {
@@ -245,6 +249,7 @@ const zoomToFitElements = (
 
 export const actionZoomToSelected = register({
   name: "zoomToSelection",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState) => zoomToFitElements(elements, appState, true),
   keyTest: (event) =>
     event.code === CODES.TWO &&
@@ -255,6 +260,7 @@ export const actionZoomToSelected = register({
 
 export const actionZoomToFit = register({
   name: "zoomToFit",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState) => zoomToFitElements(elements, appState, false),
   keyTest: (event) =>
     event.code === CODES.ONE &&
@@ -265,6 +271,7 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
+  trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {
     return {
       appState: {

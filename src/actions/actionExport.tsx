@@ -41,6 +41,7 @@ export const actionChangeProjectName = register({
 
 export const actionChangeExportScale = register({
   name: "changeExportScale",
+  trackEvent: { category: "export", action: "scale" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportScale: value },
@@ -89,6 +90,7 @@ export const actionChangeExportScale = register({
 
 export const actionChangeExportBackground = register({
   name: "changeExportBackground",
+  trackEvent: { category: "export", action: "toggleBackground" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportBackground: value },
@@ -107,6 +109,7 @@ export const actionChangeExportBackground = register({
 
 export const actionChangeExportEmbedScene = register({
   name: "changeExportEmbedScene",
+  trackEvent: { category: "export", action: "embedScene" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportEmbedScene: value },
@@ -128,6 +131,7 @@ export const actionChangeExportEmbedScene = register({
 
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
+  trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {
     const fileHandleExists = !!appState.fileHandle;
 
@@ -172,6 +176,7 @@ export const actionSaveToActiveFile = register({
 
 export const actionSaveFileToDisk = register({
   name: "saveFileToDisk",
+  trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {
     try {
       const { fileHandle } = await saveAsJSON(
@@ -210,6 +215,7 @@ export const actionSaveFileToDisk = register({
 
 export const actionLoadScene = register({
   name: "loadScene",
+  trackEvent: { category: "export" },
   perform: async (elements, appState, _, app) => {
     try {
       const {
@@ -252,6 +258,7 @@ export const actionLoadScene = register({
 
 export const actionExportWithDarkMode = register({
   name: "exportWithDarkMode",
+  trackEvent: { category: "export", action: "toggleTheme" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportWithDarkMode: value },

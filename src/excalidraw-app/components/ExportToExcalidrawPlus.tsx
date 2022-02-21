@@ -13,6 +13,7 @@ import { isInitializedImageElement } from "../../element/typeChecks";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
 import { MIME_TYPES } from "../../constants";
+import { trackEvent } from "../../analytics";
 
 const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -92,6 +93,7 @@ export const ExportToExcalidrawPlus: React.FC<{
         showAriaLabel={true}
         onClick={async () => {
           try {
+            trackEvent("export", "eplus", "ui");
             await exportToExcalidrawPlus(elements, appState, files);
           } catch (error: any) {
             console.error(error);

@@ -18,6 +18,7 @@ import {
 
 export const actionSendBackward = register({
   name: "sendBackward",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
       elements: moveOneLeft(elements, appState),
@@ -45,6 +46,7 @@ export const actionSendBackward = register({
 
 export const actionBringForward = register({
   name: "bringForward",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
       elements: moveOneRight(elements, appState),
@@ -72,6 +74,7 @@ export const actionBringForward = register({
 
 export const actionSendToBack = register({
   name: "sendToBack",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
       elements: moveAllLeft(elements, appState),
@@ -106,6 +109,8 @@ export const actionSendToBack = register({
 
 export const actionBringToFront = register({
   name: "bringToFront",
+  trackEvent: { category: "element" },
+
   perform: (elements, appState) => {
     return {
       elements: moveAllRight(elements, appState),
