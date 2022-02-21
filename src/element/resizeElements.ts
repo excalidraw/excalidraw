@@ -1,4 +1,4 @@
-import { SHIFT_LOCKING_ANGLE } from "../constants";
+import { BOUND_TEXT_PADDING, SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
 import {
@@ -141,7 +141,6 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
-      handleBindTextResize(selectedElements, transformHandleType);
       return true;
     }
   }
@@ -674,7 +673,25 @@ const resizeMultipleElements = (
         }
         const width = element.width * scale;
         const height = element.height * scale;
+        const boundTextElement = getBoundTextElement(element);
         let font: { fontSize?: number; baseline?: number } = {};
+
+        if (boundTextElement) {
+          const nextFont = measureFontSizeFromWH(
+            boundTextElement,
+            width - BOUND_TEXT_PADDING * 2,
+            height - BOUND_TEXT_PADDING * 2,
+          );
+
+          if (nextFont === null) {
+            return null;
+          }
+          font = {
+            fontSize: nextFont.size,
+            baseline: nextFont.baseline,
+          };
+        }
+
         if (isTextElement(element)) {
           const nextFont = measureFontSizeFromWH(element, width, height);
           if (nextFont === null) {
@@ -718,6 +735,15 @@ const resizeMultipleElements = (
     if (updates) {
       elements.forEach((element, index) => {
         mutateElement(element, updates[index]);
+        const boundTextElement = getBoundTextElement(element);
+
+        if (boundTextElement) {
+          mutateElement(boundTextElement, {
+            fontSize: updates[index].fontSize,
+            baseline: updates[index].baseline,
+          });
+          handleBindTextResize([element], transformHandleType);
+        }
       });
     }
   }
