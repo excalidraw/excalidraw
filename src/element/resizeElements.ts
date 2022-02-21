@@ -602,7 +602,7 @@ export const resizeSingleElement = (
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
     mutateElement(element, resizedElement);
-    handleBindTextResize([element], transformHandleDirection);
+    handleBindTextResize(element, transformHandleDirection);
   }
 };
 
@@ -742,7 +742,7 @@ const resizeMultipleElements = (
             fontSize: updates[index].fontSize,
             baseline: updates[index].baseline,
           });
-          handleBindTextResize([element], transformHandleType);
+          handleBindTextResize(element, transformHandleType);
         }
       });
     }
