@@ -106,7 +106,7 @@ export const transformElements = (
       updateBoundElements(element);
     } else if (transformHandleType) {
       resizeSingleElement(
-        pointerDownState.originalElements.get(element.id) as typeof element,
+        pointerDownState.originalElements,
         shouldMaintainAspectRatio,
         element,
         transformHandleType,
@@ -397,7 +397,7 @@ const resizeSingleTextElement = (
 };
 
 export const resizeSingleElement = (
-  stateAtResizeStart: NonDeletedExcalidrawElement,
+  originalElements: PointerDownState["originalElements"],
   shouldMaintainAspectRatio: boolean,
   element: NonDeletedExcalidrawElement,
   transformHandleDirection: TransformHandleDirection,
@@ -405,6 +405,9 @@ export const resizeSingleElement = (
   pointerX: number,
   pointerY: number,
 ) => {
+  const stateAtResizeStart = originalElements.get(
+    element.id,
+  ) as NonDeletedExcalidrawElement;
   // Gets bounds corners
   const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
     stateAtResizeStart,
@@ -485,6 +488,13 @@ export const resizeSingleElement = (
   }
 
   if (boundTextElement) {
+    const stateOfBoundTextElementAtResize = originalElements.get(
+      boundTextElement.id,
+    ) as ExcalidrawTextElement;
+    boundTextFont = {
+      fontSize: stateOfBoundTextElementAtResize.fontSize,
+      baseline: stateOfBoundTextElementAtResize.baseline,
+    };
     if (shouldMaintainAspectRatio) {
       const nextFont = measureFontSizeFromWH(
         boundTextElement,
@@ -618,7 +628,7 @@ export const resizeSingleElement = (
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
     mutateElement(element, resizedElement);
-    if (shouldMaintainAspectRatio && boundTextElement && boundTextFont) {
+    if (boundTextElement && boundTextFont) {
       mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
     }
     handleBindTextResize(element, transformHandleDirection);
