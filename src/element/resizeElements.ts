@@ -405,9 +405,7 @@ export const resizeSingleElement = (
   pointerX: number,
   pointerY: number,
 ) => {
-  const stateAtResizeStart = originalElements.get(
-    element.id,
-  ) as NonDeletedExcalidrawElement;
+  const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
   const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
     stateAtResizeStart,
@@ -490,11 +488,13 @@ export const resizeSingleElement = (
   if (boundTextElement) {
     const stateOfBoundTextElementAtResize = originalElements.get(
       boundTextElement.id,
-    ) as ExcalidrawTextElement;
-    boundTextFont = {
-      fontSize: stateOfBoundTextElementAtResize.fontSize,
-      baseline: stateOfBoundTextElementAtResize.baseline,
-    };
+    ) as typeof boundTextElement | undefined;
+    if (stateOfBoundTextElementAtResize) {
+      boundTextFont = {
+        fontSize: stateOfBoundTextElementAtResize.fontSize,
+        baseline: stateOfBoundTextElementAtResize.baseline,
+      };
+    }
     if (shouldMaintainAspectRatio) {
       const nextFont = measureFontSizeFromWH(
         boundTextElement,
