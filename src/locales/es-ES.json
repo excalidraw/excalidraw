@@ -214,12 +214,12 @@
     "resizeImage": "Puede redimensionar libremente pulsando SHIFT,\npulse ALT para redimensionar desde el centro",
     "rotate": "Puedes restringir los ángulos manteniendo presionado SHIFT mientras giras",
     "lineEditor_info": "Doble clic o pulse Enter para editar puntos",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Presione Suprimir para eliminar el/los punto(s), CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
+    "lineEditor_nothingSelected": "Seleccione un punto a editar (mantenga MAYÚSCULAS para seleccionar múltiples),\no mantenga pulsado Alt y haga clic para añadir nuevos puntos",
     "placeImage": "Haga clic para colocar la imagen o haga clic y arrastre para establecer su tamaño manualmente",
-    "publishLibrary": "",
-    "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "publishLibrary": "Publica tu propia biblioteca",
+    "bindTextToElement": "Presione Entrar para agregar",
+    "deepBoxSelect": "Mantén CtrlOrCmd para seleccionar en profundidad, y para evitar arrastrar"
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
@@ -292,16 +292,16 @@
     "title": "Borrar lienzo"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "Publicar biblioteca",
+    "itemName": "Nombre del artículo",
+    "authorName": "Nombre del autor",
+    "githubUsername": "Nombre de usuario de Github",
+    "twitterUsername": "Nombre de usuario de Twitter",
+    "libraryName": "Nombre de la librería",
+    "libraryDesc": "Descripción de la biblioteca",
+    "website": "Sitio Web",
     "placeholder": {
-      "authorName": "",
+      "authorName": "Nombre o nombre de usuario",
       "libraryName": "",
       "libraryDesc": "",
       "githubHandle": "",
