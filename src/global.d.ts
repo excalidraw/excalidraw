@@ -34,6 +34,10 @@ type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
 
+/** utility type to assert that the second type is a subtype of the first type.
+ * Returns the subtype. */
+type SubtypeOf<Supertype, Subtype extends Supertype> = Subtype;
+
 type ResolutionType<T extends (...args: any) => any> = T extends (
   ...args: any
 ) => Promise<infer R>
