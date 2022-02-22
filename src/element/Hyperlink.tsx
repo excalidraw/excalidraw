@@ -31,6 +31,7 @@ import { isPointHittingElementBoundingBox } from "./collision";
 import { getElementAbsoluteCoords } from "./";
 
 import "./Hyperlink.scss";
+import { trackEvent } from "../analytics";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -68,6 +69,10 @@ export const Hyperlink = ({
     }
 
     const link = normalizeLink(inputRef.current.value);
+
+    if (!element.link && link) {
+      trackEvent("hyperlink", "create");
+    }
 
     mutateElement(element, { link });
     setAppState({ showHyperlinkPopup: "info" });
@@ -108,6 +113,7 @@ export const Hyperlink = ({
   }, [appState, element, isEditing, setAppState]);
 
   const handleRemove = useCallback(() => {
+    trackEvent("hyperlink", "delete");
     mutateElement(element, { link: null });
     if (isEditing) {
       inputRef.current!.value = "";
@@ -116,6 +122,7 @@ export const Hyperlink = ({
   }, [setAppState, element, isEditing]);
 
   const onEdit = () => {
+    trackEvent("hyperlink", "edit", "popup-ui");
     setAppState({ showHyperlinkPopup: "editor" });
   };
   const { x, y } = getCoordsForPopover(element, appState);
@@ -239,11 +246,12 @@ export const isLocalLink = (link: string | null) => {
 };
 
 export const actionLink = register({
-  name: "link",
+  name: "hyperlink",
   perform: (elements, appState) => {
     if (appState.showHyperlinkPopup === "editor") {
       return false;
     }
+
     return {
       elements,
       appState: {
@@ -253,6 +261,9 @@ export const actionLink = register({
       },
       commitToHistory: true,
     };
+  },
+  trackEvent: (action, source) => {
+    trackEvent("hyperlink", "edit", source);
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
   contextItemLabel: (elements, appState) =>
@@ -401,6 +412,7 @@ const renderTooltip = (
     },
     "top",
   );
+  trackEvent("hyperlink", "tooltip", "link-icon");
 
   IS_HYPERLINK_TOOLTIP_VISIBLE = true;
 };
