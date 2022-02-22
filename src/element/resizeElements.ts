@@ -106,7 +106,7 @@ export const transformElements = (
       updateBoundElements(element);
     } else if (transformHandleType) {
       resizeSingleElement(
-        pointerDownState.originalElements.get(element.id) as typeof element,
+        pointerDownState.originalElements,
         shouldMaintainAspectRatio,
         element,
         transformHandleType,
@@ -397,7 +397,7 @@ const resizeSingleTextElement = (
 };
 
 export const resizeSingleElement = (
-  stateAtResizeStart: NonDeletedExcalidrawElement,
+  originalElements: PointerDownState["originalElements"],
   shouldMaintainAspectRatio: boolean,
   element: NonDeletedExcalidrawElement,
   transformHandleDirection: TransformHandleDirection,
@@ -405,6 +405,7 @@ export const resizeSingleElement = (
   pointerX: number,
   pointerY: number,
 ) => {
+  const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
   const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
     stateAtResizeStart,
@@ -439,6 +440,9 @@ export const resizeSingleElement = (
   let scaleX = atStartBoundsWidth / boundsCurrentWidth;
   let scaleY = atStartBoundsHeight / boundsCurrentHeight;
 
+  let boundTextFont: { fontSize?: number; baseline?: number } = {};
+  const boundTextElement = getBoundTextElement(element);
+
   if (transformHandleDirection.includes("e")) {
     scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
   }
@@ -451,8 +455,6 @@ export const resizeSingleElement = (
   if (transformHandleDirection.includes("n")) {
     scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsCurrentHeight;
   }
-
-  const boundTextElement = getBoundTextElement(element);
 
   // Linear elements dimensions differ from bounds dimensions
   const eleInitialWidth = stateAtResizeStart.width;
@@ -484,10 +486,34 @@ export const resizeSingleElement = (
   }
 
   if (boundTextElement) {
-    const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
-    const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
-    eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
-    eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
+    const stateOfBoundTextElementAtResize = originalElements.get(
+      boundTextElement.id,
+    ) as typeof boundTextElement | undefined;
+    if (stateOfBoundTextElementAtResize) {
+      boundTextFont = {
+        fontSize: stateOfBoundTextElementAtResize.fontSize,
+        baseline: stateOfBoundTextElementAtResize.baseline,
+      };
+    }
+    if (shouldMaintainAspectRatio) {
+      const nextFont = measureFontSizeFromWH(
+        boundTextElement,
+        eleNewWidth - BOUND_TEXT_PADDING * 2,
+        eleNewHeight - BOUND_TEXT_PADDING * 2,
+      );
+      if (nextFont === null) {
+        return;
+      }
+      boundTextFont = {
+        fontSize: nextFont.size,
+        baseline: nextFont.baseline,
+      };
+    } else {
+      const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
+      const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
+      eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
+      eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
+    }
   }
 
   const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
@@ -602,6 +628,9 @@ export const resizeSingleElement = (
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
     mutateElement(element, resizedElement);
+    if (boundTextElement && boundTextFont) {
+      mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
+    }
     handleBindTextResize(element, transformHandleDirection);
   }
 };
