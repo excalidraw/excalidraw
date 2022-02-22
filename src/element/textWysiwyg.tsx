@@ -167,11 +167,17 @@ export const textWysiwyg = ({
       const { textAlign } = updatedElement;
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
+      const initialLength = editable.value.length;
       editable.value = updatedElement.originalText;
       // restore cursor positon after value updated so it doesn't
       // go to the end of text when container auto expanded
-      editable.selectionStart = initialSelectionStart;
-      editable.selectionEnd = initialSelectionEnd;
+      if (
+        initialSelectionStart === initialSelectionEnd &&
+        initialSelectionEnd !== initialLength
+      ) {
+        editable.selectionStart = initialSelectionStart;
+        editable.selectionEnd = initialSelectionEnd;
+      }
 
       const lines = updatedElement.originalText.split("\n");
       const lineHeight = updatedElement.containerId
