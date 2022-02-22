@@ -1617,6 +1617,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+  //zsviczian
   updateContainerSize = withBatchedUpdates(
     (containers: NonDeletedExcalidrawElement[]) => {
       containers.forEach((el: ExcalidrawElement) => {
@@ -1627,7 +1628,15 @@ class App extends React.Component<AppProps, AppState> {
           el.y + el.height / 2,
           el.angle,
         );
-        resizeSingleElement(el, true, el, "se", true, x, y);
+        resizeSingleElement(
+          new Map().set(el.id, el),
+          true,
+          el,
+          "se",
+          true,
+          x,
+          y,
+        );
       });
     },
   );

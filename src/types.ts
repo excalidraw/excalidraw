@@ -159,7 +159,7 @@ export type AppState = {
     canvasBackground?: string[];
     elementBackground?: string[];
     elementStroke?: string[];
-  };
+  }; //zsviczian
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
