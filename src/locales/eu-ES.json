@@ -149,7 +149,7 @@
     "remove": "Kendu",
     "publishLibrary": "Argitaratu",
     "submit": "Bidali",
-    "confirm": "Baieztatu"
+    "confirm": "Bai"
   },
   "alerts": {
     "clearReset": "Honek oihal osoa garbituko du. Ziur zaude?",
@@ -267,7 +267,7 @@
     "blog": "Irakurri gure bloga",
     "click": "sakatu",
     "deepSelect": "Hautapen sakona",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "Hautapen sakona egin laukizuzen bidez, eta saihestu arrastatzea",
     "curvedArrow": "Gezi kurbatua",
     "curvedLine": "Lerro kurbatua",
     "documentation": "Dokumentazioa",
