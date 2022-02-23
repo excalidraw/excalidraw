@@ -107,9 +107,9 @@
     "increaseFontSize": "Handitu letra tamaina",
     "unbindText": "Askatu testua",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Editatu esteka",
+      "create": "Sortu esteka",
+      "label": "Esteka"
     }
   },
   "buttons": {
@@ -193,8 +193,8 @@
     "text": "Testua",
     "library": "Liburutegia",
     "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
-    "penMode": "",
-    "link": ""
+    "penMode": "Saihestu txikiagotzea eta onartu marrazte libreko idazketa solik arkatza bidez",
+    "link": "Gehitu / Eguneratu esteka hautatutako forma baterako"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -219,15 +219,15 @@
     "placeImage": "Egin klik irudia kokatzeko, edo egin klik eta arrastatu bere tamaina eskuz ezartzeko",
     "publishLibrary": "Argitaratu zure liburutegia",
     "bindTextToElement": "Sakatu Sartu testua gehitzeko",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "Ezin da oihala aurreikusi",
+    "canvasTooBig": "Agian oihala handiegia da.",
+    "canvasTooBigTip": "Aholkua: saiatu urrunen dauden elementuak pixka bat hurbiltzen."
   },
   "errorSplash": {
-    "headingMain_pre": "",
+    "headingMain_pre": "Errore bat aurkitu da. Saiatu ",
     "headingMain_button": "orria birkargatzen.",
     "clearCanvasMessage": "Birkargatzea ez bada burutzen, saiatu ",
     "clearCanvasMessage_button": "oihala garbitzen.",
@@ -266,7 +266,7 @@
   "helpDialog": {
     "blog": "Irakurri gure bloga",
     "click": "sakatu",
-    "deepSelect": "",
+    "deepSelect": "Hautapen sakona",
     "deepBoxSelect": "",
     "curvedArrow": "Gezi kurbatua",
     "curvedLine": "Lerro kurbatua",
