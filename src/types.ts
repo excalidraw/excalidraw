@@ -153,7 +153,6 @@ export type AppState = {
   pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
   showHyperlinkPopup: false | "info" | "editor";
   customColors: {
-    canvasBackground: Array<string>;
     elementBackground: Array<string>;
     elementStroke: Array<string>;
   };

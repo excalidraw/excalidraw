@@ -394,7 +394,7 @@ export const ColorPicker = ({
   label,
   isActive,
   setActive,
-  customColors,
+  customColors = [],
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   color: string | null;
@@ -402,7 +402,7 @@ export const ColorPicker = ({
   label: string;
   isActive: boolean;
   setActive: (active: boolean) => void;
-  customColors: Array<string>;
+  customColors?: Array<string>;
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
 

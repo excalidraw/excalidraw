@@ -86,7 +86,6 @@ export const getDefaultAppState = (): Omit<
     pendingImageElement: null,
     showHyperlinkPopup: false,
     customColors: {
-      canvasBackground: [],
       elementBackground: [],
       elementStroke: [],
     },

@@ -43,7 +43,6 @@ export const actionChangeViewBackgroundColor = register({
             updateData({ openPopup: active ? "canvasColorPicker" : null })
           }
           data-testid="canvas-background-picker"
-          customColors={appState.customColors.canvasBackground}
         />
       </div>
     );
