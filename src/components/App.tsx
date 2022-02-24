@@ -248,6 +248,7 @@ import {
   isPointHittingLinkIcon,
   isLocalLink,
 } from "../element/Hyperlink";
+import { getCustomColors } from "./ColorPicker";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -623,6 +624,7 @@ class App extends React.Component<AppProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
+
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
@@ -792,9 +794,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const scene = restore(initialData, null, null);
-
+    const customColors = getCustomColors(scene.elements);
     scene.appState = {
       ...scene.appState,
+      customColors,
       elementType:
         scene.appState.elementType === "image"
           ? "selection"
@@ -804,6 +807,7 @@ class App extends React.Component<AppProps, AppState> {
     if (initialData?.scrollToContent) {
       scene.appState = {
         ...scene.appState,
+
         ...calculateScrollCenter(
           scene.elements,
           {

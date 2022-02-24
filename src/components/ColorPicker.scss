@@ -46,7 +46,7 @@
     top: -11px;
   }
 
-  .color-picker-content {
+  .color-picker-content--default {
     padding: 0.5rem;
     display: grid;
     grid-template-columns: repeat(5, auto);
@@ -56,6 +56,23 @@
     &:focus {
       outline: none;
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
+    }
+  }
+
+  .color-picker-content--canvas {
+    display: flex;
+    flex-direction: column;
+    padding: 0.25rem;
+
+    &-title {
+      color: $oc-gray-6;
+      font-size: 15px;
+      padding: 0.5rem;
+    }
+    &-colors {
+      .color-picker-swatch {
+        margin: 0 0.25rem;
+      }
     }
   }
 

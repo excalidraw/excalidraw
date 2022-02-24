@@ -152,6 +152,11 @@ export type AppState = {
   /** imageElement waiting to be placed on canvas */
   pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
   showHyperlinkPopup: false | "info" | "editor";
+  customColors: {
+    canvasBackground: Array<string>;
+    elementBackground: Array<string>;
+    elementStroke: Array<string>;
+  };
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
