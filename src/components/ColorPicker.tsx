@@ -177,7 +177,7 @@ const Picker = ({
             : !isCustom && event.key === KEYS.ARROW_UP
             ? (length + index - 5) % length
             : index;
-        (parentSelector!.children![nextIndex] as any).focus();
+        (parentSelector!.children![nextIndex] as HTMLElement)?.focus();
       }
       event.preventDefault();
     } else if (
@@ -192,7 +192,7 @@ const Picker = ({
           )!
         : gallery!.current!.querySelector(".color-picker-content--default")!;
       const actualIndex = isCustom ? index - MAX_DEFAULT_COLORS : index;
-      (parentSelector!.children![actualIndex] as any).focus();
+      (parentSelector!.children![actualIndex] as HTMLElement)?.focus();
 
       event.preventDefault();
     } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
