@@ -229,12 +229,11 @@ const Picker = ({
             ? (index + 1) % length
             : event.key === (isRTL ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT)
             ? (length + index - 1) % length
-            : event.key === KEYS.ARROW_DOWN
+            : !isCustom && event.key === KEYS.ARROW_DOWN
             ? (index + 5) % length
-            : event.key === KEYS.ARROW_UP
+            : !isCustom && event.key === KEYS.ARROW_UP
             ? (length + index - 5) % length
             : index;
-
         (parentSelector!.children![nextIndex] as any).focus();
       }
       event.preventDefault();
