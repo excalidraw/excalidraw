@@ -274,7 +274,9 @@ export const actionZoomToFit = register({
 export const actionToggleTheme = register({
   name: "toggleTheme",
   perform: (_, appState, value, app) => {
+    //zsviczian
     if (app.props.onThemeChange) {
+      //zsviczian
       app.props.onThemeChange(
         value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
       );

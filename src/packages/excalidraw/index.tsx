@@ -30,17 +30,18 @@ const Excalidraw = (props: ExcalidrawProps) => {
     name,
     renderCustomStats,
     onPaste,
-    onDrop,
+    onDrop, //zsviczian
     detectScroll = true,
     handleKeyboardGlobally = false,
     onLibraryChange,
     autoFocus = false,
-    onBeforeTextEdit,
-    onBeforeTextSubmit,
+    onBeforeTextEdit, //zsviczian
+    onBeforeTextSubmit, //zsviczian
     generateIdForFile,
-    onThemeChange,
+    onThemeChange, //zsviczian
     onLinkOpen,
-    onLinkHover,
+    onLinkHover, //zsviczian
+    onViewModeChange, //zsviczian
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -108,6 +109,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         onThemeChange={onThemeChange} //zsviczian
         onLinkOpen={onLinkOpen}
         onLinkHover={onLinkHover} //zsviczian
+        onViewModeChange={onViewModeChange} //zsviczian
       />
     </InitializeApp>
   );

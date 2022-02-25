@@ -266,6 +266,7 @@ export interface ExcalidrawProps {
   ) => [string, string, string]; //zsviczian
   generateIdForFile?: (file: File) => string | Promise<string>;
   onThemeChange?: (newTheme: string) => void; //zsviczian
+  onViewModeChange?: (isViewModeEnabled: boolean) => void; //zsviczian
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
     event: CustomEvent<{

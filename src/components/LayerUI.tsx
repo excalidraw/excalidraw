@@ -358,6 +358,9 @@ const LayerUI = ({
                       appState={appState}
                       setAppState={setAppState}
                     />
+                    {
+                      renderTopRightUI?.(isMobile, appState) //zsviczian
+                    }
                   </Stack.Row>
                   {libraryMenu}
                 </Stack.Col>
@@ -388,7 +391,6 @@ const LayerUI = ({
                     </Tooltip>
                   ))}
             </UserList>
-            {renderTopRightUI?.(isMobile, appState)}
           </div>
         </div>
       </FixedSideContainer>

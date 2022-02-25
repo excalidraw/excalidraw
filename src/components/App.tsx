@@ -5704,6 +5704,14 @@ class App extends React.Component<AppProps, AppState> {
 
   public refresh = () => {
     this.setState({ ...this.getCanvasOffsets() });
+    //zsviczian
+    const { width, height } =
+      this.excalidrawContainerRef.current!.getBoundingClientRect();
+    this.isMobile =
+      width < MQ_MAX_WIDTH_PORTRAIT ||
+      (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE) ||
+      this.state.trayModeEnabled;
+    this.updateDOMRect();
   };
 
   private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
