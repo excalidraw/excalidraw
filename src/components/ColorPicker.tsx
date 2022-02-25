@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Popover } from "./Popover";
 import { isTransparent } from "../utils";
 
@@ -43,42 +43,9 @@ export const getCustomColors = (
     ) {
       customColors.push(element[colorType]);
     }
-
     index++;
   }
   return customColors;
-};
-
-const isColorUsed = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  color: string,
-  type: "elementBackground" | "elementStroke",
-) => {
-  const sortByUpdate = elements
-    .filter(
-      (element) =>
-        !element.isDeleted && !appState.selectedElementIds[element.id],
-    )
-    .sort((ele1, ele2) => ele2.updated - ele1.updated);
-  const elementAttr = {
-    elementBackground: "backgroundColor",
-    elementStroke: "strokeColor",
-  };
-  const colorType = elementAttr[type] as "backgroundColor" | "strokeColor";
-  return sortByUpdate.some((ele) => ele[colorType] === color);
-};
-
-const getColorIndex = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  customColors: Array<string>,
-  type: "elementBackground" | "elementStroke",
-) => {
-  const index = customColors.findIndex(
-    (color) => !isColorUsed(elements, appState, color, type),
-  );
-  return index;
 };
 
 const isCustomColor = (
@@ -126,7 +93,7 @@ const Picker = ({
   label,
   showInput = true,
   type,
-  customColors,
+  elements,
 }: {
   colors: string[];
   color: string | null;
@@ -135,12 +102,19 @@ const Picker = ({
   label: string;
   showInput: boolean;
   type: "canvasBackground" | "elementBackground" | "elementStroke";
-  customColors: Array<string>;
+  elements: readonly ExcalidrawElement[];
 }) => {
   const firstItem = React.useRef<HTMLButtonElement>();
   const activeItem = React.useRef<HTMLButtonElement>();
   const gallery = React.useRef<HTMLDivElement>();
   const colorInput = React.useRef<HTMLInputElement>();
+
+  const [customColors] = React.useState(() => {
+    if (type !== "canvasBackground") {
+      return getCustomColors(elements, type);
+    }
+    return [];
+  });
 
   React.useEffect(() => {
     // After the component is first mounted focus on first input
@@ -272,6 +246,7 @@ const Picker = ({
       );
     });
   };
+
   return (
     <div
       className={`color-picker color-picker-type-${type}`}
@@ -391,34 +366,8 @@ export const ColorPicker = ({
   appState: AppState;
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
-  const [customColors, setCustomColors] = React.useState<string[]>([]);
-  useEffect(() => {
-    if (!isActive) {
-      return;
-    }
-    if (type !== "canvasBackground") {
-      setCustomColors(getCustomColors(elements, type));
-    }
-  }, [type, elements, isActive]);
 
   const handleOnChange = (color: string) => {
-    if (type !== "canvasBackground") {
-      const colors = customColors.slice();
-      if (colors.includes(color)) {
-        if (isCustomColor(color, type)) {
-          const index = getColorIndex(elements, appState, colors, type);
-          if (index === -1) {
-            if (customColors.length === MAX_CUSTOM_COLORS) {
-              colors.pop();
-            }
-          } else {
-            colors.splice(index, 1);
-          }
-          colors.unshift(color);
-        }
-      }
-      setCustomColors(colors);
-    }
     onChange(color);
   };
 
@@ -460,7 +409,7 @@ export const ColorPicker = ({
               label={label}
               showInput={false}
               type={type}
-              customColors={customColors}
+              elements={elements}
             />
           </Popover>
         ) : null}
