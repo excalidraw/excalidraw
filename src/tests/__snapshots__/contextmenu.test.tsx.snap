@@ -20,7 +20,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -196,7 +195,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -528,7 +526,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -860,7 +857,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -1036,7 +1032,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -1247,7 +1242,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -1515,7 +1509,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -1865,7 +1858,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -2645,7 +2637,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -2977,7 +2968,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -3309,7 +3299,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -3719,7 +3708,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -3993,7 +3981,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -4346,7 +4333,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -4453,7 +4439,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
@@ -4538,7 +4523,6 @@ Object {
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "customColors": Object {
-    "canvasBackground": Array [],
     "elementBackground": Array [],
     "elementStroke": Array [],
   },
