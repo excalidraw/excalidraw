@@ -1652,6 +1652,9 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.elements) {
+        this.setState({
+          customColors: getCustomColors(sceneData.elements),
+        });
         this.scene.replaceAllElements(sceneData.elements);
       }
 
