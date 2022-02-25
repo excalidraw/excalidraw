@@ -793,6 +793,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const scene = restore(initialData, null, null);
+
     scene.appState = {
       ...scene.appState,
       elementType:
@@ -804,7 +805,6 @@ class App extends React.Component<AppProps, AppState> {
     if (initialData?.scrollToContent) {
       scene.appState = {
         ...scene.appState,
-
         ...calculateScrollCenter(
           scene.elements,
           {

@@ -17,17 +17,19 @@ const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  const updateElements = elements.map((el) => {
-    if (appState.selectedElementIds[el.id]) {
-      return newElementWith(el, { isDeleted: true });
-    }
-    if (isBoundToContainer(el) && appState.selectedElementIds[el.containerId]) {
-      return newElementWith(el, { isDeleted: true });
-    }
-    return el;
-  });
   return {
-    elements: updateElements,
+    elements: elements.map((el) => {
+      if (appState.selectedElementIds[el.id]) {
+        return newElementWith(el, { isDeleted: true });
+      }
+      if (
+        isBoundToContainer(el) &&
+        appState.selectedElementIds[el.containerId]
+      ) {
+        return newElementWith(el, { isDeleted: true });
+      }
+      return el;
+    }),
     appState: {
       ...appState,
       selectedElementIds: {},
