@@ -15,28 +15,39 @@ const MAX_DEFAULT_COLORS = 15;
 
 export const getCustomColors = (elements: readonly ExcalidrawElement[]) => {
   const customColors = {
-    canvasBackground: [],
     elementBackground: [],
     elementStroke: [],
   } as AppState["customColors"];
 
-  elements
+  const updatedElements = elements
     .filter((element) => !element.isDeleted)
-    .sort((ele1, ele2) => ele2.updated - ele1.updated)
-    .forEach((element) => {
-      if (
-        isCustomColor(element.strokeColor, "elementStroke") &&
-        !customColors.elementStroke.includes(element.strokeColor)
-      ) {
-        customColors.elementStroke.push(element.strokeColor);
-      }
-      if (
-        isCustomColor(element.backgroundColor, "elementBackground") &&
-        !customColors.elementBackground.includes(element.backgroundColor)
-      ) {
-        customColors.elementBackground.push(element.backgroundColor);
-      }
-    });
+    .sort((ele1, ele2) => ele2.updated - ele1.updated);
+
+  let index = 0;
+  while (
+    index < updatedElements.length &&
+    (customColors.elementBackground.length < MAX_CUSTOM_COLORS ||
+      customColors.elementStroke.length < MAX_CUSTOM_COLORS)
+  ) {
+    const element = updatedElements[index];
+
+    if (
+      customColors.elementStroke.length < MAX_CUSTOM_COLORS &&
+      isCustomColor(element.strokeColor, "elementStroke") &&
+      !customColors.elementStroke.includes(element.strokeColor)
+    ) {
+      customColors.elementStroke.push(element.strokeColor);
+    }
+    if (
+      customColors.elementBackground.length < MAX_CUSTOM_COLORS &&
+      isCustomColor(element.backgroundColor, "elementBackground") &&
+      !customColors.elementBackground.includes(element.backgroundColor)
+    ) {
+      customColors.elementBackground.push(element.backgroundColor);
+    }
+    index++;
+  }
+
   return customColors;
 };
 export const finalizeCustomColors = (
