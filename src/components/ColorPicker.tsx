@@ -111,9 +111,6 @@ const isCustomColor = (
   color: string,
   type: "elementBackground" | "elementStroke",
 ) => {
-  if (!isValidColor(color)) {
-    return false;
-  }
   return !colors[type].includes(color);
 };
 
