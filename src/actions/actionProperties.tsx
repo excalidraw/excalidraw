@@ -1,6 +1,6 @@
 import { AppState } from "../../src/types";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
-import { ColorPicker, finalizeCustomColors } from "../components/ColorPicker";
+import { ColorPicker } from "../components/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
 import {
   ArrowheadArrowIcon,
@@ -229,25 +229,16 @@ export const actionChangeStrokeColor = register({
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => {
-          const customStrokeColors = finalizeCustomColors(
-            color,
-            elements,
-            appState,
-            "elementStroke",
-          );
           updateData({
             currentItemStrokeColor: color,
-            customColors: {
-              ...appState.customColors,
-              elementStroke: customStrokeColors,
-            },
           });
         }}
         isActive={appState.openPopup === "strokeColorPicker"}
         setActive={(active) =>
           updateData({ openPopup: active ? "strokeColorPicker" : null })
         }
-        customColors={appState.customColors.elementStroke}
+        elements={elements}
+        appState={appState}
       />
     </>
   ),
@@ -283,26 +274,17 @@ export const actionChangeBackgroundColor = register({
           (element) => element.backgroundColor,
           appState.currentItemBackgroundColor,
         )}
-        onChange={(color) => {
-          const customBackgroundColors = finalizeCustomColors(
-            color,
-            elements,
-            appState,
-            "elementBackground",
-          );
+        onChange={(color) =>
           updateData({
             currentItemBackgroundColor: color,
-            customColors: {
-              ...appState.customColors,
-              elementBackground: customBackgroundColors,
-            },
-          });
-        }}
+          })
+        }
         isActive={appState.openPopup === "backgroundColorPicker"}
         setActive={(active) =>
           updateData({ openPopup: active ? "backgroundColorPicker" : null })
         }
-        customColors={appState.customColors.elementBackground}
+        elements={elements}
+        appState={appState}
       />
     </>
   ),

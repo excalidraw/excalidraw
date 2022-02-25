@@ -12,7 +12,6 @@ import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
 import { isBoundToContainer } from "../element/typeChecks";
-import { getCustomColors } from "../components/ColorPicker";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
@@ -32,7 +31,6 @@ const deleteSelectedElements = (
     appState: {
       ...appState,
       selectedElementIds: {},
-      customColors: getCustomColors(updateElements),
     },
   };
 };

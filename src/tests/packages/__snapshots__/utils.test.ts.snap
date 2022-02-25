@@ -19,10 +19,6 @@ Object {
   "currentItemStrokeWidth": 1,
   "currentItemTextAlign": "left",
   "cursorButton": "up",
-  "customColors": Object {
-    "elementBackground": Array [],
-    "elementStroke": Array [],
-  },
   "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,

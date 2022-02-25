@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Popover } from "./Popover";
 import { isTransparent } from "../utils";
 
@@ -13,65 +13,42 @@ import { AppState } from "../types";
 const MAX_CUSTOM_COLORS = 5;
 const MAX_DEFAULT_COLORS = 15;
 
-export const getCustomColors = (elements: readonly ExcalidrawElement[]) => {
-  const customColors = {
-    elementBackground: [],
-    elementStroke: [],
-  } as AppState["customColors"];
-
+export const getCustomColors = (
+  elements: readonly ExcalidrawElement[],
+  type: "elementBackground" | "elementStroke",
+) => {
+  const customColors: string[] = [];
   const updatedElements = elements
     .filter((element) => !element.isDeleted)
     .sort((ele1, ele2) => ele2.updated - ele1.updated);
 
   let index = 0;
+  const elementColorTypeMap = {
+    elementBackground: "backgroundColor",
+    elementStroke: "strokeColor",
+  };
+  const colorType = elementColorTypeMap[type] as
+    | "backgroundColor"
+    | "strokeColor";
   while (
     index < updatedElements.length &&
-    (customColors.elementBackground.length < MAX_CUSTOM_COLORS ||
-      customColors.elementStroke.length < MAX_CUSTOM_COLORS)
+    customColors.length < MAX_CUSTOM_COLORS
   ) {
     const element = updatedElements[index];
 
     if (
-      customColors.elementStroke.length < MAX_CUSTOM_COLORS &&
-      isCustomColor(element.strokeColor, "elementStroke") &&
-      !customColors.elementStroke.includes(element.strokeColor)
+      customColors.length < MAX_CUSTOM_COLORS &&
+      isCustomColor(element[colorType], type) &&
+      !customColors.includes(element[colorType])
     ) {
-      customColors.elementStroke.push(element.strokeColor);
+      customColors.push(element[colorType]);
     }
-    if (
-      customColors.elementBackground.length < MAX_CUSTOM_COLORS &&
-      isCustomColor(element.backgroundColor, "elementBackground") &&
-      !customColors.elementBackground.includes(element.backgroundColor)
-    ) {
-      customColors.elementBackground.push(element.backgroundColor);
-    }
+
     index++;
   }
+  return customColors;
+};
 
-  return customColors;
-};
-export const finalizeCustomColors = (
-  color: string,
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  type: "elementBackground" | "elementStroke",
-) => {
-  const customColors = appState.customColors[type].slice();
-  if (!appState.customColors[type].includes(color)) {
-    if (isCustomColor(color, type)) {
-      const index = getColorIndex(elements, appState, customColors, type);
-      if (index === -1) {
-        if (customColors.length === MAX_CUSTOM_COLORS) {
-          customColors.pop();
-        }
-      } else {
-        customColors.splice(index, 1);
-      }
-      customColors.unshift(color);
-    }
-  }
-  return customColors;
-};
 const isColorUsed = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -88,11 +65,8 @@ const isColorUsed = (
     elementBackground: "backgroundColor",
     elementStroke: "strokeColor",
   };
-  const used = sortByUpdate.some(
-    //@ts-ignore
-    (ele) => ele[elementAttr[type]] === color,
-  );
-  return used;
+  const colorType = elementAttr[type] as "backgroundColor" | "strokeColor";
+  return sortByUpdate.some((ele) => ele[colorType] === color);
 };
 
 const getColorIndex = (
@@ -161,7 +135,7 @@ const Picker = ({
   label: string;
   showInput: boolean;
   type: "canvasBackground" | "elementBackground" | "elementStroke";
-  customColors: string[];
+  customColors: Array<string>;
 }) => {
   const firstItem = React.useRef<HTMLButtonElement>();
   const activeItem = React.useRef<HTMLButtonElement>();
@@ -404,7 +378,8 @@ export const ColorPicker = ({
   label,
   isActive,
   setActive,
-  customColors = [],
+  elements,
+  appState,
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   color: string | null;
@@ -412,9 +387,40 @@ export const ColorPicker = ({
   label: string;
   isActive: boolean;
   setActive: (active: boolean) => void;
-  customColors?: Array<string>;
+  elements: readonly ExcalidrawElement[];
+  appState: AppState;
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
+  const [customColors, setCustomColors] = React.useState<string[]>([]);
+  useEffect(() => {
+    if (!isActive) {
+      return;
+    }
+    if (type !== "canvasBackground") {
+      setCustomColors(getCustomColors(elements, type));
+    }
+  }, [type, elements, isActive]);
+
+  const handleOnChange = (color: string) => {
+    if (type !== "canvasBackground") {
+      const colors = customColors.slice();
+      if (colors.includes(color)) {
+        if (isCustomColor(color, type)) {
+          const index = getColorIndex(elements, appState, colors, type);
+          if (index === -1) {
+            if (customColors.length === MAX_CUSTOM_COLORS) {
+              colors.pop();
+            }
+          } else {
+            colors.splice(index, 1);
+          }
+          colors.unshift(color);
+        }
+      }
+      setCustomColors(colors);
+    }
+    onChange(color);
+  };
 
   return (
     <div>
@@ -430,7 +436,7 @@ export const ColorPicker = ({
           color={color}
           label={label}
           onChange={(color) => {
-            onChange(color);
+            handleOnChange(color);
           }}
         />
       </div>
@@ -445,7 +451,7 @@ export const ColorPicker = ({
               colors={colors[type]}
               color={color || null}
               onChange={(changedColor) => {
-                onChange(changedColor);
+                handleOnChange(changedColor);
               }}
               onClose={() => {
                 setActive(false);

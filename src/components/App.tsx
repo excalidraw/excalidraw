@@ -248,7 +248,6 @@ import {
   isPointHittingLinkIcon,
   isLocalLink,
 } from "../element/Hyperlink";
-import { getCustomColors } from "./ColorPicker";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -794,10 +793,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const scene = restore(initialData, null, null);
-    const customColors = getCustomColors(scene.elements);
     scene.appState = {
       ...scene.appState,
-      customColors,
       elementType:
         scene.appState.elementType === "image"
           ? "selection"
@@ -1652,9 +1649,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.elements) {
-        this.setState({
-          customColors: getCustomColors(sceneData.elements),
-        });
         this.scene.replaceAllElements(sceneData.elements);
       }
 
