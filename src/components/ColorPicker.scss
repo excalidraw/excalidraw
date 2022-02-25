@@ -67,9 +67,12 @@
     &-title {
       color: $oc-gray-6;
       font-size: 15px;
-      padding: 0.5rem;
+      padding: 0 0.25rem;
     }
+
     &-colors {
+      padding: 0.5rem 0;
+
       .color-picker-swatch {
         margin: 0 0.25rem;
       }
