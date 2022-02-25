@@ -38,7 +38,11 @@ export const SelectedShapeActions = ({
   );
 
   let isSingleElementBoundContainer = false;
-  if (targetElements.length === 2 && hasBoundTextElement(targetElements[0])) {
+  if (
+    targetElements.length === 2 &&
+    (hasBoundTextElement(targetElements[0]) ||
+      hasBoundTextElement(targetElements[1]))
+  ) {
     isSingleElementBoundContainer = true;
   }
   const isEditing = Boolean(appState.editingElement);
