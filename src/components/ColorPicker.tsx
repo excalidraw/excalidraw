@@ -63,13 +63,11 @@ export const finalizeCustomColors = (
       if (index === -1) {
         if (customColors.length === MAX_CUSTOM_COLORS) {
           customColors.pop();
-          customColors.unshift(color);
-        } else {
-          customColors.push(color);
         }
       } else {
-        customColors[index] = color;
+        customColors.splice(index, 1);
       }
+      customColors.unshift(color);
     }
   }
   return customColors;
