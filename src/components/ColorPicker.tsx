@@ -20,20 +20,23 @@ export const getCustomColors = (elements: readonly ExcalidrawElement[]) => {
     elementStroke: [],
   } as AppState["customColors"];
 
-  elements.forEach((element) => {
-    if (
-      isCustomColor(element.strokeColor, "elementStroke") &&
-      !customColors.elementStroke.includes(element.strokeColor)
-    ) {
-      customColors.elementStroke.push(element.strokeColor);
-    }
-    if (
-      isCustomColor(element.backgroundColor, "elementBackground") &&
-      !customColors.elementBackground.includes(element.backgroundColor)
-    ) {
-      customColors.elementBackground.push(element.backgroundColor);
-    }
-  });
+  elements
+    .filter((element) => !element.isDeleted)
+    .sort((ele1, ele2) => ele2.updated - ele1.updated)
+    .forEach((element) => {
+      if (
+        isCustomColor(element.strokeColor, "elementStroke") &&
+        !customColors.elementStroke.includes(element.strokeColor)
+      ) {
+        customColors.elementStroke.push(element.strokeColor);
+      }
+      if (
+        isCustomColor(element.backgroundColor, "elementBackground") &&
+        !customColors.elementBackground.includes(element.backgroundColor)
+      ) {
+        customColors.elementBackground.push(element.backgroundColor);
+      }
+    });
   return customColors;
 };
 export const finalizeCustomColors = (
@@ -67,8 +70,10 @@ const isColorUsed = (
   type: "elementBackground" | "elementStroke",
 ) => {
   const sortByUpdate = elements
-    .slice()
-    .filter((ele) => !appState.selectedElementIds[ele.id])
+    .filter(
+      (element) =>
+        !element.isDeleted && !appState.selectedElementIds[element.id],
+    )
     .sort((ele1, ele2) => ele2.updated - ele1.updated);
   const elementAttr = {
     elementBackground: "backgroundColor",

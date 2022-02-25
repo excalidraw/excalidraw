@@ -12,27 +12,27 @@ import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
 import { isBoundToContainer } from "../element/typeChecks";
+import { getCustomColors } from "../components/ColorPicker";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
+  const updateElements = elements.map((el) => {
+    if (appState.selectedElementIds[el.id]) {
+      return newElementWith(el, { isDeleted: true });
+    }
+    if (isBoundToContainer(el) && appState.selectedElementIds[el.containerId]) {
+      return newElementWith(el, { isDeleted: true });
+    }
+    return el;
+  });
   return {
-    elements: elements.map((el) => {
-      if (appState.selectedElementIds[el.id]) {
-        return newElementWith(el, { isDeleted: true });
-      }
-      if (
-        isBoundToContainer(el) &&
-        appState.selectedElementIds[el.containerId]
-      ) {
-        return newElementWith(el, { isDeleted: true });
-      }
-      return el;
-    }),
+    elements: updateElements,
     appState: {
       ...appState,
       selectedElementIds: {},
+      customColors: getCustomColors(updateElements),
     },
   };
 };
