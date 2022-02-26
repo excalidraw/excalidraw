@@ -4,7 +4,7 @@ import { trackEvent } from "../analytics";
 
 export const actionToggleViewMode = register({
   name: "viewMode",
-  perform(elements, appState, app) {
+  perform(elements, appState, _, app) {
     //zsviczian
     trackEvent("view", "mode", "view");
     if (app.props.onViewModeChange) {
