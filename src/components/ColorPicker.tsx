@@ -110,10 +110,10 @@ const Picker = ({
   const colorInput = React.useRef<HTMLInputElement>();
 
   const [customColors] = React.useState(() => {
-    if (type !== "canvasBackground") {
-      return getCustomColors(elements, type);
+    if (type === "canvasBackground") {
+      return [];
     }
-    return [];
+    return getCustomColors(elements, type);
   });
 
   React.useEffect(() => {
