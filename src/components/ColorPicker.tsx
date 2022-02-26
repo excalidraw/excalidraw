@@ -367,10 +367,6 @@ export const ColorPicker = ({
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
 
-  const handleOnChange = (color: string) => {
-    onChange(color);
-  };
-
   return (
     <div>
       <div className="color-picker-control-container">
@@ -385,7 +381,7 @@ export const ColorPicker = ({
           color={color}
           label={label}
           onChange={(color) => {
-            handleOnChange(color);
+            onChange(color);
           }}
         />
       </div>
@@ -400,7 +396,7 @@ export const ColorPicker = ({
               colors={colors[type]}
               color={color || null}
               onChange={(changedColor) => {
-                handleOnChange(changedColor);
+                onChange(changedColor);
               }}
               onClose={() => {
                 setActive(false);
