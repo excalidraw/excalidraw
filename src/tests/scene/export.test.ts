@@ -1,6 +1,10 @@
 import { NonDeletedExcalidrawElement } from "../../element/types";
 import * as exportUtils from "../../scene/export";
-import { diamondFixture, ellipseFixture } from "../fixtures/elementFixture";
+import {
+  diamondFixture,
+  ellipseFixture,
+  rectangleWithLinkFixture,
+} from "../fixtures/elementFixture";
 
 describe("exportToSvg", () => {
   const ELEMENT_HEIGHT = 100;
@@ -108,6 +112,15 @@ describe("exportToSvg", () => {
         ...DEFAULT_OPTIONS,
         exportEmbedScene: true,
       },
+      null,
+    );
+    expect(svgElement.innerHTML).toMatchSnapshot();
+  });
+
+  it("with elements that have a link", async () => {
+    const svgElement = await exportUtils.exportToSvg(
+      [rectangleWithLinkFixture],
+      DEFAULT_OPTIONS,
       null,
     );
     expect(svgElement.innerHTML).toMatchSnapshot();
