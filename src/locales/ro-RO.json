@@ -64,6 +64,7 @@
     "cartoonist": "Caricaturist",
     "fileTitle": "Nume de fișier",
     "colorPicker": "Selector de culoare",
+    "canvasColors": "",
     "canvasBackground": "Fundalul pânzei",
     "drawingCanvas": "Pânză pentru desenat",
     "layers": "Straturi",
