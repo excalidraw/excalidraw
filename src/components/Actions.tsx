@@ -19,6 +19,7 @@ import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
+import { hasBoundTextElement } from "../element/typeChecks";
 
 export const SelectedShapeActions = ({
   appState,
@@ -35,6 +36,15 @@ export const SelectedShapeActions = ({
     getNonDeletedElements(elements),
     appState,
   );
+
+  let isSingleElementBoundContainer = false;
+  if (
+    targetElements.length === 2 &&
+    (hasBoundTextElement(targetElements[0]) ||
+      hasBoundTextElement(targetElements[1]))
+  ) {
+    isSingleElementBoundContainer = true;
+  }
   const isEditing = Boolean(appState.editingElement);
   const isMobile = useIsMobile();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
@@ -117,7 +127,7 @@ export const SelectedShapeActions = ({
         </div>
       </fieldset>
 
-      {targetElements.length > 1 && (
+      {targetElements.length > 1 && !isSingleElementBoundContainer && (
         <fieldset>
           <legend>{t("labels.align")}</legend>
           <div className="buttonList">
