@@ -64,6 +64,7 @@
     "cartoonist": "كرتوني",
     "fileTitle": "إسم الملف",
     "colorPicker": "منتقي اللون",
+    "canvasColors": "",
     "canvasBackground": "خلفية اللوحة",
     "drawingCanvas": "لوحة الرسم",
     "layers": "الطبقات",
