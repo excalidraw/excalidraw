@@ -64,6 +64,7 @@
     "cartoonist": "Karikatúrás",
     "fileTitle": "",
     "colorPicker": "Színválasztó",
+    "canvasColors": "",
     "canvasBackground": "Vászon háttérszíne",
     "drawingCanvas": "Rajzvászon",
     "layers": "Rétegek",
