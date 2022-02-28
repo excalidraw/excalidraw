@@ -64,6 +64,7 @@
     "cartoonist": "Карикатурист",
     "fileTitle": "Назва файла",
     "colorPicker": "Палітра кольорів",
+    "canvasColors": "",
     "canvasBackground": "Тло полотна",
     "drawingCanvas": "Полотно",
     "layers": "Шари",
