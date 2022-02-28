@@ -26,7 +26,7 @@ export const actionChangeViewBackgroundColor = register({
       commitToHistory: !!value.viewBackgroundColor,
     };
   },
-  PanelComponent: ({ appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData }) => {
     return (
       <div style={{ position: "relative" }}>
         <ColorPicker
@@ -40,6 +40,8 @@ export const actionChangeViewBackgroundColor = register({
           }
           data-testid="canvas-background-picker"
           colorPalette={appState.colorPalette} //zsviczian
+          elements={elements}
+          appState={appState}
         />
       </div>
     );
