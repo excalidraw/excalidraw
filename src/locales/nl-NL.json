@@ -64,6 +64,7 @@
     "cartoonist": "Cartoonist",
     "fileTitle": "Bestandsnaam",
     "colorPicker": "Kleurenkiezer",
+    "canvasColors": "",
     "canvasBackground": "Canvas achtergrond",
     "drawingCanvas": "Canvas",
     "layers": "Lagen",
