@@ -64,6 +64,7 @@
     "cartoonist": "Карикатурист",
     "fileTitle": "Имя файла",
     "colorPicker": "Выбор цвета",
+    "canvasColors": "",
     "canvasBackground": "Фон холста",
     "drawingCanvas": "Полотно",
     "layers": "Слои",
