@@ -64,6 +64,7 @@
     "cartoonist": "Fumettista",
     "fileTitle": "Nome del file",
     "colorPicker": "Selettore colore",
+    "canvasColors": "",
     "canvasBackground": "Sfondo tela",
     "drawingCanvas": "Area di disegno",
     "layers": "Livelli",
