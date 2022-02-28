@@ -64,6 +64,7 @@
     "cartoonist": "Serietecknare",
     "fileTitle": "Filnamn",
     "colorPicker": "Färgväljare",
+    "canvasColors": "",
     "canvasBackground": "Canvas-bakgrund",
     "drawingCanvas": "Ritar canvas",
     "layers": "Lager",
