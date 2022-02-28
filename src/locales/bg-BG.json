@@ -64,6 +64,7 @@
     "cartoonist": "Карикатурист",
     "fileTitle": "Име на файл",
     "colorPicker": "Избор на цвят",
+    "canvasColors": "",
     "canvasBackground": "Фон на платно",
     "drawingCanvas": "Платно за рисуване",
     "layers": "Слоеве",
