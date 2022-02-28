@@ -64,6 +64,7 @@
     "cartoonist": "Rysunkowy",
     "fileTitle": "Nazwa pliku",
     "colorPicker": "Paleta kolorów",
+    "canvasColors": "",
     "canvasBackground": "Kolor dokumentu",
     "drawingCanvas": "Obszar roboczy",
     "layers": "Warstwy",
