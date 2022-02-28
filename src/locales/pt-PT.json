@@ -64,6 +64,7 @@
     "cartoonist": "Caricaturista",
     "fileTitle": "Nome do ficheiro",
     "colorPicker": "Seletor de cores",
+    "canvasColors": "",
     "canvasBackground": "Fundo da área de desenho",
     "drawingCanvas": "Área de desenho",
     "layers": "Camadas",
