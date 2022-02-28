@@ -64,6 +64,7 @@
     "cartoonist": "卡通",
     "fileTitle": "檔案名稱",
     "colorPicker": "色彩選擇工具",
+    "canvasColors": "",
     "canvasBackground": "Canvas 背景",
     "drawingCanvas": "繪圖 canvas",
     "layers": "圖層",
