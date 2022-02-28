@@ -64,6 +64,7 @@
     "cartoonist": "Caricaturiste",
     "fileTitle": "Nom du fichier",
     "colorPicker": "Sélecteur de couleur",
+    "canvasColors": "",
     "canvasBackground": "Arrière-plan du canevas",
     "drawingCanvas": "Zone de dessin",
     "layers": "Calques",
