@@ -64,6 +64,7 @@
     "cartoonist": "漫画家",
     "fileTitle": "文件名",
     "colorPicker": "调色盘",
+    "canvasColors": "",
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
     "layers": "图层",
