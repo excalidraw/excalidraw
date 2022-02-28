@@ -64,6 +64,7 @@
     "cartoonist": "Teiknar",
     "fileTitle": "Filnamn",
     "colorPicker": "Fargeveljar",
+    "canvasColors": "",
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
     "layers": "Lag",
