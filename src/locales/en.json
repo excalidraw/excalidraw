@@ -64,6 +64,7 @@
     "cartoonist": "Cartoonist",
     "fileTitle": "File name",
     "colorPicker": "Color picker",
+    "canvasColors": "Used on canvas",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing canvas",
     "layers": "Layers",

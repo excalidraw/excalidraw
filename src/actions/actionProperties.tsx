@@ -233,6 +233,8 @@ export const actionChangeStrokeColor = register({
         setActive={(active) =>
           updateData({ openPopup: active ? "strokeColorPicker" : null })
         }
+        elements={elements}
+        appState={appState}
       />
     </>
   ),
@@ -273,6 +275,8 @@ export const actionChangeBackgroundColor = register({
         setActive={(active) =>
           updateData({ openPopup: active ? "backgroundColorPicker" : null })
         }
+        elements={elements}
+        appState={appState}
       />
     </>
   ),
