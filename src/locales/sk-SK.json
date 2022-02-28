@@ -64,6 +64,7 @@
     "cartoonist": "Ilustrátor",
     "fileTitle": "Názov súboru",
     "colorPicker": "Výber farby",
+    "canvasColors": "",
     "canvasBackground": "Pozadie plátna",
     "drawingCanvas": "Kresliace plátno",
     "layers": "Vrstvy",
