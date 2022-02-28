@@ -64,6 +64,7 @@
     "cartoonist": "Dibuixant",
     "fileTitle": "Nom del fitxer",
     "colorPicker": "Selector de colors",
+    "canvasColors": "",
     "canvasBackground": "Fons del llenç",
     "drawingCanvas": "Llenç de dibuix",
     "layers": "Capes",
