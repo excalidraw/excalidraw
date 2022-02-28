@@ -66,8 +66,8 @@ export const actionPasteStyles = register({
             });
 
             redrawTextBoundingBox(
-              element,
-              getContainerElement(element),
+              newElement,
+              getContainerElement(newElement),
               appState,
             );
           }
