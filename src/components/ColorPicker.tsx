@@ -16,6 +16,7 @@ const MAX_DEFAULT_COLORS = 15;
 export const getCustomColors = (
   elements: readonly ExcalidrawElement[],
   type: "elementBackground" | "elementStroke",
+  colors: string[], //zsviczian
 ) => {
   const customColors: string[] = [];
   const updatedElements = elements
@@ -38,7 +39,7 @@ export const getCustomColors = (
 
     if (
       customColors.length < MAX_CUSTOM_COLORS &&
-      isCustomColor(element[colorType], type) &&
+      isCustomColor(element[colorType], colors) && //zsviczian
       !customColors.includes(element[colorType])
     ) {
       customColors.push(element[colorType]);
@@ -50,9 +51,10 @@ export const getCustomColors = (
 
 const isCustomColor = (
   color: string,
-  type: "elementBackground" | "elementStroke",
+  //type: "elementBackground" | "elementStroke", //zsviczian
+  colors: string[], //zsviczian
 ) => {
-  return !colors[type].includes(color);
+  return !colors.includes(color); //zsviczian
 };
 
 const isValidColor = (color: string) => {
@@ -115,7 +117,7 @@ const Picker = ({
     if (type === "canvasBackground") {
       return [];
     }
-    return getCustomColors(elements, type);
+    return getCustomColors(elements, type, colors); //zsviczian
   });
 
   React.useEffect(() => {
