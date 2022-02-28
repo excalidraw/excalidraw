@@ -64,6 +64,7 @@
     "cartoonist": "Karikaturist",
     "fileTitle": "Dateiname",
     "colorPicker": "Farbauswähler",
+    "canvasColors": "",
     "canvasBackground": "Zeichenflächenhintergrund",
     "drawingCanvas": "Leinwand",
     "layers": "Ebenen",
