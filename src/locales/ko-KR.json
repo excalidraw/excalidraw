@@ -64,6 +64,7 @@
     "cartoonist": "만화가",
     "fileTitle": "파일 이름",
     "colorPicker": "색상 선택기",
+    "canvasColors": "",
     "canvasBackground": "캔버스 배경",
     "drawingCanvas": "캔버스 그리기",
     "layers": "레이어",
