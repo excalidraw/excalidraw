@@ -64,6 +64,7 @@
     "cartoonist": "Kartunis",
     "fileTitle": "Nama file",
     "colorPicker": "Pilihan Warna",
+    "canvasColors": "",
     "canvasBackground": "Latar Kanvas",
     "drawingCanvas": "Kanvas",
     "layers": "Lapisan",
