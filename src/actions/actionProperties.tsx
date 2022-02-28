@@ -241,6 +241,8 @@ export const actionChangeStrokeColor = register({
               updateData({ openPopup: active ? "strokeColorPicker" : null })
             }
             colorPalette={appState.colorPalette} //zsviczian
+            elements={elements}
+            appState={appState}
           />
         </div>
       </div>
@@ -291,6 +293,8 @@ export const actionChangeBackgroundColor = register({
               updateData({ openPopup: active ? "backgroundColorPicker" : null })
             }
             colorPalette={appState.colorPalette} //zsviczian
+            elements={elements}
+            appState={appState}
           />
         </div>
       </div>
