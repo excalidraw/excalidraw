@@ -64,6 +64,7 @@
     "cartoonist": "Σκιτσογράφος",
     "fileTitle": "Όνομα αρχείου",
     "colorPicker": "Επιλογή Χρώματος",
+    "canvasColors": "",
     "canvasBackground": "Φόντο καμβά",
     "drawingCanvas": "Σχεδίαση καμβά",
     "layers": "Στρώματα",
