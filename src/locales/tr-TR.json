@@ -64,6 +64,7 @@
     "cartoonist": "Karikatürist",
     "fileTitle": "Dosya adı",
     "colorPicker": "Renk seçici",
+    "canvasColors": "",
     "canvasBackground": "Tuval arka planı",
     "drawingCanvas": "Çizim tuvali",
     "layers": "Katmanlar",
