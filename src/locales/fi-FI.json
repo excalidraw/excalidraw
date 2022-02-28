@@ -64,6 +64,7 @@
     "cartoonist": "Sarjakuva",
     "fileTitle": "Tiedostonimi",
     "colorPicker": "Värin valinta",
+    "canvasColors": "",
     "canvasBackground": "Piirtoalueen tausta",
     "drawingCanvas": "Piirtoalue",
     "layers": "Tasot",
