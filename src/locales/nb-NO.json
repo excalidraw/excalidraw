@@ -64,6 +64,7 @@
     "cartoonist": "Tegner",
     "fileTitle": "Filnavn",
     "colorPicker": "Fargevelger",
+    "canvasColors": "",
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
     "layers": "Lag",
