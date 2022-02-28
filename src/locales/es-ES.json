@@ -64,6 +64,7 @@
     "cartoonist": "Caricatura",
     "fileTitle": "Nombre del archivo",
     "colorPicker": "Selector de color",
+    "canvasColors": "",
     "canvasBackground": "Fondo del lienzo",
     "drawingCanvas": "Lienzo de dibujo",
     "layers": "Capas",
