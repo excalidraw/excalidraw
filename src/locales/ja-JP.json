@@ -64,6 +64,7 @@
     "cartoonist": "漫画風",
     "fileTitle": "ファイル名",
     "colorPicker": "色選択",
+    "canvasColors": "",
     "canvasBackground": "キャンバスの背景",
     "drawingCanvas": "キャンバスの描画",
     "layers": "レイヤー",
