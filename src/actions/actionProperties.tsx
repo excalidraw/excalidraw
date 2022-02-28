@@ -30,6 +30,9 @@ import {
   TextAlignCenterIcon,
   TextAlignLeftIcon,
   TextAlignRightIcon,
+  AlignTopIcon,
+  CenterVerticallyIcon,
+  AlignBottomIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -58,6 +61,7 @@ import {
   ExcalidrawTextElement,
   FontFamilyValues,
   TextAlign,
+  VerticalAlign,
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
 import { KEYS } from "../keys";
@@ -709,9 +713,7 @@ export const actionChangeTextAlign = register({
           if (isTextElement(oldElement)) {
             const newElement: ExcalidrawTextElement = newElementWith(
               oldElement,
-              {
-                textAlign: value,
-              },
+              { textAlign: value },
             );
             redrawTextBoundingBox(
               newElement,
@@ -732,47 +734,116 @@ export const actionChangeTextAlign = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.textAlign")}</legend>
-      <ButtonIconSelect<TextAlign | false>
-        group="text-align"
-        options={[
-          {
-            value: "left",
-            text: t("labels.left"),
-            icon: <TextAlignLeftIcon theme={appState.theme} />,
-          },
-          {
-            value: "center",
-            text: t("labels.center"),
-            icon: <TextAlignCenterIcon theme={appState.theme} />,
-          },
-          {
-            value: "right",
-            text: t("labels.right"),
-            icon: <TextAlignRightIcon theme={appState.theme} />,
-          },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => {
-            if (isTextElement(element)) {
-              return element.textAlign;
-            }
+  PanelComponent: ({ elements, appState, updateData }) => {
+    return (
+      <fieldset>
+        <legend>{t("labels.textAlign")}</legend>
+        <ButtonIconSelect<TextAlign | false>
+          group="text-align"
+          options={[
+            {
+              value: "left",
+              text: t("labels.left"),
+              icon: <TextAlignLeftIcon theme={appState.theme} />,
+            },
+            {
+              value: "center",
+              text: t("labels.center"),
+              icon: <TextAlignCenterIcon theme={appState.theme} />,
+            },
+            {
+              value: "right",
+              text: t("labels.right"),
+              icon: <TextAlignRightIcon theme={appState.theme} />,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.textAlign;
+              }
+              const boundTextElement = getBoundTextElement(element);
+              if (boundTextElement) {
+                return boundTextElement.textAlign;
+              }
+              return null;
+            },
+            appState.currentItemTextAlign,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    );
+  },
+});
+export const actionChangeTextVerticalAlign = register({
+  name: "changeTextVerticalAlign",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(
+        elements,
+        appState,
+        (oldElement) => {
+          if (isTextElement(oldElement)) {
+            const newElement: ExcalidrawTextElement = newElementWith(
+              oldElement,
+              { verticalAlign: value },
+            );
+
+            redrawTextBoundingBox(
+              newElement,
+              getContainerElement(oldElement),
+              appState,
+            );
+            return newElement;
+          }
+
+          return oldElement;
+        },
+        true,
+      ),
+      appState: {
+        ...appState,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    return (
+      <fieldset>
+        <ButtonIconSelect<VerticalAlign | false>
+          group="text-align"
+          options={[
+            {
+              value: "top",
+              text: t("labels.alignTop"),
+              icon: <AlignTopIcon theme={appState.theme} />,
+            },
+            {
+              value: "middle",
+              text: t("labels.centerVertically"),
+              icon: <CenterVerticallyIcon theme={appState.theme} />,
+            },
+            {
+              value: "bottom",
+              text: t("labels.alignBottom"),
+              icon: <AlignBottomIcon theme={appState.theme} />,
+            },
+          ]}
+          value={getFormValue(elements, appState, (element) => {
             const boundTextElement = getBoundTextElement(element);
             if (boundTextElement) {
-              return boundTextElement.textAlign;
+              return boundTextElement.verticalAlign;
             }
             return null;
-          },
-          appState.currentItemTextAlign,
-        )}
-        onChange={(value) => updateData(value)}
-      />
-    </fieldset>
-  ),
+          })}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeSharpness = register({

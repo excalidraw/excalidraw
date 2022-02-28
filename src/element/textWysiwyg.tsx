@@ -105,6 +105,8 @@ export const textWysiwyg = ({
     const updatedElement = Scene.getScene(element)?.getElement(
       id,
     ) as ExcalidrawTextElement;
+    const { textAlign, verticalAlign } = updatedElement;
+
     const approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
@@ -160,11 +162,16 @@ export const textWysiwyg = ({
         // is reached
         else {
           // vertically center align the text
-          coordY = container.y + container.height / 2 - height / 2;
+          if (verticalAlign === "middle") {
+            coordY = container.y + container.height / 2 - height / 2;
+          }
+          if (verticalAlign === "bottom") {
+            coordY =
+              container.y + container.height - height - BOUND_TEXT_PADDING;
+          }
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
-      const { textAlign } = updatedElement;
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
       const initialLength = editable.value.length;
@@ -212,6 +219,7 @@ export const textWysiwyg = ({
           editorMaxHeight,
         ),
         textAlign,
+        verticalAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
         filter: "var(--theme-filter)",

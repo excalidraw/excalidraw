@@ -264,7 +264,11 @@ const drawElementOnCanvas = (
         const lineHeight = element.containerId
           ? getApproxLineHeight(getFontString(element))
           : element.height / lines.length;
-        const verticalOffset = element.height - element.baseline;
+        let verticalOffset = element.height - element.baseline;
+        if (element.verticalAlign === "bottom") {
+          verticalOffset = 0;
+        }
+
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2

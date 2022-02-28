@@ -39,11 +39,19 @@ export const redrawTextBoundingBox = (
   let coordY = element.y;
   // Resize container and vertically center align the text
   if (container) {
-    coordY = container.y + container.height / 2 - metrics.height / 2;
     let nextHeight = container.height;
-    if (metrics.height > container.height - BOUND_TEXT_PADDING * 2) {
-      nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
-      coordY = container.y + nextHeight / 2 - metrics.height / 2;
+
+    if (element.verticalAlign === "top") {
+      coordY = container.y + BOUND_TEXT_PADDING;
+    } else if (element.verticalAlign === "bottom") {
+      coordY =
+        container.y + container.height - metrics.height - BOUND_TEXT_PADDING;
+    } else {
+      coordY = container.y + container.height / 2 - metrics.height / 2;
+      if (metrics.height > container.height - BOUND_TEXT_PADDING * 2) {
+        nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
+        coordY = container.y + nextHeight / 2 - metrics.height / 2;
+      }
     }
     mutateElement(container, { height: nextHeight });
   }
@@ -142,7 +150,14 @@ export const handleBindTextResize = (
         });
       }
 
-      const updatedY = element.y + containerHeight / 2 - nextHeight / 2;
+      let updatedY;
+      if (textElement.verticalAlign === "top") {
+        updatedY = element.y + BOUND_TEXT_PADDING;
+      } else if (textElement.verticalAlign === "bottom") {
+        updatedY = element.y + element.height - nextHeight - BOUND_TEXT_PADDING;
+      } else {
+        updatedY = element.y + element.height / 2 - nextHeight / 2;
+      }
 
       mutateElement(textElement, {
         text,
