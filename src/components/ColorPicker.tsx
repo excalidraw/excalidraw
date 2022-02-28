@@ -7,6 +7,8 @@ import { isArrowKey, KEYS } from "../keys";
 import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
+import { PopoverModal } from "./PopoverModal";
+import { useExcalidrawContainer } from "./App";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -239,6 +241,32 @@ const ColorInput = React.forwardRef(
   },
 );
 
+const isInViewport = (element: HTMLElement): Boolean => {
+  const rect = element.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <=
+      (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+};
+
+const popupContainerNode = new WeakMap<HTMLElement, HTMLDivElement>();
+
+const getpopupContainerNode = (container: HTMLElement): HTMLDivElement => {
+  let popupModalNode = popupContainerNode.get(container);
+  if (popupModalNode) {
+    return popupModalNode;
+  }
+  popupModalNode = document.createElement("div");
+  container
+    .querySelector(".excalidraw-popupContainer")!
+    .appendChild(popupModalNode);
+  popupContainerNode.set(container, popupModalNode);
+  return popupModalNode;
+};
+
 export const ColorPicker = ({
   type,
   color,
@@ -254,10 +282,32 @@ export const ColorPicker = ({
   isActive: boolean;
   setActive: (active: boolean) => void;
 }) => {
+  const topPixels = {
+    canvasBackground: 102,
+    elementStroke: 190,
+    elementBackground: 250,
+  };
   const pickerButton = React.useRef<HTMLButtonElement>(null);
+  const colorPickerContainer = React.useRef<HTMLDivElement>(null);
+  const { container: excalidrawContainer } = useExcalidrawContainer();
+
+  let popupModalNode = null;
+  let top;
+  let left;
+  if (
+    colorPickerContainer.current &&
+    isInViewport(colorPickerContainer.current)
+  ) {
+    popupModalNode = colorPickerContainer.current;
+  } else if (excalidrawContainer) {
+    popupModalNode = getpopupContainerNode(excalidrawContainer);
+    const container = excalidrawContainer.getBoundingClientRect();
+    top = topPixels[type] - container.x;
+    left = 10;
+  }
 
   return (
-    <div>
+    <div ref={colorPickerContainer}>
       <div className="color-picker-control-container">
         <button
           className="color-picker-label-swatch"
@@ -276,26 +326,30 @@ export const ColorPicker = ({
       </div>
       <React.Suspense fallback="">
         {isActive ? (
-          <Popover
-            onCloseRequest={(event) =>
-              event.target !== pickerButton.current && setActive(false)
-            }
-          >
-            <Picker
-              colors={colors[type]}
-              color={color || null}
-              onChange={(changedColor) => {
-                onChange(changedColor);
-              }}
-              onClose={() => {
-                setActive(false);
-                pickerButton.current?.focus();
-              }}
-              label={label}
-              showInput={false}
-              type={type}
-            />
-          </Popover>
+          <PopoverModal container={popupModalNode}>
+            <Popover
+              onCloseRequest={(event) =>
+                event.target !== pickerButton.current && setActive(false)
+              }
+              top={top}
+              left={left}
+            >
+              <Picker
+                colors={colors[type]}
+                color={color || null}
+                onChange={(changedColor) => {
+                  onChange(changedColor);
+                }}
+                onClose={() => {
+                  setActive(false);
+                  pickerButton.current?.focus();
+                }}
+                label={label}
+                showInput={false}
+                type={type}
+              />
+            </Popover>
+          </PopoverModal>
         ) : null}
       </React.Suspense>
     </div>
