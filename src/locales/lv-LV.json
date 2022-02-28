@@ -64,6 +64,7 @@
     "cartoonist": "Karikatūrists",
     "fileTitle": "Datnes nosaukums",
     "colorPicker": "Krāsu atlasītājs",
+    "canvasColors": "",
     "canvasBackground": "Ainas fons",
     "drawingCanvas": "Tāfele",
     "layers": "Slāņi",
