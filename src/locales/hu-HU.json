@@ -172,30 +172,30 @@
     "cannotRestoreFromImage": "A jelenet visszaállítása nem sikerült ebből a kép fájlból",
     "invalidSceneUrl": "Nem sikerült importálni a jelenetet a megadott URL-ről. Rossz formátumú, vagy nem tartalmaz érvényes Excalidraw JSON-adatokat.",
     "resetLibrary": "Ezzel törlöd a könyvtárát. biztos vagy ebben?",
-    "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "removeItemsFromsLibrary": "{{count}} elemet törölsz a könyvtárból?",
+    "invalidEncryptionKey": "A titkosítási kulcsnak 22 karakterből kell állnia. Az élő együttműködés le van tiltva."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "unsupportedFileType": "Nem támogatott fájltípus.",
+    "imageInsertError": "Nem sikerült beszúrni a képet. Próbáld újra később...",
+    "fileTooBig": "A fájl túl nagy. A megengedett maximális méret {{maxSize}}.",
+    "svgImageInsertError": "Nem sikerült beszúrni az SVG-képet. Az SVG szintaktika érvénytelennek tűnik.",
+    "invalidSVGString": "Érvénytelen SVG."
   },
   "toolBar": {
     "selection": "Kijelölés",
-    "image": "",
+    "image": "Kép beszúrása",
     "rectangle": "Téglalap",
     "diamond": "Rombusz",
     "ellipse": "Ellipszis",
     "arrow": "Nyíl",
     "line": "Vonal",
-    "freedraw": "",
+    "freedraw": "Rajzolás",
     "text": "Szöveg",
     "library": "Könyvtár",
     "lock": "Rajzolás után az aktív eszközt tartsa kijelölve",
-    "penMode": "",
-    "link": ""
+    "penMode": "Akadályozza meg a kicsinyítést, és csak tollról fogadja el a szabadkézi bevitelt",
+    "link": "Hivatkozás hozzáadása/frissítése a kiválasztott alakzathoz"
   },
   "headings": {
     "canvasActions": "Vászon műveletek",
@@ -299,50 +299,50 @@
     "githubUsername": "",
     "twitterUsername": "",
     "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "libraryDesc": "Könyvtár leírása",
+    "website": "Weboldal",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "authorName": "Neved vagy felhasználóneved",
+      "libraryName": "A könyvtárad neve",
+      "libraryDesc": "A könyvtárad használatát segítő leírás",
+      "githubHandle": "GitHub-handle(opcionális), így szerkesztheted a könyvtárat, miután elküldted ellenőrzésre",
+      "twitterHandle": "Twitter-felhasználónév (opcionális), így tudjuk, kinek kell jóváírni a Twitteren keresztüli reklámozást",
+      "website": "Hivatkozás személyes webhelyedre vagy máshová (nem kötelező)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Kötelező",
+      "website": "Adj meg egy érvényes URL-t"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Küld be könyvtáradat, hogy bekerüljön a ",
+      "link": "nyilvános könyvtár tárolóba",
+      "post": "hogy mások is felhasználhassák a rajzaikban."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "A könyvtárat először manuálisan kell jóváhagyni. Kérjük, olvassa el a ",
+      "link": "segédletet",
+      "post": " benyújtása előtt. Szüksége lesz egy GitHub-fiókra a kommunikációhoz és a módosításokhoz, ha kérik, de ez nem feltétlenül szükséges."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "A beküldéssel elfogadja, hogy a könyvtár a következő alatt kerül közzétételre ",
+      "link": "MIT Licensz ",
+      "post": "ami röviden azt jelenti, hogy bárki korlátozás nélkül használhatja őket."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Minden könyvtárelemnek saját nevével kell rendelkeznie, hogy szűrhető legyen. A következő könyvtári tételek kerülnek bele:",
+    "atleastOneLibItem": "A kezdéshez válassz ki legalább egy könyvtári elemet"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "A könyvtár beküldve",
+    "content": "Köszönjük {{authorName}}. Könyvtáradat elküldtük felülvizsgálatra. Nyomon követheted az állapotot",
+    "link": "itt"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Könyvtár alaphelyzetbe állítása",
+    "removeItemsFromLib": "A kiválasztott elemek eltávolítása a könyvtárból"
   },
   "encrypted": {
     "tooltip": "A rajzaidat végpontok közötti titkosítással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni.",
-    "link": ""
+    "link": "Blogbejegyzés a végpontok közötti titkosításról az Excalidraw-ban"
   },
   "stats": {
     "angle": "Szög",
@@ -354,34 +354,34 @@
     "storage": "Tárhely",
     "title": "Statisztikák",
     "total": "Összesen",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Verzió",
+    "versionCopy": "Kattints a másoláshoz",
+    "versionNotAvailable": "A verzió nem elérhető",
     "width": "Szélesség"
   },
   "toast": {
-    "addedToLibrary": "",
-    "copyStyles": "",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": ""
+    "addedToLibrary": "Könyvtárhoz adva",
+    "copyStyles": "Másolt stílusok.",
+    "copyToClipboard": "Vágólapra másolva.",
+    "copyToClipboardAsPng": "Az {{exportSelection}} PNG formátumban a vágólapra másolva \n({{exportColorScheme}})",
+    "fileSaved": "Fájl elmentve.",
+    "fileSavedToFilename": "Mentve mint {filename}",
+    "canvas": "rajzvászon",
+    "selection": "kijelölés"
   },
   "colors": {
-    "ffffff": "",
-    "f8f9fa": "",
-    "f1f3f5": "",
-    "fff5f5": "",
-    "fff0f6": "",
-    "f8f0fc": "",
-    "f3f0ff": "",
-    "edf2ff": "",
-    "e7f5ff": "",
-    "e3fafc": "",
-    "e6fcf5": "",
-    "ebfbee": "",
+    "ffffff": "Fehér",
+    "f8f9fa": "Szürke 0",
+    "f1f3f5": "Szürke 1",
+    "fff5f5": "Piros 0",
+    "fff0f6": "Pink 0",
+    "f8f0fc": "Szőlő 0",
+    "f3f0ff": "Ibolya 0",
+    "edf2ff": "Indigó 0",
+    "e7f5ff": "Kék 0",
+    "e3fafc": "Cián 0",
+    "e6fcf5": "Kékes-zöld 0",
+    "ebfbee": "Zöld 0",
     "f4fce3": "",
     "fff9db": "",
     "fff4e6": "",
