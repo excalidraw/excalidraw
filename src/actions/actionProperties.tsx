@@ -38,6 +38,7 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
+  VERTICAL_ALIGN,
 } from "../constants";
 import {
   getNonDeletedElements,
@@ -817,17 +818,17 @@ export const actionChangeTextVerticalAlign = register({
           group="text-align"
           options={[
             {
-              value: "top",
+              value: VERTICAL_ALIGN.TOP,
               text: t("labels.alignTop"),
               icon: <TextAlignTopIcon theme={appState.theme} />,
             },
             {
-              value: "middle",
+              value: VERTICAL_ALIGN.MIDDLE,
               text: t("labels.centerVertically"),
               icon: <TextAlignMiddleIcon theme={appState.theme} />,
             },
             {
-              value: "bottom",
+              value: VERTICAL_ALIGN.BOTTOM,
               text: t("labels.alignBottom"),
               icon: <TextAlignBottomIcon theme={appState.theme} />,
             },

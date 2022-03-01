@@ -7,7 +7,7 @@ import {
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
-import { CLASSES, BOUND_TEXT_PADDING } from "../constants";
+import { CLASSES, BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -162,10 +162,10 @@ export const textWysiwyg = ({
         // is reached
         else {
           // vertically center align the text
-          if (verticalAlign === "middle") {
+          if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
             coordY = container.y + container.height / 2 - height / 2;
           }
-          if (verticalAlign === "bottom") {
+          if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
             coordY =
               container.y + container.height - height - BOUND_TEXT_PADDING;
           }
