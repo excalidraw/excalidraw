@@ -203,24 +203,24 @@
     "shapes": "Alakzatok"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "A vászon mozgatásához tartsd lenyomva az egér görgőjét vagy a szóköz billentyűt húzás közben",
     "linearElement": "Kattintással görbe, az eger húzásával pedig egyenes nyilat rajzolhatsz",
     "freeDraw": "Kattints és húzd, majd engedd el, amikor végeztél",
     "text": "Tipp: A kijelölés eszközzel a dupla kattintás új szöveget hoz létre",
-    "text_selected": "",
-    "text_editing": "",
+    "text_selected": "Kattints duplán, vagy nyomj entert a szöveg szerkesztéséhez",
+    "text_editing": "Nyomjd meg az Escape vagy a Ctrl/Cmd+ENTER billentyűkombinációt a szerkesztés befejezéséhez",
     "linearElementMulti": "Kattints a következő ív pozíciójára, vagy fejezd be a nyilat az Escape vagy Enter megnyomásával",
     "lockAngle": "A SHIFT billentyű lenyomva tartásával korlátozhatja forgatás szögét",
     "resize": "A SHIFT billentyű lenyomva tartásával az átméretezés megtartja az arányokat,\naz ALT lenyomva tartásával pedig a középpont egy helyben marad",
-    "resizeImage": "",
+    "resizeImage": "A SHIFT billentyű lenyomva tartásával szabadon átméretezheted,\ntartsd lenyomva az ALT billentyűt a középről való átméretezéshez",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
     "lineEditor_info": "Kattints duplán, vagy nyomj entert a pontok szerkesztéséhez",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
-    "placeImage": "",
-    "publishLibrary": "",
-    "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "lineEditor_pointSelected": "Nyomd meg a Törlés gombot a pont(ok) eltávolításához,\nA Ctrl/Cmd+D a többszörözéshez, vagy húzással mozgathatja",
+    "lineEditor_nothingSelected": "Válaszd ki a szerkeszteni kívánt pontot (több kijelöléséhez tartsd lenyomva a SHIFT billentyűt),\nvagy Alt, és kattintson az új pontok hozzáadásához",
+    "placeImage": "Kattints a kép elhelyezéséhez, vagy kattints és méretezd manuálisan",
+    "publishLibrary": "Tedd közzé saját könyvtáradat",
+    "bindTextToElement": "Nyomd meg az Entert szöveg hozzáadáshoz",
+    "deepBoxSelect": "Tartsd lenyomva a Ctrl/Cmd billentyűt a mély kijelöléshez és a húzás megakadályozásához"
   },
   "canvasError": {
     "cannotShowPreview": "Előnézet nem jeleníthető meg",
@@ -248,20 +248,20 @@
     "desc_inProgressIntro": "Az élő együttműködési munkamenet folyamatban van.",
     "desc_shareLink": "Ossza meg ezt a linket bárkivel, akivel együtt szeretne működni:",
     "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon.",
-    "shareTitle": ""
+    "shareTitle": "Csatlakozás egy élő együttműködési munkamenethez az Excalidraw-ban"
   },
   "errorDialog": {
     "title": "Hiba"
   },
   "exportDialog": {
-    "disk_title": "",
-    "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": "",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
+    "disk_title": "Mentés lemezre",
+    "disk_details": "Exportálja a jelenetadatokat egy fájlba, amelyből később importálhatja.",
+    "disk_button": "Mentés fájlba",
+    "link_title": "Megosztható hivatkozás",
+    "link_details": "Exportálás csak olvasható hivatkozásként.",
+    "link_button": "Exportálás hivatkozásba",
+    "excalidrawplus_description": "Mentse el a jelenetet az Excalidraw+ munkaterületére.",
+    "excalidrawplus_button": "Exportálás",
     "excalidrawplus_exportError": ""
   },
   "helpDialog": {
