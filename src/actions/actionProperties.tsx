@@ -30,9 +30,9 @@ import {
   TextAlignCenterIcon,
   TextAlignLeftIcon,
   TextAlignRightIcon,
-  AlignTopIcon,
-  CenterVerticallyIcon,
-  AlignBottomIcon,
+  TextAlignTopIcon,
+  TextAlignBottomIcon,
+  TextAlignMiddleIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -819,17 +819,17 @@ export const actionChangeTextVerticalAlign = register({
             {
               value: "top",
               text: t("labels.alignTop"),
-              icon: <AlignTopIcon theme={appState.theme} />,
+              icon: <TextAlignTopIcon theme={appState.theme} />,
             },
             {
               value: "middle",
               text: t("labels.centerVertically"),
-              icon: <CenterVerticallyIcon theme={appState.theme} />,
+              icon: <TextAlignMiddleIcon theme={appState.theme} />,
             },
             {
               value: "bottom",
               text: t("labels.alignBottom"),
-              icon: <AlignBottomIcon theme={appState.theme} />,
+              icon: <TextAlignBottomIcon theme={appState.theme} />,
             },
           ]}
           value={getFormValue(elements, appState, (element) => {
