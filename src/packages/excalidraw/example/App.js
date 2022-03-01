@@ -7,7 +7,7 @@ import "./App.scss";
 import initialData from "./initialData";
 import { MIME_TYPES } from "../../../constants";
 
-// This is so that we use the bundled excalidraw.developement.js file instead
+// This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
 const { exportToCanvas, exportToSvg, exportToBlob } = window.Excalidraw;
 const Excalidraw = window.Excalidraw.default;
