@@ -2167,10 +2167,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (selectedElements.length === 1) {
-      if (
-        isTextElement(selectedElements[0]) &&
-        !selectedElements[0].isDeleted
-      ) {
+      if (isTextElement(selectedElements[0])) {
         existingTextElement = selectedElements[0];
       } else if (isTextBindableContainer(selectedElements[0])) {
         container = selectedElements[0];
