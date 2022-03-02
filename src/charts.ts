@@ -103,7 +103,7 @@ const transposeCells = (cells: string[][]) => {
 };
 
 export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
-  // Copy/paste from excel, spreadhseets, tsv, csv.
+  // Copy/paste from excel, spreadsheets, tsv, csv.
   // For now we only accept 2 columns with an optional header
 
   // Check for tab separated values
