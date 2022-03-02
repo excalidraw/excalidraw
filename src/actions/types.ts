@@ -82,7 +82,7 @@ export type ActionName =
   | "zoomToSelection"
   | "changeFontFamily"
   | "changeTextAlign"
-  | "changeTextVerticalAlign"
+  | "changeVerticalAlign"
   | "toggleFullScreen"
   | "toggleShortcuts"
   | "group"

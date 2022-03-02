@@ -779,8 +779,8 @@ export const actionChangeTextAlign = register({
     );
   },
 });
-export const actionChangeTextVerticalAlign = register({
-  name: "changeTextVerticalAlign",
+export const actionChangeVerticalAlign = register({
+  name: "changeVerticalAlign",
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(
@@ -834,6 +834,9 @@ export const actionChangeTextVerticalAlign = register({
             },
           ]}
           value={getFormValue(elements, appState, (element) => {
+            if (isTextElement(element) && element.containerId) {
+              return element.verticalAlign;
+            }
             const boundTextElement = getBoundTextElement(element);
             if (boundTextElement) {
               return boundTextElement.verticalAlign;
