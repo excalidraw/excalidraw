@@ -135,8 +135,14 @@ export type ExcalidrawBindableElement =
   | ExcalidrawTextElement
   | ExcalidrawImageElement;
 
+export type ExcalidrawTextContainer =
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement
+  | ExcalidrawImageElement;
+
 export type ExcalidrawTextElementWithContainer = {
-  containerId: ExcalidrawGenericElement["id"];
+  containerId: ExcalidrawTextContainer["id"];
 } & ExcalidrawTextElement;
 
 export type PointBinding = {
