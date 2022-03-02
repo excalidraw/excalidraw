@@ -7,7 +7,7 @@ import {
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
-import { CLASSES, BOUND_TEXT_PADDING } from "../constants";
+import { CLASSES, BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -105,6 +105,8 @@ export const textWysiwyg = ({
     const updatedElement = Scene.getScene(element)?.getElement(
       id,
     ) as ExcalidrawTextElement;
+    const { textAlign, verticalAlign } = updatedElement;
+
     const approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
@@ -140,7 +142,7 @@ export const textWysiwyg = ({
         maxHeight = container.height - BOUND_TEXT_PADDING * 2;
         width = maxWidth;
         // The coordinates of text box set a distance of
-        // 30px to preserve padding
+        // 5px to preserve padding
         coordX = container.x + BOUND_TEXT_PADDING;
         // autogrow container height if text exceeds
         if (height > maxHeight) {
@@ -160,11 +162,16 @@ export const textWysiwyg = ({
         // is reached
         else {
           // vertically center align the text
-          coordY = container.y + container.height / 2 - height / 2;
+          if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
+            coordY = container.y + container.height / 2 - height / 2;
+          }
+          if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+            coordY =
+              container.y + container.height - height - BOUND_TEXT_PADDING;
+          }
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
-      const { textAlign } = updatedElement;
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
       const initialLength = editable.value.length;
@@ -212,6 +219,7 @@ export const textWysiwyg = ({
           editorMaxHeight,
         ),
         textAlign,
+        verticalAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
         filter: "var(--theme-filter)",
