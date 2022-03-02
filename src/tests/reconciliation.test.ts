@@ -148,7 +148,7 @@ describe("elements reconciliation", () => {
 
     // non-annotated elements
     // -------------------------------------------------------------------------
-    // usually when we sync elements they should always be annonated with
+    // usually when we sync elements they should always be annotated with
     // their (preceding elements) parents, but let's test a couple of cases when
     // they're not for whatever reason (remote clients are on older version...),
     // in which case the first synced element either replaces existing element

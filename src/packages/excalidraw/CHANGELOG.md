@@ -11,7 +11,7 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## 0.11.0 (2022-02-17)
 
 ## Excalidraw API
 
@@ -20,7 +20,7 @@ Please add the latest change on the top under the correct section.
 - Add `onLinkOpen` prop which will be triggered when clicked on element hyperlink if present [#4694](https://github.com/excalidraw/excalidraw/pull/4694).
 - Support updating library using [`updateScene`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene) API [#4546](https://github.com/excalidraw/excalidraw/pull/4546).
 
-- Introduced primary colors to the app. The colors can be overriden. Check [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#customizing-styles) on how to do so [#4387](https://github.com/excalidraw/excalidraw/pull/4387).
+- Introduced primary colors to the app. The colors can be overridden. Check [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#customizing-styles) on how to do so [#4387](https://github.com/excalidraw/excalidraw/pull/4387).
 
 - [`exportToBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToBlob) now automatically sets `appState.exportBackground` to `true` if exporting to `image/jpeg` MIME type (to ensure that alpha channel is not compressed to black color) [#4342](https://github.com/excalidraw/excalidraw/pull/4342).
 
@@ -33,9 +33,7 @@ Please add the latest change on the top under the correct section.
   - Add `maxWidthOrHeight?: number` attribute.
   - `scale` returned from `getDimensions()` is now optional (default to `1`).
 
-- Image support.
-
-  NOTE: the unreleased API is highly unstable and may change significantly before the next stable release. As such it's largely undocumented at this point. You are encouraged to read through the [PR](https://github.com/excalidraw/excalidraw/pull/4011) description if you want to know more about the internals.
+- Image support added for host [PR](https://github.com/excalidraw/excalidraw/pull/4011)
 
   General notes:
 
@@ -55,7 +53,7 @@ Please add the latest change on the top under the correct section.
   Other notes:
 
   - `.excalidraw` files may now contain top-level `files` key in format of `Record<FileId, BinaryFileData>` when exporting any (image) elements.
-  - Changes were made to various export utilityies exported from the package so that they take `files`. For now, TypeScript should help you figure the changes out.
+  - Changes were made to various export utilities exported from the package so that they take `files`, you can refer to the docs for the same.
 
 - Export [`isLinearElement`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#isLinearElement) and [`getNonDeletedElements`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#getNonDeletedElements) [#4072](https://github.com/excalidraw/excalidraw/pull/4072).
 
@@ -75,11 +73,281 @@ Please add the latest change on the top under the correct section.
 
 ### Build
 
+- Release preview package [@excalidraw/excalidraw-preview](https://www.npmjs.com/package/@excalidraw/excalidraw-preview) when triggered via comment
+
+```
+ @excalibot trigger release
+```
+
+[#4750](https://github.com/excalidraw/excalidraw/pull/4750).
+
 - Added an example to test and develop the package [locally](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Development) using `yarn start` [#4488](https://github.com/excalidraw/excalidraw/pull/4488)
 
 - Remove `file-loader` so font assets are not duplicated by webpack and use webpack asset modules for font generation [#4380](https://github.com/excalidraw/excalidraw/pull/4380).
 
 - We're now compiling to `es2017` target. Notably, `async/await` is not compiled down to generators. [#4341](https://github.com/excalidraw/excalidraw/pull/4341).
+
+---
+
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Show group/group and link action in mobile [#4795](https://github.com/excalidraw/excalidraw/pull/4795)
+
+- Support background fill for freedraw shapes [#4610](https://github.com/excalidraw/excalidraw/pull/4610)
+
+- Keep selected tool on canvas reset [#4728](https://github.com/excalidraw/excalidraw/pull/4728)
+
+- Make whole element clickable in view mode when it has hyperlink [#4735](https://github.com/excalidraw/excalidraw/pull/4735)
+
+- Allow any precision when zooming [#4730](https://github.com/excalidraw/excalidraw/pull/4730)
+
+- Throttle `pointermove` events per framerate [#4727](https://github.com/excalidraw/excalidraw/pull/4727)
+
+- Support hyperlinks 🔥 [#4620](https://github.com/excalidraw/excalidraw/pull/4620)
+
+- Added penMode for palm rejection [#4657](https://github.com/excalidraw/excalidraw/pull/4657)
+
+- Support unbinding bound text [#4686](https://github.com/excalidraw/excalidraw/pull/4686)
+
+- Sync local storage state across tabs when out of sync [#4545](https://github.com/excalidraw/excalidraw/pull/4545)
+
+- Support contextMenuLabel to be of function type to support dynamic labels [#4654](https://github.com/excalidraw/excalidraw/pull/4654)
+
+- Support decreasing/increasing `fontSize` via keyboard [#4553](https://github.com/excalidraw/excalidraw/pull/4553)
+
+- Link to new LP for excalidraw plus [#4549](https://github.com/excalidraw/excalidraw/pull/4549)
+
+- Update stroke color of bounded text along with container [#4541](https://github.com/excalidraw/excalidraw/pull/4541)
+
+- Hints and shortcuts help around deep selection [#4502](https://github.com/excalidraw/excalidraw/pull/4502)
+
+- Support updating text properties by clicking on container [#4499](https://github.com/excalidraw/excalidraw/pull/4499)
+
+- Bind text to shapes when pressing enter and support sticky notes 🎉 [#4343](https://github.com/excalidraw/excalidraw/pull/4343)
+
+- Change `boundElementIds` → `boundElements` [#4404](https://github.com/excalidraw/excalidraw/pull/4404)
+
+- Support selecting multiple points when editing line [#4373](https://github.com/excalidraw/excalidraw/pull/4373)
+
+- Horizontally center toolbar menu [commit link](https://github.com/excalidraw/excalidraw/commit/9b8ee3cacfec239617c357693cf2a3ca9972d2cb)
+
+- Add support for rounded corners in diamond [#4369](https://github.com/excalidraw/excalidraw/pull/4369)
+
+- Allow zooming up to 3000% [#4358](https://github.com/excalidraw/excalidraw/pull/4358)
+
+- Stop discarding precision when rendering [#4357](https://github.com/excalidraw/excalidraw/pull/4357)
+
+- Support Image binding [#4347](https://github.com/excalidraw/excalidraw/pull/4347)
+
+- Add `element.updated` [#4070](https://github.com/excalidraw/excalidraw/pull/4070)
+
+- Compress shareLink data when uploading to json server [#4225](https://github.com/excalidraw/excalidraw/pull/4225)
+
+- Supply `version` param when installing libraries [#4305](https://github.com/excalidraw/excalidraw/pull/4305)
+
+- Log FS abortError to console [#4279](https://github.com/excalidraw/excalidraw/pull/4279)
+
+- Add validation for website and remove validation for library item name [#4269](https://github.com/excalidraw/excalidraw/pull/4269)
+
+- Allow publishing libraries from UI [#4115](https://github.com/excalidraw/excalidraw/pull/4115)
+
+- Create confirm dialog to use instead of window.confirm [#4256](https://github.com/excalidraw/excalidraw/pull/4256)
+
+- Allow letters in IDs for storing files in backend [#4224](https://github.com/excalidraw/excalidraw/pull/4224)
+
+- Remove support for V1 unencrypted backend [#4189](https://github.com/excalidraw/excalidraw/pull/4189)
+
+- Use separate backend for local storage [#4187](https://github.com/excalidraw/excalidraw/pull/4187)
+
+- Add hint around canvas panning [#4159](https://github.com/excalidraw/excalidraw/pull/4159)
+
+- Stop using production services for development [#4113](https://github.com/excalidraw/excalidraw/pull/4113)
+
+- Add triangle arrowhead [#4024](https://github.com/excalidraw/excalidraw/pull/4024)
+
+- Add rewrite to webex landing page [#4102](https://github.com/excalidraw/excalidraw/pull/4102)
+
+- Switch collab server [#4092](https://github.com/excalidraw/excalidraw/pull/4092)
+
+- Use dialog component for clear canvas instead of window confirm [#4075](https://github.com/excalidraw/excalidraw/pull/4075)
+
+### Fixes
+
+- Rename --color-primary-chubb to --color-primary-contrast-offset and fallback to primary color if not present [#4803](https://github.com/excalidraw/excalidraw/pull/4803)
+
+- Add commits directly pushed to master in changelog [#4798](https://github.com/excalidraw/excalidraw/pull/4798)
+
+- Don't bump element version when adding files data [#4794](https://github.com/excalidraw/excalidraw/pull/4794)
+
+- Mobile link click [#4742](https://github.com/excalidraw/excalidraw/pull/4742)
+
+- ContextMenu timer & pointers not correctly reset on iOS [#4765](https://github.com/excalidraw/excalidraw/pull/4765)
+
+- Use absolute coords when rendering link popover [#4753](https://github.com/excalidraw/excalidraw/pull/4753)
+
+- Changing font size when text is not selected or edited [#4751](https://github.com/excalidraw/excalidraw/pull/4751)
+
+- Disable contextmenu on non-secondary `pen` events or `touch` [#4675](https://github.com/excalidraw/excalidraw/pull/4675)
+
+- Mobile context menu won't show on long press [#4741](https://github.com/excalidraw/excalidraw/pull/4741)
+
+- Do not open links twice [#4738](https://github.com/excalidraw/excalidraw/pull/4738)
+
+- Make link icon clickable in mobile [#4736](https://github.com/excalidraw/excalidraw/pull/4736)
+
+- Apple Pen missing strokes [#4705](https://github.com/excalidraw/excalidraw/pull/4705)
+
+- Freedraw slow movement jittery lines [#4726](https://github.com/excalidraw/excalidraw/pull/4726)
+
+- Disable three finger pinch zoom in penMode [#4725](https://github.com/excalidraw/excalidraw/pull/4725)
+
+- Remove click listener for opening popup [#4700](https://github.com/excalidraw/excalidraw/pull/4700)
+
+- Link popup position not accounting for offsets [#4695](https://github.com/excalidraw/excalidraw/pull/4695)
+
+- PenMode darkmode style [#4692](https://github.com/excalidraw/excalidraw/pull/4692)
+
+- Typing `_+` in wysiwyg not working [#4681](https://github.com/excalidraw/excalidraw/pull/4681)
+
+- Keyboard-zooming in wysiwyg should zoom canvas [#4676](https://github.com/excalidraw/excalidraw/pull/4676)
+
+- SceneCoordsToViewportCoords, jumping text when there is an offset [#4413](https://github.com/excalidraw/excalidraw/pull/4413) (#4630)
+
+- Right-click object menu displays partially off-screen [#4572](https://github.com/excalidraw/excalidraw/pull/4572) (#4631)
+
+- Support collaboration in bound text [#4573](https://github.com/excalidraw/excalidraw/pull/4573)
+
+- Cmd/ctrl native browser behavior blocked in inputs [#4589](https://github.com/excalidraw/excalidraw/pull/4589)
+
+- Use cached width when calculating min width during resize [#4585](https://github.com/excalidraw/excalidraw/pull/4585)
+
+- Support collaboration in bounded text [#4580](https://github.com/excalidraw/excalidraw/pull/4580)
+
+- Port for collab server and update docs [#4569](https://github.com/excalidraw/excalidraw/pull/4569)
+
+- Don't mutate the bounded text if not updated when submitted [#4543](https://github.com/excalidraw/excalidraw/pull/4543)
+
+- Prevent canvas drag while editing text [#4552](https://github.com/excalidraw/excalidraw/pull/4552)
+
+- Support shift+P for freedraw [#4550](https://github.com/excalidraw/excalidraw/pull/4550)
+
+- Prefer spreadsheet data over image [#4533](https://github.com/excalidraw/excalidraw/pull/4533)
+
+- Show text properties button states correctly for bounded text [#4542](https://github.com/excalidraw/excalidraw/pull/4542)
+
+- Rotate bounded text when container is rotated before typing [#4535](https://github.com/excalidraw/excalidraw/pull/4535)
+
+- Undo should work when selecting bounded textr [#4537](https://github.com/excalidraw/excalidraw/pull/4537)
+
+- Reduce padding to 5px for bounded text [#4530](https://github.com/excalidraw/excalidraw/pull/4530)
+
+- Bound text doesn't inherit container [#4521](https://github.com/excalidraw/excalidraw/pull/4521)
+
+- Text wrapping with grid [#4505](https://github.com/excalidraw/excalidraw/pull/4505) (#4506)
+
+- Check if process is defined before using so it works in browser [#4497](https://github.com/excalidraw/excalidraw/pull/4497)
+
+- Pending review fixes for sticky notes [#4493](https://github.com/excalidraw/excalidraw/pull/4493)
+
+- Pasted elements except binded text once paste action is complete [#4472](https://github.com/excalidraw/excalidraw/pull/4472)
+
+- Don't select binded text when ungrouping [#4470](https://github.com/excalidraw/excalidraw/pull/4470)
+
+- Set height correctly when text properties updated while editing in container until first submit [#4469](https://github.com/excalidraw/excalidraw/pull/4469)
+
+- Align and distribute binded text in container and cleanup [#4468](https://github.com/excalidraw/excalidraw/pull/4468)
+
+- Move binded text when moving container using keyboard [#4466](https://github.com/excalidraw/excalidraw/pull/4466)
+
+- Support dragging binded text in container selected in a group [#4462](https://github.com/excalidraw/excalidraw/pull/4462)
+
+- Vertically align single line when deleting text in bounded container [#4460](https://github.com/excalidraw/excalidraw/pull/4460)
+
+- Update height correctly when updating text properties in binded text [#4459](https://github.com/excalidraw/excalidraw/pull/4459)
+
+- Align library item previews to center [#4447](https://github.com/excalidraw/excalidraw/pull/4447)
+
+- Vertically center align text when text deleted [#4457](https://github.com/excalidraw/excalidraw/pull/4457)
+
+- Vertically center the first line as user starts typing in container [#4454](https://github.com/excalidraw/excalidraw/pull/4454)
+
+- Switch cursor to center of container when adding text when dimensions are too small [#4452](https://github.com/excalidraw/excalidraw/pull/4452)
+
+- Vertically center align the bounded text correctly when zoomed [#4444](https://github.com/excalidraw/excalidraw/pull/4444)
+
+- Support updating stroke color for text by typing in color picker input [#4415](https://github.com/excalidraw/excalidraw/pull/4415)
+
+- Bound text not atomic with container when changing z-index [#4414](https://github.com/excalidraw/excalidraw/pull/4414)
+
+- Update viewport coords correctly when editing text [#4416](https://github.com/excalidraw/excalidraw/pull/4416)
+
+- Use word-break break-word only and update text editor height only when binded to container [#4410](https://github.com/excalidraw/excalidraw/pull/4410)
+
+- Husky not able to execute pre-commit on windows [#4370](https://github.com/excalidraw/excalidraw/pull/4370)
+
+- Make firebase config parsing not fail on undefined env [#4381](https://github.com/excalidraw/excalidraw/pull/4381)
+
+- Adding to library via contextmenu when no image is selected [#4356](https://github.com/excalidraw/excalidraw/pull/4356)
+
+- Export scale quality regression [#4316](https://github.com/excalidraw/excalidraw/pull/4316)
+
+- Remove `100%` height from tooltip container to fix layout issues [#3980](https://github.com/excalidraw/excalidraw/pull/3980)
+
+- Inline ENV variables when building excalidraw package [#4311](https://github.com/excalidraw/excalidraw/pull/4311)
+
+- SVG export in dark mode with embedded bitmap image [#4285](https://github.com/excalidraw/excalidraw/pull/4285)
+
+- New FS API not working on Linux [#4280](https://github.com/excalidraw/excalidraw/pull/4280)
+
+- Url -> URL for consistency [#4277](https://github.com/excalidraw/excalidraw/pull/4277)
+
+- Prevent adding images to library via contextMenu [#4264](https://github.com/excalidraw/excalidraw/pull/4264)
+
+- Account for libraries v2 when prompting [#4263](https://github.com/excalidraw/excalidraw/pull/4263)
+
+- Skia rendering issues [#4200](https://github.com/excalidraw/excalidraw/pull/4200)
+
+- Ellipse roughness when `0` [#4194](https://github.com/excalidraw/excalidraw/pull/4194)
+
+- Proper string for invalid SVG [#4191](https://github.com/excalidraw/excalidraw/pull/4191)
+
+- Images not initialized correctly [#4157](https://github.com/excalidraw/excalidraw/pull/4157)
+
+- Image-related fixes [#4147](https://github.com/excalidraw/excalidraw/pull/4147)
+
+- Rewrite collab element reconciliation to fix z-index issues [#4076](https://github.com/excalidraw/excalidraw/pull/4076)
+
+- Redirect excalidraw.com/about to for-webex.excalidraw.com [#4104](https://github.com/excalidraw/excalidraw/pull/4104)
+
+- Redirect to webex LP instead of rewrite to fix SW [#4103](https://github.com/excalidraw/excalidraw/pull/4103)
+
+- Clear image/shape cache of affected elements when adding files [#4089](https://github.com/excalidraw/excalidraw/pull/4089)
+
+- Clear `LibraryUnit` DOM on unmount [#4084](https://github.com/excalidraw/excalidraw/pull/4084)
+
+- Pasting images on firefox [#4085](https://github.com/excalidraw/excalidraw/pull/4085)
+
+### Refactor
+
+- Simplify zoom by removing `zoom.translation` [#4477](https://github.com/excalidraw/excalidraw/pull/4477)
+
+- Deduplicate encryption helpers [#4146](https://github.com/excalidraw/excalidraw/pull/4146)
+
+### Performance
+
+- Cache approx line height in textwysiwg [#4651](https://github.com/excalidraw/excalidraw/pull/4651)
+
+### Build
+
+- Rename release command to 'release package' [#4783](https://github.com/excalidraw/excalidraw/pull/4783)
+
+- Deploy excalidraw package example [#4762](https://github.com/excalidraw/excalidraw/pull/4762)
+
+- Allow package.json changes when autoreleasing next [#4068](https://github.com/excalidraw/excalidraw/pull/4068)
 
 ---
 
@@ -170,10 +438,10 @@ Please add the latest change on the top under the correct section.
 
 - Added prop [`autoFocus`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#autoFocus) to focus the excalidraw component on page load when enabled, defaults to false [#3691](https://github.com/excalidraw/excalidraw/pull/3691).
 
-  Note: Earlier Excalidraw component was focussed by default on page load, you need to enable `autoFocus` prop to retain the same behaviour.
+  Note: Earlier Excalidraw component was focused by default on page load, you need to enable `autoFocus` prop to retain the same behaviour.
 
 - Added prop `UIOptions.canvasActions.export.renderCustomUI` to support Custom UI rendering inside export dialog [#3666](https://github.com/excalidraw/excalidraw/pull/3666).
-- Added prop `UIOptions.canvasActions.saveAsImage` to show/hide the **Save as image** button in the canvas actions. Defauls to `true` hence the **Save as Image** button is rendered [#3662](https://github.com/excalidraw/excalidraw/pull/3662).
+- Added prop `UIOptions.canvasActions.saveAsImage` to show/hide the **Save as image** button in the canvas actions. Defaults to `true` hence the **Save as Image** button is rendered [#3662](https://github.com/excalidraw/excalidraw/pull/3662).
 
 - Export dialog can be customised with [`UiOptions.canvasActions.export`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportOpts) [#3658](https://github.com/excalidraw/excalidraw/pull/3658).
 
@@ -221,7 +489,7 @@ Please add the latest change on the top under the correct section.
 
 - Exporting redesign [#3613](https://github.com/excalidraw/excalidraw/pull/3613)
 
-- Auto-position tooltip and suport overflowing container [#3631](https://github.com/excalidraw/excalidraw/pull/3631)
+- Auto-position tooltip and support overflowing container [#3631](https://github.com/excalidraw/excalidraw/pull/3631)
 
 - Auto release @excalidraw/excalidraw-next on every change [#3614](https://github.com/excalidraw/excalidraw/pull/3614)
 
