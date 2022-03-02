@@ -8,7 +8,7 @@ import {
   NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
-import { BOUND_TEXT_PADDING } from "../constants";
+import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { AppState } from "../types";
@@ -41,9 +41,9 @@ export const redrawTextBoundingBox = (
   if (container) {
     let nextHeight = container.height;
 
-    if (element.verticalAlign === "top") {
+    if (element.verticalAlign === VERTICAL_ALIGN.TOP) {
       coordY = container.y + BOUND_TEXT_PADDING;
-    } else if (element.verticalAlign === "bottom") {
+    } else if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
       coordY =
         container.y + container.height - metrics.height - BOUND_TEXT_PADDING;
     } else {
@@ -151,9 +151,9 @@ export const handleBindTextResize = (
       }
 
       let updatedY;
-      if (textElement.verticalAlign === "top") {
+      if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
         updatedY = element.y + BOUND_TEXT_PADDING;
-      } else if (textElement.verticalAlign === "bottom") {
+      } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
         updatedY = element.y + element.height - nextHeight - BOUND_TEXT_PADDING;
       } else {
         updatedY = element.y + element.height / 2 - nextHeight / 2;
