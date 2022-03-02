@@ -111,7 +111,7 @@ export const SelectedShapeActions = ({
       )}
 
       {targetElements.length > 0 &&
-        targetElements.every(
+        targetElements.some(
           (element) =>
             hasBoundTextElement(element) || isBoundToContainer(element),
         ) &&
