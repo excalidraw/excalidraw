@@ -22,7 +22,7 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import { getContainerElement, measureText, wrapText } from "./textElement";
-import { BOUND_TEXT_PADDING } from "../constants";
+import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -174,7 +174,7 @@ const getAdjustedDimensions = (
   let y: number;
   if (
     textAlign === "center" &&
-    verticalAlign === "middle" &&
+    verticalAlign === VERTICAL_ALIGN.MIDDLE &&
     !element.containerId
   ) {
     const prevMetrics = measureText(

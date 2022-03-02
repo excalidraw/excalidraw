@@ -69,6 +69,7 @@ import {
   TOUCH_CTX_MENU_TIMEOUT,
   URL_HASH_KEYS,
   URL_QUERY_KEYS,
+  VERTICAL_ALIGN,
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
@@ -2239,7 +2240,7 @@ class App extends React.Component<AppProps, AppState> {
             ? "center"
             : this.state.currentItemTextAlign,
           verticalAlign: parentCenterPosition
-            ? "middle"
+            ? VERTICAL_ALIGN.MIDDLE
             : DEFAULT_VERTICAL_ALIGN,
           containerId: container?.id ?? undefined,
           groupIds: container?.groupIds ?? [],
@@ -2247,19 +2248,13 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState({ editingElement: element });
 
-    if (existingTextElement) {
-      // if text element is no longer centered to a container, reset
-      // verticalAlign to default because it's currently internal-only
-      if (!parentCenterPosition || element.textAlign !== "center") {
-        mutateElement(element, { verticalAlign: DEFAULT_VERTICAL_ALIGN });
-      }
-    } else {
+    if (!existingTextElement) {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted(),
         element,
       ]);
 
-      // case: creating new text not centered to parent elemenent → offset Y
+      // case: creating new text not centered to parent element → offset Y
       // so that the text is centered to cursor position
       if (!parentCenterPosition) {
         mutateElement(element, {
@@ -3020,7 +3015,7 @@ class App extends React.Component<AppProps, AppState> {
         /*
          * Reenable next paste in case of disabled middle click paste for
          * any reason:
-         * - rigth click paste
+         * - right click paste
          * - empty clipboard
          */
         const enableNextPaste = () => {
@@ -4756,7 +4751,7 @@ class App extends React.Component<AppProps, AppState> {
       const width = height * (image.naturalWidth / image.naturalHeight);
 
       // add current imageElement width/height to account for previous centering
-      // of the placholder image
+      // of the placeholder image
       const x = imageElement.x + imageElement.width / 2 - width / 2;
       const y = imageElement.y + imageElement.height / 2 - height / 2;
 
