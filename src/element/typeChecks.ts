@@ -8,6 +8,7 @@ import {
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
+  ExcalidrawTextContainer,
 } from "./types";
 
 export const isGenericElement = (
@@ -91,7 +92,9 @@ export const isBindableElement = (
   );
 };
 
-export const isTextBindableContainer = (element: ExcalidrawElement | null) => {
+export const isTextBindableContainer = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawTextContainer => {
   return (
     element != null &&
     (element.type === "rectangle" ||

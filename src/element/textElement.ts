@@ -1,6 +1,5 @@
 import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
-  ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -12,6 +11,7 @@ import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { AppState } from "../types";
+import { isTextElement } from ".";
 
 export const redrawTextBoundingBox = (
   element: ExcalidrawTextElement,
@@ -79,22 +79,24 @@ export const bindTextToShapeAfterDuplication = (
     const boundTextElementId = getBoundTextElementId(element);
 
     if (boundTextElementId) {
-      const newTextElementId = oldIdToDuplicatedId.get(boundTextElementId)!;
-      mutateElement(
-        sceneElementMap.get(newElementId) as ExcalidrawBindableElement,
-        {
-          boundElements: element.boundElements?.concat({
-            type: "text",
-            id: newTextElementId,
-          }),
-        },
-      );
-      mutateElement(
-        sceneElementMap.get(newTextElementId) as ExcalidrawTextElement,
-        {
-          containerId: newElementId,
-        },
-      );
+      const newTextElementId = oldIdToDuplicatedId.get(boundTextElementId);
+      if (newTextElementId) {
+        const newContainer = sceneElementMap.get(newElementId);
+        if (newContainer) {
+          mutateElement(newContainer, {
+            boundElements: element.boundElements?.concat({
+              type: "text",
+              id: newTextElementId,
+            }),
+          });
+        }
+        const newTextElement = sceneElementMap.get(newTextElementId);
+        if (newTextElement && isTextElement(newTextElement)) {
+          mutateElement(newTextElement, {
+            containerId: newContainer ? newElementId : null,
+          });
+        }
+      }
     }
   });
 };
@@ -440,7 +442,10 @@ export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
 };
 
 export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
-  return container?.boundElements?.filter((ele) => ele.type === "text")[0]?.id;
+  return container?.boundElements?.length
+    ? container?.boundElements?.filter((ele) => ele.type === "text")[0]?.id ||
+        null
+    : null;
 };
 
 export const getBoundTextElement = (element: ExcalidrawElement | null) => {

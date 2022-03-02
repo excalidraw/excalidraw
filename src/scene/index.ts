@@ -14,7 +14,7 @@ export {
   canHaveArrowheads,
   canChangeSharpness,
   getElementAtPosition,
-  getElementContainingPosition,
+  getTextBindableContainerAtPosition,
   hasText,
   getElementsAtPosition,
 } from "./comparisons";

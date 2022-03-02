@@ -1,13 +1,7 @@
-import {
-  GroupId,
-  ExcalidrawElement,
-  NonDeleted,
-  ExcalidrawTextElementWithContainer,
-} from "./element/types";
+import { GroupId, ExcalidrawElement, NonDeleted } from "./element/types";
 import { AppState } from "./types";
 import { getSelectedElements } from "./scene";
-import { getBoundTextElementId } from "./element/textElement";
-import Scene from "./scene/Scene";
+import { getBoundTextElement } from "./element/textElement";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -182,13 +176,10 @@ export const getMaximumGroups = (
 
     const currentGroupMembers = groups.get(groupId) || [];
 
-    // Include bounded text if present when grouping
-    const boundTextElementId = getBoundTextElementId(element);
-    if (boundTextElementId) {
-      const textElement = Scene.getScene(element)!.getElement(
-        boundTextElementId,
-      ) as ExcalidrawTextElementWithContainer;
-      currentGroupMembers.push(textElement);
+    // Include bound text if present when grouping
+    const boundTextElement = getBoundTextElement(element);
+    if (boundTextElement) {
+      currentGroupMembers.push(boundTextElement);
     }
     groups.set(groupId, [...currentGroupMembers, element]);
   });

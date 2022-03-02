@@ -152,6 +152,7 @@ describe("element binding", () => {
     UI.clickTool("text");
 
     mouse.clickAt(text.x + 50, text.y + 50);
+
     const editor = document.querySelector(
       ".excalidraw-textEditorContainer > textarea",
     ) as HTMLTextAreaElement;
