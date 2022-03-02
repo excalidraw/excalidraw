@@ -114,7 +114,7 @@ export const textWysiwyg = ({
 
       let maxHeight = updatedElement.height;
       let width = updatedElement.width;
-      // Set to element height by default since thats
+      // Set to element height by default since that's
       // what is going to be used for unbounded text
       let height = updatedElement.height;
       if (container && updatedElement.containerId) {
@@ -170,7 +170,7 @@ export const textWysiwyg = ({
       const initialLength = editable.value.length;
       editable.value = updatedElement.originalText;
 
-      // restore cursor positon after value updated so it doesn't
+      // restore cursor position after value updated so it doesn't
       // go to the end of text when container auto expanded
       if (
         initialSelectionStart === initialSelectionEnd &&
@@ -275,7 +275,7 @@ export const textWysiwyg = ({
       // as that gets updated below
       const lines = editable.scrollHeight / getApproxLineHeight(font);
       // auto increase height only when lines  > 1 so its
-      // measured correctly and vertically alignes for
+      // measured correctly and vertically aligns for
       // first line as well as setting height to "auto"
       // doubles the height as soon as user starts typing
       if (isBoundToContainer(element) && lines > 1) {
@@ -414,7 +414,7 @@ export const textWysiwyg = ({
   };
 
   /**
-   * @returns indeces of start positions of selected lines, in reverse order
+   * @returns indices of start positions of selected lines, in reverse order
    */
   const getSelectedLinesStartIndices = () => {
     let { selectionStart, selectionEnd, value } = editable;
