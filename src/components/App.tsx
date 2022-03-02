@@ -2932,7 +2932,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event, isTouchScreen);
+      this.redirectToLink(event, this.deviceInfo.isTouchScreen);
     }
 
     this.removePointer(event);
