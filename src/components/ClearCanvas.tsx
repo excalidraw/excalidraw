@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { t } from "../i18n";
-import { useIsMobile } from "./App";
+import { useDeviceInfo } from "./App";
 import { trash } from "./icons";
 import { ToolButton } from "./ToolButton";
 
@@ -19,7 +19,7 @@ const ClearCanvas = ({ onConfirm }: { onConfirm: () => void }) => {
         icon={trash}
         title={t("buttons.clearReset")}
         aria-label={t("buttons.clearReset")}
-        showAriaLabel={useIsMobile()}
+        showAriaLabel={useDeviceInfo().isMobile}
         onClick={toggleDialog}
         data-testid="clear-canvas-button"
       />

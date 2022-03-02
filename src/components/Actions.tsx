@@ -3,7 +3,7 @@ import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
-import { useIsMobile } from "../components/App";
+import { useDeviceInfo } from "../components/App";
 import {
   canChangeSharpness,
   canHaveArrowheads,
@@ -36,7 +36,7 @@ export const SelectedShapeActions = ({
     appState,
   );
   const isEditing = Boolean(appState.editingElement);
-  const isMobile = useIsMobile();
+  const deviceInfo = useDeviceInfo();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
@@ -150,7 +150,7 @@ export const SelectedShapeActions = ({
           </div>
         </fieldset>
       )}
-      {!isMobile && !isEditing && targetElements.length > 0 && (
+      {!deviceInfo.isMobile && !isEditing && targetElements.length > 0 && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">

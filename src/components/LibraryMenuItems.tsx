@@ -12,7 +12,7 @@ import {
   LibraryItems,
 } from "../types";
 import { muteFSAbortError } from "../utils";
-import { useIsMobile } from "./App";
+import { useDeviceInfo } from "./App";
 import ConfirmDialog from "./ConfirmDialog";
 import { exportToFileIcon, load, publishIcon, trash } from "./icons";
 import { LibraryUnit } from "./LibraryUnit";
@@ -85,7 +85,7 @@ const LibraryMenuItems = ({
 
   const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
 
-  const isMobile = useIsMobile();
+  const isMobile = useDeviceInfo().isMobile;
 
   const renderLibraryActions = () => {
     const itemsSelected = !!selectedItems.length;

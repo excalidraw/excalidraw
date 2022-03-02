@@ -6,10 +6,15 @@ import { exportCanvas } from "../data";
 import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
-import { useIsMobile } from "../components/App";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
-import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
+import {
+  AppProps,
+  AppState,
+  ExcalidrawProps,
+  BinaryFiles,
+  DeviceInfo,
+} from "../types";
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
@@ -37,6 +42,7 @@ import { LibraryMenu } from "./LibraryMenu";
 import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
+import { useDeviceInfo } from "../components/App";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -95,7 +101,7 @@ const LayerUI = ({
   id,
   onImageAction,
 }: LayerUIProps) => {
-  const isMobile = useIsMobile();
+  const deviceInfo: DeviceInfo = useDeviceInfo();
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -338,7 +344,7 @@ const LayerUI = ({
                       <HintViewer
                         appState={appState}
                         elements={elements}
-                        isMobile={isMobile}
+                        isMobile={deviceInfo.isMobile}
                       />
                       {heading}
                       <Stack.Row gap={1}>
@@ -388,7 +394,7 @@ const LayerUI = ({
                     </Tooltip>
                   ))}
             </UserList>
-            {renderTopRightUI?.(isMobile, appState)}
+            {renderTopRightUI?.(deviceInfo.isMobile, appState)}
           </div>
         </div>
       </FixedSideContainer>
@@ -428,16 +434,18 @@ const LayerUI = ({
                   {actionManager.renderAction("redo", { size: "small" })}
                 </div>
               )}
-              {!viewModeEnabled && appState.multiElement && (
-                <div
-                  className={clsx("finalize-button zen-mode-transition", {
-                    "layer-ui__wrapper__footer-left--transition-left":
-                      zenModeEnabled,
-                  })}
-                >
-                  {actionManager.renderAction("finalize", { size: "small" })}
-                </div>
-              )}
+              {!viewModeEnabled &&
+                appState.multiElement &&
+                deviceInfo.isTouchScreen && (
+                  <div
+                    className={clsx("finalize-button zen-mode-transition", {
+                      "layer-ui__wrapper__footer-left--transition-left":
+                        zenModeEnabled,
+                    })}
+                  >
+                    {actionManager.renderAction("finalize", { size: "small" })}
+                  </div>
+                )}
             </Section>
           </Stack.Col>
         </div>
@@ -505,7 +513,7 @@ const LayerUI = ({
     </>
   );
 
-  return isMobile ? (
+  return deviceInfo.isMobile ? (
     <>
       {dialogs}
       <MobileMenu
