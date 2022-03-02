@@ -110,12 +110,10 @@ export const SelectedShapeActions = ({
         </>
       )}
 
-      {targetElements.length > 0 &&
-        targetElements.some(
-          (element) =>
-            hasBoundTextElement(element) || isBoundToContainer(element),
-        ) &&
-        renderAction("changeVerticalAlign")}
+      {targetElements.some(
+        (element) =>
+          hasBoundTextElement(element) || isBoundToContainer(element),
+      ) && renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(elementType) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
