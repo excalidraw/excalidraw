@@ -69,6 +69,7 @@ import {
   TOUCH_CTX_MENU_TIMEOUT,
   URL_HASH_KEYS,
   URL_QUERY_KEYS,
+  VERTICAL_ALIGN,
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
@@ -2225,7 +2226,7 @@ class App extends React.Component<AppProps, AppState> {
             ? "center"
             : this.state.currentItemTextAlign,
           verticalAlign: parentCenterPosition
-            ? "middle"
+            ? VERTICAL_ALIGN.MIDDLE
             : DEFAULT_VERTICAL_ALIGN,
           containerId: container?.id ?? undefined,
           groupIds: container?.groupIds ?? [],
@@ -2233,13 +2234,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState({ editingElement: element });
 
-    if (existingTextElement) {
-      // if text element is no longer centered to a container, reset
-      // verticalAlign to default because it's currently internal-only
-      if (!parentCenterPosition || element.textAlign !== "center") {
-        mutateElement(element, { verticalAlign: DEFAULT_VERTICAL_ALIGN });
-      }
-    } else {
+    if (!existingTextElement) {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted(),
         element,

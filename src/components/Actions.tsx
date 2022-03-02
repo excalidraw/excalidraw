@@ -19,7 +19,7 @@ import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
-import { hasBoundTextElement } from "../element/typeChecks";
+import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
 
 export const SelectedShapeActions = ({
   appState,
@@ -110,6 +110,10 @@ export const SelectedShapeActions = ({
         </>
       )}
 
+      {targetElements.every(
+        (element) =>
+          hasBoundTextElement(element) || isBoundToContainer(element),
+      ) && <>{renderAction("changeVerticalAlign")}</>}
       {(canHaveArrowheads(elementType) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
