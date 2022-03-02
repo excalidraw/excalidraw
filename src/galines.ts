@@ -7,7 +7,7 @@ import { Line, Point } from "./ga";
  *
  * This maps to a standard formula `a * x + b * y + c`.
  *
- * `(-b, a)` correponds to a 2D vector parallel to the line. The lines
+ * `(-b, a)` corresponds to a 2D vector parallel to the line. The lines
  * have a natural orientation, corresponding to that vector.
  *
  * The magnitude ("norm") of the line is `sqrt(a ^ 2 + b ^ 2)`.

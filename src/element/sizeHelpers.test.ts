@@ -32,7 +32,7 @@ describe("getPerfectElementSize", () => {
     expect(width).toEqual(135);
     expect(height).toEqual(135);
   });
-  it("should return height:0 and width:0 when width and heigh are 0", () => {
+  it("should return height:0 and width:0 when width and height are 0", () => {
     const { height, width } = getPerfectElementSize("arrow", 0, 0);
     expect(width).toEqual(0);
     expect(height).toEqual(0);

@@ -9212,7 +9212,7 @@ exports[`regression tests given a group of selected elements with an element tha
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of renders 1`] = `20`;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partialy overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] appState 1`] = `
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},
   "currentChartType": "bar",
@@ -9298,7 +9298,7 @@ Object {
 }
 `;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partialy overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] element 0 1`] = `
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "#fa5252",
@@ -9326,7 +9326,7 @@ Object {
 }
 `;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partialy overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] element 1 1`] = `
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] element 1 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "#fa5252",
@@ -9354,7 +9354,7 @@ Object {
 }
 `;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partialy overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] history 1`] = `
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -9475,9 +9475,9 @@ Object {
 }
 `;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partialy overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of elements 1`] = `2`;
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partialy overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `18`;
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] appState 1`] = `
 Object {

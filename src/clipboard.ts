@@ -124,7 +124,7 @@ const getSystemClipboard = async (
 };
 
 /**
- * Attemps to parse clipboard. Prefers system clipboard.
+ * Attempts to parse clipboard. Prefers system clipboard.
  */
 export const parseClipboard = async (
   event: ClipboardEvent | null,

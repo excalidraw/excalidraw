@@ -646,7 +646,7 @@ const getCorners = (
 
 // Returns intersection of `line` with `segment`, with `segment` moved by
 // `gap` in its polar direction.
-// If intersection conincides with second segment point returns empty array.
+// If intersection coincides with second segment point returns empty array.
 const intersectSegment = (
   line: GA.Line,
   segment: [GA.Point, GA.Point],

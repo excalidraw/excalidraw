@@ -431,7 +431,7 @@ Here you can try saving the data to your backend or local storage for example.
 
 This helps to load Excalidraw with `initialData`. It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to an object containing the below optional fields.
 
-| Name | Type | Descrption |
+| Name | Type | Description |
 | --- | --- | --- |
 | `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) | The elements with which Excalidraw should be mounted. |
 | `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) | The App state with which Excalidraw should be mounted. |
@@ -685,7 +685,7 @@ Enable this if you want Excalidraw to handle keyboard even if the component isn'
 
 #### `onLibraryChange`
 
-Ths callback if supplied will get triggered when the library is updated and has the below signature.
+This callback if supplied will get triggered when the library is updated and has the below signature.
 
 <pre>
 (items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void | Promise<any>

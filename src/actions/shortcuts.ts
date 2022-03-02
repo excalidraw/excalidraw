@@ -71,6 +71,6 @@ const shortcutMap: Record<ShortcutName, string[]> = {
 
 export const getShortcutFromShortcutName = (name: ShortcutName) => {
   const shortcuts = shortcutMap[name];
-  // if multiple shortcuts availiable, take the first one
+  // if multiple shortcuts available, take the first one
   return shortcuts && shortcuts.length > 0 ? shortcuts[0] : "";
 };

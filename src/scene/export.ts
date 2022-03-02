@@ -104,7 +104,7 @@ export const exportToSvg = async (
   }
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
-  // initialze SVG root
+  // initialize SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
