@@ -142,7 +142,7 @@ export const textWysiwyg = ({
         maxHeight = container.height - BOUND_TEXT_PADDING * 2;
         width = maxWidth;
         // The coordinates of text box set a distance of
-        // 30px to preserve padding
+        // 5px to preserve padding
         coordX = container.x + BOUND_TEXT_PADDING;
         // autogrow container height if text exceeds
         if (height > maxHeight) {
