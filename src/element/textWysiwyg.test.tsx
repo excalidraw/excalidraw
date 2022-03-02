@@ -77,7 +77,7 @@ describe("textWysiwyg", () => {
         containerId: container.id,
       });
 
-      const unboundText = API.createElement({
+      const boundText2 = API.createElement({
         type: "text",
         text: "ola",
         x: container.width / 2 - textSize / 2,
@@ -87,17 +87,17 @@ describe("textWysiwyg", () => {
         containerId: container.id,
       });
 
-      h.elements = [container, boundText, unboundText];
+      h.elements = [container, boundText, boundText2];
 
       mutateElement(container, {
         boundElements: [{ type: "text", id: boundText.id }],
       });
 
-      API.setSelectedElements([unboundText]);
+      API.setSelectedElements([boundText2]);
 
       Keyboard.keyPress(KEYS.ENTER);
 
-      expect(h.state.editingElement?.id).toBe(unboundText.id);
+      expect(h.state.editingElement?.id).toBe(boundText2.id);
     });
 
     it("should not create bound text on ENTER if text exists at container center", () => {
@@ -106,7 +106,7 @@ describe("textWysiwyg", () => {
         width: 100,
       });
       const textSize = 20;
-      const unboundText = API.createElement({
+      const text = API.createElement({
         type: "text",
         text: "ola",
         x: container.width / 2 - textSize / 2,
@@ -116,13 +116,13 @@ describe("textWysiwyg", () => {
         containerId: container.id,
       });
 
-      h.elements = [container, unboundText];
+      h.elements = [container, text];
 
       API.setSelectedElements([container]);
 
       Keyboard.keyPress(KEYS.ENTER);
 
-      expect(h.state.editingElement?.id).toBe(unboundText.id);
+      expect(h.state.editingElement?.id).toBe(text.id);
     });
 
     it("should edit existing bound text on ENTER even if higher z-index unbound text exists at container center", () => {
@@ -143,7 +143,7 @@ describe("textWysiwyg", () => {
         containerId: container.id,
       });
 
-      const unboundText = API.createElement({
+      const boundText2 = API.createElement({
         type: "text",
         text: "ola",
         x: container.width / 2 - textSize / 2,
@@ -153,7 +153,7 @@ describe("textWysiwyg", () => {
         containerId: container.id,
       });
 
-      h.elements = [container, boundText, unboundText];
+      h.elements = [container, boundText, boundText2];
 
       mutateElement(container, {
         boundElements: [{ type: "text", id: boundText.id }],
