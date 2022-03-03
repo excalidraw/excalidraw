@@ -64,7 +64,7 @@
     "cartoonist": "Caricatura",
     "fileTitle": "Nombre del archivo",
     "colorPicker": "Selector de color",
-    "canvasColors": "",
+    "canvasColors": "Usado en lienzo",
     "canvasBackground": "Fondo del lienzo",
     "drawingCanvas": "Lienzo de dibujo",
     "layers": "Capas",
@@ -203,7 +203,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Para mover lienzo, mantenga la rueda del ratón o la barra espaciadora mientras arrastra",
+    "canvasPanning": "Para mover el lienzo, mantenga la rueda del ratón o la barra de espacio mientras arrastra",
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
