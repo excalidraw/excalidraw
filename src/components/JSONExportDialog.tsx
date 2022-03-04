@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ActionsManagerInterface } from "../actions/types";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { useDeviceInfo } from "./App";
+import { useDeviceType } from "./App";
 import { AppState, ExportOpts, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
 import { exportFile, exportToFileIcon, link } from "./icons";
@@ -114,7 +114,7 @@ export const JSONExportDialog = ({
         icon={exportFile}
         type="button"
         aria-label={t("buttons.export")}
-        showAriaLabel={useDeviceInfo().isMobile}
+        showAriaLabel={useDeviceType().isMobile}
         title={t("buttons.export")}
       />
       {modalIsShown && (

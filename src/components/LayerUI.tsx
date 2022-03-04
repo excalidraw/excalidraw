@@ -42,7 +42,7 @@ import { LibraryMenu } from "./LibraryMenu";
 import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
-import { useDeviceInfo } from "../components/App";
+import { useDeviceType } from "../components/App";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -101,7 +101,7 @@ const LayerUI = ({
   id,
   onImageAction,
 }: LayerUIProps) => {
-  const deviceInfo: DeviceInfo = useDeviceInfo();
+  const deviceType: DeviceInfo = useDeviceType();
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -344,7 +344,7 @@ const LayerUI = ({
                       <HintViewer
                         appState={appState}
                         elements={elements}
-                        isMobile={deviceInfo.isMobile}
+                        isMobile={deviceType.isMobile}
                       />
                       {heading}
                       <Stack.Row gap={1}>
@@ -394,7 +394,7 @@ const LayerUI = ({
                     </Tooltip>
                   ))}
             </UserList>
-            {renderTopRightUI?.(deviceInfo.isMobile, appState)}
+            {renderTopRightUI?.(deviceType.isMobile, appState)}
           </div>
         </div>
       </FixedSideContainer>
@@ -436,7 +436,7 @@ const LayerUI = ({
               )}
               {!viewModeEnabled &&
                 appState.multiElement &&
-                deviceInfo.isTouchScreen && (
+                deviceType.isTouchScreen && (
                   <div
                     className={clsx("finalize-button zen-mode-transition", {
                       "layer-ui__wrapper__footer-left--transition-left":
@@ -513,7 +513,7 @@ const LayerUI = ({
     </>
   );
 
-  return deviceInfo.isMobile ? (
+  return deviceType.isMobile ? (
     <>
       {dialogs}
       <MobileMenu

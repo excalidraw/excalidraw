@@ -2,7 +2,7 @@ import React from "react";
 import { getCommonBounds } from "../element/bounds";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { useDeviceInfo } from "../components/App";
+import { useDeviceType } from "../components/App";
 import { getTargetElements } from "../scene";
 import { AppState, ExcalidrawProps } from "../types";
 import { close } from "./icons";
@@ -16,13 +16,13 @@ export const Stats = (props: {
   onClose: () => void;
   renderCustomStats: ExcalidrawProps["renderCustomStats"];
 }) => {
-  const deviceInfo = useDeviceInfo();
+  const deviceType = useDeviceType();
 
   const boundingBox = getCommonBounds(props.elements);
   const selectedElements = getTargetElements(props.elements, props.appState);
   const selectedBoundingBox = getCommonBounds(selectedElements);
 
-  if (deviceInfo.isMobile && props.appState.openMenu) {
+  if (deviceType.isMobile && props.appState.openMenu) {
     return null;
   }
 

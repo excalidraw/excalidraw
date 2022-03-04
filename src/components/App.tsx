@@ -195,7 +195,7 @@ import {
   LibraryItems,
   PointerDownState,
   SceneData,
-  DeviceInfo,
+  DeviceType,
 } from "../types";
 import {
   debounce,
@@ -253,12 +253,12 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 
-const defaultDeviceInfoContext: DeviceInfo = {
+const defaultDeviceTypeContext: DeviceType = {
   isMobile: false,
   isTouchScreen: false,
 };
-const DeviceInfoContext = React.createContext(defaultDeviceInfoContext);
-export const useDeviceInfo = () => useContext(DeviceInfoContext);
+const DeviceTypeContext = React.createContext(defaultDeviceTypeContext);
+export const useDeviceType = () => useContext(DeviceTypeContext);
 const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
   id: string | null;
@@ -290,7 +290,7 @@ class App extends React.Component<AppProps, AppState> {
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
-  deviceInfo: DeviceInfo = {
+  deviceType: DeviceType = {
     isMobile: false,
     isTouchScreen: false,
   };
@@ -474,7 +474,7 @@ class App extends React.Component<AppProps, AppState> {
       <div
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": viewModeEnabled,
-          "excalidraw--mobile": this.deviceInfo.isMobile,
+          "excalidraw--mobile": this.deviceType.isMobile,
         })}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -486,7 +486,7 @@ class App extends React.Component<AppProps, AppState> {
         <ExcalidrawContainerContext.Provider
           value={this.excalidrawContainerValue}
         >
-          <DeviceInfoContext.Provider value={this.deviceInfo}>
+          <DeviceTypeContext.Provider value={this.deviceType}>
             <LayerUI
               canvas={this.canvas}
               appState={this.state}
@@ -553,7 +553,7 @@ class App extends React.Component<AppProps, AppState> {
               />
             )}
             <main>{this.renderCanvas()}</main>
-          </DeviceInfoContext.Provider>
+          </DeviceTypeContext.Provider>
         </ExcalidrawContainerContext.Provider>
       </div>
     );
@@ -897,7 +897,7 @@ class App extends React.Component<AppProps, AppState> {
         // ---------------------------------------------------------------------
         const { width, height } =
           this.excalidrawContainerRef.current!.getBoundingClientRect();
-        this.deviceInfo.isMobile =
+        this.deviceType.isMobile =
           width < MQ_MAX_WIDTH_PORTRAIT ||
           (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE);
         // refresh offsets
@@ -909,7 +909,7 @@ class App extends React.Component<AppProps, AppState> {
       const mediaQuery = window.matchMedia(
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
-      const handler = () => (this.deviceInfo.isMobile = mediaQuery.matches);
+      const handler = () => (this.deviceType.isMobile = mediaQuery.matches);
       mediaQuery.addListener(handler);
       this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
     }
@@ -1202,7 +1202,7 @@ class App extends React.Component<AppProps, AppState> {
         theme: this.state.theme,
         imageCache: this.imageCache,
         isExporting: false,
-        renderScrollbars: !this.deviceInfo.isMobile,
+        renderScrollbars: !this.deviceType.isMobile,
       },
     );
 
@@ -2388,7 +2388,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
-          this.deviceInfo.isMobile,
+          this.deviceType.isMobile,
         ) &&
         index <= hitElementIndex
       );
@@ -2421,7 +2421,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
-      this.deviceInfo.isMobile,
+      this.deviceType.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUp!,
@@ -2431,7 +2431,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
-      this.deviceInfo.isMobile,
+      this.deviceType.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement.link;
@@ -2779,10 +2779,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      !this.deviceInfo.isTouchScreen &&
+      !this.deviceType.isTouchScreen &&
       ["pen", "touch"].includes(event.pointerType)
     ) {
-      this.deviceInfo.isTouchScreen = true;
+      this.deviceType.isTouchScreen = true;
     }
 
     if (isPanning) {
@@ -2914,7 +2914,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
-    if (this.deviceInfo.isTouchScreen) {
+    if (this.deviceType.isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
@@ -2932,7 +2932,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event, this.deviceInfo.isTouchScreen);
+      this.redirectToLink(event, this.deviceType.isTouchScreen);
     }
 
     this.removePointer(event);
@@ -3301,7 +3301,7 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState.hit.element,
               this.state,
               [pointerDownState.origin.x, pointerDownState.origin.y],
-              this.deviceInfo.isMobile,
+              this.deviceType.isMobile,
             )
           ) {
             return false;
@@ -5280,7 +5280,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.deviceInfo.isMobile &&
+            this.deviceType.isMobile &&
               navigator.clipboard && {
                 name: "paste",
                 perform: (elements, appStates) => {
@@ -5291,7 +5291,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.deviceInfo.isMobile && navigator.clipboard && separator,
+            this.deviceType.isMobile && navigator.clipboard && separator,
             probablySupportsClipboardBlob &&
               elements.length > 0 &&
               actionCopyAsPng,
@@ -5337,9 +5337,9 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.deviceInfo.isMobile && actionCut,
-            this.deviceInfo.isMobile && navigator.clipboard && actionCopy,
-            this.deviceInfo.isMobile &&
+            this.deviceType.isMobile && actionCut,
+            this.deviceType.isMobile && navigator.clipboard && actionCopy,
+            this.deviceType.isMobile &&
               navigator.clipboard && {
                 name: "paste",
                 perform: (elements, appStates) => {
@@ -5350,7 +5350,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.deviceInfo.isMobile && separator,
+            this.deviceType.isMobile && separator,
             ...options,
             separator,
             actionCopyStyles,

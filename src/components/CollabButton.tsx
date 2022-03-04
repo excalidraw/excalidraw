@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { ToolButton } from "./ToolButton";
 import { t } from "../i18n";
-import { useDeviceInfo } from "../components/App";
+import { useDeviceType } from "../components/App";
 import { users } from "./icons";
 
 import "./CollabButton.scss";
@@ -26,7 +26,7 @@ const CollabButton = ({
         type="button"
         title={t("labels.liveCollaboration")}
         aria-label={t("labels.liveCollaboration")}
-        showAriaLabel={useDeviceInfo().isMobile}
+        showAriaLabel={useDeviceType().isMobile}
       >
         {collaboratorCount > 0 && (
           <div className="CollabButton-collaborators">{collaboratorCount}</div>
