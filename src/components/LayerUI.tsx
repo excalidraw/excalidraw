@@ -13,7 +13,7 @@ import {
   AppState,
   ExcalidrawProps,
   BinaryFiles,
-  DeviceInfo,
+  DeviceType,
 } from "../types";
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
@@ -101,7 +101,7 @@ const LayerUI = ({
   id,
   onImageAction,
 }: LayerUIProps) => {
-  const deviceType: DeviceInfo = useDeviceType();
+  const deviceType: DeviceType = useDeviceType();
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
