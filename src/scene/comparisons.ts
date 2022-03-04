@@ -1,9 +1,11 @@
 import {
   ExcalidrawElement,
+  ExcalidrawTextContainer,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 
 import { getElementAbsoluteCoords } from "../element";
+import { isTextBindableContainer } from "../element/typeChecks";
 
 export const hasBackground = (type: string) =>
   type === "rectangle" ||
@@ -72,11 +74,11 @@ export const getElementsAtPosition = (
   );
 };
 
-export const getElementContainingPosition = (
+export const getTextBindableContainerAtPosition = (
   elements: readonly ExcalidrawElement[],
   x: number,
   y: number,
-) => {
+): ExcalidrawTextContainer | null => {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   for (let index = elements.length - 1; index >= 0; --index) {
@@ -89,5 +91,5 @@ export const getElementContainingPosition = (
       break;
     }
   }
-  return hitElement;
+  return isTextBindableContainer(hitElement) ? hitElement : null;
 };

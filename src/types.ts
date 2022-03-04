@@ -389,9 +389,9 @@ export type PointerDownState = Readonly<{
   };
   withCmdOrCtrl: boolean;
   drag: {
-    // Might change during the pointer interation
+    // Might change during the pointer interaction
     hasOccurred: boolean;
-    // Might change during the pointer interation
+    // Might change during the pointer interaction
     offset: { x: number; y: number } | null;
   };
   // We need to have these in the state so that we can unsubscribe them
