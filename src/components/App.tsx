@@ -2699,8 +2699,9 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.showHyperlinkPopup
       ) {
         this.setState({ showHyperlinkPopup: "info" });
-      }
-      if (this.state.elementType === "text") {
+      } else if (this.state.eraserActive) {
+        setCursor(this.canvas, CURSOR_TYPE.AUTO);
+      } else if (this.state.elementType === "text") {
         setCursor(
           this.canvas,
           isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
@@ -3201,6 +3202,22 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
+    if (this.state.eraserActive) {
+      const hitElement = this.getElementAtPosition(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+      );
+      if (hitElement) {
+        const elements = this.scene.getElements().map((ele) => {
+          if (ele.id === hitElement.id) {
+            return newElementWith(ele, { isDeleted: true });
+          }
+          return ele;
+        });
+        this.updateScene({ elements });
+      }
+      return false;
+    }
     if (this.state.elementType === "selection") {
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
@@ -3362,6 +3379,7 @@ class App extends React.Component<AppProps, AppState> {
             // SHIFT the previously selected element(s) were deselected above
             // (make sure you use setState updater to use latest state)
             if (
+              !this.state.eraserActive &&
               !someHitElementIsSelected &&
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
@@ -4090,7 +4108,6 @@ class App extends React.Component<AppProps, AppState> {
         isResizing,
         isRotating,
       } = this.state;
-
       this.setState({
         isResizing: false,
         isRotating: false,
@@ -4369,7 +4386,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState((_prevState) => ({
               selectedElementIds: {
                 ..._prevState.selectedElementIds,
-                [hitElement!.id]: true,
+                //  [hitElement!.id]: true,
               },
             }));
           }
@@ -4378,7 +4395,7 @@ class App extends React.Component<AppProps, AppState> {
             ...selectGroupsForSelectedElements(
               {
                 ...prevState,
-                selectedElementIds: { [hitElement.id]: true },
+                // selectedElementIds: { [hitElement.id]: true },
               },
               this.scene.getElements(),
             ),

@@ -124,6 +124,7 @@ export type AppState = {
   theme: Theme;
   gridSize: number | null;
   viewModeEnabled: boolean;
+  eraserActive: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };

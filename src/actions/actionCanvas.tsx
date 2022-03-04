@@ -1,5 +1,5 @@
 import { ColorPicker } from "../components/ColorPicker";
-import { zoomIn, zoomOut } from "../components/icons";
+import { eraser, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { THEME, ZOOM_STEP } from "../constants";
@@ -288,4 +288,32 @@ export const actionToggleTheme = register({
     </div>
   ),
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
+});
+
+export const actionDelete = register({
+  name: "delete",
+  perform: (elements, appState) => {
+    return {
+      appState: {
+        ...appState,
+        previousSelectedElementIds: appState.selectedElementIds,
+        selectedElementIds: {},
+        eraserActive: true,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ updateData }) => (
+    <ToolButton
+      type="button"
+      icon={eraser}
+      className="eraser"
+      title={t("buttons.eraser")}
+      aria-label={t("buttons.eraser")}
+      onClick={() => {
+        updateData(null);
+      }}
+      size="small"
+    ></ToolButton>
+  ),
 });

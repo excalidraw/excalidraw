@@ -150,7 +150,8 @@
     "remove": "Remove",
     "publishLibrary": "Publish",
     "submit": "Submit",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "eraser": "Eraser"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
