@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/utils",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "dist/excalidraw-utils.min.js",
   "files": [
     "dist/*"
@@ -37,8 +37,8 @@
     "@babel/core": "7.17.2",
     "@babel/plugin-transform-arrow-functions": "7.16.0",
     "@babel/plugin-transform-async-to-generator": "7.16.5",
-    "@babel/plugin-transform-runtime": "^7.14.5",
-    "@babel/plugin-transform-typescript": "7.16.7",
+    "@babel/plugin-transform-runtime": "7.17.0",
+    "@babel/plugin-transform-typescript": "7.16.1",
     "@babel/preset-env": "7.16.7",
     "@babel/preset-typescript": "7.16.7",
     "babel-loader": "8.2.3",
@@ -50,7 +50,7 @@
     "ts-loader": "9.2.6",
     "webpack": "5.66.0",
     "webpack-bundle-analyzer": "4.5.0",
-    "webpack-cli": "4.9.1"
+    "webpack-cli": "4.9.2"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
