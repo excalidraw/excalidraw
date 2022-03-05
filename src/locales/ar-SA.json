@@ -296,22 +296,22 @@
     "title": "",
     "itemName": "",
     "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "githubUsername": "اسم المستخدم في جيت هب",
+    "twitterUsername": "اسم المستخدم في تويتر",
+    "libraryName": "اسم المكتبة",
+    "libraryDesc": "وصف المكتبة",
+    "website": "الموقع",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
+      "authorName": "اسمك أو اسم المستخدم",
+      "libraryName": "اسم مكتبتك",
+      "libraryDesc": "وصف مكتبتك لمساعدة الناس على فهم استخدامها",
       "githubHandle": "",
       "twitterHandle": "",
       "website": ""
     },
     "errors": {
       "required": "مطلوب",
-      "website": ""
+      "website": "أدخل عنوان URL صالح"
     },
     "noteDescription": {
       "pre": "",
