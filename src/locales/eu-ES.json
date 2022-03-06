@@ -180,7 +180,8 @@
     "imageInsertError": "Ezin izan da irudia txertatu. Saiatu berriro geroago...",
     "fileTooBig": "Fitxategia handiegia da. Onartutako gehienezko tamaina {{maxSize}} da.",
     "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
-    "invalidSVGString": "SVG baliogabea."
+    "invalidSVGString": "SVG baliogabea.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Hautapena",
