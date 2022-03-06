@@ -690,7 +690,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         this.portal.socket &&
         this.portal.broadcastMouseLocation(payload);
     },
-    45,
+    30,
   );
 
   onIdleStateChange = (userState: UserIdleState) => {
