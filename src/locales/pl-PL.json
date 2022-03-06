@@ -180,7 +180,8 @@
     "imageInsertError": "Nie udało się wstawić obrazu. Spróbuj ponownie później...",
     "fileTooBig": "Plik jest zbyt duży. Maksymalny dozwolony rozmiar to {{maxSize}}.",
     "svgImageInsertError": "Nie udało się wstawić obrazu SVG. Znacznik SVG wygląda na nieprawidłowy.",
-    "invalidSVGString": "Nieprawidłowy SVG."
+    "invalidSVGString": "Nieprawidłowy SVG.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Zaznaczenie",
