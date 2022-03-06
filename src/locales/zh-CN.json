@@ -180,7 +180,8 @@
     "imageInsertError": "无法插入图像。请稍后再试……",
     "fileTooBig": "文件过大。最大允许的大小为 {{maxSize}}。",
     "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
-    "invalidSVGString": "无效的 SVG。"
+    "invalidSVGString": "无效的 SVG。",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "选择",
