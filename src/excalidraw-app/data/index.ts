@@ -23,7 +23,6 @@ import { saveFilesToFirebase } from "./firebase";
 
 const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
 const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
-const SOCKET_SERVER_RESOLVER = process.env.REACT_APP_SOCKET_SERVER_RESOLVER_URL;
 
 const generateRoomId = async () => {
   const buffer = new Uint8Array(ROOM_ID_BYTES);
@@ -31,17 +30,18 @@ const generateRoomId = async () => {
   return bytesToHexString(buffer);
 };
 
-export const getSocketServer = async () => {
+export const getCollabServer = async (): Promise<{
+  url: string;
+  polling: boolean;
+}> => {
   try {
-    const resp = await fetch(`${SOCKET_SERVER_RESOLVER}/socket-server`, {
-      mode: "cors",
-    });
-    const data = await resp.json();
-
-    return data;
+    const resp = await fetch(
+      `${process.env.REACT_APP_PORTAL_URL}/collab-server`,
+    );
+    return await resp.json();
   } catch (error) {
     console.error(error);
-    throw new Error(t("errors.cannotGetSocketServer"));
+    throw new Error(t("errors.cannotResolveCollabServer"));
   }
 };
 

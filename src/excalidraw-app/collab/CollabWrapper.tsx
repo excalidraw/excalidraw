@@ -27,7 +27,7 @@ import {
 import {
   generateCollaborationLinkData,
   getCollaborationLink,
-  getSocketServer,
+  getCollabServer,
   SocketUpdateDataSource,
 } from "../data";
 import {
@@ -359,9 +359,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     try {
       // Returns from the server URL where to connect sockets
-      const socketServerData = await getSocketServer();
+      const socketServerData = await getCollabServer();
       this.portal.socket = this.portal.open(
-        socketIOClient(socketServerData.socket_server_url),
+        socketIOClient(socketServerData.url),
         roomId,
         roomKey,
       );

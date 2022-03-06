@@ -181,7 +181,7 @@
     "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
     "invalidSVGString": "Invalid SVG.",
-    "cannotGetSocketServer": "Couldn't get socket server. Please refresh page and try again"
+    "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again."
   },
   "toolBar": {
     "selection": "Selection",
