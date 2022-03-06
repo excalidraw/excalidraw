@@ -180,7 +180,8 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।"
+    "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
