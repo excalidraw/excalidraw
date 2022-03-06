@@ -11,7 +11,6 @@ import {
 import { getSceneVersion } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
 import {
-  debounce,
   preventUnload,
   resolvablePromise,
   withBatchedUpdates,
@@ -598,7 +597,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.loadImageFiles();
   };
 
-  private onPointerMove = debounce(() => {
+  private onPointerMove = () => {
     if (this.idleTimeoutId) {
       window.clearTimeout(this.idleTimeoutId);
       this.idleTimeoutId = null;
@@ -612,7 +611,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         ACTIVE_THRESHOLD,
       );
     }
-  }, 500);
+  };
 
   private onVisibilityChange = () => {
     if (document.hidden) {
