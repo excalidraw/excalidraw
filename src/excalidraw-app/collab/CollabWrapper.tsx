@@ -27,8 +27,8 @@ import {
 import {
   generateCollaborationLinkData,
   getCollaborationLink,
+  getSocketServer,
   SocketUpdateDataSource,
-  SOCKET_SERVER,
 } from "../data";
 import {
   isSavedToFirebase,
@@ -357,7 +357,19 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       /* webpackChunkName: "socketIoClient" */ "socket.io-client"
     );
 
-    this.portal.open(socketIOClient(SOCKET_SERVER), roomId, roomKey);
+    try {
+      // Returns from the server URL where to connect sockets
+      const socketServerData = await getSocketServer();
+      this.portal.open(
+        socketIOClient(socketServerData.socket_server_url),
+        roomId,
+        roomKey,
+      );
+    } catch (error: any) {
+      console.error(error);
+      this.setState({ errorMessage: error.message });
+      return null;
+    }
 
     if (existingRoomLinkData) {
       this.excalidrawAPI.resetScene();

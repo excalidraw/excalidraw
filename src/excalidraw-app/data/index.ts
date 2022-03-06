@@ -23,6 +23,7 @@ import { saveFilesToFirebase } from "./firebase";
 
 const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
 const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
+const SOCKET_SERVER_RESOLVER = process.env.REACT_APP_SOCKET_SERVER_RESOLVER_URL;
 
 const generateRoomId = async () => {
   const buffer = new Uint8Array(ROOM_ID_BYTES);
@@ -30,7 +31,19 @@ const generateRoomId = async () => {
   return bytesToHexString(buffer);
 };
 
-export const SOCKET_SERVER = process.env.REACT_APP_SOCKET_SERVER_URL;
+export const getSocketServer = async () => {
+  try {
+    const resp = await fetch(`${SOCKET_SERVER_RESOLVER}/socket-server`, {
+      mode: "cors",
+    });
+    const data = await resp.json();
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw new Error(t("errors.cannotGetSocketServer"));
+  }
+};
 
 export type EncryptedData = {
   data: ArrayBuffer;

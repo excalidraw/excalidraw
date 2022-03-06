@@ -180,7 +180,8 @@
     "imageInsertError": "Couldn't insert image. Try again later...",
     "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
-    "invalidSVGString": "Invalid SVG."
+    "invalidSVGString": "Invalid SVG.",
+    "cannotGetSocketServer": "Couldn't get socket server. Please refresh page and try again"
   },
   "toolBar": {
     "selection": "Selection",
