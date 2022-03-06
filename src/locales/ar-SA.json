@@ -108,9 +108,9 @@
     "increaseFontSize": "تكبير حجم الخط",
     "unbindText": "",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "تعديل الرابط",
+      "create": "إنشاء رابط",
+      "label": "رابط"
     }
   },
   "buttons": {
@@ -168,7 +168,7 @@
     "errorAddingToLibrary": "تعذر إضافة العنصر للمكتبة",
     "errorRemovingFromLibrary": "تعذر إزالة العنصر من المكتبة",
     "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "يبدو أن هذه الصورة لا تحتوي على أي بيانات مشهد. هل قمت بتمكين تضمين المشهد أثناء التصدير؟",
     "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة",
     "invalidSceneUrl": "تعذر استيراد المشهد من عنوان URL المتوفر. إما أنها مشوهة، أو لا تحتوي على بيانات Excalidraw JSON صالحة.",
     "resetLibrary": "هذا سوف يمسح مكتبتك. هل أنت متأكد؟",
@@ -219,7 +219,7 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": "",
+    "publishLibrary": "نشر مكتبتك",
     "bindTextToElement": "",
     "deepBoxSelect": ""
   },
@@ -291,12 +291,12 @@
     "zoomToSelection": "تكبير للعنصر المحدد"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "مسح اللوحة"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
+    "title": "نشر المكتبة",
+    "itemName": "إسم العنصر",
+    "authorName": "إسم المؤلف",
     "githubUsername": "اسم المستخدم في جيت هب",
     "twitterUsername": "اسم المستخدم في تويتر",
     "libraryName": "اسم المكتبة",
@@ -316,21 +316,21 @@
     },
     "noteDescription": {
       "pre": "",
-      "link": "",
-      "post": ""
+      "link": "مستودع المكتبة العامة",
+      "post": "ليستخدمها الآخرون في رسوماتهم."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
+      "pre": "يجب الموافقة على المكتبة يدويًا أولاً. يرجى قراءة ",
+      "link": "الإرشادات",
       "post": ""
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
-      "post": ""
+      "link": "رخصة إم أي تي ",
+      "post": "وهو ما يعني باختصار أنه يمكن لأي شخص استخدامها دون قيود."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "يجب أن يكون لكل عنصر مكتبة اسمه الخاص حتى يكون قابلاً للتصفية. سيتم تضمين عناصر المكتبة التالية:",
+    "atleastOneLibItem": "يرجى تحديد عنصر مكتبة واحد على الأقل للبدء"
   },
   "publishSuccessDialog": {
     "title": "تم إرسال المكتبة",
