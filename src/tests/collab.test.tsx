@@ -18,9 +18,9 @@ Object.defineProperty(window, "crypto", {
 jest.mock("../excalidraw-app/data/index.ts", () => ({
   __esmodule: true,
   ...jest.requireActual("../excalidraw-app/data/index.ts"),
-  getSocketServer: jest.fn(
-    () => /* doesn't really matter */ "http://localhost:3002",
-  ),
+  getCollabServer: jest.fn(() => ({
+    url: /* doesn't really matter */ "http://localhost:3002",
+  })),
 }));
 
 jest.mock("../excalidraw-app/data/firebase.ts", () => {
