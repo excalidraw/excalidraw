@@ -181,7 +181,7 @@
     "fileTooBig": "Il file è troppo grande. La dimensione massima consentita è {{maxSize}}.",
     "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
     "invalidSVGString": "SVG non valido.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova."
   },
   "toolBar": {
     "selection": "Selezione",
