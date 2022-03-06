@@ -180,7 +180,8 @@
     "imageInsertError": "تعذر إدراج الصورة. حاول مرة أخرى لاحقاً...",
     "fileTooBig": "الملف كبير جداً. الحد الأقصى المسموح به للحجم هو {{maxSize}}.",
     "svgImageInsertError": "تعذر إدراج صورة SVG. يبدو أن ترميز SVG غير صحيح.",
-    "invalidSVGString": "SVG غير صالح."
+    "invalidSVGString": "SVG غير صالح.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "تحديد",
