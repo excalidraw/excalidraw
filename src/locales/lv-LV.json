@@ -180,7 +180,8 @@
     "imageInsertError": "Nevarēja ievietot attēlu. Mēģiniet vēlāk...",
     "fileTooBig": "Datne ir par lielu. Lielākais atļautais izmērs ir {{maxSize}}.",
     "svgImageInsertError": "Nevarēja ievietot SVG attēlu. Šķiet, ka SVG marķējums nav derīgs.",
-    "invalidSVGString": "Nederīgs SVG."
+    "invalidSVGString": "Nederīgs SVG.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Atlase",
