@@ -64,7 +64,7 @@
     "cartoonist": "Dibuixant",
     "fileTitle": "Nom del fitxer",
     "colorPicker": "Selector de colors",
-    "canvasColors": "",
+    "canvasColors": "Usat al llenç",
     "canvasBackground": "Fons del llenç",
     "drawingCanvas": "Llenç de dibuix",
     "layers": "Capes",
@@ -104,13 +104,13 @@
     "toggleTheme": "Activa o desactiva el tema",
     "personalLib": "Biblioteca personal",
     "excalidrawLib": "Biblioteca d'Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
-    "unbindText": "",
+    "decreaseFontSize": "Redueix la mida de la lletra",
+    "increaseFontSize": "Augmenta la mida de la lletra",
+    "unbindText": "Desvincular el text",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Edita l'enllaç",
+      "create": "Crea un enllaç",
+      "label": "Enllaç"
     }
   },
   "buttons": {
@@ -168,7 +168,7 @@
     "errorAddingToLibrary": "No s'ha pogut afegir l'element a la biblioteca",
     "errorRemovingFromLibrary": "No s'ha pogut eliminar l'element de la biblioteca",
     "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Aquesta imatge no sembla contenir cap dada d'escena. Heu activat l'incrustació de l'escena durant l'exportació?",
     "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge",
     "invalidSceneUrl": "No s'ha pogut importar l'escena des de l'adreça URL proporcionada. Està malformada o no conté dades Excalidraw JSON vàlides.",
     "resetLibrary": "Això buidarà la biblioteca. N'esteu segur?",
@@ -194,8 +194,8 @@
     "text": "Text",
     "library": "Biblioteca",
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
-    "penMode": "",
-    "link": ""
+    "penMode": "Evita el zoom i accepta solament el dibuix lliure amb bolígraf",
+    "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada"
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -215,12 +215,12 @@
     "resizeImage": "Podeu redimensionar lliurement prement MAJÚSCULA;\nper a redimensionar des del centre, premeu ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
     "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Premeu Suprimir per a eliminar el(s) punt(s), CtrlOrCmd+D per a duplicar-lo, o arrossegueu-lo per a moure'l",
+    "lineEditor_nothingSelected": "Seleccioneu un punt per a editar-lo (premeu SHIFT si voleu\nselecció múltiple), o manteniu Alt i feu clic per a afegir més punts",
     "placeImage": "Feu clic per a col·locar la imatge o clic i arrossegar per a establir-ne la mida manualment",
     "publishLibrary": "Publiqueu la vostra pròpia llibreria",
     "bindTextToElement": "Premeu enter per a afegir-hi text",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament"
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
@@ -267,7 +267,7 @@
   "helpDialog": {
     "blog": "Llegiu el nostre blog",
     "click": "clic",
-    "deepSelect": "",
+    "deepSelect": "Selecció profunda",
     "deepBoxSelect": "",
     "curvedArrow": "Fletxa corba",
     "curvedLine": "Línia corba",
@@ -306,7 +306,7 @@
       "libraryName": "Nom de la vostra biblioteca",
       "libraryDesc": "Descripció de la biblioteca per a ajudar a la gent a entendre'n el funcionament",
       "githubHandle": "",
-      "twitterHandle": "",
+      "twitterHandle": "Usuari de twitter (opcional), per tal que puguem donar-vos crèdit quan fem la promoció a Twitter",
       "website": "Enllaç al vostre lloc web personal o a qualsevol altre (opcional)"
     },
     "errors": {
