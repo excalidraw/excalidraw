@@ -358,14 +358,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     );
 
     try {
-      // Returns from the server URL where to connect sockets
       const socketServerData = await getCollabServer();
       this.portal.socket = this.portal.open(
         socketIOClient(socketServerData.url, {
-          // only reason why we conrol polling from upstream is to allow
-          // switching it on/off immediately when needed without having to
-          // wait for clients to update the SW
-          // (likely we'll switch to websockets completely soon)
           transports: socketServerData.polling
             ? ["websocket", "polling"]
             : ["websocket"],

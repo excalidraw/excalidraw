@@ -30,6 +30,11 @@ const generateRoomId = async () => {
   return bytesToHexString(buffer);
 };
 
+/**
+ * Right now the reason why we resolve connection params (url, polling...)
+ * from upstream is to allow changing the params immediately when needed without
+ * having to wait for clients to update the SW.
+ */
 export const getCollabServer = async (): Promise<{
   url: string;
   polling: boolean;
