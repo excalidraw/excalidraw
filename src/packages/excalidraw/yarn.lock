@@ -3036,15 +3036,7 @@ methods@~1.1.2:
   resolved "https://registry.yarnpkg.com/methods/-/methods-1.1.2.tgz#5529a4d67654134edcc5266656835b0f851afcee"
   integrity sha1-VSmk1nZUE07cxSZmVoNbD4Ua/O4=
 
-micromatch@^4.0.0:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-4.0.2.tgz#4fcb0999bf9fbc2fcbdd212f6d629b9a56c39259"
-  integrity sha512-y7FpHSbMUMoyPbYUSzO6PaZ6FyRnQOpHuKwbo1G+Knck95XVU4QAiKdGEnj5wwoS7PlOgthX/09u5iFJ+aYf5Q==
-  dependencies:
-    braces "^3.0.1"
-    picomatch "^2.0.5"
-
-micromatch@^4.0.2, micromatch@^4.0.4:
+micromatch@^4.0.0, micromatch@^4.0.2, micromatch@^4.0.4:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-4.0.4.tgz#896d519dfe9db25fce94ceb7a500919bf881ebf9"
   integrity sha512-pRmzw/XUcwXGpD9aI9q/0XOwLNygjETJ8y0ao0wdqprrzDa4YnxLcz7fQRZr8voh8V10kGhABbNcHVk5wHgWwg==
@@ -3355,11 +3347,6 @@ picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.2.3:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.0.tgz#f1f061de8f6a4bf022892e2d128234fb98302972"
   integrity sha512-lY1Q/PiJGC2zOv/z391WOTD+Z02bCgsFfvxoXXf6h7kv9o+WmsmzYqrAwY63sNgOxE4xEdq0WyUnXfKeBrSvYw==
-
-picomatch@^2.0.5:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.2.2.tgz#21f333e9b6b8eaff02468f5146ea406d345f4dad"
-  integrity sha512-q0M/9eZHzmr0AulXyPwNfZjtwZ/RBZlbN3K3CErVrk50T2ASYI7Bye0EvekFY3IP1Nt2DHu0re+V2ZHIpMkuWg==
 
 pkg-dir@^4.1.0, pkg-dir@^4.2.0:
   version "4.2.0"
@@ -4002,10 +3989,10 @@ totalist@^1.0.0:
   resolved "https://registry.yarnpkg.com/totalist/-/totalist-1.1.0.tgz#a4d65a3e546517701e3e5c37a47a70ac97fe56df"
   integrity sha512-gduQwd1rOdDMGxFG1gEvhV88Oirdo2p+KjoYFU7k2g+i7n6AFFbDQ5kMPUsW0pNbfQsB/cwXvT1i4Bue0s9g5g==
 
-ts-loader@9.2.6:
-  version "9.2.6"
-  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-9.2.6.tgz#9937c4dd0a1e3dbbb5e433f8102a6601c6615d74"
-  integrity sha512-QMTC4UFzHmu9wU2VHZEmWWE9cUajjfcdcws+Gh7FhiO+Dy0RnR1bNz0YCHqhI0yRowCE9arVnNxYHqELOy9Hjw==
+ts-loader@9.2.7:
+  version "9.2.7"
+  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-9.2.7.tgz#948654099ca96992b62ec47bd9cee5632006e101"
+  integrity sha512-Fxh44mKli9QezgbdCXkEJWxnedQ0ead7DXTH+lfXEPedu+Y9EtMJ2aQ9G3Dj1j7Q612E8931rww8NDZha4Tibg==
   dependencies:
     chalk "^4.1.0"
     enhanced-resolve "^5.0.0"
