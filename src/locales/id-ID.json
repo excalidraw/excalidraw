@@ -181,7 +181,7 @@
     "fileTooBig": "File terlalu besar. Ukuran maksimum yang dibolehkan {{maxSize}}.",
     "svgImageInsertError": "Tidak dapat menyisipkan gambar SVG. Markup SVG sepertinya tidak valid.",
     "invalidSVGString": "SVG tidak valid.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Tidak dapat terhubung ke server kolab. Muat ulang laman dan coba lagi."
   },
   "toolBar": {
     "selection": "Pilihan",
