@@ -180,7 +180,8 @@
     "imageInsertError": "No s'ha pogut insertar la imatge, torneu-ho a provar més tard...",
     "fileTooBig": "El fitxer és massa gros. La mida màxima permesa és {{maxSize}}.",
     "svgImageInsertError": "No ha estat possible inserir la imatge SVG. Les marques SVG semblen invàlides.",
-    "invalidSVGString": "SVG no vàlid."
+    "invalidSVGString": "SVG no vàlid.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Selecció",
