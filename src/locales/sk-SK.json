@@ -180,7 +180,8 @@
     "imageInsertError": "Nepodarilo sa vložiť obrázok. Skúste to znova neskôr...",
     "fileTooBig": "Súbor je príliš veľký. Maximálna povolená veľkosť je {{maxSize}}.",
     "svgImageInsertError": "Nepodarilo sa vložiť SVG obrázok. SVG formát je pravdepodobne nevalidný.",
-    "invalidSVGString": "Nevalidné SVG."
+    "invalidSVGString": "Nevalidné SVG.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Výber",
