@@ -181,7 +181,7 @@
     "fileTooBig": "Filen er for stor. Maksimal tillatt størrelse er {{maxSize}}.",
     "svgImageInsertError": "Kunne ikke sette inn SVG-bilde. SVG-koden ser ugyldig ut.",
     "invalidSVGString": "Ugyldig SVG.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Kunne ikke koble til samarbeidsserveren. Vennligst oppdater siden og prøv på nytt."
   },
   "toolBar": {
     "selection": "Velg",
