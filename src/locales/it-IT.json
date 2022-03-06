@@ -194,7 +194,7 @@
     "text": "Testo",
     "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato",
-    "penMode": "",
+    "penMode": "Impedisci il pinch-zoom e accetta l'input di disegno libero solo dalla penna",
     "link": "Aggiungi/ aggiorna il link per una forma selezionata"
   },
   "headings": {
@@ -215,12 +215,12 @@
     "resizeImage": "Puoi ridimensionare liberamente tenendo premuto SHIFT,\ntieni premuto ALT per ridimensionare dal centro",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Premi Elimina per rimuovere il punto(i),\nCtrlOCmd+D per duplicare o trascinare per spostare",
+    "lineEditor_nothingSelected": "Seleziona un punto da modificare (tieni premuto MAIUSC per selezionare più punti),\noppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
     "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente",
     "publishLibrary": "Pubblica la tua libreria",
     "bindTextToElement": "Premi invio per aggiungere il testo",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Tieni premuto CtrlOCmd per selezionare in profondità e per impedire il trascinamento"
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
