@@ -11,6 +11,7 @@ import {
 import { getSceneVersion } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
 import {
+  debounce,
   preventUnload,
   resolvablePromise,
   withBatchedUpdates,
@@ -597,19 +598,21 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.loadImageFiles();
   };
 
-  private onPointerMove = () => {
+  private onPointerMove = debounce(() => {
     if (this.idleTimeoutId) {
       window.clearTimeout(this.idleTimeoutId);
       this.idleTimeoutId = null;
     }
+
     this.idleTimeoutId = window.setTimeout(this.reportIdle, IDLE_THRESHOLD);
+
     if (!this.activeIntervalId) {
       this.activeIntervalId = window.setInterval(
         this.reportActive,
         ACTIVE_THRESHOLD,
       );
     }
-  };
+  }, 500);
 
   private onVisibilityChange = () => {
     if (document.hidden) {
@@ -677,15 +680,18 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     return this.excalidrawAPI.getSceneElementsIncludingDeleted();
   };
 
-  onPointerUpdate = (payload: {
-    pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
-    button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
-    pointersMap: Gesture["pointers"];
-  }) => {
-    payload.pointersMap.size < 2 &&
-      this.portal.socket &&
-      this.portal.broadcastMouseLocation(payload);
-  };
+  onPointerUpdate = throttle(
+    (payload: {
+      pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
+      button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
+      pointersMap: Gesture["pointers"];
+    }) => {
+      payload.pointersMap.size < 2 &&
+        this.portal.socket &&
+        this.portal.broadcastMouseLocation(payload);
+    },
+    45,
+  );
 
   onIdleStateChange = (userState: UserIdleState) => {
     this.setState({ userState });
