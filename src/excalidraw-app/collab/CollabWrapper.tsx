@@ -16,6 +16,7 @@ import {
   withBatchedUpdates,
 } from "../../utils";
 import {
+  CURSOR_SYNC_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
   FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
@@ -602,7 +603,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       window.clearTimeout(this.idleTimeoutId);
       this.idleTimeoutId = null;
     }
+
     this.idleTimeoutId = window.setTimeout(this.reportIdle, IDLE_THRESHOLD);
+
     if (!this.activeIntervalId) {
       this.activeIntervalId = window.setInterval(
         this.reportActive,
@@ -677,15 +680,18 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     return this.excalidrawAPI.getSceneElementsIncludingDeleted();
   };
 
-  onPointerUpdate = (payload: {
-    pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
-    button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
-    pointersMap: Gesture["pointers"];
-  }) => {
-    payload.pointersMap.size < 2 &&
-      this.portal.socket &&
-      this.portal.broadcastMouseLocation(payload);
-  };
+  onPointerUpdate = throttle(
+    (payload: {
+      pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
+      button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
+      pointersMap: Gesture["pointers"];
+    }) => {
+      payload.pointersMap.size < 2 &&
+        this.portal.socket &&
+        this.portal.broadcastMouseLocation(payload);
+    },
+    CURSOR_SYNC_TIMEOUT,
+  );
 
   onIdleStateChange = (userState: UserIdleState) => {
     this.setState({ userState });
