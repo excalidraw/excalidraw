@@ -267,8 +267,8 @@
   "helpDialog": {
     "blog": "Leggi il nostro blog",
     "click": "click",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Selezione profonda",
+    "deepBoxSelect": "Seleziona in profondità all'interno della casella e previene il trascinamento",
     "curvedArrow": "Freccia curva",
     "curvedLine": "Linea curva",
     "documentation": "Documentazione",
