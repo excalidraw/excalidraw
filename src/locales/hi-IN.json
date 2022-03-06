@@ -180,7 +180,8 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "चयन",
