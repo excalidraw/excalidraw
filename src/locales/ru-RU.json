@@ -180,7 +180,8 @@
     "imageInsertError": "Не удалось вставить изображение. Попробуйте позже...",
     "fileTooBig": "Очень большой файл. Максимально разрешенный размер {{maxSize}}.",
     "svgImageInsertError": "Не удалось вставить изображение SVG. Разметка SVG выглядит недействительной.",
-    "invalidSVGString": "Некорректный SVG."
+    "invalidSVGString": "Некорректный SVG.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Выделение области",
