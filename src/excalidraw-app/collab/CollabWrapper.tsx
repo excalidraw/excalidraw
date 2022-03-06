@@ -353,14 +353,14 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     this.isCollaborating = true;
 
-    const { default: socketIOClient }: any = await import(
+    const { default: socketIOClient } = await import(
       /* webpackChunkName: "socketIoClient" */ "socket.io-client"
     );
 
     try {
       // Returns from the server URL where to connect sockets
       const socketServerData = await getSocketServer();
-      this.portal.open(
+      this.portal.socket = this.portal.open(
         socketIOClient(socketServerData.socket_server_url),
         roomId,
         roomKey,
@@ -371,26 +371,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       return null;
     }
 
-    if (existingRoomLinkData) {
-      this.excalidrawAPI.resetScene();
-
-      try {
-        const elements = await loadFromFirebase(
-          roomId,
-          roomKey,
-          this.portal.socket,
-        );
-        if (elements) {
-          scenePromise.resolve({
-            elements,
-            scrollToContent: true,
-          });
-        }
-      } catch (error: any) {
-        // log the error and move on. other peers will sync us the scene.
-        console.error(error);
-      }
-    } else {
+    if (!existingRoomLinkData) {
       const elements = this.excalidrawAPI.getSceneElements().map((element) => {
         if (isImageElement(element) && element.status === "saved") {
           return newElementWith(element, { status: "pending" });
@@ -414,14 +395,17 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     }
 
     // fallback in case you're not alone in the room but still don't receive
-    // initial SCENE_UPDATE message
+    // initial SCENE_INIT message
     this.socketInitializationTimer = window.setTimeout(() => {
-      this.initializeSocket();
+      this.initializeRoom({
+        roomLinkData: existingRoomLinkData,
+        fetchScene: true,
+      });
       scenePromise.resolve(null);
     }, INITIAL_SCENE_UPDATE_TIMEOUT);
 
     // All socket listeners are moving to Portal
-    this.portal.socket!.on(
+    this.portal.socket.on(
       "client-broadcast",
       async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
         if (!this.portal.roomKey) {
@@ -439,7 +423,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             return;
           case SCENE.INIT: {
             if (!this.portal.socketInitialized) {
-              this.initializeSocket();
+              this.initializeRoom({ fetchScene: false });
               const remoteElements = decryptedData.payload.elements;
               const reconciledElements = this.reconcileElements(remoteElements);
               this.handleRemoteSceneUpdate(reconciledElements, {
@@ -493,12 +477,15 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       },
     );
 
-    this.portal.socket!.on("first-in-room", () => {
+    this.portal.socket.on("first-in-room", async () => {
       if (this.portal.socket) {
         this.portal.socket.off("first-in-room");
       }
-      this.initializeSocket();
-      scenePromise.resolve(null);
+      const sceneData = await this.initializeRoom({
+        fetchScene: true,
+        roomLinkData: existingRoomLinkData,
+      });
+      scenePromise.resolve(sceneData);
     });
 
     this.initializeIdleDetector();
@@ -510,9 +497,45 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     return scenePromise;
   };
 
-  private initializeSocket = () => {
-    this.portal.socketInitialized = true;
+  private initializeRoom = async ({
+    fetchScene,
+    roomLinkData,
+  }:
+    | {
+        fetchScene: true;
+        roomLinkData: { roomId: string; roomKey: string } | null;
+      }
+    | { fetchScene: false; roomLinkData?: null }) => {
     clearTimeout(this.socketInitializationTimer!);
+    if (fetchScene && roomLinkData && this.portal.socket) {
+      this.excalidrawAPI.resetScene();
+
+      try {
+        const elements = await loadFromFirebase(
+          roomLinkData.roomId,
+          roomLinkData.roomKey,
+          this.portal.socket,
+        );
+        if (elements) {
+          this.setLastBroadcastedOrReceivedSceneVersion(
+            getSceneVersion(elements),
+          );
+
+          return {
+            elements,
+            scrollToContent: true,
+          };
+        }
+      } catch (error: any) {
+        // log the error and move on. other peers will sync us the scene.
+        console.error(error);
+      } finally {
+        this.portal.socketInitialized = true;
+      }
+    } else {
+      this.portal.socketInitialized = true;
+    }
+    return null;
   };
 
   private reconcileElements = (
