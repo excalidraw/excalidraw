@@ -180,7 +180,8 @@
     "imageInsertError": "이미지를 삽입할 수 없습니다. 나중에 다시 시도 하십시오",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "선택",
