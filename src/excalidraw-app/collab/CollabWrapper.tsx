@@ -16,6 +16,7 @@ import {
   withBatchedUpdates,
 } from "../../utils";
 import {
+  CURSOR_SYNC_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
   FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
@@ -689,7 +690,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         this.portal.socket &&
         this.portal.broadcastMouseLocation(payload);
     },
-    30,
+    CURSOR_SYNC_TIMEOUT,
   );
 
   onIdleStateChange = (userState: UserIdleState) => {
