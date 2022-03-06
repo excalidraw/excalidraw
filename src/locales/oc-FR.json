@@ -180,7 +180,8 @@
     "imageInsertError": "Insercion d’imatge impossibla. Tornatz ensajar mai tard...",
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
-    "invalidSVGString": "SVG invalid."
+    "invalidSVGString": "SVG invalid.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Seleccion",
