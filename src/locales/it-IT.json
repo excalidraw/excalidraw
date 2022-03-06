@@ -180,7 +180,8 @@
     "imageInsertError": "Non è stato possibile inserire l'immagine. Riprova più tardi...",
     "fileTooBig": "Il file è troppo grande. La dimensione massima consentita è {{maxSize}}.",
     "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
-    "invalidSVGString": "SVG non valido."
+    "invalidSVGString": "SVG non valido.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Selezione",
