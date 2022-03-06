@@ -180,7 +180,8 @@
     "imageInsertError": "படத்தைப் புகுத்தவியலா. பிறகு மீண்டும் முயலவும்...",
     "fileTooBig": "கோப்பு மிகப்பெரிது. அனுமதிக்கப்பட்ட அதிகபட்ச அளவு {{maxSize}}.",
     "svgImageInsertError": "எஸ்விஜி படத்தைப் புகுத்தவியலா. எஸ்விஜியின் மார்க்அப் செல்லாததாக தெரிகிறது.",
-    "invalidSVGString": "செல்லாத SVG."
+    "invalidSVGString": "செல்லாத SVG.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "தெரிவு",
