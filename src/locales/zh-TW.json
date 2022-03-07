@@ -181,7 +181,7 @@
     "fileTooBig": "檔案過大。可接受的最大尺寸為 {{maxSize}} 。",
     "svgImageInsertError": "無法插入 SVG 圖片。此 SVG 檔案有問題。",
     "invalidSVGString": "無效的 SVG。",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "無法連結至 collab 伺服器。請重新整理後再試一次。"
   },
   "toolBar": {
     "selection": "選取",
