@@ -420,7 +420,7 @@ export type ExcalidrawImperativeAPI = {
     clear: InstanceType<typeof App>["resetHistory"];
   };
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
-  zoomToFit: InstanceType<typeof App>["zoomToFit"];
+  zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
@@ -428,14 +428,15 @@ export type ExcalidrawImperativeAPI = {
   importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
   setToastMessage: InstanceType<typeof App>["setToastMessage"];
   addFiles: (data: BinaryFileData[]) => void;
-  updateContainerSize: InstanceType<typeof App>["updateContainerSize"];
+  updateContainerSize: InstanceType<typeof App>["updateContainerSize"]; //zsviczian
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
   id: string;
-  setLocalFont: (showOnPanel: boolean) => void;
-  selectElements: (elements: readonly ExcalidrawElement[]) => void;
-  sendBackward: (elements: readonly ExcalidrawElement[]) => void;
-  bringForward: (elements: readonly ExcalidrawElement[]) => void;
-  sendToBack: (elements: readonly ExcalidrawElement[]) => void;
-  bringToFront: (elements: readonly ExcalidrawElement[]) => void;
+  setLocalFont: (showOnPanel: boolean) => void; //zsviczian
+  selectElements: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
+  sendBackward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
+  bringForward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
+  sendToBack: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
+  bringToFront: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
+  restore: InstanceType<typeof App>["restore"]; //zsviczian
 };

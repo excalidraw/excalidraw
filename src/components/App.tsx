@@ -76,7 +76,12 @@ import {
 import { loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
 import Library from "../data/library";
-import { restore, restoreElements, restoreLibraryItems } from "../data/restore";
+import {
+  restore,
+  RestoredDataState,
+  restoreElements,
+  restoreLibraryItems,
+} from "../data/restore"; //zsviczian
 import {
   dragNewElement,
   dragSelectedElements,
@@ -253,6 +258,7 @@ import {
   isPointHittingLinkIcon,
   isLocalLink,
 } from "../element/Hyperlink";
+import { ImportedDataState } from "../data/types"; //zsviczian
 
 export let showFourthFont: boolean = false;
 const IsMobileContext = React.createContext(false);
@@ -361,21 +367,22 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
-        zoomToFit: this.zoomToFit,
+        zoomToFit: this.zoomToFit, //zsviczian
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
         refresh: this.refresh,
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
-        updateContainerSize: this.updateContainerSize,
+        updateContainerSize: this.updateContainerSize, //zsviczian
         id: this.id,
-        setLocalFont: this.setLocalFont,
-        selectElements: this.selectElements,
-        sendBackward: this.sendBackward,
-        bringForward: this.bringForward,
-        sendToBack: this.sendToBack,
-        bringToFront: this.bringToFront,
+        setLocalFont: this.setLocalFont, //zsviczian
+        selectElements: this.selectElements, //zsviczian
+        sendBackward: this.sendBackward, //zsviczian
+        bringForward: this.bringForward, //zsviczian
+        sendToBack: this.sendToBack, //zsviczian
+        bringToFront: this.bringToFront, //zsviczian
+        restore: this.restore, //zsviczian
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1604,6 +1611,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  //zsviczian
   zoomToFit = (
     target: readonly ExcalidrawElement[] = this.scene.getElements(),
     maxZoom: number = 1, //null will zoom to max based on viewport
@@ -1643,6 +1651,11 @@ class App extends React.Component<AppProps, AppState> {
       });
     },
   );
+
+  //zsviczian
+  restore = (data: ImportedDataState): RestoredDataState => {
+    return restore(data, null, null);
+  };
 
   clearToast = () => {
     this.setState({ toastMessage: null });
