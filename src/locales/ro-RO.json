@@ -181,7 +181,7 @@
     "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
     "invalidSVGString": "SVG invalid.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou."
   },
   "toolBar": {
     "selection": "Selecție",
