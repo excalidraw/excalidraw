@@ -4403,7 +4403,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState((_prevState) => ({
               selectedElementIds: {
                 ..._prevState.selectedElementIds,
-                //  [hitElement!.id]: true,
+                [hitElement!.id]: true,
               },
             }));
           }
@@ -4412,7 +4412,7 @@ class App extends React.Component<AppProps, AppState> {
             ...selectGroupsForSelectedElements(
               {
                 ...prevState,
-                // selectedElementIds: { [hitElement.id]: true },
+                selectedElementIds: { [hitElement.id]: true },
               },
               this.scene.getElements(),
             ),
