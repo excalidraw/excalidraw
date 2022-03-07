@@ -314,6 +314,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   contextMenuOpen: boolean = false;
+  elementIdsToErase: { [key: ExcalidrawElement["id"]]: boolean } = {};
 
   constructor(props: AppProps) {
     super(props);
@@ -2621,10 +2622,27 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const hasDeselectedButton = Boolean(event.buttons);
+    if (hasDeselectedButton && this.state.elementType === "eraser") {
+      const hitElement = this.getElementAtPosition(
+        scenePointerX,
+        scenePointerY,
+      );
+      if (hitElement) {
+        const elements = this.scene.getElements().map((ele) => {
+          if (ele.id === hitElement.id) {
+            this.elementIdsToErase[ele.id] = true;
+            return newElementWith(ele, { opacity: 20 });
+          }
+          return ele;
+        });
+        this.updateScene({ elements });
+      }
+    }
     if (
       hasDeselectedButton ||
       (this.state.elementType !== "selection" &&
-        this.state.elementType !== "text")
+        this.state.elementType !== "text" &&
+        this.state.elementType !== "eraser")
     ) {
       return;
     }
@@ -2699,7 +2717,7 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.showHyperlinkPopup
       ) {
         this.setState({ showHyperlinkPopup: "info" });
-      } else if (this.state.eraserActive) {
+      } else if (this.state.elementType === "eraser") {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
       } else if (this.state.elementType === "text") {
         setCursor(
@@ -2774,6 +2792,7 @@ class App extends React.Component<AppProps, AppState> {
     if (isPanning) {
       return;
     }
+
     this.lastPointerDown = event;
     this.setState({
       lastPointerDownWith: event.pointerType,
@@ -2824,7 +2843,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.elementType === "text" ||
       this.state.elementType === "image";
 
-    if (!allowOnPointerDown) {
+    if (!allowOnPointerDown || this.state.elementType === "eraser") {
       return;
     }
 
@@ -2901,7 +2920,7 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.lastPointerUp = event;
     const isTouchScreen = ["pen", "touch"].includes(event.pointerType);
-    if (isTouchScreen) {
+    if (isTouchScreen || this.state.elementType === "eraser") {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
@@ -2910,6 +2929,21 @@ class App extends React.Component<AppProps, AppState> {
         scenePointer.x,
         scenePointer.y,
       );
+
+      if (this.state.elementType === "eraser") {
+        const elements = this.scene.getElements().map((ele) => {
+          if (this.elementIdsToErase[ele.id]) {
+            return newElementWith(ele, { isDeleted: true });
+          } else if (hitElement && ele.id === hitElement.id) {
+            return newElementWith(ele, { isDeleted: true });
+          }
+          return ele;
+        });
+        this.updateScene({ elements, commitToHistory: true });
+        this.elementIdsToErase = {};
+        this.removePointer(event);
+        return;
+      }
       this.hitLinkElement = this.getElementLinkAtPosition(
         scenePointer,
         hitElement,
@@ -3202,22 +3236,6 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
-    if (this.state.eraserActive) {
-      const hitElement = this.getElementAtPosition(
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
-      );
-      if (hitElement) {
-        const elements = this.scene.getElements().map((ele) => {
-          if (ele.id === hitElement.id) {
-            return newElementWith(ele, { isDeleted: true });
-          }
-          return ele;
-        });
-        this.updateScene({ elements });
-      }
-      return false;
-    }
     if (this.state.elementType === "selection") {
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
@@ -3379,7 +3397,6 @@ class App extends React.Component<AppProps, AppState> {
             // SHIFT the previously selected element(s) were deselected above
             // (make sure you use setState updater to use latest state)
             if (
-              !this.state.eraserActive &&
               !someHitElementIsSelected &&
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {

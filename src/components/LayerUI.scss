@@ -94,5 +94,13 @@
       margin-bottom: auto;
       margin-inline-end: 1em;
     }
+
+    .eraser {
+      &.active {
+        background-color: var(--color-primary);
+        --icon-fill-color: #fff;
+        --keybinding-color: #fff;
+      }
+    }
   }
 }

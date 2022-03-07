@@ -17,6 +17,7 @@ import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
 import { getDefaultAppState } from "../appState";
 import ClearCanvas from "../components/ClearCanvas";
+import clsx from "clsx";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -296,18 +297,17 @@ export const actionDelete = register({
     return {
       appState: {
         ...appState,
-        previousSelectedElementIds: appState.selectedElementIds,
         selectedElementIds: {},
-        eraserActive: true,
+        elementType: "eraser",
       },
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ appState, updateData }) => (
     <ToolButton
       type="button"
       icon={eraser}
-      className="eraser"
+      className={clsx("eraser", { active: appState.elementType === "eraser" })}
       title={t("buttons.eraser")}
       aria-label={t("buttons.eraser")}
       onClick={() => {

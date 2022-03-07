@@ -196,7 +196,8 @@
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
     "penMode": "Prevent pinch-zoom and accept freedraw input only from pen",
-    "link": "Add/ Update link for a selected shape"
+    "link": "Add/ Update link for a selected shape",
+    "eraser": "Eraser"
   },
   "headings": {
     "canvasActions": "Canvas actions",

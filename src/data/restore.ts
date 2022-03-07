@@ -31,7 +31,7 @@ type RestoredAppState = Omit<
 >;
 
 export const AllowedExcalidrawElementTypes: Record<
-  ExcalidrawElement["type"],
+  AppState["elementType"],
   true
 > = {
   selection: true,
@@ -43,6 +43,7 @@ export const AllowedExcalidrawElementTypes: Record<
   image: true,
   arrow: true,
   freedraw: true,
+  eraser: true,
 };
 
 export type RestoredDataState = {

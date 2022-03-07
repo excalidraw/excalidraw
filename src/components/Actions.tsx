@@ -30,7 +30,7 @@ export const SelectedShapeActions = ({
   appState: AppState;
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
-  elementType: ExcalidrawElement["type"];
+  elementType: AppState["elementType"];
 }) => {
   const targetElements = getTargetElements(
     getNonDeletedElements(elements),
@@ -187,7 +187,7 @@ export const ShapesSwitcher = ({
   onImageAction,
 }: {
   canvas: HTMLCanvasElement | null;
-  elementType: ExcalidrawElement["type"];
+  elementType: AppState["elementType"];
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
 }) => (
