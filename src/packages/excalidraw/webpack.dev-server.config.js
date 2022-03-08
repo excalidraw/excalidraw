@@ -12,8 +12,11 @@ const devServerConfig = {
     port: 3001,
     host: "0.0.0.0",
     hot: true,
-    watchOptions: {
-      ignored: "**/node_modules",
+    proxy: {
+      "/sbapi/**": {
+        target: `http://0.0.0.0:3000/api`,
+        secure: false,
+      },
     },
     compress: true,
     static: {
@@ -25,7 +28,6 @@ const devServerConfig = {
       overlay: true, //Shows a full-screen overlay in the browser when there are compiler errors or warnings.
     },
     open: ["./"],
-    public: "0.0.0.0:3000",
   },
 };
 

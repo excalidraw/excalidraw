@@ -67,7 +67,7 @@ import Scene from "../scene/Scene";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 import React, { useState } from "react";
-import { Consumer as SBConsumer } from "switchboard/packages/sdk/lib/cjs/packages/@react";
+//import { Consumer as SBConsumer } from "switchboard/packages/sdk/lib/cjs/packages/@react";
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -194,14 +194,8 @@ const ChipTip: React.FC<ChipTipProps> = ({ children, onClose, visible }) => {
     </div>
   );
 };
+/*
 
-export const actionShowStrokeToolTip = register({
-  name: "showStrokeToolTip",
-  perform: () => {
-    throw new Error("not implemented");
-  },
-  PanelComponent: () => (
-    <>
       <SBConsumer>
         {(sbState) => {
           if (sbState?.surfaces && sbState?.surfaces.strokeToolTip) {
@@ -220,8 +214,14 @@ export const actionShowStrokeToolTip = register({
           }
         }}
       </SBConsumer>
-    </>
-  ),
+
+ */
+export const actionShowStrokeToolTip = register({
+  name: "showStrokeToolTip",
+  perform: () => {
+    throw new Error("not implemented");
+  },
+  PanelComponent: () => <></>,
 });
 
 export const actionChangeBackgroundColor = register({

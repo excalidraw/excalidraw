@@ -53,7 +53,7 @@
     "roughjs": "4.5.2",
     "sass": "1.45.2",
     "socket.io-client": "2.3.1",
-    "switchboard": "ssh://git@github.com:switchboardcc/switchboard.git#carlos-excalidraw-prototype",
+    "switchboard": "file:../switchboard/packages/sdk/",
     "typescript": "4.5.4"
   },
   "devDependencies": {
