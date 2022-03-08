@@ -303,7 +303,7 @@ export const actionErase = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ appState, updateData }) => (
+  PanelComponent: ({ appState, updateData, data }) => (
     <ToolButton
       type="button"
       icon={eraser}
@@ -313,7 +313,7 @@ export const actionErase = register({
       onClick={() => {
         updateData(null);
       }}
-      size="small"
+      size={data?.size || "medium"}
     ></ToolButton>
   ),
 });
