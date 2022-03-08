@@ -14,7 +14,6 @@ describe("actionStyles", () => {
   beforeEach(async () => {
     await render(<ExcalidrawApp />);
   });
-  
   it("should copy & paste styles via keyboard", () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
