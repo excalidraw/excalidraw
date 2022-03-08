@@ -19,7 +19,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   FONT_FAMILY,
 } from "../constants";
-import { getDefaultAppState } from "../appState";
+import { getDefaultAppState, isEraserActive } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp } from "../utils";
@@ -255,9 +255,11 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
-    elementType: AllowedExcalidrawElementTypes[nextAppState.elementType]
-      ? nextAppState.elementType
-      : "selection",
+    elementType:
+      AllowedExcalidrawElementTypes[nextAppState.elementType] &&
+      !isEraserActive(nextAppState)
+        ? nextAppState.elementType
+        : "selection",
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"
