@@ -73,6 +73,10 @@ import {
   Step as JoyrideStep,
 } from "react-joyride/types";
 import React from "react";
+
+import { ChakraProvider } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
+
 import { SbConsumer, SbProvider, useSbState } from "@switchboardcc/sdk";
 
 const filesStore = createStore("files-db", "files-store");
@@ -689,6 +693,81 @@ const ExcalidrawWrapper = () => {
     </>
   );
 };
+function ProductTour() {
+  const tourCallback = (operation: JoyrideCallBackProps) => {
+    debugger;
+    const { step, action, type } = operation;
+  };
+
+  const tourSteps: Array<JoyrideStep> = [
+    {
+      target: "#root",
+      content: (
+        <React.Fragment>
+          Welcome to Excalidraw the best way to digitally sketch ideas. Let's
+          start sketching...
+        </React.Fragment>
+      ),
+      event: "hover",
+      placement: "center",
+      hideCloseButton: true,
+    },
+    {
+      target: "#SB-rectangle",
+      content: (
+        <React.Fragment>
+          Let's start by creating your first shape. Click the square and click
+          and drag to draw.
+        </React.Fragment>
+      ),
+      placement: "top",
+      event: "hover",
+      spotlightClicks: true,
+      hideCloseButton: true,
+    },
+    {
+      target: "body",
+      content: (
+        <React.Fragment>
+          After drawing the square let's add some text to it. Double click the
+          square text.
+        </React.Fragment>
+      ),
+      event: "click",
+      spotlightClicks: true,
+      placement: "bottom-end",
+      placementBeacon: "right",
+      disableOverlayClose: true,
+      offset: -450,
+      hideCloseButton: true,
+    },
+    {
+      target: "#SB-export",
+      content: (
+        <React.Fragment>
+          Great now let's share this work of art with a coworker.
+        </React.Fragment>
+      ),
+      event: "hover",
+      placement: "auto",
+      hideCloseButton: true,
+    },
+  ];
+
+  return (
+    <div>
+      <Joyride
+        run={true}
+        continuous={true}
+        showProgress={true}
+        debug={true}
+        callback={tourCallback}
+        stepIndex={0}
+        steps={tourSteps}
+      />
+    </div>
+  );
+}
 
 const SbComponent = () => {
   const [state, setState] = useSbState("1");
@@ -706,14 +785,18 @@ const ExcalidrawApp = () => {
     //User 2 shows inline surface
     //User 3 control
     //User 4 shows component
-    <SbProvider userId={userId}>
-      <TopErrorBoundary>
-        <SbComponent />
-        <CollabContextConsumer>
-          <ExcalidrawWrapper />
-        </CollabContextConsumer>
-      </TopErrorBoundary>
-    </SbProvider>
+    <ChakraProvider>
+      <SbProvider userId={userId}>
+        <TopErrorBoundary>
+          <Button>HEYHEYHEY</Button>
+          <SbComponent />
+          <ProductTour />
+          <CollabContextConsumer>
+            <ExcalidrawWrapper />
+          </CollabContextConsumer>
+        </TopErrorBoundary>
+      </SbProvider>
+    </ChakraProvider>
   );
 };
 
