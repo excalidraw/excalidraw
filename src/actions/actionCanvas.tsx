@@ -294,11 +294,12 @@ export const actionToggleTheme = register({
 export const actionDelete = register({
   name: "delete",
   perform: (elements, appState) => {
+    const eraserActive = appState.elementType === "eraser";
     return {
       appState: {
         ...appState,
         selectedElementIds: {},
-        elementType: "eraser",
+        elementType: eraserActive ? "selection" : "eraser",
       },
       commitToHistory: true,
     };
