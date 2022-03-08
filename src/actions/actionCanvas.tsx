@@ -291,8 +291,8 @@ export const actionToggleTheme = register({
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
 });
 
-export const actionDelete = register({
-  name: "delete",
+export const actionErase = register({
+  name: "erase",
   perform: (elements, appState) => {
     const eraserActive = appState.elementType === "eraser";
     return {
