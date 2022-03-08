@@ -35,7 +35,7 @@ import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
-import { getDefaultAppState } from "../appState";
+import { getDefaultAppState, isEraserActive } from "../appState";
 import {
   copyToClipboard,
   parseClipboard,
@@ -2622,7 +2622,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const hasDeselectedButton = Boolean(event.buttons);
-    if (hasDeselectedButton && this.state.elementType === "eraser") {
+    if (hasDeselectedButton && isEraserActive(this.state)) {
       const hitElement = this.getElementAtPosition(
         scenePointerX,
         scenePointerY,
@@ -2726,7 +2726,7 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.showHyperlinkPopup
       ) {
         this.setState({ showHyperlinkPopup: "info" });
-      } else if (this.state.elementType === "eraser") {
+      } else if (isEraserActive(this.state)) {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
       } else if (this.state.elementType === "text") {
         setCursor(
@@ -2845,6 +2845,9 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    if (this.state.elementType === "eraser") {
+      return;
+    }
     const allowOnPointerDown =
       !this.state.penMode ||
       event.pointerType !== "touch" ||
@@ -2852,7 +2855,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.elementType === "text" ||
       this.state.elementType === "image";
 
-    if (!allowOnPointerDown || this.state.elementType === "eraser") {
+    if (!allowOnPointerDown) {
       return;
     }
 
@@ -2929,7 +2932,7 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.lastPointerUp = event;
     const isTouchScreen = ["pen", "touch"].includes(event.pointerType);
-    if (isTouchScreen || this.state.elementType === "eraser") {
+    if (isTouchScreen || isEraserActive(this.state)) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
@@ -2939,7 +2942,7 @@ class App extends React.Component<AppProps, AppState> {
         scenePointer.y,
       );
 
-      if (this.state.elementType === "eraser") {
+      if (isEraserActive(this.state)) {
         const elements = this.scene.getElements().map((ele) => {
           if (this.elementIdsToErase[ele.id]) {
             return newElementWith(ele, { isDeleted: true });

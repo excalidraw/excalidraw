@@ -15,7 +15,7 @@ import { getShortcutKey } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
-import { getDefaultAppState } from "../appState";
+import { getDefaultAppState, isEraserActive } from "../appState";
 import ClearCanvas from "../components/ClearCanvas";
 import clsx from "clsx";
 
@@ -294,12 +294,11 @@ export const actionToggleTheme = register({
 export const actionErase = register({
   name: "erase",
   perform: (elements, appState) => {
-    const eraserActive = appState.elementType === "eraser";
     return {
       appState: {
         ...appState,
         selectedElementIds: {},
-        elementType: eraserActive ? "selection" : "eraser",
+        elementType: isEraserActive(appState) ? "selection" : "eraser",
       },
       commitToHistory: true,
     };
@@ -308,7 +307,7 @@ export const actionErase = register({
     <ToolButton
       type="button"
       icon={eraser}
-      className={clsx("eraser", { active: appState.elementType === "eraser" })}
+      className={clsx("eraser", { active: isEraserActive(appState) })}
       title={t("buttons.eraser")}
       aria-label={t("buttons.eraser")}
       onClick={() => {

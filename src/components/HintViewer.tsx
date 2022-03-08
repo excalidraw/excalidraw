@@ -11,6 +11,7 @@ import {
   isTextElement,
 } from "../element/typeChecks";
 import { getShortcutKey } from "../utils";
+import { isEraserActive } from "../appState";
 
 interface HintViewerProps {
   appState: AppState;
@@ -22,7 +23,7 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
   const { elementType, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
-  if (appState.elementType === "eraser") {
+  if (isEraserActive(appState)) {
     return t("hints.eraserDeselect");
   }
   if (elementType === "arrow" || elementType === "line") {
