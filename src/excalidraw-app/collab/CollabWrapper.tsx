@@ -359,7 +359,16 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     );
 
     try {
-      const socketServerData = await getCollabServer();
+      // if set in REACT_APP_WS_SERVER_URL url use it
+      let socketServerData = {
+        url: process.env.REACT_APP_WS_SERVER_URL || "",
+        polling: true,
+      };
+      // else use portal resolver to get collaboration server data
+      if (!process.env.REACT_APP_WS_SERVER_URL) {
+        socketServerData = await getCollabServer();
+      }
+
       this.portal.socket = this.portal.open(
         socketIOClient(socketServerData.url, {
           transports: socketServerData.polling
