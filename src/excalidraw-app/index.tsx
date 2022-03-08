@@ -73,7 +73,7 @@ import {
   Step as JoyrideStep,
 } from "react-joyride/types";
 import React from "react";
-import { SbConsumer, SbProvider } from "switchboard";
+import { SbConsumer, SbProvider, useSbState } from "@switchboardcc/sdk";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -690,6 +690,14 @@ const ExcalidrawWrapper = () => {
   );
 };
 
+const SbComponent = () => {
+  const [state, setState] = useSbState("1");
+
+  console.log("state from useSbState hook", state);
+
+  return <></>;
+};
+
 const ExcalidrawApp = () => {
   const userId = "1";
 
@@ -700,13 +708,7 @@ const ExcalidrawApp = () => {
     //User 4 shows component
     <SbProvider userId={userId}>
       <TopErrorBoundary>
-        <SbConsumer>
-          {(sbState) => {
-            debugger;
-            return <></>;
-          }}
-        </SbConsumer>
-
+        <SbComponent />
         <CollabContextConsumer>
           <ExcalidrawWrapper />
         </CollabContextConsumer>
