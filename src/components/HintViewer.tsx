@@ -22,6 +22,9 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
   const { elementType, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
+  if (appState.elementType === "eraser") {
+    return t("hints.eraserDeselect");
+  }
   if (elementType === "arrow" || elementType === "line") {
     if (!multiMode) {
       return t("hints.linearElement");

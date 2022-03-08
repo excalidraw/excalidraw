@@ -2630,8 +2630,17 @@ class App extends React.Component<AppProps, AppState> {
       if (hitElement) {
         const elements = this.scene.getElements().map((ele) => {
           if (ele.id === hitElement.id) {
-            this.elementIdsToErase[ele.id] = true;
-            return newElementWith(ele, { opacity: 20 });
+            if (event.altKey) {
+              if (this.elementIdsToErase[ele.id]) {
+                this.elementIdsToErase[ele.id] = false;
+                return newElementWith(ele, {
+                  opacity: this.state.currentItemOpacity,
+                });
+              }
+            } else {
+              this.elementIdsToErase[ele.id] = true;
+              return newElementWith(ele, { opacity: 20 });
+            }
           }
           return ele;
         });
