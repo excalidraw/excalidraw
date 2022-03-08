@@ -20,6 +20,20 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
 
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverFooter,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverAnchor,
+} from "@chakra-ui/react";
+
+import { useSbState } from "@switchboardcc/sdk";
+
 export const SelectedShapeActions = ({
   appState,
   elements,
@@ -170,6 +184,30 @@ export const SelectedShapeActions = ({
   );
 };
 
+const ToolButtonWrapper = (props: any) => {
+  const [state, setState] = useSbState("2");
+  if (props.value === "rectangle") {
+    if (!state || !state.active || state.finished) {
+      return props.children;
+    }
+    setState({ ...state, started: true });
+    return (
+      <Popover isOpen={state.active && !state.finished}>
+        <PopoverTrigger>{props.children}</PopoverTrigger>
+        <PopoverContent>
+          <PopoverArrow />
+          <PopoverCloseButton />
+          <PopoverBody>
+            Let's start by creating your first shape. Click the square and click
+            and drag to draw.
+          </PopoverBody>
+        </PopoverContent>
+      </Popover>
+    );
+  }
+  return props.children;
+};
+
 export const ShapesSwitcher = ({
   canvas,
   elementType,
@@ -180,44 +218,52 @@ export const ShapesSwitcher = ({
   elementType: ExcalidrawElement["type"];
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
-}) => (
-  <>
-    {SHAPES.map(({ value, icon, key }, index) => {
-      const label = t(`toolBar.${value}`);
-      const letter = key && (typeof key === "string" ? key : key[0]);
-      const shortcut = letter
-        ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
-        : `${index + 1}`;
-      return (
-        <ToolButton
-          className="Shape"
-          key={value}
-          id={`SB-${value}`}
-          type="radio"
-          icon={icon}
-          checked={elementType === value}
-          name="editor-current-shape"
-          title={`${capitalizeString(label)} — ${shortcut}`}
-          keyBindingLabel={`${index + 1}`}
-          aria-label={capitalizeString(label)}
-          aria-keyshortcuts={shortcut}
-          data-testid={value}
-          onChange={({ pointerType }) => {
-            setAppState({
-              elementType: value,
-              multiElement: null,
-              selectedElementIds: {},
-            });
-            setCursorForShape(canvas, value);
-            if (value === "image") {
-              onImageAction({ pointerType });
-            }
-          }}
-        />
-      );
-    })}
-  </>
-);
+}) => {
+  const [state, setState] = useSbState("2");
+  return (
+    <>
+      {SHAPES.map(({ value, icon, key }, index) => {
+        const label = t(`toolBar.${value}`);
+        const letter = key && (typeof key === "string" ? key : key[0]);
+        const shortcut = letter
+          ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
+          : `${index + 1}`;
+        return (
+          <ToolButtonWrapper value={value}>
+            <ToolButton
+              className="Shape"
+              key={value}
+              id={`SB-${value}`}
+              type="radio"
+              icon={icon}
+              checked={elementType === value}
+              name="editor-current-shape"
+              title={`${capitalizeString(label)} — ${shortcut}`}
+              keyBindingLabel={`${index + 1}`}
+              aria-label={capitalizeString(label)}
+              aria-keyshortcuts={shortcut}
+              data-testid={value}
+              onChange={({ pointerType }) => {
+                if (!state.finished) {
+                  setState({ ...state, finished: true });
+                }
+                setAppState({
+                  elementType: value,
+                  multiElement: null,
+                  selectedElementIds: {},
+                });
+                setCursorForShape(canvas, value);
+                if (value === "image") {
+                  onImageAction({ pointerType });
+                }
+              }}
+            />
+          </ToolButtonWrapper>
+        );
+      })}
+    </>
+  );
+};
 
 export const ZoomActions = ({
   renderAction,

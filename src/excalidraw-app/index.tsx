@@ -76,8 +76,18 @@ import React from "react";
 
 import { ChakraProvider } from "@chakra-ui/react";
 import { Button } from "@chakra-ui/react";
+import { useDisclosure } from "@chakra-ui/react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from "@chakra-ui/react";
 
-import { SbConsumer, SbProvider, useSbState } from "@switchboardcc/sdk";
+import { SbProvider, useSbState } from "@switchboardcc/sdk";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -769,28 +779,49 @@ function ProductTour() {
   );
 }
 
-const SbComponent = () => {
+const WelcomeModal = () => {
   const [state, setState] = useSbState("1");
 
-  console.log("state from useSbState hook", state);
+  if (!state || !state.active || state.finished) {
+    return null;
+  }
 
-  return <></>;
+  setState({ ...state, started: true });
+
+  return (
+    <>
+      <Modal isOpen={state.active && !state.finished} onClose={() => {}}>
+        <ModalContent>
+          <ModalBody>
+            Welcome to Excalidraw the best way to digitally sketch ideas. Let's
+            start sketching...
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost">Skip</Button>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() =>
+                setState({ ...state, finished: true, started: true })
+              }
+            >
+              Continue
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
 };
 
 const ExcalidrawApp = () => {
   const userId = "1";
 
   return (
-    //User 1 shows tour
-    //User 2 shows inline surface
-    //User 3 control
-    //User 4 shows component
     <ChakraProvider>
       <SbProvider userId={userId}>
         <TopErrorBoundary>
-          <Button>HEYHEYHEY</Button>
-          <SbComponent />
-          <ProductTour />
+          <WelcomeModal />
           <CollabContextConsumer>
             <ExcalidrawWrapper />
           </CollabContextConsumer>
