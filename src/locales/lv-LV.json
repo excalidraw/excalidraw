@@ -181,7 +181,7 @@
     "fileTooBig": "Datne ir par lielu. Lielākais atļautais izmērs ir {{maxSize}}.",
     "svgImageInsertError": "Nevarēja ievietot SVG attēlu. Šķiet, ka SVG marķējums nav derīgs.",
     "invalidSVGString": "Nederīgs SVG.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz."
   },
   "toolBar": {
     "selection": "Atlase",
