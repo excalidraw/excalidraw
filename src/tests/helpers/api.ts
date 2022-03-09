@@ -213,9 +213,12 @@ export class API {
       }
     });
 
+    const files = [blob] as File[] & { item: (index: number) => File };
+    files.item = (index: number) => files[index];
+
     Object.defineProperty(fileDropEvent, "dataTransfer", {
       value: {
-        files: [blob],
+        files,
         getData: (type: string) => {
           if (type === blob.type) {
             return text;
