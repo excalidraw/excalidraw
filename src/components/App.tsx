@@ -315,6 +315,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   contextMenuOpen: boolean = false;
   elementIdsToErase: { [key: ExcalidrawElement["id"]]: boolean } = {};
+  lastScenePointer: { x: number; y: number } | null = null;
 
   constructor(props: AppProps) {
     super(props);
@@ -2451,7 +2452,6 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
-
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(event.pointerId, {
         x: event.clientX,
@@ -2623,29 +2623,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const hasDeselectedButton = Boolean(event.buttons);
     if (hasDeselectedButton && isEraserActive(this.state)) {
-      const hitElement = this.getElementAtPosition(
-        scenePointerX,
-        scenePointerY,
-      );
-      if (hitElement) {
-        const elements = this.scene.getElements().map((ele) => {
-          if (ele.id === hitElement.id) {
-            if (event.altKey) {
-              if (this.elementIdsToErase[ele.id]) {
-                this.elementIdsToErase[ele.id] = false;
-                return newElementWith(ele, {
-                  opacity: this.state.currentItemOpacity,
-                });
-              }
-            } else {
-              this.elementIdsToErase[ele.id] = true;
-              return newElementWith(ele, { opacity: 20 });
-            }
-          }
-          return ele;
-        });
-        this.updateScene({ elements });
-      }
+      this.handleEraser(event, scenePointer);
     }
     if (
       hasDeselectedButton ||
@@ -2769,6 +2747,80 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private handleEraser = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    scenePointer: { x: number; y: number },
+  ) => {
+    const idsToUpdate: Array<string> = [];
+
+    const distance = this.lastScenePointer
+      ? distance2d(
+          this.lastScenePointer.x,
+          this.lastScenePointer.y,
+          scenePointer.x,
+          scenePointer.y,
+        )
+      : 0;
+    const threshold = 10 / this.state.zoom.value;
+    const point = this.lastScenePointer || scenePointer;
+    let samplingInterval = 0;
+    while (samplingInterval < distance) {
+      const hitElement = this.getElementAtPosition(point.x, point.y);
+      if (hitElement) {
+        idsToUpdate.push(hitElement.id);
+        if (event.altKey) {
+          if (this.elementIdsToErase[hitElement.id]) {
+            this.elementIdsToErase[hitElement.id] = false;
+          }
+        } else {
+          this.elementIdsToErase[hitElement.id] = true;
+        }
+      }
+
+      // Calculate next point in the line at a distance of sampling interval
+      samplingInterval += threshold;
+
+      const distanceRatio = samplingInterval / distance;
+      const nextX =
+        (1 - distanceRatio) * point.x + distanceRatio * scenePointer.x;
+      const nextY =
+        (1 - distanceRatio) * point.y + distanceRatio * scenePointer.y;
+      point.x = nextX;
+      point.y = nextY;
+    }
+
+    const hitElement = this.getElementAtPosition(
+      scenePointer.x,
+      scenePointer.y,
+    );
+    if (hitElement) {
+      idsToUpdate.push(hitElement.id);
+      if (event.altKey) {
+        if (this.elementIdsToErase[hitElement.id]) {
+          this.elementIdsToErase[hitElement.id] = false;
+        }
+      } else {
+        this.elementIdsToErase[hitElement.id] = true;
+      }
+    }
+
+    const elements = this.scene.getElements().map((ele) => {
+      if (idsToUpdate.includes(ele.id)) {
+        if (event.altKey) {
+          if (this.elementIdsToErase[ele.id] === false) {
+            return newElementWith(ele, {
+              opacity: this.state.currentItemOpacity,
+            });
+          }
+        } else {
+          return newElementWith(ele, { opacity: 20 });
+        }
+      }
+      return ele;
+    });
+    this.updateScene({ elements });
+    this.lastScenePointer = scenePointer;
+  };
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
     invalidateContextMenu = true;
