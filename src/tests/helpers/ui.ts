@@ -221,6 +221,14 @@ export class UI {
     fireEvent.click(GlobalTestState.renderResult.getByToolName(toolName));
   };
 
+  static clickLabeledElement = (label: string) => {
+    const element = document.querySelector(`[aria-label='${label}']`);
+    if (!element) {
+      throw new Error(`No labeled element found: ${label}`);
+    }
+    fireEvent.click(element);
+  };
+
   /**
    * Creates an Excalidraw element, and returns a proxy that wraps it so that
    * accessing props will return the latest ones from the object existing in
