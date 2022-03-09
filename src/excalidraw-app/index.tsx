@@ -810,6 +810,26 @@ const WelcomeModal = () => {
   );
 };
 
+const DrawASquare = () => {
+  const [state, setState] = useSbState("3");
+
+  if (!state) {
+    return null;
+  }
+
+  return (
+    <>
+      <Modal isOpen={state.active && !state.finished} onClose={() => {}}>
+        <ModalContent>
+          <ModalBody>
+            Great! Now let's draw a rectangle anwhere on the canvas.
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
+
 const ExcalidrawApp = () => {
   const userId = "1";
 
@@ -818,6 +838,7 @@ const ExcalidrawApp = () => {
       <SbProvider userId={userId}>
         <TopErrorBoundary>
           <WelcomeModal />
+          <DrawASquare />
           <CollabContextConsumer>
             <ExcalidrawWrapper />
           </CollabContextConsumer>

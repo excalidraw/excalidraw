@@ -4,6 +4,8 @@ import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 import { nanoid } from "nanoid";
 
+import { useSbState } from "@switchboardcc/sdk";
+
 import {
   actionAddToLibrary,
   actionBringForward,
@@ -384,6 +386,7 @@ class App extends React.Component<AppProps, AppState> {
     } = this.state;
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
+
     if (viewModeEnabled) {
       return (
         <canvas
