@@ -64,6 +64,7 @@
     "cartoonist": "",
     "fileTitle": "Isem n ufaylu",
     "colorPicker": "Amafran n yini",
+    "canvasColors": "",
     "canvasBackground": "Agilal n teɣzut n usuneɣ",
     "drawingCanvas": "Taɣzut n usuneɣ",
     "layers": "Tissiyin",
@@ -179,7 +180,8 @@
     "imageInsertError": "D awezɣi tugra n tugna. Eɛreḍ tikkelt-nniḍen ardeqqal...",
     "fileTooBig": "Afaylu meqqer aṭas. Tiddi tafellayt yurgen d {{maxSize}}.",
     "svgImageInsertError": "D awezɣi tugra n tugna SVG. Acraḍ SVG yettban-d d armeɣtu.",
-    "invalidSVGString": "SVG armeɣtu."
+    "invalidSVGString": "SVG armeɣtu.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Tafrayt",
