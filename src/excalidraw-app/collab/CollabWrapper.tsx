@@ -360,6 +360,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     try {
       const socketServerData = await getCollabServer();
+
       this.portal.socket = this.portal.open(
         socketIOClient(socketServerData.url, {
           transports: socketServerData.polling
