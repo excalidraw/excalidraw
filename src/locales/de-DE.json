@@ -64,6 +64,7 @@
     "cartoonist": "Karikaturist",
     "fileTitle": "Dateiname",
     "colorPicker": "Farbauswähler",
+    "canvasColors": "Auf Leinwand verwendet",
     "canvasBackground": "Zeichenflächenhintergrund",
     "drawingCanvas": "Leinwand",
     "layers": "Ebenen",
@@ -179,7 +180,8 @@
     "imageInsertError": "Das Bild konnte nicht eingefügt werden. Versuche es später erneut...",
     "fileTooBig": "Die Datei ist zu groß. Die maximal zulässige Größe ist {{maxSize}}.",
     "svgImageInsertError": "SVG-Bild konnte nicht eingefügt werden. Das SVG-Markup sieht ungültig aus.",
-    "invalidSVGString": "Ungültige SVG."
+    "invalidSVGString": "Ungültige SVG.",
+    "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut."
   },
   "toolBar": {
     "selection": "Auswahl",

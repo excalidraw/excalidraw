@@ -64,6 +64,7 @@
     "cartoonist": "Cartunista",
     "fileTitle": "Nome do arquivo",
     "colorPicker": "Seletor de cores",
+    "canvasColors": "Usado na tela",
     "canvasBackground": "Fundo da tela",
     "drawingCanvas": "Tela de desenho",
     "layers": "Camadas",
@@ -107,9 +108,9 @@
     "increaseFontSize": "Aumentar o tamanho da fonte",
     "unbindText": "Desvincular texto",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Editar link",
+      "create": "Criar link",
+      "label": "Link"
     }
   },
   "buttons": {
@@ -179,7 +180,8 @@
     "imageInsertError": "Não foi possível inserir imagem. Tente novamente mais tarde...",
     "fileTooBig": "O arquivo é muito grande. O tamanho máximo permitido é {{maxSize}}.",
     "svgImageInsertError": "Não foi possível inserir a imagem SVG. A marcação SVG parece inválida.",
-    "invalidSVGString": "SVG Inválido."
+    "invalidSVGString": "SVG Inválido.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Seleção",
@@ -194,7 +196,7 @@
     "library": "Biblioteca",
     "lock": "Manter ativa a ferramenta selecionada após desenhar",
     "penMode": "Prevenir a ação de tocar-ampliar e permitir apenas interações da caneta",
-    "link": ""
+    "link": "Adicionar/Atualizar link para uma forma selecionada"
   },
   "headings": {
     "canvasActions": "Ações da tela",

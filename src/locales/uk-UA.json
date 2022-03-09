@@ -64,6 +64,7 @@
     "cartoonist": "Карикатурист",
     "fileTitle": "Назва файла",
     "colorPicker": "Палітра кольорів",
+    "canvasColors": "",
     "canvasBackground": "Тло полотна",
     "drawingCanvas": "Полотно",
     "layers": "Шари",
@@ -179,7 +180,8 @@
     "imageInsertError": "Не вдалося вставити зображення. Повторіть спробу пізніше...",
     "fileTooBig": "Занадто великий розмір файлу, максимальний розмір файлу {{maxSize}}.",
     "svgImageInsertError": "Не вдалося вставити SVG-зображення. Помилка розмітки SVG.",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Виділення",

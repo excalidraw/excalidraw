@@ -64,6 +64,7 @@
     "cartoonist": "Σκιτσογράφος",
     "fileTitle": "Όνομα αρχείου",
     "colorPicker": "Επιλογή Χρώματος",
+    "canvasColors": "",
     "canvasBackground": "Φόντο καμβά",
     "drawingCanvas": "Σχεδίαση καμβά",
     "layers": "Στρώματα",
@@ -179,7 +180,8 @@
     "imageInsertError": "Αδυναμία εισαγωγής εικόνας. Προσπαθήστε ξανά αργότερα...",
     "fileTooBig": "Το αρχείο είναι πολύ μεγάλο. Το μέγιστο επιτρεπόμενο μέγεθος είναι {{maxSize}}.",
     "svgImageInsertError": "",
-    "invalidSVGString": "Μη έγκυρο SVG."
+    "invalidSVGString": "Μη έγκυρο SVG.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Επιλογή",

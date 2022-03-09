@@ -64,6 +64,7 @@
     "cartoonist": "",
     "fileTitle": "Файл атауы",
     "colorPicker": "",
+    "canvasColors": "",
     "canvasBackground": "",
     "drawingCanvas": "",
     "layers": "",
@@ -179,7 +180,8 @@
     "imageInsertError": "Суретті жүктеу мүмкін болмады. Кейінірек қайталап көріңіз...",
     "fileTooBig": "Файл өте үлкен. Максималды рұқсат етілген көлем {{maxSize}}.",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "",

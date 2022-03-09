@@ -64,6 +64,7 @@
     "cartoonist": "Marrazkilaria",
     "fileTitle": "Fitxategi izena",
     "colorPicker": "Kolore-hautatzailea",
+    "canvasColors": "",
     "canvasBackground": "Oihalaren atzeko planoa",
     "drawingCanvas": "Marrazteko oihala",
     "layers": "Geruzak",
@@ -107,9 +108,9 @@
     "increaseFontSize": "Handitu letra tamaina",
     "unbindText": "Askatu testua",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Editatu esteka",
+      "create": "Sortu esteka",
+      "label": "Esteka"
     }
   },
   "buttons": {
@@ -149,7 +150,7 @@
     "remove": "Kendu",
     "publishLibrary": "Argitaratu",
     "submit": "Bidali",
-    "confirm": "Baieztatu"
+    "confirm": "Bai"
   },
   "alerts": {
     "clearReset": "Honek oihal osoa garbituko du. Ziur zaude?",
@@ -179,7 +180,8 @@
     "imageInsertError": "Ezin izan da irudia txertatu. Saiatu berriro geroago...",
     "fileTooBig": "Fitxategia handiegia da. Onartutako gehienezko tamaina {{maxSize}} da.",
     "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
-    "invalidSVGString": "SVG baliogabea."
+    "invalidSVGString": "SVG baliogabea.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Hautapena",
@@ -193,8 +195,8 @@
     "text": "Testua",
     "library": "Liburutegia",
     "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
-    "penMode": "",
-    "link": ""
+    "penMode": "Saihestu txikiagotzea eta onartu marrazte libreko idazketa solik arkatza bidez",
+    "link": "Gehitu / Eguneratu esteka hautatutako forma baterako"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -219,15 +221,15 @@
     "placeImage": "Egin klik irudia kokatzeko, edo egin klik eta arrastatu bere tamaina eskuz ezartzeko",
     "publishLibrary": "Argitaratu zure liburutegia",
     "bindTextToElement": "Sakatu Sartu testua gehitzeko",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "Ezin da oihala aurreikusi",
+    "canvasTooBig": "Agian oihala handiegia da.",
+    "canvasTooBigTip": "Aholkua: saiatu urrunen dauden elementuak pixka bat hurbiltzen."
   },
   "errorSplash": {
-    "headingMain_pre": "",
+    "headingMain_pre": "Errore bat aurkitu da. Saiatu ",
     "headingMain_button": "orria birkargatzen.",
     "clearCanvasMessage": "Birkargatzea ez bada burutzen, saiatu ",
     "clearCanvasMessage_button": "oihala garbitzen.",
@@ -266,8 +268,8 @@
   "helpDialog": {
     "blog": "Irakurri gure bloga",
     "click": "sakatu",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Hautapen sakona",
+    "deepBoxSelect": "Hautapen sakona egin laukizuzen bidez, eta saihestu arrastatzea",
     "curvedArrow": "Gezi kurbatua",
     "curvedLine": "Lerro kurbatua",
     "documentation": "Dokumentazioa",

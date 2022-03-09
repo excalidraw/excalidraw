@@ -5,7 +5,7 @@
     "selectAll": "Marker alle",
     "multiSelect": "",
     "moveCanvas": "",
-    "cut": "",
+    "cut": "Klip",
     "copy": "Kopier",
     "copyAsPng": "Kopier til klippebord som PNG",
     "copyAsSvg": "Kopier til klippebord som SVG",
@@ -64,6 +64,7 @@
     "cartoonist": "",
     "fileTitle": "Filnavn",
     "colorPicker": "Farvevælger",
+    "canvasColors": "Brugt på lærred",
     "canvasBackground": "",
     "drawingCanvas": "",
     "layers": "",
@@ -179,7 +180,8 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "",

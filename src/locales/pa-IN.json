@@ -64,6 +64,7 @@
     "cartoonist": "ਕਾਰਟੂਨਿਸਟ",
     "fileTitle": "ਫਾਈਲ ਦਾ ਨਾਂ",
     "colorPicker": "ਰੰਗ ਚੋਣਕਾਰ",
+    "canvasColors": "",
     "canvasBackground": "ਕੈਨਵਸ ਦਾ ਬੈਕਗਰਾਉਂਡ",
     "drawingCanvas": "ਡਰਾਇੰਗ ਕੈਨਵਸ",
     "layers": "ਪਰਤਾਂ",
@@ -179,7 +180,8 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।"
+    "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
