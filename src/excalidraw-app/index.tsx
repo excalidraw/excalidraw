@@ -788,7 +788,7 @@ const WelcomeModal = () => {
 
   return (
     <>
-      <Modal isOpen={!state.finished} onClose={() => {}}>
+      <Modal isCentered isOpen={!state.finished} onClose={() => {}}>
         <ModalContent>
           <ModalBody>
             Welcome to Excalidraw the best way to digitally sketch ideas. Let's
@@ -813,6 +813,18 @@ const WelcomeModal = () => {
 const DrawASquare = () => {
   const [state, setState] = useSbState("3");
 
+  const handleKeyUp = useCallback((event) => {
+    if (state && state.active) {
+      setState({ ...state, finished: true });
+    }
+    console.log("event");
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mouseup", handleKeyUp);
+    return () => document.removeEventListener("mouseup", handleKeyUp);
+  }, [handleKeyUp]);
+
   if (!state) {
     return null;
   }
@@ -830,6 +842,27 @@ const DrawASquare = () => {
   );
 };
 
+const NiceDrawing = () => {
+  const [state, setState] = useSbState("4");
+
+  if (!state) {
+    return null;
+  }
+
+  return (
+    <>
+      <Modal isOpen={state.active && !state.finished} onClose={() => {}}>
+        <ModalContent>
+          <ModalBody>
+            Wow, that’s a good looking rectangle. Next, let’s add some text to
+            it. Double click the rectangle or press Enter to add text.
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
+
 const ExcalidrawApp = () => {
   const userId = "1";
 
@@ -839,6 +872,7 @@ const ExcalidrawApp = () => {
         <TopErrorBoundary>
           <WelcomeModal />
           <DrawASquare />
+          <NiceDrawing />
           <CollabContextConsumer>
             <ExcalidrawWrapper />
           </CollabContextConsumer>
