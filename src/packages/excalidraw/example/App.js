@@ -1,15 +1,28 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 import InitialData from "./initialData";
 import Sidebar from "./sidebar/Sidebar";
 
 import "./App.scss";
 import initialData from "./initialData";
+import { MIME_TYPES } from "../../../constants";
 
-// This is so that we use the bundled excalidraw.developement.js file instead
+// This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
 const { exportToCanvas, exportToSvg, exportToBlob } = window.Excalidraw;
 const Excalidraw = window.Excalidraw.default;
+
+const resolvablePromise = () => {
+  let resolve;
+  let reject;
+  const promise = new Promise((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  promise.resolve = resolve;
+  promise.reject = reject;
+  return promise;
+};
 
 const renderTopRightUI = () => {
   return (
@@ -38,10 +51,35 @@ export default function App() {
   const [blobUrl, setBlobUrl] = useState(null);
   const [canvasUrl, setCanvasUrl] = useState(null);
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
-  const [shouldAddWatermark, setShouldAddWatermark] = useState(false);
   const [theme, setTheme] = useState("light");
 
+  const initialStatePromiseRef = useRef({ promise: null });
+  if (!initialStatePromiseRef.current.promise) {
+    initialStatePromiseRef.current.promise = resolvablePromise();
+  }
   useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("/rocket.jpeg");
+      const imageData = await res.blob();
+      const reader = new FileReader();
+      reader.readAsDataURL(imageData);
+
+      reader.onload = function () {
+        const imagesArray = [
+          {
+            id: "rocket",
+            dataURL: reader.result,
+            mimeType: MIME_TYPES.jpg,
+            created: 1644915140367,
+          },
+        ];
+
+        initialStatePromiseRef.current.promise.resolve(InitialData);
+        excalidrawRef.current.addFiles(imagesArray);
+      };
+    };
+    fetchData();
+
     const onHashChange = () => {
       const hash = new URLSearchParams(window.location.hash.slice(1));
       const libraryUrl = hash.get("addLibrary");
@@ -86,6 +124,21 @@ export default function App() {
     };
     excalidrawRef.current.updateScene(sceneData);
   };
+
+  const onLinkOpen = useCallback((element, event) => {
+    const link = element.link;
+    const { nativeEvent } = event.detail;
+    const isNewTab = nativeEvent.ctrlKey || nativeEvent.metaKey;
+    const isNewWindow = nativeEvent.shiftKey;
+    const isInternalLink =
+      link.startsWith("/") || link.includes(window.location.origin);
+    if (isInternalLink && !isNewTab && !isNewWindow) {
+      // signal that we're handling the redirect ourselves
+      event.preventDefault();
+      // do a custom redirect, such as passing to react-router
+      // ...
+    }
+  }, []);
 
   return (
     <div className="App">
@@ -163,7 +216,7 @@ export default function App() {
         <div className="excalidraw-wrapper">
           <Excalidraw
             ref={excalidrawRef}
-            initialData={InitialData}
+            initialData={initialStatePromiseRef.current.promise}
             onChange={(elements, state) =>
               console.info("Elements :", elements, "State : ", state)
             }
@@ -179,6 +232,7 @@ export default function App() {
             UIOptions={{ canvasActions: { loadScene: false } }}
             renderTopRightUI={renderTopRightUI}
             renderFooter={renderFooter}
+            onLinkOpen={onLinkOpen}
           />
         </div>
 
@@ -191,14 +245,6 @@ export default function App() {
             />
             Export with dark mode
           </label>
-          <label className="export-wrapper__checkbox">
-            <input
-              type="checkbox"
-              checked={shouldAddWatermark}
-              onChange={() => setShouldAddWatermark(!shouldAddWatermark)}
-            />
-            Add Watermark
-          </label>
           <button
             onClick={async () => {
               const svg = await exportToSvg({
@@ -206,11 +252,11 @@ export default function App() {
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,
-                  shouldAddWatermark,
                   width: 300,
                   height: 100,
                 },
                 embedScene: true,
+                files: excalidrawRef.current.getFiles(),
               });
               document.querySelector(".export-svg").innerHTML = svg.outerHTML;
             }}
@@ -227,8 +273,8 @@ export default function App() {
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,
-                  shouldAddWatermark,
                 },
+                files: excalidrawRef.current.getFiles(),
               });
               setBlobUrl(window.URL.createObjectURL(blob));
             }}
@@ -240,14 +286,14 @@ export default function App() {
           </div>
 
           <button
-            onClick={() => {
-              const canvas = exportToCanvas({
+            onClick={async () => {
+              const canvas = await exportToCanvas({
                 elements: excalidrawRef.current.getSceneElements(),
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,
-                  shouldAddWatermark,
                 },
+                files: excalidrawRef.current.getFiles(),
               });
               const ctx = canvas.getContext("2d");
               ctx.font = "30px Virgil";

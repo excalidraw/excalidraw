@@ -40,14 +40,6 @@ const queryContextMenu = () => {
   return GlobalTestState.renderResult.container.querySelector(".context-menu");
 };
 
-const clickLabeledElement = (label: string) => {
-  const element = document.querySelector(`[aria-label='${label}']`);
-  if (!element) {
-    throw new Error(`No labeled element found: ${label}`);
-  }
-  fireEvent.click(element);
-};
-
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -136,7 +128,7 @@ describe("contextMenu element", () => {
       "sendToBack",
       "bringToFront",
       "duplicateSelection",
-      "link",
+      "hyperlink",
     ];
 
     expect(contextMenu).not.toBeNull();
@@ -312,10 +304,10 @@ describe("contextMenu element", () => {
     mouse.up(20, 20);
 
     // Change some styles of second rectangle
-    clickLabeledElement("Stroke");
-    clickLabeledElement(t("colors.c92a2a"));
-    clickLabeledElement("Background");
-    clickLabeledElement(t("colors.e64980"));
+    UI.clickLabeledElement("Stroke");
+    UI.clickLabeledElement(t("colors.c92a2a"));
+    UI.clickLabeledElement("Background");
+    UI.clickLabeledElement(t("colors.e64980"));
     // Fill style
     fireEvent.click(screen.getByTitle("Cross-hatch"));
     // Stroke width

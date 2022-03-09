@@ -1,8 +1,9 @@
-import { AppState, Point } from "../types";
+import { AppState, ExcalidrawProps, Point } from "../types";
 import {
   getShortcutKey,
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
+  wrapEvent,
 } from "../utils";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
@@ -30,6 +31,7 @@ import { isPointHittingElementBoundingBox } from "./collision";
 import { getElementAbsoluteCoords } from "./";
 
 import "./Hyperlink.scss";
+import { trackEvent } from "../analytics";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -48,10 +50,12 @@ export const Hyperlink = ({
   element,
   appState,
   setAppState,
+  onLinkOpen,
 }: {
   element: NonDeletedExcalidrawElement;
   appState: AppState;
   setAppState: React.Component<any, AppState>["setState"];
+  onLinkOpen: ExcalidrawProps["onLinkOpen"];
 }) => {
   const linkVal = element.link || "";
 
@@ -65,6 +69,10 @@ export const Hyperlink = ({
     }
 
     const link = normalizeLink(inputRef.current.value);
+
+    if (!element.link && link) {
+      trackEvent("hyperlink", "create");
+    }
 
     mutateElement(element, { link });
     setAppState({ showHyperlinkPopup: "info" });
@@ -105,6 +113,7 @@ export const Hyperlink = ({
   }, [appState, element, isEditing, setAppState]);
 
   const handleRemove = useCallback(() => {
+    trackEvent("hyperlink", "delete");
     mutateElement(element, { link: null });
     if (isEditing) {
       inputRef.current!.value = "";
@@ -113,13 +122,15 @@ export const Hyperlink = ({
   }, [setAppState, element, isEditing]);
 
   const onEdit = () => {
+    trackEvent("hyperlink", "edit", "popup-ui");
     setAppState({ showHyperlinkPopup: "editor" });
   };
   const { x, y } = getCoordsForPopover(element, appState);
   if (
     appState.draggingElement ||
     appState.resizingElement ||
-    appState.isRotating
+    appState.isRotating ||
+    appState.openMenu
   ) {
     return null;
   }
@@ -159,6 +170,18 @@ export const Hyperlink = ({
             "d-none": isEditing,
           })}
           target={isLocalLink(element.link) ? "_self" : "_blank"}
+          onClick={(event) => {
+            if (element.link && onLinkOpen) {
+              const customEvent = wrapEvent(
+                EVENT.EXCALIDRAW_LINK,
+                event.nativeEvent,
+              );
+              onLinkOpen(element, customEvent);
+              if (customEvent.defaultPrevented) {
+                event.preventDefault();
+              }
+            }
+          }}
           rel="noopener noreferrer"
         >
           {element.link}
@@ -197,8 +220,9 @@ const getCoordsForPopover = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
 ) => {
+  const [x1, y1] = getElementAbsoluteCoords(element);
   const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
-    { sceneX: element.x + element.width / 2, sceneY: element.y },
+    { sceneX: x1 + element.width / 2, sceneY: y1 },
     appState,
   );
   const x = viewportX - appState.offsetLeft - CONTAINER_WIDTH / 2;
@@ -222,19 +246,24 @@ export const isLocalLink = (link: string | null) => {
 };
 
 export const actionLink = register({
-  name: "link",
+  name: "hyperlink",
   perform: (elements, appState) => {
     if (appState.showHyperlinkPopup === "editor") {
       return false;
     }
+
     return {
       elements,
       appState: {
         ...appState,
         showHyperlinkPopup: "editor",
+        openMenu: null,
       },
       commitToHistory: true,
     };
+  },
+  trackEvent: (action, source) => {
+    trackEvent("hyperlink", "edit", source);
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
   contextItemLabel: (elements, appState) =>
@@ -306,9 +335,16 @@ export const isPointHittingLinkIcon = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   [x, y]: Point,
+  isMobile: boolean,
 ) => {
   const threshold = 4 / appState.zoom.value;
-
+  if (
+    !isMobile &&
+    appState.viewModeEnabled &&
+    isPointHittingElementBoundingBox(element, [x, y], threshold)
+  ) {
+    return true;
+  }
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
   const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
@@ -375,6 +411,7 @@ const renderTooltip = (
     },
     "top",
   );
+  trackEvent("hyperlink", "tooltip", "link-icon");
 
   IS_HYPERLINK_TOOLTIP_VISIBLE = true;
 };
@@ -403,13 +440,13 @@ export const shouldHideLinkPopup = (
   if (isPointHittingElementBoundingBox(element, [sceneX, sceneY], threshold)) {
     return false;
   }
-
+  const [x1, y1, x2] = getElementAbsoluteCoords(element);
   // hit box to prevent hiding when hovered in the vertical area between element and popover
   if (
-    sceneX >= element.x &&
-    sceneX <= element.x + element.width &&
-    sceneY <= element.y &&
-    sceneY >= element.y - SPACE_BOTTOM
+    sceneX >= x1 &&
+    sceneX <= x2 &&
+    sceneY >= y1 - SPACE_BOTTOM &&
+    sceneY <= y1
   ) {
     return false;
   }

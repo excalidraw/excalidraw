@@ -1,8 +1,10 @@
 import { t } from "../i18n";
 import { isDarwin } from "../keys";
 import { getShortcutKey } from "../utils";
+import { ActionName } from "./types";
 
-export type ShortcutName =
+export type ShortcutName = SubtypeOf<
+  ActionName,
   | "cut"
   | "copy"
   | "paste"
@@ -26,7 +28,8 @@ export type ShortcutName =
   | "viewMode"
   | "flipHorizontal"
   | "flipVertical"
-  | "link";
+  | "hyperlink"
+>;
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   cut: [getShortcutKey("CtrlOrCmd+X")],
@@ -63,11 +66,11 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   flipHorizontal: [getShortcutKey("Shift+H")],
   flipVertical: [getShortcutKey("Shift+V")],
   viewMode: [getShortcutKey("Alt+R")],
-  link: [getShortcutKey("CtrlOrCmd+K")],
+  hyperlink: [getShortcutKey("CtrlOrCmd+K")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName) => {
   const shortcuts = shortcutMap[name];
-  // if multiple shortcuts availiable, take the first one
+  // if multiple shortcuts available, take the first one
   return shortcuts && shortcuts.length > 0 ? shortcuts[0] : "";
 };

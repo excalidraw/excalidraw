@@ -24,7 +24,7 @@ export const POINTER_BUTTON = {
   WHEEL: 1,
   SECONDARY: 2,
   TOUCH: -1,
-};
+} as const;
 
 export enum EVENT {
   COPY = "copy",
@@ -52,6 +52,8 @@ export enum EVENT {
   HASHCHANGE = "hashchange",
   VISIBILITY_CHANGE = "visibilitychange",
   SCROLL = "scroll",
+  // custom events
+  EXCALIDRAW_LINK = "excalidraw-link",
 }
 
 export const ENV = {
@@ -180,3 +182,9 @@ export const VERSIONS = {
 } as const;
 
 export const BOUND_TEXT_PADDING = 5;
+
+export const VERTICAL_ALIGN = {
+  TOP: "top",
+  MIDDLE: "middle",
+  BOTTOM: "bottom",
+};

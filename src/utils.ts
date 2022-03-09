@@ -2,6 +2,7 @@ import colors from "./colors";
 import {
   CURSOR_TYPE,
   DEFAULT_VERSION,
+  EVENT,
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
@@ -474,7 +475,9 @@ export const getNearestScrollableContainer = (
     const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
     if (
       hasScrollableContent &&
-      (overflowY === "auto" || overflowY === "scroll")
+      (overflowY === "auto" ||
+        overflowY === "scroll" ||
+        overflowY === "overlay")
     ) {
       return parent;
     }
@@ -523,3 +526,12 @@ export const arrayToMap = <T extends { id: string } | string>(
 
 export const isTestEnv = () =>
   typeof process !== "undefined" && process.env?.NODE_ENV === "test";
+
+export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
+  return new CustomEvent(name, {
+    detail: {
+      nativeEvent,
+    },
+    cancelable: true,
+  });
+};

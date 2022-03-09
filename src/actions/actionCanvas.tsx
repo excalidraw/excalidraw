@@ -26,7 +26,7 @@ export const actionChangeViewBackgroundColor = register({
       commitToHistory: !!value.viewBackgroundColor,
     };
   },
-  PanelComponent: ({ appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData }) => {
     return (
       <div style={{ position: "relative" }}>
         <ColorPicker
@@ -39,6 +39,8 @@ export const actionChangeViewBackgroundColor = register({
             updateData({ openPopup: active ? "canvasColorPicker" : null })
           }
           data-testid="canvas-background-picker"
+          elements={elements}
+          appState={appState}
         />
       </div>
     );
@@ -65,6 +67,8 @@ export const actionClearCanvas = register({
         gridSize: appState.gridSize,
         showStats: appState.showStats,
         pasteDialog: appState.pasteDialog,
+        elementType:
+          appState.elementType === "image" ? "selection" : appState.elementType,
       },
       commitToHistory: true,
     };
