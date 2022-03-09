@@ -34,11 +34,20 @@ const generateRoomId = async () => {
  * Right now the reason why we resolve connection params (url, polling...)
  * from upstream is to allow changing the params immediately when needed without
  * having to wait for clients to update the SW.
+ *
+ * If REACT_APP_WS_SERVER_URL env is set, we use that instead (useful for forks)
  */
 export const getCollabServer = async (): Promise<{
   url: string;
   polling: boolean;
 }> => {
+  if (process.env.REACT_APP_WS_SERVER_URL) {
+    return {
+      url: process.env.REACT_APP_WS_SERVER_URL,
+      polling: true,
+    };
+  }
+
   try {
     const resp = await fetch(
       `${process.env.REACT_APP_PORTAL_URL}/collab-server`,
