@@ -64,6 +64,7 @@
     "cartoonist": "漫画風",
     "fileTitle": "ファイル名",
     "colorPicker": "色選択",
+    "canvasColors": "",
     "canvasBackground": "キャンバスの背景",
     "drawingCanvas": "キャンバスの描画",
     "layers": "レイヤー",
@@ -179,7 +180,8 @@
     "imageInsertError": "画像を挿入できませんでした。後でもう一度お試しください...",
     "fileTooBig": "ファイルが大きすぎます。許可される最大サイズは {{maxSize}} です。",
     "svgImageInsertError": "SVGイメージを挿入できませんでした。SVGマークアップは無効に見えます。",
-    "invalidSVGString": "無効なSVGです。"
+    "invalidSVGString": "無効なSVGです。",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "選択",
