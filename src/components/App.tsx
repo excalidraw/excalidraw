@@ -4932,7 +4932,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     try {
-      const file = event.dataTransfer.files[0];
+      const file = event.dataTransfer.files.item(0);
 
       if (isSupportedImageFile(file)) {
         // first attempt to decode scene from the image if it's embedded
@@ -5008,7 +5008,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const file = event.dataTransfer?.files[0];
+    const file = event.dataTransfer?.files.item(0);
     if (
       file?.type === MIME_TYPES.excalidrawlib ||
       file?.name?.endsWith(".excalidrawlib")
@@ -5024,7 +5024,7 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ isLoading: false, errorMessage: error.message }),
         );
       // default: assume an Excalidraw file regardless of extension/MimeType
-    } else {
+    } else if (file) {
       this.setState({ isLoading: true });
       if (nativeFileSystemSupported) {
         try {
