@@ -190,9 +190,8 @@ const ToolButtonWrapper = (props: any) => {
     if (!state || !state.active || state.finished) {
       return props.children;
     }
-    setState({ ...state, started: true });
     return (
-      <Popover isOpen={state.active && !state.finished}>
+      <Popover isOpen={!state.finished}>
         <PopoverTrigger>{props.children}</PopoverTrigger>
         <PopoverContent>
           <PopoverArrow />

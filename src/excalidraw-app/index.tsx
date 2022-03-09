@@ -782,15 +782,13 @@ function ProductTour() {
 const WelcomeModal = () => {
   const [state, setState] = useSbState("1");
 
-  if (!state || !state.active || state.finished) {
+  if (!state) {
     return null;
   }
 
-  setState({ ...state, started: true });
-
   return (
     <>
-      <Modal isOpen={state.active && !state.finished} onClose={() => {}}>
+      <Modal isOpen={!state.finished} onClose={() => {}}>
         <ModalContent>
           <ModalBody>
             Welcome to Excalidraw the best way to digitally sketch ideas. Let's
@@ -801,9 +799,7 @@ const WelcomeModal = () => {
             <Button
               colorScheme="blue"
               mr={3}
-              onClick={() =>
-                setState({ ...state, finished: true, started: true })
-              }
+              onClick={() => setState({ ...state, finished: true })}
             >
               Continue
             </Button>
