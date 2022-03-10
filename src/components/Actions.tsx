@@ -24,12 +24,9 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-  PopoverHeader,
   PopoverBody,
-  PopoverFooter,
   PopoverArrow,
   PopoverCloseButton,
-  PopoverAnchor,
 } from "@chakra-ui/react";
 
 import { useSbState } from "@switchboardcc/sdk";
@@ -192,7 +189,9 @@ const ToolButtonWrapper = (props: any) => {
     }
     return (
       <Popover isOpen={!state.finished}>
-        <PopoverTrigger>{props.children}</PopoverTrigger>
+        <PopoverTrigger>
+          <div>{props.children}</div>
+        </PopoverTrigger>
         <PopoverContent>
           <PopoverArrow />
           <PopoverCloseButton />
