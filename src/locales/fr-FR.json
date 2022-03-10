@@ -64,7 +64,7 @@
     "cartoonist": "Caricaturiste",
     "fileTitle": "Nom du fichier",
     "colorPicker": "Sélecteur de couleur",
-    "canvasColors": "",
+    "canvasColors": "Utilisé sur la zone de dessin",
     "canvasBackground": "Arrière-plan du canevas",
     "drawingCanvas": "Zone de dessin",
     "layers": "Calques",
@@ -181,7 +181,7 @@
     "fileTooBig": "Le fichier est trop volumineux. La taille maximale autorisée est de {{maxSize}}.",
     "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
     "invalidSVGString": "SVG invalide.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Impossible de se connecter au serveur collaboratif. Veuillez recharger la page et réessayer."
   },
   "toolBar": {
     "selection": "Sélection",
