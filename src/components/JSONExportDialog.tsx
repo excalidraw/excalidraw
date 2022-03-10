@@ -11,6 +11,8 @@ import { actionSaveFileToDisk } from "../actions/actionExport";
 import { Card } from "./Card";
 
 import {
+  Alert,
+  AlertIcon,
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -18,6 +20,7 @@ import {
   PopoverArrow,
   PopoverCloseButton,
 } from "@chakra-ui/react";
+
 import { useSbState } from "@switchboardcc/sdk";
 
 import "./ExportDialog.scss";
@@ -45,8 +48,23 @@ const JSONExportModal = ({
   canvas: HTMLCanvasElement | null;
 }) => {
   const { onExportToBackend } = exportOpts;
+
+  const [state, setState] = useSbState("5");
   return (
     <div className="ExportDialog ExportDialog--json">
+      {state && !state.finished && (
+        <Alert
+          status="success"
+          variant="subtle"
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="center"
+          textAlign="center"
+        >
+          <AlertIcon />
+          🎉 You did it! You’re an Excalidraw pro now!
+        </Alert>
+      )}
       <div className="ExportDialog-cards">
         {exportOpts.saveFileToDisk && (
           <Card color="lime">
@@ -137,11 +155,15 @@ export const JSONExportDialog = ({
   const handleClose = React.useCallback(() => {
     setModalIsShown(false);
   }, []);
+  const [state, setState] = useSbState("4");
 
   return (
     <ExportButtonWrapper>
       <ToolButton
         onClick={() => {
+          if (!state.finished) {
+            setState({ ...state, finished: true });
+          }
           setModalIsShown(true);
         }}
         data-testid="json-export-button"
