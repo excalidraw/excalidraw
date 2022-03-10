@@ -290,6 +290,16 @@
     width: 100%;
 
     box-sizing: border-box;
+
+    .eraser {
+      &.ToolIcon:hover {
+        --icon-fill-color: #fff;
+        --keybinding-color: #fff;
+      }
+      &.active {
+        background-color: var(--color-primary);
+      }
+    }
   }
 
   .App-toolbar-content {
