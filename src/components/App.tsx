@@ -2800,9 +2800,13 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const elements = this.scene.getElements().map((ele) => {
-      if (idsToUpdate.includes(ele.id)) {
+      const id =
+        isBoundToContainer(ele) && idsToUpdate.includes(ele.containerId)
+          ? ele.containerId
+          : ele.id;
+      if (idsToUpdate.includes(id)) {
         if (event.altKey) {
-          if (pointerDownState.elementIdsToErase[ele.id] === false) {
+          if (pointerDownState.elementIdsToErase[id] === false) {
             return newElementWith(ele, {
               opacity: this.state.currentItemOpacity,
             });
@@ -4548,6 +4552,12 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.elementIdsToErase[ele.id]) {
         return newElementWith(ele, { isDeleted: true });
       } else if (hitElement && ele.id === hitElement.id) {
+        return newElementWith(ele, { isDeleted: true });
+      } else if (
+        isBoundToContainer(ele) &&
+        (pointerDownState.elementIdsToErase[ele.containerId] ||
+          (hitElement && ele.containerId === hitElement.id))
+      ) {
         return newElementWith(ele, { isDeleted: true });
       }
       return ele;
