@@ -10,6 +10,16 @@ import { ToolButton } from "./ToolButton";
 import { actionSaveFileToDisk } from "../actions/actionExport";
 import { Card } from "./Card";
 
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,
+  PopoverArrow,
+  PopoverCloseButton,
+} from "@chakra-ui/react";
+import { useSbState } from "@switchboardcc/sdk";
+
 import "./ExportDialog.scss";
 import { nativeFileSystemSupported } from "../data/filesystem";
 
@@ -84,6 +94,29 @@ const JSONExportModal = ({
   );
 };
 
+const ExportButtonWrapper = (props: any) => {
+  const [state, setState] = useSbState("4");
+  if (!state || !state.active || state.finished) {
+    return props.children;
+  }
+  return (
+    <Popover isOpen={!state.finished}>
+      <PopoverTrigger>
+        <div>{props.children}</div>
+      </PopoverTrigger>
+      <PopoverContent>
+        <PopoverArrow />
+        <PopoverCloseButton />
+        <PopoverBody>
+          Looking good! Let’s export this drawing so you can share it with
+          others. Click the Save as image button to save this as a PNG, SVG, or
+          copy it to your clipboard.
+        </PopoverBody>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
 export const JSONExportDialog = ({
   elements,
   appState,
@@ -106,7 +139,7 @@ export const JSONExportDialog = ({
   }, []);
 
   return (
-    <>
+    <ExportButtonWrapper>
       <ToolButton
         onClick={() => {
           setModalIsShown(true);
@@ -132,6 +165,6 @@ export const JSONExportDialog = ({
           />
         </Dialog>
       )}
-    </>
+    </ExportButtonWrapper>
   );
 };

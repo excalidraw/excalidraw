@@ -772,7 +772,7 @@ const DrawASquare = () => {
     </>
   );
 };
-
+/*
 const NiceDrawing = () => {
   const [state, setState] = useSbState("4");
 
@@ -793,6 +793,7 @@ const NiceDrawing = () => {
     </>
   );
 };
+ */
 
 const ExcalidrawApp = () => {
   const userId = "1";
@@ -803,7 +804,6 @@ const ExcalidrawApp = () => {
         <TopErrorBoundary>
           <WelcomeModal />
           <DrawASquare />
-          <NiceDrawing />
           <CollabContextConsumer>
             <ExcalidrawWrapper />
           </CollabContextConsumer>
