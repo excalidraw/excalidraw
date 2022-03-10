@@ -24,7 +24,7 @@
     "@emotion/styled": "^11",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
-    "@switchboardcc/sdk": "file:../switchboard/packages/sdk/",
+    "@switchboardcc/react-sdk-proto": "file:../switchboard/packages/react-sdk-proto/",
     "@testing-library/jest-dom": "5.16.1",
     "@testing-library/react": "12.1.2",
     "@tldraw/vec": "1.4.0",

@@ -29,7 +29,7 @@ import {
   PopoverCloseButton,
 } from "@chakra-ui/react";
 
-import { useSbState } from "@switchboardcc/sdk";
+import { useSbState } from "@switchboardcc/react-sdk-proto";
 
 export const SelectedShapeActions = ({
   appState,

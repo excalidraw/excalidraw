@@ -21,7 +21,7 @@ import {
   PopoverCloseButton,
 } from "@chakra-ui/react";
 
-import { useSbState } from "@switchboardcc/sdk";
+import { useSbState } from "@switchboardcc/react-sdk-proto";
 
 import "./ExportDialog.scss";
 import { nativeFileSystemSupported } from "../data/filesystem";

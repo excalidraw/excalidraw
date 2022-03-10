@@ -16,7 +16,7 @@ import Stack from "../../components/Stack";
 import { AppState } from "../../types";
 
 import { Alert, AlertIcon } from "@chakra-ui/react";
-import { useSbState } from "@switchboardcc/sdk";
+import { useSbState } from "@switchboardcc/react-sdk-proto";
 
 const getShareIcon = () => {
   const navigator = window.navigator as any;

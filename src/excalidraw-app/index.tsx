@@ -87,7 +87,7 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 
-import { SbProvider, useSbState } from "@switchboardcc/sdk";
+import { SbProvider, useSbState } from "@switchboardcc/react-sdk-proto";
 
 import queryString from "query-string";
 

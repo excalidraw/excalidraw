@@ -3,7 +3,7 @@ import { ToolButton } from "./ToolButton";
 import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import { users } from "./icons";
-import { useSbState } from "@switchboardcc/sdk";
+import { useSbState } from "@switchboardcc/react-sdk-proto";
 
 import "./CollabButton.scss";
 
