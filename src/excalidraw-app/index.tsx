@@ -89,6 +89,8 @@ import {
 
 import { SbProvider, useSbState } from "@switchboardcc/sdk";
 
+import queryString from "query-string";
+
 const filesStore = createStore("files-db", "files-store");
 
 const clearObsoleteFilesFromIndexedDB = async (opts: {
@@ -796,7 +798,7 @@ const NiceDrawing = () => {
  */
 
 const ExcalidrawApp = () => {
-  const userId = "1";
+  const userId = (queryString.parse(location.search).userId as string) || "1";
 
   return (
     <ChakraProvider>

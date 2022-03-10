@@ -51,6 +51,7 @@
     "png-chunks-extract": "1.0.0",
     "points-on-curve": "0.2.0",
     "pwacompat": "2.0.17",
+    "query-string": "7.1.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-joyride": "2.3.2",
