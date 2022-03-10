@@ -49,7 +49,7 @@ const JSONExportModal = ({
 }) => {
   const { onExportToBackend } = exportOpts;
 
-  const [state, setState] = useSbState("5");
+  const [state, setState] = useSbState("congratulations-db59ae1");
   return (
     <div className="ExportDialog ExportDialog--json">
       {state && !state.finished && (
@@ -113,7 +113,7 @@ const JSONExportModal = ({
 };
 
 const ExportButtonWrapper = (props: any) => {
-  const [state, setState] = useSbState("4");
+  const [state, setState] = useSbState("export-78e5a70");
   if (!state || !state.active || state.finished) {
     return props.children;
   }
@@ -158,12 +158,14 @@ export const JSONExportDialog = ({
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
 
-  const [modalBannerState, setModalBannerState] = useSbState("5");
+  const [modalBannerState, setModalBannerState] = useSbState(
+    "congratulations-db59ae1",
+  );
   const handleClose = React.useCallback(() => {
     setModalBannerState({ ...modalBannerState, finished: true });
     setModalIsShown(false);
   }, [modalBannerState, setModalBannerState]);
-  const [state, setState] = useSbState("4");
+  const [state, setState] = useSbState("export-78e5a70");
 
   return (
     <ExportButtonWrapper>

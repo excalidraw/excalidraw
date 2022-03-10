@@ -4,8 +4,6 @@ import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 import { nanoid } from "nanoid";
 
-import { useSbState } from "@switchboardcc/sdk";
-
 import {
   actionAddToLibrary,
   actionBringForward,

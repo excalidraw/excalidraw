@@ -707,7 +707,7 @@ const ExcalidrawWrapper = () => {
 };
 
 const WelcomeModal = () => {
-  const [state, setState] = useSbState("1");
+  const [state, setState] = useSbState("welcome-cf7230a");
 
   if (!state) {
     return null;
@@ -738,7 +738,7 @@ const WelcomeModal = () => {
 };
 
 const DrawASquare = () => {
-  const [state, setState] = useSbState("3");
+  const [state, setState] = useSbState("draw-afcee69");
 
   const handleKeyUp = useCallback(
     (event) => {
@@ -774,28 +774,6 @@ const DrawASquare = () => {
     </>
   );
 };
-/*
-const NiceDrawing = () => {
-  const [state, setState] = useSbState("4");
-
-  if (!state) {
-    return null;
-  }
-
-  return (
-    <>
-      <Modal isOpen={state.active && !state.finished} onClose={() => {}}>
-        <ModalContent>
-          <ModalBody>
-            Wow, that’s a good looking rectangle. Next, let’s add some text to
-            it. Double click the rectangle or press Enter to add text.
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-    </>
-  );
-};
- */
 
 const ExcalidrawApp = () => {
   const userId = (queryString.parse(location.search).userId as string) || "1";

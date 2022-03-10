@@ -182,7 +182,7 @@ export const SelectedShapeActions = ({
 };
 
 const ToolButtonWrapper = (props: any) => {
-  const [state, setState] = useSbState("2");
+  const [state, setState] = useSbState("rectangle-tool-a40ea81");
   if (props.value === "rectangle") {
     if (!state || !state.active || state.finished) {
       return props.children;
@@ -217,7 +217,7 @@ export const ShapesSwitcher = ({
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
 }) => {
-  const [state, setState] = useSbState("2");
+  const [state, setState] = useSbState("rectangle-tool-a40ea81");
   return (
     <>
       {SHAPES.map(({ value, icon, key }, index) => {
