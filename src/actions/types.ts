@@ -107,7 +107,7 @@ export type ActionName =
   | "decreaseFontSize"
   | "unbindText"
   | "hyperlink"
-  | "erase";
+  | "eraser";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

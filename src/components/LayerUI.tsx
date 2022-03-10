@@ -426,7 +426,7 @@ const LayerUI = ({
                 >
                   {actionManager.renderAction("undo", { size: "small" })}
                   {actionManager.renderAction("redo", { size: "small" })}
-                  {actionManager.renderAction("erase", { size: "small" })}
+                  {actionManager.renderAction("eraser", { size: "small" })}
                 </div>
               )}
             </Section>

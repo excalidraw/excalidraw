@@ -150,8 +150,7 @@
     "remove": "Remove",
     "publishLibrary": "Publish",
     "submit": "Submit",
-    "confirm": "Confirm",
-    "eraser": "Eraser"
+    "confirm": "Confirm"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -223,7 +222,7 @@
     "publishLibrary": "Publish your own library",
     "bindTextToElement": "Press enter to add text",
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
-    "eraserDeselect": "Hold Alt while holding the mouse over to deselect the elements for removal"
+    "eraserRevert": "Hold Alt to revert the elements marked for deletion"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",

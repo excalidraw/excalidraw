@@ -134,7 +134,7 @@ export const MobileMenu = ({
 
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
-        {showEraser && actionManager.renderAction("erase")}
+        {showEraser && actionManager.renderAction("eraser")}
 
         {actionManager.renderAction(
           appState.multiElement ? "finalize" : "duplicateSelection",

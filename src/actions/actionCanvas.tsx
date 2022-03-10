@@ -292,7 +292,7 @@ export const actionToggleTheme = register({
 });
 
 export const actionErase = register({
-  name: "erase",
+  name: "eraser",
   perform: (elements, appState) => {
     return {
       appState: {
@@ -308,8 +308,8 @@ export const actionErase = register({
       type="button"
       icon={eraser}
       className={clsx("eraser", { active: isEraserActive(appState) })}
-      title={t("buttons.eraser")}
-      aria-label={t("buttons.eraser")}
+      title={t("toolBar.eraser")}
+      aria-label={t("toolBar.eraser")}
       onClick={() => {
         updateData(null);
       }}
