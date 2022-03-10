@@ -15,6 +15,9 @@ import "./RoomDialog.scss";
 import Stack from "../../components/Stack";
 import { AppState } from "../../types";
 
+import { Alert, AlertIcon } from "@chakra-ui/react";
+import { useSbState } from "@switchboardcc/sdk";
+
 const getShareIcon = () => {
   const navigator = window.navigator as any;
   const isAppleBrowser = /Apple/.test(navigator.vendor);
@@ -49,6 +52,7 @@ const RoomDialog = ({
   theme: AppState["theme"];
 }) => {
   const roomLinkInput = useRef<HTMLInputElement>(null);
+  const [state, setState] = useSbState("congratulations-df49ae1");
 
   const copyRoomLink = async () => {
     try {
@@ -102,6 +106,19 @@ const RoomDialog = ({
         )}
         {activeRoomLink && (
           <>
+            {state && state.active && !state.finished && (
+              <Alert
+                status="success"
+                variant="subtle"
+                flexDirection="row"
+                alignItems="center"
+                justifyContent="center"
+                textAlign="center"
+              >
+                <AlertIcon />
+                🎉 You did it! You’re an Excalidraw pro now!
+              </Alert>
+            )}
             <p>{t("roomDialog.desc_inProgressIntro")}</p>
             <p>{t("roomDialog.desc_shareLink")}</p>
             <div className="RoomDialog-linkContainer">
@@ -171,7 +188,10 @@ const RoomDialog = ({
   return (
     <Dialog
       small
-      onCloseRequest={handleClose}
+      onCloseRequest={() => {
+        setState({ ...state, finished: true });
+        handleClose();
+      }}
       title={t("labels.liveCollaboration")}
       theme={theme}
     >

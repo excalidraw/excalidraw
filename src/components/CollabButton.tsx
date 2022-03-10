@@ -53,13 +53,17 @@ const CollabButton = ({
   collaboratorCount: number;
   onClick: () => void;
 }) => {
+  const [state, setState] = useSbState("share-78e5c60");
   return (
     <CollabButtonWrapper>
       <ToolButton
         className={clsx("CollabButton", {
           "is-collaborating": isCollaborating,
         })}
-        onClick={onClick}
+        onClick={() => {
+          setState({ ...state, finished: true });
+          onClick();
+        }}
         icon={users}
         type="button"
         title={t("labels.liveCollaboration")}
