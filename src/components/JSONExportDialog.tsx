@@ -152,9 +152,11 @@ export const JSONExportDialog = ({
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
 
+  const [modalBannerState, setModalBannerState] = useSbState("5");
   const handleClose = React.useCallback(() => {
+    setModalBannerState({ ...modalBannerState, finished: true });
     setModalIsShown(false);
-  }, []);
+  }, [modalBannerState, setModalBannerState]);
   const [state, setState] = useSbState("4");
 
   return (
