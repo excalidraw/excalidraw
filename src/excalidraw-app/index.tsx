@@ -703,81 +703,6 @@ const ExcalidrawWrapper = () => {
     </>
   );
 };
-function ProductTour() {
-  const tourCallback = (operation: JoyrideCallBackProps) => {
-    debugger;
-    const { step, action, type } = operation;
-  };
-
-  const tourSteps: Array<JoyrideStep> = [
-    {
-      target: "#root",
-      content: (
-        <React.Fragment>
-          Welcome to Excalidraw the best way to digitally sketch ideas. Let's
-          start sketching...
-        </React.Fragment>
-      ),
-      event: "hover",
-      placement: "center",
-      hideCloseButton: true,
-    },
-    {
-      target: "#SB-rectangle",
-      content: (
-        <React.Fragment>
-          Let's start by creating your first shape. Click the square and click
-          and drag to draw.
-        </React.Fragment>
-      ),
-      placement: "top",
-      event: "hover",
-      spotlightClicks: true,
-      hideCloseButton: true,
-    },
-    {
-      target: "body",
-      content: (
-        <React.Fragment>
-          After drawing the square let's add some text to it. Double click the
-          square text.
-        </React.Fragment>
-      ),
-      event: "click",
-      spotlightClicks: true,
-      placement: "bottom-end",
-      placementBeacon: "right",
-      disableOverlayClose: true,
-      offset: -450,
-      hideCloseButton: true,
-    },
-    {
-      target: "#SB-export",
-      content: (
-        <React.Fragment>
-          Great now let's share this work of art with a coworker.
-        </React.Fragment>
-      ),
-      event: "hover",
-      placement: "auto",
-      hideCloseButton: true,
-    },
-  ];
-
-  return (
-    <div>
-      <Joyride
-        run={true}
-        continuous={true}
-        showProgress={true}
-        debug={true}
-        callback={tourCallback}
-        stepIndex={0}
-        steps={tourSteps}
-      />
-    </div>
-  );
-}
 
 const WelcomeModal = () => {
   const [state, setState] = useSbState("1");
@@ -813,12 +738,14 @@ const WelcomeModal = () => {
 const DrawASquare = () => {
   const [state, setState] = useSbState("3");
 
-  const handleKeyUp = useCallback((event) => {
-    if (state && state.active) {
-      setState({ ...state, finished: true });
-    }
-    console.log("event");
-  }, []);
+  const handleKeyUp = useCallback(
+    (event) => {
+      if (state && state.active) {
+        setState({ ...state, finished: true });
+      }
+    },
+    [state, setState],
+  );
 
   useEffect(() => {
     document.addEventListener("mouseup", handleKeyUp);
@@ -831,7 +758,11 @@ const DrawASquare = () => {
 
   return (
     <>
-      <Modal isOpen={state.active && !state.finished} onClose={() => {}}>
+      <Modal
+        isCentered
+        isOpen={state.active && !state.finished}
+        onClose={() => {}}
+      >
         <ModalContent>
           <ModalBody>
             Great! Now let's draw a rectangle anwhere on the canvas.
