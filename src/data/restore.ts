@@ -19,7 +19,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   FONT_FAMILY,
 } from "../constants";
-import { getDefaultAppState, isEraserActive } from "../appState";
+import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp } from "../utils";
@@ -32,7 +32,7 @@ type RestoredAppState = Omit<
 
 export const AllowedExcalidrawElementTypes: Record<
   AppState["elementType"],
-  true
+  boolean
 > = {
   selection: true,
   text: true,
@@ -43,7 +43,7 @@ export const AllowedExcalidrawElementTypes: Record<
   image: true,
   arrow: true,
   freedraw: true,
-  eraser: true,
+  eraser: false,
 };
 
 export type RestoredDataState = {
@@ -255,11 +255,9 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
-    elementType:
-      AllowedExcalidrawElementTypes[nextAppState.elementType] &&
-      !isEraserActive(nextAppState)
-        ? nextAppState.elementType
-        : "selection",
+    elementType: AllowedExcalidrawElementTypes[nextAppState.elementType]
+      ? nextAppState.elementType
+      : "selection",
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"
