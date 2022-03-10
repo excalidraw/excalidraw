@@ -2813,7 +2813,9 @@ class App extends React.Component<AppProps, AppState> {
       }
       return ele;
     });
-    this.updateScene({ elements });
+
+    this.scene.replaceAllElements(elements);
+
     pointerDownState.lastCoords.x = scenePointer.x;
     pointerDownState.lastCoords.y = scenePointer.y;
   };
@@ -4550,7 +4552,9 @@ class App extends React.Component<AppProps, AppState> {
       }
       return ele;
     });
-    this.updateScene({ elements, commitToHistory: true });
+
+    this.history.resumeRecording();
+    this.scene.replaceAllElements(elements);
   };
 
   private initializeImage = async ({
