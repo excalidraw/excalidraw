@@ -196,7 +196,8 @@
     "library": "Бібліотека",
     "lock": "Залишити обраний інструмент після креслення",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Дії з полотном",
@@ -221,7 +222,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не вдається показати попередній перегляд",
