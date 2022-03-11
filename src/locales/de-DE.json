@@ -196,7 +196,8 @@
     "library": "Bibliothek",
     "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen",
     "penMode": "",
-    "link": "Link für ausgewählte Form hinzufügen / aktualisieren"
+    "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
@@ -221,7 +222,8 @@
     "placeImage": "Klicken, um das Bild zu platzieren oder klicken und ziehen um seine Größe manuell zu setzen",
     "publishLibrary": "Veröffentliche deine eigene Bibliothek",
     "bindTextToElement": "Zum Hinzufügen Eingabetaste drücken",
-    "deepBoxSelect": "Halte CtrlOrCmd gedrückt, um innerhalb der Gruppe auszuwählen, und um Ziehen zu vermeiden"
+    "deepBoxSelect": "Halte CtrlOrCmd gedrückt, um innerhalb der Gruppe auszuwählen, und um Ziehen zu vermeiden",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
