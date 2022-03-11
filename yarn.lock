@@ -5974,11 +5974,6 @@ dedent@^0.7.0:
   resolved "https://registry.npmjs.org/dedent/-/dedent-0.7.0.tgz"
   integrity sha1-JJXduvbrh0q7Dhvp3yLS5aVEMmw=
 
-deep-diff@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/deep-diff/-/deep-diff-1.0.2.tgz#afd3d1f749115be965e89c63edc7abb1506b9c26"
-  integrity sha512-aWS3UIVH+NPGCD1kki+DCU9Dua032iSsO43LqQpcs4R3+dVv7tX0qBGjiVHJHjplsoUM2XRO/KB92glqc68awg==
-
 deep-eql@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/deep-eql/-/deep-eql-3.0.1.tgz#dfc9404400ad1c8fe023e7da1df1c147c4b444df"
@@ -7091,11 +7086,6 @@ exegesis@^2.0.0, exegesis@^2.5.7:
     raw-body "^2.3.3"
     semver "^7.0.0"
 
-exenv@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/exenv/-/exenv-1.2.2.tgz#2ae78e85d9894158670b03d47bec1f03bd91bb9d"
-  integrity sha1-KueOhdmJQVhnCwPUe+wfA72Ru50=
-
 exit-code@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/exit-code/-/exit-code-1.0.2.tgz"
@@ -7234,7 +7224,7 @@ fake-indexeddb@3.1.7:
   dependencies:
     realistic-structured-clone "^2.0.1"
 
-fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
+fast-deep-equal@^3.1.1:
   version "3.1.3"
   resolved "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz"
   integrity sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==
@@ -9019,11 +9009,6 @@ is-lambda@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/is-lambda/-/is-lambda-1.0.1.tgz#3d9877899e6a53efc0160504cde15f82e6f061d5"
   integrity sha1-PZh3iZ5qU+/AFgUEzeFfgubwYdU=
-
-is-lite@^0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/is-lite/-/is-lite-0.8.1.tgz#a9bd03c90ea723d450c78c991b84f78e7e3126f9"
-  integrity sha512-ekSwuewzOmwFnzzAOWuA5fRFPqOeTrLIL3GWT7hdVVi+oLuD+Rau8gCmkb94vH5hjXc1Q/CfIW/y/td1RrNQIg==
 
 is-module@^1.0.0:
   version "1.0.0"
@@ -11026,16 +11011,6 @@ neo-async@^2.5.0, neo-async@^2.6.1, neo-async@^2.6.2:
   resolved "https://registry.npmjs.org/neo-async/-/neo-async-2.6.2.tgz"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nested-property@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/nested-property/-/nested-property-1.0.1.tgz#2001105b5c69413411b876bba9b86f4316af613f"
-  integrity sha512-BnBBoo/8bBNRdAnJc7+m79oWk7dXwW1+vCesaEQhfDGVwXGLMvmI4NwYgLTW94R/x+R2s/yr2g/hB/4w/YSAvA==
-
-nested-property@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/nested-property/-/nested-property-4.0.0.tgz#a67b5a31991e701e03cdbaa6453bc5b1011bb88d"
-  integrity sha512-yFehXNWRs4cM0+dz7QxCd06hTbWbSkV0ISsqBfkntU6TOY4Qm3Q88fRRLOddkGh2Qq6dZvnKVAahfhjcUvLnyA==
-
 netmask@^2.0.1:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-2.0.2.tgz#8b01a07644065d536383835823bc52004ebac5e7"
@@ -11958,11 +11933,6 @@ popmotion@9.3.6:
     hey-listen "^1.0.8"
     style-value-types "4.1.4"
     tslib "^2.1.0"
-
-popper.js@^1.16.0:
-  version "1.16.1"
-  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1.tgz#2a223cb3dc7b6213d740e40372be40de43e65b1b"
-  integrity sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==
 
 portfinder@^1.0.23, portfinder@^1.0.26:
   version "1.0.28"
@@ -13092,18 +13062,6 @@ react-fast-compare@3.2.0:
   resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-3.2.0.tgz#641a9da81b6a6320f270e89724fb45a0b39e43bb"
   integrity sha512-rtGImPZ0YyLrscKI9xTpV8psd6I8VAtjKCzQDlzyDvqJA8XOW78TXYQwNRNd8g8JZnDu8q9Fu/1v4HPAVwVdHA==
 
-react-floater@^0.7.3:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/react-floater/-/react-floater-0.7.3.tgz#f57947960682586866ec21540e73c9049ca9f787"
-  integrity sha512-d1wAEph+xRxQ0RJ3woMmYLlZHTaCIsja7Bv6JNo2ezsVUgdMan4CxOR4Do4/xgpmRFfsQMdlygexLAZZypWirw==
-  dependencies:
-    deepmerge "^4.2.2"
-    exenv "^1.2.2"
-    is-lite "^0.8.1"
-    popper.js "^1.16.0"
-    react-proptype-conditional-require "^1.0.4"
-    tree-changes "^0.5.1"
-
 react-focus-lock@2.5.2:
   version "2.5.2"
   resolved "https://registry.yarnpkg.com/react-focus-lock/-/react-focus-lock-2.5.2.tgz#f1e4db5e25cd8789351f2bd5ebe91e9dcb9c2922"
@@ -13125,27 +13083,6 @@ react-is@^17.0.1:
   version "17.0.1"
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.1.tgz"
   integrity sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
-
-react-joyride@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/react-joyride/-/react-joyride-2.3.2.tgz#7a5407b9032ab399c3c624ab21e60ddd40c12d56"
-  integrity sha512-MPYvHdxF/ylBZXJkKzyR3nTd+jydPeTKVwQDg8y7Ctl5H0UPgvF3uCzfieyJqE/JnK2wJU4QcjkontqBU1g7Xg==
-  dependencies:
-    deep-diff "^1.0.2"
-    deepmerge "^4.2.2"
-    exenv "^1.2.2"
-    is-lite "^0.8.1"
-    nested-property "^4.0.0"
-    react-floater "^0.7.3"
-    react-is "^16.13.1"
-    scroll "^3.0.1"
-    scrollparent "^2.0.1"
-    tree-changes "^0.7.1"
-
-react-proptype-conditional-require@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/react-proptype-conditional-require/-/react-proptype-conditional-require-1.0.4.tgz#69c2d5741e6df5e08f230f36bbc2944ee1222555"
-  integrity sha1-acLVdB5t9eCPIw82u8KUTuEiJVU=
 
 react-refresh@^0.8.3:
   version "0.8.3"
@@ -13963,16 +13900,6 @@ schema-utils@^3.0.0:
     "@types/json-schema" "^7.0.6"
     ajv "^6.12.5"
     ajv-keywords "^3.5.2"
-
-scroll@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/scroll/-/scroll-3.0.1.tgz#d5afb59fb3592ee3df31c89743e78b39e4cd8a26"
-  integrity sha512-pz7y517OVls1maEzlirKO5nPYle9AXsFzTMNJrRGmT951mzpIBy7sNHOg5o/0MQd/NqliCiWnAi0kZneMPFLcg==
-
-scrollparent@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/scrollparent/-/scrollparent-2.0.1.tgz#715d5b9cc57760fb22bdccc3befb5bfe06b1a317"
-  integrity sha1-cV1bnMV3YPsivczDvvtb/gaxoxc=
 
 select-hose@^2.0.0:
   version "2.0.0"
@@ -15271,22 +15198,6 @@ tr46@^2.1.0:
   version "0.3.9"
   resolved "https://registry.npmjs.org/traverse/-/traverse-0.3.9.tgz"
   integrity sha1-cXuPIgzAu3tE5AUUwisui7xw2Lk=
-
-tree-changes@^0.5.1:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/tree-changes/-/tree-changes-0.5.1.tgz#e31cc8a0f56c8c401f0a88243d9165dbea4f570c"
-  integrity sha512-O873xzV2xRZ6N059Mn06QzmGKEE21LlvIPbsk2G+GS9ZX5OCur6PIwuuh0rWpAPvLWQZPj0XObyG27zZyLHUzw==
-  dependencies:
-    deep-diff "^1.0.2"
-    nested-property "1.0.1"
-
-tree-changes@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/tree-changes/-/tree-changes-0.7.1.tgz#fa8810cbe417e80b9a42c4b018f934c7ad8fa156"
-  integrity sha512-sPIt8PKDi0OQTglr7lsetcB9DU19Ls/ZgFSjFvK6DWJGisAn4sOxtjpmQfuqjexQE4UU9U53LNmataL1kRJ3Uw==
-  dependencies:
-    fast-deep-equal "^3.1.3"
-    is-lite "^0.8.1"
 
 triple-beam@^1.2.0, triple-beam@^1.3.0:
   version "1.3.0"
