@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React from "react";
 import { AppState } from "../types";
 import { ActionManager } from "../actions/manager";
@@ -171,15 +172,16 @@ export const MobileMenu = ({
     <>
       {!viewModeEnabled && renderToolbar()}
       <div
-        className="App-bottom-bar"
+        className={clsx("App-bottom-bar", {
+          "disable-pointerEvents":
+            appState.draggingElement ||
+           appState.resizingElement ||
+            (appState.editingElement && !isTextElement(appState.editingElement)),
+        })}
         style={{
           marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
           marginLeft: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
           marginRight: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
-          "disable-pointerEvents":
-            appState.draggingElement ||
-            appState.resizingElement ||
-            (appState.editingElement && !isTextElement(appState.editingElement)),
         }}
       >
         <Island padding={0}>
