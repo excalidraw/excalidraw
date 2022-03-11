@@ -2984,7 +2984,21 @@ class App extends React.Component<AppProps, AppState> {
     this.lastPointerUp = event;
     const isTouchScreen = ["pen", "touch"].includes(event.pointerType);
 
-    if (isTouchScreen || isEraserActive(this.state)) {
+    if (isTouchScreen) {
+      const scenePointer = viewportCoordsToSceneCoords(
+        { clientX: event.clientX, clientY: event.clientY },
+        this.state,
+      );
+      const hitElement = this.getElementAtPosition(
+        scenePointer.x,
+        scenePointer.y,
+      );
+      this.hitLinkElement = this.getElementLinkAtPosition(
+        scenePointer,
+        hitElement,
+      );
+    }
+    if (isEraserActive(this.state)) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
