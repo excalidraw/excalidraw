@@ -196,7 +196,8 @@
     "library": "Tamkarḍit",
     "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ",
     "penMode": "",
-    "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen"
+    "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",
@@ -221,7 +222,8 @@
     "placeImage": "Ssit akken ad tserseḍ tugna, neɣ ssit u zuɣer akken ad tesbaduḍ tiddi-ines s ufus",
     "publishLibrary": "Siẓreg tamkarḍit-inek•inem",
     "bindTextToElement": "Ssed ɣef kcem akken ad ternuḍ aḍris",
-    "deepBoxSelect": "Ṭṭef CtrlOrCmd akken ad tferneḍ s telqey, yerna ad trewleḍ i uzuɣer"
+    "deepBoxSelect": "Ṭṭef CtrlOrCmd akken ad tferneḍ s telqey, yerna ad trewleḍ i uzuɣer",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Ulamek abeqqeḍ n teskant",
