@@ -298,6 +298,7 @@ export const actionErase = register({
       appState: {
         ...appState,
         selectedElementIds: {},
+        selectedGroupIds: {},
         elementType: isEraserActive(appState) ? "selection" : "eraser",
       },
       commitToHistory: true,
