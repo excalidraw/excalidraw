@@ -223,7 +223,7 @@
     "publishLibrary": "發布個人資料庫",
     "bindTextToElement": "按下 Enter 以加入文字。",
     "deepBoxSelect": "按住 Ctrl 或 Cmd 以深度選取並避免拖曳",
-    "eraserRevert": ""
+    "eraserRevert": "按住 Alt 以反選取已標記待刪除的元素"
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
