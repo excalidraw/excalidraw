@@ -16860,7 +16860,7 @@ Object {
 
 exports[`regression tests two-finger scroll works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `12`;
+exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `16`;
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
