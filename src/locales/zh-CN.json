@@ -196,7 +196,8 @@
     "library": "素材库",
     "lock": "绘制后保持所选的工具栏状态",
     "penMode": "禁用手势缩放并只接收来自触控笔的输入",
-    "link": "为选中的形状添加/更新链接"
+    "link": "为选中的形状添加/更新链接",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "画布动作",
@@ -221,7 +222,8 @@
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
     "publishLibrary": "发布您自己的素材库",
     "bindTextToElement": "按下 Enter 以添加文本",
-    "deepBoxSelect": "按住 CtrlOrCmd 以深度选择，并避免拖拽"
+    "deepBoxSelect": "按住 CtrlOrCmd 以深度选择，并避免拖拽",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
