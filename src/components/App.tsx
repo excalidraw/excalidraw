@@ -2999,22 +2999,24 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
     if (isEraserActive(this.state)) {
-      const scenePointer = viewportCoordsToSceneCoords(
-        { clientX: event.clientX, clientY: event.clientY },
-        this.state,
+      const draggedDistance = distance2d(
+        this.lastPointerDown!.clientX,
+        this.lastPointerDown!.clientY,
+        this.lastPointerUp!.clientX,
+        this.lastPointerUp!.clientY,
       );
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-      );
-      const pointerDownEvent = this.initialPointerDownState(event);
-      pointerDownEvent.hit.element = hitElement;
-      this.eraseElements(pointerDownEvent);
-      if (isTouchScreen) {
-        this.hitLinkElement = this.getElementLinkAtPosition(
-          scenePointer,
-          hitElement,
+      if (draggedDistance === 0) {
+        const scenePointer = viewportCoordsToSceneCoords(
+          { clientX: event.clientX, clientY: event.clientY },
+          this.state,
         );
+        const hitElement = this.getElementAtPosition(
+          scenePointer.x,
+          scenePointer.y,
+        );
+        const pointerDownEvent = this.initialPointerDownState(event);
+        pointerDownEvent.hit.element = hitElement;
+        this.eraseElements(pointerDownEvent);
       }
     }
     if (
