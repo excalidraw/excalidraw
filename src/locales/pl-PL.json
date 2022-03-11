@@ -196,7 +196,8 @@
     "library": "Biblioteka",
     "lock": "Zablokuj wybrane narzędzie",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -221,7 +222,8 @@
     "placeImage": "Kliknij, aby umieścić obraz, lub kliknij i przeciągnij, aby ustawić jego rozmiar ręcznie",
     "publishLibrary": "Opublikuj własną bibliotekę",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
