@@ -196,7 +196,8 @@
     "library": "Библиотека",
     "lock": "Поддържайте избрания инструмент активен след рисуване",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Действия по платното",
@@ -221,7 +222,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "Натиснете Enter, за да добавите",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Невъзможност за показване на preview",
