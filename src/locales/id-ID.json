@@ -197,7 +197,7 @@
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar",
     "penMode": "Cegah jepit perbesar dan terima hanya input freedraw dari pena",
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
-    "eraser": ""
+    "eraser": "Penghapus"
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -223,7 +223,7 @@
     "publishLibrary": "Terbitkan pustaka Anda",
     "bindTextToElement": "Tekan enter untuk tambahkan teks",
     "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran",
-    "eraserRevert": ""
+    "eraserRevert": "Tahan Alt untuk mengembalikan elemen yang ditandai untuk dihapus"
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
