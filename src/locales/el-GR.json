@@ -196,7 +196,8 @@
     "library": "Βιβλιοθήκη",
     "lock": "Κράτησε επιλεγμένο το εργαλείο μετά το σχέδιο",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Ενέργειες καμβά",
@@ -221,7 +222,8 @@
     "placeImage": "",
     "publishLibrary": "Δημοσιεύστε τη δική σας βιβλιοθήκη",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Αδυναμία εμφάνισης προεπισκόπησης",
