@@ -2748,6 +2748,19 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     scenePointer: { x: number; y: number },
   ) => {
+    const updateElementIds = (elements: ExcalidrawElement[]) => {
+      elements.forEach((element) => {
+        idsToUpdate.push(element.id);
+        if (event.altKey) {
+          if (pointerDownState.elementIdsToErase[element.id]) {
+            pointerDownState.elementIdsToErase[element.id] = false;
+          }
+        } else {
+          pointerDownState.elementIdsToErase[element.id] = true;
+        }
+      });
+    };
+
     const idsToUpdate: Array<string> = [];
 
     const distance = distance2d(
@@ -2757,23 +2770,19 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer.y,
     );
     const threshold = 10 / this.state.zoom.value;
-    const point = pointerDownState.lastCoords;
+    const point = { ...pointerDownState.lastCoords };
     let samplingInterval = 0;
-    while (samplingInterval < distance) {
+    while (samplingInterval <= distance) {
       const hitElements = this.getElementsAtPosition(point.x, point.y);
-      hitElements.forEach((hitElement) => {
-        idsToUpdate.push(hitElement.id);
-        if (event.altKey) {
-          if (pointerDownState.elementIdsToErase[hitElement.id]) {
-            pointerDownState.elementIdsToErase[hitElement.id] = false;
-          }
-        } else {
-          pointerDownState.elementIdsToErase[hitElement.id] = true;
-        }
-      });
+      updateElementIds(hitElements);
+
+      // Exit since we reached current point
+      if (samplingInterval === distance) {
+        break;
+      }
 
       // Calculate next point in the line at a distance of sampling interval
-      samplingInterval += threshold;
+      samplingInterval = Math.min(samplingInterval + threshold, distance);
 
       const distanceRatio = samplingInterval / distance;
       const nextX =
@@ -2782,21 +2791,6 @@ class App extends React.Component<AppProps, AppState> {
         (1 - distanceRatio) * point.y + distanceRatio * scenePointer.y;
       point.x = nextX;
       point.y = nextY;
-    }
-
-    const hitElement = this.getElementAtPosition(
-      scenePointer.x,
-      scenePointer.y,
-    );
-    if (hitElement) {
-      idsToUpdate.push(hitElement.id);
-      if (event.altKey) {
-        if (pointerDownState.elementIdsToErase[hitElement.id]) {
-          pointerDownState.elementIdsToErase[hitElement.id] = false;
-        }
-      } else {
-        pointerDownState.elementIdsToErase[hitElement.id] = true;
-      }
     }
 
     const elements = this.scene.getElements().map((ele) => {
