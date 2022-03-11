@@ -176,7 +176,8 @@ export const MobileMenu = ({
           "disable-pointerEvents":
             appState.draggingElement ||
             appState.resizingElement ||
-            (appState.editingElement && !isTextElement(appState.editingElement)),
+            (appState.editingElement &&
+              !isTextElement(appState.editingElement)),
         })}
         style={{
           marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
