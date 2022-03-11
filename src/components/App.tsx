@@ -2983,7 +2983,17 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.lastPointerUp = event;
     const isTouchScreen = ["pen", "touch"].includes(event.pointerType);
-    if (isTouchScreen) {
+    const draggedDistance = distance2d(
+      this.lastPointerDown!.clientX,
+      this.lastPointerDown!.clientY,
+      this.lastPointerUp!.clientX,
+      this.lastPointerUp!.clientY,
+    );
+
+    if (
+      isTouchScreen ||
+      (draggedDistance === 0 && isEraserActive(this.state))
+    ) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
@@ -2992,11 +3002,15 @@ class App extends React.Component<AppProps, AppState> {
         scenePointer.x,
         scenePointer.y,
       );
-
-      this.hitLinkElement = this.getElementLinkAtPosition(
-        scenePointer,
-        hitElement,
-      );
+      const pointerDownEvent = this.initialPointerDownState(event);
+      pointerDownEvent.hit.element = hitElement;
+      this.eraseElements(pointerDownEvent);
+      if (isTouchScreen) {
+        this.hitLinkElement = this.getElementLinkAtPosition(
+          scenePointer,
+          hitElement,
+        );
+      }
     }
     if (
       this.hitLinkElement &&
@@ -4546,7 +4560,6 @@ class App extends React.Component<AppProps, AppState> {
 
   private eraseElements = (pointerDownState: PointerDownState) => {
     const hitElement = pointerDownState.hit.element;
-
     const elements = this.scene.getElements().map((ele) => {
       if (pointerDownState.elementIdsToErase[ele.id]) {
         return newElementWith(ele, { isDeleted: true });
