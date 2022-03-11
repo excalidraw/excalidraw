@@ -196,7 +196,8 @@
     "library": "Bibliothèque",
     "lock": "Garder l'outil sélectionné actif après le dessin",
     "penMode": "Empêcher le zoom tactile et accepter la saisie libre uniquement à partir du stylet",
-    "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée"
+    "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Actions du canevas",
@@ -221,7 +222,8 @@
     "placeImage": "Cliquez pour placer l'image, ou cliquez et faites glisser pour définir sa taille manuellement",
     "publishLibrary": "Publier votre propre bibliothèque",
     "bindTextToElement": "Appuyer sur Entrée pour ajouter du texte",
-    "deepBoxSelect": "Maintenir CtrlOuCmd pour sélectionner dans les groupes, et empêcher le déplacement"
+    "deepBoxSelect": "Maintenir CtrlOuCmd pour sélectionner dans les groupes, et empêcher le déplacement",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
