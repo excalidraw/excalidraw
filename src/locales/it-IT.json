@@ -197,7 +197,7 @@
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato",
     "penMode": "Impedisci il pinch-zoom e accetta l'input di disegno libero solo dalla penna",
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
-    "eraser": ""
+    "eraser": "Gomma"
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
@@ -223,7 +223,7 @@
     "publishLibrary": "Pubblica la tua libreria",
     "bindTextToElement": "Premi invio per aggiungere il testo",
     "deepBoxSelect": "Tieni premuto CtrlOCmd per selezionare in profondità e per impedire il trascinamento",
-    "eraserRevert": ""
+    "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione"
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
