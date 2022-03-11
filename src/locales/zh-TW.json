@@ -197,7 +197,7 @@
     "lock": "可連續使用選取的工具",
     "penMode": "停止使用手勢縮放並接受以繪圖筆繪圖輸入",
     "link": "為所選的形狀增加\b/更新連結",
-    "eraser": ""
+    "eraser": "橡皮擦"
   },
   "headings": {
     "canvasActions": "canvas 動作",
