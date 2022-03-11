@@ -224,6 +224,9 @@ export const setCursorForShape = (
   }
   if (shape === "selection") {
     resetCursor(canvas);
+  } else if (shape === "eraser") {
+    resetCursor(canvas);
+
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
   } else if (shape !== "image") {

@@ -1,3 +1,4 @@
+import { AppState } from "../types";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -60,7 +61,7 @@ export const isLinearElement = (
 };
 
 export const isLinearElementType = (
-  elementType: ExcalidrawElement["type"],
+  elementType: AppState["elementType"],
 ): boolean => {
   return (
     elementType === "arrow" || elementType === "line" // || elementType === "freedraw"
@@ -74,7 +75,7 @@ export const isBindingElement = (
 };
 
 export const isBindingElementType = (
-  elementType: ExcalidrawElement["type"],
+  elementType: AppState["elementType"],
 ): boolean => {
   return elementType === "arrow";
 };

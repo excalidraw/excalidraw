@@ -1,5 +1,5 @@
 import { ColorPicker } from "../components/ColorPicker";
-import { zoomIn, zoomOut } from "../components/icons";
+import { eraser, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { THEME, ZOOM_STEP } from "../constants";
@@ -15,8 +15,9 @@ import { getShortcutKey } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
-import { getDefaultAppState } from "../appState";
+import { getDefaultAppState, isEraserActive } from "../appState";
 import ClearCanvas from "../components/ClearCanvas";
+import clsx from "clsx";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -288,4 +289,32 @@ export const actionToggleTheme = register({
     </div>
   ),
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
+});
+
+export const actionErase = register({
+  name: "eraser",
+  perform: (elements, appState) => {
+    return {
+      appState: {
+        ...appState,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        elementType: isEraserActive(appState) ? "selection" : "eraser",
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, data }) => (
+    <ToolButton
+      type="button"
+      icon={eraser}
+      className={clsx("eraser", { active: isEraserActive(appState) })}
+      title={t("toolBar.eraser")}
+      aria-label={t("toolBar.eraser")}
+      onClick={() => {
+        updateData(null);
+      }}
+      size={data?.size || "medium"}
+    ></ToolButton>
+  ),
 });

@@ -35,7 +35,7 @@ import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
-import { getDefaultAppState } from "../appState";
+import { getDefaultAppState, isEraserActive } from "../appState";
 import {
   copyToClipboard,
   parseClipboard,
@@ -314,6 +314,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   contextMenuOpen: boolean = false;
+  lastScenePointer: { x: number; y: number } | null = null;
 
   constructor(props: AppProps) {
     super(props);
@@ -1044,6 +1045,12 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    if (
+      Object.keys(this.state.selectedElementIds).length &&
+      isEraserActive(this.state)
+    ) {
+      this.setState({ elementType: "selection" });
+    }
     // Hide hyperlink popup if shown when element type is not selection
     if (
       prevState.elementType === "selection" &&
@@ -2450,7 +2457,6 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
-
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(event.pointerId, {
         x: event.clientX,
@@ -2624,7 +2630,8 @@ class App extends React.Component<AppProps, AppState> {
     if (
       hasDeselectedButton ||
       (this.state.elementType !== "selection" &&
-        this.state.elementType !== "text")
+        this.state.elementType !== "text" &&
+        this.state.elementType !== "eraser")
     ) {
       return;
     }
@@ -2699,8 +2706,9 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.showHyperlinkPopup
       ) {
         this.setState({ showHyperlinkPopup: "info" });
-      }
-      if (this.state.elementType === "text") {
+      } else if (isEraserActive(this.state)) {
+        setCursor(this.canvas, CURSOR_TYPE.AUTO);
+      } else if (this.state.elementType === "text") {
         setCursor(
           this.canvas,
           isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
@@ -2741,6 +2749,80 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private handleEraser = (
+    event: PointerEvent,
+    pointerDownState: PointerDownState,
+    scenePointer: { x: number; y: number },
+  ) => {
+    const updateElementIds = (elements: ExcalidrawElement[]) => {
+      elements.forEach((element) => {
+        idsToUpdate.push(element.id);
+        if (event.altKey) {
+          if (pointerDownState.elementIdsToErase[element.id]) {
+            pointerDownState.elementIdsToErase[element.id] = false;
+          }
+        } else {
+          pointerDownState.elementIdsToErase[element.id] = true;
+        }
+      });
+    };
+
+    const idsToUpdate: Array<string> = [];
+
+    const distance = distance2d(
+      pointerDownState.lastCoords.x,
+      pointerDownState.lastCoords.y,
+      scenePointer.x,
+      scenePointer.y,
+    );
+    const threshold = 10 / this.state.zoom.value;
+    const point = { ...pointerDownState.lastCoords };
+    let samplingInterval = 0;
+    while (samplingInterval <= distance) {
+      const hitElements = this.getElementsAtPosition(point.x, point.y);
+      updateElementIds(hitElements);
+
+      // Exit since we reached current point
+      if (samplingInterval === distance) {
+        break;
+      }
+
+      // Calculate next point in the line at a distance of sampling interval
+      samplingInterval = Math.min(samplingInterval + threshold, distance);
+
+      const distanceRatio = samplingInterval / distance;
+      const nextX =
+        (1 - distanceRatio) * point.x + distanceRatio * scenePointer.x;
+      const nextY =
+        (1 - distanceRatio) * point.y + distanceRatio * scenePointer.y;
+      point.x = nextX;
+      point.y = nextY;
+    }
+
+    const elements = this.scene.getElements().map((ele) => {
+      const id =
+        isBoundToContainer(ele) && idsToUpdate.includes(ele.containerId)
+          ? ele.containerId
+          : ele.id;
+      if (idsToUpdate.includes(id)) {
+        if (event.altKey) {
+          if (pointerDownState.elementIdsToErase[id] === false) {
+            return newElementWith(ele, {
+              opacity: this.state.currentItemOpacity,
+            });
+          }
+        } else {
+          return newElementWith(ele, { opacity: 20 });
+        }
+      }
+      return ele;
+    });
+
+    this.scene.replaceAllElements(elements);
+
+    pointerDownState.lastCoords.x = scenePointer.x;
+    pointerDownState.lastCoords.y = scenePointer.y;
+  };
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
     invalidateContextMenu = true;
@@ -2773,6 +2855,7 @@ class App extends React.Component<AppProps, AppState> {
     if (isPanning) {
       return;
     }
+
     this.lastPointerDown = event;
     this.setState({
       lastPointerDownWith: event.pointerType,
@@ -2865,7 +2948,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.elementType,
         pointerDownState,
       );
-    } else {
+    } else if (this.state.elementType !== "eraser") {
       this.createGenericElementOnPointerDown(
         this.state.elementType,
         pointerDownState,
@@ -2900,7 +2983,8 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.lastPointerUp = event;
     const isTouchScreen = ["pen", "touch"].includes(event.pointerType);
-    if (isTouchScreen) {
+
+    if (isTouchScreen || isEraserActive(this.state)) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
@@ -2909,10 +2993,15 @@ class App extends React.Component<AppProps, AppState> {
         scenePointer.x,
         scenePointer.y,
       );
-      this.hitLinkElement = this.getElementLinkAtPosition(
-        scenePointer,
-        hitElement,
-      );
+      const pointerDownEvent = this.initialPointerDownState(event);
+      pointerDownEvent.hit.element = hitElement;
+      this.eraseElements(pointerDownEvent);
+      if (isTouchScreen) {
+        this.hitLinkElement = this.getElementLinkAtPosition(
+          scenePointer,
+          hitElement,
+        );
+      }
     }
     if (
       this.hitLinkElement &&
@@ -3139,6 +3228,7 @@ class App extends React.Component<AppProps, AppState> {
       boxSelection: {
         hasOccurred: false,
       },
+      elementIdsToErase: {},
     };
   }
 
@@ -3727,7 +3817,6 @@ class App extends React.Component<AppProps, AppState> {
           ),
         );
       }
-
       const target = event.target;
       if (!(target instanceof HTMLElement)) {
         return;
@@ -3738,6 +3827,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
+
+      if (isEraserActive(this.state)) {
+        this.handleEraser(event, pointerDownState, pointerCoords);
+        return;
+      }
+
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
@@ -4090,7 +4185,6 @@ class App extends React.Component<AppProps, AppState> {
         isResizing,
         isRotating,
       } = this.state;
-
       this.setState({
         isResizing: false,
         isRotating: false,
@@ -4311,6 +4405,11 @@ class App extends React.Component<AppProps, AppState> {
       // Code below handles selection when element(s) weren't
       // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
+      if (isEraserActive(this.state)) {
+        this.eraseElements(pointerDownState);
+        return;
+      }
+
       if (
         hitElement &&
         !pointerDownState.drag.hasOccurred &&
@@ -4449,6 +4548,27 @@ class App extends React.Component<AppProps, AppState> {
       }
     });
   }
+
+  private eraseElements = (pointerDownState: PointerDownState) => {
+    const hitElement = pointerDownState.hit.element;
+    const elements = this.scene.getElements().map((ele) => {
+      if (pointerDownState.elementIdsToErase[ele.id]) {
+        return newElementWith(ele, { isDeleted: true });
+      } else if (hitElement && ele.id === hitElement.id) {
+        return newElementWith(ele, { isDeleted: true });
+      } else if (
+        isBoundToContainer(ele) &&
+        (pointerDownState.elementIdsToErase[ele.containerId] ||
+          (hitElement && ele.containerId === hitElement.id))
+      ) {
+        return newElementWith(ele, { isDeleted: true });
+      }
+      return ele;
+    });
+
+    this.history.resumeRecording();
+    this.scene.replaceAllElements(elements);
+  };
 
   private initializeImage = async ({
     imageFile,

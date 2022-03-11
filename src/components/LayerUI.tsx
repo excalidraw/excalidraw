@@ -428,6 +428,14 @@ const LayerUI = ({
                   {actionManager.renderAction("redo", { size: "small" })}
                 </div>
               )}
+              <div
+                className={clsx("eraser-buttons zen-mode-transition", {
+                  "layer-ui__wrapper__footer-left--transition-left":
+                    zenModeEnabled,
+                })}
+              >
+                {actionManager.renderAction("eraser", { size: "small" })}
+              </div>
             </Section>
           </Stack.Col>
         </div>
