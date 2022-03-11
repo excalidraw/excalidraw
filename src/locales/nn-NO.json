@@ -196,7 +196,8 @@
     "library": "Bibliotek",
     "lock": "Hald fram med valt verktøy",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Handlingar: lerret",
@@ -221,7 +222,8 @@
     "placeImage": "Klikk for å plassere biletet, eller klikk og drag for å velje storleik manuelt",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikkje vise førehandsvising",
