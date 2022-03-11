@@ -54,14 +54,15 @@ const JSONExportModal = ({
     <div className="ExportDialog ExportDialog--json">
       {state && !state.finished && (
         <Alert
+          colorScheme="purple"
           status="success"
           variant="subtle"
           flexDirection="row"
           alignItems="center"
           justifyContent="center"
           textAlign="center"
+          borderRadius={6}
         >
-          <AlertIcon />
           🎉 You did it! You’re an Excalidraw pro now!
         </Alert>
       )}
@@ -120,9 +121,16 @@ const ExportButtonWrapper = (props: any) => {
   return (
     <Popover isOpen={!state.finished}>
       <PopoverTrigger>
-        <div>{props.children}</div>
+        <div
+          style={{
+            borderRadius: "var(--border-radius-lg)",
+            boxShadow: "0 0 0 3px var(--color-primary)",
+          }}
+        >
+          {props.children}
+        </div>
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent p={2} pr={6}>
         <PopoverArrow />
         <PopoverCloseButton
           onClick={() => {
@@ -133,8 +141,8 @@ const ExportButtonWrapper = (props: any) => {
         />
         <PopoverBody>
           Looking good! Let’s export this drawing so you can share it with
-          others. Click the Save as image button to save this as a PNG, SVG, or
-          copy it to your clipboard.
+          others. <strong>Click the Save as image button to save this as a PNG, SVG, or
+          copy it to your clipboard.</strong>
         </PopoverBody>
       </PopoverContent>
     </Popover>

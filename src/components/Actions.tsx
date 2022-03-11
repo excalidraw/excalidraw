@@ -190,14 +190,21 @@ const ToolButtonWrapper = (props: any) => {
     return (
       <Popover isOpen={!state.finished}>
         <PopoverTrigger>
-          <div>{props.children}</div>
+          <div
+            style={{
+              borderRadius: "var(--border-radius-lg)",
+              boxShadow: "inset 0 0 0 3px var(--color-primary)",
+            }}
+          >
+            {props.children}
+          </div>
         </PopoverTrigger>
-        <PopoverContent>
+        <PopoverContent p={2} pr={6}>
           <PopoverArrow />
           <PopoverCloseButton />
           <PopoverBody>
-            Let's start by creating your first shape. Click the square and click
-            and drag to draw.
+            Let's start by creating your first shape. <strong>Click the square and click
+            and drag to draw.</strong>
           </PopoverBody>
         </PopoverContent>
       </Popover>

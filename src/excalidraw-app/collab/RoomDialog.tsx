@@ -108,15 +108,19 @@ const RoomDialog = ({
           <>
             {state && state.active && !state.finished && (
               <Alert
+                colorScheme="purple"
                 status="success"
                 variant="subtle"
                 flexDirection="row"
                 alignItems="center"
                 justifyContent="center"
                 textAlign="center"
+                borderRadius={6}
+                mb={4}
               >
-                <AlertIcon />
-                🎉 You did it! You’re an Excalidraw pro now!
+                <div>
+                  🎉 You did it! You’re an Excalidraw pro now! <strong>You can share this link with your coworkers and they’ll be able to draw with you.</strong>
+                </div>
               </Alert>
             )}
             <p>{t("roomDialog.desc_inProgressIntro")}</p>

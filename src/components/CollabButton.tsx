@@ -24,9 +24,16 @@ const CollabButtonWrapper = (props: any) => {
   return (
     <Popover isOpen={!state.finished}>
       <PopoverTrigger>
-        <div>{props.children}</div>
+        <div
+          style={{
+            borderRadius: "var(--border-radius-lg)",
+            boxShadow: "0 0 0 3px var(--color-primary)",
+          }}
+        >
+          {props.children}
+        </div>
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent p={2} pr={6}>
         <PopoverArrow />
         <PopoverCloseButton
           onClick={() => {
@@ -37,7 +44,7 @@ const CollabButtonWrapper = (props: any) => {
         />
         <PopoverBody>
           Looking good! Let’s invite a coworker to help us make this drawing
-          even better. Click the Live collaboration button.
+          even better. <strong>Click the Live collaboration button.</strong>
         </PopoverBody>
       </PopoverContent>
     </Popover>
