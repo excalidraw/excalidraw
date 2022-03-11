@@ -196,7 +196,8 @@
     "library": "Biblioteca",
     "lock": "Manter a ferramenta selecionada ativa após desenhar",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Ações da área de desenho",
@@ -221,7 +222,8 @@
     "placeImage": "Clique para colocar a imagem ou clique e arraste para definir o seu tamanho manualmente",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar uma pré-visualização",
