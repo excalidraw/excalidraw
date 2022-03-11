@@ -196,7 +196,8 @@
     "library": "Knižnica",
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia",
     "penMode": "Zabrániť priblíženiu potiahnutím a povoliť vstup voľnou rokou iba z pera",
-    "link": "Pridať/ Upraviť odkaz pre vybraný tvar"
+    "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Akcie plátna",
@@ -221,7 +222,8 @@
     "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
     "publishLibrary": "Uverejniť vašu knižnicu",
     "bindTextToElement": "Stlačte enter na pridanie textu",
-    "deepBoxSelect": "Podržte CtrlOrCmd na výber v skupine alebo zamedzeniu poťiahnutia"
+    "deepBoxSelect": "Podržte CtrlOrCmd na výber v skupine alebo zamedzeniu poťiahnutia",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
