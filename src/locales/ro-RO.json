@@ -196,7 +196,8 @@
     "library": "Bibliotecă",
     "lock": "Menține activ instrumentul selectat după desenare",
     "penMode": "Împiedică mărirea prin ciupire și acceptă desenarea liberă doar de la stilou",
-    "link": "Adăugare/actualizare URL pentru forma selectată"
+    "link": "Adăugare/actualizare URL pentru forma selectată",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -221,7 +222,8 @@
     "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
     "publishLibrary": "Publică propria bibliotecă",
     "bindTextToElement": "Apasă tasta Enter pentru a adăuga text",
-    "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea"
+    "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
