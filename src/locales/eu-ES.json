@@ -196,7 +196,8 @@
     "library": "Liburutegia",
     "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
     "penMode": "Saihestu txikiagotzea eta onartu marrazte libreko idazketa solik arkatza bidez",
-    "link": "Gehitu / Eguneratu esteka hautatutako forma baterako"
+    "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -221,7 +222,8 @@
     "placeImage": "Egin klik irudia kokatzeko, edo egin klik eta arrastatu bere tamaina eskuz ezartzeko",
     "publishLibrary": "Argitaratu zure liburutegia",
     "bindTextToElement": "Sakatu Sartu testua gehitzeko",
-    "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko"
+    "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Ezin da oihala aurreikusi",
