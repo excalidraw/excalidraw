@@ -67,12 +67,6 @@ import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
-import Joyride, { EVENTS, ACTIONS } from "react-joyride";
-import {
-  CallBackProps as JoyrideCallBackProps,
-  Step as JoyrideStep,
-} from "react-joyride/types";
-import React from "react";
 
 import { ChakraProvider } from "@chakra-ui/react";
 import { Button } from "@chakra-ui/react";

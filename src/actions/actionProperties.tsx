@@ -66,8 +66,7 @@ import { hasStrokeColor } from "../scene/comparisons";
 import Scene from "../scene/Scene";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
-import React, { useState } from "react";
-//import { Consumer as SBConsumer } from "switchboard/packages/sdk/lib/cjs/packages/@react";
+
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -156,66 +155,6 @@ export const actionChangeStrokeColor = register({
   ),
 });
 
-type ChipTipProps = {
-  children: string;
-  onClose(): void;
-  visible: boolean;
-};
-
-const ChipTip: React.FC<ChipTipProps> = ({ children, onClose, visible }) => {
-  const [isVisible, setIsVisible] = useState(visible);
-
-  const handleOnClose = () => {
-    setIsVisible(false);
-    onClose();
-  };
-
-  return (
-    <div
-      style={{
-        display: isVisible ? "flex" : "none",
-        maxWidth: 244,
-        fontSize: "0.75rem",
-        background: "var(--color-primary)",
-        margin: "-8px -8px 0",
-        padding: "12px 8px",
-        borderTopLeftRadius: "var(--border-radius-lg)",
-        borderTopRightRadius: "var(--border-radius-lg)",
-      }}
-    >
-      <div style={{ fontSize: "1rem", paddingRight: 8 }}>⚡️</div>
-      <div style={{ color: "#fff", paddingRight: 16 }}>{children}</div>
-      <button
-        style={{ background: "none", fontSize: "1rem", color: "#fff" }}
-        onClick={handleOnClose}
-      >
-        &times;
-      </button>
-    </div>
-  );
-};
-/*
-
-      <SBConsumer>
-        {(sbState) => {
-          if (sbState?.surfaces && sbState?.surfaces.strokeToolTip) {
-            return (
-              <ChipTip
-                visible={sbState?.surfaces.strokeToolTip?.component?.active}
-                onClose={() =>
-                  sbState.setComponentInactive(
-                    sbState.surfaces?.strokeToolTip.componentName,
-                  )
-                }
-              >
-                We redesigned the shape panel to give you more stroke styles
-              </ChipTip>
-            );
-          }
-        }}
-      </SBConsumer>
-
- */
 export const actionShowStrokeToolTip = register({
   name: "showStrokeToolTip",
   perform: () => {
