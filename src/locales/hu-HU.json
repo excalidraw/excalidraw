@@ -196,7 +196,8 @@
     "library": "Könyvtár",
     "lock": "Rajzolás után az aktív eszközt tartsa kijelölve",
     "penMode": "Akadályozza meg a kicsinyítést, és csak tollról fogadja el a szabadkézi bevitelt",
-    "link": "Hivatkozás hozzáadása/frissítése a kiválasztott alakzathoz"
+    "link": "Hivatkozás hozzáadása/frissítése a kiválasztott alakzathoz",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Vászon műveletek",
@@ -221,7 +222,8 @@
     "placeImage": "Kattints a kép elhelyezéséhez, vagy kattints és méretezd manuálisan",
     "publishLibrary": "Tedd közzé saját könyvtáradat",
     "bindTextToElement": "Nyomd meg az Entert szöveg hozzáadáshoz",
-    "deepBoxSelect": "Tartsd lenyomva a Ctrl/Cmd billentyűt a mély kijelöléshez és a húzás megakadályozásához"
+    "deepBoxSelect": "Tartsd lenyomva a Ctrl/Cmd billentyűt a mély kijelöléshez és a húzás megakadályozásához",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Előnézet nem jeleníthető meg",
