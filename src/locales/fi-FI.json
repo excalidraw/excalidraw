@@ -196,7 +196,8 @@
     "library": "Kirjasto",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen",
     "penMode": "Estä nipistyszoomaus ja vastaanota ainoastaan kynällä piirretty",
-    "link": "Lisää/päivitä linkki valitulle muodolle"
+    "link": "Lisää/päivitä linkki valitulle muodolle",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
@@ -221,7 +222,8 @@
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
     "publishLibrary": "Julkaise oma kirjasto",
     "bindTextToElement": "Lisää tekstiä painamalla enter",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
