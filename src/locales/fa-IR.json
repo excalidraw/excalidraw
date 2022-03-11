@@ -196,7 +196,8 @@
     "library": "کتابخانه",
     "lock": "ابزار انتخاب شده را بعد از کشیدن نگه دار",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
@@ -221,7 +222,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
