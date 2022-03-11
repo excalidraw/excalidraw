@@ -196,7 +196,8 @@
     "library": "Pustaka",
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar",
     "penMode": "Cegah jepit perbesar dan terima hanya input freedraw dari pena",
-    "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih"
+    "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -221,7 +222,8 @@
     "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
     "publishLibrary": "Terbitkan pustaka Anda",
     "bindTextToElement": "Tekan enter untuk tambahkan teks",
-    "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran"
+    "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
