@@ -176,6 +176,10 @@ export const MobileMenu = ({
           marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
           marginLeft: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
           marginRight: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
+          "disable-pointerEvents":
+            appState.draggingElement ||
+            appState.resizingElement ||
+            (appState.editingElement && !isTextElement(appState.editingElement)),
         }}
       >
         <Island padding={0}>
