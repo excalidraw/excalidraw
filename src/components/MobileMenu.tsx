@@ -210,7 +210,7 @@ export const MobileMenu = ({
                                   "goToCollaborator",
                                   {
                                     id: clientId,
-                                  }
+                                  },
                                 )}
                               </React.Fragment>
                             ))}
