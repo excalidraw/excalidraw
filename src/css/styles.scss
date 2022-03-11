@@ -477,7 +477,8 @@
     font-family: var(--ui-font);
   }
 
-  .undo-redo-buttons {
+  .undo-redo-buttons,
+  .eraser-buttons {
     display: grid;
     grid-auto-flow: column;
     gap: 0.4em;
