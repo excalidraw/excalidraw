@@ -196,7 +196,8 @@
     "library": "ライブラリ",
     "lock": "描画後も使用中のツールを選択したままにする",
     "penMode": "ピンチとズームを抑止し、ペンからのみ自由な入力を受け付けます",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -221,7 +222,8 @@
     "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
     "publishLibrary": "自分のライブラリを公開",
     "bindTextToElement": "Enterを押してテキストを追加",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
