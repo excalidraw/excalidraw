@@ -196,7 +196,8 @@
     "library": "Biblioteca",
     "lock": "Mantener la herramienta seleccionada activa después de dibujar",
     "penMode": "Evitar el zoom de pellizco y aceptar la entrada libre sólo desde el lápiz",
-    "link": "Añadir/Actualizar enlace para una forma seleccionada"
+    "link": "Añadir/Actualizar enlace para una forma seleccionada",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
@@ -221,7 +222,8 @@
     "placeImage": "Haga clic para colocar la imagen o haga clic y arrastre para establecer su tamaño manualmente",
     "publishLibrary": "Publica tu propia biblioteca",
     "bindTextToElement": "Presione Entrar para agregar",
-    "deepBoxSelect": "Mantén CtrlOrCmd para seleccionar en profundidad, y para evitar arrastrar"
+    "deepBoxSelect": "Mantén CtrlOrCmd para seleccionar en profundidad, y para evitar arrastrar",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
