@@ -196,7 +196,8 @@
     "library": "مكتبة",
     "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
@@ -221,7 +222,8 @@
     "placeImage": "",
     "publishLibrary": "نشر مكتبتك",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
