@@ -196,7 +196,8 @@
     "library": "Biblioteca",
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
     "penMode": "Evita el zoom i accepta solament el dibuix lliure amb bolígraf",
-    "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada"
+    "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -221,7 +222,8 @@
     "placeImage": "Feu clic per a col·locar la imatge o clic i arrossegar per a establir-ne la mida manualment",
     "publishLibrary": "Publiqueu la vostra pròpia llibreria",
     "bindTextToElement": "Premeu enter per a afegir-hi text",
-    "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament"
+    "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
