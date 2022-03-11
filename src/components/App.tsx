@@ -2983,17 +2983,8 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.lastPointerUp = event;
     const isTouchScreen = ["pen", "touch"].includes(event.pointerType);
-    const draggedDistance = distance2d(
-      this.lastPointerDown!.clientX,
-      this.lastPointerDown!.clientY,
-      this.lastPointerUp!.clientX,
-      this.lastPointerUp!.clientY,
-    );
 
-    if (
-      isTouchScreen ||
-      (draggedDistance === 0 && isEraserActive(this.state))
-    ) {
+    if (isTouchScreen || isEraserActive(this.state)) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
