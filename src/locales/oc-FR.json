@@ -196,7 +196,8 @@
     "library": "Bibliotèca",
     "lock": "Mantenir activa l’aisina aprèp dessenhar",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -221,7 +222,8 @@
     "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament",
     "publishLibrary": "Publicar vòstra pròpria bibliotèca",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
