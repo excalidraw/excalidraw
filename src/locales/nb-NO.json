@@ -197,7 +197,7 @@
     "lock": "Behold merket verktøy som aktivt",
     "penMode": "Forhindre zoom ved kniping og godta frihåndstegning kun fra penn",
     "link": "Legg til / oppdater link for en valgt figur",
-    "eraser": ""
+    "eraser": "Viskelær"
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
@@ -223,7 +223,7 @@
     "publishLibrary": "Publiser ditt eget bibliotek",
     "bindTextToElement": "Trykk Enter for å legge til tekst",
     "deepBoxSelect": "Hold CTRL/CMD for å markere dypt og forhindre flytting",
-    "eraserRevert": ""
+    "eraserRevert": "Hold Alt for å reversere elementene merket for sletting"
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
