@@ -196,7 +196,8 @@
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
     "penMode": "Voorkom pinch-zoom en accepteer freedraw invoer alleen van pen",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Canvasacties",
@@ -221,7 +222,8 @@
     "placeImage": "",
     "publishLibrary": "Publiceer je eigen bibliotheek",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan voorbeeld niet tonen",
