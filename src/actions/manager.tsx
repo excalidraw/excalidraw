@@ -91,6 +91,9 @@ export class ActionManager implements ActionsManagerInterface {
       );
 
     if (data.length !== 1) {
+      if (data.length > 1) {
+        console.warn("Canceling as multiple actions match this shortcut", data);
+      }
       return false;
     }
 

@@ -64,6 +64,7 @@
     "cartoonist": "Cartoonist",
     "fileTitle": "Bestandsnaam",
     "colorPicker": "Kleurenkiezer",
+    "canvasColors": "Gebruikt op canvas",
     "canvasBackground": "Canvas achtergrond",
     "drawingCanvas": "Canvas",
     "layers": "Lagen",
@@ -179,7 +180,8 @@
     "imageInsertError": "Afbeelding invoegen mislukt. Probeer het later opnieuw...",
     "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
     "svgImageInsertError": "",
-    "invalidSVGString": "Ongeldige SVG."
+    "invalidSVGString": "Ongeldige SVG.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Selectie",

@@ -64,6 +64,7 @@
     "cartoonist": "Kartunis",
     "fileTitle": "Nama file",
     "colorPicker": "Pilihan Warna",
+    "canvasColors": "Digunakan di kanvas",
     "canvasBackground": "Latar Kanvas",
     "drawingCanvas": "Kanvas",
     "layers": "Lapisan",
@@ -179,7 +180,8 @@
     "imageInsertError": "Tidak dapat menyisipkan gambar. Coba lagi nanti...",
     "fileTooBig": "File terlalu besar. Ukuran maksimum yang dibolehkan {{maxSize}}.",
     "svgImageInsertError": "Tidak dapat menyisipkan gambar SVG. Markup SVG sepertinya tidak valid.",
-    "invalidSVGString": "SVG tidak valid."
+    "invalidSVGString": "SVG tidak valid.",
+    "cannotResolveCollabServer": "Tidak dapat terhubung ke server kolab. Muat ulang laman dan coba lagi."
   },
   "toolBar": {
     "selection": "Pilihan",

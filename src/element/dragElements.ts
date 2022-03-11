@@ -1,4 +1,3 @@
-import { SHAPES } from "../shapes";
 import { updateBoundElements } from "./binding";
 import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
@@ -93,7 +92,7 @@ export const getDragOffsetXY = (
 
 export const dragNewElement = (
   draggingElement: NonDeletedExcalidrawElement,
-  elementType: typeof SHAPES[number]["value"],
+  elementType: AppState["elementType"],
   originX: number,
   originY: number,
   x: number,

@@ -64,6 +64,7 @@
     "cartoonist": "Caricaturist",
     "fileTitle": "Nume de fișier",
     "colorPicker": "Selector de culoare",
+    "canvasColors": "Folosite pe pânză",
     "canvasBackground": "Fundalul pânzei",
     "drawingCanvas": "Pânză pentru desenat",
     "layers": "Straturi",
@@ -179,7 +180,8 @@
     "imageInsertError": "Imaginea nu a putut fi introdusă. Reîncearcă mai târziu...",
     "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
-    "invalidSVGString": "SVG invalid."
+    "invalidSVGString": "SVG invalid.",
+    "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou."
   },
   "toolBar": {
     "selection": "Selecție",
