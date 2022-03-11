@@ -2760,8 +2760,8 @@ class App extends React.Component<AppProps, AppState> {
     const point = pointerDownState.lastCoords;
     let samplingInterval = 0;
     while (samplingInterval < distance) {
-      const hitElement = this.getElementAtPosition(point.x, point.y);
-      if (hitElement) {
+      const hitElements = this.getElementsAtPosition(point.x, point.y);
+      hitElements.forEach((hitElement) => {
         idsToUpdate.push(hitElement.id);
         if (event.altKey) {
           if (pointerDownState.elementIdsToErase[hitElement.id]) {
@@ -2770,7 +2770,7 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           pointerDownState.elementIdsToErase[hitElement.id] = true;
         }
-      }
+      });
 
       // Calculate next point in the line at a distance of sampling interval
       samplingInterval += threshold;
