@@ -1045,6 +1045,12 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    if (
+      Object.keys(this.state.selectedElementIds).length &&
+      isEraserActive(this.state)
+    ) {
+      this.setState({ elementType: "selection" });
+    }
     // Hide hyperlink popup if shown when element type is not selection
     if (
       prevState.elementType === "selection" &&
@@ -4394,7 +4400,6 @@ class App extends React.Component<AppProps, AppState> {
       // Code below handles selection when element(s) weren't
       // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
-
       if (isEraserActive(this.state)) {
         this.eraseElements(pointerDownState);
         return;
