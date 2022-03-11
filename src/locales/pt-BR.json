@@ -196,7 +196,8 @@
     "library": "Biblioteca",
     "lock": "Manter ativa a ferramenta selecionada após desenhar",
     "penMode": "Prevenir a ação de tocar-ampliar e permitir apenas interações da caneta",
-    "link": "Adicionar/Atualizar link para uma forma selecionada"
+    "link": "Adicionar/Atualizar link para uma forma selecionada",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Ações da tela",
@@ -221,7 +222,8 @@
     "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
     "publishLibrary": "Publicar sua própria biblioteca",
     "bindTextToElement": "Pressione Enter para adicionar o texto",
-    "deepBoxSelect": "Segure Ctrl/Cmd para seleção profunda e para evitar arrastar"
+    "deepBoxSelect": "Segure Ctrl/Cmd para seleção profunda e para evitar arrastar",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
