@@ -65,6 +65,7 @@
     "cartoonist": "漫画家",
     "fileTitle": "文件名",
     "colorPicker": "调色盘",
+    "canvasColors": "画布上的",
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
     "layers": "图层",
@@ -180,7 +181,8 @@
     "imageInsertError": "无法插入图像。请稍后再试……",
     "fileTooBig": "文件过大。最大允许的大小为 {{maxSize}}。",
     "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
-    "invalidSVGString": "无效的 SVG。"
+    "invalidSVGString": "无效的 SVG。",
+    "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。"
   },
   "toolBar": {
     "selection": "选择",

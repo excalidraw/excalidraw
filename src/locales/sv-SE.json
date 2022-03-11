@@ -64,6 +64,7 @@
     "cartoonist": "Serietecknare",
     "fileTitle": "Filnamn",
     "colorPicker": "Färgväljare",
+    "canvasColors": "Används på canvas",
     "canvasBackground": "Canvas-bakgrund",
     "drawingCanvas": "Ritar canvas",
     "layers": "Lager",
@@ -179,7 +180,8 @@
     "imageInsertError": "Kunde inte infoga bild. Försök igen senare...",
     "fileTooBig": "Filen är för stor. Maximal tillåten storlek är {{maxSize}}.",
     "svgImageInsertError": "Kunde inte infoga SVG-bild. SVG-koden ser ogiltig ut.",
-    "invalidSVGString": "Ogiltig SVG."
+    "invalidSVGString": "Ogiltig SVG.",
+    "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen."
   },
   "toolBar": {
     "selection": "Markering",
