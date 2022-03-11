@@ -563,9 +563,12 @@ export const textWysiwyg = ({
       event.target.closest(".color-picker-input") &&
       isWritableElement(event.target);
     const isShapeActionsPanel =
-      event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
-      event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
-      event.target.closest(`.${CLASSES.MOBILE_TOOLBAR}`);
+      ((event.target instanceof HTMLElement ||
+        event.target instanceof SVGElement) && (
+          event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
+          event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
+          event.target.closest(`.${CLASSES.MOBILE_TOOLBAR}`)
+      ));
     if (
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
