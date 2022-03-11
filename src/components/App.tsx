@@ -2998,6 +2998,25 @@ class App extends React.Component<AppProps, AppState> {
         hitElement,
       );
     }
+    if (isEraserActive(this.state)) {
+      const scenePointer = viewportCoordsToSceneCoords(
+        { clientX: event.clientX, clientY: event.clientY },
+        this.state,
+      );
+      const hitElement = this.getElementAtPosition(
+        scenePointer.x,
+        scenePointer.y,
+      );
+      const pointerDownEvent = this.initialPointerDownState(event);
+      pointerDownEvent.hit.element = hitElement;
+      this.eraseElements(pointerDownEvent);
+      if (isTouchScreen) {
+        this.hitLinkElement = this.getElementLinkAtPosition(
+          scenePointer,
+          hitElement,
+        );
+      }
+    }
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
