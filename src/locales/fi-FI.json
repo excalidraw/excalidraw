@@ -64,6 +64,7 @@
     "cartoonist": "Sarjakuva",
     "fileTitle": "Tiedostonimi",
     "colorPicker": "Värin valinta",
+    "canvasColors": "",
     "canvasBackground": "Piirtoalueen tausta",
     "drawingCanvas": "Piirtoalue",
     "layers": "Tasot",
@@ -179,7 +180,8 @@
     "imageInsertError": "Kuvan lisääminen epäonnistui. Yritä myöhemmin uudelleen...",
     "fileTooBig": "Tiedosto on liian suuri. Suurin sallittu koko on {{maxSize}}.",
     "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
-    "invalidSVGString": "Virheellinen SVG."
+    "invalidSVGString": "Virheellinen SVG.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Valinta",

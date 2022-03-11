@@ -290,6 +290,16 @@
     width: 100%;
 
     box-sizing: border-box;
+
+    .eraser {
+      &.ToolIcon:hover {
+        --icon-fill-color: #fff;
+        --keybinding-color: #fff;
+      }
+      &.active {
+        background-color: var(--color-primary);
+      }
+    }
   }
 
   .App-toolbar-content {
@@ -477,7 +487,8 @@
     margin-inline-start: 0.6em;
   }
 
-  .undo-redo-buttons {
+  .undo-redo-buttons,
+  .eraser-buttons {
     display: grid;
     grid-auto-flow: column;
     gap: 0.4em;

@@ -219,3 +219,9 @@ export const cleanAppStateForExport = (appState: Partial<AppState>) => {
 export const clearAppStateForDatabase = (appState: Partial<AppState>) => {
   return _clearAppStateForStorage(appState, "server");
 };
+
+export const isEraserActive = ({
+  elementType,
+}: {
+  elementType: AppState["elementType"];
+}) => elementType === "eraser";
