@@ -175,7 +175,7 @@ export const MobileMenu = ({
         className={clsx("App-bottom-bar", {
           "disable-pointerEvents":
             appState.draggingElement ||
-           appState.resizingElement ||
+            appState.resizingElement ||
             (appState.editingElement && !isTextElement(appState.editingElement)),
         })}
         style={{
