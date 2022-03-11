@@ -196,7 +196,8 @@
     "library": "Bibliotek",
     "lock": "Håll valt verktyg aktivt efter ritande",
     "penMode": "Förhindra nypzoom och acceptera endast frihandsteckning från penna",
-    "link": "Lägg till / Uppdatera länk för en vald form"
+    "link": "Lägg till / Uppdatera länk för en vald form",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",
@@ -221,7 +222,8 @@
     "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt",
     "publishLibrary": "Publicera ditt eget bibliotek",
     "bindTextToElement": "Tryck på Enter för att lägga till text",
-    "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra"
+    "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
