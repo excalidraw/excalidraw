@@ -179,7 +179,7 @@ export const MobileMenu = ({
             (appState.editingElement &&
               !isTextElement(appState.editingElement)),
         })}
-      >      
+      >
         <div
           className="App-bottom-bar"
           style={{
@@ -206,9 +206,11 @@ export const MobileMenu = ({
                             )
                             .map(([clientId, client]) => (
                               <React.Fragment key={clientId}>
-                                {actionManager.renderAction("goToCollaborator", {
-                                  id: clientId,
-                                })}
+                                {actionManager.renderAction(
+                                  "goToCollaborator", {
+                                    id: clientId,
+                                  }
+                                )}
                               </React.Fragment>
                             ))}
                         </UserList>
@@ -220,7 +222,10 @@ export const MobileMenu = ({
             ) : appState.openMenu === "shape" &&
               !viewModeEnabled &&
               showSelectedShapeActions(appState, elements) ? (
-              <Section className="App-mobile-menu" heading="selectedShapeActions">
+              <Section
+                className="App-mobile-menu"
+                heading="selectedShapeActions"
+              >
                 <SelectedShapeActions
                   appState={appState}
                   elements={elements}
