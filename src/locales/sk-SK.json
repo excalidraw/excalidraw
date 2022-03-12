@@ -223,7 +223,7 @@
     "publishLibrary": "Uverejniť vašu knižnicu",
     "bindTextToElement": "Stlačte enter na pridanie textu",
     "deepBoxSelect": "Podržte CtrlOrCmd na výber v skupine alebo zamedzeniu poťiahnutia",
-    "eraserRevert": ""
+    "eraserRevert": "Podržte Alt pre prehodenie položiek určených na vymazanie"
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
