@@ -64,7 +64,7 @@
     "cartoonist": "व्यंग्य चित्रकार",
     "fileTitle": "फ़ाइल का नाम",
     "colorPicker": "रंग चयन",
-    "canvasColors": "",
+    "canvasColors": "कॅनवास पर प्रयोगित",
     "canvasBackground": "कैनवास बैकग्राउंड",
     "drawingCanvas": "कैनवास बना रहे हैं",
     "layers": "परतें",
@@ -181,7 +181,7 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": "कोलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयत्न करे."
+    "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे."
   },
   "toolBar": {
     "selection": "चयन",
