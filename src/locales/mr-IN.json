@@ -181,7 +181,7 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "कॉलेब सर्वर कनेक्ट होत नाही आहे. पाना ला परत आणन्याचा प्रयत्न करावे."
   },
   "toolBar": {
     "selection": "",
@@ -197,7 +197,7 @@
     "lock": "",
     "penMode": "",
     "link": "",
-    "eraser": ""
+    "eraser": "खोड रबर"
   },
   "headings": {
     "canvasActions": "",
@@ -223,7 +223,7 @@
     "publishLibrary": "",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "खोडण्या साठी घेतलेल्या वस्तु ना घेण्या साठी Alt दाबून ठेवावे"
   },
   "canvasError": {
     "cannotShowPreview": "",
