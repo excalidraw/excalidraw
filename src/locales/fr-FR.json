@@ -197,7 +197,7 @@
     "lock": "Garder l'outil sélectionné actif après le dessin",
     "penMode": "Empêcher le zoom tactile et accepter la saisie libre uniquement à partir du stylet",
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
-    "eraser": ""
+    "eraser": "Gomme"
   },
   "headings": {
     "canvasActions": "Actions du canevas",
