@@ -197,7 +197,7 @@
     "lock": "Manter ativa a ferramenta selecionada após desenhar",
     "penMode": "Prevenir a ação de tocar-ampliar e permitir apenas interações da caneta",
     "link": "Adicionar/Atualizar link para uma forma selecionada",
-    "eraser": ""
+    "eraser": "Borracha"
   },
   "headings": {
     "canvasActions": "Ações da tela",
@@ -223,7 +223,7 @@
     "publishLibrary": "Publicar sua própria biblioteca",
     "bindTextToElement": "Pressione Enter para adicionar o texto",
     "deepBoxSelect": "Segure Ctrl/Cmd para seleção profunda e para evitar arrastar",
-    "eraserRevert": ""
+    "eraserRevert": "Segure a tecla Alt para inverter os elementos marcados para exclusão"
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
