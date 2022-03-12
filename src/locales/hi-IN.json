@@ -197,7 +197,7 @@
     "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें",
     "penMode": "",
     "link": "",
-    "eraser": ""
+    "eraser": "रबड़"
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",
@@ -223,7 +223,7 @@
     "publishLibrary": "",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
