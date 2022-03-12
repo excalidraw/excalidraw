@@ -195,7 +195,7 @@
     "text": "Text",
     "library": "Bibliothek",
     "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen",
-    "penMode": "",
+    "penMode": "Verhindere Pinch-Zoom und akzeptiere Eingabe nur vom Stift",
     "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
     "eraser": "Radierer"
   },
