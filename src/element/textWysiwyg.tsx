@@ -551,7 +551,7 @@ export const textWysiwyg = ({
     setTimeout(() => {
       editable.onblur = () => {
         app.setState({
-          toastMessage: 
+          toastMessage:
             target instanceof HTMLElement
               ? target.tagName ?? "no tagName"
               : "not an HTMLElement",
