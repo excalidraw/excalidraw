@@ -543,7 +543,12 @@ export const textWysiwyg = ({
       isWritableElement(target);
 
     setTimeout(() => {
-      editable.onblur = handleSubmit;
+      editable.onblur = () => {
+        app.setState({
+          toastMessage: "debug: onblur",
+        });  
+        handleSubmit();
+      };
       if (target && isTargetColorPicker) {
         target.onblur = () => {
           editable.focus();
@@ -576,7 +581,7 @@ export const textWysiwyg = ({
       isTargetColorPicker
     ) {
       app.setState({
-        toastMessage: "debug",
+        toastMessage: "debug: onPointerDown",
       });
       editable.onblur = null;
       window.addEventListener("pointerup", bindBlurEvent);
