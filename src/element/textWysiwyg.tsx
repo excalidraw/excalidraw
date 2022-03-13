@@ -575,7 +575,7 @@ export const textWysiwyg = ({
         !isWritableElement(event.target)) ||
       isTargetColorPicker
     ) {
-      this.setState({
+      app.setState({
         toastMessage: "debug",
       });
       editable.onblur = null;
