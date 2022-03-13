@@ -64,7 +64,7 @@
     "cartoonist": "漫画風",
     "fileTitle": "ファイル名",
     "colorPicker": "色選択",
-    "canvasColors": "",
+    "canvasColors": "キャンバス上で使用",
     "canvasBackground": "キャンバスの背景",
     "drawingCanvas": "キャンバスの描画",
     "layers": "レイヤー",
@@ -106,7 +106,7 @@
     "excalidrawLib": "Excalidrawライブラリ",
     "decreaseFontSize": "フォントサイズを縮小",
     "increaseFontSize": "フォントサイズを拡大",
-    "unbindText": "",
+    "unbindText": "テキストのバインド解除",
     "link": {
       "edit": "リンクを編集",
       "create": "リンクを作成",
@@ -181,7 +181,7 @@
     "fileTooBig": "ファイルが大きすぎます。許可される最大サイズは {{maxSize}} です。",
     "svgImageInsertError": "SVGイメージを挿入できませんでした。SVGマークアップは無効に見えます。",
     "invalidSVGString": "無効なSVGです。",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "コラボレーションサーバに接続できませんでした。ページを再読み込みして、もう一度お試しください。"
   },
   "toolBar": {
     "selection": "選択",
@@ -196,8 +196,8 @@
     "library": "ライブラリ",
     "lock": "描画後も使用中のツールを選択したままにする",
     "penMode": "ピンチとズームを抑止し、ペンからのみ自由な入力を受け付けます",
-    "link": "",
-    "eraser": ""
+    "link": "選択した図形のリンクを追加/更新",
+    "eraser": "消しゴム"
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -222,8 +222,8 @@
     "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
     "publishLibrary": "自分のライブラリを公開",
     "bindTextToElement": "Enterを押してテキストを追加",
-    "deepBoxSelect": "",
-    "eraserRevert": ""
+    "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行う",
+    "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す"
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
@@ -270,8 +270,8 @@
   "helpDialog": {
     "blog": "公式ブログを読む",
     "click": "クリック",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "深い選択",
+    "deepBoxSelect": "ボックス内の深い選択、およびドラッグの抑止",
     "curvedArrow": "カーブした矢印",
     "curvedLine": "曲線",
     "documentation": "ドキュメント",
@@ -328,10 +328,10 @@
     },
     "noteLicense": {
       "pre": "提出することにより、ライブラリが次の下で公開されることに同意します： ",
-      "link": "MIT ライセンス",
+      "link": "MIT ライセンス ",
       "post": "つまり誰でも制限なく使えるということです"
     },
-    "noteItems": "",
+    "noteItems": "各ライブラリ項目は、フィルタリングのために独自の名前を持つ必要があります。以下のライブラリアイテムが含まれます:",
     "atleastOneLibItem": "開始するには少なくとも1つのライブラリ項目を選択してください"
   },
   "publishSuccessDialog": {
