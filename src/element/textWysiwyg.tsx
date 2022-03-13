@@ -546,7 +546,7 @@ export const textWysiwyg = ({
       editable.onblur = () => {
         app.setState({
           toastMessage: "debug: onblur",
-        });  
+        });
         handleSubmit();
       };
       if (target && isTargetColorPicker) {
