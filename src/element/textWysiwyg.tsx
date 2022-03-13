@@ -541,10 +541,9 @@ export const textWysiwyg = ({
       target instanceof HTMLInputElement &&
       target.closest(".color-picker-input") &&
       isWritableElement(target);
- 
+
     const isShapeActionsPanel =
-      (target instanceof HTMLElement ||
-        target instanceof SVGElement) &&
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
       (target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
         target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
         target.closest(`.${CLASSES.MOBILE_TOOLBAR}`)) &&
