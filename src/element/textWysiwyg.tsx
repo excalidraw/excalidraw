@@ -541,9 +541,20 @@ export const textWysiwyg = ({
       target instanceof HTMLInputElement &&
       target.closest(".color-picker-input") &&
       isWritableElement(target);
+ 
+    const isShapeActionsPanel =
+      (event.target instanceof HTMLElement ||
+        event.target instanceof SVGElement) &&
+      (event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
+        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
+        event.target.closest(`.${CLASSES.MOBILE_TOOLBAR}`)) &&
+      !isWritableElement(event.target);
 
     setTimeout(() => {
       editable.onblur = () => {
+        if (isShapeActionsPanel) {
+          return;
+        }
         app.setState({
           toastMessage: "debug: onblur",
         });
