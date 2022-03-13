@@ -575,6 +575,9 @@ export const textWysiwyg = ({
         !isWritableElement(event.target)) ||
       isTargetColorPicker
     ) {
+      this.setState({
+        toastMessage: "debug",
+      });
       editable.onblur = null;
       window.addEventListener("pointerup", bindBlurEvent);
       // handle edge-case where pointerup doesn't fire e.g. due to user
