@@ -546,8 +546,7 @@ export const textWysiwyg = ({
       (target instanceof HTMLElement || target instanceof SVGElement) &&
       (target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
         target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
-        target.closest(`.${CLASSES.MOBILE_TOOLBAR}`)) &&
-      !isWritableElement(target);
+        target.closest(`.${CLASSES.MOBILE_TOOLBAR}`));
 
     setTimeout(() => {
       editable.onblur = () => {
