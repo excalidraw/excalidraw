@@ -551,7 +551,7 @@ export const textWysiwyg = ({
     setTimeout(() => {
       editable.onblur = () => {
         app.setState({
-          toastMessage: "debug: " + target.tagName,
+          toastMessage: "debug: " + target?.tagName ?? "no tagName",
         });
         if (isShapeActionsPanel) {
           return;
