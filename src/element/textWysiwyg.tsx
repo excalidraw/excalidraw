@@ -543,12 +543,12 @@ export const textWysiwyg = ({
       isWritableElement(target);
  
     const isShapeActionsPanel =
-      (event.target instanceof HTMLElement ||
-        event.target instanceof SVGElement) &&
-      (event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
-        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
-        event.target.closest(`.${CLASSES.MOBILE_TOOLBAR}`)) &&
-      !isWritableElement(event.target);
+      (target instanceof HTMLElement ||
+        target instanceof SVGElement) &&
+      (target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
+        target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
+        target.closest(`.${CLASSES.MOBILE_TOOLBAR}`)) &&
+      !isWritableElement(target);
 
     setTimeout(() => {
       editable.onblur = () => {
