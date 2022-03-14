@@ -1691,7 +1691,9 @@ class App extends React.Component<AppProps, AppState> {
           ".eraser-cursor",
         )! as HTMLDivElement;
         if (target instanceof HTMLCanvasElement) {
-          cursor.classList.add("active");
+          if (!cursor.classList.contains(".active")) {
+            cursor.classList.add("active");
+          }
           cursor.style.left = `${cursorX}px`;
           cursor.style.top = `${cursorY}px`;
         } else {
