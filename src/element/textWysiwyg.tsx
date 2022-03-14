@@ -564,7 +564,10 @@ export const textWysiwyg = ({
         });
         handleSubmit();
       };
-      if (target && isTargetColorPicker) {
+      if (
+        target &&
+        (isTargetColorPicker || isShapeActionsPanel)
+      ) {
         target.onblur = () => {
           editable.focus();
         };
