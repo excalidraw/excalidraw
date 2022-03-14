@@ -223,7 +223,7 @@
     "publishLibrary": "Publică propria bibliotecă",
     "bindTextToElement": "Apasă tasta Enter pentru a adăuga text",
     "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea",
-    "eraserRevert": ""
+    "eraserRevert": "Ține apăsată tasta Alt pentru a anula elementele marcate pentru ștergere"
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
