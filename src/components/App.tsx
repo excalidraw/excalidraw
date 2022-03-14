@@ -2999,25 +2999,6 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
     if (isEraserActive(this.state)) {
-      const draggedDistance = distance2d(
-        this.lastPointerDown!.clientX,
-        this.lastPointerDown!.clientY,
-        this.lastPointerUp!.clientX,
-        this.lastPointerUp!.clientY,
-      );
-      if (draggedDistance === 0) {
-        const scenePointer = viewportCoordsToSceneCoords(
-          { clientX: event.clientX, clientY: event.clientY },
-          this.state,
-        );
-        const hitElement = this.getElementAtPosition(
-          scenePointer.x,
-          scenePointer.y,
-        );
-        const pointerDownEvent = this.initialPointerDownState(event);
-        pointerDownEvent.hit.element = hitElement;
-        this.eraseElements(pointerDownEvent);
-      }
     }
     if (
       this.hitLinkElement &&
@@ -4422,6 +4403,28 @@ class App extends React.Component<AppProps, AppState> {
       // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
       if (isEraserActive(this.state)) {
+        const draggedDistance = distance2d(
+          this.lastPointerDown!.clientX,
+          this.lastPointerDown!.clientY,
+          this.lastPointerUp!.clientX,
+          this.lastPointerUp!.clientY,
+        );
+
+        if (draggedDistance === 0) {
+          const scenePointer = viewportCoordsToSceneCoords(
+            {
+              clientX: this.lastPointerUp!.clientX,
+              clientY: this.lastPointerUp!.clientY,
+            },
+            this.state,
+          );
+          const hitElement = this.getElementAtPosition(
+            scenePointer.x,
+            scenePointer.y,
+          );
+
+          pointerDownState.hit.element = hitElement;
+        }
         this.eraseElements(pointerDownState);
         return;
       }
@@ -4567,6 +4570,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private eraseElements = (pointerDownState: PointerDownState) => {
     const hitElement = pointerDownState.hit.element;
+
     const elements = this.scene.getElements().map((ele) => {
       if (pointerDownState.elementIdsToErase[ele.id]) {
         return newElementWith(ele, { isDeleted: true });
