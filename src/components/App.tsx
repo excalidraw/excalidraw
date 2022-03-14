@@ -476,6 +476,7 @@ class App extends React.Component<AppProps, AppState> {
           this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
         }
       >
+        <div className="eraser-cursor" />
         <ExcalidrawContainerContext.Provider
           value={this.excalidrawContainerValue}
         >
@@ -1050,6 +1051,9 @@ class App extends React.Component<AppProps, AppState> {
       isEraserActive(this.state)
     ) {
       this.setState({ elementType: "selection" });
+      this.excalidrawContainerRef.current
+        ?.querySelector(".eraser-cursor")
+        ?.classList.remove("active");
     }
     // Hide hyperlink popup if shown when element type is not selection
     if (
@@ -1681,6 +1685,19 @@ class App extends React.Component<AppProps, AppState> {
     (event: MouseEvent) => {
       cursorX = event.clientX;
       cursorY = event.clientY;
+      const target = event.target;
+      if (isEraserActive(this.state)) {
+        const cursor = this.excalidrawContainerRef.current?.querySelector(
+          ".eraser-cursor",
+        )! as HTMLDivElement;
+        if (target instanceof HTMLCanvasElement) {
+          cursor.classList.add("active");
+          cursor.style.left = `${cursorX}px`;
+          cursor.style.top = `${cursorY}px`;
+        } else {
+          cursor.classList.remove("active");
+        }
+      }
     },
   );
 
@@ -2707,7 +2724,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.setState({ showHyperlinkPopup: "info" });
       } else if (isEraserActive(this.state)) {
-        setCursor(this.canvas, CURSOR_TYPE.AUTO);
+        setCursor(this.canvas, CURSOR_TYPE.NONE);
       } else if (this.state.elementType === "text") {
         setCursor(
           this.canvas,

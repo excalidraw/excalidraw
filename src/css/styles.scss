@@ -558,6 +558,21 @@
       display: none;
     }
   }
+  .eraser-cursor {
+    display: none;
+    &.active {
+      background-color: transparent;
+      border: 1px solid $oc-black;
+      height: 10px;
+      width: 10px;
+      border-radius: 50%;
+      -moz-border-radius: 50%;
+      -webkit-border-radius: 50%;
+      position: absolute;
+      z-index: 10;
+      display: block;
+    }
+  }
 }
 
 .ErrorSplash.excalidraw {

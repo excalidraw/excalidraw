@@ -18,6 +18,7 @@ export const CURSOR_TYPE = {
   POINTER: "pointer",
   MOVE: "move",
   AUTO: "",
+  NONE: "none",
 };
 export const POINTER_BUTTON = {
   MAIN: 0,
