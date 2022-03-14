@@ -255,7 +255,8 @@
     color: #aaa;
   }
 
-  .color-picker-type-elementStroke .color-picker-keybinding {
+  .color-picker-type-elementStroke .color-picker-keybinding,
+  .color-picker-type-elementFontColor .color-picker-keybinding {
     color: #d4d4d4;
   }
 

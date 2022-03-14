@@ -1840,7 +1840,11 @@ class App extends React.Component<AppProps, AppState> {
         event.preventDefault();
       }
 
-      if (event.key === KEYS.G || event.key === KEYS.S) {
+      if (
+        event.key === KEYS.G ||
+        event.key === KEYS.S ||
+        event.key === KEYS.C
+      ) {
         const selectedElements = getSelectedElements(
           this.scene.getElements(),
           this.state,
@@ -1861,6 +1865,9 @@ class App extends React.Component<AppProps, AppState> {
         }
         if (event.key === KEYS.S) {
           this.setState({ openPopup: "strokeColorPicker" });
+        }
+        if (event.key === KEYS.C) {
+          this.setState({ openPopup: "fontColorPicker" });
         }
       }
     },

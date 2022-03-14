@@ -4,7 +4,7 @@ import {
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
-import { isBoundToContainer } from "../element/typeChecks";
+import { isBoundToContainer, isTextElement } from "../element/typeChecks";
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -41,12 +41,15 @@ export const getCommonAttributeOfSelectedElements = <T>(
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
+  onlyBoundTextElements: boolean = false,
 ): T | null => {
   const attributes = Array.from(
     new Set(
-      getSelectedElements(elements, appState).map((element) =>
-        getAttribute(element),
-      ),
+      getSelectedElements(elements, appState, onlyBoundTextElements)
+        .filter((element) =>
+          onlyBoundTextElements ? isTextElement(element) : true,
+        )
+        .map((element) => getAttribute(element)),
     ),
   );
   return attributes.length === 1 ? attributes[0] : null;

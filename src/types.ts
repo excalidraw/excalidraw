@@ -113,6 +113,7 @@ export type AppState = {
     | "canvasColorPicker"
     | "backgroundColorPicker"
     | "strokeColorPicker"
+    | "fontColorPicker"
     | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };

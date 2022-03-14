@@ -51,6 +51,7 @@ import {
   getContainerElement,
 } from "../element/textElement";
 import {
+  hasBoundTextElement,
   isBoundToContainer,
   isLinearElement,
   isLinearElementType,
@@ -106,6 +107,7 @@ const getFormValue = function <T>(
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
   defaultValue?: T,
+  onlyBoundTextElements: boolean = false,
 ): T | null {
   const editingElement = appState.editingElement;
   const nonDeletedElements = getNonDeletedElements(elements);
@@ -116,6 +118,7 @@ const getFormValue = function <T>(
           nonDeletedElements,
           appState,
           getAttribute,
+          onlyBoundTextElements,
         )
       : defaultValue) ??
     null
@@ -196,8 +199,8 @@ const changeFontSize = (
 
 // -----------------------------------------------------------------------------
 
-export const actionChangeStrokeColor = register({
-  name: "changeStrokeColor",
+export const actionChangeFontColor = register({
+  name: "changeFontColor",
   perform: (elements, appState, value) => {
     return {
       ...(value.currentItemStrokeColor && {
@@ -205,7 +208,7 @@ export const actionChangeStrokeColor = register({
           elements,
           appState,
           (el) => {
-            return hasStrokeColor(el.type)
+            return isTextElement(el)
               ? newElementWith(el, {
                   strokeColor: value.currentItemStrokeColor,
                 })
@@ -221,28 +224,107 @@ export const actionChangeStrokeColor = register({
       commitToHistory: !!value.currentItemStrokeColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <>
-      <h3 aria-hidden="true">{t("labels.stroke")}</h3>
-      <ColorPicker
-        type="elementStroke"
-        label={t("labels.stroke")}
-        color={getFormValue(
+  PanelComponent: ({ elements, appState, updateData }) => {
+    return (
+      <>
+        <h3 aria-hidden="true">{t("labels.fontColor")}</h3>
+        <ColorPicker
+          type="elementFontColor"
+          label={t("labels.fontColor")}
+          color={getFormValue(
+            elements,
+            appState,
+            (element) => element.strokeColor,
+            appState.currentItemStrokeColor,
+            true,
+          )}
+          onChange={(color) => updateData({ currentItemStrokeColor: color })}
+          isActive={appState.openPopup === "fontColorPicker"}
+          setActive={(active) =>
+            updateData({ openPopup: active ? "fontColorPicker" : null })
+          }
+          elements={elements}
+          appState={appState}
+        />
+      </>
+    );
+  },
+});
+
+export const actionChangeStrokeColor = register({
+  name: "changeStrokeColor",
+  perform: (elements, appState, value) => {
+    const targetElements = getTargetElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+
+    const hasOnlyContainersWithBoundText =
+      targetElements.length > 1 &&
+      targetElements.every(
+        (element) =>
+          hasBoundTextElement(element) || isBoundToContainer(element),
+      );
+
+    return {
+      ...(value.currentItemStrokeColor && {
+        elements: changeProperty(
           elements,
           appState,
-          (element) => element.strokeColor,
-          appState.currentItemStrokeColor,
-        )}
-        onChange={(color) => updateData({ currentItemStrokeColor: color })}
-        isActive={appState.openPopup === "strokeColorPicker"}
-        setActive={(active) =>
-          updateData({ openPopup: active ? "strokeColorPicker" : null })
-        }
-        elements={elements}
-        appState={appState}
-      />
-    </>
-  ),
+          (el) => {
+            return (hasStrokeColor(el.type) &&
+              !hasOnlyContainersWithBoundText) ||
+              !isBoundToContainer(el)
+              ? newElementWith(el, {
+                  strokeColor: value.currentItemStrokeColor,
+                })
+              : el;
+          },
+          true,
+        ),
+      }),
+      appState: {
+        ...appState,
+        ...value,
+      },
+      commitToHistory: !!value.currentItemStrokeColor,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const targetElements = getTargetElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+
+    const hasOnlyContainersWithBoundText = targetElements.every(
+      (element) => hasBoundTextElement(element) || isBoundToContainer(element),
+    );
+
+    return (
+      <>
+        <h3 aria-hidden="true">{t("labels.stroke")}</h3>
+        <ColorPicker
+          type="elementStroke"
+          label={t("labels.stroke")}
+          color={getFormValue(
+            hasOnlyContainersWithBoundText
+              ? elements.filter((element) => !isTextElement(element))
+              : elements,
+            appState,
+            (element) => element.strokeColor,
+            appState.currentItemStrokeColor,
+          )}
+          onChange={(color) => updateData({ currentItemStrokeColor: color })}
+          isActive={appState.openPopup === "strokeColorPicker"}
+          setActive={(active) =>
+            updateData({ openPopup: active ? "strokeColorPicker" : null })
+          }
+          elements={elements}
+          appState={appState}
+        />
+      </>
+    );
+  },
 });
 
 export const actionChangeBackgroundColor = register({

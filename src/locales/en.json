@@ -16,6 +16,7 @@
     "delete": "Delete",
     "copyStyles": "Copy styles",
     "pasteStyles": "Paste styles",
+    "fontColor": "Font color",
     "stroke": "Stroke",
     "background": "Background",
     "fill": "Fill",

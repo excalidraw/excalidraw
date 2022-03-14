@@ -68,8 +68,15 @@ export const SelectedShapeActions = ({
     }
   }
 
+  const hasOnlyContainersWithBoundText =
+    targetElements.length > 1 &&
+    targetElements.every(
+      (element) => hasBoundTextElement(element) || isBoundToContainer(element),
+    );
+
   return (
     <div className="panelColumn">
+      {hasOnlyContainersWithBoundText && renderAction("changeFontColor")}
       {((hasStrokeColor(elementType) &&
         elementType !== "image" &&
         commonSelectedType !== "image") ||

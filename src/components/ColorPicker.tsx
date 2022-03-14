@@ -101,19 +101,24 @@ const Picker = ({
   onClose: () => void;
   label: string;
   showInput: boolean;
-  type: "canvasBackground" | "elementBackground" | "elementStroke";
+  type:
+    | "canvasBackground"
+    | "elementBackground"
+    | "elementStroke"
+    | "elementFontColor";
   elements: readonly ExcalidrawElement[];
 }) => {
   const firstItem = React.useRef<HTMLButtonElement>();
   const activeItem = React.useRef<HTMLButtonElement>();
   const gallery = React.useRef<HTMLDivElement>();
   const colorInput = React.useRef<HTMLInputElement>();
+  const colorType = type === "elementFontColor" ? "elementStroke" : type;
 
   const [customColors] = React.useState(() => {
-    if (type === "canvasBackground") {
+    if (colorType === "canvasBackground") {
       return [];
     }
-    return getCustomColors(elements, type);
+    return getCustomColors(elements, colorType);
   });
 
   React.useEffect(() => {
@@ -356,7 +361,11 @@ export const ColorPicker = ({
   elements,
   appState,
 }: {
-  type: "canvasBackground" | "elementBackground" | "elementStroke";
+  type:
+    | "canvasBackground"
+    | "elementBackground"
+    | "elementStroke"
+    | "elementFontColor";
   color: string | null;
   onChange: (color: string) => void;
   label: string;
@@ -366,7 +375,7 @@ export const ColorPicker = ({
   appState: AppState;
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
-
+  const colorType = type === "elementFontColor" ? "elementStroke" : type;
   return (
     <div>
       <div className="color-picker-control-container">
@@ -393,7 +402,7 @@ export const ColorPicker = ({
             }
           >
             <Picker
-              colors={colors[type]}
+              colors={colors[colorType]}
               color={color || null}
               onChange={(changedColor) => {
                 onChange(changedColor);
