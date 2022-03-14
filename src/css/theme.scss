@@ -45,6 +45,8 @@
   --border-radius-md: 0.375rem;
   --border-radius-lg: 0.5rem;
 
+  --eraser-border-color: #000;
+
   &.theme--dark {
     background: $oc-black;
 
@@ -87,5 +89,7 @@
     --color-primary-darker: #4b46d8;
     --color-primary-darkest: #3e39be;
     --color-primary-light: #3f3d64;
+
+    --eraser-border-color: #{$oc-white};
   }
 }

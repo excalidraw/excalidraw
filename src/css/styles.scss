@@ -562,7 +562,7 @@
     display: none;
     &.active {
       background-color: transparent;
-      border: 1px solid $oc-black;
+      border: 1px solid var(--eraser-border-color);
       height: 10px;
       width: 10px;
       border-radius: 50%;
