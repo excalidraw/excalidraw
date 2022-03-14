@@ -4570,7 +4570,6 @@ class App extends React.Component<AppProps, AppState> {
 
   private eraseElements = (pointerDownState: PointerDownState) => {
     const hitElement = pointerDownState.hit.element;
-
     const elements = this.scene.getElements().map((ele) => {
       if (pointerDownState.elementIdsToErase[ele.id]) {
         return newElementWith(ele, { isDeleted: true });
