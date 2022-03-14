@@ -214,6 +214,7 @@ import {
   withBatchedUpdates,
   wrapEvent,
   withBatchedUpdatesThrottled,
+  setEraserCursor,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -476,7 +477,6 @@ class App extends React.Component<AppProps, AppState> {
           this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
         }
       >
-        <div className="eraser-cursor" />
         <ExcalidrawContainerContext.Provider
           value={this.excalidrawContainerValue}
         >
@@ -1051,9 +1051,9 @@ class App extends React.Component<AppProps, AppState> {
       isEraserActive(this.state)
     ) {
       this.setState({ elementType: "selection" });
-      this.excalidrawContainerRef.current
-        ?.querySelector(".eraser-cursor")
-        ?.classList.remove("active");
+    }
+    if (prevState.theme !== this.state.theme) {
+      setEraserCursor(this.canvas, this.state.theme);
     }
     // Hide hyperlink popup if shown when element type is not selection
     if (
@@ -1685,21 +1685,6 @@ class App extends React.Component<AppProps, AppState> {
     (event: MouseEvent) => {
       cursorX = event.clientX;
       cursorY = event.clientY;
-      const target = event.target;
-      if (isEraserActive(this.state)) {
-        const cursor = this.excalidrawContainerRef.current?.querySelector(
-          ".eraser-cursor",
-        )! as HTMLDivElement;
-        if (target instanceof HTMLCanvasElement) {
-          if (!cursor.classList.contains(".active")) {
-            cursor.classList.add("active");
-          }
-          cursor.style.left = `${cursorX}px`;
-          cursor.style.top = `${cursorY}px`;
-        } else {
-          cursor.classList.remove("active");
-        }
-      }
     },
   );
 
@@ -1892,7 +1877,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (this.state.elementType === "selection") {
         resetCursor(this.canvas);
       } else {
-        setCursorForShape(this.canvas, this.state.elementType);
+        setCursorForShape(this.canvas, this.state);
         this.setState({
           selectedElementIds: {},
           selectedGroupIds: {},
@@ -1918,7 +1903,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private selectShapeTool(elementType: AppState["elementType"]) {
     if (!isHoldingSpace) {
-      setCursorForShape(this.canvas, elementType);
+      setCursorForShape(this.canvas, this.state);
     }
     if (isToolIcon(document.activeElement)) {
       this.focusContainer();
@@ -2062,7 +2047,7 @@ class App extends React.Component<AppProps, AppState> {
           editingElement: null,
         });
         if (this.state.elementLocked) {
-          setCursorForShape(this.canvas, this.state.elementType);
+          setCursorForShape(this.canvas, this.state);
         }
 
         this.focusContainer();
@@ -2544,7 +2529,7 @@ class App extends React.Component<AppProps, AppState> {
       if (isOverScrollBar) {
         resetCursor(this.canvas);
       } else {
-        setCursorForShape(this.canvas, this.state.elementType);
+        setCursorForShape(this.canvas, this.state);
       }
     }
 
@@ -2594,7 +2579,7 @@ class App extends React.Component<AppProps, AppState> {
       const { points, lastCommittedPoint } = multiElement;
       const lastPoint = points[points.length - 1];
 
-      setCursorForShape(this.canvas, this.state.elementType);
+      setCursorForShape(this.canvas, this.state);
 
       if (lastPoint === lastCommittedPoint) {
         // if we haven't yet created a temp point and we're beyond commit-zone
@@ -2726,7 +2711,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.setState({ showHyperlinkPopup: "info" });
       } else if (isEraserActive(this.state)) {
-        setCursor(this.canvas, CURSOR_TYPE.NONE);
+        setEraserCursor(this.canvas, this.state.theme);
       } else if (this.state.elementType === "text") {
         setCursor(
           this.canvas,
@@ -3017,8 +3002,6 @@ class App extends React.Component<AppProps, AppState> {
         hitElement,
       );
     }
-    if (isEraserActive(this.state)) {
-    }
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
@@ -3147,7 +3130,7 @@ class App extends React.Component<AppProps, AppState> {
           if (this.state.viewModeEnabled) {
             setCursor(this.canvas, CURSOR_TYPE.GRAB);
           } else {
-            setCursorForShape(this.canvas, this.state.elementType);
+            setCursorForShape(this.canvas, this.state);
           }
         }
         this.setState({
@@ -3272,7 +3255,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const onPointerUp = withBatchedUpdates(() => {
       isDraggingScrollBar = false;
-      setCursorForShape(this.canvas, this.state.elementType);
+      setCursorForShape(this.canvas, this.state);
       lastPointerUp = null;
       this.setState({
         cursorButton: "up",

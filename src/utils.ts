@@ -4,10 +4,12 @@ import {
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
+  MIME_TYPES,
+  THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { Zoom } from "./types";
+import { AppState, DataURL, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 
@@ -215,21 +217,49 @@ export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
   }
 };
 
+export const setEraserCursor = (
+  canvas: HTMLCanvasElement | null,
+  theme: AppState["theme"],
+) => {
+  const cursorImageSizePx = 20;
+  const eraserCanvasCache = document.createElement("canvas");
+  eraserCanvasCache.height = cursorImageSizePx;
+  eraserCanvasCache.width = cursorImageSizePx;
+
+  const context = eraserCanvasCache.getContext("2d")!;
+  if (theme === THEME.DARK) {
+    context.strokeStyle = "#fff";
+  } else {
+    context.strokeStyle = "#000";
+  }
+  context.beginPath();
+  context.arc(
+    eraserCanvasCache.width / 2,
+    eraserCanvasCache.height / 2,
+    5,
+    0,
+    2 * Math.PI,
+  );
+  context.stroke();
+  const previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
+  setCursor(canvas, `url(${previewDataURL}) 4 4, auto`);
+};
+
 export const setCursorForShape = (
   canvas: HTMLCanvasElement | null,
-  shape: string,
+  appState: AppState,
 ) => {
   if (!canvas) {
     return;
   }
-  if (shape === "selection") {
+  if (appState.elementType === "selection") {
     resetCursor(canvas);
-  } else if (shape === "eraser") {
-    canvas.style.cursor = CURSOR_TYPE.NONE;
+  } else if (appState.elementType === "eraser") {
+    setEraserCursor(canvas, appState.theme);
 
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
-  } else if (shape !== "image") {
+  } else if (appState.elementType !== "image") {
     canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
