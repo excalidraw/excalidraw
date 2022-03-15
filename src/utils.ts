@@ -251,6 +251,18 @@ export const setEraserCursor = (
       context.strokeStyle = oc.black;
     }
     context.stroke();
+
+    context.beginPath();
+    context.arc(
+      eraserCanvasCache.width / 2,
+      eraserCanvasCache.height / 2,
+      7,
+      0,
+      2 * Math.PI,
+    );
+    context.strokeStyle = oc.white;
+    context.stroke();
+
     previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
   };
   if (!eraserCanvasCache) {
