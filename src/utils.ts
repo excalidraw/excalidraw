@@ -217,31 +217,47 @@ export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
   }
 };
 
+let eraserCanvasCache: any;
 export const setEraserCursor = (
   canvas: HTMLCanvasElement | null,
   theme: AppState["theme"],
 ) => {
-  const cursorImageSizePx = 20;
-  const eraserCanvasCache = document.createElement("canvas");
-  eraserCanvasCache.height = cursorImageSizePx;
-  eraserCanvasCache.width = cursorImageSizePx;
+  const drawCanvas = () => {
+    const cursorImageSizePx = 20;
+    eraserCanvasCache = document.createElement("canvas");
+    eraserCanvasCache.height = cursorImageSizePx;
+    eraserCanvasCache.width = cursorImageSizePx;
 
-  const context = eraserCanvasCache.getContext("2d")!;
-  if (theme === THEME.DARK) {
-    context.strokeStyle = "#fff";
+    const context = eraserCanvasCache.getContext("2d")!;
+    if (theme === THEME.DARK) {
+      context.strokeStyle = "#fff";
+    } else {
+      context.strokeStyle = "#000";
+    }
+    context.beginPath();
+    context.arc(
+      eraserCanvasCache.width / 2,
+      eraserCanvasCache.height / 2,
+      5,
+      0,
+      2 * Math.PI,
+    );
+    context.stroke();
+  };
+  if (!eraserCanvasCache) {
+    drawCanvas();
   } else {
-    context.strokeStyle = "#000";
+    const context = eraserCanvasCache.getContext("2d")!;
+    const strokeStyle = context.strokeStyle;
+    if (theme === THEME.LIGHT && strokeStyle !== "#000000") {
+      drawCanvas();
+    } else if (theme === THEME.DARK && strokeStyle !== "#ffffff") {
+      drawCanvas();
+    }
   }
-  context.beginPath();
-  context.arc(
-    eraserCanvasCache.width / 2,
-    eraserCanvasCache.height / 2,
-    5,
-    0,
-    2 * Math.PI,
-  );
-  context.stroke();
+
   const previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
+
   setCursor(canvas, `url(${previewDataURL}) 4 4, auto`);
 };
 
@@ -256,7 +272,6 @@ export const setCursorForShape = (
     resetCursor(canvas);
   } else if (appState.elementType === "eraser") {
     setEraserCursor(canvas, appState.theme);
-
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
   } else if (appState.elementType !== "image") {

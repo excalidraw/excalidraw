@@ -2693,7 +2693,9 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer,
       hitElement,
     );
-
+    if (isEraserActive(this.state)) {
+      return;
+    }
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
@@ -2710,8 +2712,6 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.showHyperlinkPopup
       ) {
         this.setState({ showHyperlinkPopup: "info" });
-      } else if (isEraserActive(this.state)) {
-        setEraserCursor(this.canvas, this.state.theme);
       } else if (this.state.elementType === "text") {
         setCursor(
           this.canvas,
