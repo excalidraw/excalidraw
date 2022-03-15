@@ -225,8 +225,9 @@ export const setEraserCursor = (
   canvas: HTMLCanvasElement | null,
   theme: AppState["theme"],
 ) => {
+  const cursorImageSizePx = 20;
+
   const drawCanvas = () => {
-    const cursorImageSizePx = 20;
     eraserCanvasCache = document.createElement("canvas");
     eraserCanvasCache.height = cursorImageSizePx;
     eraserCanvasCache.width = cursorImageSizePx;
@@ -264,7 +265,12 @@ export const setEraserCursor = (
     }
   }
 
-  setCursor(canvas, `url(${previewDataURL}) 0 0, auto`);
+  setCursor(
+    canvas,
+    `url(${previewDataURL}) ${cursorImageSizePx / 2} ${
+      cursorImageSizePx / 2
+    }, auto`,
+  );
 };
 
 export const setCursorForShape = (
