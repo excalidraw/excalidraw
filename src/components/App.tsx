@@ -201,6 +201,7 @@ import {
   LibraryItems,
   PointerDownState,
   SceneData,
+  DeviceType,
 } from "../types";
 import {
   debounce,
@@ -220,6 +221,7 @@ import {
   withBatchedUpdates,
   wrapEvent,
   withBatchedUpdatesThrottled,
+  updateObject,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -261,8 +263,12 @@ import {
 import { ImportedDataState } from "../data/types"; //zsviczian
 
 export let showFourthFont: boolean = false;
-const IsMobileContext = React.createContext(false);
-export const useIsMobile = () => useContext(IsMobileContext);
+const defaultDeviceTypeContext: DeviceType = {
+  isMobile: false,
+  isTouchScreen: false,
+};
+const DeviceTypeContext = React.createContext(defaultDeviceTypeContext);
+export const useDeviceType = () => useContext(DeviceTypeContext);
 const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
   id: string | null;
@@ -294,7 +300,10 @@ class App extends React.Component<AppProps, AppState> {
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
-  isMobile = false;
+  deviceType: DeviceType = {
+    isMobile: false,
+    isTouchScreen: false,
+  };
   detachIsMobileMqHandler?: () => void;
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
@@ -485,7 +494,8 @@ class App extends React.Component<AppProps, AppState> {
       <div
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": viewModeEnabled,
-          "excalidraw--mobile": this.isMobile || this.state.trayModeEnabled, //zsviczian
+          "excalidraw--mobile":
+            this.deviceType.isMobile || this.state.trayModeEnabled, //zsviczian
         })}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -497,11 +507,7 @@ class App extends React.Component<AppProps, AppState> {
         <ExcalidrawContainerContext.Provider
           value={this.excalidrawContainerValue}
         >
-          <IsMobileContext.Provider
-            value={
-              this.isMobile || this.state.trayModeEnabled //zsviczian
-            }
-          >
+          <DeviceTypeContext.Provider value={this.deviceType}>
             <LayerUI
               canvas={this.canvas}
               appState={this.state}
@@ -568,7 +574,7 @@ class App extends React.Component<AppProps, AppState> {
               />
             )}
             <main>{this.renderCanvas()}</main>
-          </IsMobileContext.Provider>
+          </DeviceTypeContext.Provider>
         </ExcalidrawContainerContext.Provider>
       </div>
     );
@@ -912,11 +918,13 @@ class App extends React.Component<AppProps, AppState> {
         // ---------------------------------------------------------------------
         const { width, height } =
           this.excalidrawContainerRef.current!.getBoundingClientRect();
-        this.isMobile =
-          width < MQ_MAX_WIDTH_PORTRAIT ||
-          (height < MQ_MAX_HEIGHT_LANDSCAPE &&
-            width < MQ_MAX_WIDTH_LANDSCAPE) ||
-          this.state.trayModeEnabled; //zsviczian
+        this.deviceType = updateObject(this.deviceType, {
+          isMobile:
+            width < MQ_MAX_WIDTH_PORTRAIT ||
+            (height < MQ_MAX_HEIGHT_LANDSCAPE &&
+              width < MQ_MAX_WIDTH_LANDSCAPE) ||
+            this.state.trayModeEnabled, //zsviczian
+        });
         // refresh offsets
         // ---------------------------------------------------------------------
         this.updateDOMRect();
@@ -926,8 +934,11 @@ class App extends React.Component<AppProps, AppState> {
       const mediaQuery = window.matchMedia(
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
-      const handler = () =>
-        (this.isMobile = mediaQuery.matches || this.state.trayModeEnabled); //zsviczian
+      const handler = () => {
+        this.deviceType = updateObject(this.deviceType, {
+          isMobile: mediaQuery.matches || this.state.trayModeEnabled, //zsviczian
+        });
+      };
       mediaQuery.addListener(handler);
       this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
     }
@@ -1226,7 +1237,7 @@ class App extends React.Component<AppProps, AppState> {
         theme: this.state.theme,
         imageCache: this.imageCache,
         isExporting: false,
-        renderScrollbars: !this.isMobile,
+        renderScrollbars: !this.deviceType.isMobile,
       },
     );
 
@@ -2555,7 +2566,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
-          this.isMobile,
+          this.deviceType.isMobile,
         ) &&
         index <= hitElementIndex
       );
@@ -2588,7 +2599,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
-      this.isMobile,
+      this.deviceType.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUp!,
@@ -2598,7 +2609,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement!,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
-      this.isMobile,
+      this.deviceType.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement.link;
@@ -3025,6 +3036,13 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
+    if (
+      !this.deviceType.isTouchScreen &&
+      ["pen", "touch"].includes(event.pointerType)
+    ) {
+      this.deviceType = updateObject(this.deviceType, { isTouchScreen: true });
+    }
+
     if (isPanning) {
       return;
     }
@@ -3155,9 +3173,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
-    const isTouchScreen = ["pen", "touch"].includes(event.pointerType);
-
-    if (isTouchScreen) {
+    if (this.deviceType.isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
@@ -3172,31 +3188,12 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
     if (isEraserActive(this.state)) {
-      const draggedDistance = distance2d(
-        this.lastPointerDown!.clientX,
-        this.lastPointerDown!.clientY,
-        this.lastPointerUp!.clientX,
-        this.lastPointerUp!.clientY,
-      );
-      if (draggedDistance === 0) {
-        const scenePointer = viewportCoordsToSceneCoords(
-          { clientX: event.clientX, clientY: event.clientY },
-          this.state,
-        );
-        const hitElement = this.getElementAtPosition(
-          scenePointer.x,
-          scenePointer.y,
-        );
-        const pointerDownEvent = this.initialPointerDownState(event);
-        pointerDownEvent.hit.element = hitElement;
-        this.eraseElements(pointerDownEvent);
-      }
     }
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event, isTouchScreen);
+      this.redirectToLink(event, this.deviceType.isTouchScreen);
     }
 
     this.removePointer(event);
@@ -3566,7 +3563,7 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState.hit.element,
               this.state,
               [pointerDownState.origin.x, pointerDownState.origin.y],
-              this.isMobile,
+              this.deviceType.isMobile,
             )
           ) {
             return false;
@@ -4595,6 +4592,28 @@ class App extends React.Component<AppProps, AppState> {
       // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
       if (isEraserActive(this.state)) {
+        const draggedDistance = distance2d(
+          this.lastPointerDown!.clientX,
+          this.lastPointerDown!.clientY,
+          this.lastPointerUp!.clientX,
+          this.lastPointerUp!.clientY,
+        );
+
+        if (draggedDistance === 0) {
+          const scenePointer = viewportCoordsToSceneCoords(
+            {
+              clientX: this.lastPointerUp!.clientX,
+              clientY: this.lastPointerUp!.clientY,
+            },
+            this.state,
+          );
+          const hitElement = this.getElementAtPosition(
+            scenePointer.x,
+            scenePointer.y,
+          );
+
+          pointerDownState.hit.element = hitElement;
+        }
         this.eraseElements(pointerDownState);
         return;
       }
@@ -5584,7 +5603,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.isMobile &&
+            this.deviceType.isMobile &&
               navigator.clipboard && {
                 name: "paste",
                 perform: (elements, appStates) => {
@@ -5595,7 +5614,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.isMobile && navigator.clipboard && separator,
+            this.deviceType.isMobile && navigator.clipboard && separator,
             probablySupportsClipboardBlob &&
               elements.length > 0 &&
               actionCopyAsPng,
@@ -5641,9 +5660,9 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.isMobile && actionCut,
-            this.isMobile && navigator.clipboard && actionCopy,
-            this.isMobile &&
+            this.deviceType.isMobile && actionCut,
+            this.deviceType.isMobile && navigator.clipboard && actionCopy,
+            this.deviceType.isMobile &&
               navigator.clipboard && {
                 name: "paste",
                 perform: (elements, appStates) => {
@@ -5654,7 +5673,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.isMobile && separator,
+            this.deviceType.isMobile && separator,
             ...options,
             separator,
             actionCopyStyles,
@@ -5865,11 +5884,14 @@ class App extends React.Component<AppProps, AppState> {
     //zsviczian
     const { width, height } =
       this.excalidrawContainerRef.current!.getBoundingClientRect();
-    this.isMobile =
-      width < MQ_MAX_WIDTH_PORTRAIT ||
-      (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE) ||
-      this.state.trayModeEnabled;
-    this.updateDOMRect();
+
+    this.deviceType = updateObject(this.deviceType, {
+      isMobile:
+        width < MQ_MAX_WIDTH_PORTRAIT ||
+        (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE) ||
+        this.state.trayModeEnabled, //zsviczian
+    });
+    //this.updateDOMRect();
   };
 
   private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {

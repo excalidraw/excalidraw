@@ -44,10 +44,10 @@
     "babel-loader": "8.2.3",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
-    "css-loader": "6.5.1",
+    "css-loader": "6.7.1",
     "file-loader": "6.2.0",
     "sass-loader": "12.4.0",
-    "ts-loader": "9.2.6",
+    "ts-loader": "9.2.8",
     "webpack": "5.66.0",
     "webpack-bundle-analyzer": "4.5.0",
     "webpack-cli": "4.9.2"
