@@ -229,29 +229,13 @@ export const setEraserCursor = (
 
   const drawCanvas = () => {
     eraserCanvasCache = document.createElement("canvas");
+    eraserCanvasCache.theme = theme;
     eraserCanvasCache.height = cursorImageSizePx;
     eraserCanvasCache.width = cursorImageSizePx;
     const context = eraserCanvasCache.getContext("2d")!;
-
-    context.beginPath();
-    context.arc(
-      eraserCanvasCache.width / 2,
-      eraserCanvasCache.height / 2,
-      5,
-      0,
-      2 * Math.PI,
-    );
-
     context.lineWidth = 2;
-    context.fillStyle = oc.white;
 
-    if (theme === THEME.DARK) {
-      context.strokeStyle = oc.white;
-    } else {
-      context.strokeStyle = oc.black;
-    }
-    context.stroke();
-
+    // outer circle
     context.beginPath();
     context.arc(
       eraserCanvasCache.width / 2,
@@ -260,21 +244,28 @@ export const setEraserCursor = (
       0,
       2 * Math.PI,
     );
-    context.strokeStyle = oc.white;
+    context.strokeStyle = theme === THEME.DARK ? oc.black : oc.white;
     context.stroke();
+    context.fillStyle = context.strokeStyle;
+    context.fill();
 
+    // inner circle
+    context.beginPath();
+    context.arc(
+      eraserCanvasCache.width / 2,
+      eraserCanvasCache.height / 2,
+      5,
+      0,
+      2 * Math.PI,
+    );
+    context.fillStyle = oc.white;
+    context.fill();
+    context.strokeStyle = theme === THEME.DARK ? oc.white : oc.black;
+    context.stroke();
     previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
   };
-  if (!eraserCanvasCache) {
+  if (!eraserCanvasCache || eraserCanvasCache.theme !== theme) {
     drawCanvas();
-  } else {
-    const context = eraserCanvasCache.getContext("2d")!;
-    const strokeStyle = context.strokeStyle;
-    if (theme === THEME.LIGHT && strokeStyle !== oc.black) {
-      drawCanvas();
-    } else if (theme === THEME.DARK && strokeStyle !== oc.white) {
-      drawCanvas();
-    }
   }
 
   setCursor(
