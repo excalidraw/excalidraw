@@ -1,13 +1,17 @@
+import oc from "open-color";
+
 import colors from "./colors";
 import {
   CURSOR_TYPE,
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
+  MIME_TYPES,
+  THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { Zoom } from "./types";
+import { AppState, DataURL, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 
@@ -215,21 +219,62 @@ export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
   }
 };
 
+let eraserCanvasCache: any;
+let previewDataURL: string;
+export const setEraserCursor = (
+  canvas: HTMLCanvasElement | null,
+  theme: AppState["theme"],
+) => {
+  const cursorImageSizePx = 20;
+
+  const drawCanvas = () => {
+    const isDarkTheme = theme === THEME.DARK;
+    eraserCanvasCache = document.createElement("canvas");
+    eraserCanvasCache.theme = theme;
+    eraserCanvasCache.height = cursorImageSizePx;
+    eraserCanvasCache.width = cursorImageSizePx;
+    const context = eraserCanvasCache.getContext("2d")!;
+    context.lineWidth = 1;
+    context.beginPath();
+    context.arc(
+      eraserCanvasCache.width / 2,
+      eraserCanvasCache.height / 2,
+      5,
+      0,
+      2 * Math.PI,
+    );
+    context.fillStyle = isDarkTheme ? oc.black : oc.white;
+    context.fill();
+    context.strokeStyle = isDarkTheme ? oc.white : oc.black;
+    context.stroke();
+    previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
+  };
+  if (!eraserCanvasCache || eraserCanvasCache.theme !== theme) {
+    drawCanvas();
+  }
+
+  setCursor(
+    canvas,
+    `url(${previewDataURL}) ${cursorImageSizePx / 2} ${
+      cursorImageSizePx / 2
+    }, auto`,
+  );
+};
+
 export const setCursorForShape = (
   canvas: HTMLCanvasElement | null,
-  shape: string,
+  appState: AppState,
 ) => {
   if (!canvas) {
     return;
   }
-  if (shape === "selection") {
+  if (appState.elementType === "selection") {
     resetCursor(canvas);
-  } else if (shape === "eraser") {
-    resetCursor(canvas);
-
+  } else if (appState.elementType === "eraser") {
+    setEraserCursor(canvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
-  } else if (shape !== "image") {
+  } else if (appState.elementType !== "image") {
     canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
