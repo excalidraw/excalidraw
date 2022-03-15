@@ -338,7 +338,13 @@ const LayerUI = ({
                       <HintViewer
                         appState={appState}
                         elements={elements}
-                        isMobile={deviceType.isMobile}
+                        isMobile={
+                          deviceType.isMobile ||
+                          (!(
+                            appState.viewModeEnabled || appState.zenModeEnabled
+                          ) &&
+                            appState.trayModeEnabled)
+                        } //zsviczian
                       />
                       {heading}
                       <Stack.Row gap={1}>
@@ -360,7 +366,14 @@ const LayerUI = ({
                       setAppState={setAppState}
                     />
                     {
-                      renderTopRightUI?.(deviceType.isMobile, appState) //zsviczian
+                      renderTopRightUI?.(
+                        deviceType.isMobile ||
+                          (!(
+                            appState.viewModeEnabled || appState.zenModeEnabled
+                          ) &&
+                            appState.trayModeEnabled), //zsviczian
+                        appState,
+                      ) //zsviczian
                     }
                   </Stack.Row>
                   {libraryMenu}
@@ -518,7 +531,9 @@ const LayerUI = ({
     </>
   );
 
-  return deviceType.isMobile ? (
+  return deviceType.isMobile ||
+    (!(appState.viewModeEnabled || appState.zenModeEnabled) &&
+      appState.trayModeEnabled) ? ( //zsviczian
     <>
       {dialogs}
       <MobileMenu

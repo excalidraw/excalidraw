@@ -496,7 +496,9 @@ class App extends React.Component<AppProps, AppState> {
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": viewModeEnabled,
           "excalidraw--mobile":
-            this.deviceType.isMobile || this.state.trayModeEnabled, //zsviczian
+            this.deviceType.isMobile ||
+            (!(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
+              this.state.trayModeEnabled), //zsviczian
         })}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -923,8 +925,7 @@ class App extends React.Component<AppProps, AppState> {
           isMobile:
             width < MQ_MAX_WIDTH_PORTRAIT ||
             (height < MQ_MAX_HEIGHT_LANDSCAPE &&
-              width < MQ_MAX_WIDTH_LANDSCAPE) ||
-            this.state.trayModeEnabled, //zsviczian
+              width < MQ_MAX_WIDTH_LANDSCAPE),
         });
         // refresh offsets
         // ---------------------------------------------------------------------
@@ -937,7 +938,7 @@ class App extends React.Component<AppProps, AppState> {
       );
       const handler = () => {
         this.deviceType = updateObject(this.deviceType, {
-          isMobile: mediaQuery.matches || this.state.trayModeEnabled, //zsviczian
+          isMobile: mediaQuery.matches,
         });
       };
       mediaQuery.addListener(handler);
@@ -5883,17 +5884,6 @@ class App extends React.Component<AppProps, AppState> {
 
   public refresh = () => {
     this.setState({ ...this.getCanvasOffsets() });
-    //zsviczian
-    const { width, height } =
-      this.excalidrawContainerRef.current!.getBoundingClientRect();
-
-    this.deviceType = updateObject(this.deviceType, {
-      isMobile:
-        width < MQ_MAX_WIDTH_PORTRAIT ||
-        (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE) ||
-        this.state.trayModeEnabled, //zsviczian
-    });
-    //this.updateDOMRect();
   };
 
   private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
