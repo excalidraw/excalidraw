@@ -2,8 +2,8 @@
   "labels": {
     "changeUseTex": "MathJax type",
     "toggleUseTex": "Toggle using AsciiMath",
-    "useTexTrue": "LaTeX",
-    "useTexFalse": "AsciiMath"
+    "useTexTrue": "Standard",
+    "useTexFalse": "Simplified"
   },
   "alerts": {
     "useTexTrue": "Using LaTeX for math mode.",
