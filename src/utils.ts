@@ -233,14 +233,14 @@ export const setEraserCursor = (
     eraserCanvasCache.height = cursorImageSizePx;
     eraserCanvasCache.width = cursorImageSizePx;
     const context = eraserCanvasCache.getContext("2d")!;
-    context.lineWidth = 2;
+    context.lineWidth = 1;
 
     // outer circle
     context.beginPath();
     context.arc(
       eraserCanvasCache.width / 2,
       eraserCanvasCache.height / 2,
-      7,
+      6,
       0,
       2 * Math.PI,
     );
