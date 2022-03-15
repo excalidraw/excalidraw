@@ -924,6 +924,7 @@ export const renderElementToSvg = (
       break;
     }
     case "freedraw": {
+      generateElementShape(element, generator);
       generateFreeDrawShape(element);
       const opacity = element.opacity / 100;
       const shape = getShapeForElement(element);

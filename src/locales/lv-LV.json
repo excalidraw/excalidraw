@@ -64,6 +64,7 @@
     "cartoonist": "Karikatūrists",
     "fileTitle": "Datnes nosaukums",
     "colorPicker": "Krāsu atlasītājs",
+    "canvasColors": "Izmantots tāfelei",
     "canvasBackground": "Ainas fons",
     "drawingCanvas": "Tāfele",
     "layers": "Slāņi",
@@ -179,7 +180,8 @@
     "imageInsertError": "Nevarēja ievietot attēlu. Mēģiniet vēlāk...",
     "fileTooBig": "Datne ir par lielu. Lielākais atļautais izmērs ir {{maxSize}}.",
     "svgImageInsertError": "Nevarēja ievietot SVG attēlu. Šķiet, ka SVG marķējums nav derīgs.",
-    "invalidSVGString": "Nederīgs SVG."
+    "invalidSVGString": "Nederīgs SVG.",
+    "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz."
   },
   "toolBar": {
     "selection": "Atlase",

@@ -180,7 +180,8 @@
     "imageInsertError": "Couldn't insert image. Try again later...",
     "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
-    "invalidSVGString": "Invalid SVG."
+    "invalidSVGString": "Invalid SVG.",
+    "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again."
   },
   "toolBar": {
     "selection": "Selection",
@@ -195,7 +196,8 @@
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
     "penMode": "Prevent pinch-zoom and accept freedraw input only from pen",
-    "link": "Add/ Update link for a selected shape"
+    "link": "Add/ Update link for a selected shape",
+    "eraser": "Eraser"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -220,7 +222,8 @@
     "placeImage": "Click to place the image, or click and drag to set its size manually",
     "publishLibrary": "Publish your own library",
     "bindTextToElement": "Press enter to add text",
-    "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging"
+    "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
+    "eraserRevert": "Hold Alt to revert the elements marked for deletion"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
