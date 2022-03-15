@@ -441,3 +441,8 @@ export type ExcalidrawImperativeAPI = {
   bringToFront: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   restore: InstanceType<typeof App>["restore"]; //zsviczian
 };
+
+export type DeviceType = {
+  isMobile: boolean;
+  isTouchScreen: boolean;
+};
