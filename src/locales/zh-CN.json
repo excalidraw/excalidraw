@@ -197,7 +197,7 @@
     "lock": "绘制后保持所选的工具栏状态",
     "penMode": "禁用手势缩放并只接收来自触控笔的输入",
     "link": "为选中的形状添加/更新链接",
-    "eraser": ""
+    "eraser": "橡皮"
   },
   "headings": {
     "canvasActions": "画布动作",
@@ -223,7 +223,7 @@
     "publishLibrary": "发布您自己的素材库",
     "bindTextToElement": "按下 Enter 以添加文本",
     "deepBoxSelect": "按住 CtrlOrCmd 以深度选择，并避免拖拽",
-    "eraserRevert": ""
+    "eraserRevert": "按住 Alt 以反选被标记删除的元素"
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
