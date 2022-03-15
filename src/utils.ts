@@ -220,6 +220,7 @@ export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
 };
 
 let eraserCanvasCache: any;
+let previewDataURL: string;
 export const setEraserCursor = (
   canvas: HTMLCanvasElement | null,
   theme: AppState["theme"],
@@ -245,6 +246,7 @@ export const setEraserCursor = (
       2 * Math.PI,
     );
     context.stroke();
+    previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
   };
   if (!eraserCanvasCache) {
     drawCanvas();
@@ -257,8 +259,6 @@ export const setEraserCursor = (
       drawCanvas();
     }
   }
-
-  const previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
 
   setCursor(canvas, `url(${previewDataURL}) 4 4, auto`);
 };
