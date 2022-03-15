@@ -228,28 +228,13 @@ export const setEraserCursor = (
   const cursorImageSizePx = 20;
 
   const drawCanvas = () => {
+    const isDarkTheme = theme === THEME.DARK;
     eraserCanvasCache = document.createElement("canvas");
     eraserCanvasCache.theme = theme;
     eraserCanvasCache.height = cursorImageSizePx;
     eraserCanvasCache.width = cursorImageSizePx;
     const context = eraserCanvasCache.getContext("2d")!;
     context.lineWidth = 1;
-
-    // outer circle
-    context.beginPath();
-    context.arc(
-      eraserCanvasCache.width / 2,
-      eraserCanvasCache.height / 2,
-      6,
-      0,
-      2 * Math.PI,
-    );
-    context.strokeStyle = theme === THEME.DARK ? oc.black : oc.white;
-    context.stroke();
-    context.fillStyle = context.strokeStyle;
-    context.fill();
-
-    // inner circle
     context.beginPath();
     context.arc(
       eraserCanvasCache.width / 2,
@@ -258,9 +243,9 @@ export const setEraserCursor = (
       0,
       2 * Math.PI,
     );
-    context.fillStyle = oc.white;
+    context.fillStyle = isDarkTheme ? oc.black : oc.white;
     context.fill();
-    context.strokeStyle = theme === THEME.DARK ? oc.white : oc.black;
+    context.strokeStyle = isDarkTheme ? oc.white : oc.black;
     context.stroke();
     previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
   };
