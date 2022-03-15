@@ -914,7 +914,11 @@ class App extends React.Component<AppProps, AppState> {
       const mediaQuery = window.matchMedia(
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
-      const handler = () => (this.deviceType.isMobile = mediaQuery.matches);
+      const handler = () => {
+        this.deviceType = updateObject(this.deviceType, {
+          isMobile: mediaQuery.matches,
+        });
+      };
       mediaQuery.addListener(handler);
       this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
     }
