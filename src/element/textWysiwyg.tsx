@@ -562,7 +562,7 @@ export const textWysiwyg = ({
       event.target instanceof HTMLInputElement &&
       event.target.closest(".color-picker-input") &&
       isWritableElement(event.target);
-    const isShapeActionsPanel =
+    const isShapeActionsPanel = //zsviczian
       (event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
       (event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
@@ -571,7 +571,7 @@ export const textWysiwyg = ({
     if (
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-        isShapeActionsPanel &&
+        isShapeActionsPanel && //zsviczian
         !isWritableElement(event.target)) ||
       isTargetColorPicker
     ) {

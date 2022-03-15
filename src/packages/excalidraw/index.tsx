@@ -198,10 +198,11 @@ export {
   loadLibraryFromBlob,
   loadFromBlob,
   getFreeDrawSvgPath,
-  getCommonBoundingBox,
-  getMaximumGroups,
-  intersectElementWithLine,
-  determineFocusDistance,
+  getCommonBoundingBox, //zsviczian
+  getMaximumGroups, //zsviczian
+  intersectElementWithLine, //zsviczian
+  determineFocusDistance, //zsviczian
+  measureText, //zsviczian
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
 
