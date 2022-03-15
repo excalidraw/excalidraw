@@ -8,13 +8,7 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
-import {
-  AppProps,
-  AppState,
-  ExcalidrawProps,
-  BinaryFiles,
-  DeviceType,
-} from "../types";
+import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
@@ -101,7 +95,7 @@ const LayerUI = ({
   id,
   onImageAction,
 }: LayerUIProps) => {
-  const deviceType: DeviceType = useDeviceType();
+  const deviceType = useDeviceType();
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
