@@ -185,11 +185,13 @@ export const ShapesSwitcher = ({
   elementType,
   setAppState,
   onImageAction,
+  appState,
 }: {
   canvas: HTMLCanvasElement | null;
   elementType: AppState["elementType"];
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
+  appState: AppState;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
@@ -217,7 +219,7 @@ export const ShapesSwitcher = ({
               multiElement: null,
               selectedElementIds: {},
             });
-            setCursorForShape(canvas, value);
+            setCursorForShape(canvas, { ...appState, elementType: value });
             if (value === "image") {
               onImageAction({ pointerType });
             }
