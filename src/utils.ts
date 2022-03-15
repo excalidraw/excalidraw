@@ -230,13 +230,8 @@ export const setEraserCursor = (
     eraserCanvasCache = document.createElement("canvas");
     eraserCanvasCache.height = cursorImageSizePx;
     eraserCanvasCache.width = cursorImageSizePx;
-
     const context = eraserCanvasCache.getContext("2d")!;
-    if (theme === THEME.DARK) {
-      context.strokeStyle = oc.white;
-    } else {
-      context.strokeStyle = oc.black;
-    }
+
     context.beginPath();
     context.arc(
       eraserCanvasCache.width / 2,
@@ -245,6 +240,15 @@ export const setEraserCursor = (
       0,
       2 * Math.PI,
     );
+
+    context.lineWidth = 2;
+    context.fillStyle = oc.white;
+
+    if (theme === THEME.DARK) {
+      context.strokeStyle = oc.white;
+    } else {
+      context.strokeStyle = oc.black;
+    }
     context.stroke();
     previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
   };
@@ -260,7 +264,7 @@ export const setEraserCursor = (
     }
   }
 
-  setCursor(canvas, `url(${previewDataURL}) 4 4, auto`);
+  setCursor(canvas, `url(${previewDataURL}) 0 0, auto`);
 };
 
 export const setCursorForShape = (
