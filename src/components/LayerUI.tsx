@@ -343,6 +343,7 @@ const LayerUI = ({
                       {heading}
                       <Stack.Row gap={1}>
                         <ShapesSwitcher
+                          appState={appState}
                           canvas={canvas}
                           elementType={appState.elementType}
                           setAppState={setAppState}
