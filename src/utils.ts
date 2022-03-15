@@ -1,3 +1,5 @@
+import oc from "open-color";
+
 import colors from "./colors";
 import {
   CURSOR_TYPE,
@@ -230,9 +232,9 @@ export const setEraserCursor = (
 
     const context = eraserCanvasCache.getContext("2d")!;
     if (theme === THEME.DARK) {
-      context.strokeStyle = "#fff";
+      context.strokeStyle = oc.white;
     } else {
-      context.strokeStyle = "#000";
+      context.strokeStyle = oc.black;
     }
     context.beginPath();
     context.arc(
@@ -249,9 +251,9 @@ export const setEraserCursor = (
   } else {
     const context = eraserCanvasCache.getContext("2d")!;
     const strokeStyle = context.strokeStyle;
-    if (theme === THEME.LIGHT && strokeStyle !== "#000000") {
+    if (theme === THEME.LIGHT && strokeStyle !== oc.black) {
       drawCanvas();
-    } else if (theme === THEME.DARK && strokeStyle !== "#ffffff") {
+    } else if (theme === THEME.DARK && strokeStyle !== oc.white) {
       drawCanvas();
     }
   }
