@@ -2,7 +2,7 @@ import clsx from "clsx";
 import oc from "open-color";
 import { useEffect, useRef, useState } from "react";
 import { MIME_TYPES } from "../constants";
-import { useIsMobile } from "../components/App";
+import { useDeviceType } from "../components/App";
 import { exportToSvg } from "../scene/export";
 import { BinaryFiles, LibraryItem } from "../types";
 import "./LibraryUnit.scss";
@@ -66,7 +66,7 @@ export const LibraryUnit = ({
   }, [elements, files]);
 
   const [isHovered, setIsHovered] = useState(false);
-  const isMobile = useIsMobile();
+  const isMobile = useDeviceType().isMobile;
   const adder = isPending && (
     <div className="library-unit__adder">{PLUS_ICON}</div>
   );
