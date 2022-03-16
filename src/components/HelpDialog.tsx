@@ -139,7 +139,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
         <Section title={t("helpDialog.shortcuts")}>
           <Columns>
             <Column>
-              <ShortcutIsland caption={t("helpDialog.shapes")}>
+              <ShortcutIsland caption={t("helpDialog.tools")}>
                 <Shortcut
                   label={t("toolBar.selection")}
                   shortcuts={["V", "1"]}
@@ -159,6 +159,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
                 <Shortcut label={t("toolBar.image")} shortcuts={["9"]} />
                 <Shortcut label={t("toolBar.library")} shortcuts={["0"]} />
+                <Shortcut
+                  label={t("toolBar.eraser")}
+                  shortcuts={[getShortcutKey("E")]}
+                />
                 <Shortcut
                   label={t("helpDialog.editSelectedShape")}
                   shortcuts={[
@@ -405,10 +409,6 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut
                   label={t("labels.increaseFontSize")}
                   shortcuts={[getShortcutKey("CtrlOrCmd+Shift+>")]}
-                />
-                <Shortcut
-                  label={t("toolBar.eraser")}
-                  shortcuts={[getShortcutKey("E")]}
                 />
               </ShortcutIsland>
             </Column>
