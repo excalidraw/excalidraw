@@ -25,7 +25,6 @@ export const CODES = {
   X: "KeyX",
   Z: "KeyZ",
   R: "KeyR",
-  E: "KeyE",
 } as const;
 
 export const KEYS = {
