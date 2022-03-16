@@ -296,52 +296,52 @@
     "title": "Tøm lerretet"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "Publiser bibliotek",
+    "itemName": "Elementnamn",
+    "authorName": "Eigaren sitt namn",
+    "githubUsername": "GitHub-brukarnamn",
+    "twitterUsername": "Twitter-brukarnamn",
+    "libraryName": "Biblioteknamn",
+    "libraryDesc": "Bibliotekskildring",
+    "website": "Nettstad",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "authorName": "Namnet eller brukarnamnet ditt",
+      "libraryName": "Namnet på biblioteket ditt",
+      "libraryDesc": "Skildring av biblioteket ditt sånn at andre forstår bruken av det",
+      "githubHandle": "GitHub-brukarnamn (valfritt), slik at du kan redigere bibiloteket når det er sendt inn til vurdering",
+      "twitterHandle": "Twitter-brukarnamn (valfritt), så vi veit kven vi skal kreditere på Twitter",
+      "website": "Lenke til den personlege nettstaden din eller ein anna stad (valfritt)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Kravt",
+      "website": "Fyll inn ein gyldig URL"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Send inn biblioteket ditt til inkludering i ",
+      "link": "den offentlege bibliotek-kjeldekoda",
+      "post": "slik at andre kan bruke det i teikningane deira."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Biblioteket må godkjennast manuelt fyrst. Ver vennleg å lese ",
+      "link": "retningslinjene",
+      "post": " før du sender inn. Du kjem til å trenge ein GitHub-konto for å kommunisere og gjere endringar dersom kravt, men det er ikkje strengt naudsynt."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Ved å sende inn godkjenner du at biblioteket vert publisert under ",
+      "link": "MIT-lisensen, ",
+      "post": "som kort sagt betyr at kven som helst kan bruke det utan avgrensingar."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Kvart bibliotekselement må ha eit eige namn, slik at det er mogleg å filtrere. Dei følgande bibliotekselementa blir inkludert:",
+    "atleastOneLibItem": "Ver vennleg å markere minst eitt bibliotekselement for å starte"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Bibliotek innsendt",
+    "content": "Tusen takk {{authorName}}! Biblioteket ditt har blitt sendt inn til gjennomgang. Du kan halde styr på status",
+    "link": "her"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Tilbakestill bibliotek",
+    "removeItemsFromLib": "Fjern valde element frå biblioteket"
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei.",
@@ -363,7 +363,7 @@
     "width": "Breidde"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Lagt til i bibliotek",
     "copyStyles": "Kopierte stilane.",
     "copyToClipboard": "Kopiert til utklippstavla.",
     "copyToClipboardAsPng": "Kopierte {{exportSelection}} til utklippstavla som PNG\n({{exportColorScheme}})",
