@@ -128,14 +128,41 @@ For collaboration, you will need to set up [collab server](https://github.com/ex
 
 #### Commands
 
-| Command            | Description                       |
-| ------------------ | --------------------------------- |
-| `yarn`             | Install the dependencies          |
-| `yarn start`       | Run the project                   |
-| `yarn fix`         | Reformat all files with Prettier  |
-| `yarn test`        | Run tests                         |
-| `yarn test:update` | Update test snapshots             |
-| `yarn test:code`   | Test for formatting with Prettier |
+##### Install the dependencies
+
+```
+yarn
+```
+
+##### Run the project
+
+```
+yarn start
+```
+
+##### Reformat all files with Prettier
+
+```
+yarn fix
+```
+
+##### Run tests
+
+```
+yarn test
+```
+
+##### Update test snapshots
+
+```
+yarn test:update
+```
+
+##### Test for formatting with Prettier
+
+```
+yarn test:code
+```
 
 #### Docker Compose
 
