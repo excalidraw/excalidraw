@@ -40,7 +40,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "ellipse",
-    key: KEYS.E,
+    key: KEYS.O,
   },
   {
     icon: (

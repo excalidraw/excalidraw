@@ -304,13 +304,13 @@ export const actionErase = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => event.shiftKey && event.code === CODES.E,
+  keyTest: (event) => event.code === CODES.E,
   PanelComponent: ({ elements, appState, updateData, data }) => (
     <ToolButton
       type="button"
       icon={eraser}
       className={clsx("eraser", { active: isEraserActive(appState) })}
-      title={`${t("toolBar.eraser")}-${getShortcutKey("Shift+E")}`}
+      title={`${t("toolBar.eraser")}-${getShortcutKey("E")}`}
       aria-label={t("toolBar.eraser")}
       onClick={() => {
         updateData(null);

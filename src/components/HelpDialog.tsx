@@ -149,7 +149,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   shortcuts={["R", "2"]}
                 />
                 <Shortcut label={t("toolBar.diamond")} shortcuts={["D", "3"]} />
-                <Shortcut label={t("toolBar.ellipse")} shortcuts={["E", "4"]} />
+                <Shortcut label={t("toolBar.ellipse")} shortcuts={["O", "4"]} />
                 <Shortcut label={t("toolBar.arrow")} shortcuts={["A", "5"]} />
                 <Shortcut label={t("toolBar.line")} shortcuts={["P", "6"]} />
                 <Shortcut
@@ -408,7 +408,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 />
                 <Shortcut
                   label={t("toolBar.eraser")}
-                  shortcuts={[getShortcutKey("Shift+E")]}
+                  shortcuts={[getShortcutKey("E")]}
                 />
               </ShortcutIsland>
             </Column>
