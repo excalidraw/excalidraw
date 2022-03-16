@@ -165,7 +165,7 @@ export const actionFinalize = register({
         (!appState.draggingElement && appState.multiElement === null))) ||
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
-  PanelComponent: ({ appState, updateData }) => (
+  PanelComponent: ({ appState, updateData, data }) => (
     <ToolButton
       type="button"
       icon={done}
@@ -173,6 +173,7 @@ export const actionFinalize = register({
       aria-label={t("buttons.done")}
       onClick={updateData}
       visible={appState.multiElement != null}
+      size={data?.size || "medium"}
     />
   ),
 });

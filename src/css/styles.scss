@@ -477,6 +477,15 @@
     font-family: var(--ui-font);
   }
 
+  .finalize-button {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 0.4em;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-inline-start: 0.6em;
+  }
+
   .undo-redo-buttons,
   .eraser-buttons {
     display: grid;
