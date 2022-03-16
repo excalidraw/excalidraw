@@ -35,7 +35,7 @@
     "arrowhead_arrow": "Pil",
     "arrowhead_bar": "Stolpe",
     "arrowhead_dot": "Prikk",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "Trekant",
     "fontSize": "Skriftstorleik",
     "fontFamily": "Skrifttype",
     "onlySelected": "Kun valde",
@@ -64,7 +64,7 @@
     "cartoonist": "Teiknar",
     "fileTitle": "Filnamn",
     "colorPicker": "Fargeveljar",
-    "canvasColors": "",
+    "canvasColors": "Brukt på lerretet",
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
     "layers": "Lag",
@@ -102,15 +102,15 @@
     "showStroke": "Vis fargeveljar for linjer",
     "showBackground": "Vis fargeveljar for bakgrunn",
     "toggleTheme": "Veksle tema",
-    "personalLib": "",
-    "excalidrawLib": "",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
-    "unbindText": "",
+    "personalLib": "Personleg bibliotek",
+    "excalidrawLib": "Excalidraw-bibliotek",
+    "decreaseFontSize": "Gjer skriftstorleik mindre",
+    "increaseFontSize": "Gjer skriftstorleik større",
+    "unbindText": "Avbind tekst",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Rediger lenke",
+      "create": "Lag lenke",
+      "label": "Lenke"
     }
   },
   "buttons": {
@@ -147,10 +147,10 @@
     "exitZenMode": "Avslutt zen-modus",
     "cancel": "Avbryt",
     "clear": "Tøm",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "remove": "Fjern",
+    "publishLibrary": "Publiser",
+    "submit": "Send inn",
+    "confirm": "Stadfest"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
@@ -172,7 +172,7 @@
     "cannotRestoreFromImage": "Scena kunne ikkje gjenopprettast frå denne biletfila",
     "invalidSceneUrl": "Kunne ikkje hente noko scene frå den URL-en. Ho er anten øydelagd eller inneheld ikkje gyldig Excalidraw JSON-data.",
     "resetLibrary": "Dette vil fjerne alt innhald frå biblioteket. Er du sikker?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "Slette {{count}} element frå biblioteket?",
     "invalidEncryptionKey": "Krypteringsnøkkelen må ha 22 teikn. Sanntidssamarbeid er deaktivert."
   },
   "errors": {
@@ -180,8 +180,8 @@
     "imageInsertError": "Kunne ikkje sette inn biletet. Prøv igjen seinare...",
     "fileTooBig": "Fila er for stor. Maksimal tillate storleik er {{maxSize}}.",
     "svgImageInsertError": "Kunne ikkje sette inn SVG-biletet. SVG-koden ser ugyldig ut.",
-    "invalidSVGString": "",
-    "cannotResolveCollabServer": ""
+    "invalidSVGString": "Ugyldig SVG.",
+    "cannotResolveCollabServer": "Kunne ikkje kople til samarbeidsserveren. Ver vennleg å oppdatere inn sida og prøv på nytt."
   },
   "toolBar": {
     "selection": "Vel",
@@ -195,9 +195,9 @@
     "text": "Tekst",
     "library": "Bibliotek",
     "lock": "Hald fram med valt verktøy",
-    "penMode": "",
-    "link": "",
-    "eraser": ""
+    "penMode": "Forhindre zoom ved kniping og godta frihandsteikning kun frå penn",
+    "link": "Legg til/ oppdater lenke til valt figur",
+    "eraser": "Viskelêr"
   },
   "headings": {
     "canvasActions": "Handlingar: lerret",
@@ -205,7 +205,7 @@
     "shapes": "Formar"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "For å flytte lerretet, hald inne musehjulet eller mellomromstasten medan du dreg",
     "linearElement": "Klikk for å starte linje med fleire punkt, eller drag for ei enkel linje",
     "freeDraw": "Klikk og drag, slepp når du er ferdig",
     "text": "Tips: du kan òg leggje til tekst ved å dobbeltklikke kor som helst med utvalgsverktyet",
@@ -217,13 +217,13 @@
     "resizeImage": "Du kan endre storleiken fritt ved å halde inne SHIFT,\nhald ALT for å endre storleik frå sentrum",
     "rotate": "Du kan låse vinklane ved å halde SHIFT medan du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkt",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Trykk på Slett for å fjerne punkt(a),\nCtrl / Cmd+D for å duplisere, eller drag for å flytte",
+    "lineEditor_nothingSelected": "Vel eit punkt å redigere (hald inne SHIFT for å velje fleire),\neller hald inne Alt og klikk for å legge til nye punkt",
     "placeImage": "Klikk for å plassere biletet, eller klikk og drag for å velje storleik manuelt",
-    "publishLibrary": "",
-    "bindTextToElement": "",
-    "deepBoxSelect": "",
-    "eraserRevert": ""
+    "publishLibrary": "Publiser ditt eige bibliotek",
+    "bindTextToElement": "Trykk på enter for å legge til tekst",
+    "deepBoxSelect": "Hald inne Ctrl / Cmd for å velje djupt, og forhindre flytting",
+    "eraserRevert": "Hald inne Alt for å reversere markering av element for sletting"
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikkje vise førehandsvising",
@@ -270,8 +270,8 @@
   "helpDialog": {
     "blog": "Les bloggen vår",
     "click": "klikk",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Marker djupt",
+    "deepBoxSelect": "Marker djupt inni boksen og forhindr flytting",
     "curvedArrow": "Boga pil",
     "curvedLine": "Boga linje",
     "documentation": "Dokumentasjon",
@@ -293,7 +293,7 @@
     "zoomToSelection": "Zoom til utval"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Tøm lerretet"
   },
   "publishDialog": {
     "title": "",
