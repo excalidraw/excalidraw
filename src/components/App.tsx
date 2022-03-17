@@ -27,6 +27,7 @@ import {
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
+  actionBindText,
   actionUngroup,
   actionLink,
 } from "../actions";
@@ -245,7 +246,10 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
 } from "../element/textElement";
-import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
+import {
+  getClosestBindableContainer,
+  isHittingElementNotConsideringBoundingBox,
+} from "../element/collision";
 import {
   normalizeLink,
   showHyperlinkTooltip,
@@ -5468,10 +5472,19 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
     } else if (type === "element") {
-      const elementsWithUnbindedText = getSelectedElements(
-        elements,
-        this.state,
-      ).some((element) => !hasBoundTextElement(element));
+      const selectedElements = getSelectedElements(elements, this.state);
+      const elementsWithUnbindedText = selectedElements.some(
+        (element) => !hasBoundTextElement(element),
+      );
+      const singleTextElement =
+        selectedElements.length === 1 && isTextElement(selectedElements[0]);
+      let closestContainer;
+      if (singleTextElement) {
+        closestContainer = getClosestBindableContainer(
+          selectedElements[0],
+          this.scene.getElements(),
+        );
+      }
       if (this.state.viewModeEnabled) {
         ContextMenu.push({
           options: [navigator.clipboard && actionCopy, ...options],
@@ -5506,6 +5519,7 @@ class App extends React.Component<AppProps, AppState> {
             separator,
             maybeGroupAction && actionGroup,
             !elementsWithUnbindedText && actionUnbindText,
+            closestContainer && actionBindText,
             maybeUngroupAction && actionUngroup,
             (maybeGroupAction || maybeUngroupAction) && separator,
             actionAddToLibrary,
