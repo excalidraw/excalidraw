@@ -4610,12 +4610,15 @@ class App extends React.Component<AppProps, AppState> {
             },
             this.state,
           );
-          const hitElement = this.getElementAtPosition(
+          const hitElements = this.getElementsAtPosition(
             scenePointer.x,
             scenePointer.y,
           );
 
-          pointerDownState.hit.element = hitElement;
+          hitElements.forEach(
+            (hitElement) =>
+              (pointerDownState.elementIdsToErase[hitElement.id] = true),
+          );
         }
         this.eraseElements(pointerDownState);
         return;
@@ -4761,16 +4764,12 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private eraseElements = (pointerDownState: PointerDownState) => {
-    const hitElement = pointerDownState.hit.element;
     const elements = this.scene.getElements().map((ele) => {
       if (pointerDownState.elementIdsToErase[ele.id]) {
         return newElementWith(ele, { isDeleted: true });
-      } else if (hitElement && ele.id === hitElement.id) {
-        return newElementWith(ele, { isDeleted: true });
       } else if (
         isBoundToContainer(ele) &&
-        (pointerDownState.elementIdsToErase[ele.containerId] ||
-          (hitElement && ele.containerId === hitElement.id))
+        pointerDownState.elementIdsToErase[ele.containerId]
       ) {
         return newElementWith(ele, { isDeleted: true });
       }

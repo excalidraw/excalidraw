@@ -319,12 +319,13 @@ export const actionErase = register({
       commitToHistory: true,
     };
   },
+  keyTest: (event) => event.key === KEYS.E,
   PanelComponent: ({ elements, appState, updateData, data }) => (
     <ToolButton
       type="button"
       icon={eraser}
       className={clsx("eraser", { active: isEraserActive(appState) })}
-      title={t("toolBar.eraser")}
+      title={`${t("toolBar.eraser")}-${getShortcutKey("E")}`}
       aria-label={t("toolBar.eraser")}
       onClick={() => {
         updateData(null);
