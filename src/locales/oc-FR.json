@@ -64,7 +64,7 @@
     "cartoonist": "Dessenhaire",
     "fileTitle": "Nom del fichièr",
     "colorPicker": "Selector de color",
-    "canvasColors": "Utilizada suls canbanassses",
+    "canvasColors": "Utilizada suls canabassses",
     "canvasBackground": "Rèireplan del canabàs",
     "drawingCanvas": "Zòna de dessenh",
     "layers": "Calques",
@@ -106,7 +106,7 @@
     "excalidrawLib": "Bibliotèca Excalidraw",
     "decreaseFontSize": "Reduire talha poliça",
     "increaseFontSize": "Aumentar talha poliça",
-    "unbindText": "",
+    "unbindText": "Dessociar lo tèxte",
     "link": {
       "edit": "Modificar lo ligam",
       "create": "Crear un ligam",
@@ -181,7 +181,7 @@
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
     "invalidSVGString": "SVG invalid.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar."
   },
   "toolBar": {
     "selection": "Seleccion",
