@@ -64,7 +64,7 @@
     "cartoonist": "Dessenhaire",
     "fileTitle": "Nom del fichièr",
     "colorPicker": "Selector de color",
-    "canvasColors": "",
+    "canvasColors": "Utilizada suls canbanassses",
     "canvasBackground": "Rèireplan del canabàs",
     "drawingCanvas": "Zòna de dessenh",
     "layers": "Calques",
@@ -197,7 +197,7 @@
     "lock": "Mantenir activa l’aisina aprèp dessenhar",
     "penMode": "",
     "link": "",
-    "eraser": ""
+    "eraser": "Goma"
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -221,7 +221,7 @@
     "lineEditor_nothingSelected": "Seleccionar un punt d’editar (manténer Maj. per ne seleccionar mantun),\no manténer Alt e clicar per n’apondre de novèls",
     "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament",
     "publishLibrary": "Publicar vòstra pròpria bibliotèca",
-    "bindTextToElement": "",
+    "bindTextToElement": "Quichatz Entrada per apondre de tèxte",
     "deepBoxSelect": "",
     "eraserRevert": ""
   },
@@ -283,7 +283,7 @@
     "howto": "Seguissètz nòstras guidas",
     "or": "o",
     "preventBinding": "Empachar la fixacion de sagetas",
-    "tools": "",
+    "tools": "Aisinas",
     "shortcuts": "Acorchis clavièr",
     "textFinish": "Terminar l’edicion (editor de tèxt)",
     "textNewLine": "Apondre linha novèl (editor de tèxt)",
