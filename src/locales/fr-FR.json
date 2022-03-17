@@ -223,7 +223,7 @@
     "publishLibrary": "Publier votre propre bibliothèque",
     "bindTextToElement": "Appuyer sur Entrée pour ajouter du texte",
     "deepBoxSelect": "Maintenir CtrlOuCmd pour sélectionner dans les groupes, et empêcher le déplacement",
-    "eraserRevert": ""
+    "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression"
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
@@ -283,7 +283,7 @@
     "howto": "Suivez nos guides",
     "or": "ou",
     "preventBinding": "Empêcher la liaison de flèche",
-    "tools": "",
+    "tools": "Outils",
     "shortcuts": "Raccourcis clavier",
     "textFinish": "Terminer l'édition (éditeur de texte)",
     "textNewLine": "Ajouter une nouvelle ligne (éditeur de texte)",
