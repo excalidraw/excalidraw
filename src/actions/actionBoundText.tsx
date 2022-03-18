@@ -1,12 +1,12 @@
 import { VERTICAL_ALIGN } from "../constants";
-import { getNonDeletedElements } from "../element";
-import { getClosestBindableContainer } from "../element/collision";
+import { getNonDeletedElements, isTextElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import {
   getBoundTextElement,
   measureText,
   redrawTextBoundingBox,
 } from "../element/textElement";
+import { isTextBindableContainer } from "../element/typeChecks";
 import {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
@@ -56,34 +56,44 @@ export const actionBindText = register({
   name: "bindText",
   contextItemLabel: "labels.bindText",
   perform: (elements, appState) => {
-    const textElement = getSelectedElements(
+    const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
-    )[0] as ExcalidrawTextElement;
-    const closestContainer = getClosestBindableContainer(
-      textElement,
-      elements,
-    )! as ExcalidrawTextContainer;
-    mutateElement(textElement, {
-      containerId: closestContainer.id,
+    );
+
+    let textElement: ExcalidrawTextElement;
+    let container: ExcalidrawTextContainer;
+
+    if (
+      isTextElement(selectedElements[0]) &&
+      isTextBindableContainer(selectedElements[1])
+    ) {
+      textElement = selectedElements[0];
+      container = selectedElements[1];
+    } else {
+      textElement = selectedElements[1] as ExcalidrawTextElement;
+      container = selectedElements[0] as ExcalidrawTextContainer;
+    }
+    mutateElement(textElement!, {
+      containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
     });
-    mutateElement(closestContainer, {
-      boundElements: (closestContainer.boundElements || []).concat({
+    mutateElement(container!, {
+      boundElements: (container.boundElements || []).concat({
         type: "text",
         id: textElement.id,
       }),
     });
-    redrawTextBoundingBox(textElement, closestContainer);
+    redrawTextBoundingBox(textElement, container);
     const updatedElements = elements.slice();
     const textElementIndex = updatedElements.findIndex(
       (ele) => ele.id === textElement.id,
     );
     updatedElements.splice(textElementIndex, 1);
     const containerIndex = updatedElements.findIndex(
-      (ele) => ele.id === closestContainer.id,
+      (ele) => ele.id === container!.id,
     );
-    updatedElements.splice(containerIndex + 1, 0, textElement);
+    updatedElements.splice(containerIndex + 1, 0, textElement!);
     return {
       elements: updatedElements,
       appState,

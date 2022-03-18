@@ -32,12 +32,8 @@ import { Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
-import {
-  hasBoundTextElement,
-  isImageElement,
-  isTextBindableContainer,
-} from "./typeChecks";
-import { getElementBounds, isTextElement } from ".";
+import { hasBoundTextElement, isImageElement } from "./typeChecks";
+import { isTextElement } from ".";
 import { isTransparent } from "../utils";
 
 const isElementDraggableFromInside = (
@@ -925,25 +921,4 @@ const hitTestRoughShape = (
 
     return false;
   });
-};
-
-export const getClosestBindableContainer = (
-  elementToCheck: ExcalidrawElement,
-  elements: readonly NonDeletedExcalidrawElement[],
-) => {
-  let minDistance = Infinity;
-  let closestContainer;
-  const [eleX1, eleY1, eleX2, eleY2] = getElementBounds(elementToCheck);
-  const from = { x: (eleX1 + eleX2) / 2, y: (eleY1 + eleY2) / 2 };
-  elements.forEach((element) => {
-    if (isTextBindableContainer(element)) {
-      const [x1, y1, x2, y2] = getElementBounds(element);
-      const distance = distance2d((x1 + x2) / 2, (y1 + y2) / 2, from.x, from.y);
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestContainer = element;
-      }
-    }
-  });
-  return closestContainer;
 };

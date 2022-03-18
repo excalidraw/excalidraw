@@ -246,10 +246,7 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
 } from "../element/textElement";
-import {
-  getClosestBindableContainer,
-  isHittingElementNotConsideringBoundingBox,
-} from "../element/collision";
+import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
   normalizeLink,
   showHyperlinkTooltip,
@@ -5476,14 +5473,18 @@ class App extends React.Component<AppProps, AppState> {
       const elementsWithUnbindedText = selectedElements.some(
         (element) => !hasBoundTextElement(element),
       );
-      const singleTextElement =
-        selectedElements.length === 1 && isTextElement(selectedElements[0]);
-      let closestContainer;
-      if (singleTextElement) {
-        closestContainer = getClosestBindableContainer(
-          selectedElements[0],
-          this.scene.getElements(),
-        );
+      let allowBinding = false;
+      if (selectedElements.length === 2) {
+        const textElement =
+          isTextElement(selectedElements[0]) ||
+          isTextElement(selectedElements[1]);
+
+        const bindingContainer =
+          isTextBindableContainer(selectedElements[0]) ||
+          isTextBindableContainer(selectedElements[1]);
+        if (textElement && bindingContainer) {
+          allowBinding = true;
+        }
       }
       if (this.state.viewModeEnabled) {
         ContextMenu.push({
@@ -5519,7 +5520,7 @@ class App extends React.Component<AppProps, AppState> {
             separator,
             maybeGroupAction && actionGroup,
             !elementsWithUnbindedText && actionUnbindText,
-            closestContainer && actionBindText,
+            allowBinding && actionBindText,
             maybeUngroupAction && actionUngroup,
             (maybeGroupAction || maybeUngroupAction) && separator,
             actionAddToLibrary,
