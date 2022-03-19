@@ -84,6 +84,7 @@ export type ActionName =
   | "zoomToSelection"
   | "changeFontFamily"
   | "changeTextAlign"
+  | "changeVerticalAlign"
   | "toggleFullScreen"
   | "toggleShortcuts"
   | "group"
@@ -107,7 +108,8 @@ export type ActionName =
   | "increaseFontSize"
   | "decreaseFontSize"
   | "unbindText"
-  | "link";
+  | "hyperlink"
+  | "eraser";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -142,6 +144,9 @@ export interface Action {
     appState: AppState,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
+  trackEvent?:
+    | boolean
+    | ((action: Action, type: "ui" | "keyboard" | "api", value: any) => void);
 }
 
 export interface ActionsManagerInterface {

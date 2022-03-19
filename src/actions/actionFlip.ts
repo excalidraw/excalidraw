@@ -155,7 +155,7 @@ const flipElement = (
     // calculate new x-coord for transformation
     newNCoordsX = usingNWHandle ? element.x + 2 * width : element.x - 2 * width;
     resizeSingleElement(
-      element,
+      new Map().set(element.id, element),
       true,
       element,
       usingNWHandle ? "nw" : "ne",

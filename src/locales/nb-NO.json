@@ -64,6 +64,7 @@
     "cartoonist": "Tegner",
     "fileTitle": "Filnavn",
     "colorPicker": "Fargevelger",
+    "canvasColors": "Brukes på lerretet",
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
     "layers": "Lag",
@@ -179,7 +180,8 @@
     "imageInsertError": "Kunne ikke sette inn bildet. Prøv igjen senere...",
     "fileTooBig": "Filen er for stor. Maksimal tillatt størrelse er {{maxSize}}.",
     "svgImageInsertError": "Kunne ikke sette inn SVG-bilde. SVG-koden ser ugyldig ut.",
-    "invalidSVGString": "Ugyldig SVG."
+    "invalidSVGString": "Ugyldig SVG.",
+    "cannotResolveCollabServer": "Kunne ikke koble til samarbeidsserveren. Vennligst oppdater siden og prøv på nytt."
   },
   "toolBar": {
     "selection": "Velg",

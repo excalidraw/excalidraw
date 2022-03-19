@@ -29,8 +29,7 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import { getContainerElement } from "./textElement";
-import { isBoundToContainer } from "./typeChecks";
-import { BOUND_TEXT_PADDING } from "../constants";
+import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -189,7 +188,7 @@ const getAdjustedDimensions = (
   let y: number;
   if (
     textAlign === "center" &&
-    verticalAlign === "middle" &&
+    verticalAlign === VERTICAL_ALIGN.MIDDLE &&
     !element.containerId
   ) {
     const prevMetrics = measureTextElement(
@@ -235,8 +234,7 @@ const getAdjustedDimensions = (
 
   // make sure container dimensions are set properly when
   // text editor overflows beyond viewport dimensions
-  if (isBoundToContainer(element)) {
-    const container = getContainerElement(element)!;
+  if (container) {
     let height = container.height;
     let width = container.width;
     if (nextHeight > height - BOUND_TEXT_PADDING * 2) {

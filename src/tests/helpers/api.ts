@@ -15,6 +15,7 @@ import path from "path";
 import { getMimeType } from "../../data/blob";
 import { newFreeDrawElement } from "../../element/newElement";
 import { TextOpts, TEXT_SUBTYPE_DEFAULT } from "../../textlike/types";
+import { Point } from "../../types";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -101,6 +102,7 @@ export class API {
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
       : never;
+    points?: T extends "arrow" | "line" ? readonly Point[] : never;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
@@ -163,10 +165,13 @@ export class API {
       case "arrow":
       case "line":
         element = newLinearElement({
+          ...base,
+          width,
+          height,
           type: type as "arrow" | "line",
           startArrowhead: null,
           endArrowhead: null,
-          ...base,
+          points: rest.points ?? [],
         });
         break;
     }
@@ -213,9 +218,12 @@ export class API {
       }
     });
 
+    const files = [blob] as File[] & { item: (index: number) => File };
+    files.item = (index: number) => files[index];
+
     Object.defineProperty(fileDropEvent, "dataTransfer", {
       value: {
-        files: [blob],
+        files,
         getData: (type: string) => {
           if (type === blob.type) {
             return text;

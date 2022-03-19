@@ -64,6 +64,7 @@
     "cartoonist": "Karikatürist",
     "fileTitle": "Dosya adı",
     "colorPicker": "Renk seçici",
+    "canvasColors": "",
     "canvasBackground": "Tuval arka planı",
     "drawingCanvas": "Çizim tuvali",
     "layers": "Katmanlar",
@@ -179,7 +180,8 @@
     "imageInsertError": "Görsel eklenemedi. Daha sonra tekrar deneyin...",
     "fileTooBig": "Dosya çok büyük. İzin verilen maksimum boyut {{maxSize}}.",
     "svgImageInsertError": "SVG resmi eklenemedi. SVG işaretlemesi geçersiz görünüyor.",
-    "invalidSVGString": "Geçersiz SVG."
+    "invalidSVGString": "Geçersiz SVG.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Seçme",

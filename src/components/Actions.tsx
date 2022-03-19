@@ -3,7 +3,7 @@ import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
-import { useIsMobile } from "../components/App";
+import { useDeviceType } from "../components/App";
 import {
   canChangeSharpness,
   canHaveArrowheads,
@@ -20,6 +20,7 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { getTextLikeActions } from "../textlike";
 import { hasStrokeColor } from "../scene/comparisons";
+import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
 
 export const SelectedShapeActions = ({
   appState,
@@ -30,14 +31,23 @@ export const SelectedShapeActions = ({
   appState: AppState;
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
-  elementType: ExcalidrawElement["type"];
+  elementType: AppState["elementType"];
 }) => {
   const targetElements = getTargetElements(
     getNonDeletedElements(elements),
     appState,
   );
+
+  let isSingleElementBoundContainer = false;
+  if (
+    targetElements.length === 2 &&
+    (hasBoundTextElement(targetElements[0]) ||
+      hasBoundTextElement(targetElements[1]))
+  ) {
+    isSingleElementBoundContainer = true;
+  }
   const isEditing = Boolean(appState.editingElement);
-  const isMobile = useIsMobile();
+  const deviceType = useDeviceType();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
@@ -107,6 +117,10 @@ export const SelectedShapeActions = ({
         </>
       )}
 
+      {targetElements.some(
+        (element) =>
+          hasBoundTextElement(element) || isBoundToContainer(element),
+      ) && renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(elementType) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
@@ -124,7 +138,7 @@ export const SelectedShapeActions = ({
         </div>
       </fieldset>
 
-      {targetElements.length > 1 && (
+      {targetElements.length > 1 && !isSingleElementBoundContainer && (
         <fieldset>
           <legend>{t("labels.align")}</legend>
           <div className="buttonList">
@@ -161,11 +175,11 @@ export const SelectedShapeActions = ({
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
-            {!isMobile && renderAction("duplicateSelection")}
-            {!isMobile && renderAction("deleteSelectedElements")}
+            {!deviceType.isMobile && renderAction("duplicateSelection")}
+            {!deviceType.isMobile && renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
-            {targetElements.length === 1 && renderAction("link")}
+            {targetElements.length === 1 && renderAction("hyperlink")}
           </div>
         </fieldset>
       )}
@@ -178,11 +192,13 @@ export const ShapesSwitcher = ({
   elementType,
   setAppState,
   onImageAction,
+  appState,
 }: {
   canvas: HTMLCanvasElement | null;
-  elementType: ExcalidrawElement["type"];
+  elementType: AppState["elementType"];
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
+  appState: AppState;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
@@ -210,7 +226,7 @@ export const ShapesSwitcher = ({
               multiElement: null,
               selectedElementIds: {},
             });
-            setCursorForShape(canvas, value);
+            setCursorForShape(canvas, { ...appState, elementType: value });
             if (value === "image") {
               onImageAction({ pointerType });
             }

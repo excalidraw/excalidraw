@@ -11,6 +11,31 @@ import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { MODES } from "../constants";
 import { TextActionName } from "../textlike/types";
+import { trackEvent } from "../analytics";
+
+const trackAction = (
+  action: Action,
+  source: "ui" | "keyboard" | "api",
+  value: any,
+) => {
+  if (action.trackEvent !== false) {
+    try {
+      if (action.trackEvent === true) {
+        trackEvent(
+          action.name,
+          source,
+          typeof value === "number" || typeof value === "string"
+            ? String(value)
+            : undefined,
+        );
+      } else {
+        action.trackEvent?.(action, source, value);
+      }
+    } catch (error) {
+      console.error("error while logging action:", error);
+    }
+  }
+};
 
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
@@ -71,15 +96,23 @@ export class ActionManager implements ActionsManagerInterface {
           ),
       );
 
-    if (data.length === 0) {
+    if (data.length !== 1) {
+      if (data.length > 1) {
+        console.warn("Canceling as multiple actions match this shortcut", data);
+      }
       return false;
     }
+
+    const action = data[0];
+
     const { viewModeEnabled } = this.getAppState();
     if (viewModeEnabled) {
       if (!Object.values(MODES).includes(data[0].name)) {
         return false;
       }
     }
+
+    trackAction(action, "keyboard", null);
 
     event.preventDefault();
     this.updater(
@@ -102,6 +135,7 @@ export class ActionManager implements ActionsManagerInterface {
         this.app,
       ),
     );
+    trackAction(action, "api", null);
   }
 
   /**
@@ -136,6 +170,8 @@ export class ActionManager implements ActionsManagerInterface {
             this.app,
           ),
         );
+
+        trackAction(action, "ui", formState);
       };
 
       return (

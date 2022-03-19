@@ -64,6 +64,7 @@
     "cartoonist": "Caricatura",
     "fileTitle": "Nombre del archivo",
     "colorPicker": "Selector de color",
+    "canvasColors": "Usado en lienzo",
     "canvasBackground": "Fondo del lienzo",
     "drawingCanvas": "Lienzo de dibujo",
     "layers": "Capas",
@@ -101,15 +102,15 @@
     "showStroke": "Mostrar selector de color de trazo",
     "showBackground": "Mostrar el selector de color de fondo",
     "toggleTheme": "Alternar tema",
-    "personalLib": "",
-    "excalidrawLib": "",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
-    "unbindText": "",
+    "personalLib": "Biblioteca personal",
+    "excalidrawLib": "Biblioteca Excalidraw",
+    "decreaseFontSize": "Disminuir tamaño de letra",
+    "increaseFontSize": "Aumentar el tamaño de letra",
+    "unbindText": "Desvincular texto",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Editar enlace",
+      "create": "Crear enlace",
+      "label": "Enlace"
     }
   },
   "buttons": {
@@ -146,10 +147,10 @@
     "exitZenMode": "Salir del modo Zen",
     "cancel": "Cancelar",
     "clear": "Borrar",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "remove": "Eliminar",
+    "publishLibrary": "Publicar",
+    "submit": "Enviar",
+    "confirm": "Confirmar"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -171,7 +172,7 @@
     "cannotRestoreFromImage": "No se pudo restaurar la escena desde este archivo de imagen",
     "invalidSceneUrl": "No se ha podido importar la escena desde la URL proporcionada. Está mal formada, o no contiene datos de Excalidraw JSON válidos.",
     "resetLibrary": "Esto borrará tu biblioteca. ¿Estás seguro?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "¿Eliminar {{count}} elemento(s) de la biblioteca?",
     "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada."
   },
   "errors": {
@@ -179,7 +180,8 @@
     "imageInsertError": "No se pudo insertar la imagen. Inténtelo de nuevo más tarde...",
     "fileTooBig": "Archivo demasiado grande. El tamaño máximo permitido es {{maxSize}}.",
     "svgImageInsertError": "No se pudo insertar la imagen SVG. El código SVG parece inválido.",
-    "invalidSVGString": "SVG no válido."
+    "invalidSVGString": "SVG no válido.",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Selección",
@@ -193,8 +195,8 @@
     "text": "Texto",
     "library": "Biblioteca",
     "lock": "Mantener la herramienta seleccionada activa después de dibujar",
-    "penMode": "",
-    "link": ""
+    "penMode": "Evitar el zoom de pellizco y aceptar la entrada libre sólo desde el lápiz",
+    "link": "Añadir/Actualizar enlace para una forma seleccionada"
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
@@ -202,7 +204,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Para mover lienzo, mantenga la rueda del ratón o la barra espaciadora mientras arrastra",
+    "canvasPanning": "Para mover el lienzo, mantenga la rueda del ratón o la barra de espacio mientras arrastra",
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
@@ -214,12 +216,12 @@
     "resizeImage": "Puede redimensionar libremente pulsando SHIFT,\npulse ALT para redimensionar desde el centro",
     "rotate": "Puedes restringir los ángulos manteniendo presionado SHIFT mientras giras",
     "lineEditor_info": "Doble clic o pulse Enter para editar puntos",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Presione Suprimir para eliminar el/los punto(s), CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
+    "lineEditor_nothingSelected": "Seleccione un punto a editar (mantenga MAYÚSCULAS para seleccionar múltiples),\no mantenga pulsado Alt y haga clic para añadir nuevos puntos",
     "placeImage": "Haga clic para colocar la imagen o haga clic y arrastre para establecer su tamaño manualmente",
-    "publishLibrary": "",
-    "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "publishLibrary": "Publica tu propia biblioteca",
+    "bindTextToElement": "Presione Entrar para agregar",
+    "deepBoxSelect": "Mantén CtrlOrCmd para seleccionar en profundidad, y para evitar arrastrar"
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
@@ -266,8 +268,8 @@
   "helpDialog": {
     "blog": "Lea nuestro blog",
     "click": "clic",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Selección profunda",
+    "deepBoxSelect": "Seleccione en profundidad dentro de la caja, y evite arrastrar",
     "curvedArrow": "Flecha curva",
     "curvedLine": "Línea curva",
     "documentation": "Documentación",
@@ -292,52 +294,52 @@
     "title": "Borrar lienzo"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "Publicar biblioteca",
+    "itemName": "Nombre del artículo",
+    "authorName": "Nombre del autor",
+    "githubUsername": "Nombre de usuario de Github",
+    "twitterUsername": "Nombre de usuario de Twitter",
+    "libraryName": "Nombre de la librería",
+    "libraryDesc": "Descripción de la biblioteca",
+    "website": "Sitio Web",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "authorName": "Nombre o nombre de usuario",
+      "libraryName": "Nombre de tu biblioteca",
+      "libraryDesc": "Descripción de su biblioteca para ayudar a la gente a entender su uso",
+      "githubHandle": "GitHub maneja (opcional), así que puede editar la biblioteca una vez enviada para su revisión",
+      "twitterHandle": "Nombre de usuario de Twitter (opcional), así que sabemos a quién acreditar cuando se promociona en Twitter",
+      "website": "Enlace a su sitio web personal o en cualquier otro lugar (opcional)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Requerido",
+      "website": "Introduce una URL válida"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Envía tu biblioteca para ser incluida en el ",
+      "link": "repositorio de librería pública",
+      "post": "para que otras personas utilicen en sus dibujos."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "La biblioteca debe ser aprobada manualmente primero. Por favor, lea la ",
+      "link": "pautas",
+      "post": " antes de enviar. Necesitará una cuenta de GitHub para comunicarse y hacer cambios si se solicita, pero no es estrictamente necesario."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Al enviar, usted acepta que la biblioteca se publicará bajo el ",
+      "link": "Licencia MIT ",
+      "post": "que en breve significa que cualquiera puede utilizarlos sin restricciones."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Cada elemento de la biblioteca debe tener su propio nombre para que sea filtrable. Los siguientes elementos de la biblioteca serán incluidos:",
+    "atleastOneLibItem": "Por favor, seleccione al menos un elemento de la biblioteca para empezar"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Biblioteca enviada",
+    "content": "Gracias {{authorName}}. Su biblioteca ha sido enviada para ser revisada. Puede seguir el estado",
+    "link": "aquí"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Reiniciar biblioteca",
+    "removeItemsFromLib": "Eliminar elementos seleccionados de la biblioteca"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",
@@ -359,7 +361,7 @@
     "width": "Ancho"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Añadido a la biblioteca",
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado en el portapapeles.",
     "copyToClipboardAsPng": "Copiado {{exportSelection}} al portapapeles como PNG\n({{exportColorScheme}})",
