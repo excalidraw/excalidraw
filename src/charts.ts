@@ -1,5 +1,10 @@
 import colors from "./colors";
-import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, ENV } from "./constants";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  ENV,
+  VERTICAL_ALIGN,
+} from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
@@ -104,7 +109,7 @@ const transposeCells = (cells: string[][]) => {
 };
 
 export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
-  // Copy/paste from excel, spreadhseets, tsv, csv.
+  // Copy/paste from excel, spreadsheets, tsv, csv.
   // For now we only accept 2 columns with an optional header
 
   // Check for tab separated values
@@ -162,7 +167,7 @@ const commonProps = {
   strokeSharpness: "sharp",
   strokeStyle: "solid",
   strokeWidth: 1,
-  verticalAlign: "middle",
+  verticalAlign: VERTICAL_ALIGN.MIDDLE,
 } as const;
 
 const getChartDimentions = (spreadsheet: Spreadsheet) => {

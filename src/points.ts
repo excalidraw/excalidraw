@@ -37,7 +37,7 @@ export const rescalePoints = (
   );
 
   if (scaledPoints.length === 2) {
-    // we don't tranlate two-point lines
+    // we don't translate two-point lines
     return scaledPoints;
   }
 

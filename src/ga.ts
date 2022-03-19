@@ -62,7 +62,7 @@ const NVECTOR_BASE = ["1", "e0", "e1", "e2", "e01", "e20", "e12", "e012"];
 export const nvector = (value: number = 0, index: number = 0): NVector => {
   const result = [0, 0, 0, 0, 0, 0, 0, 0];
   if (index < 0 || index > 7) {
-    throw new Error(`Expected \`index\` betwen 0 and 7, got \`${index}\``);
+    throw new Error(`Expected \`index\` between 0 and 7, got \`${index}\``);
   }
   if (value !== 0) {
     result[index] = value;

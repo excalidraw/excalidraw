@@ -1,4 +1,4 @@
-import { SVG_NS } from "../../constants";
+import { BOUND_TEXT_PADDING, SVG_NS, VERTICAL_ALIGN } from "../../constants";
 import { getFontFamilyString, getFontString, isRTL } from "../../utils";
 import { ExcalidrawTextElement, NonDeleted } from "../../element/types";
 import { ElementUpdate } from "../../element/mutateElement";
@@ -97,7 +97,11 @@ const renderTextElementText = (
   const lineHeight = element.containerId
     ? getApproxLineHeight(getFontString(element))
     : element.height / lines.length;
-  const verticalOffset = element.height - element.baseline;
+  let verticalOffset = element.height - element.baseline;
+  if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+    verticalOffset = BOUND_TEXT_PADDING;
+  }
+
   const horizontalOffset =
     element.textAlign === "center"
       ? element.width / 2

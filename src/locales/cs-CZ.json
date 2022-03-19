@@ -64,6 +64,7 @@
     "cartoonist": "",
     "fileTitle": "",
     "colorPicker": "",
+    "canvasColors": "",
     "canvasBackground": "Pozadí plátna",
     "drawingCanvas": "",
     "layers": "",
@@ -179,7 +180,8 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "Výběr",

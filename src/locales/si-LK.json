@@ -64,6 +64,7 @@
     "cartoonist": "සැකිලිරූකරු",
     "fileTitle": "ගොනු නාමය",
     "colorPicker": "පාට තෝරකය",
+    "canvasColors": "",
     "canvasBackground": "කැන්වස පසුබිම",
     "drawingCanvas": "චිත්‍රක කැන්වසය",
     "layers": "ලේයර",
@@ -179,7 +180,8 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": ""
   },
   "toolBar": {
     "selection": "",
