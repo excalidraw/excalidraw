@@ -186,14 +186,15 @@ export const ShapesSwitcher = ({
   setAppState,
   onImageAction,
   appState,
+  penDetected,
 }: {
   canvas: HTMLCanvasElement | null;
   elementType: AppState["elementType"];
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: AppState;
+  penDetected: boolean;
 }) => {
-  const penDetected = useDeviceType().penDetected;
   return (
     <>
       {SHAPES.map(({ value, icon, key }, index) => {

@@ -352,6 +352,7 @@ const LayerUI = ({
                               insertOnCanvasDirectly: pointerType !== "mouse",
                             });
                           }}
+                          penDetected={deviceType.penDetected}
                         />
                       </Stack.Row>
                     </Island>
