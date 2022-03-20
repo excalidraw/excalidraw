@@ -85,7 +85,6 @@ export const MobileMenu = ({
                           insertOnCanvasDirectly: pointerType !== "mouse",
                         });
                       }}
-                      penDetected={deviceType.penDetected}
                       setDeviceType={setDeviceType}
                     />
                   </Stack.Row>
