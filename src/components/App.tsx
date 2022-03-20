@@ -258,6 +258,7 @@ import {
 const defaultDeviceTypeContext: DeviceType = {
   isMobile: false,
   isTouchScreen: false,
+  penDetected: false,
 };
 const DeviceTypeContext = React.createContext(defaultDeviceTypeContext);
 export const useDeviceType = () => useContext(DeviceTypeContext);
@@ -295,6 +296,7 @@ class App extends React.Component<AppProps, AppState> {
   deviceType: DeviceType = {
     isMobile: false,
     isTouchScreen: false,
+    penDetected: false,
   };
   detachIsMobileMqHandler?: () => void;
 
@@ -2863,11 +2865,11 @@ class App extends React.Component<AppProps, AppState> {
 
     //fires only once, if pen is detected, penMode is enabled
     //the user can disable this by toggling the penMode button
-    if (!this.state.penDetected && event.pointerType === "pen") {
+    if (!this.deviceType.penDetected && event.pointerType === "pen") {
+      this.deviceType = updateObject(this.deviceType, { penDetected: true });
       this.setState((prevState) => {
         return {
           penMode: true,
-          penDetected: true,
         };
       });
     }

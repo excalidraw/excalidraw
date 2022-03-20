@@ -18,6 +18,7 @@ import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
+import { useDeviceType } from "./App";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -61,6 +62,7 @@ export const MobileMenu = ({
   onImageAction,
   renderTopRightUI,
 }: MobileMenuProps) => {
+  const deviceType = useDeviceType();
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
@@ -101,7 +103,7 @@ export const MobileMenu = ({
                   onChange={onPenModeToggle}
                   title={t("toolBar.penMode")}
                   isMobile
-                  penDetected={appState.penDetected}
+                  penDetected={deviceType.penDetected}
                 />
               </Stack.Row>
               {libraryMenu}

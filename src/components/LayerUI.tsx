@@ -321,7 +321,7 @@ const LayerUI = ({
                       checked={appState.penMode}
                       onChange={onPenModeToggle}
                       title={t("toolBar.penMode")}
-                      penDetected={appState.penDetected}
+                      penDetected={deviceType.penDetected}
                     />
                     <LockButton
                       zenModeEnabled={zenModeEnabled}

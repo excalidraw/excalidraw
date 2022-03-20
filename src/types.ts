@@ -80,7 +80,6 @@ export type AppState = {
   elementType: typeof SHAPES[number]["value"] | "eraser";
   elementLocked: boolean;
   penMode: boolean;
-  penDetected: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
@@ -412,4 +411,5 @@ export type ExcalidrawImperativeAPI = {
 export type DeviceType = {
   isMobile: boolean;
   isTouchScreen: boolean;
+  penDetected: boolean;
 };

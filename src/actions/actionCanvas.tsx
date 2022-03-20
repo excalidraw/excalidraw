@@ -62,7 +62,6 @@ export const actionClearCanvas = register({
         theme: appState.theme,
         elementLocked: appState.elementLocked,
         penMode: appState.penMode,
-        penDetected: appState.penDetected,
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,
         gridSize: appState.gridSize,
