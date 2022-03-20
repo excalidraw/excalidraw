@@ -217,12 +217,13 @@ export const ShapesSwitcher = ({
             aria-keyshortcuts={shortcut}
             data-testid={value}
             onChange={({ pointerType }) => {
+              if (!penDetected && pointerType === "pen") {
+                setAppState({ penMode: true });
+              }
               setAppState({
                 elementType: value,
                 multiElement: null,
                 selectedElementIds: {},
-                penMode:
-                  (!penDetected && pointerType === "pen") ?? appState.penMode,
               });
               setCursorForShape(canvas, { ...appState, elementType: value });
               if (value === "image") {
