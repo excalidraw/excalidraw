@@ -193,7 +193,7 @@ export const ShapesSwitcher = ({
   onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: AppState;
 }) => {
-  const deviceType = useDeviceType();
+  const penDetected = useDeviceType().penDetected;
   return (
     <>
       {SHAPES.map(({ value, icon, key }, index) => {
@@ -216,13 +216,12 @@ export const ShapesSwitcher = ({
             aria-keyshortcuts={shortcut}
             data-testid={value}
             onChange={({ pointerType }) => {
-              if (!deviceType.penDetected && pointerType === "pen") {
-                setAppState({ penMode: true });
-              }
               setAppState({
                 elementType: value,
                 multiElement: null,
                 selectedElementIds: {},
+                penMode:
+                  (!penDetected && pointerType === "pen") ?? appState.penMode,
               });
               setCursorForShape(canvas, { ...appState, elementType: value });
               if (value === "image") {

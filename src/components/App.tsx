@@ -2867,11 +2867,7 @@ class App extends React.Component<AppProps, AppState> {
     //the user can disable this by toggling the penMode button
     if (!this.deviceType.penDetected && event.pointerType === "pen") {
       this.deviceType = updateObject(this.deviceType, { penDetected: true });
-      this.setState((prevState) => {
-        return {
-          penMode: true,
-        };
-      });
+      this.setState({ penMode: true });
     }
 
     if (
