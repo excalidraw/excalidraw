@@ -192,43 +192,49 @@ export const ShapesSwitcher = ({
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: AppState;
-}) => (
-  <>
-    {SHAPES.map(({ value, icon, key }, index) => {
-      const label = t(`toolBar.${value}`);
-      const letter = key && (typeof key === "string" ? key : key[0]);
-      const shortcut = letter
-        ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
-        : `${index + 1}`;
-      return (
-        <ToolButton
-          className="Shape"
-          key={value}
-          type="radio"
-          icon={icon}
-          checked={elementType === value}
-          name="editor-current-shape"
-          title={`${capitalizeString(label)} — ${shortcut}`}
-          keyBindingLabel={`${index + 1}`}
-          aria-label={capitalizeString(label)}
-          aria-keyshortcuts={shortcut}
-          data-testid={value}
-          onChange={({ pointerType }) => {
-            setAppState({
-              elementType: value,
-              multiElement: null,
-              selectedElementIds: {},
-            });
-            setCursorForShape(canvas, { ...appState, elementType: value });
-            if (value === "image") {
-              onImageAction({ pointerType });
-            }
-          }}
-        />
-      );
-    })}
-  </>
-);
+}) => {
+  const deviceType = useDeviceType();
+  return (
+    <>
+      {SHAPES.map(({ value, icon, key }, index) => {
+        const label = t(`toolBar.${value}`);
+        const letter = key && (typeof key === "string" ? key : key[0]);
+        const shortcut = letter
+          ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
+          : `${index + 1}`;
+        return (
+          <ToolButton
+            className="Shape"
+            key={value}
+            type="radio"
+            icon={icon}
+            checked={elementType === value}
+            name="editor-current-shape"
+            title={`${capitalizeString(label)} — ${shortcut}`}
+            keyBindingLabel={`${index + 1}`}
+            aria-label={capitalizeString(label)}
+            aria-keyshortcuts={shortcut}
+            data-testid={value}
+            onChange={({ pointerType }) => {
+              if (!deviceType.penDetected && pointerType === "pen") {
+                setAppState({ penMode: true });
+              }
+              setAppState({
+                elementType: value,
+                multiElement: null,
+                selectedElementIds: {},
+              });
+              setCursorForShape(canvas, { ...appState, elementType: value });
+              if (value === "image") {
+                onImageAction({ pointerType });
+              }
+            }}
+          />
+        );
+      })}
+    </>
+  );
+};
 
 export const ZoomActions = ({
   renderAction,
