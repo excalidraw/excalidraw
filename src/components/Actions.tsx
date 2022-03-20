@@ -197,6 +197,7 @@ export const ShapesSwitcher = ({
   penDetected: boolean;
   setDeviceType: (obj: Partial<DeviceType>) => void;
 }) => {
+  const pd = useDeviceType().penDetected;
   return (
     <>
       {SHAPES.map(({ value, icon, key }, index) => {
@@ -219,7 +220,7 @@ export const ShapesSwitcher = ({
             aria-keyshortcuts={shortcut}
             data-testid={value}
             onChange={({ pointerType }) => {
-              if (!penDetected && pointerType === "pen") {
+              if (!pd && pointerType === "pen") {
                 setAppState({ penMode: true });
                 setDeviceType({ penDetected: true });
               }
