@@ -13,6 +13,7 @@ import {
   FillCrossHatchIcon,
   FillHachureIcon,
   FillSolidIcon,
+  FillDotsIcon,
   FontFamilyCodeIcon,
   FontFamilyHandDrawnIcon,
   FontFamilyNormalIcon,
@@ -319,6 +320,11 @@ export const actionChangeFillStyle = register({
             value: "solid",
             text: t("labels.solid"),
             icon: <FillSolidIcon theme={appState.theme} />,
+          },
+          {
+            value: "dots",
+            text: t("labels.dots"),
+            icon: <FillDotsIcon theme={appState.theme} />,
           },
         ]}
         group="fill"

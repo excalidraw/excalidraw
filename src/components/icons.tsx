@@ -565,6 +565,22 @@ export const FillCrossHatchIcon = React.memo(({ theme }: { theme: Theme }) =>
   ),
 );
 
+export const FillDotsIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <g fill={iconFillColor(theme)} fillRule="evenodd">
+      <path d="M36 4H4V8 16H36V11.6378ZM2 2V18H38V2H" />
+      <circle cx="10" cy="8" r="1.5" />
+      <circle cx="15" cy="10" r="1.5" />
+      <circle cx="11" cy="13" r="1.5" />
+      <circle cx="22" cy="8" r="1.5" />
+      <circle cx="25" cy="11" r="1.5" />
+      <circle cx="29" cy="15" r="1.5" />
+      <circle cx="29" cy="7" r="1.5" />
+    </g>,
+    { width: 40, height: 20 },
+  ),
+);
+
 export const FillSolidIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(<path d="M2 2H38V18H2V2Z" fill={iconFillColor(theme)} />, {
     width: 40,
