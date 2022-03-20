@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState } from "../types";
+import { AppState, DeviceType } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -26,6 +26,7 @@ type MobileMenuProps = {
   renderJSONExportDialog: () => React.ReactNode;
   renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
+  setDeviceType: (obj: Partial<DeviceType>) => void;
   elements: readonly NonDeletedExcalidrawElement[];
   libraryMenu: JSX.Element | null;
   onCollabButtonClick?: () => void;
@@ -51,6 +52,7 @@ export const MobileMenu = ({
   renderJSONExportDialog,
   renderImageExportDialog,
   setAppState,
+  setDeviceType,
   onCollabButtonClick,
   onLockToggle,
   onPenModeToggle,
@@ -84,6 +86,7 @@ export const MobileMenu = ({
                         });
                       }}
                       penDetected={deviceType.penDetected}
+                      setDeviceType={setDeviceType}
                     />
                   </Stack.Row>
                 </Island>

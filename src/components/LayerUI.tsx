@@ -540,6 +540,7 @@ const LayerUI = ({
         renderJSONExportDialog={renderJSONExportDialog}
         renderImageExportDialog={renderImageExportDialog}
         setAppState={setAppState}
+        setDeviceType={setDeviceType}
         onCollabButtonClick={onCollabButtonClick}
         onLockToggle={onLockToggle}
         onPenModeToggle={onPenModeToggle}
