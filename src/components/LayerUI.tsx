@@ -8,7 +8,13 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
-import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
+import {
+  AppProps,
+  AppState,
+  ExcalidrawProps,
+  BinaryFiles,
+  DeviceType,
+} from "../types";
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
@@ -44,6 +50,7 @@ interface LayerUIProps {
   files: BinaryFiles;
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
+  setDeviceType: (obj: Partial<DeviceType>) => void;
   elements: readonly NonDeletedExcalidrawElement[];
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
@@ -74,6 +81,7 @@ const LayerUI = ({
   appState,
   files,
   setAppState,
+  setDeviceType,
   canvas,
   elements,
   onCollabButtonClick,
@@ -353,6 +361,7 @@ const LayerUI = ({
                             });
                           }}
                           penDetected={deviceType.penDetected}
+                          setDeviceType={setDeviceType}
                         />
                       </Stack.Row>
                     </Island>

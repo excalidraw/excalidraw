@@ -14,7 +14,7 @@ import {
   hasText,
 } from "../scene";
 import { SHAPES } from "../shapes";
-import { AppState, Zoom } from "../types";
+import { AppState, DeviceType, Zoom } from "../types";
 import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
@@ -187,6 +187,7 @@ export const ShapesSwitcher = ({
   onImageAction,
   appState,
   penDetected,
+  setDeviceType,
 }: {
   canvas: HTMLCanvasElement | null;
   elementType: AppState["elementType"];
@@ -194,6 +195,7 @@ export const ShapesSwitcher = ({
   onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: AppState;
   penDetected: boolean;
+  setDeviceType: (obj: Partial<DeviceType>) => void;
 }) => {
   return (
     <>
@@ -219,6 +221,7 @@ export const ShapesSwitcher = ({
             onChange={({ pointerType }) => {
               if (!penDetected && pointerType === "pen") {
                 setAppState({ penMode: true });
+                setDeviceType({ penDetected: true });
               }
               setAppState({
                 elementType: value,

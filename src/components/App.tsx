@@ -497,6 +497,7 @@ class App extends React.Component<AppProps, AppState> {
               appState={this.state}
               files={this.files}
               setAppState={this.setAppState}
+              setDeviceType={this.setDeviceType}
               actionManager={this.actionManager}
               elements={this.scene.getElements()}
               onCollabButtonClick={onCollabButtonClick}
@@ -902,7 +903,7 @@ class App extends React.Component<AppProps, AppState> {
         // ---------------------------------------------------------------------
         const { width, height } =
           this.excalidrawContainerRef.current!.getBoundingClientRect();
-        this.deviceType = updateObject(this.deviceType, {
+        this.setDeviceType({
           isMobile:
             width < MQ_MAX_WIDTH_PORTRAIT ||
             (height < MQ_MAX_HEIGHT_LANDSCAPE &&
@@ -918,9 +919,7 @@ class App extends React.Component<AppProps, AppState> {
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
       const handler = () => {
-        this.deviceType = updateObject(this.deviceType, {
-          isMobile: mediaQuery.matches,
-        });
+        this.setDeviceType({ isMobile: mediaQuery.matches });
       };
       mediaQuery.addListener(handler);
       this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
@@ -1560,6 +1559,10 @@ class App extends React.Component<AppProps, AppState> {
 
   setAppState = (obj: any) => {
     this.setState(obj);
+  };
+
+  setDeviceType = (obj: Partial<DeviceType>): void => {
+    this.deviceType = updateObject(this.deviceType, obj);
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
@@ -2866,7 +2869,7 @@ class App extends React.Component<AppProps, AppState> {
     //fires only once, if pen is detected, penMode is enabled
     //the user can disable this by toggling the penMode button
     if (!this.deviceType.penDetected && event.pointerType === "pen") {
-      this.deviceType = updateObject(this.deviceType, { penDetected: true });
+      this.setDeviceType({ penDetected: true });
       this.setState({ penMode: true });
     }
 
@@ -2874,7 +2877,7 @@ class App extends React.Component<AppProps, AppState> {
       !this.deviceType.isTouchScreen &&
       ["pen", "touch"].includes(event.pointerType)
     ) {
-      this.deviceType = updateObject(this.deviceType, { isTouchScreen: true });
+      this.setDeviceType({ isTouchScreen: true });
     }
 
     if (isPanning) {
