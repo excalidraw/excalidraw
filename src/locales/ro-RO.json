@@ -107,6 +107,7 @@
     "decreaseFontSize": "Micșorează dimensiunea fontului",
     "increaseFontSize": "Mărește dimensiunea fontului",
     "unbindText": "Deconectare text",
+    "bindText": "",
     "link": {
       "edit": "Editare URL",
       "create": "Creare URL",
