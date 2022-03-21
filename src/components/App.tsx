@@ -5405,6 +5405,23 @@ class App extends React.Component<AppProps, AppState> {
     if (probablySupportsClipboardWriteText && elements.length > 0) {
       options.push(actionCopyAsSvg);
     }
+
+    const selectedElements = getSelectedElements(elements, this.state);
+
+    let allowBinding = false;
+    if (selectedElements.length === 2) {
+      const textElement =
+        isTextElement(selectedElements[0]) ||
+        isTextElement(selectedElements[1]);
+
+      const bindingContainer =
+        isTextBindableContainer(selectedElements[0]) ||
+        isTextBindableContainer(selectedElements[1]);
+      if (textElement && bindingContainer) {
+        allowBinding = true;
+      }
+    }
+
     if (type === "canvas") {
       const viewModeOptions = [
         ...options,
@@ -5450,6 +5467,7 @@ class App extends React.Component<AppProps, AppState> {
             ((probablySupportsClipboardBlob && elements.length > 0) ||
               (probablySupportsClipboardWriteText && elements.length > 0)) &&
               separator,
+            allowBinding && actionBindText,
             actionSelectAll,
             separator,
             typeof this.props.gridModeEnabled === "undefined" &&
@@ -5473,19 +5491,7 @@ class App extends React.Component<AppProps, AppState> {
       const elementsWithUnbindedText = selectedElements.some(
         (element) => !hasBoundTextElement(element),
       );
-      let allowBinding = false;
-      if (selectedElements.length === 2) {
-        const textElement =
-          isTextElement(selectedElements[0]) ||
-          isTextElement(selectedElements[1]);
 
-        const bindingContainer =
-          isTextBindableContainer(selectedElements[0]) ||
-          isTextBindableContainer(selectedElements[1]);
-        if (textElement && bindingContainer) {
-          allowBinding = true;
-        }
-      }
       if (this.state.viewModeEnabled) {
         ContextMenu.push({
           options: [navigator.clipboard && actionCopy, ...options],

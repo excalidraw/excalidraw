@@ -78,7 +78,7 @@ export const actionBindText = register({
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
     });
-    mutateElement(container!, {
+    mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
         type: "text",
         id: textElement.id,
@@ -96,7 +96,7 @@ export const actionBindText = register({
     updatedElements.splice(containerIndex + 1, 0, textElement!);
     return {
       elements: updatedElements,
-      appState,
+      appState: { ...appState, selectedElementIds: { [container.id]: true } },
       commitToHistory: true,
     };
   },
