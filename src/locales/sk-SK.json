@@ -107,6 +107,7 @@
     "decreaseFontSize": "Zmenšiť veľkosť písma",
     "increaseFontSize": "Zväčšiť veľkosť písma",
     "unbindText": "Zrušiť previazanie textu",
+    "bindText": "",
     "link": {
       "edit": "Upraviť odkaz",
       "create": "Vytvoriť odkaz",
