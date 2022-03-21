@@ -217,12 +217,14 @@ export const ShapesSwitcher = ({
             aria-label={capitalizeString(label)}
             aria-keyshortcuts={shortcut}
             data-testid={value}
-            onChange={({ pointerType }) => {
+            onPointerDown={({ pointerType }) => {
               setAppState({ toastMessage: pointerType }); //debug iOS
               if (!penDetected && pointerType === "pen") {
                 setAppState({ penMode: true });
                 setDeviceType({ penDetected: true });
               }
+            }}
+            onChange={({ pointerType }) => {
               setAppState({
                 elementType: value,
                 multiElement: null,

@@ -48,6 +48,7 @@ type ToolButtonProps =
       type: "radio";
       checked: boolean;
       onChange?(data: { pointerType: PointerType | null }): void;
+      onPointerDown?(data: { pointerType: PointerType }): void;
     });
 
 export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
