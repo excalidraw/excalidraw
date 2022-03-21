@@ -107,6 +107,7 @@
     "decreaseFontSize": "Txikitu letra tamaina",
     "increaseFontSize": "Handitu letra tamaina",
     "unbindText": "Askatu testua",
+    "bindText": "",
     "link": {
       "edit": "Editatu esteka",
       "create": "Sortu esteka",
