@@ -196,7 +196,6 @@ export const ShapesSwitcher = ({
   setDeviceType: (obj: Partial<DeviceType>) => void;
 }) => {
   const penDetected = useDeviceType().penDetected;
-  setAppState({ toastMessage: penDetected ? "penOn" : "penOff" }); //debug iOS
   return (
     <>
       {SHAPES.map(({ value, icon, key }, index) => {
@@ -219,6 +218,7 @@ export const ShapesSwitcher = ({
             aria-keyshortcuts={shortcut}
             data-testid={value}
             onChange={({ pointerType }) => {
+              setAppState({ toastMessage: penDetected ? "penOn" : "penOff" }); //debug iOS
               if (!penDetected && pointerType === "pen") {
                 setAppState({ penMode: true });
                 setDeviceType({ penDetected: true });
