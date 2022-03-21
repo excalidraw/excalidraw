@@ -107,7 +107,7 @@
     "decreaseFontSize": "縮小文字",
     "increaseFontSize": "放大文字",
     "unbindText": "取消綁定文字",
-    "bindText": "",
+    "bindText": "結合文字至容器",
     "link": {
       "edit": "編輯連結",
       "create": "建立連結",
