@@ -107,6 +107,7 @@
     "decreaseFontSize": "تصغير حجم الخط",
     "increaseFontSize": "تكبير حجم الخط",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "تعديل الرابط",
       "create": "إنشاء رابط",
