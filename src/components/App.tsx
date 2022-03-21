@@ -5414,10 +5414,17 @@ class App extends React.Component<AppProps, AppState> {
         isTextElement(selectedElements[0]) ||
         isTextElement(selectedElements[1]);
 
-      const bindingContainer =
-        isTextBindableContainer(selectedElements[0]) ||
-        isTextBindableContainer(selectedElements[1]);
-      if (textElement && bindingContainer) {
+      let bindingContainer;
+      if (isTextBindableContainer(selectedElements[0])) {
+        bindingContainer = selectedElements[0];
+      } else if (isTextBindableContainer(selectedElements[1])) {
+        bindingContainer = selectedElements[1];
+      }
+      if (
+        textElement &&
+        bindingContainer &&
+        getBoundTextElement(bindingContainer) === null
+      ) {
         allowBinding = true;
       }
     }
