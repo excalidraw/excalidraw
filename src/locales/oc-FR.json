@@ -107,6 +107,7 @@
     "decreaseFontSize": "Reduire talha poliça",
     "increaseFontSize": "Aumentar talha poliça",
     "unbindText": "Dessociar lo tèxte",
+    "bindText": "",
     "link": {
       "edit": "Modificar lo ligam",
       "create": "Crear un ligam",
