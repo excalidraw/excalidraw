@@ -150,6 +150,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
       title={props.title}
       onPointerDown={(event) => {
         lastPointerTypeRef.current = event.pointerType || null;
+        props.onPointerDown?.({ pointerType: event.pointerType || null });
       }}
       onPointerUp={() => {
         requestAnimationFrame(() => {
@@ -165,9 +166,6 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         aria-keyshortcuts={props["aria-keyshortcuts"]}
         data-testid={props["data-testid"]}
         id={`${excalId}-${props.id}`}
-        onPointerDown={(e) => {
-          props.onPointerDown?.({ pointerType: "pen" });
-        }}
         onChange={() => {
           props.onChange?.({ pointerType: lastPointerTypeRef.current });
         }}
