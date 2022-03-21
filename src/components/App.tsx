@@ -27,6 +27,7 @@ import {
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
+  actionBindText,
   actionUngroup,
   actionLink,
 } from "../actions";
@@ -5391,6 +5392,16 @@ class App extends React.Component<AppProps, AppState> {
       this.actionManager.getAppState(),
     );
 
+    const mayBeAllowUnbinding = actionUnbindText.contextItemPredicate(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const mayBeAllowBinding = actionBindText.contextItemPredicate(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
     const separator = "separator";
 
     const elements = this.scene.getElements();
@@ -5467,10 +5478,6 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
     } else if (type === "element") {
-      const elementsWithUnbindedText = getSelectedElements(
-        elements,
-        this.state,
-      ).some((element) => !hasBoundTextElement(element));
       if (this.state.viewModeEnabled) {
         ContextMenu.push({
           options: [navigator.clipboard && actionCopy, ...options],
@@ -5504,7 +5511,8 @@ class App extends React.Component<AppProps, AppState> {
             actionPasteStyles,
             separator,
             maybeGroupAction && actionGroup,
-            !elementsWithUnbindedText && actionUnbindText,
+            mayBeAllowUnbinding && actionUnbindText,
+            mayBeAllowBinding && actionBindText,
             maybeUngroupAction && actionUngroup,
             (maybeGroupAction || maybeUngroupAction) && separator,
             actionAddToLibrary,
