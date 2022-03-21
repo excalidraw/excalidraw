@@ -107,6 +107,7 @@
     "decreaseFontSize": "",
     "increaseFontSize": "",
     "unbindText": "Ontkoppel tekst",
+    "bindText": "",
     "link": {
       "edit": "",
       "create": "",
