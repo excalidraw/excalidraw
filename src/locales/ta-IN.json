@@ -107,6 +107,7 @@
     "decreaseFontSize": "எழுத்துரு அளவைக் குறை",
     "increaseFontSize": "எழுத்துரு அளவை அதிகரி",
     "unbindText": "உரையைப் பிணைவவிழ்",
+    "bindText": "",
     "link": {
       "edit": "தொடுப்பைத் திருத்து",
       "create": "தொடுப்பைப் படை",
