@@ -107,6 +107,7 @@
     "decreaseFontSize": "Diminuir o tamanho da fonte",
     "increaseFontSize": "Aumentar o tamanho da fonte",
     "unbindText": "Desvincular texto",
+    "bindText": "",
     "link": {
       "edit": "Editar link",
       "create": "Criar link",
