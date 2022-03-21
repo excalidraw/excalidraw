@@ -196,6 +196,7 @@ export const ShapesSwitcher = ({
   setDeviceType: (obj: Partial<DeviceType>) => void;
 }) => {
   const penDetected = useDeviceType().penDetected;
+  app.setState({ toastMessage: penDetected ? "penOn" : "penOff" }); //debug iOS
   return (
     <>
       {SHAPES.map(({ value, icon, key }, index) => {
