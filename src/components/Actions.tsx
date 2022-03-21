@@ -218,7 +218,6 @@ export const ShapesSwitcher = ({
             aria-keyshortcuts={shortcut}
             data-testid={value}
             onPointerDown={({ pointerType }) => {
-              setAppState({ toastMessage: pointerType }); //debug iOS
               if (!penDetected && pointerType === "pen") {
                 setAppState({ penMode: true });
                 setDeviceType({ penDetected: true });
