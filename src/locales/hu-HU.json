@@ -107,6 +107,7 @@
     "decreaseFontSize": "Betűméret csökkentése",
     "increaseFontSize": "Betűméret növelése",
     "unbindText": "Szövegkötés feloldása",
+    "bindText": "",
     "link": {
       "edit": "Hivatkozás szerkesztése",
       "create": "Hivatkozás létrehozása",
