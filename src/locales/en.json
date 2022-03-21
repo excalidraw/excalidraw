@@ -107,6 +107,7 @@
     "decreaseFontSize": "Decrease font size",
     "increaseFontSize": "Increase font size",
     "unbindText": "Unbind text",
+    "bindText": "Bind text to the container",
     "link": {
       "edit": "Edit link",
       "create": "Create link",

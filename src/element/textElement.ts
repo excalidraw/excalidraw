@@ -10,13 +10,11 @@ import { mutateElement } from "./mutateElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
-import { AppState } from "../types";
 import { isTextElement } from ".";
 
 export const redrawTextBoundingBox = (
   element: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
-  appState: AppState,
 ) => {
   const maxWidth = container
     ? container.width - BOUND_TEXT_PADDING * 2
@@ -35,12 +33,12 @@ export const redrawTextBoundingBox = (
     getFontString(element),
     maxWidth,
   );
-
   let coordY = element.y;
+  let coordX = element.x;
   // Resize container and vertically center align the text
   if (container) {
     let nextHeight = container.height;
-
+    coordX = container.x + BOUND_TEXT_PADDING;
     if (element.verticalAlign === VERTICAL_ALIGN.TOP) {
       coordY = container.y + BOUND_TEXT_PADDING;
     } else if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
@@ -55,12 +53,12 @@ export const redrawTextBoundingBox = (
     }
     mutateElement(container, { height: nextHeight });
   }
-
   mutateElement(element, {
     width: metrics.width,
     height: metrics.height,
     baseline: metrics.baseline,
     y: coordY,
+    x: coordX,
     text,
   });
 };
