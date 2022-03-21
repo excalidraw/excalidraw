@@ -63,11 +63,7 @@ export const actionPasteStyles = register({
               textAlign: pastedElement?.textAlign || DEFAULT_TEXT_ALIGN,
             });
 
-            redrawTextBoundingBox(
-              newElement,
-              getContainerElement(newElement),
-              appState,
-            );
+            redrawTextBoundingBox(newElement, getContainerElement(newElement));
           }
           return newElement;
         }
