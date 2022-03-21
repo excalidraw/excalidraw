@@ -107,6 +107,7 @@
     "decreaseFontSize": "Riduci dimensione dei caratteri",
     "increaseFontSize": "Aumenta la dimensione dei caratteri",
     "unbindText": "Scollega testo",
+    "bindText": "",
     "link": {
       "edit": "Modifica link",
       "create": "Crea link",
