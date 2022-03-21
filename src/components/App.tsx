@@ -5460,7 +5460,6 @@ class App extends React.Component<AppProps, AppState> {
             ((probablySupportsClipboardBlob && elements.length > 0) ||
               (probablySupportsClipboardWriteText && elements.length > 0)) &&
               separator,
-            mayBeAllowBinding && actionBindText,
             actionSelectAll,
             separator,
             typeof this.props.gridModeEnabled === "undefined" &&
