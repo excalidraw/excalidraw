@@ -107,6 +107,7 @@
     "decreaseFontSize": "Reduser skriftstørrelse",
     "increaseFontSize": "Øk skriftstørrelse",
     "unbindText": "Avbind tekst",
+    "bindText": "",
     "link": {
       "edit": "Rediger lenke",
       "create": "Opprett lenke",
