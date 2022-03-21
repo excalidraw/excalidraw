@@ -107,6 +107,7 @@
     "decreaseFontSize": "Kecilkan ukuran font",
     "increaseFontSize": "Besarkan ukuran font",
     "unbindText": "Lepas teks",
+    "bindText": "",
     "link": {
       "edit": "Edit tautan",
       "create": "Buat tautan",
