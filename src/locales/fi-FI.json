@@ -107,6 +107,7 @@
     "decreaseFontSize": "Pienennä kirjasinkokoa",
     "increaseFontSize": "Kasvata kirjasinkokoa",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "Muokkaa linkkiä",
       "create": "Luo linkki",
