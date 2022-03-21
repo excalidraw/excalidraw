@@ -107,6 +107,7 @@
     "decreaseFontSize": "폰트 사이즈 줄이기",
     "increaseFontSize": "폰트 사이즈 키우기",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "",
       "create": "",
