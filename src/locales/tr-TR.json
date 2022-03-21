@@ -107,6 +107,7 @@
     "decreaseFontSize": "",
     "increaseFontSize": "",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "",
       "create": "",
