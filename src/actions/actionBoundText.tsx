@@ -74,7 +74,7 @@ export const actionBindText = register({
       textElement = selectedElements[1] as ExcalidrawTextElement;
       container = selectedElements[0] as ExcalidrawTextContainer;
     }
-    mutateElement(textElement!, {
+    mutateElement(textElement, {
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
     });
@@ -91,9 +91,9 @@ export const actionBindText = register({
     );
     updatedElements.splice(textElementIndex, 1);
     const containerIndex = updatedElements.findIndex(
-      (ele) => ele.id === container!.id,
+      (ele) => ele.id === container.id,
     );
-    updatedElements.splice(containerIndex + 1, 0, textElement!);
+    updatedElements.splice(containerIndex + 1, 0, textElement);
     return {
       elements: updatedElements,
       appState: { ...appState, selectedElementIds: { [container.id]: true } },
