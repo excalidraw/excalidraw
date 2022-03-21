@@ -165,6 +165,9 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         aria-keyshortcuts={props["aria-keyshortcuts"]}
         data-testid={props["data-testid"]}
         id={`${excalId}-${props.id}`}
+        onPointerDown={(e) => {
+          props.onPointerDown?.({ pointerType: e.pointerType });
+        }}
         onChange={() => {
           props.onChange?.({ pointerType: lastPointerTypeRef.current });
         }}
