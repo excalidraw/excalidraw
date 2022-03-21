@@ -107,6 +107,7 @@
     "decreaseFontSize": "Уменьшить шрифт",
     "increaseFontSize": "Увеличить шрифт",
     "unbindText": "Отвязать текст",
+    "bindText": "",
     "link": {
       "edit": "Редактировать ссылку",
       "create": "Создать ссылку",
