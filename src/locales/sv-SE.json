@@ -107,7 +107,7 @@
     "decreaseFontSize": "Minska fontstorleken",
     "increaseFontSize": "Öka fontstorleken",
     "unbindText": "Koppla bort text",
-    "bindText": "",
+    "bindText": "Bind texten till behållaren",
     "link": {
       "edit": "Redigera länk",
       "create": "Skapa länk",
@@ -224,7 +224,7 @@
     "publishLibrary": "Publicera ditt eget bibliotek",
     "bindTextToElement": "Tryck på Enter för att lägga till text",
     "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra",
-    "eraserRevert": ""
+    "eraserRevert": "Håll Alt för att återställa de element som är markerade för borttagning"
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
