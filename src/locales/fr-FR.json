@@ -107,6 +107,7 @@
     "decreaseFontSize": "Réduire la taille de police",
     "increaseFontSize": "Augmenter la taille de police",
     "unbindText": "Délier le texte",
+    "bindText": "",
     "link": {
       "edit": "Modifier le lien",
       "create": "Créer un lien",
