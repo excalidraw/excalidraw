@@ -107,6 +107,7 @@
     "decreaseFontSize": "Minska fontstorleken",
     "increaseFontSize": "Öka fontstorleken",
     "unbindText": "Koppla bort text",
+    "bindText": "",
     "link": {
       "edit": "Redigera länk",
       "create": "Skapa länk",
