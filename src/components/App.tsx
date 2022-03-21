@@ -5393,6 +5393,16 @@ class App extends React.Component<AppProps, AppState> {
       this.actionManager.getAppState(),
     );
 
+    const mayBeAllowUnbinding = actionUnbindText.contextItemPredicate(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const mayBeAllowBinding = actionBindText.contextItemPredicate(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
     const separator = "separator";
 
     const elements = this.scene.getElements();
@@ -5405,30 +5415,6 @@ class App extends React.Component<AppProps, AppState> {
     if (probablySupportsClipboardWriteText && elements.length > 0) {
       options.push(actionCopyAsSvg);
     }
-
-    const selectedElements = getSelectedElements(elements, this.state);
-
-    let allowBinding = false;
-    if (selectedElements.length === 2) {
-      const textElement =
-        isTextElement(selectedElements[0]) ||
-        isTextElement(selectedElements[1]);
-
-      let bindingContainer;
-      if (isTextBindableContainer(selectedElements[0])) {
-        bindingContainer = selectedElements[0];
-      } else if (isTextBindableContainer(selectedElements[1])) {
-        bindingContainer = selectedElements[1];
-      }
-      if (
-        textElement &&
-        bindingContainer &&
-        getBoundTextElement(bindingContainer) === null
-      ) {
-        allowBinding = true;
-      }
-    }
-
     if (type === "canvas") {
       const viewModeOptions = [
         ...options,
@@ -5474,7 +5460,7 @@ class App extends React.Component<AppProps, AppState> {
             ((probablySupportsClipboardBlob && elements.length > 0) ||
               (probablySupportsClipboardWriteText && elements.length > 0)) &&
               separator,
-            allowBinding && actionBindText,
+            mayBeAllowBinding && actionBindText,
             actionSelectAll,
             separator,
             typeof this.props.gridModeEnabled === "undefined" &&
@@ -5494,11 +5480,6 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
     } else if (type === "element") {
-      const selectedElements = getSelectedElements(elements, this.state);
-      const elementsWithUnbindedText = selectedElements.some(
-        (element) => !hasBoundTextElement(element),
-      );
-
       if (this.state.viewModeEnabled) {
         ContextMenu.push({
           options: [navigator.clipboard && actionCopy, ...options],
@@ -5532,8 +5513,8 @@ class App extends React.Component<AppProps, AppState> {
             actionPasteStyles,
             separator,
             maybeGroupAction && actionGroup,
-            !elementsWithUnbindedText && actionUnbindText,
-            allowBinding && actionBindText,
+            mayBeAllowUnbinding && actionUnbindText,
+            mayBeAllowBinding && actionBindText,
             maybeUngroupAction && actionUngroup,
             (maybeGroupAction || maybeUngroupAction) && separator,
             actionAddToLibrary,

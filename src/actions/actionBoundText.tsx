@@ -6,7 +6,10 @@ import {
   measureText,
   redrawTextBoundingBox,
 } from "../element/textElement";
-import { isTextBindableContainer } from "../element/typeChecks";
+import {
+  hasBoundTextElement,
+  isTextBindableContainer,
+} from "../element/typeChecks";
 import {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
@@ -18,6 +21,10 @@ import { register } from "./register";
 export const actionUnbindText = register({
   name: "unbindText",
   contextItemLabel: "labels.unbindText",
+  contextItemPredicate: (elements, appState) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    return selectedElements.some((element) => hasBoundTextElement(element));
+  },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
@@ -55,6 +62,30 @@ export const actionUnbindText = register({
 export const actionBindText = register({
   name: "bindText",
   contextItemLabel: "labels.bindText",
+  contextItemPredicate: (elements, appState) => {
+    const selectedElements = getSelectedElements(elements, appState);
+
+    if (selectedElements.length === 2) {
+      const textElement =
+        isTextElement(selectedElements[0]) ||
+        isTextElement(selectedElements[1]);
+
+      let bindingContainer;
+      if (isTextBindableContainer(selectedElements[0])) {
+        bindingContainer = selectedElements[0];
+      } else if (isTextBindableContainer(selectedElements[1])) {
+        bindingContainer = selectedElements[1];
+      }
+      if (
+        textElement &&
+        bindingContainer &&
+        getBoundTextElement(bindingContainer) === null
+      ) {
+        return true;
+      }
+    }
+    return false;
+  },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
