@@ -2217,7 +2217,9 @@ class App extends React.Component<AppProps, AppState> {
       container = getTextBindableContainerAtPosition(
         this.scene
           .getElements()
-          .filter((ele) => !isTextElement(ele) && !getBoundTextElement(ele)),
+          .filter(
+            (ele) => isTextBindableContainer(ele) && !getBoundTextElement(ele),
+          ),
         sceneX,
         sceneY,
       );
