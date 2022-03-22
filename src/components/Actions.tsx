@@ -213,6 +213,14 @@ export const ShapesSwitcher = ({
           aria-label={capitalizeString(label)}
           aria-keyshortcuts={shortcut}
           data-testid={value}
+          onPointerDown={({ pointerType }) => {
+            if (!appState.penDetected && pointerType === "pen") {
+              setAppState({
+                penDetected: true,
+                penMode: true,
+              });
+            }
+          }}
           onChange={({ pointerType }) => {
             setAppState({
               elementType: value,
