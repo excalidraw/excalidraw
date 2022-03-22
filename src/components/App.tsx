@@ -50,6 +50,7 @@ import {
   DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
+  ELEMENT_READY_TO_ERASE_OPACITY,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
@@ -2215,7 +2216,11 @@ class App extends React.Component<AppProps, AppState> {
       (shouldBind || parentCenterPosition)
     ) {
       container = getTextBindableContainerAtPosition(
-        this.scene.getElements().filter((ele) => !isTextElement(ele)),
+        this.scene
+          .getElements()
+          .filter(
+            (ele) => isTextBindableContainer(ele) && !getBoundTextElement(ele),
+          ),
         sceneX,
         sceneY,
       );
@@ -2779,11 +2784,17 @@ class App extends React.Component<AppProps, AppState> {
       elements.forEach((element) => {
         idsToUpdate.push(element.id);
         if (event.altKey) {
-          if (pointerDownState.elementIdsToErase[element.id]) {
-            pointerDownState.elementIdsToErase[element.id] = false;
+          if (
+            pointerDownState.elementIdsToErase[element.id] &&
+            pointerDownState.elementIdsToErase[element.id].erase
+          ) {
+            pointerDownState.elementIdsToErase[element.id].erase = false;
           }
-        } else {
-          pointerDownState.elementIdsToErase[element.id] = true;
+        } else if (!pointerDownState.elementIdsToErase[element.id]) {
+          pointerDownState.elementIdsToErase[element.id] = {
+            erase: true,
+            opacity: element.opacity,
+          };
         }
       });
     };
@@ -2827,13 +2838,18 @@ class App extends React.Component<AppProps, AppState> {
           : ele.id;
       if (idsToUpdate.includes(id)) {
         if (event.altKey) {
-          if (pointerDownState.elementIdsToErase[id] === false) {
+          if (
+            pointerDownState.elementIdsToErase[id] &&
+            pointerDownState.elementIdsToErase[id].erase === false
+          ) {
             return newElementWith(ele, {
-              opacity: this.state.currentItemOpacity,
+              opacity: pointerDownState.elementIdsToErase[id].opacity,
             });
           }
         } else {
-          return newElementWith(ele, { opacity: 20 });
+          return newElementWith(ele, {
+            opacity: ELEMENT_READY_TO_ERASE_OPACITY,
+          });
         }
       }
       return ele;
@@ -4446,14 +4462,18 @@ class App extends React.Component<AppProps, AppState> {
             scenePointer.x,
             scenePointer.y,
           );
-
           hitElements.forEach(
             (hitElement) =>
-              (pointerDownState.elementIdsToErase[hitElement.id] = true),
+              (pointerDownState.elementIdsToErase[hitElement.id] = {
+                erase: true,
+                opacity: hitElement.opacity,
+              }),
           );
         }
         this.eraseElements(pointerDownState);
         return;
+      } else if (Object.keys(pointerDownState.elementIdsToErase).length) {
+        this.restoreReadyToEraseElements(pointerDownState);
       }
 
       if (
@@ -4595,13 +4615,43 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  private restoreReadyToEraseElements = (
+    pointerDownState: PointerDownState,
+  ) => {
+    const elements = this.scene.getElements().map((ele) => {
+      if (
+        pointerDownState.elementIdsToErase[ele.id] &&
+        pointerDownState.elementIdsToErase[ele.id].erase
+      ) {
+        return newElementWith(ele, {
+          opacity: pointerDownState.elementIdsToErase[ele.id].opacity,
+        });
+      } else if (
+        isBoundToContainer(ele) &&
+        pointerDownState.elementIdsToErase[ele.containerId] &&
+        pointerDownState.elementIdsToErase[ele.containerId].erase
+      ) {
+        return newElementWith(ele, {
+          opacity: pointerDownState.elementIdsToErase[ele.containerId].opacity,
+        });
+      }
+      return ele;
+    });
+
+    this.scene.replaceAllElements(elements);
+  };
+
   private eraseElements = (pointerDownState: PointerDownState) => {
     const elements = this.scene.getElements().map((ele) => {
-      if (pointerDownState.elementIdsToErase[ele.id]) {
+      if (
+        pointerDownState.elementIdsToErase[ele.id] &&
+        pointerDownState.elementIdsToErase[ele.id].erase
+      ) {
         return newElementWith(ele, { isDeleted: true });
       } else if (
         isBoundToContainer(ele) &&
-        pointerDownState.elementIdsToErase[ele.containerId]
+        pointerDownState.elementIdsToErase[ele.containerId] &&
+        pointerDownState.elementIdsToErase[ele.containerId].erase
       ) {
         return newElementWith(ele, { isDeleted: true });
       }

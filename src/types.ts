@@ -384,7 +384,12 @@ export type PointerDownState = Readonly<{
   boxSelection: {
     hasOccurred: boolean;
   };
-  elementIdsToErase: { [key: ExcalidrawElement["id"]]: boolean };
+  elementIdsToErase: {
+    [key: ExcalidrawElement["id"]]: {
+      opacity: ExcalidrawElement["opacity"];
+      erase: boolean;
+    };
+  };
 }>;
 
 export type ExcalidrawImperativeAPI = {
