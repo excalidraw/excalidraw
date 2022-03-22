@@ -4442,7 +4442,10 @@ class App extends React.Component<AppProps, AppState> {
       // Code below handles selection when element(s) weren't
       // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
-      if (isEraserActive(this.state)) {
+      if (
+        isEraserActive(this.state) ||
+        Object.keys(pointerDownState.elementIdsToErase).length
+      ) {
         const draggedDistance = distance2d(
           this.lastPointerDown!.clientX,
           this.lastPointerDown!.clientY,
