@@ -64,6 +64,9 @@ export const SelectedShapeActions = ({
     hasBackground(elementType) ||
     targetElements.some((element) => hasBackground(element.type));
 
+  const showLinkIcon =
+    targetElements.length === 1 || isSingleElementBoundContainer;
+
   let commonSelectedType: string | null = targetElements[0]?.type || null;
 
   for (const element of targetElements) {
@@ -177,7 +180,7 @@ export const SelectedShapeActions = ({
             {!deviceType.isMobile && renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
-            {targetElements.length === 1 && renderAction("hyperlink")}
+            {showLinkIcon && renderAction("hyperlink")}
           </div>
         </fieldset>
       )}
