@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@sentry/browser": "6.2.5",
-    "@sentry/integrations": "6.2.5",
+    "@sentry/integrations": "6.19.1",
     "@testing-library/jest-dom": "5.16.2",
     "@testing-library/react": "12.1.2",
     "@tldraw/vec": "1.4.3",
@@ -67,7 +67,7 @@
     "eslint-plugin-prettier": "3.3.1",
     "husky": "7.0.4",
     "jest-canvas-mock": "2.3.1",
-    "lint-staged": "12.3.3",
+    "lint-staged": "12.3.7",
     "pepjs": "0.5.3",
     "prettier": "2.5.1",
     "rewire": "5.0.0"
