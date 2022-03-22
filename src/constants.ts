@@ -188,3 +188,5 @@ export const VERTICAL_ALIGN = {
   MIDDLE: "middle",
   BOTTOM: "bottom",
 };
+
+export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
