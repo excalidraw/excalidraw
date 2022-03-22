@@ -4472,6 +4472,8 @@ class App extends React.Component<AppProps, AppState> {
         }
         this.eraseElements(pointerDownState);
         return;
+      } else if (Object.keys(pointerDownState.elementIdsToErase).length) {
+        this.restoreReadyToEraseElements(pointerDownState);
       }
 
       if (
@@ -4612,6 +4614,32 @@ class App extends React.Component<AppProps, AppState> {
       }
     });
   }
+
+  private restoreReadyToEraseElements = (
+    pointerDownState: PointerDownState,
+  ) => {
+    const elements = this.scene.getElements().map((ele) => {
+      if (
+        pointerDownState.elementIdsToErase[ele.id] &&
+        pointerDownState.elementIdsToErase[ele.id].erase
+      ) {
+        return newElementWith(ele, {
+          opacity: pointerDownState.elementIdsToErase[ele.id].opacity,
+        });
+      } else if (
+        isBoundToContainer(ele) &&
+        pointerDownState.elementIdsToErase[ele.containerId] &&
+        pointerDownState.elementIdsToErase[ele.containerId].erase
+      ) {
+        return newElementWith(ele, {
+          opacity: pointerDownState.elementIdsToErase[ele.containerId].opacity,
+        });
+      }
+      return ele;
+    });
+
+    this.scene.replaceAllElements(elements);
+  };
 
   private eraseElements = (pointerDownState: PointerDownState) => {
     const elements = this.scene.getElements().map((ele) => {
