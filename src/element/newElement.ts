@@ -12,6 +12,7 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawRectangleElement,
+  ExcalidrawCustomElement,
 } from "../element/types";
 import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -318,6 +319,17 @@ export const newImageElement = (
   };
 };
 
+export const newCustomElement = (
+  name: string,
+  opts: {
+    type: ExcalidrawCustomElement["type"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawCustomElement> => {
+  return {
+    ..._newElementBase<ExcalidrawCustomElement>("custom", opts),
+    name,
+  };
+};
 // Simplified deep clone for the purpose of cloning ExcalidrawElement only
 // (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
 //

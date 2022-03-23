@@ -83,6 +83,9 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     scale: [number, number];
   }>;
 
+export type ExcalidrawCustomElement = _ExcalidrawElementBase &
+  Readonly<{ type: "custom"; name: string }>;
+
 export type InitializedExcalidrawImageElement = MarkNonNullable<
   ExcalidrawImageElement,
   "fileId"
@@ -107,7 +110,8 @@ export type ExcalidrawElement =
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawFreeDrawElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawCustomElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: boolean;
@@ -133,7 +137,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawCustomElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement

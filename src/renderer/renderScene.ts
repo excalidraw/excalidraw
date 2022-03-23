@@ -190,7 +190,6 @@ export const renderScene = (
   if (canvas === null) {
     return { atLeastOneVisibleElement: false };
   }
-
   const {
     renderScrollbars = true,
     renderSelection = true,

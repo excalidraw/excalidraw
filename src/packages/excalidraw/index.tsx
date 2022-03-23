@@ -36,6 +36,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
     autoFocus = false,
     generateIdForFile,
     onLinkOpen,
+    renderCustomElementWidget,
+    customElementsConfig,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -98,6 +100,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
         autoFocus={autoFocus}
         generateIdForFile={generateIdForFile}
         onLinkOpen={onLinkOpen}
+        renderCustomElementWidget={renderCustomElementWidget}
+        customElementsConfig={customElementsConfig}
       />
     </InitializeApp>
   );

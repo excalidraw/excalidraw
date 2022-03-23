@@ -250,6 +250,16 @@ const drawElementOnCanvas = (
       }
       break;
     }
+
+    case "custom": {
+      const config = renderConfig.customElementsConfig?.find(
+        (config) => config.name === element.name,
+      );
+      const img = document.createElement("img");
+      img.src = config!.svg;
+      context.drawImage(img, 0, 0, element.width, element.height);
+      break;
+    }
     default: {
       if (isTextElement(element)) {
         const rtl = isRTL(element.text);
@@ -779,7 +789,8 @@ export const renderElement = (
     case "line":
     case "arrow":
     case "image":
-    case "text": {
+    case "text":
+    case "custom": {
       generateElementShape(element, generator);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -809,6 +820,7 @@ export const renderElement = (
       }
       break;
     }
+
     default: {
       // @ts-ignore
       throw new Error(`Unimplemented type ${element.type}`);

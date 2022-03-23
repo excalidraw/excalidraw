@@ -77,7 +77,7 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
-  elementType: typeof SHAPES[number]["value"] | "eraser";
+  elementType: typeof SHAPES[number]["value"] | "eraser" | "custom";
   elementLocked: boolean;
   penMode: boolean;
   penDetected: boolean;
@@ -206,6 +206,15 @@ export type ExcalidrawAPIRefValue =
       ready?: false;
     };
 
+type CustomElementConfig = {
+  type: "custom";
+  name: string;
+  resize?: boolean;
+  rotate?: boolean;
+  svg: string;
+  width?: number;
+  height?: number;
+};
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly ExcalidrawElement[],
@@ -253,6 +262,8 @@ export interface ExcalidrawProps {
       nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
   ) => void;
+  renderCustomElementWidget?: (appState: AppState) => void;
+  customElementsConfig?: CustomElementConfig[];
 }
 
 export type SceneData = {
@@ -412,6 +423,7 @@ export type ExcalidrawImperativeAPI = {
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
   id: string;
+  setCustomType: InstanceType<typeof App>["setCustomType"];
 };
 
 export type DeviceType = {

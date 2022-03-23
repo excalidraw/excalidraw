@@ -119,7 +119,11 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
+import {
+  deepCopyElement,
+  newCustomElement,
+  newFreeDrawElement,
+} from "../element/newElement";
 import {
   hasBoundTextElement,
   isBindingElement,
@@ -327,6 +331,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   contextMenuOpen: boolean = false;
   lastScenePointer: { x: number; y: number } | null = null;
+  customElementName: string | null = null;
 
   constructor(props: AppProps) {
     super(props);
@@ -378,6 +383,7 @@ class App extends React.Component<AppProps, AppState> {
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
         id: this.id,
+        setCustomType: this.setCustomType,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -406,6 +412,48 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
   }
+
+  setCustomType = (name: string) => {
+    this.setState({ elementType: "custom" });
+    this.customElementName = name;
+  };
+
+  renderCustomElement = (
+    coords: { x: number; y: number },
+    name: string = "",
+  ) => {
+    const config = this.props.customElementsConfig!.find(
+      (config) => config.name === name,
+    )!;
+
+    const [gridX, gridY] = getGridPoint(
+      coords.x,
+      coords.y,
+      this.state.gridSize,
+    );
+
+    const width = config.width || 40;
+    const height = config.height || 40;
+    const customElement = newCustomElement(name, {
+      type: "custom",
+      x: gridX - width / 2,
+      y: gridY - height / 2,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+      width,
+      height,
+    });
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      customElement,
+    ]);
+  };
 
   private renderCanvas() {
     const canvasScale = window.devicePixelRatio;
@@ -530,6 +578,7 @@ class App extends React.Component<AppProps, AppState> {
               library={this.library}
               id={this.id}
               onImageAction={this.onImageAction}
+              renderCustomElementWidget={this.props.renderCustomElementWidget}
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
@@ -1224,6 +1273,7 @@ class App extends React.Component<AppProps, AppState> {
         imageCache: this.imageCache,
         isExporting: false,
         renderScrollbars: !this.deviceType.isMobile,
+        customElementsConfig: this.props.customElementsConfig,
       },
     );
 
@@ -2986,6 +3036,17 @@ class App extends React.Component<AppProps, AppState> {
         x,
         y,
       });
+    } else if (this.state.elementType === "custom") {
+      if (this.customElementName) {
+        setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
+        this.renderCustomElement(
+          {
+            x: pointerDownState.origin.x,
+            y: pointerDownState.origin.y,
+          },
+          this.customElementName,
+        );
+      }
     } else if (this.state.elementType === "freedraw") {
       this.handleFreeDrawElementOnPointerDown(
         event,

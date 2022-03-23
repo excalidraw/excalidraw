@@ -67,6 +67,7 @@ interface LayerUIProps {
   library: Library;
   id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
+  renderCustomElementWidget?: (appState: AppState) => void;
 }
 
 const LayerUI = ({
@@ -94,6 +95,7 @@ const LayerUI = ({
   library,
   id,
   onImageAction,
+  renderCustomElementWidget,
 }: LayerUIProps) => {
   const deviceType = useDeviceType();
 
@@ -437,6 +439,8 @@ const LayerUI = ({
                     })}
                   >
                     {actionManager.renderAction("eraser", { size: "small" })}
+                    {renderCustomElementWidget &&
+                      renderCustomElementWidget(appState)}
                   </div>
                 </>
               )}

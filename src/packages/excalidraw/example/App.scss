@@ -6,7 +6,7 @@
 .button-wrapper button {
   z-index: 1;
   height: 40px;
-  max-width: 200px;
+  max-width: 250px;
   margin: 10px;
   padding: 5px;
 }
@@ -16,7 +16,7 @@
 }
 
 .excalidraw-wrapper {
-  height: 800px;
+  height: 600px;
   margin: 50px;
 }
 
@@ -46,4 +46,9 @@
   --color-primary-darker: #f783ac;
   --color-primary-darkest: #e64980;
   --color-primary-light: #fcc2d7;
+}
+
+.custom-element {
+  width: 2rem;
+  height: 2rem;
 }

@@ -44,6 +44,7 @@ export const AllowedExcalidrawElementTypes: Record<
   arrow: true,
   freedraw: true,
   eraser: false,
+  custom: true,
 };
 
 export type RestoredDataState = {
@@ -193,6 +194,8 @@ const restoreElement = (
         y,
       });
     }
+    case "custom":
+      return restoreElementWithProperties(element, { name: "custom" });
     // generic elements
     case "ellipse":
       return restoreElementWithProperties(element, {});
