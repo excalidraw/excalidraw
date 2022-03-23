@@ -3458,7 +3458,7 @@ class App extends React.Component<AppProps, AppState> {
           });
           // If we click on something
         } else if (hitElement != null) {
-          if (hitElement.locked) {
+          if (hitElement.locked && !event.metaKey) {
             return true;
           }
 
