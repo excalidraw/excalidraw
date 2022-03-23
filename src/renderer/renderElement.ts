@@ -6,6 +6,7 @@ import {
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
+  ExcalidrawCustomElement,
 } from "../element/types";
 import {
   isTextElement,
@@ -189,6 +190,9 @@ const drawImagePlaceholder = (
   );
 };
 
+const customElementImgCache: {
+  [key: ExcalidrawCustomElement["name"]]: HTMLImageElement;
+} = {};
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -254,10 +258,20 @@ const drawElementOnCanvas = (
     case "custom": {
       const config = renderConfig.customElementsConfig?.find(
         (config) => config.name === element.name,
+      )!;
+      if (!customElementImgCache[config.name]) {
+        const img = document.createElement("img");
+        img.id = config.name;
+        img.src = config.svg;
+        customElementImgCache[img.id] = img;
+      }
+      context.drawImage(
+        customElementImgCache[config.name],
+        0,
+        0,
+        element.width,
+        element.height,
       );
-      const img = document.createElement("img");
-      img.src = config!.svg;
-      context.drawImage(img, 0, 0, element.width, element.height);
       break;
     }
     default: {
