@@ -222,6 +222,10 @@ export const getTransformHandles = (
   zoom: Zoom,
   pointerType: PointerType = "mouse",
 ): TransformHandles => {
+  if (element.locked) {
+    return {};
+  }
+
   let omitSides: { [T in TransformHandleType]?: boolean } = {};
   if (
     element.type === "arrow" ||
