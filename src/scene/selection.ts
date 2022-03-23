@@ -3,20 +3,27 @@ import {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
-import { AppState } from "../types";
+import { AppState, ExcalidrawProps } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
+import { getCustomElementConfig } from "../utils";
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
+  customElementConfig: ExcalidrawProps["customElementsConfig"],
 ) => {
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
     getElementAbsoluteCoords(selection);
   return elements.filter((element) => {
     const [elementX1, elementY1, elementX2, elementY2] =
       getElementBounds(element);
-
+    const isCustom = element.type === "custom";
+    const allowSelection = isCustom
+      ? getCustomElementConfig(customElementConfig, element.name)
+          ?.transformHandles
+      : true;
     return (
+      allowSelection &&
       element.type !== "selection" &&
       !isBoundToContainer(element) &&
       selectionX1 <= elementX1 &&

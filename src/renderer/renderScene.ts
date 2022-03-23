@@ -2,7 +2,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 import oc from "open-color";
 
-import { AppState, BinaryFiles, Zoom } from "../types";
+import { AppState, BinaryFiles, CustomElementConfig, Zoom } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -47,7 +47,11 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
+import {
+  viewportCoordsToSceneCoords,
+  supportsEmoji,
+  getCustomElementConfig,
+} from "../utils";
 import { UserIdleState } from "../types";
 import { THEME_FILTER } from "../constants";
 import {
@@ -304,24 +308,35 @@ export const renderScene = (
     !appState.editingLinearElement
   ) {
     const selections = elements.reduce((acc, element) => {
+      const isCustom = element.type === "custom";
+      let config: CustomElementConfig;
       const selectionColors = [];
-      // local user
-      if (
-        appState.selectedElementIds[element.id] &&
-        !isSelectedViaGroup(appState, element)
-      ) {
-        selectionColors.push(oc.black);
+
+      if (element.type === "custom") {
+        config = getCustomElementConfig(
+          renderConfig.customElementsConfig,
+          element.name,
+        )!;
       }
-      // remote users
-      if (renderConfig.remoteSelectedElementIds[element.id]) {
-        selectionColors.push(
-          ...renderConfig.remoteSelectedElementIds[element.id].map(
-            (socketId) => {
-              const { background } = getClientColors(socketId, appState);
-              return background;
-            },
-          ),
-        );
+      if (!isCustom || (isCustom && config!.transformHandles)) {
+        // local user
+        if (
+          appState.selectedElementIds[element.id] &&
+          !isSelectedViaGroup(appState, element)
+        ) {
+          selectionColors.push(oc.black);
+        }
+        // remote users
+        if (renderConfig.remoteSelectedElementIds[element.id]) {
+          selectionColors.push(
+            ...renderConfig.remoteSelectedElementIds[element.id].map(
+              (socketId) => {
+                const { background } = getClientColors(socketId, appState);
+                return background;
+              },
+            ),
+          );
+        }
       }
       if (selectionColors.length) {
         const [elementX1, elementY1, elementX2, elementY2] =
@@ -351,7 +366,6 @@ export const renderScene = (
         selectionColors: [oc.black],
       });
     };
-
     for (const groupId of getSelectedGroupIds(appState)) {
       // TODO: support multiplayer selected group IDs
       addSelectionForGroupId(groupId);
@@ -371,19 +385,32 @@ export const renderScene = (
     context.save();
     context.translate(renderConfig.scrollX, renderConfig.scrollY);
     if (locallySelectedElements.length === 1) {
-      context.fillStyle = oc.white;
-      const transformHandles = getTransformHandles(
-        locallySelectedElements[0],
-        renderConfig.zoom,
-        "mouse", // when we render we don't know which pointer type so use mouse
-      );
-      if (!appState.viewModeEnabled) {
-        renderTransformHandles(
-          context,
-          renderConfig,
-          transformHandles,
-          locallySelectedElements[0].angle,
+      let showTransformHandles = true;
+      if (locallySelectedElements[0].type === "custom") {
+        const config = getCustomElementConfig(
+          renderConfig.customElementsConfig,
+          locallySelectedElements[0].name,
         );
+        if (!config || !config.transformHandles) {
+          showTransformHandles = false;
+        }
+      }
+      if (showTransformHandles) {
+        context.fillStyle = oc.white;
+        const transformHandles = getTransformHandles(
+          locallySelectedElements[0],
+          renderConfig.zoom,
+          "mouse", // when we render we don't know which pointer type so use mouse
+        );
+
+        if (!appState.viewModeEnabled) {
+          renderTransformHandles(
+            context,
+            renderConfig,
+            transformHandles,
+            locallySelectedElements[0].angle,
+          );
+        }
       }
     } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
       const dashedLinePadding = 4 / renderConfig.zoom.value;
@@ -570,6 +597,7 @@ const renderTransformHandles = (
   renderConfig: RenderConfig,
   transformHandles: TransformHandles,
   angle: number,
+  name?: string,
 ): void => {
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];

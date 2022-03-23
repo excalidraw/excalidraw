@@ -9,7 +9,10 @@ import "../../css/styles.scss";
 
 import { AppProps, ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { defaultLang } from "../../i18n";
-import { DEFAULT_UI_OPTIONS } from "../../constants";
+import {
+  DEFAULT_UI_OPTIONS,
+  DEFAULT_CUSTOM_ELEMENT_CONFIG,
+} from "../../constants";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
@@ -37,7 +40,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
     generateIdForFile,
     onLinkOpen,
     renderCustomElementWidget,
-    customElementsConfig,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -48,6 +50,11 @@ const Excalidraw = (props: ExcalidrawProps) => {
       ...canvasActions,
     },
   };
+  const customElementsConfig: AppProps["customElementsConfig"] =
+    props.customElementsConfig?.map((customElementConfig) => ({
+      ...DEFAULT_CUSTOM_ELEMENT_CONFIG,
+      ...customElementConfig,
+    }));
 
   if (canvasActions?.export) {
     UIOptions.canvasActions.export.saveFileToDisk =

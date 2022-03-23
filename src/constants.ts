@@ -1,5 +1,5 @@
 import cssVariables from "./css/variables.module.scss";
-import { AppProps } from "./types";
+import { AppProps, CustomElementConfig } from "./types";
 import { FontFamilyValues } from "./element/types";
 
 export const APP_NAME = "Excalidraw";
@@ -152,6 +152,14 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
   },
 };
 
+export const DEFAULT_CUSTOM_ELEMENT_CONFIG: Required<CustomElementConfig> = {
+  type: "custom",
+  name: "custom",
+  transformHandles: true,
+  svg: "",
+  width: 40,
+  height: 40,
+};
 export const MQ_MAX_WIDTH_PORTRAIT = 730;
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
 export const MQ_MAX_HEIGHT_LANDSCAPE = 500;

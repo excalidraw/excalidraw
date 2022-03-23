@@ -206,11 +206,10 @@ export type ExcalidrawAPIRefValue =
       ready?: false;
     };
 
-type CustomElementConfig = {
+export type CustomElementConfig = {
   type: "custom";
   name: string;
-  resize?: boolean;
-  rotate?: boolean;
+  transformHandles?: boolean;
   svg: string;
   width?: number;
   height?: number;
@@ -317,6 +316,7 @@ export type AppProps = ExcalidrawProps & {
   detectScroll: boolean;
   handleKeyboardGlobally: boolean;
   isCollaborating: boolean;
+  customElementsConfig: Required<CustomElementConfig>[] | undefined;
 };
 
 /** A subset of App class properties that we need to use elsewhere

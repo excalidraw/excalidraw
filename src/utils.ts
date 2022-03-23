@@ -11,7 +11,7 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { AppState, DataURL, Zoom } from "./types";
+import { AppState, DataURL, ExcalidrawProps, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 
@@ -611,4 +611,14 @@ export const updateObject = <T extends Record<string, any>>(
     ...obj,
     ...updates,
   };
+};
+
+export const getCustomElementConfig = (
+  customElementConfig: ExcalidrawProps["customElementsConfig"],
+  name: string,
+) => {
+  if (!customElementConfig) {
+    return null;
+  }
+  return customElementConfig.find((config) => config.name === name);
 };

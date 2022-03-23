@@ -223,6 +223,7 @@ import {
   withBatchedUpdatesThrottled,
   updateObject,
   setEraserCursor,
+  getCustomElementConfig,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -422,10 +423,13 @@ class App extends React.Component<AppProps, AppState> {
     coords: { x: number; y: number },
     name: string = "",
   ) => {
-    const config = this.props.customElementsConfig!.find(
-      (config) => config.name === name,
-    )!;
-
+    const config = getCustomElementConfig(
+      this.props.customElementsConfig,
+      name,
+    );
+    if (!config) {
+      return;
+    }
     const [gridX, gridY] = getGridPoint(
       coords.x,
       coords.y,
@@ -3393,6 +3397,15 @@ class App extends React.Component<AppProps, AppState> {
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
+        if (selectedElements[0].type === "custom") {
+          const config = getCustomElementConfig(
+            this.props.customElementsConfig,
+            selectedElements[0].name,
+          );
+          if (!config?.transformHandles) {
+            return false;
+          }
+        }
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
             elements,
@@ -4209,6 +4222,7 @@ class App extends React.Component<AppProps, AppState> {
           const elementsWithinSelection = getElementsWithinSelection(
             elements,
             draggingElement,
+            this.props.customElementsConfig,
           );
           this.setState((prevState) =>
             selectGroupsForSelectedElements(
