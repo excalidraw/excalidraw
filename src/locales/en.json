@@ -112,6 +112,12 @@
       "edit": "Edit link",
       "create": "Create link",
       "label": "Link"
+    },
+    "lock": {
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "lockAll": "Lock all",
+      "unlockAll": "Unlock all"
     }
   },
   "buttons": {
@@ -335,7 +341,6 @@
     "noteItems": "Each library item must have its own name so it's filterable. The following library items will be included:",
     "atleastOneLibItem": "Please select at least one library item to get started"
   },
-
   "publishSuccessDialog": {
     "title": "Library submitted",
     "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",

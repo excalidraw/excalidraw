@@ -30,6 +30,7 @@ import {
   actionBindText,
   actionUngroup,
   actionLink,
+  actionLock,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -1546,6 +1547,7 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
+      locked: false,
     });
 
     this.scene.replaceAllElements([
@@ -2277,6 +2279,7 @@ class App extends React.Component<AppProps, AppState> {
             : DEFAULT_VERTICAL_ALIGN,
           containerId: container?.id ?? undefined,
           groupIds: container?.groupIds ?? [],
+          locked: false,
         });
 
     this.setState({ editingElement: element });
@@ -3455,6 +3458,10 @@ class App extends React.Component<AppProps, AppState> {
           });
           // If we click on something
         } else if (hitElement != null) {
+          if (hitElement.locked) {
+            return true;
+          }
+
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
             if (!this.state.selectedElementIds[hitElement.id]) {
@@ -3603,6 +3610,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemLinearStrokeSharpness,
       simulatePressure: event.pressure === 0.5,
+      locked: false,
     });
 
     this.setState((prevState) => ({
@@ -3658,6 +3666,7 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+      locked: false,
     });
 
     return element;
@@ -3745,6 +3754,7 @@ class App extends React.Component<AppProps, AppState> {
         strokeSharpness: this.state.currentItemLinearStrokeSharpness,
         startArrowhead,
         endArrowhead,
+        locked: false,
       });
       this.setState((prevState) => ({
         selectedElementIds: {
@@ -3793,6 +3803,7 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
+      locked: false,
     });
 
     if (element.type === "selection") {
@@ -5577,6 +5588,7 @@ class App extends React.Component<AppProps, AppState> {
             (maybeFlipHorizontal || maybeFlipVertical) && separator,
             actionLink.contextItemPredicate(elements, this.state) && actionLink,
             actionDuplicateSelection,
+            actionLock,
             actionDeleteSelected,
           ],
           top,

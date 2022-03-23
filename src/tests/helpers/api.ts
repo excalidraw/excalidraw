@@ -100,6 +100,7 @@ export class API {
       ? ExcalidrawTextElement["containerId"]
       : never;
     points?: T extends "arrow" | "line" ? readonly Point[] : never;
+    locked?: boolean;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
@@ -125,6 +126,7 @@ export class API {
       roughness: rest.roughness ?? appState.currentItemRoughness,
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,
+      locked: rest.locked ?? false,
     };
     switch (type) {
       case "rectangle":
