@@ -40,6 +40,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     generateIdForFile,
     onLinkOpen,
     renderCustomElementWidget,
+    onElementClick,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -109,6 +110,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         onLinkOpen={onLinkOpen}
         renderCustomElementWidget={renderCustomElementWidget}
         customElementsConfig={customElementsConfig}
+        onElementClick={onElementClick}
       />
     </InitializeApp>
   );
@@ -207,3 +209,5 @@ export {
   newElementWith,
   bumpVersion,
 } from "../../element/mutateElement";
+
+export { sceneCoordsToViewportCoords } from "../../utils";

@@ -9,7 +9,12 @@ import { MIME_TYPES } from "../../../constants";
 
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
-const { exportToCanvas, exportToSvg, exportToBlob } = window.Excalidraw;
+const {
+  exportToCanvas,
+  exportToSvg,
+  exportToBlob,
+  sceneCoordsToViewportCoords,
+} = window.Excalidraw;
 const Excalidraw = window.Excalidraw.default;
 
 const STAR_SVG = (
@@ -56,7 +61,7 @@ const renderFooter = () => {
 
 export default function App() {
   const excalidrawRef = useRef(null);
-
+  const excalidrawWrapperRef = useRef(null);
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
@@ -200,6 +205,39 @@ export default function App() {
       },
     ];
   };
+
+  const onElementClick = (element) => {
+    if (element.type === "custom" && element.customType === "comment") {
+      const { x: viewPortX, y: viewPortY } = sceneCoordsToViewportCoords(
+        {
+          sceneX: element.x,
+          sceneY: element.y,
+        },
+        excalidrawRef.current.getAppState(),
+      );
+      const textarea = document.createElement("textarea");
+      Object.assign(textarea.style, {
+        position: "absolute",
+        display: "inline-block",
+        left: `${viewPortX + element.width / 2}px`,
+        top: `${viewPortY + element.height / 2}px`,
+        height: `${100}px`,
+        width: `${100}px`,
+        zIndex: 10,
+        className: "comment-textarea",
+        whiteSpace: "pre-wrap",
+        fontSize: "13px",
+      });
+      textarea.placeholder = "Start typing your comments";
+      textarea.onblur = () => {
+        textarea.remove();
+      };
+      excalidrawWrapperRef.current
+        .querySelector(".excalidraw")
+        .append(textarea);
+      textarea.focus();
+    }
+  };
   return (
     <div className="App">
       <h1> Excalidraw Example</h1>
@@ -273,7 +311,7 @@ export default function App() {
             Switch to Dark Theme
           </label>
         </div>
-        <div className="excalidraw-wrapper">
+        <div className="excalidraw-wrapper" ref={excalidrawWrapperRef}>
           <Excalidraw
             ref={excalidrawRef}
             initialData={initialStatePromiseRef.current.promise}
@@ -295,6 +333,7 @@ export default function App() {
             onLinkOpen={onLinkOpen}
             renderCustomElementWidget={renderCustomElementWidget}
             customElementsConfig={getCustomElementsConfig()}
+            onElementClick={onElementClick}
           />
         </div>
 

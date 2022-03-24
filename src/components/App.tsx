@@ -3091,15 +3091,13 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
-    if (this.deviceType.isTouchScreen) {
+    let hitElement;
+    if (this.deviceType.isTouchScreen || this.props.onElementClick) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
       );
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-      );
+      hitElement = this.getElementAtPosition(scenePointer.x, scenePointer.y);
       this.hitLinkElement = this.getElementLinkAtPosition(
         scenePointer,
         hitElement,
@@ -3112,6 +3110,23 @@ class App extends React.Component<AppProps, AppState> {
       this.redirectToLink(event, this.deviceType.isTouchScreen);
     }
 
+    if (
+      this.state.elementType === "selection" &&
+      this.props.onElementClick &&
+      hitElement
+    ) {
+      const threshold = 5;
+      const isSinglePointClick =
+        distance2d(
+          this.lastPointerDown!.clientX,
+          this.lastPointerDown!.clientY,
+          this.lastPointerUp!.clientX,
+          this.lastPointerUp!.clientY,
+        ) <= threshold;
+      if (isSinglePointClick) {
+        this.props.onElementClick(hitElement, event);
+      }
+    }
     this.removePointer(event);
   };
 
@@ -4517,6 +4532,7 @@ class App extends React.Component<AppProps, AppState> {
       // Code below handles selection when element(s) weren't
       // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
+
       if (isEraserActive(this.state)) {
         const draggedDistance = distance2d(
           this.lastPointerDown!.clientX,
@@ -4550,7 +4566,6 @@ class App extends React.Component<AppProps, AppState> {
       } else if (Object.keys(pointerDownState.elementIdsToErase).length) {
         this.restoreReadyToEraseElements(pointerDownState);
       }
-
       if (
         hitElement &&
         !pointerDownState.drag.hasOccurred &&

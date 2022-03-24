@@ -263,6 +263,10 @@ export interface ExcalidrawProps {
   ) => void;
   renderCustomElementWidget?: (appState: AppState) => void;
   customElementsConfig?: CustomElementConfig[];
+  onElementClick: (
+    element: NonDeleted<ExcalidrawElement>,
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => void;
 }
 
 export type SceneData = {
