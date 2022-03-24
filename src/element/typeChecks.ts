@@ -10,6 +10,7 @@ import {
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextContainer,
+  ExcalidrawCustomElement,
 } from "./types";
 
 export const isGenericElement = (
@@ -133,3 +134,7 @@ export const isBoundToContainer = (
     element !== null && isTextElement(element) && element.containerId !== null
   );
 };
+
+export const isCustomElement = (
+  element: ExcalidrawElement,
+): element is ExcalidrawCustomElement => element && element.type === "custom";

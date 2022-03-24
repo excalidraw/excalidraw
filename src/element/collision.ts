@@ -33,13 +33,20 @@ import { Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
-import { hasBoundTextElement, isImageElement } from "./typeChecks";
+import {
+  hasBoundTextElement,
+  isCustomElement,
+  isImageElement,
+} from "./typeChecks";
 import { isTextElement } from ".";
 import { isTransparent } from "../utils";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
 ): boolean => {
+  if (isCustomElement(element)) {
+    return true;
+  }
   if (element.type === "arrow") {
     return false;
   }
