@@ -5588,7 +5588,7 @@ class App extends React.Component<AppProps, AppState> {
             (maybeFlipHorizontal || maybeFlipVertical) && separator,
             actionLink.contextItemPredicate(elements, this.state) && actionLink,
             actionDuplicateSelection,
-            actionLock,
+            Object.keys(this.state.selectedGroupIds).length === 0 && actionLock,
             actionDeleteSelected,
           ],
           top,
