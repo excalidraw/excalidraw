@@ -2769,7 +2769,8 @@ class App extends React.Component<AppProps, AppState> {
           this.isHittingCommonBoundingBoxOfSelectedElements(
             scenePointer,
             selectedElements,
-          ))
+          )) &&
+        !hitElement?.locked
       ) {
         setCursor(this.canvas, CURSOR_TYPE.MOVE);
       } else {
