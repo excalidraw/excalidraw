@@ -2785,6 +2785,10 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     const updateElementIds = (elements: ExcalidrawElement[]) => {
       elements.forEach((element) => {
+        if (element.locked) {
+          return;
+        }
+
         idsToUpdate.push(element.id);
         if (event.altKey) {
           if (
