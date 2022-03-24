@@ -140,11 +140,7 @@ export const actionChangeTextElementSubtype = register({
               }),
               appState.textOpts,
             );
-            redrawTextBoundingBox(
-              newElement,
-              getContainerElement(oldElement),
-              appState,
-            );
+            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
             return newElement;
           }
 
@@ -237,11 +233,7 @@ const changeFontSize = (
           let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
             fontSize: newFontSize,
           });
-          redrawTextBoundingBox(
-            newElement,
-            getContainerElement(oldElement),
-            appState,
-          );
+          redrawTextBoundingBox(newElement, getContainerElement(oldElement));
 
           newElement = offsetElementAfterFontResize(oldElement, newElement);
 
@@ -714,11 +706,7 @@ export const actionChangeFontFamily = register({
                 fontFamily: value,
               },
             );
-            redrawTextBoundingBox(
-              newElement,
-              getContainerElement(oldElement),
-              appState,
-            );
+            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
             return newElement;
           }
 
@@ -803,11 +791,7 @@ export const actionChangeTextAlign = register({
               oldElement,
               { textAlign: value },
             );
-            redrawTextBoundingBox(
-              newElement,
-              getContainerElement(oldElement),
-              appState,
-            );
+            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
             return newElement;
           }
 
@@ -886,11 +870,7 @@ export const actionChangeVerticalAlign = register({
               { verticalAlign: value },
             );
 
-            redrawTextBoundingBox(
-              newElement,
-              getContainerElement(oldElement),
-              appState,
-            );
+            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
             return newElement;
           }
 
