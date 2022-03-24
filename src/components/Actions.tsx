@@ -15,7 +15,12 @@ import {
 } from "../scene";
 import { SHAPES } from "../shapes";
 import { AppState, Zoom } from "../types";
-import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
+import {
+  capitalizeString,
+  isTransparent,
+  setCursorForShape,
+  withBatchedUpdates,
+} from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { getTextLikeActions } from "../textlike";
@@ -59,6 +64,9 @@ export const SelectedShapeActions = ({
   const showChangeBackgroundIcons =
     hasBackground(elementType) ||
     targetElements.some((element) => hasBackground(element.type));
+
+  const showLinkIcon =
+    targetElements.length === 1 || isSingleElementBoundContainer;
 
   let commonSelectedType: string | null = targetElements[0]?.type || null;
 
@@ -179,7 +187,7 @@ export const SelectedShapeActions = ({
             {!deviceType.isMobile && renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
-            {targetElements.length === 1 && renderAction("hyperlink")}
+            {showLinkIcon && renderAction("hyperlink")}
           </div>
         </fieldset>
       )}
@@ -199,43 +207,66 @@ export const ShapesSwitcher = ({
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: AppState;
-}) => (
-  <>
-    {SHAPES.map(({ value, icon, key }, index) => {
-      const label = t(`toolBar.${value}`);
-      const letter = key && (typeof key === "string" ? key : key[0]);
-      const shortcut = letter
-        ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
-        : `${index + 1}`;
-      return (
-        <ToolButton
-          className="Shape"
-          key={value}
-          type="radio"
-          icon={icon}
-          checked={elementType === value}
-          name="editor-current-shape"
-          title={`${capitalizeString(label)} — ${shortcut}`}
-          keyBindingLabel={`${index + 1}`}
-          aria-label={capitalizeString(label)}
-          aria-keyshortcuts={shortcut}
-          data-testid={value}
-          onChange={({ pointerType }) => {
-            setAppState({
-              elementType: value,
-              multiElement: null,
-              selectedElementIds: {},
-            });
-            setCursorForShape(canvas, { ...appState, elementType: value });
-            if (value === "image") {
-              onImageAction({ pointerType });
-            }
-          }}
-        />
-      );
-    })}
-  </>
-);
+}) => {
+  const onChange = withBatchedUpdates(
+    ({
+      elementType,
+      pointerType,
+    }: {
+      elementType: typeof SHAPES[number]["value"];
+      pointerType: PointerType | null;
+    }) => {
+      if (!appState.penDetected && pointerType === "pen") {
+        setAppState({
+          penDetected: true,
+          penMode: true,
+        });
+      }
+      setAppState({
+        elementType,
+        multiElement: null,
+        selectedElementIds: {},
+      });
+      setCursorForShape(canvas, { ...appState, elementType });
+      if (elementType === "image") {
+        onImageAction({ pointerType });
+      }
+    },
+  );
+
+  return (
+    <>
+      {SHAPES.map(({ value, icon, key }, index) => {
+        const label = t(`toolBar.${value}`);
+        const letter = key && (typeof key === "string" ? key : key[0]);
+        const shortcut = letter
+          ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
+          : `${index + 1}`;
+        return (
+          <ToolButton
+            className="Shape"
+            key={value}
+            type="radio"
+            icon={icon}
+            checked={elementType === value}
+            name="editor-current-shape"
+            title={`${capitalizeString(label)} — ${shortcut}`}
+            keyBindingLabel={`${index + 1}`}
+            aria-label={capitalizeString(label)}
+            aria-keyshortcuts={shortcut}
+            data-testid={value}
+            onPointerDown={({ pointerType }) => {
+              onChange({ elementType: value, pointerType });
+            }}
+            onChange={({ pointerType }) => {
+              onChange({ elementType: value, pointerType });
+            }}
+          />
+        );
+      })}
+    </>
+  );
+};
 
 export const ZoomActions = ({
   renderAction,
