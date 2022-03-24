@@ -1,3 +1,4 @@
+import { newElementWith } from "../element/mutateElement";
 import { getSelectedElements } from "../scene";
 import { register } from "./register";
 
@@ -22,10 +23,7 @@ export const actionLock = register({
           return element;
         }
 
-        return {
-          ...element,
-          locked: operation === "lock",
-        };
+        return newElementWith(element, { locked: operation === "lock" });
       }),
       appState,
       commitToHistory: true,
