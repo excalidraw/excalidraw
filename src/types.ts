@@ -208,7 +208,7 @@ export type ExcalidrawAPIRefValue =
 
 export type CustomElementConfig = {
   type: "custom";
-  name: string;
+  customType: string;
   transformHandles?: boolean;
   svg: string;
   width?: number;

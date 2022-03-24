@@ -320,14 +320,14 @@ export const newImageElement = (
 };
 
 export const newCustomElement = (
-  name: string,
+  customType: string,
   opts: {
     type: ExcalidrawCustomElement["type"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawCustomElement> => {
   return {
     ..._newElementBase<ExcalidrawCustomElement>("custom", opts),
-    name,
+    customType,
   };
 };
 // Simplified deep clone for the purpose of cloning ExcalidrawElement only

@@ -154,7 +154,7 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
 
 export const DEFAULT_CUSTOM_ELEMENT_CONFIG: Required<CustomElementConfig> = {
   type: "custom",
-  name: "custom",
+  customType: "custom",
   transformHandles: true,
   svg: "",
   width: 40,

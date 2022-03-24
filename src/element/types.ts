@@ -84,7 +84,7 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
   }>;
 
 export type ExcalidrawCustomElement = _ExcalidrawElementBase &
-  Readonly<{ type: "custom"; name: string }>;
+  Readonly<{ type: "custom"; customType: string }>;
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<
   ExcalidrawImageElement,

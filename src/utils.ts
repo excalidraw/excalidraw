@@ -615,10 +615,10 @@ export const updateObject = <T extends Record<string, any>>(
 
 export const getCustomElementConfig = (
   customElementConfig: ExcalidrawProps["customElementsConfig"],
-  name: string,
+  customType: string,
 ) => {
   if (!customElementConfig) {
     return null;
   }
-  return customElementConfig.find((config) => config.name === name);
+  return customElementConfig.find((config) => config.customType === customType);
 };

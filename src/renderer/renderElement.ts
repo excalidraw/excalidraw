@@ -197,7 +197,7 @@ const drawImagePlaceholder = (
 };
 
 const customElementImgCache: {
-  [key: ExcalidrawCustomElement["name"]]: HTMLImageElement;
+  [key: ExcalidrawCustomElement["customType"]]: HTMLImageElement;
 } = {};
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
@@ -264,19 +264,19 @@ const drawElementOnCanvas = (
     case "custom": {
       const config = getCustomElementConfig(
         renderConfig.customElementsConfig,
-        element.name,
+        element.customType,
       );
       if (!config) {
         break;
       }
-      if (!customElementImgCache[config.name]) {
+      if (!customElementImgCache[config.customType]) {
         const img = document.createElement("img");
-        img.id = config.name;
+        img.id = config.customType;
         img.src = config.svg;
         customElementImgCache[img.id] = img;
       }
       context.drawImage(
-        customElementImgCache[config.name],
+        customElementImgCache[config.customType],
         0,
         0,
         element.width,

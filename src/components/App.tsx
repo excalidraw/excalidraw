@@ -421,11 +421,11 @@ class App extends React.Component<AppProps, AppState> {
 
   renderCustomElement = (
     coords: { x: number; y: number },
-    name: string = "",
+    customType: string = "",
   ) => {
     const config = getCustomElementConfig(
       this.props.customElementsConfig,
-      name,
+      customType,
     );
     if (!config) {
       return;
@@ -438,7 +438,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const width = config.width || 40;
     const height = config.height || 40;
-    const customElement = newCustomElement(name, {
+    const customElement = newCustomElement(customType, {
       type: "custom",
       x: gridX - width / 2,
       y: gridY - height / 2,
@@ -3400,7 +3400,7 @@ class App extends React.Component<AppProps, AppState> {
         if (selectedElements[0].type === "custom") {
           const config = getCustomElementConfig(
             this.props.customElementsConfig,
-            selectedElements[0].name,
+            selectedElements[0].customType,
           );
           if (!config?.transformHandles) {
             return false;

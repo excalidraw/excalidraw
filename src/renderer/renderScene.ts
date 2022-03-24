@@ -315,7 +315,7 @@ export const renderScene = (
       if (element.type === "custom") {
         config = getCustomElementConfig(
           renderConfig.customElementsConfig,
-          element.name,
+          element.customType,
         )!;
       }
       if (!isCustom || (isCustom && config!.transformHandles)) {
@@ -389,7 +389,7 @@ export const renderScene = (
       if (locallySelectedElements[0].type === "custom") {
         const config = getCustomElementConfig(
           renderConfig.customElementsConfig,
-          locallySelectedElements[0].name,
+          locallySelectedElements[0].customType,
         );
         if (!config || !config.transformHandles) {
           showTransformHandles = false;

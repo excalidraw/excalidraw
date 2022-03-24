@@ -179,7 +179,7 @@ export default function App() {
     return [
       {
         type: "custom",
-        name: "star",
+        customType: "star",
         svg: `data:${
           MIME_TYPES.svg
         }, ${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
@@ -190,7 +190,7 @@ export default function App() {
       },
       {
         type: "custom",
-        name: "comment",
+        customType: "comment",
         svg: `data:${
           MIME_TYPES.svg
         }, ${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">

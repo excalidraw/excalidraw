@@ -195,7 +195,7 @@ const restoreElement = (
       });
     }
     case "custom":
-      return restoreElementWithProperties(element, { name: "custom" });
+      return restoreElementWithProperties(element, { customType: "custom" });
     // generic elements
     case "ellipse":
       return restoreElementWithProperties(element, {});

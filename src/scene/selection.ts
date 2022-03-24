@@ -19,7 +19,7 @@ export const getElementsWithinSelection = (
       getElementBounds(element);
     const isCustom = element.type === "custom";
     const allowSelection = isCustom
-      ? getCustomElementConfig(customElementConfig, element.name)
+      ? getCustomElementConfig(customElementConfig, element.customType)
           ?.transformHandles
       : true;
     return (
