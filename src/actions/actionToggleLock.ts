@@ -4,8 +4,8 @@ import { CODES, KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { register } from "./register";
 
-export const actionLock = register({
-  name: "lock",
+export const actionToggleLock = register({
+  name: "toggleLock",
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState, false);
     const selectedElementIds = new Set(

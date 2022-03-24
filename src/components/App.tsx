@@ -30,7 +30,7 @@ import {
   actionBindText,
   actionUngroup,
   actionLink,
-  actionLock,
+  actionToggleLock,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -5593,7 +5593,8 @@ class App extends React.Component<AppProps, AppState> {
             (maybeFlipHorizontal || maybeFlipVertical) && separator,
             actionLink.contextItemPredicate(elements, this.state) && actionLink,
             actionDuplicateSelection,
-            Object.keys(this.state.selectedGroupIds).length === 0 && actionLock,
+            Object.keys(this.state.selectedGroupIds).length === 0 &&
+              actionToggleLock,
             actionDeleteSelected,
           ],
           top,

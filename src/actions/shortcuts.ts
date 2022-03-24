@@ -29,7 +29,7 @@ export type ShortcutName = SubtypeOf<
   | "flipHorizontal"
   | "flipVertical"
   | "hyperlink"
-  | "lock"
+  | "toggleLock"
 >;
 
 const shortcutMap: Record<ShortcutName, string[]> = {
@@ -68,7 +68,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   flipVertical: [getShortcutKey("Shift+V")],
   viewMode: [getShortcutKey("Alt+R")],
   hyperlink: [getShortcutKey("CtrlOrCmd+K")],
-  lock: [getShortcutKey("CtrlOrCmd+Shift+K")],
+  toggleLock: [getShortcutKey("CtrlOrCmd+Shift+K")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName) => {
