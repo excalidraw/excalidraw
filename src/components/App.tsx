@@ -3415,6 +3415,10 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.y,
           );
 
+        if (pointerDownState.hit.element?.locked && !event.metaKey) {
+          pointerDownState.hit.element = null;
+        }
+
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
           if (
@@ -3463,10 +3467,6 @@ class App extends React.Component<AppProps, AppState> {
           });
           // If we click on something
         } else if (hitElement != null) {
-          if (hitElement.locked && !event.metaKey) {
-            return true;
-          }
-
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
             if (!this.state.selectedElementIds[hitElement.id]) {
