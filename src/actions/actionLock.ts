@@ -1,4 +1,5 @@
 import { newElementWith } from "../element/mutateElement";
+import { CODES, KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { register } from "./register";
 
@@ -44,5 +45,13 @@ export const actionLock = register({
     throw new Error(
       "Unexpected zero elements to lock. This should never happen.",
     );
+  },
+  keyTest: (event, appState, elements) => {
+    const selected = getSelectedElements(elements, appState, false);
+    if (selected.length === 0) {
+      return false;
+    }
+
+    return event.code === CODES.K && event[KEYS.CTRL_OR_CMD] && event.shiftKey;
   },
 });
