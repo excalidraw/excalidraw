@@ -1,4 +1,5 @@
 import { newElementWith } from "../element/mutateElement";
+import { ExcalidrawElement } from "../element/types";
 import { CODES, KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { register } from "./register";
@@ -15,8 +16,7 @@ export const actionLock = register({
       return false;
     }
 
-    // It's safe to infer the operation from the first element because selection logic will ensure that selected elements are all of the same locked state
-    const operation = selectedElements[0].locked ? "unlock" : "lock";
+    const operation = getOperation(selectedElements);
 
     return {
       elements: elements.map((element) => {
@@ -37,9 +37,9 @@ export const actionLock = register({
     }
 
     if (selected.length > 1) {
-      return selected[0].locked
-        ? "labels.lock.unlockAll"
-        : "labels.lock.lockAll";
+      return getOperation(selected) === "lock"
+        ? "labels.lock.lockAll"
+        : "labels.lock.unlockAll";
     }
 
     throw new Error(
@@ -55,3 +55,7 @@ export const actionLock = register({
     return event.code === CODES.K && event[KEYS.CTRL_OR_CMD] && event.shiftKey;
   },
 });
+
+const getOperation = (
+  elements: readonly ExcalidrawElement[],
+): "lock" | "unlock" => (elements.some((el) => !el.locked) ? "lock" : "unlock");
