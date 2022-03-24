@@ -1035,7 +1035,7 @@ const setUseTexForSelectedElements = (
       isMathJaxLoaded,
     );
     mutateElement(el, metrics);
-    redrawTextBoundingBox(el, getContainerElement(element), appState);
+    redrawTextBoundingBox(el, getContainerElement(element));
   });
 
   // Set the default value for new math-text elements.
