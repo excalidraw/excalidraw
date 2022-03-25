@@ -30,12 +30,12 @@ export const SelectedShapeActions = ({
   appState,
   elements,
   renderAction,
-  elementType,
+  activeTool,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
-  elementType: AppState["elementType"];
+  activeTool: AppState["activeTool"];
 }) => {
   const targetElements = getTargetElements(
     getNonDeletedElements(elements),
@@ -55,13 +55,13 @@ export const SelectedShapeActions = ({
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
-    hasBackground(elementType) ||
+    hasBackground(activeTool) ||
     targetElements.some(
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
   const showChangeBackgroundIcons =
-    hasBackground(elementType) ||
+    hasBackground(activeTool) ||
     targetElements.some((element) => hasBackground(element.type));
 
   const showLinkIcon =
@@ -78,23 +78,23 @@ export const SelectedShapeActions = ({
 
   return (
     <div className="panelColumn">
-      {((hasStrokeColor(elementType) &&
-        elementType !== "image" &&
+      {((hasStrokeColor(activeTool) &&
+        activeTool !== "image" &&
         commonSelectedType !== "image") ||
         targetElements.some((element) => hasStrokeColor(element.type))) &&
         renderAction("changeStrokeColor")}
       {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
       {showFillIcons && renderAction("changeFillStyle")}
 
-      {(hasStrokeWidth(elementType) ||
+      {(hasStrokeWidth(activeTool) ||
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}
 
-      {(elementType === "freedraw" ||
+      {(activeTool === "freedraw" ||
         targetElements.some((element) => element.type === "freedraw")) &&
         renderAction("changeStrokeShape")}
 
-      {(hasStrokeStyle(elementType) ||
+      {(hasStrokeStyle(activeTool) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>
           {renderAction("changeStrokeStyle")}
@@ -102,12 +102,12 @@ export const SelectedShapeActions = ({
         </>
       )}
 
-      {(canChangeSharpness(elementType) ||
+      {(canChangeSharpness(activeTool) ||
         targetElements.some((element) => canChangeSharpness(element.type))) && (
         <>{renderAction("changeSharpness")}</>
       )}
 
-      {(hasText(elementType) ||
+      {(hasText(activeTool) ||
         targetElements.some((element) => hasText(element.type))) && (
         <>
           {renderAction("changeFontSize")}
@@ -122,7 +122,7 @@ export const SelectedShapeActions = ({
         (element) =>
           hasBoundTextElement(element) || isBoundToContainer(element),
       ) && renderAction("changeVerticalAlign")}
-      {(canHaveArrowheads(elementType) ||
+      {(canHaveArrowheads(activeTool) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
       )}
@@ -190,23 +190,23 @@ export const SelectedShapeActions = ({
 
 export const ShapesSwitcher = ({
   canvas,
-  elementType,
+  activeTool,
   setAppState,
   onImageAction,
   appState,
 }: {
   canvas: HTMLCanvasElement | null;
-  elementType: AppState["elementType"];
+  activeTool: AppState["activeTool"];
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: AppState;
 }) => {
   const onChange = withBatchedUpdates(
     ({
-      elementType,
+      activeTool,
       pointerType,
     }: {
-      elementType: typeof SHAPES[number]["value"];
+      activeTool: typeof SHAPES[number]["value"];
       pointerType: PointerType | null;
     }) => {
       if (!appState.penDetected && pointerType === "pen") {
@@ -216,12 +216,12 @@ export const ShapesSwitcher = ({
         });
       }
       setAppState({
-        elementType,
+        activeTool,
         multiElement: null,
         selectedElementIds: {},
       });
-      setCursorForShape(canvas, { ...appState, elementType });
-      if (elementType === "image") {
+      setCursorForShape(canvas, { ...appState, activeTool });
+      if (activeTool === "image") {
         onImageAction({ pointerType });
       }
     },
@@ -241,7 +241,7 @@ export const ShapesSwitcher = ({
             key={value}
             type="radio"
             icon={icon}
-            checked={elementType === value}
+            checked={activeTool === value}
             name="editor-current-shape"
             title={`${capitalizeString(label)} — ${shortcut}`}
             keyBindingLabel={`${index + 1}`}
@@ -249,10 +249,10 @@ export const ShapesSwitcher = ({
             aria-keyshortcuts={shortcut}
             data-testid={value}
             onPointerDown={({ pointerType }) => {
-              onChange({ elementType: value, pointerType });
+              onChange({ activeTool: value, pointerType });
             }}
             onChange={({ pointerType }) => {
-              onChange({ elementType: value, pointerType });
+              onChange({ activeTool: value, pointerType });
             }}
           />
         );

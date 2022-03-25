@@ -847,10 +847,10 @@ export const actionChangeSharpness = register({
     );
     const shouldUpdateForNonLinearElements = targetElements.length
       ? targetElements.every((el) => !isLinearElement(el))
-      : !isLinearElementType(appState.elementType);
+      : !isLinearElementType(appState.activeTool);
     const shouldUpdateForLinearElements = targetElements.length
       ? targetElements.every(isLinearElement)
-      : isLinearElementType(appState.elementType);
+      : isLinearElementType(appState.activeTool);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -890,8 +890,8 @@ export const actionChangeSharpness = register({
           elements,
           appState,
           (element) => element.strokeSharpness,
-          (canChangeSharpness(appState.elementType) &&
-            (isLinearElementType(appState.elementType)
+          (canChangeSharpness(appState.activeTool) &&
+            (isLinearElementType(appState.activeTool)
               ? appState.currentItemLinearStrokeSharpness
               : appState.currentItemStrokeSharpness)) ||
             null,

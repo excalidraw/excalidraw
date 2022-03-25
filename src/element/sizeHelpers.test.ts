@@ -2,22 +2,22 @@ import { getPerfectElementSize } from "./sizeHelpers";
 import * as constants from "../constants";
 
 describe("getPerfectElementSize", () => {
-  it("should return height:0 if `elementType` is line and locked angle is 0", () => {
+  it("should return height:0 if `activeTool` is line and locked angle is 0", () => {
     const { height, width } = getPerfectElementSize("line", 149, 10);
     expect(width).toEqual(149);
     expect(height).toEqual(0);
   });
-  it("should return width:0 if `elementType` is line and locked angle is 90 deg (Math.PI/2)", () => {
+  it("should return width:0 if `activeTool` is line and locked angle is 90 deg (Math.PI/2)", () => {
     const { height, width } = getPerfectElementSize("line", 10, 140);
     expect(width).toEqual(0);
     expect(height).toEqual(140);
   });
-  it("should return height:0 if `elementType` is arrow and locked angle is 0", () => {
+  it("should return height:0 if `activeTool` is arrow and locked angle is 0", () => {
     const { height, width } = getPerfectElementSize("arrow", 200, 20);
     expect(width).toEqual(200);
     expect(height).toEqual(0);
   });
-  it("should return width:0 if `elementType` is arrow and locked angle is 90 deg (Math.PI/2)", () => {
+  it("should return width:0 if `activeTool` is arrow and locked angle is 90 deg (Math.PI/2)", () => {
     const { height, width } = getPerfectElementSize("arrow", 10, 100);
     expect(width).toEqual(0);
     expect(height).toEqual(100);

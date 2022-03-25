@@ -984,7 +984,7 @@ import { isLinearElement } from "@excalidraw/excalidraw";
 **Signature**
 
 <pre>
-isLinearElement(elementType?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L80">ExcalidrawElement</a>): boolean
+isLinearElement(activeTool?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L80">ExcalidrawElement</a>): boolean
 </pre>
 
 This function returns true if the element is linear type (`arrow` |`line`) else returns false.

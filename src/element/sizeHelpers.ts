@@ -16,7 +16,7 @@ export const isInvisiblySmallElement = (
  * Makes a perfect shape or diagonal/horizontal/vertical line
  */
 export const getPerfectElementSize = (
-  elementType: string,
+  activeTool: string,
   width: number,
   height: number,
 ): { width: number; height: number } => {
@@ -24,9 +24,9 @@ export const getPerfectElementSize = (
   const absHeight = Math.abs(height);
 
   if (
-    elementType === "line" ||
-    elementType === "arrow" ||
-    elementType === "freedraw"
+    activeTool === "line" ||
+    activeTool === "arrow" ||
+    activeTool === "freedraw"
   ) {
     const lockedAngle =
       Math.round(Math.atan(absHeight / absWidth) / SHIFT_LOCKING_ANGLE) *
@@ -40,7 +40,7 @@ export const getPerfectElementSize = (
         Math.round(absWidth * Math.tan(lockedAngle)) * Math.sign(height) ||
         height;
     }
-  } else if (elementType !== "selection") {
+  } else if (activeTool !== "selection") {
     height = absWidth * Math.sign(height);
   }
   return { width, height };

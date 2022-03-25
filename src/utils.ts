@@ -268,13 +268,13 @@ export const setCursorForShape = (
   if (!canvas) {
     return;
   }
-  if (appState.elementType === "selection") {
+  if (appState.activeTool === "selection") {
     resetCursor(canvas);
-  } else if (appState.elementType === "eraser") {
+  } else if (appState.activeTool === "eraser") {
     setEraserCursor(canvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
-  } else if (appState.elementType !== "image") {
+  } else if (appState.activeTool !== "image") {
     canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };

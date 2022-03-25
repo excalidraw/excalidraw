@@ -186,13 +186,13 @@ const validateTwoPointElementNormalized = (
 };
 
 const getPerfectElementSizeWithRotation = (
-  elementType: string,
+  activeTool: string,
   width: number,
   height: number,
   angle: number,
 ): [number, number] => {
   const size = getPerfectElementSize(
-    elementType,
+    activeTool,
     ...rotate(width, height, 0, 0, angle),
   );
   return rotate(size.width, size.height, 0, 0, -angle);

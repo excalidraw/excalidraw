@@ -133,7 +133,7 @@ export const actionDeleteSelected = register({
       elements: nextElements,
       appState: {
         ...nextAppState,
-        elementType: "selection",
+        activeTool: "selection",
         multiElement: null,
       },
       commitToHistory: isSomeElementSelected(

@@ -24,7 +24,7 @@ Object {
   "editingGroupId": null,
   "editingLinearElement": null,
   "elementLocked": false,
-  "elementType": "selection",
+  "activeTool": "selection",
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,

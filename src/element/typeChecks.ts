@@ -49,9 +49,9 @@ export const isFreeDrawElement = (
 };
 
 export const isFreeDrawElementType = (
-  elementType: ExcalidrawElement["type"],
+  activeTool: ExcalidrawElement["type"],
 ): boolean => {
-  return elementType === "freedraw";
+  return activeTool === "freedraw";
 };
 
 export const isLinearElement = (
@@ -61,10 +61,10 @@ export const isLinearElement = (
 };
 
 export const isLinearElementType = (
-  elementType: AppState["elementType"],
+  activeTool: AppState["activeTool"],
 ): boolean => {
   return (
-    elementType === "arrow" || elementType === "line" // || elementType === "freedraw"
+    activeTool === "arrow" || activeTool === "line" // || activeTool === "freedraw"
   );
 };
 
@@ -75,9 +75,9 @@ export const isBindingElement = (
 };
 
 export const isBindingElementType = (
-  elementType: AppState["elementType"],
+  activeTool: AppState["activeTool"],
 ): boolean => {
-  return elementType === "arrow";
+  return activeTool === "arrow";
 };
 
 export const isBindableElement = (

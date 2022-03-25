@@ -92,7 +92,7 @@ export const getDragOffsetXY = (
 
 export const dragNewElement = (
   draggingElement: NonDeletedExcalidrawElement,
-  elementType: AppState["elementType"],
+  activeTool: AppState["activeTool"],
   originX: number,
   originY: number,
   x: number,
@@ -110,7 +110,7 @@ export const dragNewElement = (
       height = width / widthAspectRatio;
     } else {
       ({ width, height } = getPerfectElementSize(
-        elementType,
+        activeTool,
         width,
         y < originY ? -height : height,
       ));

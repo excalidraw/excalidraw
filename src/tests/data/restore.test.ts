@@ -297,12 +297,12 @@ describe("restoreElements", () => {
 describe("restoreAppState", () => {
   it("should restore with imported data", () => {
     const stubImportedAppState = getDefaultAppState();
-    stubImportedAppState.elementType = "selection";
+    stubImportedAppState.activeTool = "selection";
     stubImportedAppState.cursorButton = "down";
     stubImportedAppState.name = "imported app state";
 
     const stubLocalAppState = getDefaultAppState();
-    stubLocalAppState.elementType = "rectangle";
+    stubLocalAppState.activeTool = "rectangle";
     stubLocalAppState.cursorButton = "up";
     stubLocalAppState.name = "local app state";
 
@@ -310,7 +310,7 @@ describe("restoreAppState", () => {
       stubImportedAppState,
       stubLocalAppState,
     );
-    expect(restoredAppState.elementType).toBe(stubImportedAppState.elementType);
+    expect(restoredAppState.activeTool).toBe(stubImportedAppState.activeTool);
     expect(restoredAppState.cursorButton).toBe(
       stubImportedAppState.cursorButton,
     );
@@ -391,14 +391,14 @@ describe("restoreAppState", () => {
   it("when imported data state has a not allowed Excalidraw Element Types", () => {
     const stubImportedAppState: any = getDefaultAppState();
 
-    stubImportedAppState.elementType = "not allowed Excalidraw Element Types";
+    stubImportedAppState.activeTool = "not allowed Excalidraw Element Types";
     const stubLocalAppState = getDefaultAppState();
 
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
       stubLocalAppState,
     );
-    expect(restoredAppState.elementType).toBe("selection");
+    expect(restoredAppState.activeTool).toBe("selection");
   });
 
   describe("with zoom in imported data state", () => {
