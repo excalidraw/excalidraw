@@ -297,7 +297,8 @@
     "title": "Help",
     "view": "View",
     "zoomToFit": "Zoom to fit all elements",
-    "zoomToSelection": "Zoom to selection"
+    "zoomToSelection": "Zoom to selection",
+    "toggleElementLock": "Lock/unlock selection"
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"
