@@ -478,7 +478,7 @@ const getElligibleElementsForBindingElement = (
     getElligibleElementForBindingElement(linearElement, "end"),
   ].filter(
     (element): element is NonDeleted<ExcalidrawBindableElement> =>
-      element != null,
+      element != null && element.locked === false,
   );
 };
 

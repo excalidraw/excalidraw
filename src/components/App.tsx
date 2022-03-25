@@ -5098,6 +5098,7 @@ class App extends React.Component<AppProps, AppState> {
         );
         if (
           hoveredBindableElement != null &&
+          hoveredBindableElement.locked === false &&
           !isLinearElementSimpleAndAlreadyBound(
             linearElement,
             oppositeBindingBoundElement?.id,
