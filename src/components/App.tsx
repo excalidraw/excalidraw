@@ -2201,7 +2201,7 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length === 1) {
       if (isTextElement(selectedElements[0])) {
         existingTextElement = selectedElements[0];
-      } else if (isTextBindableContainer(selectedElements[0])) {
+      } else if (isTextBindableContainer(selectedElements[0], false)) {
         container = selectedElements[0];
         existingTextElement = getBoundTextElement(container);
       }
@@ -2221,7 +2221,8 @@ class App extends React.Component<AppProps, AppState> {
         this.scene
           .getElements()
           .filter(
-            (ele) => isTextBindableContainer(ele) && !getBoundTextElement(ele),
+            (ele) =>
+              isTextBindableContainer(ele, false) && !getBoundTextElement(ele),
           ),
         sceneX,
         sceneY,

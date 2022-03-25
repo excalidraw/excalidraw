@@ -102,9 +102,11 @@ export const isBindableElement = (
 
 export const isTextBindableContainer = (
   element: ExcalidrawElement | null,
+  includeLocked = true,
 ): element is ExcalidrawTextContainer => {
   return (
     element != null &&
+    (!element.locked || includeLocked === true) &&
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
