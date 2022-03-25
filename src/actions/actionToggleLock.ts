@@ -1,6 +1,6 @@
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
-import { CODES, KEYS } from "../keys";
+import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { register } from "./register";
 
@@ -52,7 +52,11 @@ export const actionToggleLock = register({
       return false;
     }
 
-    return event.code === CODES.K && event[KEYS.CTRL_OR_CMD] && event.shiftKey;
+    return (
+      event.key.toLocaleLowerCase() === KEYS.L &&
+      event[KEYS.CTRL_OR_CMD] &&
+      event.shiftKey
+    );
   },
 });
 
