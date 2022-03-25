@@ -26,22 +26,22 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
   if (isEraserActive(appState)) {
     return t("hints.eraserRevert");
   }
-  if (activeTool === "arrow" || activeTool === "line") {
+  if (activeTool.type === "arrow" || activeTool.type === "line") {
     if (!multiMode) {
       return t("hints.linearElement");
     }
     return t("hints.linearElementMulti");
   }
 
-  if (activeTool === "freedraw") {
+  if (activeTool.type === "freedraw") {
     return t("hints.freeDraw");
   }
 
-  if (activeTool === "text") {
+  if (activeTool.type === "text") {
     return t("hints.text");
   }
 
-  if (appState.activeTool === "image" && appState.pendingImageElement) {
+  if (appState.activeTool.type === "image" && appState.pendingImageElement) {
     return t("hints.placeImage");
   }
 
@@ -73,7 +73,7 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
     return t("hints.text_editing");
   }
 
-  if (activeTool === "selection") {
+  if (activeTool.type === "selection") {
     if (
       appState.draggingElement?.type === "selection" &&
       !appState.editingElement &&

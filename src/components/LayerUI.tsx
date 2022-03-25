@@ -248,7 +248,7 @@ const LayerUI = ({
           appState={appState}
           elements={elements}
           renderAction={actionManager.renderAction}
-          activeTool={appState.activeTool}
+          activeTool={appState.activeTool.type}
         />
       </Island>
     </Section>

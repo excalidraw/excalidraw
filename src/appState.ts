@@ -42,7 +42,7 @@ export const getDefaultAppState = (): Omit<
     editingGroupId: null,
     editingLinearElement: null,
     elementLocked: false,
-    activeTool: "selection",
+    activeTool: { type: "selection" },
     penMode: false,
     penDetected: false,
     errorMessage: null,
@@ -218,4 +218,4 @@ export const isEraserActive = ({
   activeTool,
 }: {
   activeTool: AppState["activeTool"];
-}) => activeTool === "eraser";
+}) => activeTool.type === "eraser";

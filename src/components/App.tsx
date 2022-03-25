@@ -812,8 +812,8 @@ class App extends React.Component<AppProps, AppState> {
     scene.appState = {
       ...scene.appState,
       activeTool:
-        scene.appState.activeTool === "image"
-          ? "selection"
+        scene.appState.activeTool.type === "image"
+          ? { type: "selection" }
           : scene.appState.activeTool,
       isLoading: false,
     };
@@ -1068,15 +1068,15 @@ class App extends React.Component<AppProps, AppState> {
       Object.keys(this.state.selectedElementIds).length &&
       isEraserActive(this.state)
     ) {
-      this.setState({ activeTool: "selection" });
+      this.setState({ activeTool: { type: "selection" } });
     }
     if (prevState.theme !== this.state.theme) {
       setEraserCursor(this.canvas, this.state.theme);
     }
     // Hide hyperlink popup if shown when element type is not selection
     if (
-      prevState.activeTool === "selection" &&
-      this.state.activeTool !== "selection" &&
+      prevState.activeTool.type === "selection" &&
+      this.state.activeTool.type !== "selection" &&
       this.state.showHyperlinkPopup
     ) {
       this.setState({ showHyperlinkPopup: false });
@@ -1433,7 +1433,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.text) {
         this.addTextFromPaste(data.text);
       }
-      this.selectShapeTool("selection");
+      this.setActiveTool({ type: "selection" });
       event?.preventDefault();
     },
   );
@@ -1521,7 +1521,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.selectShapeTool("selection");
+    this.setActiveTool({ type: "selection" });
   };
 
   private addTextFromPaste(text: any) {
@@ -1575,7 +1575,7 @@ class App extends React.Component<AppProps, AppState> {
       return {
         elementLocked: !prevState.elementLocked,
         activeTool: prevState.elementLocked
-          ? "selection"
+          ? { type: "selection" }
           : prevState.activeTool,
       };
     });
@@ -1851,7 +1851,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         const shape = findShapeByKey(event.key);
         if (shape) {
-          this.selectShapeTool(shape);
+          this.setActiveTool({ type: shape });
         } else if (event.key === KEYS.Q) {
           this.toggleLock();
         }
@@ -1867,13 +1867,16 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getElements(),
           this.state,
         );
-        if (this.state.activeTool === "selection" && !selectedElements.length) {
+        if (
+          this.state.activeTool.type === "selection" &&
+          !selectedElements.length
+        ) {
           return;
         }
 
         if (
           event.key === KEYS.G &&
-          (hasBackground(this.state.activeTool) ||
+          (hasBackground(this.state.activeTool.type) ||
             selectedElements.some((element) => hasBackground(element.type)))
         ) {
           this.setState({ openPopup: "backgroundColorPicker" });
@@ -1889,7 +1892,7 @@ class App extends React.Component<AppProps, AppState> {
     if (event.key === KEYS.SPACE) {
       if (this.state.viewModeEnabled) {
         setCursor(this.canvas, CURSOR_TYPE.GRAB);
-      } else if (this.state.activeTool === "selection") {
+      } else if (this.state.activeTool.type === "selection") {
         resetCursor(this.canvas);
       } else {
         setCursorForShape(this.canvas, this.state);
@@ -1916,28 +1919,28 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  private selectShapeTool(activeTool: AppState["activeTool"]) {
+  private setActiveTool(tool: AppState["activeTool"]) {
     if (!isHoldingSpace) {
       setCursorForShape(this.canvas, this.state);
     }
     if (isToolIcon(document.activeElement)) {
       this.focusContainer();
     }
-    if (!isLinearElementType(activeTool)) {
+    if (!isLinearElementType(tool.type)) {
       this.setState({ suggestedBindings: [] });
     }
-    if (activeTool === "image") {
+    if (tool.type === "image") {
       this.onImageAction();
     }
-    if (activeTool !== "selection") {
+    if (tool.type !== "selection") {
       this.setState({
-        activeTool,
+        activeTool: tool,
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
       });
     } else {
-      this.setState({ activeTool });
+      this.setState({ activeTool: tool });
     }
   }
 
@@ -2311,7 +2314,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     // we should only be able to double click when mode is selection
-    if (this.state.activeTool !== "selection") {
+    if (this.state.activeTool.type !== "selection") {
       return;
     }
 
@@ -2501,7 +2504,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor =
-        this.state.activeTool === "freedraw" && this.state.penMode
+        this.state.activeTool.type === "freedraw" && this.state.penMode
           ? 1
           : distance / gesture.initialDistance;
 
@@ -2576,7 +2579,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    if (isBindingElementType(this.state.activeTool)) {
+    if (isBindingElementType(this.state.activeTool.type)) {
       // Hovering with a selected tool or creating new linear element via click
       // and point
       const { draggingElement } = this.state;
@@ -2652,9 +2655,9 @@ class App extends React.Component<AppProps, AppState> {
     const hasDeselectedButton = Boolean(event.buttons);
     if (
       hasDeselectedButton ||
-      (this.state.activeTool !== "selection" &&
-        this.state.activeTool !== "text" &&
-        this.state.activeTool !== "eraser")
+      (this.state.activeTool.type !== "selection" &&
+        this.state.activeTool.type !== "text" &&
+        this.state.activeTool.type !== "eraser")
     ) {
       return;
     }
@@ -2731,7 +2734,7 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.showHyperlinkPopup
       ) {
         this.setState({ showHyperlinkPopup: "info" });
-      } else if (this.state.activeTool === "text") {
+      } else if (this.state.activeTool.type === "text") {
         setCursor(
           this.canvas,
           isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
@@ -2943,27 +2946,27 @@ class App extends React.Component<AppProps, AppState> {
     const allowOnPointerDown =
       !this.state.penMode ||
       event.pointerType !== "touch" ||
-      this.state.activeTool === "selection" ||
-      this.state.activeTool === "text" ||
-      this.state.activeTool === "image";
+      this.state.activeTool.type === "selection" ||
+      this.state.activeTool.type === "text" ||
+      this.state.activeTool.type === "image";
 
     if (!allowOnPointerDown) {
       return;
     }
 
-    if (this.state.activeTool === "text") {
+    if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
       return;
     } else if (
-      this.state.activeTool === "arrow" ||
-      this.state.activeTool === "line"
+      this.state.activeTool.type === "arrow" ||
+      this.state.activeTool.type === "line"
     ) {
       this.handleLinearElementOnPointerDown(
         event,
-        this.state.activeTool,
+        this.state.activeTool.type,
         pointerDownState,
       );
-    } else if (this.state.activeTool === "image") {
+    } else if (this.state.activeTool.type === "image") {
       // reset image preview on pointerdown
       setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
 
@@ -2983,15 +2986,15 @@ class App extends React.Component<AppProps, AppState> {
         x,
         y,
       });
-    } else if (this.state.activeTool === "freedraw") {
+    } else if (this.state.activeTool.type === "freedraw") {
       this.handleFreeDrawElementOnPointerDown(
         event,
-        this.state.activeTool,
+        this.state.activeTool.type,
         pointerDownState,
       );
-    } else if (this.state.activeTool !== "eraser") {
+    } else if (this.state.activeTool.type !== "eraser") {
       this.createGenericElementOnPointerDown(
-        this.state.activeTool,
+        this.state.activeTool.type,
         pointerDownState,
       );
     }
@@ -3309,7 +3312,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private clearSelectionIfNotUsingSelection = (): void => {
-    if (this.state.activeTool !== "selection") {
+    if (this.state.activeTool.type !== "selection") {
       this.setState({
         selectedElementIds: {},
         selectedGroupIds: {},
@@ -3325,7 +3328,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
-    if (this.state.activeTool === "selection") {
+    if (this.state.activeTool.type === "selection") {
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
@@ -3570,14 +3573,14 @@ class App extends React.Component<AppProps, AppState> {
     resetCursor(this.canvas);
     if (!this.state.elementLocked) {
       this.setState({
-        activeTool: "selection",
+        activeTool: { type: "selection" },
       });
     }
   };
 
   private handleFreeDrawElementOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
-    activeTool: ExcalidrawFreeDrawElement["type"],
+    elementType: ExcalidrawFreeDrawElement["type"],
     pointerDownState: PointerDownState,
   ) => {
     // Begin a mark capture. This does not have to update state yet.
@@ -3588,7 +3591,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const element = newFreeDrawElement({
-      type: activeTool,
+      type: elementType,
       x: gridX,
       y: gridY,
       strokeColor: this.state.currentItemStrokeColor,
@@ -3879,7 +3882,8 @@ class App extends React.Component<AppProps, AppState> {
       // triggering pointermove)
       if (
         !pointerDownState.drag.hasOccurred &&
-        (this.state.activeTool === "arrow" || this.state.activeTool === "line")
+        (this.state.activeTool.type === "arrow" ||
+          this.state.activeTool.type === "line")
       ) {
         if (
           distance2d(
@@ -4074,7 +4078,7 @@ class App extends React.Component<AppProps, AppState> {
 
         if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
           ({ width: dx, height: dy } = getPerfectElementSize(
-            this.state.activeTool,
+            this.state.activeTool.type,
             dx,
             dy,
           ));
@@ -4102,7 +4106,7 @@ class App extends React.Component<AppProps, AppState> {
         this.maybeDragNewGenericElement(pointerDownState, event);
       }
 
-      if (this.state.activeTool === "selection") {
+      if (this.state.activeTool.type === "selection") {
         pointerDownState.boxSelection.hasOccurred = true;
 
         const elements = this.scene.getElements();
@@ -4382,7 +4386,7 @@ class App extends React.Component<AppProps, AppState> {
             resetCursor(this.canvas);
             this.setState((prevState) => ({
               draggingElement: null,
-              activeTool: "selection",
+              activeTool: { type: "selection" },
               selectedElementIds: {
                 ...prevState.selectedElementIds,
                 [this.state.draggingElement!.id]: true,
@@ -4402,7 +4406,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        activeTool !== "selection" &&
+        activeTool.type !== "selection" &&
         draggingElement &&
         isInvisiblySmallElement(draggingElement)
       ) {
@@ -4571,7 +4575,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (!elementLocked && activeTool !== "freedraw" && draggingElement) {
+      if (!elementLocked && activeTool.type !== "freedraw" && draggingElement) {
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -4581,7 +4585,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        activeTool !== "selection" ||
+        activeTool.type !== "selection" ||
         isSomeElementSelected(this.scene.getElements(), this.state)
       ) {
         this.history.resumeRecording();
@@ -4595,12 +4599,12 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
-      if (!elementLocked && activeTool !== "freedraw") {
+      if (!elementLocked && activeTool.type !== "freedraw") {
         resetCursor(this.canvas);
         this.setState({
           draggingElement: null,
           suggestedBindings: [],
-          activeTool: "selection",
+          activeTool: { type: "selection" },
         });
       } else {
         this.setState({
@@ -4906,7 +4910,7 @@ class App extends React.Component<AppProps, AppState> {
         {
           pendingImageElement: null,
           editingElement: null,
-          activeTool: "selection",
+          activeTool: { type: "selection" },
         },
         () => {
           this.actionManager.executeAction(actionFinalize);
@@ -5276,7 +5280,7 @@ class App extends React.Component<AppProps, AppState> {
         (event.nativeEvent.pointerType === "pen" &&
           // always allow if user uses a pen secondary button
           event.button !== POINTER_BUTTON.SECONDARY)) &&
-      this.state.activeTool !== "selection"
+      this.state.activeTool.type !== "selection"
     ) {
       return;
     }
@@ -5310,10 +5314,13 @@ class App extends React.Component<AppProps, AppState> {
     if (!draggingElement) {
       return;
     }
-    if (draggingElement.type === "selection") {
+    if (
+      draggingElement.type === "selection" &&
+      this.state.activeTool.type !== "eraser"
+    ) {
       dragNewElement(
         draggingElement,
-        this.state.activeTool,
+        this.state.activeTool.type,
         pointerDownState.origin.x,
         pointerDownState.origin.y,
         pointerCoords.x,
@@ -5340,7 +5347,7 @@ class App extends React.Component<AppProps, AppState> {
 
       dragNewElement(
         draggingElement,
-        this.state.activeTool,
+        this.state.activeTool.type,
         pointerDownState.originInGrid.x,
         pointerDownState.originInGrid.y,
         gridX,

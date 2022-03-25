@@ -119,13 +119,13 @@ export const actionFinalize = register({
         );
       }
 
-      if (!appState.elementLocked && appState.activeTool !== "freedraw") {
+      if (!appState.elementLocked && appState.activeTool.type !== "freedraw") {
         appState.selectedElementIds[multiPointElement.id] = true;
       }
     }
 
     if (
-      (!appState.elementLocked && appState.activeTool !== "freedraw") ||
+      (!appState.elementLocked && appState.activeTool.type !== "freedraw") ||
       !multiPointElement
     ) {
       resetCursor(canvas);
@@ -136,10 +136,10 @@ export const actionFinalize = register({
       appState: {
         ...appState,
         activeTool:
-          (appState.elementLocked || appState.activeTool === "freedraw") &&
+          (appState.elementLocked || appState.activeTool.type === "freedraw") &&
           multiPointElement
             ? appState.activeTool
-            : "selection",
+            : { type: "selection" },
         draggingElement: null,
         multiElement: null,
         editingElement: null,
@@ -148,7 +148,7 @@ export const actionFinalize = register({
         selectedElementIds:
           multiPointElement &&
           !appState.elementLocked &&
-          appState.activeTool !== "freedraw"
+          appState.activeTool.type !== "freedraw"
             ? {
                 ...appState.selectedElementIds,
                 [multiPointElement.id]: true,
@@ -156,7 +156,7 @@ export const actionFinalize = register({
             : appState.selectedElementIds,
         pendingImageElement: null,
       },
-      commitToHistory: appState.activeTool === "freedraw",
+      commitToHistory: appState.activeTool.type === "freedraw",
     };
   },
   keyTest: (event, appState) =>

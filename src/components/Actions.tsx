@@ -35,7 +35,7 @@ export const SelectedShapeActions = ({
   appState: AppState;
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
-  activeTool: AppState["activeTool"];
+  activeTool: AppState["activeTool"]["type"];
 }) => {
   const targetElements = getTargetElements(
     getNonDeletedElements(elements),
@@ -203,10 +203,10 @@ export const ShapesSwitcher = ({
 }) => {
   const onChange = withBatchedUpdates(
     ({
-      activeTool,
+      activeToolType,
       pointerType,
     }: {
-      activeTool: typeof SHAPES[number]["value"];
+      activeToolType: typeof SHAPES[number]["value"];
       pointerType: PointerType | null;
     }) => {
       if (!appState.penDetected && pointerType === "pen") {
@@ -216,12 +216,12 @@ export const ShapesSwitcher = ({
         });
       }
       setAppState({
-        activeTool,
+        activeTool: { type: activeToolType },
         multiElement: null,
         selectedElementIds: {},
       });
       setCursorForShape(canvas, { ...appState, activeTool });
-      if (activeTool === "image") {
+      if (activeTool.type === "image") {
         onImageAction({ pointerType });
       }
     },
@@ -241,7 +241,7 @@ export const ShapesSwitcher = ({
             key={value}
             type="radio"
             icon={icon}
-            checked={activeTool === value}
+            checked={activeTool.type === value}
             name="editor-current-shape"
             title={`${capitalizeString(label)} — ${shortcut}`}
             keyBindingLabel={`${index + 1}`}
@@ -249,10 +249,10 @@ export const ShapesSwitcher = ({
             aria-keyshortcuts={shortcut}
             data-testid={value}
             onPointerDown={({ pointerType }) => {
-              onChange({ activeTool: value, pointerType });
+              onChange({ activeToolType: value, pointerType });
             }}
             onChange={({ pointerType }) => {
-              onChange({ activeTool: value, pointerType });
+              onChange({ activeToolType: value, pointerType });
             }}
           />
         );
