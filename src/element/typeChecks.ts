@@ -70,8 +70,13 @@ export const isLinearElementType = (
 
 export const isBindingElement = (
   element?: ExcalidrawElement | null,
+  includeLocked = true,
 ): element is ExcalidrawLinearElement => {
-  return element != null && isBindingElementType(element.type);
+  return (
+    element != null &&
+    (!element.locked || includeLocked === true) &&
+    isBindingElementType(element.type)
+  );
 };
 
 export const isBindingElementType = (
@@ -82,9 +87,11 @@ export const isBindingElementType = (
 
 export const isBindableElement = (
   element: ExcalidrawElement | null,
+  includeLocked = true,
 ): element is ExcalidrawBindableElement => {
   return (
     element != null &&
+    (!element.locked || includeLocked === true) &&
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||

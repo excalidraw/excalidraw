@@ -1134,7 +1134,7 @@ class App extends React.Component<AppProps, AppState> {
       prevState.elementType !== this.state.elementType &&
       multiElement != null &&
       isBindingEnabled(this.state) &&
-      isBindingElement(multiElement)
+      isBindingElement(multiElement, false)
     ) {
       maybeBindLinearElement(
         multiElement,
@@ -2586,7 +2586,7 @@ class App extends React.Component<AppProps, AppState> {
       // Hovering with a selected tool or creating new linear element via click
       // and point
       const { draggingElement } = this.state;
-      if (isBindingElement(draggingElement)) {
+      if (isBindingElement(draggingElement, false)) {
         this.maybeSuggestBindingsForLinearElementAtCoords(
           draggingElement,
           [scenePointer],
@@ -4108,7 +4108,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
 
-        if (isBindingElement(draggingElement)) {
+        if (isBindingElement(draggingElement, false)) {
           // When creating a linear element by dragging
           this.maybeSuggestBindingsForLinearElementAtCoords(
             draggingElement,
@@ -4388,7 +4388,7 @@ class App extends React.Component<AppProps, AppState> {
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
           if (
             isBindingEnabled(this.state) &&
-            isBindingElement(draggingElement)
+            isBindingElement(draggingElement, false)
           ) {
             maybeBindLinearElement(
               draggingElement,
@@ -5098,7 +5098,6 @@ class App extends React.Component<AppProps, AppState> {
         );
         if (
           hoveredBindableElement != null &&
-          hoveredBindableElement.locked === false &&
           !isLinearElementSimpleAndAlreadyBound(
             linearElement,
             oppositeBindingBoundElement?.id,
