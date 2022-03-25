@@ -12,6 +12,7 @@ import {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
+  ExcalidrawElement,
 } from "./types";
 import {
   getElementAbsoluteCoords,
@@ -186,7 +187,7 @@ const validateTwoPointElementNormalized = (
 };
 
 const getPerfectElementSizeWithRotation = (
-  elementType: string,
+  elementType: ExcalidrawElement["type"],
   width: number,
   height: number,
   angle: number,

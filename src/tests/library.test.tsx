@@ -60,6 +60,6 @@ describe("library", () => {
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A_copy" })]);
     });
-    expect(h.state.elementType).toBe("selection");
+    expect(h.state.activeTool.type).toBe("selection");
   });
 });

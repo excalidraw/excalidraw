@@ -20,28 +20,28 @@ interface HintViewerProps {
 }
 
 const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
-  const { elementType, isResizing, isRotating, lastPointerDownWith } = appState;
+  const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
   if (isEraserActive(appState)) {
     return t("hints.eraserRevert");
   }
-  if (elementType === "arrow" || elementType === "line") {
+  if (activeTool.type === "arrow" || activeTool.type === "line") {
     if (!multiMode) {
       return t("hints.linearElement");
     }
     return t("hints.linearElementMulti");
   }
 
-  if (elementType === "freedraw") {
+  if (activeTool.type === "freedraw") {
     return t("hints.freeDraw");
   }
 
-  if (elementType === "text") {
+  if (activeTool.type === "text") {
     return t("hints.text");
   }
 
-  if (appState.elementType === "image" && appState.pendingImageElement) {
+  if (appState.activeTool.type === "image" && appState.pendingImageElement) {
     return t("hints.placeImage");
   }
 
@@ -73,7 +73,7 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
     return t("hints.text_editing");
   }
 
-  if (elementType === "selection") {
+  if (activeTool.type === "selection") {
     if (
       appState.draggingElement?.type === "selection" &&
       !appState.editingElement &&
