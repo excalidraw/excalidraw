@@ -2,7 +2,9 @@
 
 exports[`exportToSvg with default arguments 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",

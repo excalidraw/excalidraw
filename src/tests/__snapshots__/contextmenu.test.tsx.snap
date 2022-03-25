@@ -2,7 +2,9 @@
 
 exports[`contextMenu element selecting 'Add to library' in context menu adds element to library: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -173,7 +175,9 @@ exports[`contextMenu element selecting 'Add to library' in context menu adds ele
 
 exports[`contextMenu element selecting 'Bring forward' in context menu brings element forward: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -500,7 +504,9 @@ exports[`contextMenu element selecting 'Bring forward' in context menu brings el
 
 exports[`contextMenu element selecting 'Bring to front' in context menu brings element to front: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -827,7 +833,9 @@ exports[`contextMenu element selecting 'Bring to front' in context menu brings e
 
 exports[`contextMenu element selecting 'Copy styles' in context menu copies styles: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -998,7 +1006,9 @@ exports[`contextMenu element selecting 'Copy styles' in context menu copies styl
 
 exports[`contextMenu element selecting 'Delete' in context menu deletes element: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -1204,7 +1214,9 @@ exports[`contextMenu element selecting 'Delete' in context menu deletes element:
 
 exports[`contextMenu element selecting 'Duplicate' in context menu duplicates element: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -1467,7 +1479,9 @@ exports[`contextMenu element selecting 'Duplicate' in context menu duplicates el
 
 exports[`contextMenu element selecting 'Group selection' in context menu groups selected elements: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -1812,7 +1826,9 @@ exports[`contextMenu element selecting 'Group selection' in context menu groups 
 
 exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "#e64980",
@@ -2587,7 +2603,9 @@ exports[`contextMenu element selecting 'Paste styles' in context menu pastes sty
 
 exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -2914,7 +2932,9 @@ exports[`contextMenu element selecting 'Send backward' in context menu sends ele
 
 exports[`contextMenu element selecting 'Send to back' in context menu sends element to back: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -3241,7 +3261,9 @@ exports[`contextMenu element selecting 'Send to back' in context menu sends elem
 
 exports[`contextMenu element selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -3646,7 +3668,9 @@ exports[`contextMenu element selecting 'Ungroup selection' in context menu ungro
 
 exports[`contextMenu element shows 'Group selection' in context menu for multiple selected elements: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -3915,7 +3939,9 @@ exports[`contextMenu element shows 'Group selection' in context menu for multipl
 
 exports[`contextMenu element shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -4263,7 +4289,9 @@ exports[`contextMenu element shows 'Ungroup selection' in context menu for group
 
 exports[`contextMenu element shows context menu for canvas: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -4365,7 +4393,9 @@ exports[`contextMenu element shows context menu for canvas: [end of test] number
 
 exports[`contextMenu element shows context menu for element: [end of test] appState 1`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -4445,7 +4475,9 @@ Object {
 
 exports[`contextMenu element shows context menu for element: [end of test] appState 2`] = `
 Object {
-  "activeTool": "selection",
+  "activeTool": Object {
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",

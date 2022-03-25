@@ -297,12 +297,12 @@ describe("restoreElements", () => {
 describe("restoreAppState", () => {
   it("should restore with imported data", () => {
     const stubImportedAppState = getDefaultAppState();
-    stubImportedAppState.activeTool = "selection";
+    stubImportedAppState.activeTool.type = "selection";
     stubImportedAppState.cursorButton = "down";
     stubImportedAppState.name = "imported app state";
 
     const stubLocalAppState = getDefaultAppState();
-    stubLocalAppState.activeTool = "rectangle";
+    stubLocalAppState.activeTool.type = "rectangle";
     stubLocalAppState.cursorButton = "up";
     stubLocalAppState.name = "local app state";
 
@@ -398,7 +398,7 @@ describe("restoreAppState", () => {
       stubImportedAppState,
       stubLocalAppState,
     );
-    expect(restoredAppState.activeTool).toBe("selection");
+    expect(restoredAppState.activeTool.type).toBe("selection");
   });
 
   describe("with zoom in imported data state", () => {

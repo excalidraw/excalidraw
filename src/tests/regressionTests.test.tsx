@@ -144,7 +144,7 @@ describe("regression tests", () => {
       it(`key ${key} selects ${shape} tool`, () => {
         Keyboard.keyPress(key);
 
-        expect(h.state.activeTool).toBe(shape);
+        expect(h.state.activeTool.type).toBe(shape);
 
         mouse.down(10, 10);
         mouse.up(10, 10);

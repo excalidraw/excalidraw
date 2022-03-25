@@ -3665,7 +3665,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleLinearElementOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
-    activeTool: ExcalidrawLinearElement["type"],
+    elementType: ExcalidrawLinearElement["type"],
     pointerDownState: PointerDownState,
   ): void => {
     if (this.state.multiElement) {
@@ -3727,12 +3727,12 @@ class App extends React.Component<AppProps, AppState> {
 
       const { currentItemStartArrowhead, currentItemEndArrowhead } = this.state;
       const [startArrowhead, endArrowhead] =
-        activeTool === "arrow"
+        elementType === "arrow"
           ? [currentItemStartArrowhead, currentItemEndArrowhead]
           : [null, null];
 
       const element = newLinearElement({
-        type: activeTool,
+        type: elementType,
         x: gridX,
         y: gridY,
         strokeColor: this.state.currentItemStrokeColor,
@@ -3773,7 +3773,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private createGenericElementOnPointerDown = (
-    activeTool: ExcalidrawGenericElement["type"],
+    elementType: ExcalidrawGenericElement["type"],
     pointerDownState: PointerDownState,
   ): void => {
     const [gridX, gridY] = getGridPoint(
@@ -3782,7 +3782,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.gridSize,
     );
     const element = newElement({
-      type: activeTool,
+      type: elementType,
       x: gridX,
       y: gridY,
       strokeColor: this.state.currentItemStrokeColor,

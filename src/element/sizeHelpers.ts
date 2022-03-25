@@ -2,6 +2,7 @@ import { ExcalidrawElement } from "./types";
 import { mutateElement } from "./mutateElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
+import { AppState } from "../types";
 
 export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
@@ -16,7 +17,7 @@ export const isInvisiblySmallElement = (
  * Makes a perfect shape or diagonal/horizontal/vertical line
  */
 export const getPerfectElementSize = (
-  activeTool: string,
+  elementType: AppState["activeTool"]["type"],
   width: number,
   height: number,
 ): { width: number; height: number } => {
@@ -24,9 +25,9 @@ export const getPerfectElementSize = (
   const absHeight = Math.abs(height);
 
   if (
-    activeTool === "line" ||
-    activeTool === "arrow" ||
-    activeTool === "freedraw"
+    elementType === "line" ||
+    elementType === "arrow" ||
+    elementType === "freedraw"
   ) {
     const lockedAngle =
       Math.round(Math.atan(absHeight / absWidth) / SHIFT_LOCKING_ANGLE) *
@@ -40,7 +41,7 @@ export const getPerfectElementSize = (
         Math.round(absWidth * Math.tan(lockedAngle)) * Math.sign(height) ||
         height;
     }
-  } else if (activeTool !== "selection") {
+  } else if (elementType !== "selection") {
     height = absWidth * Math.sign(height);
   }
   return { width, height };
