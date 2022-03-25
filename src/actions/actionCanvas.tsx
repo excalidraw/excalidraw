@@ -68,8 +68,10 @@ export const actionClearCanvas = register({
         gridSize: appState.gridSize,
         showStats: appState.showStats,
         pasteDialog: appState.pasteDialog,
-        elementType:
-          appState.elementType === "image" ? "selection" : appState.elementType,
+        activeTool:
+          appState.activeTool.type === "image"
+            ? { type: "selection" }
+            : appState.activeTool,
       },
       commitToHistory: true,
     };
@@ -299,7 +301,7 @@ export const actionErase = register({
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
-        elementType: isEraserActive(appState) ? "selection" : "eraser",
+        activeTool: { type: isEraserActive(appState) ? "selection" : "eraser" },
       },
       commitToHistory: true,
     };
