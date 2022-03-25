@@ -17,7 +17,7 @@ Please add the latest change on the top under the correct section.
 
 #### Refactor
 
-- Rename `appState.elementType` to [`appState.activeTool`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L80).
+- Rename `appState.elementType` to [`appState.activeTool`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L80) which is now an object.
 
 ##### BREAKING CHANGE
 
