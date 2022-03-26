@@ -30,8 +30,8 @@ type RestoredAppState = Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;
 
-export const AllowedExcalidrawElementTypes: Record<
-  AppState["elementType"],
+export const AllowedExcalidrawActiveTools: Record<
+  AppState["activeTool"]["type"],
   boolean
 > = {
   selection: true,
@@ -256,9 +256,9 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
-    elementType: AllowedExcalidrawElementTypes[nextAppState.elementType]
-      ? nextAppState.elementType
-      : "selection",
+    activeTool: AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
+      ? nextAppState.activeTool
+      : { type: "selection" },
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"

@@ -248,7 +248,7 @@ const LayerUI = ({
           appState={appState}
           elements={elements}
           renderAction={actionManager.renderAction}
-          elementType={appState.elementType}
+          activeTool={appState.activeTool.type}
         />
       </Island>
     </Section>
@@ -351,7 +351,7 @@ const LayerUI = ({
                         <ShapesSwitcher
                           appState={appState}
                           canvas={canvas}
-                          elementType={appState.elementType}
+                          activeTool={appState.activeTool}
                           setAppState={setAppState}
                           onImageAction={({ pointerType }) => {
                             onImageAction({
