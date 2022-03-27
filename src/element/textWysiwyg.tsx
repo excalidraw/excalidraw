@@ -105,6 +105,9 @@ export const textWysiwyg = ({
     const updatedElement = Scene.getScene(element)?.getElement(
       id,
     ) as ExcalidrawTextElement;
+    if (!updatedElement) {
+      return;
+    }
     const { textAlign, verticalAlign } = updatedElement;
 
     const approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
