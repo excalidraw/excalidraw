@@ -7,7 +7,7 @@ import { distributeElements, Distribution } from "../disitrubte";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { CODES } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { AppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
@@ -49,7 +49,8 @@ export const distributeHorizontally = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => event.altKey && event.code === CODES.H,
+  keyTest: (event) =>
+    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.H,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
@@ -77,7 +78,8 @@ export const distributeVertically = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => event.altKey && event.code === CODES.V,
+  keyTest: (event) =>
+    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}

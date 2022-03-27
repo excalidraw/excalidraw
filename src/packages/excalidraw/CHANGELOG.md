@@ -11,6 +11,18 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+### Excalidraw API
+
+#### Refactor
+
+- Rename `appState.elementType` to [`appState.activeTool`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L80) which is now an object.
+
+##### BREAKING CHANGE
+
+You will need to pass `activeTool` instead of `elementType` from now onwards in `appState`
+
 ## 0.11.0 (2022-02-17)
 
 ## Excalidraw API
@@ -20,7 +32,7 @@ Please add the latest change on the top under the correct section.
 - Add `onLinkOpen` prop which will be triggered when clicked on element hyperlink if present [#4694](https://github.com/excalidraw/excalidraw/pull/4694).
 - Support updating library using [`updateScene`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene) API [#4546](https://github.com/excalidraw/excalidraw/pull/4546).
 
-- Introduced primary colors to the app. The colors can be overriden. Check [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#customizing-styles) on how to do so [#4387](https://github.com/excalidraw/excalidraw/pull/4387).
+- Introduced primary colors to the app. The colors can be overridden. Check [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#customizing-styles) on how to do so [#4387](https://github.com/excalidraw/excalidraw/pull/4387).
 
 - [`exportToBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToBlob) now automatically sets `appState.exportBackground` to `true` if exporting to `image/jpeg` MIME type (to ensure that alpha channel is not compressed to black color) [#4342](https://github.com/excalidraw/excalidraw/pull/4342).
 
@@ -115,7 +127,7 @@ Please add the latest change on the top under the correct section.
 
 - Sync local storage state across tabs when out of sync [#4545](https://github.com/excalidraw/excalidraw/pull/4545)
 
-- Support contextMenuLabel to be of function type to support dynmaic labels [#4654](https://github.com/excalidraw/excalidraw/pull/4654)
+- Support contextMenuLabel to be of function type to support dynamic labels [#4654](https://github.com/excalidraw/excalidraw/pull/4654)
 
 - Support decreasing/increasing `fontSize` via keyboard [#4553](https://github.com/excalidraw/excalidraw/pull/4553)
 
@@ -438,10 +450,10 @@ Please add the latest change on the top under the correct section.
 
 - Added prop [`autoFocus`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#autoFocus) to focus the excalidraw component on page load when enabled, defaults to false [#3691](https://github.com/excalidraw/excalidraw/pull/3691).
 
-  Note: Earlier Excalidraw component was focussed by default on page load, you need to enable `autoFocus` prop to retain the same behaviour.
+  Note: Earlier Excalidraw component was focused by default on page load, you need to enable `autoFocus` prop to retain the same behaviour.
 
 - Added prop `UIOptions.canvasActions.export.renderCustomUI` to support Custom UI rendering inside export dialog [#3666](https://github.com/excalidraw/excalidraw/pull/3666).
-- Added prop `UIOptions.canvasActions.saveAsImage` to show/hide the **Save as image** button in the canvas actions. Defauls to `true` hence the **Save as Image** button is rendered [#3662](https://github.com/excalidraw/excalidraw/pull/3662).
+- Added prop `UIOptions.canvasActions.saveAsImage` to show/hide the **Save as image** button in the canvas actions. Defaults to `true` hence the **Save as Image** button is rendered [#3662](https://github.com/excalidraw/excalidraw/pull/3662).
 
 - Export dialog can be customised with [`UiOptions.canvasActions.export`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportOpts) [#3658](https://github.com/excalidraw/excalidraw/pull/3658).
 
@@ -489,7 +501,7 @@ Please add the latest change on the top under the correct section.
 
 - Exporting redesign [#3613](https://github.com/excalidraw/excalidraw/pull/3613)
 
-- Auto-position tooltip and suport overflowing container [#3631](https://github.com/excalidraw/excalidraw/pull/3631)
+- Auto-position tooltip and support overflowing container [#3631](https://github.com/excalidraw/excalidraw/pull/3631)
 
 - Auto release @excalidraw/excalidraw-next on every change [#3614](https://github.com/excalidraw/excalidraw/pull/3614)
 

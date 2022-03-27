@@ -1,3 +1,4 @@
+import { AppState } from "../types";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -8,6 +9,7 @@ import {
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
+  ExcalidrawTextContainer,
 } from "./types";
 
 export const isGenericElement = (
@@ -59,7 +61,7 @@ export const isLinearElement = (
 };
 
 export const isLinearElementType = (
-  elementType: ExcalidrawElement["type"],
+  elementType: AppState["activeTool"]["type"],
 ): boolean => {
   return (
     elementType === "arrow" || elementType === "line" // || elementType === "freedraw"
@@ -73,7 +75,7 @@ export const isBindingElement = (
 };
 
 export const isBindingElementType = (
-  elementType: ExcalidrawElement["type"],
+  elementType: AppState["activeTool"]["type"],
 ): boolean => {
   return elementType === "arrow";
 };
@@ -91,7 +93,9 @@ export const isBindableElement = (
   );
 };
 
-export const isTextBindableContainer = (element: ExcalidrawElement | null) => {
+export const isTextBindableContainer = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawTextContainer => {
   return (
     element != null &&
     (element.type === "rectangle" ||

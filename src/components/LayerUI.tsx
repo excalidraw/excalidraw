@@ -6,7 +6,6 @@ import { exportCanvas } from "../data";
 import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
-import { useIsMobile } from "../components/App";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
 import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
@@ -38,6 +37,7 @@ import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
+import { useDeviceType } from "../components/App";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -96,7 +96,7 @@ const LayerUI = ({
   id,
   onImageAction,
 }: LayerUIProps) => {
-  const isMobile = useIsMobile();
+  const deviceType = useDeviceType();
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -240,7 +240,7 @@ const LayerUI = ({
         className={CLASSES.SHAPE_ACTIONS_MENU}
         padding={2}
         style={{
-          // we want to make sure this doesn't overflow so substracting 200
+          // we want to make sure this doesn't overflow so subtracting 200
           // which is approximately height of zoom footer and top left menu items with some buffer
           // if active file name is displayed, subtracting 248 to account for its height
           maxHeight: `${appState.height - (appState.fileHandle ? 248 : 200)}px`,
@@ -250,7 +250,7 @@ const LayerUI = ({
           appState={appState}
           elements={elements}
           renderAction={actionManager.renderAction}
-          elementType={appState.elementType}
+          activeTool={appState.activeTool.type}
         />
       </Island>
     </Section>
@@ -340,13 +340,14 @@ const LayerUI = ({
                       <HintViewer
                         appState={appState}
                         elements={elements}
-                        isMobile={isMobile}
+                        isMobile={deviceType.isMobile}
                       />
                       {heading}
                       <Stack.Row gap={1}>
                         <ShapesSwitcher
+                          appState={appState}
                           canvas={canvas}
-                          elementType={appState.elementType}
+                          activeTool={appState.activeTool}
                           setAppState={setAppState}
                           onImageAction={({ pointerType }) => {
                             onImageAction({
@@ -390,7 +391,7 @@ const LayerUI = ({
                     </Tooltip>
                   ))}
             </UserList>
-            {renderTopRightUI?.(isMobile, appState)}
+            {renderTopRightUI?.(deviceType.isMobile, appState)}
           </div>
         </div>
       </FixedSideContainer>
@@ -420,16 +421,39 @@ const LayerUI = ({
                 />
               </Island>
               {!viewModeEnabled && (
-                <div
-                  className={clsx("undo-redo-buttons zen-mode-transition", {
-                    "layer-ui__wrapper__footer-left--transition-bottom":
-                      zenModeEnabled,
-                  })}
-                >
-                  {actionManager.renderAction("undo", { size: "small" })}
-                  {actionManager.renderAction("redo", { size: "small" })}
-                </div>
+                <>
+                  <div
+                    className={clsx("undo-redo-buttons zen-mode-transition", {
+                      "layer-ui__wrapper__footer-left--transition-bottom":
+                        zenModeEnabled,
+                    })}
+                  >
+                    {actionManager.renderAction("undo", { size: "small" })}
+                    {actionManager.renderAction("redo", { size: "small" })}
+                  </div>
+
+                  <div
+                    className={clsx("eraser-buttons zen-mode-transition", {
+                      "layer-ui__wrapper__footer-left--transition-left":
+                        zenModeEnabled,
+                    })}
+                  >
+                    {actionManager.renderAction("eraser", { size: "small" })}
+                  </div>
+                </>
               )}
+              {!viewModeEnabled &&
+                appState.multiElement &&
+                deviceType.isTouchScreen && (
+                  <div
+                    className={clsx("finalize-button zen-mode-transition", {
+                      "layer-ui__wrapper__footer-left--transition-left":
+                        zenModeEnabled,
+                    })}
+                  >
+                    {actionManager.renderAction("finalize", { size: "small" })}
+                  </div>
+                )}
             </Section>
           </Stack.Col>
         </div>
@@ -497,7 +521,7 @@ const LayerUI = ({
     </>
   );
 
-  return isMobile ? (
+  return deviceType.isMobile ? (
     <>
       {dialogs}
       <MobileMenu

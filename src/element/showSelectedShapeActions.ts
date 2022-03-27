@@ -10,5 +10,6 @@ export const showSelectedShapeActions = (
     !appState.viewModeEnabled &&
       (appState.editingElement ||
         getSelectedElements(elements, appState).length ||
-        appState.elementType !== "selection"),
+        (appState.activeTool.type !== "selection" &&
+          appState.activeTool.type !== "eraser")),
   );

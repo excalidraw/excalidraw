@@ -77,7 +77,7 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
-  elementType: typeof SHAPES[number]["value"];
+  activeTool: { type: typeof SHAPES[number]["value"] | "eraser" };
   elementLocked: boolean;
   penMode: boolean;
   penDetected: boolean;
@@ -365,9 +365,9 @@ export type PointerDownState = Readonly<{
   };
   withCmdOrCtrl: boolean;
   drag: {
-    // Might change during the pointer interation
+    // Might change during the pointer interaction
     hasOccurred: boolean;
-    // Might change during the pointer interation
+    // Might change during the pointer interaction
     offset: { x: number; y: number } | null;
   };
   // We need to have these in the state so that we can unsubscribe them
@@ -383,6 +383,12 @@ export type PointerDownState = Readonly<{
   };
   boxSelection: {
     hasOccurred: boolean;
+  };
+  elementIdsToErase: {
+    [key: ExcalidrawElement["id"]]: {
+      opacity: ExcalidrawElement["opacity"];
+      erase: boolean;
+    };
   };
 }>;
 
@@ -406,4 +412,9 @@ export type ExcalidrawImperativeAPI = {
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
   id: string;
+};
+
+export type DeviceType = {
+  isMobile: boolean;
+  isTouchScreen: boolean;
 };

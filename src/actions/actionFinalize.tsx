@@ -119,13 +119,13 @@ export const actionFinalize = register({
         );
       }
 
-      if (!appState.elementLocked && appState.elementType !== "freedraw") {
+      if (!appState.elementLocked && appState.activeTool.type !== "freedraw") {
         appState.selectedElementIds[multiPointElement.id] = true;
       }
     }
 
     if (
-      (!appState.elementLocked && appState.elementType !== "freedraw") ||
+      (!appState.elementLocked && appState.activeTool.type !== "freedraw") ||
       !multiPointElement
     ) {
       resetCursor(canvas);
@@ -135,11 +135,11 @@ export const actionFinalize = register({
       elements: newElements,
       appState: {
         ...appState,
-        elementType:
-          (appState.elementLocked || appState.elementType === "freedraw") &&
+        activeTool:
+          (appState.elementLocked || appState.activeTool.type === "freedraw") &&
           multiPointElement
-            ? appState.elementType
-            : "selection",
+            ? appState.activeTool
+            : { type: "selection" },
         draggingElement: null,
         multiElement: null,
         editingElement: null,
@@ -148,7 +148,7 @@ export const actionFinalize = register({
         selectedElementIds:
           multiPointElement &&
           !appState.elementLocked &&
-          appState.elementType !== "freedraw"
+          appState.activeTool.type !== "freedraw"
             ? {
                 ...appState.selectedElementIds,
                 [multiPointElement.id]: true,
@@ -156,7 +156,7 @@ export const actionFinalize = register({
             : appState.selectedElementIds,
         pendingImageElement: null,
       },
-      commitToHistory: appState.elementType === "freedraw",
+      commitToHistory: appState.activeTool.type === "freedraw",
     };
   },
   keyTest: (event, appState) =>
@@ -165,7 +165,7 @@ export const actionFinalize = register({
         (!appState.draggingElement && appState.multiElement === null))) ||
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
-  PanelComponent: ({ appState, updateData }) => (
+  PanelComponent: ({ appState, updateData, data }) => (
     <ToolButton
       type="button"
       icon={done}
@@ -173,6 +173,7 @@ export const actionFinalize = register({
       aria-label={t("buttons.done")}
       onClick={updateData}
       visible={appState.multiElement != null}
+      size={data?.size || "medium"}
     />
   ),
 });

@@ -84,6 +84,7 @@ export type ActionName =
   | "zoomToSelection"
   | "changeFontFamily"
   | "changeTextAlign"
+  | "changeVerticalAlign"
   | "toggleFullScreen"
   | "toggleShortcuts"
   | "group"
@@ -107,7 +108,9 @@ export type ActionName =
   | "increaseFontSize"
   | "decreaseFontSize"
   | "unbindText"
-  | "hyperlink";
+  | "hyperlink"
+  | "eraser"
+  | "bindText";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

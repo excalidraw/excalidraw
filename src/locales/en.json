@@ -64,6 +64,7 @@
     "cartoonist": "Cartoonist",
     "fileTitle": "File name",
     "colorPicker": "Color picker",
+    "canvasColors": "Used on canvas",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing canvas",
     "layers": "Layers",
@@ -106,6 +107,7 @@
     "decreaseFontSize": "Decrease font size",
     "increaseFontSize": "Increase font size",
     "unbindText": "Unbind text",
+    "bindText": "Bind text to the container",
     "link": {
       "edit": "Edit link",
       "create": "Create link",
@@ -179,7 +181,8 @@
     "imageInsertError": "Couldn't insert image. Try again later...",
     "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
-    "invalidSVGString": "Invalid SVG."
+    "invalidSVGString": "Invalid SVG.",
+    "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again."
   },
   "toolBar": {
     "selection": "Selection",
@@ -194,7 +197,8 @@
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
     "penMode": "Prevent pinch-zoom and accept freedraw input only from pen",
-    "link": "Add/ Update link for a selected shape"
+    "link": "Add/ Update link for a selected shape",
+    "eraser": "Eraser"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -219,7 +223,8 @@
     "placeImage": "Click to place the image, or click and drag to set its size manually",
     "publishLibrary": "Publish your own library",
     "bindTextToElement": "Press enter to add text",
-    "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging"
+    "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
+    "eraserRevert": "Hold Alt to revert the elements marked for deletion"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -279,7 +284,7 @@
     "howto": "Follow our guides",
     "or": "or",
     "preventBinding": "Prevent arrow binding",
-    "shapes": "Shapes",
+    "tools": "Tools",
     "shortcuts": "Keyboard shortcuts",
     "textFinish": "Finish editing (text editor)",
     "textNewLine": "Add new line (text editor)",
