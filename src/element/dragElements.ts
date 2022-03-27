@@ -92,7 +92,7 @@ export const getDragOffsetXY = (
 
 export const dragNewElement = (
   draggingElement: NonDeletedExcalidrawElement,
-  elementType: AppState["elementType"],
+  elementType: AppState["activeTool"]["type"],
   originX: number,
   originY: number,
   x: number,

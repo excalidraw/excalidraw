@@ -43,7 +43,7 @@ export const getDefaultAppState = (): Omit<
     editingGroupId: null,
     editingLinearElement: null,
     elementLocked: false,
-    elementType: "selection",
+    activeTool: { type: "selection" },
     textElementSubtype: TEXT_SUBTYPE_DEFAULT,
     textOpts: {},
     penMode: false,
@@ -134,7 +134,7 @@ const APP_STATE_STORAGE_CONF = (<
   editingGroupId: { browser: true, export: false, server: false },
   editingLinearElement: { browser: false, export: false, server: false },
   elementLocked: { browser: true, export: false, server: false },
-  elementType: { browser: true, export: false, server: false },
+  activeTool: { browser: true, export: false, server: false },
   textElementSubtype: { browser: true, export: false, server: false },
   textOpts: { browser: true, export: false, server: false },
   penMode: { browser: true, export: false, server: false },
@@ -220,7 +220,7 @@ export const clearAppStateForDatabase = (appState: Partial<AppState>) => {
 };
 
 export const isEraserActive = ({
-  elementType,
+  activeTool,
 }: {
-  elementType: AppState["elementType"];
-}) => elementType === "eraser";
+  activeTool: AppState["activeTool"];
+}) => activeTool.type === "eraser";
