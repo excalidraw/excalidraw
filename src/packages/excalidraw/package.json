@@ -53,7 +53,7 @@
     "@babel/preset-react": "7.16.7",
     "@babel/preset-typescript": "7.16.7",
     "autoprefixer": "10.4.2",
-    "babel-loader": "8.2.3",
+    "babel-loader": "8.2.4",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
     "css-loader": "6.7.1",
