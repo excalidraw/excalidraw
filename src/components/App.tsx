@@ -2409,13 +2409,13 @@ class App extends React.Component<AppProps, AppState> {
       }
       return (
         element.link &&
+        index <= hitElementIndex &&
         isPointHittingLinkIcon(
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
           this.deviceType.isMobile,
-        ) &&
-        index <= hitElementIndex
+        )
       );
     });
   };
