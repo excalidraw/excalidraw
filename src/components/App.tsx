@@ -2443,7 +2443,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
     const lastPointerDownHittingLinkIcon = isPointHittingLinkIcon(
-      this.hitLinkElement!,
+      this.hitLinkElement,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
       this.deviceType.isMobile,
@@ -2453,7 +2453,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
     const lastPointerUpHittingLinkIcon = isPointHittingLinkIcon(
-      this.hitLinkElement!,
+      this.hitLinkElement,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
       this.deviceType.isMobile,
@@ -3415,8 +3415,7 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
               [pointerDownState.origin.x, pointerDownState.origin.y],
               this.deviceType.isMobile,
-            ) &&
-            pointerDownState.hit.element.link!.length > 0
+            )
           ) {
             return false;
           }
