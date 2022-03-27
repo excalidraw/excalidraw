@@ -301,7 +301,14 @@ export const actionErase = register({
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
-        activeTool: { type: isEraserActive(appState) ? "selection" : "eraser" },
+        activeTool: {
+          type: isEraserActive(appState)
+            ? appState.activeTool.typeBeforeEraser ?? "selection"
+            : "eraser",
+          typeBeforeEraser: isEraserActive(appState)
+            ? undefined
+            : appState.activeTool.type,
+        },
       },
       commitToHistory: true,
     };

@@ -77,7 +77,10 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
-  activeTool: { type: typeof SHAPES[number]["value"] | "eraser" };
+  activeTool: {
+    type: typeof SHAPES[number]["value"] | "eraser";
+    typeBeforeEraser?: typeof SHAPES[number]["value"] | "eraser";
+  };
   elementLocked: boolean;
   penMode: boolean;
   penDetected: boolean;
