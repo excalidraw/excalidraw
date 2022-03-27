@@ -1098,7 +1098,7 @@ const registerActionsMath = () => {
         enabled = false;
       }
       if (
-        appState.elementType === "text" &&
+        appState.activeTool.type === "text" &&
         appState.textElementSubtype !== TEXT_SUBTYPE_MATH
       ) {
         enabled = false;
