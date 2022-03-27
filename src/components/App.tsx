@@ -3415,7 +3415,8 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
               [pointerDownState.origin.x, pointerDownState.origin.y],
               this.deviceType.isMobile,
-            )
+            ) &&
+            pointerDownState.hit.element.link!.length > 0
           ) {
             return false;
           }
