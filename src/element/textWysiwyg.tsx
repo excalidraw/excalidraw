@@ -102,7 +102,9 @@ export const textWysiwyg = ({
 
   const updateWysiwygStyle = () => {
     const appState = app.state;
-    const updatedElement = Scene.getScene(element)?.getElement(id);
+    const updatedElement = Scene.getScene(element)?.getElement(
+      id,
+    ) as ExcalidrawTextElement;
     if (!updatedElement) {
       return;
     }
