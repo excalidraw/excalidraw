@@ -21,6 +21,7 @@ import clsx from "clsx";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
+  trackEvent: false,
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
@@ -302,6 +303,7 @@ export const actionToggleTheme = register({
 
 export const actionErase = register({
   name: "eraser",
+  trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
     return {
       appState: {

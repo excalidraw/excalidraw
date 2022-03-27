@@ -3,7 +3,10 @@ import { register } from "./register";
 
 export const actionToggleZenMode = register({
   name: "zenMode",
-  trackEvent: { category: "canvas" },
+  trackEvent: {
+    category: "canvas",
+    predicate: (appState) => !appState.zenModeEnabled,
+  },
   perform(elements, appState) {
     return {
       appState: {

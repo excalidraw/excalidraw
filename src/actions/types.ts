@@ -141,16 +141,23 @@ export interface Action {
     appState: AppState,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
-  trackEvent?:
+  trackEvent:
+    | false
     | {
         category:
+          | "toolbar"
           | "element"
           | "canvas"
           | "export"
           | "history"
           | "menu"
-          | "collab";
+          | "collab"
+          | "hyperlink";
         action?: string;
-      }
-    | ((action: Action, source: ActionSource, value: any) => void);
+        predicate?: (
+          appState: Readonly<AppState>,
+          elements: readonly ExcalidrawElement[],
+          value: any,
+        ) => boolean;
+      };
 }

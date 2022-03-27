@@ -5,7 +5,10 @@ import { AppState } from "../types";
 
 export const actionToggleGridMode = register({
   name: "gridMode",
-  trackEvent: { category: "canvas" },
+  trackEvent: {
+    category: "canvas",
+    predicate: (appState) => !appState.gridSize,
+  },
   perform(elements, appState) {
     return {
       appState: {

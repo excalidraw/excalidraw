@@ -3,7 +3,10 @@ import { register } from "./register";
 
 export const actionToggleViewMode = register({
   name: "viewMode",
-  trackEvent: { category: "canvas" },
+  trackEvent: {
+    category: "canvas",
+    predicate: (appState) => !appState.viewModeEnabled,
+  },
   perform(elements, appState) {
     return {
       appState: {

@@ -1569,7 +1569,9 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   toggleLock = (source: "keyboard" | "ui" = "ui") => {
-    trackEvent("toolbar", "toggleLock", source);
+    if (!this.state.elementLocked) {
+      trackEvent("toolbar", "toggleLock", source);
+    }
     this.setState((prevState) => {
       return {
         elementLocked: !prevState.elementLocked,
@@ -1593,9 +1595,6 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   toggleStats = () => {
-    if (!this.state.showStats) {
-      trackEvent("dialog", "stats");
-    }
     this.actionManager.executeAction(actionToggleStats);
   };
 
@@ -1931,7 +1930,9 @@ class App extends React.Component<AppProps, AppState> {
     if (tool.type === "image") {
       this.onImageAction();
     }
-    trackEvent("toolbar", tool.type, "keyboard");
+    if (this.state.activeTool.type !== tool.type) {
+      trackEvent("toolbar", tool.type, "keyboard");
+    }
     if (tool.type !== "selection") {
       this.setState({
         activeTool: tool,
@@ -5493,6 +5494,7 @@ class App extends React.Component<AppProps, AppState> {
           options: [
             this.deviceType.isMobile &&
               navigator.clipboard && {
+                trackEvent: false,
                 name: "paste",
                 perform: (elements, appStates) => {
                   this.pasteFromClipboard(null);
@@ -5549,6 +5551,7 @@ class App extends React.Component<AppProps, AppState> {
             this.deviceType.isMobile &&
               navigator.clipboard && {
                 name: "paste",
+                trackEvent: false,
                 perform: (elements, appStates) => {
                   this.pasteFromClipboard(null);
                   return {

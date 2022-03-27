@@ -12,17 +12,26 @@ import { AppClassProperties, AppState } from "../types";
 import { MODES } from "../constants";
 import { trackEvent } from "../analytics";
 
-const trackAction = (action: Action, source: ActionSource, value: any) => {
+const trackAction = (
+  action: Action,
+  source: ActionSource,
+  appState: Readonly<AppState>,
+  elements: readonly ExcalidrawElement[],
+  value: any,
+) => {
   if (action.trackEvent) {
     try {
       if (typeof action.trackEvent === "object") {
-        trackEvent(
-          action.trackEvent.category,
-          action.trackEvent.action || action.name,
-          source,
-        );
-      } else {
-        action.trackEvent?.(action, source, value);
+        const shouldTrack = action.trackEvent.predicate
+          ? action.trackEvent.predicate(appState, elements, value)
+          : true;
+        if (shouldTrack) {
+          trackEvent(
+            action.trackEvent.category,
+            action.trackEvent.action || action.name,
+            source,
+          );
+        }
       }
     } catch (error) {
       console.error("error while logging action:", error);
@@ -100,30 +109,25 @@ export class ActionManager {
       }
     }
 
-    trackAction(action, "keyboard", null);
+    const elements = this.getElementsIncludingDeleted();
+    const appState = this.getAppState();
+    const value = null;
+
+    trackAction(action, "keyboard", appState, elements, null);
 
     event.preventDefault();
-    this.updater(
-      data[0].perform(
-        this.getElementsIncludingDeleted(),
-        this.getAppState(),
-        null,
-        this.app,
-      ),
-    );
+    this.updater(data[0].perform(elements, appState, value, this.app));
     return true;
   }
 
   executeAction(action: Action, source: ActionSource = "api") {
-    this.updater(
-      action.perform(
-        this.getElementsIncludingDeleted(),
-        this.getAppState(),
-        null,
-        this.app,
-      ),
-    );
-    trackAction(action, source, null);
+    const elements = this.getElementsIncludingDeleted();
+    const appState = this.getAppState();
+    const value = null;
+
+    trackAction(action, source, appState, elements, value);
+
+    this.updater(action.perform(elements, appState, value, this.app));
   }
 
   /**
@@ -141,7 +145,11 @@ export class ActionManager {
     ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
+      const elements = this.getElementsIncludingDeleted();
+      const appState = this.getAppState();
       const updateData = (formState?: any) => {
+        trackAction(action, "ui", appState, elements, formState);
+
         this.updater(
           action.perform(
             this.getElementsIncludingDeleted(),
@@ -150,8 +158,6 @@ export class ActionManager {
             this.app,
           ),
         );
-
-        trackAction(action, "ui", formState);
       };
 
       return (

@@ -1,4 +1,3 @@
-import { trackEvent } from "../analytics";
 import { load, questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
@@ -23,8 +22,8 @@ import { Theme } from "../element/types";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
+  trackEvent: false,
   perform: (_elements, appState, value) => {
-    trackEvent("change", "title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
   PanelComponent: ({ appState, updateData, appProps }) => (

@@ -210,6 +210,9 @@ export const ShapesSwitcher = ({
       activeToolType: typeof SHAPES[number]["value"];
       pointerType: PointerType | null;
     }) => {
+      if (appState.activeTool.type !== activeToolType) {
+        trackEvent("toolbar", activeToolType, "ui");
+      }
       if (!appState.penDetected && pointerType === "pen") {
         setAppState({
           penDetected: true,
@@ -225,7 +228,6 @@ export const ShapesSwitcher = ({
       if (activeTool.type === "image") {
         onImageAction({ pointerType });
       }
-      trackEvent("toolbar", activeToolType, "ui");
     },
   );
 

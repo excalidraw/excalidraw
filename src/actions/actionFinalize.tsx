@@ -17,6 +17,7 @@ import { isBindingElement } from "../element/typeChecks";
 
 export const actionFinalize = register({
   name: "finalize",
+  trackEvent: false,
   perform: (elements, appState, _, { canvas, focusContainer }) => {
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
