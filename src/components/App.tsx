@@ -2409,13 +2409,13 @@ class App extends React.Component<AppProps, AppState> {
       }
       return (
         element.link &&
+        index <= hitElementIndex &&
         isPointHittingLinkIcon(
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
           this.deviceType.isMobile,
-        ) &&
-        index <= hitElementIndex
+        )
       );
     });
   };
@@ -2443,7 +2443,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
     const lastPointerDownHittingLinkIcon = isPointHittingLinkIcon(
-      this.hitLinkElement!,
+      this.hitLinkElement,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
       this.deviceType.isMobile,
@@ -2453,7 +2453,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
     const lastPointerUpHittingLinkIcon = isPointHittingLinkIcon(
-      this.hitLinkElement!,
+      this.hitLinkElement,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
       this.deviceType.isMobile,
