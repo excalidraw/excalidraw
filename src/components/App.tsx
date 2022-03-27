@@ -1570,7 +1570,11 @@ class App extends React.Component<AppProps, AppState> {
 
   toggleLock = (source: "keyboard" | "ui" = "ui") => {
     if (!this.state.elementLocked) {
-      trackEvent("toolbar", "toggleLock", source);
+      trackEvent(
+        "toolbar",
+        "toggleLock",
+        `${source} (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
+      );
     }
     this.setState((prevState) => {
       return {
@@ -1849,6 +1853,13 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         const shape = findShapeByKey(event.key);
         if (shape) {
+          if (this.state.activeTool.type !== shape) {
+            trackEvent(
+              "toolbar",
+              shape,
+              `keyboard (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
+            );
+          }
           this.setActiveTool({ type: shape });
         } else if (event.key === KEYS.Q) {
           this.toggleLock("keyboard");
@@ -1929,9 +1940,6 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (tool.type === "image") {
       this.onImageAction();
-    }
-    if (this.state.activeTool.type !== tool.type) {
-      trackEvent("toolbar", tool.type, "keyboard");
     }
     if (tool.type !== "selection") {
       this.setState({

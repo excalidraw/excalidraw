@@ -17,6 +17,7 @@ const trackAction = (
   source: ActionSource,
   appState: Readonly<AppState>,
   elements: readonly ExcalidrawElement[],
+  app: AppClassProperties,
   value: any,
 ) => {
   if (action.trackEvent) {
@@ -29,7 +30,7 @@ const trackAction = (
           trackEvent(
             action.trackEvent.category,
             action.trackEvent.action || action.name,
-            source,
+            `${source} (${app.deviceType.isMobile ? "mobile" : "desktop"})`,
           );
         }
       }
@@ -113,7 +114,7 @@ export class ActionManager {
     const appState = this.getAppState();
     const value = null;
 
-    trackAction(action, "keyboard", appState, elements, null);
+    trackAction(action, "keyboard", appState, elements, this.app, null);
 
     event.preventDefault();
     this.updater(data[0].perform(elements, appState, value, this.app));
@@ -125,7 +126,7 @@ export class ActionManager {
     const appState = this.getAppState();
     const value = null;
 
-    trackAction(action, source, appState, elements, value);
+    trackAction(action, source, appState, elements, this.app, value);
 
     this.updater(action.perform(elements, appState, value, this.app));
   }
@@ -148,7 +149,7 @@ export class ActionManager {
       const elements = this.getElementsIncludingDeleted();
       const appState = this.getAppState();
       const updateData = (formState?: any) => {
-        trackAction(action, "ui", appState, elements, formState);
+        trackAction(action, "ui", appState, elements, this.app, formState);
 
         this.updater(
           action.perform(
