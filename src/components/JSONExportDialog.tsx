@@ -13,6 +13,7 @@ import "./ExportDialog.scss";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { trackEvent } from "../analytics";
 import { ActionManager } from "../actions/manager";
+import { getFrame } from "../utils";
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -73,7 +74,7 @@ const JSONExportModal = ({
               showAriaLabel={true}
               onClick={() => {
                 onExportToBackend(elements, appState, files, canvas);
-                trackEvent("export", "link", "ui");
+                trackEvent("export", "link", `ui (${getFrame()})`);
               }}
             />
           </Card>
