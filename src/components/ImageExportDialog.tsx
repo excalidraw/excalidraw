@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-import { ActionsManagerInterface } from "../actions/types";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
@@ -19,6 +18,7 @@ import OpenColor from "open-color";
 import { CheckboxItem } from "./CheckboxItem";
 import { DEFAULT_EXPORT_PADDING } from "../constants";
 import { nativeFileSystemSupported } from "../data/filesystem";
+import { ActionManager } from "../actions/manager";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -90,7 +90,7 @@ const ImageExportModal = ({
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles;
   exportPadding?: number;
-  actionManager: ActionsManagerInterface;
+  actionManager: ActionManager;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
@@ -229,7 +229,7 @@ export const ImageExportDialog = ({
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles;
   exportPadding?: number;
-  actionManager: ActionsManagerInterface;
+  actionManager: ActionManager;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
