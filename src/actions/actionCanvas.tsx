@@ -60,7 +60,6 @@ export const actionClearCanvas = register({
         ...getDefaultAppState(),
         files: {},
         theme: appState.theme,
-        elementLocked: appState.elementLocked,
         penMode: appState.penMode,
         penDetected: appState.penDetected,
         exportBackground: appState.exportBackground,
@@ -70,7 +69,7 @@ export const actionClearCanvas = register({
         pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
-            ? { type: "selection" }
+            ? { type: "selection", locked: appState.activeTool.locked }
             : appState.activeTool,
       },
       commitToHistory: true,
@@ -301,7 +300,10 @@ export const actionErase = register({
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
-        activeTool: { type: isEraserActive(appState) ? "selection" : "eraser" },
+        activeTool: {
+          ...appState.activeTool,
+          type: isEraserActive(appState) ? "selection" : "eraser",
+        },
       },
       commitToHistory: true,
     };

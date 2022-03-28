@@ -216,7 +216,7 @@ export const ShapesSwitcher = ({
         });
       }
       setAppState({
-        activeTool: { type: activeToolType },
+        activeTool: { ...activeTool, type: activeToolType },
         multiElement: null,
         selectedElementIds: {},
       });

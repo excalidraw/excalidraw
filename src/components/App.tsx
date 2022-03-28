@@ -808,12 +808,11 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const scene = restore(initialData, null, null);
-
     scene.appState = {
       ...scene.appState,
       activeTool:
         scene.appState.activeTool.type === "image"
-          ? { type: "selection" }
+          ? { ...scene.appState.activeTool, type: "selection" }
           : scene.appState.activeTool,
       isLoading: false,
     };
@@ -1068,7 +1067,9 @@ class App extends React.Component<AppProps, AppState> {
       Object.keys(this.state.selectedElementIds).length &&
       isEraserActive(this.state)
     ) {
-      this.setState({ activeTool: { type: "selection" } });
+      this.setState({
+        activeTool: { ...this.state.activeTool, type: "selection" },
+      });
     }
     if (prevState.theme !== this.state.theme) {
       setEraserCursor(this.canvas, this.state.theme);
@@ -1433,7 +1434,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.text) {
         this.addTextFromPaste(data.text);
       }
-      this.setActiveTool({ type: "selection" });
+      this.setActiveTool({ ...this.state.activeTool, type: "selection" });
       event?.preventDefault();
     },
   );
@@ -1521,7 +1522,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool({ type: "selection" });
+    this.setActiveTool({ ...this.state.activeTool, type: "selection" });
   };
 
   private addTextFromPaste(text: any) {
@@ -1573,10 +1574,12 @@ class App extends React.Component<AppProps, AppState> {
   toggleLock = () => {
     this.setState((prevState) => {
       return {
-        elementLocked: !prevState.elementLocked,
-        activeTool: prevState.elementLocked
-          ? { type: "selection" }
-          : prevState.activeTool,
+        activeTool: {
+          locked: !prevState.activeTool.locked,
+          type: prevState.activeTool.locked
+            ? "selection"
+            : prevState.activeTool.type,
+        },
       };
     });
   };
@@ -1851,7 +1854,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         const shape = findShapeByKey(event.key);
         if (shape) {
-          this.setActiveTool({ type: shape });
+          this.setActiveTool({ ...this.state.activeTool, type: shape });
         } else if (event.key === KEYS.Q) {
           this.toggleLock();
         }
@@ -2064,7 +2067,7 @@ class App extends React.Component<AppProps, AppState> {
           draggingElement: null,
           editingElement: null,
         });
-        if (this.state.elementLocked) {
+        if (this.state.activeTool.locked) {
           setCursorForShape(this.canvas, this.state);
         }
 
@@ -3547,7 +3550,7 @@ class App extends React.Component<AppProps, AppState> {
   ): void => {
     // if we're currently still editing text, clicking outside
     // should only finalize it, not create another (irrespective
-    // of state.elementLocked)
+    // of state.activeTool.locked)
     if (isTextElement(this.state.editingElement)) {
       return;
     }
@@ -3571,9 +3574,9 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     resetCursor(this.canvas);
-    if (!this.state.elementLocked) {
+    if (!this.state.activeTool.locked) {
       this.setState({
-        activeTool: { type: "selection" },
+        activeTool: { type: "selection", locked: false },
       });
     }
   };
@@ -4218,7 +4221,6 @@ class App extends React.Component<AppProps, AppState> {
         resizingElement,
         multiElement,
         activeTool,
-        elementLocked,
         isResizing,
         isRotating,
       } = this.state;
@@ -4382,11 +4384,11 @@ class App extends React.Component<AppProps, AppState> {
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
-          if (!elementLocked) {
+          if (!activeTool.locked) {
             resetCursor(this.canvas);
             this.setState((prevState) => ({
               draggingElement: null,
-              activeTool: { type: "selection" },
+              activeTool: { ...prevState.activeTool, type: "selection" },
               selectedElementIds: {
                 ...prevState.selectedElementIds,
                 [this.state.draggingElement!.id]: true,
@@ -4575,7 +4577,11 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (!elementLocked && activeTool.type !== "freedraw" && draggingElement) {
+      if (
+        !activeTool.locked &&
+        activeTool.type !== "freedraw" &&
+        draggingElement
+      ) {
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -4599,12 +4605,12 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
-      if (!elementLocked && activeTool.type !== "freedraw") {
+      if (!activeTool.locked && activeTool.type !== "freedraw") {
         resetCursor(this.canvas);
         this.setState({
           draggingElement: null,
           suggestedBindings: [],
-          activeTool: { type: "selection" },
+          activeTool: { ...activeTool, type: "selection" },
         });
       } else {
         this.setState({
@@ -4910,7 +4916,7 @@ class App extends React.Component<AppProps, AppState> {
         {
           pendingImageElement: null,
           editingElement: null,
-          activeTool: { type: "selection" },
+          activeTool: { ...this.state.activeTool, type: "selection" },
         },
         () => {
           this.actionManager.executeAction(actionFinalize);
