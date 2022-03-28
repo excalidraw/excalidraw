@@ -3576,7 +3576,7 @@ class App extends React.Component<AppProps, AppState> {
     resetCursor(this.canvas);
     if (!this.state.activeTool.locked) {
       this.setState({
-        activeTool: { type: "selection", locked: false },
+        activeTool: { ...this.state.activeTool, type: "selection" },
       });
     }
   };

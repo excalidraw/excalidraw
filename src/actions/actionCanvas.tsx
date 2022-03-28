@@ -69,7 +69,7 @@ export const actionClearCanvas = register({
         pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
-            ? { type: "selection", locked: appState.activeTool.locked }
+            ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
       },
       commitToHistory: true,
