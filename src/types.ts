@@ -215,6 +215,7 @@ export type CustomElementConfig = {
   svg: string;
   width?: number;
   height?: number;
+  stackedOnTop: boolean;
 };
 export interface ExcalidrawProps {
   onChange?: (

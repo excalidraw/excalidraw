@@ -5,6 +5,9 @@ import {
 } from "../element/types";
 import { getNonDeletedElements, isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import App from "../components/App";
+import { isCustomElement } from "../element/typeChecks";
+import { getCustomElementConfig } from "../utils";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -26,7 +29,11 @@ class Scene {
 
   private static sceneMapByElement = new WeakMap<ExcalidrawElement, Scene>();
   private static sceneMapById = new Map<string, Scene>();
+  private app: App;
 
+  constructor(app: App) {
+    this.app = app;
+  }
   static mapElementToScene(elementKey: ElementKey, scene: Scene) {
     if (isIdKey(elementKey)) {
       this.sceneMapById.set(elementKey, scene);
@@ -91,12 +98,29 @@ class Scene {
   }
 
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
-    this.elements = nextElements;
+    this.elements = [];
+    const elements: ExcalidrawElement[] = [];
     this.elementsMap.clear();
+    const elementsToBeStackedOnTop: ExcalidrawElement[] = [];
     nextElements.forEach((element) => {
+      if (isCustomElement(element)) {
+        const config = getCustomElementConfig(
+          this.app.props.customElementsConfig,
+          element.customType,
+        );
+        if (config?.stackedOnTop) {
+          elementsToBeStackedOnTop.push(element);
+        } else {
+          elements.push(element);
+        }
+      } else {
+        elements.push(element);
+      }
       this.elementsMap.set(element.id, element);
       Scene.mapElementToScene(element, this);
     });
+    elementsToBeStackedOnTop.forEach((ele) => elements.push(ele));
+    this.elements = elements;
     this.nonDeletedElements = getNonDeletedElements(this.elements);
     this.informMutation();
   }

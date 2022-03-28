@@ -398,7 +398,7 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    this.scene = new Scene();
+    this.scene = new Scene(this);
     this.library = new Library(this);
     this.history = new History();
     this.actionManager = new ActionManager(
