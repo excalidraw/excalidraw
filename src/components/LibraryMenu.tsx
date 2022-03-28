@@ -19,6 +19,7 @@ import LibraryMenuItems from "./LibraryMenuItems";
 import { EVENT } from "../constants";
 import { KEYS } from "../keys";
 import { arrayToMap } from "../utils";
+import { trackEvent } from "../analytics";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -157,6 +158,7 @@ export const LibraryMenu = ({
 
   const addToLibrary = useCallback(
     async (elements: LibraryItem["elements"]) => {
+      trackEvent("element", "addToLibrary", "ui");
       if (elements.some((element) => element.type === "image")) {
         return setAppState({
           errorMessage: "Support for adding images to the library coming soon!",

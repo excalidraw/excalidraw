@@ -11,6 +11,7 @@ import {
 import { getSceneVersion } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
 import {
+  getFrame,
   preventUnload,
   resolvablePromise,
   withBatchedUpdates,
@@ -239,7 +240,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   openPortal = async () => {
-    trackEvent("share", "room creation");
+    trackEvent("share", "room creation", `ui (${getFrame()})`);
     return this.initializeSocketClient(null);
   };
 

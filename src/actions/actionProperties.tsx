@@ -194,6 +194,7 @@ const changeFontSize = (
 
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return {
       ...(value.currentItemStrokeColor && {
@@ -243,6 +244,7 @@ export const actionChangeStrokeColor = register({
 
 export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return {
       ...(value.currentItemBackgroundColor && {
@@ -285,6 +287,7 @@ export const actionChangeBackgroundColor = register({
 
 export const actionChangeFillStyle = register({
   name: "changeFillStyle",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) =>
@@ -334,6 +337,7 @@ export const actionChangeFillStyle = register({
 
 export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) =>
@@ -381,6 +385,7 @@ export const actionChangeStrokeWidth = register({
 
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) =>
@@ -429,6 +434,7 @@ export const actionChangeSloppiness = register({
 
 export const actionChangeStrokeStyle = register({
   name: "changeStrokeStyle",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) =>
@@ -476,6 +482,7 @@ export const actionChangeStrokeStyle = register({
 
 export const actionChangeOpacity = register({
   name: "changeOpacity",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) =>
@@ -525,6 +532,7 @@ export const actionChangeOpacity = register({
 
 export const actionChangeFontSize = register({
   name: "changeFontSize",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return changeFontSize(elements, appState, () => value, value);
   },
@@ -582,6 +590,7 @@ export const actionChangeFontSize = register({
 
 export const actionDecreaseFontSize = register({
   name: "decreaseFontSize",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return changeFontSize(elements, appState, (element) =>
       Math.round(
@@ -603,6 +612,7 @@ export const actionDecreaseFontSize = register({
 
 export const actionIncreaseFontSize = register({
   name: "increaseFontSize",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return changeFontSize(elements, appState, (element) =>
       Math.round(element.fontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)),
@@ -620,6 +630,7 @@ export const actionIncreaseFontSize = register({
 
 export const actionChangeFontFamily = register({
   name: "changeFontFamily",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(
@@ -701,6 +712,7 @@ export const actionChangeFontFamily = register({
 
 export const actionChangeTextAlign = register({
   name: "changeTextAlign",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(
@@ -773,6 +785,7 @@ export const actionChangeTextAlign = register({
 });
 export const actionChangeVerticalAlign = register({
   name: "changeVerticalAlign",
+  trackEvent: { category: "element" },
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(
@@ -840,6 +853,7 @@ export const actionChangeVerticalAlign = register({
 
 export const actionChangeSharpness = register({
   name: "changeSharpness",
+  trackEvent: false,
   perform: (elements, appState, value) => {
     const targetElements = getTargetElements(
       getNonDeletedElements(elements),
@@ -904,6 +918,7 @@ export const actionChangeSharpness = register({
 
 export const actionChangeArrowhead = register({
   name: "changeArrowhead",
+  trackEvent: false,
   perform: (
     elements,
     appState,

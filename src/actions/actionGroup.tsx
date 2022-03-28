@@ -54,6 +54,7 @@ const enableActionGroup = (
 
 export const actionGroup = register({
   name: "group",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
@@ -147,6 +148,7 @@ export const actionGroup = register({
 
 export const actionUngroup = register({
   name: "ungroup",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     const groupIds = getSelectedGroupIds(appState);
     if (groupIds.length === 0) {

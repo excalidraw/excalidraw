@@ -323,6 +323,7 @@ export type AppClassProperties = {
     }
   >;
   files: BinaryFiles;
+  deviceType: App["deviceType"];
 };
 
 export type PointerDownState = Readonly<{

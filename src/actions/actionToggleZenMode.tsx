@@ -1,12 +1,13 @@
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
-import { trackEvent } from "../analytics";
 
 export const actionToggleZenMode = register({
   name: "zenMode",
+  trackEvent: {
+    category: "canvas",
+    predicate: (appState) => !appState.zenModeEnabled,
+  },
   perform(elements, appState) {
-    trackEvent("view", "mode", "zen");
-
     return {
       appState: {
         ...appState,

@@ -4,15 +4,19 @@ export const trackEvent =
   typeof window !== "undefined" &&
   window.gtag
     ? (category: string, action: string, label?: string, value?: number) => {
-        window.gtag("event", action, {
-          event_category: category,
-          event_label: label,
-          value,
-        });
+        try {
+          window.gtag("event", action, {
+            event_category: category,
+            event_label: label,
+            value,
+          });
+        } catch (error) {
+          console.error("error logging to ga", error);
+        }
       }
     : typeof process !== "undefined" && process.env?.JEST_WORKER_ID
     ? (category: string, action: string, label?: string, value?: number) => {}
     : (category: string, action: string, label?: string, value?: number) => {
         // Uncomment the next line to track locally
-        // console.info("Track Event", category, action, label, value);
+        // console.log("Track Event", { category, action, label, value });
       };
