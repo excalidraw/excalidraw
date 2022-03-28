@@ -14,7 +14,6 @@ import {
   bindOrUnbindLinearElement,
 } from "../element/binding";
 import { isBindingElement } from "../element/typeChecks";
-import { isEraserActive } from "../appState";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -141,7 +140,10 @@ export const actionFinalize = register({
           (appState.elementLocked || appState.activeTool.type === "freedraw") &&
           multiPointElement
             ? appState.activeTool
-            : { type: appState.activeTool.lastActiveToolBeforeEraser ?? "selection" },
+            : {
+                type:
+                  appState.activeTool.lastActiveToolBeforeEraser ?? "selection",
+              },
         draggingElement: null,
         multiElement: null,
         editingElement: null,
@@ -165,8 +167,8 @@ export const actionFinalize = register({
     (event.key === KEYS.ESCAPE &&
       (appState.editingLinearElement !== null ||
         (!appState.draggingElement && appState.multiElement === null))) ||
-      ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
-        appState.multiElement !== null),
+    ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
+      appState.multiElement !== null),
   PanelComponent: ({ appState, updateData, data }) => (
     <ToolButton
       type="button"
