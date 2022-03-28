@@ -6,6 +6,7 @@ import { register } from "./register";
 
 export const actionGoToCollaborator = register({
   name: "goToCollaborator",
+  trackEvent: { category: "collab" },
   perform: (_elements, appState, value) => {
     const point = value as Collaborator["pointer"];
     if (!point) {
