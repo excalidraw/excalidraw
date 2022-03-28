@@ -38,7 +38,6 @@ import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
 import {
-  copyToClipboard,
   parseClipboard,
   probablySupportsClipboardBlob,
   probablySupportsClipboardWriteText,
@@ -1292,12 +1291,11 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   private cutAll = () => {
-    this.copyAll();
-    this.actionManager.executeAction(actionDeleteSelected);
+    this.actionManager.executeAction(actionCut, "keyboard");
   };
 
   private copyAll = () => {
-    copyToClipboard(this.scene.getElements(), this.state, this.files);
+    this.actionManager.executeAction(actionCopy, "keyboard");
   };
 
   private static resetTapTwice() {
@@ -1571,7 +1569,14 @@ class App extends React.Component<AppProps, AppState> {
     gesture.pointers.delete(event.pointerId);
   };
 
-  toggleLock = () => {
+  toggleLock = (source: "keyboard" | "ui" = "ui") => {
+    if (!this.state.activeTool.locked) {
+      trackEvent(
+        "toolbar",
+        "toggleLock",
+        `${source} (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
+      );
+    }
     this.setState((prevState) => {
       return {
         activeTool: {
@@ -1597,9 +1602,6 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   toggleStats = () => {
-    if (!this.state.showStats) {
-      trackEvent("dialog", "stats");
-    }
     this.actionManager.executeAction(actionToggleStats);
   };
 
@@ -1854,9 +1856,16 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         const shape = findShapeByKey(event.key);
         if (shape) {
+          if (this.state.activeTool.type !== shape) {
+            trackEvent(
+              "toolbar",
+              shape,
+              `keyboard (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
+            );
+          }
           this.setActiveTool({ ...this.state.activeTool, type: shape });
         } else if (event.key === KEYS.Q) {
-          this.toggleLock();
+          this.toggleLock("keyboard");
         }
       }
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
@@ -5499,6 +5508,7 @@ class App extends React.Component<AppProps, AppState> {
           options: [
             this.deviceType.isMobile &&
               navigator.clipboard && {
+                trackEvent: false,
                 name: "paste",
                 perform: (elements, appStates) => {
                   this.pasteFromClipboard(null);
@@ -5555,6 +5565,7 @@ class App extends React.Component<AppProps, AppState> {
             this.deviceType.isMobile &&
               navigator.clipboard && {
                 name: "paste",
+                trackEvent: false,
                 perform: (elements, appStates) => {
                   this.pasteFromClipboard(null);
                   return {
