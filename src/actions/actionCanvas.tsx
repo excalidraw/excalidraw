@@ -315,7 +315,7 @@ export const actionErase = register({
             ? appState.activeTool.lastActiveToolBeforeEraser ?? "selection"
             : "eraser",
           lastActiveToolBeforeEraser:
-            appState.activeTool.type === "eraser" //node throws incorrect type error when using isEraserActive()
+            appState.activeTool.type === "eraser"
               ? undefined
               : appState.activeTool.type,
         },
