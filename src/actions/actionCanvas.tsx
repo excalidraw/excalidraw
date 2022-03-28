@@ -303,17 +303,23 @@ export const actionErase = register({
         selectedGroupIds: {},
         activeTool: {
           type: isEraserActive(appState)
-            ? appState.activeTool.typeBeforeEraser ?? "selection"
+            ? appState.activeTool.lastActiveToolBeforeEraser ?? "selection"
             : "eraser",
-          typeBeforeEraser: isEraserActive(appState)
-            ? undefined
-            : appState.activeTool.type,
+          lastActiveToolBeforeEraser:
+            appState.activeTool.type === "eraser" //node throws incorrect type error when using isEraserActive()
+              ? undefined
+              : appState.activeTool.type,
         },
       },
       commitToHistory: true,
     };
   },
-  keyTest: (event) => event.key === KEYS.E,
+  keyTest: (event, appState) => {
+    return (
+      event.key === KEYS.E ||
+      (event.key === KEYS.ESCAPE && isEraserActive(appState))
+    );
+  },
   PanelComponent: ({ elements, appState, updateData, data }) => (
     <ToolButton
       type="button"
