@@ -3,6 +3,7 @@
 exports[`exportToSvg with default arguments 1`] = `
 Object {
   "activeTool": Object {
+    "lastActiveToolBeforeEraser": null,
     "locked": false,
     "type": "selection",
   },
