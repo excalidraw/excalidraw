@@ -21,6 +21,7 @@ import clsx from "clsx";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
+  trackEvent: false,
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
@@ -51,6 +52,7 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     app.imageCache.clear();
     return {
@@ -61,7 +63,6 @@ export const actionClearCanvas = register({
         ...getDefaultAppState(),
         files: {},
         theme: appState.theme,
-        elementLocked: appState.elementLocked,
         penMode: appState.penMode,
         penDetected: appState.penDetected,
         exportBackground: appState.exportBackground,
@@ -71,7 +72,7 @@ export const actionClearCanvas = register({
         pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
-            ? { type: "selection" }
+            ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
       },
       commitToHistory: true,
@@ -83,6 +84,7 @@ export const actionClearCanvas = register({
 
 export const actionZoomIn = register({
   name: "zoomIn",
+  trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
       appState: {
@@ -118,6 +120,7 @@ export const actionZoomIn = register({
 
 export const actionZoomOut = register({
   name: "zoomOut",
+  trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
       appState: {
@@ -153,6 +156,7 @@ export const actionZoomOut = register({
 
 export const actionResetZoom = register({
   name: "resetZoom",
+  trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
       appState: {
@@ -258,6 +262,7 @@ export const zoomToFitElements = (
 
 export const actionZoomToSelected = register({
   name: "zoomToSelection",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState) => zoomToFitElements(elements, appState, true),
   keyTest: (event) =>
     event.code === CODES.TWO &&
@@ -268,6 +273,7 @@ export const actionZoomToSelected = register({
 
 export const actionZoomToFit = register({
   name: "zoomToFit",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState) => zoomToFitElements(elements, appState, false),
   keyTest: (event) =>
     event.code === CODES.ONE &&
@@ -278,6 +284,7 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
+  trackEvent: { category: "canvas" },
   perform: (_, appState, value, app) => {
     //zsviczian
     if (app.props.onThemeChange) {
@@ -310,13 +317,23 @@ export const actionToggleTheme = register({
 
 export const actionErase = register({
   name: "eraser",
+  trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
     return {
       appState: {
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
-        activeTool: { type: isEraserActive(appState) ? "selection" : "eraser" },
+        activeTool: {
+          ...appState.activeTool,
+          type: isEraserActive(appState)
+            ? appState.activeTool.lastActiveToolBeforeEraser ?? "selection"
+            : "eraser",
+          lastActiveToolBeforeEraser:
+            appState.activeTool.type === "eraser" //node throws incorrect type error when using isEraserActive()
+              ? null
+              : appState.activeTool.type,
+        },
       },
       commitToHistory: true,
     };

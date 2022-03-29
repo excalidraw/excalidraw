@@ -2,12 +2,14 @@ import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 import { GRID_SIZE } from "../constants";
 import { AppState } from "../types";
-import { trackEvent } from "../analytics";
 
 export const actionToggleGridMode = register({
   name: "gridMode",
+  trackEvent: {
+    category: "canvas",
+    predicate: (appState) => !appState.gridSize,
+  },
   perform(elements, appState) {
-    trackEvent("view", "mode", "grid");
     return {
       appState: {
         ...appState,

@@ -5,6 +5,7 @@ import { getNonDeletedElements, isTextElement } from "../element";
 
 export const actionSelectAll = register({
   name: "selectAll",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState) => {
     if (appState.editingLinearElement) {
       return false;

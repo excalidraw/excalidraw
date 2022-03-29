@@ -1,12 +1,14 @@
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
-import { trackEvent } from "../analytics";
 
 export const actionToggleViewMode = register({
   name: "viewMode",
+  trackEvent: {
+    category: "canvas",
+    predicate: (appState) => !appState.viewModeEnabled,
+  },
   perform(elements, appState, _, app) {
     //zsviczian
-    trackEvent("view", "mode", "view");
     if (app.props.onViewModeChange) {
       //zsviczian
       app.props.onViewModeChange(!this.checked!(appState));

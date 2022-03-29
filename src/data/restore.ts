@@ -236,10 +236,8 @@ export const restoreAppState = (
   localAppState: Partial<AppState> | null | undefined,
 ): RestoredAppState => {
   appState = appState || {};
-
   const defaultAppState = getDefaultAppState();
   const nextAppState = {} as typeof defaultAppState;
-
   for (const [key, defaultValue] of Object.entries(defaultAppState) as [
     keyof typeof defaultAppState,
     any,
@@ -253,12 +251,15 @@ export const restoreAppState = (
         ? localValue
         : defaultValue;
   }
-
   return {
     ...nextAppState,
-    activeTool: AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
-      ? nextAppState.activeTool
-      : { type: "selection" },
+    activeTool: {
+      lastActiveToolBeforeEraser: null,
+      locked: nextAppState.activeTool.locked ?? false,
+      type: AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
+        ? nextAppState.activeTool.type ?? "selection"
+        : "selection",
+    },
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"
