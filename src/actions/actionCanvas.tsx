@@ -62,7 +62,6 @@ export const actionClearCanvas = register({
         ...getDefaultAppState(),
         files: {},
         theme: appState.theme,
-        elementLocked: appState.elementLocked,
         penMode: appState.penMode,
         penDetected: appState.penDetected,
         exportBackground: appState.exportBackground,
@@ -72,7 +71,7 @@ export const actionClearCanvas = register({
         pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
-            ? { type: "selection" }
+            ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
       },
       commitToHistory: true,
@@ -311,12 +310,13 @@ export const actionErase = register({
         selectedElementIds: {},
         selectedGroupIds: {},
         activeTool: {
+          ...appState.activeTool,
           type: isEraserActive(appState)
             ? appState.activeTool.lastActiveToolBeforeEraser ?? "selection"
             : "eraser",
           lastActiveToolBeforeEraser:
             appState.activeTool.type === "eraser" //node throws incorrect type error when using isEraserActive()
-              ? undefined
+              ? null
               : appState.activeTool.type,
         },
       },

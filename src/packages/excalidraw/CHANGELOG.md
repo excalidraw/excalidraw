@@ -17,7 +17,13 @@ Please add the latest change on the top under the correct section.
 
 #### Refactor
 
-- Rename `appState.elementType` to [`appState.activeTool`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L80) which is now an object.
+- Rename `appState.elementLocked` to `appState.activeTool.locked` [#4983](https://github.com/excalidraw/excalidraw/pull/4983).
+
+##### BREAKING CHANGE
+
+You will need to pass `activeTool.locked` instead of `elementType` from now onwards in `appState`.
+
+- Rename `appState.elementType` to [`appState.activeTool`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L80) which is now an object [#4698](https://github.com/excalidraw/excalidraw/pull/4968).
 
 ##### BREAKING CHANGE
 
