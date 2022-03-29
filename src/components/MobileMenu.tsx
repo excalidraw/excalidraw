@@ -86,7 +86,7 @@ export const MobileMenu = ({
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
                 <LockButton
-                  checked={appState.elementLocked}
+                  checked={appState.activeTool.locked}
                   onChange={onLockToggle}
                   title={t("toolBar.lock")}
                   isMobile

@@ -70,7 +70,9 @@ const ContextMenu = ({
                   dangerous: actionName === "deleteSelectedElements",
                   checkmark: option.checked?.(appState),
                 })}
-                onClick={() => actionManager.executeAction(option)}
+                onClick={() =>
+                  actionManager.executeAction(option, "contextMenu")
+                }
               >
                 <div className="context-menu-option__label">{label}</div>
                 <kbd className="context-menu-option__shortcut">
