@@ -252,6 +252,10 @@ export const restoreAppState = (
   }
   return {
     ...nextAppState,
+    // reset on fresh restore so as to hide the UI button if penMode not active
+    penDetected:
+      localAppState?.penDetected ??
+      (appState.penMode ? appState.penDetected ?? false : false),
     activeTool: {
       lastActiveToolBeforeEraser: null,
       locked: nextAppState.activeTool.locked ?? false,
