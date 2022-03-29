@@ -329,7 +329,7 @@ const LayerUI = ({
                     />
                     <LockButton
                       zenModeEnabled={zenModeEnabled}
-                      checked={appState.elementLocked}
+                      checked={appState.activeTool.locked}
                       onChange={() => onLockToggle()}
                       title={t("toolBar.lock")}
                     />

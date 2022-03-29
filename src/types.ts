@@ -69,7 +69,7 @@ export type LastActiveToolBeforeEraser =
       type: "custom";
       customType: string;
     }
-  | undefined;
+  | null;
 
 export type AppState = {
   isLoading: boolean;
@@ -88,14 +88,15 @@ export type AppState = {
   activeTool:
     | {
         type: typeof SHAPES[number]["value"] | "eraser";
-        lastActiveToolBeforeEraser?: LastActiveToolBeforeEraser;
+        lastActiveToolBeforeEraser: LastActiveToolBeforeEraser;
+        locked: boolean;
       }
     | {
         type: "custom";
         customType: string;
-        lastActiveToolBeforeEraser?: LastActiveToolBeforeEraser;
+        lastActiveToolBeforeEraser: LastActiveToolBeforeEraser;
+        locked: boolean;
       };
-  elementLocked: boolean;
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;

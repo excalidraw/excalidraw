@@ -62,7 +62,6 @@ export const actionClearCanvas = register({
         ...getDefaultAppState(),
         files: {},
         theme: appState.theme,
-        elementLocked: appState.elementLocked,
         penMode: appState.penMode,
         penDetected: appState.penDetected,
         exportBackground: appState.exportBackground,
@@ -72,7 +71,7 @@ export const actionClearCanvas = register({
         pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
-            ? { type: "selection" }
+            ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
       },
       commitToHistory: true,
@@ -305,7 +304,8 @@ export const actionErase = register({
   name: "eraser",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
-    const activeTool: any = {};
+    const activeTool: any = { ...appState.activeTool };
+
     if (appState.activeTool.type !== "eraser") {
       if (appState.activeTool.type === "custom") {
         activeTool.lastActiveToolBeforeEraser = {
