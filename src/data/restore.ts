@@ -256,7 +256,7 @@ export const restoreAppState = (
       lastActiveToolBeforeEraser: null,
       locked: nextAppState.activeTool.locked ?? false,
       type: AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
-        ? nextAppState.activeTool.type
+        ? nextAppState.activeTool.type ?? "selection"
         : "selection",
     },
     // Migrates from previous version where appState.zoom was a number
