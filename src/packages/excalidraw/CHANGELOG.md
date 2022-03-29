@@ -17,7 +17,7 @@ Please add the latest change on the top under the correct section.
 
 #### Refactor
 
-- Rename `appState.elementLocked` to `appState.activeTool.locked`[#4983](https://github.com/excalidraw/excalidraw/pull/4983).
+- Rename `appState.elementLocked` to `appState.activeTool.locked` [#4983](https://github.com/excalidraw/excalidraw/pull/4983).
 
 ##### BREAKING CHANGE
 
