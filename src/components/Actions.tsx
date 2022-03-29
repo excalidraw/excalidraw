@@ -219,13 +219,17 @@ export const ShapesSwitcher = ({
           penMode: true,
         });
       }
+      const nextActiveTool = { ...activeTool, type: activeToolType };
       setAppState({
-        activeTool: { ...activeTool, type: activeToolType },
+        activeTool: nextActiveTool,
         multiElement: null,
         selectedElementIds: {},
       });
-      setCursorForShape(canvas, { ...appState, activeTool });
-      if (activeTool.type === "image") {
+      setCursorForShape(canvas, {
+        ...appState,
+        activeTool: nextActiveTool,
+      });
+      if (activeToolType === "image") {
         onImageAction({ pointerType });
       }
     },
