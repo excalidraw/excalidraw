@@ -170,20 +170,9 @@ class Portal {
       );
     }
 
-    const broadcastPromise = this._broadcastSocketData(
-      data as SocketUpdateData,
-    );
-
     this.queueFileUpload();
 
-    if (syncAll && this.collab.isCollaborating) {
-      await Promise.all([
-        broadcastPromise,
-        this.collab.saveCollabRoomToFirebase(syncableElements),
-      ]);
-    } else {
-      await broadcastPromise;
-    }
+    await this._broadcastSocketData(data as SocketUpdateData);
   };
 
   broadcastIdleChange = (userState: UserIdleState) => {
