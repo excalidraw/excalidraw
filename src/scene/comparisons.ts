@@ -6,6 +6,7 @@ import {
 
 import { getElementAbsoluteCoords } from "../element";
 import { isTextBindableContainer } from "../element/typeChecks";
+import { AppState } from "../types";
 
 export const hasBackground = (type: string) =>
   type === "rectangle" ||
@@ -31,7 +32,7 @@ export const hasStrokeStyle = (type: string) =>
   type === "arrow" ||
   type === "line";
 
-export const canChangeSharpness = (type: string) =>
+export const canChangeSharpness = (type: AppState["activeTool"]["type"]) =>
   type === "rectangle" ||
   type === "arrow" ||
   type === "line" ||

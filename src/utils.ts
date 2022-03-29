@@ -613,6 +613,19 @@ export const updateObject = <T extends Record<string, any>>(
   };
 };
 
+export const isPrimitive = (val: any) => {
+  const type = typeof val;
+  return val == null || (type !== "object" && type !== "function");
+};
+
+export const getFrame = () => {
+  try {
+    return window.self === window.top ? "top" : "iframe";
+  } catch (error) {
+    return "iframe";
+  }
+};
+
 export const getCustomElementConfig = (
   customElementConfig: ExcalidrawProps["customElementsConfig"],
   customType: string,

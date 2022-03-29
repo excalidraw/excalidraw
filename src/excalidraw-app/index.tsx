@@ -34,6 +34,7 @@ import {
 import {
   debounce,
   getVersion,
+  getFrame,
   isTestEnv,
   preventUnload,
   ResolvablePromise,
@@ -302,6 +303,7 @@ const ExcalidrawWrapper = () => {
   }
 
   useEffect(() => {
+    trackEvent("load", "frame", getFrame());
     // Delayed so that the app has a time to load the latest SW
     setTimeout(() => {
       trackEvent("load", "version", getVersion());

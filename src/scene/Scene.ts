@@ -69,8 +69,8 @@ class Scene {
     return this.nonDeletedElements;
   }
 
-  getElement(id: ExcalidrawElement["id"]): ExcalidrawElement | null {
-    return this.elementsMap.get(id) || null;
+  getElement<T extends ExcalidrawElement>(id: T["id"]): T | null {
+    return (this.elementsMap.get(id) as T | undefined) || null;
   }
 
   getNonDeletedElement(

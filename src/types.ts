@@ -63,6 +63,14 @@ export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
+export type LastActiveToolBeforeEraser =
+  | typeof SHAPES[number]["value"]
+  | {
+      type: "custom";
+      customType: string;
+    }
+  | undefined;
+
 export type AppState = {
   isLoading: boolean;
   errorMessage: string | null;
@@ -78,8 +86,15 @@ export type AppState = {
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
   activeTool:
-    | { type: typeof SHAPES[number]["value"] | "eraser" }
-    | { type: "custom"; customType: string };
+    | {
+        type: typeof SHAPES[number]["value"] | "eraser";
+        lastActiveToolBeforeEraser?: LastActiveToolBeforeEraser;
+      }
+    | {
+        type: "custom";
+        customType: string;
+        lastActiveToolBeforeEraser?: LastActiveToolBeforeEraser;
+      };
   elementLocked: boolean;
   penMode: boolean;
   penDetected: boolean;
@@ -341,6 +356,7 @@ export type AppClassProperties = {
     }
   >;
   files: BinaryFiles;
+  deviceType: App["deviceType"];
 };
 
 export type PointerDownState = Readonly<{

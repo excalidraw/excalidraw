@@ -21,6 +21,7 @@ import clsx from "clsx";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
+  trackEvent: false,
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
@@ -50,6 +51,7 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     app.imageCache.clear();
     return {
@@ -82,6 +84,7 @@ export const actionClearCanvas = register({
 
 export const actionZoomIn = register({
   name: "zoomIn",
+  trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
       appState: {
@@ -117,6 +120,7 @@ export const actionZoomIn = register({
 
 export const actionZoomOut = register({
   name: "zoomOut",
+  trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
       appState: {
@@ -152,6 +156,7 @@ export const actionZoomOut = register({
 
 export const actionResetZoom = register({
   name: "resetZoom",
+  trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
       appState: {
@@ -250,6 +255,7 @@ const zoomToFitElements = (
 
 export const actionZoomToSelected = register({
   name: "zoomToSelection",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState) => zoomToFitElements(elements, appState, true),
   keyTest: (event) =>
     event.code === CODES.TWO &&
@@ -260,6 +266,7 @@ export const actionZoomToSelected = register({
 
 export const actionZoomToFit = register({
   name: "zoomToFit",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState) => zoomToFitElements(elements, appState, false),
   keyTest: (event) =>
     event.code === CODES.ONE &&
@@ -270,6 +277,7 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
+  trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {
     return {
       appState: {
@@ -295,18 +303,45 @@ export const actionToggleTheme = register({
 
 export const actionErase = register({
   name: "eraser",
+  trackEvent: { category: "toolbar" },
+  //@ts-ignore
   perform: (elements, appState) => {
+    let lastActiveToolBeforeEraser: AppState["activeTool"]["lastActiveToolBeforeEraser"] =
+      undefined;
+    if (appState.activeTool.type !== "eraser") {
+      if (appState.activeTool.type === "custom") {
+        lastActiveToolBeforeEraser = {
+          type: "custom",
+          customType: appState.activeTool.customType,
+        };
+      } else {
+        lastActiveToolBeforeEraser = appState.activeTool.type;
+      }
+    }
+
     return {
       appState: {
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
-        activeTool: { type: isEraserActive(appState) ? "selection" : "eraser" },
+        activeTool: {
+          ...appState.activeTool,
+          type: isEraserActive(appState)
+            ? appState.activeTool.lastActiveToolBeforeEraser ?? "selection"
+            : "eraser",
+
+          lastActiveToolBeforeEraser,
+        },
       },
       commitToHistory: true,
     };
   },
-  keyTest: (event) => event.key === KEYS.E,
+  keyTest: (event, appState) => {
+    return (
+      event.key === KEYS.E ||
+      (event.key === KEYS.ESCAPE && isEraserActive(appState))
+    );
+  },
   PanelComponent: ({ elements, appState, updateData, data }) => (
     <ToolButton
       type="button"
