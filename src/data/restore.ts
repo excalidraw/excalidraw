@@ -252,9 +252,13 @@ export const restoreAppState = (
   }
   return {
     ...nextAppState,
-    activeTool: AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
-      ? nextAppState.activeTool
-      : { ...nextAppState.activeTool, type: "selection" },
+    activeTool: {
+      lastActiveToolBeforeEraser: null,
+      locked: nextAppState.activeTool.locked ?? false,
+      type: AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
+        ? nextAppState.activeTool.type ?? "selection"
+        : "selection",
+    },
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"

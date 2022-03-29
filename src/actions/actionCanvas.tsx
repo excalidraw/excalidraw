@@ -323,12 +323,7 @@ export const actionErase = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event, appState) => {
-    return (
-      event.key === KEYS.E ||
-      (event.key === KEYS.ESCAPE && isEraserActive(appState))
-    );
-  },
+  keyTest: (event) => event.key === KEYS.E,
   PanelComponent: ({ elements, appState, updateData, data }) => (
     <ToolButton
       type="button"
