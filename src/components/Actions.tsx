@@ -24,6 +24,7 @@ import {
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
+import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
 
 export const SelectedShapeActions = ({
@@ -209,19 +210,26 @@ export const ShapesSwitcher = ({
       activeToolType: typeof SHAPES[number]["value"];
       pointerType: PointerType | null;
     }) => {
+      if (appState.activeTool.type !== activeToolType) {
+        trackEvent("toolbar", activeToolType, "ui");
+      }
       if (!appState.penDetected && pointerType === "pen") {
         setAppState({
           penDetected: true,
           penMode: true,
         });
       }
+      const nextActiveTool = { ...activeTool, type: activeToolType };
       setAppState({
-        activeTool: { type: activeToolType },
+        activeTool: nextActiveTool,
         multiElement: null,
         selectedElementIds: {},
       });
-      setCursorForShape(canvas, { ...appState, activeTool });
-      if (activeTool.type === "image") {
+      setCursorForShape(canvas, {
+        ...appState,
+        activeTool: nextActiveTool,
+      });
+      if (activeToolType === "image") {
         onImageAction({ pointerType });
       }
     },

@@ -9,6 +9,7 @@ import { t } from "../i18n";
 
 export const actionCopy = register({
   name: "copy",
+  trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     copyToClipboard(getNonDeletedElements(elements), appState, app.files);
 
@@ -23,6 +24,7 @@ export const actionCopy = register({
 
 export const actionCut = register({
   name: "cut",
+  trackEvent: { category: "element" },
   perform: (elements, appState, data, app) => {
     actionCopy.perform(elements, appState, data, app);
     return actionDeleteSelected.perform(elements, appState);
@@ -33,6 +35,7 @@ export const actionCut = register({
 
 export const actionCopyAsSvg = register({
   name: "copyAsSvg",
+  trackEvent: { category: "element" },
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
       return {
@@ -73,6 +76,7 @@ export const actionCopyAsSvg = register({
 
 export const actionCopyAsPng = register({
   name: "copyAsPng",
+  trackEvent: { category: "element" },
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
       return {

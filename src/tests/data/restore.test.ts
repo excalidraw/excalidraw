@@ -311,7 +311,9 @@ describe("restoreAppState", () => {
       stubImportedAppState,
       stubLocalAppState,
     );
-    expect(restoredAppState.activeTool).toBe(stubImportedAppState.activeTool);
+    expect(restoredAppState.activeTool).toEqual(
+      stubImportedAppState.activeTool,
+    );
     expect(restoredAppState.cursorButton).toBe(
       stubImportedAppState.cursorButton,
     );

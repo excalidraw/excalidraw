@@ -36,6 +36,7 @@ import { LibraryMenu } from "./LibraryMenu";
 import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
+import { trackEvent } from "../analytics";
 import { useDeviceType } from "../components/App";
 
 interface LayerUIProps {
@@ -122,6 +123,7 @@ const LayerUI = ({
     const createExporter =
       (type: ExportType): ExportCB =>
       async (exportedElements) => {
+        trackEvent("export", type, "ui");
         const fileHandle = await exportCanvas(
           type,
           exportedElements,
@@ -325,8 +327,8 @@ const LayerUI = ({
                     />
                     <LockButton
                       zenModeEnabled={zenModeEnabled}
-                      checked={appState.elementLocked}
-                      onChange={onLockToggle}
+                      checked={appState.activeTool.locked}
+                      onChange={() => onLockToggle()}
                       title={t("toolBar.lock")}
                     />
                     <Island
@@ -548,7 +550,7 @@ const LayerUI = ({
         renderImageExportDialog={renderImageExportDialog}
         setAppState={setAppState}
         onCollabButtonClick={onCollabButtonClick}
-        onLockToggle={onLockToggle}
+        onLockToggle={() => onLockToggle()}
         onPenModeToggle={onPenModeToggle}
         canvas={canvas}
         isCollaborating={isCollaborating}
