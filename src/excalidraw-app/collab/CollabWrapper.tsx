@@ -22,7 +22,7 @@ import {
   FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
   LOAD_IMAGES_TIMEOUT,
-  SCENE,
+  WS_SCENE_EVENT_TYPES,
   STORAGE_KEYS,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
@@ -427,7 +427,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         switch (decryptedData.type) {
           case "INVALID_RESPONSE":
             return;
-          case SCENE.INIT: {
+          case WS_SCENE_EVENT_TYPES.INIT: {
             if (!this.portal.socketInitialized) {
               this.initializeRoom({ fetchScene: false });
               const remoteElements = decryptedData.payload.elements;
@@ -443,7 +443,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             }
             break;
           }
-          case SCENE.UPDATE:
+          case WS_SCENE_EVENT_TYPES.UPDATE:
             this.handleRemoteSceneUpdate(
               this.reconcileElements(decryptedData.payload.elements),
             );
@@ -705,7 +705,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
     ) {
-      this.portal.broadcastScene(SCENE.UPDATE, elements, false);
+      this.portal.broadcastScene(WS_SCENE_EVENT_TYPES.UPDATE, elements, false);
       this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
       this.queueBroadcastAllElements();
     }
@@ -713,7 +713,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   queueBroadcastAllElements = throttle(() => {
     this.portal.broadcastScene(
-      SCENE.UPDATE,
+      WS_SCENE_EVENT_TYPES.UPDATE,
       this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       true,
     );
