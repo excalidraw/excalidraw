@@ -79,6 +79,7 @@ export type AppState = {
   editingLinearElement: LinearElementEditor | null;
   activeTool: {
     type: typeof SHAPES[number]["value"] | "eraser";
+    lastActiveToolBeforeEraser?: typeof SHAPES[number]["value"];
     locked: boolean;
   };
   penMode: boolean;
