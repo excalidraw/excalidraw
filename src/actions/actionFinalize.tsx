@@ -148,7 +148,10 @@ export const actionFinalize = register({
             : {
                 ...appState.activeTool,
                 type:
-                  appState.activeTool.lastActiveToolBeforeEraser ?? "selection",
+                  appState.activeTool.type === "eraser" &&
+                  appState.activeTool.lastActiveToolBeforeEraser
+                    ? appState.activeTool.lastActiveToolBeforeEraser
+                    : "selection",
               },
         draggingElement: null,
         multiElement: null,
