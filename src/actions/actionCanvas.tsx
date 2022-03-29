@@ -304,34 +304,42 @@ export const actionToggleTheme = register({
 export const actionErase = register({
   name: "eraser",
   trackEvent: { category: "toolbar" },
-  //@ts-ignore
   perform: (elements, appState) => {
-    let lastActiveToolBeforeEraser: AppState["activeTool"]["lastActiveToolBeforeEraser"] =
-      undefined;
+    const activeTool: any = {};
     if (appState.activeTool.type !== "eraser") {
       if (appState.activeTool.type === "custom") {
-        lastActiveToolBeforeEraser = {
+        activeTool.lastActiveToolBeforeEraser = {
           type: "custom",
           customType: appState.activeTool.customType,
         };
       } else {
-        lastActiveToolBeforeEraser = appState.activeTool.type;
+        activeTool.lastActiveToolBeforeEraser = appState.activeTool.type;
       }
     }
-
+    if (isEraserActive(appState)) {
+      if (appState.activeTool.lastActiveToolBeforeEraser) {
+        if (
+          typeof appState.activeTool.lastActiveToolBeforeEraser === "object" &&
+          appState.activeTool.lastActiveToolBeforeEraser?.type === "custom"
+        ) {
+          activeTool.type = "custom";
+          activeTool.customType =
+            appState.activeTool.lastActiveToolBeforeEraser.customType;
+        } else {
+          activeTool.type = appState.activeTool.type;
+        }
+      } else {
+        activeTool.type = "selection";
+      }
+    } else {
+      activeTool.type = "eraser";
+    }
     return {
       appState: {
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
-        activeTool: {
-          ...appState.activeTool,
-          type: isEraserActive(appState)
-            ? appState.activeTool.lastActiveToolBeforeEraser ?? "selection"
-            : "eraser",
-
-          lastActiveToolBeforeEraser,
-        },
+        activeTool,
       },
       commitToHistory: true,
     };
