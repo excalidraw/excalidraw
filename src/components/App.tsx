@@ -1070,7 +1070,10 @@ class App extends React.Component<AppProps, AppState> {
         activeTool: { ...this.state.activeTool, type: "selection" },
       });
     }
-    if (prevState.theme !== this.state.theme) {
+    if (
+      this.state.activeTool.type === "eraser" &&
+      prevState.theme !== this.state.theme
+    ) {
       setEraserCursor(this.canvas, this.state.theme);
     }
     // Hide hyperlink popup if shown when element type is not selection
