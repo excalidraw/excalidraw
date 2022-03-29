@@ -1580,6 +1580,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState((prevState) => {
       return {
         activeTool: {
+          ...prevState.activeTool,
           locked: !prevState.activeTool.locked,
           type: prevState.activeTool.locked
             ? "selection"

@@ -41,7 +41,11 @@ export const getDefaultAppState = (): Omit<
     editingElement: null,
     editingGroupId: null,
     editingLinearElement: null,
-    activeTool: { type: "selection", locked: false },
+    activeTool: {
+      type: "selection",
+      locked: false,
+      lastActiveToolBeforeEraser: null,
+    },
     penMode: false,
     penDetected: false,
     errorMessage: null,
