@@ -15,11 +15,11 @@ Please add the latest change on the top under the correct section.
 
 ### Excalidraw API
 
-### Features
+#### Features
 
 - Exported [`restoreLibraryItems`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreLibraryItems) API useful when dealing with libraries [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
 
-### Fixes
+#### Fixes
 
 - Library menu now properly rerenders if open when library is updated using `updateScene({ libraryItems })` [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
 
