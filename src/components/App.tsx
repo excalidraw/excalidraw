@@ -1697,6 +1697,11 @@ class App extends React.Component<AppProps, AppState> {
         this.library.saveLibrary(
           restoreLibraryItems(sceneData.libraryItems, "unpublished"),
         );
+        if (this.state.isLibraryOpen) {
+          this.setState({ isLibraryOpen: false }, () => {
+            this.setState({ isLibraryOpen: true });
+          });
+        }
       }
     },
   );
