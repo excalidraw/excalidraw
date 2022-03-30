@@ -4328,7 +4328,11 @@ class App extends React.Component<AppProps, AppState> {
           lastCommittedPoint: [dx, dy],
         });
 
-        this.actionManager.executeAction(actionFinalize);
+        this.setState({
+          cursorButton: "up"
+        }, () => {
+          this.actionManager.executeAction(actionFinalize);
+        });
 
         return;
       }
