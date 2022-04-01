@@ -6,6 +6,7 @@ import { register } from "./register";
 
 export const actionToggleLock = register({
   name: "toggleLock",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState, false);
     const selectedElementIds = new Set(
