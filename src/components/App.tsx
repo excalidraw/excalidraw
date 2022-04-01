@@ -2127,12 +2127,14 @@ class App extends React.Component<AppProps, AppState> {
         of all hit elements */
       preferSelected?: boolean;
       includeBoundTextElement?: boolean;
+      includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement> | null {
     const allHitElements = this.getElementsAtPosition(
       x,
       y,
       opts?.includeBoundTextElement,
+      opts?.includeLockedElements,
     );
     if (allHitElements.length > 1) {
       if (opts?.preferSelected) {
@@ -2165,17 +2167,19 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
     includeBoundTextElement: boolean = false,
-    excludeLockedElements: boolean = false,
+    includeLockedElements: boolean = false,
   ): NonDeleted<ExcalidrawElement>[] {
-    const elements = (
-      includeBoundTextElement
+    const elements =
+      includeBoundTextElement && includeLockedElements
         ? this.scene.getElements()
         : this.scene
             .getElements()
             .filter(
-              (element) => !(isTextElement(element) && element.containerId),
-            )
-    ).filter((el) => !excludeLockedElements || !el.locked);
+              (element) =>
+                (includeLockedElements || !element.locked) &&
+                (includeBoundTextElement ||
+                  !(isTextElement(element) && element.containerId)),
+            );
 
     return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, x, y),
@@ -3461,8 +3465,6 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.hit.allHitElements = this.getElementsAtPosition(
           pointerDownState.origin.x,
           pointerDownState.origin.y,
-          false,
-          true,
         );
 
         const hitElement = pointerDownState.hit.element;
@@ -5324,7 +5326,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const { x, y } = viewportCoordsToSceneCoords(event, this.state);
-    const element = this.getElementAtPosition(x, y, { preferSelected: true });
+    const element = this.getElementAtPosition(x, y, {
+      preferSelected: true,
+      includeLockedElements: true,
+    });
 
     const type = element ? "element" : "canvas";
 
