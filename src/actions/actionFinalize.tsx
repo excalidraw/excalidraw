@@ -39,6 +39,7 @@ export const actionFinalize = register({
               : undefined,
           appState: {
             ...appState,
+            cursorButton: "up",
             editingLinearElement: null,
           },
           commitToHistory: true,
@@ -140,6 +141,7 @@ export const actionFinalize = register({
       elements: newElements,
       appState: {
         ...appState,
+        cursorButton: "up",
         activeTool:
           (appState.activeTool.locked ||
             appState.activeTool.type === "freedraw") &&
