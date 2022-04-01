@@ -2152,14 +2152,17 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
     includeBoundTextElement: boolean = false,
+    excludeLockedElements: boolean = false,
   ): NonDeleted<ExcalidrawElement>[] {
-    const elements = includeBoundTextElement
-      ? this.scene.getElements()
-      : this.scene
-          .getElements()
-          .filter(
-            (element) => !(isTextElement(element) && element.containerId),
-          );
+    const elements = (
+      includeBoundTextElement
+        ? this.scene.getElements()
+        : this.scene
+            .getElements()
+            .filter(
+              (element) => !(isTextElement(element) && element.containerId),
+            )
+    ).filter((el) => !excludeLockedElements || !el.locked);
 
     return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, x, y),
@@ -3445,6 +3448,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.hit.allHitElements = this.getElementsAtPosition(
           pointerDownState.origin.x,
           pointerDownState.origin.y,
+          false,
+          true,
         );
 
         const hitElement = pointerDownState.hit.element;
