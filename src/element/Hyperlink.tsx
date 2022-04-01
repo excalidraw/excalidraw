@@ -262,9 +262,7 @@ export const actionLink = register({
       commitToHistory: true,
     };
   },
-  trackEvent: (action, source) => {
-    trackEvent("hyperlink", "edit", source);
-  },
+  trackEvent: { category: "hyperlink", action: "click" },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
   contextItemLabel: (elements, appState) =>
     getContextMenuLabel(elements, appState),
@@ -337,6 +335,9 @@ export const isPointHittingLinkIcon = (
   [x, y]: Point,
   isMobile: boolean,
 ) => {
+  if (!element.link || appState.selectedElementIds[element.id]) {
+    return false;
+  }
   const threshold = 4 / appState.zoom.value;
   if (
     !isMobile &&

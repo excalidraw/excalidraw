@@ -74,7 +74,7 @@ export const MobileMenu = ({
                     <ShapesSwitcher
                       appState={appState}
                       canvas={canvas}
-                      elementType={appState.elementType}
+                      activeTool={appState.activeTool}
                       setAppState={setAppState}
                       onImageAction={({ pointerType }) => {
                         onImageAction({
@@ -86,7 +86,7 @@ export const MobileMenu = ({
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
                 <LockButton
-                  checked={appState.elementLocked}
+                  checked={appState.activeTool.locked}
                   onChange={onLockToggle}
                   title={t("toolBar.lock")}
                   isMobile
@@ -226,7 +226,7 @@ export const MobileMenu = ({
                 appState={appState}
                 elements={elements}
                 renderAction={actionManager.renderAction}
-                elementType={appState.elementType}
+                activeTool={appState.activeTool.type}
               />
             </Section>
           ) : null}

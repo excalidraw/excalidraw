@@ -2,6 +2,11 @@
 
 exports[`exportToSvg with default arguments 1`] = `
 Object {
+  "activeTool": Object {
+    "lastActiveToolBeforeEraser": null,
+    "locked": false,
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -23,8 +28,6 @@ Object {
   "editingElement": null,
   "editingGroupId": null,
   "editingLinearElement": null,
-  "elementLocked": false,
-  "elementType": "selection",
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,

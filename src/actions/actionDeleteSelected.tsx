@@ -58,6 +58,7 @@ const handleGroupEditingState = (
 
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
+  trackEvent: { category: "element", action: "delete" },
   perform: (elements, appState) => {
     if (appState.editingLinearElement) {
       const {
@@ -133,7 +134,7 @@ export const actionDeleteSelected = register({
       elements: nextElements,
       appState: {
         ...nextAppState,
-        elementType: "selection",
+        activeTool: { ...appState.activeTool, type: "selection" },
         multiElement: null,
       },
       commitToHistory: isSomeElementSelected(

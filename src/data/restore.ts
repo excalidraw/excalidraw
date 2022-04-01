@@ -30,8 +30,8 @@ type RestoredAppState = Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;
 
-export const AllowedExcalidrawElementTypes: Record<
-  AppState["elementType"],
+export const AllowedExcalidrawActiveTools: Record<
+  AppState["activeTool"]["type"],
   boolean
 > = {
   selection: true,
@@ -236,10 +236,8 @@ export const restoreAppState = (
   localAppState: Partial<AppState> | null | undefined,
 ): RestoredAppState => {
   appState = appState || {};
-
   const defaultAppState = getDefaultAppState();
   const nextAppState = {} as typeof defaultAppState;
-
   for (const [key, defaultValue] of Object.entries(defaultAppState) as [
     keyof typeof defaultAppState,
     any,
@@ -253,12 +251,20 @@ export const restoreAppState = (
         ? localValue
         : defaultValue;
   }
-
   return {
     ...nextAppState,
-    elementType: AllowedExcalidrawElementTypes[nextAppState.elementType]
-      ? nextAppState.elementType
-      : "selection",
+    cursorButton: localAppState?.cursorButton || "up",
+    // reset on fresh restore so as to hide the UI button if penMode not active
+    penDetected:
+      localAppState?.penDetected ??
+      (appState.penMode ? appState.penDetected ?? false : false),
+    activeTool: {
+      lastActiveToolBeforeEraser: null,
+      locked: nextAppState.activeTool.locked ?? false,
+      type: AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
+        ? nextAppState.activeTool.type ?? "selection"
+        : "selection",
+    },
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"
