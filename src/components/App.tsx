@@ -5626,6 +5626,7 @@ class App extends React.Component<AppProps, AppState> {
             actionLink.contextItemPredicate(elements, this.state) && actionLink,
             actionDuplicateSelection,
             actionToggleLock,
+            separator,
             actionDeleteSelected,
           ],
           top,
