@@ -78,10 +78,13 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
-  activeTool: { type: typeof SHAPES[number]["value"] | "eraser" };
   textElementSubtype: TextSubtype;
   textOpts: TextOpts;
-  elementLocked: boolean;
+  activeTool: {
+    type: typeof SHAPES[number]["value"] | "eraser";
+    lastActiveToolBeforeEraser: typeof SHAPES[number]["value"] | null;
+    locked: boolean;
+  };
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
@@ -326,6 +329,7 @@ export type AppClassProperties = {
     }
   >;
   files: BinaryFiles;
+  deviceType: App["deviceType"];
 };
 
 export type PointerDownState = Readonly<{

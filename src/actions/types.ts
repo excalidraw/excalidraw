@@ -9,6 +9,8 @@ import {
 import { ToolButtonSize } from "../components/ToolButton";
 import { TextActionName } from "../textlike/types";
 
+export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
+
 /** if false, the action should be prevented */
 export type ActionResult =
   | {
@@ -145,17 +147,23 @@ export interface Action {
     appState: AppState,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
-  trackEvent?:
-    | boolean
-    | ((action: Action, type: "ui" | "keyboard" | "api", value: any) => void);
-}
-
-export interface ActionsManagerInterface {
-  actions: Record<ActionName | TextActionName, Action>;
-  registerAction: (action: Action) => void;
-  handleKeyDown: (event: React.KeyboardEvent | KeyboardEvent) => boolean;
-  renderAction: (
-    name: ActionName | TextActionName,
-  ) => React.ReactElement | null;
-  executeAction: (action: Action) => void;
+  trackEvent:
+    | false
+    | {
+        category:
+          | "toolbar"
+          | "element"
+          | "canvas"
+          | "export"
+          | "history"
+          | "menu"
+          | "collab"
+          | "hyperlink";
+        action?: string;
+        predicate?: (
+          appState: Readonly<AppState>,
+          elements: readonly ExcalidrawElement[],
+          value: any,
+        ) => boolean;
+      };
 }
