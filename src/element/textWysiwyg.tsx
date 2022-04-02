@@ -206,12 +206,13 @@ export const textWysiwyg = ({
       }
 
       const lines = updatedElement.originalText.split("\n");
-      const offsetX =
-        textAlign === "right"
-          ? updatedElement.width - metrics.width
-          : textAlign === "center"
-          ? (updatedElement.width - metrics.width) / 2
-          : 0;
+      const offsetX = container
+        ? 0
+        : textAlign === "right"
+        ? updatedElement.width - metrics.width
+        : textAlign === "center"
+        ? (updatedElement.width - metrics.width) / 2
+        : 0;
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
 
       const lineHeight = updatedElement.containerId
