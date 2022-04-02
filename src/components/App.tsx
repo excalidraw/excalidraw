@@ -1031,7 +1031,12 @@ class App extends React.Component<AppProps, AppState> {
       this.onGestureEnd as any,
       false,
     );
+    if (this.state.viewModeEnabled) {
+      return;
+    }
 
+    document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
+    document.addEventListener(EVENT.CUT, this.onCut);
     if (this.props.detectScroll) {
       this.nearestScrollableContainer = getNearestScrollableContainer(
         this.excalidrawContainerRef.current!,
@@ -1042,13 +1047,6 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
-
-    if (this.state.viewModeEnabled) {
-      return;
-    }
-
-    document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
-    document.addEventListener(EVENT.CUT, this.onCut);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
     this.excalidrawContainerRef.current?.addEventListener(
@@ -3911,14 +3909,14 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       }
-
+      /*
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         if (this.maybeHandleResize(pointerDownState, event)) {
           return true;
         }
-      }
+      }*/
 
       if (this.state.editingLinearElement) {
         const didDrag = LinearElementEditor.handlePointDragging(
