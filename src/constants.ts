@@ -173,7 +173,7 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
   MIME_TYPES.gif,
 ] as const;
 
-export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
+export const MAX_ALLOWED_FILE_BYTES = 20 * 1024 * 1024; //zsviczian
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
