@@ -59,7 +59,13 @@ type ExcalidrawTextElementMath = ExcalidrawTextElement &
   Readonly<{
     subtype: typeof TEXT_SUBTYPE_MATH;
     useTex: boolean;
+    mathOnly: boolean;
   }>;
+
+type MathOpts = {
+  useTex: boolean;
+  mathOnly: boolean;
+};
 
 const isMathElement = (
   element: ExcalidrawElement | null,
@@ -73,12 +79,24 @@ const isMathElement = (
 
 const textShortcutMap: Record<TextShortcutNameMath, string[]> = {
   changeUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
+  changeMathOnly: [getShortcutKey("CtrlOrCmd+Shift+O")],
 };
 
 const getUseTex = (appState: AppState): boolean => {
   const textOptsMath = appState.textOpts as TextOptsMath;
   const useTex = textOptsMath.useTex !== undefined ? textOptsMath.useTex : true;
   return useTex;
+};
+
+const getMathOnly = (appState: AppState): boolean => {
+  const textOptsMath = appState.textOpts as TextOptsMath;
+  const mathOnly =
+    textOptsMath.mathOnly !== undefined ? textOptsMath.mathOnly : false;
+  return mathOnly;
+};
+
+const getDelimiter = (useTex: boolean): string => {
+  return useTex ? "$$" : "`";
 };
 
 const mathJax = {} as {
@@ -169,12 +187,17 @@ const loadMathJax = async () => {
 
 // This lets math input run across multiple newlines.
 // Basically, replace with a space each newline between the delimiters.
-const consumeMathNewlines = (text: string, useTex: boolean) => {
-  const delimiter = useTex ? "$$" : "`";
-  const tempText = text.replace(/\r\n?/g, "\n").split(delimiter);
-  for (let i = 0; i < tempText.length; i++) {
-    if (i % 2 === 1) {
-      tempText[i] = tempText[i].replace(/\n/g, " ");
+// Do so unless it's AsciiMath in math-only mode.
+const consumeMathNewlines = (text: string, mathOpts: MathOpts) => {
+  const delimiter = getDelimiter(mathOpts.useTex);
+  const tempText = mathOpts.mathOnly
+    ? [text]
+    : text.replace(/\r\n?/g, "\n").split(delimiter);
+  if (mathOpts.useTex || !mathOpts.mathOnly) {
+    for (let i = 0; i < tempText.length; i++) {
+      if (i % 2 === 1 || mathOpts.mathOnly) {
+        tempText[i] = tempText[i].replace(/\n/g, " ");
+      }
     }
   }
   return tempText.join(delimiter);
@@ -184,7 +207,12 @@ const consumeMathNewlines = (text: string, useTex: boolean) => {
 const mathJaxSvgCacheAM = {} as { [key: string]: string };
 const mathJaxSvgCacheTex = {} as { [key: string]: string };
 
-const math2Svg = (text: string, useTex: boolean, isMathJaxLoaded: boolean) => {
+const math2Svg = (
+  text: string,
+  mathOpts: MathOpts,
+  isMathJaxLoaded: boolean,
+) => {
+  const useTex = mathOpts.useTex;
   if (
     isMathJaxLoaded &&
     (useTex ? mathJaxSvgCacheTex[text] : mathJaxSvgCacheAM[text])
@@ -193,7 +221,7 @@ const math2Svg = (text: string, useTex: boolean, isMathJaxLoaded: boolean) => {
   }
   loadMathJax();
   try {
-    const userOptions = { display: false };
+    const userOptions = { display: mathOpts.mathOnly };
     const htmlString = isMathJaxLoaded
       ? mathJax.adaptor.outerHTML(
           useTex
@@ -219,25 +247,28 @@ const math2Svg = (text: string, useTex: boolean, isMathJaxLoaded: boolean) => {
 
 const markupText = (
   text: string,
-  useTex: boolean,
+  mathOpts: MathOpts,
   isMathJaxLoaded: boolean,
 ) => {
-  const lines = consumeMathNewlines(text, useTex).split("\n");
+  const lines = consumeMathNewlines(text, mathOpts).split("\n");
   const outputs = [] as Array<string>[];
   for (let index = 0; index < lines.length; index++) {
     outputs.push([]);
     if (!isMathJaxLoaded) {
       // Run lines[index] through math2Svg so loadMathJax() gets called
-      outputs[index].push(math2Svg(lines[index], useTex, isMathJaxLoaded));
+      outputs[index].push(math2Svg(lines[index], mathOpts, isMathJaxLoaded));
       continue;
     }
-    const lineArray = lines[index].split(useTex ? "$$" : "`");
+    // Don't split by the delimiter in math-only mode
+    const lineArray = mathOpts.mathOnly
+      ? [lines[index]]
+      : lines[index].split(getDelimiter(mathOpts.useTex));
     for (let i = 0; i < lineArray.length; i++) {
       // Don't guard the following as "isMathJaxLoaded && i % 2 === 1"
       // in order to ensure math2Svg() actually gets called, and thus
       // loadMathJax().
-      if (i % 2 === 1) {
-        const svgString = math2Svg(lineArray[i], useTex, isMathJaxLoaded);
+      if (i % 2 === 1 || mathOpts.mathOnly) {
+        const svgString = math2Svg(lineArray[i], mathOpts, isMathJaxLoaded);
         outputs[index].push(svgString);
       } else {
         outputs[index].push(lineArray[i]);
@@ -256,9 +287,9 @@ const getCacheKey = (
   strokeColor: String,
   textAlign: CanvasTextAlign,
   opacity: Number,
-  useTex: boolean,
+  mathOpts: MathOpts,
 ) => {
-  const key = `${text}, ${fontSize}, ${strokeColor}, ${textAlign}, ${opacity}, ${useTex}`;
+  const key = `${text}, ${fontSize}, ${strokeColor}, ${textAlign}, ${opacity}, ${mathOpts.useTex}, ${mathOpts.mathOnly}`;
   return key;
 };
 
@@ -335,6 +366,7 @@ const measureHTML = (
 const measureOutputs = (
   outputs: string[][],
   fontString: FontString,
+  mathOpts: MathOpts,
   isMathJaxLoaded: boolean,
   maxWidth?: number | null,
 ) => {
@@ -387,17 +419,25 @@ const measureOutputs = (
       childOffsets: lineChildOffsets,
     } = measureHTML(html, fontString, maxWidth);
 
-    for (let i = 0; i < outputs[index].length; i++) {
-      if (isMathJaxLoaded && i % 2 === 1) {
-        // svg
-        outputMetrics[index].push({
-          width: lineChildOffsets[(i - 1) / 2].width,
-          height: lineChildOffsets[(i - 1) / 2].height,
-          baseline: 0,
-        });
-      } else {
-        // text
-        outputMetrics[index].push(measureText(outputs[index][i], fontString));
+    if (mathOpts.mathOnly) {
+      outputMetrics[index].push({
+        width: lineChildOffsets[0].width,
+        height: lineChildOffsets[0].height,
+        baseline: 0,
+      });
+    } else {
+      for (let i = 0; i < outputs[index].length; i++) {
+        if (isMathJaxLoaded && i % 2 === 1) {
+          // svg
+          outputMetrics[index].push({
+            width: lineChildOffsets[(i - 1) / 2].width,
+            height: lineChildOffsets[(i - 1) / 2].height,
+            baseline: 0,
+          });
+        } else {
+          // text
+          outputMetrics[index].push(measureText(outputs[index][i], fontString));
+        }
       }
     }
     imageWidth = Math.max(imageWidth, lineWidth);
@@ -430,7 +470,7 @@ const createSvg = (
   strokeColor: String,
   textAlign: CanvasTextAlign,
   opacity: Number,
-  useTex: boolean,
+  mathOpts: MathOpts,
   isMathJaxLoaded: boolean,
 ) => {
   const key = getCacheKey(
@@ -439,15 +479,20 @@ const createSvg = (
     strokeColor,
     textAlign,
     opacity,
-    useTex,
+    mathOpts,
   );
 
-  const mathLines = consumeMathNewlines(text, useTex).split("\n");
-  const processed = markupText(text, useTex, isMathJaxLoaded);
+  const mathLines = consumeMathNewlines(text, mathOpts).split("\n");
+  const processed = markupText(text, mathOpts, isMathJaxLoaded);
 
   const fontFamily = FONT_FAMILY_MATH;
   const fontString = getFontString({ fontSize, fontFamily });
-  const metrics = measureOutputs(processed, fontString, isMathJaxLoaded);
+  const metrics = measureOutputs(
+    processed,
+    fontString,
+    mathOpts,
+    isMathJaxLoaded,
+  );
   const imageMetrics = metrics.imageMetrics;
 
   if (isMathJaxLoaded && svgCache[key]) {
@@ -486,10 +531,10 @@ const createSvg = (
     ) {
       let childNode = {} as SVGSVGElement | SVGTextElement;
       // If i % 2 === 0, then childNode is an SVGTextElement, not an SVGSVGElement.
-      const childIsSvg = isMathJaxLoaded && i % 2 === 1;
+      const childIsSvg = isMathJaxLoaded && (i % 2 === 1 || mathOpts.mathOnly);
       if (childIsSvg) {
         const tempDiv = svgRoot.ownerDocument.createElement("div");
-        tempDiv.innerHTML = processed[index][i];
+        tempDiv.innerHTML = processed[index][mathOpts.mathOnly ? 0 : i];
         childNode = tempDiv.children[0].children[0] as SVGSVGElement;
       } else {
         const text = svgRoot.ownerDocument.createElementNS(
@@ -546,13 +591,14 @@ const getRenderDims = (width: number, height: number) => {
 const measureMath = (
   text: string,
   fontSize: number,
-  useTex: boolean,
+  mathOpts: MathOpts,
   isMathJaxLoaded: boolean,
   maxWidth?: number | null,
 ) => {
   return measureOutputs(
-    markupText(text, useTex, isMathJaxLoaded),
+    markupText(text, mathOpts, isMathJaxLoaded),
     getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH }),
+    mathOpts,
     isMathJaxLoaded,
     maxWidth,
   ).imageMetrics;
@@ -583,7 +629,12 @@ const applyTextElementMathOpts = (
   textOpts?: TextOptsMath,
 ): NonDeleted<ExcalidrawTextElement> => {
   const useTex = textOpts?.useTex !== undefined ? textOpts.useTex : true;
-  return newElementWith(element, { useTex, fontFamily: FONT_FAMILY_MATH });
+  const mathOnly = textOpts?.mathOnly !== undefined ? textOpts.mathOnly : false;
+  return newElementWith(element, {
+    useTex,
+    mathOnly,
+    fontFamily: FONT_FAMILY_MATH,
+  });
 };
 
 const cleanTextOptUpdatesMath = (
@@ -632,7 +683,12 @@ const measureTextElementMath = (
     next?.textOpts !== undefined && next.textOpts.useTex !== undefined
       ? next.textOpts.useTex
       : element.useTex;
-  return measureMath(text, fontSize, useTex, isMathJaxLoaded, maxWidth);
+  const mathOnly =
+    next?.textOpts !== undefined && next.textOpts.mathOnly !== undefined
+      ? next.textOpts.mathOnly
+      : element.mathOnly;
+  const mathOpts: MathOpts = { useTex, mathOnly };
+  return measureMath(text, fontSize, mathOpts, isMathJaxLoaded, maxWidth);
 };
 
 const renderTextElementMath = (
@@ -649,6 +705,8 @@ const renderTextElementMath = (
   const textAlign = element.textAlign;
   const opacity = context.globalAlpha;
   const useTex = element.useTex;
+  const mathOnly = element.mathOnly;
+  const mathOpts: MathOpts = { useTex, mathOnly };
 
   const key = getCacheKey(
     text,
@@ -656,7 +714,7 @@ const renderTextElementMath = (
     strokeColor,
     textAlign,
     opacity,
-    useTex,
+    mathOpts,
   );
 
   if (
@@ -665,8 +723,9 @@ const renderTextElementMath = (
     imageMetricsCache[key] === undefined
   ) {
     imageMetricsCache[key] = measureOutputs(
-      markupText(text, useTex, isMathJaxLoaded),
+      markupText(text, mathOpts, isMathJaxLoaded),
       getFontString({ fontSize, fontFamily }),
+      mathOpts,
       isMathJaxLoaded,
     ).imageMetrics;
   }
@@ -676,8 +735,9 @@ const renderTextElementMath = (
     imageMetricsCache[key] !== undefined
       ? imageMetricsCache[key]
       : measureOutputs(
-          markupText(text, useTex, isMathJaxLoaded),
+          markupText(text, mathOpts, isMathJaxLoaded),
           getFontString({ fontSize, fontFamily }),
+          mathOpts,
           isMathJaxLoaded,
         ).imageMetrics;
   const imgKey = `${key}, ${imageMetrics.width}, ${imageMetrics.height}`;
@@ -701,7 +761,7 @@ const renderTextElementMath = (
       strokeColor,
       textAlign,
       opacity,
-      useTex,
+      mathOpts,
       isMathJaxLoaded,
     ).outerHTML;
     const svg = new Blob([svgString], {
@@ -746,7 +806,7 @@ const renderSvgTextElementMath = (
     element.strokeColor,
     element.textAlign,
     element.opacity / 100,
-    element.useTex,
+    { useTex: element.useTex, mathOnly: element.mathOnly },
     isMathJaxLoaded,
   );
   const tempSvg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
@@ -764,6 +824,7 @@ const restoreTextElementMath = (
   const mathElement = element;
   elementRestored = newElementWith(elementRestored, {
     useTex: mathElement.useTex,
+    mathOnly: mathElement.mathOnly,
   });
   return elementRestored;
 };
@@ -802,16 +863,26 @@ export const wrapTextElementMath = (
     next?.textOpts !== undefined && next.textOpts.useTex !== undefined
       ? next.textOpts.useTex
       : element.useTex;
+  const mathOnly =
+    next?.textOpts !== undefined && next.textOpts.mathOnly !== undefined
+      ? next.textOpts.mathOnly
+      : element.mathOnly;
+  const mathOpts: MathOpts = { useTex, mathOnly };
 
   const font = getFontString({ fontSize, fontFamily: element.fontFamily });
 
   const maxWidth = containerWidth - BOUND_TEXT_PADDING * 2;
 
-  const outputs = markupText(text, useTex, isMathJaxLoaded);
-  const outputMetrics = measureOutputs(outputs, font, isMathJaxLoaded);
+  const outputs = markupText(text, mathOpts, isMathJaxLoaded);
+  const outputMetrics = measureOutputs(
+    outputs,
+    font,
+    mathOpts,
+    isMathJaxLoaded,
+  );
 
-  const delimiter = useTex ? "$$" : "`";
-  const lines = consumeMathNewlines(text, useTex).split("\n");
+  const delimiter = getDelimiter(useTex);
+  const lines = consumeMathNewlines(text, mathOpts).split("\n");
   const lineText: string[][] = [];
   const lineWidth: number[][] = [];
   const newText: string[] = [];
@@ -827,7 +898,7 @@ export const wrapTextElementMath = (
     lineWidth[index].push(0);
     const lineArray = lines[index].split(delimiter);
     for (let i = 0; i < outputs[index].length; i++) {
-      const isSvg = i % 2 === 1;
+      const isSvg = i % 2 === 1 || mathOnly;
       itemWidth = 0;
       let lineItem = lineArray[i];
       if (isSvg) {
@@ -843,7 +914,7 @@ export const wrapTextElementMath = (
       }
       pushNew = true;
     }
-    if (outputs[index].length % 2 === 1) {
+    if (outputs[index].length % 2 === 1 || mathOnly) {
       // Last one was text
       pushNew = false;
     }
@@ -858,7 +929,7 @@ export const wrapTextElementMath = (
     // Now move onto wrapping
     let curWidth = 0;
     for (let i = 0; i < lineText[index].length; i++) {
-      if (i % 2 === 1) {
+      if (i % 2 === 1 || mathOnly) {
         // lineText[index][i] is math here
         if (lineWidth[index][i] > maxWidth) {
           // If the math svg is greater than maxWidth, make it its
@@ -938,7 +1009,7 @@ export const wrapTextElementMath = (
   // Since we cache, no need to do anything with the return value
   // of measureMath().
   const wrappedText = newText.join("\n");
-  measureMath(wrappedText, fontSize, useTex, isMathJaxLoaded);
+  measureMath(wrappedText, fontSize, mathOpts, isMathJaxLoaded);
   return wrappedText;
 };
 
@@ -986,7 +1057,7 @@ export const registerTextElementSubtypeMath = (
   // Call loadMathJax() here if we want to be sure it's loaded.
 };
 
-const enableActionChangeUseTex = (
+const enableActionChangeMathOpts = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
@@ -1006,10 +1077,10 @@ const enableActionChangeUseTex = (
   return enabled;
 };
 
-const setUseTexForSelectedElements = (
+const setMathOptsForSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
-  useTex: boolean,
+  mathOpts: TextOptsMath,
 ) => {
   // Operate on the selected math elements only
   const selectedElements = getSelectedMathElements(elements, appState);
@@ -1024,14 +1095,20 @@ const setUseTexForSelectedElements = (
     const isMathJaxLoaded = mathJaxLoaded;
 
     // Set the useTex field
-    mutateElement(el, { useTex });
+    if (mathOpts.useTex !== undefined) {
+      mutateElement(el, { useTex: mathOpts.useTex });
+    }
+    // Set the mathOnly field
+    if (mathOpts.mathOnly !== undefined) {
+      mutateElement(el, { mathOnly: mathOpts.mathOnly });
+    }
     // Mark the element for re-rendering
     invalidateShapeForElement(el);
     // Update the width/height of the element
     const metrics = measureMath(
       el.text,
       el.fontSize,
-      el.useTex,
+      { useTex: el.useTex, mathOnly: el.mathOnly },
       isMathJaxLoaded,
     );
     mutateElement(el, metrics);
@@ -1044,7 +1121,7 @@ const setUseTexForSelectedElements = (
       (element) =>
         selectedElements.find((ele) => ele.id === element.id) || element,
     ),
-    appState: { ...appState, textOpts: { useTex } },
+    appState: { ...appState, textOpts: mathOpts },
   };
 };
 
@@ -1066,7 +1143,7 @@ const registerActionsMath = () => {
         useTex = !useTex;
       }
       const { elements: modElements, appState: modAppState } =
-        setUseTexForSelectedElements(elements, appState, useTex);
+        setMathOptsForSelectedElements(elements, appState, { useTex });
 
       return {
         elements: modElements,
@@ -1078,7 +1155,7 @@ const registerActionsMath = () => {
       event.ctrlKey && event.shiftKey && event.code === "KeyM",
     contextItemLabel: "labels.toggleUseTex",
     contextItemPredicate: (elements, appState) =>
-      enableActionChangeUseTex(elements, appState),
+      enableActionChangeMathOpts(elements, appState),
     PanelComponentPredicate: (elements, appState) => {
       let enabled = true;
       getSelectedElements(getNonDeletedElements(elements), appState).forEach(
@@ -1137,6 +1214,94 @@ const registerActionsMath = () => {
       </fieldset>
     ),
   };
+  const actionChangeMathOnly: Action = {
+    name: "changeMathOnly",
+    perform: (elements, appState, mathOnly) => {
+      if (mathOnly === null) {
+        mathOnly = getFormValue(elements, appState, (element) => {
+          const el = hasBoundTextElement(element)
+            ? getBoundTextElement(element)
+            : element;
+          return isMathElement(el) && el.mathOnly;
+        });
+        if (mathOnly === null) {
+          mathOnly = getMathOnly(appState);
+        }
+        mathOnly = !mathOnly;
+      }
+      const { elements: modElements, appState: modAppState } =
+        setMathOptsForSelectedElements(elements, appState, { mathOnly });
+
+      return {
+        elements: modElements,
+        appState: modAppState,
+        commitToHistory: true,
+      };
+    },
+    keyTest: (event) =>
+      event.ctrlKey && event.shiftKey && event.code === "KeyO",
+    contextItemLabel: "labels.toggleMathOnly",
+    contextItemPredicate: (elements, appState) =>
+      enableActionChangeMathOpts(elements, appState),
+    PanelComponentPredicate: (elements, appState) => {
+      let enabled = true;
+      getSelectedElements(getNonDeletedElements(elements), appState).forEach(
+        (element) => {
+          if (
+            (!isTextElement(element) && !hasBoundTextElement(element)) ||
+            (!isTextElement(element) &&
+              hasBoundTextElement(element) &&
+              !isMathElement(getBoundTextElement(element))) ||
+            (isTextElement(element) && element.subtype !== TEXT_SUBTYPE_MATH)
+          ) {
+            enabled = false;
+          }
+        },
+      );
+      if (appState.editingElement && !isMathElement(appState.editingElement)) {
+        enabled = false;
+      }
+      if (
+        appState.activeTool.type === "text" &&
+        appState.textElementSubtype !== TEXT_SUBTYPE_MATH
+      ) {
+        enabled = false;
+      }
+      return enabled;
+    },
+    PanelComponent: ({ elements, appState, updateData }) => (
+      <fieldset>
+        <legend>{t("labels.changeMathOnly")}</legend>
+        <ButtonSelect
+          group="mathOnly"
+          options={[
+            {
+              value: false,
+              text: t("labels.mathOnlyFalse"),
+            },
+            {
+              value: true,
+              text: t("labels.mathOnlyTrue"),
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => {
+              const el = hasBoundTextElement(element)
+                ? getBoundTextElement(element)
+                : element;
+              return isMathElement(el) && el.mathOnly;
+            },
+            getMathOnly(appState),
+          )}
+          onChange={(value) => updateData(value)}
+          theme={appState.theme}
+        />
+      </fieldset>
+    ),
+  };
   mathActions.push(actionChangeUseTex);
+  mathActions.push(actionChangeMathOnly);
   addTextLikeActions(mathActions);
 };

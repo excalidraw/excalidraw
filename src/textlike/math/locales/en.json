@@ -1,6 +1,10 @@
 {
   "labels": {
-    "changeUseTex": "MathJax type",
+    "changeMathOnly": "Math mode",
+    "toggleMathOnly": "Toggle math-only mode",
+    "mathOnlyTrue": "Math only",
+    "mathOnlyFalse": "Mixed text",
+    "changeUseTex": "Math input",
     "toggleUseTex": "Toggle using AsciiMath",
     "useTexTrue": "Standard",
     "useTexFalse": "Simplified"
