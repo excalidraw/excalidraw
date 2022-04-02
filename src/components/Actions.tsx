@@ -119,10 +119,6 @@ export const SelectedShapeActions = ({
           {renderAction("changeFontFamily")}
 
           {renderAction("changeTextAlign")}
-
-          {getTextLikeActions().map((action) => {
-            return renderAction(action.name);
-          })}
         </>
       )}
 
@@ -130,6 +126,14 @@ export const SelectedShapeActions = ({
         (element) =>
           hasBoundTextElement(element) || isBoundToContainer(element),
       ) && renderAction("changeVerticalAlign")}
+      {(hasText(activeTool) ||
+        targetElements.some((element) => hasText(element.type))) && (
+        <>
+          {getTextLikeActions().map((action) => {
+            return renderAction(action.name);
+          })}
+        </>
+      )}
       {(canHaveArrowheads(activeTool) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
