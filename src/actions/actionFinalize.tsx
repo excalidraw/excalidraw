@@ -17,6 +17,7 @@ import { isBindingElement } from "../element/typeChecks";
 
 export const actionFinalize = register({
   name: "finalize",
+  trackEvent: false,
   perform: (elements, appState, _, { canvas, focusContainer }) => {
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
@@ -38,6 +39,7 @@ export const actionFinalize = register({
               : undefined,
           appState: {
             ...appState,
+            cursorButton: "up",
             editingLinearElement: null,
           },
           commitToHistory: true,
@@ -119,13 +121,17 @@ export const actionFinalize = register({
         );
       }
 
-      if (!appState.elementLocked && appState.activeTool.type !== "freedraw") {
+      if (
+        !appState.activeTool.locked &&
+        appState.activeTool.type !== "freedraw"
+      ) {
         appState.selectedElementIds[multiPointElement.id] = true;
       }
     }
 
     if (
-      (!appState.elementLocked && appState.activeTool.type !== "freedraw") ||
+      (!appState.activeTool.locked &&
+        appState.activeTool.type !== "freedraw") ||
       !multiPointElement
     ) {
       resetCursor(canvas);
@@ -135,11 +141,20 @@ export const actionFinalize = register({
       elements: newElements,
       appState: {
         ...appState,
+        cursorButton: "up",
         activeTool:
-          (appState.elementLocked || appState.activeTool.type === "freedraw") &&
+          (appState.activeTool.locked ||
+            appState.activeTool.type === "freedraw") &&
           multiPointElement
             ? appState.activeTool
-            : { type: "selection" },
+            : {
+                ...appState.activeTool,
+                type:
+                  appState.activeTool.type === "eraser" &&
+                  appState.activeTool.lastActiveToolBeforeEraser
+                    ? appState.activeTool.lastActiveToolBeforeEraser
+                    : "selection",
+              },
         draggingElement: null,
         multiElement: null,
         editingElement: null,
@@ -147,7 +162,7 @@ export const actionFinalize = register({
         suggestedBindings: [],
         selectedElementIds:
           multiPointElement &&
-          !appState.elementLocked &&
+          !appState.activeTool.locked &&
           appState.activeTool.type !== "freedraw"
             ? {
                 ...appState.selectedElementIds,

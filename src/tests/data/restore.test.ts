@@ -316,10 +316,10 @@ describe("restoreAppState", () => {
       stubImportedAppState,
       stubLocalAppState,
     );
-    expect(restoredAppState.activeTool).toBe(stubImportedAppState.activeTool);
-    expect(restoredAppState.cursorButton).toBe(
-      stubImportedAppState.cursorButton,
+    expect(restoredAppState.activeTool).toEqual(
+      stubImportedAppState.activeTool,
     );
+    expect(restoredAppState.cursorButton).toBe("up");
     expect(restoredAppState.name).toBe(stubImportedAppState.name);
   });
 
@@ -351,9 +351,7 @@ describe("restoreAppState", () => {
       stubImportedAppState,
       null,
     );
-    expect(restoredAppState.cursorButton).toBe(
-      stubImportedAppState.cursorButton,
-    );
+    expect(restoredAppState.cursorButton).toBe("up");
     expect(restoredAppState.name).toBe(stubImportedAppState.name);
   });
 
@@ -506,9 +504,7 @@ describe("restore", () => {
     importedDataState.appState = stubImportedAppState;
 
     const restoredData = restore.restore(importedDataState, null, null);
-    expect(restoredData.appState.cursorButton).toBe(
-      stubImportedAppState.cursorButton,
-    );
+    expect(restoredData.appState.cursorButton).toBe("up");
     expect(restoredData.appState.name).toBe(stubImportedAppState.name);
   });
 

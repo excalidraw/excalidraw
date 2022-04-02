@@ -7,6 +7,7 @@ import { t } from "../i18n";
 
 export const actionAddToLibrary = register({
   name: "addToLibrary",
+  trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
