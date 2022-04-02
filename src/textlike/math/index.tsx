@@ -82,18 +82,36 @@ const textShortcutMap: Record<TextShortcutNameMath, string[]> = {
   changeMathOnly: [getShortcutKey("CtrlOrCmd+Shift+O")],
 };
 
-const getUseTex = (appState: AppState): boolean => {
-  const textOptsMath = appState.textOpts as TextOptsMath;
-  const useTex = textOptsMath.useTex !== undefined ? textOptsMath.useTex : true;
-  return useTex;
-};
+class GetMathOpts {
+  private useTex: boolean = true;
+  private mathOnly: boolean = false;
+  getUseTex = (appState: AppState): boolean => {
+    const textOptsMath = appState.textOpts as TextOptsMath;
+    if (textOptsMath !== undefined) {
+      this.useTex =
+        textOptsMath.useTex !== undefined ? textOptsMath.useTex : true;
+    }
+    return this.useTex;
+  };
 
-const getMathOnly = (appState: AppState): boolean => {
-  const textOptsMath = appState.textOpts as TextOptsMath;
-  const mathOnly =
-    textOptsMath.mathOnly !== undefined ? textOptsMath.mathOnly : false;
-  return mathOnly;
-};
+  getMathOnly = (appState: AppState): boolean => {
+    const textOptsMath = appState.textOpts as TextOptsMath;
+    if (textOptsMath !== undefined) {
+      this.mathOnly =
+        textOptsMath.mathOnly !== undefined ? textOptsMath.mathOnly : false;
+    }
+    return this.mathOnly;
+  };
+
+  ensureMathOpts = (useTex: boolean, mathOnly: boolean): MathOpts => {
+    const mathOpts: MathOpts = {
+      useTex: useTex !== undefined ? useTex : this.useTex,
+      mathOnly: mathOnly !== undefined ? mathOnly : this.mathOnly,
+    };
+    return mathOpts;
+  };
+}
+const getMathOpts = new GetMathOpts();
 
 const getDelimiter = (useTex: boolean): string => {
   return useTex ? "$$" : "`";
@@ -643,7 +661,16 @@ const cleanTextOptUpdatesMath = (
   const newOpts = {};
   for (const key in opts) {
     const value = key === "fontFamily" ? FONT_FAMILY_MATH : (opts as any)[key];
-    (newOpts as any)[key] = value;
+    (newOpts as any)[key] =
+      key === "useTex"
+        ? value !== undefined
+          ? value
+          : true
+        : key === "mathOnly"
+        ? value !== undefined
+          ? value
+          : false
+        : value;
   }
   return newOpts;
 };
@@ -687,7 +714,7 @@ const measureTextElementMath = (
     next?.textOpts !== undefined && next.textOpts.mathOnly !== undefined
       ? next.textOpts.mathOnly
       : element.mathOnly;
-  const mathOpts: MathOpts = { useTex, mathOnly };
+  const mathOpts = getMathOpts.ensureMathOpts(useTex, mathOnly);
   return measureMath(text, fontSize, mathOpts, isMathJaxLoaded, maxWidth);
 };
 
@@ -706,7 +733,7 @@ const renderTextElementMath = (
   const opacity = context.globalAlpha;
   const useTex = element.useTex;
   const mathOnly = element.mathOnly;
-  const mathOpts: MathOpts = { useTex, mathOnly };
+  const mathOpts = getMathOpts.ensureMathOpts(useTex, mathOnly);
 
   const key = getCacheKey(
     text,
@@ -806,7 +833,7 @@ const renderSvgTextElementMath = (
     element.strokeColor,
     element.textAlign,
     element.opacity / 100,
-    { useTex: element.useTex, mathOnly: element.mathOnly },
+    getMathOpts.ensureMathOpts(element.useTex, element.mathOnly),
     isMathJaxLoaded,
   );
   const tempSvg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
@@ -822,9 +849,13 @@ const restoreTextElementMath = (
   elementRestored: ExcalidrawTextElementMath,
 ): ExcalidrawTextElement => {
   const mathElement = element;
+  const mathOpts = getMathOpts.ensureMathOpts(
+    mathElement.useTex,
+    mathElement.mathOnly,
+  );
   elementRestored = newElementWith(elementRestored, {
-    useTex: mathElement.useTex,
-    mathOnly: mathElement.mathOnly,
+    useTex: mathOpts.useTex,
+    mathOnly: mathOpts.mathOnly,
   });
   return elementRestored;
 };
@@ -867,7 +898,7 @@ export const wrapTextElementMath = (
     next?.textOpts !== undefined && next.textOpts.mathOnly !== undefined
       ? next.textOpts.mathOnly
       : element.mathOnly;
-  const mathOpts: MathOpts = { useTex, mathOnly };
+  const mathOpts = getMathOpts.ensureMathOpts(useTex, mathOnly);
 
   const font = getFontString({ fontSize, fontFamily: element.fontFamily });
 
@@ -881,7 +912,7 @@ export const wrapTextElementMath = (
     isMathJaxLoaded,
   );
 
-  const delimiter = getDelimiter(useTex);
+  const delimiter = getDelimiter(mathOpts.useTex);
   const lines = consumeMathNewlines(text, mathOpts).split("\n");
   const lineText: string[][] = [];
   const lineWidth: number[][] = [];
@@ -1108,7 +1139,7 @@ const setMathOptsForSelectedElements = (
     const metrics = measureMath(
       el.text,
       el.fontSize,
-      { useTex: el.useTex, mathOnly: el.mathOnly },
+      getMathOpts.ensureMathOpts(el.useTex, el.mathOnly),
       isMathJaxLoaded,
     );
     mutateElement(el, metrics);
@@ -1138,7 +1169,7 @@ const registerActionsMath = () => {
           return isMathElement(el) && el.useTex;
         });
         if (useTex === null) {
-          useTex = getUseTex(appState);
+          useTex = getMathOpts.getUseTex(appState);
         }
         useTex = !useTex;
       }
@@ -1204,9 +1235,11 @@ const registerActionsMath = () => {
               const el = hasBoundTextElement(element)
                 ? getBoundTextElement(element)
                 : element;
-              return isMathElement(el) && el.useTex;
+              return isMathElement(el) && el.useTex !== undefined
+                ? el.useTex
+                : true;
             },
-            getUseTex(appState),
+            getMathOpts.getUseTex(appState),
           )}
           onChange={(value) => updateData(value)}
           theme={appState.theme}
@@ -1226,7 +1259,7 @@ const registerActionsMath = () => {
           return isMathElement(el) && el.mathOnly;
         });
         if (mathOnly === null) {
-          mathOnly = getMathOnly(appState);
+          mathOnly = getMathOpts.getMathOnly(appState);
         }
         mathOnly = !mathOnly;
       }
@@ -1292,9 +1325,11 @@ const registerActionsMath = () => {
               const el = hasBoundTextElement(element)
                 ? getBoundTextElement(element)
                 : element;
-              return isMathElement(el) && el.mathOnly;
+              return isMathElement(el) && el.mathOnly !== undefined
+                ? el.mathOnly
+                : false;
             },
-            getMathOnly(appState),
+            getMathOpts.getMathOnly(appState),
           )}
           onChange={(value) => updateData(value)}
           theme={appState.theme}
