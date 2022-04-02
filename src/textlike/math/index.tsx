@@ -1213,6 +1213,7 @@ const registerActionsMath = () => {
         />
       </fieldset>
     ),
+    trackEvent: false,
   };
   const actionChangeMathOnly: Action = {
     name: "changeMathOnly",
@@ -1300,6 +1301,7 @@ const registerActionsMath = () => {
         />
       </fieldset>
     ),
+    trackEvent: false,
   };
   mathActions.push(actionChangeUseTex);
   mathActions.push(actionChangeMathOnly);
