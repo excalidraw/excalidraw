@@ -8,7 +8,7 @@ export const actionToggleLock = register({
   name: "toggleLock",
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(elements, appState, false);
+    const selectedElements = getSelectedElements(elements, appState, true);
     const selectedElementIds = new Set(
       selectedElements.map((element) => element.id),
     );
