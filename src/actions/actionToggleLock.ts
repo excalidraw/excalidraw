@@ -33,13 +33,15 @@ export const actionToggleLock = register({
   contextItemLabel: (elements, appState) => {
     const selected = getSelectedElements(elements, appState, false);
     if (selected.length === 1) {
-      return selected[0].locked ? "labels.lock.unlock" : "labels.lock.lock";
+      return selected[0].locked
+        ? "labels.elementLock.unlock"
+        : "labels.elementLock.lock";
     }
 
     if (selected.length > 1) {
       return getOperation(selected) === "lock"
-        ? "labels.lock.lockAll"
-        : "labels.lock.unlockAll";
+        ? "labels.elementLock.lockAll"
+        : "labels.elementLock.unlockAll";
     }
 
     throw new Error(

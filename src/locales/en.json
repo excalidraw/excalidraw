@@ -113,7 +113,7 @@
       "create": "Create link",
       "label": "Link"
     },
-    "lock": {
+    "elementLock": {
       "lock": "Lock",
       "unlock": "Unlock",
       "lockAll": "Lock all",
