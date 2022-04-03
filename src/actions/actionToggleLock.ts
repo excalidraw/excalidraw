@@ -2,6 +2,7 @@ import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
+import { arrayToMap } from "../utils";
 import { register } from "./register";
 
 export const actionToggleLock = register({
@@ -9,19 +10,17 @@ export const actionToggleLock = register({
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState, true);
-    const selectedElementIds = new Set(
-      selectedElements.map((element) => element.id),
-    );
 
-    if (selectedElementIds.size === 0) {
+    if (!selectedElements.length) {
       return false;
     }
 
     const operation = getOperation(selectedElements);
+    const selectedElementsMap = arrayToMap(selectedElements);
 
     return {
       elements: elements.map((element) => {
-        if (!selectedElementIds.has(element.id)) {
+        if (!selectedElementsMap.has(element.id)) {
           return element;
         }
 
