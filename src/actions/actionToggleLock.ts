@@ -45,7 +45,7 @@ export const actionToggleLock = register({
     }
 
     throw new Error(
-      "Unexpected zero elements to lock. This should never happen.",
+      "Unexpected zero elements to lock/unlock. This should never happen.",
     );
   },
   keyTest: (event, appState, elements) => {
