@@ -48,15 +48,11 @@ export const actionToggleLock = register({
     );
   },
   keyTest: (event, appState, elements) => {
-    const selected = getSelectedElements(elements, appState, false);
-    if (selected.length === 0) {
-      return false;
-    }
-
     return (
       event.key.toLocaleLowerCase() === KEYS.L &&
       event[KEYS.CTRL_OR_CMD] &&
-      event.shiftKey
+      event.shiftKey &&
+      getSelectedElements(elements, appState, false).length > 0
     );
   },
 });
