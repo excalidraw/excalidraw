@@ -29,7 +29,7 @@
     "@types/react": "17.0.39",
     "@types/react-dom": "17.0.11",
     "@types/socket.io-client": "1.4.36",
-    "browser-fs-access": "0.24.1",
+    "browser-fs-access": "0.25.3",
     "clsx": "1.1.1",
     "fake-indexeddb": "3.1.7",
     "firebase": "8.3.3",
