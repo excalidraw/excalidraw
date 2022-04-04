@@ -107,7 +107,7 @@
     "decreaseFontSize": "Txikitu letra tamaina",
     "increaseFontSize": "Handitu letra tamaina",
     "unbindText": "Askatu testua",
-    "bindText": "",
+    "bindText": "Lotu testua edukiontziari",
     "link": {
       "edit": "Editatu esteka",
       "create": "Sortu esteka",
@@ -182,7 +182,7 @@
     "fileTooBig": "Fitxategia handiegia da. Onartutako gehienezko tamaina {{maxSize}} da.",
     "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
     "invalidSVGString": "SVG baliogabea.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro."
   },
   "toolBar": {
     "selection": "Hautapena",
@@ -198,7 +198,7 @@
     "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
     "penMode": "Saihestu txikiagotzea eta onartu marrazte libreko idazketa solik arkatza bidez",
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
-    "eraser": ""
+    "eraser": "Borragoma"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -224,7 +224,7 @@
     "publishLibrary": "Argitaratu zure liburutegia",
     "bindTextToElement": "Sakatu Sartu testua gehitzeko",
     "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko",
-    "eraserRevert": ""
+    "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko"
   },
   "canvasError": {
     "cannotShowPreview": "Ezin da oihala aurreikusi",
@@ -284,7 +284,7 @@
     "howto": "Jarraitu gure gidak",
     "or": "edo",
     "preventBinding": "Saihestu gezien gainjartzea",
-    "tools": "",
+    "tools": "Tresnak",
     "shortcuts": "Laster-teklak",
     "textFinish": "Bukatu edizioa (testu editorea)",
     "textNewLine": "Gehitu lerro berri bat (testu editorea)",
