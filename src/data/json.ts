@@ -131,7 +131,7 @@ export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
     libraryItems,
   };
   return JSON.stringify(data, null, 2);
-}
+};
 
 export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
   const serialized = serializeLibraryAsJSON(libraryItems);
