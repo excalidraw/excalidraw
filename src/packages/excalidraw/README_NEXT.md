@@ -912,7 +912,7 @@ Takes the scene elements and state and returns a JSON string. Deleted `elements`
 
 <pre>
 serializeLibraryAsJSON({
-  libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/2fa69ddc329c327458d50ce6efde65d4e247b175/src/types.ts#L191">LibraryItems[]</a>,
+  libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L191">LibraryItems[]</a>,
 </pre>
 
 Takes the library items and returns a JSON string.
