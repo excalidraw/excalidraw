@@ -9,7 +9,7 @@
     "copy": "複製",
     "copyAsPng": "以 PNG 格式複製",
     "copyAsSvg": "以 SVG 格式複製",
-    "copyAllTextNodesAsText": "",
+    "copyText": "",
     "bringForward": "往上一層移動",
     "sendToBack": "移到最底層",
     "bringToFront": "移到最上層",
