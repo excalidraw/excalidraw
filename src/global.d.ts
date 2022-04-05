@@ -60,6 +60,9 @@ type NonOptional<T> = Exclude<T, undefined>;
 // -----------------------------------------------------------------------------
 type TEXtChunk = { name: "tEXt"; data: Uint8Array };
 
+declare module "png-chunk-phys" {
+  function writePngDpi(data: Uint8Array, dpi: number): Uint8Array;
+}
 declare module "png-chunk-text" {
   function encode(
     name: string,

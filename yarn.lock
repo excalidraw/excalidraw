@@ -9276,6 +9276,11 @@ pkg-up@3.1.0:
   dependencies:
     find-up "^3.0.0"
 
+png-chunk-phys@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/png-chunk-phys/-/png-chunk-phys-0.0.2.tgz#1e44b7b7cd12b4e3a42fe333f4c93188579c6dda"
+  integrity sha512-ypJK0cpc624F5fm8YJLYBRWfwRyC54Ur9/WbMT6JbQR+oq3AKlVBsIgs7849g8sDpzOLMVVGwsGNcBtBnaIB1w==
+
 png-chunk-text@1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/png-chunk-text/-/png-chunk-text-1.0.0.tgz"
