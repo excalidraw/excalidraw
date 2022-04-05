@@ -9,7 +9,7 @@
     "copy": "Salin",
     "copyAsPng": "Salin ke papan klip sebagai PNG",
     "copyAsSvg": "Salin ke papan klip sebagai SVG",
-    "copyText": "",
+    "copyText": "Salin ke papan klip sebagai teks",
     "bringForward": "Bawa maju",
     "sendToBack": "Kirim ke belakang",
     "bringToFront": "Bawa ke depan",
@@ -108,7 +108,7 @@
     "decreaseFontSize": "Kecilkan ukuran font",
     "increaseFontSize": "Besarkan ukuran font",
     "unbindText": "Lepas teks",
-    "bindText": "",
+    "bindText": "Kunci teks ke kontainer",
     "link": {
       "edit": "Edit tautan",
       "create": "Buat tautan",
