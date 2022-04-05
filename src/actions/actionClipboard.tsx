@@ -6,7 +6,6 @@ import { getSelectedElements } from "../scene/selection";
 import { exportCanvas } from "../data/index";
 import { getNonDeletedElements } from "../element";
 import { t } from "../i18n";
-import { ExcalidrawTextElement } from "../element/types";
 
 export const actionCopy = register({
   name: "copy",
@@ -135,13 +134,15 @@ export const copyAllTextNodesAsText = register({
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
-      true,
+      false,
     );
 
-    const text = (selectedElements as ExcalidrawTextElement[]).reduce(
-      (acc, element) => `${acc}${element.text}\n`,
-      "",
-    );
+    const text = selectedElements.reduce((acc, element) => {
+      if (element.type === "text") {
+        return `${acc}${element.text}\n`;
+      }
+      return acc;
+    }, "");
     copyTextToSystemClipboard(text);
     return {
       commitToHistory: false,
