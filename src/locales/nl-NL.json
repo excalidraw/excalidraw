@@ -9,7 +9,7 @@
     "copy": "Kopiëren",
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer naar klembord als SVG",
-    "copyAllTextNodesAsText": "",
+    "copyAllTextNodesAsText": "Kopieer naar klembord als een enkel tekstelement",
     "bringForward": "Breng naar voren",
     "sendToBack": "Stuur naar achtergrond",
     "bringToFront": "Breng naar voorgrond",
