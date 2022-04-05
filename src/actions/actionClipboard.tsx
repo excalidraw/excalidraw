@@ -4,9 +4,8 @@ import { copyTextToSystemClipboard, copyToClipboard } from "../clipboard";
 import { actionDeleteSelected } from "./actionDeleteSelected";
 import { getSelectedElements } from "../scene/selection";
 import { exportCanvas } from "../data/index";
-import { getNonDeletedElements } from "../element";
+import { getNonDeletedElements, isTextElement } from "../element";
 import { t } from "../i18n";
-import { ExcalidrawTextElement } from "../element/types";
 
 export const actionCopy = register({
   name: "copy",
@@ -131,10 +130,19 @@ export const actionCopyAsPng = register({
 export const copyAllTextNodesAsText = register({
   name: "copyAllTextNodesAsText",
   trackEvent: { category: "element" },
-  perform: (elements) => {
-    const text = (
-      getNonDeletedElements(elements) as ExcalidrawTextElement[]
-    ).reduce((acc, element) => `${acc}${element.text}\n`, "");
+  perform: (elements, appState) => {
+    const selectedElements = getSelectedElements(
+      getNonDeletedElements(elements),
+      appState,
+      true,
+    );
+
+    const text = selectedElements.reduce((acc, element) => {
+      if (isTextElement(element)) {
+        return `${acc}${element.text}\n\n`;
+      }
+      return acc;
+    }, "");
     copyTextToSystemClipboard(text);
     return {
       commitToHistory: false,
