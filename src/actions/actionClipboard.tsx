@@ -139,7 +139,7 @@ export const copyAllTextNodesAsText = register({
 
     const text = selectedElements.reduce((acc, element) => {
       if (element.type === "text") {
-        return `${acc}${element.text}\n`;
+        return `${acc}${element.text}\n\n`;
       }
       return acc;
     }, "");
