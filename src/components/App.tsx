@@ -5490,7 +5490,11 @@ class App extends React.Component<AppProps, AppState> {
       options.push(actionCopyAsSvg);
     }
 
-    if (probablySupportsClipboardWriteText && selectedElements.length > 0) {
+    if (
+      type === "element" &&
+      copyText.contextItemPredicate(elements, this.state) &&
+      probablySupportsClipboardWriteText
+    ) {
       options.push(copyText);
     }
     if (type === "canvas") {

@@ -1,6 +1,10 @@
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
-import { copyTextToSystemClipboard, copyToClipboard } from "../clipboard";
+import {
+  copyTextToSystemClipboard,
+  copyToClipboard,
+  probablySupportsClipboardWriteText,
+} from "../clipboard";
 import { actionDeleteSelected } from "./actionDeleteSelected";
 import { getSelectedElements } from "../scene/selection";
 import { exportCanvas } from "../data/index";
@@ -149,6 +153,12 @@ export const copyText = register({
     return {
       commitToHistory: false,
     };
+  },
+  contextItemPredicate: (elements, appState) => {
+    return (
+      probablySupportsClipboardWriteText &&
+      getSelectedElements(elements, appState, true).some(isTextElement)
+    );
   },
   contextItemLabel: "labels.copyText",
 });
