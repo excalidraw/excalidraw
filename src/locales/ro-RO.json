@@ -9,7 +9,7 @@
     "copy": "Copiere",
     "copyAsPng": "Copiere în memoria temporară ca PNG",
     "copyAsSvg": "Copiere în memoria temporară ca SVG",
-    "copyAllTextNodesAsText": "",
+    "copyText": "",
     "bringForward": "Aducere în plan apropiat",
     "sendToBack": "Trimitere în ultimul plan",
     "bringToFront": "Aducere în prim plan",
