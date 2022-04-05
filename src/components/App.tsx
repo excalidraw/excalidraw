@@ -11,7 +11,7 @@ import {
   actionCopy,
   actionCopyAsPng,
   actionCopyAsSvg,
-  copyAllTextNodesAsText,
+  copyText,
   actionCopyStyles,
   actionCut,
   actionDeleteSelected,
@@ -5490,8 +5490,12 @@ class App extends React.Component<AppProps, AppState> {
       options.push(actionCopyAsSvg);
     }
 
-    if (probablySupportsClipboardWriteText && selectedElements.length > 0) {
-      options.push(copyAllTextNodesAsText);
+    if (
+      type === "element" &&
+      copyText.contextItemPredicate(elements, this.state) &&
+      probablySupportsClipboardWriteText
+    ) {
+      options.push(copyText);
     }
     if (type === "canvas") {
       const viewModeOptions = [
@@ -5538,7 +5542,7 @@ class App extends React.Component<AppProps, AppState> {
               actionCopyAsSvg,
             probablySupportsClipboardWriteText &&
               selectedElements.length > 0 &&
-              copyAllTextNodesAsText,
+              copyText,
             ((probablySupportsClipboardBlob && elements.length > 0) ||
               (probablySupportsClipboardWriteText && elements.length > 0)) &&
               separator,

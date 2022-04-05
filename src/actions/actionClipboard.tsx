@@ -1,6 +1,10 @@
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
-import { copyTextToSystemClipboard, copyToClipboard } from "../clipboard";
+import {
+  copyTextToSystemClipboard,
+  copyToClipboard,
+  probablySupportsClipboardWriteText,
+} from "../clipboard";
 import { actionDeleteSelected } from "./actionDeleteSelected";
 import { getSelectedElements } from "../scene/selection";
 import { exportCanvas } from "../data/index";
@@ -127,8 +131,8 @@ export const actionCopyAsPng = register({
   keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
 });
 
-export const copyAllTextNodesAsText = register({
-  name: "copyAllTextNodesAsText",
+export const copyText = register({
+  name: "copyText",
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(
@@ -137,16 +141,24 @@ export const copyAllTextNodesAsText = register({
       true,
     );
 
-    const text = selectedElements.reduce((acc, element) => {
-      if (isTextElement(element)) {
-        return `${acc}${element.text}\n\n`;
-      }
-      return acc;
-    }, "");
+    const text = selectedElements
+      .reduce((acc: string[], element) => {
+        if (isTextElement(element)) {
+          acc.push(element.text);
+        }
+        return acc;
+      }, [])
+      .join("\n\n");
     copyTextToSystemClipboard(text);
     return {
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.copyAllTextNodesAsText",
+  contextItemPredicate: (elements, appState) => {
+    return (
+      probablySupportsClipboardWriteText &&
+      getSelectedElements(elements, appState, true).some(isTextElement)
+    );
+  },
+  contextItemLabel: "labels.copyText",
 });
