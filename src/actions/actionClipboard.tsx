@@ -4,7 +4,7 @@ import { copyTextToSystemClipboard, copyToClipboard } from "../clipboard";
 import { actionDeleteSelected } from "./actionDeleteSelected";
 import { getSelectedElements } from "../scene/selection";
 import { exportCanvas } from "../data/index";
-import { getNonDeletedElements } from "../element";
+import { getNonDeletedElements, isTextElement } from "../element";
 import { t } from "../i18n";
 
 export const actionCopy = register({
@@ -134,11 +134,11 @@ export const copyAllTextNodesAsText = register({
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
-      false,
+      true,
     );
 
     const text = selectedElements.reduce((acc, element) => {
-      if (element.type === "text") {
+      if (isTextElement(element)) {
         return `${acc}${element.text}\n\n`;
       }
       return acc;
