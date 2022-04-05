@@ -9,6 +9,7 @@
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
     "copyAsSvg": "Vágólapra másolás mint SVG",
+    "copyAllTextNodesAsText": "",
     "bringForward": "Előrébb hozás",
     "sendToBack": "Hátraküldés",
     "bringToFront": "Előrehozás",
