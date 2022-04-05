@@ -183,7 +183,7 @@
     "fileTooBig": "Archivo demasiado grande. El tamaño máximo permitido es {{maxSize}}.",
     "svgImageInsertError": "No se pudo insertar la imagen SVG. El código SVG parece inválido.",
     "invalidSVGString": "SVG no válido.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "No se pudo conectar al servidor colaborador. Por favor, vuelva a cargar la página y vuelva a intentarlo."
   },
   "toolBar": {
     "selection": "Selección",
@@ -199,7 +199,7 @@
     "lock": "Mantener la herramienta seleccionada activa después de dibujar",
     "penMode": "Evitar el zoom de pellizco y aceptar la entrada libre sólo desde el lápiz",
     "link": "Añadir/Actualizar enlace para una forma seleccionada",
-    "eraser": ""
+    "eraser": "Borrar"
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
@@ -225,7 +225,7 @@
     "publishLibrary": "Publica tu propia biblioteca",
     "bindTextToElement": "Presione Entrar para agregar",
     "deepBoxSelect": "Mantén CtrlOrCmd para seleccionar en profundidad, y para evitar arrastrar",
-    "eraserRevert": ""
+    "eraserRevert": "Mantenga pulsado Alt para revertir los elementos marcados para su eliminación"
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
@@ -285,7 +285,7 @@
     "howto": "Siga nuestras guías",
     "or": "o",
     "preventBinding": "Evitar yuxtaposición de flechas",
-    "tools": "",
+    "tools": "Herramientas",
     "shortcuts": "Atajos del teclado",
     "textFinish": "Finalizar edición (editor de texto)",
     "textNewLine": "Añadir nueva linea (editor de texto)",
