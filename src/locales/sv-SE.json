@@ -9,7 +9,7 @@
     "copy": "Kopiera",
     "copyAsPng": "Kopiera till urklipp som PNG",
     "copyAsSvg": "Kopiera till urklipp som SVG",
-    "copyAllTextNodesAsText": "",
+    "copyAllTextNodesAsText": "Kopiera till urklipp som ett enda textelement",
     "bringForward": "Flytta framåt",
     "sendToBack": "Flytta underst",
     "bringToFront": "Flytta främst",
