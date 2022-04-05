@@ -9,7 +9,7 @@
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
     "copyAsSvg": "Copy to clipboard as SVG",
-    "copyAllTextNodesAsText": "Copy to clipboard as a single text element",
+    "copyText": "Copy to clipboard as text",
     "bringForward": "Bring forward",
     "sendToBack": "Send to back",
     "bringToFront": "Bring to front",
