@@ -9,7 +9,7 @@
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
-    "copyAllTextNodesAsText": "",
+    "copyText": "",
     "bringForward": "Envoyer vers l'avant",
     "sendToBack": "Mettre en arrière-plan",
     "bringToFront": "Mettre au premier plan",
