@@ -1,11 +1,12 @@
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
-import { copyToClipboard } from "../clipboard";
+import { copyTextToSystemClipboard, copyToClipboard } from "../clipboard";
 import { actionDeleteSelected } from "./actionDeleteSelected";
 import { getSelectedElements } from "../scene/selection";
 import { exportCanvas } from "../data/index";
 import { getNonDeletedElements } from "../element";
 import { t } from "../i18n";
+import { ExcalidrawTextElement } from "../element/types";
 
 export const actionCopy = register({
   name: "copy",
@@ -125,4 +126,19 @@ export const actionCopyAsPng = register({
   },
   contextItemLabel: "labels.copyAsPng",
   keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
+});
+
+export const copyAllTextNodesAsText = register({
+  name: "copyAllTextNodesAsText",
+  trackEvent: { category: "element" },
+  perform: (elements) => {
+    const text = (
+      getNonDeletedElements(elements) as ExcalidrawTextElement[]
+    ).reduce((acc, element) => `${acc}${element.text}\n`, "");
+    copyTextToSystemClipboard(text);
+    return {
+      commitToHistory: false,
+    };
+  },
+  contextItemLabel: "labels.copyAllTextNodesAsText",
 });
