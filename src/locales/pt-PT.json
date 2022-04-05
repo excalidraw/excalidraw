@@ -9,6 +9,7 @@
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
+    "copyAllTextNodesAsText": "",
     "bringForward": "Trazer para o primeiro plano",
     "sendToBack": "Enviar para o plano de fundo",
     "bringToFront": "Trazer para o primeiro plano",
