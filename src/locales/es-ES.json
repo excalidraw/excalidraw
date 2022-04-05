@@ -9,7 +9,7 @@
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
-    "copyAllTextNodesAsText": "",
+    "copyAllTextNodesAsText": "Copiar al portapapeles como un único elemento de texto",
     "bringForward": "Traer hacia delante",
     "sendToBack": "Enviar al fondo",
     "bringToFront": "Traer al frente",
@@ -108,7 +108,7 @@
     "decreaseFontSize": "Disminuir tamaño de letra",
     "increaseFontSize": "Aumentar el tamaño de letra",
     "unbindText": "Desvincular texto",
-    "bindText": "",
+    "bindText": "Vincular texto al contenedor",
     "link": {
       "edit": "Editar enlace",
       "create": "Crear enlace",
