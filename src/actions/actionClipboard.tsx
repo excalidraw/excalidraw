@@ -127,8 +127,8 @@ export const actionCopyAsPng = register({
   keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
 });
 
-export const copyAllTextNodesAsText = register({
-  name: "copyAllTextNodesAsText",
+export const copyText = register({
+  name: "copyText",
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(
@@ -148,5 +148,5 @@ export const copyAllTextNodesAsText = register({
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.copyAllTextNodesAsText",
+  contextItemLabel: "labels.copyText",
 });
