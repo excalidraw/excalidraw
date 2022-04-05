@@ -75,6 +75,7 @@ export {
   actionCut,
   actionCopyAsPng,
   actionCopyAsSvg,
+  copyAllTextNodesAsText,
 } from "./actionClipboard";
 
 export { actionToggleGridMode } from "./actionToggleGridMode";
