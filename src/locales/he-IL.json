@@ -9,7 +9,7 @@
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
-    "copyAllTextNodesAsText": "",
+    "copyText": "",
     "bringForward": "הבא שכבה קדימה",
     "sendToBack": "העבר לסוף",
     "bringToFront": "העבר לחזית",
