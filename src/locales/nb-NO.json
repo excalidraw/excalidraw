@@ -9,6 +9,7 @@
     "copy": "Kopier",
     "copyAsPng": "Kopier til PNG",
     "copyAsSvg": "Kopier til utklippstavlen som SVG",
+    "copyAllTextNodesAsText": "",
     "bringForward": "Flytt framover",
     "sendToBack": "Send bakerst",
     "bringToFront": "Flytt forrest",
