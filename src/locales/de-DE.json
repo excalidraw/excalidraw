@@ -9,7 +9,7 @@
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
     "copyAsSvg": "In Zwischenablage kopieren (SVG)",
-    "copyAllTextNodesAsText": "",
+    "copyAllTextNodesAsText": "In die Zwischenablage als einzelnes Textelement kopieren",
     "bringForward": "Nach vorne",
     "sendToBack": "In den Hintergrund",
     "bringToFront": "In den Vordergrund",
