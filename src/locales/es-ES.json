@@ -9,7 +9,7 @@
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
-    "copyAllTextNodesAsText": "Copiar al portapapeles como un único elemento de texto",
+    "copyText": "",
     "bringForward": "Traer hacia delante",
     "sendToBack": "Enviar al fondo",
     "bringToFront": "Traer al frente",
