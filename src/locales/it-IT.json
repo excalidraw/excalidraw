@@ -9,7 +9,7 @@
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti come PNG",
     "copyAsSvg": "Copia negli appunti come SVG",
-    "copyAllTextNodesAsText": "Copia negli appunti come un singolo elemento di testo",
+    "copyText": "",
     "bringForward": "Porta avanti",
     "sendToBack": "Manda in fondo",
     "bringToFront": "Porta in cima",
