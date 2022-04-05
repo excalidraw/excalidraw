@@ -9,6 +9,7 @@
     "copy": "拷贝",
     "copyAsPng": "复制为 PNG 到剪贴板",
     "copyAsSvg": "复制为 SVG 到剪贴板",
+    "copyAllTextNodesAsText": "",
     "bringForward": "上移一层",
     "sendToBack": "置于底层",
     "bringToFront": "置于顶层",
