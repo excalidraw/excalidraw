@@ -137,12 +137,14 @@ export const copyText = register({
       true,
     );
 
-    const text = selectedElements.reduce((acc, element) => {
-      if (isTextElement(element)) {
-        return `${acc}${element.text}\n\n`;
-      }
-      return acc;
-    }, "");
+    const text = selectedElements
+      .reduce((acc: string[], element) => {
+        if (isTextElement(element)) {
+          acc.push(element.text);
+        }
+        return acc;
+      }, [])
+      .join("\n\n");
     copyTextToSystemClipboard(text);
     return {
       commitToHistory: false,
