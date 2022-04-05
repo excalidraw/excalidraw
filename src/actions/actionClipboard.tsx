@@ -131,10 +131,17 @@ export const actionCopyAsPng = register({
 export const copyAllTextNodesAsText = register({
   name: "copyAllTextNodesAsText",
   trackEvent: { category: "element" },
-  perform: (elements) => {
-    const text = (
-      getNonDeletedElements(elements) as ExcalidrawTextElement[]
-    ).reduce((acc, element) => `${acc}${element.text}\n`, "");
+  perform: (elements, appState) => {
+    const selectedElements = getSelectedElements(
+      getNonDeletedElements(elements),
+      appState,
+      true,
+    );
+
+    const text = (selectedElements as ExcalidrawTextElement[]).reduce(
+      (acc, element) => `${acc}${element.text}\n`,
+      "",
+    );
     copyTextToSystemClipboard(text);
     return {
       commitToHistory: false,

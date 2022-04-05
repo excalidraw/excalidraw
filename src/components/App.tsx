@@ -5476,7 +5476,14 @@ class App extends React.Component<AppProps, AppState> {
 
     const elements = this.scene.getElements();
 
-    const isTextNodesOnly = elements.every((element) => isTextElement(element));
+    const selectedElements = getSelectedElements(
+      this.scene.getElements(),
+      this.state,
+    );
+
+    const isTextNodesOnly = selectedElements.every((element) =>
+      isTextElement(element),
+    );
 
     const options: ContextMenuOption[] = [];
     if (probablySupportsClipboardBlob && elements.length > 0) {
@@ -5489,7 +5496,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (
       probablySupportsClipboardWriteText &&
-      elements.length > 0 &&
+      selectedElements.length > 0 &&
       isTextNodesOnly
     ) {
       options.push(copyAllTextNodesAsText);
@@ -5538,7 +5545,7 @@ class App extends React.Component<AppProps, AppState> {
               elements.length > 0 &&
               actionCopyAsSvg,
             probablySupportsClipboardWriteText &&
-              elements.length > 0 &&
+              selectedElements.length > 0 &&
               isTextNodesOnly &&
               copyAllTextNodesAsText,
             ((probablySupportsClipboardBlob && elements.length > 0) ||
