@@ -906,6 +906,17 @@ serializeAsJSON({
 
 Takes the scene elements and state and returns a JSON string. Deleted `elements`as well as most properties from `AppState` are removed from the resulting JSON. (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/src/data/json.ts#L16) source for details).
 
+#### `serializeLibraryAsJSON`
+
+**_Signature_**
+
+<pre>
+serializeLibraryAsJSON({
+  libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L191">LibraryItems[]</a>,
+</pre>
+
+Takes the library items and returns a JSON string.
+
 #### `getSceneVersion`
 
 **How to use**

@@ -123,14 +123,18 @@ export const isValidLibrary = (json: any) => {
   );
 };
 
-export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
+export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
   const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
     version: VERSIONS.excalidrawLibrary,
     source: EXPORT_SOURCE,
     libraryItems,
   };
-  const serialized = JSON.stringify(data, null, 2);
+  return JSON.stringify(data, null, 2);
+};
+
+export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
+  const serialized = serializeLibraryAsJSON(libraryItems);
   await fileSave(
     new Blob([serialized], {
       type: MIME_TYPES.excalidrawlib,
