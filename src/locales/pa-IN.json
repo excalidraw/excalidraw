@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "ਨਜਾਇਜ਼ ਫਾਈਲ ਲੋਡ ਨਹੀਂ ਕਰ ਸਕੇ",
     "importBackendFailed": "ਬੈਕਐੱਨਡ ਤੋਂ ਆਯਾਤ ਕਰਨ ਵਿੱਚ ਅਸਫਲ ਰਹੇ।",
     "cannotExportEmptyCanvas": "ਖਾਲੀ ਕੈਨਵਸ ਨਿਰਯਾਤ ਨਹੀਂ ਕਰ ਸਕਦੇ।",
-    "couldNotCopyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਨਹੀਂ ਕਰ ਸਕੇ। ਕਰੋਮ ਬਰਾਉਜ਼ਰ ਵਰਤ ਕੇ ਦੇਖੋ।",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "ਡਾਟਾ ਡੀਕਰਿਪਟ ਨਹੀਂ ਕਰ ਸਕੇ।",
     "uploadedSecurly": "ਅੱਪਲੋਡ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਸ਼ਨ ਨਾਲ ਸੁਰੱਖਿਅਤ ਕੀਤੀ ਹੋਈ ਹੈ, ਜਿਸਦਾ ਮਤਲਬ ਇਹ ਹੈ ਕਿ Excalidraw ਸਰਵਰ ਅਤੇ ਤੀਜੀ ਧਿਰ ਦੇ ਬੰਦੇ ਸਮੱਗਰੀ ਨੂੰ ਪੜ੍ਹ ਨਹੀਂ ਸਕਦੇ।",
     "loadSceneOverridePrompt": "ਬਾਹਰੀ ਡਰਾਇੰਗ ਨੂੰ ਲੋਡ ਕਰਨਾ ਤੁਹਾਡੀ ਮੌਜੂਦਾ ਸਮੱਗਰੀ ਦੀ ਥਾਂ ਲੈ ਲਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਜਾਰੀ ਰੱਖਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
