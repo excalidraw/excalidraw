@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "Nevarēja ielādēt nederīgu datni",
     "importBackendFailed": "Ielāde no krātuves neizdevās.",
     "cannotExportEmptyCanvas": "Nevar eksportēt tukšu tāfeli.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Nevarēja nokopēt starpliktuvē.",
     "decryptFailed": "Nevarēja atšifrēt datus.",
     "uploadedSecurly": "Augšuplāde nodrošināta ar šifrēšanu no gala līdz galam, kas nozīmē, ka Excalidraw serveri un trešās puses nevar lasīt saturu.",
     "loadSceneOverridePrompt": "Ārēja satura ielāde aizstās jūsu pašreizējo saturu. Vai vēlaties turpināt?",
