@@ -9,7 +9,7 @@
     "copy": "複製",
     "copyAsPng": "以PNG格式儲存到剪貼板",
     "copyAsSvg": "以SVG格式複製到剪貼板",
-    "copyText": "",
+    "copyText": "以文字格式複製至剪貼簿",
     "bringForward": "上移一層",
     "sendToBack": "移到最底層",
     "bringToFront": "置於最頂層",
