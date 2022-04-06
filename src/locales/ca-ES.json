@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "No s'ha pogut carregar un fitxer no vàlid",
     "importBackendFailed": "Importació fallida.",
     "cannotExportEmptyCanvas": "No es pot exportar un llenç buit.",
-    "couldNotCopyToClipboard": "No s'ha pogut copiar al porta-retalls. Intentar amb el navegador Google Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "No s'ha pogut desencriptar.",
     "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut.",
     "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?",
