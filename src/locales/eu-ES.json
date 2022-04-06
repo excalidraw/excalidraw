@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "Ezin izan da kargatu, fitxategiak ez du balio",
     "importBackendFailed": "Inportazioak huts egin du.",
     "cannotExportEmptyCanvas": "Ezin izan da oihal hutsa esportatu.",
-    "couldNotCopyToClipboard": "Ezin izan da arbelean kopiatu.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "Ezin izan da deszifratu.",
     "uploadedSecurly": "Kargatzea muturretik muturrerako zifratze bidez ziurtatu da, hau da, Excalidraw zerbitzariak eta hirugarrenek ezin dutela edukia irakurri.",
     "loadSceneOverridePrompt": "Kanpoko marrazkia kargatzeak lehendik duzun edukia ordezkatuko du. Jarraitu nahi duzu?",
