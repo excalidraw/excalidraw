@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "Kunne ikke laste inn ugyldig fil",
     "importBackendFailed": "Importering av backend feilet.",
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen.",
     "decryptFailed": "Kunne ikke dekryptere data.",
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter.",
     "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?",
