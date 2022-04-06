@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "Kunde inte ladda ogiltig fil",
     "importBackendFailed": "Importering från backend misslyckades.",
     "cannotExportEmptyCanvas": "Kan inte exportera tom canvas.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Kunde inte kopiera till urklipp.",
     "decryptFailed": "Kunde inte avkryptera data.",
     "uploadedSecurly": "Uppladdning har säkrats med kryptering från ände till ände. vilket innebär att Excalidraw server och tredje part inte kan läsa innehållet.",
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
