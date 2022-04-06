@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "Cargament impossible d’un fichièr invalid",
     "importBackendFailed": "Importacion fracassada.",
     "cannotExportEmptyCanvas": "Impossible d’exportar los canabasses voids.",
-    "couldNotCopyToClipboard": "Còpia impossibla al quichapapièrs. Ensajatz d’utilizar lo navegador Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "Deschiframent impossible de las donadas.",
     "uploadedSecurly": "Lo telecargament es estat securizat amb un chiframent del cap a la fin, significa que los servidors d’Excalidraw o que quina tèrça part que siá pòdon pas legir lo contengut.",
     "loadSceneOverridePrompt": "Cargar un dessenh extèrn remplaçarà vòstre contengut existent. Volètz contunhar ?",
