@@ -224,7 +224,7 @@
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
     "publishLibrary": "Julkaise oma kirjasto",
     "bindTextToElement": "Lisää tekstiä painamalla enter",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus painamalla CtrlOrCmd",
     "eraserRevert": ""
   },
   "canvasError": {
@@ -272,7 +272,7 @@
   "helpDialog": {
     "blog": "Lue blogiamme",
     "click": "klikkaa",
-    "deepSelect": "",
+    "deepSelect": "Syvävalinta",
     "deepBoxSelect": "",
     "curvedArrow": "Kaareva nuoli",
     "curvedLine": "Kaareva viiva",
