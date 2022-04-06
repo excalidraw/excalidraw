@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "לא ניתן לטעון קובץ שאיננו תואם",
     "importBackendFailed": "ייבוא מהשרת נכשל.",
     "cannotExportEmptyCanvas": "לא ניתן לייצא לוח ריק.",
-    "couldNotCopyToClipboard": "לא ניתן להעתיק ללוח. נסה להשתמש בדפדפן Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "לא ניתן לפענח מידע.",
     "uploadedSecurly": "ההעלאה הוצפנה מקצה לקצה, ולכן שרת Excalidraw וצד שלישי לא יכולים לקרוא את התוכן.",
     "loadSceneOverridePrompt": "טעינה של ציור חיצוני תחליף את התוכן הקיים שלך. האם תרצה להמשיך?",
