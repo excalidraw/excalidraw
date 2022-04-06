@@ -9,7 +9,7 @@
     "copy": "Kopioi",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
-    "copyText": "",
+    "copyText": "Kopioi tekstinä",
     "bringForward": "Tuo eteenpäin",
     "sendToBack": "Vie taakse",
     "bringToFront": "Tuo eteen",
@@ -65,7 +65,7 @@
     "cartoonist": "Sarjakuva",
     "fileTitle": "Tiedostonimi",
     "colorPicker": "Värin valinta",
-    "canvasColors": "",
+    "canvasColors": "Käytössä piirtoalueella",
     "canvasBackground": "Piirtoalueen tausta",
     "drawingCanvas": "Piirtoalue",
     "layers": "Tasot",
@@ -199,7 +199,7 @@
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen",
     "penMode": "Estä nipistyszoomaus ja vastaanota ainoastaan kynällä piirretty",
     "link": "Lisää/päivitä linkki valitulle muodolle",
-    "eraser": ""
+    "eraser": "Poistotyökalu"
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
@@ -285,7 +285,7 @@
     "howto": "Seuraa oppaitamme",
     "or": "tai",
     "preventBinding": "Estä nuolten kiinnitys",
-    "tools": "",
+    "tools": "Työkalut",
     "shortcuts": "Pikanäppäimet",
     "textFinish": "Lopeta muokkaus (tekstieditori)",
     "textNewLine": "Lisää uusi rivi (tekstieditori)",
