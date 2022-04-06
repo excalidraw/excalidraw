@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "D awezɣi asali n ufaylu armeɣtu",
     "importBackendFailed": "Takterḍ seg uɣawas n deffir ur teddi ara.",
     "cannotExportEmptyCanvas": "D awezɣi asifeḍ n teɣzut n usuneɣ tilemt.",
-    "couldNotCopyToClipboard": "D awezɣi anɣal ɣer tecfawit. Eɛreḍ ad tesqedceḍ iminig Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "D awezɣi tukksa n uwgelhen i yisefka.",
     "uploadedSecurly": "Asili yettwasɣelles s uwgelhen ixef s ixef, ayagi yebɣa ad d-yini belli aqeddac n Excalidraw akked medden ur zmiren ara ad ɣren agbur.",
     "loadSceneOverridePrompt": "Asali n wunuɣ uffiɣ ad isemselsi agbur-inek (m) yellan. Tebɣiḍ ad tkemmeleḍ?",
