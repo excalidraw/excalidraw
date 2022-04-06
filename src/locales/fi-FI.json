@@ -107,8 +107,8 @@
     "excalidrawLib": "Excalidraw kirjasto",
     "decreaseFontSize": "Pienennä kirjasinkokoa",
     "increaseFontSize": "Kasvata kirjasinkokoa",
-    "unbindText": "",
-    "bindText": "",
+    "unbindText": "Irroita teksti",
+    "bindText": "Kiinnitä teksti säiliöön",
     "link": {
       "edit": "Muokkaa linkkiä",
       "create": "Luo linkki",
@@ -183,7 +183,7 @@
     "fileTooBig": "Tiedosto on liian suuri. Suurin sallittu koko on {{maxSize}}.",
     "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
     "invalidSVGString": "Virheellinen SVG.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Yhteyden muodostaminen collab-palvelimeen epäonnistui. Virkistä sivu ja yritä uudelleen."
   },
   "toolBar": {
     "selection": "Valinta",
@@ -225,7 +225,7 @@
     "publishLibrary": "Julkaise oma kirjasto",
     "bindTextToElement": "Lisää tekstiä painamalla enter",
     "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus painamalla CtrlOrCmd",
-    "eraserRevert": ""
+    "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen"
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
@@ -273,7 +273,7 @@
     "blog": "Lue blogiamme",
     "click": "klikkaa",
     "deepSelect": "Syvävalinta",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus",
     "curvedArrow": "Kaareva nuoli",
     "curvedLine": "Kaareva viiva",
     "documentation": "Käyttöohjeet",
