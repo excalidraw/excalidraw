@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "유효하지 않은 파일입니다.",
     "importBackendFailed": "서버로부터 불러 오지 못했습니다.",
     "cannotExportEmptyCanvas": "빈 캔버스를 내보낼 수 없습니다.",
-    "couldNotCopyToClipboard": "클립 보드에 복사할 수 없습니다. Chrome 브라우저에서 시도해 주세요.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "데이터를 복호화하지 못했습니다.",
     "uploadedSecurly": "업로드는 종단 간 암호화로 보호되므로 Excalidraw 서버 및 타사가 콘텐츠를 읽을 수 없습니다.",
     "loadSceneOverridePrompt": "외부 파일을 불러 오면 기존 콘텐츠가 대체됩니다. 계속 진행할까요?",
