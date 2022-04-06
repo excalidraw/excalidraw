@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "Nem sikerült betölteni a helytelen fájlt",
     "importBackendFailed": "Nem sikerült betölteni a szerverről.",
     "cannotExportEmptyCanvas": "Üres vászont nem lehet exportálni.",
-    "couldNotCopyToClipboard": "Nem sikerült vágólapra menteni. Próbáld meg Chrome böngészővel.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "Nem sikerült visszafejteni a titkosított adatot.",
     "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy egy harmadik fél nem tudja megnézni a tartalmát, beleértve az Excalidraw szervereit is.",
     "loadSceneOverridePrompt": "A betöltött külső rajz felül fogja írnia meglévőt. Szeretnéd folytatni?",
