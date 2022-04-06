@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "Não foi possível carregar o ficheiro inválido",
     "importBackendFailed": "A importação do servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar uma área de desenho vazia.",
-    "couldNotCopyToClipboard": "Não foi possível copiar para a área de transferência. Experimente no navegador Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "Não foi possível desencriptar os dados.",
     "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo.",
     "loadSceneOverridePrompt": "Se carregar um desenho externo substituirá o conteúdo existente. Quer continuar?",
