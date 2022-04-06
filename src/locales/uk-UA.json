@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "Файл з помилками не відкрився",
     "importBackendFailed": "Імпортування невдале.",
     "cannotExportEmptyCanvas": "Не вийшло експортувати пусте полотно.",
-    "couldNotCopyToClipboard": "Не копіюється до буферу обміну. Спробуйте в браузері Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "Не вдалося розшифрувати дані.",
     "uploadedSecurly": "Це завантаження було захищене наскрізним шифруванням, а це означає що сервер Excalidraw та інші не зможуть прочитати вміст.",
     "loadSceneOverridePrompt": "Завантаження зовнішнього креслення замінить ваш наявний контент. Продовжити?",
