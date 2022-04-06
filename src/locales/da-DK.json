@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "",
     "importBackendFailed": "",
     "cannotExportEmptyCanvas": "",
-    "couldNotCopyToClipboard": "Kunne ikke kopiere til klippebord. Prøv at bruge Chrome browser.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "",
     "uploadedSecurly": "",
     "loadSceneOverridePrompt": "",
