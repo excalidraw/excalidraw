@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "Virheellistä tiedostoa ei voitu avata",
     "importBackendFailed": "Palvelimelta tuonti epäonnistui.",
     "cannotExportEmptyCanvas": "Tyhjää piirtoaluetta ei voi viedä.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Leikepöydälle vieminen epäonnistui.",
     "decryptFailed": "Salauksen purkaminen epäonnistui.",
     "uploadedSecurly": "Lähetys on turvattu päästä-päähän-salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
     "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Jatketaanko?",
