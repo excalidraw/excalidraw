@@ -9,7 +9,7 @@
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
-    "copyText": "",
+    "copyText": "Copier dans le presse-papiers comme du texte",
     "bringForward": "Envoyer vers l'avant",
     "sendToBack": "Mettre en arrière-plan",
     "bringToFront": "Mettre au premier plan",
@@ -108,7 +108,7 @@
     "decreaseFontSize": "Réduire la taille de police",
     "increaseFontSize": "Augmenter la taille de police",
     "unbindText": "Délier le texte",
-    "bindText": "",
+    "bindText": "Lier le texte au conteneur",
     "link": {
       "edit": "Modifier le lien",
       "create": "Créer un lien",
