@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "无法加载无效的文件",
     "importBackendFailed": "从后端导入失败。",
     "cannotExportEmptyCanvas": "无法导出空白画布。",
-    "couldNotCopyToClipboard": "无法复制到剪贴板，请尝试使用 Chrome 浏览器。",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "无法解密数据。",
     "uploadedSecurly": "上传已被端到端加密保护，这意味着 Excalidraw 的服务器和第三方都无法读取内容。",
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
