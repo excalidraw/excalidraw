@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "無法讀取失效的檔案。",
     "importBackendFailed": "後端讀取失敗。",
     "cannotExportEmptyCanvas": "無法輸出空白的 canvas。",
-    "couldNotCopyToClipboard": "無法複製至剪貼簿。請使用 Chrome 瀏覽器再試試看。",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "無法解密資料。",
     "uploadedSecurly": "上傳已通過 end-to-end 加密，Excalidraw 伺服器和第三方無法皆讀取其內容。",
     "loadSceneOverridePrompt": "讀取外部圖樣將取代目前的內容。是否要繼續？",
