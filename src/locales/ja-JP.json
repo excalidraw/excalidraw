@@ -161,7 +161,7 @@
     "couldNotLoadInvalidFile": "無効なファイルを読み込めませんでした。",
     "importBackendFailed": "サーバーからの読み込みに失敗しました。",
     "cannotExportEmptyCanvas": "空のキャンバスはエクスポートできません。",
-    "couldNotCopyToClipboard": "クリップボードにコピーできません。Google Chromeでお試しください。",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "データを復号できませんでした。",
     "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。",
     "loadSceneOverridePrompt": "外部図面を読み込むと、既存のコンテンツが置き換わります。続行しますか？",
