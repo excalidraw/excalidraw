@@ -113,6 +113,12 @@
       "edit": "Modifier le lien",
       "create": "Créer un lien",
       "label": "Lien"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Aide",
     "view": "Affichage",
     "zoomToFit": "Zoomer pour voir tous les éléments",
-    "zoomToSelection": "Zoomer sur la sélection"
+    "zoomToSelection": "Zoomer sur la sélection",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Effacer la zone de dessin"
