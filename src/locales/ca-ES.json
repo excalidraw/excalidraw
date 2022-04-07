@@ -113,6 +113,12 @@
       "edit": "Edita l'enllaç",
       "create": "Crea un enllaç",
       "label": "Enllaç"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Ajuda",
     "view": "Visualització",
     "zoomToFit": "Zoom per veure tots els elements",
-    "zoomToSelection": "Zoom per veure la selecció"
+    "zoomToSelection": "Zoom per veure la selecció",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Neteja el llenç"
