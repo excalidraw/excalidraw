@@ -113,6 +113,12 @@
       "edit": "Edit tautan",
       "create": "Buat tautan",
       "label": "Tautan"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Bantuan",
     "view": "Tampilan",
     "zoomToFit": "Perbesar agar sesuai dengan semua elemen",
-    "zoomToSelection": "Perbesar ke seleksi"
+    "zoomToSelection": "Perbesar ke seleksi",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Hapus kanvas"
