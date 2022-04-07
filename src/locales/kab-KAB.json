@@ -113,6 +113,12 @@
       "edit": "Ẓreg aseɣwen",
       "create": "Snulfu-d aseɣwen",
       "label": "Aseɣwen"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Tallelt",
     "view": "Tamuɣli",
     "zoomToFit": "Simɣur akken ad twliḍ akk iferdisen",
-    "zoomToSelection": "Simɣur ɣer tefrayt"
+    "zoomToSelection": "Simɣur ɣer tefrayt",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Sfeḍ taɣzut n usuneɣ"
