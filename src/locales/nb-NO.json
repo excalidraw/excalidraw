@@ -113,6 +113,12 @@
       "edit": "Rediger lenke",
       "create": "Opprett lenke",
       "label": "Lenke"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Hjelp",
     "view": "Vis",
     "zoomToFit": "Zoom for å se alle elementer",
-    "zoomToSelection": "Zoom til utvalg"
+    "zoomToSelection": "Zoom til utvalg",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Tøm lerret"
