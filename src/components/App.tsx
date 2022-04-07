@@ -5337,9 +5337,18 @@ class App extends React.Component<AppProps, AppState> {
     const top = event.clientY - offsetTop;
 
     if (element && !this.state.selectedElementIds[element.id]) {
-      this.setState({ selectedElementIds: { [element.id]: true } }, () => {
-        this._openContextMenu({ top, left }, type);
-      });
+      this.setState(
+        selectGroupsForSelectedElements(
+          {
+            ...this.state,
+            selectedElementIds: { [element.id]: true },
+          },
+          this.scene.getElements(),
+        ),
+        () => {
+          this._openContextMenu({ top, left }, type);
+        },
+      );
     } else {
       this._openContextMenu({ top, left }, type);
     }

@@ -557,4 +557,29 @@ describe("contextMenu element", () => {
     expect(h.elements[0].groupIds).toHaveLength(0);
     expect(h.elements[1].groupIds).toHaveLength(0);
   });
+
+  it("right-clicking on a group should select whole group", () => {
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      width: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+      groupIds: ["g1"],
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      width: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+      groupIds: ["g1"],
+    });
+    h.elements = [rectangle1, rectangle2];
+
+    mouse.rightClickAt(50, 50);
+    expect(API.getSelectedElements().length).toBe(2);
+    expect(API.getSelectedElements()).toEqual([
+      expect.objectContaining({ id: rectangle1.id }),
+      expect.objectContaining({ id: rectangle2.id }),
+    ]);
+  });
 });
