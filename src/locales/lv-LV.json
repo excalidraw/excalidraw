@@ -115,10 +115,10 @@
       "label": "Saite"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Fiksēt",
+      "unlock": "Atbrīvot",
+      "lockAll": "Fiksēt visu",
+      "unlockAll": "Atbrīvot visu"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "Skatīt",
     "zoomToFit": "Iestatīt mērogu, kas iekļauj visus elementus",
     "zoomToSelection": "Iestatīt mērogu, lai rādītu atlasi",
-    "toggleElementLock": ""
+    "toggleElementLock": "Fiksēt/atbrīvot atlasīto"
   },
   "clearCanvasDialog": {
     "title": "Notīrīt tāfeli"
