@@ -113,6 +113,12 @@
       "edit": "Editar link",
       "create": "Criar link",
       "label": "Link"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Ajudar",
     "view": "Visualizar",
     "zoomToFit": "Ampliar para encaixar todos os elementos",
-    "zoomToSelection": "Ampliar a seleção"
+    "zoomToSelection": "Ampliar a seleção",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Limpar a tela"
