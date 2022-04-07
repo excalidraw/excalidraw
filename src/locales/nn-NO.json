@@ -113,6 +113,12 @@
       "edit": "Rediger lenke",
       "create": "Lag lenke",
       "label": "Lenke"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Hjelp",
     "view": "Vising",
     "zoomToFit": "Zoom for å sjå alle elementa",
-    "zoomToSelection": "Zoom til utval"
+    "zoomToSelection": "Zoom til utval",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Tøm lerretet"
