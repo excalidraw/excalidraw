@@ -113,6 +113,12 @@
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Βοήθεια",
     "view": "Προβολή",
     "zoomToFit": "Zoom ώστε να χωρέσουν όλα τα στοιχεία",
-    "zoomToSelection": "Ζουμ στην επιλογή"
+    "zoomToSelection": "Ζουμ στην επιλογή",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Καθαρισμός καμβά"
