@@ -113,6 +113,12 @@
       "edit": "Editare URL",
       "create": "Creare URL",
       "label": "URL"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Ajutor",
     "view": "Vizualizare",
     "zoomToFit": "Transfocare pentru a cuprinde totul",
-    "zoomToSelection": "Transfocare la selecție"
+    "zoomToSelection": "Transfocare la selecție",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Ștergere pânză"
