@@ -113,6 +113,12 @@
       "edit": "Rediģēt saiti",
       "create": "Izveidot saiti",
       "label": "Saite"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Palīdzība",
     "view": "Skatīt",
     "zoomToFit": "Iestatīt mērogu, kas iekļauj visus elementus",
-    "zoomToSelection": "Iestatīt mērogu, lai rādītu atlasi"
+    "zoomToSelection": "Iestatīt mērogu, lai rādītu atlasi",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Notīrīt tāfeli"
