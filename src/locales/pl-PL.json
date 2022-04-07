@@ -113,6 +113,12 @@
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Pomoc",
     "view": "Widok",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
-    "zoomToSelection": "Przybliż do zaznaczenia"
+    "zoomToSelection": "Przybliż do zaznaczenia",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Wyczyść płótno"
