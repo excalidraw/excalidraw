@@ -113,6 +113,12 @@
       "edit": "リンクを編集",
       "create": "リンクを作成",
       "label": "リンク"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "ヘルプ",
     "view": "表示",
     "zoomToFit": "すべての要素が収まるようにズーム",
-    "zoomToSelection": "選択要素にズーム"
+    "zoomToSelection": "選択要素にズーム",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "キャンバスを消去"
