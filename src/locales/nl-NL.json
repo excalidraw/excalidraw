@@ -113,6 +113,12 @@
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Help",
     "view": "Weergave",
     "zoomToFit": "Zoom in op alle elementen",
-    "zoomToSelection": "Inzoomen op selectie"
+    "zoomToSelection": "Inzoomen op selectie",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
