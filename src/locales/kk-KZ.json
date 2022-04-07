@@ -113,6 +113,12 @@
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Көмек",
     "view": "Көру",
     "zoomToFit": "Барлық элементтердің көлеміне сәйкес үлкейту",
-    "zoomToSelection": "Таңдалғанды үлкейту"
+    "zoomToSelection": "Таңдалғанды үлкейту",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
