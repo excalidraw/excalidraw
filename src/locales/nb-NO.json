@@ -115,10 +115,10 @@
       "label": "Lenke"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Lås",
+      "unlock": "Lås opp",
+      "lockAll": "Lås alle",
+      "unlockAll": "Lås opp alle"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "Vis",
     "zoomToFit": "Zoom for å se alle elementer",
     "zoomToSelection": "Zoom til utvalg",
-    "toggleElementLock": ""
+    "toggleElementLock": "Lås/lås opp utvalg"
   },
   "clearCanvasDialog": {
     "title": "Tøm lerret"
