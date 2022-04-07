@@ -113,6 +113,12 @@
       "edit": "Modifica link",
       "create": "Crea link",
       "label": "Link"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Guida",
     "view": "Vista",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
-    "zoomToSelection": "Zoom alla selezione"
+    "zoomToSelection": "Zoom alla selezione",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Svuota la tela"
