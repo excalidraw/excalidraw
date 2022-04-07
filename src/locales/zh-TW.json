@@ -113,6 +113,12 @@
       "edit": "編輯連結",
       "create": "建立連結",
       "label": "連結"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "說明",
     "view": "檢視",
     "zoomToFit": "放大至填滿畫面",
-    "zoomToSelection": "縮放至選取區"
+    "zoomToSelection": "縮放至選取區",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "清除畫布"
