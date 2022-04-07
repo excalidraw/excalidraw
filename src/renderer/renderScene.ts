@@ -413,7 +413,9 @@ export const renderScene = (
         "mouse",
         OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
       );
-      renderTransformHandles(context, renderConfig, transformHandles, 0);
+      if (locallySelectedElements.some((element) => !element.locked)) {
+        renderTransformHandles(context, renderConfig, transformHandles, 0);
+      }
     }
     context.restore();
   }
