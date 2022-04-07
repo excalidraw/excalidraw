@@ -113,6 +113,12 @@
       "edit": "தொடுப்பைத் திருத்து",
       "create": "தொடுப்பைப் படை",
       "label": "தொடுப்பு"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "உதவி",
     "view": "பார்",
     "zoomToFit": "அனைத்துறுப்புகளும் பொருந்தும்படி விரிவாக்கு",
-    "zoomToSelection": "தெரிவுக்கு விரிவாக்கு"
+    "zoomToSelection": "தெரிவுக்கு விரிவாக்கு",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "கித்தானைத் துடை"
