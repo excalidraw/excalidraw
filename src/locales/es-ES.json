@@ -113,6 +113,12 @@
       "edit": "Editar enlace",
       "create": "Crear enlace",
       "label": "Enlace"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Ayuda",
     "view": "Vista",
     "zoomToFit": "Ajustar la vista para mostrar todos los elementos",
-    "zoomToSelection": "Zoom a la selección"
+    "zoomToSelection": "Zoom a la selección",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Borrar lienzo"
