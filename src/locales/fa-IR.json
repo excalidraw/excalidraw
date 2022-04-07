@@ -113,6 +113,12 @@
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "راهنما",
     "view": "مشاهده",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
-    "zoomToSelection": "بزرگنمایی قسمت انتخاب شده"
+    "zoomToSelection": "بزرگنمایی قسمت انتخاب شده",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
