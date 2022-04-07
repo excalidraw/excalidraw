@@ -113,6 +113,12 @@
       "edit": "编辑链接",
       "create": "新建链接",
       "label": "链接"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "帮助",
     "view": "视图",
     "zoomToFit": "缩放以适应所有元素",
-    "zoomToSelection": "缩放到选区"
+    "zoomToSelection": "缩放到选区",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "清除画布"
