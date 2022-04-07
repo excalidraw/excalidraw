@@ -11,12 +11,12 @@ export const FILE_UPLOAD_MAX_BYTES = 3 * 1024 * 1024; // 3 MiB
 // 1 year (https://stackoverflow.com/a/25201898/927631)
 export const FILE_CACHE_MAX_AGE_SEC = 31536000;
 
-export const WS_EVENTS = {
+export const BROADCAST = {
   SERVER_VOLATILE: "server-volatile-broadcast",
   SERVER: "server-broadcast",
 };
 
-export enum WS_SCENE_EVENT_TYPES {
+export enum SCENE {
   INIT = "SCENE_INIT",
   UPDATE = "SCENE_UPDATE",
 }

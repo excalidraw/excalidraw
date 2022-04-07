@@ -517,7 +517,7 @@ const ExcalidrawWrapper = () => {
     files: BinaryFiles,
   ) => {
     if (collabAPI?.isCollaborating()) {
-      collabAPI.syncElements(elements);
+      collabAPI.broadcastElements(elements);
     } else {
       saveDebounced(elements, appState, files, () => {
         if (excalidrawAPI) {

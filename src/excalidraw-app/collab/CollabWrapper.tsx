@@ -22,7 +22,7 @@ import {
   FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
   LOAD_IMAGES_TIMEOUT,
-  WS_SCENE_EVENT_TYPES,
+  SCENE,
   STORAGE_KEYS,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
@@ -87,7 +87,7 @@ export interface CollabAPI {
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   initializeSocketClient: CollabInstance["initializeSocketClient"];
   onCollabButtonClick: CollabInstance["onCollabButtonClick"];
-  syncElements: CollabInstance["syncElements"];
+  broadcastElements: CollabInstance["broadcastElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
   setUsername: (username: string) => void;
 }
@@ -228,20 +228,12 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   });
 
   saveCollabRoomToFirebase = async (
-    syncableElements: readonly ExcalidrawElement[],
+    syncableElements: readonly ExcalidrawElement[] = this.getSyncableElements(
+      this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+    ),
   ) => {
     try {
-      const savedData = await saveToFirebase(
-        this.portal,
-        syncableElements,
-        this.excalidrawAPI.getAppState(),
-      );
-
-      if (this.isCollaborating && savedData && savedData.reconciledElements) {
-        this.handleRemoteSceneUpdate(
-          this.reconcileElements(savedData.reconciledElements),
-        );
-      }
+      await saveToFirebase(this.portal, syncableElements);
     } catch (error: any) {
       console.error(error);
     }
@@ -254,14 +246,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   closePortal = () => {
     this.queueBroadcastAllElements.cancel();
-    this.queueSaveToFirebase.cancel();
     this.loadImageFiles.cancel();
 
-    this.saveCollabRoomToFirebase(
-      this.getSyncableElements(
-        this.excalidrawAPI.getSceneElementsIncludingDeleted(),
-      ),
-    );
+    this.saveCollabRoomToFirebase();
     if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
       // hack to ensure that we prefer we disregard any new browser state
       // that could have been saved in other tabs while we were collaborating
@@ -407,7 +394,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         commitToHistory: true,
       });
 
-      this.saveCollabRoomToFirebase(this.getSyncableElements(elements));
+      this.broadcastElements(elements);
+
+      const syncableElements = this.getSyncableElements(elements);
+      this.saveCollabRoomToFirebase(syncableElements);
     }
 
     // fallback in case you're not alone in the room but still don't receive
@@ -437,7 +427,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         switch (decryptedData.type) {
           case "INVALID_RESPONSE":
             return;
-          case WS_SCENE_EVENT_TYPES.INIT: {
+          case SCENE.INIT: {
             if (!this.portal.socketInitialized) {
               this.initializeRoom({ fetchScene: false });
               const remoteElements = decryptedData.payload.elements;
@@ -453,7 +443,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             }
             break;
           }
-          case WS_SCENE_EVENT_TYPES.UPDATE:
+          case SCENE.UPDATE:
             this.handleRemoteSceneUpdate(
               this.reconcileElements(decryptedData.payload.elements),
             );
@@ -715,20 +705,15 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
     ) {
-      this.portal.broadcastScene(WS_SCENE_EVENT_TYPES.UPDATE, elements, false);
+      this.portal.broadcastScene(SCENE.UPDATE, elements, false);
       this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
       this.queueBroadcastAllElements();
     }
   };
 
-  syncElements = (elements: readonly ExcalidrawElement[]) => {
-    this.broadcastElements(elements);
-    this.queueSaveToFirebase();
-  };
-
   queueBroadcastAllElements = throttle(() => {
     this.portal.broadcastScene(
-      WS_SCENE_EVENT_TYPES.UPDATE,
+      SCENE.UPDATE,
       this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       true,
     );
@@ -738,16 +723,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       getSceneVersion(this.getSceneElementsIncludingDeleted()),
     );
     this.setLastBroadcastedOrReceivedSceneVersion(newVersion);
-  }, SYNC_FULL_SCENE_INTERVAL_MS);
-
-  queueSaveToFirebase = throttle(() => {
-    if (this.portal.socketInitialized) {
-      this.saveCollabRoomToFirebase(
-        this.getSyncableElements(
-          this.excalidrawAPI.getSceneElementsIncludingDeleted(),
-        ),
-      );
-    }
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
   handleClose = () => {
@@ -790,7 +765,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.contextValue.onPointerUpdate = this.onPointerUpdate;
     this.contextValue.initializeSocketClient = this.initializeSocketClient;
     this.contextValue.onCollabButtonClick = this.onCollabButtonClick;
-    this.contextValue.syncElements = this.syncElements;
+    this.contextValue.broadcastElements = this.broadcastElements;
     this.contextValue.fetchImageFilesFromFirebase =
       this.fetchImageFilesFromFirebase;
     this.contextValue.setUsername = this.setUsername;

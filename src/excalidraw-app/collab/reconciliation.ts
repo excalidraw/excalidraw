@@ -78,7 +78,7 @@ export const reconcileElements = (
       continue;
     }
 
-    if (local && local[0] !== remoteElement) {
+    if (local) {
       // mark for removal since it'll be replaced with the remote element
       duplicates.set(local[0], true);
     }
