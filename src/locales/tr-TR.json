@@ -113,6 +113,12 @@
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Yardım",
     "view": "Görünüm",
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
-    "zoomToSelection": "Seçime yakınlaş"
+    "zoomToSelection": "Seçime yakınlaş",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Tuvali temizle"
