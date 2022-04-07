@@ -3976,13 +3976,16 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.hit.element?.id ||
           pointerDownState.hit.hasHitElementInside)
       ) {
-        // Marking that click was used for dragging to check
-        // if elements should be deselected on pointerup
-        pointerDownState.drag.hasOccurred = true;
         const selectedElements = getSelectedElements(
           this.scene.getElements(),
           this.state,
         );
+        if (selectedElements.every((element) => element.locked)) {
+          return;
+        }
+        // Marking that click was used for dragging to check
+        // if elements should be deselected on pointerup
+        pointerDownState.drag.hasOccurred = true;
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
         if (selectedElements.length > 0 && !pointerDownState.withCmdOrCtrl) {
@@ -5337,9 +5340,18 @@ class App extends React.Component<AppProps, AppState> {
     const top = event.clientY - offsetTop;
 
     if (element && !this.state.selectedElementIds[element.id]) {
-      this.setState({ selectedElementIds: { [element.id]: true } }, () => {
-        this._openContextMenu({ top, left }, type);
-      });
+      this.setState(
+        selectGroupsForSelectedElements(
+          {
+            ...this.state,
+            selectedElementIds: { [element.id]: true },
+          },
+          this.scene.getElements(),
+        ),
+        () => {
+          this._openContextMenu({ top, left }, type);
+        },
+      );
     } else {
       this._openContextMenu({ top, left }, type);
     }
