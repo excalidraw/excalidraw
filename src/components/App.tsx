@@ -3436,10 +3436,6 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.y,
           );
 
-        if (pointerDownState.hit.element?.locked && !event.metaKey) {
-          pointerDownState.hit.element = null;
-        }
-
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
           if (
