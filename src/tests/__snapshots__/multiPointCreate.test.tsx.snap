@@ -17,6 +17,7 @@ Object {
     110,
   ],
   "link": null,
+  "locked": false,
   "opacity": 100,
   "points": Array [
     Array [
@@ -67,6 +68,7 @@ Object {
     110,
   ],
   "link": null,
+  "locked": false,
   "opacity": 100,
   "points": Array [
     Array [

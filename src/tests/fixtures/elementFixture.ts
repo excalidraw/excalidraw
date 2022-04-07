@@ -23,6 +23,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   boundElements: null,
   updated: 1,
   link: null,
+  locked: false,
 };
 
 export const rectangleFixture: ExcalidrawElement = {

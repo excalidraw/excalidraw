@@ -167,6 +167,7 @@ const commonProps = {
   strokeStyle: "solid",
   strokeWidth: 1,
   verticalAlign: VERTICAL_ALIGN.MIDDLE,
+  locked: false,
 } as const;
 
 const getChartDimentions = (spreadsheet: Spreadsheet) => {

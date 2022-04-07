@@ -255,7 +255,8 @@ export const getHoveredElementForBinding = (
   const hoveredElement = getElementAtPosition(
     scene.getElements(),
     (element) =>
-      isBindableElement(element) && bindingBorderTest(element, pointerCoords),
+      isBindableElement(element, false) &&
+      bindingBorderTest(element, pointerCoords),
   );
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };
@@ -456,13 +457,13 @@ export const getEligibleElementsForBinding = (
 ): SuggestedBinding[] => {
   const includedElementIds = new Set(elements.map(({ id }) => id));
   return elements.flatMap((element) =>
-    isBindingElement(element)
+    isBindingElement(element, false)
       ? (getElligibleElementsForBindingElement(
           element as NonDeleted<ExcalidrawLinearElement>,
         ).filter(
           (element) => !includedElementIds.has(element.id),
         ) as SuggestedBinding[])
-      : isBindableElement(element)
+      : isBindableElement(element, false)
       ? getElligibleElementsForBindableElementAndWhere(element).filter(
           (binding) => !includedElementIds.has(binding[0].id),
         )
@@ -508,7 +509,7 @@ const getElligibleElementsForBindableElementAndWhere = (
   return Scene.getScene(bindableElement)!
     .getElements()
     .map((element) => {
-      if (!isBindingElement(element)) {
+      if (!isBindingElement(element, false)) {
         return null;
       }
       const canBindStart = isLinearElementEligibleForNewBindingByBindable(

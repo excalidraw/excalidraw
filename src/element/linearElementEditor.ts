@@ -205,7 +205,7 @@ export class LinearElementEditor {
       );
 
       // suggest bindings for first and last point if selected
-      if (isBindingElement(element)) {
+      if (isBindingElement(element, false)) {
         const coords: { x: number; y: number }[] = [];
 
         const firstSelectedIndex = selectedPointsIndices[0];
