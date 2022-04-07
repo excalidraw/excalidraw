@@ -115,10 +115,10 @@
       "label": "Lien"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Verrouiller",
+      "unlock": "Déverrouiller",
+      "lockAll": "Tout verrouiller",
+      "unlockAll": "Tout déverouiller"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "Affichage",
     "zoomToFit": "Zoomer pour voir tous les éléments",
     "zoomToSelection": "Zoomer sur la sélection",
-    "toggleElementLock": ""
+    "toggleElementLock": "Verrouiller/déverrouiller la sélection"
   },
   "clearCanvasDialog": {
     "title": "Effacer la zone de dessin"
