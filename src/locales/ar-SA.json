@@ -113,6 +113,12 @@
       "edit": "تعديل الرابط",
       "create": "إنشاء رابط",
       "label": "رابط"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "المساعدة",
     "view": "عرض",
     "zoomToFit": "تكبير للملائمة",
-    "zoomToSelection": "تكبير للعنصر المحدد"
+    "zoomToSelection": "تكبير للعنصر المحدد",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "مسح اللوحة"
