@@ -115,10 +115,10 @@
       "label": "Ссылка"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Блокировать",
+      "unlock": "Разблокировать",
+      "lockAll": "Заблокировать все",
+      "unlockAll": "Разблокировать все"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "Просмотр",
     "zoomToFit": "Отмастштабировать, чтобы поместились все элементы",
     "zoomToSelection": "Увеличить до выделенного",
-    "toggleElementLock": ""
+    "toggleElementLock": "Заблокировать/разблокировать выделение"
   },
   "clearCanvasDialog": {
     "title": "Очистить холст"
