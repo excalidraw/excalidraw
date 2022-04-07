@@ -113,6 +113,12 @@
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Помощ",
     "view": "Преглед",
     "zoomToFit": "Приближи докато се виждат всички елементи",
-    "zoomToSelection": "Приближи селекцията"
+    "zoomToSelection": "Приближи селекцията",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
