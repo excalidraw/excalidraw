@@ -113,6 +113,12 @@
       "edit": "Redigera länk",
       "create": "Skapa länk",
       "label": "Länk"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Hjälp",
     "view": "Visa",
     "zoomToFit": "Zooma för att rymma alla element",
-    "zoomToSelection": "Zooma till markering"
+    "zoomToSelection": "Zooma till markering",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Rensa canvas"
