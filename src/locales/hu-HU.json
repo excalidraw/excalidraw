@@ -113,6 +113,12 @@
       "edit": "Hivatkozás szerkesztése",
       "create": "Hivatkozás létrehozása",
       "label": "Hivatkozás"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Segítség",
     "view": "Nézet",
     "zoomToFit": "Az összes elem látótérbe hozása",
-    "zoomToSelection": "Kijelölésre nagyítás"
+    "zoomToSelection": "Kijelölésre nagyítás",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Rajzvászon alaphelyzetbe"
