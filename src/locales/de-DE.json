@@ -113,6 +113,12 @@
       "edit": "Link bearbeiten",
       "create": "Link erstellen",
       "label": "Link"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Hilfe",
     "view": "Ansicht",
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
-    "zoomToSelection": "Auf Auswahl zoomen"
+    "zoomToSelection": "Auf Auswahl zoomen",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Zeichenfläche löschen"
