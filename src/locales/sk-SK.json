@@ -113,6 +113,12 @@
       "edit": "Upraviť odkaz",
       "create": "Vytvoriť odkaz",
       "label": "Odkaz"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Pomocník",
     "view": "Zobrazenie",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
-    "zoomToSelection": "Priblížiť na výber"
+    "zoomToSelection": "Priblížiť na výber",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Vyčistiť plátno"
