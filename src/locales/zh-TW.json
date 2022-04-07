@@ -115,10 +115,10 @@
       "label": "連結"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "鎖定",
+      "unlock": "解鎖",
+      "lockAll": "全部鎖定",
+      "unlockAll": "全部解鎖"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "檢視",
     "zoomToFit": "放大至填滿畫面",
     "zoomToSelection": "縮放至選取區",
-    "toggleElementLock": ""
+    "toggleElementLock": "鎖定/解鎖已選的項目"
   },
   "clearCanvasDialog": {
     "title": "清除畫布"
