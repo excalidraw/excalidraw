@@ -113,6 +113,12 @@
       "edit": "Modificar lo ligam",
       "create": "Crear un ligam",
       "label": "Ligam"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Ajuda",
     "view": "Vista",
     "zoomToFit": "Zoomar per veire totes los elements",
-    "zoomToSelection": "Zoomar la seleccion"
+    "zoomToSelection": "Zoomar la seleccion",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Escafar canabàs"
