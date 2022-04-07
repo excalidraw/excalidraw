@@ -113,6 +113,12 @@
       "edit": "Редагування посилання",
       "create": "Створити посилання",
       "label": "Посилання"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Допомога",
     "view": "Вигляд",
     "zoomToFit": "Збільшити щоб умістити всі елементи",
-    "zoomToSelection": "Наблизити вибране"
+    "zoomToSelection": "Наблизити вибране",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Очистити полотно"
