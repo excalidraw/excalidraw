@@ -113,6 +113,12 @@
       "edit": "Muokkaa linkkiä",
       "create": "Luo linkki",
       "label": "Linkki"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Ohjeet",
     "view": "Näkymä",
     "zoomToFit": "Näytä kaikki elementit",
-    "zoomToSelection": "Näytä valinta"
+    "zoomToSelection": "Näytä valinta",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Pyyhi piirtoalue"
