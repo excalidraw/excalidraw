@@ -113,6 +113,12 @@
       "edit": "Editatu esteka",
       "create": "Sortu esteka",
       "label": "Esteka"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Laguntza",
     "view": "Bistaratu",
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
-    "zoomToSelection": "Zooma hautapenera"
+    "zoomToSelection": "Zooma hautapenera",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Garbitu oihala"
