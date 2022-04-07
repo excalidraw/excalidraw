@@ -115,10 +115,10 @@
       "label": "URL"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Blocare",
+      "unlock": "Deblocare",
+      "lockAll": "Blocare toate",
+      "unlockAll": "Deblocare toate"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "Vizualizare",
     "zoomToFit": "Transfocare pentru a cuprinde totul",
     "zoomToSelection": "Transfocare la selecție",
-    "toggleElementLock": ""
+    "toggleElementLock": "Blocare/deblocare selecție"
   },
   "clearCanvasDialog": {
     "title": "Ștergere pânză"
