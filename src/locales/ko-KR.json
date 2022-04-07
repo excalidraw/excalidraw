@@ -113,6 +113,12 @@
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "도움말",
     "view": "보기",
     "zoomToFit": "모든 요소가 보이도록 확대/축소",
-    "zoomToSelection": "선택 영역으로 확대/축소"
+    "zoomToSelection": "선택 영역으로 확대/축소",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "캔버스 지우기"
