@@ -113,6 +113,12 @@
       "edit": "Редактировать ссылку",
       "create": "Создать ссылку",
       "label": "Ссылка"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "Помощь",
     "view": "Просмотр",
     "zoomToFit": "Отмастштабировать, чтобы поместились все элементы",
-    "zoomToSelection": "Увеличить до выделенного"
+    "zoomToSelection": "Увеличить до выделенного",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Очистить холст"
