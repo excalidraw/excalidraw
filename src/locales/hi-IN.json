@@ -113,6 +113,12 @@
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -292,7 +298,8 @@
     "title": "मदद",
     "view": "दृश्य",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
-    "zoomToSelection": "चयन तक ज़ूम करे"
+    "zoomToSelection": "चयन तक ज़ूम करे",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
