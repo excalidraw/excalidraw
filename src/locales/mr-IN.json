@@ -99,20 +99,20 @@
     "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
-    "share": "",
-    "showStroke": "",
-    "showBackground": "",
-    "toggleTheme": "",
-    "personalLib": "",
-    "excalidrawLib": "",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
-    "unbindText": "",
+    "share": "सामायिक करा",
+    "showStroke": "रेघ रंग निवड यंत्र दाखवा",
+    "showBackground": "पार्श्वभूमि: रंग निवड यंत्र दाखवा",
+    "toggleTheme": "शैली बदला",
+    "personalLib": "वैयक्तिक संग्रह",
+    "excalidrawLib": "एक्सकेलीड्रॉ संग्रह",
+    "decreaseFontSize": "अक्षर आकार छोटा करा",
+    "increaseFontSize": "अक्षर आकार मोठा करा",
+    "unbindText": "लेखन संबंध संपवा",
     "bindText": "शब्द समूह ला पात्रात घ्या",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "दुवा संपादन",
+      "create": "दुवा तयार करा",
+      "label": "दुवा"
     },
     "elementLock": {
       "lock": "कुलूपात ठेवा",
@@ -122,7 +122,7 @@
     }
   },
   "buttons": {
-    "clearReset": "",
+    "clearReset": "पटल पुसा",
     "exportJSON": "",
     "exportImage": "",
     "export": "",
