@@ -116,9 +116,9 @@
     },
     "elementLock": {
       "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "unlock": "ताले से बाहर",
+      "lockAll": "सब ताले के अंदर रखे",
+      "unlockAll": "सब ताले के बाहर निकाले"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "दृश्य",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
     "zoomToSelection": "चयन तक ज़ूम करे",
-    "toggleElementLock": ""
+    "toggleElementLock": "ताले के अंदर/बाहर चुनाव"
   },
   "clearCanvasDialog": {
     "title": ""
