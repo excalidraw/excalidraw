@@ -228,7 +228,7 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": "",
+    "publishLibrary": "तुम्हीं आपला खाजगि संग्रह प्रकाशित करा",
     "bindTextToElement": "मजकूर जोडण्यासाठी एंटर दाबा",
     "deepBoxSelect": "",
     "eraserRevert": "खोडण्या साठी घेतलेल्या वस्तु ना घेण्या साठी Alt दाबून ठेवावे"
@@ -246,14 +246,14 @@
     "clearCanvasCaveat": " त्यामुळे केलेल्या कामाचे नुकसान होईल ",
     "trackedToSentry_pre": "त्रुटि क्रमांक के साथ त्रुटि ",
     "trackedToSentry_post": " आमच्या प्रणाली नी निरीक्षण केले होते.",
-    "openIssueMessage_pre": "",
+    "openIssueMessage_pre": "त्रुटीत तुमची दृश्य माहिती समाविष्ट न करण्यासाठी आम्ही खूप सावध होतो. तुमचा सीन खाजगी नसल्यास, कृपया आम्हाला पुढ च्या कारवाई साठी सम्पर्क साधा ",
     "openIssueMessage_button": "त्रुटि व्यवस्थापन.",
     "openIssueMessage_post": " कृपया गिटहब समस्येमध्ये कॉपी आणि पेस्ट करून खालिल माहिती समाविष्ट करा.",
-    "sceneContent": ""
+    "sceneContent": "दृश्य विषय:"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "तुम्‍ही तुमच्‍या सध्‍याच्‍या दृश्यासाठी लोकांना आपल्‍यासह सहयोग करण्‍यासाठी आमंत्रित करू शकता.",
+    "desc_privacy": "काळजी करू नका, सत्र या टोकापासून त्या टोकापर्यंत कूटबद्धता वापरते, त्यामुळे तुम्ही जे काही काढाल ते खाजगी राहील. तुम्ही काय घेऊन आला आहात हे आमचा सर्व्हर ही देखील पाहू शकत नाही.",
     "button_startSession": "सत्र सुरु करा",
     "button_stopSession": "सत्र थाम्बवा",
     "desc_inProgressIntro": "थेट सहयोग सत्र चालू आहे.",
