@@ -9,7 +9,7 @@
     "copy": "拷贝",
     "copyAsPng": "复制为 PNG 到剪贴板",
     "copyAsSvg": "复制为 SVG 到剪贴板",
-    "copyText": "",
+    "copyText": "复制文本到剪贴板",
     "bringForward": "上移一层",
     "sendToBack": "置于底层",
     "bringToFront": "置于顶层",
@@ -77,8 +77,8 @@
     "name": "名字",
     "yourName": "您的姓名",
     "madeWithExcalidraw": "使用 Excalidraw 创建",
-    "group": "组选",
-    "ungroup": "取消组选",
+    "group": "编组",
+    "ungroup": "解除编组",
     "collaborators": "协作者",
     "showGrid": "显示网格",
     "addToLibrary": "添加到素材库中",
@@ -115,10 +115,10 @@
       "label": "链接"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "锁定",
+      "unlock": "解锁​​​​",
+      "lockAll": "全部锁定",
+      "unlockAll": "全部解锁"
     }
   },
   "buttons": {
@@ -167,7 +167,7 @@
     "couldNotLoadInvalidFile": "无法加载无效的文件",
     "importBackendFailed": "从后端导入失败。",
     "cannotExportEmptyCanvas": "无法导出空白画布。",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "无法复制到剪贴板。",
     "decryptFailed": "无法解密数据。",
     "uploadedSecurly": "上传已被端到端加密保护，这意味着 Excalidraw 的服务器和第三方都无法读取内容。",
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
@@ -299,7 +299,7 @@
     "view": "视图",
     "zoomToFit": "缩放以适应所有元素",
     "zoomToSelection": "缩放到选区",
-    "toggleElementLock": ""
+    "toggleElementLock": "锁定/解锁"
   },
   "clearCanvasDialog": {
     "title": "清除画布"
