@@ -115,10 +115,10 @@
       "label": "Tautan"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Kunci",
+      "unlock": "Lepas",
+      "lockAll": "Kunci semua",
+      "unlockAll": "Lepas semua"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "Tampilan",
     "zoomToFit": "Perbesar agar sesuai dengan semua elemen",
     "zoomToSelection": "Perbesar ke seleksi",
-    "toggleElementLock": ""
+    "toggleElementLock": "Kunci/lepas seleksi"
   },
   "clearCanvasDialog": {
     "title": "Hapus kanvas"
