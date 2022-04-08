@@ -332,24 +332,24 @@
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "मार्गदर्शक तत्त्वे",
       "post": ""
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
+      "link": "एम-आइ-टी परवाना, ",
       "post": ""
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "प्रतैक संग्रहाचे नाव, नीट शोधनासाठी, असणे आवश्यक आहे. खाली दिलेल्या वस्तु समाविष्ट केल्या जातील:",
+    "atleastOneLibItem": "सुरु करण्यासाठी, कृपया करून, कमित कमी एक वस्तु तरी निवडा"
   },
   "publishSuccessDialog": {
     "title": "संग्रह जमा केला",
-    "content": "",
-    "link": ""
+    "content": "धन्यवाद {{authorName}}. आपला संग्रह पुनरावलोकना साठी जमा झाला आहे. तुम्हीं स्थिति सारखी तपासू सकता",
+    "link": "इकडे"
   },
   "confirmDialog": {
-    "resetLibrary": "",
+    "resetLibrary": "संग्रह पुनर्स्थित करा",
     "removeItemsFromLib": ""
   },
   "encrypted": {
