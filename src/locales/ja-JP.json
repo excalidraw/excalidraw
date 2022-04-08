@@ -115,10 +115,10 @@
       "label": "リンク"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "ロック",
+      "unlock": "ロック解除",
+      "lockAll": "すべてロック",
+      "unlockAll": "すべてのロックを解除"
     }
   },
   "buttons": {
