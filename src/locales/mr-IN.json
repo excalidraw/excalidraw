@@ -157,8 +157,8 @@
     "clear": "स्वछ",
     "remove": "हटवा",
     "publishLibrary": "प्रकाशित करा",
-    "submit": "",
-    "confirm": ""
+    "submit": "जमा करा",
+    "confirm": "पुष्टि करा"
   },
   "alerts": {
     "clearReset": "",
@@ -265,23 +265,23 @@
     "title": ""
   },
   "exportDialog": {
-    "disk_title": "",
+    "disk_title": "डिस्क मधे जतन करा",
     "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
+    "disk_button": "फ़ाइल मधे जतन करा",
+    "link_title": "सामायिके साठी दुवा",
     "link_details": "",
-    "link_button": "",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
-    "excalidrawplus_exportError": ""
+    "link_button": "दुवा स्वरूपे बाहेर ठेवा",
+    "excalidrawplus_description": "दृश्य तुमच्या एक्सकेलीड्रॉ कार्यक्षेत्र मधे जतन करा.",
+    "excalidrawplus_button": "बाहेर ठेवा",
+    "excalidrawplus_exportError": "एक्सकेलीड्रॉ मधे बाहेर ठेवता नाही येत..."
   },
   "helpDialog": {
-    "blog": "",
-    "click": "",
+    "blog": "आमचा ब्लॉग वाचा",
+    "click": "क्लिक करा",
     "deepSelect": "",
     "deepBoxSelect": "",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "curvedArrow": "वक्र बाण",
+    "curvedLine": "वक्र रेघ",
     "documentation": "",
     "doubleClick": "",
     "drag": "",
