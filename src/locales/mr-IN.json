@@ -117,7 +117,7 @@
     "elementLock": {
       "lock": "",
       "unlock": "",
-      "lockAll": "",
+      "lockAll": "सब ताले के अंदर रखें",
       "unlockAll": ""
     }
   },
