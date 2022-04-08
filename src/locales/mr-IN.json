@@ -245,10 +245,10 @@
     "clearCanvasMessage_button": "पटल स्वच्छ करित आहे.",
     "clearCanvasCaveat": " त्यामुळे केलेल्या कामाचे नुकसान होईल ",
     "trackedToSentry_pre": "त्रुटि क्रमांक के साथ त्रुटि ",
-    "trackedToSentry_post": "",
+    "trackedToSentry_post": " आमच्या प्रणाली नी निरीक्षण केले होते.",
     "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "openIssueMessage_button": "त्रुटि व्यवस्थापन.",
+    "openIssueMessage_post": " कृपया गिटहब समस्येमध्ये कॉपी आणि पेस्ट करून खालिल माहिती समाविष्ट करा.",
     "sceneContent": ""
   },
   "roomDialog": {
@@ -258,7 +258,7 @@
     "button_stopSession": "सत्र थाम्बवा",
     "desc_inProgressIntro": "थेट सहयोग सत्र चालू आहे.",
     "desc_shareLink": "तुम्ही ज्यांच्याशी सहयोग करू इच्छिता त्यांच्याशी ही दुवा सामायिक करा:",
-    "desc_exitSession": "",
+    "desc_exitSession": "सत्र थांबवल्याने तुम्हीं खोली तून बाहेर याल, तरिही तुम्ही स्थानिक पातळीवर दृश्यासह काम करु शकाल. लक्षात ठेवा की याचा इतर लोकांवर परिणाम होणार नाही आणि ते त्यांच्या आवृत्तीवर सहयोग करित राहातील.",
     "shareTitle": "एक्सकेलीड्रॉ वर थेट सहयोग सत्रात सामील व्हा"
   },
   "errorDialog": {
@@ -266,10 +266,10 @@
   },
   "exportDialog": {
     "disk_title": "डिस्क मधे जतन करा",
-    "disk_details": "",
+    "disk_details": "सीन डेटा बाहेर एक फ़ाइल मधे जतन करा, त्या फ़ाइल मधुम तो डेटा नंतर परत आणु शकता.",
     "disk_button": "फ़ाइल मधे जतन करा",
     "link_title": "सामायिके साठी दुवा",
-    "link_details": "",
+    "link_details": "नुसतं वाचु देणारा दुवा चा स्वरूपे बाहेर ठेवा.",
     "link_button": "दुवा स्वरूपे बाहेर ठेवा",
     "excalidrawplus_description": "दृश्य तुमच्या एक्सकेलीड्रॉ कार्यक्षेत्र मधे जतन करा.",
     "excalidrawplus_button": "बाहेर ठेवा",
@@ -279,7 +279,7 @@
     "blog": "आमचा ब्लॉग वाचा",
     "click": "क्लिक करा",
     "deepSelect": "खोल निवड",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "चौकट मधे खोल निवड करा आणि बाहेर ओढणे वाचवा",
     "curvedArrow": "वक्र बाण",
     "curvedLine": "वक्र रेघ",
     "documentation": "कागदपत्रे",
