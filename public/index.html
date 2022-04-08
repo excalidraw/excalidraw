@@ -79,6 +79,20 @@
     />
 
     <link rel="stylesheet" href="fonts.css" type="text/css" />
+    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD === "true") { %>
+      <script>
+        {
+          const _WebSocket = window.WebSocket;
+          window.WebSocket = function (url) {
+            if (/ws:\/\/localhost:.+?\/sockjs-node/.test(url)) {
+              console.info("[!!!] Live reload is disabled via process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD [!!!]");
+            } else {
+              return new _WebSocket(url);
+            }
+          };
+        }
+      </script>
+    <% } %>
     <script>
       window.EXCALIDRAW_ASSET_PATH = "/";
       // setting this so that libraries installation reuses this window tab.

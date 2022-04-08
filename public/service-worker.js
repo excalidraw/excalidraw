@@ -17,11 +17,23 @@
  * See https://goo.gl/2aRDsh
  */
 
-importScripts("/workbox/workbox-sw.js");
+// in dev, `process` is undefined because this file is not compiled until build
+const IS_DEVELOPMENT =
+  typeof process === "undefined" || process.env.NODE_ENV !== "production";
 
-workbox.setConfig({
-  modulePathPrefix: "/workbox/",
-});
+if (IS_DEVELOPMENT) {
+  importScripts(
+    "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js",
+  );
+  workbox.setConfig({
+    debug: false,
+  });
+} else {
+  importScripts("/workbox/workbox-sw.js");
+  workbox.setConfig({
+    modulePathPrefix: "/workbox/",
+  });
+}
 
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
@@ -30,14 +42,17 @@ self.addEventListener("message", (event) => {
 });
 
 workbox.core.clientsClaim();
-workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
 
-workbox.routing.registerNavigationRoute(
-  workbox.precaching.getCacheKeyForURL("./index.html"),
-  {
-    blacklist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
-  },
-);
+if (!IS_DEVELOPMENT) {
+  workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
+
+  workbox.routing.registerNavigationRoute(
+    workbox.precaching.getCacheKeyForURL("./index.html"),
+    {
+      blacklist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
+    },
+  );
+}
 
 // Cache relevant font files
 workbox.routing.registerRoute(
