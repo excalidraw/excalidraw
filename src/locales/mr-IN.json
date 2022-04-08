@@ -184,10 +184,10 @@
     "invalidEncryptionKey": ""
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
+    "unsupportedFileType": "असमर्थित फ़ाइल प्रकार.",
+    "imageInsertError": "प्रतिमा शिरवता येत नाही. पुनः प्रयत्न करा...",
+    "fileTooBig": "फ़ाइल फार मोठी आहे. कमाल अनुमत आकार {{maxSize}} आहे.",
+    "svgImageInsertError": "एस-वी-जी प्रतिमा शिरवू शकलो नाही. एस-वी-जी मार्क-अप यंत्र अयोग्य आहे.",
     "invalidSVGString": "अयोग्य एस-वी-जी.",
     "cannotResolveCollabServer": "कॉलेब सर्वर कनेक्ट होत नाही आहे. पाना ला परत आणन्याचा प्रयत्न करावे."
   },
@@ -202,8 +202,8 @@
     "freedraw": "रेखांकित करा",
     "text": "टेक्स्ट",
     "library": "संग्रह",
-    "lock": "",
-    "penMode": "",
+    "lock": "निवडलेले यंत्र चित्रकरण झाल्या नंतर ही सक्रिय ठेवा",
+    "penMode": "पिंच-झूम प्रतिबंधित करा आणि फक्त पेन हे यंत्र मुक्त चित्री करण साठी स्वीकारा",
     "link": "",
     "eraser": "खोड रबर"
   },
