@@ -92,12 +92,12 @@
     "alignLeft": "डावा बाजूला संरेखित करा",
     "alignRight": "उजव्या बाजूला संरेखित करा",
     "centerVertically": "मधल्या मधे उभं संरेखित करा",
-    "centerHorizontally": "",
-    "distributeHorizontally": "",
-    "distributeVertically": "",
-    "flipHorizontal": "",
-    "flipVertical": "",
-    "viewMode": "",
+    "centerHorizontally": "मधल्या मधे आडवं संरेखित करा",
+    "distributeHorizontally": "आडवं वितरित करा",
+    "distributeVertically": "उभं वितरित करा",
+    "flipHorizontal": "आडवं फ्लिप करा",
+    "flipVertical": "उभं फ्लिप करा",
+    "viewMode": "पहायची पद्धत",
     "toggleExportColorScheme": "",
     "share": "सामायिक करा",
     "showStroke": "रेघ रंग निवड यंत्र दाखवा",
@@ -208,13 +208,13 @@
     "eraser": "खोड रबर"
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
-    "shapes": ""
+    "canvasActions": "पटल क्रिया",
+    "selectedShapeActions": "निवडित आकार क्रिया",
+    "shapes": "आकार"
   },
   "hints": {
     "canvasPanning": "",
-    "linearElement": "",
+    "linearElement": "ठिपक्या ठिपक्या साठी क्लिक करा, रेघे साठी ड्रैग करा",
     "freeDraw": "",
     "text": "",
     "text_selected": "",
