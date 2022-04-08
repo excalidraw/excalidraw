@@ -230,18 +230,18 @@
     "placeImage": "",
     "publishLibrary": "तुम्हीं आपला खाजगि संग्रह प्रकाशित करा",
     "bindTextToElement": "मजकूर जोडण्यासाठी एंटर दाबा",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "खोल निवड ह्या साठी CtrlOrCmd दाबून ठेवा, आणि बाहेर खेचणे वाचवण्या साठी पण",
     "eraserRevert": "खोडण्या साठी घेतलेल्या वस्तु ना घेण्या साठी Alt दाबून ठेवावे"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन दाखवू शकत नाही",
     "canvasTooBig": "पटल खूप जास्त मोठा असू शकतो.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "टीप: दूर चा तत्व थोडं जवळ आणण्याचा प्रयत्न करावा."
   },
   "errorSplash": {
     "headingMain_pre": "त्रुटि आली. परत प्रयत्न करा ",
     "headingMain_button": "ह्या पानाला पुनः लोड करा.",
-    "clearCanvasMessage": "",
+    "clearCanvasMessage": "रीलोडिंग होत नसल्यास, परत प्रयत्न करा ",
     "clearCanvasMessage_button": "पटल स्वच्छ करित आहे.",
     "clearCanvasCaveat": " त्यामुळे केलेल्या कामाचे नुकसान होईल ",
     "trackedToSentry_pre": "त्रुटि क्रमांक के साथ त्रुटि ",
