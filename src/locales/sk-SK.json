@@ -9,7 +9,7 @@
     "copy": "Kopírovať",
     "copyAsPng": "Kopírovať do schránky ako PNG",
     "copyAsSvg": "Kopírovať do schránky ako SVG",
-    "copyText": "",
+    "copyText": "Kopírovať do schránky ako text",
     "bringForward": "Presunúť o úroveň dopredu",
     "sendToBack": "Presunúť dozadu",
     "bringToFront": "Presunúť dopredu",
@@ -115,10 +115,10 @@
       "label": "Odkaz"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Zamknúť",
+      "unlock": "Odomknúť",
+      "lockAll": "Zamknúť všetko",
+      "unlockAll": "Odomknúť všetko"
     }
   },
   "buttons": {
@@ -167,7 +167,7 @@
     "couldNotLoadInvalidFile": "Nepodarilo sa načítať nevalidný súbor",
     "importBackendFailed": "Nepdarilo sa importovanie zo serveru.",
     "cannotExportEmptyCanvas": "Nie je možné exportovať prázdne plátno.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Kopírovanie do schránky sa nepodarilo.",
     "decryptFailed": "Nepodarilo sa rozšifrovať údaje.",
     "uploadedSecurly": "Nahratie je zabezpečené end-to-end šifrovaním, takže Excalidraw server a tretie strany nedokážu prečítať jeho obsah.",
     "loadSceneOverridePrompt": "Nahratie externej kresby nahradí existujúci obsah. Prajete si pokračovať?",
