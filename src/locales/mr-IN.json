@@ -254,12 +254,12 @@
   "roomDialog": {
     "desc_intro": "",
     "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
-    "desc_inProgressIntro": "",
-    "desc_shareLink": "",
+    "button_startSession": "सत्र सुरु करा",
+    "button_stopSession": "सत्र थाम्बवा",
+    "desc_inProgressIntro": "थेट सहयोग सत्र चालू आहे.",
+    "desc_shareLink": "तुम्ही ज्यांच्याशी सहयोग करू इच्छिता त्यांच्याशी ही दुवा सामायिक करा:",
     "desc_exitSession": "",
-    "shareTitle": ""
+    "shareTitle": "एक्सकेलीड्रॉ वर थेट सहयोग सत्रात सामील व्हा"
   },
   "errorDialog": {
     "title": "त्रुटि"
@@ -286,11 +286,11 @@
     "doubleClick": "दुहेरी क्लिक",
     "drag": "ओढा",
     "editor": "संपादक",
-    "editSelectedShape": "",
-    "github": "",
+    "editSelectedShape": "निवडलेला प्रकार संपादित करा (मजकूर/बाण/रेघ)",
+    "github": "समस्या मिळाली? प्रस्तुत करा",
     "howto": "आमच्या मार्गदर्शकाचे अनुसरण करा",
     "or": "किंवा",
-    "preventBinding": "",
+    "preventBinding": "बाण बंधन होणं टाळा",
     "tools": "अवजार",
     "shortcuts": "कीबोर्ड शॉर्टकट",
     "textFinish": "संपादन संपले (मजकूर संपादन)",
