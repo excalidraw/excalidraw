@@ -220,8 +220,8 @@
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
+    "lockAngle": "शिफ्ट धरून तुम्ही कोन मर्यादित करू शकता",
+    "resize": "आकार छोटा मोठा करताना SHIFT धरून तुम्ही प्रमाण मर्यादित करू शकता, \nकेंद्रापासून आकार छोटा मोठा करण्यासाठी ALT धरून ठेवा",
     "resizeImage": "",
     "rotate": "",
     "lineEditor_info": "",
@@ -229,17 +229,17 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
-    "bindTextToElement": "",
+    "bindTextToElement": "मजकूर जोडण्यासाठी एंटर दाबा",
     "deepBoxSelect": "",
     "eraserRevert": "खोडण्या साठी घेतलेल्या वस्तु ना घेण्या साठी Alt दाबून ठेवावे"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
+    "cannotShowPreview": "पूर्वावलोकन दाखवू शकत नाही",
+    "canvasTooBig": "पटल खूप जास्त मोठा असू शकतो.",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
-    "headingMain_pre": "",
+    "headingMain_pre": "त्रुटि आली. परत प्रयत्न करा ",
     "headingMain_button": "",
     "clearCanvasMessage": "",
     "clearCanvasMessage_button": "",
@@ -296,9 +296,9 @@
     "textFinish": "",
     "textNewLine": "",
     "title": "",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": "",
+    "view": "दृश्य",
+    "zoomToFit": "सर्व तत्व दिसतील असे दृश्यरूप आकार करा",
+    "zoomToSelection": "निवडी प्रयंत दृश्यरूप आकार करा",
     "toggleElementLock": "कुलूपातून आत/बाहेर निवड"
   },
   "clearCanvasDialog": {
@@ -326,12 +326,12 @@
       "website": "वैध यू-आर-एल द्या"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "समाविष्ट करण्या साठी तुमचा संग्रह ह्याचात जमा करा ",
+      "link": "सार्वजनिक संग्रहाचे कोठार",
+      "post": "इतर लोकांना त्यांच्या रेखाचित्रांमधे वापरण्यासाठी."
     },
     "noteGuidelines": {
-      "pre": "",
+      "pre": "संग्रहाला आधी स्वहस्ते स्वीकृती मिळणे आवश्यक आहे. कृपया हे वाचा ",
       "link": "मार्गदर्शक तत्त्वे",
       "post": " जमा करण्या पूर्वी, तुमच्या जवळ एक गिटहब खाते असणे आवश्यक आहे जे संवादा साठी आणिक बदल करण्या साठी लागेल, तरी हे सर्व अगदी आवश्यक नाही आहे."
     },
@@ -377,7 +377,7 @@
     "copyToClipboard": "फळी वर कॉपी झाली.",
     "copyToClipboardAsPng": "{{exportSelection}} फळी वर पी-एन-जी स्वरूपात कॉपी झाली\n({{exportColorScheme}})",
     "fileSaved": "फ़ाइल जतन झाली.",
-    "fileSavedToFilename": "",
+    "fileSavedToFilename": "{filename} मधे जतन झाली",
     "canvas": "पटल",
     "selection": "निवड"
   },
