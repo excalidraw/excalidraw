@@ -262,7 +262,7 @@
     "shareTitle": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "त्रुटि"
   },
   "exportDialog": {
     "disk_title": "डिस्क मधे जतन करा",
@@ -283,19 +283,19 @@
     "curvedArrow": "वक्र बाण",
     "curvedLine": "वक्र रेघ",
     "documentation": "कागदपत्रे",
-    "doubleClick": "",
-    "drag": "",
-    "editor": "",
+    "doubleClick": "दुहेरी क्लिक",
+    "drag": "ओढा",
+    "editor": "संपादक",
     "editSelectedShape": "",
     "github": "",
-    "howto": "",
-    "or": "",
+    "howto": "आमच्या मार्गदर्शकाचे अनुसरण करा",
+    "or": "किंवा",
     "preventBinding": "",
     "tools": "अवजार",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
+    "shortcuts": "कीबोर्ड शॉर्टकट",
+    "textFinish": "संपादन संपले (मजकूर संपादन)",
+    "textNewLine": "नवी ओळ जोडा (मजकूर संपादक)",
+    "title": "मदत",
     "view": "दृश्य",
     "zoomToFit": "सर्व तत्व दिसतील असे दृश्यरूप आकार करा",
     "zoomToSelection": "निवडी प्रयंत दृश्यरूप आकार करा",
