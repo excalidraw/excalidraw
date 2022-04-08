@@ -302,12 +302,12 @@
     "toggleElementLock": "कुलूपातून आत/बाहेर निवड"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "पटल स्वच्छ करा"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
+    "title": "संग्रह प्रकाशित करा",
+    "itemName": "वस्तु चे नाव",
+    "authorName": "लेखक चे नाव",
     "githubUsername": "गिटहब वापरकर्तानाव",
     "twitterUsername": "ट्विटर वापरकर्तानाव",
     "libraryName": "संग्रहाचे नाव",
@@ -318,11 +318,11 @@
       "libraryName": "तुमचा संग्रहाचे नाव",
       "libraryDesc": "तुमचा संग्रहाचे वर्णन लोकांना संग्रहा बद्दल जाणकारी देतील",
       "githubHandle": "गिटहब हैंडल (वैकल्पिक), एकदा संग्रह पुनरावलोकना साठी जमा केल्या नंतर ही तुम्हीं सम्पादित करु शकता",
-      "twitterHandle": "",
+      "twitterHandle": "ट्विटर वापरकार्यक नाव (वैकल्पिक), त्यामुळे ट्विटर वर ज़हीरांति साठी कोणाला गुण द्यायचे हे आम्हाला समजेल",
       "website": ""
     },
     "errors": {
-      "required": "",
+      "required": "आवश्यक आहे",
       "website": ""
     },
     "noteDescription": {
@@ -344,7 +344,7 @@
     "atleastOneLibItem": ""
   },
   "publishSuccessDialog": {
-    "title": "",
+    "title": "संग्रह जमा केला",
     "content": "",
     "link": ""
   },
