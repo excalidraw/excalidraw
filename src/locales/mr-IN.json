@@ -163,7 +163,7 @@
   "alerts": {
     "clearReset": "पटल स्वच्छ होणार, तुम्हाला खात्री आहे का?",
     "couldNotCreateShareableLink": "सामायी करण करण्या योग्य दुवा नाही बनवता आला.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "सामायी करण करण्या योग्य दुवा नाही बनवता आला: दृश्य फार मोठं आहे",
     "couldNotLoadInvalidFile": "अवैध फ़ाइल लोड करता आली नाही",
     "importBackendFailed": "बैकएंड हून मागवणे विफल झाले.",
     "cannotExportEmptyCanvas": "रिकामा पटल जतन करता येत नाही.",
@@ -177,10 +177,10 @@
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "",
     "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": "",
+    "cannotRestoreFromImage": "प्रतिमा फ़ाइल पासून दृश्य पुनः रचित नाही झाला",
     "invalidSceneUrl": "",
-    "resetLibrary": "",
-    "removeItemsFromsLibrary": "",
+    "resetLibrary": "पटल स्वच्छ होणार, तुम्हाला खात्री आहे का?",
+    "removeItemsFromsLibrary": "संग्रहातून {{count}} तत्व (एक किव्हा अनेक) काढू?",
     "invalidEncryptionKey": ""
   },
   "errors": {
