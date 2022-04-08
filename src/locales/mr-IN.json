@@ -115,10 +115,10 @@
       "label": ""
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "सब ताले के अंदर रखें",
-      "unlockAll": ""
+      "lock": "कुलुपात ठेवा",
+      "unlock": "कुलपातून बाहेर",
+      "lockAll": "सर्व कुलूपात ठेवा",
+      "unlockAll": "सर्व कुलूपातून बाहेर"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": "",
-    "toggleElementLock": ""
+    "toggleElementLock": "कुलूपातून आत/बाहेर निवड"
   },
   "clearCanvasDialog": {
     "title": ""
