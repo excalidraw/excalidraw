@@ -123,8 +123,8 @@
   },
   "buttons": {
     "clearReset": "पटल पुसा",
-    "exportJSON": "",
-    "exportImage": "",
+    "exportJSON": "फ़ाइलमधे बाहेर ठेवा",
+    "exportImage": "प्रतिमेस्वरूप जतन करा",
     "export": "",
     "exportToPng": "",
     "exportToSvg": "",
