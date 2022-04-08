@@ -26,7 +26,7 @@ if (IS_DEVELOPMENT) {
     "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js",
   );
   workbox.setConfig({
-    debug: false,
+    debug: true,
   });
 } else {
   importScripts("/workbox/workbox-sw.js");
