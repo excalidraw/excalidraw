@@ -313,7 +313,12 @@ const getCacheKey = (
 
 const metricsCache = {} as {
   [key: string]: {
-    outputMetrics: Array<{ width: number; height: number; baseline: number }>[];
+    outputMetrics: Array<{
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }>[];
     lineMetrics: Array<{ width: number; height: number; baseline: number }>;
     imageMetrics: { width: number; height: number; baseline: number };
   };
@@ -322,6 +327,8 @@ const metricsCache = {} as {
 const measureHTML = (
   text: string,
   font: FontString,
+  mathOpts: MathOpts,
+  isMathJaxLoaded: boolean,
   maxWidth?: number | null,
 ) => {
   const container = document.createElement("div");
@@ -356,29 +363,45 @@ const measureHTML = (
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
 
-  // Compute for each SVG child element of line (the last
+  const containerRect = container.getBoundingClientRect();
+  // Compute for each SVG or Text child node of line (the last
   // child is the span element for the baseline).
-  const childOffsets = [];
-  for (let i = 0; i < container.children.length - 1; i++) {
-    // The mji-container element
-    const child = container.children[i] as HTMLElement;
-    // The svg element
-    const grandchild = child.firstChild as HTMLElement;
-    // How far the svg element is offset from the top of the rendered text
-    const childOffsetHeight =
-      container.getBoundingClientRect().y -
-      grandchild.getBoundingClientRect().y;
-    childOffsets.push({
-      width: child.offsetWidth,
-      height: childOffsetHeight,
-    });
+  const childMetrics = [];
+  let nextX = 0;
+  for (let i = 0; i < container.childNodes.length - 1; i++) {
+    const childIsSvg = i % 2 === 1;
+    // The mjx-container element or the Text node
+    const child = container.childNodes[i] as HTMLElement | Text;
+    if (isMathJaxLoaded && (mathOpts.mathOnly || childIsSvg)) {
+      // The svg element
+      const grandchild = (child as HTMLElement).firstChild as HTMLElement;
+      const grandchildRect = grandchild.getBoundingClientRect();
+      childMetrics.push({
+        x: grandchildRect.x - containerRect.x,
+        y: grandchildRect.y - containerRect.y,
+        width: grandchildRect.width,
+        height: grandchildRect.height,
+      });
+      // Set the x value for the next Text node
+      nextX = grandchildRect.x + grandchildRect.width - containerRect.x;
+    } else {
+      // The Text node
+      const grandchild = child as Text;
+      const textMetrics = measureText(grandchild.data, font, maxWidth);
+      childMetrics.push({
+        x: nextX,
+        y: baseline,
+        width: textMetrics.width,
+        height: textMetrics.height,
+      });
+    }
   }
-  if (childOffsets.length === 0) {
+  if (childMetrics.length === 0) {
     // Avoid crashes in measureOutputs()
-    childOffsets.push({ width: 0, height: 0 });
+    childMetrics.push({ x: 0, y: 0, width: 0, height: 0 });
   }
   document.body.removeChild(container);
-  return { width, height, baseline, childOffsets };
+  return { width, height, baseline, childMetrics };
 };
 
 const measureOutputs = (
@@ -401,14 +424,11 @@ const measureOutputs = (
   if (isMathJaxLoaded && metricsCache[cKey]) {
     return metricsCache[cKey];
   }
-  const tCtx = document.createElement("canvas").getContext("2d");
-  if (tCtx !== null) {
-    tCtx.font = fontString;
-  }
   const outputMetrics = [] as Array<{
+    x: number;
+    y: number;
     width: number;
     height: number;
-    baseline: number;
   }>[];
   const lineMetrics = [] as Array<{
     width: number;
@@ -419,7 +439,6 @@ const measureOutputs = (
   let imageHeight = 0;
   let imageBaseline = 0;
   for (let index = 0; index < outputs.length; index++) {
-    outputMetrics.push([]);
     let html = "";
     for (let i = 0; i < outputs[index].length; i++) {
       html += outputs[index][i];
@@ -434,38 +453,18 @@ const measureOutputs = (
       width: lineWidth,
       height: lineHeight,
       baseline: lineBaseline,
-      childOffsets: lineChildOffsets,
-    } = measureHTML(html, fontString, maxWidth);
+      childMetrics: lineChildMetrics,
+    } = measureHTML(html, fontString, mathOpts, isMathJaxLoaded, maxWidth);
 
-    if (mathOpts.mathOnly) {
-      outputMetrics[index].push({
-        width: lineChildOffsets[0].width,
-        height: lineChildOffsets[0].height,
-        baseline: 0,
-      });
-    } else {
-      for (let i = 0; i < outputs[index].length; i++) {
-        if (isMathJaxLoaded && i % 2 === 1) {
-          // svg
-          outputMetrics[index].push({
-            width: lineChildOffsets[(i - 1) / 2].width,
-            height: lineChildOffsets[(i - 1) / 2].height,
-            baseline: 0,
-          });
-        } else {
-          // text
-          outputMetrics[index].push(measureText(outputs[index][i], fontString));
-        }
-      }
-    }
-    imageWidth = Math.max(imageWidth, lineWidth);
-    imageBaseline = imageHeight + lineBaseline;
-    imageHeight += lineHeight;
+    outputMetrics.push(lineChildMetrics);
     lineMetrics.push({
       width: lineWidth,
       height: lineHeight,
       baseline: lineBaseline,
     });
+    imageWidth = Math.max(imageWidth, lineWidth);
+    imageBaseline = imageHeight + lineBaseline;
+    imageHeight += lineHeight;
   }
   const imageMetrics = {
     width: imageWidth,
@@ -534,13 +533,12 @@ const createSvg = (
   let y = 0;
   for (let index = 0; index < processed.length; index++) {
     const lineMetrics = metrics.lineMetrics[index];
-    let x =
+    const x =
       textAlign === "right"
         ? imageMetrics.width - lineMetrics.width
         : textAlign === "center"
         ? (imageMetrics.width - lineMetrics.width) / 2
         : 0;
-    y += lineMetrics.height;
     const rtl = isRTL(mathLines[index]);
     for (
       let i = rtl ? processed[index].length - 1 : 0;
@@ -566,19 +564,21 @@ const createSvg = (
         text.textContent = processed[index][i];
         childNode = text;
       }
-      const childMetrics = metrics.outputMetrics[index][i];
-      childNode.setAttribute("x", `${x}`);
       // Don't offset x when we have an empty string.
-      x +=
+      const childX =
         processed[index].length > 0 && processed[index][i] === ""
           ? 0
-          : childMetrics.width;
-      const yOffset =
-        lineMetrics.height +
-        (childIsSvg ? childMetrics.height : -lineMetrics.baseline);
-      childNode.setAttribute("y", `${y - yOffset}`);
+          : metrics.outputMetrics[index][i].x;
+      childNode.setAttribute("x", `${x + childX}`);
+      // Don't offset y when we have an empty string.
+      const childY =
+        processed[index].length > 0 && processed[index][i] === ""
+          ? 0
+          : metrics.outputMetrics[index][i].y;
+      childNode.setAttribute("y", `${y + childY}`);
       node.appendChild(childNode);
     }
+    y += lineMetrics.height;
   }
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", "http://www.w3.org/2000/svg");
