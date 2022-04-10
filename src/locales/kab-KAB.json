@@ -9,7 +9,7 @@
     "copy": "Nɣel",
     "copyAsPng": "Nɣel ɣer tecfawit am PNG",
     "copyAsSvg": "Nɣel ɣer tecfawit am SVG",
-    "copyText": "",
+    "copyText": "Nɣel ɣer tecfawit am uḍris",
     "bringForward": "Awi ɣer sdat",
     "sendToBack": "Awi s agilal",
     "bringToFront": "Err ɣer deffir",
@@ -167,7 +167,7 @@
     "couldNotLoadInvalidFile": "D awezɣi asali n ufaylu armeɣtu",
     "importBackendFailed": "Takterḍ seg uɣawas n deffir ur teddi ara.",
     "cannotExportEmptyCanvas": "D awezɣi asifeḍ n teɣzut n usuneɣ tilemt.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Ulamek anɣal ɣer tecfawit.",
     "decryptFailed": "D awezɣi tukksa n uwgelhen i yisefka.",
     "uploadedSecurly": "Asili yettwasɣelles s uwgelhen ixef s ixef, ayagi yebɣa ad d-yini belli aqeddac n Excalidraw akked medden ur zmiren ara ad ɣren agbur.",
     "loadSceneOverridePrompt": "Asali n wunuɣ uffiɣ ad isemselsi agbur-inek (m) yellan. Tebɣiḍ ad tkemmeleḍ?",
@@ -299,7 +299,7 @@
     "view": "Tamuɣli",
     "zoomToFit": "Simɣur akken ad twliḍ akk iferdisen",
     "zoomToSelection": "Simɣur ɣer tefrayt",
-    "toggleElementLock": ""
+    "toggleElementLock": "Sekkeṛ/kkes asekker i tefrayt"
   },
   "clearCanvasDialog": {
     "title": "Sfeḍ taɣzut n usuneɣ"
