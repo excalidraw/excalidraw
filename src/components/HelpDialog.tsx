@@ -364,6 +364,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   ]}
                 />
                 <Shortcut
+                  label={t("helpDialog.toggleElementLock")}
+                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+L")]}
+                />
+                <Shortcut
                   label={t("buttons.undo")}
                   shortcuts={[getShortcutKey("CtrlOrCmd+Z")]}
                 />

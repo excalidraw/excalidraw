@@ -11,6 +11,7 @@ import {
   actionCopy,
   actionCopyAsPng,
   actionCopyAsSvg,
+  copyText,
   actionCopyStyles,
   actionCut,
   actionDeleteSelected,
@@ -31,6 +32,7 @@ import {
   actionUngroup,
   zoomToFitElements,
   actionLink,
+  actionToggleLock,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -1154,7 +1156,7 @@ class App extends React.Component<AppProps, AppState> {
       prevState.activeTool !== this.state.activeTool &&
       multiElement != null &&
       isBindingEnabled(this.state) &&
-      isBindingElement(multiElement)
+      isBindingElement(multiElement, false)
     ) {
       maybeBindLinearElement(
         multiElement,
@@ -1567,6 +1569,7 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
+      locked: false,
     });
 
     this.scene.replaceAllElements([
@@ -2288,12 +2291,14 @@ class App extends React.Component<AppProps, AppState> {
         of all hit elements */
       preferSelected?: boolean;
       includeBoundTextElement?: boolean;
+      includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement> | null {
     const allHitElements = this.getElementsAtPosition(
       x,
       y,
       opts?.includeBoundTextElement,
+      opts?.includeLockedElements,
     );
     if (allHitElements.length > 1) {
       if (opts?.preferSelected) {
@@ -2326,14 +2331,19 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
     includeBoundTextElement: boolean = false,
+    includeLockedElements: boolean = false,
   ): NonDeleted<ExcalidrawElement>[] {
-    const elements = includeBoundTextElement
-      ? this.scene.getElements()
-      : this.scene
-          .getElements()
-          .filter(
-            (element) => !(isTextElement(element) && element.containerId),
-          );
+    const elements =
+      includeBoundTextElement && includeLockedElements
+        ? this.scene.getElements()
+        : this.scene
+            .getElements()
+            .filter(
+              (element) =>
+                (includeLockedElements || !element.locked) &&
+                (includeBoundTextElement ||
+                  !(isTextElement(element) && element.containerId)),
+            );
 
     return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, x, y),
@@ -2375,7 +2385,7 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length === 1) {
       if (isTextElement(selectedElements[0])) {
         existingTextElement = selectedElements[0];
-      } else if (isTextBindableContainer(selectedElements[0])) {
+      } else if (isTextBindableContainer(selectedElements[0], false)) {
         container = selectedElements[0];
         existingTextElement = getBoundTextElement(container);
       }
@@ -2395,7 +2405,8 @@ class App extends React.Component<AppProps, AppState> {
         this.scene
           .getElements()
           .filter(
-            (ele) => isTextBindableContainer(ele) && !getBoundTextElement(ele),
+            (ele) =>
+              isTextBindableContainer(ele, false) && !getBoundTextElement(ele),
           ),
         sceneX,
         sceneY,
@@ -2454,6 +2465,7 @@ class App extends React.Component<AppProps, AppState> {
             : DEFAULT_VERTICAL_ALIGN,
           containerId: container?.id ?? undefined,
           groupIds: container?.groupIds ?? [],
+          locked: false,
         });
 
     this.setState({ editingElement: element });
@@ -2760,7 +2772,7 @@ class App extends React.Component<AppProps, AppState> {
       // Hovering with a selected tool or creating new linear element via click
       // and point
       const { draggingElement } = this.state;
-      if (isBindingElement(draggingElement)) {
+      if (isBindingElement(draggingElement, false)) {
         this.maybeSuggestBindingsForLinearElementAtCoords(
           draggingElement,
           [scenePointer],
@@ -2946,7 +2958,8 @@ class App extends React.Component<AppProps, AppState> {
           this.isHittingCommonBoundingBoxOfSelectedElements(
             scenePointer,
             selectedElements,
-          ))
+          )) &&
+        !hitElement?.locked
       ) {
         setCursor(this.canvas, CURSOR_TYPE.MOVE);
       } else {
@@ -2962,6 +2975,10 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     const updateElementIds = (elements: ExcalidrawElement[]) => {
       elements.forEach((element) => {
+        if (element.locked) {
+          return;
+        }
+
         idsToUpdate.push(element.id);
         if (event.altKey) {
           if (
@@ -3785,6 +3802,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemLinearStrokeSharpness,
       simulatePressure: event.pressure === 0.5,
+      locked: false,
     });
 
     this.setState((prevState) => ({
@@ -3840,6 +3858,7 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+      locked: false,
     });
 
     return element;
@@ -3927,6 +3946,7 @@ class App extends React.Component<AppProps, AppState> {
         strokeSharpness: this.state.currentItemLinearStrokeSharpness,
         startArrowhead,
         endArrowhead,
+        locked: false,
       });
       this.setState((prevState) => ({
         selectedElementIds: {
@@ -3975,6 +3995,7 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
+      locked: false,
     });
 
     if (element.type === "selection") {
@@ -4124,13 +4145,16 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.hit.element?.id ||
           pointerDownState.hit.hasHitElementInside)
       ) {
-        // Marking that click was used for dragging to check
-        // if elements should be deselected on pointerup
-        pointerDownState.drag.hasOccurred = true;
         const selectedElements = getSelectedElements(
           this.scene.getElements(),
           this.state,
         );
+        if (selectedElements.every((element) => element.locked)) {
+          return;
+        }
+        // Marking that click was used for dragging to check
+        // if elements should be deselected on pointerup
+        pointerDownState.drag.hasOccurred = true;
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
         if (selectedElements.length > 0 && !pointerDownState.withCmdOrCtrl) {
@@ -4274,7 +4298,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
 
-        if (isBindingElement(draggingElement)) {
+        if (isBindingElement(draggingElement, false)) {
           // When creating a linear element by dragging
           this.maybeSuggestBindingsForLinearElementAtCoords(
             draggingElement,
@@ -4553,7 +4577,7 @@ class App extends React.Component<AppProps, AppState> {
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
           if (
             isBindingEnabled(this.state) &&
-            isBindingElement(draggingElement)
+            isBindingElement(draggingElement, false)
           ) {
             maybeBindLinearElement(
               draggingElement,
@@ -5480,7 +5504,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const { x, y } = viewportCoordsToSceneCoords(event, this.state);
-    const element = this.getElementAtPosition(x, y, { preferSelected: true });
+    const element = this.getElementAtPosition(x, y, {
+      preferSelected: true,
+      includeLockedElements: true,
+    });
 
     const type = element ? "element" : "canvas";
 
@@ -5491,9 +5518,18 @@ class App extends React.Component<AppProps, AppState> {
     const top = event.clientY - offsetTop;
 
     if (element && !this.state.selectedElementIds[element.id]) {
-      this.setState({ selectedElementIds: { [element.id]: true } }, () => {
-        this._openContextMenu({ top, left }, type);
-      });
+      this.setState(
+        selectGroupsForSelectedElements(
+          {
+            ...this.state,
+            selectedElementIds: { [element.id]: true },
+          },
+          this.scene.getElements(),
+        ),
+        () => {
+          this._openContextMenu({ top, left }, type);
+        },
+      );
     } else {
       this._openContextMenu({ top, left }, type);
     }
@@ -5653,6 +5689,11 @@ class App extends React.Component<AppProps, AppState> {
 
     const elements = this.scene.getElements();
 
+    const selectedElements = getSelectedElements(
+      this.scene.getElements(),
+      this.state,
+    );
+
     const options: ContextMenuOption[] = [];
     if (probablySupportsClipboardBlob && elements.length > 0) {
       options.push(actionCopyAsPng);
@@ -5660,6 +5701,14 @@ class App extends React.Component<AppProps, AppState> {
 
     if (probablySupportsClipboardWriteText && elements.length > 0) {
       options.push(actionCopyAsSvg);
+    }
+
+    if (
+      type === "element" &&
+      copyText.contextItemPredicate(elements, this.state) &&
+      probablySupportsClipboardWriteText
+    ) {
+      options.push(copyText);
     }
     if (type === "canvas") {
       const viewModeOptions = [
@@ -5704,6 +5753,9 @@ class App extends React.Component<AppProps, AppState> {
             probablySupportsClipboardWriteText &&
               elements.length > 0 &&
               actionCopyAsSvg,
+            probablySupportsClipboardWriteText &&
+              selectedElements.length > 0 &&
+              copyText,
             ((probablySupportsClipboardBlob && elements.length > 0) ||
               (probablySupportsClipboardWriteText && elements.length > 0)) &&
               separator,
@@ -5776,6 +5828,8 @@ class App extends React.Component<AppProps, AppState> {
             (maybeFlipHorizontal || maybeFlipVertical) && separator,
             actionLink.contextItemPredicate(elements, this.state) && actionLink,
             actionDuplicateSelection,
+            actionToggleLock,
+            separator,
             actionDeleteSelected,
           ],
           top,

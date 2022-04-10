@@ -76,6 +76,7 @@ export {
   actionCut,
   actionCopyAsPng,
   actionCopyAsSvg,
+  copyText,
 } from "./actionClipboard";
 
 export { actionToggleGridMode } from "./actionToggleGridMode";
@@ -84,3 +85,4 @@ export { actionToggleZenMode } from "./actionToggleZenMode";
 export { actionToggleStats } from "./actionToggleStats";
 export { actionUnbindText, actionBindText } from "./actionBoundText";
 export { actionLink } from "../element/Hyperlink";
+export { actionToggleLock } from "./actionToggleLock";

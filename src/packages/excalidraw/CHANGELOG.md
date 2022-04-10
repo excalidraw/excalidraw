@@ -18,6 +18,7 @@ Please add the latest change on the top under the correct section.
 #### Refactor
 
 - Rename `appState.elementLocked` to `appState.activeTool.locked` [#4983](https://github.com/excalidraw/excalidraw/pull/4983).
+- Expose [`serializeLibraryAsJSON`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#serializeLibraryAsJSON) helper that we use when saving Excalidraw Library to a file.
 
 ##### BREAKING CHANGE
 
