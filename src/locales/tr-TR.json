@@ -322,35 +322,35 @@
       "website": "Kişisel web sayfanızı ya da başka bir yeri bağlayın (tercihe bağlı)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Gerekli",
+      "website": "Geçerli bir URL girin"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Submit your library to be included in the ",
+      "link": "genel kütüphane reposu",
+      "post": "diğer insanlar çizimlerinde kullanabilsin diye."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Önce kütüphane elle onaylanmalı. şunu okuyun ",
+      "link": "yönergeler",
+      "post": " onaylamadan önce. gerekli olması halinde iletişim kurmak için ve değişiklik için Github hesabı gerekli, ama çok da illaki olmalı değil."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Bunu onaylayarak, kütüğhanenin şu lisansla yayınlanmasını onaylıyorsunuz ",
+      "link": "MIT Lisans, ",
+      "post": "ki bu kısaca herkesin onu kısıtlama olmaksızın kullanabileceği anlamına gelmektedir."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Her kütüphane kendi ismine sahip olmalı ki tarama yapabilelim. Şu kütüphane ögeleri dahil edilecek:",
+    "atleastOneLibItem": "Lütfen başlamak için en az bir tane kütüphane ögesi seçin"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Kütüphane gönderildi",
+    "content": "Teşekkürler {{authorName}}. Kütüphaneniz gözden geçirme için alındı. Durumu takip edebilirsiniz",
+    "link": "burada"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Kütüphaneyi sıfırla",
+    "removeItemsFromLib": "Seçilen ögeleri kütüphaneden kaldır"
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez.",
@@ -372,7 +372,7 @@
     "width": "Genişlik"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Kütüphaneye eklendi",
     "copyStyles": "Stiller kopyalandı.",
     "copyToClipboard": "Panoya kopyalandı.",
     "copyToClipboardAsPng": "{{exportSelection}} panoya PNG olarak\n({{exportColorScheme}}) kopyalandı",
@@ -387,9 +387,9 @@
     "f1f3f5": "Gri 1",
     "fff5f5": "Kırmızı 0",
     "fff0f6": "Pembe 0",
-    "f8f0fc": "",
-    "f3f0ff": "",
-    "edf2ff": "",
+    "f8f0fc": "Üzüm 0",
+    "f3f0ff": "Menekşe 0",
+    "edf2ff": "Çivit 0",
     "e7f5ff": "Mavi 0",
     "e3fafc": "",
     "e6fcf5": "",
