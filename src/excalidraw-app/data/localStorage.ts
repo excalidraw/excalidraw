@@ -5,7 +5,6 @@ import {
   getDefaultAppState,
 } from "../../appState";
 import { clearElementsForLocalStorage } from "../../element";
-import { updateBrowserStateVersion } from "./tabSync";
 import { STORAGE_KEYS } from "../app_constants";
 
 export const saveUsernameToLocalStorage = (username: string) => {
@@ -32,26 +31,6 @@ export const importUsernameFromLocalStorage = (): string | null => {
   }
 
   return null;
-};
-
-export const saveToLocalStorage = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  try {
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(clearElementsForLocalStorage(elements)),
-    );
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(clearAppStateForLocalStorage(appState)),
-    );
-    updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
-  } catch (error: any) {
-    // Unable to access window.localStorage
-    console.error(error);
-  }
 };
 
 export const importFromLocalStorage = () => {
