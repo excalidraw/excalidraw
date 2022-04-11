@@ -1973,7 +1973,7 @@ class App extends React.Component<AppProps, AppState> {
     // zoom in at the right location on the touchMove handler already.
     // On Macbook, we don't have those events so will zoom in at the
     // current location instead.
-    if (gesture.pointers.size >= 2 && !this.state.viewModeEnabled) {
+    if (gesture.pointers.size >= 2) {
       return;
     }
 
@@ -3116,7 +3116,8 @@ class App extends React.Component<AppProps, AppState> {
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           this.state.viewModeEnabled)
       ) ||
-      isTextElement(this.state.editingElement)
+      isTextElement(this.state.editingElement) ||
+      (gesture.pointers.size > 1 && this.state.viewModeEnabled)
     ) {
       return false;
     }
