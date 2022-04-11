@@ -420,7 +420,7 @@ const measureOutputs = (
   let key = fontString as string;
   for (let index = 0; index < outputs.length; index++) {
     for (let i = 0; i < outputs[index].length; i++) {
-      key += outputs[index][i] === "" ? " " : outputs[index][i];
+      key += outputs[index][i];
     }
     if (index < outputs.length - 1) {
       key += "\n";
