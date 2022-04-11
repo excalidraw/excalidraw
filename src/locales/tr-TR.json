@@ -317,9 +317,9 @@
       "authorName": "Adınız ya da kullanıcı adınız",
       "libraryName": "Kitaplığınızın adı",
       "libraryDesc": "İnsanların kullanımını anlamasına yardımcı olmak için kitaplığınızın açıklaması",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "githubHandle": "Github bağlantısı ( tercihe bağlı), kütüphane gözden geçirme için onaylandığında düzenleyebiliesiniz diye",
+      "twitterHandle": "Twitter kullanıcı adı ( tercihe bağlı), bu sayede Twitter üzerinde paylaşıren çalışmanızı size atfedebiliriz",
+      "website": "Kişisel web sayfanızı ya da başka bir yeri bağlayın (tercihe bağlı)"
     },
     "errors": {
       "required": "",
