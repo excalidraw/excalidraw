@@ -349,8 +349,6 @@ const measureHTML = (
   document.body.appendChild(container);
 
   container.innerHTML = text;
-  const width = container.offsetWidth;
-  const height = container.offsetHeight;
 
   // Now creating 1px sized item that will be aligned to baseline
   // to calculate baseline shift
@@ -362,6 +360,8 @@ const measureHTML = (
   container.appendChild(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
+  const width = container.offsetWidth;
+  const height = container.offsetHeight;
 
   const containerRect = container.getBoundingClientRect();
   // Compute for each SVG or Text child node of line (the last
@@ -448,9 +448,6 @@ const measureOutputs = (
     let html = "";
     for (let i = 0; i < outputs[index].length; i++) {
       html += outputs[index][i];
-    }
-    if (html === "") {
-      html += "\n";
     }
 
     // Use the browser's measurements by temporarily attaching
@@ -788,10 +785,6 @@ const renderTextElementMath = (
     const [width, height] = getRenderDims(img.naturalWidth, img.naturalHeight);
     context.drawImage(img, 0, 0, width, height);
   } else {
-    // Avoid creating and rendering an SVG until MathJax is loaded.
-    if (!isMathJaxLoaded) {
-      return;
-    }
     const img = new Image();
     const svgString = createSvg(
       text,
