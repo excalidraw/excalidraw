@@ -3111,7 +3111,7 @@ class App extends React.Component<AppProps, AppState> {
   ): boolean => {
     if (
       !(
-        gesture.pointers.size === 0 &&
+        gesture.pointers.size <= 1 &&
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           this.state.viewModeEnabled)
