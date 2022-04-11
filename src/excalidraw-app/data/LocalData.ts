@@ -54,7 +54,7 @@ const saveDataStateToLocalStorage = (
   }
 };
 
-type SavingLockTypes = "collaboration" | "hidden";
+type SavingLockTypes = "collaboration";
 
 export class LocalData {
   private static _save = debounce(
@@ -83,7 +83,7 @@ export class LocalData {
     onFilesSaved: () => void,
   ) => {
     // we need to make the `isSavePaused` check synchronously (undebounced)
-    if (!this.isSavePaused()) {
+    if (!this.isSavePaused() && !document.hidden) {
       this._save(elements, appState, files, onFilesSaved);
     }
   };

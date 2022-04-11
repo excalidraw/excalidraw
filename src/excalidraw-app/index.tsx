@@ -397,9 +397,6 @@ const ExcalidrawWrapper = () => {
     const visibilityChange = (event: FocusEvent | Event) => {
       if (event.type === EVENT.BLUR || document.hidden) {
         LocalData.flushSave();
-        LocalData.pauseSave("hidden");
-      } else {
-        LocalData.resumeSave("hidden");
       }
       if (
         event.type === EVENT.VISIBILITY_CHANGE ||
