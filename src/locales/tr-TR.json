@@ -107,18 +107,18 @@
     "excalidrawLib": "Excalidraw Kitaplığı",
     "decreaseFontSize": "Yazının boyutunu küçültün",
     "increaseFontSize": "Yazının boyutunu arttırın",
-    "unbindText": "",
-    "bindText": "",
+    "unbindText": "Metni çöz",
+    "bindText": "Metni taşıyıcıya bağla",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Bağlantıyı düzenle",
+      "create": "Bağlantı oluştur",
+      "label": "Bağlantı"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Kilitle",
+      "unlock": "Çöz",
+      "lockAll": "Hepsini kilitle",
+      "unlockAll": "Hepsini çöz"
     }
   },
   "buttons": {
@@ -167,7 +167,7 @@
     "couldNotLoadInvalidFile": "Bilinmeyen dosya yüklenemiyor",
     "importBackendFailed": "Sunucudan içe aktarma başarısız.",
     "cannotExportEmptyCanvas": "Boş tuval dışarıya aktarılamaz.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Panoya kopyalanamıyor.",
     "decryptFailed": "Şifrelenmiş veri çözümlenemedi.",
     "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır.",
     "loadSceneOverridePrompt": "Harici çizimler yüklemek mevcut olan içeriği değiştirecektir. Devam etmek istiyor musunuz?",
@@ -189,7 +189,7 @@
     "fileTooBig": "Dosya çok büyük. İzin verilen maksimum boyut {{maxSize}}.",
     "svgImageInsertError": "SVG resmi eklenemedi. SVG işaretlemesi geçersiz görünüyor.",
     "invalidSVGString": "Geçersiz SVG.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Collab sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin."
   },
   "toolBar": {
     "selection": "Seçme",
@@ -203,9 +203,9 @@
     "text": "Yazı",
     "library": "Kütüphane",
     "lock": "Seçilen aracı çizimden sonra aktif tut",
-    "penMode": "",
-    "link": "",
-    "eraser": ""
+    "penMode": "Çift parmak sıkıştırmayı önle ve serbest çizimi yalnızca kalemle yap",
+    "link": "Seçilen şekil için bağlantı Ekle/Güncelle",
+    "eraser": "Silgi"
   },
   "headings": {
     "canvasActions": "Tuval eylemleri",
@@ -225,13 +225,13 @@
     "resizeImage": "SHIFT'e basılı tutarak serbestçe yeniden boyutlandırabilirsiniz, merkezden yeniden boyutlandırmak için ALT tuşunu basılı tutun",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",
     "lineEditor_info": "Noktaları düzenlemek için çift-tıklayın veya Enter'a basın",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Sil tuşuna basarak nokta(lar) ı silin,\nCtrlOrCmd+D ile çoğaltın, ya da sürükleyerek taşıyın",
+    "lineEditor_nothingSelected": "Düzenlemek için nokta seçin (SHIFT tuşuna basılı tutarak çoklu seçim),\nya da Alt ve tıklama ile yeni noktalar ekleyin",
     "placeImage": "Resmi yerleştirmek için tıklayın ya da boyutunu manuel olarak ayarlamak için tıklayıp sürükleyin",
     "publishLibrary": "Kendi kitaplığınızı yayınlayın",
-    "bindTextToElement": "",
-    "deepBoxSelect": "",
-    "eraserRevert": ""
+    "bindTextToElement": "Enter tuşuna basarak metin ekleyin",
+    "deepBoxSelect": "CtrlOrCmd tuşuna basılı tutarak derin seçin yapın ya da sürüklemeyi engelleyin",
+    "eraserRevert": "Alt tuşuna basılı tutarak silinme için işaretlenmiş ögeleri tersine çevirin"
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
@@ -278,8 +278,8 @@
   "helpDialog": {
     "blog": "Blog'umuzu okuyun",
     "click": "tıkla",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Derin seçim",
+    "deepBoxSelect": "Kutu içerisinde derin seçim yapın, sürüklemeyi engelleyin",
     "curvedArrow": "Eğri ok",
     "curvedLine": "Eğri çizgi",
     "documentation": "Dokümantasyon",
@@ -291,7 +291,7 @@
     "howto": "Rehberlerimizi takip edin",
     "or": "veya",
     "preventBinding": "Ok bağlamayı önleyin",
-    "tools": "",
+    "tools": "Araçlar",
     "shortcuts": "Klavye kısayolları",
     "textFinish": "Düzenlemeyi bitir (metin düzenleyici)",
     "textNewLine": "Yeni satır ekle (metin düzenleyici)",
@@ -299,7 +299,7 @@
     "view": "Görünüm",
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
     "zoomToSelection": "Seçime yakınlaş",
-    "toggleElementLock": ""
+    "toggleElementLock": "Seçimi Kilitle/çöz"
   },
   "clearCanvasDialog": {
     "title": "Tuvali temizle"
