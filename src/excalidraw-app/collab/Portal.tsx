@@ -172,7 +172,7 @@ class Portal {
 
     this.queueFileUpload();
 
-    if (syncAll && this.collab.isCollaborating) {
+    if (syncAll && this.collab.isCollaborating()) {
       await Promise.all([
         broadcastPromise,
         this.collab.saveCollabRoomToFirebase(syncableElements),

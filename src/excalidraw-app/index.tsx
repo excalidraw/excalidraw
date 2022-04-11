@@ -28,7 +28,6 @@ import {
   AppState,
   LibraryItems,
   ExcalidrawImperativeAPI,
-  BinaryFileData,
   BinaryFiles,
 } from "../types";
 import {
@@ -42,7 +41,6 @@ import {
 } from "../utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
-  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
@@ -57,7 +55,6 @@ import {
   getLibraryItemsFromStorage,
   importFromLocalStorage,
   importUsernameFromLocalStorage,
-  saveToLocalStorage,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { restoreAppState, RestoredDataState } from "../data/restore";
@@ -67,72 +64,12 @@ import { shield } from "../components/icons";
 import "./index.scss";
 import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
-import { getMany, set, del, keys, createStore } from "idb-keyval";
-import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
+import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
-import {
-  isBrowserStorageStateNewer,
-  updateBrowserStateVersion,
-} from "./data/tabSync";
-
-const filesStore = createStore("files-db", "files-store");
-
-const clearObsoleteFilesFromIndexedDB = async (opts: {
-  currentFileIds: FileId[];
-}) => {
-  const allIds = await keys(filesStore);
-  for (const id of allIds) {
-    if (!opts.currentFileIds.includes(id as FileId)) {
-      del(id, filesStore);
-    }
-  }
-};
-
-const localFileStorage = new FileManager({
-  getFiles(ids) {
-    return getMany(ids, filesStore).then(
-      (filesData: (BinaryFileData | undefined)[]) => {
-        const loadedFiles: BinaryFileData[] = [];
-        const erroredFiles = new Map<FileId, true>();
-        filesData.forEach((data, index) => {
-          const id = ids[index];
-          if (data) {
-            loadedFiles.push(data);
-          } else {
-            erroredFiles.set(id, true);
-          }
-        });
-
-        return { loadedFiles, erroredFiles };
-      },
-    );
-  },
-  async saveFiles({ addedFiles }) {
-    const savedFiles = new Map<FileId, true>();
-    const erroredFiles = new Map<FileId, true>();
-
-    // before we use `storage` event synchronization, let's update the flag
-    // optimistically. Hopefully nothing fails, and an IDB read executed
-    // before an IDB write finishes will read the latest value.
-    updateBrowserStateVersion(STORAGE_KEYS.VERSION_FILES);
-
-    await Promise.all(
-      [...addedFiles].map(async ([id, fileData]) => {
-        try {
-          await set(id, fileData, filesStore);
-          savedFiles.set(id, true);
-        } catch (error: any) {
-          console.error(error);
-          erroredFiles.set(id, true);
-        }
-      }),
-    );
-
-    return { savedFiles, erroredFiles };
-  },
-});
+import { LocalData } from "./data/LocalData";
+import { isBrowserStorageStateNewer } from "./data/tabSync";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -142,28 +79,6 @@ languageDetector.init({
   },
   checkWhitelist: false,
 });
-
-const saveDebounced = debounce(
-  async (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    files: BinaryFiles,
-    onFilesSaved: () => void,
-  ) => {
-    saveToLocalStorage(elements, appState);
-
-    await localFileStorage.saveFiles({
-      elements,
-      files,
-    });
-    onFilesSaved();
-  },
-  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
-);
-
-const onBlur = () => {
-  saveDebounced.flush();
-};
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
@@ -366,7 +281,7 @@ const ExcalidrawWrapper = () => {
           });
         } else if (isInitialLoad) {
           if (fileIds.length) {
-            localFileStorage
+            LocalData.fileStorage
               .getFiles(fileIds)
               .then(({ loadedFiles, erroredFiles }) => {
                 if (loadedFiles.length) {
@@ -381,7 +296,7 @@ const ExcalidrawWrapper = () => {
           }
           // on fresh load, clear unused files from IDB (from previous
           // session)
-          clearObsoleteFilesFromIndexedDB({ currentFileIds: fileIds });
+          LocalData.fileStorage.clearObsoleteFiles({ currentFileIds: fileIds });
         }
       }
 
@@ -458,7 +373,7 @@ const ExcalidrawWrapper = () => {
               return acc;
             }, [] as FileId[]) || [];
           if (fileIds.length) {
-            localFileStorage
+            LocalData.fileStorage
               .getFiles(fileIds)
               .then(({ loadedFiles, erroredFiles }) => {
                 if (loadedFiles.length) {
@@ -475,28 +390,50 @@ const ExcalidrawWrapper = () => {
       }
     }, SYNC_BROWSER_TABS_TIMEOUT);
 
+    const onUnload = () => {
+      LocalData.flushSave();
+    };
+
+    const visibilityChange = (event: FocusEvent | Event) => {
+      if (event.type === EVENT.BLUR || document.hidden) {
+        LocalData.flushSave();
+      }
+      if (
+        event.type === EVENT.VISIBILITY_CHANGE ||
+        event.type === EVENT.FOCUS
+      ) {
+        syncData();
+      }
+    };
+
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
-    window.addEventListener(EVENT.UNLOAD, onBlur, false);
-    window.addEventListener(EVENT.BLUR, onBlur, false);
-    document.addEventListener(EVENT.VISIBILITY_CHANGE, syncData, false);
-    window.addEventListener(EVENT.FOCUS, syncData, false);
+    window.addEventListener(EVENT.UNLOAD, onUnload, false);
+    window.addEventListener(EVENT.BLUR, visibilityChange, false);
+    document.addEventListener(EVENT.VISIBILITY_CHANGE, visibilityChange, false);
+    window.addEventListener(EVENT.FOCUS, visibilityChange, false);
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
-      window.removeEventListener(EVENT.UNLOAD, onBlur, false);
-      window.removeEventListener(EVENT.BLUR, onBlur, false);
-      window.removeEventListener(EVENT.FOCUS, syncData, false);
-      document.removeEventListener(EVENT.VISIBILITY_CHANGE, syncData, false);
+      window.removeEventListener(EVENT.UNLOAD, onUnload, false);
+      window.removeEventListener(EVENT.BLUR, visibilityChange, false);
+      window.removeEventListener(EVENT.FOCUS, visibilityChange, false);
+      document.removeEventListener(
+        EVENT.VISIBILITY_CHANGE,
+        visibilityChange,
+        false,
+      );
       clearTimeout(titleTimeout);
     };
   }, [collabAPI, excalidrawAPI]);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
-      saveDebounced.flush();
+      LocalData.flushSave();
 
       if (
         excalidrawAPI &&
-        localFileStorage.shouldPreventUnload(excalidrawAPI.getSceneElements())
+        LocalData.fileStorage.shouldPreventUnload(
+          excalidrawAPI.getSceneElements(),
+        )
       ) {
         preventUnload(event);
       }
@@ -518,8 +455,12 @@ const ExcalidrawWrapper = () => {
   ) => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.broadcastElements(elements);
-    } else {
-      saveDebounced(elements, appState, files, () => {
+    }
+
+    // this check is redundant, but since this is a hot path, it's best
+    // not to evaludate the nested expression every time
+    if (!LocalData.isSavePaused()) {
+      LocalData.save(elements, appState, files, () => {
         if (excalidrawAPI) {
           let didChange = false;
 
@@ -527,7 +468,9 @@ const ExcalidrawWrapper = () => {
           const elements = excalidrawAPI
             .getSceneElementsIncludingDeleted()
             .map((element) => {
-              if (localFileStorage.shouldUpdateImageElementStatus(element)) {
+              if (
+                LocalData.fileStorage.shouldUpdateImageElementStatus(element)
+              ) {
                 didChange = true;
                 const newEl = newElementWith(element, { status: "saved" });
                 if (pendingImageElement === element) {
@@ -687,7 +630,7 @@ const ExcalidrawWrapper = () => {
   };
 
   const onRoomClose = useCallback(() => {
-    localFileStorage.reset();
+    LocalData.fileStorage.reset();
   }, []);
 
   return (
