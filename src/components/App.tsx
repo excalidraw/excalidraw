@@ -1973,7 +1973,7 @@ class App extends React.Component<AppProps, AppState> {
     // zoom in at the right location on the touchMove handler already.
     // On Macbook, we don't have those events so will zoom in at the
     // current location instead.
-    if (gesture.pointers.size >= 2) {
+    if (gesture.pointers.size >= 2 && !this.state.viewModeEnabled) {
       return;
     }
 
@@ -3909,14 +3909,14 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       }
-      /*
+      
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         if (this.maybeHandleResize(pointerDownState, event)) {
           return true;
         }
-      }*/
+      }
 
       if (this.state.editingLinearElement) {
         const didDrag = LinearElementEditor.handlePointDragging(
