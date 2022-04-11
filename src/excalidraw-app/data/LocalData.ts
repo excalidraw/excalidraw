@@ -83,7 +83,7 @@ export class LocalData {
     onFilesSaved: () => void,
   ) => {
     // we need to make the `isSavePaused` check synchronously (undebounced)
-    if (!this.isSavePaused() && !document.hidden) {
+    if (!this.isSavePaused()) {
       this._save(elements, appState, files, onFilesSaved);
     }
   };
@@ -103,7 +103,7 @@ export class LocalData {
   };
 
   static isSavePaused = () => {
-    return this.locker.isLocked();
+    return document.hidden || this.locker.isLocked();
   };
 
   // ---------------------------------------------------------------------------
