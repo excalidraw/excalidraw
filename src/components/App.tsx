@@ -3909,7 +3909,7 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       }
-      
+
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
