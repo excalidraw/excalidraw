@@ -80,10 +80,6 @@ languageDetector.init({
   checkWhitelist: false,
 });
 
-const onBlur = () => {
-  LocalData.flushSave();
-};
-
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
 }): Promise<
@@ -394,17 +390,40 @@ const ExcalidrawWrapper = () => {
       }
     }, SYNC_BROWSER_TABS_TIMEOUT);
 
+    const onUnload = () => {
+      LocalData.flushSave();
+    };
+
+    const visibilityChange = (event: FocusEvent | Event) => {
+      if (document.hidden) {
+        LocalData.flushSave();
+        LocalData.pauseSave("hidden");
+      } else {
+        LocalData.resumeSave("hidden");
+      }
+      if (
+        event.type === EVENT.VISIBILITY_CHANGE ||
+        event.type === EVENT.FOCUS
+      ) {
+        syncData();
+      }
+    };
+
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
-    window.addEventListener(EVENT.UNLOAD, onBlur, false);
-    window.addEventListener(EVENT.BLUR, onBlur, false);
-    document.addEventListener(EVENT.VISIBILITY_CHANGE, syncData, false);
-    window.addEventListener(EVENT.FOCUS, syncData, false);
+    window.addEventListener(EVENT.UNLOAD, onUnload, false);
+    window.addEventListener(EVENT.BLUR, visibilityChange, false);
+    document.addEventListener(EVENT.VISIBILITY_CHANGE, visibilityChange, false);
+    window.addEventListener(EVENT.FOCUS, visibilityChange, false);
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
-      window.removeEventListener(EVENT.UNLOAD, onBlur, false);
-      window.removeEventListener(EVENT.BLUR, onBlur, false);
-      window.removeEventListener(EVENT.FOCUS, syncData, false);
-      document.removeEventListener(EVENT.VISIBILITY_CHANGE, syncData, false);
+      window.removeEventListener(EVENT.UNLOAD, onUnload, false);
+      window.removeEventListener(EVENT.BLUR, visibilityChange, false);
+      window.removeEventListener(EVENT.FOCUS, visibilityChange, false);
+      document.removeEventListener(
+        EVENT.VISIBILITY_CHANGE,
+        visibilityChange,
+        false,
+      );
       clearTimeout(titleTimeout);
     };
   }, [collabAPI, excalidrawAPI]);

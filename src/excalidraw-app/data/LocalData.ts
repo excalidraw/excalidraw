@@ -54,7 +54,7 @@ const saveDataStateToLocalStorage = (
   }
 };
 
-type SavingLockTypes = "collaboration";
+type SavingLockTypes = "collaboration" | "hidden";
 
 export class LocalData {
   private static _save = debounce(
