@@ -536,20 +536,16 @@ const createSvg = (
   let y = 0;
   for (let index = 0; index < processed.length; index++) {
     const lineMetrics = metrics.lineMetrics[index];
-    const x =
-      textAlign === "right"
-        ? imageMetrics.width - lineMetrics.width
-        : textAlign === "center"
-        ? (imageMetrics.width - lineMetrics.width) / 2
-        : 0;
     const rtl = isRTL(mathLines[index]);
+    const x =
+      (!rtl && textAlign === "right") || (rtl && textAlign === "left")
+        ? imageMetrics.width - lineMetrics.width
+        : (!rtl && textAlign === "left") || (rtl && textAlign === "right")
+        ? 0
+        : (imageMetrics.width - lineMetrics.width) / 2;
     // Drop any empty strings from this line to match childMetrics
     const content = processed[index].filter((value) => value !== "");
-    for (
-      let i = rtl ? content.length - 1 : 0;
-      rtl ? i >= 0 : i < content.length;
-      i += rtl ? -1 : 1
-    ) {
+    for (let i = 0; i < content.length; i += 1) {
       let childNode = {} as SVGSVGElement | SVGTextElement;
       // Put the content in a div to check whether it is SVG or Text
       const container = svgRoot.ownerDocument.createElement("div");
@@ -577,7 +573,14 @@ const createSvg = (
         content.length > 0 && content[i] === ""
           ? 0
           : metrics.outputMetrics[index][i].x;
-      childNode.setAttribute("x", `${x + childX}`);
+      const childWidth =
+        content.length > 0 && content[i] === ""
+          ? 0
+          : metrics.outputMetrics[index][i].width;
+      childNode.setAttribute(
+        "x",
+        `${rtl ? imageMetrics.width - childWidth - (x + childX) : x + childX}`,
+      );
       // Don't offset y when we have an empty string.
       const childY =
         content.length > 0 && content[i] === ""
