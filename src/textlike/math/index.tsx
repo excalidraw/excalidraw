@@ -487,7 +487,6 @@ const svgCache = {} as { [key: string]: SVGSVGElement };
 const setMath = (
   text: string,
   fontSize: number,
-  strokeColor: String,
   textAlign: CanvasTextAlign,
   mathOpts: MathOpts,
   isMathJaxLoaded: boolean,
@@ -495,10 +494,9 @@ const setMath = (
     childIsSvg: boolean,
     svg: SVGSVGElement | null,
     text: string,
-    strokeColor: String,
     rtl: boolean,
   ) => void,
-  doRenderChild: (x: number, y: number) => void,
+  doRenderChild: (x: number, y: number, width: number, height: number) => void,
 ) => {
   const mathLines = consumeMathNewlines(text, mathOpts).split("\n");
   const processed = markupText(text, mathOpts, isMathJaxLoaded);
@@ -538,7 +536,6 @@ const setMath = (
           ? (container.children[0].children[0] as SVGSVGElement)
           : null,
         content[i],
-        strokeColor,
         rtl,
       );
       // Don't offset x when we have an empty string.
@@ -555,9 +552,15 @@ const setMath = (
         content.length > 0 && content[i] === ""
           ? 0
           : metrics.outputMetrics[index][i].y;
+      const childHeight =
+        content.length > 0 && content[i] === ""
+          ? 0
+          : metrics.outputMetrics[index][i].height;
       doRenderChild(
         rtl ? imageMetrics.width - childWidth - (x + childX) : x + childX,
         y + childY,
+        childWidth,
+        childHeight,
       );
     }
     y += lineMetrics.height;
@@ -614,9 +617,8 @@ const createSvg = (
     childIsSvg: boolean,
     svg: SVGSVGElement | null,
     text: string,
-    strokeColor: String,
     rtl: boolean,
-  ) => void = function (childIsSvg, svg, text, strokeColor, rtl) {
+  ) => void = function (childIsSvg, svg, text, rtl) {
     if (childIsSvg && text !== "") {
       childNode = svg!;
     } else {
@@ -640,7 +642,6 @@ const createSvg = (
   setMath(
     text,
     fontSize,
-    strokeColor,
     textAlign,
     mathOpts,
     isMathJaxLoaded,
@@ -662,9 +663,6 @@ const createSvg = (
 };
 
 const imageCache = {} as { [key: string]: HTMLImageElement };
-const imageMetricsCache = {} as {
-  [key: string]: { width: number; height: number; baseline: number };
-};
 
 const getRenderDims = (width: number, height: number) => {
   return [width / window.devicePixelRatio, height / window.devicePixelRatio];
@@ -785,13 +783,12 @@ const measureTextElementMath = (
 const renderTextElementMath = (
   element: NonDeleted<ExcalidrawTextElementMath>,
   context: CanvasRenderingContext2D,
-  refresh?: () => void,
+  renderCb?: () => void,
 ) => {
   const isMathJaxLoaded = mathJaxLoaded;
 
   const text = element.text;
   const fontSize = element.fontSize * window.devicePixelRatio;
-  const fontFamily = FONT_FAMILY_MATH;
   const strokeColor = element.strokeColor;
   const textAlign = element.textAlign;
   const opacity = context.globalAlpha;
@@ -799,86 +796,107 @@ const renderTextElementMath = (
   const mathOnly = element.mathOnly;
   const mathOpts = getMathOpts.ensureMathOpts(useTex, mathOnly);
 
-  const key = getCacheKey(
+  let _childIsSvg: boolean;
+  let _text: string;
+  let _svg: SVGSVGElement;
+
+  const doSetupChild: (
+    childIsSvg: boolean,
+    svg: SVGSVGElement | null,
+    text: string,
+    rtl: boolean,
+  ) => void = function (childIsSvg, svg, text, rtl) {
+    _childIsSvg = childIsSvg;
+    if (_childIsSvg) {
+      _svg = svg!;
+    } else {
+      _text = text;
+
+      context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
+      context.save();
+      context.font = getFontString(element);
+      context.fillStyle = element.strokeColor;
+      context.textAlign = element.textAlign as CanvasTextAlign;
+    }
+  };
+
+  const doRenderChild: (
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  ) => void = function (x, y, width, height) {
+    if (_childIsSvg) {
+      const key = getCacheKey(
+        _text,
+        fontSize,
+        strokeColor,
+        textAlign,
+        opacity,
+        mathOpts,
+      );
+
+      const _x = Math.round(x);
+      const _y = Math.round(y);
+      const imgKey = `${key}, ${width}, ${height}`;
+      if (
+        isMathJaxLoaded &&
+        imageCache[imgKey] &&
+        imageCache[imgKey] !== undefined
+      ) {
+        const img = imageCache[imgKey];
+        const [width, height] = getRenderDims(
+          img.naturalWidth,
+          img.naturalHeight,
+        );
+        context.drawImage(img, _x, _y, width, height);
+      } else {
+        const img = new Image();
+        _svg.setAttribute("width", `${width}`);
+        _svg.setAttribute("height", `${height}`);
+        const svgString = _svg.outerHTML;
+        const svg = new Blob([svgString], {
+          type: "image/svg+xml;charset=utf-8",
+        });
+        const transformMatrix = context.getTransform();
+        const reader = new FileReader();
+        reader.addEventListener(
+          "load",
+          () => {
+            img.onload = function () {
+              const [width, height] = getRenderDims(
+                img.naturalWidth,
+                img.naturalHeight,
+              );
+              context.setTransform(transformMatrix);
+              context.drawImage(img, _x, _y, width, height);
+              if (isMathJaxLoaded) {
+                imageCache[imgKey] = img;
+              }
+              if (renderCb) {
+                renderCb();
+              }
+            };
+            img.src = reader.result as string;
+          },
+          false,
+        );
+        reader.readAsDataURL(svg);
+      }
+    } else {
+      context.fillText(_text, x, y);
+      context.restore();
+    }
+  };
+  setMath(
     text,
     fontSize,
-    strokeColor,
     textAlign,
-    opacity,
     mathOpts,
+    isMathJaxLoaded,
+    doSetupChild,
+    doRenderChild,
   );
-
-  if (
-    isMathJaxLoaded &&
-    imageMetricsCache[key] &&
-    imageMetricsCache[key] === undefined
-  ) {
-    imageMetricsCache[key] = measureOutputs(
-      markupText(text, mathOpts, isMathJaxLoaded),
-      getFontString({ fontSize, fontFamily }),
-      mathOpts,
-      isMathJaxLoaded,
-    ).imageMetrics;
-  }
-  const imageMetrics =
-    isMathJaxLoaded &&
-    imageMetricsCache[key] &&
-    imageMetricsCache[key] !== undefined
-      ? imageMetricsCache[key]
-      : measureOutputs(
-          markupText(text, mathOpts, isMathJaxLoaded),
-          getFontString({ fontSize, fontFamily }),
-          mathOpts,
-          isMathJaxLoaded,
-        ).imageMetrics;
-  const imgKey = `${key}, ${imageMetrics.width}, ${imageMetrics.height}`;
-  if (
-    isMathJaxLoaded &&
-    imageCache[imgKey] &&
-    imageCache[imgKey] !== undefined
-  ) {
-    const img = imageCache[imgKey];
-    const [width, height] = getRenderDims(img.naturalWidth, img.naturalHeight);
-    context.drawImage(img, 0, 0, width, height);
-  } else {
-    const img = new Image();
-    const svgString = createSvg(
-      text,
-      fontSize,
-      strokeColor,
-      textAlign,
-      opacity,
-      mathOpts,
-      isMathJaxLoaded,
-    ).outerHTML;
-    const svg = new Blob([svgString], {
-      type: "image/svg+xml;charset=utf-8",
-    });
-    const transformMatrix = context.getTransform();
-    const reader = new FileReader();
-    reader.addEventListener(
-      "load",
-      () => {
-        img.onload = function () {
-          const [width, height] = getRenderDims(
-            img.naturalWidth,
-            img.naturalHeight,
-          );
-          context.setTransform(transformMatrix);
-          context.drawImage(img, 0, 0, width, height);
-          if (isMathJaxLoaded) {
-            imageCache[imgKey] = img;
-          }
-          if (refresh) {
-            refresh();
-          }
-        };
-        img.src = reader.result as string;
-      },
-      false,
-    );
-    reader.readAsDataURL(svg);
-  }
 };
 
 const renderSvgTextElementMath = (
