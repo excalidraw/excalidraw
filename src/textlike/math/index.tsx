@@ -484,6 +484,86 @@ const measureOutputs = (
 
 const svgCache = {} as { [key: string]: SVGSVGElement };
 
+const setMath = (
+  text: string,
+  fontSize: number,
+  strokeColor: String,
+  textAlign: CanvasTextAlign,
+  mathOpts: MathOpts,
+  isMathJaxLoaded: boolean,
+  doSetupChild: (
+    childIsSvg: boolean,
+    svg: SVGSVGElement | null,
+    text: string,
+    strokeColor: String,
+    rtl: boolean,
+  ) => void,
+  doRenderChild: (x: number, y: number) => void,
+) => {
+  const mathLines = consumeMathNewlines(text, mathOpts).split("\n");
+  const processed = markupText(text, mathOpts, isMathJaxLoaded);
+  const fontFamily = FONT_FAMILY_MATH;
+  const fontString = getFontString({ fontSize, fontFamily });
+  const metrics = measureOutputs(
+    processed,
+    fontString,
+    mathOpts,
+    isMathJaxLoaded,
+  );
+  const imageMetrics = metrics.imageMetrics;
+
+  let y = 0;
+  for (let index = 0; index < processed.length; index++) {
+    const lineMetrics = metrics.lineMetrics[index];
+    const rtl = isRTL(mathLines[index]);
+    const x =
+      (!rtl && textAlign === "right") || (rtl && textAlign === "left")
+        ? imageMetrics.width - lineMetrics.width
+        : (!rtl && textAlign === "left") || (rtl && textAlign === "right")
+        ? 0
+        : (imageMetrics.width - lineMetrics.width) / 2;
+    // Drop any empty strings from this line to match childMetrics
+    const content = processed[index].filter((value) => value !== "");
+    for (let i = 0; i < content.length; i += 1) {
+      // Put the content in a div to check whether it is SVG or Text
+      const container = document.createElement("div");
+      container.innerHTML = content[mathOpts.mathOnly ? 0 : i];
+      // The mjx-container has child nodes, while Text nodes do not
+      const childIsSvg =
+        isMathJaxLoaded &&
+        (container.childNodes[0].hasChildNodes() || mathOpts.mathOnly);
+      doSetupChild(
+        childIsSvg,
+        childIsSvg
+          ? (container.children[0].children[0] as SVGSVGElement)
+          : null,
+        content[i],
+        strokeColor,
+        rtl,
+      );
+      // Don't offset x when we have an empty string.
+      const childX =
+        content.length > 0 && content[i] === ""
+          ? 0
+          : metrics.outputMetrics[index][i].x;
+      const childWidth =
+        content.length > 0 && content[i] === ""
+          ? 0
+          : metrics.outputMetrics[index][i].width;
+      // Don't offset y when we have an empty string.
+      const childY =
+        content.length > 0 && content[i] === ""
+          ? 0
+          : metrics.outputMetrics[index][i].y;
+      doRenderChild(
+        rtl ? imageMetrics.width - childWidth - (x + childX) : x + childX,
+        y + childY,
+      );
+    }
+    y += lineMetrics.height;
+  }
+};
+
 const createSvg = (
   text: string,
   fontSize: number,
@@ -506,18 +586,16 @@ const createSvg = (
     return svgRoot;
   }
 
-  const mathLines = consumeMathNewlines(text, mathOpts).split("\n");
   const processed = markupText(text, mathOpts, isMathJaxLoaded);
 
   const fontFamily = FONT_FAMILY_MATH;
   const fontString = getFontString({ fontSize, fontFamily });
-  const metrics = measureOutputs(
+  const imageMetrics = measureOutputs(
     processed,
     fontString,
     mathOpts,
     isMathJaxLoaded,
-  );
-  const imageMetrics = metrics.imageMetrics;
+  ).imageMetrics;
 
   const svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const node = svgRoot.ownerDocument.createElementNS(
@@ -531,64 +609,44 @@ const createSvg = (
   node.setAttribute("fill-opacity", `${opacity}`);
   svgRoot.appendChild(node);
 
-  let y = 0;
-  for (let index = 0; index < processed.length; index++) {
-    const lineMetrics = metrics.lineMetrics[index];
-    const rtl = isRTL(mathLines[index]);
-    const x =
-      (!rtl && textAlign === "right") || (rtl && textAlign === "left")
-        ? imageMetrics.width - lineMetrics.width
-        : (!rtl && textAlign === "left") || (rtl && textAlign === "right")
-        ? 0
-        : (imageMetrics.width - lineMetrics.width) / 2;
-    // Drop any empty strings from this line to match childMetrics
-    const content = processed[index].filter((value) => value !== "");
-    for (let i = 0; i < content.length; i += 1) {
-      let childNode = {} as SVGSVGElement | SVGTextElement;
-      // Put the content in a div to check whether it is SVG or Text
-      const container = svgRoot.ownerDocument.createElement("div");
-      container.innerHTML = content[mathOpts.mathOnly ? 0 : i];
-      // The mjx-container has child nodes, while Text nodes do not
-      const childIsSvg =
-        isMathJaxLoaded &&
-        (container.childNodes[0].hasChildNodes() || mathOpts.mathOnly);
-      if (childIsSvg && content[i] !== "") {
-        childNode = container.children[0].children[0] as SVGSVGElement;
-      } else {
-        const text = svgRoot.ownerDocument.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "text",
-        );
-        text.setAttribute("style", "white-space: pre;");
-        text.setAttribute("fill", `${strokeColor}`);
-        text.setAttribute("direction", `${rtl ? "rtl" : "ltr"}`);
-        text.setAttribute("text-anchor", `${rtl ? "end" : "start"}`);
-        text.textContent = content[i];
-        childNode = text;
-      }
-      // Don't offset x when we have an empty string.
-      const childX =
-        content.length > 0 && content[i] === ""
-          ? 0
-          : metrics.outputMetrics[index][i].x;
-      const childWidth =
-        content.length > 0 && content[i] === ""
-          ? 0
-          : metrics.outputMetrics[index][i].width;
-      childNode.setAttribute(
-        "x",
-        `${rtl ? imageMetrics.width - childWidth - (x + childX) : x + childX}`,
+  let childNode = {} as SVGSVGElement | SVGTextElement;
+  const doSetupChild: (
+    childIsSvg: boolean,
+    svg: SVGSVGElement | null,
+    text: string,
+    strokeColor: String,
+    rtl: boolean,
+  ) => void = function (childIsSvg, svg, text, strokeColor, rtl) {
+    if (childIsSvg && text !== "") {
+      childNode = svg!;
+    } else {
+      const textNode = svgRoot.ownerDocument.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text",
       );
-      // Don't offset y when we have an empty string.
-      const childY =
-        content.length > 0 && content[i] === ""
-          ? 0
-          : metrics.outputMetrics[index][i].y;
-      childNode.setAttribute("y", `${y + childY}`);
-      node.appendChild(childNode);
+      textNode.setAttribute("style", "white-space: pre;");
+      textNode.setAttribute("fill", `${strokeColor}`);
+      textNode.setAttribute("direction", `${rtl ? "rtl" : "ltr"}`);
+      textNode.setAttribute("text-anchor", `${rtl ? "end" : "start"}`);
+      textNode.textContent = text;
+      childNode = textNode;
     }
-    y += lineMetrics.height;
-  }
+  };
+  const doRenderChild: (x: number, y: number) => void = function (x, y) {
+    childNode.setAttribute("x", `${x}`);
+    childNode.setAttribute("y", `${y}`);
+    node.appendChild(childNode);
+  };
+  setMath(
+    text,
+    fontSize,
+    strokeColor,
+    textAlign,
+    mathOpts,
+    isMathJaxLoaded,
+    doSetupChild,
+    doRenderChild,
+  );
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   svgRoot.setAttribute(
