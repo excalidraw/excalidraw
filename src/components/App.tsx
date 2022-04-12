@@ -2937,6 +2937,8 @@ class App extends React.Component<AppProps, AppState> {
     });
     this.savePointer(event.clientX, event.clientY, "down");
 
+    this.updateGestureOnPointerDown(event);
+
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
     }
@@ -2948,8 +2950,6 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       return;
     }
-
-    this.updateGestureOnPointerDown(event);
 
     // don't select while panning
     if (gesture.pointers.size > 1) {
@@ -3128,7 +3128,7 @@ class App extends React.Component<AppProps, AppState> {
   ): boolean => {
     if (
       !(
-        gesture.pointers.size === 0 &&
+        gesture.pointers.size <= 1 &&
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           this.state.viewModeEnabled)
