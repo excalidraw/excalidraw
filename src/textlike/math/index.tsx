@@ -501,6 +501,10 @@ const createSvg = (
     opacity,
     mathOpts,
   );
+  if (isMathJaxLoaded && svgCache[key]) {
+    const svgRoot = svgCache[key];
+    return svgRoot;
+  }
 
   const mathLines = consumeMathNewlines(text, mathOpts).split("\n");
   const processed = markupText(text, mathOpts, isMathJaxLoaded);
@@ -515,12 +519,6 @@ const createSvg = (
   );
   const imageMetrics = metrics.imageMetrics;
 
-  if (isMathJaxLoaded && svgCache[key]) {
-    const svgRoot = svgCache[key];
-    svgRoot.setAttribute("width", `${imageMetrics.width}`);
-    svgRoot.setAttribute("height", `${imageMetrics.height}`);
-    return svgRoot;
-  }
   const svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const node = svgRoot.ownerDocument.createElementNS(
     "http://www.w3.org/2000/svg",
@@ -602,9 +600,6 @@ const createSvg = (
   if (isMathJaxLoaded) {
     svgCache[key] = svgRoot;
   }
-  // Now that we have cached the base SVG, scale it appropriately.
-  svgRoot.setAttribute("width", `${imageMetrics.width}`);
-  svgRoot.setAttribute("height", `${imageMetrics.height}`);
   return svgRoot;
 };
 
