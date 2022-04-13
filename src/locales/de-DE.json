@@ -115,10 +115,10 @@
       "label": "Link"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Sperren",
+      "unlock": "Entsperren",
+      "lockAll": "Alle sperren",
+      "unlockAll": "Alle entsperren"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "Ansicht",
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
     "zoomToSelection": "Auf Auswahl zoomen",
-    "toggleElementLock": ""
+    "toggleElementLock": "Auswahl sperren/entsperren"
   },
   "clearCanvasDialog": {
     "title": "Zeichenfläche löschen"
