@@ -16,6 +16,7 @@ import { getMimeType } from "../../data/blob";
 import { newFreeDrawElement } from "../../element/newElement";
 import { TextOpts, TEXT_SUBTYPE_DEFAULT } from "../../textlike/types";
 import { Point } from "../../types";
+import { getSelectedElements } from "../../scene/selection";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -31,10 +32,10 @@ export class API {
     });
   };
 
-  static getSelectedElements = (): ExcalidrawElement[] => {
-    return h.elements.filter(
-      (element) => h.state.selectedElementIds[element.id],
-    );
+  static getSelectedElements = (
+    includeBoundTextElement: boolean = false,
+  ): ExcalidrawElement[] => {
+    return getSelectedElements(h.elements, h.state, includeBoundTextElement);
   };
 
   static getSelectedElement = (): ExcalidrawElement => {
@@ -103,6 +104,7 @@ export class API {
       ? ExcalidrawTextElement["containerId"]
       : never;
     points?: T extends "arrow" | "line" ? readonly Point[] : never;
+    locked?: boolean;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
@@ -128,6 +130,7 @@ export class API {
       roughness: rest.roughness ?? appState.currentItemRoughness,
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,
+      locked: rest.locked ?? false,
     };
     switch (type) {
       case "rectangle":

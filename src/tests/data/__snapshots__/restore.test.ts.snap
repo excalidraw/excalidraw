@@ -14,6 +14,7 @@ Object {
   "isDeleted": false,
   "lastCommittedPoint": null,
   "link": null,
+  "locked": false,
   "opacity": 100,
   "points": Array [
     Array [
@@ -58,6 +59,7 @@ Object {
   "id": "1",
   "isDeleted": false,
   "link": null,
+  "locked": false,
   "opacity": 10,
   "roughness": 2,
   "seed": Any<Number>,
@@ -90,6 +92,7 @@ Object {
   "id": "2",
   "isDeleted": false,
   "link": null,
+  "locked": false,
   "opacity": 10,
   "roughness": 2,
   "seed": Any<Number>,
@@ -122,6 +125,7 @@ Object {
   "id": "3",
   "isDeleted": false,
   "link": null,
+  "locked": false,
   "opacity": 10,
   "roughness": 2,
   "seed": Any<Number>,
@@ -151,6 +155,7 @@ Object {
   "isDeleted": false,
   "lastCommittedPoint": null,
   "link": null,
+  "locked": false,
   "opacity": 100,
   "points": Array [],
   "pressures": Array [],
@@ -185,6 +190,7 @@ Object {
   "isDeleted": false,
   "lastCommittedPoint": null,
   "link": null,
+  "locked": false,
   "opacity": 100,
   "points": Array [
     Array [
@@ -228,6 +234,7 @@ Object {
   "isDeleted": false,
   "lastCommittedPoint": null,
   "link": null,
+  "locked": false,
   "opacity": 100,
   "points": Array [
     Array [
@@ -272,6 +279,7 @@ Object {
   "id": "id-text01",
   "isDeleted": false,
   "link": null,
+  "locked": false,
   "opacity": 100,
   "originalText": "text",
   "roughness": 1,
@@ -309,6 +317,7 @@ Object {
   "id": "id-text01",
   "isDeleted": false,
   "link": null,
+  "locked": false,
   "opacity": 100,
   "originalText": "test",
   "roughness": 1,

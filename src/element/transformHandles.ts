@@ -222,6 +222,13 @@ export const getTransformHandles = (
   zoom: Zoom,
   pointerType: PointerType = "mouse",
 ): TransformHandles => {
+  // so that when locked element is selected (especially when you toggle lock
+  // via keyboard) the locked element is visually distinct, indicating
+  // you can't move/resize
+  if (element.locked) {
+    return {};
+  }
+
   let omitSides: { [T in TransformHandleType]?: boolean } = {};
   if (
     element.type === "arrow" ||
