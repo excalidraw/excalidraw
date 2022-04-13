@@ -807,11 +807,11 @@ const renderTextElementMath = (
     rtl: boolean,
   ) => void = function (childIsSvg, svg, text, rtl) {
     _childIsSvg = childIsSvg;
+    _text = text;
+
     if (_childIsSvg) {
       _svg = svg!;
     } else {
-      _text = text;
-
       context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
       context.save();
       context.font = getFontString(element);
