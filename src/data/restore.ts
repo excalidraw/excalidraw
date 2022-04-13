@@ -108,6 +108,7 @@ const restoreElementWithProperties = <
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ?? null,
+    locked: element.locked ?? false,
   };
 
   return {

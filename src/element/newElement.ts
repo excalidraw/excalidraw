@@ -63,6 +63,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     strokeSharpness,
     boundElements = null,
     link = null,
+    locked,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
@@ -90,6 +91,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     boundElements,
     updated: getUpdatedTimestamp(),
     link,
+    locked,
   };
   return element;
 };

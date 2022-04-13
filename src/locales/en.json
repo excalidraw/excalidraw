@@ -10,6 +10,7 @@
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
     "copyAsSvg": "Copy to clipboard as SVG",
+    "copyText": "Copy to clipboard as text",
     "bringForward": "Bring forward",
     "sendToBack": "Send to back",
     "bringToFront": "Bring to front",
@@ -113,6 +114,12 @@
       "edit": "Edit link",
       "create": "Create link",
       "label": "Link"
+    },
+    "elementLock": {
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "lockAll": "Lock all",
+      "unlockAll": "Unlock all"
     }
   },
   "buttons": {
@@ -161,7 +168,7 @@
     "couldNotLoadInvalidFile": "Couldn't load invalid file",
     "importBackendFailed": "Importing from backend failed.",
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
-    "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
+    "couldNotCopyToClipboard": "Couldn't copy to clipboard.",
     "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
     "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
@@ -292,7 +299,8 @@
     "title": "Help",
     "view": "View",
     "zoomToFit": "Zoom to fit all elements",
-    "zoomToSelection": "Zoom to selection"
+    "zoomToSelection": "Zoom to selection",
+    "toggleElementLock": "Lock/unlock selection"
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"
@@ -336,7 +344,6 @@
     "noteItems": "Each library item must have its own name so it's filterable. The following library items will be included:",
     "atleastOneLibItem": "Please select at least one library item to get started"
   },
-
   "publishSuccessDialog": {
     "title": "Library submitted",
     "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",
