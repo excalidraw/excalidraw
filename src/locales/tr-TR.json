@@ -42,7 +42,7 @@
     "onlySelected": "Sadece seçilen",
     "withBackground": "Arka plan",
     "exportEmbedScene": "Gömülü sahne",
-    "exportEmbedScene_details": "Sahne datası, daha sonra geri kullanılabilmesi için çıktı alınan PNG/SVG dosyasına dahil edicelek. Bu işlem dosya boyutunu arttıracaktır.",
+    "exportEmbedScene_details": "Sahne verileri, sahnenin geri yüklenebilmesi için dışa aktarılan PNG/SVG dosyasına kaydedilecektir.\nDışa aktarılan dosya boyutunu artıracaktır.",
     "addWatermark": "\"Excalidraw ile yapıldı\" yazısını ekle",
     "handDrawn": "El-yazısı",
     "normal": "Normal",
@@ -85,7 +85,7 @@
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor…",
     "libraries": "Kütüphanelere gözat",
-    "loadingScene": "Çalışma alanı yükleniyor…",
+    "loadingScene": "Sahne yükleniyor…",
     "align": "Hizala",
     "alignTop": "Yukarı hizala",
     "alignBottom": "Aşağı hizala",
@@ -105,8 +105,8 @@
     "toggleTheme": "Temayı etkinleştir/devre dışı bırak",
     "personalLib": "Kişisel Kitaplık",
     "excalidrawLib": "Excalidraw Kitaplığı",
-    "decreaseFontSize": "Yazının boyutunu küçültün",
-    "increaseFontSize": "Yazının boyutunu arttırın",
+    "decreaseFontSize": "Yazı Tipi Boyutunu Küçült",
+    "increaseFontSize": "Yazı Tipi Boyutunu Büyült",
     "unbindText": "Metni çöz",
     "bindText": "Metni taşıyıcıya bağla",
     "link": {
@@ -116,9 +116,9 @@
     },
     "elementLock": {
       "lock": "Kilitle",
-      "unlock": "Çöz",
+      "unlock": "Kilidi Kaldır",
       "lockAll": "Hepsini kilitle",
-      "unlockAll": "Hepsini çöz"
+      "unlockAll": "Hepsinin kilidini kaldır"
     }
   },
   "buttons": {
