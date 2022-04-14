@@ -269,12 +269,12 @@ const markupText = (
   isMathJaxLoaded: boolean,
 ) => {
   const lines = consumeMathNewlines(text, mathOpts).split("\n");
-  const outputs = [] as Array<string>[];
+  const markup = [] as Array<string>[];
   for (let index = 0; index < lines.length; index++) {
-    outputs.push([]);
+    markup.push([]);
     if (!isMathJaxLoaded) {
       // Run lines[index] through math2Svg so loadMathJax() gets called
-      outputs[index].push(math2Svg(lines[index], mathOpts, isMathJaxLoaded));
+      markup[index].push(math2Svg(lines[index], mathOpts, isMathJaxLoaded));
       continue;
     }
     // Don't split by the delimiter in math-only mode
@@ -287,16 +287,16 @@ const markupText = (
       // loadMathJax().
       if (i % 2 === 1 || mathOpts.mathOnly) {
         const svgString = math2Svg(lineArray[i], mathOpts, isMathJaxLoaded);
-        outputs[index].push(svgString);
+        markup[index].push(svgString);
       } else {
-        outputs[index].push(lineArray[i]);
+        markup[index].push(lineArray[i]);
       }
     }
     if (lineArray.length === 0) {
-      outputs[index].push("");
+      markup[index].push("");
     }
   }
-  return outputs;
+  return markup;
 };
 
 const getCacheKey = (
@@ -313,7 +313,7 @@ const getCacheKey = (
 
 const metricsCache = {} as {
   [key: string]: {
-    outputMetrics: Array<{
+    markupMetrics: Array<{
       x: number;
       y: number;
       width: number;
@@ -324,7 +324,7 @@ const metricsCache = {} as {
   };
 };
 
-const measureHTML = (
+const measureMarkup = (
   text: string,
   font: FontString,
   mathOpts: MathOpts,
@@ -403,26 +403,27 @@ const measureHTML = (
     }
   }
   if (childMetrics.length === 0) {
-    // Avoid crashes in measureOutputs()
+    // Avoid crashes in getMetrics()
     childMetrics.push({ x: 0, y: 0, width: 0, height: 0 });
   }
   document.body.removeChild(container);
   return { width, height, baseline, childMetrics };
 };
 
-const measureOutputs = (
-  outputs: string[][],
-  fontString: FontString,
+const getMetrics = (
+  markup: string[][],
+  fontSize: number,
   mathOpts: MathOpts,
   isMathJaxLoaded: boolean,
   maxWidth?: number | null,
 ) => {
+  const fontString = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
   let key = fontString as string;
-  for (let index = 0; index < outputs.length; index++) {
-    for (let i = 0; i < outputs[index].length; i++) {
-      key += outputs[index][i];
+  for (let index = 0; index < markup.length; index++) {
+    for (let i = 0; i < markup[index].length; i++) {
+      key += markup[index][i];
     }
-    if (index < outputs.length - 1) {
+    if (index < markup.length - 1) {
       key += "\n";
     }
   }
@@ -430,7 +431,7 @@ const measureOutputs = (
   if (isMathJaxLoaded && metricsCache[cKey]) {
     return metricsCache[cKey];
   }
-  const outputMetrics = [] as Array<{
+  const markupMetrics = [] as Array<{
     x: number;
     y: number;
     width: number;
@@ -444,10 +445,10 @@ const measureOutputs = (
   let imageWidth = 0;
   let imageHeight = 0;
   let imageBaseline = 0;
-  for (let index = 0; index < outputs.length; index++) {
+  for (let index = 0; index < markup.length; index++) {
     let html = "";
-    for (let i = 0; i < outputs[index].length; i++) {
-      html += outputs[index][i];
+    for (let i = 0; i < markup[index].length; i++) {
+      html += markup[index][i];
     }
 
     // Use the browser's measurements by temporarily attaching
@@ -457,9 +458,9 @@ const measureOutputs = (
       height: lineHeight,
       baseline: lineBaseline,
       childMetrics: lineChildMetrics,
-    } = measureHTML(html, fontString, mathOpts, isMathJaxLoaded, maxWidth);
+    } = measureMarkup(html, fontString, mathOpts, isMathJaxLoaded, maxWidth);
 
-    outputMetrics.push(lineChildMetrics);
+    markupMetrics.push(lineChildMetrics);
     lineMetrics.push({
       width: lineWidth,
       height: lineHeight,
@@ -474,7 +475,7 @@ const measureOutputs = (
     height: imageHeight,
     baseline: imageBaseline,
   };
-  const metrics = { outputMetrics, lineMetrics, imageMetrics };
+  const metrics = { markupMetrics, lineMetrics, imageMetrics };
   if (isMathJaxLoaded) {
     metricsCache[cKey] = metrics;
     return metricsCache[cKey];
@@ -484,7 +485,7 @@ const measureOutputs = (
 
 const svgCache = {} as { [key: string]: SVGSVGElement };
 
-const setMath = (
+const renderMath = (
   text: string,
   fontSize: number,
   textAlign: CanvasTextAlign,
@@ -499,20 +500,14 @@ const setMath = (
   doRenderChild: (x: number, y: number, width: number, height: number) => void,
 ) => {
   const mathLines = consumeMathNewlines(text, mathOpts).split("\n");
-  const processed = markupText(text, mathOpts, isMathJaxLoaded);
-  const fontFamily = FONT_FAMILY_MATH;
-  const fontString = getFontString({ fontSize, fontFamily });
-  const metrics = measureOutputs(
-    processed,
-    fontString,
-    mathOpts,
-    isMathJaxLoaded,
-  );
+  const markup = markupText(text, mathOpts, isMathJaxLoaded);
+  const metrics = getMetrics(markup, fontSize, mathOpts, isMathJaxLoaded);
   const imageMetrics = metrics.imageMetrics;
 
   let y = 0;
-  for (let index = 0; index < processed.length; index++) {
+  for (let index = 0; index < markup.length; index++) {
     const lineMetrics = metrics.lineMetrics[index];
+    const lineMarkupMetrics = metrics.markupMetrics[index];
     const rtl = isRTL(mathLines[index]);
     const x =
       (!rtl && textAlign === "right") || (rtl && textAlign === "left")
@@ -521,7 +516,7 @@ const setMath = (
         ? 0
         : (imageMetrics.width - lineMetrics.width) / 2;
     // Drop any empty strings from this line to match childMetrics
-    const content = processed[index].filter((value) => value !== "");
+    const content = markup[index].filter((value) => value !== "");
     for (let i = 0; i < content.length; i += 1) {
       // Put the content in a div to check whether it is SVG or Text
       const container = document.createElement("div");
@@ -530,38 +525,24 @@ const setMath = (
       const childIsSvg =
         isMathJaxLoaded &&
         (container.childNodes[0].hasChildNodes() || mathOpts.mathOnly);
-      doSetupChild(
-        childIsSvg,
-        childIsSvg
-          ? (container.children[0].children[0] as SVGSVGElement)
-          : null,
-        content[i],
-        rtl,
-      );
-      // Don't offset x when we have an empty string.
-      const childX =
-        content.length > 0 && content[i] === ""
-          ? 0
-          : metrics.outputMetrics[index][i].x;
-      const childWidth =
-        content.length > 0 && content[i] === ""
-          ? 0
-          : metrics.outputMetrics[index][i].width;
-      // Don't offset y when we have an empty string.
-      const childY =
-        content.length > 0 && content[i] === ""
-          ? 0
-          : metrics.outputMetrics[index][i].y;
-      const childHeight =
-        content.length > 0 && content[i] === ""
-          ? 0
-          : metrics.outputMetrics[index][i].height;
-      doRenderChild(
-        rtl ? imageMetrics.width - childWidth - (x + childX) : x + childX,
-        y + childY,
-        childWidth,
-        childHeight,
-      );
+      // Conditionally the child SVG
+      const svg = childIsSvg
+        ? (container.children[0].children[0] as SVGSVGElement)
+        : null;
+      // Set up the child for rendering
+      doSetupChild(childIsSvg, svg, content[i], rtl);
+      // Don't offset when we have an empty string.
+      const nullContent = content.length > 0 && content[i] === "";
+      const childX = nullContent ? 0 : lineMarkupMetrics[i].x;
+      const childY = nullContent ? 0 : lineMarkupMetrics[i].y;
+      const childWidth = nullContent ? 0 : lineMarkupMetrics[i].width;
+      const childHeight = nullContent ? 0 : lineMarkupMetrics[i].height;
+      // I18n'd x position
+      const intlX = rtl
+        ? imageMetrics.width - childWidth - (x + childX)
+        : x + childX;
+      // Now render the child
+      doRenderChild(intlX, y + childY, childWidth, childHeight);
     }
     y += lineMetrics.height;
   }
@@ -585,27 +566,16 @@ const createSvg = (
     mathOpts,
   );
   if (isMathJaxLoaded && svgCache[key]) {
-    const svgRoot = svgCache[key];
-    return svgRoot;
+    return svgCache[key];
   }
-
-  const processed = markupText(text, mathOpts, isMathJaxLoaded);
-
-  const fontFamily = FONT_FAMILY_MATH;
-  const fontString = getFontString({ fontSize, fontFamily });
-  const imageMetrics = measureOutputs(
-    processed,
-    fontString,
-    mathOpts,
-    isMathJaxLoaded,
-  ).imageMetrics;
 
   const svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const node = svgRoot.ownerDocument.createElementNS(
     "http://www.w3.org/2000/svg",
     "g",
   );
-  node.setAttribute("font-family", `${getFontFamilyString({ fontFamily })}`);
+  const font = getFontFamilyString({ fontFamily: FONT_FAMILY_MATH });
+  node.setAttribute("font-family", `${font}`);
   node.setAttribute("font-size", `${fontSize}px`);
   node.setAttribute("color", `${strokeColor}`);
   node.setAttribute("stroke-opacity", `${opacity}`);
@@ -639,7 +609,7 @@ const createSvg = (
     childNode.setAttribute("y", `${y}`);
     node.appendChild(childNode);
   };
-  setMath(
+  renderMath(
     text,
     fontSize,
     textAlign,
@@ -648,14 +618,18 @@ const createSvg = (
     doSetupChild,
     doRenderChild,
   );
+  const { width: imageWidth, height: imageHeight } = getImageMetrics(
+    text,
+    fontSize,
+    mathOpts,
+    isMathJaxLoaded,
+  );
+
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-  svgRoot.setAttribute(
-    "viewBox",
-    `0 0 ${imageMetrics.width} ${imageMetrics.height}`,
-  );
-  svgRoot.setAttribute("width", `${imageMetrics.width}`);
-  svgRoot.setAttribute("height", `${imageMetrics.height}`);
+  svgRoot.setAttribute("viewBox", `0 0 ${imageWidth} ${imageHeight}`);
+  svgRoot.setAttribute("width", `${imageWidth}`);
+  svgRoot.setAttribute("height", `${imageHeight}`);
   if (isMathJaxLoaded) {
     svgCache[key] = svgRoot;
   }
@@ -668,20 +642,16 @@ const getRenderDims = (width: number, height: number) => {
   return [width / window.devicePixelRatio, height / window.devicePixelRatio];
 };
 
-const measureMath = (
+const getImageMetrics = (
   text: string,
   fontSize: number,
   mathOpts: MathOpts,
   isMathJaxLoaded: boolean,
   maxWidth?: number | null,
 ) => {
-  return measureOutputs(
-    markupText(text, mathOpts, isMathJaxLoaded),
-    getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH }),
-    mathOpts,
-    isMathJaxLoaded,
-    maxWidth,
-  ).imageMetrics;
+  const markup = markupText(text, mathOpts, isMathJaxLoaded);
+  return getMetrics(markup, fontSize, mathOpts, isMathJaxLoaded, maxWidth)
+    .imageMetrics;
 };
 
 const getSelectedMathElements = (
@@ -777,7 +747,7 @@ const measureTextElementMath = (
       ? next.textOpts.mathOnly
       : element.mathOnly;
   const mathOpts = getMathOpts.ensureMathOpts(useTex, mathOnly);
-  return measureMath(text, fontSize, mathOpts, isMathJaxLoaded, maxWidth);
+  return getImageMetrics(text, fontSize, mathOpts, isMathJaxLoaded, maxWidth);
 };
 
 const renderTextElementMath = (
@@ -888,7 +858,7 @@ const renderTextElementMath = (
       context.restore();
     }
   };
-  setMath(
+  renderMath(
     text,
     fontSize,
     textAlign,
@@ -978,17 +948,12 @@ export const wrapTextElementMath = (
       : element.mathOnly;
   const mathOpts = getMathOpts.ensureMathOpts(useTex, mathOnly);
 
-  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
+  const font = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
 
   const maxWidth = containerWidth - BOUND_TEXT_PADDING * 2;
 
-  const outputs = markupText(text, mathOpts, isMathJaxLoaded);
-  const outputMetrics = measureOutputs(
-    outputs,
-    font,
-    mathOpts,
-    isMathJaxLoaded,
-  );
+  const markup = markupText(text, mathOpts, isMathJaxLoaded);
+  const metrics = getMetrics(markup, fontSize, mathOpts, isMathJaxLoaded);
 
   const delimiter = getDelimiter(mathOpts.useTex);
   const lines = consumeMathNewlines(text, mathOpts).split("\n");
@@ -997,7 +962,7 @@ export const wrapTextElementMath = (
   const newText: string[] = [];
   let newTextIndex = 0;
   newText.push("");
-  for (let index = 0; index < outputs.length; index++) {
+  for (let index = 0; index < markup.length; index++) {
     let lineIndex = 0;
     let itemWidth = 0;
     let pushNew = false;
@@ -1006,12 +971,12 @@ export const wrapTextElementMath = (
     lineText[index].push("");
     lineWidth[index].push(0);
     const lineArray = lines[index].split(delimiter);
-    for (let i = 0; i < outputs[index].length; i++) {
+    for (let i = 0; i < markup[index].length; i++) {
       const isSvg = i % 2 === 1 || mathOnly;
       itemWidth = 0;
       let lineItem = lineArray[i];
       if (isSvg) {
-        itemWidth = outputMetrics.outputMetrics[index][i].width;
+        itemWidth = metrics.markupMetrics[index][i].width;
         lineItem = delimiter + lineItem + delimiter;
       }
       if (pushNew) {
@@ -1023,7 +988,7 @@ export const wrapTextElementMath = (
       }
       pushNew = true;
     }
-    if (outputs[index].length % 2 === 1 || mathOnly) {
+    if (markup[index].length % 2 === 1 || mathOnly) {
       // Last one was text
       pushNew = false;
     }
@@ -1116,9 +1081,9 @@ export const wrapTextElementMath = (
 
   // Get the metrics for the newly wrapped text.
   // Since we cache, no need to do anything with the return value
-  // of measureMath().
+  // of getImageMetrics().
   const wrappedText = newText.join("\n");
-  measureMath(wrappedText, fontSize, mathOpts, isMathJaxLoaded);
+  getImageMetrics(wrappedText, fontSize, mathOpts, isMathJaxLoaded);
   return wrappedText;
 };
 
@@ -1214,7 +1179,7 @@ const setMathOptsForSelectedElements = (
     // Mark the element for re-rendering
     invalidateShapeForElement(el);
     // Update the width/height of the element
-    const metrics = measureMath(
+    const metrics = getImageMetrics(
       el.text,
       el.fontSize,
       getMathOpts.ensureMathOpts(el.useTex, el.mathOnly),
