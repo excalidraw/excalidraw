@@ -241,7 +241,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         this.excalidrawAPI.getAppState(),
       );
 
-      if (this.isCollaborating && savedData && savedData.reconciledElements) {
+      if (this.isCollaborating() && savedData && savedData.reconciledElements) {
         this.handleRemoteSceneUpdate(
           this.reconcileElements(savedData.reconciledElements),
         );
