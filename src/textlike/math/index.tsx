@@ -224,6 +224,23 @@ const consumeMathNewlines = (text: string, mathOpts: MathOpts) => {
 // Cache the SVGs from MathJax
 const mathJaxSvgCacheAM = {} as { [key: string]: string };
 const mathJaxSvgCacheTex = {} as { [key: string]: string };
+// Cache the results of getMetrics()
+const metricsCache = {} as {
+  [key: string]: {
+    markupMetrics: Array<{
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }>[];
+    lineMetrics: Array<{ width: number; height: number; baseline: number }>;
+    imageMetrics: { width: number; height: number };
+  };
+};
+// Cache the SVGs for renderSvgTextElementMath()
+const svgCache = {} as { [key: string]: SVGSVGElement };
+// Cache the rendered MathJax images for renderTextElementMath()
+const imageCache = {} as { [key: string]: HTMLImageElement };
 
 const math2Svg = (
   text: string,
@@ -309,19 +326,6 @@ const getCacheKey = (
 ) => {
   const key = `${text}, ${fontSize}, ${strokeColor}, ${textAlign}, ${opacity}, ${mathOpts.useTex}, ${mathOpts.mathOnly}`;
   return key;
-};
-
-const metricsCache = {} as {
-  [key: string]: {
-    markupMetrics: Array<{
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-    }>[];
-    lineMetrics: Array<{ width: number; height: number; baseline: number }>;
-    imageMetrics: { width: number; height: number; baseline: number };
-  };
 };
 
 const measureMarkup = (
@@ -444,7 +448,6 @@ const getMetrics = (
   }>;
   let imageWidth = 0;
   let imageHeight = 0;
-  let imageBaseline = 0;
   for (let index = 0; index < markup.length; index++) {
     let html = "";
     for (let i = 0; i < markup[index].length; i++) {
@@ -453,37 +456,29 @@ const getMetrics = (
 
     // Use the browser's measurements by temporarily attaching
     // the rendered line to the document.body.
-    const {
-      width: lineWidth,
-      height: lineHeight,
-      baseline: lineBaseline,
-      childMetrics: lineChildMetrics,
-    } = measureMarkup(html, fontString, mathOpts, isMathJaxLoaded, maxWidth);
+    const { width, height, baseline, childMetrics } = measureMarkup(
+      html,
+      fontString,
+      mathOpts,
+      isMathJaxLoaded,
+      maxWidth,
+    );
 
-    markupMetrics.push(lineChildMetrics);
-    lineMetrics.push({
-      width: lineWidth,
-      height: lineHeight,
-      baseline: lineBaseline,
-    });
-    imageWidth = Math.max(imageWidth, lineWidth);
-    imageBaseline = imageHeight + lineBaseline;
-    imageHeight += lineHeight;
+    markupMetrics.push(childMetrics);
+    lineMetrics.push({ width, height, baseline });
+    imageWidth = Math.max(imageWidth, width);
+    imageHeight += height;
   }
   const imageMetrics = {
     width: imageWidth,
     height: imageHeight,
-    baseline: imageBaseline,
   };
   const metrics = { markupMetrics, lineMetrics, imageMetrics };
   if (isMathJaxLoaded) {
     metricsCache[cKey] = metrics;
-    return metricsCache[cKey];
   }
   return metrics;
 };
-
-const svgCache = {} as { [key: string]: SVGSVGElement };
 
 const renderMath = (
   text: string,
@@ -547,8 +542,6 @@ const renderMath = (
     y += lineMetrics.height;
   }
 };
-
-const imageCache = {} as { [key: string]: HTMLImageElement };
 
 const getRenderDims = (width: number, height: number) => {
   return [width / window.devicePixelRatio, height / window.devicePixelRatio];
