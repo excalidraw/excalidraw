@@ -258,7 +258,7 @@ export const ShapesSwitcher = ({
             }}
             onChange={({ pointerType }) => {
               onChange({ activeToolType: value, pointerType });
-              if (activeToolType === "image") {
+              if (value === "image") {
                 onImageAction({ pointerType });
               }
             }}
