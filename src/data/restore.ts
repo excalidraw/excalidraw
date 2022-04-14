@@ -111,6 +111,7 @@ const restoreElementWithProperties = <
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ?? null,
+    locked: element.locked ?? false,
   };
 
   return {
@@ -256,6 +257,7 @@ export const restoreAppState = (
   }
   return {
     ...nextAppState,
+    cursorButton: localAppState?.cursorButton || "up",
     // reset on fresh restore so as to hide the UI button if penMode not active
     penDetected:
       localAppState?.penDetected ??

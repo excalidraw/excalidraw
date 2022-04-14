@@ -188,6 +188,7 @@ export {
   exportToBlob,
   exportToSvg,
   serializeAsJSON,
+  serializeLibraryAsJSON,
   loadLibraryFromBlob,
   loadFromBlob,
   getFreeDrawSvgPath,
