@@ -255,12 +255,12 @@ export const ShapesSwitcher = ({
             data-testid={value}
             onPointerDown={({ pointerType }) => {
               onChange({ activeToolType: value, pointerType });
-            }}
-            onChange={({ pointerType }) => {
-              onChange({ activeToolType: value, pointerType });
               if (value === "image") {
                 onImageAction({ pointerType });
               }
+            }}
+            onChange={({ pointerType }) => {
+              onChange({ activeToolType: value, pointerType });
             }}
           />
         );
