@@ -68,6 +68,7 @@ import {
 } from "./reconciliation";
 import { decryptData } from "../../data/encryption";
 import { resetBrowserStateVersions } from "../data/tabSync";
+import { LocalData } from "../data/LocalData";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -109,10 +110,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
   fileManager: FileManager;
   excalidrawAPI: Props["excalidrawAPI"];
-  isCollaborating: boolean = false;
   activeIntervalId: number | null;
   idleTimeoutId: number | null;
 
+  // marked as private to ensure we don't change it outside this class
+  private _isCollaborating: boolean = false;
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
   private collaborators = new Map<string, Collaborator>();
@@ -193,6 +195,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     }
   }
 
+  isCollaborating = () => this._isCollaborating;
+
   private onUnload = () => {
     this.destroySocketClient({ isUnload: true });
   };
@@ -203,7 +207,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     );
 
     if (
-      this.isCollaborating &&
+      this._isCollaborating &&
       (this.fileManager.shouldPreventUnload(syncableElements) ||
         !isSavedToFirebase(this.portal, syncableElements))
     ) {
@@ -298,7 +302,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.setState({
         activeRoomLink: "",
       });
-      this.isCollaborating = false;
+      this._isCollaborating = false;
+      LocalData.resumeSave("collaboration");
     }
     this.lastBroadcastedOrReceivedSceneVersion = -1;
     this.portal.close();
@@ -366,7 +371,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     const scenePromise = resolvablePromise<ImportedDataState | null>();
 
-    this.isCollaborating = true;
+    this._isCollaborating = true;
+    LocalData.pauseSave("collaboration");
 
     const { default: socketIOClient } = await import(
       /* webpackChunkName: "socketIoClient" */ "socket.io-client"
@@ -785,7 +791,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.contextValue = {} as CollabAPI;
     }
 
-    this.contextValue.isCollaborating = () => this.isCollaborating;
+    this.contextValue.isCollaborating = this.isCollaborating;
     this.contextValue.username = this.state.username;
     this.contextValue.onPointerUpdate = this.onPointerUpdate;
     this.contextValue.initializeSocketClient = this.initializeSocketClient;

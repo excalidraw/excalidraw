@@ -107,6 +107,7 @@ const restoreElementWithProperties = <
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ?? null,
+    locked: element.locked ?? false,
   };
 
   return {
@@ -252,9 +253,18 @@ export const restoreAppState = (
   }
   return {
     ...nextAppState,
-    activeTool: AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
-      ? nextAppState.activeTool
-      : { ...nextAppState.activeTool, type: "selection" },
+    cursorButton: localAppState?.cursorButton || "up",
+    // reset on fresh restore so as to hide the UI button if penMode not active
+    penDetected:
+      localAppState?.penDetected ??
+      (appState.penMode ? appState.penDetected ?? false : false),
+    activeTool: {
+      lastActiveToolBeforeEraser: null,
+      locked: nextAppState.activeTool.locked ?? false,
+      type: AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
+        ? nextAppState.activeTool.type ?? "selection"
+        : "selection",
+    },
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"
