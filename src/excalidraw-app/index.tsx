@@ -663,6 +663,7 @@ const ExcalidrawWrapper = () => {
                 );
               },
             },
+            clearCanvas: !collabAPI?.isCollaborating(),
           },
         }}
         renderTopRightUI={renderTopRightUI}
