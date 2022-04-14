@@ -26,3 +26,8 @@
     }
   }
 }
+.excalidraw-app.is-collaborating {
+  [data-testid="clear-canvas-button"] {
+    visibility: hidden;
+  }
+}
