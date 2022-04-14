@@ -229,9 +229,6 @@ export const ShapesSwitcher = ({
         ...appState,
         activeTool: nextActiveTool,
       });
-      if (activeToolType === "image") {
-        onImageAction({ pointerType });
-      }
     },
   );
 
@@ -261,6 +258,9 @@ export const ShapesSwitcher = ({
             }}
             onChange={({ pointerType }) => {
               onChange({ activeToolType: value, pointerType });
+              if (activeToolType === "image") {
+                onImageAction({ pointerType });
+              }
             }}
           />
         );
