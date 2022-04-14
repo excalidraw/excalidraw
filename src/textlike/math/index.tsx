@@ -548,94 +548,6 @@ const renderMath = (
   }
 };
 
-const createSvg = (
-  text: string,
-  fontSize: number,
-  strokeColor: String,
-  textAlign: CanvasTextAlign,
-  opacity: Number,
-  mathOpts: MathOpts,
-  isMathJaxLoaded: boolean,
-) => {
-  const key = getCacheKey(
-    text,
-    fontSize,
-    strokeColor,
-    textAlign,
-    opacity,
-    mathOpts,
-  );
-  if (isMathJaxLoaded && svgCache[key]) {
-    return svgCache[key];
-  }
-
-  const svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  const node = svgRoot.ownerDocument.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "g",
-  );
-  const font = getFontFamilyString({ fontFamily: FONT_FAMILY_MATH });
-  node.setAttribute("font-family", `${font}`);
-  node.setAttribute("font-size", `${fontSize}px`);
-  node.setAttribute("color", `${strokeColor}`);
-  node.setAttribute("stroke-opacity", `${opacity}`);
-  node.setAttribute("fill-opacity", `${opacity}`);
-  svgRoot.appendChild(node);
-
-  let childNode = {} as SVGSVGElement | SVGTextElement;
-  const doSetupChild: (
-    childIsSvg: boolean,
-    svg: SVGSVGElement | null,
-    text: string,
-    rtl: boolean,
-  ) => void = function (childIsSvg, svg, text, rtl) {
-    if (childIsSvg && text !== "") {
-      childNode = svg!;
-    } else {
-      const textNode = svgRoot.ownerDocument.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "text",
-      );
-      textNode.setAttribute("style", "white-space: pre;");
-      textNode.setAttribute("fill", `${strokeColor}`);
-      textNode.setAttribute("direction", `${rtl ? "rtl" : "ltr"}`);
-      textNode.setAttribute("text-anchor", `${rtl ? "end" : "start"}`);
-      textNode.textContent = text;
-      childNode = textNode;
-    }
-  };
-  const doRenderChild: (x: number, y: number) => void = function (x, y) {
-    childNode.setAttribute("x", `${x}`);
-    childNode.setAttribute("y", `${y}`);
-    node.appendChild(childNode);
-  };
-  renderMath(
-    text,
-    fontSize,
-    textAlign,
-    mathOpts,
-    isMathJaxLoaded,
-    doSetupChild,
-    doRenderChild,
-  );
-  const { width: imageWidth, height: imageHeight } = getImageMetrics(
-    text,
-    fontSize,
-    mathOpts,
-    isMathJaxLoaded,
-  );
-
-  svgRoot.setAttribute("version", "1.1");
-  svgRoot.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-  svgRoot.setAttribute("viewBox", `0 0 ${imageWidth} ${imageHeight}`);
-  svgRoot.setAttribute("width", `${imageWidth}`);
-  svgRoot.setAttribute("height", `${imageHeight}`);
-  if (isMathJaxLoaded) {
-    svgCache[key] = svgRoot;
-  }
-  return svgRoot;
-};
-
 const imageCache = {} as { [key: string]: HTMLImageElement };
 
 const getRenderDims = (width: number, height: number) => {
@@ -875,20 +787,88 @@ const renderSvgTextElementMath = (
   element: NonDeleted<ExcalidrawTextElementMath>,
 ): void => {
   const isMathJaxLoaded = mathJaxLoaded;
-  const svg = createSvg(
-    element.text,
-    element.fontSize,
-    element.strokeColor,
-    element.textAlign,
-    element.opacity / 100,
-    getMathOpts.ensureMathOpts(element.useTex, element.mathOnly),
+  const mathOpts = getMathOpts.ensureMathOpts(element.useTex, element.mathOnly);
+  const text = element.text;
+  const fontSize = element.fontSize;
+  const strokeColor = element.strokeColor;
+  const textAlign = element.textAlign;
+  const opacity = element.opacity / 100;
+
+  const key = getCacheKey(
+    text,
+    fontSize,
+    strokeColor,
+    textAlign,
+    opacity,
+    mathOpts,
+  );
+  if (isMathJaxLoaded && svgCache[key]) {
+    node.appendChild(svgCache[key]);
+    return;
+  }
+
+  const tempSvg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
+  const groupNode = tempSvg.ownerDocument.createElementNS(SVG_NS, "g");
+
+  const font = getFontFamilyString({ fontFamily: FONT_FAMILY_MATH });
+  groupNode.setAttribute("font-family", `${font}`);
+  groupNode.setAttribute("font-size", `${fontSize}px`);
+  groupNode.setAttribute("color", `${strokeColor}`);
+  groupNode.setAttribute("stroke-opacity", `${opacity}`);
+  groupNode.setAttribute("fill-opacity", `${opacity}`);
+  tempSvg.appendChild(groupNode);
+
+  let childNode = {} as SVGSVGElement | SVGTextElement;
+  const doSetupChild: (
+    childIsSvg: boolean,
+    svg: SVGSVGElement | null,
+    text: string,
+    rtl: boolean,
+  ) => void = function (childIsSvg, svg, text, rtl) {
+    if (childIsSvg && text !== "") {
+      childNode = svg!;
+    } else {
+      const textNode = tempSvg.ownerDocument.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text",
+      );
+      textNode.setAttribute("style", "white-space: pre;");
+      textNode.setAttribute("fill", `${strokeColor}`);
+      textNode.setAttribute("direction", `${rtl ? "rtl" : "ltr"}`);
+      textNode.setAttribute("text-anchor", `${rtl ? "end" : "start"}`);
+      textNode.textContent = text;
+      childNode = textNode;
+    }
+  };
+  const doRenderChild: (x: number, y: number) => void = function (x, y) {
+    childNode.setAttribute("x", `${x}`);
+    childNode.setAttribute("y", `${y}`);
+    groupNode.appendChild(childNode);
+  };
+  renderMath(
+    text,
+    fontSize,
+    textAlign,
+    mathOpts,
+    isMathJaxLoaded,
+    doSetupChild,
+    doRenderChild,
+  );
+
+  const { width, height } = getImageMetrics(
+    text,
+    fontSize,
+    mathOpts,
     isMathJaxLoaded,
   );
-  const tempSvg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
-  tempSvg.innerHTML = svg.innerHTML;
-  tempSvg.setAttribute("width", svg.getAttribute("width")!);
-  tempSvg.setAttribute("height", svg.getAttribute("height")!);
-  tempSvg.setAttribute("viewBox", svg.getAttribute("viewBox")!);
+
+  tempSvg.setAttribute("version", "1.1");
+  tempSvg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  tempSvg.setAttribute("width", `${width}`);
+  tempSvg.setAttribute("height", `${height}`);
+  if (isMathJaxLoaded) {
+    svgCache[key] = tempSvg;
+  }
   node.appendChild(tempSvg);
 };
 
