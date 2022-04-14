@@ -177,8 +177,8 @@
     "errorRemovingFromLibrary": "Öğe kütüphaneden silinemedi",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
     "imageDoesNotContainScene": "Bu görüntü herhangi bir sahne verisi içermiyor gibi görünüyor. Dışa aktarma sırasında sahne yerleştirmeyi etkinleştirdiniz mi?",
-    "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
-    "invalidSceneUrl": "Verilen URL'den çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
+    "cannotRestoreFromImage": "Sahne bu resim dosyasından geri yüklenemedi",
+    "invalidSceneUrl": "Verilen bağlantıdan çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
     "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?",
     "removeItemsFromsLibrary": "{{count}} öğe(ler) kitaplıktan kaldırılsın mı?",
     "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı."
@@ -189,7 +189,7 @@
     "fileTooBig": "Dosya çok büyük. İzin verilen maksimum boyut {{maxSize}}.",
     "svgImageInsertError": "SVG resmi eklenemedi. SVG işaretlemesi geçersiz görünüyor.",
     "invalidSVGString": "Geçersiz SVG.",
-    "cannotResolveCollabServer": "Collab sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin."
+    "cannotResolveCollabServer": "İş birliği sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin."
   },
   "toolBar": {
     "selection": "Seçme",
@@ -219,18 +219,18 @@
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
     "text_selected": "Metni düzenlemek için çift tıklayın veya ENTER'a basın",
     "text_editing": "Düzenlemeyi bitirmek için ESC veya Ctrl/Cmd+ENTER tuşlarına basın",
-    "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
+    "linearElementMulti": "Bitirmek için son noktaya tıklayın ya da Escape veya Enter tuşuna basın",
     "lockAngle": "SHIFT tuşuna basılı tutarak açıyı koruyabilirsiniz",
-    "resize": "Yeniden boyutlandırırken SHIFT'e basılı tutarak oranları kısıtlayabilirsiniz, merkezden yeniden boyutlandırmak için ALT'a basılı tutun",
+    "resize": "Yeniden boyutlandırırken SHIFT tuşunu basılı tutarak oranları sınırlayabilirsiniz,\nmerkezden yeniden boyutlandırmak için ALT tuşunu basılı tutun",
     "resizeImage": "SHIFT'e basılı tutarak serbestçe yeniden boyutlandırabilirsiniz, merkezden yeniden boyutlandırmak için ALT tuşunu basılı tutun",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",
     "lineEditor_info": "Noktaları düzenlemek için çift-tıklayın veya Enter'a basın",
-    "lineEditor_pointSelected": "Sil tuşuna basarak nokta(lar) ı silin,\nCtrlOrCmd+D ile çoğaltın, ya da sürükleyerek taşıyın",
-    "lineEditor_nothingSelected": "Düzenlemek için nokta seçin (SHIFT tuşuna basılı tutarak çoklu seçim),\nya da Alt ve tıklama ile yeni noktalar ekleyin",
+    "lineEditor_pointSelected": "Sil tuşuna basarak noktaları silin,\nCtrl/Cmd + D ile çoğaltın, ya da sürükleyerek taşıyın",
+    "lineEditor_nothingSelected": "Düzenlemek için bir nokta seçin (birden fazla seçmek için SHIFT tuşunu basılı tutun),\nveya Alt tuşunu basılı tutun ve yeni noktalar eklemek için tıklayın",
     "placeImage": "Resmi yerleştirmek için tıklayın ya da boyutunu manuel olarak ayarlamak için tıklayıp sürükleyin",
     "publishLibrary": "Kendi kitaplığınızı yayınlayın",
     "bindTextToElement": "Enter tuşuna basarak metin ekleyin",
-    "deepBoxSelect": "CtrlOrCmd tuşuna basılı tutarak derin seçin yapın ya da sürüklemeyi engelleyin",
+    "deepBoxSelect": "Ctrl/Cmd tuşuna basılı tutarak derin seçim yapın ya da sürüklemeyi engelleyin",
     "eraserRevert": "Alt tuşuna basılı tutarak silinme için işaretlenmiş ögeleri tersine çevirin"
   },
   "canvasError": {
