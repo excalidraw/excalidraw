@@ -115,10 +115,10 @@
       "label": "Link"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Blocca",
+      "unlock": "Sblocca",
+      "lockAll": "Blocca tutto",
+      "unlockAll": "Sblocca tutto"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "Vista",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
     "zoomToSelection": "Zoom alla selezione",
-    "toggleElementLock": ""
+    "toggleElementLock": "Blocca/sblocca selezione"
   },
   "clearCanvasDialog": {
     "title": "Svuota la tela"
