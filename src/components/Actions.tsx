@@ -251,7 +251,10 @@ export const ShapesSwitcher = ({
             data-testid={value}
             onPointerDown={({ pointerType }) => {
               onChange({ activeToolType: value, pointerType });
-              setCursorForShape(canvas, { ...appState, elementType: value });
+              setCursorForShape(canvas, {
+                ...appState,
+                activeTool: { ...activeTool, type: value },
+              });
               if (value === "image") {
                 onImageAction({ pointerType });
               }
