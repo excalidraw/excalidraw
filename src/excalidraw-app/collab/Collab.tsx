@@ -95,7 +95,6 @@ export interface CollabAPI {
 
 interface PublicProps {
   excalidrawAPI: ExcalidrawImperativeAPI;
-  onRoomClose?: () => void;
 }
 
 type Props = PublicProps & { modalIsShown: boolean };
@@ -279,7 +278,7 @@ class Collab extends PureComponent<Props, CollabState> {
       this.destroySocketClient();
       trackEvent("share", "room closed");
 
-      this.props.onRoomClose?.();
+      LocalData.fileStorage.reset();
 
       const elements = this.excalidrawAPI
         .getSceneElementsIncludingDeleted()
