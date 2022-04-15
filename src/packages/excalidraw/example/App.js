@@ -9,9 +9,9 @@ import { MIME_TYPES } from "../../../constants";
 
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
-const { exportToCanvas, exportToSvg, exportToBlob } = window.Excalidraw;
-const Excalidraw = window.Excalidraw.default;
 
+const { exportToCanvas, exportToSvg, exportToBlob, Excalidraw } =
+  window.ExcalidrawLib;
 const resolvablePromise = () => {
   let resolve;
   let reject;
