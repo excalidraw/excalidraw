@@ -81,7 +81,7 @@ interface CollabState {
   activeRoomLink: string;
 }
 
-type CollabInstance = InstanceType<typeof CollabWrapper>;
+type CollabInstance = InstanceType<typeof Collab>;
 
 export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
@@ -100,7 +100,7 @@ interface PublicProps {
 
 type Props = PublicProps & { modalIsShown: boolean };
 
-class CollabWrapper extends PureComponent<Props, CollabState> {
+class Collab extends PureComponent<Props, CollabState> {
   portal: Portal;
   fileManager: FileManager;
   excalidrawAPI: Props["excalidrawAPI"];
@@ -676,7 +676,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   setCollaborators(sockets: string[]) {
     this.setState((state) => {
-      const collaborators: InstanceType<typeof CollabWrapper>["collaborators"] =
+      const collaborators: InstanceType<typeof Collab>["collaborators"] =
         new Map();
       for (const socketId of sockets) {
         if (this.collaborators.has(socketId)) {
@@ -814,7 +814,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
 declare global {
   interface Window {
-    collab: InstanceType<typeof CollabWrapper>;
+    collab: InstanceType<typeof Collab>;
   }
 }
 
@@ -825,11 +825,11 @@ if (
   window.collab = window.collab || ({} as Window["collab"]);
 }
 
-const _CollabWrapper: React.FC<PublicProps> = (props) => {
+const _Collab: React.FC<PublicProps> = (props) => {
   const [collabDialogShown] = useAtom(collabDialogShownAtom);
-  return <CollabWrapper {...props} modalIsShown={collabDialogShown} />;
+  return <Collab {...props} modalIsShown={collabDialogShown} />;
 };
 
-export default _CollabWrapper;
+export default _Collab;
 
-export type TCollabClass = CollabWrapper;
+export type TCollabClass = Collab;

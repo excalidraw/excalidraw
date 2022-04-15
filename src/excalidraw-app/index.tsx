@@ -44,11 +44,11 @@ import {
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
-import CollabWrapper, {
+import Collab, {
   CollabAPI,
   collabAPIAtom,
   collabDialogShownAtom,
-} from "./collab/CollabWrapper";
+} from "./collab/Collab";
 import { LanguageList } from "./components/LanguageList";
 import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
 import {
@@ -684,10 +684,7 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
       />
       {excalidrawAPI && (
-        <CollabWrapper
-          excalidrawAPI={excalidrawAPI}
-          onRoomClose={onRoomClose}
-        />
+        <Collab excalidrawAPI={excalidrawAPI} onRoomClose={onRoomClose} />
       )}
       {errorMessage && (
         <ErrorDialog
