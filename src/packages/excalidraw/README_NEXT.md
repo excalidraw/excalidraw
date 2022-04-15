@@ -48,7 +48,7 @@ If you are using a Web bundler (for instance, Webpack), you can import it as an 
 
 ```js
 import React, { useEffect, useState, useRef } from "react";
-import Excalidraw from "@excalidraw/excalidraw-next";
+import { Excalidraw } from "@excalidraw/excalidraw-next";
 import InitialData from "./initialData";
 
 import "./styles.scss";
@@ -328,7 +328,7 @@ const App = () => {
         className: "excalidraw-wrapper",
         ref: excalidrawWrapperRef,
       },
-      React.createElement(Excalidraw.default, {
+      React.createElement(ExcalidrawLib.Excalidraw, {
         initialData: InitialData,
         onChange: (elements, state) =>
           console.log("Elements :", elements, "State : ", state),
