@@ -106,6 +106,20 @@ export const normalizeSVG = async (SVGString: string) => {
       svg.setAttribute("xmlns", SVG_NS);
     }
 
+    if (!svg.hasAttribute("width") || !svg.hasAttribute("height")) {
+      const viewBox = svg.getAttribute("viewBox");
+      let width = svg.getAttribute("width") || "50";
+      let height = svg.getAttribute("height") || "50";
+      if (viewBox) {
+        const match = viewBox.match(/\d+ +\d+ +(\d+) +(\d+)/);
+        if (match) {
+          [, width, height] = match;
+        }
+      }
+      svg.setAttribute("width", width);
+      svg.setAttribute("height", height);
+    }
+
     return svg.outerHTML;
   }
 };
