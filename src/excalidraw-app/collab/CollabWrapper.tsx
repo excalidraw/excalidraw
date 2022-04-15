@@ -45,7 +45,6 @@ import {
 } from "../data/localStorage";
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
-import { createInverseContext } from "../../createInverseContext";
 import { t } from "../../i18n";
 import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
@@ -69,6 +68,10 @@ import {
 import { decryptData } from "../../data/encryption";
 import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
+import { atom } from "jotai";
+import { jotaiStore } from "../jotai";
+
+export const collabAPIAtom = atom<CollabAPI | null>(null);
 
 interface CollabState {
   modalIsShown: boolean;
@@ -83,8 +86,6 @@ type CollabInstance = InstanceType<typeof CollabWrapper>;
 export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
   isCollaborating: () => boolean;
-  username: CollabState["username"];
-  userState: CollabState["userState"];
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   initializeSocketClient: CollabInstance["initializeSocketClient"];
   onCollabButtonClick: CollabInstance["onCollabButtonClick"];
@@ -97,14 +98,6 @@ interface Props {
   excalidrawAPI: ExcalidrawImperativeAPI;
   onRoomClose?: () => void;
 }
-
-const {
-  Context: CollabContext,
-  Consumer: CollabContextConsumer,
-  Provider: CollabContextProvider,
-} = createInverseContext<{ api: CollabAPI | null }>({ api: null });
-
-export { CollabContext, CollabContextConsumer };
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
@@ -162,6 +155,18 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   componentDidMount() {
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
+
+    const collabAPI: CollabAPI = {
+      isCollaborating: this.isCollaborating,
+      onPointerUpdate: this.onPointerUpdate,
+      initializeSocketClient: this.initializeSocketClient,
+      onCollabButtonClick: this.onCollabButtonClick,
+      syncElements: this.syncElements,
+      fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
+      setUsername: this.setUsername,
+    };
+
+    jotaiStore.set(collabAPIAtom, collabAPI);
 
     if (
       process.env.NODE_ENV === ENV.TEST ||
@@ -782,27 +787,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
     elements.filter((element) => this.isSyncableElement(element));
 
-  /** PRIVATE. Use `this.getContextValue()` instead. */
-  private contextValue: CollabAPI | null = null;
-
-  /** Getter of context value. Returned object is stable. */
-  getContextValue = (): CollabAPI => {
-    if (!this.contextValue) {
-      this.contextValue = {} as CollabAPI;
-    }
-
-    this.contextValue.isCollaborating = this.isCollaborating;
-    this.contextValue.username = this.state.username;
-    this.contextValue.onPointerUpdate = this.onPointerUpdate;
-    this.contextValue.initializeSocketClient = this.initializeSocketClient;
-    this.contextValue.onCollabButtonClick = this.onCollabButtonClick;
-    this.contextValue.syncElements = this.syncElements;
-    this.contextValue.fetchImageFilesFromFirebase =
-      this.fetchImageFilesFromFirebase;
-    this.contextValue.setUsername = this.setUsername;
-    return this.contextValue;
-  };
-
   render() {
     const { modalIsShown, username, errorMessage, activeRoomLink } = this.state;
 
@@ -828,11 +812,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             onClose={() => this.setState({ errorMessage: "" })}
           />
         )}
-        <CollabContextProvider
-          value={{
-            api: this.getContextValue(),
-          }}
-        />
       </>
     );
   }
