@@ -49,7 +49,7 @@ You will need to import the named export from now onwards to use the component
 Using bundler :point_down:
 
 ```js
-import { Excalidraw } from "@excalidraw/excalidraw"
+import { Excalidraw } from "@excalidraw/excalidraw";
 ```
 
 In Browser :point_down:
