@@ -38,6 +38,26 @@ You will need to pass `activeTool.locked` instead of `elementType` from now onwa
 
 You will need to pass `activeTool` instead of `elementType` from now onwards in `appState`
 
+### Build
+
+- Use only named exports [#5045](https://github.com/excalidraw/excalidraw/pull/5045).
+
+#### BREAKING CHANGE
+
+You will need to import the named export from now onwards to use the component
+
+Using bundler :point_down:
+
+```js
+import { Excalidraw } from "@excalidraw/excalidraw";
+```
+
+In Browser :point_down:
+
+```js
+React.createElement(ExcalidrawLib.Excalidraw, opts);
+```
+
 ## 0.11.0 (2022-02-17)
 
 ## Excalidraw API
