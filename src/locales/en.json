@@ -98,7 +98,7 @@
     "flipHorizontal": "Flip horizontal",
     "flipVertical": "Flip vertical",
     "viewMode": "View mode",
-    "toggleExportColorScheme": "Toggle export color scheme",
+    "changeExportTheme": "Change export theme",
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
@@ -149,9 +149,7 @@
     "resetLibrary": "Reset library",
     "createNewRoom": "Create new room",
     "fullScreen": "Full screen",
-    "darkMode": "Dark mode",
-    "lightMode": "Light mode",
-    "autoMode": "Auto mode",
+    "changeTheme": "Change color theme",
     "zenMode": "Zen mode",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",
@@ -380,7 +378,9 @@
     "fileSaved": "File saved.",
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
-    "selection": "selection"
+    "selection": "selection",
+    "darkTheme": "dark theme",
+    "lightTheme": "light theme"
   },
   "colors": {
     "ffffff": "White",

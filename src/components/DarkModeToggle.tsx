@@ -13,17 +13,7 @@ export const DarkModeToggle = (props: {
   title?: string;
   withSystemTheme?: boolean;
 }) => {
-  let title = props.title || t("buttons.lightMode");
-  if (!props.title) {
-    switch (props.value) {
-      case THEME.DARK:
-        title = t("buttons.darkMode");
-        break;
-      case THEME.SYSTEM:
-        t("buttons.autoMode");
-        break;
-    }
-  }
+  const title = props.title || t("buttons.changeTheme");
 
   return (
     <ToolButton

@@ -110,8 +110,8 @@ export const actionCopyAsPng = register({
               ? t("toast.selection")
               : t("toast.canvas"),
             exportColorScheme: appState.exportWithDarkMode
-              ? t("buttons.darkMode")
-              : t("buttons.lightMode"),
+              ? t("toast.darkTheme")
+              : t("toast.lightTheme"),
           }),
         },
         commitToHistory: false,

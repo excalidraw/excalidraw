@@ -65,6 +65,10 @@ React.createElement(ExcalidrawLib.Excalidraw, opts);
 
 - Support system theme in the `DarkModeToggle` component
 
+#### Style
+
+- Improve local strings for system theme support
+
 ## 0.11.0 (2022-02-17)
 
 ## Excalidraw API

@@ -169,10 +169,10 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
           style="margin-inline-start: 0.25rem;"
         >
           <button
-            aria-label="Light mode"
+            aria-label="Change color theme"
             class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon ToolIcon--plain"
             data-testid="toggle-dark-mode"
-            title="Light mode"
+            title="Change color theme"
             type="button"
           >
             <div
@@ -368,10 +368,10 @@ exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when t
           style="margin-inline-start: 0.25rem;"
         >
           <button
-            aria-label="Light mode"
+            aria-label="Change color theme"
             class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon ToolIcon--plain"
             data-testid="toggle-dark-mode"
-            title="Light mode"
+            title="Change color theme"
             type="button"
           >
             <div
