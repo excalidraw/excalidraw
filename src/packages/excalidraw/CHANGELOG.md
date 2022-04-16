@@ -59,6 +59,12 @@ In Browser :point_down:
 React.createElement(ExcalidrawLib.Excalidraw, opts);
 ```
 
+### Excalidraw Library
+
+#### Features
+
+- Support system theme in the `DarkModeToggle` component
+
 ## 0.11.0 (2022-02-17)
 
 ## Excalidraw API
