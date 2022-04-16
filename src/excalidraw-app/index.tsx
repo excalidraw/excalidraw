@@ -48,6 +48,7 @@ import Collab, {
   CollabAPI,
   collabAPIAtom,
   collabDialogShownAtom,
+  isCollaboratingAtom,
 } from "./collab/Collab";
 import { LanguageList } from "./components/LanguageList";
 import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
@@ -233,6 +234,7 @@ const ExcalidrawWrapper = () => {
 
   const [collabAPI] = useAtom(collabAPIAtom);
   const [, setCollabDialogShown] = useAtom(collabDialogShownAtom);
+  const [isCollaborating] = useAtom(isCollaboratingAtom);
 
   useEffect(() => {
     if (!collabAPI || !excalidrawAPI) {
@@ -637,7 +639,7 @@ const ExcalidrawWrapper = () => {
     <div
       style={{ height: "100%" }}
       className={clsx("excalidraw-app", {
-        "is-collaborating": collabAPI?.isCollaborating(),
+        "is-collaborating": isCollaborating,
       })}
     >
       <Excalidraw
@@ -645,7 +647,7 @@ const ExcalidrawWrapper = () => {
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
         onCollabButtonClick={() => setCollabDialogShown(true)}
-        isCollaborating={collabAPI?.isCollaborating()}
+        isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{
           canvasActions: {

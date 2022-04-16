@@ -73,6 +73,7 @@ import { jotaiStore } from "../jotai";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
+export const isCollaboratingAtom = atom(false);
 
 interface CollabState {
   errorMessage: string;
@@ -106,8 +107,6 @@ class Collab extends PureComponent<Props, CollabState> {
   activeIntervalId: number | null;
   idleTimeoutId: number | null;
 
-  // marked as private to ensure we don't change it outside this class
-  private _isCollaborating: boolean = false;
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
   private collaborators = new Map<string, Collaborator>();
@@ -198,7 +197,11 @@ class Collab extends PureComponent<Props, CollabState> {
     }
   }
 
-  isCollaborating = () => this._isCollaborating;
+  isCollaborating = () => jotaiStore.get(isCollaboratingAtom)!;
+
+  private setIsCollaborating = (isCollaborating: boolean) => {
+    jotaiStore.set(isCollaboratingAtom, isCollaborating);
+  };
 
   private onUnload = () => {
     this.destroySocketClient({ isUnload: true });
@@ -210,7 +213,7 @@ class Collab extends PureComponent<Props, CollabState> {
     );
 
     if (
-      this._isCollaborating &&
+      this.isCollaborating() &&
       (this.fileManager.shouldPreventUnload(syncableElements) ||
         !isSavedToFirebase(this.portal, syncableElements))
     ) {
@@ -305,7 +308,7 @@ class Collab extends PureComponent<Props, CollabState> {
       this.setState({
         activeRoomLink: "",
       });
-      this._isCollaborating = false;
+      this.setIsCollaborating(false);
       LocalData.resumeSave("collaboration");
     }
     this.lastBroadcastedOrReceivedSceneVersion = -1;
@@ -374,7 +377,7 @@ class Collab extends PureComponent<Props, CollabState> {
 
     const scenePromise = resolvablePromise<ImportedDataState | null>();
 
-    this._isCollaborating = true;
+    this.setIsCollaborating(true);
     LocalData.pauseSave("collaboration");
 
     const { default: socketIOClient } = await import(
