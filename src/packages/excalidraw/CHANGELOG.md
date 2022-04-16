@@ -17,7 +17,8 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
-- Exported [`restoreLibraryItems`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreLibraryItems) API useful when dealing with libraries [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
+- Exported [`restoreLibraryItems`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreLibraryItems) API [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
+- The `exportToBlob` utility now supports the `exportEmbedScene` options when generating a png image
 
 #### Fixes
 
