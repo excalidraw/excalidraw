@@ -8,6 +8,8 @@ import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { getNonDeletedElements } from "../element";
 import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
+import { encodePngMetadata } from "../data/image";
+import { serializeAsJSON } from "../data/json";
 
 type ExportOpts = {
   elements: readonly NonDeleted<ExcalidrawElement>[];
@@ -105,7 +107,7 @@ export const exportToBlob = async (
 
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
-  return new Promise((resolve) => {
+  let blob: Blob | null = await new Promise((resolve) => {
     canvas.toBlob(
       (blob: Blob | null) => {
         resolve(blob);
@@ -114,6 +116,20 @@ export const exportToBlob = async (
       quality,
     );
   });
+
+  if (blob && mimeType === MIME_TYPES.png && opts.appState?.exportEmbedScene) {
+    blob = await encodePngMetadata({
+      blob,
+      metadata: serializeAsJSON(
+        opts.elements,
+        opts.appState,
+        opts.files || {},
+        "local",
+      ),
+    });
+  }
+
+  return blob;
 };
 
 export const exportToSvg = async ({
