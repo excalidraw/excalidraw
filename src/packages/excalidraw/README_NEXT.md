@@ -907,7 +907,7 @@ This function returns a promise which resolves to svg of the exported drawing.
 | exportBackground | boolean | true | Indicates whether background should be exported |
 | viewBackgroundColor | string | #fff | The default background color |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
-| exportEmbedScene | boolean | false | Indicates whether scene data should be embedded in svg. This will increase the svg size. |
+| exportEmbedScene | boolean | false | Indicates whether scene data should be embedded in svg/png. This will increase the image size. |
 
 ### Extra API's
 
