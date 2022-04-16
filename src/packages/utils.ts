@@ -107,29 +107,30 @@ export const exportToBlob = async (
 
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
-  let blob: Blob | null = await new Promise((resolve) => {
+  return new Promise((resolve) => {
     canvas.toBlob(
-      (blob: Blob | null) => {
+      async (blob: Blob | null) => {
+        if (
+          blob &&
+          mimeType === MIME_TYPES.png &&
+          opts.appState?.exportEmbedScene
+        ) {
+          blob = await encodePngMetadata({
+            blob,
+            metadata: serializeAsJSON(
+              opts.elements,
+              opts.appState,
+              opts.files || {},
+              "local",
+            ),
+          });
+        }
         resolve(blob);
       },
       mimeType,
       quality,
     );
   });
-
-  if (blob && mimeType === MIME_TYPES.png && opts.appState?.exportEmbedScene) {
-    blob = await encodePngMetadata({
-      blob,
-      metadata: serializeAsJSON(
-        opts.elements,
-        opts.appState,
-        opts.files || {},
-        "local",
-      ),
-    });
-  }
-
-  return blob;
 };
 
 export const exportToSvg = async ({
