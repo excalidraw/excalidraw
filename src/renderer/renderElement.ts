@@ -839,7 +839,6 @@ export const renderElementToSvg = (
   files: BinaryFiles,
   offsetX?: number,
   offsetY?: number,
-  exportWithDarkMode?: boolean,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x2 - x1) / 2 - (element.x - x1);
@@ -972,11 +971,6 @@ export const renderElementToSvg = (
 
         const use = svgRoot.ownerDocument!.createElementNS(SVG_NS, "use");
         use.setAttribute("href", `#${symbolId}`);
-
-        // in dark theme, revert the image color filter
-        if (exportWithDarkMode && fileData.mimeType !== MIME_TYPES.svg) {
-          use.setAttribute("filter", IMAGE_INVERT_FILTER);
-        }
 
         use.setAttribute("width", `${Math.round(element.width)}`);
         use.setAttribute("height", `${Math.round(element.height)}`);

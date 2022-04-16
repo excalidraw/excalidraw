@@ -2,7 +2,7 @@ import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance } from "../utils";
+import { bytesToHexString, distance } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
@@ -11,6 +11,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
+import { nanoid } from "nanoid";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -111,9 +112,6 @@ export const exportToSvg = async (
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svgRoot.setAttribute("width", `${width * exportScale}`);
   svgRoot.setAttribute("height", `${height * exportScale}`);
-  if (appState.exportWithDarkMode) {
-    svgRoot.setAttribute("filter", THEME_FILTER);
-  }
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
@@ -131,6 +129,26 @@ export const exportToSvg = async (
     </style>
   </defs>
   `;
+  const style = svgRoot.querySelector("style") as HTMLStyleElement;
+
+  // create a group to wrap the scene, allowing to easily apply a `filter` property to all elements
+  const groupRoot = document.createElementNS(SVG_NS, "g");
+  svgRoot.appendChild(groupRoot);
+
+  let groupId = "";
+  if (appState.exportWithDarkMode) {
+    // use a uniquely generated ID for the group to avoid duplicates when inlining multiple SVGs in a webpage
+    groupId = `group-${await generateIdFromElements(elements)}`;
+    groupRoot.setAttribute("id", groupId);
+
+    // append CSS to apply dark theme
+    const css = `
+      #${groupId}, image {
+        filter: ${THEME_FILTER};
+      }
+    `;
+    addCssToStyle(css, style);
+  }
 
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
@@ -140,14 +158,13 @@ export const exportToSvg = async (
     rect.setAttribute("width", `${width}`);
     rect.setAttribute("height", `${height}`);
     rect.setAttribute("fill", viewBackgroundColor);
-    svgRoot.appendChild(rect);
+    groupRoot.appendChild(rect);
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
+  renderSceneToSvg(elements, rsvg, groupRoot, files || {}, {
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,
-    exportWithDarkMode: appState.exportWithDarkMode,
   });
 
   return svgRoot;
@@ -175,4 +192,37 @@ export const getExportSize = (
   );
 
   return [width, height];
+};
+
+/**
+ * Generates SHA-1 digest from supplied string (if not supported, falls back to
+ * a 40-char base64 random id)
+ */
+const generateIdFromElements = async (
+  elements: readonly NonDeletedExcalidrawElement[],
+): Promise<string> => {
+  try {
+    const str = JSON.stringify(elements);
+    const blob = new Blob([str], { type: "text/plain; charset=utf-8" });
+    const hashBuffer = await window.crypto.subtle.digest(
+      "SHA-1",
+      await blob.arrayBuffer(),
+    );
+    return bytesToHexString(new Uint8Array(hashBuffer));
+  } catch (error: any) {
+    console.error(error);
+    // length 40 to align with the HEX length of SHA-1 (which is 160 bit)
+    return nanoid(40);
+  }
+};
+
+/**
+ * Adds CSS to the style tag without breaking the indentation
+ */
+const addCssToStyle = (css: string, style: HTMLStyleElement) => {
+  const content = style.innerHTML;
+  const paddingIndex = content.trimEnd().length;
+  const styleCss = content.trimEnd();
+  const paddingEnd = content.slice(paddingIndex);
+  style.innerHTML = styleCss + css.trimEnd() + paddingEnd;
 };

@@ -65,6 +65,10 @@ React.createElement(ExcalidrawLib.Excalidraw, opts);
 
 - Support system theme in the `DarkModeToggle` component
 
+#### Refactor
+
+- Wrap all elements of an exported SVG in a group to apply dark theme filter
+
 #### Style
 
 - Improve local strings for system theme support
