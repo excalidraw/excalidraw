@@ -115,10 +115,10 @@
       "label": "தொடுப்பு"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "பூட்டு",
+      "unlock": "பூட்டவிழ்",
+      "lockAll": "எல்லாம் பூட்டு",
+      "unlockAll": "எல்லாம் பூட்டவிழ்"
     }
   },
   "buttons": {
@@ -299,7 +299,7 @@
     "view": "பார்",
     "zoomToFit": "அனைத்துறுப்புகளும் பொருந்தும்படி விரிவாக்கு",
     "zoomToSelection": "தெரிவுக்கு விரிவாக்கு",
-    "toggleElementLock": ""
+    "toggleElementLock": "தேர்ந்தெடுப்பைப் பூட்டு/பூட்டவிழ்"
   },
   "clearCanvasDialog": {
     "title": "கித்தானைத் துடை"
