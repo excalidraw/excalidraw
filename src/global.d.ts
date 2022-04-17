@@ -34,6 +34,8 @@ type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
 
+type ValueOf<T> = T[keyof T];
+
 /** utility type to assert that the second type is a subtype of the first type.
  * Returns the subtype. */
 type SubtypeOf<Supertype, Subtype extends Supertype> = Subtype;
