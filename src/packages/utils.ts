@@ -11,6 +11,8 @@ import { MIME_TYPES } from "../constants";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
 
+export { MIME_TYPES };
+
 type ExportOpts = {
   elements: readonly NonDeleted<ExcalidrawElement>[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
@@ -157,5 +159,9 @@ export const exportToSvg = async ({
 };
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";
-export { loadFromBlob, loadLibraryFromBlob } from "../data/blob";
+export {
+  loadFromBlob,
+  loadSceneOrLibraryFromBlob,
+  loadLibraryFromBlob,
+} from "../data/blob";
 export { getFreeDrawSvgPath } from "../renderer/renderElement";
