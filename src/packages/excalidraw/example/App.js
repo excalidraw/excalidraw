@@ -5,7 +5,7 @@ import Sidebar from "./sidebar/Sidebar";
 
 import "./App.scss";
 import initialData from "./initialData";
-import { MIME_TYPES } from "../../../constants";
+import { MIME_TYPES, THEME } from "../../../constants";
 
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
@@ -260,7 +260,7 @@ export default function App() {
                 elements: excalidrawRef.current.getSceneElements(),
                 appState: {
                   ...initialData.appState,
-                  exportWithDarkMode,
+                  exportTheme: exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
                   exportEmbedScene,
                   width: 300,
                   height: 100,
@@ -282,8 +282,8 @@ export default function App() {
                 mimeType: "image/png",
                 appState: {
                   ...initialData.appState,
+                  exportTheme: exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
                   exportEmbedScene,
-                  exportWithDarkMode,
                 },
                 files: excalidrawRef.current.getFiles(),
               });
@@ -302,7 +302,7 @@ export default function App() {
                 elements: excalidrawRef.current.getSceneElements(),
                 appState: {
                   ...initialData.appState,
-                  exportWithDarkMode,
+                  exportTheme: exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
                 },
                 files: excalidrawRef.current.getFiles(),
               });

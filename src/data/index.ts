@@ -42,7 +42,7 @@ export const exportCanvas = async (
       elements,
       {
         exportBackground,
-        exportWithDarkMode: appState.exportWithDarkMode,
+        exportTheme: appState.exportTheme,
         viewBackgroundColor,
         exportPadding,
         exportScale: appState.exportScale,

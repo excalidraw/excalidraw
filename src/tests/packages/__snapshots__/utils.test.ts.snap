@@ -33,7 +33,7 @@ Object {
   "exportEmbedScene": false,
   "exportPadding": undefined,
   "exportScale": 1,
-  "exportWithDarkMode": false,
+  "exportTheme": "light",
   "fileHandle": null,
   "gridSize": null,
   "isBindingEnabled": true,

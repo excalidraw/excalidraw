@@ -1,10 +1,15 @@
 import rough from "roughjs/bin/rough";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { NonDeletedExcalidrawElement, Theme } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { bytesToHexString, distance } from "../utils";
 import { AppState, BinaryFiles } from "../types";
-import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
+import {
+  DEFAULT_EXPORT_PADDING,
+  SVG_NS,
+  THEME,
+  THEME_FILTER,
+} from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
 import {
@@ -44,6 +49,13 @@ export const exportToCanvas = async (
 
   const defaultAppState = getDefaultAppState();
 
+  let theme = appState.exportTheme;
+  if (theme === THEME.SYSTEM) {
+    theme = matchMedia("(prefers-color-scheme: dark)").matches
+      ? THEME.DARK
+      : THEME.LIGHT;
+  }
+
   const { imageCache } = await updateImageCache({
     imageCache: new Map(),
     fileIds: getInitializedImageElements(elements).map(
@@ -62,7 +74,7 @@ export const exportToCanvas = async (
     shouldCacheIgnoreZoom: false,
     remotePointerUsernames: {},
     remotePointerUserStates: {},
-    theme: appState.exportWithDarkMode ? "dark" : "light",
+    theme,
     imageCache,
     renderScrollbars: false,
     renderSelection: false,
@@ -80,7 +92,7 @@ export const exportToSvg = async (
     exportPadding?: number;
     exportScale?: number;
     viewBackgroundColor: string;
-    exportWithDarkMode?: boolean;
+    exportTheme?: Theme;
     exportEmbedScene?: boolean;
   },
   files: BinaryFiles | null,
@@ -136,15 +148,29 @@ export const exportToSvg = async (
   svgRoot.appendChild(groupRoot);
 
   let groupId = "";
-  if (appState.exportWithDarkMode) {
+  if (
+    appState.exportTheme === THEME.DARK ||
+    appState.exportTheme === THEME.SYSTEM
+  ) {
     // use a uniquely generated ID for the group to avoid duplicates when inlining multiple SVGs in a webpage
     groupId = `group-${await generateIdFromElements(elements)}`;
     groupRoot.setAttribute("id", groupId);
+  }
 
-    // append CSS to apply dark theme
+  // append CSS to apply dark or system theme
+  if (appState.exportTheme === THEME.DARK) {
     const css = `
       #${groupId}, image {
         filter: ${THEME_FILTER};
+      }
+    `;
+    addCssToStyle(css, style);
+  } else if (appState.exportTheme === THEME.SYSTEM) {
+    const css = `
+      @media (prefers-color-scheme: dark) {
+        #${groupId}, image {
+          filter: ${THEME_FILTER};
+        }
       }
     `;
     addCssToStyle(css, style);

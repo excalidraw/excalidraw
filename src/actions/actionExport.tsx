@@ -12,7 +12,7 @@ import { KEYS } from "../keys";
 import { register } from "./register";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
-import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
+import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { ActiveFile } from "../components/ActiveFile";
@@ -255,12 +255,12 @@ export const actionLoadScene = register({
   ),
 });
 
-export const actionExportWithDarkMode = register({
-  name: "exportWithDarkMode",
+export const actionChangeExportTheme = register({
+  name: "changeExportTheme",
   trackEvent: { category: "export", action: "toggleTheme" },
   perform: (_elements, appState, value) => {
     return {
-      appState: { ...appState, exportWithDarkMode: value },
+      appState: { ...appState, exportTheme: value },
       commitToHistory: false,
     };
   },
@@ -274,11 +274,10 @@ export const actionExportWithDarkMode = register({
       }}
     >
       <DarkModeToggle
-        value={appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT}
-        onChange={(theme: Theme) => {
-          updateData(theme === THEME.DARK);
-        }}
+        value={appState.exportTheme}
+        onChange={(theme: Theme) => updateData(theme)}
         title={t("labels.changeExportTheme")}
+        withSystemTheme={true}
       />
     </div>
   ),

@@ -10,6 +10,7 @@ import { getSelectedElements } from "../scene/selection";
 import { exportCanvas } from "../data/index";
 import { getNonDeletedElements, isTextElement } from "../element";
 import { t } from "../i18n";
+import { THEME } from "../constants";
 
 export const actionCopy = register({
   name: "copy",
@@ -102,6 +103,15 @@ export const actionCopyAsPng = register({
         app.files,
         appState,
       );
+      let exportColorScheme =
+        appState.exportTheme === THEME.LIGHT
+          ? t("toast.lightTheme")
+          : t("toast.darkTheme");
+      if (appState.exportTheme === THEME.SYSTEM) {
+        exportColorScheme = matchMedia("(prefers-color-scheme: dark)").matches
+          ? t("toast.lightTheme")
+          : t("toast.darkTheme");
+      }
       return {
         appState: {
           ...appState,
@@ -109,9 +119,7 @@ export const actionCopyAsPng = register({
             exportSelection: selectedElements.length
               ? t("toast.selection")
               : t("toast.canvas"),
-            exportColorScheme: appState.exportWithDarkMode
-              ? t("toast.darkTheme")
-              : t("toast.lightTheme"),
+            exportColorScheme,
           }),
         },
         commitToHistory: false,

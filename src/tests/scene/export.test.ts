@@ -1,3 +1,4 @@
+import { THEME } from "../../constants";
 import { NonDeletedExcalidrawElement } from "../../element/types";
 import * as exportUtils from "../../scene/export";
 import {
@@ -54,7 +55,7 @@ describe("exportToSvg", () => {
       ELEMENTS,
       {
         ...DEFAULT_OPTIONS,
-        exportWithDarkMode: true,
+        exportTheme: THEME.DARK,
       },
       null,
     );

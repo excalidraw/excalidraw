@@ -86,7 +86,7 @@ export type AppState = {
   penDetected: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;
-  exportWithDarkMode: boolean;
+  exportTheme: Theme;
   exportScale: number;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;

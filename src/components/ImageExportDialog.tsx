@@ -143,7 +143,7 @@ const ImageExportModal = ({
     <div className="ExportDialog">
       <div className="ExportDialog__preview" ref={previewRef} />
       {supportsContextFilters &&
-        actionManager.renderAction("exportWithDarkMode")}
+        actionManager.renderAction("changeExportTheme")}
       <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
         <div
           style={{
