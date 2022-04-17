@@ -2,11 +2,17 @@ import { ExcalidrawElement, FileId } from "../../element/types";
 import { getSceneVersion } from "../../element";
 import Portal from "../collab/Portal";
 import { restoreElements } from "../../data/restore";
-import { BinaryFileData, BinaryFileMetadata, DataURL } from "../../types";
+import {
+  AppState,
+  BinaryFileData,
+  BinaryFileMetadata,
+  DataURL,
+} from "../../types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 import { decompressData } from "../../data/encode";
 import { encryptData, decryptData } from "../../data/encryption";
 import { MIME_TYPES } from "../../constants";
+import { reconcileElements } from "../collab/reconciliation";
 
 // private
 // -----------------------------------------------------------------------------
@@ -108,11 +114,13 @@ const encryptElements = async (
 };
 
 const decryptElements = async (
-  key: string,
-  iv: Uint8Array,
-  ciphertext: ArrayBuffer | Uint8Array,
+  data: FirebaseStoredScene,
+  roomKey: string,
 ): Promise<readonly ExcalidrawElement[]> => {
-  const decrypted = await decryptData(iv, ciphertext, key);
+  const ciphertext = data.ciphertext.toUint8Array();
+  const iv = data.iv.toUint8Array();
+
+  const decrypted = await decryptData(iv, ciphertext, roomKey);
   const decodedData = new TextDecoder("utf-8").decode(
     new Uint8Array(decrypted),
   );
@@ -171,57 +179,86 @@ export const saveFilesToFirebase = async ({
   return { savedFiles, erroredFiles };
 };
 
-export const saveToFirebase = async (
-  portal: Portal,
+const createFirebaseSceneDocument = async (
+  firebase: ResolutionType<typeof loadFirestore>,
   elements: readonly ExcalidrawElement[],
+  roomKey: string,
 ) => {
-  const { roomId, roomKey, socket } = portal;
-  if (
-    // if no room exists, consider the room saved because there's nothing we can
-    // do at this point
-    !roomId ||
-    !roomKey ||
-    !socket ||
-    isSavedToFirebase(portal, elements)
-  ) {
-    return true;
-  }
-
-  const firebase = await loadFirestore();
   const sceneVersion = getSceneVersion(elements);
   const { ciphertext, iv } = await encryptElements(roomKey, elements);
-
-  const nextDocData = {
+  return {
     sceneVersion,
     ciphertext: firebase.firestore.Blob.fromUint8Array(
       new Uint8Array(ciphertext),
     ),
     iv: firebase.firestore.Blob.fromUint8Array(iv),
   } as FirebaseStoredScene;
+};
 
-  const db = firebase.firestore();
-  const docRef = db.collection("scenes").doc(roomId);
-  const didUpdate = await db.runTransaction(async (transaction) => {
-    const doc = await transaction.get(docRef);
-    if (!doc.exists) {
-      transaction.set(docRef, nextDocData);
-      return true;
-    }
-
-    const prevDocData = doc.data() as FirebaseStoredScene;
-    if (prevDocData.sceneVersion >= nextDocData.sceneVersion) {
-      return false;
-    }
-
-    transaction.update(docRef, nextDocData);
-    return true;
-  });
-
-  if (didUpdate) {
-    firebaseSceneVersionCache.set(socket, sceneVersion);
+export const saveToFirebase = async (
+  portal: Portal,
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const { roomId, roomKey, socket } = portal;
+  if (
+    // bail if no room exists as there's nothing we can do at this point
+    !roomId ||
+    !roomKey ||
+    !socket ||
+    isSavedToFirebase(portal, elements)
+  ) {
+    return false;
   }
 
-  return didUpdate;
+  const firebase = await loadFirestore();
+  const firestore = firebase.firestore();
+
+  const docRef = firestore.collection("scenes").doc(roomId);
+
+  const savedData = await firestore.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(docRef);
+
+    if (!snapshot.exists) {
+      const sceneDocument = await createFirebaseSceneDocument(
+        firebase,
+        elements,
+        roomKey,
+      );
+
+      transaction.set(docRef, sceneDocument);
+
+      return {
+        sceneVersion: sceneDocument.sceneVersion,
+        reconciledElements: null,
+      };
+    }
+
+    const prevDocData = snapshot.data() as FirebaseStoredScene;
+    const prevElements = await decryptElements(prevDocData, roomKey);
+
+    const reconciledElements = reconcileElements(
+      elements,
+      prevElements,
+      appState,
+    );
+
+    const sceneDocument = await createFirebaseSceneDocument(
+      firebase,
+      reconciledElements,
+      roomKey,
+    );
+
+    transaction.update(docRef, sceneDocument);
+    return {
+      reconciledElements,
+      sceneVersion: sceneDocument.sceneVersion,
+    };
+  });
+
+  firebaseSceneVersionCache.set(socket, savedData.sceneVersion);
+
+  return savedData;
 };
 
 export const loadFromFirebase = async (
@@ -238,10 +275,7 @@ export const loadFromFirebase = async (
     return null;
   }
   const storedScene = doc.data() as FirebaseStoredScene;
-  const ciphertext = storedScene.ciphertext.toUint8Array();
-  const iv = storedScene.iv.toUint8Array();
-
-  const elements = await decryptElements(roomKey, iv, ciphertext);
+  const elements = await decryptElements(storedScene, roomKey);
 
   if (socket) {
     firebaseSceneVersionCache.set(socket, getSceneVersion(elements));
