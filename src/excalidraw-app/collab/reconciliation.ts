@@ -78,8 +78,14 @@ export const reconcileElements = (
       continue;
     }
 
+    // Mark duplicate for removal as it'll be replaced with the remote element
     if (local) {
-      // mark for removal since it'll be replaced with the remote element
+      // Unless the ramote and local elements are the same element in which case
+      // we need to keep it as we'd otherwise discard it from the resulting
+      // array.
+      if (local[0] === remoteElement) {
+        continue;
+      }
       duplicates.set(local[0], true);
     }
 

@@ -9,36 +9,60 @@ import { randomInteger } from "../random";
 import { AppState } from "../types";
 
 type Id = string;
-type Ids = Id[];
+type ElementLike = {
+  id: string;
+  version: number;
+  versionNonce: number;
+  parent?: string | null;
+};
 
 type Cache = Record<string, ExcalidrawElement | undefined>;
 
-const parseId = (uid: string) => {
-  const [, parent, id, version] = uid.match(
-    /^(?:\((\^|\w+)\))?(\w+)(?::(\d+))?(?:\((\w+)\))?$/,
-  )!;
+const createElement = (opts: { uid: string } | ElementLike) => {
+  let uid: string;
+  let id: string;
+  let version: number | null;
+  let parent: string | null = null;
+  let versionNonce: number | null = null;
+  if ("uid" in opts) {
+    const match = opts.uid.match(
+      /^(?:\((\^|\w+)\))?(\w+)(?::(\d+))?(?:\((\w+)\))?$/,
+    )!;
+    parent = match[1];
+    id = match[2];
+    version = match[3] ? parseInt(match[3]) : null;
+    uid = version ? `${id}:${version}` : id;
+  } else {
+    ({ id, version, versionNonce } = opts);
+    parent = parent || null;
+    uid = id;
+  }
   return {
-    uid: version ? `${id}:${version}` : id,
+    uid,
     id,
-    version: version ? parseInt(version) : null,
+    version,
+    versionNonce: versionNonce || randomInteger(),
     parent: parent || null,
   };
 };
 
 const idsToElements = (
-  ids: Ids,
+  ids: (Id | ElementLike)[],
   cache: Cache = {},
 ): readonly ExcalidrawElement[] => {
   return ids.reduce((acc, _uid, idx) => {
-    const { uid, id, version, parent } = parseId(_uid);
+    const { uid, id, version, parent, versionNonce } = createElement(
+      typeof _uid === "string" ? { uid: _uid } : _uid,
+    );
     const cached = cache[uid];
     const elem = {
       id,
       version: version ?? 0,
-      versionNonce: randomInteger(),
+      versionNonce,
       ...cached,
       parent,
     } as BroadcastedExcalidrawElement;
+    // @ts-ignore
     cache[uid] = elem;
     acc.push(elem);
     return acc;
@@ -67,8 +91,8 @@ const cleanElements = (elements: ReconciledElements) => {
 const cloneDeep = (data: any) => JSON.parse(JSON.stringify(data));
 
 const test = <U extends `${string}:${"L" | "R"}`>(
-  local: Ids,
-  remote: Ids,
+  local: (Id | ElementLike)[],
+  remote: (Id | ElementLike)[],
   target: U[],
   bidirectional = true,
 ) => {
@@ -80,6 +104,7 @@ const test = <U extends `${string}:${"L" | "R"}`>(
     return (source === "L" ? _local : _remote).find((e) => e.id === id)!;
   }) as any as ReconciledElements;
   const remoteReconciled = reconcileElements(_local, _remote, {} as AppState);
+  expect(target.length).equal(remoteReconciled.length);
   expect(cleanElements(remoteReconciled)).deep.equal(
     cleanElements(_target),
     "remote reconciliation",
@@ -300,5 +325,93 @@ describe("elements reconciliation", () => {
     test(["A:2", "B:2"], ["B:1", "C"], ["A:L", "B:L", "C:R"]);
     test(["A:2", "B:2"], ["(A)C", "B:1"], ["A:L", "C:R", "B:L"]);
     test(["A:2", "B:2"], ["(A)C", "B:1"], ["A:L", "C:R", "B:L"]);
+  });
+
+  it("test identical elements reconciliation", () => {
+    const testIdentical = (
+      local: ElementLike[],
+      remote: ElementLike[],
+      expected: Id[],
+    ) => {
+      const ret = reconcileElements(
+        local as any as ExcalidrawElement[],
+        remote as any as ExcalidrawElement[],
+        {} as AppState,
+      );
+
+      if (new Set(ret.map((x) => x.id)).size !== ret.length) {
+        throw new Error("reconcileElements: duplicate elements found");
+      }
+
+      expect(ret.map((x) => x.id)).to.deep.equal(expected);
+    };
+
+    // identical id/version/versionNonce
+    // -------------------------------------------------------------------------
+
+    testIdentical(
+      [{ id: "A", version: 1, versionNonce: 1 }],
+      [{ id: "A", version: 1, versionNonce: 1 }],
+      ["A"],
+    );
+    testIdentical(
+      [
+        { id: "A", version: 1, versionNonce: 1 },
+        { id: "B", version: 1, versionNonce: 1 },
+      ],
+      [
+        { id: "B", version: 1, versionNonce: 1 },
+        { id: "A", version: 1, versionNonce: 1 },
+      ],
+      ["B", "A"],
+    );
+    testIdentical(
+      [
+        { id: "A", version: 1, versionNonce: 1 },
+        { id: "B", version: 1, versionNonce: 1 },
+      ],
+      [
+        { id: "B", version: 1, versionNonce: 1 },
+        { id: "A", version: 1, versionNonce: 1 },
+      ],
+      ["B", "A"],
+    );
+
+    // actually identical (arrays and element objects)
+    // -------------------------------------------------------------------------
+
+    const elements1 = [
+      {
+        id: "A",
+        version: 1,
+        versionNonce: 1,
+        parent: null,
+      },
+      {
+        id: "B",
+        version: 1,
+        versionNonce: 1,
+        parent: null,
+      },
+    ];
+
+    testIdentical(elements1, elements1, ["A", "B"]);
+    testIdentical(elements1, elements1.slice(), ["A", "B"]);
+    testIdentical(elements1.slice(), elements1, ["A", "B"]);
+    testIdentical(elements1.slice(), elements1.slice(), ["A", "B"]);
+
+    const el1 = {
+      id: "A",
+      version: 1,
+      versionNonce: 1,
+      parent: null,
+    };
+    const el2 = {
+      id: "B",
+      version: 1,
+      versionNonce: 1,
+      parent: null,
+    };
+    testIdentical([el1, el2], [el2, el1], ["A", "B"]);
   });
 });
