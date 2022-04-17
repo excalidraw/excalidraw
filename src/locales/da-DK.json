@@ -9,6 +9,7 @@
     "copy": "Kopier",
     "copyAsPng": "Kopier til klippebord som PNG",
     "copyAsSvg": "Kopier til klippebord som SVG",
+    "copyText": "",
     "bringForward": "",
     "sendToBack": "",
     "bringToFront": "",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "",
     "increaseFontSize": "",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "",
     "importBackendFailed": "",
     "cannotExportEmptyCanvas": "",
-    "couldNotCopyToClipboard": "Kunne ikke kopiere til klippebord. Prøv at bruge Chrome browser.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "",
     "uploadedSecurly": "",
     "loadSceneOverridePrompt": "",
@@ -196,7 +204,8 @@
     "library": "",
     "lock": "",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "",
@@ -221,7 +230,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -281,14 +291,15 @@
     "howto": "",
     "or": "",
     "preventBinding": "",
-    "shapes": "",
+    "tools": "",
     "shortcuts": "",
     "textFinish": "",
     "textNewLine": "",
     "title": "",
     "view": "",
     "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToSelection": "",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""

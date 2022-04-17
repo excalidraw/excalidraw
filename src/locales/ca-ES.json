@@ -9,6 +9,7 @@
     "copy": "Copia",
     "copyAsPng": "Copia al porta-retalls com a PNG",
     "copyAsSvg": "Copia al porta-retalls com a SVG",
+    "copyText": "",
     "bringForward": "Porta endavant",
     "sendToBack": "Envia enrere",
     "bringToFront": "Porta al davant",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "Redueix la mida de la lletra",
     "increaseFontSize": "Augmenta la mida de la lletra",
     "unbindText": "Desvincular el text",
+    "bindText": "",
     "link": {
       "edit": "Edita l'enllaç",
       "create": "Crea un enllaç",
       "label": "Enllaç"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "No s'ha pogut carregar un fitxer no vàlid",
     "importBackendFailed": "Importació fallida.",
     "cannotExportEmptyCanvas": "No es pot exportar un llenç buit.",
-    "couldNotCopyToClipboard": "No s'ha pogut copiar al porta-retalls. Intentar amb el navegador Google Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "No s'ha pogut desencriptar.",
     "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut.",
     "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?",
@@ -196,7 +204,8 @@
     "library": "Biblioteca",
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
     "penMode": "Evita el zoom i accepta solament el dibuix lliure amb bolígraf",
-    "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada"
+    "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -221,7 +230,8 @@
     "placeImage": "Feu clic per a col·locar la imatge o clic i arrossegar per a establir-ne la mida manualment",
     "publishLibrary": "Publiqueu la vostra pròpia llibreria",
     "bindTextToElement": "Premeu enter per a afegir-hi text",
-    "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament"
+    "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
@@ -281,14 +291,15 @@
     "howto": "Seguiu les nostres guies",
     "or": "o",
     "preventBinding": "Prevenir vinculació de la fletxa",
-    "shapes": "Formes",
+    "tools": "",
     "shortcuts": "Dreceres de teclat",
     "textFinish": "Finalitza l'edició (editor de text)",
     "textNewLine": "Afegeix una línia nova (editor de text)",
     "title": "Ajuda",
     "view": "Visualització",
     "zoomToFit": "Zoom per veure tots els elements",
-    "zoomToSelection": "Zoom per veure la selecció"
+    "zoomToSelection": "Zoom per veure la selecció",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Neteja el llenç"

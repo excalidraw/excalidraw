@@ -9,6 +9,7 @@
     "copy": "Kopier",
     "copyAsPng": "Kopier til PNG",
     "copyAsSvg": "Kopier til utklippstavlen som SVG",
+    "copyText": "Kopier til utklippstavlen som tekst",
     "bringForward": "Flytt framover",
     "sendToBack": "Send bakerst",
     "bringToFront": "Flytt forrest",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "Reduser skriftstørrelse",
     "increaseFontSize": "Øk skriftstørrelse",
     "unbindText": "Avbind tekst",
+    "bindText": "Bind tekst til beholderen",
     "link": {
       "edit": "Rediger lenke",
       "create": "Opprett lenke",
       "label": "Lenke"
+    },
+    "elementLock": {
+      "lock": "Lås",
+      "unlock": "Lås opp",
+      "lockAll": "Lås alle",
+      "unlockAll": "Lås opp alle"
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "Kunne ikke laste inn ugyldig fil",
     "importBackendFailed": "Importering av backend feilet.",
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
-    "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
+    "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen.",
     "decryptFailed": "Kunne ikke dekryptere data.",
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter.",
     "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?",
@@ -196,7 +204,8 @@
     "library": "Bibliotek",
     "lock": "Behold merket verktøy som aktivt",
     "penMode": "Forhindre zoom ved kniping og godta frihåndstegning kun fra penn",
-    "link": "Legg til / oppdater link for en valgt figur"
+    "link": "Legg til / oppdater link for en valgt figur",
+    "eraser": "Viskelær"
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
@@ -221,7 +230,8 @@
     "placeImage": "Klikk for å plassere bildet, eller klikk og dra for å angi størrelsen manuelt",
     "publishLibrary": "Publiser ditt eget bibliotek",
     "bindTextToElement": "Trykk Enter for å legge til tekst",
-    "deepBoxSelect": "Hold CTRL/CMD for å markere dypt og forhindre flytting"
+    "deepBoxSelect": "Hold CTRL/CMD for å markere dypt og forhindre flytting",
+    "eraserRevert": "Hold Alt for å reversere elementene merket for sletting"
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
@@ -281,14 +291,15 @@
     "howto": "Følg våre veiledninger",
     "or": "eller",
     "preventBinding": "Forhindre pilbinding",
-    "shapes": "Former",
+    "tools": "Verktøy",
     "shortcuts": "Tastatursnarveier",
     "textFinish": "Fullfør redigering (teksteditor)",
     "textNewLine": "Legg til ny linje (teksteditor)",
     "title": "Hjelp",
     "view": "Vis",
     "zoomToFit": "Zoom for å se alle elementer",
-    "zoomToSelection": "Zoom til utvalg"
+    "zoomToSelection": "Zoom til utvalg",
+    "toggleElementLock": "Lås/lås opp utvalg"
   },
   "clearCanvasDialog": {
     "title": "Tøm lerret"

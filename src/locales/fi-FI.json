@@ -9,6 +9,7 @@
     "copy": "Kopioi",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
+    "copyText": "Kopioi tekstinä",
     "bringForward": "Tuo eteenpäin",
     "sendToBack": "Vie taakse",
     "bringToFront": "Tuo eteen",
@@ -64,7 +65,7 @@
     "cartoonist": "Sarjakuva",
     "fileTitle": "Tiedostonimi",
     "colorPicker": "Värin valinta",
-    "canvasColors": "",
+    "canvasColors": "Käytössä piirtoalueella",
     "canvasBackground": "Piirtoalueen tausta",
     "drawingCanvas": "Piirtoalue",
     "layers": "Tasot",
@@ -106,11 +107,18 @@
     "excalidrawLib": "Excalidraw kirjasto",
     "decreaseFontSize": "Pienennä kirjasinkokoa",
     "increaseFontSize": "Kasvata kirjasinkokoa",
-    "unbindText": "",
+    "unbindText": "Irroita teksti",
+    "bindText": "Kiinnitä teksti säiliöön",
     "link": {
       "edit": "Muokkaa linkkiä",
       "create": "Luo linkki",
       "label": "Linkki"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "Virheellistä tiedostoa ei voitu avata",
     "importBackendFailed": "Palvelimelta tuonti epäonnistui.",
     "cannotExportEmptyCanvas": "Tyhjää piirtoaluetta ei voi viedä.",
-    "couldNotCopyToClipboard": "Leikepöydälle kopiointi epäonnistui. Kokeile Chrome-selainta.",
+    "couldNotCopyToClipboard": "Leikepöydälle vieminen epäonnistui.",
     "decryptFailed": "Salauksen purkaminen epäonnistui.",
     "uploadedSecurly": "Lähetys on turvattu päästä-päähän-salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
     "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Jatketaanko?",
@@ -181,7 +189,7 @@
     "fileTooBig": "Tiedosto on liian suuri. Suurin sallittu koko on {{maxSize}}.",
     "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
     "invalidSVGString": "Virheellinen SVG.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Yhteyden muodostaminen collab-palvelimeen epäonnistui. Virkistä sivu ja yritä uudelleen."
   },
   "toolBar": {
     "selection": "Valinta",
@@ -196,7 +204,8 @@
     "library": "Kirjasto",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen",
     "penMode": "Estä nipistyszoomaus ja vastaanota ainoastaan kynällä piirretty",
-    "link": "Lisää/päivitä linkki valitulle muodolle"
+    "link": "Lisää/päivitä linkki valitulle muodolle",
+    "eraser": "Poistotyökalu"
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
@@ -221,7 +230,8 @@
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
     "publishLibrary": "Julkaise oma kirjasto",
     "bindTextToElement": "Lisää tekstiä painamalla enter",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus painamalla CtrlOrCmd",
+    "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen"
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
@@ -268,8 +278,8 @@
   "helpDialog": {
     "blog": "Lue blogiamme",
     "click": "klikkaa",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Syvävalinta",
+    "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus",
     "curvedArrow": "Kaareva nuoli",
     "curvedLine": "Kaareva viiva",
     "documentation": "Käyttöohjeet",
@@ -281,14 +291,15 @@
     "howto": "Seuraa oppaitamme",
     "or": "tai",
     "preventBinding": "Estä nuolten kiinnitys",
-    "shapes": "Muodot",
+    "tools": "Työkalut",
     "shortcuts": "Pikanäppäimet",
     "textFinish": "Lopeta muokkaus (tekstieditori)",
     "textNewLine": "Lisää uusi rivi (tekstieditori)",
     "title": "Ohjeet",
     "view": "Näkymä",
     "zoomToFit": "Näytä kaikki elementit",
-    "zoomToSelection": "Näytä valinta"
+    "zoomToSelection": "Näytä valinta",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Pyyhi piirtoalue"

@@ -9,6 +9,7 @@
     "copy": "Kopēt",
     "copyAsPng": "Kopēt starpliktuvē kā PNG",
     "copyAsSvg": "Kopēt starpliktuvē kā SVG",
+    "copyText": "Kopēt starpliktuvē kā tekstu",
     "bringForward": "Pārvietot vienu slāni augstāk",
     "sendToBack": "Pārvietot uz zemāko slāni",
     "bringToFront": "Pārvietot uz virsējo slāni",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "Samazināt fonta izmēru",
     "increaseFontSize": "Palielināt fonta izmēru",
     "unbindText": "Atdalīt tekstu",
+    "bindText": "Piesaistīt tekstu figūrai",
     "link": {
       "edit": "Rediģēt saiti",
       "create": "Izveidot saiti",
       "label": "Saite"
+    },
+    "elementLock": {
+      "lock": "Fiksēt",
+      "unlock": "Atbrīvot",
+      "lockAll": "Fiksēt visu",
+      "unlockAll": "Atbrīvot visu"
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "Nevarēja ielādēt nederīgu datni",
     "importBackendFailed": "Ielāde no krātuves neizdevās.",
     "cannotExportEmptyCanvas": "Nevar eksportēt tukšu tāfeli.",
-    "couldNotCopyToClipboard": "Neizdevās kopēt starpliktuvē. Mēģiniet vēlreiz, izmantojot pārlūku Chrome.",
+    "couldNotCopyToClipboard": "Nevarēja nokopēt starpliktuvē.",
     "decryptFailed": "Nevarēja atšifrēt datus.",
     "uploadedSecurly": "Augšuplāde nodrošināta ar šifrēšanu no gala līdz galam, kas nozīmē, ka Excalidraw serveri un trešās puses nevar lasīt saturu.",
     "loadSceneOverridePrompt": "Ārēja satura ielāde aizstās jūsu pašreizējo saturu. Vai vēlaties turpināt?",
@@ -196,7 +204,8 @@
     "library": "Bibliotēka",
     "lock": "Paturēt izvēlēto rīku pēc darbības",
     "penMode": "Lietojot pildspalvu, bloķēt tuvināšanu un atļaut tikai zīmēšanu",
-    "link": "Pievienot/rediģēt atlasītās figūras saiti"
+    "link": "Pievienot/rediģēt atlasītās figūras saiti",
+    "eraser": "Dzēšgumija"
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
@@ -221,7 +230,8 @@
     "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru",
     "publishLibrary": "Publicēt savu bibliotēku",
     "bindTextToElement": "Spiediet ievades taustiņu, lai pievienotu tekstu",
-    "deepBoxSelect": "Turient nospiestu Ctrl vai Cmd, lai atlasītu dziļumā un lai nepieļautu objektu pavilkšanu"
+    "deepBoxSelect": "Turient nospiestu Ctrl vai Cmd, lai atlasītu dziļumā un lai nepieļautu objektu pavilkšanu",
+    "eraserRevert": "Turiet Alt, lai noņemtu elementus no dzēsšanas atlases"
   },
   "canvasError": {
     "cannotShowPreview": "Nevar rādīt priekšskatījumu",
@@ -232,7 +242,7 @@
     "headingMain_pre": "Notikusi kļūda. Mēģiniet ",
     "headingMain_button": "pārlādēt lapu.",
     "clearCanvasMessage": "Ja pārlādēšana nestrādā, mēģiniet ",
-    "clearCanvasMessage_button": "notīrīt tāfeli.",
+    "clearCanvasMessage_button": "notīrot tāfeli.",
     "clearCanvasCaveat": " Tas novedīs pie darba zaudēšanas ",
     "trackedToSentry_pre": "Kļūda ar kodu ",
     "trackedToSentry_post": " tika noteikta mūsu sistēmā.",
@@ -281,14 +291,15 @@
     "howto": "Sekojiet mūsu instrukcijām",
     "or": "vai",
     "preventBinding": "Novērst bultu piesaistīšanos",
-    "shapes": "Figūras",
+    "tools": "Rīki",
     "shortcuts": "Tastatūras saīsnes",
     "textFinish": "Pabeigt rediģēšanu (teksta redaktorā)",
     "textNewLine": "Nākamā rindiņa (teksta redaktorā)",
     "title": "Palīdzība",
     "view": "Skatīt",
     "zoomToFit": "Iestatīt mērogu, kas iekļauj visus elementus",
-    "zoomToSelection": "Iestatīt mērogu, lai rādītu atlasi"
+    "zoomToSelection": "Iestatīt mērogu, lai rādītu atlasi",
+    "toggleElementLock": "Fiksēt/atbrīvot atlasīto"
   },
   "clearCanvasDialog": {
     "title": "Notīrīt tāfeli"

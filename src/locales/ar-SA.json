@@ -9,6 +9,7 @@
     "copy": "نسخ",
     "copyAsPng": "نسخ إلى الحافظة بصيغة PNG",
     "copyAsSvg": "نسخ إلى الحافظة بصيغة SVG",
+    "copyText": "نسخ إلى الحافظة كنص",
     "bringForward": "جلب للأمام",
     "sendToBack": "أرسل للخلف",
     "bringToFront": "أحضر للأمام",
@@ -21,7 +22,7 @@
     "fill": "التعبئة",
     "strokeWidth": "سُمك الخط",
     "strokeStyle": "نمط الخط",
-    "strokeStyle_solid": "كامل",
+    "strokeStyle_solid": "متصل",
     "strokeStyle_dashed": "متقطع",
     "strokeStyle_dotted": "منقط",
     "sloppiness": "الإمالة",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "تصغير حجم الخط",
     "increaseFontSize": "تكبير حجم الخط",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "تعديل الرابط",
       "create": "إنشاء رابط",
       "label": "رابط"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "تعذر التحميل، الملف غير صالح",
     "importBackendFailed": "فشل الاستيراد من الخادوم.",
     "cannotExportEmptyCanvas": "لا يمكن تصدير لوحة فارغة.",
-    "couldNotCopyToClipboard": "تعذر النسخ إلى الحافظة. حاول استخدام متصفح Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "تعذر فك تشفير البيانات.",
     "uploadedSecurly": "تم تأمين التحميل بتشفير النهاية إلى النهاية، مما يعني أن خادوم Excalidraw والأطراف الثالثة لا يمكنها قراءة المحتوى.",
     "loadSceneOverridePrompt": "تحميل الرسم الخارجي سيحل محل المحتوى الموجود لديك. هل ترغب في المتابعة؟",
@@ -172,7 +180,7 @@
     "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة",
     "invalidSceneUrl": "تعذر استيراد المشهد من عنوان URL المتوفر. إما أنها مشوهة، أو لا تحتوي على بيانات Excalidraw JSON صالحة.",
     "resetLibrary": "هذا سوف يمسح مكتبتك. هل أنت متأكد؟",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "حذف {{count}} عنصر (عناصر) من المكتبة؟",
     "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل."
   },
   "errors": {
@@ -196,7 +204,8 @@
     "library": "مكتبة",
     "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": "ممحاة"
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
@@ -221,7 +230,8 @@
     "placeImage": "",
     "publishLibrary": "نشر مكتبتك",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
@@ -281,14 +291,15 @@
     "howto": "اتبع التعليمات",
     "or": "أو",
     "preventBinding": "منع ارتبط السهم",
-    "shapes": "أشكال",
+    "tools": "الأدوات",
     "shortcuts": "اختصارات لوحة المفاتيح",
     "textFinish": "إنهاء التعديل (محرر النص)",
     "textNewLine": "أضف سطر جديد (محرر نص)",
     "title": "المساعدة",
     "view": "عرض",
     "zoomToFit": "تكبير للملائمة",
-    "zoomToSelection": "تكبير للعنصر المحدد"
+    "zoomToSelection": "تكبير للعنصر المحدد",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "مسح اللوحة"

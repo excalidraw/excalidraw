@@ -9,6 +9,7 @@
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
+    "copyText": "",
     "bringForward": "Trazer para a frente",
     "sendToBack": "Enviar para o fundo",
     "bringToFront": "Trazer para o primeiro plano",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "Diminuir o tamanho da fonte",
     "increaseFontSize": "Aumentar o tamanho da fonte",
     "unbindText": "Desvincular texto",
+    "bindText": "",
     "link": {
       "edit": "Editar link",
       "create": "Criar link",
       "label": "Link"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "Não foi possível carregar o arquivo inválido",
     "importBackendFailed": "A importação do servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazio.",
-    "couldNotCopyToClipboard": "Não foi possível copiar para a área de transferência. Experimente usando o navegador Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "Não foi possível descriptografar os dados.",
     "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo.",
     "loadSceneOverridePrompt": "Carregar um desenho externo substituirá o seu conteúdo existente. Deseja continuar?",
@@ -181,7 +189,7 @@
     "fileTooBig": "O arquivo é muito grande. O tamanho máximo permitido é {{maxSize}}.",
     "svgImageInsertError": "Não foi possível inserir a imagem SVG. A marcação SVG parece inválida.",
     "invalidSVGString": "SVG Inválido.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Não foi possível conectar-se ao servidor colaborativo. Por favor, recarregue a página e tente novamente."
   },
   "toolBar": {
     "selection": "Seleção",
@@ -196,7 +204,8 @@
     "library": "Biblioteca",
     "lock": "Manter ativa a ferramenta selecionada após desenhar",
     "penMode": "Prevenir a ação de tocar-ampliar e permitir apenas interações da caneta",
-    "link": "Adicionar/Atualizar link para uma forma selecionada"
+    "link": "Adicionar/Atualizar link para uma forma selecionada",
+    "eraser": "Borracha"
   },
   "headings": {
     "canvasActions": "Ações da tela",
@@ -221,7 +230,8 @@
     "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
     "publishLibrary": "Publicar sua própria biblioteca",
     "bindTextToElement": "Pressione Enter para adicionar o texto",
-    "deepBoxSelect": "Segure Ctrl/Cmd para seleção profunda e para evitar arrastar"
+    "deepBoxSelect": "Segure Ctrl/Cmd para seleção profunda e para evitar arrastar",
+    "eraserRevert": "Segure a tecla Alt para inverter os elementos marcados para exclusão"
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -281,14 +291,15 @@
     "howto": "Siga nossos guias",
     "or": "ou",
     "preventBinding": "Evitar fixação de seta",
-    "shapes": "Formas",
+    "tools": "",
     "shortcuts": "Atalhos de teclado",
     "textFinish": "Encerrar edição (editor de texto)",
     "textNewLine": "Adicionar nova linha (editor de texto)",
     "title": "Ajudar",
     "view": "Visualizar",
     "zoomToFit": "Ampliar para encaixar todos os elementos",
-    "zoomToSelection": "Ampliar a seleção"
+    "zoomToSelection": "Ampliar a seleção",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Limpar a tela"
