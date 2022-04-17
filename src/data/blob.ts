@@ -232,7 +232,7 @@ export const generateIdFromFile = async (file: File): Promise<FileId> => {
   try {
     const hashBuffer = await window.crypto.subtle.digest(
       "SHA-1",
-      await file.arrayBuffer(),
+      await blobToArrayBuffer(file),
     );
     return bytesToHexString(new Uint8Array(hashBuffer)) as FileId;
   } catch (error: any) {
@@ -397,18 +397,18 @@ export const normalizeFile = async (file: File) => {
   if (!file.type) {
     if (file?.name?.endsWith(".excalidrawlib")) {
       file = createFile(
-        await file.arrayBuffer(),
+        await blobToArrayBuffer(file),
         MIME_TYPES.excalidrawlib,
         file.name,
       );
     } else if (file?.name?.endsWith(".excalidraw")) {
       file = createFile(
-        await file.arrayBuffer(),
+        await blobToArrayBuffer(file),
         MIME_TYPES.excalidraw,
         file.name,
       );
     } else {
-      const ab = await file.arrayBuffer();
+      const ab = await blobToArrayBuffer(file);
       const mimeType = getActualMimeTypeFromImage(ab);
       if (mimeType) {
         file = createFile(ab, mimeType, file.name);
@@ -417,7 +417,7 @@ export const normalizeFile = async (file: File) => {
     // when the file is an image, make sure the extension corresponds to the
     // actual mimeType (this is an edge case, but happens sometime)
   } else if (isSupportedImageFile(file)) {
-    const ab = await file.arrayBuffer();
+    const ab = await blobToArrayBuffer(file);
     const mimeType = getActualMimeTypeFromImage(ab);
     if (mimeType && mimeType !== file.type) {
       file = createFile(ab, mimeType, file.name);
@@ -425,4 +425,21 @@ export const normalizeFile = async (file: File) => {
   }
 
   return file;
+};
+
+export const blobToArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {
+  if ("arrayBuffer" in blob) {
+    return blob.arrayBuffer();
+  }
+  // Safari
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (!event.target?.result) {
+        return reject(new Error("couldn't convert blob to ArrayBuffer"));
+      }
+      resolve(event.target.result as ArrayBuffer);
+    };
+    reader.readAsArrayBuffer(blob);
+  });
 };
