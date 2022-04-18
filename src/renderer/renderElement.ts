@@ -269,39 +269,46 @@ const drawElementOnCanvas = (
       if (!config) {
         break;
       }
-      if (!customElementImgCache[config.customType]) {
-        const img = document.createElement("img");
-        img.id = config.customType;
-        if (typeof config.svg === "string") {
+      if (typeof config.svg === "string") {
+        if (!customElementImgCache[element.id]) {
+          const img = document.createElement("img");
           img.src = config.svg;
-        } else {
-          const svg = config.svg(element);
-          if (svg instanceof Promise) {
-            svg.then((res) => {
+          img.id = element.id;
+          customElementImgCache[img.id] = img;
+        }
+      } else if (typeof config.svg === "function") {
+        const svg = config.svg(element);
+        if (svg instanceof Promise) {
+          svg.then((res) => {
+            if (!customElementImgCache[element.id]) {
+              const img = document.createElement("img");
+              img.id = element.id;
               img.src = res;
               customElementImgCache[img.id] = img;
-
               context.drawImage(
-                customElementImgCache[config.customType],
+                customElementImgCache[element.id],
                 0,
                 0,
                 element.width,
                 element.height,
               );
-            });
-          } else {
-            img.src = svg;
-          }
+            }
+          });
+        } else if (!customElementImgCache[element.id]) {
+          const img = document.createElement("img");
+          img.id = element.id;
+          img.src = svg;
+          customElementImgCache[img.id] = img;
         }
-        customElementImgCache[img.id] = img;
       }
       context.drawImage(
-        customElementImgCache[config.customType],
+        customElementImgCache[element.id],
         0,
         0,
         element.width,
         element.height,
       );
+
       break;
     }
     default: {
