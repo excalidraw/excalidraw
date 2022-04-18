@@ -179,16 +179,16 @@
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "",
     "invalidSceneUrl": "",
-    "resetLibrary": "",
+    "resetLibrary": "To bo počistilo vašo knjižnico. Ali ste prepričani?",
     "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": ""
   },
   "errors": {
-    "unsupportedFileType": "",
+    "unsupportedFileType": "Nepodprt tip datoteke.",
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": "",
+    "invalidSVGString": "Neveljaven SVG.",
     "cannotResolveCollabServer": ""
   },
   "toolBar": {
@@ -283,14 +283,14 @@
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "Dokumentacija",
-    "doubleClick": "",
-    "drag": "",
+    "doubleClick": "dvojni klik",
+    "drag": "vleci",
     "editor": "Urejevalnik",
-    "editSelectedShape": "",
+    "editSelectedShape": "Uredi izbrano obliko (besedilo/puščica/črta)",
     "github": "Ste našli težavo? Oddajte",
     "howto": "Sledite našim vodičem",
     "or": "ali",
-    "preventBinding": "",
+    "preventBinding": "Prepreči vezanje puščice",
     "tools": "Orodja",
     "shortcuts": "Bližnjice na tipkovnici",
     "textFinish": "Zaključi urejanje (urejevalnik besedila)",
@@ -319,7 +319,7 @@
       "libraryDesc": "Opis vaše knjižnice, da bodo ljudje lažje razumeli njeno uporabo",
       "githubHandle": "GitHub uporabniško ime (neobvezno), tako da lahko urejate knjižnico, ko jo pošljete v pregled",
       "twitterHandle": "Twitter uporabniško ime (neobvezno), tako da vemo, komu se zahvaliti pri promociji prek Twitterja",
-      "website": ""
+      "website": "Povezava na vaše osebno spletno stran ali drugam (neobvezno)"
     },
     "errors": {
       "required": "Obvezno",
