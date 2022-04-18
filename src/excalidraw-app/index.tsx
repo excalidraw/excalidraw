@@ -74,6 +74,7 @@ import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
 import { Provider, useAtom } from "jotai";
 import { jotaiStore } from "./jotai";
+import { reconcileElements } from "./collab/reconciliation";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -309,9 +310,23 @@ const ExcalidrawWrapper = () => {
       data.scene.libraryItems = getLibraryItemsFromStorage();
     };
 
-    initializeScene({ collabAPI }).then((data) => {
+    initializeScene({ collabAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
-      initialStatePromiseRef.current.promise.resolve(data.scene);
+
+      initialStatePromiseRef.current.promise.resolve({
+        ...data.scene,
+        // at this point the state may have already been updated (e.g. when
+        // collaborating, we may have received updates from other clients)
+        appState: restoreAppState(
+          data.scene?.appState,
+          excalidrawAPI.getAppState(),
+        ),
+        elements: reconcileElements(
+          data.scene?.elements || [],
+          excalidrawAPI.getSceneElementsIncludingDeleted(),
+          excalidrawAPI.getAppState(),
+        ),
+      });
     });
 
     const onHashChange = (event: HashChangeEvent) => {
