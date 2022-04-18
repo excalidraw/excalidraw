@@ -744,15 +744,19 @@ class Collab extends PureComponent<Props, CollabState> {
     this.setLastBroadcastedOrReceivedSceneVersion(newVersion);
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
-  queueSaveToFirebase = throttle(() => {
-    if (this.portal.socketInitialized) {
-      this.saveCollabRoomToFirebase(
-        this.getSyncableElements(
-          this.excalidrawAPI.getSceneElementsIncludingDeleted(),
-        ),
-      );
-    }
-  }, SYNC_FULL_SCENE_INTERVAL_MS);
+  queueSaveToFirebase = throttle(
+    () => {
+      if (this.portal.socketInitialized) {
+        this.saveCollabRoomToFirebase(
+          this.getSyncableElements(
+            this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+          ),
+        );
+      }
+    },
+    SYNC_FULL_SCENE_INTERVAL_MS,
+    { leading: false },
+  );
 
   handleClose = () => {
     jotaiStore.set(collabDialogShownAtom, false);
