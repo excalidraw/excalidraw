@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Prilepi",
-    "pasteCharts": "Prilepi grafikon",
+    "pasteCharts": "Prilepi grafikone",
     "selectAll": "Izberi vse",
     "multiSelect": "Dodaj element v izbor",
     "moveCanvas": "Premakni platno",
@@ -203,8 +203,8 @@
     "text": "Besedilo",
     "library": "Knjižnica",
     "lock": "Ohrani izbrano orodje aktivno po risanju",
-    "penMode": "",
-    "link": "",
+    "penMode": "Prepreči povečavo s prsti in sprejmi risanje samo s peresom",
+    "link": "Dodaj/posodobi povezavo za izbrano obliko",
     "eraser": "Radirka"
   },
   "headings": {
@@ -213,25 +213,25 @@
     "shapes": "Oblike"
   },
   "hints": {
-    "canvasPanning": "",
-    "linearElement": "",
-    "freeDraw": "",
-    "text": "",
-    "text_selected": "",
+    "canvasPanning": "Za premik platna med vlečenjem držite kolesce miške ali preslednico",
+    "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
+    "freeDraw": "Kliknite in povlecite, spustite, ko končate",
+    "text": "Namig: besedilo lahko dodate tudi z dvoklikom kjer koli z orodjem za izbiro",
+    "text_selected": "Dvokliknite ali pritisnite Enter, da uredite besedilo",
     "text_editing": "Pritisnite tipko Escape ali CtrlOrCmd + Enter za zaključek urejanja",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
+    "linearElementMulti": "Kliknite zadnjo točko ali pritisnite Escape ali Enter, da končate",
+    "lockAngle": "Kot lahko omejite tako, da držite tipko Shift",
+    "resize": "Razmerja lahko omejite tako, da držite tipko Shift med spreminjanjem velikosti, držite tipko Alt, da spremenite velikost od središča",
+    "resizeImage": "Velikost lahko prosto spreminjate tako, da držite tipko Shift, držite tipko Alt, da spremenite velikost od središča",
+    "rotate": "Kote lahko omejite tako, da med vrtenjem držite tipko Shift",
+    "lineEditor_info": "Dvokliknite ali pritisnite Enter, da uredite točke",
     "lineEditor_pointSelected": "Pritisnite Delete da odstranite točko(e), CtrlOrCmd+D za podvojitev ali povlecite za premikanje",
-    "lineEditor_nothingSelected": "",
-    "placeImage": "",
+    "lineEditor_nothingSelected": "Izberite točko za urejanje (pridržite tipko Shift za izbiro večih), ali držite tipko Alt in kliknite za dodajanje novih točk",
+    "placeImage": "Kliknite, da postavite sliko, ali kliknite in povlecite, da ročno nastavite njeno velikost",
     "publishLibrary": "Objavi svojo knjižnico",
     "bindTextToElement": "Pritisnite Enter za dodajanje besedila",
     "deepBoxSelect": "Držite tipko CtrlOrCmd za globoko izbiro in preprečitev vlečenja",
-    "eraserRevert": ""
+    "eraserRevert": "Pridržite tipko Alt, da razveljavite elemente, označene za brisanje"
   },
   "canvasError": {
     "cannotShowPreview": "Predogleda ni bilo mogoče prikazati",
@@ -252,36 +252,36 @@
     "sceneContent": "Vsebina scene:"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Na vašo trenutno sceno lahko povabite ljudi, ki bodo sodelovali z vami.",
+    "desc_privacy": "Brez skrbi. Seja uporablja šifriranje od konca do konca, tako da bo vse, kar narišete, ostalo zasebno. Niti naš strežnik ne bo mogel videti, kaj si izmislite.",
     "button_startSession": "Začni sejo",
     "button_stopSession": "Ustavi sejo",
-    "desc_inProgressIntro": "",
-    "desc_shareLink": "",
-    "desc_exitSession": "",
-    "shareTitle": ""
+    "desc_inProgressIntro": "Seja sodelovanja v živo je v teku.",
+    "desc_shareLink": "Delite to povezavo z vsemi, s katerimi želite sodelovati:",
+    "desc_exitSession": "Ustavitev seje vas bo odklopila od sobe, vendar boste lahko lokalno nadaljevali delo s sceno. To pa ne bo vplivalo na druge osebe. Le-te bodo še vedno lahko sodelovale pri svoji različici.",
+    "shareTitle": "Pridruži se seji sodelovanja v živo na Excalidraw"
   },
   "errorDialog": {
     "title": "Napaka"
   },
   "exportDialog": {
     "disk_title": "Shrani na disk",
-    "disk_details": "",
+    "disk_details": "Izvozi podatke scene v datoteko, iz katere jo lahko pozneje uvozite.",
     "disk_button": "Shrani v datoteko",
     "link_title": "Povezava za deljenje",
     "link_details": "Izvoz kot povezava samo za branje.",
     "link_button": "Izvoz s povezavo",
-    "excalidrawplus_description": "",
+    "excalidrawplus_description": "Shrani sceno v svoj delovni prostor Excalidraw+.",
     "excalidrawplus_button": "Izvoz",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_exportError": "Trenutno ni bilo mogoče izvoziti v Excalidraw+..."
   },
   "helpDialog": {
     "blog": "Preberite naš blog",
     "click": "klik",
     "deepSelect": "Globoka izbira",
-    "deepBoxSelect": "",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "deepBoxSelect": "Globoka izbira znotraj polja in preprečitev vlečenja",
+    "curvedArrow": "Ukrivljena puščica",
+    "curvedLine": "Ukrivljena črta",
     "documentation": "Dokumentacija",
     "doubleClick": "dvojni klik",
     "drag": "vleci",
@@ -326,9 +326,9 @@
       "website": "Vnesite veljaven URL"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Predložite svojo knjižnico, da bo vključena v ",
+      "link": "javno skladišče knjižnic,",
+      "post": "da jih drugi uporabljajo v svojih risbah."
     },
     "noteGuidelines": {
       "pre": "Knjižnica mora biti najprej ročno odobrena. Prosimo, preberite naše ",
