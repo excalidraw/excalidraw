@@ -361,6 +361,7 @@ const ExcalidrawWrapper = () => {
             excalidrawAPI.updateScene({
               ...data.scene,
               appState: restoreAppState(data.scene.appState, null),
+              commitToHistory: true,
             });
           }
         });
@@ -389,6 +390,7 @@ const ExcalidrawWrapper = () => {
           excalidrawAPI.updateScene({
             ...localDataState,
             libraryItems: getLibraryItemsFromStorage(),
+            commitToHistory: true,
           });
           collabAPI.setUsername(username || "");
         }
