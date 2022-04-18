@@ -258,7 +258,7 @@
     "button_stopSession": "Ustavi sejo",
     "desc_inProgressIntro": "Seja sodelovanja v živo je v teku.",
     "desc_shareLink": "Delite to povezavo z vsemi, s katerimi želite sodelovati:",
-    "desc_exitSession": "Ustavitev seje vas bo odklopila od sobe, vendar boste lahko lokalno nadaljevali delo s sceno. To pa ne bo vplivalo na druge osebe. Le-te bodo še vedno lahko sodelovale pri svoji različici.",
+    "desc_exitSession": "Ustavitev seje vas bo odklopila od sobe, vendar boste lahko lokalno nadaljevali delo s sceno. To pa ne bo vplivalo na druge osebe. Druge osebe bodo še vedno lahko sodelovale v svoji različici.",
     "shareTitle": "Pridruži se seji sodelovanja v živo na Excalidraw"
   },
   "errorDialog": {
@@ -266,11 +266,11 @@
   },
   "exportDialog": {
     "disk_title": "Shrani na disk",
-    "disk_details": "Izvozi podatke scene v datoteko, iz katere jo lahko pozneje uvozite.",
+    "disk_details": "Izvozite podatke scene v datoteko, iz katere jo lahko pozneje uvozite.",
     "disk_button": "Shrani v datoteko",
     "link_title": "Povezava za deljenje",
     "link_details": "Izvoz kot povezava samo za branje.",
-    "link_button": "Izvoz s povezavo",
+    "link_button": "Izvoz kot povezava",
     "excalidrawplus_description": "Shrani sceno v svoj delovni prostor Excalidraw+.",
     "excalidrawplus_button": "Izvoz",
     "excalidrawplus_exportError": "Trenutno ni bilo mogoče izvoziti v Excalidraw+..."
@@ -287,7 +287,7 @@
     "drag": "vleci",
     "editor": "Urejevalnik",
     "editSelectedShape": "Uredi izbrano obliko (besedilo/puščica/črta)",
-    "github": "Ste našli težavo? Oddajte",
+    "github": "Ste našli težavo? Pošljite",
     "howto": "Sledite našim vodičem",
     "or": "ali",
     "preventBinding": "Prepreči vezanje puščice",
@@ -317,9 +317,9 @@
       "authorName": "Vaše ime ali uporabniško ime",
       "libraryName": "Ime vaše knjižnice",
       "libraryDesc": "Opis vaše knjižnice, da bodo ljudje lažje razumeli njeno uporabo",
-      "githubHandle": "GitHub uporabniško ime (neobvezno), tako da lahko urejate knjižnico, ko jo pošljete v pregled",
-      "twitterHandle": "Twitter uporabniško ime (neobvezno), tako da vemo, komu se zahvaliti pri promociji prek Twitterja",
-      "website": "Povezava na vaše osebno spletno stran ali drugam (neobvezno)"
+      "githubHandle": "GitHub uporabniško ime (neobvezno), tako da lahko urejate knjižnico potem, ko jo pošljete v pregled",
+      "twitterHandle": "Twitter uporabniško ime (neobvezno), tako da vemo, koga omeniti pri promociji prek Twitterja",
+      "website": "Povezava na vašo osebno spletno stran ali drugam (neobvezno)"
     },
     "errors": {
       "required": "Obvezno",
@@ -328,12 +328,12 @@
     "noteDescription": {
       "pre": "Predložite svojo knjižnico, da bo vključena v ",
       "link": "javno skladišče knjižnic,",
-      "post": "da jih drugi uporabljajo v svojih risbah."
+      "post": "da jih drugi lahko uporabljajo v svojih risbah."
     },
     "noteGuidelines": {
-      "pre": "Knjižnica mora biti najprej ročno odobrena. Prosimo, preberite naše ",
-      "link": "smernice",
-      "post": " pred oddajanjem. Za komunikacijo in spreminjanje po potrebi boste potrebovali račun GitHub, vendar to ni strogo obvezno."
+      "pre": "Knjižnica mora biti najprej ročno odobrena. Prosimo vas, da pred oddajanjem preberete naše ",
+      "link": "smernice.",
+      "post": "Za komunikacijo in spreminjanje po potrebi boste potrebovali račun GitHub, vendar to ni obvezno."
     },
     "noteLicense": {
       "pre": "Z oddajo se strinjate, da bo knjižnica objavljena pod ",
@@ -350,7 +350,7 @@
   },
   "confirmDialog": {
     "resetLibrary": "Ponastavi knjižnico",
-    "removeItemsFromLib": "Odstrani izbrane elemente iz knjižnice"
+    "removeItemsFromLib": "Odstran izbrane elemente iz knjižnice"
   },
   "encrypted": {
     "tooltip": "Vaše risbe so šifrirane od konca do konca, tako da jih strežniki Excalidraw nikoli ne bodo videli.",
@@ -364,11 +364,11 @@
     "scene": "Scena",
     "selected": "Izbrano",
     "storage": "Shramba",
-    "title": "Statistika za piflarje",
+    "title": "Statistika za napredne uporabnike",
     "total": "Skupaj",
     "version": "Različica",
     "versionCopy": "Kliknite za kopiranje",
-    "versionNotAvailable": "Verzija ni na voljo",
+    "versionNotAvailable": "Različica ni na voljo",
     "width": "Širina"
   },
   "toast": {
