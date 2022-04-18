@@ -272,7 +272,27 @@ const drawElementOnCanvas = (
       if (!customElementImgCache[config.customType]) {
         const img = document.createElement("img");
         img.id = config.customType;
-        img.src = config.svg;
+        if (typeof config.svg === "string") {
+          img.src = config.svg;
+        } else {
+          const svg = config.svg(element);
+          if (svg instanceof Promise) {
+            svg.then((res) => {
+              img.src = res;
+              customElementImgCache[img.id] = img;
+
+              context.drawImage(
+                customElementImgCache[config.customType],
+                0,
+                0,
+                element.width,
+                element.height,
+              );
+            });
+          } else {
+            img.src = svg;
+          }
+        }
         customElementImgCache[img.id] = img;
       }
       context.drawImage(

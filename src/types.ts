@@ -228,7 +228,7 @@ export type CustomElementConfig = {
   type: "custom";
   customType: string;
   transformHandles?: boolean;
-  svg: string;
+  svg: string | ((element?: ExcalidrawElement) => string | Promise<string>);
   width?: number;
   height?: number;
   stackedOnTop: boolean;
