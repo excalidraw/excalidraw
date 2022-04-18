@@ -78,7 +78,7 @@ import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
 import { Provider, useAtom } from "jotai";
-import { jotaiStore } from "./jotai";
+import { jotaiStore, useAtomWithInitialValue } from "./jotai";
 import { reconcileElements } from "./collab/reconciliation";
 
 const languageDetector = new LanguageDetector();
@@ -240,7 +240,9 @@ const ExcalidrawWrapper = () => {
 
   const [collabAPI] = useAtom(collabAPIAtom);
   const [, setCollabDialogShown] = useAtom(collabDialogShownAtom);
-  const [isCollaborating] = useAtom(isCollaboratingAtom);
+  const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
+    return isCollaborationLink(window.location.href);
+  });
 
   useEffect(() => {
     if (!collabAPI || !excalidrawAPI) {
