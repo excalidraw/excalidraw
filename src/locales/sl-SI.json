@@ -246,10 +246,10 @@
     "clearCanvasCaveat": " To bo povzročilo izgubo dela ",
     "trackedToSentry_pre": "Napaka z identifikatorjem ",
     "trackedToSentry_post": " smo zabeležili v naš sistem.",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
-    "sceneContent": ""
+    "openIssueMessage_pre": "Zelo smo bili previdni, da v napako nismo vključili vaših podatkov o sceni. Če vaša scena ni zasebna, vas prosimo, da napišete več podrobnosti na našem ",
+    "openIssueMessage_button": "sledilniku hroščev.",
+    "openIssueMessage_post": " Prosimo, vključite spodnje informacije tako, da jih kopirate in prilepite v GitHub vprašanje.",
+    "sceneContent": "Vsebina scene:"
   },
   "roomDialog": {
     "desc_intro": "",
