@@ -218,19 +218,19 @@
     "freeDraw": "",
     "text": "",
     "text_selected": "",
-    "text_editing": "",
+    "text_editing": "Pritisnite tipko Escape ali CtrlOrCmd + Enter za zaključek urejanja",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
     "rotate": "",
     "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Pritisnite Delete da odstranite točko(e), CtrlOrCmd+D za podvojitev ali povlecite za premikanje",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "Objavi svojo knjižnico",
     "bindTextToElement": "Pritisnite Enter za dodajanje besedila",
-    "deepBoxSelect": "Držite tipko Ctrl ali Command za globoko izbiro in preprečitev vlečenja",
+    "deepBoxSelect": "Držite tipko CtrlOrCmd za globoko izbiro in preprečitev vlečenja",
     "eraserRevert": ""
   },
   "canvasError": {
@@ -282,13 +282,13 @@
     "deepBoxSelect": "",
     "curvedArrow": "",
     "curvedLine": "",
-    "documentation": "",
+    "documentation": "Dokumentacija",
     "doubleClick": "",
     "drag": "",
     "editor": "Urejevalnik",
     "editSelectedShape": "",
-    "github": "",
-    "howto": "",
+    "github": "Ste našli težavo? Oddajte",
+    "howto": "Sledite našim vodičem",
     "or": "ali",
     "preventBinding": "",
     "tools": "Orodja",
@@ -322,7 +322,7 @@
       "website": ""
     },
     "errors": {
-      "required": "",
+      "required": "Obvezno",
       "website": ""
     },
     "noteDescription": {
