@@ -11,7 +11,6 @@ import {
 import { getSceneVersion } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
 import {
-  getFrame,
   preventUnload,
   resolvablePromise,
   withBatchedUpdates,
@@ -48,7 +47,6 @@ import RoomDialog from "./RoomDialog";
 import { t } from "../../i18n";
 import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
-import { trackEvent } from "../../analytics";
 import { isInvisiblySmallElement } from "../../element";
 import {
   encodeFilesForUpload,
@@ -87,7 +85,8 @@ export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
   isCollaborating: () => boolean;
   onPointerUpdate: CollabInstance["onPointerUpdate"];
-  initializeSocketClient: CollabInstance["initializeSocketClient"];
+  startCollaboration: CollabInstance["startCollaboration"];
+  stopCollaboration: CollabInstance["stopCollaboration"];
   syncElements: CollabInstance["syncElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
   setUsername: (username: string) => void;
@@ -155,9 +154,10 @@ class Collab extends PureComponent<Props, CollabState> {
     const collabAPI: CollabAPI = {
       isCollaborating: this.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
-      initializeSocketClient: this.initializeSocketClient,
+      startCollaboration: this.startCollaboration,
       syncElements: this.syncElements,
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
+      stopCollaboration: this.stopCollaboration,
       setUsername: this.setUsername,
     };
 
@@ -255,12 +255,7 @@ class Collab extends PureComponent<Props, CollabState> {
     }
   };
 
-  openPortal = async () => {
-    trackEvent("share", "room creation", `ui (${getFrame()})`);
-    return this.initializeSocketClient(null);
-  };
-
-  closePortal = () => {
+  stopCollaboration = (keepRemoteState = true) => {
     this.queueBroadcastAllElements.cancel();
     this.queueSaveToFirebase.cancel();
     this.loadImageFiles.cancel();
@@ -270,14 +265,16 @@ class Collab extends PureComponent<Props, CollabState> {
         this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       ),
     );
-    if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
+    if (!keepRemoteState) {
+      LocalData.fileStorage.reset();
+      this.destroySocketClient();
+    } else if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
       // hack to ensure that we prefer we disregard any new browser state
       // that could have been saved in other tabs while we were collaborating
       resetBrowserStateVersions();
 
       window.history.pushState({}, APP_NAME, window.location.origin);
       this.destroySocketClient();
-      trackEvent("share", "room closed");
 
       LocalData.fileStorage.reset();
 
@@ -298,20 +295,20 @@ class Collab extends PureComponent<Props, CollabState> {
   };
 
   private destroySocketClient = (opts?: { isUnload: boolean }) => {
+    this.lastBroadcastedOrReceivedSceneVersion = -1;
+    this.portal.close();
+    this.fileManager.reset();
     if (!opts?.isUnload) {
+      this.setIsCollaborating(false);
+      this.setState({
+        activeRoomLink: "",
+      });
       this.collaborators = new Map();
       this.excalidrawAPI.updateScene({
         collaborators: this.collaborators,
       });
-      this.setState({
-        activeRoomLink: "",
-      });
-      this.setIsCollaborating(false);
       LocalData.resumeSave("collaboration");
     }
-    this.lastBroadcastedOrReceivedSceneVersion = -1;
-    this.portal.close();
-    this.fileManager.reset();
   };
 
   private fetchImageFilesFromFirebase = async (scene: {
@@ -352,7 +349,7 @@ class Collab extends PureComponent<Props, CollabState> {
     }
   };
 
-  private initializeSocketClient = async (
+  startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
     if (this.portal.socket) {
@@ -790,8 +787,8 @@ class Collab extends PureComponent<Props, CollabState> {
             activeRoomLink={activeRoomLink}
             username={username}
             onUsernameChange={this.onUsernameChange}
-            onRoomCreate={this.openPortal}
-            onRoomDestroy={this.closePortal}
+            onRoomCreate={() => this.startCollaboration(null)}
+            onRoomDestroy={this.stopCollaboration}
             setErrorMessage={(errorMessage) => {
               this.setState({ errorMessage });
             }}

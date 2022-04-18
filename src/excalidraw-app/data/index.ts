@@ -108,9 +108,16 @@ export type SocketUpdateData =
     _brand: "socketUpdateData";
   };
 
+const RE_COLLAB_LINK = /^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/;
+
+export const isCollaborationLink = (link: string) => {
+  const hash = new URL(link).hash;
+  return RE_COLLAB_LINK.test(hash);
+};
+
 export const getCollaborationLinkData = (link: string) => {
   const hash = new URL(link).hash;
-  const match = hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+  const match = hash.match(RE_COLLAB_LINK);
   if (match && match[2].length !== 22) {
     window.alert(t("alerts.invalidEncryptionKey"));
     return null;

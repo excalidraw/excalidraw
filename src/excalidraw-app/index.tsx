@@ -51,7 +51,12 @@ import Collab, {
   isCollaboratingAtom,
 } from "./collab/Collab";
 import { LanguageList } from "./components/LanguageList";
-import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
+import {
+  exportToBackend,
+  getCollaborationLinkData,
+  isCollaborationLink,
+  loadScene,
+} from "./data";
 import {
   getLibraryItemsFromStorage,
   importFromLocalStorage,
@@ -172,7 +177,7 @@ const initializeScene = async (opts: {
 
   if (roomLinkData) {
     return {
-      scene: await opts.collabAPI.initializeSocketClient(roomLinkData),
+      scene: await opts.collabAPI.startCollaboration(roomLinkData),
       isExternalScene: true,
       id: roomLinkData.roomId,
       key: roomLinkData.roomKey,
@@ -341,6 +346,15 @@ const ExcalidrawWrapper = () => {
         window.history.replaceState({}, "", event.oldURL);
         excalidrawAPI.importLibrary(libraryUrl, hash.get("token"));
       } else {
+        if (
+          collabAPI.isCollaborating() &&
+          !isCollaborationLink(window.location.href)
+        ) {
+          collabAPI.stopCollaboration(false);
+        }
+
+        excalidrawAPI.updateScene({ appState: { isLoading: true } });
+
         initializeScene({ collabAPI }).then((data) => {
           loadImages(data);
           if (data.scene) {
