@@ -293,13 +293,13 @@
     "preventBinding": "",
     "tools": "Orodja",
     "shortcuts": "Bližnjice na tipkovnici",
-    "textFinish": "",
-    "textNewLine": "",
+    "textFinish": "Zaključi urejanje (urejevalnik besedila)",
+    "textNewLine": "Dodaj novo vrstico (urejevalnik besedila)",
     "title": "Pomoč",
     "view": "Pogled",
-    "zoomToFit": "",
-    "zoomToSelection": "",
-    "toggleElementLock": ""
+    "zoomToFit": "Približaj na vse elemente",
+    "zoomToSelection": "Približaj na izbor",
+    "toggleElementLock": "Zakleni/odkleni izbor"
   },
   "clearCanvasDialog": {
     "title": "Počisti platno"
@@ -315,15 +315,15 @@
     "website": "Spletna stran",
     "placeholder": {
       "authorName": "Vaše ime ali uporabniško ime",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
+      "libraryName": "Ime vaše knjižnice",
+      "libraryDesc": "Opis vaše knjižnice, da bodo ljudje lažje razumeli njeno uporabo",
+      "githubHandle": "GitHub uporabniško ime (neobvezno), tako da lahko urejate knjižnico, ko jo pošljete v pregled",
+      "twitterHandle": "Twitter uporabniško ime (neobvezno), tako da vemo, komu se zahvaliti pri promociji prek Twitterja",
       "website": ""
     },
     "errors": {
       "required": "Obvezno",
-      "website": ""
+      "website": "Vnesite veljaven URL"
     },
     "noteDescription": {
       "pre": "",
@@ -331,35 +331,35 @@
       "post": ""
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Knjižnica mora biti najprej ročno odobrena. Prosimo, preberite naše ",
+      "link": "smernice",
+      "post": " pred oddajanjem. Za komunikacijo in spreminjanje po potrebi boste potrebovali račun GitHub, vendar to ni strogo obvezno."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Z oddajo se strinjate, da bo knjižnica objavljena pod ",
+      "link": "licenco MIT, ",
+      "post": "kar na kratko pomeni, da jo lahko kdorkoli uporablja brez omejitev."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Vsak element knjižnice mora imeti svoje ime, tako da ga je mogoče filtrirati. Vključeni bodo naslednji elementi knjižnice:",
+    "atleastOneLibItem": "Za začetek izberite vsaj en element knjižnice"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Knjižnica oddana",
+    "content": "{{authorName}}, hvala. Vaša knjižnica je bila poslana v pregled. Stanje lahko spremljate",
+    "link": "tukaj"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Ponastavi knjižnico",
+    "removeItemsFromLib": "Odstrani izbrane elemente iz knjižnice"
   },
   "encrypted": {
-    "tooltip": "",
-    "link": ""
+    "tooltip": "Vaše risbe so šifrirane od konca do konca, tako da jih strežniki Excalidraw nikoli ne bodo videli.",
+    "link": "Blog objava o šifriranju od konca do konca v Excalidraw"
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
+    "angle": "Kot",
+    "element": "Element",
+    "elements": "Elementi",
     "height": "Višina",
     "scene": "Scena",
     "selected": "Izbrano",
