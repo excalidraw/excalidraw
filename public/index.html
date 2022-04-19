@@ -124,26 +124,6 @@
         user-select: none;
       }
 
-      .LoadingMessage {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-      }
-
-      .LoadingMessage span {
-        background-color: var(--button-gray-1);
-        border-radius: 5px;
-        padding: 0.8em 1.2em;
-        color: var(--popup-text-color);
-        font-size: 1.3em;
-      }
       #root {
         height: 100%;
         -webkit-touch-callout: none;
@@ -172,10 +152,6 @@
     <header>
       <h1 class="visually-hidden">Excalidraw</h1>
     </header>
-    <div id="root">
-      <div class="LoadingMessage">
-        <span>Loading scene...</span>
-      </div>
-    </div>
+    <div id="root"></div>
   </body>
 </html>

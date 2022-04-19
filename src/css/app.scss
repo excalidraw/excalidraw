@@ -16,15 +16,17 @@
   left: 0;
   z-index: 999;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   pointer-events: none;
-}
 
-.LoadingMessage span {
-  background-color: var(--button-gray-1);
-  border-radius: 5px;
-  padding: 0.8em 1.2em;
-  color: var(--popup-text-color);
-  font-size: 1.3em;
+  .Spinner {
+    font-size: 2.8em;
+  }
+
+  .LoadingMessage-text {
+    margin-top: 1em;
+    font-size: 0.8em;
+  }
 }
