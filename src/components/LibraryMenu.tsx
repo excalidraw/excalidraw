@@ -1,4 +1,11 @@
-import { useRef, useState, useEffect, useCallback, RefObject } from "react";
+import {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  RefObject,
+  forwardRef,
+} from "react";
 import Library, { libraryItemsAtom } from "../data/library";
 import { t } from "../i18n";
 import { randomId } from "../random";
@@ -22,6 +29,7 @@ import { arrayToMap } from "../utils";
 import { trackEvent } from "../analytics";
 import { useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
+import Spinner from "./Spinner";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -55,6 +63,17 @@ const getSelectedItems = (
   libraryItems: LibraryItems,
   selectedItems: LibraryItem["id"][],
 ) => libraryItems.filter((item) => selectedItems.includes(item.id));
+
+const LibraryMenuWrapper = forwardRef<
+  HTMLDivElement,
+  { children: React.ReactNode }
+>(({ children }, ref) => {
+  return (
+    <Island padding={1} ref={ref} className="layer-ui__library">
+      {children}
+    </Island>
+  );
+});
 
 export const LibraryMenu = ({
   onClose,
@@ -113,17 +132,20 @@ export const LibraryMenu = ({
     authorName: string;
   }>(null);
 
-  const [libraryItems] = useAtom(libraryItemsAtom, jotaiScope);
+  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
 
-  const removeFromLibrary = useCallback(async () => {
-    const nextItems = libraryItems.filter(
-      (item) => !selectedItems.includes(item.id),
-    );
-    library.saveLibrary(nextItems).catch(() => {
-      setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
-    });
-    setSelectedItems([]);
-  }, [library, setAppState, selectedItems, setSelectedItems, libraryItems]);
+  const removeFromLibrary = useCallback(
+    async (libraryItems: LibraryItems) => {
+      const nextItems = libraryItems.filter(
+        (item) => !selectedItems.includes(item.id),
+      );
+      library.saveLibrary(nextItems).catch(() => {
+        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
+      });
+      setSelectedItems([]);
+    },
+    [library, setAppState, selectedItems, setSelectedItems],
+  );
 
   const resetLibrary = useCallback(() => {
     library.resetLibrary();
@@ -131,7 +153,7 @@ export const LibraryMenu = ({
   }, [library, focusContainer]);
 
   const addToLibrary = useCallback(
-    async (elements: LibraryItem["elements"]) => {
+    async (elements: LibraryItem["elements"], libraryItems: LibraryItems) => {
       trackEvent("element", "addToLibrary", "ui");
       if (elements.some((element) => element.type === "image")) {
         return setAppState({
@@ -152,7 +174,7 @@ export const LibraryMenu = ({
         setAppState({ errorMessage: t("alerts.errorAddingToLibrary") });
       });
     },
-    [onAddToLibrary, library, setAppState, libraryItems],
+    [onAddToLibrary, library, setAppState],
   );
 
   const renderPublishSuccess = useCallback(() => {
@@ -189,7 +211,7 @@ export const LibraryMenu = ({
   }, [setPublishLibSuccess, publishLibSuccess]);
 
   const onPublishLibSuccess = useCallback(
-    (data) => {
+    (data, libraryItems: LibraryItems) => {
       setShowPublishLibraryDialog(false);
       setPublishLibSuccess({ url: data.url, authorName: data.authorName });
       const nextLibItems = libraryItems.slice();
@@ -200,29 +222,41 @@ export const LibraryMenu = ({
       });
       library.saveLibrary(nextLibItems);
     },
-    [
-      setShowPublishLibraryDialog,
-      setPublishLibSuccess,
-      libraryItems,
-      selectedItems,
-      library,
-    ],
+    [setShowPublishLibraryDialog, setPublishLibSuccess, selectedItems, library],
   );
 
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
   >(null);
 
+  if (libraryItemsData.status === "loading") {
+    return (
+      <LibraryMenuWrapper ref={ref}>
+        <div className="layer-ui__library-message">
+          <Spinner size="2em" />
+          <span>{t("labels.libraryLoadingMessage")}</span>
+        </div>
+      </LibraryMenuWrapper>
+    );
+  }
+
   return (
-    <Island padding={1} ref={ref} className="layer-ui__library">
+    <LibraryMenuWrapper ref={ref}>
       {showPublishLibraryDialog && (
         <PublishLibrary
           onClose={() => setShowPublishLibraryDialog(false)}
-          libraryItems={getSelectedItems(libraryItems, selectedItems)}
+          libraryItems={getSelectedItems(
+            libraryItemsData.libraryItems,
+            selectedItems,
+          )}
           appState={appState}
-          onSuccess={onPublishLibSuccess}
+          onSuccess={(data) =>
+            onPublishLibSuccess(data, libraryItemsData.libraryItems)
+          }
           onError={(error) => window.alert(error)}
-          updateItemsInStorage={() => library.saveLibrary(libraryItems)}
+          updateItemsInStorage={() =>
+            library.saveLibrary(libraryItemsData.libraryItems)
+          }
           onRemove={(id: string) =>
             setSelectedItems(selectedItems.filter((_id) => _id !== id))
           }
@@ -230,9 +264,13 @@ export const LibraryMenu = ({
       )}
       {publishLibSuccess && renderPublishSuccess()}
       <LibraryMenuItems
-        libraryItems={libraryItems}
-        onRemoveFromLibrary={removeFromLibrary}
-        onAddToLibrary={addToLibrary}
+        libraryItems={libraryItemsData.libraryItems}
+        onRemoveFromLibrary={() =>
+          removeFromLibrary(libraryItemsData.libraryItems)
+        }
+        onAddToLibrary={(elements) =>
+          addToLibrary(elements, libraryItemsData.libraryItems)
+        }
         onInsertShape={onInsertShape}
         pendingElements={pendingElements}
         setAppState={setAppState}
@@ -247,10 +285,12 @@ export const LibraryMenu = ({
 
           if (shouldSelect) {
             if (event.shiftKey && lastSelectedItem) {
-              const rangeStart = libraryItems.findIndex(
+              const rangeStart = libraryItemsData.libraryItems.findIndex(
                 (item) => item.id === lastSelectedItem,
               );
-              const rangeEnd = libraryItems.findIndex((item) => item.id === id);
+              const rangeEnd = libraryItemsData.libraryItems.findIndex(
+                (item) => item.id === id,
+              );
 
               if (rangeStart === -1 || rangeEnd === -1) {
                 setSelectedItems([...selectedItems, id]);
@@ -258,7 +298,7 @@ export const LibraryMenu = ({
               }
 
               const selectedItemsMap = arrayToMap(selectedItems);
-              const nextSelectedIds = libraryItems.reduce(
+              const nextSelectedIds = libraryItemsData.libraryItems.reduce(
                 (acc: LibraryItem["id"][], item, idx) => {
                   if (
                     (idx >= rangeStart && idx <= rangeEnd) ||
@@ -284,6 +324,6 @@ export const LibraryMenu = ({
         onPublish={() => setShowPublishLibraryDialog(true)}
         resetLibrary={resetLibrary}
       />
-    </Island>
+    </LibraryMenuWrapper>
   );
 };
