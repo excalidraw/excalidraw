@@ -2,6 +2,31 @@ import { loadLibraryFromBlob } from "./blob";
 import { LibraryItems, LibraryItem } from "../types";
 import { restoreLibraryItems } from "./restore";
 import type App from "../components/App";
+import { ImportedDataState } from "./types";
+
+/**
+ * checks if library item does not exist already in current library
+ */
+const isUniqueitem = (
+  existingLibraryItems: LibraryItems,
+  targetLibraryItem: LibraryItem,
+) => {
+  return !existingLibraryItems.find((libraryItem) => {
+    if (libraryItem.elements.length !== targetLibraryItem.elements.length) {
+      return false;
+    }
+
+    // detect z-index difference by checking the excalidraw elements
+    // are in order
+    return libraryItem.elements.every((libItemExcalidrawItem, idx) => {
+      return (
+        libItemExcalidrawItem.id === targetLibraryItem.elements[idx].id &&
+        libItemExcalidrawItem.versionNonce ===
+          targetLibraryItem.elements[idx].versionNonce
+      );
+    });
+  });
+};
 
 class Library {
   private libraryCache: LibraryItems | null = null;
@@ -18,44 +43,27 @@ class Library {
 
   /** imports library (currently merges, removing duplicates) */
   async importLibrary(
-    blob: Blob,
+    blob:
+      | Blob
+      | Required<ImportedDataState>["libraryItems"]
+      | Promise<Required<ImportedDataState>["libraryItems"]>,
     defaultStatus: LibraryItem["status"] = "unpublished",
   ) {
-    const libraryFile = await loadLibraryFromBlob(blob);
-    if (!libraryFile || !(libraryFile.libraryItems || libraryFile.library)) {
-      return;
+    let libraryItems: LibraryItems;
+    if (blob instanceof Blob) {
+      const libraryFile = await loadLibraryFromBlob(blob);
+      if (!libraryFile || !(libraryFile.libraryItems || libraryFile.library)) {
+        return;
+      }
+      libraryItems = libraryFile.libraryItems || libraryFile.library || [];
+    } else {
+      libraryItems = restoreLibraryItems(await blob, defaultStatus);
     }
-
-    /**
-     * checks if library item does not exist already in current library
-     */
-    const isUniqueitem = (
-      existingLibraryItems: LibraryItems,
-      targetLibraryItem: LibraryItem,
-    ) => {
-      return !existingLibraryItems.find((libraryItem) => {
-        if (libraryItem.elements.length !== targetLibraryItem.elements.length) {
-          return false;
-        }
-
-        // detect z-index difference by checking the excalidraw elements
-        // are in order
-        return libraryItem.elements.every((libItemExcalidrawItem, idx) => {
-          return (
-            libItemExcalidrawItem.id === targetLibraryItem.elements[idx].id &&
-            libItemExcalidrawItem.versionNonce ===
-              targetLibraryItem.elements[idx].versionNonce
-          );
-        });
-      });
-    };
 
     const existingLibraryItems = await this.loadLibrary();
 
-    const library = libraryFile.libraryItems || libraryFile.library || [];
-    const restoredLibItems = restoreLibraryItems(library, defaultStatus);
     const filteredItems = [];
-    for (const item of restoredLibItems) {
+    for (const item of libraryItems) {
       if (isUniqueitem(existingLibraryItems, item)) {
         filteredItems.push(item);
       }

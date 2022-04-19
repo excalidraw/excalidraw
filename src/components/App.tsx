@@ -1681,7 +1681,9 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
-      libraryItems?: SceneData["libraryItems"];
+      libraryItems?:
+        | Required<SceneData>["libraryItems"]
+        | Promise<Required<SceneData>["libraryItems"]>;
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1700,14 +1702,15 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.libraryItems) {
-        this.library.saveLibrary(
-          restoreLibraryItems(sceneData.libraryItems, "unpublished"),
-        );
-        if (this.state.isLibraryOpen) {
-          this.setState({ isLibraryOpen: false }, () => {
-            this.setState({ isLibraryOpen: true });
+        this.library
+          .importLibrary(sceneData.libraryItems, "unpublished")
+          .then(() => {
+            if (this.state.isLibraryOpen) {
+              this.setState({ isLibraryOpen: false }, () => {
+                this.setState({ isLibraryOpen: true });
+              });
+            }
           });
-        }
       }
     },
   );
