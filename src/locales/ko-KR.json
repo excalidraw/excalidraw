@@ -9,6 +9,7 @@
     "copy": "복사",
     "copyAsPng": "클립보드로 PNG 이미지 복사",
     "copyAsSvg": "클립보드로 SVG 이미지 복사",
+    "copyText": "",
     "bringForward": "앞으로 가져오기",
     "sendToBack": "맨 뒤로 보내기",
     "bringToFront": "맨 앞으로 가져오기",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "폰트 사이즈 줄이기",
     "increaseFontSize": "폰트 사이즈 키우기",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "유효하지 않은 파일입니다.",
     "importBackendFailed": "서버로부터 불러 오지 못했습니다.",
     "cannotExportEmptyCanvas": "빈 캔버스를 내보낼 수 없습니다.",
-    "couldNotCopyToClipboard": "클립 보드에 복사할 수 없습니다. Chrome 브라우저에서 시도해 주세요.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "데이터를 복호화하지 못했습니다.",
     "uploadedSecurly": "업로드는 종단 간 암호화로 보호되므로 Excalidraw 서버 및 타사가 콘텐츠를 읽을 수 없습니다.",
     "loadSceneOverridePrompt": "외부 파일을 불러 오면 기존 콘텐츠가 대체됩니다. 계속 진행할까요?",
@@ -196,7 +204,8 @@
     "library": "라이브러리",
     "lock": "선택된 도구 유지하기",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "캔버스 동작",
@@ -221,7 +230,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "미리보기를 볼 수 없습니다",
@@ -281,14 +291,15 @@
     "howto": "가이드 참고하기",
     "or": "또는",
     "preventBinding": "화살표가 붙지 않게 하기",
-    "shapes": "도형",
+    "tools": "",
     "shortcuts": "키보드 단축키",
     "textFinish": "편집 완료 (텍스트 에디터)",
     "textNewLine": "줄바꿈(텍스트 에디터)",
     "title": "도움말",
     "view": "보기",
     "zoomToFit": "모든 요소가 보이도록 확대/축소",
-    "zoomToSelection": "선택 영역으로 확대/축소"
+    "zoomToSelection": "선택 영역으로 확대/축소",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "캔버스 지우기"

@@ -9,6 +9,7 @@
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
+    "copyText": "",
     "bringForward": "הבא שכבה קדימה",
     "sendToBack": "העבר לסוף",
     "bringToFront": "העבר לחזית",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "",
     "increaseFontSize": "",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "לא ניתן לטעון קובץ שאיננו תואם",
     "importBackendFailed": "ייבוא מהשרת נכשל.",
     "cannotExportEmptyCanvas": "לא ניתן לייצא לוח ריק.",
-    "couldNotCopyToClipboard": "לא ניתן להעתיק ללוח. נסה להשתמש בדפדפן Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "לא ניתן לפענח מידע.",
     "uploadedSecurly": "ההעלאה הוצפנה מקצה לקצה, ולכן שרת Excalidraw וצד שלישי לא יכולים לקרוא את התוכן.",
     "loadSceneOverridePrompt": "טעינה של ציור חיצוני תחליף את התוכן הקיים שלך. האם תרצה להמשיך?",
@@ -196,7 +204,8 @@
     "library": "ספריה",
     "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "פעולות הלוח",
@@ -221,7 +230,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "לא הצלחנו להציג את התצוגה המקדימה",
@@ -281,14 +291,15 @@
     "howto": "עקוב אחר המדריכים שלנו",
     "or": "או",
     "preventBinding": "למנוע נעיצת חיצים",
-    "shapes": "צורות",
+    "tools": "",
     "shortcuts": "קיצורי מקלדת",
     "textFinish": "סיים עריכה (טקסט)",
     "textNewLine": "הוסף שורה חדשה (טקסט)",
     "title": "עזרה",
     "view": "תצוגה",
     "zoomToFit": "גלילה להצגת כל האלמנטים במסך",
-    "zoomToSelection": "התמקד בבחירה"
+    "zoomToSelection": "התמקד בבחירה",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""

@@ -1,7 +1,6 @@
 import { loadLibraryFromBlob } from "./blob";
 import { LibraryItems, LibraryItem } from "../types";
-import { restoreElements, restoreLibraryItems } from "./restore";
-import { getNonDeletedElements } from "../element";
+import { restoreLibraryItems } from "./restore";
 import type App from "../components/App";
 
 class Library {
@@ -17,15 +16,11 @@ class Library {
     this.libraryCache = [];
   };
 
-  restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
-    const elements = getNonDeletedElements(
-      restoreElements(libraryItem.elements, null),
-    );
-    return elements.length ? { ...libraryItem, elements } : null;
-  };
-
   /** imports library (currently merges, removing duplicates) */
-  async importLibrary(blob: Blob, defaultStatus = "unpublished") {
+  async importLibrary(
+    blob: Blob,
+    defaultStatus: LibraryItem["status"] = "unpublished",
+  ) {
     const libraryFile = await loadLibraryFromBlob(blob);
     if (!libraryFile || !(libraryFile.libraryItems || libraryFile.library)) {
       return;
@@ -58,15 +53,11 @@ class Library {
     const existingLibraryItems = await this.loadLibrary();
 
     const library = libraryFile.libraryItems || libraryFile.library || [];
-    const restoredLibItems = restoreLibraryItems(
-      library,
-      defaultStatus as "published" | "unpublished",
-    );
+    const restoredLibItems = restoreLibraryItems(library, defaultStatus);
     const filteredItems = [];
     for (const item of restoredLibItems) {
-      const restoredItem = this.restoreLibraryItem(item as LibraryItem);
-      if (restoredItem && isUniqueitem(existingLibraryItems, restoredItem)) {
-        filteredItems.push(restoredItem);
+      if (isUniqueitem(existingLibraryItems, item)) {
+        filteredItems.push(item);
       }
     }
 
@@ -85,13 +76,7 @@ class Library {
           return resolve([]);
         }
 
-        const items = libraryItems.reduce((acc, item) => {
-          const restoredItem = this.restoreLibraryItem(item);
-          if (restoredItem) {
-            acc.push(item);
-          }
-          return acc;
-        }, [] as Mutable<LibraryItems>);
+        const items = restoreLibraryItems(libraryItems, "unpublished");
 
         // clone to ensure we don't mutate the cached library elements in the app
         this.libraryCache = JSON.parse(JSON.stringify(items));

@@ -9,6 +9,7 @@
     "copy": "Salin",
     "copyAsPng": "Salin ke papan klip sebagai PNG",
     "copyAsSvg": "Salin ke papan klip sebagai SVG",
+    "copyText": "Salin ke papan klip sebagai teks",
     "bringForward": "Bawa maju",
     "sendToBack": "Kirim ke belakang",
     "bringToFront": "Bawa ke depan",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "Kecilkan ukuran font",
     "increaseFontSize": "Besarkan ukuran font",
     "unbindText": "Lepas teks",
+    "bindText": "Kunci teks ke kontainer",
     "link": {
       "edit": "Edit tautan",
       "create": "Buat tautan",
       "label": "Tautan"
+    },
+    "elementLock": {
+      "lock": "Kunci",
+      "unlock": "Lepas",
+      "lockAll": "Kunci semua",
+      "unlockAll": "Lepas semua"
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "Tidak dapat memuat berkas yang tidak valid",
     "importBackendFailed": "Gagal mengimpor dari backend",
     "cannotExportEmptyCanvas": "Tidak bisa mengekspor kanvas kosong",
-    "couldNotCopyToClipboard": "Tidak bisa menyalin ke papan klip. Coba gunakan Browser Chrome",
+    "couldNotCopyToClipboard": "Tidak bisa menyalin ke papan klip.",
     "decryptFailed": "Tidak dapat mengdekripsi data.",
     "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya",
     "loadSceneOverridePrompt": "Memuat gambar external akan mengganti konten Anda yang ada. Apakah Anda ingin melanjutkan?",
@@ -196,7 +204,8 @@
     "library": "Pustaka",
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar",
     "penMode": "Cegah jepit perbesar dan terima hanya input freedraw dari pena",
-    "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih"
+    "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
+    "eraser": "Penghapus"
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -221,7 +230,8 @@
     "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
     "publishLibrary": "Terbitkan pustaka Anda",
     "bindTextToElement": "Tekan enter untuk tambahkan teks",
-    "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran"
+    "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran",
+    "eraserRevert": "Tahan Alt untuk mengembalikan elemen yang ditandai untuk dihapus"
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -281,14 +291,15 @@
     "howto": "Ikuti panduan kami",
     "or": "atau",
     "preventBinding": "Cegah pengikatan panah",
-    "shapes": "Bentuk",
+    "tools": "Alat",
     "shortcuts": "Pintasan keyboard",
     "textFinish": "Selesai mengedit (editor teks)",
     "textNewLine": "Tambahkan garis baru (editor teks)",
     "title": "Bantuan",
     "view": "Tampilan",
     "zoomToFit": "Perbesar agar sesuai dengan semua elemen",
-    "zoomToSelection": "Perbesar ke seleksi"
+    "zoomToSelection": "Perbesar ke seleksi",
+    "toggleElementLock": "Kunci/lepas seleksi"
   },
   "clearCanvasDialog": {
     "title": "Hapus kanvas"

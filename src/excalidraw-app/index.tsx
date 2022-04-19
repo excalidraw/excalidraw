@@ -70,6 +70,7 @@ import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
+import clsx from "clsx";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -454,7 +455,7 @@ const ExcalidrawWrapper = () => {
     files: BinaryFiles,
   ) => {
     if (collabAPI?.isCollaborating()) {
-      collabAPI.broadcastElements(elements);
+      collabAPI.syncElements(elements);
     }
 
     // this check is redundant, but since this is a hot path, it's best
@@ -634,7 +635,12 @@ const ExcalidrawWrapper = () => {
   }, []);
 
   return (
-    <>
+    <div
+      style={{ height: "100%" }}
+      className={clsx("excalidraw-app", {
+        "is-collaborating": collabAPI?.isCollaborating(),
+      })}
+    >
       <Excalidraw
         ref={excalidrawRefCallback}
         onChange={onChange}
@@ -686,7 +692,7 @@ const ExcalidrawWrapper = () => {
           onClose={() => setErrorMessage("")}
         />
       )}
-    </>
+    </div>
   );
 };
 
