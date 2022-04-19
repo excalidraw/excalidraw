@@ -306,11 +306,11 @@ const restoreLibraryItem = (libraryItem: LibraryItem) => {
 };
 
 export const restoreLibraryItems = (
-  libraryItems: NonOptional<ImportedDataState["libraryItems"]>,
+  libraryItems: ImportedDataState["libraryItems"],
   defaultStatus: LibraryItem["status"],
 ) => {
   const restoredItems: LibraryItem[] = [];
-  for (const item of libraryItems) {
+  for (const item of libraryItems || []) {
     // migrate older libraries
     if (Array.isArray(item)) {
       const restoredItem = restoreLibraryItem({

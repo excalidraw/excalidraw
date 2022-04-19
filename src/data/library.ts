@@ -6,6 +6,7 @@ import { ImportedDataState } from "./types";
 import { atom } from "jotai";
 import { jotaiStore } from "../jotai";
 import { isPromiseLike } from "../utils";
+import { t } from "../i18n";
 
 export const libraryItemsAtom = atom<
   | { status: "loading"; libraryItems: null; promise: Promise<LibraryItems> }
@@ -58,7 +59,7 @@ class Library {
 
   /** imports library (currently merges, removing duplicates) */
   async importLibrary(
-    blob:
+    library:
       | Blob
       | Required<ImportedDataState>["libraryItems"]
       | Promise<Required<ImportedDataState>["libraryItems"]>,
@@ -68,20 +69,10 @@ class Library {
       new Promise<LibraryItems>(async (resolve, reject) => {
         try {
           let libraryItems: LibraryItems;
-          if (blob instanceof Blob) {
-            const libraryFile = await loadLibraryFromBlob(blob);
-            if (
-              !libraryFile ||
-              !(libraryFile.libraryItems || libraryFile.library)
-            ) {
-              throw new Error("Invalid library file");
-            }
-            libraryItems = restoreLibraryItems(
-              libraryFile.libraryItems || libraryFile.library || [],
-              defaultStatus,
-            );
+          if (library instanceof Blob) {
+            libraryItems = await loadLibraryFromBlob(library, defaultStatus);
           } else {
-            libraryItems = restoreLibraryItems(await blob, defaultStatus);
+            libraryItems = restoreLibraryItems(await library, defaultStatus);
           }
 
           const existingLibraryItems = this.lastLibraryItems;
@@ -95,7 +86,7 @@ class Library {
 
           resolve([...filteredItems, ...existingLibraryItems]);
         } catch (error) {
-          reject(error);
+          reject(new Error(t("errors.importLibraryError")));
         }
       }),
     );
