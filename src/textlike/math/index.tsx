@@ -234,7 +234,7 @@ const metricsCache = {} as {
       height: number;
     }>[];
     lineMetrics: Array<{ width: number; height: number; baseline: number }>;
-    imageMetrics: { width: number; height: number };
+    imageMetrics: { width: number; height: number; baseline: number };
   };
 };
 // Cache the SVGs for renderSvgTextElementMath()
@@ -469,9 +469,11 @@ const getMetrics = (
     imageWidth = Math.max(imageWidth, width);
     imageHeight += height;
   }
+  const lastLineMetrics = lineMetrics[lineMetrics.length - 1];
   const imageMetrics = {
     width: imageWidth,
     height: imageHeight,
+    baseline: imageHeight - lastLineMetrics.height + lastLineMetrics.baseline,
   };
   const metrics = { markupMetrics, lineMetrics, imageMetrics };
   if (isMathJaxLoaded) {
