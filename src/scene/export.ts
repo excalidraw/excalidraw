@@ -2,7 +2,7 @@ import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, isDevEnv } from "../utils";
+import { distance, isProdEnv } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
@@ -120,9 +120,9 @@ export const exportToSvg = async (
     `https://unpkg.com/${pkg.name}@${pkg.version}/dist/excalidraw-assets/`;
 
   if (assetPath?.startsWith("/")) {
-    const origin = isDevEnv()
-      ? "https://excalidraw.com"
-      : window.location.origin;
+    const origin = isProdEnv()
+      ? window.location.origin
+      : "https://excalidraw.com";
     assetPath = assetPath.replace("/", `${origin}/`);
   }
 
