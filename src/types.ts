@@ -232,6 +232,7 @@ export type CustomElementConfig = {
   width?: number;
   height?: number;
   stackedOnTop: boolean;
+  onCreate?: (element: ExcalidrawElement) => void;
 };
 export interface ExcalidrawProps {
   onChange?: (

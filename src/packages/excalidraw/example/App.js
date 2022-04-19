@@ -194,6 +194,10 @@ export default function App() {
     );
   };
 
+  const onCreate = (element) => {
+    setTimeout(() => addTextArea(element), 0);
+  };
+
   const getCustomElementsConfig = () => {
     return [
       {
@@ -217,6 +221,7 @@ export default function App() {
       </svg>`)}`,
         transformHandles: false,
         stackedOnTop: true,
+        onCreate,
       },
       {
         type: "custom",
@@ -244,36 +249,39 @@ export default function App() {
     ];
   };
 
+  const addTextArea = (element) => {
+    const { x: viewPortX, y: viewPortY } = sceneCoordsToViewportCoords(
+      {
+        sceneX: element.x,
+        sceneY: element.y,
+      },
+      excalidrawRef.current.getAppState(),
+    );
+    const textarea = document.createElement("textarea");
+    Object.assign(textarea.style, {
+      position: "absolute",
+      display: "inline-block",
+      left: `${viewPortX + element.width / 2}px`,
+      top: `${viewPortY + element.height / 2}px`,
+      height: `${100}px`,
+      width: `${100}px`,
+      zIndex: 10,
+      className: "comment-textarea",
+      whiteSpace: "pre-wrap",
+      fontSize: "13px",
+    });
+    textarea.placeholder = "Start typing your comments";
+
+    textarea.onblur = () => {
+      textarea.remove();
+    };
+    excalidrawWrapperRef.current.querySelector(".excalidraw").append(textarea);
+    textarea.focus();
+  };
+
   const onElementClick = (element) => {
     if (element.type === "custom" && element.customType === "comment") {
-      const { x: viewPortX, y: viewPortY } = sceneCoordsToViewportCoords(
-        {
-          sceneX: element.x,
-          sceneY: element.y,
-        },
-        excalidrawRef.current.getAppState(),
-      );
-      const textarea = document.createElement("textarea");
-      Object.assign(textarea.style, {
-        position: "absolute",
-        display: "inline-block",
-        left: `${viewPortX + element.width / 2}px`,
-        top: `${viewPortY + element.height / 2}px`,
-        height: `${100}px`,
-        width: `${100}px`,
-        zIndex: 10,
-        className: "comment-textarea",
-        whiteSpace: "pre-wrap",
-        fontSize: "13px",
-      });
-      textarea.placeholder = "Start typing your comments";
-      textarea.onblur = () => {
-        textarea.remove();
-      };
-      excalidrawWrapperRef.current
-        .querySelector(".excalidraw")
-        .append(textarea);
-      textarea.focus();
+      addTextArea(element);
     }
   };
   return (

@@ -452,6 +452,16 @@ class App extends React.Component<AppProps, AppState> {
       width,
       height,
     });
+
+    this.scene.addCallback(() => {
+      const customElementConfig = getCustomElementConfig(
+        this.props.customElementsConfig,
+        customElement.customType,
+      );
+      if (customElementConfig && customElementConfig.onCreate) {
+        customElementConfig.onCreate(customElement);
+      }
+    });
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
       customElement,
