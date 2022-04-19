@@ -719,11 +719,6 @@ class App extends React.Component<AppProps, AppState> {
         )
       ) {
         await this.library.importLibrary(blob, "published");
-        // hack to rerender the library items after import
-        if (this.state.isLibraryOpen) {
-          this.setState({ isLibraryOpen: false });
-        }
-        this.setState({ isLibraryOpen: true });
       }
     } catch (error: any) {
       window.alert(t("alerts.errorLoadingLibrary"));
@@ -1699,15 +1694,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.libraryItems) {
-        this.library
-          .importLibrary(sceneData.libraryItems, "unpublished")
-          .then(() => {
-            if (this.state.isLibraryOpen) {
-              this.setState({ isLibraryOpen: false }, () => {
-                this.setState({ isLibraryOpen: true });
-              });
-            }
-          });
+        this.library.importLibrary(sceneData.libraryItems, "unpublished");
       }
     },
   );

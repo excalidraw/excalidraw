@@ -3,6 +3,13 @@ import { LibraryItems, LibraryItem } from "../types";
 import { restoreLibraryItems } from "./restore";
 import type App from "../components/App";
 import { ImportedDataState } from "./types";
+import { atom } from "jotai";
+import { jotaiStore } from "../jotai";
+
+export const libraryItemsAtom = atom<LibraryItems>([]);
+
+const cloneLibraryItems = (libraryItems: LibraryItems): LibraryItems =>
+  JSON.parse(JSON.stringify(libraryItems));
 
 /**
  * checks if library item does not exist already in current library
@@ -29,7 +36,6 @@ const isUniqueitem = (
 };
 
 class Library {
-  private libraryCache: LibraryItems | null = null;
   private app: App;
 
   constructor(app: App) {
@@ -37,8 +43,7 @@ class Library {
   }
 
   resetLibrary = async () => {
-    await this.app.props.onLibraryChange?.([]);
-    this.libraryCache = [];
+    this.saveLibrary([]);
   };
 
   /** imports library (currently merges, removing duplicates) */
@@ -60,7 +65,7 @@ class Library {
       libraryItems = restoreLibraryItems(await blob, defaultStatus);
     }
 
-    const existingLibraryItems = await this.loadLibrary();
+    const existingLibraryItems = await jotaiStore.get(libraryItemsAtom)!;
 
     const filteredItems = [];
     for (const item of libraryItems) {
@@ -74,23 +79,18 @@ class Library {
 
   loadLibrary = (): Promise<LibraryItems> => {
     return new Promise(async (resolve) => {
-      if (this.libraryCache) {
-        return resolve(JSON.parse(JSON.stringify(this.libraryCache)));
-      }
-      resolve([]);
+      const libraryItems = (await jotaiStore.get(libraryItemsAtom)) || [];
+      resolve(cloneLibraryItems(libraryItems));
     });
   };
 
   saveLibrary = async (items: LibraryItems) => {
-    const prevLibraryItems = this.libraryCache;
+    const prevLibraryItems = (await jotaiStore.get(libraryItemsAtom)) || [];
     try {
-      const serializedItems = JSON.stringify(items);
-      // cache optimistically so that the app has access to the latest
-      // immediately
-      this.libraryCache = JSON.parse(serializedItems);
+      jotaiStore.set(libraryItemsAtom, cloneLibraryItems(items));
       await this.app.props.onLibraryChange?.(items);
     } catch (error: any) {
-      this.libraryCache = prevLibraryItems;
+      jotaiStore.set(libraryItemsAtom, prevLibraryItems);
       throw error;
     }
   };

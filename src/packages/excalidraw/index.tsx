@@ -10,6 +10,8 @@ import "../../css/styles.scss";
 import { AppProps, ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { defaultLang } from "../../i18n";
 import { DEFAULT_UI_OPTIONS } from "../../constants";
+import { Provider } from "jotai";
+import { jotaiScope, jotaiStore } from "../../jotai";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
@@ -73,32 +75,34 @@ const Excalidraw = (props: ExcalidrawProps) => {
 
   return (
     <InitializeApp langCode={langCode}>
-      <App
-        onChange={onChange}
-        initialData={initialData}
-        excalidrawRef={excalidrawRef}
-        onCollabButtonClick={onCollabButtonClick}
-        isCollaborating={isCollaborating}
-        onPointerUpdate={onPointerUpdate}
-        renderTopRightUI={renderTopRightUI}
-        renderFooter={renderFooter}
-        langCode={langCode}
-        viewModeEnabled={viewModeEnabled}
-        zenModeEnabled={zenModeEnabled}
-        gridModeEnabled={gridModeEnabled}
-        libraryReturnUrl={libraryReturnUrl}
-        theme={theme}
-        name={name}
-        renderCustomStats={renderCustomStats}
-        UIOptions={UIOptions}
-        onPaste={onPaste}
-        detectScroll={detectScroll}
-        handleKeyboardGlobally={handleKeyboardGlobally}
-        onLibraryChange={onLibraryChange}
-        autoFocus={autoFocus}
-        generateIdForFile={generateIdForFile}
-        onLinkOpen={onLinkOpen}
-      />
+      <Provider unstable_createStore={() => jotaiStore} scope={jotaiScope}>
+        <App
+          onChange={onChange}
+          initialData={initialData}
+          excalidrawRef={excalidrawRef}
+          onCollabButtonClick={onCollabButtonClick}
+          isCollaborating={isCollaborating}
+          onPointerUpdate={onPointerUpdate}
+          renderTopRightUI={renderTopRightUI}
+          renderFooter={renderFooter}
+          langCode={langCode}
+          viewModeEnabled={viewModeEnabled}
+          zenModeEnabled={zenModeEnabled}
+          gridModeEnabled={gridModeEnabled}
+          libraryReturnUrl={libraryReturnUrl}
+          theme={theme}
+          name={name}
+          renderCustomStats={renderCustomStats}
+          UIOptions={UIOptions}
+          onPaste={onPaste}
+          detectScroll={detectScroll}
+          handleKeyboardGlobally={handleKeyboardGlobally}
+          onLibraryChange={onLibraryChange}
+          autoFocus={autoFocus}
+          generateIdForFile={generateIdForFile}
+          onLinkOpen={onLinkOpen}
+        />
+      </Provider>
     </InitializeApp>
   );
 };
