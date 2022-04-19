@@ -9,6 +9,7 @@
     "copy": "Kopírovať",
     "copyAsPng": "Kopírovať do schránky ako PNG",
     "copyAsSvg": "Kopírovať do schránky ako SVG",
+    "copyText": "Kopírovať do schránky ako text",
     "bringForward": "Presunúť o úroveň dopredu",
     "sendToBack": "Presunúť dozadu",
     "bringToFront": "Presunúť dopredu",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "Zmenšiť veľkosť písma",
     "increaseFontSize": "Zväčšiť veľkosť písma",
     "unbindText": "Zrušiť previazanie textu",
+    "bindText": "Previazať text s kontajnerom",
     "link": {
       "edit": "Upraviť odkaz",
       "create": "Vytvoriť odkaz",
       "label": "Odkaz"
+    },
+    "elementLock": {
+      "lock": "Zamknúť",
+      "unlock": "Odomknúť",
+      "lockAll": "Zamknúť všetko",
+      "unlockAll": "Odomknúť všetko"
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "Nepodarilo sa načítať nevalidný súbor",
     "importBackendFailed": "Nepdarilo sa importovanie zo serveru.",
     "cannotExportEmptyCanvas": "Nie je možné exportovať prázdne plátno.",
-    "couldNotCopyToClipboard": "Nepodarilo sa kopírovanie do schránky. Skúste použiť prehliadač Chrome.",
+    "couldNotCopyToClipboard": "Kopírovanie do schránky sa nepodarilo.",
     "decryptFailed": "Nepodarilo sa rozšifrovať údaje.",
     "uploadedSecurly": "Nahratie je zabezpečené end-to-end šifrovaním, takže Excalidraw server a tretie strany nedokážu prečítať jeho obsah.",
     "loadSceneOverridePrompt": "Nahratie externej kresby nahradí existujúci obsah. Prajete si pokračovať?",
@@ -181,7 +189,7 @@
     "fileTooBig": "Súbor je príliš veľký. Maximálna povolená veľkosť je {{maxSize}}.",
     "svgImageInsertError": "Nepodarilo sa vložiť SVG obrázok. SVG formát je pravdepodobne nevalidný.",
     "invalidSVGString": "Nevalidné SVG.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu."
   },
   "toolBar": {
     "selection": "Výber",
@@ -196,7 +204,8 @@
     "library": "Knižnica",
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia",
     "penMode": "Zabrániť priblíženiu potiahnutím a povoliť vstup voľnou rokou iba z pera",
-    "link": "Pridať/ Upraviť odkaz pre vybraný tvar"
+    "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
+    "eraser": "Guma"
   },
   "headings": {
     "canvasActions": "Akcie plátna",
@@ -221,7 +230,8 @@
     "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
     "publishLibrary": "Uverejniť vašu knižnicu",
     "bindTextToElement": "Stlačte enter na pridanie textu",
-    "deepBoxSelect": "Podržte CtrlOrCmd na výber v skupine alebo zamedzeniu poťiahnutia"
+    "deepBoxSelect": "Podržte CtrlOrCmd na výber v skupine alebo zamedzeniu poťiahnutia",
+    "eraserRevert": "Podržte Alt pre prehodenie položiek určených na vymazanie"
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -281,14 +291,15 @@
     "howto": "Postupujte podľa naších návodov",
     "or": "alebo",
     "preventBinding": "Zakázať pripájanie šípky",
-    "shapes": "Tvary",
+    "tools": "Nástroje",
     "shortcuts": "Klávesové skratky",
     "textFinish": "Ukončenie editovania (text editor)",
     "textNewLine": "Vložiť nový riadok (text editor)",
     "title": "Pomocník",
     "view": "Zobrazenie",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
-    "zoomToSelection": "Priblížiť na výber"
+    "zoomToSelection": "Priblížiť na výber",
+    "toggleElementLock": "Zamknúť/odomknúť vybrané"
   },
   "clearCanvasDialog": {
     "title": "Vyčistiť plátno"

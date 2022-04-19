@@ -9,6 +9,7 @@
     "copy": "Nɣel",
     "copyAsPng": "Nɣel ɣer tecfawit am PNG",
     "copyAsSvg": "Nɣel ɣer tecfawit am SVG",
+    "copyText": "Nɣel ɣer tecfawit am uḍris",
     "bringForward": "Awi ɣer sdat",
     "sendToBack": "Awi s agilal",
     "bringToFront": "Err ɣer deffir",
@@ -64,7 +65,7 @@
     "cartoonist": "",
     "fileTitle": "Isem n ufaylu",
     "colorPicker": "Amafran n yini",
-    "canvasColors": "",
+    "canvasColors": "Yettwaseqdec di teɣzut n usuneɣ",
     "canvasBackground": "Agilal n teɣzut n usuneɣ",
     "drawingCanvas": "Taɣzut n usuneɣ",
     "layers": "Tissiyin",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "Senqes tiddi n tsefsit",
     "increaseFontSize": "Sali tiddi n tsefsit",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "Ẓreg aseɣwen",
       "create": "Snulfu-d aseɣwen",
       "label": "Aseɣwen"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "D awezɣi asali n ufaylu armeɣtu",
     "importBackendFailed": "Takterḍ seg uɣawas n deffir ur teddi ara.",
     "cannotExportEmptyCanvas": "D awezɣi asifeḍ n teɣzut n usuneɣ tilemt.",
-    "couldNotCopyToClipboard": "D awezɣi anɣal ɣer tecfawit. Eɛreḍ ad tesqedceḍ iminig Chrome.",
+    "couldNotCopyToClipboard": "Ulamek anɣal ɣer tecfawit.",
     "decryptFailed": "D awezɣi tukksa n uwgelhen i yisefka.",
     "uploadedSecurly": "Asili yettwasɣelles s uwgelhen ixef s ixef, ayagi yebɣa ad d-yini belli aqeddac n Excalidraw akked medden ur zmiren ara ad ɣren agbur.",
     "loadSceneOverridePrompt": "Asali n wunuɣ uffiɣ ad isemselsi agbur-inek (m) yellan. Tebɣiḍ ad tkemmeleḍ?",
@@ -181,7 +189,7 @@
     "fileTooBig": "Afaylu meqqer aṭas. Tiddi tafellayt yurgen d {{maxSize}}.",
     "svgImageInsertError": "D awezɣi tugra n tugna SVG. Acraḍ SVG yettban-d d armeɣtu.",
     "invalidSVGString": "SVG armeɣtu.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Ulamek tuqqna s aqeddac n umyalel. Ma ulac uɣilif ales asali n usebter sakin eɛreḍ tikkelt-nniḍen."
   },
   "toolBar": {
     "selection": "Tafrayt",
@@ -196,7 +204,8 @@
     "library": "Tamkarḍit",
     "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ",
     "penMode": "",
-    "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen"
+    "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen",
+    "eraser": "Sfeḍ"
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",
@@ -221,7 +230,8 @@
     "placeImage": "Ssit akken ad tserseḍ tugna, neɣ ssit u zuɣer akken ad tesbaduḍ tiddi-ines s ufus",
     "publishLibrary": "Siẓreg tamkarḍit-inek•inem",
     "bindTextToElement": "Ssed ɣef kcem akken ad ternuḍ aḍris",
-    "deepBoxSelect": "Ṭṭef CtrlOrCmd akken ad tferneḍ s telqey, yerna ad trewleḍ i uzuɣer"
+    "deepBoxSelect": "Ṭṭef CtrlOrCmd akken ad tferneḍ s telqey, yerna ad trewleḍ i uzuɣer",
+    "eraserRevert": "Ssed Alt akken ad tsefsxeḍ iferdisen yettwacerḍen i tukksa"
   },
   "canvasError": {
     "cannotShowPreview": "Ulamek abeqqeḍ n teskant",
@@ -281,14 +291,15 @@
     "howto": "Ḍfer imniren-nneɣ",
     "or": "neɣ",
     "preventBinding": "Seḥbes tuqqna n tneccabin",
-    "shapes": "Talɣiwin",
+    "tools": "Ifecka",
     "shortcuts": "Inegzumen n unasiw",
     "textFinish": "Fak asiẓreg (amaẓrag n uḍris)",
     "textNewLine": "Rnu ajerriḍ amaynut (amaẓrag n uḍris)",
     "title": "Tallelt",
     "view": "Tamuɣli",
     "zoomToFit": "Simɣur akken ad twliḍ akk iferdisen",
-    "zoomToSelection": "Simɣur ɣer tefrayt"
+    "zoomToSelection": "Simɣur ɣer tefrayt",
+    "toggleElementLock": "Sekkeṛ/kkes asekker i tefrayt"
   },
   "clearCanvasDialog": {
     "title": "Sfeḍ taɣzut n usuneɣ"

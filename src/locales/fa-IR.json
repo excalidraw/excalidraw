@@ -9,6 +9,7 @@
     "copy": "کپی",
     "copyAsPng": "کپی در حافطه موقت به صورت PNG",
     "copyAsSvg": "کپی در حافطه موقت به صورت SVG",
+    "copyText": "",
     "bringForward": "جلو آوردن",
     "sendToBack": "پس فرستادن",
     "bringToFront": "جلو آوردن",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "",
     "increaseFontSize": "",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "عدم توانایی در بازگذاری فایل نامعتبر",
     "importBackendFailed": "بارگیری از پشت صحنه با شکست مواجه شد.",
     "cannotExportEmptyCanvas": "بوم خالی قابل تبدیل نیست.",
-    "couldNotCopyToClipboard": "کپی نشد. از مرورگر Chrome استفاده کنید.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "رمزگشایی داده ها امکان پذیر نیست.",
     "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
@@ -196,7 +204,8 @@
     "library": "کتابخانه",
     "lock": "ابزار انتخاب شده را بعد از کشیدن نگه دار",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
@@ -221,7 +230,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -281,14 +291,15 @@
     "howto": "راهنمای ما را دنبال کنید",
     "or": "یا",
     "preventBinding": "مانع شدن از چسبیدن فلش ها",
-    "shapes": "شکل‌ها",
+    "tools": "",
     "shortcuts": "میانبرهای صفحه کلید",
     "textFinish": "پایان ویرایش (ویرایشگر متن)",
     "textNewLine": "افزودن خط جدید (ویرایشگر متن)",
     "title": "راهنما",
     "view": "مشاهده",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
-    "zoomToSelection": "بزرگنمایی قسمت انتخاب شده"
+    "zoomToSelection": "بزرگنمایی قسمت انتخاب شده",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""

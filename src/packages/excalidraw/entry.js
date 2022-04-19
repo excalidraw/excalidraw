@@ -2,5 +2,5 @@ import Excalidraw from "./index";
 
 import "../../../public/fonts.css";
 
-export default Excalidraw;
+export { Excalidraw };
 export * from "./index";

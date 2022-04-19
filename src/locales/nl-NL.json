@@ -9,6 +9,7 @@
     "copy": "Kopiëren",
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer naar klembord als SVG",
+    "copyText": "Kopiëren naar klembord als tekst",
     "bringForward": "Breng naar voren",
     "sendToBack": "Stuur naar achtergrond",
     "bringToFront": "Breng naar voorgrond",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "",
     "increaseFontSize": "",
     "unbindText": "Ontkoppel tekst",
+    "bindText": "",
     "link": {
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "Kan ongeldig bestand niet laden",
     "importBackendFailed": "Importeren vanuit backend mislukt.",
     "cannotExportEmptyCanvas": "Kan geen leeg canvas exporteren.",
-    "couldNotCopyToClipboard": "Kan niet kopiëren. Probeer in de Chrome-browser.",
+    "couldNotCopyToClipboard": "Kon niet naar klembord kopiëren.",
     "decryptFailed": "Kan gegevens niet decoderen.",
     "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
     "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wil je doorgaan?",
@@ -196,7 +204,8 @@
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
     "penMode": "Voorkom pinch-zoom en accepteer freedraw invoer alleen van pen",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Canvasacties",
@@ -221,7 +230,8 @@
     "placeImage": "",
     "publishLibrary": "Publiceer je eigen bibliotheek",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan voorbeeld niet tonen",
@@ -281,14 +291,15 @@
     "howto": "Volg onze handleidingen",
     "or": "of",
     "preventBinding": "Pijlbinding voorkomen",
-    "shapes": "Vormen",
+    "tools": "",
     "shortcuts": "Sneltoetsen",
     "textFinish": "Voltooi het bewerken (teksteditor)",
     "textNewLine": "Nieuwe regel toevoegen (teksteditor)",
     "title": "Help",
     "view": "Weergave",
     "zoomToFit": "Zoom in op alle elementen",
-    "zoomToSelection": "Inzoomen op selectie"
+    "zoomToSelection": "Inzoomen op selectie",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""

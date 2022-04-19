@@ -11,7 +11,11 @@ import {
   NormalizedZoomValue,
 } from "../types";
 import { ImportedDataState } from "./types";
-import { getNormalizedDimensions, isInvisiblySmallElement } from "../element";
+import {
+  getNonDeletedElements,
+  getNormalizedDimensions,
+  isInvisiblySmallElement,
+} from "../element";
 import { isLinearElementType } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
@@ -299,6 +303,14 @@ export const restore = (
   };
 };
 
+const restoreLibraryItem = (libraryItem: LibraryItem) => {
+  const elements = restoreElements(
+    getNonDeletedElements(libraryItem.elements),
+    null,
+  );
+  return elements.length ? { ...libraryItem, elements } : null;
+};
+
 export const restoreLibraryItems = (
   libraryItems: NonOptional<ImportedDataState["libraryItems"]>,
   defaultStatus: LibraryItem["status"],
@@ -307,20 +319,29 @@ export const restoreLibraryItems = (
   for (const item of libraryItems) {
     // migrate older libraries
     if (Array.isArray(item)) {
-      restoredItems.push({
+      const restoredItem = restoreLibraryItem({
         status: defaultStatus,
         elements: item,
         id: randomId(),
         created: Date.now(),
       });
+      if (restoredItem) {
+        restoredItems.push(restoredItem);
+      }
     } else {
-      const _item = item as MarkOptional<LibraryItem, "id" | "status">;
-      restoredItems.push({
+      const _item = item as MarkOptional<
+        LibraryItem,
+        "id" | "status" | "created"
+      >;
+      const restoredItem = restoreLibraryItem({
         ..._item,
         id: _item.id || randomId(),
         status: _item.status || defaultStatus,
         created: _item.created || Date.now(),
       });
+      if (restoredItem) {
+        restoredItems.push(restoredItem);
+      }
     }
   }
   return restoredItems;

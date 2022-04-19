@@ -1099,7 +1099,10 @@ class App extends React.Component<AppProps, AppState> {
         activeTool: { ...this.state.activeTool, type: "selection" },
       });
     }
-    if (prevState.theme !== this.state.theme) {
+    if (
+      this.state.activeTool.type === "eraser" &&
+      prevState.theme !== this.state.theme
+    ) {
       setEraserCursor(this.canvas, this.state.theme);
     }
     // Hide hyperlink popup if shown when element type is not selection
@@ -1744,6 +1747,11 @@ class App extends React.Component<AppProps, AppState> {
         this.library.saveLibrary(
           restoreLibraryItems(sceneData.libraryItems, "unpublished"),
         );
+        if (this.state.isLibraryOpen) {
+          this.setState({ isLibraryOpen: false }, () => {
+            this.setState({ isLibraryOpen: true });
+          });
+        }
       }
     },
   );
