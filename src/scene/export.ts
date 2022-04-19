@@ -2,7 +2,7 @@ import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance } from "../utils";
+import { distance, isDevEnv } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
@@ -11,6 +11,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
+import pkg from "../../src/packages/excalidraw/package.json";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -114,24 +115,37 @@ export const exportToSvg = async (
   if (appState.exportWithDarkMode) {
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
+  let assetPath =
+    window.EXCALIDRAW_ASSET_PATH ||
+    `https://unpkg.com/${pkg.name}@${pkg.version}/dist/excalidraw-assets/`;
 
+  if (assetPath?.startsWith("/")) {
+    const origin = isDevEnv()
+      ? "https://excalidraw.com"
+      : window.location.origin;
+    assetPath = assetPath.replace("/", `${origin}/`);
+  }
+
+  const defs = document.createElement("defs");
+  const style = document.createElement("style");
+  style.appendChild(
+    document.createTextNode(
+      "@font-face {" +
+        "font-family: 'Virgil';" +
+        `src: url(${assetPath}Virgil.woff2);` +
+        "}" +
+        "@font-face {" +
+        "font-family: 'Cascadia';" +
+        `src: url(${assetPath}Cascadia.woff2);` +
+        "}",
+    ),
+  );
+  defs.appendChild(style);
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
-  <defs>
-    <style>
-      @font-face {
-        font-family: "Virgil";
-        src: url("https://excalidraw.com/Virgil.woff2");
-      }
-      @font-face {
-        font-family: "Cascadia";
-        src: url("https://excalidraw.com/Cascadia.woff2");
-      }
-    </style>
-  </defs>
   `;
-
+  svgRoot.appendChild(defs);
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
