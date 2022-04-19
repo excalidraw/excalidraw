@@ -77,23 +77,7 @@ class Library {
       if (this.libraryCache) {
         return resolve(JSON.parse(JSON.stringify(this.libraryCache)));
       }
-
-      try {
-        const libraryItems = this.app.libraryItemsFromStorage;
-        if (!libraryItems) {
-          return resolve([]);
-        }
-
-        const items = restoreLibraryItems(libraryItems, "unpublished");
-
-        // clone to ensure we don't mutate the cached library elements in the app
-        this.libraryCache = JSON.parse(JSON.stringify(items));
-
-        resolve(items);
-      } catch (error: any) {
-        console.error(error);
-        resolve([]);
-      }
+      resolve([]);
     });
   };
 
