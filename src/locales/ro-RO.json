@@ -189,7 +189,7 @@
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
     "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou.",
-    "importLibraryError": ""
+    "importLibraryError": "Biblioteca nu a putut fi încărcată"
   },
   "toolBar": {
     "selection": "Selecție",
