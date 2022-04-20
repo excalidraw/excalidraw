@@ -453,7 +453,7 @@ class App extends React.Component<AppProps, AppState> {
       height,
     });
 
-    this.scene.addCallback(() => {
+    const unbind = this.scene.addCallback(() => {
       const customElementConfig = getCustomElementConfig(
         this.props.customElementsConfig,
         customElement.customType,
@@ -466,6 +466,7 @@ class App extends React.Component<AppProps, AppState> {
       ...this.scene.getElementsIncludingDeleted(),
       customElement,
     ]);
+    unbind();
   };
 
   private renderCanvas() {
