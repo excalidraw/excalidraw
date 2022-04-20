@@ -189,7 +189,7 @@
     "svgImageInsertError": "Не удалось вставить изображение SVG. Разметка SVG выглядит недействительной.",
     "invalidSVGString": "Некорректный SVG.",
     "cannotResolveCollabServer": "Не удалось подключиться к серверу совместного редактирования. Перезагрузите страницу и повторите попытку.",
-    "importLibraryError": ""
+    "importLibraryError": "Не удалось загрузить библиотеку"
   },
   "toolBar": {
     "selection": "Выделение области",
