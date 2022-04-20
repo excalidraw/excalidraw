@@ -172,7 +172,6 @@
     "uploadedSecurly": "Uppladdning har säkrats med kryptering från ände till ände. vilket innebär att Excalidraw server och tredje part inte kan läsa innehållet.",
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
     "collabStopOverridePrompt": "Att stoppa sessionen kommer att skriva över din föregående, lokalt lagrade skiss. Är du säker?\n\n(Om du vill behålla din lokala skiss, stäng bara webbläsarfliken istället.)",
-    "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
     "errorAddingToLibrary": "Kunde inte lägga till objekt i biblioteket",
     "errorRemovingFromLibrary": "Kunde inte ta bort objekt från biblioteket",
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
@@ -189,7 +188,8 @@
     "fileTooBig": "Filen är för stor. Maximal tillåten storlek är {{maxSize}}.",
     "svgImageInsertError": "Kunde inte infoga SVG-bild. SVG-koden ser ogiltig ut.",
     "invalidSVGString": "Ogiltig SVG.",
-    "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen."
+    "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Markering",
