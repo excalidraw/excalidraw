@@ -172,7 +172,6 @@
     "uploadedSecurly": "Asili yettwasɣelles s uwgelhen ixef s ixef, ayagi yebɣa ad d-yini belli aqeddac n Excalidraw akked medden ur zmiren ara ad ɣren agbur.",
     "loadSceneOverridePrompt": "Asali n wunuɣ uffiɣ ad isemselsi agbur-inek (m) yellan. Tebɣiḍ ad tkemmeleḍ?",
     "collabStopOverridePrompt": "Aḥbas n tɣimit ad yesefsex unuɣ-inek (m) yettwaḥerzen yakan s wudem adigan. Tetḥeqqeḍ?\n(Ma tebɣiḍ ad teǧǧeḍ unuɣ-inek (m) adigan, mdel iccer n yiminig, deg umḍiq.)",
-    "errorLoadingLibrary": "Teḍra-d tuccḍa deg usali n temkarḍit n wis kraḍ.",
     "errorAddingToLibrary": "Ulamek ara yettwarnu uferdis ɣer temkarḍit",
     "errorRemovingFromLibrary": "Ulamek ara yettwakkes uferdis si temkarḍit",
     "confirmAddLibrary": "Ayagi adirnu talɣa (win) {{numShapes}} ɣer temkarḍit-inek (m). Tetḥeqqeḍ?",
@@ -189,7 +188,8 @@
     "fileTooBig": "Afaylu meqqer aṭas. Tiddi tafellayt yurgen d {{maxSize}}.",
     "svgImageInsertError": "D awezɣi tugra n tugna SVG. Acraḍ SVG yettban-d d armeɣtu.",
     "invalidSVGString": "SVG armeɣtu.",
-    "cannotResolveCollabServer": "Ulamek tuqqna s aqeddac n umyalel. Ma ulac uɣilif ales asali n usebter sakin eɛreḍ tikkelt-nniḍen."
+    "cannotResolveCollabServer": "Ulamek tuqqna s aqeddac n umyalel. Ma ulac uɣilif ales asali n usebter sakin eɛreḍ tikkelt-nniḍen.",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Tafrayt",
