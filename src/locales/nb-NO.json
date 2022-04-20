@@ -172,7 +172,6 @@
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter.",
     "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?",
     "collabStopOverridePrompt": "Hvis du slutter økten, overskrives din forrige, lokalt lagrede tegning. Er du sikker?\n\n(Hvis du ønsker å beholde din lokale tegning, bare lukk nettleserfanen i stedet.)",
-    "errorLoadingLibrary": "Det oppstod en feil under lasting av tredjepartsbiblioteket.",
     "errorAddingToLibrary": "Kunne ikke legge element i biblioteket",
     "errorRemovingFromLibrary": "Kunne ikke fjerne element fra biblioteket",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
@@ -189,7 +188,8 @@
     "fileTooBig": "Filen er for stor. Maksimal tillatt størrelse er {{maxSize}}.",
     "svgImageInsertError": "Kunne ikke sette inn SVG-bilde. SVG-koden ser ugyldig ut.",
     "invalidSVGString": "Ugyldig SVG.",
-    "cannotResolveCollabServer": "Kunne ikke koble til samarbeidsserveren. Vennligst oppdater siden og prøv på nytt."
+    "cannotResolveCollabServer": "Kunne ikke koble til samarbeidsserveren. Vennligst oppdater siden og prøv på nytt.",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Velg",
