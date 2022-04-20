@@ -172,7 +172,6 @@
     "uploadedSecurly": "Încărcarea a fost securizată prin criptare integrală, însemnând că serverul Excalidraw și terții nu pot citi conținutul.",
     "loadSceneOverridePrompt": "Încărcarea desenului extern va înlocui conținutul existent. Dorești să continui?",
     "collabStopOverridePrompt": "Oprirea sesiunii va suprascrie desenul anterior stocat local. Confirmi alegerea?\n\n(Dacă vrei să păstrezi desenul local, pur și simplu închide fila navigatorului în schimb.)",
-    "errorLoadingLibrary": "A apărut o eroare la încărcarea bibliotecii terțe.",
     "errorAddingToLibrary": "Elementul nu a putut fi adăugat în bibliotecă",
     "errorRemovingFromLibrary": "Elementul nu a putut fi eliminat din bibliotecă",
     "confirmAddLibrary": "Această acțiune va adăuga {{numShapes}} formă(e) la biblioteca ta. Confirmi?",
@@ -189,7 +188,8 @@
     "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
     "invalidSVGString": "SVG invalid.",
-    "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou."
+    "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou.",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Selecție",
