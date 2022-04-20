@@ -172,7 +172,6 @@
     "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz.",
     "loadSceneOverridePrompt": "Wczytanie zewnętrznego rysunku zastąpi istniejącą zawartość. Czy chcesz kontynuować?",
     "collabStopOverridePrompt": "Zatrzymanie sesji nadpisze poprzedni, zapisany lokalnie rysunk. Jesteś pewien?\n\n(Jeśli chcesz zachować swój lokalny rysunek, po prostu zamknij zakładkę przeglądarki.)",
-    "errorLoadingLibrary": "Wystąpił błąd podczas wczytywania zewnętrznej biblioteki.",
     "errorAddingToLibrary": "Nie udało się dodać elementu do biblioteki",
     "errorRemovingFromLibrary": "Nie udało się usunąć elementu z biblioteki",
     "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
@@ -189,7 +188,8 @@
     "fileTooBig": "Plik jest zbyt duży. Maksymalny dozwolony rozmiar to {{maxSize}}.",
     "svgImageInsertError": "Nie udało się wstawić obrazu SVG. Znacznik SVG wygląda na nieprawidłowy.",
     "invalidSVGString": "Nieprawidłowy SVG.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Zaznaczenie",
