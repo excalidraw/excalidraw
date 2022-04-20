@@ -172,7 +172,6 @@
     "uploadedSecurly": "Lo telecargament es estat securizat amb un chiframent del cap a la fin, significa que los servidors d’Excalidraw o que quina tèrça part que siá pòdon pas legir lo contengut.",
     "loadSceneOverridePrompt": "Cargar un dessenh extèrn remplaçarà vòstre contengut existent. Volètz contunhar ?",
     "collabStopOverridePrompt": "Arrestar la session remplaçarà vòstre precedent dessenh gardat localament. O volètz vertadièrament ?\n\n(Se volètz gardar vòstre dessenh local, tampatz simplament l’onglet del navegador a la plaça)",
-    "errorLoadingLibrary": "Una error s’es producha en cargant una bibliotèca tèrça.",
     "errorAddingToLibrary": "Apondon impossible de l’element a la bibliotèca",
     "errorRemovingFromLibrary": "Supression impossibla de l’element a la bibliotèca",
     "confirmAddLibrary": "Apondrà {{numShapes}} forma(s) a vòstra bibliotèca. Confirmatz ?",
@@ -189,7 +188,8 @@
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
     "invalidSVGString": "SVG invalid.",
-    "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar."
+    "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Seleccion",
