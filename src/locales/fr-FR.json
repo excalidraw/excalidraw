@@ -189,7 +189,7 @@
     "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
     "invalidSVGString": "SVG invalide.",
     "cannotResolveCollabServer": "Impossible de se connecter au serveur collaboratif. Veuillez recharger la page et réessayer.",
-    "importLibraryError": ""
+    "importLibraryError": "Impossible de charger la bibliothèque"
   },
   "toolBar": {
     "selection": "Sélection",
