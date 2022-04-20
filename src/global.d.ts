@@ -34,6 +34,8 @@ type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
 
+type Merge<M, N> = Omit<M, keyof N> & N;
+
 /** utility type to assert that the second type is a subtype of the first type.
  * Returns the subtype. */
 type SubtypeOf<Supertype, Subtype extends Supertype> = Subtype;
