@@ -172,7 +172,6 @@
     "uploadedSecurly": "업로드는 종단 간 암호화로 보호되므로 Excalidraw 서버 및 타사가 콘텐츠를 읽을 수 없습니다.",
     "loadSceneOverridePrompt": "외부 파일을 불러 오면 기존 콘텐츠가 대체됩니다. 계속 진행할까요?",
     "collabStopOverridePrompt": "협업 세션을 종료하면 로컬 저장소에 있는 그림이 협업 세션의 그림으로 대체됩니다. 진행하겠습니까?\n\n(로컬 저장소에 있는 그림을 유지하려면 현재 브라우저 탭을 닫아주세요.)",
-    "errorLoadingLibrary": "외부 라이브러리를 불러오는 중에 문제가 발생했습니다.",
     "errorAddingToLibrary": "아이템을 라이브러리에 추가 할수 없습니다",
     "errorRemovingFromLibrary": "라이브러리에서 아이템을 삭제할수 없습니다",
     "confirmAddLibrary": "{{numShapes}}개의 모양이 라이브러리에 추가됩니다. 계속하시겠어요?",
@@ -189,7 +188,8 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "선택",
