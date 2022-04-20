@@ -189,7 +189,7 @@
     "svgImageInsertError": "எஸ்விஜி படத்தைப் புகுத்தவியலா. எஸ்விஜியின் மார்க்அப் செல்லாததாக தெரிகிறது.",
     "invalidSVGString": "செல்லாத SVG.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "நூலகத்தை ஏற்ற முடியவில்லை"
   },
   "toolBar": {
     "selection": "தெரிவு",
