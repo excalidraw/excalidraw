@@ -172,7 +172,6 @@
     "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "خطایی در بارگذاری کتابخانه ثالث وجود داشت.",
     "errorAddingToLibrary": "مورد به کتابخانه اضافه نشد",
     "errorRemovingFromLibrary": "مورد از کتابخانه حذف نشد",
     "confirmAddLibrary": "{{numShapes}} از اشکال به کتابخانه شما اضافه خواهد شد. مطمئن هستید؟",
@@ -189,7 +188,8 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "گزینش",
