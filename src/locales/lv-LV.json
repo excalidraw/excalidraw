@@ -189,7 +189,7 @@
     "svgImageInsertError": "Nevarēja ievietot SVG attēlu. Šķiet, ka SVG marķējums nav derīgs.",
     "invalidSVGString": "Nederīgs SVG.",
     "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz.",
-    "importLibraryError": ""
+    "importLibraryError": "Nevarēja ielādēt bibliotēku"
   },
   "toolBar": {
     "selection": "Atlase",
