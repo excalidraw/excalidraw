@@ -189,7 +189,7 @@
     "svgImageInsertError": "Kunne ikke sette inn SVG-bilde. SVG-koden ser ugyldig ut.",
     "invalidSVGString": "Ugyldig SVG.",
     "cannotResolveCollabServer": "Kunne ikke koble til samarbeidsserveren. Vennligst oppdater siden og prøv på nytt.",
-    "importLibraryError": ""
+    "importLibraryError": "Kunne ikke laste bibliotek"
   },
   "toolBar": {
     "selection": "Velg",
