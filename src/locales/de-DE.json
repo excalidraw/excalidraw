@@ -172,7 +172,6 @@
     "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen.",
     "loadSceneOverridePrompt": "Das Laden einer externen Zeichnung ersetzt den vorhandenen Inhalt. Möchtest du fortfahren?",
     "collabStopOverridePrompt": "Das Stoppen der Sitzung wird deine vorherige, lokal gespeicherte Zeichnung überschreiben. Bist du dir sicher?\n\n(Wenn du deine lokale Zeichnung behalten möchtest, schließe stattdessen den Browser-Tab.)",
-    "errorLoadingLibrary": "Beim Laden der Drittanbieter-Bibliothek ist ein Fehler aufgetreten.",
     "errorAddingToLibrary": "Das Element konnte nicht zur Bibliothek hinzugefügt werden",
     "errorRemovingFromLibrary": "Das Element konnte nicht aus der Bibliothek entfernt werden",
     "confirmAddLibrary": "Dies fügt {{numShapes}} Form(en) zu deiner Bibliothek hinzu. Bist du dir sicher?",
@@ -189,7 +188,8 @@
     "fileTooBig": "Die Datei ist zu groß. Die maximal zulässige Größe ist {{maxSize}}.",
     "svgImageInsertError": "SVG-Bild konnte nicht eingefügt werden. Das SVG-Markup sieht ungültig aus.",
     "invalidSVGString": "Ungültige SVG.",
-    "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut."
+    "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Auswahl",
