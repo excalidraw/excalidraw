@@ -172,7 +172,6 @@
     "uploadedSecurly": "Augšuplāde nodrošināta ar šifrēšanu no gala līdz galam, kas nozīmē, ka Excalidraw serveri un trešās puses nevar lasīt saturu.",
     "loadSceneOverridePrompt": "Ārēja satura ielāde aizstās jūsu pašreizējo saturu. Vai vēlaties turpināt?",
     "collabStopOverridePrompt": "Sesijas pārtraukšana pārrakstīs jūsu iepriekšējo zīmējumu, kas saglabāts jūsu pārlūkā. Vai turpināt?\n\n(Ja vēlaties paturēt zīmējumu, kas saglabāts jūsu pārlūkā, vienkārši aizveriet pārlūka cilni.)",
-    "errorLoadingLibrary": "Lasot trešās puses bibliotēku, notika kļūda.",
     "errorAddingToLibrary": "Nevarēja pievienot vienumu bibliotēkai",
     "errorRemovingFromLibrary": "Nevarēja izņemt vienumu no bibliotēkas",
     "confirmAddLibrary": "Šī funkcija pievienos {{numShapes}} formu(-as) jūsu bibliotēkai. Vai turpināt?",
@@ -189,7 +188,8 @@
     "fileTooBig": "Datne ir par lielu. Lielākais atļautais izmērs ir {{maxSize}}.",
     "svgImageInsertError": "Nevarēja ievietot SVG attēlu. Šķiet, ka SVG marķējums nav derīgs.",
     "invalidSVGString": "Nederīgs SVG.",
-    "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz."
+    "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz.",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Atlase",
