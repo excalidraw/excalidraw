@@ -189,7 +189,7 @@
     "svgImageInsertError": "Vstavljanje slike SVG ni uspelo. Oznake SVG so videti neveljavne.",
     "invalidSVGString": "Neveljaven SVG.",
     "cannotResolveCollabServer": "Povezave s strežnikom za sodelovanje ni bilo mogoče vzpostaviti. Ponovno naložite stran in poskusite znova.",
-    "importLibraryError": ""
+    "importLibraryError": "Nalaganje knjižnice ni uspelo"
   },
   "toolBar": {
     "selection": "Izbor",
