@@ -172,7 +172,6 @@
     "uploadedSecurly": "တင်သွင်းအချက်အလက်များအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်စနစ်အသုံးပြု၍လုံခြုံစွာထိန်းသိမ်းထားပါသဖြင့် Excalidraw ဆာဗာနှင့်ဆက်စပ်အဖွဲ့အစည်းများပင်လျှင်မဖတ်ရှုနိုင်ပါ။",
     "loadSceneOverridePrompt": "လက်ရှိရေးဆွဲထားသမျှအား ပြင်ပမှတင်သွင်းသောပုံနှင့်အစားထိုးပါမည်။ ဆက်လက်ဆောင်ရွက်လိုပါသလား။",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "ပြင်ပမှမှတ်တမ်းအားတင်သွင်းရာတွင်အမှားအယွင်းရှိနေသည်။",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "{{numShapes}} ခုသောပုံသဏ္ဌာန်အားမှတ်တမ်းတင်ပါမည်။ အတည်ပြုပါ။",
@@ -189,7 +188,8 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
