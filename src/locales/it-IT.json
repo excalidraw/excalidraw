@@ -189,7 +189,7 @@
     "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
     "invalidSVGString": "SVG non valido.",
     "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
-    "importLibraryError": ""
+    "importLibraryError": "Impossibile caricare la libreria"
   },
   "toolBar": {
     "selection": "Selezione",
