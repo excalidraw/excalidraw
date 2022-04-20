@@ -172,7 +172,6 @@
     "uploadedSecurly": "Nalaganje je bilo zaščiteno s šifriranjem od konca do konca, kar pomeni, da strežnik Excalidraw in tretje osebe ne morejo brati vsebine.",
     "loadSceneOverridePrompt": "Nalaganje zunanje risbe bo nadomestilo vašo obstoječo vsebino. Ali želite nadaljevati?",
     "collabStopOverridePrompt": "Ustavitev seje bo prepisala vašo prejšnjo, lokalno shranjeno risbo. Ali ste prepričani?\n\n(Če želite obdržati lokalno risbo, preprosto zaprite zavihek brskalnika.)",
-    "errorLoadingLibrary": "Pri nalaganju knjižnice tretje osebe je prišlo do napake.",
     "errorAddingToLibrary": "Elementa ni bilo mogoče dodati v knjižnico",
     "errorRemovingFromLibrary": "Elementa ni bilo mogoče izbrisati iz knjižnice",
     "confirmAddLibrary": "S tem boste v vašo knjižnico dodali oblike ({{numShapes}}). Ali ste prepričani?",
@@ -189,7 +188,8 @@
     "fileTooBig": "Datoteka je prevelika. Največja dovoljena velikost je {{maxSize}}.",
     "svgImageInsertError": "Vstavljanje slike SVG ni uspelo. Oznake SVG so videti neveljavne.",
     "invalidSVGString": "Neveljaven SVG.",
-    "cannotResolveCollabServer": "Povezave s strežnikom za sodelovanje ni bilo mogoče vzpostaviti. Ponovno naložite stran in poskusite znova."
+    "cannotResolveCollabServer": "Povezave s strežnikom za sodelovanje ni bilo mogoče vzpostaviti. Ponovno naložite stran in poskusite znova.",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Izbor",
