@@ -105,7 +105,9 @@ export const encodeSvgMetadata = async ({ text }: { text: string }) => {
 
 export const decodeSvgMetadata = async ({ svg }: { svg: string }) => {
   if (svg.includes(`payload-type:${MIME_TYPES.excalidraw}`)) {
-    const match = svg.match(/<!-- payload-start -->\s*(.+?)\s*<!-- payload-end -->/m);
+    const match = svg.match(
+      /<!-- payload-start -->\s*(.+?)\s*<!-- payload-end -->/,
+    );
     if (!match) {
       throw new Error("INVALID");
     }
