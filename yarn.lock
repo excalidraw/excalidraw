@@ -3394,10 +3394,10 @@ brorand@^1.0.1, brorand@^1.1.0:
   resolved "https://registry.npmjs.org/brorand/-/brorand-1.1.0.tgz"
   integrity sha1-EsJe/kCkXjwyPrhnWgoM5XsiNx8=
 
-browser-fs-access@0.24.1:
-  version "0.24.1"
-  resolved "https://registry.yarnpkg.com/browser-fs-access/-/browser-fs-access-0.24.1.tgz#29b915fdcd2ef0972ebabc2b7685c6893d288a72"
-  integrity sha512-fRcwhfNej0h2Jy+Uodxjbc5PQvNkZyG9fXu3S6Mcv0kigKath5sL54GXfMtOay/A/ULMa956eQZ9lMWVPiLtMA==
+browser-fs-access@0.28.1:
+  version "0.28.1"
+  resolved "https://registry.yarnpkg.com/browser-fs-access/-/browser-fs-access-0.28.1.tgz#9262974228781216f7a55005c94a0238d9fbf7e4"
+  integrity sha512-LVt8Nm+1opx6hUun2bCX7jFsOMMrtjK/+8vDH7kxYqhzP2UzM2ogPpVhbOmPkZGFfrT3kehEDFX9x1SgXtSK9A==
 
 browser-process-hrtime@^1.0.0:
   version "1.0.0"
@@ -7677,6 +7677,11 @@ jest@26.6.0:
     "@jest/core" "^26.6.0"
     import-local "^3.0.2"
     jest-cli "^26.6.0"
+
+jotai@1.6.4:
+  version "1.6.4"
+  resolved "https://registry.yarnpkg.com/jotai/-/jotai-1.6.4.tgz#4d9904362c53c4293d32e21fb358d3de34b82912"
+  integrity sha512-XC0ExLhdE6FEBdIjKTe6kMlHaAUV/QiwN7vZond76gNr/WdcdonJOEW79+5t8u38sR41bJXi26B1dRi7cCRz9A==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
