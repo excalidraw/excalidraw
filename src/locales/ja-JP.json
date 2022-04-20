@@ -172,7 +172,6 @@
     "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。",
     "loadSceneOverridePrompt": "外部図面を読み込むと、既存のコンテンツが置き換わります。続行しますか？",
     "collabStopOverridePrompt": "セッションを停止すると、ローカルに保存されている図が上書きされます。 本当によろしいですか？\n\n(ローカルの図を保持したい場合は、セッションを停止せずにブラウザタブを閉じてください。)",
-    "errorLoadingLibrary": "サードパーティライブラリの読み込み中にエラーが発生しました。",
     "errorAddingToLibrary": "アイテムをライブラリに追加できませんでした",
     "errorRemovingFromLibrary": "ライブラリからアイテムを削除できませんでした",
     "confirmAddLibrary": "{{numShapes}} 個の図形をライブラリに追加します。よろしいですか？",
@@ -189,7 +188,8 @@
     "fileTooBig": "ファイルが大きすぎます。許可される最大サイズは {{maxSize}} です。",
     "svgImageInsertError": "SVGイメージを挿入できませんでした。SVGマークアップは無効に見えます。",
     "invalidSVGString": "無効なSVGです。",
-    "cannotResolveCollabServer": "コラボレーションサーバに接続できませんでした。ページを再読み込みして、もう一度お試しください。"
+    "cannotResolveCollabServer": "コラボレーションサーバに接続できませんでした。ページを再読み込みして、もう一度お試しください。",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "選択",
