@@ -172,7 +172,6 @@
     "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
     "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wil je doorgaan?",
     "collabStopOverridePrompt": "Wanneer de sessie wordt gestopt, overschrijft u de eerdere, lokaal opgeslagen tekening. Weet je het zeker?\n\n(Als je de lokale tekening wilt behouden, sluit je in plaats daarvan het browsertabblad)",
-    "errorLoadingLibrary": "Bij het laden van de externe bibliotheek is een fout opgetreden.",
     "errorAddingToLibrary": "Kan item niet toevoegen aan de bibliotheek",
     "errorRemovingFromLibrary": "Kan item niet uit de bibliotheek verwijderen",
     "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
@@ -189,7 +188,8 @@
     "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
     "svgImageInsertError": "",
     "invalidSVGString": "Ongeldige SVG.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Selectie",
