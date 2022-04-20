@@ -172,7 +172,6 @@
     "uploadedSecurly": "ההעלאה הוצפנה מקצה לקצה, ולכן שרת Excalidraw וצד שלישי לא יכולים לקרוא את התוכן.",
     "loadSceneOverridePrompt": "טעינה של ציור חיצוני תחליף את התוכן הקיים שלך. האם תרצה להמשיך?",
     "collabStopOverridePrompt": "עצירת השיתוף תוביל למחיקת התרשימים השמורים בדפדפן. האם את/ה בטוח/ה?\n(אם תרצה לשמור את התרשימים הקיימים, תוכל לסגור את הדפדפן מבלי לסיים את השיתוף.)",
-    "errorLoadingLibrary": "קרתה שגיאה בטעינת הספריה החיצונית.",
     "errorAddingToLibrary": "לא ניתן להוסיף פריט לספרייה",
     "errorRemovingFromLibrary": "לא ניתן למחוק פריט מהספריה",
     "confirmAddLibrary": "הפעולה תוסיף {{numShapes}} צורה(ות) לספריה שלך. האם אתה בטוח?",
@@ -189,7 +188,8 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "בחירה",
