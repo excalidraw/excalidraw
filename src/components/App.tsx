@@ -76,9 +76,8 @@ import {
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
-import { isValidLibrary } from "../data/json";
 import Library from "../data/library";
-import { restore, restoreElements, restoreLibraryItems } from "../data/restore";
+import { restore, restoreElements } from "../data/restore";
 import {
   dragNewElement,
   dragSelectedElements,
@@ -231,6 +230,7 @@ import {
   generateIdFromFile,
   getDataURL,
   isSupportedImageFile,
+  loadLibraryFromBlob,
   resizeImageFile,
   SVGStringToFile,
 } from "../data/blob";
@@ -706,28 +706,21 @@ class App extends React.Component<AppProps, AppState> {
     try {
       const request = await fetch(decodeURIComponent(url));
       const blob = await request.blob();
-      const json = JSON.parse(await blob.text());
-      if (!isValidLibrary(json)) {
-        throw new Error();
-      }
+      const defaultStatus = "published";
+      const libraryItems = await loadLibraryFromBlob(blob, defaultStatus);
       if (
         token === this.id ||
         window.confirm(
           t("alerts.confirmAddLibrary", {
-            numShapes: (json.libraryItems || json.library || []).length,
+            numShapes: libraryItems.length,
           }),
         )
       ) {
-        await this.library.importLibrary(blob, "published");
-        // hack to rerender the library items after import
-        if (this.state.isLibraryOpen) {
-          this.setState({ isLibraryOpen: false });
-        }
-        this.setState({ isLibraryOpen: true });
+        await this.library.importLibrary(libraryItems, defaultStatus);
       }
     } catch (error: any) {
-      window.alert(t("alerts.errorLoadingLibrary"));
       console.error(error);
+      this.setState({ errorMessage: t("errors.importLibraryError") });
     } finally {
       this.focusContainer();
     }
@@ -792,10 +785,7 @@ class App extends React.Component<AppProps, AppState> {
     try {
       initialData = (await this.props.initialData) || null;
       if (initialData?.libraryItems) {
-        this.libraryItemsFromStorage = restoreLibraryItems(
-          initialData.libraryItems,
-          "unpublished",
-        ) as LibraryItems;
+        this.library.importLibrary(initialData.libraryItems, "unpublished");
       }
     } catch (error: any) {
       console.error(error);
@@ -1681,7 +1671,9 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
-      libraryItems?: SceneData["libraryItems"];
+      libraryItems?:
+        | Required<SceneData>["libraryItems"]
+        | Promise<Required<SceneData>["libraryItems"]>;
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1700,14 +1692,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.libraryItems) {
-        this.library.saveLibrary(
-          restoreLibraryItems(sceneData.libraryItems, "unpublished"),
-        );
-        if (this.state.isLibraryOpen) {
-          this.setState({ isLibraryOpen: false }, () => {
-            this.setState({ isLibraryOpen: true });
-          });
-        }
+        this.library.importLibrary(sceneData.libraryItems, "unpublished");
       }
     },
   );
@@ -5275,11 +5260,6 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.library
         .importLibrary(file)
-        .then(() => {
-          // Close and then open to get the libraries updated
-          this.setState({ isLibraryOpen: false });
-          this.setState({ isLibraryOpen: true });
-        })
         .catch((error) =>
           this.setState({ isLoading: false, errorMessage: error.message }),
         );

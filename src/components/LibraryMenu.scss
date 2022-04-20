@@ -28,8 +28,17 @@
   }
 
   .layer-ui__library-message {
-    padding: 10px 20px;
-    max-width: 200px;
+    padding: 2em 4em;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .Spinner {
+      margin-bottom: 1em;
+    }
+    span {
+      font-size: 0.8em;
+    }
   }
 
   .publish-library-success {

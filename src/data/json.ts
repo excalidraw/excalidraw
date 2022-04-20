@@ -15,6 +15,7 @@ import {
   ExportedDataState,
   ImportedDataState,
   ExportedLibraryData,
+  ImportedLibraryData,
 } from "./types";
 import Library from "./library";
 
@@ -114,7 +115,7 @@ export const isValidExcalidrawData = (data?: {
   );
 };
 
-export const isValidLibrary = (json: any) => {
+export const isValidLibrary = (json: any): json is ImportedLibraryData => {
   return (
     typeof json === "object" &&
     json &&
