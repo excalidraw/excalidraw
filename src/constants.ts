@@ -161,6 +161,7 @@ export const DEFAULT_CUSTOM_ELEMENT_CONFIG: Required<CustomElementConfig> = {
   height: 40,
   stackedOnTop: false,
   onCreate: () => {},
+  disableContextMenu: false,
 };
 export const MQ_MAX_WIDTH_PORTRAIT = 730;
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;

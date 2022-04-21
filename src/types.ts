@@ -233,6 +233,7 @@ export type CustomElementConfig = {
   height?: number;
   stackedOnTop: boolean;
   onCreate?: (element: ExcalidrawElement) => void;
+  disableContextMenu: boolean;
 };
 export type ExcalidrawInitialDataState = Merge<
   ImportedDataState,

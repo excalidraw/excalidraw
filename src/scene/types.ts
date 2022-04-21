@@ -1,5 +1,5 @@
 import { ExcalidrawTextElement } from "../element/types";
-import { AppClassProperties, AppState, ExcalidrawProps } from "../types";
+import { AppClassProperties, AppProps, AppState } from "../types";
 
 export type RenderConfig = {
   // AppState values
@@ -27,7 +27,7 @@ export type RenderConfig = {
   /** when exporting the behavior is slightly different (e.g. we can't use
     CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
-  customElementsConfig?: ExcalidrawProps["customElementsConfig"];
+  customElementsConfig?: AppProps["customElementsConfig"];
 };
 
 export type SceneScroll = {

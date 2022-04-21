@@ -129,6 +129,7 @@ import {
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
+  isCustomElement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -3158,6 +3159,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
+      event.button !== POINTER_BUTTON.SECONDARY &&
       this.state.activeTool.type === "selection" &&
       this.props.onElementClick &&
       hitElement
@@ -5416,7 +5418,6 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.preventDefault();
-
     if (
       (event.nativeEvent.pointerType === "touch" ||
         (event.nativeEvent.pointerType === "pen" &&
@@ -5433,6 +5434,18 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements: true,
     });
 
+    let disableContextMenu = false;
+    if (element && isCustomElement(element)) {
+      const config = getCustomElementConfig(
+        this.props.customElementsConfig,
+        element.customType,
+      );
+      disableContextMenu = !!config?.disableContextMenu;
+    }
+    if (disableContextMenu) {
+      this.contextMenuOpen = true;
+      return false;
+    }
     const type = element ? "element" : "canvas";
 
     const container = this.excalidrawContainerRef.current!;

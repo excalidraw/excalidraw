@@ -3,14 +3,14 @@ import {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
-import { AppState, ExcalidrawProps } from "../types";
+import { AppProps, AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import { getCustomElementConfig } from "../utils";
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
-  customElementConfig: ExcalidrawProps["customElementsConfig"],
+  customElementConfig: AppProps["customElementsConfig"],
 ) => {
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
     getElementAbsoluteCoords(selection);

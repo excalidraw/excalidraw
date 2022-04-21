@@ -211,6 +211,7 @@ export default function App() {
       </svg>`)}`,
         width: 60,
         height: 60,
+        disableContextMenu: true,
       },
       {
         type: "custom",
@@ -223,6 +224,7 @@ export default function App() {
         transformHandles: false,
         stackedOnTop: true,
         onCreate,
+        disableContextMenu: true,
       },
       {
         type: "custom",
