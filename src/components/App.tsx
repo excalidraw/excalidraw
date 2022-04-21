@@ -77,7 +77,7 @@ import {
 } from "../constants";
 import { loadFromBlob } from "../data";
 import Library from "../data/library";
-import { restore, restoreElements } from "../data/restore";
+import { restore, restoreElements, restoreLibraryItems } from "../data/restore";
 import {
   dragNewElement,
   dragSelectedElements,
@@ -1692,7 +1692,20 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.libraryItems) {
-        this.library.importLibrary(sceneData.libraryItems, "unpublished");
+        this.library.saveLibrary(
+          new Promise<LibraryItems>(async (resolve, reject) => {
+            try {
+              resolve(
+                restoreLibraryItems(
+                  await sceneData.libraryItems,
+                  "unpublished",
+                ),
+              );
+            } catch {
+              reject(new Error(t("errors.importLibraryError")));
+            }
+          }),
+        );
       }
     },
   );
