@@ -10,12 +10,12 @@ import { MIME_TYPES } from "../../../constants";
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
 const {
+  Excalidraw,
   exportToCanvas,
   exportToSvg,
   exportToBlob,
   sceneCoordsToViewportCoords,
-} = window.Excalidraw;
-const Excalidraw = window.Excalidraw.default;
+} = window.ExcalidrawLib;
 
 const STAR_SVG = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">

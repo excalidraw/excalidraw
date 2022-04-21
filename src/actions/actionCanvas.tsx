@@ -316,7 +316,6 @@ export const actionErase = register({
         activeTool.lastActiveToolBeforeEraser = appState.activeTool.type;
       }
     }
-    debugger;
     if (isEraserActive(appState)) {
       if (appState.activeTool.lastActiveToolBeforeEraser) {
         if (

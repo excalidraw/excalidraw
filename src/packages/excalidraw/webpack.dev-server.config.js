@@ -9,7 +9,7 @@ const devServerConfig = {
   },
   // Server Configuration options
   devServer: {
-    port: 3001,
+    //port: 3001,
     host: "localhost",
     hot: true,
     compress: true,
