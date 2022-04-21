@@ -9,7 +9,7 @@
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
-    "copyText": "",
+    "copyText": "Copiar al portapapeles como texto",
     "bringForward": "Traer hacia delante",
     "sendToBack": "Enviar al fondo",
     "bringToFront": "Traer al frente",
@@ -115,10 +115,10 @@
       "label": "Enlace"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Bloquear",
+      "unlock": "Desbloquear",
+      "lockAll": "Bloquear todo",
+      "unlockAll": "Desbloquear todo"
     }
   },
   "buttons": {
@@ -189,7 +189,7 @@
     "svgImageInsertError": "No se pudo insertar la imagen SVG. El código SVG parece inválido.",
     "invalidSVGString": "SVG no válido.",
     "cannotResolveCollabServer": "No se pudo conectar al servidor colaborador. Por favor, vuelva a cargar la página y vuelva a intentarlo.",
-    "importLibraryError": ""
+    "importLibraryError": "No se pudo cargar la librería"
   },
   "toolBar": {
     "selection": "Selección",
@@ -299,7 +299,7 @@
     "view": "Vista",
     "zoomToFit": "Ajustar la vista para mostrar todos los elementos",
     "zoomToSelection": "Zoom a la selección",
-    "toggleElementLock": ""
+    "toggleElementLock": "Bloquear/desbloquear selección"
   },
   "clearCanvasDialog": {
     "title": "Borrar lienzo"
