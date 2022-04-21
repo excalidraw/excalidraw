@@ -189,7 +189,7 @@
     "svgImageInsertError": "無法插入 SVG 圖片。此 SVG 檔案有問題。",
     "invalidSVGString": "無效的 SVG。",
     "cannotResolveCollabServer": "無法連結至 collab 伺服器。請重新整理後再試一次。",
-    "importLibraryError": ""
+    "importLibraryError": "無法載入資料庫"
   },
   "toolBar": {
     "selection": "選取",
