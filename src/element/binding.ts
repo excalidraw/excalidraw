@@ -669,6 +669,13 @@ export const fixBindingsAfterDeletion = (
           boundElementIds.add(element.id);
         }
       });
+    } else if (deletedElement.type === "arrow") {
+      if (deletedElement.startBinding) {
+        boundElementIds.add(deletedElement.startBinding.elementId);
+      }
+      if (deletedElement.endBinding) {
+        boundElementIds.add(deletedElement.endBinding.elementId);
+      }
     }
   });
   (
@@ -676,10 +683,14 @@ export const fixBindingsAfterDeletion = (
       boundElementIds.has(id),
     ) as ExcalidrawLinearElement[]
   ).forEach((element: ExcalidrawLinearElement) => {
-    const { startBinding, endBinding } = element;
+    const { startBinding, endBinding, boundElements } = element;
     mutateElement(element, {
       startBinding: newBindingAfterDeletion(startBinding, deletedElementIds),
       endBinding: newBindingAfterDeletion(endBinding, deletedElementIds),
+      boundElements: newBoundElementsAfterDeletion(
+        boundElements,
+        deletedElementIds,
+      ),
     });
   });
 };
@@ -692,4 +703,14 @@ const newBindingAfterDeletion = (
     return null;
   }
   return binding;
+};
+
+const newBoundElementsAfterDeletion = (
+  boundElements: ExcalidrawElement["boundElements"],
+  deletedElementIds: Set<ExcalidrawElement["id"]>,
+) => {
+  if (!boundElements) {
+    return null;
+  }
+  return boundElements.filter((ele) => !deletedElementIds.has(ele.id));
 };
