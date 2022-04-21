@@ -5,8 +5,8 @@ import {
   getDefaultAppState,
 } from "../../appState";
 import { clearElementsForLocalStorage } from "../../element";
-import { updateBrowserStateVersion } from "./tabSync";
 import { STORAGE_KEYS } from "../app_constants";
+import { ImportedDataState } from "../../data/types";
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -32,26 +32,6 @@ export const importUsernameFromLocalStorage = (): string | null => {
   }
 
   return null;
-};
-
-export const saveToLocalStorage = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  try {
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(clearElementsForLocalStorage(elements)),
-    );
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(clearAppStateForLocalStorage(appState)),
-    );
-    updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
-  } catch (error: any) {
-    // Unable to access window.localStorage
-    console.error(error);
-  }
 };
 
 export const importFromLocalStorage = () => {
@@ -123,14 +103,13 @@ export const getTotalStorageSize = () => {
 
 export const getLibraryItemsFromStorage = () => {
   try {
-    const libraryItems =
-      JSON.parse(
-        localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
-      ) || [];
+    const libraryItems: ImportedDataState["libraryItems"] = JSON.parse(
+      localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
+    );
 
-    return libraryItems;
-  } catch (e) {
-    console.error(e);
+    return libraryItems || [];
+  } catch (error) {
+    console.error(error);
     return [];
   }
 };

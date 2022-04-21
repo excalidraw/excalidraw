@@ -74,6 +74,7 @@ export default function App() {
   const [blobUrl, setBlobUrl] = useState(null);
   const [canvasUrl, setCanvasUrl] = useState(null);
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
+  const [exportEmbedScene, setExportEmbedScene] = useState(false);
   const [theme, setTheme] = useState("light");
 
   const initialStatePromiseRef = useRef({ promise: null });
@@ -392,6 +393,14 @@ export default function App() {
             />
             Export with dark mode
           </label>
+          <label className="export-wrapper__checkbox">
+            <input
+              type="checkbox"
+              checked={exportEmbedScene}
+              onChange={() => setExportEmbedScene(!exportEmbedScene)}
+            />
+            Export with embed scene
+          </label>
           <button
             onClick={async () => {
               const svg = await exportToSvg({
@@ -399,6 +408,7 @@ export default function App() {
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,
+                  exportEmbedScene,
                   width: 300,
                   height: 100,
                 },
@@ -419,6 +429,7 @@ export default function App() {
                 mimeType: "image/png",
                 appState: {
                   ...initialData.appState,
+                  exportEmbedScene,
                   exportWithDarkMode,
                 },
                 files: excalidrawRef.current.getFiles(),

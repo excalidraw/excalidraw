@@ -234,13 +234,25 @@ export type CustomElementConfig = {
   stackedOnTop: boolean;
   onCreate?: (element: ExcalidrawElement) => void;
 };
+export type ExcalidrawInitialDataState = Merge<
+  ImportedDataState,
+  {
+    libraryItems?:
+      | Required<ImportedDataState>["libraryItems"]
+      | Promise<Required<ImportedDataState>["libraryItems"]>;
+  }
+>;
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => void;
-  initialData?: ImportedDataState | null | Promise<ImportedDataState | null>;
+  initialData?:
+    | ExcalidrawInitialDataState
+    | null
+    | Promise<ExcalidrawInitialDataState | null>;
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
   onCollabButtonClick?: () => void;
   isCollaborating?: boolean;

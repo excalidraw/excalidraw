@@ -13,7 +13,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, "dist"),
-    library: "Excalidraw",
+    library: "ExcalidrawLib",
     libraryTarget: "umd",
     filename: "[name].js",
     chunkFilename: "excalidraw-assets/[name]-[contenthash].js",

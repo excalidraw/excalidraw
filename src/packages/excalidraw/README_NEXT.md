@@ -48,7 +48,7 @@ If you are using a Web bundler (for instance, Webpack), you can import it as an 
 
 ```js
 import React, { useEffect, useState, useRef } from "react";
-import Excalidraw from "@excalidraw/excalidraw-next";
+import { Excalidraw } from "@excalidraw/excalidraw-next";
 import InitialData from "./initialData";
 
 import "./styles.scss";
@@ -328,7 +328,7 @@ const App = () => {
         className: "excalidraw-wrapper",
         ref: excalidrawWrapperRef,
       },
-      React.createElement(Excalidraw.default, {
+      React.createElement(ExcalidrawLib.Excalidraw, {
         initialData: InitialData,
         onChange: (elements, state) =>
           console.log("Elements :", elements, "State : ", state),
@@ -802,6 +802,24 @@ import { restore } from "@excalidraw/excalidraw-next";
 
 This function makes sure elements and state is set to appropriate values and set to default value if not present. It is a combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState).
 
+#### `restoreLibraryItems`
+
+**_Signature_**
+
+<pre>
+restoreLibraryItems(libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L22">ImportedDataState["libraryItems"]</a>, defaultStatus: "published" | "unpublished")
+</pre>
+
+**_How to use_**
+
+```js
+import { restoreLibraryItems } from "@excalidraw/excalidraw-next";
+
+restoreLibraryItems(libraryItems, "unpublished");
+```
+
+This function normalizes library items elements, adding missing values when needed.
+
 ### Export utilities
 
 #### `exportToCanvas`
@@ -889,7 +907,7 @@ This function returns a promise which resolves to svg of the exported drawing.
 | exportBackground | boolean | true | Indicates whether background should be exported |
 | viewBackgroundColor | string | #fff | The default background color |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
-| exportEmbedScene | boolean | false | Indicates whether scene data should be embedded in svg. This will increase the svg size. |
+| exportEmbedScene | boolean | false | Indicates whether scene data should be embedded in svg/png. This will increase the image size. |
 
 ### Extra API's
 
@@ -905,6 +923,17 @@ serializeAsJSON({
 </pre>
 
 Takes the scene elements and state and returns a JSON string. Deleted `elements`as well as most properties from `AppState` are removed from the resulting JSON. (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/src/data/json.ts#L16) source for details).
+
+#### `serializeLibraryAsJSON`
+
+**_Signature_**
+
+<pre>
+serializeLibraryAsJSON({
+  libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L191">LibraryItems[]</a>,
+</pre>
+
+Takes the library items and returns a JSON string.
 
 #### `getSceneVersion`
 

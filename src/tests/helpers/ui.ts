@@ -179,6 +179,14 @@ export class Pointer {
     this.upAt();
   }
 
+  rightClickAt(x: number, y: number) {
+    fireEvent.contextMenu(GlobalTestState.canvas, {
+      button: 2,
+      clientX: x,
+      clientY: y,
+    });
+  }
+
   doubleClickAt(x: number, y: number) {
     this.moveTo(x, y);
     fireEvent.doubleClick(GlobalTestState.canvas, this.getEvent());
@@ -309,4 +317,10 @@ export class UI {
       Keyboard.codePress(CODES.G);
     });
   }
+
+  static queryContextMenu = () => {
+    return GlobalTestState.renderResult.container.querySelector(
+      ".context-menu",
+    );
+  };
 }

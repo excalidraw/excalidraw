@@ -14,7 +14,6 @@ import {
   bindOrUnbindLinearElement,
 } from "../element/binding";
 import { isBindingElement } from "../element/typeChecks";
-import { isEraserActive } from "../appState";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -40,6 +39,7 @@ export const actionFinalize = register({
               : undefined,
           appState: {
             ...appState,
+            cursorButton: "up",
             editingLinearElement: null,
           },
           commitToHistory: true,
@@ -136,17 +136,36 @@ export const actionFinalize = register({
     ) {
       resetCursor(canvas);
     }
+    const activeTool: any = { ...appState.activeTool };
+    if (appState.activeTool.lastActiveToolBeforeEraser) {
+      if (
+        typeof appState.activeTool.lastActiveToolBeforeEraser === "object" &&
+        appState.activeTool.lastActiveToolBeforeEraser.type === "custom"
+      ) {
+        activeTool.type = appState.activeTool.lastActiveToolBeforeEraser.type;
+        activeTool.customType =
+          appState.activeTool.lastActiveToolBeforeEraser.customType;
+      } else {
+        activeTool.type = appState.activeTool.lastActiveToolBeforeEraser;
+      }
+    } else {
+      activeTool.type = "selection";
+    }
 
     return {
       elements: newElements,
       appState: {
         ...appState,
+        cursorButton: "up",
         activeTool:
           (appState.activeTool.locked ||
             appState.activeTool.type === "freedraw") &&
           multiPointElement
             ? appState.activeTool
-            : { ...appState.activeTool, type: "selection" },
+            : {
+                ...appState.activeTool,
+                activeTool,
+              },
         draggingElement: null,
         multiElement: null,
         editingElement: null,
@@ -167,12 +186,11 @@ export const actionFinalize = register({
     };
   },
   keyTest: (event, appState) =>
-    !isEraserActive(appState) &&
-    ((event.key === KEYS.ESCAPE &&
+    (event.key === KEYS.ESCAPE &&
       (appState.editingLinearElement !== null ||
         (!appState.draggingElement && appState.multiElement === null))) ||
-      ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
-        appState.multiElement !== null)),
+    ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
+      appState.multiElement !== null),
   PanelComponent: ({ appState, updateData, data }) => (
     <ToolButton
       type="button"

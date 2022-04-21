@@ -1,11 +1,52 @@
 import { loadLibraryFromBlob } from "./blob";
 import { LibraryItems, LibraryItem } from "../types";
-import { restoreElements, restoreLibraryItems } from "./restore";
-import { getNonDeletedElements } from "../element";
+import { restoreLibraryItems } from "./restore";
 import type App from "../components/App";
+import { ImportedDataState } from "./types";
+import { atom } from "jotai";
+import { jotaiStore } from "../jotai";
+import { isPromiseLike } from "../utils";
+import { t } from "../i18n";
+
+export const libraryItemsAtom = atom<
+  | { status: "loading"; libraryItems: null; promise: Promise<LibraryItems> }
+  | { status: "loaded"; libraryItems: LibraryItems }
+>({ status: "loaded", libraryItems: [] });
+
+const cloneLibraryItems = (libraryItems: LibraryItems): LibraryItems =>
+  JSON.parse(JSON.stringify(libraryItems));
+
+/**
+ * checks if library item does not exist already in current library
+ */
+const isUniqueItem = (
+  existingLibraryItems: LibraryItems,
+  targetLibraryItem: LibraryItem,
+) => {
+  return !existingLibraryItems.find((libraryItem) => {
+    if (libraryItem.elements.length !== targetLibraryItem.elements.length) {
+      return false;
+    }
+
+    // detect z-index difference by checking the excalidraw elements
+    // are in order
+    return libraryItem.elements.every((libItemExcalidrawItem, idx) => {
+      return (
+        libItemExcalidrawItem.id === targetLibraryItem.elements[idx].id &&
+        libItemExcalidrawItem.versionNonce ===
+          targetLibraryItem.elements[idx].versionNonce
+      );
+    });
+  });
+};
 
 class Library {
-  private libraryCache: LibraryItems | null = null;
+  /** cache for currently active promise when initializing/updating libaries
+   asynchronously */
+  private libraryItemsPromise: Promise<LibraryItems> | null = null;
+  /** last resolved libraryItems */
+  private lastLibraryItems: LibraryItems = [];
+
   private app: App;
 
   constructor(app: App) {
@@ -13,107 +54,92 @@ class Library {
   }
 
   resetLibrary = async () => {
-    await this.app.props.onLibraryChange?.([]);
-    this.libraryCache = [];
-  };
-
-  restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
-    const elements = getNonDeletedElements(
-      restoreElements(libraryItem.elements, null),
-    );
-    return elements.length ? { ...libraryItem, elements } : null;
+    this.saveLibrary([]);
   };
 
   /** imports library (currently merges, removing duplicates) */
-  async importLibrary(blob: Blob, defaultStatus = "unpublished") {
-    const libraryFile = await loadLibraryFromBlob(blob);
-    if (!libraryFile || !(libraryFile.libraryItems || libraryFile.library)) {
-      return;
-    }
+  async importLibrary(
+    library:
+      | Blob
+      | Required<ImportedDataState>["libraryItems"]
+      | Promise<Required<ImportedDataState>["libraryItems"]>,
+    defaultStatus: LibraryItem["status"] = "unpublished",
+  ) {
+    return this.saveLibrary(
+      new Promise<LibraryItems>(async (resolve, reject) => {
+        try {
+          let libraryItems: LibraryItems;
+          if (library instanceof Blob) {
+            libraryItems = await loadLibraryFromBlob(library, defaultStatus);
+          } else {
+            libraryItems = restoreLibraryItems(await library, defaultStatus);
+          }
 
-    /**
-     * checks if library item does not exist already in current library
-     */
-    const isUniqueitem = (
-      existingLibraryItems: LibraryItems,
-      targetLibraryItem: LibraryItem,
-    ) => {
-      return !existingLibraryItems.find((libraryItem) => {
-        if (libraryItem.elements.length !== targetLibraryItem.elements.length) {
-          return false;
+          const existingLibraryItems = this.lastLibraryItems;
+
+          const filteredItems = [];
+          for (const item of libraryItems) {
+            if (isUniqueItem(existingLibraryItems, item)) {
+              filteredItems.push(item);
+            }
+          }
+
+          resolve([...filteredItems, ...existingLibraryItems]);
+        } catch (error) {
+          reject(new Error(t("errors.importLibraryError")));
         }
-
-        // detect z-index difference by checking the excalidraw elements
-        // are in order
-        return libraryItem.elements.every((libItemExcalidrawItem, idx) => {
-          return (
-            libItemExcalidrawItem.id === targetLibraryItem.elements[idx].id &&
-            libItemExcalidrawItem.versionNonce ===
-              targetLibraryItem.elements[idx].versionNonce
-          );
-        });
-      });
-    };
-
-    const existingLibraryItems = await this.loadLibrary();
-
-    const library = libraryFile.libraryItems || libraryFile.library || [];
-    const restoredLibItems = restoreLibraryItems(
-      library,
-      defaultStatus as "published" | "unpublished",
+      }),
     );
-    const filteredItems = [];
-    for (const item of restoredLibItems) {
-      const restoredItem = this.restoreLibraryItem(item as LibraryItem);
-      if (restoredItem && isUniqueitem(existingLibraryItems, restoredItem)) {
-        filteredItems.push(restoredItem);
-      }
-    }
-
-    await this.saveLibrary([...filteredItems, ...existingLibraryItems]);
   }
 
   loadLibrary = (): Promise<LibraryItems> => {
     return new Promise(async (resolve) => {
-      if (this.libraryCache) {
-        return resolve(JSON.parse(JSON.stringify(this.libraryCache)));
-      }
-
       try {
-        const libraryItems = this.app.libraryItemsFromStorage;
-        if (!libraryItems) {
-          return resolve([]);
-        }
-
-        const items = libraryItems.reduce((acc, item) => {
-          const restoredItem = this.restoreLibraryItem(item);
-          if (restoredItem) {
-            acc.push(item);
-          }
-          return acc;
-        }, [] as Mutable<LibraryItems>);
-
-        // clone to ensure we don't mutate the cached library elements in the app
-        this.libraryCache = JSON.parse(JSON.stringify(items));
-
-        resolve(items);
-      } catch (error: any) {
-        console.error(error);
-        resolve([]);
+        resolve(
+          cloneLibraryItems(
+            await (this.libraryItemsPromise || this.lastLibraryItems),
+          ),
+        );
+      } catch (error) {
+        return resolve(this.lastLibraryItems);
       }
     });
   };
 
-  saveLibrary = async (items: LibraryItems) => {
-    const prevLibraryItems = this.libraryCache;
+  saveLibrary = async (items: LibraryItems | Promise<LibraryItems>) => {
+    const prevLibraryItems = this.lastLibraryItems;
     try {
-      const serializedItems = JSON.stringify(items);
-      // cache optimistically so that the app has access to the latest
-      // immediately
-      this.libraryCache = JSON.parse(serializedItems);
-      await this.app.props.onLibraryChange?.(items);
+      let nextLibraryItems;
+      if (isPromiseLike(items)) {
+        const promise = items.then((items) => cloneLibraryItems(items));
+        this.libraryItemsPromise = promise;
+        jotaiStore.set(libraryItemsAtom, {
+          status: "loading",
+          promise,
+          libraryItems: null,
+        });
+        nextLibraryItems = await promise;
+      } else {
+        nextLibraryItems = cloneLibraryItems(items);
+      }
+
+      this.lastLibraryItems = nextLibraryItems;
+      this.libraryItemsPromise = null;
+
+      jotaiStore.set(libraryItemsAtom, {
+        status: "loaded",
+        libraryItems: nextLibraryItems,
+      });
+      await this.app.props.onLibraryChange?.(
+        cloneLibraryItems(nextLibraryItems),
+      );
     } catch (error: any) {
-      this.libraryCache = prevLibraryItems;
+      this.lastLibraryItems = prevLibraryItems;
+      this.libraryItemsPromise = null;
+      jotaiStore.set(libraryItemsAtom, {
+        status: "loaded",
+        libraryItems: prevLibraryItems,
+      });
       throw error;
     }
   };

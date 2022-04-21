@@ -15,9 +15,19 @@ Please add the latest change on the top under the correct section.
 
 ### Excalidraw API
 
+#### Features
+
+- The `exportToBlob` utility now supports the `exportEmbedScene` option when generating a png image [#5047](https://github.com/excalidraw/excalidraw/pull/5047).
+- Exported [`restoreLibraryItems`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreLibraryItems) API [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
+
+#### Fixes
+
+- Library menu now properly rerenders if open when library is updated using `updateScene({ libraryItems })` [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
+
 #### Refactor
 
 - Rename `appState.elementLocked` to `appState.activeTool.locked` [#4983](https://github.com/excalidraw/excalidraw/pull/4983).
+- Expose [`serializeLibraryAsJSON`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#serializeLibraryAsJSON) helper that we use when saving Excalidraw Library to a file.
 
 ##### BREAKING CHANGE
 
@@ -28,6 +38,26 @@ You will need to pass `activeTool.locked` instead of `elementType` from now onwa
 ##### BREAKING CHANGE
 
 You will need to pass `activeTool` instead of `elementType` from now onwards in `appState`
+
+### Build
+
+- Use only named exports [#5045](https://github.com/excalidraw/excalidraw/pull/5045).
+
+#### BREAKING CHANGE
+
+You will need to import the named export from now onwards to use the component
+
+Using bundler :point_down:
+
+```js
+import { Excalidraw } from "@excalidraw/excalidraw";
+```
+
+In Browser :point_down:
+
+```js
+React.createElement(ExcalidrawLib.Excalidraw, opts);
+```
 
 ## 0.11.0 (2022-02-17)
 

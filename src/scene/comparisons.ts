@@ -92,5 +92,5 @@ export const getTextBindableContainerAtPosition = (
       break;
     }
   }
-  return isTextBindableContainer(hitElement) ? hitElement : null;
+  return isTextBindableContainer(hitElement, false) ? hitElement : null;
 };

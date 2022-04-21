@@ -1,5 +1,12 @@
-import { useRef, useState, useEffect, useCallback, RefObject } from "react";
-import Library from "../data/library";
+import {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  RefObject,
+  forwardRef,
+} from "react";
+import Library, { libraryItemsAtom } from "../data/library";
 import { t } from "../i18n";
 import { randomId } from "../random";
 import {
@@ -20,6 +27,9 @@ import { EVENT } from "../constants";
 import { KEYS } from "../keys";
 import { arrayToMap } from "../utils";
 import { trackEvent } from "../analytics";
+import { useAtom } from "jotai";
+import { jotaiScope } from "../jotai";
+import Spinner from "./Spinner";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -53,6 +63,17 @@ const getSelectedItems = (
   libraryItems: LibraryItems,
   selectedItems: LibraryItem["id"][],
 ) => libraryItems.filter((item) => selectedItems.includes(item.id));
+
+const LibraryMenuWrapper = forwardRef<
+  HTMLDivElement,
+  { children: React.ReactNode }
+>(({ children }, ref) => {
+  return (
+    <Island padding={1} ref={ref} className="layer-ui__library">
+      {children}
+    </Island>
+  );
+});
 
 export const LibraryMenu = ({
   onClose,
@@ -103,11 +124,6 @@ export const LibraryMenu = ({
     };
   }, [onClose]);
 
-  const [libraryItems, setLibraryItems] = useState<LibraryItems>([]);
-
-  const [loadingState, setIsLoading] = useState<
-    "preloading" | "loading" | "ready"
-  >("preloading");
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
   const [showPublishLibraryDialog, setShowPublishLibraryDialog] =
     useState(false);
@@ -115,56 +131,35 @@ export const LibraryMenu = ({
     url: string;
     authorName: string;
   }>(null);
-  const loadingTimerRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    Promise.race([
-      new Promise((resolve) => {
-        loadingTimerRef.current = window.setTimeout(() => {
-          resolve("loading");
-        }, 100);
-      }),
-      library.loadLibrary().then((items) => {
-        setLibraryItems(items);
-        setIsLoading("ready");
-      }),
-    ]).then((data) => {
-      if (data === "loading") {
-        setIsLoading("loading");
-      }
-    });
-    return () => {
-      clearTimeout(loadingTimerRef.current!);
-    };
-  }, [library]);
+  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
 
-  const removeFromLibrary = useCallback(async () => {
-    const items = await library.loadLibrary();
-
-    const nextItems = items.filter((item) => !selectedItems.includes(item.id));
-    library.saveLibrary(nextItems).catch((error) => {
-      setLibraryItems(items);
-      setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
-    });
-    setSelectedItems([]);
-    setLibraryItems(nextItems);
-  }, [library, setAppState, selectedItems, setSelectedItems]);
+  const removeFromLibrary = useCallback(
+    async (libraryItems: LibraryItems) => {
+      const nextItems = libraryItems.filter(
+        (item) => !selectedItems.includes(item.id),
+      );
+      library.saveLibrary(nextItems).catch(() => {
+        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
+      });
+      setSelectedItems([]);
+    },
+    [library, setAppState, selectedItems, setSelectedItems],
+  );
 
   const resetLibrary = useCallback(() => {
     library.resetLibrary();
-    setLibraryItems([]);
     focusContainer();
   }, [library, focusContainer]);
 
   const addToLibrary = useCallback(
-    async (elements: LibraryItem["elements"]) => {
+    async (elements: LibraryItem["elements"], libraryItems: LibraryItems) => {
       trackEvent("element", "addToLibrary", "ui");
       if (elements.some((element) => element.type === "image")) {
         return setAppState({
           errorMessage: "Support for adding images to the library coming soon!",
         });
       }
-      const items = await library.loadLibrary();
       const nextItems: LibraryItems = [
         {
           status: "unpublished",
@@ -172,14 +167,12 @@ export const LibraryMenu = ({
           id: randomId(),
           created: Date.now(),
         },
-        ...items,
+        ...libraryItems,
       ];
       onAddToLibrary();
-      library.saveLibrary(nextItems).catch((error) => {
-        setLibraryItems(items);
+      library.saveLibrary(nextItems).catch(() => {
         setAppState({ errorMessage: t("alerts.errorAddingToLibrary") });
       });
-      setLibraryItems(nextItems);
     },
     [onAddToLibrary, library, setAppState],
   );
@@ -218,7 +211,7 @@ export const LibraryMenu = ({
   }, [setPublishLibSuccess, publishLibSuccess]);
 
   const onPublishLibSuccess = useCallback(
-    (data) => {
+    (data, libraryItems: LibraryItems) => {
       setShowPublishLibraryDialog(false);
       setPublishLibSuccess({ url: data.url, authorName: data.authorName });
       const nextLibItems = libraryItems.slice();
@@ -228,101 +221,109 @@ export const LibraryMenu = ({
         }
       });
       library.saveLibrary(nextLibItems);
-      setLibraryItems(nextLibItems);
     },
-    [
-      setShowPublishLibraryDialog,
-      setPublishLibSuccess,
-      libraryItems,
-      selectedItems,
-      library,
-    ],
+    [setShowPublishLibraryDialog, setPublishLibSuccess, selectedItems, library],
   );
 
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
   >(null);
 
-  return loadingState === "preloading" ? null : (
-    <Island padding={1} ref={ref} className="layer-ui__library">
+  if (libraryItemsData.status === "loading") {
+    return (
+      <LibraryMenuWrapper ref={ref}>
+        <div className="layer-ui__library-message">
+          <Spinner size="2em" />
+          <span>{t("labels.libraryLoadingMessage")}</span>
+        </div>
+      </LibraryMenuWrapper>
+    );
+  }
+
+  return (
+    <LibraryMenuWrapper ref={ref}>
       {showPublishLibraryDialog && (
         <PublishLibrary
           onClose={() => setShowPublishLibraryDialog(false)}
-          libraryItems={getSelectedItems(libraryItems, selectedItems)}
+          libraryItems={getSelectedItems(
+            libraryItemsData.libraryItems,
+            selectedItems,
+          )}
           appState={appState}
-          onSuccess={onPublishLibSuccess}
+          onSuccess={(data) =>
+            onPublishLibSuccess(data, libraryItemsData.libraryItems)
+          }
           onError={(error) => window.alert(error)}
-          updateItemsInStorage={() => library.saveLibrary(libraryItems)}
+          updateItemsInStorage={() =>
+            library.saveLibrary(libraryItemsData.libraryItems)
+          }
           onRemove={(id: string) =>
             setSelectedItems(selectedItems.filter((_id) => _id !== id))
           }
         />
       )}
       {publishLibSuccess && renderPublishSuccess()}
+      <LibraryMenuItems
+        libraryItems={libraryItemsData.libraryItems}
+        onRemoveFromLibrary={() =>
+          removeFromLibrary(libraryItemsData.libraryItems)
+        }
+        onAddToLibrary={(elements) =>
+          addToLibrary(elements, libraryItemsData.libraryItems)
+        }
+        onInsertShape={onInsertShape}
+        pendingElements={pendingElements}
+        setAppState={setAppState}
+        libraryReturnUrl={libraryReturnUrl}
+        library={library}
+        theme={theme}
+        files={files}
+        id={id}
+        selectedItems={selectedItems}
+        onToggle={(id, event) => {
+          const shouldSelect = !selectedItems.includes(id);
 
-      {loadingState === "loading" ? (
-        <div className="layer-ui__library-message">
-          {t("labels.libraryLoadingMessage")}
-        </div>
-      ) : (
-        <LibraryMenuItems
-          libraryItems={libraryItems}
-          onRemoveFromLibrary={removeFromLibrary}
-          onAddToLibrary={addToLibrary}
-          onInsertShape={onInsertShape}
-          pendingElements={pendingElements}
-          setAppState={setAppState}
-          libraryReturnUrl={libraryReturnUrl}
-          library={library}
-          theme={theme}
-          files={files}
-          id={id}
-          selectedItems={selectedItems}
-          onToggle={(id, event) => {
-            const shouldSelect = !selectedItems.includes(id);
+          if (shouldSelect) {
+            if (event.shiftKey && lastSelectedItem) {
+              const rangeStart = libraryItemsData.libraryItems.findIndex(
+                (item) => item.id === lastSelectedItem,
+              );
+              const rangeEnd = libraryItemsData.libraryItems.findIndex(
+                (item) => item.id === id,
+              );
 
-            if (shouldSelect) {
-              if (event.shiftKey && lastSelectedItem) {
-                const rangeStart = libraryItems.findIndex(
-                  (item) => item.id === lastSelectedItem,
-                );
-                const rangeEnd = libraryItems.findIndex(
-                  (item) => item.id === id,
-                );
-
-                if (rangeStart === -1 || rangeEnd === -1) {
-                  setSelectedItems([...selectedItems, id]);
-                  return;
-                }
-
-                const selectedItemsMap = arrayToMap(selectedItems);
-                const nextSelectedIds = libraryItems.reduce(
-                  (acc: LibraryItem["id"][], item, idx) => {
-                    if (
-                      (idx >= rangeStart && idx <= rangeEnd) ||
-                      selectedItemsMap.has(item.id)
-                    ) {
-                      acc.push(item.id);
-                    }
-                    return acc;
-                  },
-                  [],
-                );
-
-                setSelectedItems(nextSelectedIds);
-              } else {
+              if (rangeStart === -1 || rangeEnd === -1) {
                 setSelectedItems([...selectedItems, id]);
+                return;
               }
-              setLastSelectedItem(id);
+
+              const selectedItemsMap = arrayToMap(selectedItems);
+              const nextSelectedIds = libraryItemsData.libraryItems.reduce(
+                (acc: LibraryItem["id"][], item, idx) => {
+                  if (
+                    (idx >= rangeStart && idx <= rangeEnd) ||
+                    selectedItemsMap.has(item.id)
+                  ) {
+                    acc.push(item.id);
+                  }
+                  return acc;
+                },
+                [],
+              );
+
+              setSelectedItems(nextSelectedIds);
             } else {
-              setLastSelectedItem(null);
-              setSelectedItems(selectedItems.filter((_id) => _id !== id));
+              setSelectedItems([...selectedItems, id]);
             }
-          }}
-          onPublish={() => setShowPublishLibraryDialog(true)}
-          resetLibrary={resetLibrary}
-        />
-      )}
-    </Island>
+            setLastSelectedItem(id);
+          } else {
+            setLastSelectedItem(null);
+            setSelectedItems(selectedItems.filter((_id) => _id !== id));
+          }
+        }}
+        onPublish={() => setShowPublishLibraryDialog(true)}
+        resetLibrary={resetLibrary}
+      />
+    </LibraryMenuWrapper>
   );
 };

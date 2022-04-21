@@ -41,6 +41,7 @@ export type ActionName =
   | "paste"
   | "copyAsPng"
   | "copyAsSvg"
+  | "copyText"
   | "sendBackward"
   | "bringForward"
   | "sendToBack"
@@ -110,7 +111,8 @@ export type ActionName =
   | "unbindText"
   | "hyperlink"
   | "eraser"
-  | "bindText";
+  | "bindText"
+  | "toggleLock";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

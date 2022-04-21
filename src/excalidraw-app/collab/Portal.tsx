@@ -3,7 +3,11 @@ import { SocketUpdateData, SocketUpdateDataSource } from "../data";
 import CollabWrapper from "./CollabWrapper";
 
 import { ExcalidrawElement } from "../../element/types";
-import { BROADCAST, FILE_UPLOAD_TIMEOUT, SCENE } from "../app_constants";
+import {
+  WS_EVENTS,
+  FILE_UPLOAD_TIMEOUT,
+  WS_SCENE_EVENT_TYPES,
+} from "../app_constants";
 import { UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
 import { throttle } from "lodash";
@@ -37,7 +41,7 @@ class Portal {
     });
     this.socket.on("new-user", async (_socketId: string) => {
       this.broadcastScene(
-        SCENE.INIT,
+        WS_SCENE_EVENT_TYPES.INIT,
         this.collab.getSceneElementsIncludingDeleted(),
         /* syncAll */ true,
       );
@@ -81,7 +85,7 @@ class Portal {
       const { encryptedBuffer, iv } = await encryptData(this.roomKey!, encoded);
 
       this.socket?.emit(
-        volatile ? BROADCAST.SERVER_VOLATILE : BROADCAST.SERVER,
+        volatile ? WS_EVENTS.SERVER_VOLATILE : WS_EVENTS.SERVER,
         this.roomId,
         encryptedBuffer,
         iv,
@@ -121,11 +125,11 @@ class Portal {
   }, FILE_UPLOAD_TIMEOUT);
 
   broadcastScene = async (
-    sceneType: SCENE.INIT | SCENE.UPDATE,
+    updateType: WS_SCENE_EVENT_TYPES.INIT | WS_SCENE_EVENT_TYPES.UPDATE,
     allElements: readonly ExcalidrawElement[],
     syncAll: boolean,
   ) => {
-    if (sceneType === SCENE.INIT && !syncAll) {
+    if (updateType === WS_SCENE_EVENT_TYPES.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
 
@@ -152,8 +156,8 @@ class Portal {
       [] as BroadcastedExcalidrawElement[],
     );
 
-    const data: SocketUpdateDataSource[typeof sceneType] = {
-      type: sceneType,
+    const data: SocketUpdateDataSource[typeof updateType] = {
+      type: updateType,
       payload: {
         elements: syncableElements,
       },
@@ -166,20 +170,9 @@ class Portal {
       );
     }
 
-    const broadcastPromise = this._broadcastSocketData(
-      data as SocketUpdateData,
-    );
-
     this.queueFileUpload();
 
-    if (syncAll && this.collab.isCollaborating) {
-      await Promise.all([
-        broadcastPromise,
-        this.collab.saveCollabRoomToFirebase(syncableElements),
-      ]);
-    } else {
-      await broadcastPromise;
-    }
+    await this._broadcastSocketData(data as SocketUpdateData);
   };
 
   broadcastIdleChange = (userState: UserIdleState) => {

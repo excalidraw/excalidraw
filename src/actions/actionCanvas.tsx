@@ -316,6 +316,7 @@ export const actionErase = register({
         activeTool.lastActiveToolBeforeEraser = appState.activeTool.type;
       }
     }
+    debugger;
     if (isEraserActive(appState)) {
       if (appState.activeTool.lastActiveToolBeforeEraser) {
         if (
@@ -326,7 +327,7 @@ export const actionErase = register({
           activeTool.customType =
             appState.activeTool.lastActiveToolBeforeEraser.customType;
         } else {
-          activeTool.type = appState.activeTool.type;
+          activeTool.type = appState.activeTool.lastActiveToolBeforeEraser;
         }
       } else {
         activeTool.type = "selection";
@@ -344,12 +345,7 @@ export const actionErase = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event, appState) => {
-    return (
-      event.key === KEYS.E ||
-      (event.key === KEYS.ESCAPE && isEraserActive(appState))
-    );
-  },
+  keyTest: (event) => event.key === KEYS.E,
   PanelComponent: ({ elements, appState, updateData, data }) => (
     <ToolButton
       type="button"
