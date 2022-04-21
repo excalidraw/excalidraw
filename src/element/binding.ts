@@ -660,28 +660,47 @@ export const fixBindingsAfterDeletion = (
   const deletedElementIds = new Set(
     deletedElements.map((element) => element.id),
   );
-  // Non deleted and need an update
-  const boundElementIds: Set<ExcalidrawElement["id"]> = new Set();
+  // non-deleted which bindings need to be updated
+  const affectedElements: Set<ExcalidrawElement["id"]> = new Set();
   deletedElements.forEach((deletedElement) => {
     if (isBindableElement(deletedElement)) {
       deletedElement.boundElements?.forEach((element) => {
         if (!deletedElementIds.has(element.id)) {
-          boundElementIds.add(element.id);
+          affectedElements.add(element.id);
         }
       });
+    } else if (isBindingElement(deletedElement)) {
+      if (deletedElement.startBinding) {
+        affectedElements.add(deletedElement.startBinding.elementId);
+      }
+      if (deletedElement.endBinding) {
+        affectedElements.add(deletedElement.endBinding.elementId);
+      }
     }
   });
-  (
-    sceneElements.filter(({ id }) =>
-      boundElementIds.has(id),
-    ) as ExcalidrawLinearElement[]
-  ).forEach((element: ExcalidrawLinearElement) => {
-    const { startBinding, endBinding } = element;
-    mutateElement(element, {
-      startBinding: newBindingAfterDeletion(startBinding, deletedElementIds),
-      endBinding: newBindingAfterDeletion(endBinding, deletedElementIds),
+  sceneElements
+    .filter(({ id }) => affectedElements.has(id))
+    .forEach((element) => {
+      if (isBindableElement(element)) {
+        mutateElement(element, {
+          boundElements: newBoundElementsAfterDeletion(
+            element.boundElements,
+            deletedElementIds,
+          ),
+        });
+      } else if (isBindingElement(element)) {
+        mutateElement(element, {
+          startBinding: newBindingAfterDeletion(
+            element.startBinding,
+            deletedElementIds,
+          ),
+          endBinding: newBindingAfterDeletion(
+            element.endBinding,
+            deletedElementIds,
+          ),
+        });
+      }
     });
-  });
 };
 
 const newBindingAfterDeletion = (
@@ -692,4 +711,14 @@ const newBindingAfterDeletion = (
     return null;
   }
   return binding;
+};
+
+const newBoundElementsAfterDeletion = (
+  boundElements: ExcalidrawElement["boundElements"],
+  deletedElementIds: Set<ExcalidrawElement["id"]>,
+) => {
+  if (!boundElements) {
+    return null;
+  }
+  return boundElements.filter((ele) => !deletedElementIds.has(ele.id));
 };
