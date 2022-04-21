@@ -189,7 +189,7 @@
     "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
     "invalidSVGString": "无效的 SVG。",
     "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。",
-    "importLibraryError": ""
+    "importLibraryError": "无法加载素材库"
   },
   "toolBar": {
     "selection": "选择",
