@@ -19,7 +19,8 @@ import {
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { Language, t } from "../i18n";
-import Excalidraw, {
+import {
+  Excalidraw,
   defaultLang,
   languages,
 } from "../packages/excalidraw/index";
