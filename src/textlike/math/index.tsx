@@ -545,10 +545,6 @@ const renderMath = (
   }
 };
 
-const getRenderDims = (width: number, height: number) => {
-  return [width / window.devicePixelRatio, height / window.devicePixelRatio];
-};
-
 const getImageMetrics = (
   text: string,
   fontSize: number,
@@ -665,7 +661,7 @@ const renderTextElementMath = (
   const isMathJaxLoaded = mathJaxLoaded;
 
   const text = element.text;
-  const fontSize = element.fontSize * window.devicePixelRatio;
+  const fontSize = element.fontSize;
   const strokeColor = element.strokeColor;
   const textAlign = element.textAlign;
   const opacity = context.globalAlpha;
@@ -722,10 +718,7 @@ const renderTextElementMath = (
         imageCache[imgKey] !== undefined
       ) {
         const img = imageCache[imgKey];
-        const [width, height] = getRenderDims(
-          img.naturalWidth,
-          img.naturalHeight,
-        );
+        const [width, height] = [img.naturalWidth, img.naturalHeight];
         context.drawImage(img, _x, _y, width, height);
       } else {
         const img = new Image();
@@ -741,10 +734,7 @@ const renderTextElementMath = (
           "load",
           () => {
             img.onload = function () {
-              const [width, height] = getRenderDims(
-                img.naturalWidth,
-                img.naturalHeight,
-              );
+              const [width, height] = [img.naturalWidth, img.naturalHeight];
               context.setTransform(transformMatrix);
               context.drawImage(img, _x, _y, width, height);
               if (isMathJaxLoaded) {
