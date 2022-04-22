@@ -13,7 +13,9 @@ type FILE_EXTENSION =
   | "gif"
   | "jpg"
   | "png"
+  | "excalidraw.png"
   | "svg"
+  | "excalidraw.svg"
   | "json"
   | "excalidraw"
   | "excalidrawlib";
