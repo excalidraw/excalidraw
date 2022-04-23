@@ -189,7 +189,7 @@
     "svgImageInsertError": "",
     "invalidSVGString": "",
     "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे.",
-    "importLibraryError": ""
+    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका"
   },
   "toolBar": {
     "selection": "चयन",
