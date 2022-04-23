@@ -1,5 +1,4 @@
 import React, { useEffect, forwardRef } from "react";
-import "./publicPath";
 
 import { InitializeApp } from "../../components/InitializeApp";
 import App from "../../components/App";
