@@ -189,7 +189,7 @@
     "svgImageInsertError": "Nepodarilo sa vložiť SVG obrázok. SVG formát je pravdepodobne nevalidný.",
     "invalidSVGString": "Nevalidné SVG.",
     "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu.",
-    "importLibraryError": ""
+    "importLibraryError": "Nepodarilo sa načítať knižnicu"
   },
   "toolBar": {
     "selection": "Výber",
