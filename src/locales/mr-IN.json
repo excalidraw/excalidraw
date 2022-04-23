@@ -189,7 +189,7 @@
     "svgImageInsertError": "एस-वी-जी प्रतिमा आत घालवू शकलो नाही. एस-वी-जी-मार्क-अप यंत्र अयोग्य आहे.",
     "invalidSVGString": "अयोग्य एस-वी-जी.",
     "cannotResolveCollabServer": "कॉलेब-सर्वर हे पोहोचत नाही आहे. पान परत लोड करायचा प्रयत्न करावे.",
-    "importLibraryError": ""
+    "importLibraryError": "संग्रह प्रतिस्थापित नाही करता आला"
   },
   "toolBar": {
     "selection": "निवड",
