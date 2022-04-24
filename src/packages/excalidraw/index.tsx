@@ -199,6 +199,7 @@ export {
   getFreeDrawSvgPath,
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
+export { debounce } from "../../utils";
 
 export { FONT_FAMILY, THEME } from "../../constants";
 
