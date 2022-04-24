@@ -41,7 +41,7 @@
     "fontFamily": "글꼴",
     "onlySelected": "선택한 항목만",
     "withBackground": "배경",
-    "exportEmbedScene": "",
+    "exportEmbedScene": "화면을 담기",
     "exportEmbedScene_details": "화면 정보가 내보내는 PNG/SVG 파일에 저장되어 이후에 파일에서 화면을 복구할 수 있습니다. 파일 크기가 증가합니다.",
     "addWatermark": "\"Made with Excalidraw\" 추가",
     "handDrawn": "손글씨",
@@ -116,9 +116,9 @@
     },
     "elementLock": {
       "lock": "",
-      "unlock": "잠금해제",
+      "unlock": "잠금 해제",
       "lockAll": "모두 잠그기",
-      "unlockAll": "모두 잠금해제"
+      "unlockAll": "모두 잠금 해제"
     }
   },
   "buttons": {
@@ -178,18 +178,18 @@
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "이미지 파일에서 화면을 복구할 수 없었습니다",
     "invalidSceneUrl": "",
-    "resetLibrary": "",
-    "removeItemsFromsLibrary": "",
+    "resetLibrary": "당신의 라이브러리를 초기화 합니다. 계속하시겠습니까?",
+    "removeItemsFromsLibrary": "{{count}}개의 아이템을 라이브러리에서 삭제하시겠습니까?",
     "invalidEncryptionKey": ""
   },
   "errors": {
     "unsupportedFileType": "지원하지 않는 파일 형식 입니다.",
     "imageInsertError": "이미지를 삽입할 수 없습니다. 나중에 다시 시도 하십시오",
-    "fileTooBig": "",
+    "fileTooBig": "파일이 너무 큽니다. 최대 크기는 {{maxSize}} 입니다.",
     "svgImageInsertError": "",
-    "invalidSVGString": "",
+    "invalidSVGString": "유효하지 않은 SVG입니다.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "라이브러리를 불러오지 못했습니다."
   },
   "toolBar": {
     "selection": "선택",
@@ -205,7 +205,7 @@
     "lock": "선택된 도구 유지하기",
     "penMode": "",
     "link": "",
-    "eraser": ""
+    "eraser": "지우개"
   },
   "headings": {
     "canvasActions": "캔버스 동작",
@@ -229,7 +229,7 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
-    "bindTextToElement": "",
+    "bindTextToElement": "Enter 키를 눌러서 텍스트 추가하기",
     "deepBoxSelect": "",
     "eraserRevert": ""
   },
