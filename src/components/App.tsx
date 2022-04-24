@@ -1888,7 +1888,11 @@ class App extends React.Component<AppProps, AppState> {
         event.preventDefault();
       }
 
-      if (event.key === KEYS.G || event.key === KEYS.S) {
+      if (
+        (event.key === KEYS.G || event.key === KEYS.S) &&
+        !event.altKey &&
+        !event[KEYS.CTRL_OR_CMD]
+      ) {
         const selectedElements = getSelectedElements(
           this.scene.getElements(),
           this.state,
