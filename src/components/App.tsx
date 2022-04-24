@@ -1272,6 +1272,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     this.cutAll();
     event.preventDefault();
+    event.stopPropagation();
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
@@ -1283,6 +1284,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     this.copyAll();
     event.preventDefault();
+    event.stopPropagation();
   });
 
   private cutAll = () => {
@@ -1874,8 +1876,10 @@ class App extends React.Component<AppProps, AppState> {
             );
           }
           this.setActiveTool({ ...this.state.activeTool, type: shape });
+          event.stopPropagation();
         } else if (event.key === KEYS.Q) {
           this.toggleLock("keyboard");
+          event.stopPropagation();
         }
       }
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
@@ -1902,9 +1906,11 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements.some((element) => hasBackground(element.type)))
         ) {
           this.setState({ openPopup: "backgroundColorPicker" });
+          event.stopPropagation();
         }
         if (event.key === KEYS.S) {
           this.setState({ openPopup: "strokeColorPicker" });
+          event.stopPropagation();
         }
       }
     },
