@@ -9,7 +9,7 @@
     "copy": "복사",
     "copyAsPng": "클립보드로 PNG 이미지 복사",
     "copyAsSvg": "클립보드로 SVG 이미지 복사",
-    "copyText": "",
+    "copyText": "클립보드로 텍스트 복사",
     "bringForward": "앞으로 가져오기",
     "sendToBack": "맨 뒤로 보내기",
     "bringToFront": "맨 앞으로 가져오기",
