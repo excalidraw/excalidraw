@@ -924,6 +924,8 @@ serializeAsJSON({
 
 Takes the scene elements and state and returns a JSON string. Deleted `elements`as well as most properties from `AppState` are removed from the resulting JSON. (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/src/data/json.ts#L16) source for details).
 
+If you want to overwrite the source field in the JSON string, you can set a variable `window.EXCALIDRAW_EXPORT_SOURCE` to the desired value.
+
 #### `serializeLibraryAsJSON`
 
 **_Signature_**

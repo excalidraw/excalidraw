@@ -17,6 +17,7 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
+- Expose `window.EXCALIDRAW_EXPORT_SOURCE` which host can use to overwrite the source field in exports
 - The `exportToBlob` utility now supports the `exportEmbedScene` option when generating a png image [#5047](https://github.com/excalidraw/excalidraw/pull/5047).
 - Exported [`restoreLibraryItems`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreLibraryItems) API [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
 
