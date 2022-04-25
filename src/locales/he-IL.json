@@ -9,7 +9,7 @@
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
-    "copyText": "",
+    "copyText": "העתק ללוח כ-PNG",
     "bringForward": "הבא שכבה קדימה",
     "sendToBack": "העבר לסוף",
     "bringToFront": "העבר לחזית",
@@ -36,7 +36,7 @@
     "arrowhead_arrow": "חץ",
     "arrowhead_bar": "שורה",
     "arrowhead_dot": "נקודה",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "משולש",
     "fontSize": "גודל גופן",
     "fontFamily": "סוג הגופן",
     "onlySelected": "רק מה שנבחר",
@@ -103,22 +103,22 @@
     "showStroke": "הצג צבעי קו מתאר",
     "showBackground": "הצג צבעי רקע",
     "toggleTheme": "שינוי ערכת העיצוב",
-    "personalLib": "",
-    "excalidrawLib": "",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
+    "personalLib": "ספריה פרטית",
+    "excalidrawLib": "הספריה של Excalidraw",
+    "decreaseFontSize": "הקטן את גודל הגופן",
+    "increaseFontSize": "הגדל את גודל הגופן",
     "unbindText": "",
     "bindText": "",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "עריכת קישור",
+      "create": "יצירת קישור",
+      "label": "קישור"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "נעילה",
+      "unlock": "ביטול נעילה",
+      "lockAll": "לנעול הכל",
+      "unlockAll": "שחרור הכול"
     }
   },
   "buttons": {
@@ -153,12 +153,12 @@
     "lightMode": "מצב בהיר",
     "zenMode": "מצב זן",
     "exitZenMode": "צא ממצב תפריט מרחף",
-    "cancel": "",
-    "clear": "",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "cancel": "ביטול",
+    "clear": "ניקוי",
+    "remove": "מחיקה",
+    "publishLibrary": "פירסום",
+    "submit": "שליחה",
+    "confirm": "לאשר"
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
