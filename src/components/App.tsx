@@ -2871,6 +2871,15 @@ class App extends React.Component<AppProps, AppState> {
           )) &&
         !hitElement?.locked
       ) {
+        if (hitElement && isCustomElement(hitElement)) {
+          const config = getCustomElementConfig(
+            this.props.customElementsConfig,
+            hitElement.customType,
+          );
+          if (!config?.transformHandles) {
+            return;
+          }
+        }
         setCursor(this.canvas, CURSOR_TYPE.MOVE);
       } else {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
