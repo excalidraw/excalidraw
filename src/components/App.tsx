@@ -3461,15 +3461,6 @@ class App extends React.Component<AppProps, AppState> {
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
-        if (selectedElements[0].type === "custom") {
-          const config = getCustomElementConfig(
-            this.props.customElementsConfig,
-            selectedElements[0].customType,
-          );
-          if (!config?.transformHandles) {
-            return false;
-          }
-        }
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
             elements,
