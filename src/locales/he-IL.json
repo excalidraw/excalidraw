@@ -279,7 +279,7 @@
     "blog": "קרא את הבלוג שלנו",
     "click": "קליק",
     "deepSelect": "בחירה עמוקה",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "בחירה עמוקה בתוך קופסה ומניעת גרירה",
     "curvedArrow": "חץ מעוגל",
     "curvedLine": "קו מעוגל",
     "documentation": "תיעוד",
@@ -319,7 +319,7 @@
       "libraryDesc": "",
       "githubHandle": "",
       "twitterHandle": "",
-      "website": ""
+      "website": "קישור לאתר הפרטי שלך או לכל מקום אחר (אופציונאלי)"
     },
     "errors": {
       "required": "נדרש",
@@ -327,7 +327,7 @@
     },
     "noteDescription": {
       "pre": "",
-      "link": "",
+      "link": "מאגר הספריה הציבורית",
       "post": ""
     },
     "noteGuidelines": {
@@ -338,14 +338,14 @@
     "noteLicense": {
       "pre": "",
       "link": "רישיון MIT, ",
-      "post": ""
+      "post": "שאומר בקצרה שכל אחד יכול לעשות בהם שימוש ללא מגבלות."
     },
     "noteItems": "",
     "atleastOneLibItem": ""
   },
   "publishSuccessDialog": {
     "title": "הספריה נשלחה",
-    "content": "",
+    "content": "תודה {{authorName}}. הספריה שלך נשלחה לבחינה. תוכל לעקוב אחרי סטטוס הפרסום",
     "link": "כאן"
   },
   "confirmDialog": {
