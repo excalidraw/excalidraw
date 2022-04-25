@@ -108,7 +108,8 @@ const LibraryMenuItems = ({
               importLibraryFromJSON(library)
                 .catch(muteFSAbortError)
                 .catch((error) => {
-                  setAppState({ errorMessage: error.message });
+                  console.error(error);
+                  setAppState({ errorMessage: t("errors.importLibraryError") });
                 });
             }}
             className="library-actions--load"

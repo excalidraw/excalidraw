@@ -6,7 +6,6 @@ import { ImportedDataState } from "./types";
 import { atom } from "jotai";
 import { jotaiStore } from "../jotai";
 import { isPromiseLike } from "../utils";
-import { t } from "../i18n";
 
 export const libraryItemsAtom = atom<
   | { status: "loading"; libraryItems: null; promise: Promise<LibraryItems> }
@@ -86,7 +85,7 @@ class Library {
 
           resolve([...filteredItems, ...existingLibraryItems]);
         } catch (error) {
-          reject(new Error(t("errors.importLibraryError")));
+          reject(error);
         }
       }),
     );

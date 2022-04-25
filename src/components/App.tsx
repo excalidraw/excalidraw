@@ -257,6 +257,7 @@ import {
   isPointHittingLinkIcon,
   isLocalLink,
 } from "../element/Hyperlink";
+import { AbortError } from "../errors";
 
 const defaultDeviceTypeContext: DeviceType = {
   isMobile: false,
@@ -703,24 +704,40 @@ class App extends React.Component<AppProps, AppState> {
       window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
     }
 
+    const defaultStatus = "published";
+
+    this.setState({ isLibraryOpen: true });
+
     try {
-      const request = await fetch(decodeURIComponent(url));
-      const blob = await request.blob();
-      const defaultStatus = "published";
-      const libraryItems = await loadLibraryFromBlob(blob, defaultStatus);
-      if (
-        token === this.id ||
-        window.confirm(
-          t("alerts.confirmAddLibrary", {
-            numShapes: libraryItems.length,
-          }),
-        )
-      ) {
-        await this.library.importLibrary(libraryItems, defaultStatus);
-      }
+      await this.library.importLibrary(
+        new Promise<LibraryItems>(async (resolve, reject) => {
+          try {
+            const request = await fetch(decodeURIComponent(url));
+            const blob = await request.blob();
+            const libraryItems = await loadLibraryFromBlob(blob, defaultStatus);
+
+            if (
+              token === this.id ||
+              window.confirm(
+                t("alerts.confirmAddLibrary", {
+                  numShapes: libraryItems.length,
+                }),
+              )
+            ) {
+              resolve(libraryItems);
+            } else {
+              reject(new AbortError());
+            }
+          } catch (error: any) {
+            reject(error);
+          }
+        }),
+      );
     } catch (error: any) {
-      console.error(error);
-      this.setState({ errorMessage: t("errors.importLibraryError") });
+      if (!(error instanceof AbortError)) {
+        console.error(error);
+        this.setState({ errorMessage: t("errors.importLibraryError") });
+      }
     } finally {
       this.focusContainer();
     }
@@ -5281,11 +5298,13 @@ class App extends React.Component<AppProps, AppState> {
       file?.type === MIME_TYPES.excalidrawlib ||
       file?.name?.endsWith(".excalidrawlib")
     ) {
-      this.library
-        .importLibrary(file)
-        .catch((error) =>
-          this.setState({ isLoading: false, errorMessage: error.message }),
-        );
+      this.library.importLibrary(file).catch((error) => {
+        console.error(error);
+        this.setState({
+          isLoading: false,
+          errorMessage: t("errors.importLibraryError"),
+        });
+      });
       // default: assume an Excalidraw file regardless of extension/MimeType
     } else if (file) {
       this.setState({ isLoading: true });
