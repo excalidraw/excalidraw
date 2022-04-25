@@ -301,14 +301,15 @@ const drawElementOnCanvas = (
           customElementImgCache[img.id] = img;
         }
       }
-      context.drawImage(
-        customElementImgCache[element.id],
-        0,
-        0,
-        element.width,
-        element.height,
-      );
-
+      if (customElementImgCache[element.id]) {
+        context.drawImage(
+          customElementImgCache[element.id],
+          0,
+          0,
+          element.width,
+          element.height,
+        );
+      }
       break;
     }
     default: {
