@@ -115,10 +115,10 @@
       "label": "Länk"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Lås",
+      "unlock": "Lås upp",
+      "lockAll": "Lås alla",
+      "unlockAll": "Lås upp alla"
     }
   },
   "buttons": {
@@ -189,7 +189,7 @@
     "svgImageInsertError": "Kunde inte infoga SVG-bild. SVG-koden ser ogiltig ut.",
     "invalidSVGString": "Ogiltig SVG.",
     "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
-    "importLibraryError": ""
+    "importLibraryError": "Kunde inte ladda bibliotek"
   },
   "toolBar": {
     "selection": "Markering",
@@ -299,7 +299,7 @@
     "view": "Visa",
     "zoomToFit": "Zooma för att rymma alla element",
     "zoomToSelection": "Zooma till markering",
-    "toggleElementLock": ""
+    "toggleElementLock": "Lås/Lås upp valda"
   },
   "clearCanvasDialog": {
     "title": "Rensa canvas"
