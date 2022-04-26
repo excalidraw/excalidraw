@@ -734,10 +734,8 @@ class App extends React.Component<AppProps, AppState> {
         }),
       );
     } catch (error: any) {
-      if (!(error instanceof AbortError)) {
-        console.error(error);
-        this.setState({ errorMessage: t("errors.importLibraryError") });
-      }
+      console.error(error);
+      this.setState({ errorMessage: t("errors.importLibraryError") });
     } finally {
       this.focusContainer();
     }
