@@ -206,11 +206,16 @@ const loadMathJax = async () => {
 // This lets math input run across multiple newlines.
 // Basically, replace with a space each newline between the delimiters.
 // Do so unless it's AsciiMath in math-only mode.
-const consumeMathNewlines = (text: string, mathOpts: MathOpts) => {
+const consumeMathNewlines = (
+  text: string,
+  mathOpts: MathOpts,
+  isMathJaxLoaded: boolean,
+) => {
   const delimiter = getDelimiter(mathOpts.useTex);
-  const tempText = mathOpts.mathOnly
-    ? [text]
-    : text.replace(/\r\n?/g, "\n").split(delimiter);
+  const tempText =
+    mathOpts.mathOnly || !isMathJaxLoaded
+      ? [text]
+      : text.replace(/\r\n?/g, "\n").split(delimiter);
   if (mathOpts.useTex || !mathOpts.mathOnly) {
     for (let i = 0; i < tempText.length; i++) {
       if (i % 2 === 1 || mathOpts.mathOnly) {
@@ -285,7 +290,9 @@ const markupText = (
   mathOpts: MathOpts,
   isMathJaxLoaded: boolean,
 ) => {
-  const lines = consumeMathNewlines(text, mathOpts).split("\n");
+  const lines = consumeMathNewlines(text, mathOpts, isMathJaxLoaded).split(
+    "\n",
+  );
   const markup = [] as Array<string>[];
   for (let index = 0; index < lines.length; index++) {
     markup.push([]);
@@ -295,9 +302,10 @@ const markupText = (
       continue;
     }
     // Don't split by the delimiter in math-only mode
-    const lineArray = mathOpts.mathOnly
-      ? [lines[index]]
-      : lines[index].split(getDelimiter(mathOpts.useTex));
+    const lineArray =
+      mathOpts.mathOnly || !isMathJaxLoaded
+        ? [lines[index]]
+        : lines[index].split(getDelimiter(mathOpts.useTex));
     for (let i = 0; i < lineArray.length; i++) {
       // Don't guard the following as "isMathJaxLoaded && i % 2 === 1"
       // in order to ensure math2Svg() actually gets called, and thus
@@ -493,10 +501,13 @@ const renderMath = (
     svg: SVGSVGElement | null,
     text: string,
     rtl: boolean,
+    childRtl: boolean,
   ) => void,
   doRenderChild: (x: number, y: number, width: number, height: number) => void,
 ) => {
-  const mathLines = consumeMathNewlines(text, mathOpts).split("\n");
+  const mathLines = consumeMathNewlines(text, mathOpts, isMathJaxLoaded).split(
+    "\n",
+  );
   const markup = markupText(text, mathOpts, isMathJaxLoaded);
   const metrics = getMetrics(markup, fontSize, mathOpts, isMathJaxLoaded);
   const imageMetrics = metrics.imageMetrics;
@@ -507,9 +518,9 @@ const renderMath = (
     const lineMarkupMetrics = metrics.markupMetrics[index];
     const rtl = isRTL(mathLines[index]);
     const x =
-      (!rtl && textAlign === "right") || (rtl && textAlign === "left")
+      textAlign === "right"
         ? imageMetrics.width - lineMetrics.width
-        : (!rtl && textAlign === "left") || (rtl && textAlign === "right")
+        : textAlign === "left"
         ? 0
         : (imageMetrics.width - lineMetrics.width) / 2;
     // Drop any empty strings from this line to match childMetrics
@@ -526,20 +537,19 @@ const renderMath = (
       const svg = childIsSvg
         ? (container.children[0].children[0] as SVGSVGElement)
         : null;
+      const childRtl = childIsSvg
+        ? false
+        : isRTL(content[mathOpts.mathOnly ? 0 : i]);
       // Set up the child for rendering
-      doSetupChild(childIsSvg, svg, content[i], rtl);
+      doSetupChild(childIsSvg, svg, content[i], rtl, childRtl);
       // Don't offset when we have an empty string.
       const nullContent = content.length > 0 && content[i] === "";
       const childX = nullContent ? 0 : lineMarkupMetrics[i].x;
       const childY = nullContent ? 0 : lineMarkupMetrics[i].y;
       const childWidth = nullContent ? 0 : lineMarkupMetrics[i].width;
       const childHeight = nullContent ? 0 : lineMarkupMetrics[i].height;
-      // I18n'd x position
-      const intlX = rtl
-        ? imageMetrics.width - childWidth - (x + childX)
-        : x + childX;
       // Now render the child
-      doRenderChild(intlX, y + childY, childWidth, childHeight);
+      doRenderChild(x + childX, y + childY, childWidth, childHeight);
     }
     y += lineMetrics.height;
   }
@@ -664,7 +674,7 @@ const renderTextElementMath = (
   const fontSize = element.fontSize;
   const strokeColor = element.strokeColor;
   const textAlign = element.textAlign;
-  const opacity = context.globalAlpha;
+  const opacity = element.opacity / 100;
   const useTex = element.useTex;
   const mathOnly = element.mathOnly;
   const mathOpts = getMathOpts.ensureMathOpts(useTex, mathOnly);
@@ -678,15 +688,16 @@ const renderTextElementMath = (
     svg: SVGSVGElement | null,
     text: string,
     rtl: boolean,
-  ) => void = function (childIsSvg, svg, text, rtl) {
+    childRtl: boolean,
+  ) => void = function (childIsSvg, svg, text, rtl, childRtl) {
     _childIsSvg = childIsSvg;
     _text = text;
 
     if (_childIsSvg) {
       _svg = svg!;
     } else {
-      context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
       context.save();
+      context.canvas.setAttribute("dir", childRtl ? "rtl" : "ltr");
       context.font = getFontString(element);
       context.fillStyle = element.strokeColor;
       context.textAlign = element.textAlign as CanvasTextAlign;
@@ -704,8 +715,8 @@ const renderTextElementMath = (
         _text,
         fontSize,
         strokeColor,
-        textAlign,
-        opacity,
+        "left",
+        1,
         mathOpts,
       );
 
@@ -724,6 +735,7 @@ const renderTextElementMath = (
         const img = new Image();
         _svg.setAttribute("width", `${width}`);
         _svg.setAttribute("height", `${height}`);
+        _svg.setAttribute("color", `${strokeColor}`);
         const svgString = _svg.outerHTML;
         const svg = new Blob([svgString], {
           type: "image/svg+xml;charset=utf-8",
@@ -735,8 +747,11 @@ const renderTextElementMath = (
           () => {
             img.onload = function () {
               const [width, height] = [img.naturalWidth, img.naturalHeight];
+              context.save();
               context.setTransform(transformMatrix);
+              context.globalAlpha = opacity;
               context.drawImage(img, _x, _y, width, height);
+              context.restore();
               if (isMathJaxLoaded) {
                 imageCache[imgKey] = img;
               }
@@ -751,7 +766,13 @@ const renderTextElementMath = (
         reader.readAsDataURL(svg);
       }
     } else {
-      context.fillText(_text, x, y);
+      const childOffset =
+        textAlign === "center"
+          ? (width - 1) / 2
+          : textAlign === "right"
+          ? width - 1
+          : 0;
+      context.fillText(_text, x + childOffset, y);
       context.restore();
     }
   };
@@ -803,13 +824,23 @@ const renderSvgTextElementMath = (
   groupNode.setAttribute("fill-opacity", `${opacity}`);
   tempSvg.appendChild(groupNode);
 
+  const { width, height } = getImageMetrics(
+    text,
+    fontSize,
+    mathOpts,
+    isMathJaxLoaded,
+  );
+
+  let _rtl: boolean;
   let childNode = {} as SVGSVGElement | SVGTextElement;
   const doSetupChild: (
     childIsSvg: boolean,
     svg: SVGSVGElement | null,
     text: string,
     rtl: boolean,
-  ) => void = function (childIsSvg, svg, text, rtl) {
+    childRtl: boolean,
+  ) => void = function (childIsSvg, svg, text, rtl, childRtl) {
+    _rtl = rtl;
     if (childIsSvg && text !== "") {
       childNode = svg!;
     } else {
@@ -819,14 +850,14 @@ const renderSvgTextElementMath = (
       );
       textNode.setAttribute("style", "white-space: pre;");
       textNode.setAttribute("fill", `${strokeColor}`);
-      textNode.setAttribute("direction", `${rtl ? "rtl" : "ltr"}`);
-      textNode.setAttribute("text-anchor", `${rtl ? "end" : "start"}`);
+      textNode.setAttribute("direction", `${childRtl ? "rtl" : "ltr"}`);
+      textNode.setAttribute("text-anchor", `${childRtl ? "end" : "start"}`);
       textNode.textContent = text;
       childNode = textNode;
     }
   };
   const doRenderChild: (x: number, y: number) => void = function (x, y) {
-    childNode.setAttribute("x", `${x}`);
+    childNode.setAttribute("x", `${_rtl ? x : x}`);
     childNode.setAttribute("y", `${y}`);
     groupNode.appendChild(childNode);
   };
@@ -838,13 +869,6 @@ const renderSvgTextElementMath = (
     isMathJaxLoaded,
     doSetupChild,
     doRenderChild,
-  );
-
-  const { width, height } = getImageMetrics(
-    text,
-    fontSize,
-    mathOpts,
-    isMathJaxLoaded,
   );
 
   tempSvg.setAttribute("version", "1.1");
@@ -921,7 +945,9 @@ export const wrapTextElementMath = (
   const metrics = getMetrics(markup, fontSize, mathOpts, isMathJaxLoaded);
 
   const delimiter = getDelimiter(mathOpts.useTex);
-  const lines = consumeMathNewlines(text, mathOpts).split("\n");
+  const lines = consumeMathNewlines(text, mathOpts, isMathJaxLoaded).split(
+    "\n",
+  );
   const lineText: string[][] = [];
   const lineWidth: number[][] = [];
   const newText: string[] = [];
