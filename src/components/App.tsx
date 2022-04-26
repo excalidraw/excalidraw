@@ -5296,6 +5296,7 @@ class App extends React.Component<AppProps, AppState> {
       file?.type === MIME_TYPES.excalidrawlib ||
       file?.name?.endsWith(".excalidrawlib")
     ) {
+      this.setState({ isLibraryOpen: true });
       this.library.importLibrary(file).catch((error) => {
         console.error(error);
         this.setState({
