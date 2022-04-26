@@ -32,7 +32,7 @@
     "browser-fs-access": "0.29.1",
     "clsx": "1.1.1",
     "fake-indexeddb": "3.1.7",
-    "firebase": "8.3.3",
+    "firebase": "9.6.11",
     "i18next-browser-languagedetector": "6.1.2",
     "idb-keyval": "6.0.3",
     "image-blob-reduce": "3.0.1",
