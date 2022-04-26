@@ -247,6 +247,25 @@ const svgCache = {} as { [key: string]: SVGSVGElement };
 // Cache the rendered MathJax images for renderTextElementMath()
 const imageCache = {} as { [key: string]: HTMLImageElement };
 
+const textAsMjxContainer = (
+  text: string,
+  isMathJaxLoaded: boolean,
+): Element | null => {
+  // Put the content in a div to check whether it is SVG or Text
+  const container = document.createElement("div");
+  container.innerHTML = text;
+  // The mjx-container has child nodes, while Text nodes do not.
+  // Check for the "viewBox" attribute to determine if it's SVG.
+  const childIsSvg =
+    isMathJaxLoaded &&
+    container.childNodes &&
+    container.childNodes.length > 0 &&
+    container.childNodes[0].hasChildNodes() &&
+    (container.childNodes[0].childNodes[0] as Element).hasAttribute("viewBox");
+  // Conditionally return the mjx-container
+  return childIsSvg ? (container.children[0] as Element) : null;
+};
+
 const math2Svg = (
   text: string,
   mathOpts: MathOpts,
@@ -337,7 +356,7 @@ const getCacheKey = (
 };
 
 const measureMarkup = (
-  text: string,
+  markup: Array<string | Element>,
   font: FontString,
   mathOpts: MathOpts,
   isMathJaxLoaded: boolean,
@@ -360,7 +379,17 @@ const measureMarkup = (
   }
   document.body.appendChild(container);
 
-  container.innerHTML = text;
+  // Sanitize possible HTML entered
+  for (let i = 0; i < markup.length; i++) {
+    // This should be an mjx-container
+    if ((markup[i] as Element).hasChildNodes) {
+      // Append as HTML
+      container.appendChild(markup[i] as Element);
+    } else {
+      // Append as text
+      container.append(markup[i]);
+    }
+  }
 
   // Now creating 1px sized item that will be aligned to baseline
   // to calculate baseline shift
@@ -457,15 +486,17 @@ const getMetrics = (
   let imageWidth = 0;
   let imageHeight = 0;
   for (let index = 0; index < markup.length; index++) {
-    let html = "";
+    // We pass an array of mjx-containers and strings
+    const lineMarkup = [] as Array<string | Element>;
     for (let i = 0; i < markup[index].length; i++) {
-      html += markup[index][i];
+      const mjx = textAsMjxContainer(markup[index][i], isMathJaxLoaded);
+      lineMarkup.push(mjx !== null ? mjx : markup[index][i]);
     }
 
     // Use the browser's measurements by temporarily attaching
     // the rendered line to the document.body.
     const { width, height, baseline, childMetrics } = measureMarkup(
-      html,
+      lineMarkup,
       fontString,
       mathOpts,
       isMathJaxLoaded,
@@ -526,17 +557,13 @@ const renderMath = (
     // Drop any empty strings from this line to match childMetrics
     const content = markup[index].filter((value) => value !== "");
     for (let i = 0; i < content.length; i += 1) {
-      // Put the content in a div to check whether it is SVG or Text
-      const container = document.createElement("div");
-      container.innerHTML = content[mathOpts.mathOnly ? 0 : i];
-      // The mjx-container has child nodes, while Text nodes do not
-      const childIsSvg =
-        isMathJaxLoaded &&
-        (container.childNodes[0].hasChildNodes() || mathOpts.mathOnly);
-      // Conditionally the child SVG
-      const svg = childIsSvg
-        ? (container.children[0].children[0] as SVGSVGElement)
-        : null;
+      const mjx = textAsMjxContainer(
+        content[mathOpts.mathOnly ? 0 : i],
+        isMathJaxLoaded,
+      );
+      // If we got an mjx-container, then assume it contains an SVG child
+      const childIsSvg = mjx !== null;
+      const svg = childIsSvg ? (mjx.children[0] as SVGSVGElement) : null;
       const childRtl = childIsSvg
         ? false
         : isRTL(content[mathOpts.mathOnly ? 0 : i]);
