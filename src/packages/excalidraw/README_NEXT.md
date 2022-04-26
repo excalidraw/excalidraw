@@ -937,7 +937,7 @@ serializeLibraryAsJSON({
 
 Takes the library items and returns a JSON string.
 
-If you want to overwrite the source field in the JSON string, you can set a variable `window.EXCALIDRAW_EXPORT_SOURCE` to the desired value.
+If you want to overwrite the source field in the JSON string, you can set  `window.EXCALIDRAW_EXPORT_SOURCE` to the desired value.
 
 #### `getSceneVersion`
 
