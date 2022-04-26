@@ -1720,8 +1720,8 @@ class App extends React.Component<AppProps, AppState> {
                   "unpublished",
                 ),
               );
-            } catch {
-              reject(new Error(t("errors.importLibraryError")));
+            } catch (error: any) {
+              reject(error);
             }
           }),
         );
