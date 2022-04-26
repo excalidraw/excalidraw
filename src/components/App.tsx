@@ -1709,7 +1709,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.libraryItems) {
-        this.library.saveLibrary(
+        this.library.setLibrary(
           new Promise<LibraryItems>(async (resolve, reject) => {
             try {
               resolve(

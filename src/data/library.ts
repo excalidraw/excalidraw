@@ -76,7 +76,7 @@ class Library {
   };
 
   resetLibrary = () => {
-    return this.saveLibrary([]);
+    return this.setLibrary([]);
   };
 
   /**
@@ -90,7 +90,7 @@ class Library {
       | Promise<Required<ImportedDataState>["libraryItems"]>,
     defaultStatus: LibraryItem["status"] = "unpublished",
   ): Promise<LibraryItems> {
-    return this.saveLibrary(
+    return this.setLibrary(
       () =>
         new Promise<LibraryItems>(async (resolve, reject) => {
           try {
@@ -121,13 +121,13 @@ class Library {
   /**
    * @returns latest cloned libraryItems. Awaits all in-progress updates first.
    */
-  loadLibrary = (): Promise<LibraryItems> => {
+  getLatestLibrary = (): Promise<LibraryItems> => {
     return new Promise(async (resolve) => {
       try {
         const libraryItems = await (this.getLastUpdateTask() ||
           this.lastLibraryItems);
         if (this.updateQueue.length > 0) {
-          resolve(this.loadLibrary());
+          resolve(this.getLatestLibrary());
         } else {
           resolve(cloneLibraryItems(libraryItems));
         }
@@ -137,7 +137,7 @@ class Library {
     });
   };
 
-  saveLibrary = (
+  setLibrary = (
     /**
      * LibraryItems that will replace current items. Can be a function which
      * will be invoked after all previous tasks are resolved

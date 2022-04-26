@@ -126,7 +126,7 @@ const LibraryMenuItems = ({
               onClick={async () => {
                 const libraryItems = itemsSelected
                   ? items
-                  : await library.loadLibrary();
+                  : await library.getLatestLibrary();
                 saveLibraryAsJSON(libraryItems)
                   .catch(muteFSAbortError)
                   .catch((error) => {
