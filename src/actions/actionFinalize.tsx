@@ -151,7 +151,6 @@ export const actionFinalize = register({
     } else {
       activeTool.type = "selection";
     }
-
     return {
       elements: newElements,
       appState: {
@@ -162,10 +161,7 @@ export const actionFinalize = register({
             appState.activeTool.type === "freedraw") &&
           multiPointElement
             ? appState.activeTool
-            : {
-                ...appState.activeTool,
-                activeTool,
-              },
+            : activeTool,
         draggingElement: null,
         multiElement: null,
         editingElement: null,

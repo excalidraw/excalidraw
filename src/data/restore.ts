@@ -263,6 +263,7 @@ export const restoreAppState = (
   const activeTool: any = {
     lastActiveToolBeforeEraser: null,
     locked: nextAppState.activeTool.locked ?? false,
+    type: "selection",
   };
   if (AllowedExcalidrawActiveTools[nextAppState.activeTool.type]) {
     if (nextAppState.activeTool.type === "custom") {
