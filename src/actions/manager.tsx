@@ -78,6 +78,12 @@ export class ActionManager {
   }
 
   handleKeyDown(event: React.KeyboardEvent | KeyboardEvent) {
+    if (
+      event.target instanceof HTMLInputElement &&
+      event.target.classList.contains("excalidraw-wysiwyg")
+    ) {
+      return;
+    }
     const canvasActions = this.app.props.UIOptions.canvasActions;
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
