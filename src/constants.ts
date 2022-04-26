@@ -108,7 +108,8 @@ export const EXPORT_DATA_TYPES = {
   excalidrawLibrary: "excalidrawlib",
 } as const;
 
-export const EXPORT_SOURCE = window.location.origin;
+export const EXPORT_SOURCE =
+  window.EXCALIDRAW_EXPORT_SOURCE_PATH || window.location.origin;
 
 // time in milliseconds
 export const IMAGE_RENDER_TIMEOUT = 500;
