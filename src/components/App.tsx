@@ -2239,8 +2239,7 @@ class App extends React.Component<AppProps, AppState> {
       if (isTextElement(selectedElements[0])) {
         existingTextElement = selectedElements[0];
       } else if (isTextBindableContainer(selectedElements[0], false)) {
-        container = selectedElements[0];
-        existingTextElement = getBoundTextElement(container);
+        existingTextElement = getBoundTextElement(selectedElements[0]);
       }
     }
 
