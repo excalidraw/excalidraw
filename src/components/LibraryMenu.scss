@@ -13,6 +13,10 @@
       width: 100%;
       margin: 2px 0;
 
+      .Spinner {
+        margin-right: 1rem;
+      }
+
       button {
         // 2px from the left to account for focus border of left-most button
         margin: 0 2px;

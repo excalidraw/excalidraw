@@ -6,10 +6,11 @@ import { ImportedDataState } from "./types";
 import { atom } from "jotai";
 import { jotaiStore } from "../jotai";
 
-export const libraryItemsAtom = atom<
-  | { status: "loading"; libraryItems: null }
-  | { status: "loaded"; libraryItems: LibraryItems }
->({ status: "loaded", libraryItems: [] });
+export const libraryItemsAtom = atom<{
+  status: "loading" | "loaded";
+  isInitialized: boolean;
+  libraryItems: LibraryItems;
+}>({ status: "loaded", isInitialized: true, libraryItems: [] });
 
 const cloneLibraryItems = (libraryItems: LibraryItems): LibraryItems =>
   JSON.parse(JSON.stringify(libraryItems));
@@ -41,6 +42,9 @@ const isUniqueItem = (
 class Library {
   /** latest libraryItems */
   private lastLibraryItems: LibraryItems = [];
+  /** indicates whether library is initialized with library items (has gone
+   * though at least one update) */
+  private isInitialized = false;
 
   private app: App;
 
@@ -58,12 +62,15 @@ class Library {
     if (this.updateQueue.length > 0) {
       jotaiStore.set(libraryItemsAtom, {
         status: "loading",
-        libraryItems: null,
+        libraryItems: this.lastLibraryItems,
+        isInitialized: this.isInitialized,
       });
     } else {
+      this.isInitialized = true;
       jotaiStore.set(libraryItemsAtom, {
         status: "loaded",
         libraryItems: this.lastLibraryItems,
+        isInitialized: this.isInitialized,
       });
       try {
         this.app.props.onLibraryChange?.(

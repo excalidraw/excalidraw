@@ -229,7 +229,10 @@ export const LibraryMenu = ({
     LibraryItem["id"] | null
   >(null);
 
-  if (libraryItemsData.status === "loading") {
+  if (
+    libraryItemsData.status === "loading" &&
+    !libraryItemsData.isInitialized
+  ) {
     return (
       <LibraryMenuWrapper ref={ref}>
         <div className="layer-ui__library-message">
@@ -264,6 +267,7 @@ export const LibraryMenu = ({
       )}
       {publishLibSuccess && renderPublishSuccess()}
       <LibraryMenuItems
+        isLoading={libraryItemsData.status === "loading"}
         libraryItems={libraryItemsData.libraryItems}
         onRemoveFromLibrary={() =>
           removeFromLibrary(libraryItemsData.libraryItems)
