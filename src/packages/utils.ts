@@ -10,6 +10,7 @@ import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
+import { copyBlobToClipboardAsPng } from "../clipboard";
 
 type ExportOpts = {
   elements: readonly NonDeleted<ExcalidrawElement>[];
@@ -154,6 +155,16 @@ export const exportToSvg = async ({
     },
     files,
   );
+};
+
+export const exportToClipboard = async (
+  opts: ExportOpts & { mimeType?: string; quality?: number },
+) => {
+  const blob = await exportToBlob(opts);
+  if (!blob) {
+    throw new Error("couldn't export to blob");
+  }
+  await copyBlobToClipboardAsPng(blob);
 };
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";

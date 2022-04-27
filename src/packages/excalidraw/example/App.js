@@ -10,8 +10,13 @@ import { MIME_TYPES } from "../../../constants";
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
 
-const { exportToCanvas, exportToSvg, exportToBlob, Excalidraw } =
-  window.ExcalidrawLib;
+const {
+  exportToCanvas,
+  exportToSvg,
+  exportToBlob,
+  exportToClipboard,
+  Excalidraw,
+} = window.ExcalidrawLib;
 const resolvablePromise = () => {
   let resolve;
   let reject;
@@ -174,6 +179,20 @@ export default function App() {
             }}
           >
             Update Library
+          </button>
+          <button
+            onClick={async () => {
+              await exportToClipboard({
+                elements: excalidrawRef.current.getSceneElements(),
+                appState: {
+                  ...initialData.appState,
+                  exportWithDarkMode,
+                },
+              });
+              window.alert("Copied");
+            }}
+          >
+            Copy to Clipboard
           </button>
           <label>
             <input
