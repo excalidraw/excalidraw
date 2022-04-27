@@ -82,7 +82,7 @@ export const exportToBlob = async (
     mimeType?: string;
     quality?: number;
   },
-): Promise<Blob | null> => {
+): Promise<Blob> => {
   let { mimeType = MIME_TYPES.png, quality } = opts;
 
   if (mimeType === MIME_TYPES.png && typeof quality === "number") {
@@ -108,9 +108,12 @@ export const exportToBlob = async (
 
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     canvas.toBlob(
-      async (blob: Blob | null) => {
+      async (blob) => {
+        if (!blob) {
+          return reject(new Error("couldn't export to blob"));
+        }
         if (
           blob &&
           mimeType === MIME_TYPES.png &&
@@ -160,11 +163,7 @@ export const exportToSvg = async ({
 export const exportToClipboard = async (
   opts: ExportOpts & { mimeType?: string; quality?: number },
 ) => {
-  const blob = await exportToBlob(opts);
-  if (!blob) {
-    throw new Error("couldn't export to blob");
-  }
-  await copyBlobToClipboardAsPng(blob);
+  await copyBlobToClipboardAsPng(exportToBlob(opts));
 };
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";
