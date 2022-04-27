@@ -156,7 +156,7 @@ export const DEFAULT_CUSTOM_ELEMENT_CONFIG: Required<CustomElementConfig> = {
   type: "custom",
   customType: "custom",
   transformHandles: true,
-  svg: "",
+  displayData: { content: "", type: "svg" },
   width: 40,
   height: 40,
   stackedOnTop: false,

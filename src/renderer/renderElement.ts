@@ -269,36 +269,34 @@ const drawElementOnCanvas = (
       if (!config) {
         break;
       }
-      if (typeof config.svg === "string") {
+      const cacheImage = (data: string, type: "svg" | "dataURL") => {
         if (!customElementImgCache[element.id]) {
+          let url: string;
+          if (type === "svg") {
+            url = `data:${MIME_TYPES.svg}, ${encodeURIComponent(data)}`;
+          } else {
+            url = data;
+          }
           const img = document.createElement("img");
-          img.src = config.svg;
+          img.src = url;
           img.id = element.id;
-          customElementImgCache[img.id] = img;
+          customElementImgCache[element.id] = img;
         }
-      } else if (typeof config.svg === "function") {
-        const svg = config.svg(element);
-        if (svg instanceof Promise) {
-          svg.then((res) => {
-            if (!customElementImgCache[element.id]) {
-              const img = document.createElement("img");
-              img.id = element.id;
-              img.src = res;
-              customElementImgCache[img.id] = img;
-              context.drawImage(
-                customElementImgCache[element.id],
-                0,
-                0,
-                element.width,
-                element.height,
-              );
-            }
-          });
-        } else if (!customElementImgCache[element.id]) {
-          const img = document.createElement("img");
-          img.id = element.id;
-          img.src = svg;
-          customElementImgCache[img.id] = img;
+      };
+      const { type, content } = config.displayData;
+      if (typeof content === "string") {
+        cacheImage(content, type);
+      } else {
+        const contentData = content(element);
+        if (contentData instanceof Promise) {
+          contentData.then(
+            (res) => {
+              cacheImage(res, type);
+            },
+            (err) => console.error(err),
+          );
+        } else {
+          cacheImage(contentData, type);
         }
       }
       if (customElementImgCache[element.id]) {
