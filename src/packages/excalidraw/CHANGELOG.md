@@ -23,6 +23,7 @@ Please add the latest change on the top under the correct section.
 
 #### Fixes
 
+- Use `window.EXCALIDRAW_ASSET_PATH` for fonts when exporting to svg [#5065](https://github.com/excalidraw/excalidraw/pull/5065).
 - Library menu now properly rerenders if open when library is updated using `updateScene({ libraryItems })` [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
 
 #### Refactor
