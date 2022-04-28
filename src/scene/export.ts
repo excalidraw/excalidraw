@@ -125,27 +125,22 @@ export const exportToSvg = async (
       : "https://excalidraw.com";
     assetPath = assetPath.replace("/", `${origin}/`);
   }
-
-  const defs = document.createElement("defs");
-  const style = document.createElement("style");
-  style.appendChild(
-    document.createTextNode(
-      "@font-face {" +
-        "font-family: 'Virgil';" +
-        `src: url(${assetPath}Virgil.woff2);` +
-        "}" +
-        "@font-face {" +
-        "font-family: 'Cascadia';" +
-        `src: url(${assetPath}Cascadia.woff2);` +
-        "}",
-    ),
-  );
-  defs.appendChild(style);
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
+  <defs>
+    <style>
+      @font-face {
+        font-family: "Virgil";
+        src: url(${assetPath}Virgil.woff2);
+      }
+      @font-face {
+        font-family: "Cascadia";
+        src: url(${assetPath}Cascadia.woff2);
+      }
+    </style>
+  </defs>
   `;
-  svgRoot.appendChild(defs);
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
