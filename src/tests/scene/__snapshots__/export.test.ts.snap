@@ -21,11 +21,11 @@ exports[`exportToSvg with default arguments 1`] = `
       
       @font-face {
         font-family: "Virgil";
-        src: url(https://excalidraw.com/Virgil.woff2);
+        src: url("https://excalidraw.com/Virgil.woff2");
       }
       @font-face {
         font-family: "Cascadia";
-        src: url(https://excalidraw.com/Cascadia.woff2);
+        src: url("https://excalidraw.com/Cascadia.woff2");
       }
     
     </style>
@@ -79,11 +79,11 @@ exports[`exportToSvg with elements that have a link 1`] = `
     <style>
       @font-face {
         font-family: \\"Virgil\\";
-        src: url(https://excalidraw.com/Virgil.woff2);
+        src: url(\\"https://excalidraw.com/Virgil.woff2\\");
       }
       @font-face {
         font-family: \\"Cascadia\\";
-        src: url(https://excalidraw.com/Cascadia.woff2);
+        src: url(\\"https://excalidraw.com/Cascadia.woff2\\");
       }
     </style>
   </defs>
@@ -98,11 +98,11 @@ exports[`exportToSvg with exportEmbedScene 1`] = `
     <style>
       @font-face {
         font-family: \\"Virgil\\";
-        src: url(https://excalidraw.com/Virgil.woff2);
+        src: url(\\"https://excalidraw.com/Virgil.woff2\\");
       }
       @font-face {
         font-family: \\"Cascadia\\";
-        src: url(https://excalidraw.com/Cascadia.woff2);
+        src: url(\\"https://excalidraw.com/Cascadia.woff2\\");
       }
     </style>
   </defs>

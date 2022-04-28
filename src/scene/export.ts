@@ -135,11 +135,11 @@ export const exportToSvg = async (
     <style>
       @font-face {
         font-family: "Virgil";
-        src: url(${assetPath}Virgil.woff2);
+        src: url("${assetPath}Virgil.woff2");
       }
       @font-face {
         font-family: "Cascadia";
-        src: url(${assetPath}Cascadia.woff2);
+        src: url("${assetPath}Cascadia.woff2");
       }
     </style>
   </defs>
