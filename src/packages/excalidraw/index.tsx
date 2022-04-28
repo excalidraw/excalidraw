@@ -12,7 +12,8 @@ import { DEFAULT_UI_OPTIONS } from "../../constants";
 import { Provider } from "jotai";
 import { jotaiScope, jotaiStore } from "../../jotai";
 
-const ExcalidrawBase = (props: ExcalidrawProps) => {
+const Excalidraw = (props: ExcalidrawProps) => {
+  //zsviczian https://github.com/excalidraw/excalidraw/pull/5078 !!!
   const {
     onChange,
     initialData,
@@ -184,9 +185,9 @@ const areEqual = (
 const forwardedRefComp = forwardRef<
   ExcalidrawAPIRefValue,
   PublicExcalidrawProps
->((props, ref) => <ExcalidrawBase {...props} excalidrawRef={ref} />);
+>((props, ref) => <Excalidraw {...props} excalidrawRef={ref} />); //zsviczian https://github.com/excalidraw/excalidraw/pull/5078 !!!
 
-export const Excalidraw = React.memo(forwardedRefComp, areEqual);
+export default React.memo(forwardedRefComp, areEqual); //zsviczian https://github.com/excalidraw/excalidraw/pull/5078 !!!
 
 export {
   getSceneVersion,
