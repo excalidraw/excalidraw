@@ -57,19 +57,21 @@ const clipboardContainsElements = (
 export const copyToClipboard = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  files: BinaryFiles,
+  files: BinaryFiles | null,
 ) => {
   // select binded text elements when copying
   const selectedElements = getSelectedElements(elements, appState, true);
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
     elements: selectedElements,
-    files: selectedElements.reduce((acc, element) => {
-      if (isInitializedImageElement(element) && files[element.fileId]) {
-        acc[element.fileId] = files[element.fileId];
-      }
-      return acc;
-    }, {} as BinaryFiles),
+    files: files
+      ? selectedElements.reduce((acc, element) => {
+          if (isInitializedImageElement(element) && files[element.fileId]) {
+            acc[element.fileId] = files[element.fileId];
+          }
+          return acc;
+        }, {} as BinaryFiles)
+      : undefined,
   };
   const json = JSON.stringify(contents);
   CLIPBOARD = json;

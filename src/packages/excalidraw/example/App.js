@@ -146,6 +146,14 @@ export default function App() {
     }
   }, []);
 
+  const onCopy = async (type) => {
+    await exportToClipboard({
+      elements: excalidrawRef.current.getSceneElements(),
+      appState: excalidrawRef.current.getAppState(),
+      type,
+    });
+    window.alert(`Copied to clipboard as ${type} sucessfully`);
+  };
   return (
     <div className="App">
       <h1> Excalidraw Example</h1>
@@ -180,20 +188,7 @@ export default function App() {
           >
             Update Library
           </button>
-          <button
-            onClick={async () => {
-              await exportToClipboard({
-                elements: excalidrawRef.current.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode,
-                },
-              });
-              window.alert("Copied");
-            }}
-          >
-            Copy to Clipboard
-          </button>
+
           <label>
             <input
               type="checkbox"
@@ -232,6 +227,17 @@ export default function App() {
             />
             Switch to Dark Theme
           </label>
+          <div>
+            <button onClick={onCopy.bind(null, "png")}>
+              Copy to Clipboard as PNG
+            </button>
+            <button onClick={onCopy.bind(null, "svg")}>
+              Copy to Clipboard as SVG
+            </button>
+            <button onClick={onCopy.bind(null, "text")}>
+              Copy to Clipboard as Text
+            </button>
+          </div>
         </div>
         <div className="excalidraw-wrapper">
           <Excalidraw

@@ -10,7 +10,11 @@ import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
-import { copyBlobToClipboardAsPng } from "../clipboard";
+import {
+  copyBlobToClipboardAsPng,
+  copyTextToSystemClipboard,
+  copyToClipboard,
+} from "../clipboard";
 
 type ExportOpts = {
   elements: readonly NonDeleted<ExcalidrawElement>[];
@@ -161,9 +165,30 @@ export const exportToSvg = async ({
 };
 
 export const exportToClipboard = async (
-  opts: ExportOpts & { mimeType?: string; quality?: number },
+  opts: ExportOpts & {
+    mimeType?: string;
+    quality?: number;
+    type: "png" | "svg" | "text";
+  },
 ) => {
-  await copyBlobToClipboardAsPng(exportToBlob(opts));
+  if (opts.type === "svg") {
+    const svg = await exportToSvg(opts);
+    await copyTextToSystemClipboard(svg.outerHTML);
+  } else if (opts.type === "png") {
+    await copyBlobToClipboardAsPng(exportToBlob(opts));
+  } else if (opts.type === "text") {
+    const appState = {
+      offsetTop: 0,
+      offsetLeft: 0,
+      width: 0,
+      height: 0,
+      ...getDefaultAppState(),
+      ...opts.appState,
+    };
+    await copyToClipboard(opts.elements, appState, opts.files);
+  } else {
+    throw new Error("Invalid export type");
+  }
 };
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";
