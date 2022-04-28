@@ -23,6 +23,10 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
+  if (appState.isLibraryOpen) {
+    return null;
+  }
+
   if (isEraserActive(appState)) {
     return t("hints.eraserRevert");
   }

@@ -1,5 +1,4 @@
 import React, { useEffect, forwardRef } from "react";
-import "./publicPath";
 
 import { InitializeApp } from "../../components/InitializeApp";
 import App from "../../components/App";
@@ -10,8 +9,10 @@ import "../../css/styles.scss";
 import { AppProps, ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { defaultLang } from "../../i18n";
 import { DEFAULT_UI_OPTIONS } from "../../constants";
+import { Provider } from "jotai";
+import { jotaiScope, jotaiStore } from "../../jotai";
 
-const Excalidraw = (props: ExcalidrawProps) => {
+const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
     onChange,
     initialData,
@@ -73,32 +74,34 @@ const Excalidraw = (props: ExcalidrawProps) => {
 
   return (
     <InitializeApp langCode={langCode}>
-      <App
-        onChange={onChange}
-        initialData={initialData}
-        excalidrawRef={excalidrawRef}
-        onCollabButtonClick={onCollabButtonClick}
-        isCollaborating={isCollaborating}
-        onPointerUpdate={onPointerUpdate}
-        renderTopRightUI={renderTopRightUI}
-        renderFooter={renderFooter}
-        langCode={langCode}
-        viewModeEnabled={viewModeEnabled}
-        zenModeEnabled={zenModeEnabled}
-        gridModeEnabled={gridModeEnabled}
-        libraryReturnUrl={libraryReturnUrl}
-        theme={theme}
-        name={name}
-        renderCustomStats={renderCustomStats}
-        UIOptions={UIOptions}
-        onPaste={onPaste}
-        detectScroll={detectScroll}
-        handleKeyboardGlobally={handleKeyboardGlobally}
-        onLibraryChange={onLibraryChange}
-        autoFocus={autoFocus}
-        generateIdForFile={generateIdForFile}
-        onLinkOpen={onLinkOpen}
-      />
+      <Provider unstable_createStore={() => jotaiStore} scope={jotaiScope}>
+        <App
+          onChange={onChange}
+          initialData={initialData}
+          excalidrawRef={excalidrawRef}
+          onCollabButtonClick={onCollabButtonClick}
+          isCollaborating={isCollaborating}
+          onPointerUpdate={onPointerUpdate}
+          renderTopRightUI={renderTopRightUI}
+          renderFooter={renderFooter}
+          langCode={langCode}
+          viewModeEnabled={viewModeEnabled}
+          zenModeEnabled={zenModeEnabled}
+          gridModeEnabled={gridModeEnabled}
+          libraryReturnUrl={libraryReturnUrl}
+          theme={theme}
+          name={name}
+          renderCustomStats={renderCustomStats}
+          UIOptions={UIOptions}
+          onPaste={onPaste}
+          detectScroll={detectScroll}
+          handleKeyboardGlobally={handleKeyboardGlobally}
+          onLibraryChange={onLibraryChange}
+          autoFocus={autoFocus}
+          generateIdForFile={generateIdForFile}
+          onLinkOpen={onLinkOpen}
+        />
+      </Provider>
     </InitializeApp>
   );
 };
@@ -169,8 +172,10 @@ const areEqual = (
 const forwardedRefComp = forwardRef<
   ExcalidrawAPIRefValue,
   PublicExcalidrawProps
->((props, ref) => <Excalidraw {...props} excalidrawRef={ref} />);
-export default React.memo(forwardedRefComp, areEqual);
+>((props, ref) => <ExcalidrawBase {...props} excalidrawRef={ref} />);
+
+export const Excalidraw = React.memo(forwardedRefComp, areEqual);
+
 export {
   getSceneVersion,
   isInvisiblySmallElement,
