@@ -2,7 +2,7 @@ import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, isProdEnv } from "../utils";
+import { distance } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
@@ -11,7 +11,6 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
-import pkg from "../../src/packages/excalidraw/package.json";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -115,15 +114,19 @@ export const exportToSvg = async (
   if (appState.exportWithDarkMode) {
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
-  let assetPath =
-    window.EXCALIDRAW_ASSET_PATH ||
-    `https://unpkg.com/${pkg.name}@${pkg.version}/dist/excalidraw-assets/`;
 
-  if (assetPath?.startsWith("/")) {
-    const origin = isProdEnv()
-      ? window.location.origin
-      : "https://excalidraw.com";
-    assetPath = assetPath.replace("/", `${origin}/`);
+  let assetPath = "https://excalidraw.com/";
+
+  // Asset path needs to be determined only when using package
+  if (process.env.IS_EXCALIDRAW_NPM_PACKAGE) {
+    assetPath =
+      window.EXCALIDRAW_ASSET_PATH ||
+      `https://unpkg.com/${process.env.PKG_NAME}@${process.env.PKG_VERSION}`;
+
+    if (assetPath?.startsWith("/")) {
+      assetPath = assetPath.replace("/", `${window.location.origin}/`);
+    }
+    assetPath = `${assetPath}/dist/excalidraw-assets/`;
   }
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
