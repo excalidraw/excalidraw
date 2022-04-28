@@ -48,6 +48,7 @@ export const AllowedExcalidrawActiveTools: Record<
   arrow: true,
   freedraw: true,
   eraser: false,
+  comment: false,
 };
 
 export type RestoredDataState = {
@@ -204,6 +205,8 @@ const restoreElement = (
     case "rectangle":
       return restoreElementWithProperties(element, {});
     case "diamond":
+      return restoreElementWithProperties(element, {});
+    case "comment":
       return restoreElementWithProperties(element, {});
 
     // Don't use default case so as to catch a missing an element type case.

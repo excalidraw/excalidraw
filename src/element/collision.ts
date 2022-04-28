@@ -25,6 +25,7 @@ import {
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
+  ExcalidrawCommentElement,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -183,6 +184,12 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
     case "arrow":
     case "line":
       return hitTestLinear(args);
+    case "comment":
+      const distance2 = distanceToBindableElement(
+        args.element as ExcalidrawBindableElement,
+        args.point,
+      );
+      return args.check(distance2, args.threshold);
     case "selection":
       console.warn(
         "This should not happen, we need to investigate why it does.",
@@ -203,6 +210,8 @@ export const distanceToBindableElement = (
     case "diamond":
       return distanceToDiamond(element, point);
     case "ellipse":
+      return distanceToEllipse(element, point);
+    case "comment":
       return distanceToEllipse(element, point);
   }
 };
@@ -248,7 +257,7 @@ const distanceToDiamond = (
 };
 
 const distanceToEllipse = (
-  element: ExcalidrawEllipseElement,
+  element: ExcalidrawEllipseElement | ExcalidrawCommentElement,
   point: Point,
 ): number => {
   const [pointRel, tangent] = ellipseParamsForTest(element, point);
@@ -256,7 +265,7 @@ const distanceToEllipse = (
 };
 
 const ellipseParamsForTest = (
-  element: ExcalidrawEllipseElement,
+  element: ExcalidrawEllipseElement | ExcalidrawCommentElement,
   point: Point,
 ): [GA.Point, GA.Line] => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);
@@ -509,6 +518,8 @@ export const determineFocusDistance = (
       return mabs < nabs ? c / (nabs * hwidth) : c / (mabs * hheight);
     case "ellipse":
       return c / (hwidth * Math.sqrt(n ** 2 + q ** 2 * m ** 2));
+    case "comment":
+      return c / (hwidth * Math.sqrt(n ** 2 + q ** 2 * m ** 2));
   }
 };
 
@@ -539,6 +550,9 @@ export const determineFocusPoint = (
       point = findFocusPointForRectangulars(element, focus, adjecentPointRel);
       break;
     case "ellipse":
+      point = findFocusPointForEllipse(element, focus, adjecentPointRel);
+      break;
+    case "comment":
       point = findFocusPointForEllipse(element, focus, adjecentPointRel);
       break;
   }
@@ -597,6 +611,9 @@ const getSortedElementLineIntersections = (
         );
       break;
     case "ellipse":
+      intersections = getEllipseIntersections(element, gap, line);
+      break;
+    case "comment":
       intersections = getEllipseIntersections(element, gap, line);
       break;
   }
@@ -674,7 +691,7 @@ const offsetSegment = (
 };
 
 const getEllipseIntersections = (
-  element: ExcalidrawEllipseElement,
+  element: ExcalidrawEllipseElement | ExcalidrawCommentElement,
   gap: number,
   line: GA.Line,
 ): GA.Point[] => {
@@ -734,7 +751,7 @@ export const getCircleIntersections = (
 // The focus point is the tangent point of the "focus image" of the
 // `element`, where the tangent goes through `point`.
 export const findFocusPointForEllipse = (
-  ellipse: ExcalidrawEllipseElement,
+  ellipse: ExcalidrawEllipseElement | ExcalidrawCommentElement,
   // Between -1 and 1 (not 0) the relative size of the "focus image" of
   // the element on which the focus point lies
   relativeDistance: number,

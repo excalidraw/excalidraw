@@ -12,6 +12,7 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawRectangleElement,
+  ExcalidrawCommentElement,
 } from "../element/types";
 import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -115,6 +116,33 @@ const getTextElementPositionOffsets = (
         ? metrics.width
         : 0,
     y: opts.verticalAlign === "middle" ? metrics.height / 2 : 0,
+  };
+};
+
+export const newCommentElement = (opts: {
+  type: "comment";
+  x: number;
+  y: number;
+}): NonDeleted<ExcalidrawCommentElement> => {
+  const height = 40;
+  const width = 40;
+  return {
+    ..._newElementBase<ExcalidrawCommentElement>(opts.type, {
+      x: opts.x - width / 2,
+      y: opts.y - height / 2,
+      locked: false,
+      height,
+      width,
+      fillStyle: "solid",
+      strokeWidth: 4,
+      strokeStyle: "solid",
+      angle: 0,
+      opacity: 100,
+      strokeColor: "#495057",
+      backgroundColor: "#e64980",
+      strokeSharpness: "sharp",
+      roughness: 0,
+    }),
   };
 };
 

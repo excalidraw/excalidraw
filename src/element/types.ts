@@ -96,7 +96,8 @@ export type ExcalidrawGenericElement =
   | ExcalidrawSelectionElement
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
-  | ExcalidrawEllipseElement;
+  | ExcalidrawEllipseElement
+  | ExcalidrawCommentElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
@@ -134,7 +135,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawCommentElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
@@ -172,6 +174,11 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     pressures: readonly number[];
     simulatePressure: boolean;
     lastCommittedPoint: Point | null;
+  }>;
+
+export type ExcalidrawCommentElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "comment";
   }>;
 
 export type FileId = string & { _brand: "FileId" };

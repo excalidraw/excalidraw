@@ -52,6 +52,7 @@ import {
 } from "../element/textElement";
 import {
   isBoundToContainer,
+  isCommentElement,
   isLinearElement,
   isLinearElementType,
 } from "../element/typeChecks";
@@ -92,8 +93,9 @@ const changeProperty = (
   );
   return elements.map((element) => {
     if (
-      selectedElementIds.get(element.id) ||
-      element.id === appState.editingElement?.id
+      !isCommentElement(element) &&
+      (selectedElementIds.get(element.id) ||
+        element.id === appState.editingElement?.id)
     ) {
       return callback(element);
     }

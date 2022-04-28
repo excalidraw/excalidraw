@@ -119,12 +119,17 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
+import {
+  deepCopyElement,
+  newCommentElement,
+  newFreeDrawElement,
+} from "../element/newElement";
 import {
   hasBoundTextElement,
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
+  isCommentElement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -144,6 +149,7 @@ import {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
+  ExcalidrawCommentElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -3028,6 +3034,11 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type,
         pointerDownState,
       );
+    } else if (this.state.activeTool.type === "comment") {
+      this.handleCommentElementOnPointerDown(
+        this.state.activeTool.type,
+        pointerDownState,
+      );
     } else if (this.state.activeTool.type !== "eraser") {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -3528,10 +3539,14 @@ class App extends React.Component<AppProps, AppState> {
               !someHitElementIsSelected &&
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
+              const activeComment: ExcalidrawCommentElement | null =
+                isCommentElement(hitElement) ? hitElement : null;
+
               this.setState((prevState) => {
                 return selectGroupsForSelectedElements(
                   {
                     ...prevState,
+                    activeComment,
                     selectedElementIds: {
                       ...prevState.selectedElementIds,
                       [hitElement.id]: true,
@@ -3576,6 +3591,28 @@ class App extends React.Component<AppProps, AppState> {
       point.y < y2 + threshold
     );
   }
+
+  private handleCommentElementOnPointerDown = (
+    elementType: "comment",
+    pointerDownState: PointerDownState,
+  ): void => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      this.state.gridSize,
+    );
+
+    const element = newCommentElement({
+      type: elementType,
+      x: gridX,
+      y: gridY,
+    });
+
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      element,
+    ]);
+  };
 
   private handleTextOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
@@ -5163,6 +5200,7 @@ class App extends React.Component<AppProps, AppState> {
         isElementInGroup(hitElement, prevState.editingGroupId)
           ? prevState.editingGroupId
           : null,
+      activeComment: null,
     }));
     this.setState({
       selectedElementIds: {},

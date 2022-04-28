@@ -20,6 +20,7 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 import {
+  isCommentElement,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
@@ -406,6 +407,9 @@ export const resizeSingleElement = (
   pointerX: number,
   pointerY: number,
 ) => {
+  if (isCommentElement(element)) {
+    return;
+  }
   const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
   const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
@@ -701,8 +705,12 @@ const resizeMultipleElements = (
         if (!prev) {
           return prev;
         }
-        const width = element.width * scale;
-        const height = element.height * scale;
+        const width = isCommentElement(element)
+          ? element.width
+          : element.width * scale;
+        const height = isCommentElement(element)
+          ? element.height
+          : element.height * scale;
         const boundTextElement = getBoundTextElement(element);
         let font: { fontSize?: number; baseline?: number } = {};
 
@@ -795,32 +803,35 @@ const rotateMultipleElements = (
     centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
   elements.forEach((element, index) => {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    const cx = (x1 + x2) / 2;
-    const cy = (y1 + y2) / 2;
-    const origAngle =
-      pointerDownState.originalElements.get(element.id)?.angle ?? element.angle;
-    const [rotatedCX, rotatedCY] = rotate(
-      cx,
-      cy,
-      centerX,
-      centerY,
-      centerAngle + origAngle - element.angle,
-    );
-    mutateElement(element, {
-      x: element.x + (rotatedCX - cx),
-      y: element.y + (rotatedCY - cy),
-      angle: normalizeAngle(centerAngle + origAngle),
-    });
-    const boundTextElementId = getBoundTextElementId(element);
-    if (boundTextElementId) {
-      const textElement =
-        Scene.getScene(element)!.getElement(boundTextElementId)!;
-      mutateElement(textElement, {
-        x: textElement.x + (rotatedCX - cx),
-        y: textElement.y + (rotatedCY - cy),
+    if (!isCommentElement(element)) {
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+      const cx = (x1 + x2) / 2;
+      const cy = (y1 + y2) / 2;
+      const origAngle =
+        pointerDownState.originalElements.get(element.id)?.angle ??
+        element.angle;
+      const [rotatedCX, rotatedCY] = rotate(
+        cx,
+        cy,
+        centerX,
+        centerY,
+        centerAngle + origAngle - element.angle,
+      );
+      mutateElement(element, {
+        x: element.x + (rotatedCX - cx),
+        y: element.y + (rotatedCY - cy),
         angle: normalizeAngle(centerAngle + origAngle),
       });
+      const boundTextElementId = getBoundTextElementId(element);
+      if (boundTextElementId) {
+        const textElement =
+          Scene.getScene(element)!.getElement(boundTextElementId)!;
+        mutateElement(textElement, {
+          x: textElement.x + (rotatedCX - cx),
+          y: textElement.y + (rotatedCY - cy),
+          angle: normalizeAngle(centerAngle + origAngle),
+        });
+      }
     }
   });
 };

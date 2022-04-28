@@ -205,6 +205,12 @@ const drawElementOnCanvas = (
       rc.draw(getShapeForElement(element)!);
       break;
     }
+    case "comment": {
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      rc.draw(getShapeForElement(element)!);
+      break;
+    }
     case "arrow":
     case "line": {
       context.lineJoin = "round";
@@ -377,6 +383,17 @@ export const generateRoughOptions = (
       }
       return options;
     }
+    case "comment": {
+      options.fillStyle = element.fillStyle;
+      options.fill =
+        element.backgroundColor === "transparent"
+          ? undefined
+          : element.backgroundColor;
+      if (element.type === "comment") {
+        options.curveFitting = 1;
+      }
+      return options;
+    }
     case "line":
     case "freedraw": {
       if (isPathALoop(element.points)) {
@@ -485,6 +502,17 @@ const generateElementShape = (
         break;
       }
       case "ellipse":
+        shape = generator.ellipse(
+          element.width / 2,
+          element.height / 2,
+          element.width,
+          element.height,
+          generateRoughOptions(element),
+        );
+        setShapeForElement(element, shape);
+
+        break;
+      case "comment":
         shape = generator.ellipse(
           element.width / 2,
           element.height / 2,
@@ -776,6 +804,7 @@ export const renderElement = (
     case "rectangle":
     case "diamond":
     case "ellipse":
+    case "comment":
     case "line":
     case "arrow":
     case "image":
@@ -886,6 +915,9 @@ export const renderElementToSvg = (
         }) rotate(${degree} ${cx} ${cy})`,
       );
       root.appendChild(node);
+      break;
+    }
+    case "comment": {
       break;
     }
     case "line":

@@ -10,6 +10,7 @@ import {
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextContainer,
+  ExcalidrawCommentElement,
 } from "./types";
 
 export const isGenericElement = (
@@ -40,6 +41,12 @@ export const isTextElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawTextElement => {
   return element != null && element.type === "text";
+};
+
+export const isCommentElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawCommentElement => {
+  return element != null && element.type === "comment";
 };
 
 export const isFreeDrawElement = (

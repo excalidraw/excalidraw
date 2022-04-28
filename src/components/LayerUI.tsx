@@ -9,7 +9,7 @@ import { Language, t } from "../i18n";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
 import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
-import { muteFSAbortError } from "../utils";
+import { muteFSAbortError, setCursorForShape } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
@@ -38,6 +38,7 @@ import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
 import { useDeviceType } from "../components/App";
+import { CommentButton } from "./CommentButton";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -290,6 +291,24 @@ const LayerUI = ({
     />
   ) : null;
 
+  const addComment = () => {
+    const nextActiveTool: AppState["activeTool"] = {
+      type: "comment",
+      lastActiveToolBeforeEraser:
+        appState.activeTool.lastActiveToolBeforeEraser,
+      locked: appState.activeTool.locked,
+    };
+    setAppState({
+      activeTool: nextActiveTool,
+      multiElement: null,
+      selectedElementIds: {},
+    });
+    setCursorForShape(canvas, {
+      ...appState,
+      activeTool: nextActiveTool,
+    });
+  };
+
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
       appState,
@@ -360,6 +379,10 @@ const LayerUI = ({
                     <LibraryButton
                       appState={appState}
                       setAppState={setAppState}
+                    />
+                    <CommentButton
+                      addComment={addComment}
+                      appState={appState}
                     />
                   </Stack.Row>
                   {libraryMenu}

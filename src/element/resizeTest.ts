@@ -13,6 +13,7 @@ import {
   MaybeTransformHandleType,
 } from "./transformHandles";
 import { AppState, Zoom } from "../types";
+import { isCommentElement } from "./typeChecks";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
@@ -32,7 +33,7 @@ export const resizeTest = (
   zoom: Zoom,
   pointerType: PointerType,
 ): MaybeTransformHandleType => {
-  if (!appState.selectedElementIds[element.id]) {
+  if (!appState.selectedElementIds[element.id] || isCommentElement(element)) {
     return false;
   }
 

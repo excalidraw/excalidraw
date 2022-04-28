@@ -199,6 +199,9 @@ export const ShapesSwitcher = ({
 }) => (
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
+      if (value === "comment") {
+        return null;
+      }
       const label = t(`toolBar.${value}`);
       const letter = key && (typeof key === "string" ? key : key[0]);
       const shortcut = letter

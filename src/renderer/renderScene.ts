@@ -54,6 +54,7 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
+import { isCommentElement } from "../element/typeChecks";
 
 const hasEmojiSupport = supportsEmoji();
 
@@ -378,7 +379,10 @@ export const renderScene = (
         renderConfig.zoom,
         "mouse", // when we render we don't know which pointer type so use mouse
       );
-      if (!appState.viewModeEnabled) {
+      if (
+        !appState.viewModeEnabled &&
+        !isCommentElement(locallySelectedElements[0])
+      ) {
         renderTransformHandles(
           context,
           renderConfig,
