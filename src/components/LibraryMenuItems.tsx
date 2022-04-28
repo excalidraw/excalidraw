@@ -106,11 +106,6 @@ const LibraryMenuItems = ({
             icon={load}
             onClick={() => {
               importLibraryFromJSON(library)
-                .then(() => {
-                  // Close and then open to get the libraries updated
-                  setAppState({ isLibraryOpen: false });
-                  setAppState({ isLibraryOpen: true });
-                })
                 .catch(muteFSAbortError)
                 .catch((error) => {
                   setAppState({ errorMessage: error.message });

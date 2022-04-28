@@ -97,7 +97,9 @@ export const MIME_TYPES = {
   excalidrawlib: "application/vnd.excalidrawlib+json",
   json: "application/json",
   svg: "image/svg+xml",
+  "excalidraw.svg": "image/svg+xml",
   png: "image/png",
+  "excalidraw.png": "image/png",
   jpg: "image/jpeg",
   gif: "image/gif",
   binary: "application/octet-stream",
@@ -109,7 +111,8 @@ export const EXPORT_DATA_TYPES = {
   excalidrawLibrary: "excalidrawlib",
 } as const;
 
-export const EXPORT_SOURCE = window.location.origin;
+export const EXPORT_SOURCE =
+  window.EXCALIDRAW_EXPORT_SOURCE || window.location.origin;
 
 // time in milliseconds
 export const IMAGE_RENDER_TIMEOUT = 500;

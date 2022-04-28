@@ -9,6 +9,7 @@
     "copy": "Көшіру",
     "copyAsPng": "",
     "copyAsSvg": "",
+    "copyText": "",
     "bringForward": "",
     "sendToBack": "",
     "bringToFront": "",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "",
     "increaseFontSize": "",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -196,7 +204,8 @@
     "library": "",
     "lock": "",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "",
@@ -221,7 +230,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -281,14 +291,15 @@
     "howto": "Біздің нұсқаулықтарды орындаңыз",
     "or": "немесе",
     "preventBinding": "Нұсқарды байланыстыруға жол бермеу",
-    "shapes": "Пішіндер",
+    "tools": "",
     "shortcuts": "Пернетақта пәрмендері",
     "textFinish": "Өңдеуді аяқтау (мәтіндік редактор)",
     "textNewLine": "Жаңа жолға көшу (мәтіндік редактор)",
     "title": "Көмек",
     "view": "Көру",
     "zoomToFit": "Барлық элементтердің көлеміне сәйкес үлкейту",
-    "zoomToSelection": "Таңдалғанды үлкейту"
+    "zoomToSelection": "Таңдалғанды үлкейту",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
