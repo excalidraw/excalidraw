@@ -56,7 +56,7 @@ export const exportCanvas = async (
         {
           description: "Export to SVG",
           name,
-          extension: "svg",
+          extension: appState.exportEmbedScene ? "excalidraw.svg" : "svg",
           fileHandle,
         },
       );
@@ -89,7 +89,7 @@ export const exportCanvas = async (
     return await fileSave(blob, {
       description: "Export to PNG",
       name,
-      extension: "png",
+      extension: appState.exportEmbedScene ? "excalidraw.png" : "png",
       fileHandle,
     });
   } else if (type === "clipboard") {
