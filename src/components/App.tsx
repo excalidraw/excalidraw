@@ -149,7 +149,6 @@ import {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
-  ExcalidrawCommentElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -204,6 +203,7 @@ import {
   PointerDownState,
   SceneData,
   DeviceType,
+  ActiveComment,
 } from "../types";
 import {
   debounce,
@@ -1197,6 +1197,24 @@ class App extends React.Component<AppProps, AppState> {
       }
       // don't render text element that's being currently edited (it's
       // rendered on remote only)
+      if (
+        isCommentElement(element) &&
+        this.state.activeComment?.element.id === element.id
+      ) {
+        const { x: canvasX, y: canvasY } = sceneCoordsToViewportCoords(
+          {
+            sceneX: element.x,
+            sceneY: element.y,
+          },
+          this.state,
+        );
+        if (
+          canvasX !== this.state.activeComment.canvasX ||
+          canvasY !== this.state.activeComment.canvasY
+        ) {
+          this.props.onActiveCommentUpdate?.(element, canvasX, canvasY);
+        }
+      }
       return (
         !this.state.editingElement ||
         this.state.editingElement.type !== "text" ||
@@ -3548,8 +3566,22 @@ class App extends React.Component<AppProps, AppState> {
               !someHitElementIsSelected &&
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
-              const activeComment: ExcalidrawCommentElement | null =
-                isCommentElement(hitElement) ? hitElement : null;
+              let activeComment: ActiveComment | null = null;
+              if (isCommentElement(hitElement)) {
+                const { x: canvasX, y: canvasY } = sceneCoordsToViewportCoords(
+                  {
+                    sceneX: hitElement.x,
+                    sceneY: hitElement.y,
+                  },
+                  this.state,
+                );
+
+                activeComment = {
+                  element: hitElement,
+                  canvasX,
+                  canvasY,
+                };
+              }
 
               this.setState((prevState) => {
                 return selectGroupsForSelectedElements(

@@ -156,7 +156,13 @@ export type AppState = {
   /** imageElement waiting to be placed on canvas */
   pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
   showHyperlinkPopup: false | "info" | "editor";
-  activeComment: ExcalidrawCommentElement | null;
+  activeComment: ActiveComment | null;
+};
+
+export type ActiveComment = {
+  element: ExcalidrawCommentElement;
+  canvasX: number;
+  canvasY: number;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -270,13 +276,19 @@ export interface ExcalidrawProps {
       nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
   ) => void;
+  user?: User;
+  onActiveCommentUpdate?: (
+    element: ExcalidrawCommentElement,
+    canvasX: number,
+    canvasY: number,
+  ) => void;
 }
 
 export type User = {
-  first_name?: string;
-  last_name?: string | null;
-  email?: string;
-  image?: string | null;
+  first_name: string;
+  last_name: string | null;
+  email: string;
+  image: string | null;
 };
 
 export type SceneData = {

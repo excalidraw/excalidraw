@@ -234,6 +234,9 @@ export default function App() {
             renderTopRightUI={renderTopRightUI}
             renderFooter={renderFooter}
             onLinkOpen={onLinkOpen}
+            onActiveCommentUpdate={(element, x, y) => {
+              console.info("active comment updated", x, y);
+            }}
           />
         </div>
 
