@@ -507,7 +507,7 @@ const LayerUI = ({
 
   const dialogs = (
     <>
-      {appState.isLoading && <LoadingMessage />}
+      {appState.isLoading && <LoadingMessage delay={250} />}
       {appState.errorMessage && (
         <ErrorDialog
           message={appState.errorMessage}

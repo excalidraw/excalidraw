@@ -17,10 +17,13 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
-- Exported [`restoreLibraryItems`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreLibraryItems) API useful when dealing with libraries [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
+- Expose `window.EXCALIDRAW_EXPORT_SOURCE` which you can use to overwrite the `source` field in exported data [#5095](https://github.com/excalidraw/excalidraw/pull/5095).
+- The `exportToBlob` utility now supports the `exportEmbedScene` option when generating a png image [#5047](https://github.com/excalidraw/excalidraw/pull/5047).
+- Exported [`restoreLibraryItems`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreLibraryItems) API [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
 
 #### Fixes
 
+- Use `window.EXCALIDRAW_ASSET_PATH` for fonts when exporting to svg [#5065](https://github.com/excalidraw/excalidraw/pull/5065).
 - Library menu now properly rerenders if open when library is updated using `updateScene({ libraryItems })` [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
 
 #### Refactor

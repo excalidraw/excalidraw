@@ -9,6 +9,7 @@
     "copy": "拷贝",
     "copyAsPng": "复制为 PNG 到剪贴板",
     "copyAsSvg": "复制为 SVG 到剪贴板",
+    "copyText": "复制文本到剪贴板",
     "bringForward": "上移一层",
     "sendToBack": "置于底层",
     "bringToFront": "置于顶层",
@@ -77,8 +78,8 @@
     "name": "名字",
     "yourName": "您的姓名",
     "madeWithExcalidraw": "使用 Excalidraw 创建",
-    "group": "组选",
-    "ungroup": "取消组选",
+    "group": "编组",
+    "ungroup": "解除编组",
     "collaborators": "协作者",
     "showGrid": "显示网格",
     "addToLibrary": "添加到素材库中",
@@ -108,10 +109,17 @@
     "decreaseFontSize": "缩小字体大小",
     "increaseFontSize": "放大字体大小",
     "unbindText": "取消文本绑定",
+    "bindText": "将文本绑定到容器",
     "link": {
       "edit": "编辑链接",
       "create": "新建链接",
       "label": "链接"
+    },
+    "elementLock": {
+      "lock": "锁定",
+      "unlock": "解锁​​​​",
+      "lockAll": "全部锁定",
+      "unlockAll": "全部解锁"
     }
   },
   "buttons": {
@@ -160,7 +168,7 @@
     "couldNotLoadInvalidFile": "无法加载无效的文件",
     "importBackendFailed": "从后端导入失败。",
     "cannotExportEmptyCanvas": "无法导出空白画布。",
-    "couldNotCopyToClipboard": "无法复制到剪贴板，请尝试使用 Chrome 浏览器。",
+    "couldNotCopyToClipboard": "无法复制到剪贴板。",
     "decryptFailed": "无法解密数据。",
     "uploadedSecurly": "上传已被端到端加密保护，这意味着 Excalidraw 的服务器和第三方都无法读取内容。",
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
@@ -197,7 +205,8 @@
     "library": "素材库",
     "lock": "绘制后保持所选的工具栏状态",
     "penMode": "禁用手势缩放并只接收来自触控笔的输入",
-    "link": "为选中的形状添加/更新链接"
+    "link": "为选中的形状添加/更新链接",
+    "eraser": "橡皮"
   },
   "headings": {
     "canvasActions": "画布动作",
@@ -222,7 +231,8 @@
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
     "publishLibrary": "发布您自己的素材库",
     "bindTextToElement": "按下 Enter 以添加文本",
-    "deepBoxSelect": "按住 CtrlOrCmd 以深度选择，并避免拖拽"
+    "deepBoxSelect": "按住 CtrlOrCmd 以深度选择，并避免拖拽",
+    "eraserRevert": "按住 Alt 以反选被标记删除的元素"
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -282,14 +292,15 @@
     "howto": "帮助文档",
     "or": "或",
     "preventBinding": "禁用箭头吸附",
-    "shapes": "形状",
+    "tools": "工具",
     "shortcuts": "快捷键列表",
     "textFinish": "完成编辑 (文本编辑器)",
     "textNewLine": "添加新行(文本编辑器)",
     "title": "帮助",
     "view": "视图",
     "zoomToFit": "缩放以适应所有元素",
-    "zoomToSelection": "缩放到选区"
+    "zoomToSelection": "缩放到选区",
+    "toggleElementLock": "锁定/解锁"
   },
   "clearCanvasDialog": {
     "title": "清除画布"

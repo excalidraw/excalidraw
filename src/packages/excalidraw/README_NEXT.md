@@ -1021,7 +1021,7 @@ This function returns a promise which resolves to svg of the exported drawing.
 | exportBackground | boolean | true | Indicates whether background should be exported |
 | viewBackgroundColor | string | #fff | The default background color |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
-| exportEmbedScene | boolean | false | Indicates whether scene data should be embedded in svg. This will increase the svg size. |
+| exportEmbedScene | boolean | false | Indicates whether scene data should be embedded in svg/png. This will increase the image size. |
 
 ### Extra API's
 
@@ -1038,6 +1038,8 @@ serializeAsJSON({
 
 Takes the scene elements and state and returns a JSON string. Deleted `elements`as well as most properties from `AppState` are removed from the resulting JSON. (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/src/data/json.ts#L16) source for details).
 
+If you want to overwrite the source field in the JSON string, you can set `window.EXCALIDRAW_EXPORT_SOURCE` to the desired value.
+
 #### `serializeLibraryAsJSON`
 
 **_Signature_**
@@ -1048,6 +1050,8 @@ serializeLibraryAsJSON({
 </pre>
 
 Takes the library items and returns a JSON string.
+
+If you want to overwrite the source field in the JSON string, you can set `window.EXCALIDRAW_EXPORT_SOURCE` to the desired value.
 
 #### `getSceneVersion`
 

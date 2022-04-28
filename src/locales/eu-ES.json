@@ -9,6 +9,7 @@
     "copy": "Kopiatu",
     "copyAsPng": "Kopiatu arbelera PNG gisa",
     "copyAsSvg": "Kopiatu arbelera SVG gisa",
+    "copyText": "Kopiatu arbelera testu gisa",
     "bringForward": "Ekarri aurrerago",
     "sendToBack": "Eraman atzera",
     "bringToFront": "Ekarri aurrera",
@@ -64,7 +65,7 @@
     "cartoonist": "Marrazkilaria",
     "fileTitle": "Fitxategi izena",
     "colorPicker": "Kolore-hautatzailea",
-    "canvasColors": "",
+    "canvasColors": "Oihalean erabilita",
     "canvasBackground": "Oihalaren atzeko planoa",
     "drawingCanvas": "Marrazteko oihala",
     "layers": "Geruzak",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "Txikitu letra tamaina",
     "increaseFontSize": "Handitu letra tamaina",
     "unbindText": "Askatu testua",
+    "bindText": "Lotu testua edukiontziari",
     "link": {
       "edit": "Editatu esteka",
       "create": "Sortu esteka",
       "label": "Esteka"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -181,7 +189,7 @@
     "fileTooBig": "Fitxategia handiegia da. Onartutako gehienezko tamaina {{maxSize}} da.",
     "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
     "invalidSVGString": "SVG baliogabea.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro."
   },
   "toolBar": {
     "selection": "Hautapena",
@@ -196,7 +204,8 @@
     "library": "Liburutegia",
     "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
     "penMode": "Saihestu txikiagotzea eta onartu marrazte libreko idazketa solik arkatza bidez",
-    "link": "Gehitu / Eguneratu esteka hautatutako forma baterako"
+    "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
+    "eraser": "Borragoma"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -221,7 +230,8 @@
     "placeImage": "Egin klik irudia kokatzeko, edo egin klik eta arrastatu bere tamaina eskuz ezartzeko",
     "publishLibrary": "Argitaratu zure liburutegia",
     "bindTextToElement": "Sakatu Sartu testua gehitzeko",
-    "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko"
+    "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko",
+    "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko"
   },
   "canvasError": {
     "cannotShowPreview": "Ezin da oihala aurreikusi",
@@ -281,14 +291,15 @@
     "howto": "Jarraitu gure gidak",
     "or": "edo",
     "preventBinding": "Saihestu gezien gainjartzea",
-    "shapes": "Formak",
+    "tools": "Tresnak",
     "shortcuts": "Laster-teklak",
     "textFinish": "Bukatu edizioa (testu editorea)",
     "textNewLine": "Gehitu lerro berri bat (testu editorea)",
     "title": "Laguntza",
     "view": "Bistaratu",
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
-    "zoomToSelection": "Zooma hautapenera"
+    "zoomToSelection": "Zooma hautapenera",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Garbitu oihala"

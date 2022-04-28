@@ -1,12 +1,11 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{migrations} {
-      match /{scenes}/{scene} {
-      	allow get, write: if true;
-        // redundant, but let's be explicit'
-        allow list: if false;
-      }
+    match /{files}/rooms/{room}/{file} {
+    	allow get, write: if true;
+    }
+    match /{files}/shareLinks/{shareLink}/{file} {
+    	allow get, write: if true;
     }
   }
 }
