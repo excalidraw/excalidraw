@@ -8,11 +8,15 @@ import {
   BinaryFileMetadata,
   DataURL,
 } from "../../types";
-import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
+import {
+  DELETED_ELEMENT_TIMEOUT,
+  FILE_CACHE_MAX_AGE_SEC,
+} from "../app_constants";
 import { decompressData } from "../../data/encode";
 import { encryptData, decryptData } from "../../data/encryption";
 import { MIME_TYPES } from "../../constants";
 import { reconcileElements } from "../collab/reconciliation";
+import { getUpdatedTimestamp } from "../../utils";
 
 // private
 // -----------------------------------------------------------------------------
@@ -106,7 +110,13 @@ const encryptElements = async (
   key: string,
   elements: readonly ExcalidrawElement[],
 ): Promise<{ ciphertext: ArrayBuffer; iv: Uint8Array }> => {
-  const json = JSON.stringify(elements.filter((el) => !el.isDeleted));
+  const json = JSON.stringify(
+    elements.filter(
+      (el) =>
+        !el.isDeleted ||
+        el.updated >= getUpdatedTimestamp() - DELETED_ELEMENT_TIMEOUT,
+    ),
+  );
   const encoded = new TextEncoder().encode(json);
   const { encryptedBuffer, iv } = await encryptData(key, encoded);
 
