@@ -25,9 +25,9 @@ export const actionAddToLibrary = register({
     }
 
     return app.library
-      .loadLibrary()
+      .getLatestLibrary()
       .then((items) => {
-        return app.library.saveLibrary([
+        return app.library.setLibrary([
           {
             id: randomId(),
             status: "unpublished",

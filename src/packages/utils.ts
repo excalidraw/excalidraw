@@ -194,3 +194,4 @@ export const exportToClipboard = async (
 export { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";
 export { loadFromBlob, loadLibraryFromBlob } from "../data/blob";
 export { getFreeDrawSvgPath } from "../renderer/renderElement";
+export { mergeLibraryItems } from "../data/library";
