@@ -257,6 +257,7 @@ import {
   isPointHittingLinkIcon,
   isLocalLink,
 } from "../element/Hyperlink";
+import { AbortError } from "../errors";
 
 const defaultDeviceTypeContext: DeviceType = {
   isMobile: false,
@@ -703,21 +704,35 @@ class App extends React.Component<AppProps, AppState> {
       window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
     }
 
+    const defaultStatus = "published";
+
+    this.setState({ isLibraryOpen: true });
+
     try {
-      const request = await fetch(decodeURIComponent(url));
-      const blob = await request.blob();
-      const defaultStatus = "published";
-      const libraryItems = await loadLibraryFromBlob(blob, defaultStatus);
-      if (
-        token === this.id ||
-        window.confirm(
-          t("alerts.confirmAddLibrary", {
-            numShapes: libraryItems.length,
-          }),
-        )
-      ) {
-        await this.library.importLibrary(libraryItems, defaultStatus);
-      }
+      await this.library.importLibrary(
+        new Promise<LibraryItems>(async (resolve, reject) => {
+          try {
+            const request = await fetch(decodeURIComponent(url));
+            const blob = await request.blob();
+            const libraryItems = await loadLibraryFromBlob(blob, defaultStatus);
+
+            if (
+              token === this.id ||
+              window.confirm(
+                t("alerts.confirmAddLibrary", {
+                  numShapes: libraryItems.length,
+                }),
+              )
+            ) {
+              resolve(libraryItems);
+            } else {
+              reject(new AbortError());
+            }
+          } catch (error: any) {
+            reject(error);
+          }
+        }),
+      );
     } catch (error: any) {
       console.error(error);
       this.setState({ errorMessage: t("errors.importLibraryError") });
@@ -1674,6 +1689,11 @@ class App extends React.Component<AppProps, AppState> {
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
       libraryItems?:
+        | ((
+            currentLibraryItems: LibraryItems,
+          ) =>
+            | Required<SceneData>["libraryItems"]
+            | Promise<Required<SceneData>["libraryItems"]>)
         | Required<SceneData>["libraryItems"]
         | Promise<Required<SceneData>["libraryItems"]>;
     }) => {
@@ -1694,20 +1714,20 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.libraryItems) {
-        this.library.saveLibrary(
-          new Promise<LibraryItems>(async (resolve, reject) => {
+        this.library.setLibrary((currentLibraryItems) => {
+          const nextItems =
+            typeof sceneData.libraryItems === "function"
+              ? sceneData.libraryItems(currentLibraryItems)
+              : sceneData.libraryItems;
+
+          return new Promise<LibraryItems>(async (resolve, reject) => {
             try {
-              resolve(
-                restoreLibraryItems(
-                  await sceneData.libraryItems,
-                  "unpublished",
-                ),
-              );
-            } catch {
-              reject(new Error(t("errors.importLibraryError")));
+              resolve(restoreLibraryItems(await nextItems, "unpublished"));
+            } catch (error: any) {
+              reject(error);
             }
-          }),
-        );
+          });
+        });
       }
     },
   );
@@ -5280,11 +5300,14 @@ class App extends React.Component<AppProps, AppState> {
       file?.type === MIME_TYPES.excalidrawlib ||
       file?.name?.endsWith(".excalidrawlib")
     ) {
-      this.library
-        .importLibrary(file)
-        .catch((error) =>
-          this.setState({ isLoading: false, errorMessage: error.message }),
-        );
+      this.setState({ isLibraryOpen: true });
+      this.library.importLibrary(file).catch((error) => {
+        console.error(error);
+        this.setState({
+          isLoading: false,
+          errorMessage: t("errors.importLibraryError"),
+        });
+      });
       // default: assume an Excalidraw file regardless of extension/MimeType
     } else if (file) {
       this.setState({ isLoading: true });
