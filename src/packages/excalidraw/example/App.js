@@ -150,7 +150,7 @@ export default function App() {
     await exportToClipboard({
       elements: excalidrawRef.current.getSceneElements(),
       appState: excalidrawRef.current.getAppState(),
-      files: excalidrawRef.getFiles(),
+      files: excalidrawRef.current.getFiles(),
       type,
     });
     window.alert(`Copied to clipboard as ${type} sucessfully`);
