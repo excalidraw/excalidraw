@@ -203,9 +203,17 @@ const PlusLinkJSX = (
 );
 
 const getLibraryUrlTokens = () => {
-  const hash = new URLSearchParams(window.location.hash.slice(1));
-  const libraryUrl = hash.get(URL_HASH_KEYS.addLibrary);
-  const idToken = hash.get("token");
+  const libraryUrl =
+    // current
+    new URLSearchParams(window.location.hash.slice(1)).get(
+      URL_HASH_KEYS.addLibrary,
+    ) ||
+    // legacy, kept for compat reasons
+    new URLSearchParams(window.location.search).get(URL_QUERY_KEYS.addLibrary);
+  const idToken = libraryUrl
+    ? new URLSearchParams(window.location.hash.slice(1)).get("token")
+    : null;
+
   return libraryUrl ? { libraryUrl, idToken } : null;
 };
 
