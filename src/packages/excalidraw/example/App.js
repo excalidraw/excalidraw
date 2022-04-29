@@ -53,6 +53,7 @@ export default function App() {
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
   const [exportEmbedScene, setExportEmbedScene] = useState(false);
   const [theme, setTheme] = useState("light");
+  const [isCollaborating, setIsCollaborating] = useState(false);
 
   const initialStatePromiseRef = useRef({ promise: null });
   if (!initialStatePromiseRef.current.promise) {
@@ -212,6 +213,36 @@ export default function App() {
               }}
             />
             Switch to Dark Theme
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={isCollaborating}
+              onChange={() => {
+                if (!isCollaborating) {
+                  const collaborators = new Map();
+                  collaborators.set("id1", {
+                    username: "Aakansha",
+                    avatarUrl: "https://avatars.githubusercontent.com/ad1992",
+                  });
+                  collaborators.set("id2", {
+                    username: "Excalibot",
+                    avatarUrl:
+                      "https://avatars.githubusercontent.com/excalibot",
+                  });
+                  collaborators.set("id3", {
+                    username: "Lisa",
+                  });
+                  excalidrawRef.current.updateScene({ collaborators });
+                } else {
+                  excalidrawRef.current.updateScene({
+                    collaborators: new Map(),
+                  });
+                }
+                setIsCollaborating(!isCollaborating);
+              }}
+            />
+            Show collaborators
           </label>
         </div>
         <div className="excalidraw-wrapper">

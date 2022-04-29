@@ -478,7 +478,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             user.button = button;
             user.selectedElementIds = selectedElementIds;
             user.username = username;
+            user.avatarUrl =
+              "https://lh6.googleusercontent.com/-dZw-mZManmo/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuckRdFLy0UnEICJgB6QnRNJAfI743g/photo.jpg";
             collaborators.set(socketId, user);
+
             this.excalidrawAPI.updateScene({
               collaborators,
             });

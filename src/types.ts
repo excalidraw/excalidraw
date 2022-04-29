@@ -45,6 +45,7 @@ export type Collaborator = {
     background: string;
     stroke: string;
   };
+  avatarUrl?: string;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
