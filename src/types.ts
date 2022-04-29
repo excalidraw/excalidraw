@@ -185,7 +185,7 @@ export declare class GestureEvent extends UIEvent {
 /** @deprecated legacy: do not use outside of migration paths */
 export type LibraryItem_v1 = readonly NonDeleted<ExcalidrawElement>[];
 /** @deprecated legacy: do not use outside of migration paths */
-export type LibraryItems_v1 = readonly LibraryItem_v1[];
+type LibraryItems_v1 = readonly LibraryItem_v1[];
 
 /** v2 library item */
 export type LibraryItem = {
@@ -198,6 +198,7 @@ export type LibraryItem = {
   error?: string;
 };
 export type LibraryItems = readonly LibraryItem[];
+export type LibraryItems_anyVersion = LibraryItems | LibraryItems_v1;
 // -----------------------------------------------------------------------------
 
 // NOTE ready/readyPromise props are optional for host apps' sake (our own
@@ -275,7 +276,7 @@ export type SceneData = {
   appState?: ImportedDataState["appState"];
   collaborators?: Map<string, Collaborator>;
   commitToHistory?: boolean;
-  libraryItems?: LibraryItems | LibraryItems_v1;
+  libraryItems?: LibraryItems_anyVersion;
 };
 
 export enum UserIdleState {
@@ -410,6 +411,7 @@ export type PointerDownState = Readonly<{
 
 export type ExcalidrawImperativeAPI = {
   updateScene: InstanceType<typeof App>["updateScene"];
+  updateLibrary: InstanceType<typeof Library>["updateLibrary"];
   resetScene: InstanceType<typeof App>["resetScene"];
   getSceneElementsIncludingDeleted: InstanceType<
     typeof App
@@ -422,7 +424,6 @@ export type ExcalidrawImperativeAPI = {
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
   refresh: InstanceType<typeof App>["refresh"];
-  importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
   setToastMessage: InstanceType<typeof App>["setToastMessage"];
   addFiles: (data: BinaryFileData[]) => void;
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;

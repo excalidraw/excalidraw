@@ -1,10 +1,11 @@
 import { loadLibraryFromBlob } from "./blob";
-import { LibraryItems, LibraryItem } from "../types";
+import { LibraryItems, LibraryItem, LibraryItems_anyVersion } from "../types";
 import { restoreLibraryItems } from "./restore";
 import type App from "../components/App";
-import { ImportedDataState } from "./types";
 import { atom } from "jotai";
 import { jotaiStore } from "../jotai";
+import { AbortError } from "../errors";
+import { t } from "../i18n";
 
 export const libraryItemsAtom = atom<{
   status: "loading" | "loaded";
@@ -103,36 +104,6 @@ class Library {
   };
 
   /**
-   * imports library (from blob or libraryItems), merging with current library
-   * (attempting to remove duplicates)
-   */
-  importLibrary(
-    library:
-      | Blob
-      | Required<ImportedDataState>["libraryItems"]
-      | Promise<Required<ImportedDataState>["libraryItems"]>,
-    defaultStatus: LibraryItem["status"] = "unpublished",
-  ): Promise<LibraryItems> {
-    return this.setLibrary(
-      () =>
-        new Promise<LibraryItems>(async (resolve, reject) => {
-          try {
-            let libraryItems: LibraryItems;
-            if (library instanceof Blob) {
-              libraryItems = await loadLibraryFromBlob(library, defaultStatus);
-            } else {
-              libraryItems = restoreLibraryItems(await library, defaultStatus);
-            }
-
-            resolve(mergeLibraryItems(this.lastLibraryItems, libraryItems));
-          } catch (error) {
-            reject(error);
-          }
-        }),
-    );
-  }
-
-  /**
    * @returns latest cloned libraryItems. Awaits all in-progress updates first.
    */
   getLatestLibrary = (): Promise<LibraryItems> => {
@@ -149,6 +120,85 @@ class Library {
         return resolve(this.lastLibraryItems);
       }
     });
+  };
+
+  // NOTE this is a high-level public API (eposed on ExcalidrawAPI) with
+  // a slight overhead (always restoring library items). For internal use
+  // where merging isn't needed, use `library.setLibrary()` directly.
+  updateLibrary = async ({
+    libraryItems,
+    prompt = false,
+    merge = false,
+    openLibraryMenu = false,
+    handleError = false,
+    defaultStatus = "unpublished",
+  }: {
+    libraryItems:
+      | ((
+          currentLibraryItems: LibraryItems,
+        ) =>
+          | Blob
+          | LibraryItems_anyVersion
+          | Promise<LibraryItems_anyVersion | Blob>)
+      | Blob
+      | LibraryItems_anyVersion
+      | Promise<LibraryItems_anyVersion | Blob>;
+    merge?: boolean;
+    prompt?: boolean;
+    openLibraryMenu?: boolean;
+    handleError?: boolean;
+    defaultStatus?: "unpublished" | "published";
+  }) => {
+    if (openLibraryMenu) {
+      this.app.setState({ isLibraryOpen: true });
+    }
+
+    this.setLibrary(() => {
+      return new Promise<LibraryItems>(async (resolve, reject) => {
+        try {
+          const source = await (typeof libraryItems === "function"
+            ? libraryItems(this.lastLibraryItems)
+            : libraryItems);
+
+          let nextItems;
+
+          if (source instanceof Blob) {
+            nextItems = await loadLibraryFromBlob(source, defaultStatus);
+          } else {
+            nextItems = restoreLibraryItems(source, defaultStatus);
+          }
+          if (
+            !prompt ||
+            window.confirm(
+              t("alerts.confirmAddLibrary", {
+                numShapes: nextItems.length,
+              }),
+            )
+          ) {
+            if (merge) {
+              resolve(mergeLibraryItems(this.lastLibraryItems, nextItems));
+            } else {
+              resolve(nextItems);
+            }
+          } else {
+            reject(new AbortError());
+          }
+        } catch (error: any) {
+          reject(error);
+        }
+      });
+    })
+      .catch((error) => {
+        if (handleError) {
+          console.error(error);
+          this.app.setState({ errorMessage: t("errors.importLibraryError") });
+        } else {
+          throw error;
+        }
+      })
+      .finally(() => {
+        this.app.focusContainer();
+      });
   };
 
   setLibrary = (

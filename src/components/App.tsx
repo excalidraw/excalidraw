@@ -70,14 +70,12 @@ import {
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   THEME,
   TOUCH_CTX_MENU_TIMEOUT,
-  URL_HASH_KEYS,
-  URL_QUERY_KEYS,
   VERTICAL_ALIGN,
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
 import Library from "../data/library";
-import { restore, restoreElements, restoreLibraryItems } from "../data/restore";
+import { restore, restoreElements } from "../data/restore";
 import {
   dragNewElement,
   dragSelectedElements,
@@ -230,7 +228,6 @@ import {
   generateIdFromFile,
   getDataURL,
   isSupportedImageFile,
-  loadLibraryFromBlob,
   resizeImageFile,
   SVGStringToFile,
 } from "../data/blob";
@@ -257,7 +254,6 @@ import {
   isPointHittingLinkIcon,
   isLocalLink,
 } from "../element/Hyperlink";
-import { AbortError } from "../errors";
 
 const defaultDeviceTypeContext: DeviceType = {
   isMobile: false,
@@ -357,6 +353,8 @@ class App extends React.Component<AppProps, AppState> {
 
     this.id = nanoid();
 
+    this.library = new Library(this);
+
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -366,6 +364,7 @@ class App extends React.Component<AppProps, AppState> {
         ready: true,
         readyPromise,
         updateScene: this.updateScene,
+        updateLibrary: this.library.updateLibrary,
         addFiles: this.addFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
@@ -377,7 +376,6 @@ class App extends React.Component<AppProps, AppState> {
         getAppState: () => this.state,
         getFiles: () => this.files,
         refresh: this.refresh,
-        importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
         id: this.id,
       } as const;
@@ -395,7 +393,6 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.scene = new Scene();
-    this.library = new Library(this);
     this.history = new History();
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -693,54 +690,6 @@ class App extends React.Component<AppProps, AppState> {
     this.onSceneUpdated();
   };
 
-  private importLibraryFromUrl = async (url: string, token?: string | null) => {
-    if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
-      const hash = new URLSearchParams(window.location.hash.slice(1));
-      hash.delete(URL_HASH_KEYS.addLibrary);
-      window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
-    } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
-      const query = new URLSearchParams(window.location.search);
-      query.delete(URL_QUERY_KEYS.addLibrary);
-      window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
-    }
-
-    const defaultStatus = "published";
-
-    this.setState({ isLibraryOpen: true });
-
-    try {
-      await this.library.importLibrary(
-        new Promise<LibraryItems>(async (resolve, reject) => {
-          try {
-            const request = await fetch(decodeURIComponent(url));
-            const blob = await request.blob();
-            const libraryItems = await loadLibraryFromBlob(blob, defaultStatus);
-
-            if (
-              token === this.id ||
-              window.confirm(
-                t("alerts.confirmAddLibrary", {
-                  numShapes: libraryItems.length,
-                }),
-              )
-            ) {
-              resolve(libraryItems);
-            } else {
-              reject(new AbortError());
-            }
-          } catch (error: any) {
-            reject(error);
-          }
-        }),
-      );
-    } catch (error: any) {
-      console.error(error);
-      this.setState({ errorMessage: t("errors.importLibraryError") });
-    } finally {
-      this.focusContainer();
-    }
-  };
-
   private resetHistory = () => {
     this.history.clear();
   };
@@ -800,7 +749,10 @@ class App extends React.Component<AppProps, AppState> {
     try {
       initialData = (await this.props.initialData) || null;
       if (initialData?.libraryItems) {
-        this.library.importLibrary(initialData.libraryItems, "unpublished");
+        this.library.updateLibrary({
+          libraryItems: initialData.libraryItems,
+          merge: true,
+        });
       }
     } catch (error: any) {
       console.error(error);
@@ -812,10 +764,10 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-
     const scene = restore(initialData, null, null);
     scene.appState = {
       ...scene.appState,
+      isLibraryOpen: this.state.isLibraryOpen,
       activeTool:
         scene.appState.activeTool.type === "image"
           ? { ...scene.appState.activeTool, type: "selection" }
@@ -844,20 +796,6 @@ class App extends React.Component<AppProps, AppState> {
       ...scene,
       commitToHistory: true,
     });
-
-    const libraryUrl =
-      // current
-      new URLSearchParams(window.location.hash.slice(1)).get(
-        URL_HASH_KEYS.addLibrary,
-      ) ||
-      // legacy, kept for compat reasons
-      new URLSearchParams(window.location.search).get(
-        URL_QUERY_KEYS.addLibrary,
-      );
-
-    if (libraryUrl) {
-      await this.importLibraryFromUrl(libraryUrl);
-    }
   };
 
   public async componentDidMount() {
@@ -1688,14 +1626,6 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
-      libraryItems?:
-        | ((
-            currentLibraryItems: LibraryItems,
-          ) =>
-            | Required<SceneData>["libraryItems"]
-            | Promise<Required<SceneData>["libraryItems"]>)
-        | Required<SceneData>["libraryItems"]
-        | Promise<Required<SceneData>["libraryItems"]>;
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1711,23 +1641,6 @@ class App extends React.Component<AppProps, AppState> {
 
       if (sceneData.collaborators) {
         this.setState({ collaborators: sceneData.collaborators });
-      }
-
-      if (sceneData.libraryItems) {
-        this.library.setLibrary((currentLibraryItems) => {
-          const nextItems =
-            typeof sceneData.libraryItems === "function"
-              ? sceneData.libraryItems(currentLibraryItems)
-              : sceneData.libraryItems;
-
-          return new Promise<LibraryItems>(async (resolve, reject) => {
-            try {
-              resolve(restoreLibraryItems(await nextItems, "unpublished"));
-            } catch (error: any) {
-              reject(error);
-            }
-          });
-        });
       }
     },
   );
@@ -5300,13 +5213,11 @@ class App extends React.Component<AppProps, AppState> {
       file?.type === MIME_TYPES.excalidrawlib ||
       file?.name?.endsWith(".excalidrawlib")
     ) {
-      this.setState({ isLibraryOpen: true });
-      this.library.importLibrary(file).catch((error) => {
-        console.error(error);
-        this.setState({
-          isLoading: false,
-          errorMessage: t("errors.importLibraryError"),
-        });
+      this.library.updateLibrary({
+        libraryItems: file,
+        merge: true,
+        openLibraryMenu: true,
+        handleError: true,
       });
       // default: assume an Excalidraw file regardless of extension/MimeType
     } else if (file) {
