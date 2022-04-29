@@ -234,8 +234,8 @@ export default function App() {
             <button onClick={onCopy.bind(null, "svg")}>
               Copy to Clipboard as SVG
             </button>
-            <button onClick={onCopy.bind(null, "text")}>
-              Copy to Clipboard as Text
+            <button onClick={onCopy.bind(null, "json")}>
+              Copy to Clipboard as JSON
             </button>
           </div>
         </div>

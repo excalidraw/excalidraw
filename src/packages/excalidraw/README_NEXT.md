@@ -909,7 +909,7 @@ exportToClipboard(
   opts: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L14">ExportOpts</a> & {
   mimeType?: string,
   quality?: number;
-  type: 'png' | 'svg' |'text'
+  type: 'png' | 'svg' |'json'
 })
 </pre>
 
@@ -918,7 +918,7 @@ exportToClipboard(
 | opts |  |  | This param is same as the params passed to `exportToCanvas`. You can refer to [`exportToCanvas`](#exportToCanvas). |
 | mimeType | string | "image/png" | Indicates the image format, this will be used when exporting as `png`. |
 | quality | number | 0.92 | A value between 0 and 1 indicating the [image quality](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#parameters). Applies only to `image/jpeg`/`image/webp` MIME types. This will be used when exporting as `png`. |
-| type | 'png' | 'svg' | 'text' |  | This determines the format to which the scene data should be exported. |
+| type | 'png' | 'svg' | 'json' |  | This determines the format to which the scene data should be exported. |
 
 **How to use**
 

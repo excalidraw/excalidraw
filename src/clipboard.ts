@@ -2,7 +2,6 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { getSelectedElements } from "./scene";
 import { AppState, BinaryFiles } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
@@ -12,7 +11,7 @@ import { isPromiseLike } from "./utils";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
-  elements: ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles | undefined;
 };
 
@@ -60,12 +59,11 @@ export const copyToClipboard = async (
   files: BinaryFiles | null,
 ) => {
   // select binded text elements when copying
-  const selectedElements = getSelectedElements(elements, appState, true);
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
-    elements: selectedElements,
+    elements,
     files: files
-      ? selectedElements.reduce((acc, element) => {
+      ? elements.reduce((acc, element) => {
           if (isInitializedImageElement(element) && files[element.fileId]) {
             acc[element.fileId] = files[element.fileId];
           }

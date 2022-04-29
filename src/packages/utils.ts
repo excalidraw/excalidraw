@@ -168,7 +168,7 @@ export const exportToClipboard = async (
   opts: ExportOpts & {
     mimeType?: string;
     quality?: number;
-    type: "png" | "svg" | "text";
+    type: "png" | "svg" | "json";
   },
 ) => {
   if (opts.type === "svg") {
@@ -176,7 +176,7 @@ export const exportToClipboard = async (
     await copyTextToSystemClipboard(svg.outerHTML);
   } else if (opts.type === "png") {
     await copyBlobToClipboardAsPng(exportToBlob(opts));
-  } else if (opts.type === "text") {
+  } else if (opts.type === "json") {
     const appState = {
       offsetTop: 0,
       offsetLeft: 0,
