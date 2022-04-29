@@ -1689,6 +1689,11 @@ class App extends React.Component<AppProps, AppState> {
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
       libraryItems?:
+        | ((
+            currentLibraryItems: LibraryItems,
+          ) =>
+            | Required<SceneData>["libraryItems"]
+            | Promise<Required<SceneData>["libraryItems"]>)
         | Required<SceneData>["libraryItems"]
         | Promise<Required<SceneData>["libraryItems"]>;
     }) => {
@@ -1709,20 +1714,20 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.libraryItems) {
-        this.library.setLibrary(
-          new Promise<LibraryItems>(async (resolve, reject) => {
+        this.library.setLibrary((currentLibraryItems) => {
+          const nextItems =
+            typeof sceneData.libraryItems === "function"
+              ? sceneData.libraryItems(currentLibraryItems)
+              : sceneData.libraryItems;
+
+          return new Promise<LibraryItems>(async (resolve, reject) => {
             try {
-              resolve(
-                restoreLibraryItems(
-                  await sceneData.libraryItems,
-                  "unpublished",
-                ),
-              );
+              resolve(restoreLibraryItems(await nextItems, "unpublished"));
             } catch (error: any) {
               reject(error);
             }
-          }),
-        );
+          });
+        });
       }
     },
   );
