@@ -26,7 +26,10 @@ const resolvablePromise = () => {
 
 const renderTopRightUI = () => {
   return (
-    <button onClick={() => alert("This is dummy top right UI")}>
+    <button
+      onClick={() => alert("This is dummy top right UI")}
+      style={{ height: "2.5rem" }}
+    >
       {" "}
       Click me{" "}
     </button>
@@ -222,8 +225,8 @@ export default function App() {
                 if (!isCollaborating) {
                   const collaborators = new Map();
                   collaborators.set("id1", {
-                    username: "Aakansha",
-                    avatarUrl: "https://avatars.githubusercontent.com/ad1992",
+                    username: "Doremon",
+                    avatarUrl: "doremon.png",
                   });
                   collaborators.set("id2", {
                     username: "Excalibot",
@@ -231,7 +234,8 @@ export default function App() {
                       "https://avatars.githubusercontent.com/excalibot",
                   });
                   collaborators.set("id3", {
-                    username: "Lisa",
+                    username: "Pika",
+                    avatarUrl: "pika.jpeg",
                   });
                   excalidrawRef.current.updateScene({ collaborators });
                 } else {
