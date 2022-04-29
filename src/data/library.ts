@@ -39,6 +39,22 @@ const isUniqueItem = (
   });
 };
 
+/** Merges otherItems into localItems. Unique items in otherItems array are
+    sorted first. */
+export const mergeLibraryItems = (
+  localItems: LibraryItems,
+  otherItems: LibraryItems,
+): LibraryItems => {
+  const newItems = [];
+  for (const item of otherItems) {
+    if (isUniqueItem(localItems, item)) {
+      newItems.push(item);
+    }
+  }
+
+  return [...newItems, ...localItems];
+};
+
 class Library {
   /** latest libraryItems */
   private lastLibraryItems: LibraryItems = [];
@@ -108,16 +124,7 @@ class Library {
               libraryItems = restoreLibraryItems(await library, defaultStatus);
             }
 
-            const existingLibraryItems = this.lastLibraryItems;
-
-            const filteredItems = [];
-            for (const item of libraryItems) {
-              if (isUniqueItem(existingLibraryItems, item)) {
-                filteredItems.push(item);
-              }
-            }
-
-            resolve([...filteredItems, ...existingLibraryItems]);
+            resolve(mergeLibraryItems(this.lastLibraryItems, libraryItems));
           } catch (error) {
             reject(error);
           }

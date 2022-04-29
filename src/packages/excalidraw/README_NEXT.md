@@ -1040,6 +1040,20 @@ getNonDeletedElements(elements: <a href="https://github.com/excalidraw/excalidra
 
 This function returns an array of deleted elements.
 
+#### `mergeLibraryItems`
+
+```js
+import { mergeLibraryItems } from "@excalidraw/excalidraw-next";
+```
+
+**_Signature_**
+
+<pre>
+mergeLibraryItems(localItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>, otherItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>
+</pre>
+
+This function merges two `LibraryItems` arrays, where unique items from `otherItems` are sorted first in the returned array.
+
 ### Exported constants
 
 #### `FONT_FAMILY`
