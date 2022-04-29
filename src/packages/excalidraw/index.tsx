@@ -197,6 +197,7 @@ export {
   loadLibraryFromBlob,
   loadFromBlob,
   getFreeDrawSvgPath,
+  exportToClipboard,
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
 
