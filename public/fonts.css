@@ -11,3 +11,9 @@
   src: url("Cascadia.woff2");
   font-display: swap;
 }
+
+@font-face {
+  font-family: "Yozai";
+	src: url("Yozai-Regular.ttf");  
+	font-display: swap;
+}

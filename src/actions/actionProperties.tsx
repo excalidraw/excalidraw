@@ -666,6 +666,11 @@ export const actionChangeFontFamily = register({
         text: t("labels.code"),
         icon: <FontFamilyCodeIcon theme={appState.theme} />,
       },
+      {
+        value: FONT_FAMILY.Yozai,
+        text: "Yozai字体",
+        icon: <FontFamilyNormalIcon theme={appState.theme} />,
+    },
     ];
 
     return (
