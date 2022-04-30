@@ -571,20 +571,6 @@ export const actionChangeOpacity = register({
         max="100"
         step="10"
         onChange={(event) => updateData(+event.target.value)}
-        onWheel={(event) => {
-          event.stopPropagation();
-          const target = event.target as HTMLInputElement;
-          const STEP = 10;
-          const MAX = 100;
-          const MIN = 0;
-          const value = +target.value;
-
-          if (event.deltaY < 0 && value < MAX) {
-            updateData(value + STEP);
-          } else if (event.deltaY > 0 && value > MIN) {
-            updateData(value - STEP);
-          }
-        }}
         value={
           getFormValue(
             elements,

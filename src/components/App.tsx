@@ -76,7 +76,6 @@ import {
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
-import { isValidLibrary } from "../data/json";
 import Library from "../data/library";
 import { restore, restoreElements, restoreLibraryItems } from "../data/restore";
 import {
@@ -233,6 +232,7 @@ import {
   generateIdFromFile,
   getDataURL,
   isSupportedImageFile,
+  loadLibraryFromBlob,
   resizeImageFile,
   SVGStringToFile,
 } from "../data/blob";
@@ -259,6 +259,7 @@ import {
   isPointHittingLinkIcon,
   isLocalLink,
 } from "../element/Hyperlink";
+import { AbortError } from "../errors";
 
 const defaultDeviceTypeContext: DeviceType = {
   isMobile: false,
@@ -730,31 +731,38 @@ class App extends React.Component<AppProps, AppState> {
       window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
     }
 
+    const defaultStatus = "published";
+
+    this.setState({ isLibraryOpen: true });
+
     try {
-      const request = await fetch(decodeURIComponent(url));
-      const blob = await request.blob();
-      const json = JSON.parse(await blob.text());
-      if (!isValidLibrary(json)) {
-        throw new Error();
-      }
-      if (
-        token === this.id ||
-        window.confirm(
-          t("alerts.confirmAddLibrary", {
-            numShapes: (json.libraryItems || json.library || []).length,
-          }),
-        )
-      ) {
-        await this.library.importLibrary(blob, "published");
-        // hack to rerender the library items after import
-        if (this.state.isLibraryOpen) {
-          this.setState({ isLibraryOpen: false });
-        }
-        this.setState({ isLibraryOpen: true });
-      }
+      await this.library.importLibrary(
+        new Promise<LibraryItems>(async (resolve, reject) => {
+          try {
+            const request = await fetch(decodeURIComponent(url));
+            const blob = await request.blob();
+            const libraryItems = await loadLibraryFromBlob(blob, defaultStatus);
+
+            if (
+              token === this.id ||
+              window.confirm(
+                t("alerts.confirmAddLibrary", {
+                  numShapes: libraryItems.length,
+                }),
+              )
+            ) {
+              resolve(libraryItems);
+            } else {
+              reject(new AbortError());
+            }
+          } catch (error: any) {
+            reject(error);
+          }
+        }),
+      );
     } catch (error: any) {
-      window.alert(t("alerts.errorLoadingLibrary"));
       console.error(error);
+      this.setState({ errorMessage: t("errors.importLibraryError") });
     } finally {
       this.focusContainer();
     }
@@ -819,10 +827,7 @@ class App extends React.Component<AppProps, AppState> {
     try {
       initialData = (await this.props.initialData) || null;
       if (initialData?.libraryItems) {
-        this.libraryItemsFromStorage = restoreLibraryItems(
-          initialData.libraryItems,
-          "unpublished",
-        ) as LibraryItems;
+        this.library.importLibrary(initialData.libraryItems, "unpublished");
       }
     } catch (error: any) {
       console.error(error);
@@ -1324,6 +1329,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     this.cutAll();
     event.preventDefault();
+    event.stopPropagation();
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
@@ -1335,6 +1341,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     this.copyAll();
     event.preventDefault();
+    event.stopPropagation();
   });
 
   private cutAll = () => {
@@ -1725,7 +1732,14 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
-      libraryItems?: SceneData["libraryItems"];
+      libraryItems?:
+        | ((
+            currentLibraryItems: LibraryItems,
+          ) =>
+            | Required<SceneData>["libraryItems"]
+            | Promise<Required<SceneData>["libraryItems"]>)
+        | Required<SceneData>["libraryItems"]
+        | Promise<Required<SceneData>["libraryItems"]>;
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1744,14 +1758,20 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.libraryItems) {
-        this.library.saveLibrary(
-          restoreLibraryItems(sceneData.libraryItems, "unpublished"),
-        );
-        if (this.state.isLibraryOpen) {
-          this.setState({ isLibraryOpen: false }, () => {
-            this.setState({ isLibraryOpen: true });
+        this.library.setLibrary((currentLibraryItems) => {
+          const nextItems =
+            typeof sceneData.libraryItems === "function"
+              ? sceneData.libraryItems(currentLibraryItems)
+              : sceneData.libraryItems;
+
+          return new Promise<LibraryItems>(async (resolve, reject) => {
+            try {
+              resolve(restoreLibraryItems(await nextItems, "unpublished"));
+            } catch (error: any) {
+              reject(error);
+            }
           });
-        }
+        });
       }
     },
   );
@@ -1920,8 +1940,10 @@ class App extends React.Component<AppProps, AppState> {
             );
           }
           this.setActiveTool({ ...this.state.activeTool, type: shape });
+          event.stopPropagation();
         } else if (event.key === KEYS.Q) {
           this.toggleLock("keyboard");
+          event.stopPropagation();
         }
       }
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
@@ -1930,7 +1952,11 @@ class App extends React.Component<AppProps, AppState> {
         event.preventDefault();
       }
 
-      if (event.key === KEYS.G || event.key === KEYS.S) {
+      if (
+        (event.key === KEYS.G || event.key === KEYS.S) &&
+        !event.altKey &&
+        !event[KEYS.CTRL_OR_CMD]
+      ) {
         const selectedElements = getSelectedElements(
           this.scene.getElements(),
           this.state,
@@ -1948,9 +1974,11 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements.some((element) => hasBackground(element.type)))
         ) {
           this.setState({ openPopup: "backgroundColorPicker" });
+          event.stopPropagation();
         }
         if (event.key === KEYS.S) {
           this.setState({ openPopup: "strokeColorPicker" });
+          event.stopPropagation();
         }
       }
     },
@@ -2275,8 +2303,7 @@ class App extends React.Component<AppProps, AppState> {
       if (isTextElement(selectedElements[0])) {
         existingTextElement = selectedElements[0];
       } else if (isTextBindableContainer(selectedElements[0], false)) {
-        container = selectedElements[0];
-        existingTextElement = getBoundTextElement(container);
+        existingTextElement = getBoundTextElement(selectedElements[0]);
       }
     }
 
@@ -5319,16 +5346,14 @@ class App extends React.Component<AppProps, AppState> {
       file?.type === MIME_TYPES.excalidrawlib ||
       file?.name?.endsWith(".excalidrawlib")
     ) {
-      this.library
-        .importLibrary(file)
-        .then(() => {
-          // Close and then open to get the libraries updated
-          this.setState({ isLibraryOpen: false });
-          this.setState({ isLibraryOpen: true });
-        })
-        .catch((error) =>
-          this.setState({ isLoading: false, errorMessage: error.message }),
-        );
+      this.setState({ isLibraryOpen: true });
+      this.library.importLibrary(file).catch((error) => {
+        console.error(error);
+        this.setState({
+          isLoading: false,
+          errorMessage: t("errors.importLibraryError"),
+        });
+      });
       // default: assume an Excalidraw file regardless of extension/MimeType
     } else if (file) {
       this.setState({ isLoading: true });

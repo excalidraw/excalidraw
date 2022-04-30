@@ -341,8 +341,6 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
-    event.stopPropagation();
-
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomIn);

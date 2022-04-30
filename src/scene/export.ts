@@ -150,6 +150,19 @@ export const exportToSvg = async (
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
+  let assetPath = "https://excalidraw.com/";
+
+  // Asset path needs to be determined only when using package
+  if (process.env.IS_EXCALIDRAW_NPM_PACKAGE) {
+    assetPath =
+      window.EXCALIDRAW_ASSET_PATH ||
+      `https://unpkg.com/${process.env.PKG_NAME}@${process.env.PKG_VERSION}`;
+
+    if (assetPath?.startsWith("/")) {
+      assetPath = assetPath.replace("/", `${window.location.origin}/`);
+    }
+    assetPath = `${assetPath}/dist/excalidraw-assets/`;
+  }
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
@@ -157,16 +170,15 @@ export const exportToSvg = async (
     <style>
       @font-face {
         font-family: "Virgil";
-        src: url("https://excalidraw.com/Virgil.woff2");
+        src: url("${assetPath}Virgil.woff2");
       }
       @font-face {
         font-family: "Cascadia";
-        src: url("https://excalidraw.com/Cascadia.woff2");
+        src: url("${assetPath}Cascadia.woff2");
       }
     </style>
   </defs>
   `;
-
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");

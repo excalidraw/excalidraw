@@ -6,6 +6,7 @@ import {
 } from "../../appState";
 import { clearElementsForLocalStorage } from "../../element";
 import { STORAGE_KEYS } from "../app_constants";
+import { ImportedDataState } from "../../data/types";
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -102,14 +103,13 @@ export const getTotalStorageSize = () => {
 
 export const getLibraryItemsFromStorage = () => {
   try {
-    const libraryItems =
-      JSON.parse(
-        localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
-      ) || [];
+    const libraryItems: ImportedDataState["libraryItems"] = JSON.parse(
+      localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
+    );
 
-    return libraryItems;
-  } catch (e) {
-    console.error(e);
+    return libraryItems || [];
+  } catch (error) {
+    console.error(error);
     return [];
   }
 };
