@@ -10,8 +10,13 @@ import { MIME_TYPES } from "../../../constants";
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
 
-const { exportToCanvas, exportToSvg, exportToBlob, Excalidraw } =
-  window.ExcalidrawLib;
+const {
+  exportToCanvas,
+  exportToSvg,
+  exportToBlob,
+  exportToClipboard,
+  Excalidraw,
+} = window.ExcalidrawLib;
 const resolvablePromise = () => {
   let resolve;
   let reject;
@@ -145,6 +150,15 @@ export default function App() {
     }
   }, []);
 
+  const onCopy = async (type) => {
+    await exportToClipboard({
+      elements: excalidrawRef.current.getSceneElements(),
+      appState: excalidrawRef.current.getAppState(),
+      files: excalidrawRef.current.getFiles(),
+      type,
+    });
+    window.alert(`Copied to clipboard as ${type} sucessfully`);
+  };
   return (
     <div className="App">
       <h1> Excalidraw Example</h1>
@@ -179,6 +193,7 @@ export default function App() {
           >
             Update Library
           </button>
+
           <label>
             <input
               type="checkbox"
@@ -248,6 +263,17 @@ export default function App() {
             />
             Show collaborators
           </label>
+          <div>
+            <button onClick={onCopy.bind(null, "png")}>
+              Copy to Clipboard as PNG
+            </button>
+            <button onClick={onCopy.bind(null, "svg")}>
+              Copy to Clipboard as SVG
+            </button>
+            <button onClick={onCopy.bind(null, "json")}>
+              Copy to Clipboard as JSON
+            </button>
+          </div>
         </div>
         <div className="excalidraw-wrapper">
           <Excalidraw

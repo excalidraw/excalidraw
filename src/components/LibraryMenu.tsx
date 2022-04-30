@@ -139,7 +139,7 @@ export const LibraryMenu = ({
       const nextItems = libraryItems.filter(
         (item) => !selectedItems.includes(item.id),
       );
-      library.saveLibrary(nextItems).catch(() => {
+      library.setLibrary(nextItems).catch(() => {
         setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
       });
       setSelectedItems([]);
@@ -170,7 +170,7 @@ export const LibraryMenu = ({
         ...libraryItems,
       ];
       onAddToLibrary();
-      library.saveLibrary(nextItems).catch(() => {
+      library.setLibrary(nextItems).catch(() => {
         setAppState({ errorMessage: t("alerts.errorAddingToLibrary") });
       });
     },
@@ -220,7 +220,7 @@ export const LibraryMenu = ({
           libItem.status = "published";
         }
       });
-      library.saveLibrary(nextLibItems);
+      library.setLibrary(nextLibItems);
     },
     [setShowPublishLibraryDialog, setPublishLibSuccess, selectedItems, library],
   );
@@ -229,7 +229,10 @@ export const LibraryMenu = ({
     LibraryItem["id"] | null
   >(null);
 
-  if (libraryItemsData.status === "loading") {
+  if (
+    libraryItemsData.status === "loading" &&
+    !libraryItemsData.isInitialized
+  ) {
     return (
       <LibraryMenuWrapper ref={ref}>
         <div className="layer-ui__library-message">
@@ -255,7 +258,7 @@ export const LibraryMenu = ({
           }
           onError={(error) => window.alert(error)}
           updateItemsInStorage={() =>
-            library.saveLibrary(libraryItemsData.libraryItems)
+            library.setLibrary(libraryItemsData.libraryItems)
           }
           onRemove={(id: string) =>
             setSelectedItems(selectedItems.filter((_id) => _id !== id))
@@ -264,6 +267,7 @@ export const LibraryMenu = ({
       )}
       {publishLibSuccess && renderPublishSuccess()}
       <LibraryMenuItems
+        isLoading={libraryItemsData.status === "loading"}
         libraryItems={libraryItemsData.libraryItems}
         onRemoveFromLibrary={() =>
           removeFromLibrary(libraryItemsData.libraryItems)
