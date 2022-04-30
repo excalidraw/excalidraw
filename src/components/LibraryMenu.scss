@@ -13,6 +13,10 @@
       width: 100%;
       margin: 2px 0;
 
+      .Spinner {
+        margin-right: 1rem;
+      }
+
       button {
         // 2px from the left to account for focus border of left-most button
         margin: 0 2px;
@@ -28,8 +32,17 @@
   }
 
   .layer-ui__library-message {
-    padding: 10px 20px;
-    max-width: 200px;
+    padding: 2em 4em;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .Spinner {
+      margin-bottom: 1em;
+    }
+    span {
+      font-size: 0.8em;
+    }
   }
 
   .publish-library-success {

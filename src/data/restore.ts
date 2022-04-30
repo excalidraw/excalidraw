@@ -286,7 +286,7 @@ export const restoreAppState = (
 };
 
 export const restore = (
-  data: ImportedDataState | null,
+  data: Pick<ImportedDataState, "appState" | "elements" | "files"> | null,
   /**
    * Local AppState (`this.state` or initial state from localStorage) so that we
    * don't overwrite local state with default values (when values not
@@ -312,7 +312,7 @@ const restoreLibraryItem = (libraryItem: LibraryItem) => {
 };
 
 export const restoreLibraryItems = (
-  libraryItems: NonOptional<ImportedDataState["libraryItems"]>,
+  libraryItems: ImportedDataState["libraryItems"] = [],
   defaultStatus: LibraryItem["status"],
 ) => {
   const restoredItems: LibraryItem[] = [];

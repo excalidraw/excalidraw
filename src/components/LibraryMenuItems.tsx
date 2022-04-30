@@ -22,8 +22,10 @@ import { Tooltip } from "./Tooltip";
 
 import "./LibraryMenuItems.scss";
 import { VERSIONS } from "../constants";
+import Spinner from "./Spinner";
 
 const LibraryMenuItems = ({
+  isLoading,
   libraryItems,
   onRemoveFromLibrary,
   onAddToLibrary,
@@ -40,6 +42,7 @@ const LibraryMenuItems = ({
   onPublish,
   resetLibrary,
 }: {
+  isLoading: boolean;
   libraryItems: LibraryItems;
   pendingElements: LibraryItem["elements"];
   onRemoveFromLibrary: () => void;
@@ -106,14 +109,10 @@ const LibraryMenuItems = ({
             icon={load}
             onClick={() => {
               importLibraryFromJSON(library)
-                .then(() => {
-                  // Close and then open to get the libraries updated
-                  setAppState({ isLibraryOpen: false });
-                  setAppState({ isLibraryOpen: true });
-                })
                 .catch(muteFSAbortError)
                 .catch((error) => {
-                  setAppState({ errorMessage: error.message });
+                  console.error(error);
+                  setAppState({ errorMessage: t("errors.importLibraryError") });
                 });
             }}
             className="library-actions--load"
@@ -130,7 +129,7 @@ const LibraryMenuItems = ({
               onClick={async () => {
                 const libraryItems = itemsSelected
                   ? items
-                  : await library.loadLibrary();
+                  : await library.getLatestLibrary();
                 saveLibraryAsJSON(libraryItems)
                   .catch(muteFSAbortError)
                   .catch((error) => {
@@ -289,16 +288,20 @@ const LibraryMenuItems = ({
       {showRemoveLibAlert && renderRemoveLibAlert()}
       <div className="layer-ui__library-header" key="library-header">
         {renderLibraryActions()}
-        <a
-          href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-            window.name || "_blank"
-          }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
-            VERSIONS.excalidrawLibrary
-          }`}
-          target="_excalidraw_libraries"
-        >
-          {t("labels.libraries")}
-        </a>
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <a
+            href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+              window.name || "_blank"
+            }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+              VERSIONS.excalidrawLibrary
+            }`}
+            target="_excalidraw_libraries"
+          >
+            {t("labels.libraries")}
+          </a>
+        )}
       </div>
       <Stack.Col
         className="library-menu-items-container__items"
