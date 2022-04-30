@@ -38,6 +38,7 @@ import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
 import { useDeviceType } from "../components/App";
+import { distributeLibraryItemsOnSquareGrid } from "../disitrubte";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -277,7 +278,9 @@ const LayerUI = ({
     <LibraryMenu
       pendingElements={getSelectedElements(elements, appState, true)}
       onClose={closeLibrary}
-      onInsertShape={onInsertElements}
+      onInsertLibraryItems={(libraryItems) => {
+        onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
+      }}
       onAddToLibrary={deselectItems}
       setAppState={setAppState}
       libraryReturnUrl={libraryReturnUrl}
