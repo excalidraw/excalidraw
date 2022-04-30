@@ -260,6 +260,7 @@ const useLibrary = (excalidrawAPI: ExcalidrawImperativeAPI | null) => {
       event.preventDefault();
       const libraryUrlTokens = getLibraryUrlTokens();
       if (libraryUrlTokens) {
+        event.stopImmediatePropagation();
         // If hash changed and it contains library url, import it and replace
         // the url to its previous state (important in case of collaboration
         // and similar).
@@ -320,6 +321,8 @@ const ExcalidrawWrapper = () => {
     useCallbackRefState<ExcalidrawImperativeAPI>();
 
   const collabAPI = useContext(CollabContext)?.api;
+
+  useLibrary(excalidrawAPI);
 
   useEffect(() => {
     if (!collabAPI || !excalidrawAPI) {
@@ -507,8 +510,6 @@ const ExcalidrawWrapper = () => {
       clearTimeout(titleTimeout);
     };
   }, [collabAPI, excalidrawAPI]);
-
-  useLibrary(excalidrawAPI);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
