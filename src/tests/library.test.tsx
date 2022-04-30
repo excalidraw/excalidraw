@@ -4,6 +4,7 @@ import { API } from "./helpers/api";
 import { MIME_TYPES } from "../constants";
 import { LibraryItem } from "../types";
 import { UI } from "./helpers/ui";
+import { serializeLibraryAsJSON } from "../data/json";
 
 const { h } = window;
 
@@ -37,7 +38,7 @@ describe("library", () => {
       await API.readFile("./fixtures/fixture_library.excalidrawlib", "utf8"),
     ).library[0];
     await API.drop(
-      new Blob([JSON.stringify(libraryItems)], {
+      new Blob([serializeLibraryAsJSON([libraryItems])], {
         type: MIME_TYPES.excalidrawlib,
       }),
     );
@@ -53,7 +54,7 @@ describe("library", () => {
       await API.readFile("./fixtures/fixture_library.excalidrawlib", "utf8"),
     ).library[0];
     await API.drop(
-      new Blob([JSON.stringify(libraryItems)], {
+      new Blob([serializeLibraryAsJSON([libraryItems])], {
         type: MIME_TYPES.excalidrawlib,
       }),
     );
