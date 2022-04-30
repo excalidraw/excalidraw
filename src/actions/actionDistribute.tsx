@@ -3,7 +3,7 @@ import {
   DistributeVerticallyIcon,
 } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { distributeElements, Distribution } from "../disitrubte";
+import { distributeElements, Distribution } from "../distribute";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";

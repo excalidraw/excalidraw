@@ -259,7 +259,7 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { AbortError } from "../errors";
-import { distributeLibraryItemsOnSquareGrid } from "../disitrubte";
+import { distributeLibraryItemsOnSquareGrid } from "../distribute";
 
 const defaultDeviceTypeContext: DeviceType = {
   isMobile: false,

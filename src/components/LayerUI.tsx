@@ -38,7 +38,7 @@ import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
 import { useDeviceType } from "../components/App";
-import { distributeLibraryItemsOnSquareGrid } from "../disitrubte";
+import { distributeLibraryItemsOnSquareGrid } from "../distribute";
 
 interface LayerUIProps {
   actionManager: ActionManager;
