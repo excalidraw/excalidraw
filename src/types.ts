@@ -310,13 +310,19 @@ type CanvasActions = {
   saveAsImage?: boolean;
 };
 
+type ShapeActions = {
+  image?: boolean;
+};
+
 export type UIOptions = {
   canvasActions?: CanvasActions;
+  shapeActions?: ShapeActions;
 };
 
 export type AppProps = ExcalidrawProps & {
   UIOptions: {
     canvasActions: Required<CanvasActions> & { export: ExportOpts };
+    shapeActions: Required<ShapeActions>;
   };
   detectScroll: boolean;
   handleKeyboardGlobally: boolean;

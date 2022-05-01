@@ -153,6 +153,9 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     theme: true,
     saveAsImage: true,
   },
+  shapeActions: {
+    image: true,
+  },
 };
 
 export const MQ_MAX_WIDTH_PORTRAIT = 730;

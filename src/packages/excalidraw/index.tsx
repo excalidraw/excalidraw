@@ -40,11 +40,16 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
+  const shapeActions = props.UIOptions?.shapeActions;
 
   const UIOptions: AppProps["UIOptions"] = {
     canvasActions: {
       ...DEFAULT_UI_OPTIONS.canvasActions,
       ...canvasActions,
+    },
+    shapeActions: {
+      ...DEFAULT_UI_OPTIONS.shapeActions,
+      ...shapeActions,
     },
   };
 
@@ -154,6 +159,17 @@ const areEqual = (
         return (
           prevUIOptions?.canvasActions?.[key] ===
           nextUIOptions?.canvasActions?.[key]
+        );
+      });
+    }
+    if (key === "shapeActions") {
+      const shapeOptionKeys = Object.keys(
+        prevUIOptions.shapeActions!,
+      ) as (keyof Partial<typeof DEFAULT_UI_OPTIONS.shapeActions>)[];
+      shapeOptionKeys.every((key) => {
+        return (
+          prevUIOptions?.shapeActions?.[key] ===
+          nextUIOptions?.shapeActions?.[key]
         );
       });
     }
