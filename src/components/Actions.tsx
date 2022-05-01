@@ -14,7 +14,7 @@ import {
   hasText,
 } from "../scene";
 import { SHAPES } from "../shapes";
-import { AppState, Zoom } from "../types";
+import { AppState, UIOptions, Zoom } from "../types";
 import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
@@ -190,12 +190,14 @@ export const ShapesSwitcher = ({
   setAppState,
   onImageAction,
   appState,
+  uiOptions,
 }: {
   canvas: HTMLCanvasElement | null;
   activeTool: AppState["activeTool"];
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: AppState;
+  uiOptions: UIOptions;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
@@ -204,6 +206,15 @@ export const ShapesSwitcher = ({
       const shortcut = letter
         ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
         : `${index + 1}`;
+      const isEnabled =
+        uiOptions.shapeActions?.[
+          value as keyof typeof uiOptions.shapeActions
+        ] ?? true;
+
+      if (!isEnabled) {
+        return null;
+      }
+
       return (
         <ToolButton
           className="Shape"

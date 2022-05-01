@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState } from "../types";
+import { AppState, UIOptions } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -21,6 +21,7 @@ import { PenModeButton } from "./PenModeButton";
 
 type MobileMenuProps = {
   appState: AppState;
+  uiOptions: UIOptions;
   actionManager: ActionManager;
   renderJSONExportDialog: () => React.ReactNode;
   renderImageExportDialog: () => React.ReactNode;
@@ -44,6 +45,7 @@ type MobileMenuProps = {
 
 export const MobileMenu = ({
   appState,
+  uiOptions,
   elements,
   libraryMenu,
   actionManager,
@@ -73,6 +75,7 @@ export const MobileMenu = ({
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
                       appState={appState}
+                      uiOptions={uiOptions}
                       canvas={canvas}
                       activeTool={appState.activeTool}
                       setAppState={setAppState}

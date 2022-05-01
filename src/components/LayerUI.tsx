@@ -346,6 +346,7 @@ const LayerUI = ({
                       <Stack.Row gap={1}>
                         <ShapesSwitcher
                           appState={appState}
+                          uiOptions={UIOptions}
                           canvas={canvas}
                           activeTool={appState.activeTool}
                           setAppState={setAppState}
@@ -526,6 +527,7 @@ const LayerUI = ({
       {dialogs}
       <MobileMenu
         appState={appState}
+        uiOptions={UIOptions}
         elements={elements}
         actionManager={actionManager}
         libraryMenu={libraryMenu}
