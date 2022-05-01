@@ -1888,6 +1888,10 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         const shape = findShapeByKey(event.key);
         if (shape) {
+          const shapeActions = this.props.UIOptions.shapeActions;
+          if (shapeActions[shape as keyof typeof shapeActions] === false) {
+            return;
+          }
           if (this.state.activeTool.type !== shape) {
             trackEvent(
               "toolbar",
