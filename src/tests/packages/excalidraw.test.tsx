@@ -220,6 +220,24 @@ describe("<Excalidraw/>", () => {
         expect(queryByTestId(container, "toggle-dark-mode")).toBeNull();
       });
     });
+
+    describe("Test shapeActions", () => {
+      it("should show the image button when image is true", async () => {
+        const { container } = await render(
+          <Excalidraw UIOptions={{ shapeActions: { image: true } }} />,
+        );
+
+        expect(queryByTestId(container, "image")).toBeTruthy();
+      });
+
+      it("should hide the image button when image is false", async () => {
+        const { container } = await render(
+          <Excalidraw UIOptions={{ shapeActions: { image: false } }} />,
+        );
+
+        expect(queryByTestId(container, "image")).toBeNull();
+      });
+    });
   });
 
   describe("Test autoFocus prop", () => {
