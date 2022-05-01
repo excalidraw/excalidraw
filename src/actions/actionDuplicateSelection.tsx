@@ -17,8 +17,12 @@ import { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
 import { ActionResult } from "./types";
 import { GRID_SIZE } from "../constants";
-import { bindTextToShapeAfterDuplication } from "../element/textElement";
+import {
+  bindTextToShapeAfterDuplication,
+  getBoundTextElement,
+} from "../element/textElement";
 import { isBoundToContainer } from "../element/typeChecks";
+import { sortBoundTextElementsAndContainersTogether } from "../element/sortElements";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -64,6 +68,7 @@ const duplicateElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ): Partial<ActionResult> => {
+  const sortedElements = sortBoundTextElementsAndContainersTogether(elements);
   const groupIdMap = new Map();
   const newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
@@ -89,16 +94,17 @@ const duplicateElements = (
 
   let index = 0;
   const selectedElementIds = arrayToMap(
-    getSelectedElements(elements, appState, true),
+    getSelectedElements(sortedElements, appState, true),
   );
-  while (index < elements.length) {
-    const element = elements[index];
+  while (index < sortedElements.length) {
+    const element = sortedElements[index];
+    const boundTextElement = getBoundTextElement(element);
     if (selectedElementIds.get(element.id)) {
-      if (element.groupIds.length) {
+      if (element.groupIds.length || boundTextElement) {
         const groupId = getSelectedGroupForElement(appState, element);
         // if group selected, duplicate it atomically
         if (groupId) {
-          const groupElements = getElementsInGroup(elements, groupId);
+          const groupElements = getElementsInGroup(sortedElements, groupId);
           finalElements.push(
             ...groupElements,
             ...groupElements.map((element) =>
@@ -106,6 +112,19 @@ const duplicateElements = (
             ),
           );
           index = index + groupElements.length;
+          continue;
+        }
+        // If container + bounding text(s), interweave z-index-wise
+        if (boundTextElement) {
+          finalElements.push(
+            element,
+            boundTextElement,
+            duplicateAndOffsetElement(element),
+            duplicateAndOffsetElement(boundTextElement),
+          );
+          // if multiple text elements can be bound to a container
+          // change 2 to boundTextElements.length
+          index = index + 2;
           continue;
         }
       }

@@ -82,10 +82,16 @@ export const bindTextToShapeAfterDuplication = (
         const newContainer = sceneElementMap.get(newElementId);
         if (newContainer) {
           mutateElement(newContainer, {
-            boundElements: element.boundElements?.concat({
-              type: "text",
-              id: newTextElementId,
-            }),
+            boundElements: element.boundElements
+              ?.filter(
+                (boundElement) =>
+                  boundElement.id !== newTextElementId &&
+                  boundElement.id !== boundTextElementId,
+              )
+              ?.concat({
+                type: "text",
+                id: newTextElementId,
+              }),
           });
         }
         const newTextElement = sceneElementMap.get(newTextElementId);
