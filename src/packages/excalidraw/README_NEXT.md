@@ -1123,6 +1123,16 @@ import { THEME } from "@excalidraw/excalidraw-next";
 
 Defaults to `THEME.LIGHT` unless passed in `initialData.appState.theme`
 
+### `MIME_TYPES`
+
+**How to use **
+
+```js
+import { MIME_TYPES } from "@excalidraw/excalidraw-next";
+```
+
+[`MIME_TYPES`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L92) contains all the mime types supported by `Excalidraw`.
+
 ## Need help?
 
 Check out the existing [Q&A](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw). If you have any queries or need help, ask us [here](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw).

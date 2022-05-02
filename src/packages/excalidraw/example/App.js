@@ -5,7 +5,6 @@ import Sidebar from "./sidebar/Sidebar";
 
 import "./App.scss";
 import initialData from "./initialData";
-import { MIME_TYPES } from "../../../constants";
 
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
@@ -16,7 +15,9 @@ const {
   exportToBlob,
   exportToClipboard,
   Excalidraw,
+  MIME_TYPES,
 } = window.ExcalidrawLib;
+
 const resolvablePromise = () => {
   let resolve;
   let reject;
