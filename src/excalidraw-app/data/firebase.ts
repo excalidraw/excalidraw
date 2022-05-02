@@ -114,7 +114,8 @@ const encryptElements = async (
     elements.filter(
       (el) =>
         !el.isDeleted ||
-        el.updated >= getUpdatedTimestamp() - DELETED_ELEMENT_TIMEOUT,
+        // Drop deleted elements older than a day
+        el.updated > getUpdatedTimestamp() - DELETED_ELEMENT_TIMEOUT,
     ),
   );
   const encoded = new TextEncoder().encode(json);
