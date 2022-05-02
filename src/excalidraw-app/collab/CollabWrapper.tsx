@@ -479,7 +479,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             user.selectedElementIds = selectedElementIds;
             user.username = username;
             collaborators.set(socketId, user);
-
             this.excalidrawAPI.updateScene({
               collaborators,
             });
