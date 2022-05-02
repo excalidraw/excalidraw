@@ -50,7 +50,7 @@ export const actionGoToCollaborator = register({
         border={stroke}
         onClick={() => updateData(collaborator.pointer)}
         name={collaborator.username || ""}
-        src={collaborator.avatarUrl}
+        src={collaborator.src}
       />
     );
   },

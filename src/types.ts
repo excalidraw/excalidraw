@@ -45,7 +45,9 @@ export type Collaborator = {
     background: string;
     stroke: string;
   };
-  avatarUrl?: string;
+  // The url of the collaborator's avatar, defaults to username intials
+  // if not present
+  src?: string;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
