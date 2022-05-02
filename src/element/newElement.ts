@@ -18,7 +18,7 @@ import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
-import { AppState } from "../types";
+import { AppState, CommentOwner } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
@@ -123,6 +123,7 @@ export const newCommentElement = (opts: {
   type: "comment";
   x: number;
   y: number;
+  owner: CommentOwner;
 }): NonDeleted<ExcalidrawCommentElement> => {
   const height = 40;
   const width = 40;
@@ -134,15 +135,16 @@ export const newCommentElement = (opts: {
       height,
       width,
       fillStyle: "solid",
-      strokeWidth: 4,
+      strokeWidth: 5,
       strokeStyle: "solid",
       angle: 0,
       opacity: 100,
-      strokeColor: "#495057",
-      backgroundColor: "#e64980",
+      strokeColor: "white",
+      backgroundColor: opts.owner.color,
       strokeSharpness: "sharp",
       roughness: 0,
     }),
+    owner: opts.owner,
   };
 };
 

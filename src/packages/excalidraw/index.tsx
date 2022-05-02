@@ -38,7 +38,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     generateIdForFile,
     onLinkOpen,
     user,
-    onActiveCommentUpdate,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -103,7 +102,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           generateIdForFile={generateIdForFile}
           onLinkOpen={onLinkOpen}
           user={user}
-          onActiveCommentUpdate={onActiveCommentUpdate}
         />
       </Provider>
     </InitializeApp>

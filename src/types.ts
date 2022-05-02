@@ -276,20 +276,22 @@ export interface ExcalidrawProps {
       nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
   ) => void;
-  user?: User;
-  onActiveCommentUpdate?: (
-    element: ExcalidrawCommentElement,
-    canvasX: number,
-    canvasY: number,
-  ) => void;
+  user?: UserProp;
 }
 
-export type User = {
+export type UserProp = Readonly<{
   first_name: string;
-  last_name: string | null;
   email: string;
-  image: string | null;
-};
+  color?: string;
+  last_name?: string;
+  image?: string;
+}>;
+
+export type CommentOwner = UserProp &
+  Readonly<{
+    id: string;
+    color: string;
+  }>;
 
 export type SceneData = {
   elements?: ImportedDataState["elements"];

@@ -17,21 +17,27 @@ const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
+  let isActiveCommentDeleted = false;
+  const nextElements = elements.map((el) => {
+    if (appState.selectedElementIds[el.id]) {
+      if (appState.activeComment?.element.id === el.id) {
+        isActiveCommentDeleted = true;
+      }
+      return newElementWith(el, { isDeleted: true });
+    }
+    if (isBoundToContainer(el) && appState.selectedElementIds[el.containerId]) {
+      if (appState.activeComment?.element.id === el.id) {
+        isActiveCommentDeleted = true;
+      }
+      return newElementWith(el, { isDeleted: true });
+    }
+    return el;
+  });
   return {
-    elements: elements.map((el) => {
-      if (appState.selectedElementIds[el.id]) {
-        return newElementWith(el, { isDeleted: true });
-      }
-      if (
-        isBoundToContainer(el) &&
-        appState.selectedElementIds[el.containerId]
-      ) {
-        return newElementWith(el, { isDeleted: true });
-      }
-      return el;
-    }),
+    elements: nextElements,
     appState: {
       ...appState,
+      activeComment: isActiveCommentDeleted ? null : appState.activeComment,
       selectedElementIds: {},
     },
   };

@@ -204,6 +204,7 @@ import {
   SceneData,
   DeviceType,
   ActiveComment,
+  CommentOwner,
 } from "../types";
 import {
   debounce,
@@ -329,6 +330,8 @@ class App extends React.Component<AppProps, AppState> {
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
 
+  public excalOwner: CommentOwner;
+
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
@@ -412,6 +415,31 @@ class App extends React.Component<AppProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
+
+    this.excalOwner = {
+      id: props.user?.email || this.id,
+      first_name: props.user?.first_name || "Anonymous",
+      email: props.user?.email || "Anonymous@hackerdraw.com",
+      color: props.user?.color || "#e64980",
+      ...props.user,
+    };
+
+    this.cacheCommentOwnerImage(this.excalOwner);
+  }
+
+  private cacheCommentOwnerImage(user: CommentOwner) {
+    if (user.image) {
+      // get image data from user.image url
+      const image = new Image();
+      image.src = user.image;
+      image.onload = () => {
+        this.imageCache.set(user.id as FileId, {
+          image,
+          mimeType: "image/png",
+        });
+      };
+      image.onerror = () => {};
+    }
   }
 
   private renderCanvas() {
@@ -803,7 +831,6 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-
     const scene = restore(initialData, null, null);
     scene.appState = {
       ...scene.appState,
@@ -1214,7 +1241,6 @@ class App extends React.Component<AppProps, AppState> {
           canvasY !== this.state.activeComment.canvasY
         ) {
           activeComment = { element, canvasX, canvasY };
-          this.props.onActiveCommentUpdate?.(element, canvasX, canvasY);
         }
       }
       return (
@@ -3586,11 +3612,6 @@ class App extends React.Component<AppProps, AppState> {
                   canvasX,
                   canvasY,
                 };
-                this.props.onActiveCommentUpdate?.(
-                  hitElement,
-                  canvasX,
-                  canvasY,
-                );
               }
 
               this.setState((prevState) => {
@@ -3647,6 +3668,9 @@ class App extends React.Component<AppProps, AppState> {
     elementType: "comment",
     pointerDownState: PointerDownState,
   ): void => {
+    if (!this.props.user) {
+      return;
+    }
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
@@ -3657,6 +3681,7 @@ class App extends React.Component<AppProps, AppState> {
       type: elementType,
       x: gridX,
       y: gridY,
+      owner: this.excalOwner,
     });
 
     this.scene.replaceAllElements([

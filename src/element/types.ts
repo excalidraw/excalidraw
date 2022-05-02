@@ -1,4 +1,4 @@
-import { Point } from "../types";
+import { Point, CommentOwner } from "../types";
 import { FONT_FAMILY, THEME, VERTICAL_ALIGN } from "../constants";
 
 export type ChartType = "bar" | "line";
@@ -96,8 +96,7 @@ export type ExcalidrawGenericElement =
   | ExcalidrawSelectionElement
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
-  | ExcalidrawEllipseElement
-  | ExcalidrawCommentElement;
+  | ExcalidrawEllipseElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
@@ -109,7 +108,8 @@ export type ExcalidrawElement =
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawFreeDrawElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawCommentElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: boolean;
@@ -179,6 +179,7 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
 export type ExcalidrawCommentElement = _ExcalidrawElementBase &
   Readonly<{
     type: "comment";
+    owner: CommentOwner;
   }>;
 
 export type FileId = string & { _brand: "FileId" };

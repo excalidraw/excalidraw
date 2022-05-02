@@ -207,7 +207,9 @@ const restoreElement = (
     case "diamond":
       return restoreElementWithProperties(element, {});
     case "comment":
-      return restoreElementWithProperties(element, {});
+      return restoreElementWithProperties(element, {
+        owner: element.owner,
+      });
 
     // Don't use default case so as to catch a missing an element type case.
     // We also don't want to throw, but instead return void so we filter
@@ -293,9 +295,10 @@ export const restore = (
   localAppState: Partial<AppState> | null | undefined,
   localElements: readonly ExcalidrawElement[] | null | undefined,
 ): RestoredDataState => {
+  const appState = restoreAppState(data?.appState, localAppState || null);
   return {
     elements: restoreElements(data?.elements, localElements),
-    appState: restoreAppState(data?.appState, localAppState || null),
+    appState,
     files: data?.files || {},
   };
 };

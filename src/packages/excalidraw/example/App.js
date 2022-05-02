@@ -218,9 +218,9 @@ export default function App() {
           <Excalidraw
             ref={excalidrawRef}
             initialData={initialStatePromiseRef.current.promise}
-            onChange={(elements, state) =>
-              console.info("Elements :", elements, "State : ", state)
-            }
+            onChange={(elements, state) => {
+              console.info("Elements :", elements, "State : ", state);
+            }}
             onPointerUpdate={(payload) => console.info(payload)}
             onCollabButtonClick={() =>
               window.alert("You clicked on collab button")
@@ -234,8 +234,13 @@ export default function App() {
             renderTopRightUI={renderTopRightUI}
             renderFooter={renderFooter}
             onLinkOpen={onLinkOpen}
-            onActiveCommentUpdate={(element, x, y) => {
-              console.info("active comment updated", x, y);
+            user={{
+              first_name: "Vivek",
+              last_name: "Patel",
+              email: "patel.vivek@hackerrank.com",
+              color: "#00ff6e",
+              image:
+                "https://lh3.googleusercontent.com/a-/AOh14GhnBcE5G6gu8ZYjEanRJ4-SUNI7GLshrGuJfGoo=s96-c",
             }}
           />
         </div>
