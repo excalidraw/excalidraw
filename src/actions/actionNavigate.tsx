@@ -1,4 +1,4 @@
-import { getClientColors, getClientInitials } from "../clients";
+import { getClientColors } from "../clients";
 import { Avatar } from "../components/Avatar";
 import { centerScrollOn } from "../scene/scroll";
 import { Collaborator } from "../types";
@@ -43,16 +43,15 @@ export const actionGoToCollaborator = register({
     }
 
     const { background, stroke } = getClientColors(clientId, appState);
-    const shortName = getClientInitials(collaborator.username);
 
     return (
       <Avatar
         color={background}
         border={stroke}
         onClick={() => updateData(collaborator.pointer)}
-      >
-        {shortName}
-      </Avatar>
+        name={collaborator.username || ""}
+        src={collaborator.src}
+      />
     );
   },
 });

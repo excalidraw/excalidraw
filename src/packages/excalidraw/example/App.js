@@ -31,7 +31,10 @@ const resolvablePromise = () => {
 
 const renderTopRightUI = () => {
   return (
-    <button onClick={() => alert("This is dummy top right UI")}>
+    <button
+      onClick={() => alert("This is dummy top right UI")}
+      style={{ height: "2.5rem" }}
+    >
       {" "}
       Click me{" "}
     </button>
@@ -58,6 +61,7 @@ export default function App() {
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
   const [exportEmbedScene, setExportEmbedScene] = useState(false);
   const [theme, setTheme] = useState("light");
+  const [isCollaborating, setIsCollaborating] = useState(false);
 
   const initialStatePromiseRef = useRef({ promise: null });
   if (!initialStatePromiseRef.current.promise) {
@@ -227,6 +231,36 @@ export default function App() {
               }}
             />
             Switch to Dark Theme
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={isCollaborating}
+              onChange={() => {
+                if (!isCollaborating) {
+                  const collaborators = new Map();
+                  collaborators.set("id1", {
+                    username: "Doremon",
+                    src: "doremon.png",
+                  });
+                  collaborators.set("id2", {
+                    username: "Excalibot",
+                    src: "https://avatars.githubusercontent.com/excalibot",
+                  });
+                  collaborators.set("id3", {
+                    username: "Pika",
+                    src: "pika.jpeg",
+                  });
+                  excalidrawRef.current.updateScene({ collaborators });
+                } else {
+                  excalidrawRef.current.updateScene({
+                    collaborators: new Map(),
+                  });
+                }
+                setIsCollaborating(!isCollaborating);
+              }}
+            />
+            Show collaborators
           </label>
           <div>
             <button onClick={onCopy.bind(null, "png")}>
