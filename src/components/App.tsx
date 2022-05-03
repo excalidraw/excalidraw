@@ -2164,14 +2164,13 @@ class App extends React.Component<AppProps, AppState> {
         of all hit elements */
       preferSelected?: boolean;
       includeBoundTextElement?: boolean;
-      includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement> | null {
     const allHitElements = this.getElementsAtPosition(
       x,
       y,
       opts?.includeBoundTextElement,
-      opts?.includeLockedElements,
+      true,
     );
     if (allHitElements.length > 1) {
       if (opts?.preferSelected) {
@@ -5361,7 +5360,6 @@ class App extends React.Component<AppProps, AppState> {
     const { x, y } = viewportCoordsToSceneCoords(event, this.state);
     const element = this.getElementAtPosition(x, y, {
       preferSelected: true,
-      includeLockedElements: true,
     });
 
     const type = element ? "element" : "canvas";
