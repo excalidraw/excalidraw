@@ -9,7 +9,7 @@
     "copy": "Copiar",
     "copyAsPng": "Copiar al quichapapièrs coma PNG",
     "copyAsSvg": "Copiar al quichapapièrs coma SVG",
-    "copyText": "",
+    "copyText": "Copiar al quichapapièrs coma tèxt",
     "bringForward": "En avant",
     "sendToBack": "En arrièr",
     "bringToFront": "A l’endavant",
@@ -108,17 +108,17 @@
     "decreaseFontSize": "Reduire talha poliça",
     "increaseFontSize": "Aumentar talha poliça",
     "unbindText": "Dessociar lo tèxte",
-    "bindText": "",
+    "bindText": "Ligar lo tèxt al contenidor",
     "link": {
       "edit": "Modificar lo ligam",
       "create": "Crear un ligam",
       "label": "Ligam"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Verrolhar",
+      "unlock": "Desverrolhar",
+      "lockAll": "Tot verrolhar",
+      "unlockAll": "Tot desverrolhar"
     }
   },
   "buttons": {
@@ -167,7 +167,7 @@
     "couldNotLoadInvalidFile": "Cargament impossible d’un fichièr invalid",
     "importBackendFailed": "Importacion fracassada.",
     "cannotExportEmptyCanvas": "Impossible d’exportar los canabasses voids.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Còpia impossibla al quichapapièrs.",
     "decryptFailed": "Deschiframent impossible de las donadas.",
     "uploadedSecurly": "Lo telecargament es estat securizat amb un chiframent del cap a la fin, significa que los servidors d’Excalidraw o que quina tèrça part que siá pòdon pas legir lo contengut.",
     "loadSceneOverridePrompt": "Cargar un dessenh extèrn remplaçarà vòstre contengut existent. Volètz contunhar ?",
@@ -189,7 +189,7 @@
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
     "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
-    "importLibraryError": ""
+    "importLibraryError": "Impossible de cargar la bibliotèca"
   },
   "toolBar": {
     "selection": "Seleccion",
@@ -203,8 +203,8 @@
     "text": "Tèxt",
     "library": "Bibliotèca",
     "lock": "Mantenir activa l’aisina aprèp dessenhar",
-    "penMode": "",
-    "link": "",
+    "penMode": "Empachar l’agradiment tactil e acceptar la picada liura solament amb un estilò",
+    "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
     "eraser": "Goma"
   },
   "headings": {
@@ -230,8 +230,8 @@
     "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament",
     "publishLibrary": "Publicar vòstra pròpria bibliotèca",
     "bindTextToElement": "Quichatz Entrada per apondre de tèxte",
-    "deepBoxSelect": "",
-    "eraserRevert": ""
+    "deepBoxSelect": "Gardar CtrlOCmd per una seleccion gropada e empachar lo desplaçament",
+    "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression"
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
@@ -278,8 +278,8 @@
   "helpDialog": {
     "blog": "Legir nòstre blog",
     "click": "clic",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Seleccion prigonda",
+    "deepBoxSelect": "Seleccionar demest un grop e empacha lo desplaçament",
     "curvedArrow": "Sageta corba",
     "curvedLine": "Linha corba",
     "documentation": "Documentacion",
@@ -299,7 +299,7 @@
     "view": "Vista",
     "zoomToFit": "Zoomar per veire totes los elements",
     "zoomToSelection": "Zoomar la seleccion",
-    "toggleElementLock": ""
+    "toggleElementLock": "Verrolhar/Desverrolhar la seleccion"
   },
   "clearCanvasDialog": {
     "title": "Escafar canabàs"
