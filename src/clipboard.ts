@@ -7,7 +7,10 @@ import { AppState, BinaryFiles } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "./constants";
-import { isInitializedImageElement } from "./element/typeChecks";
+import {
+  isCommentElement,
+  isInitializedImageElement,
+} from "./element/typeChecks";
 import { isPromiseLike } from "./utils";
 
 type ElementsClipboard = {
@@ -60,7 +63,9 @@ export const copyToClipboard = async (
   files: BinaryFiles,
 ) => {
   // select binded text elements when copying
-  const selectedElements = getSelectedElements(elements, appState, true);
+  const selectedElements = getSelectedElements(elements, appState, true).filter(
+    (element) => !isCommentElement(element),
+  );
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
     elements: selectedElements,
