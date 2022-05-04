@@ -225,8 +225,8 @@
     "resizeImage": "SHIFT를 눌러서 자유롭게 크기를 변경하거나,\nALT를 눌러서 중앙을 고정하고 크기를 변경하기",
     "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
     "lineEditor_info": "지점을 수정하려면 두 번 클릭하거나 Enter 키를 누르세요.",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Delete 키로 꼭짓점을 제거하거나,\nCtrlOrCmd+D 로 복제하거나, 드래그 해서 이동시키기",
+    "lineEditor_nothingSelected": "꼭짓점을 선택해서 수정하거나 (SHIFT를 눌러서 여러개 선택),\nAlt를 누르고 클릭해서 새로운 꼭짓점 추가하기",
     "placeImage": "",
     "publishLibrary": "당신만의 라이브러리를 게시하기",
     "bindTextToElement": "Enter 키를 눌러서 텍스트 추가하기",
@@ -259,7 +259,7 @@
     "desc_inProgressIntro": "실시간 협업 세션이 진행 중입니다.",
     "desc_shareLink": "공동 작업자에게 이 링크를 공유하세요.",
     "desc_exitSession": "세션을 중단하면 연결은 끊어지나 작업을 이어갈 수 있습니다. 이 작업은 다른 작업자에게 영향을 미치지 않으며 각자의 공동 작업은 계속 유지됩니다.",
-    "shareTitle": ""
+    "shareTitle": "Excalidraw의 실시간 협업 세션에 참가하기"
   },
   "errorDialog": {
     "title": "오류"
@@ -273,7 +273,7 @@
     "link_button": "링크로 내보내기",
     "excalidrawplus_description": "화면을 당신의 Excalidraw+ 작업 공간으로 저장합니다.",
     "excalidrawplus_button": "내보내기",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_exportError": "지금은 Excalidraw+로 내보낼 수 없습니다..."
   },
   "helpDialog": {
     "blog": "블로그 읽어보기",
@@ -315,7 +315,7 @@
     "website": "웹사이트",
     "placeholder": {
       "authorName": "이름 또는 사용자명",
-      "libraryName": "",
+      "libraryName": "당신의 라이브러리 이름",
       "libraryDesc": "",
       "githubHandle": "",
       "twitterHandle": "",
