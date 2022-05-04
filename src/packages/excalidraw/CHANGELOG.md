@@ -17,11 +17,18 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
+- Export [`MIME_TYPES`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L92) supported by Excalidraw [#5135](https://github.com/excalidraw/excalidraw/pull/5135).
+- Support [`src`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L50) for collaborators. Now onwards host can pass `src` to render the customized avatar for collaborators [#5114](https://github.com/excalidraw/excalidraw/pull/5114).
+- Support `libraryItems` argument in `initialData.libraryItems` and `updateScene({ libraryItems })` to be a Promise resolving to `LibraryItems`, and support functional update of `libraryItems` in [`updateScene({ libraryItems })`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene). [#5101](https://github.com/excalidraw/excalidraw/pull/5101).
+- Expose util [`mergeLibraryItems`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#mergeLibraryItems) [#5101](https://github.com/excalidraw/excalidraw/pull/5101).
+- Expose util [`exportToClipboard`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToClipboard) which allows to copy the scene contents to clipboard as `svg`, `png` or `json` [#5103](https://github.com/excalidraw/excalidraw/pull/5103).
+- Expose `window.EXCALIDRAW_EXPORT_SOURCE` which you can use to overwrite the `source` field in exported data [#5095](https://github.com/excalidraw/excalidraw/pull/5095).
 - The `exportToBlob` utility now supports the `exportEmbedScene` option when generating a png image [#5047](https://github.com/excalidraw/excalidraw/pull/5047).
 - Exported [`restoreLibraryItems`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreLibraryItems) API [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
 
 #### Fixes
 
+- Use `window.EXCALIDRAW_ASSET_PATH` for fonts when exporting to svg [#5065](https://github.com/excalidraw/excalidraw/pull/5065).
 - Library menu now properly rerenders if open when library is updated using `updateScene({ libraryItems })` [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
 
 #### Refactor

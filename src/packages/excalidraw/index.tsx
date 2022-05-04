@@ -1,5 +1,4 @@
 import React, { useEffect, forwardRef } from "react";
-import "./publicPath";
 
 import { InitializeApp } from "../../components/InitializeApp";
 import App from "../../components/App";
@@ -16,7 +15,7 @@ import {
 import { Provider } from "jotai";
 import { jotaiScope, jotaiStore } from "../../jotai";
 
-const Excalidraw = (props: ExcalidrawProps) => {
+const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
     onChange,
     initialData,
@@ -186,8 +185,10 @@ const areEqual = (
 const forwardedRefComp = forwardRef<
   ExcalidrawAPIRefValue,
   PublicExcalidrawProps
->((props, ref) => <Excalidraw {...props} excalidrawRef={ref} />);
-export default React.memo(forwardedRefComp, areEqual);
+>((props, ref) => <ExcalidrawBase {...props} excalidrawRef={ref} />);
+
+export const Excalidraw = React.memo(forwardedRefComp, areEqual);
+
 export {
   getSceneVersion,
   isInvisiblySmallElement,
@@ -209,10 +210,12 @@ export {
   loadLibraryFromBlob,
   loadFromBlob,
   getFreeDrawSvgPath,
+  exportToClipboard,
+  mergeLibraryItems,
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
 
-export { FONT_FAMILY, THEME } from "../../constants";
+export { FONT_FAMILY, THEME, MIME_TYPES } from "../../constants";
 
 export {
   mutateElement,
