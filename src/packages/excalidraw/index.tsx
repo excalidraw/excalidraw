@@ -197,10 +197,12 @@ export {
   loadLibraryFromBlob,
   loadFromBlob,
   getFreeDrawSvgPath,
+  exportToClipboard,
+  mergeLibraryItems,
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
 
-export { FONT_FAMILY, THEME } from "../../constants";
+export { FONT_FAMILY, THEME, MIME_TYPES } from "../../constants";
 
 export {
   mutateElement,
