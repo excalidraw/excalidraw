@@ -5737,49 +5737,58 @@ class App extends React.Component<AppProps, AppState> {
           elements,
         });
       } else {
+        const contextMenuOptions: (
+          | false
+          | undefined
+          | null
+          | ContextMenuOption
+        )[] =
+          selectedElements.length === 1 && isCommentElement(selectedElements[0])
+            ? []
+            : [
+                this.deviceType.isMobile && actionCut,
+                this.deviceType.isMobile && navigator.clipboard && actionCopy,
+                this.deviceType.isMobile &&
+                  navigator.clipboard && {
+                    name: "paste",
+                    trackEvent: false,
+                    perform: (elements, appStates) => {
+                      this.pasteFromClipboard(null);
+                      return {
+                        commitToHistory: false,
+                      };
+                    },
+                    contextItemLabel: "labels.paste",
+                  },
+                this.deviceType.isMobile && separator,
+                ...options,
+                separator,
+                actionCopyStyles,
+                actionPasteStyles,
+                separator,
+                maybeGroupAction && actionGroup,
+                mayBeAllowUnbinding && actionUnbindText,
+                mayBeAllowBinding && actionBindText,
+                maybeUngroupAction && actionUngroup,
+                (maybeGroupAction || maybeUngroupAction) && separator,
+                actionAddToLibrary,
+                separator,
+                actionSendBackward,
+                actionBringForward,
+                actionSendToBack,
+                actionBringToFront,
+                separator,
+                maybeFlipHorizontal && actionFlipHorizontal,
+                maybeFlipVertical && actionFlipVertical,
+                (maybeFlipHorizontal || maybeFlipVertical) && separator,
+                actionLink.contextItemPredicate(elements, this.state) &&
+                  actionLink,
+                actionDuplicateSelection,
+                actionToggleLock,
+                separator,
+              ];
         ContextMenu.push({
-          options: [
-            this.deviceType.isMobile && actionCut,
-            this.deviceType.isMobile && navigator.clipboard && actionCopy,
-            this.deviceType.isMobile &&
-              navigator.clipboard && {
-                name: "paste",
-                trackEvent: false,
-                perform: (elements, appStates) => {
-                  this.pasteFromClipboard(null);
-                  return {
-                    commitToHistory: false,
-                  };
-                },
-                contextItemLabel: "labels.paste",
-              },
-            this.deviceType.isMobile && separator,
-            ...options,
-            separator,
-            actionCopyStyles,
-            actionPasteStyles,
-            separator,
-            maybeGroupAction && actionGroup,
-            mayBeAllowUnbinding && actionUnbindText,
-            mayBeAllowBinding && actionBindText,
-            maybeUngroupAction && actionUngroup,
-            (maybeGroupAction || maybeUngroupAction) && separator,
-            actionAddToLibrary,
-            separator,
-            actionSendBackward,
-            actionBringForward,
-            actionSendToBack,
-            actionBringToFront,
-            separator,
-            maybeFlipHorizontal && actionFlipHorizontal,
-            maybeFlipVertical && actionFlipVertical,
-            (maybeFlipHorizontal || maybeFlipVertical) && separator,
-            actionLink.contextItemPredicate(elements, this.state) && actionLink,
-            actionDuplicateSelection,
-            actionToggleLock,
-            separator,
-            actionDeleteSelected,
-          ],
+          options: [...contextMenuOptions, actionDeleteSelected],
           top,
           left,
           actionManager: this.actionManager,
