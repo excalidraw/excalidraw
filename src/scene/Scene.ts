@@ -7,7 +7,6 @@ import { getNonDeletedElements, isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import App from "../components/App";
 import { isCustomElement } from "../element/typeChecks";
-import { getCustomElementConfig } from "../utils";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -104,10 +103,9 @@ class Scene {
     const elementsToBeStackedOnTop: ExcalidrawElement[] = [];
     nextElements.forEach((element) => {
       if (isCustomElement(element)) {
-        const config = getCustomElementConfig(
-          this.app.props.customElementsConfig,
-          element.customType,
-        );
+        const config =
+          this.app.props.customElementsConfig?.[element.customType];
+
         if (config?.stackedOnTop) {
           elementsToBeStackedOnTop.push(element);
         } else {

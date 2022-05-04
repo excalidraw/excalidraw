@@ -11,7 +11,7 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { AppProps, AppState, DataURL, Zoom } from "./types";
+import { AppState, DataURL, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 
@@ -627,16 +627,6 @@ export const getFrame = () => {
   } catch (error) {
     return "iframe";
   }
-};
-
-export const getCustomElementConfig = (
-  customElementConfig: AppProps["customElementsConfig"],
-  customType: string,
-) => {
-  if (!customElementConfig) {
-    return null;
-  }
-  return customElementConfig.find((config) => config.customType === customType);
 };
 
 export const isPromiseLike = (

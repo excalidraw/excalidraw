@@ -52,11 +52,10 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       ...canvasActions,
     },
   };
-  const customElementsConfig: AppProps["customElementsConfig"] =
-    props.customElementsConfig?.map((customElementConfig) => ({
-      ...DEFAULT_CUSTOM_ELEMENT_CONFIG,
-      ...customElementConfig,
-    }));
+  const customElementsConfig = {} as AppProps["customElementsConfig"];
+  Object.entries(props.customElementsConfig || {}).forEach(([key, value]) => {
+    customElementsConfig![key] = { ...DEFAULT_CUSTOM_ELEMENT_CONFIG, ...value };
+  });
 
   if (canvasActions?.export) {
     UIOptions.canvasActions.export.saveFileToDisk =

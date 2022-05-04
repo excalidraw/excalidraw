@@ -5,7 +5,6 @@ import {
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppProps, AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
-import { getCustomElementConfig } from "../utils";
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -19,8 +18,7 @@ export const getElementsWithinSelection = (
       getElementBounds(element);
     const isCustom = element.type === "custom";
     const allowSelection = isCustom
-      ? getCustomElementConfig(customElementConfig, element.customType)
-          ?.transformHandles
+      ? customElementConfig?.[element.customType]?.transformHandles
       : true;
     return (
       allowSelection &&

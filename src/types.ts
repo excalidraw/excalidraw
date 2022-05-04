@@ -303,7 +303,7 @@ export interface ExcalidrawProps {
     }>,
   ) => void;
   renderCustomElementWidget?: (appState: AppState) => void;
-  customElementsConfig?: CustomElementConfig[];
+  customElementsConfig?: Record<string, CustomElementConfig>;
   onElementClick?: (
     element: NonDeleted<ExcalidrawElement>,
     event: React.PointerEvent<HTMLCanvasElement>,

@@ -205,8 +205,8 @@ export default function App() {
   };
 
   const getCustomElementsConfig = () => {
-    return [
-      {
+    return {
+      star: {
         type: "custom",
         customType: "star",
         displayData: {
@@ -219,7 +219,7 @@ export default function App() {
         height: 60,
         disableContextMenu: true,
       },
-      {
+      comment: {
         type: "custom",
         customType: "comment",
         displayData: {
@@ -234,7 +234,7 @@ export default function App() {
         onCreate,
         disableContextMenu: true,
       },
-      {
+      thumbsup: {
         type: "custom",
         customType: "thumbsup",
         displayData: {
@@ -260,7 +260,7 @@ export default function App() {
           },
         },
       },
-    ];
+    };
   };
 
   const addTextArea = (element) => {

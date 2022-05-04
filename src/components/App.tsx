@@ -224,7 +224,6 @@ import {
   withBatchedUpdatesThrottled,
   updateObject,
   setEraserCursor,
-  getCustomElementConfig,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -426,10 +425,9 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.activeTool.type !== "custom") {
       return;
     }
-    const config = getCustomElementConfig(
-      this.props.customElementsConfig,
-      this.state.activeTool.customType,
-    );
+    const config =
+      this.props.customElementsConfig?.[this.state.activeTool.customType];
+
     if (!config) {
       return;
     }
@@ -462,10 +460,9 @@ class App extends React.Component<AppProps, AppState> {
       ...this.scene.getElementsIncludingDeleted(),
       customElement,
     ]);
-    const customElementConfig = getCustomElementConfig(
-      this.props.customElementsConfig,
-      customElement.customType,
-    );
+    const customElementConfig =
+      this.props.customElementsConfig?.[customElement.customType];
+
     if (customElementConfig && customElementConfig.onCreate) {
       customElementConfig.onCreate(customElement);
     }
@@ -2898,10 +2895,9 @@ class App extends React.Component<AppProps, AppState> {
         !hitElement?.locked
       ) {
         if (hitElement && isCustomElement(hitElement)) {
-          const config = getCustomElementConfig(
-            this.props.customElementsConfig,
-            hitElement.customType,
-          );
+          const config =
+            this.props.customElementsConfig?.[hitElement.customType];
+
           if (!config?.transformHandles) {
             return;
           }
@@ -5465,10 +5461,8 @@ class App extends React.Component<AppProps, AppState> {
 
     let disableContextMenu = false;
     if (element && isCustomElement(element)) {
-      const config = getCustomElementConfig(
-        this.props.customElementsConfig,
-        element.customType,
-      );
+      const config = this.props.customElementsConfig?.[element.customType];
+
       disableContextMenu = !!config?.disableContextMenu;
     }
     if (disableContextMenu) {

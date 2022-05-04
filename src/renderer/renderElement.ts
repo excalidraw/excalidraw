@@ -25,13 +25,7 @@ import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
-import {
-  distance,
-  getFontString,
-  getFontFamilyString,
-  isRTL,
-  getCustomElementConfig,
-} from "../utils";
+import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
@@ -262,10 +256,8 @@ const drawElementOnCanvas = (
     }
 
     case "custom": {
-      const config = getCustomElementConfig(
-        renderConfig.customElementsConfig,
-        element.customType,
-      );
+      const config = renderConfig.customElementsConfig?.[element.customType];
+
       if (!config) {
         break;
       }

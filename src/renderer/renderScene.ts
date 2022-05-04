@@ -2,7 +2,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 import oc from "open-color";
 
-import { AppState, BinaryFiles, CustomElementConfig, Zoom } from "../types";
+import { AppState, BinaryFiles, Zoom } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -47,11 +47,7 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import {
-  viewportCoordsToSceneCoords,
-  supportsEmoji,
-  getCustomElementConfig,
-} from "../utils";
+import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
 import { UserIdleState } from "../types";
 import { THEME_FILTER } from "../constants";
 import {
@@ -309,16 +305,13 @@ export const renderScene = (
   ) {
     const selections = elements.reduce((acc, element) => {
       const isCustom = element.type === "custom";
-      let config: CustomElementConfig;
+      let config;
       const selectionColors = [];
 
       if (element.type === "custom") {
-        config = getCustomElementConfig(
-          renderConfig.customElementsConfig,
-          element.customType,
-        )!;
+        config = renderConfig.customElementsConfig?.[element.customType];
       }
-      if (!isCustom || (isCustom && config!.transformHandles)) {
+      if (!isCustom || (isCustom && config && config.transformHandles)) {
         // local user
         if (
           appState.selectedElementIds[element.id] &&
@@ -387,10 +380,11 @@ export const renderScene = (
     if (locallySelectedElements.length === 1) {
       let showTransformHandles = true;
       if (locallySelectedElements[0].type === "custom") {
-        const config = getCustomElementConfig(
-          renderConfig.customElementsConfig,
-          locallySelectedElements[0].customType,
-        );
+        const config =
+          renderConfig.customElementsConfig?.[
+            locallySelectedElements[0].customType
+          ];
+
         if (!config || !config.transformHandles) {
           showTransformHandles = false;
         }
