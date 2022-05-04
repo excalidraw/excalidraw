@@ -180,13 +180,13 @@
     "invalidSceneUrl": "",
     "resetLibrary": "당신의 라이브러리를 초기화 합니다. 계속하시겠습니까?",
     "removeItemsFromsLibrary": "{{count}}개의 아이템을 라이브러리에서 삭제하시겠습니까?",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "암호화 키는 반드시 22글자여야 합니다. 실시간 협업이 비활성화됩니다."
   },
   "errors": {
     "unsupportedFileType": "지원하지 않는 파일 형식 입니다.",
     "imageInsertError": "이미지를 삽입할 수 없습니다. 나중에 다시 시도 하십시오",
     "fileTooBig": "파일이 너무 큽니다. 최대 크기는 {{maxSize}} 입니다.",
-    "svgImageInsertError": "",
+    "svgImageInsertError": "SVG 이미지를 삽입하지 못했습니다. SVG 문법이 유효하지 않은 것 같습니다.",
     "invalidSVGString": "유효하지 않은 SVG입니다.",
     "cannotResolveCollabServer": "",
     "importLibraryError": "라이브러리를 불러오지 못했습니다."
@@ -217,7 +217,7 @@
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
     "freeDraw": "클릭 후 드래그하세요. 완료되면 놓으세요.",
     "text": "팁: 선택 툴로 아무 곳이나 더블 클릭해 텍스트를 추가할 수도 있습니다.",
-    "text_selected": "",
+    "text_selected": "더블 클릭 또는 ENTER를 눌러서 텍스트 수정",
     "text_editing": "",
     "linearElementMulti": "마지막 지점을 클릭하거나 Esc 또는 Enter 키를 눌러 완료하세요.",
     "lockAngle": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
@@ -228,7 +228,7 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": "",
+    "publishLibrary": "당신만의 라이브러리를 게시하기",
     "bindTextToElement": "Enter 키를 눌러서 텍스트 추가하기",
     "deepBoxSelect": "",
     "eraserRevert": ""
@@ -269,9 +269,9 @@
     "disk_details": "",
     "disk_button": "파일로 저장",
     "link_title": "공유 가능한 링크 생성",
-    "link_details": "",
+    "link_details": "읽기 전용 링크로 내보냅니다.",
     "link_button": "링크로 내보내기",
-    "excalidrawplus_description": "",
+    "excalidrawplus_description": "화면을 당신의 Excalidraw+ 작업 공간으로 저장합니다.",
     "excalidrawplus_button": "내보내기",
     "excalidrawplus_exportError": ""
   },
@@ -291,7 +291,7 @@
     "howto": "가이드 참고하기",
     "or": "또는",
     "preventBinding": "화살표가 붙지 않게 하기",
-    "tools": "",
+    "tools": "도구",
     "shortcuts": "키보드 단축키",
     "textFinish": "편집 완료 (텍스트 에디터)",
     "textNewLine": "줄바꿈(텍스트 에디터)",
@@ -305,7 +305,7 @@
     "title": "캔버스 지우기"
   },
   "publishDialog": {
-    "title": "",
+    "title": "라이브러리 게시하기",
     "itemName": "아이템 이름",
     "authorName": "저자명",
     "githubUsername": "깃허브 사용자이름",
