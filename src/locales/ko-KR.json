@@ -314,7 +314,7 @@
     "libraryDesc": "",
     "website": "웹사이트",
     "placeholder": {
-      "authorName": "",
+      "authorName": "이름 또는 사용자명",
       "libraryName": "",
       "libraryDesc": "",
       "githubHandle": "",
