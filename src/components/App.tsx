@@ -1225,23 +1225,34 @@ class App extends React.Component<AppProps, AppState> {
       }
       // don't render text element that's being currently edited (it's
       // rendered on remote only)
-      if (
-        isCommentElement(element) &&
-        this.state.activeComment?.element.id === element.id
-      ) {
-        const { x: canvasX, y: canvasY } = sceneCoordsToViewportCoords(
-          {
-            sceneX: element.x,
-            sceneY: element.y,
-          },
-          this.state,
-        );
-        if (
-          canvasX !== this.state.activeComment.canvasX ||
-          canvasY !== this.state.activeComment.canvasY
-        ) {
-          activeComment = { element, canvasX, canvasY };
+
+      if (isCommentElement(element)) {
+        if (this.state.activeComment?.element.id === element.id) {
+          const { x: canvasX, y: canvasY } = sceneCoordsToViewportCoords(
+            {
+              sceneX: element.x,
+              sceneY: element.y,
+            },
+            this.state,
+          );
+          if (
+            canvasX !== this.state.activeComment.canvasX ||
+            canvasY !== this.state.activeComment.canvasY
+          ) {
+            activeComment = { element, canvasX, canvasY };
+          }
         }
+
+        if (element.owner.email === this.excalOwner.email) {
+          element.owner = {
+            ...element.owner,
+            first_name: this.excalOwner.first_name,
+            color: this.excalOwner.color,
+            last_name: this.excalOwner.last_name,
+            image: this.excalOwner.image,
+          };
+        }
+        this.cacheCommentOwnerImage(element.owner);
       }
       return (
         !this.state.editingElement ||

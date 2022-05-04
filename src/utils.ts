@@ -11,7 +11,7 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { AppState, DataURL, Zoom } from "./types";
+import { AppState, CommentOwner, DataURL, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 
@@ -636,4 +636,10 @@ export const isPromiseLike = (
     "catch" in value &&
     "finally" in value
   );
+};
+
+export const getOwnerInitals = (owner: CommentOwner): string => {
+  return (
+    owner.first_name.charAt(0) + (owner.last_name || "").charAt(0)
+  ).toUpperCase();
 };

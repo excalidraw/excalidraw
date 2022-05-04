@@ -280,18 +280,18 @@ export interface ExcalidrawProps {
 }
 
 export type UserProp = Readonly<{
-  first_name: string;
   email: string;
+}> & {
+  first_name: string;
   color?: string;
   last_name?: string;
   image?: string;
-}>;
+};
 
-export type CommentOwner = UserProp &
-  Readonly<{
-    id: string;
-    color: string;
-  }>;
+export type CommentOwner = UserProp & {
+  id: string;
+  color: string;
+};
 
 export type SceneData = {
   elements?: ImportedDataState["elements"];

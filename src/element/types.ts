@@ -179,7 +179,6 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
 export type ExcalidrawCommentElement = _ExcalidrawElementBase &
   Readonly<{
     type: "comment";
-    owner: CommentOwner;
-  }>;
+  }> & { owner: CommentOwner };
 
 export type FileId = string & { _brand: "FileId" };

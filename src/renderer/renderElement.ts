@@ -25,7 +25,13 @@ import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
-import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
+import {
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+  getOwnerInitals,
+} from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
@@ -253,7 +259,7 @@ const drawElementOnCanvas = (
         context.lineWidth = 5;
         context.stroke();
         context.restore();
-        context.fillStyle = element.backgroundColor;
+        context.fillStyle = element.owner.color;
         context.fill();
         context.closePath();
         context.font = `18px Open Sans`;
@@ -261,7 +267,7 @@ const drawElementOnCanvas = (
         context.textAlign = "center";
         context.textBaseline = "middle";
         context.fillText(
-          "VP",
+          getOwnerInitals(element.owner),
           element.width / 2,
           element.height / 2 + 2,
           element.width,
@@ -574,15 +580,6 @@ const generateElementShape = (
 
         break;
       case "comment":
-        shape = generator.ellipse(
-          element.width / 2,
-          element.height / 2,
-          element.width,
-          element.height,
-          generateRoughOptions(element),
-        );
-        setShapeForElement(element, shape);
-
         break;
       case "line":
       case "arrow": {
