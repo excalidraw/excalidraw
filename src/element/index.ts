@@ -4,7 +4,7 @@ import {
   NonDeleted,
 } from "./types";
 import { isInvisiblySmallElement } from "./sizeHelpers";
-import { isLinearElementType } from "./typeChecks";
+import { isCommentElement, isLinearElementType } from "./typeChecks";
 
 export {
   newElement,
@@ -91,7 +91,11 @@ export const clearElementsForDatabase = (
 
 export const clearElementsForExport = (
   elements: readonly ExcalidrawElement[],
-) => _clearElements(elements);
+) => {
+  return _clearElements(
+    elements.filter((element) => !isCommentElement(element)),
+  );
+};
 
 export const clearElementsForLocalStorage = (
   elements: readonly ExcalidrawElement[],

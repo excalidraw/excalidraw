@@ -11,6 +11,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
+import { isCommentElement } from "../element/typeChecks";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -37,6 +38,7 @@ export const exportToCanvas = async (
     return { canvas, scale: appState.exportScale };
   },
 ) => {
+  elements = elements.filter((element) => !isCommentElement(element));
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
   const { canvas, scale = 1 } = createCanvas(width, height);
