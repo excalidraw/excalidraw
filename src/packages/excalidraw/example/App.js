@@ -5,13 +5,19 @@ import Sidebar from "./sidebar/Sidebar";
 
 import "./App.scss";
 import initialData from "./initialData";
-import { MIME_TYPES } from "../../../constants";
 
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
 
-const { exportToCanvas, exportToSvg, exportToBlob, Excalidraw } =
-  window.ExcalidrawLib;
+const {
+  exportToCanvas,
+  exportToSvg,
+  exportToBlob,
+  exportToClipboard,
+  Excalidraw,
+  MIME_TYPES,
+} = window.ExcalidrawLib;
+
 const resolvablePromise = () => {
   let resolve;
   let reject;
@@ -26,7 +32,10 @@ const resolvablePromise = () => {
 
 const renderTopRightUI = () => {
   return (
-    <button onClick={() => alert("This is dummy top right UI")}>
+    <button
+      onClick={() => alert("This is dummy top right UI")}
+      style={{ height: "2.5rem" }}
+    >
       {" "}
       Click me{" "}
     </button>
@@ -53,6 +62,7 @@ export default function App() {
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
   const [exportEmbedScene, setExportEmbedScene] = useState(false);
   const [theme, setTheme] = useState("light");
+  const [isCollaborating, setIsCollaborating] = useState(false);
 
   const initialStatePromiseRef = useRef({ promise: null });
   if (!initialStatePromiseRef.current.promise) {
@@ -141,6 +151,15 @@ export default function App() {
     }
   }, []);
 
+  const onCopy = async (type) => {
+    await exportToClipboard({
+      elements: excalidrawRef.current.getSceneElements(),
+      appState: excalidrawRef.current.getAppState(),
+      files: excalidrawRef.current.getFiles(),
+      type,
+    });
+    window.alert(`Copied to clipboard as ${type} sucessfully`);
+  };
   return (
     <div className="App">
       <h1> Excalidraw Example</h1>
@@ -175,6 +194,7 @@ export default function App() {
           >
             Update Library
           </button>
+
           <label>
             <input
               type="checkbox"
@@ -213,6 +233,47 @@ export default function App() {
             />
             Switch to Dark Theme
           </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={isCollaborating}
+              onChange={() => {
+                if (!isCollaborating) {
+                  const collaborators = new Map();
+                  collaborators.set("id1", {
+                    username: "Doremon",
+                    src: "doremon.png",
+                  });
+                  collaborators.set("id2", {
+                    username: "Excalibot",
+                    src: "https://avatars.githubusercontent.com/excalibot",
+                  });
+                  collaborators.set("id3", {
+                    username: "Pika",
+                    src: "pika.jpeg",
+                  });
+                  excalidrawRef.current.updateScene({ collaborators });
+                } else {
+                  excalidrawRef.current.updateScene({
+                    collaborators: new Map(),
+                  });
+                }
+                setIsCollaborating(!isCollaborating);
+              }}
+            />
+            Show collaborators
+          </label>
+          <div>
+            <button onClick={onCopy.bind(null, "png")}>
+              Copy to Clipboard as PNG
+            </button>
+            <button onClick={onCopy.bind(null, "svg")}>
+              Copy to Clipboard as SVG
+            </button>
+            <button onClick={onCopy.bind(null, "json")}>
+              Copy to Clipboard as JSON
+            </button>
+          </div>
         </div>
         <div className="excalidraw-wrapper">
           <Excalidraw
