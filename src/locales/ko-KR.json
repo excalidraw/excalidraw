@@ -316,7 +316,7 @@
     "placeholder": {
       "authorName": "이름 또는 사용자명",
       "libraryName": "당신의 라이브러리 이름",
-      "libraryDesc": "",
+      "libraryDesc": "사람들이 쓰임새를 파악할 수 있도록 라이브러리에 대해 설명",
       "githubHandle": "",
       "twitterHandle": "",
       "website": ""
@@ -326,14 +326,14 @@
       "website": ""
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "당신의 라이브러리를 제출하여 ",
+      "link": "공개 라이브러리 저장소",
+      "post": "에서 다른 사람들의 그림에 사용할 수 있도록 하세요."
     },
     "noteGuidelines": {
-      "pre": "",
+      "pre": "라이브러리는 먼저 수동으로 승인되어야 합니다. 제출하기 전에 ",
       "link": "가이드라인",
-      "post": ""
+      "post": " 을 먼저 읽어보세요. 의견을 공유하거나 변경사항을 만들기 위해선 GitHub 계정이 필요하지만, 반드시 필요하진 않습니다."
     },
     "noteLicense": {
       "pre": "",
