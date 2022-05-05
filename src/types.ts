@@ -66,6 +66,13 @@ export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
+export type LastActiveToolBeforeEraser =
+  | typeof SHAPES[number]["value"]
+  | {
+      type: "custom";
+      customType: string;
+    }
+  | null;
 export type AppState = {
   isLoading: boolean;
   errorMessage: string | null;
@@ -80,11 +87,18 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
-  activeTool: {
-    type: typeof SHAPES[number]["value"] | "eraser";
-    lastActiveToolBeforeEraser: typeof SHAPES[number]["value"] | null;
-    locked: boolean;
-  };
+  activeTool:
+    | {
+        type: typeof SHAPES[number]["value"] | "eraser";
+        lastActiveToolBeforeEraser: LastActiveToolBeforeEraser;
+        locked: boolean;
+      }
+    | {
+        type: "custom";
+        customType: string;
+        lastActiveToolBeforeEraser: LastActiveToolBeforeEraser;
+        locked: boolean;
+      };
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;

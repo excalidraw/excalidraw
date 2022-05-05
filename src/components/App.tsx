@@ -1591,14 +1591,18 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
     this.setState((prevState) => {
+      const activeTool: any = {
+        ...prevState.activeTool,
+        locked: !prevState.activeTool.locked,
+        type: prevState.activeTool.locked
+          ? "selection"
+          : prevState.activeTool.type,
+      };
+      if (prevState.activeTool.type === "custom") {
+        activeTool.customType = prevState.activeTool.customType;
+      }
       return {
-        activeTool: {
-          ...prevState.activeTool,
-          locked: !prevState.activeTool.locked,
-          type: prevState.activeTool.locked
-            ? "selection"
-            : prevState.activeTool.type,
-        },
+        activeTool,
       };
     });
   };
@@ -3057,6 +3061,8 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type,
         pointerDownState,
       );
+    } else if (this.state.activeTool.type === "custom") {
+      setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
     } else if (this.state.activeTool.type !== "eraser") {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,

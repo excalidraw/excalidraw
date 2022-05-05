@@ -304,21 +304,40 @@ export const actionErase = register({
   name: "eraser",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
+    const activeTool: any = { ...appState.activeTool };
+
+    if (isEraserActive(appState)) {
+      if (appState.activeTool.lastActiveToolBeforeEraser) {
+        if (
+          typeof appState.activeTool.lastActiveToolBeforeEraser === "object" &&
+          appState.activeTool.lastActiveToolBeforeEraser.type === "custom"
+        ) {
+          activeTool.type = "custom";
+          activeTool.customType =
+            appState.activeTool.lastActiveToolBeforeEraser.customType;
+        } else {
+          activeTool.type = appState.activeTool.lastActiveToolBeforeEraser;
+        }
+      } else {
+        activeTool.type = "selection";
+      }
+    } else {
+      activeTool.type = "eraser";
+      if (appState.activeTool.type === "custom") {
+        activeTool.lastActiveToolBeforeEraser = {
+          type: "custom",
+          customType: appState.activeTool.customType,
+        };
+      } else {
+        activeTool.lastActiveToolBeforeEraser = appState.activeTool.type;
+      }
+    }
     return {
       appState: {
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
-        activeTool: {
-          ...appState.activeTool,
-          type: isEraserActive(appState)
-            ? appState.activeTool.lastActiveToolBeforeEraser ?? "selection"
-            : "eraser",
-          lastActiveToolBeforeEraser:
-            appState.activeTool.type === "eraser" //node throws incorrect type error when using isEraserActive()
-              ? null
-              : appState.activeTool.type,
-        },
+        activeTool,
       },
       commitToHistory: true,
     };

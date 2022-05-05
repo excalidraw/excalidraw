@@ -48,6 +48,7 @@ export const AllowedExcalidrawActiveTools: Record<
   arrow: true,
   freedraw: true,
   eraser: false,
+  custom: true,
 };
 
 export type RestoredDataState = {
@@ -198,6 +199,7 @@ const restoreElement = (
         y,
       });
     }
+
     // generic elements
     case "ellipse":
       return restoreElementWithProperties(element, {});
@@ -255,6 +257,19 @@ export const restoreAppState = (
         ? localValue
         : defaultValue;
   }
+  const activeTool: any = {
+    lastActiveToolBeforeEraser: null,
+    locked: nextAppState.activeTool.locked ?? false,
+    type: "selection",
+  };
+  if (AllowedExcalidrawActiveTools[nextAppState.activeTool.type]) {
+    if (nextAppState.activeTool.type === "custom") {
+      activeTool.type = "custom";
+      activeTool.customType = nextAppState.activeTool.customType ?? "custom";
+    } else {
+      activeTool.type = nextAppState.activeTool.type;
+    }
+  }
   return {
     ...nextAppState,
     cursorButton: localAppState?.cursorButton || "up",
@@ -262,13 +277,7 @@ export const restoreAppState = (
     penDetected:
       localAppState?.penDetected ??
       (appState.penMode ? appState.penDetected ?? false : false),
-    activeTool: {
-      lastActiveToolBeforeEraser: null,
-      locked: nextAppState.activeTool.locked ?? false,
-      type: AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
-        ? nextAppState.activeTool.type ?? "selection"
-        : "selection",
-    },
+    activeTool,
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"

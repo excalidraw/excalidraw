@@ -137,24 +137,27 @@ export const actionFinalize = register({
       resetCursor(canvas);
     }
 
+    const activeTool: any = { ...appState.activeTool };
+    if (appState.activeTool.lastActiveToolBeforeEraser) {
+      if (
+        typeof appState.activeTool.lastActiveToolBeforeEraser === "object" &&
+        appState.activeTool.lastActiveToolBeforeEraser.type === "custom"
+      ) {
+        activeTool.type = appState.activeTool.lastActiveToolBeforeEraser.type;
+        activeTool.customType =
+          appState.activeTool.lastActiveToolBeforeEraser.customType;
+      } else {
+        activeTool.type = appState.activeTool.lastActiveToolBeforeEraser;
+      }
+    } else {
+      activeTool.type = "selection";
+    }
     return {
       elements: newElements,
       appState: {
         ...appState,
         cursorButton: "up",
-        activeTool:
-          (appState.activeTool.locked ||
-            appState.activeTool.type === "freedraw") &&
-          multiPointElement
-            ? appState.activeTool
-            : {
-                ...appState.activeTool,
-                type:
-                  appState.activeTool.type === "eraser" &&
-                  appState.activeTool.lastActiveToolBeforeEraser
-                    ? appState.activeTool.lastActiveToolBeforeEraser
-                    : "selection",
-              },
+        activeTool,
         draggingElement: null,
         multiElement: null,
         editingElement: null,
