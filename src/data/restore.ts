@@ -26,7 +26,7 @@ import {
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
-import { getUpdatedTimestamp } from "../utils";
+import { getUpdatedTimestamp, makeActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 
 type RestoredAppState = Omit<
@@ -257,19 +257,7 @@ export const restoreAppState = (
         ? localValue
         : defaultValue;
   }
-  const activeTool: any = {
-    lastActiveToolBeforeEraser: null,
-    locked: nextAppState.activeTool.locked ?? false,
-    type: "selection",
-  };
-  if (AllowedExcalidrawActiveTools[nextAppState.activeTool.type]) {
-    if (nextAppState.activeTool.type === "custom") {
-      activeTool.type = "custom";
-      activeTool.customType = nextAppState.activeTool.customType ?? "custom";
-    } else {
-      activeTool.type = nextAppState.activeTool.type;
-    }
-  }
+
   return {
     ...nextAppState,
     cursorButton: localAppState?.cursorButton || "up",
@@ -277,7 +265,17 @@ export const restoreAppState = (
     penDetected:
       localAppState?.penDetected ??
       (appState.penMode ? appState.penDetected ?? false : false),
-    activeTool,
+    activeTool: {
+      ...makeActiveTool(
+        defaultAppState,
+        nextAppState.activeTool.type &&
+          AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
+          ? nextAppState.activeTool
+          : { type: "selection" },
+      ),
+      lastActiveToolBeforeEraser: null,
+      locked: nextAppState.activeTool.locked ?? false,
+    },
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"

@@ -67,7 +67,10 @@ export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
 export type LastActiveToolBeforeEraser =
-  | typeof SHAPES[number]["value"]
+  | {
+      type: typeof SHAPES[number]["value"] | "eraser";
+      customType: null;
+    }
   | {
       type: "custom";
       customType: string;
@@ -92,6 +95,7 @@ export type AppState = {
         type: typeof SHAPES[number]["value"] | "eraser";
         lastActiveToolBeforeEraser: LastActiveToolBeforeEraser;
         locked: boolean;
+        customType: null;
       }
     | {
         type: "custom";

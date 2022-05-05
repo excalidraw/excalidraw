@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { isInvisiblySmallElement } from "../element";
-import { resetCursor } from "../utils";
+import { makeActiveTool, resetCursor } from "../utils";
 import { ToolButton } from "../components/ToolButton";
 import { done } from "../components/icons";
 import { t } from "../i18n";
@@ -14,6 +14,7 @@ import {
   bindOrUnbindLinearElement,
 } from "../element/binding";
 import { isBindingElement } from "../element/typeChecks";
+import { AppState } from "../types";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -137,21 +138,20 @@ export const actionFinalize = register({
       resetCursor(canvas);
     }
 
-    const activeTool: any = { ...appState.activeTool };
-    if (appState.activeTool.lastActiveToolBeforeEraser) {
-      if (
-        typeof appState.activeTool.lastActiveToolBeforeEraser === "object" &&
-        appState.activeTool.lastActiveToolBeforeEraser.type === "custom"
-      ) {
-        activeTool.type = appState.activeTool.lastActiveToolBeforeEraser.type;
-        activeTool.customType =
-          appState.activeTool.lastActiveToolBeforeEraser.customType;
-      } else {
-        activeTool.type = appState.activeTool.lastActiveToolBeforeEraser;
-      }
+    let activeTool: AppState["activeTool"];
+    if (appState.activeTool.type === "eraser") {
+      activeTool = makeActiveTool(appState, {
+        ...(appState.activeTool.lastActiveToolBeforeEraser || {
+          type: "selection",
+        }),
+        lastActiveToolBeforeEraser: null,
+      });
     } else {
-      activeTool.type = "selection";
+      activeTool = makeActiveTool(appState, {
+        type: "selection",
+      });
     }
+
     return {
       elements: newElements,
       appState: {

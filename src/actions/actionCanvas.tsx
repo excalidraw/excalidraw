@@ -11,7 +11,7 @@ import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
-import { getShortcutKey } from "../utils";
+import { getShortcutKey, makeActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
@@ -304,34 +304,22 @@ export const actionErase = register({
   name: "eraser",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
-    const activeTool: any = { ...appState.activeTool };
+    let activeTool: AppState["activeTool"];
 
-    if (isEraserActive(appState)) {
-      if (appState.activeTool.lastActiveToolBeforeEraser) {
-        if (
-          typeof appState.activeTool.lastActiveToolBeforeEraser === "object" &&
-          appState.activeTool.lastActiveToolBeforeEraser.type === "custom"
-        ) {
-          activeTool.type = "custom";
-          activeTool.customType =
-            appState.activeTool.lastActiveToolBeforeEraser.customType;
-        } else {
-          activeTool.type = appState.activeTool.lastActiveToolBeforeEraser;
-        }
-      } else {
-        activeTool.type = "selection";
-      }
+    if (appState.activeTool.type === "eraser") {
+      activeTool = makeActiveTool(appState, {
+        ...(appState.activeTool.lastActiveToolBeforeEraser || {
+          type: "selection",
+        }),
+        lastActiveToolBeforeEraser: null,
+      });
     } else {
-      activeTool.type = "eraser";
-      if (appState.activeTool.type === "custom") {
-        activeTool.lastActiveToolBeforeEraser = {
-          type: "custom",
-          customType: appState.activeTool.customType,
-        };
-      } else {
-        activeTool.lastActiveToolBeforeEraser = appState.activeTool.type;
-      }
+      activeTool = makeActiveTool(appState, {
+        type: "eraser",
+        lastActiveToolBeforeEraser: appState.activeTool,
+      });
     }
+
     return {
       appState: {
         ...appState,

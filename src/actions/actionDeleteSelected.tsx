@@ -12,6 +12,7 @@ import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
 import { isBoundToContainer } from "../element/typeChecks";
+import { makeActiveTool } from "../utils";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
@@ -134,7 +135,7 @@ export const actionDeleteSelected = register({
       elements: nextElements,
       appState: {
         ...nextAppState,
-        activeTool: { ...appState.activeTool, type: "selection" },
+        activeTool: makeActiveTool(appState, { type: "selection" }),
         multiElement: null,
       },
       commitToHistory: isSomeElementSelected(
