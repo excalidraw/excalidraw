@@ -317,13 +317,13 @@
       "authorName": "이름 또는 사용자명",
       "libraryName": "당신의 라이브러리 이름",
       "libraryDesc": "사람들이 쓰임새를 파악할 수 있도록 라이브러리에 대해 설명",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "githubHandle": "GitHub 사용자명 (선택), 제출한 뒤에도 심사를 위해서 라이브러리를 수정할 때 사용됩니다",
+      "twitterHandle": "Twitter 사용자명 (선택), Twitter를 통한 홍보에서 누가 제작했는지를 알리기 위해 사용됩니다",
+      "website": "개인 웹사이트나 다른 어딘가의 링크 (선택)"
     },
     "errors": {
       "required": "필수사항",
-      "website": ""
+      "website": "유효한 URL을 입력하세요"
     },
     "noteDescription": {
       "pre": "당신의 라이브러리를 제출하여 ",
@@ -333,19 +333,19 @@
     "noteGuidelines": {
       "pre": "라이브러리는 먼저 수동으로 승인되어야 합니다. 제출하기 전에 ",
       "link": "가이드라인",
-      "post": " 을 먼저 읽어보세요. 의견을 공유하거나 변경사항을 만들기 위해선 GitHub 계정이 필요하지만, 반드시 필요하진 않습니다."
+      "post": "을 먼저 읽어보세요. 의견을 공유하거나 변경사항을 만들기 위해선 GitHub 계정이 필요하지만, 반드시 필요하진 않습니다."
     },
     "noteLicense": {
       "pre": "제출함으로써, 당신은 라이브러리가 ",
       "link": "MIT 라이선스 ",
       "post": "하에 배포됨을, 즉 아무나 제약 없이 사용할 수 있음에 동의합니다."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "각각의 라이브러리는 분류할 수 있도록 고유한 이름을 가져야 합니다. 다음의 라이브러리 항목이 포함됩니다:",
+    "atleastOneLibItem": "최소한 하나의 라이브러리를 선택해주세요"
   },
   "publishSuccessDialog": {
     "title": "라이브러리 제출됨",
-    "content": "",
+    "content": "{{authorName}}님 감사합니다. 당신의 라이브러리가 심사를 위해 제출되었습니다. 진행 상황을 다음의 링크에서 확인할 수 있습니다.",
     "link": "여기"
   },
   "confirmDialog": {
