@@ -98,11 +98,11 @@
     "flipHorizontal": "좌우반전",
     "flipVertical": "상하반전",
     "viewMode": "보기 모드",
-    "toggleExportColorScheme": "",
+    "toggleExportColorScheme": "내보내기의 색상 테마 전환하기",
     "share": "공유",
     "showStroke": "윤곽선 색상 선택기 열기",
     "showBackground": "배경 색상 선택기 열기",
-    "toggleTheme": "",
+    "toggleTheme": "테마 전환",
     "personalLib": "개인 라이브러리",
     "excalidrawLib": "Excalidraw 라이브러리",
     "decreaseFontSize": "폰트 사이즈 줄이기",
@@ -112,12 +112,12 @@
     "link": {
       "edit": "링크 수정하기",
       "create": "링크 만들기",
-      "label": ""
+      "label": "링크"
     },
     "elementLock": {
-      "lock": "",
+      "lock": "잠금",
       "unlock": "잠금 해제",
-      "lockAll": "모두 잠그기",
+      "lockAll": "모두 잠금",
       "unlockAll": "모두 잠금 해제"
     }
   },
@@ -177,7 +177,7 @@
     "confirmAddLibrary": "{{numShapes}}개의 모양이 라이브러리에 추가됩니다. 계속하시겠어요?",
     "imageDoesNotContainScene": "이 이미지는 화면 데이터를 포함하고 있지 않은 것 같습니다. 내보낼 때 화면을 첨부하도록 설정하셨나요?",
     "cannotRestoreFromImage": "이미지 파일에서 화면을 복구할 수 없었습니다",
-    "invalidSceneUrl": "",
+    "invalidSceneUrl": "제공된 URL에서 화면을 가져오는데 실패했습니다. 주소가 잘못되거나, 유효한 Excalidraw JSON 데이터를 포함하고 있지 않은 것일 수 있습니다.",
     "resetLibrary": "당신의 라이브러리를 초기화 합니다. 계속하시겠습니까?",
     "removeItemsFromsLibrary": "{{count}}개의 아이템을 라이브러리에서 삭제하시겠습니까?",
     "invalidEncryptionKey": "암호화 키는 반드시 22글자여야 합니다. 실시간 협업이 비활성화됩니다."
@@ -188,7 +188,7 @@
     "fileTooBig": "파일이 너무 큽니다. 최대 크기는 {{maxSize}} 입니다.",
     "svgImageInsertError": "SVG 이미지를 삽입하지 못했습니다. SVG 문법이 유효하지 않은 것 같습니다.",
     "invalidSVGString": "유효하지 않은 SVG입니다.",
-    "cannotResolveCollabServer": "",
+    "cannotResolveCollabServer": "협업 서버에 접속하는데 실패했습니다. 페이지를 새로고침하고 다시 시도해보세요.",
     "importLibraryError": "라이브러리를 불러오지 못했습니다."
   },
   "toolBar": {
@@ -227,11 +227,11 @@
     "lineEditor_info": "지점을 수정하려면 두 번 클릭하거나 Enter 키를 누르세요.",
     "lineEditor_pointSelected": "Delete 키로 꼭짓점을 제거하거나,\nCtrlOrCmd+D 로 복제하거나, 드래그 해서 이동시키기",
     "lineEditor_nothingSelected": "꼭짓점을 선택해서 수정하거나 (SHIFT를 눌러서 여러개 선택),\nAlt를 누르고 클릭해서 새로운 꼭짓점 추가하기",
-    "placeImage": "",
+    "placeImage": "클릭해서 이미지를 배치하거나, 클릭하고 드래그해서 사이즈를 조정하기",
     "publishLibrary": "당신만의 라이브러리를 게시하기",
     "bindTextToElement": "Enter 키를 눌러서 텍스트 추가하기",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "Alt를 눌러서 삭제하도록 지정된 요소를 되돌리기"
   },
   "canvasError": {
     "cannotShowPreview": "미리보기를 볼 수 없습니다",
@@ -299,7 +299,7 @@
     "view": "보기",
     "zoomToFit": "모든 요소가 보이도록 확대/축소",
     "zoomToSelection": "선택 영역으로 확대/축소",
-    "toggleElementLock": ""
+    "toggleElementLock": "선택한 항목을 잠금/잠금 해제"
   },
   "clearCanvasDialog": {
     "title": "캔버스 지우기"
@@ -336,25 +336,25 @@
       "post": " 을 먼저 읽어보세요. 의견을 공유하거나 변경사항을 만들기 위해선 GitHub 계정이 필요하지만, 반드시 필요하진 않습니다."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "MIT 라이선스, ",
-      "post": ""
+      "pre": "제출함으로써, 당신은 라이브러리가 ",
+      "link": "MIT 라이선스 ",
+      "post": "하에 배포됨을, 즉 아무나 제약 없이 사용할 수 있음에 동의합니다."
     },
     "noteItems": "",
     "atleastOneLibItem": ""
   },
   "publishSuccessDialog": {
-    "title": "",
+    "title": "라이브러리 제출됨",
     "content": "",
     "link": "여기"
   },
   "confirmDialog": {
     "resetLibrary": "라이브러리 리셋",
-    "removeItemsFromLib": ""
+    "removeItemsFromLib": "선택한 항목을 라이브러리에서 제거"
   },
   "encrypted": {
     "tooltip": "그림은 종단 간 암호화되므로 Excalidraw의 서버는 절대로 내용을 알 수 없습니다.",
-    "link": ""
+    "link": "Excalidraw의 종단 간 암호화에 대한 블로그 포스트"
   },
   "stats": {
     "angle": "각도",
@@ -375,11 +375,11 @@
     "addedToLibrary": "라이브러리에 추가되었습니다",
     "copyStyles": "스타일 복사.",
     "copyToClipboard": "클립보드로 복사.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "{{exportSelection}}를 클립보드에 PNG로 복사했습니다\n({{exportColorScheme}})",
     "fileSaved": "파일이 저장되었습니다.",
     "fileSavedToFilename": "{filename} 로 저장되었습니다",
     "canvas": "캔버스",
-    "selection": "선택"
+    "selection": "선택한 요소"
   },
   "colors": {
     "ffffff": "화이트",
@@ -425,7 +425,7 @@
     "087f5b": "틸 9",
     "2b8a3e": "녹색 9",
     "5c940d": "라임 9",
-    "e67700": "",
-    "d9480f": ""
+    "e67700": "노란색 9",
+    "d9480f": "주황색 9"
   }
 }
