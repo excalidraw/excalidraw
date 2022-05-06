@@ -263,10 +263,9 @@ const drawElementOnCanvas = (
         context.save();
         context.font = getFontString(element);
         context.fillStyle = element.strokeColor;
-        context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const lines = getLineGroupedRanges(element);
         const lineHeight = element.containerId
           ? getApproxLineHeight(getFontString(element))
           : element.height / lines.length;
@@ -275,19 +274,31 @@ const drawElementOnCanvas = (
           verticalOffset = BOUND_TEXT_PADDING;
         }
 
-        const horizontalOffset =
-          element.textAlign === "center"
-            ? element.width / 2
-            : element.textAlign === "right"
-            ? element.width
-            : 0;
-        for (let index = 0; index < lines.length; index++) {
-          context.fillText(
-            lines[index],
-            horizontalOffset,
-            (index + 1) * lineHeight - verticalOffset,
+        lines.forEach((ranges, index) => {
+          const { width: lineWidth } = context.measureText(
+            // TODO: Maybe compute this inside of getLineGroupedRanges for perf
+            ranges.map((range) => range.text).join(""),
           );
-        }
+
+          let horizontalOffset =
+            element.textAlign === "center"
+              ? (element.width - lineWidth) / 2
+              : element.textAlign === "right"
+              ? element.width - lineWidth
+              : 0;
+
+          ranges.forEach((range) => {
+            context.fillStyle = range.color;
+            context.fillText(
+              range.text,
+              horizontalOffset,
+              (index + 1) * lineHeight - verticalOffset,
+            );
+            horizontalOffset +=
+              context.measureText(range.text).width * (rtl ? -1 : 1);
+          });
+        });
+
         context.restore();
         if (shouldTemporarilyAttach) {
           context.canvas.remove();
@@ -298,6 +309,30 @@ const drawElementOnCanvas = (
     }
   }
   context.globalAlpha = 1;
+};
+
+type LineGroupedRanges = { color: string; text: string }[][];
+
+const getLineGroupedRanges = (
+  element: ExcalidrawTextElement,
+): LineGroupedRanges => {
+  const lines: LineGroupedRanges = [];
+
+  let charCount = 0;
+  element.text
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .forEach((elementLine) => {
+      lines.push(
+        [...elementLine].map((char, i) => ({
+          text: char,
+          color: element.colorRanges[charCount + i] ?? element.strokeColor,
+        })),
+      );
+      charCount += elementLine.length;
+    });
+
+  return lines;
 };
 
 const elementWithCanvasCache = new WeakMap<
