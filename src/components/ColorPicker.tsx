@@ -186,13 +186,16 @@ const Picker = ({
     ) {
       const index = keyBindings.indexOf(event.key.toLowerCase());
       const isCustom = index >= MAX_DEFAULT_COLORS;
-      const parentSelector = isCustom
-        ? gallery!.current!.querySelector(
-            ".color-picker-content--canvas-colors",
-          )!
-        : gallery!.current!.querySelector(".color-picker-content--default")!;
+      const parentSelector =
+        (isCustom
+          ? gallery?.current?.querySelector(
+              ".color-picker-content--canvas-colors",
+            )
+          : gallery?.current?.querySelector(
+              ".color-picker-content--default",
+            )) ?? null;
       const actualIndex = isCustom ? index - MAX_DEFAULT_COLORS : index;
-      (parentSelector!.children![actualIndex] as HTMLElement)?.focus();
+      (parentSelector?.children?.[actualIndex] as HTMLElement)?.focus();
 
       event.preventDefault();
     } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
