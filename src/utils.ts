@@ -226,8 +226,9 @@ export const updateActiveTool = (
   return {
     ...appState.activeTool,
     lastActiveToolBeforeEraser:
-      data.lastActiveToolBeforeEraser ||
-      appState.activeTool.lastActiveToolBeforeEraser,
+      data.lastActiveToolBeforeEraser === undefined
+        ? appState.activeTool.lastActiveToolBeforeEraser
+        : data.lastActiveToolBeforeEraser,
     type: data.type,
     customType: null,
   };
