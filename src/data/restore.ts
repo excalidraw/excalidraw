@@ -26,7 +26,7 @@ import {
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
-import { getUpdatedTimestamp } from "../utils";
+import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 
 type RestoredAppState = Omit<
@@ -48,6 +48,7 @@ export const AllowedExcalidrawActiveTools: Record<
   arrow: true,
   freedraw: true,
   eraser: false,
+  custom: true,
 };
 
 export type RestoredDataState = {
@@ -198,6 +199,7 @@ const restoreElement = (
         y,
       });
     }
+
     // generic elements
     case "ellipse":
       return restoreElementWithProperties(element, {});
@@ -255,6 +257,7 @@ export const restoreAppState = (
         ? localValue
         : defaultValue;
   }
+
   return {
     ...nextAppState,
     cursorButton: localAppState?.cursorButton || "up",
@@ -263,11 +266,15 @@ export const restoreAppState = (
       localAppState?.penDetected ??
       (appState.penMode ? appState.penDetected ?? false : false),
     activeTool: {
+      ...updateActiveTool(
+        defaultAppState,
+        nextAppState.activeTool.type &&
+          AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
+          ? nextAppState.activeTool
+          : { type: "selection" },
+      ),
       lastActiveToolBeforeEraser: null,
       locked: nextAppState.activeTool.locked ?? false,
-      type: AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
-        ? nextAppState.activeTool.type ?? "selection"
-        : "selection",
     },
     // Migrates from previous version where appState.zoom was a number
     zoom:

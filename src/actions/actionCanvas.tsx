@@ -11,7 +11,7 @@ import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
-import { getShortcutKey } from "../utils";
+import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
@@ -304,21 +304,28 @@ export const actionErase = register({
   name: "eraser",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
+    let activeTool: AppState["activeTool"];
+
+    if (isEraserActive(appState)) {
+      activeTool = updateActiveTool(appState, {
+        ...(appState.activeTool.lastActiveToolBeforeEraser || {
+          type: "selection",
+        }),
+        lastActiveToolBeforeEraser: null,
+      });
+    } else {
+      activeTool = updateActiveTool(appState, {
+        type: "eraser",
+        lastActiveToolBeforeEraser: appState.activeTool,
+      });
+    }
+
     return {
       appState: {
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
-        activeTool: {
-          ...appState.activeTool,
-          type: isEraserActive(appState)
-            ? appState.activeTool.lastActiveToolBeforeEraser ?? "selection"
-            : "eraser",
-          lastActiveToolBeforeEraser:
-            appState.activeTool.type === "eraser" //node throws incorrect type error when using isEraserActive()
-              ? null
-              : appState.activeTool.type,
-        },
+        activeTool,
       },
       commitToHistory: true,
     };
