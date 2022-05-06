@@ -208,7 +208,7 @@ export const removeSelection = () => {
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
-export const makeActiveTool = (
+export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: (
     | { type: typeof SHAPES[number]["value"] | "eraser" }
@@ -226,9 +226,8 @@ export const makeActiveTool = (
   return {
     ...appState.activeTool,
     lastActiveToolBeforeEraser:
-      data.lastActiveToolBeforeEraser === undefined
-        ? appState.activeTool.lastActiveToolBeforeEraser
-        : data.lastActiveToolBeforeEraser,
+      data.lastActiveToolBeforeEraser ||
+      appState.activeTool.lastActiveToolBeforeEraser,
     type: data.type,
     customType: null,
   };

@@ -11,7 +11,7 @@ import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
-import { getShortcutKey, makeActiveTool } from "../utils";
+import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
@@ -306,15 +306,15 @@ export const actionErase = register({
   perform: (elements, appState) => {
     let activeTool: AppState["activeTool"];
 
-    if (appState.activeTool.type === "eraser") {
-      activeTool = makeActiveTool(appState, {
+    if (isEraserActive(appState)) {
+      activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveToolBeforeEraser || {
           type: "selection",
         }),
         lastActiveToolBeforeEraser: null,
       });
     } else {
-      activeTool = makeActiveTool(appState, {
+      activeTool = updateActiveTool(appState, {
         type: "eraser",
         lastActiveToolBeforeEraser: appState.activeTool,
       });

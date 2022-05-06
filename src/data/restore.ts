@@ -26,7 +26,7 @@ import {
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
-import { getUpdatedTimestamp, makeActiveTool } from "../utils";
+import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 
 type RestoredAppState = Omit<
@@ -266,7 +266,7 @@ export const restoreAppState = (
       localAppState?.penDetected ??
       (appState.penMode ? appState.penDetected ?? false : false),
     activeTool: {
-      ...makeActiveTool(
+      ...updateActiveTool(
         defaultAppState,
         nextAppState.activeTool.type &&
           AllowedExcalidrawActiveTools[nextAppState.activeTool.type]

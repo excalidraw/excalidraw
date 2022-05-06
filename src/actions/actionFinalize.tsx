@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { isInvisiblySmallElement } from "../element";
-import { makeActiveTool, resetCursor } from "../utils";
+import { updateActiveTool, resetCursor } from "../utils";
 import { ToolButton } from "../components/ToolButton";
 import { done } from "../components/icons";
 import { t } from "../i18n";
@@ -140,14 +140,14 @@ export const actionFinalize = register({
 
     let activeTool: AppState["activeTool"];
     if (appState.activeTool.type === "eraser") {
-      activeTool = makeActiveTool(appState, {
+      activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveToolBeforeEraser || {
           type: "selection",
         }),
         lastActiveToolBeforeEraser: null,
       });
     } else {
-      activeTool = makeActiveTool(appState, {
+      activeTool = updateActiveTool(appState, {
         type: "selection",
       });
     }

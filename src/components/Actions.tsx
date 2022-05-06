@@ -18,7 +18,7 @@ import { AppState, Zoom } from "../types";
 import {
   capitalizeString,
   isTransparent,
-  makeActiveTool,
+  updateActiveTool,
   setCursorForShape,
 } from "../utils";
 import Stack from "./Stack";
@@ -234,7 +234,7 @@ export const ShapesSwitcher = ({
             if (appState.activeTool.type !== value) {
               trackEvent("toolbar", value, "ui");
             }
-            const nextActiveTool = makeActiveTool(appState, {
+            const nextActiveTool = updateActiveTool(appState, {
               type: value,
             });
             setAppState({

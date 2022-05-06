@@ -219,7 +219,7 @@ import {
   withBatchedUpdatesThrottled,
   updateObject,
   setEraserCursor,
-  makeActiveTool,
+  updateActiveTool,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -1075,7 +1075,7 @@ class App extends React.Component<AppProps, AppState> {
       isEraserActive(this.state)
     ) {
       this.setState({
-        activeTool: makeActiveTool(this.state, { type: "selection" }),
+        activeTool: updateActiveTool(this.state, { type: "selection" }),
       });
     }
     if (
@@ -1595,7 +1595,7 @@ class App extends React.Component<AppProps, AppState> {
       return {
         activeTool: {
           ...prevState.activeTool,
-          ...makeActiveTool(
+          ...updateActiveTool(
             this.state,
             prevState.activeTool.locked
               ? { type: "selection" }
@@ -1980,7 +1980,7 @@ class App extends React.Component<AppProps, AppState> {
       | { type: typeof SHAPES[number]["value"] | "eraser" }
       | { type: "custom"; customType: string },
   ) {
-    const nextActiveTool = makeActiveTool(this.state, tool);
+    const nextActiveTool = updateActiveTool(this.state, tool);
     if (!isHoldingSpace) {
       setCursorForShape(this.canvas, this.state);
     }
@@ -3649,7 +3649,7 @@ class App extends React.Component<AppProps, AppState> {
     resetCursor(this.canvas);
     if (!this.state.activeTool.locked) {
       this.setState({
-        activeTool: makeActiveTool(this.state, { type: "selection" }),
+        activeTool: updateActiveTool(this.state, { type: "selection" }),
       });
     }
   };
@@ -4468,7 +4468,7 @@ class App extends React.Component<AppProps, AppState> {
             resetCursor(this.canvas);
             this.setState((prevState) => ({
               draggingElement: null,
-              activeTool: makeActiveTool(this.state, {
+              activeTool: updateActiveTool(this.state, {
                 type: "selection",
               }),
               selectedElementIds: {
@@ -4692,7 +4692,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           draggingElement: null,
           suggestedBindings: [],
-          activeTool: makeActiveTool(this.state, { type: "selection" }),
+          activeTool: updateActiveTool(this.state, { type: "selection" }),
         });
       } else {
         this.setState({
@@ -4998,7 +4998,7 @@ class App extends React.Component<AppProps, AppState> {
         {
           pendingImageElement: null,
           editingElement: null,
-          activeTool: makeActiveTool(this.state, { type: "selection" }),
+          activeTool: updateActiveTool(this.state, { type: "selection" }),
         },
         () => {
           this.actionManager.executeAction(actionFinalize);
