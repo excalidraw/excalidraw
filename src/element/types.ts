@@ -116,17 +116,11 @@ export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
 
-// - must be sorted (ascending) - makes it much easier to draw to canvas
-// - overlapping ranges are not possible
-// options:
-// - sparse array of colours for each char - solves both problems, space ineficient, could be weird when working with multi-byte unicode chars
-// - Record<number, string>
-// export type TextColorRangeList = null | {
-//   start: number;
-//   end: number;
-//   color: string;
-//   nextRange: TextColorRangeList;
-// };
+/**
+ * Indicates the color of each character at the position of the key in the record, respective to the text contents with newlines removed.
+ * If a key doesn't exist then the character is assumed to be the standard text color.
+ */
+export type TextColorRanges = Readonly<Record<number, string>>;
 
 export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
@@ -139,7 +133,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
-    colorRanges: Readonly<Record<number, string>>;
+    colorRanges: TextColorRanges;
   }>;
 
 export type ExcalidrawBindableElement =
