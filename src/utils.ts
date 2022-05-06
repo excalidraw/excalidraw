@@ -11,9 +11,10 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { AppState, DataURL, Zoom } from "./types";
+import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
+import { SHAPES } from "./shapes";
 
 let mockDateTime: string | null = null;
 
@@ -206,6 +207,32 @@ export const removeSelection = () => {
 };
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
+
+export const updateActiveTool = (
+  appState: Pick<AppState, "activeTool">,
+  data: (
+    | { type: typeof SHAPES[number]["value"] | "eraser" }
+    | { type: "custom"; customType: string }
+  ) & { lastActiveToolBeforeEraser?: LastActiveToolBeforeEraser },
+): AppState["activeTool"] => {
+  if (data.type === "custom") {
+    return {
+      ...appState.activeTool,
+      type: "custom",
+      customType: data.customType,
+    };
+  }
+
+  return {
+    ...appState.activeTool,
+    lastActiveToolBeforeEraser:
+      data.lastActiveToolBeforeEraser === undefined
+        ? appState.activeTool.lastActiveToolBeforeEraser
+        : data.lastActiveToolBeforeEraser,
+    type: data.type,
+    customType: null,
+  };
+};
 
 export const resetCursor = (canvas: HTMLCanvasElement | null) => {
   if (canvas) {
