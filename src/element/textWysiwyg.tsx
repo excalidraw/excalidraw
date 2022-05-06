@@ -12,8 +12,9 @@ import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
+  TextColorRanges,
 } from "./types";
-import { AppState } from "../types";
+import { AppState, Selection } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
@@ -63,6 +64,7 @@ export const textWysiwyg = ({
   id,
   onChange,
   onSubmit,
+  onSelection,
   getViewportCoords,
   element,
   canvas,
@@ -70,12 +72,13 @@ export const textWysiwyg = ({
   app,
 }: {
   id: ExcalidrawElement["id"];
-  onChange?: (text: string) => void;
+  onChange?: (data: { text: string; colorRanges: TextColorRanges }) => void;
   onSubmit: (data: {
     text: string;
     viaKeyboard: boolean;
     originalText: string;
   }) => void;
+  onSelection: (selection: Selection | null) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement | null;
@@ -222,7 +225,8 @@ export const textWysiwyg = ({
         ),
         textAlign,
         verticalAlign,
-        color: updatedElement.strokeColor,
+        color: "transparent",
+        "caret-color": "#000",
         opacity: updatedElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxWidth: `${maxWidth}px`,
@@ -265,6 +269,7 @@ export const textWysiwyg = ({
     resize: "none",
     background: "transparent",
     overflow: "hidden",
+    color: "transparent",
     // must be specified because in dark mode canvas creates a stacking context
     zIndex: "var(--zIndex-wysiwyg)",
     wordBreak,
@@ -317,9 +322,23 @@ export const textWysiwyg = ({
         editable.style.height = height;
         editable.style.height = `${editable.scrollHeight}px`;
       }
-      onChange(normalizeText(editable.value));
+      onChange({
+        text: normalizeText(editable.value),
+        colorRanges: element.colorRanges,
+      });
     };
   }
+
+  const handleSelectionChange = () => {
+    const { selectionStart, selectionEnd } =
+      document.querySelector<HTMLTextAreaElement>(
+        ".excalidraw-textEditorContainer textarea",
+      )!;
+
+    onSelection({ start: selectionStart, end: selectionEnd });
+  };
+
+  document.addEventListener("selectionchange", handleSelectionChange);
 
   editable.onkeydown = (event) => {
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
@@ -503,6 +522,8 @@ export const textWysiwyg = ({
       }
     }
 
+    onSelection(null);
+
     onSubmit({
       text,
       viaKeyboard: submittedViaKeyboard,
@@ -529,6 +550,7 @@ export const textWysiwyg = ({
     window.removeEventListener("pointerdown", onPointerDown);
     window.removeEventListener("pointerup", bindBlurEvent);
     window.removeEventListener("blur", handleSubmit);
+    document.removeEventListener("selectionchange", handleSelectionChange);
 
     unbindUpdate();
 

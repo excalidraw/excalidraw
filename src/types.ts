@@ -76,6 +76,9 @@ export type LastActiveToolBeforeEraser =
       customType: string;
     }
   | null;
+
+export type Selection = { start: number; end: number };
+
 export type AppState = {
   isLoading: boolean;
   errorMessage: string | null;
@@ -176,6 +179,7 @@ export type AppState = {
   /** imageElement waiting to be placed on canvas */
   pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
   showHyperlinkPopup: false | "info" | "editor";
+  selectedTextRange: null | Selection;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

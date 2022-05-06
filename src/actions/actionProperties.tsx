@@ -202,11 +202,35 @@ export const actionChangeStrokeColor = register({
           elements,
           appState,
           (el) => {
-            return hasStrokeColor(el.type)
-              ? newElementWith(el, {
-                  strokeColor: value.currentItemStrokeColor,
-                })
-              : el;
+            if (!hasStrokeColor(el.type)) {
+              return el;
+            }
+
+            if (el.type === "text" && appState.selectedTextRange) {
+              const newColorRange = Object.fromEntries(
+                Array.from(
+                  {
+                    length:
+                      appState.selectedTextRange.end -
+                      appState.selectedTextRange.start,
+                  },
+                  (_, i) => [
+                    i + appState.selectedTextRange!.start,
+                    value.currentItemStrokeColor,
+                  ],
+                ),
+              );
+              return newElementWith(el, {
+                colorRanges: {
+                  ...el.colorRanges,
+                  ...newColorRange,
+                },
+              });
+            }
+
+            return newElementWith(el, {
+              strokeColor: value.currentItemStrokeColor,
+            });
           },
           true,
         ),
@@ -227,7 +251,14 @@ export const actionChangeStrokeColor = register({
         color={getFormValue(
           elements,
           appState,
-          (element) => element.strokeColor,
+          (element) => {
+            if (element.type !== "text") {
+              return element.strokeColor;
+            }
+
+            const selectStart = appState.selectedTextRange?.start ?? -1;
+            return element.colorRanges[selectStart] ?? element.strokeColor;
+          },
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}

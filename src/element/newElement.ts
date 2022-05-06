@@ -12,6 +12,7 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawRectangleElement,
+  TextColorRanges,
 } from "../element/types";
 import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -145,15 +146,7 @@ export const newTextElement = (
       baseline: metrics.baseline,
       containerId: opts.containerId || null,
       originalText: opts.text,
-      // TODO: Just mock some color ranges for now while we work on rendering
-      colorRanges: {
-        0: "#ff1100",
-        1: "#ff1100",
-        4: "#ff1100",
-        5: "#ff1100",
-        6: "#ff1100",
-        7: "#ff1100",
-      },
+      colorRanges: {},
     },
     {},
   );
@@ -259,8 +252,10 @@ export const updateTextElement = (
     text,
     isDeleted,
     originalText,
+    colorRanges,
   }: {
     text: string;
+    colorRanges?: TextColorRanges;
     isDeleted?: boolean;
     originalText: string;
   },
@@ -274,6 +269,7 @@ export const updateTextElement = (
     text,
     originalText,
     isDeleted: isDeleted ?? element.isDeleted,
+    colorRanges,
     ...dimensions,
   });
 };
