@@ -60,6 +60,33 @@ describe("getLineGroupedRanges", () => {
     ]);
   });
 
+  it("handles emoji within a range", () => {
+    const element = API.createElement({
+      type: "text",
+      text: "aa😀aa😀aa",
+      // colorRanges stores the color of all codepoints in a character.
+      // Emoji are made up of two codepoints so we store two key/values.
+      colorRanges: { 2: "#fff", 3: "#fff", 6: "#fff", 7: "#fff" },
+      strokeColor: "#000",
+    });
+
+    expect(
+      utils.getLineGroupedRanges(element),
+    ).toEqual<utils.LineGroupedRanges>([
+      [
+        { color: "#000", text: "a" },
+        { color: "#000", text: "a" },
+        // The range should apply to just the emoji
+        { color: "#fff", text: "😀" },
+        { color: "#000", text: "a" },
+        { color: "#000", text: "a" },
+        { color: "#fff", text: "😀" },
+        { color: "#000", text: "a" },
+        { color: "#000", text: "a" },
+      ],
+    ]);
+  });
+
   it.skip("handles multi codepoint unicode", () => {
     expect(
       utils.getLineGroupedRanges(
