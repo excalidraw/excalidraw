@@ -9,6 +9,7 @@
     "copy": "Копирай",
     "copyAsPng": "Копиране в клипборда",
     "copyAsSvg": "Копирано в клипборда като SVG",
+    "copyText": "",
     "bringForward": "Преместване напред",
     "sendToBack": "Изнасяне назад",
     "bringToFront": "Изнасяне отпред",
@@ -107,10 +108,17 @@
     "decreaseFontSize": "",
     "increaseFontSize": "",
     "unbindText": "",
+    "bindText": "",
     "link": {
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     }
   },
   "buttons": {
@@ -159,7 +167,7 @@
     "couldNotLoadInvalidFile": "Невалиден файл не може да се зареди",
     "importBackendFailed": "Импортирането от бекенд не беше успешно.",
     "cannotExportEmptyCanvas": "Не може да се експортира празно платно.",
-    "couldNotCopyToClipboard": "Неуспешно копиране в клипборда. Опитайте да използвате браузъра Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "Данните не можаха да се дешифрират.",
     "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието.",
     "loadSceneOverridePrompt": "Зареждането на външна рисунка ще презапише настоящото ви съдържание. Желаете ли да продължите?",
@@ -196,7 +204,8 @@
     "library": "Библиотека",
     "lock": "Поддържайте избрания инструмент активен след рисуване",
     "penMode": "",
-    "link": ""
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Действия по платното",
@@ -221,7 +230,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "Натиснете Enter, за да добавите",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Невъзможност за показване на preview",
@@ -281,14 +291,15 @@
     "howto": "Следвайте нашите ръководства",
     "or": "или",
     "preventBinding": "Спри прилепяне на стрелките",
-    "shapes": "Фигури",
+    "tools": "",
     "shortcuts": "Клавиши за бърз достъп",
     "textFinish": "",
     "textNewLine": "",
     "title": "Помощ",
     "view": "Преглед",
     "zoomToFit": "Приближи докато се виждат всички елементи",
-    "zoomToSelection": "Приближи селекцията"
+    "zoomToSelection": "Приближи селекцията",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""

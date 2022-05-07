@@ -76,7 +76,6 @@ import {
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
-import { isValidLibrary } from "../data/json";
 import Library from "../data/library";
 import { restore, restoreElements, restoreLibraryItems } from "../data/restore";
 import {
@@ -184,7 +183,7 @@ import {
 import Scene from "../scene/Scene";
 import { RenderConfig, ScrollBars } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
-import { findShapeByKey } from "../shapes";
+import { findShapeByKey, SHAPES } from "../shapes";
 import {
   AppClassProperties,
   AppProps,
@@ -220,6 +219,7 @@ import {
   withBatchedUpdatesThrottled,
   updateObject,
   setEraserCursor,
+  updateActiveTool,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -234,6 +234,7 @@ import {
   isSupportedImageFile,
   loadSceneOrLibraryFromBlob,
   normalizeFile,
+  loadLibraryFromBlob,
   resizeImageFile,
   SVGStringToFile,
 } from "../data/blob";
@@ -260,6 +261,7 @@ import {
   isPointHittingLinkIcon,
   isLocalLink,
 } from "../element/Hyperlink";
+import { AbortError } from "../errors";
 
 const defaultDeviceTypeContext: DeviceType = {
   isMobile: false,
@@ -706,31 +708,38 @@ class App extends React.Component<AppProps, AppState> {
       window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
     }
 
+    const defaultStatus = "published";
+
+    this.setState({ isLibraryOpen: true });
+
     try {
-      const request = await fetch(decodeURIComponent(url));
-      const blob = await request.blob();
-      const json = JSON.parse(await blob.text());
-      if (!isValidLibrary(json)) {
-        throw new Error();
-      }
-      if (
-        token === this.id ||
-        window.confirm(
-          t("alerts.confirmAddLibrary", {
-            numShapes: (json.libraryItems || json.library || []).length,
-          }),
-        )
-      ) {
-        await this.library.importLibrary(blob, "published");
-        // hack to rerender the library items after import
-        if (this.state.isLibraryOpen) {
-          this.setState({ isLibraryOpen: false });
-        }
-        this.setState({ isLibraryOpen: true });
-      }
+      await this.library.importLibrary(
+        new Promise<LibraryItems>(async (resolve, reject) => {
+          try {
+            const request = await fetch(decodeURIComponent(url));
+            const blob = await request.blob();
+            const libraryItems = await loadLibraryFromBlob(blob, defaultStatus);
+
+            if (
+              token === this.id ||
+              window.confirm(
+                t("alerts.confirmAddLibrary", {
+                  numShapes: libraryItems.length,
+                }),
+              )
+            ) {
+              resolve(libraryItems);
+            } else {
+              reject(new AbortError());
+            }
+          } catch (error: any) {
+            reject(error);
+          }
+        }),
+      );
     } catch (error: any) {
-      window.alert(t("alerts.errorLoadingLibrary"));
       console.error(error);
+      this.setState({ errorMessage: t("errors.importLibraryError") });
     } finally {
       this.focusContainer();
     }
@@ -780,10 +789,7 @@ class App extends React.Component<AppProps, AppState> {
     try {
       initialData = (await this.props.initialData) || null;
       if (initialData?.libraryItems) {
-        this.libraryItemsFromStorage = restoreLibraryItems(
-          initialData.libraryItems,
-          "unpublished",
-        ) as LibraryItems;
+        this.library.importLibrary(initialData.libraryItems, "unpublished");
       }
     } catch (error: any) {
       console.error(error);
@@ -1057,10 +1063,13 @@ class App extends React.Component<AppProps, AppState> {
       isEraserActive(this.state)
     ) {
       this.setState({
-        activeTool: { ...this.state.activeTool, type: "selection" },
+        activeTool: updateActiveTool(this.state, { type: "selection" }),
       });
     }
-    if (prevState.theme !== this.state.theme) {
+    if (
+      this.state.activeTool.type === "eraser" &&
+      prevState.theme !== this.state.theme
+    ) {
       setEraserCursor(this.canvas, this.state.theme);
     }
     // Hide hyperlink popup if shown when element type is not selection
@@ -1267,6 +1276,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     this.cutAll();
     event.preventDefault();
+    event.stopPropagation();
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
@@ -1278,6 +1288,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     this.copyAll();
     event.preventDefault();
+    event.stopPropagation();
   });
 
   private cutAll = () => {
@@ -1422,7 +1433,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.text) {
         this.addTextFromPaste(data.text);
       }
-      this.setActiveTool({ ...this.state.activeTool, type: "selection" });
+      this.setActiveTool({ type: "selection" });
       event?.preventDefault();
     },
   );
@@ -1510,7 +1521,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool({ ...this.state.activeTool, type: "selection" });
+    this.setActiveTool({ type: "selection" });
   };
 
   private addTextFromPaste(text: any) {
@@ -1572,10 +1583,13 @@ class App extends React.Component<AppProps, AppState> {
       return {
         activeTool: {
           ...prevState.activeTool,
+          ...updateActiveTool(
+            this.state,
+            prevState.activeTool.locked
+              ? { type: "selection" }
+              : prevState.activeTool,
+          ),
           locked: !prevState.activeTool.locked,
-          type: prevState.activeTool.locked
-            ? "selection"
-            : prevState.activeTool.type,
         },
       };
     });
@@ -1667,7 +1681,14 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
-      libraryItems?: SceneData["libraryItems"];
+      libraryItems?:
+        | ((
+            currentLibraryItems: LibraryItems,
+          ) =>
+            | Required<SceneData>["libraryItems"]
+            | Promise<Required<SceneData>["libraryItems"]>)
+        | Required<SceneData>["libraryItems"]
+        | Promise<Required<SceneData>["libraryItems"]>;
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1686,14 +1707,20 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.libraryItems) {
-        this.library.saveLibrary(
-          restoreLibraryItems(sceneData.libraryItems, "unpublished"),
-        );
-        if (this.state.isLibraryOpen) {
-          this.setState({ isLibraryOpen: false }, () => {
-            this.setState({ isLibraryOpen: true });
+        this.library.setLibrary((currentLibraryItems) => {
+          const nextItems =
+            typeof sceneData.libraryItems === "function"
+              ? sceneData.libraryItems(currentLibraryItems)
+              : sceneData.libraryItems;
+
+          return new Promise<LibraryItems>(async (resolve, reject) => {
+            try {
+              resolve(restoreLibraryItems(await nextItems, "unpublished"));
+            } catch (error: any) {
+              reject(error);
+            }
           });
-        }
+        });
       }
     },
   );
@@ -1861,9 +1888,11 @@ class App extends React.Component<AppProps, AppState> {
               `keyboard (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
             );
           }
-          this.setActiveTool({ ...this.state.activeTool, type: shape });
+          this.setActiveTool({ type: shape });
+          event.stopPropagation();
         } else if (event.key === KEYS.Q) {
           this.toggleLock("keyboard");
+          event.stopPropagation();
         }
       }
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
@@ -1872,7 +1901,11 @@ class App extends React.Component<AppProps, AppState> {
         event.preventDefault();
       }
 
-      if (event.key === KEYS.G || event.key === KEYS.S) {
+      if (
+        (event.key === KEYS.G || event.key === KEYS.S) &&
+        !event.altKey &&
+        !event[KEYS.CTRL_OR_CMD]
+      ) {
         const selectedElements = getSelectedElements(
           this.scene.getElements(),
           this.state,
@@ -1890,9 +1923,11 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements.some((element) => hasBackground(element.type)))
         ) {
           this.setState({ openPopup: "backgroundColorPicker" });
+          event.stopPropagation();
         }
         if (event.key === KEYS.S) {
           this.setState({ openPopup: "strokeColorPicker" });
+          event.stopPropagation();
         }
       }
     },
@@ -1929,28 +1964,33 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  private setActiveTool(tool: AppState["activeTool"]) {
+  private setActiveTool(
+    tool:
+      | { type: typeof SHAPES[number]["value"] | "eraser" }
+      | { type: "custom"; customType: string },
+  ) {
+    const nextActiveTool = updateActiveTool(this.state, tool);
     if (!isHoldingSpace) {
       setCursorForShape(this.canvas, this.state);
     }
     if (isToolIcon(document.activeElement)) {
       this.focusContainer();
     }
-    if (!isLinearElementType(tool.type)) {
+    if (!isLinearElementType(nextActiveTool.type)) {
       this.setState({ suggestedBindings: [] });
     }
-    if (tool.type === "image") {
+    if (nextActiveTool.type === "image") {
       this.onImageAction();
     }
-    if (tool.type !== "selection") {
+    if (nextActiveTool.type !== "selection") {
       this.setState({
-        activeTool: tool,
+        activeTool: nextActiveTool,
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
       });
     } else {
-      this.setState({ activeTool: tool });
+      this.setState({ activeTool: nextActiveTool });
     }
   }
 
@@ -2217,8 +2257,7 @@ class App extends React.Component<AppProps, AppState> {
       if (isTextElement(selectedElements[0])) {
         existingTextElement = selectedElements[0];
       } else if (isTextBindableContainer(selectedElements[0], false)) {
-        container = selectedElements[0];
-        existingTextElement = getBoundTextElement(container);
+        existingTextElement = getBoundTextElement(selectedElements[0]);
       }
     }
 
@@ -3016,6 +3055,8 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type,
         pointerDownState,
       );
+    } else if (this.state.activeTool.type === "custom") {
+      setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
     } else if (this.state.activeTool.type !== "eraser") {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -3597,7 +3638,7 @@ class App extends React.Component<AppProps, AppState> {
     resetCursor(this.canvas);
     if (!this.state.activeTool.locked) {
       this.setState({
-        activeTool: { ...this.state.activeTool, type: "selection" },
+        activeTool: updateActiveTool(this.state, { type: "selection" }),
       });
     }
   };
@@ -4416,7 +4457,9 @@ class App extends React.Component<AppProps, AppState> {
             resetCursor(this.canvas);
             this.setState((prevState) => ({
               draggingElement: null,
-              activeTool: { ...prevState.activeTool, type: "selection" },
+              activeTool: updateActiveTool(this.state, {
+                type: "selection",
+              }),
               selectedElementIds: {
                 ...prevState.selectedElementIds,
                 [this.state.draggingElement!.id]: true,
@@ -4638,7 +4681,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           draggingElement: null,
           suggestedBindings: [],
-          activeTool: { ...activeTool, type: "selection" },
+          activeTool: updateActiveTool(this.state, { type: "selection" }),
         });
       } else {
         this.setState({
@@ -4944,7 +4987,7 @@ class App extends React.Component<AppProps, AppState> {
         {
           pendingImageElement: null,
           editingElement: null,
-          activeTool: { ...this.state.activeTool, type: "selection" },
+          activeTool: updateActiveTool(this.state, { type: "selection" }),
         },
         () => {
           this.actionManager.executeAction(actionFinalize);
@@ -5244,7 +5287,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (file) {
-      this.setState({ isLoading: true });
       // atetmpt to parse an excalidraw/excalidrawlib file
       await this.loadFileToCanvas(file, fileHandle);
     }
@@ -5263,6 +5305,7 @@ class App extends React.Component<AppProps, AppState> {
         fileHandle,
       );
       if (ret.type === MIME_TYPES.excalidraw) {
+        this.setState({ isLoading: true });
         this.syncActionResult({
           ...ret.data,
           appState: {
@@ -5276,13 +5319,17 @@ class App extends React.Component<AppProps, AppState> {
         this.library
           .importLibrary(file)
           .then(() => {
-            // Close and then open to get the libraries updated
-            this.setState({ isLibraryOpen: false, isLoading: false });
-            this.setState({ isLibraryOpen: true });
+            this.setState({
+              isLoading: false,
+            });
           })
-          .catch((error) =>
-            this.setState({ isLoading: false, errorMessage: error.message }),
-          );
+          .catch((error) => {
+            console.error(error);
+            this.setState({
+              isLoading: false,
+              errorMessage: t("errors.importLibraryError"),
+            });
+          });
       }
     } catch (error: any) {
       this.setState({ isLoading: false, errorMessage: error.message });

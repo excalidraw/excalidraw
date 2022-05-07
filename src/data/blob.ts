@@ -1,20 +1,16 @@
 import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
-import {
-  ALLOWED_IMAGE_MIME_TYPES,
-  EXPORT_DATA_TYPES,
-  MIME_TYPES,
-} from "../constants";
+import { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
-import { AppState, DataURL } from "../types";
+import { AppState, DataURL, LibraryItem } from "../types";
 import { bytesToHexString } from "../utils";
 import { FileSystemHandle, nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
-import { restore } from "./restore";
+import { restore, restoreLibraryItems } from "./restore";
 import { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File) => {
@@ -195,13 +191,17 @@ export const loadFromBlob = async (
   return ret.data;
 };
 
-export const loadLibraryFromBlob = async (blob: Blob) => {
+export const loadLibraryFromBlob = async (
+  blob: Blob,
+  defaultStatus: LibraryItem["status"] = "unpublished",
+) => {
   const contents = await parseFileContents(blob);
-  const data: ImportedLibraryData = JSON.parse(contents);
-  if (data.type !== EXPORT_DATA_TYPES.excalidrawLibrary) {
-    throw new Error(t("alerts.couldNotLoadInvalidFile"));
+  const data: ImportedLibraryData | undefined = JSON.parse(contents);
+  if (!isValidLibrary(data)) {
+    throw new Error("Invalid library");
   }
-  return data;
+  const libraryItems = data.libraryItems || data.library;
+  return restoreLibraryItems(libraryItems, defaultStatus);
 };
 
 export const canvasToBlob = async (
