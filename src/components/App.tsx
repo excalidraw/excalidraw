@@ -4706,7 +4706,7 @@ class App extends React.Component<AppProps, AppState> {
   private restoreReadyToEraseElements = (
     pointerDownState: PointerDownState,
   ) => {
-    const elements = this.scene.getElements().map((ele) => {
+    const elements = this.scene.getElementsIncludingDeleted().map((ele) => {
       if (
         pointerDownState.elementIdsToErase[ele.id] &&
         pointerDownState.elementIdsToErase[ele.id].erase
@@ -4730,7 +4730,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private eraseElements = (pointerDownState: PointerDownState) => {
-    const elements = this.scene.getElements().map((ele) => {
+    const elements = this.scene.getElementsIncludingDeleted().map((ele) => {
       if (
         pointerDownState.elementIdsToErase[ele.id] &&
         pointerDownState.elementIdsToErase[ele.id].erase
