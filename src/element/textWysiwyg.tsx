@@ -12,7 +12,6 @@ import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
-  TextColorRanges,
 } from "./types";
 import { AppState, Selection } from "../types";
 import { mutateElement } from "./mutateElement";
@@ -72,7 +71,7 @@ export const textWysiwyg = ({
   app,
 }: {
   id: ExcalidrawElement["id"];
-  onChange?: (data: { text: string; colorRanges: TextColorRanges }) => void;
+  onChange?: (text: string) => void;
   onSubmit: (data: {
     text: string;
     viaKeyboard: boolean;
@@ -322,10 +321,8 @@ export const textWysiwyg = ({
         editable.style.height = height;
         editable.style.height = `${editable.scrollHeight}px`;
       }
-      onChange({
-        text: normalizeText(editable.value),
-        colorRanges: element.colorRanges,
-      });
+
+      onChange(normalizeText(editable.value));
     };
   }
 

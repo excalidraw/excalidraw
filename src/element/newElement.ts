@@ -127,6 +127,7 @@ export const newTextElement = (
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     containerId?: ExcalidrawRectangleElement["id"];
+    colorRanges?: TextColorRanges;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const metrics = measureText(opts.text, getFontString(opts));
@@ -146,7 +147,7 @@ export const newTextElement = (
       baseline: metrics.baseline,
       containerId: opts.containerId || null,
       originalText: opts.text,
-      colorRanges: {},
+      colorRanges: opts.colorRanges ?? {},
     },
     {},
   );
@@ -269,7 +270,7 @@ export const updateTextElement = (
     text,
     originalText,
     isDeleted: isDeleted ?? element.isDeleted,
-    colorRanges,
+    colorRanges: colorRanges ?? element.colorRanges,
     ...dimensions,
   });
 };

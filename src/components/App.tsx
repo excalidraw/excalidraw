@@ -2092,8 +2092,8 @@ class App extends React.Component<AppProps, AppState> {
           viewportY - this.state.offsetTop,
         ];
       },
-      onChange: withBatchedUpdates(({ text, colorRanges }) => {
-        updateElement(text, text, false, colorRanges);
+      onChange: withBatchedUpdates((text) => {
+        updateElement(text, text, false, undefined);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
