@@ -468,7 +468,7 @@ class App extends React.Component<AppProps, AppState> {
   public render() {
     const { zenModeEnabled, viewModeEnabled } = this.state;
     const selectedElement = getSelectedElements(
-      this.scene.getElements(),
+      this.scene.getNonDeletedElements(),
       this.state,
     );
     const {
@@ -501,7 +501,7 @@ class App extends React.Component<AppProps, AppState> {
               files={this.files}
               setAppState={this.setAppState}
               actionManager={this.actionManager}
-              elements={this.scene.getElements()}
+              elements={this.scene.getNonDeletedElements()}
               onCollabButtonClick={onCollabButtonClick}
               onLockToggle={this.toggleLock}
               onPenModeToggle={this.togglePenMode}
@@ -549,7 +549,7 @@ class App extends React.Component<AppProps, AppState> {
               <Stats
                 appState={this.state}
                 setAppState={this.setAppState}
-                elements={this.scene.getElements()}
+                elements={this.scene.getNonDeletedElements()}
                 onClose={this.toggleStats}
                 renderCustomStats={renderCustomStats}
               />
@@ -578,7 +578,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public getSceneElements = () => {
-    return this.scene.getElements();
+    return this.scene.getNonDeletedElements();
   };
 
   private syncActionResult = withBatchedUpdates(
@@ -1195,24 +1195,26 @@ class App extends React.Component<AppProps, AppState> {
       );
       cursorButton[socketId] = user.button;
     });
-    const renderingElements = this.scene.getElements().filter((element) => {
-      if (isImageElement(element)) {
-        if (
-          // not placed on canvas yet (but in elements array)
-          this.state.pendingImageElement &&
-          element.id === this.state.pendingImageElement.id
-        ) {
-          return false;
+    const renderingElements = this.scene
+      .getNonDeletedElements()
+      .filter((element) => {
+        if (isImageElement(element)) {
+          if (
+            // not placed on canvas yet (but in elements array)
+            this.state.pendingImageElement &&
+            element.id === this.state.pendingImageElement.id
+          ) {
+            return false;
+          }
         }
-      }
-      // don't render text element that's being currently edited (it's
-      // rendered on remote only)
-      return (
-        !this.state.editingElement ||
-        this.state.editingElement.type !== "text" ||
-        element.id !== this.state.editingElement.id
-      );
-    });
+        // don't render text element that's being currently edited (it's
+        // rendered on remote only)
+        return (
+          !this.state.editingElement ||
+          this.state.editingElement.type !== "text" ||
+          element.id !== this.state.editingElement.id
+        );
+      });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       renderingElements,
       this.state,
@@ -1525,7 +1527,7 @@ class App extends React.Component<AppProps, AppState> {
           }, {} as any),
           selectedGroupIds: {},
         },
-        this.scene.getElements(),
+        this.scene.getNonDeletedElements(),
       ),
       () => {
         if (opts.files) {
@@ -1626,7 +1628,7 @@ class App extends React.Component<AppProps, AppState> {
   scrollToContent = (
     target:
       | ExcalidrawElement
-      | readonly ExcalidrawElement[] = this.scene.getElements(),
+      | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
   ) => {
     this.setState({
       ...calculateScrollCenter(
@@ -1671,7 +1673,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.files = { ...this.files, ...Object.fromEntries(filesMap) };
 
-      this.scene.getElements().forEach((element) => {
+      this.scene.getNonDeletedElements().forEach((element) => {
         if (
           isInitializedImageElement(element) &&
           filesMap.has(element.fileId)
@@ -1816,7 +1818,7 @@ class App extends React.Component<AppProps, AppState> {
             : ELEMENT_TRANSLATE_AMOUNT);
 
         const selectedElements = getSelectedElements(
-          this.scene.getElements(),
+          this.scene.getNonDeletedElements(),
           this.state,
           true,
         );
@@ -1850,7 +1852,7 @@ class App extends React.Component<AppProps, AppState> {
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {
         const selectedElements = getSelectedElements(
-          this.scene.getElements(),
+          this.scene.getNonDeletedElements(),
           this.state,
         );
 
@@ -1918,7 +1920,7 @@ class App extends React.Component<AppProps, AppState> {
         !event[KEYS.CTRL_OR_CMD]
       ) {
         const selectedElements = getSelectedElements(
-          this.scene.getElements(),
+          this.scene.getNonDeletedElements(),
           this.state,
         );
         if (
@@ -1965,7 +1967,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (isArrowKey(event.key)) {
       const selectedElements = getSelectedElements(
-        this.scene.getElements(),
+        this.scene.getNonDeletedElements(),
         this.state,
       );
       isBindingEnabled(this.state)
@@ -2115,7 +2117,9 @@ class App extends React.Component<AppProps, AppState> {
           }));
         }
         if (isDeleted) {
-          fixBindingsAfterDeletion(this.scene.getElements(), [element]);
+          fixBindingsAfterDeletion(this.scene.getNonDeletedElements(), [
+            element,
+          ]);
         }
         if (!isDeleted || isExistingElement) {
           this.history.resumeRecording();
@@ -2217,9 +2221,9 @@ class App extends React.Component<AppProps, AppState> {
   ): NonDeleted<ExcalidrawElement>[] {
     const elements =
       includeBoundTextElement && includeLockedElements
-        ? this.scene.getElements()
+        ? this.scene.getNonDeletedElements()
         : this.scene
-            .getElements()
+            .getNonDeletedElements()
             .filter(
               (element) =>
                 (includeLockedElements || !element.locked) &&
@@ -2260,7 +2264,7 @@ class App extends React.Component<AppProps, AppState> {
     let container: ExcalidrawTextContainer | null = null;
 
     const selectedElements = getSelectedElements(
-      this.scene.getElements(),
+      this.scene.getNonDeletedElements(),
       this.state,
     );
 
@@ -2284,7 +2288,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       container = getTextBindableContainerAtPosition(
         this.scene
-          .getElements()
+          .getNonDeletedElements()
           .filter(
             (ele) =>
               isTextBindableContainer(ele, false) && !getBoundTextElement(ele),
@@ -2388,7 +2392,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const selectedElements = getSelectedElements(
-      this.scene.getElements(),
+      this.scene.getNonDeletedElements(),
       this.state,
     );
 
@@ -2433,7 +2437,7 @@ class App extends React.Component<AppProps, AppState> {
               selectedElementIds: { [hitElement!.id]: true },
               selectedGroupIds: {},
             },
-            this.scene.getElements(),
+            this.scene.getNonDeletedElements(),
           ),
         );
         return;
@@ -2443,7 +2447,7 @@ class App extends React.Component<AppProps, AppState> {
     resetCursor(this.canvas);
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
       const selectedElements = getSelectedElements(
-        this.scene.getElements(),
+        this.scene.getNonDeletedElements(),
         this.state,
       );
       if (selectedElements.length === 1) {
@@ -2469,7 +2473,7 @@ class App extends React.Component<AppProps, AppState> {
   ): ExcalidrawElement | undefined => {
     // Reversing so we traverse the elements in decreasing order
     // of z-index
-    const elements = this.scene.getElements().slice().reverse();
+    const elements = this.scene.getNonDeletedElements().slice().reverse();
     let hitElementIndex = Infinity;
 
     return elements.find((element, index) => {
@@ -2731,7 +2735,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const elements = this.scene.getElements();
+    const elements = this.scene.getNonDeletedElements();
 
     const selectedElements = getSelectedElements(elements, this.state);
     if (
@@ -2905,7 +2909,7 @@ class App extends React.Component<AppProps, AppState> {
       point.y = nextY;
     }
 
-    const elements = this.scene.getElements().map((ele) => {
+    const elements = this.scene.getNonDeletedElements().map((ele) => {
       const id =
         isBoundToContainer(ele) && idsToUpdate.includes(ele.containerId)
           ? ele.containerId
@@ -3287,7 +3291,7 @@ class App extends React.Component<AppProps, AppState> {
   ): PointerDownState {
     const origin = viewportCoordsToSceneCoords(event, this.state);
     const selectedElements = getSelectedElements(
-      this.scene.getElements(),
+      this.scene.getNonDeletedElements(),
       this.state,
     );
     const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
@@ -3305,10 +3309,12 @@ class App extends React.Component<AppProps, AppState> {
       ),
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
-      originalElements: this.scene.getElements().reduce((acc, element) => {
-        acc.set(element.id, deepCopyElement(element));
-        return acc;
-      }, new Map() as PointerDownState["originalElements"]),
+      originalElements: this.scene
+        .getNonDeletedElements()
+        .reduce((acc, element) => {
+          acc.set(element.id, deepCopyElement(element));
+          return acc;
+        }, new Map() as PointerDownState["originalElements"]),
       resize: {
         handleType: false,
         isResizing: false,
@@ -3405,7 +3411,7 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): boolean => {
     if (this.state.activeTool.type === "selection") {
-      const elements = this.scene.getElements();
+      const elements = this.scene.getNonDeletedElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
         const elementWithTransformHandleType =
@@ -3578,7 +3584,7 @@ class App extends React.Component<AppProps, AppState> {
                     },
                     showHyperlinkPopup: hitElement.link ? "info" : false,
                   },
-                  this.scene.getElements(),
+                  this.scene.getNonDeletedElements(),
                 );
               });
               pointerDownState.hit.wasAddedToSelection = true;
@@ -3928,7 +3934,7 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.drag.offset === null) {
         pointerDownState.drag.offset = tupleToCoors(
           getDragOffsetXY(
-            getSelectedElements(this.scene.getElements(), this.state),
+            getSelectedElements(this.scene.getNonDeletedElements(), this.state),
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           ),
@@ -4023,7 +4029,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.hit.hasHitElementInside)
       ) {
         const selectedElements = getSelectedElements(
-          this.scene.getElements(),
+          this.scene.getNonDeletedElements(),
           this.state,
         );
         if (selectedElements.every((element) => element.locked)) {
@@ -4192,7 +4198,7 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.activeTool.type === "selection") {
         pointerDownState.boxSelection.hasOccurred = true;
 
-        const elements = this.scene.getElements();
+        const elements = this.scene.getNonDeletedElements();
         if (
           !event.shiftKey &&
           // allows for box-selecting points (without shift)
@@ -4208,7 +4214,7 @@ class App extends React.Component<AppProps, AppState> {
                     [pointerDownState.hit.element!.id]: true,
                   },
                 },
-                this.scene.getElements(),
+                this.scene.getNonDeletedElements(),
               ),
             );
           } else {
@@ -4257,7 +4263,7 @@ class App extends React.Component<AppProps, AppState> {
                     ? "info"
                     : false,
               },
-              this.scene.getElements(),
+              this.scene.getNonDeletedElements(),
             ),
           );
         }
@@ -4578,7 +4584,10 @@ class App extends React.Component<AppProps, AppState> {
               // hitElement is part of
               const idsOfSelectedElementsThatAreInGroups = hitElement.groupIds
                 .flatMap((groupId) =>
-                  getElementsInGroup(this.scene.getElements(), groupId),
+                  getElementsInGroup(
+                    this.scene.getNonDeletedElements(),
+                    groupId,
+                  ),
                 )
                 .map((element) => ({ [element.id]: false }))
                 .reduce((prevId, acc) => ({ ...prevId, ...acc }), {});
@@ -4607,7 +4616,7 @@ class App extends React.Component<AppProps, AppState> {
                       [hitElement!.id]: false,
                     },
                   },
-                  this.scene.getElements(),
+                  this.scene.getNonDeletedElements(),
                 ),
               );
             }
@@ -4629,7 +4638,7 @@ class App extends React.Component<AppProps, AppState> {
                 ...prevState,
                 selectedElementIds: { [hitElement.id]: true },
               },
-              this.scene.getElements(),
+              this.scene.getNonDeletedElements(),
             ),
           }));
         }
@@ -4674,7 +4683,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (
         activeTool.type !== "selection" ||
-        isSomeElementSelected(this.scene.getElements(), this.state)
+        isSomeElementSelected(this.scene.getNonDeletedElements(), this.state)
       ) {
         this.history.resumeRecording();
       }
@@ -4683,7 +4692,7 @@ class App extends React.Component<AppProps, AppState> {
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
           : unbindLinearElements)(
-          getSelectedElements(this.scene.getElements(), this.state),
+          getSelectedElements(this.scene.getNonDeletedElements(), this.state),
         );
       }
 
@@ -5099,7 +5108,7 @@ class App extends React.Component<AppProps, AppState> {
   /** adds new images to imageCache and re-renders if needed */
   private addNewImagesToImageCache = async (
     imageElements: InitializedExcalidrawImageElement[] = getInitializedImageElements(
-      this.scene.getElements(),
+      this.scene.getNonDeletedElements(),
     ),
     files: BinaryFiles = this.files,
   ) => {
@@ -5392,7 +5401,7 @@ class App extends React.Component<AppProps, AppState> {
             ...this.state,
             selectedElementIds: { [element.id]: true },
           },
-          this.scene.getElements(),
+          this.scene.getNonDeletedElements(),
         ),
         () => {
           this._openContextMenu({ top, left }, type);
@@ -5468,7 +5477,7 @@ class App extends React.Component<AppProps, AppState> {
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
     const selectedElements = getSelectedElements(
-      this.scene.getElements(),
+      this.scene.getNonDeletedElements(),
       this.state,
     );
     const transformHandleType = pointerDownState.resize.handleType;
@@ -5555,10 +5564,10 @@ class App extends React.Component<AppProps, AppState> {
 
     const separator = "separator";
 
-    const elements = this.scene.getElements();
+    const elements = this.scene.getNonDeletedElements();
 
     const selectedElements = getSelectedElements(
-      this.scene.getElements(),
+      this.scene.getNonDeletedElements(),
       this.state,
     );
 
