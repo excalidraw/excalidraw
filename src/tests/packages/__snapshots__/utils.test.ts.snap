@@ -61,6 +61,7 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {},
   "selectedGroupIds": Object {},
+  "selectedTextRange": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
