@@ -363,7 +363,7 @@ const getActualMimeTypeFromImage = (buffer: ArrayBuffer) => {
     // https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
     png: "137 80 78 71 13 10 26 10 ",
     // https://en.wikipedia.org/wiki/JPEG#Syntax_and_structure
-    // jpg is a big wonky. Checking the first three bytes should be enough,
+    // jpg is a bit wonky. Checking the first three bytes should be enough,
     // but may yield false positives. (https://stackoverflow.com/a/23360709/927631)
     jpg: "255 216 255 ",
     // https://en.wikipedia.org/wiki/GIF#Example_GIF_file
