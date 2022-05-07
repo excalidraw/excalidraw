@@ -144,13 +144,13 @@ const Picker = ({
       const isRTL = getLanguage().rtl;
       let isCustom = false;
       let index = Array.prototype.indexOf.call(
-        gallery!.current!.querySelector(".color-picker-content--default")!
+        gallery.current!.querySelector(".color-picker-content--default")!
           .children,
         activeElement,
       );
       if (index === -1) {
         index = Array.prototype.indexOf.call(
-          gallery!.current!.querySelector(
+          gallery.current!.querySelector(
             ".color-picker-content--canvas-colors",
           )!.children,
           activeElement,
@@ -159,14 +159,12 @@ const Picker = ({
           isCustom = true;
         }
       }
-      const parentSelector = isCustom
-        ? gallery!.current!.querySelector(
-            ".color-picker-content--canvas-colors",
-          )!
-        : gallery!.current!.querySelector(".color-picker-content--default")!;
+      const parentElement = isCustom
+        ? gallery.current?.querySelector(".color-picker-content--canvas-colors")
+        : gallery.current?.querySelector(".color-picker-content--default");
 
-      if (index !== -1) {
-        const length = parentSelector!.children.length - (showInput ? 1 : 0);
+      if (parentElement && index !== -1) {
+        const length = parentElement.children.length - (showInput ? 1 : 0);
         const nextIndex =
           event.key === (isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT)
             ? (index + 1) % length
@@ -177,7 +175,7 @@ const Picker = ({
             : !isCustom && event.key === KEYS.ARROW_UP
             ? (length + index - 5) % length
             : index;
-        (parentSelector!.children![nextIndex] as HTMLElement)?.focus();
+        (parentElement.children[nextIndex] as HTMLElement | undefined)?.focus();
       }
       event.preventDefault();
     } else if (
@@ -186,16 +184,15 @@ const Picker = ({
     ) {
       const index = keyBindings.indexOf(event.key.toLowerCase());
       const isCustom = index >= MAX_DEFAULT_COLORS;
-      const parentSelector =
-        (isCustom
-          ? gallery?.current?.querySelector(
-              ".color-picker-content--canvas-colors",
-            )
-          : gallery?.current?.querySelector(
-              ".color-picker-content--default",
-            )) ?? null;
+      const parentElement = isCustom
+        ? gallery?.current?.querySelector(
+            ".color-picker-content--canvas-colors",
+          )
+        : gallery?.current?.querySelector(".color-picker-content--default");
       const actualIndex = isCustom ? index - MAX_DEFAULT_COLORS : index;
-      (parentSelector?.children?.[actualIndex] as HTMLElement)?.focus();
+      (
+        parentElement?.children[actualIndex] as HTMLElement | undefined
+      )?.focus();
 
       event.preventDefault();
     } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
