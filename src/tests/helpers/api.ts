@@ -69,6 +69,7 @@ export class API {
     height = width,
     isDeleted = false,
     groupIds = [],
+    colorRanges,
     ...rest
   }: {
     type: T;
@@ -93,6 +94,9 @@ export class API {
     fontSize?: T extends "text" ? ExcalidrawTextElement["fontSize"] : never;
     fontFamily?: T extends "text" ? ExcalidrawTextElement["fontFamily"] : never;
     textAlign?: T extends "text" ? ExcalidrawTextElement["textAlign"] : never;
+    colorRanges?: T extends "text"
+      ? ExcalidrawTextElement["colorRanges"]
+      : never;
     verticalAlign?: T extends "text"
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
@@ -149,6 +153,7 @@ export class API {
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
           containerId: rest.containerId ?? undefined,
+          colorRanges,
         });
         element.width = width;
         element.height = height;

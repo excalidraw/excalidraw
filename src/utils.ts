@@ -10,7 +10,11 @@ import {
   THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import { FontFamilyValues, FontString } from "./element/types";
+import {
+  ExcalidrawTextElement,
+  FontFamilyValues,
+  FontString,
+} from "./element/types";
 import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
@@ -666,4 +670,35 @@ export const isPromiseLike = (
     "catch" in value &&
     "finally" in value
   );
+};
+
+export type LineGroupedRanges = { color: string; text: string }[][];
+
+export const getLineGroupedRanges = (
+  element: ExcalidrawTextElement,
+): LineGroupedRanges => {
+  const lines: LineGroupedRanges = [[]];
+
+  const characters = [...element.text];
+  for (let index = 0; index < characters.length; index++) {
+    const char = characters[index];
+    if (char === "\r" && characters[index + 1] === "\n") {
+      // skip carriage returns
+      index++;
+      lines.push([]);
+      continue;
+    }
+
+    if (char === "\n") {
+      lines.push([]);
+      continue;
+    }
+
+    lines[lines.length - 1].push({
+      text: char,
+      color: element.colorRanges[index] ?? element.strokeColor,
+    });
+  }
+
+  return lines;
 };

@@ -24,7 +24,13 @@ import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
-import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
+import {
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+  getLineGroupedRanges,
+} from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
@@ -264,7 +270,7 @@ const drawElementOnCanvas = (
         context.font = getFontString(element);
         context.fillStyle = element.strokeColor;
 
-        // Canvas does not support multiline text by default
+        // Canvas does not support multiline text by default so we have to render newlines ourselves
         const lines = getLineGroupedRanges(element);
         const lineHeight = element.containerId
           ? getApproxLineHeight(getFontString(element))
@@ -309,30 +315,6 @@ const drawElementOnCanvas = (
     }
   }
   context.globalAlpha = 1;
-};
-
-type LineGroupedRanges = { color: string; text: string }[][];
-
-const getLineGroupedRanges = (
-  element: ExcalidrawTextElement,
-): LineGroupedRanges => {
-  const lines: LineGroupedRanges = [];
-
-  let charCount = 0;
-  element.text
-    .replace(/\r\n?/g, "\n")
-    .split("\n")
-    .forEach((elementLine) => {
-      lines.push(
-        [...elementLine].map((char, i) => ({
-          text: char,
-          color: element.colorRanges[charCount + i] ?? element.strokeColor,
-        })),
-      );
-      charCount += elementLine.length;
-    });
-
-  return lines;
 };
 
 const elementWithCanvasCache = new WeakMap<
