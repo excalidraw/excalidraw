@@ -43,6 +43,7 @@ export const getDefaultAppState = (): Omit<
     editingLinearElement: null,
     activeTool: {
       type: "selection",
+      customType: null,
       locked: false,
       lastActiveToolBeforeEraser: null,
     },

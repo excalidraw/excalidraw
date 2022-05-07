@@ -189,7 +189,7 @@ import {
 import Scene from "../scene/Scene";
 import { RenderConfig, ScrollBars } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
-import { findShapeByKey } from "../shapes";
+import { findShapeByKey, SHAPES } from "../shapes";
 import {
   AppClassProperties,
   AppProps,
@@ -225,6 +225,7 @@ import {
   withBatchedUpdatesThrottled,
   updateObject,
   setEraserCursor,
+  updateActiveTool,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -1095,7 +1096,7 @@ class App extends React.Component<AppProps, AppState> {
       isEraserActive(this.state)
     ) {
       this.setState({
-        activeTool: { ...this.state.activeTool, type: "selection" },
+        activeTool: updateActiveTool(this.state, { type: "selection" }),
       });
     }
     if (
@@ -1465,7 +1466,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.text) {
         this.addTextFromPaste(data.text);
       }
-      this.setActiveTool({ ...this.state.activeTool, type: "selection" });
+      this.setActiveTool({ type: "selection" });
       event?.preventDefault();
     },
   );
@@ -1553,7 +1554,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool({ ...this.state.activeTool, type: "selection" });
+    this.setActiveTool({ type: "selection" });
   };
 
   private addTextFromPaste(text: any) {
@@ -1616,10 +1617,13 @@ class App extends React.Component<AppProps, AppState> {
       return {
         activeTool: {
           ...prevState.activeTool,
+          ...updateActiveTool(
+            this.state,
+            prevState.activeTool.locked
+              ? { type: "selection" }
+              : prevState.activeTool,
+          ),
           locked: !prevState.activeTool.locked,
-          type: prevState.activeTool.locked
-            ? "selection"
-            : prevState.activeTool.type,
         },
       };
     });
@@ -2021,7 +2025,7 @@ class App extends React.Component<AppProps, AppState> {
               `keyboard (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
             );
           }
-          this.setActiveTool({ ...this.state.activeTool, type: shape });
+          this.setActiveTool({ type: shape });
           event.stopPropagation();
         } else if (event.key === KEYS.Q) {
           this.toggleLock("keyboard");
@@ -2097,28 +2101,33 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  private setActiveTool(tool: AppState["activeTool"]) {
+  private setActiveTool(
+    tool:
+      | { type: typeof SHAPES[number]["value"] | "eraser" }
+      | { type: "custom"; customType: string },
+  ) {
+    const nextActiveTool = updateActiveTool(this.state, tool);
     if (!isHoldingSpace) {
       setCursorForShape(this.canvas, this.state);
     }
     if (isToolIcon(document.activeElement)) {
       this.focusContainer();
     }
-    if (!isLinearElementType(tool.type)) {
+    if (!isLinearElementType(nextActiveTool.type)) {
       this.setState({ suggestedBindings: [] });
     }
-    if (tool.type === "image") {
+    if (nextActiveTool.type === "image") {
       this.onImageAction();
     }
-    if (tool.type !== "selection") {
+    if (nextActiveTool.type !== "selection") {
       this.setState({
-        activeTool: tool,
+        activeTool: nextActiveTool,
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
       });
     } else {
-      this.setState({ activeTool: tool });
+      this.setState({ activeTool: nextActiveTool });
     }
   }
 
@@ -3226,6 +3235,8 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type,
         pointerDownState,
       );
+    } else if (this.state.activeTool.type === "custom") {
+      setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
     } else if (this.state.activeTool.type !== "eraser") {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -3807,7 +3818,7 @@ class App extends React.Component<AppProps, AppState> {
     resetCursor(this.canvas);
     if (!this.state.activeTool.locked) {
       this.setState({
-        activeTool: { ...this.state.activeTool, type: "selection" },
+        activeTool: updateActiveTool(this.state, { type: "selection" }),
       });
     }
   };
@@ -4626,7 +4637,9 @@ class App extends React.Component<AppProps, AppState> {
             resetCursor(this.canvas);
             this.setState((prevState) => ({
               draggingElement: null,
-              activeTool: { ...prevState.activeTool, type: "selection" },
+              activeTool: updateActiveTool(this.state, {
+                type: "selection",
+              }),
               selectedElementIds: {
                 ...prevState.selectedElementIds,
                 [this.state.draggingElement!.id]: true,
@@ -4848,7 +4861,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           draggingElement: null,
           suggestedBindings: [],
-          activeTool: { ...activeTool, type: "selection" },
+          activeTool: updateActiveTool(this.state, { type: "selection" }),
         });
       } else {
         this.setState({
@@ -5154,7 +5167,7 @@ class App extends React.Component<AppProps, AppState> {
         {
           pendingImageElement: null,
           editingElement: null,
-          activeTool: { ...this.state.activeTool, type: "selection" },
+          activeTool: updateActiveTool(this.state, { type: "selection" }),
         },
         () => {
           this.actionManager.executeAction(actionFinalize);
