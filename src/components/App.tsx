@@ -2909,7 +2909,7 @@ class App extends React.Component<AppProps, AppState> {
       point.y = nextY;
     }
 
-    const elements = this.scene.getNonDeletedElements().map((ele) => {
+    const elements = this.scene.getElementsIncludingDeleted().map((ele) => {
       const id =
         isBoundToContainer(ele) && idsToUpdate.includes(ele.containerId)
           ? ele.containerId
