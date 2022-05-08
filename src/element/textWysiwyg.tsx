@@ -327,12 +327,7 @@ export const textWysiwyg = ({
   }
 
   const handleSelectionChange = () => {
-    const { selectionStart, selectionEnd } =
-      document.querySelector<HTMLTextAreaElement>(
-        ".excalidraw-textEditorContainer textarea",
-      )!;
-
-    onSelection({ start: selectionStart, end: selectionEnd });
+    onSelection({ start: editable.selectionStart, end: editable.selectionEnd });
   };
 
   document.addEventListener("selectionchange", handleSelectionChange);
