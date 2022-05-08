@@ -206,6 +206,19 @@ export const textWysiwyg = ({
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
       const angle = container ? container.angle : updatedElement.angle;
+      const caretColor =
+        appState.editingElement?.type === "text" &&
+        appState.selectedTextRange &&
+        appState.selectedTextRange.type === "cursor"
+          ? appState.selectedTextRange.newColorRange?.position ===
+            appState.selectedTextRange.cursorPosition
+            ? appState.selectedTextRange.newColorRange.color
+            : appState.editingElement.colorRanges[
+                // TODO: Should + 1 here when in RTL mode
+                appState.selectedTextRange.cursorPosition - 1
+              ] ?? appState.editingElement.strokeColor
+          : "currentcolor";
+
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -225,7 +238,7 @@ export const textWysiwyg = ({
         textAlign,
         verticalAlign,
         color: "transparent",
-        "caret-color": "#000",
+        caretColor,
         opacity: updatedElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxWidth: `${maxWidth}px`,
@@ -328,6 +341,7 @@ export const textWysiwyg = ({
 
   const handleSelectionChange = () => {
     onSelection({ start: editable.selectionStart, end: editable.selectionEnd });
+    updateWysiwygStyle();
   };
 
   document.addEventListener("selectionchange", handleSelectionChange);
