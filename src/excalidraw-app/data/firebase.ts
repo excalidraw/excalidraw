@@ -16,7 +16,6 @@ import { decompressData } from "../../data/encode";
 import { encryptData, decryptData } from "../../data/encryption";
 import { MIME_TYPES } from "../../constants";
 import { reconcileElements } from "../collab/reconciliation";
-import { getUpdatedTimestamp } from "../../utils";
 
 // private
 // -----------------------------------------------------------------------------
@@ -115,7 +114,7 @@ const encryptElements = async (
       (el) =>
         !el.isDeleted ||
         // Drop deleted elements older than a day
-        el.updated > getUpdatedTimestamp() - DELETED_ELEMENT_TIMEOUT,
+        el.updated > Date.now() - DELETED_ELEMENT_TIMEOUT,
     ),
   );
   const encoded = new TextEncoder().encode(json);
