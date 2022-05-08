@@ -13,7 +13,7 @@ import {
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
 } from "./types";
-import { AppState, Selection } from "../types";
+import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
@@ -77,7 +77,7 @@ export const textWysiwyg = ({
     viaKeyboard: boolean;
     originalText: string;
   }) => void;
-  onSelection: (selection: Selection | null) => void;
+  onSelection: (selection: { start: number; end: number } | null) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement | null;

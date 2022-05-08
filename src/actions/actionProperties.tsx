@@ -1,4 +1,4 @@
-import { AppState } from "../../src/types";
+import { AppState, Selection } from "../../src/types";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
@@ -196,6 +196,21 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   trackEvent: false,
   perform: (elements, appState, value) => {
+    const newAppState: AppState = {
+      ...appState,
+      ...value,
+    };
+
+    if (
+      newAppState.selectedTextRange?.type === "cursor" &&
+      typeof value.currentItemStrokeColor === "string"
+    ) {
+      newAppState.selectedTextRange.newColorRange = {
+        color: value.currentItemStrokeColor,
+        position: newAppState.selectedTextRange.cursorPosition,
+      };
+    }
+
     return {
       ...(value.currentItemStrokeColor && {
         elements: changeProperty(
@@ -206,26 +221,36 @@ export const actionChangeStrokeColor = register({
               return el;
             }
 
-            if (el.type === "text" && appState.selectedTextRange) {
-              const newColorRange = Object.fromEntries(
-                Array.from(
-                  {
-                    length:
-                      appState.selectedTextRange.end -
-                      appState.selectedTextRange.start,
+            if (el.type === "text") {
+              if (appState.selectedTextRange?.type === "range") {
+                const newColorRange = Object.fromEntries(
+                  Array.from(
+                    {
+                      length:
+                        appState.selectedTextRange.end -
+                        appState.selectedTextRange.start,
+                    },
+                    (_, i) => [
+                      i +
+                        (
+                          appState.selectedTextRange as Extract<
+                            Selection,
+                            { type: "range" }
+                          >
+                        ).start,
+                      value.currentItemStrokeColor,
+                    ],
+                  ),
+                );
+                return newElementWith(el, {
+                  colorRanges: {
+                    ...el.colorRanges,
+                    ...newColorRange,
                   },
-                  (_, i) => [
-                    i + appState.selectedTextRange!.start,
-                    value.currentItemStrokeColor,
-                  ],
-                ),
-              );
-              return newElementWith(el, {
-                colorRanges: {
-                  ...el.colorRanges,
-                  ...newColorRange,
-                },
-              });
+                });
+              }
+
+              return el;
             }
 
             return newElementWith(el, {
@@ -235,10 +260,7 @@ export const actionChangeStrokeColor = register({
           true,
         ),
       }),
-      appState: {
-        ...appState,
-        ...value,
-      },
+      appState: newAppState,
       commitToHistory: !!value.currentItemStrokeColor,
     };
   },
@@ -256,8 +278,29 @@ export const actionChangeStrokeColor = register({
               return element.strokeColor;
             }
 
-            const selectStart = appState.selectedTextRange?.start ?? -1;
-            return element.colorRanges[selectStart] ?? element.strokeColor;
+            const selectedRange = appState.selectedTextRange;
+
+            if (!selectedRange) {
+              return element.strokeColor;
+            }
+
+            if (selectedRange.type === "range") {
+              return element.colorRanges[selectedRange.start];
+            }
+
+            if (
+              selectedRange.newColorRange?.position ===
+              selectedRange.cursorPosition
+            ) {
+              return selectedRange.newColorRange.color;
+            }
+
+            return (
+              element.colorRanges[
+                // TODO: Should + 1 here if RTL
+                selectedRange.cursorPosition - 1
+              ] ?? element.strokeColor
+            );
           },
           appState.currentItemStrokeColor,
         )}
