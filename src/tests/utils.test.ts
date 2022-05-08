@@ -33,14 +33,17 @@ describe("getLineGroupedRanges", () => {
       utils.getLineGroupedRanges(
         API.createElement({
           type: "text",
-          text: "a\na",
-          colorRanges: { 0: "#fff", 1: "#fff" },
+          text: "a\naa",
+          colorRanges: { 0: "#fff", 1: "#fff", 2: "#fff" },
           strokeColor: "#000",
         }),
       ),
     ).toEqual<utils.LineGroupedRanges>([
       [{ color: "#fff", text: "a" }],
-      [{ color: "#000", text: "a" }],
+      [
+        { color: "#fff", text: "a" },
+        { color: "#000", text: "a" },
+      ],
     ]);
   });
 
@@ -49,24 +52,27 @@ describe("getLineGroupedRanges", () => {
       utils.getLineGroupedRanges(
         API.createElement({
           type: "text",
-          text: "a\r\na",
-          colorRanges: { 0: "#fff", 1: "#fff", 2: "#fff" },
+          text: "a\r\naa",
+          colorRanges: { 0: "#fff", 1: "#fff", 2: "#fff", 3: "#fff" },
           strokeColor: "#000",
         }),
       ),
     ).toEqual<utils.LineGroupedRanges>([
       [{ color: "#fff", text: "a" }],
-      [{ color: "#000", text: "a" }],
+      [
+        { color: "#fff", text: "a" },
+        { color: "#000", text: "a" },
+      ],
     ]);
   });
 
   it("handles emoji within a range", () => {
     const element = API.createElement({
       type: "text",
-      text: "aa😀aa😀aa",
+      text: "a😀a😀a",
       // colorRanges stores the color of all codepoints in a character.
       // Emoji are made up of two codepoints so we store two key/values.
-      colorRanges: { 2: "#fff", 3: "#fff", 6: "#fff", 7: "#fff" },
+      colorRanges: { 1: "#fff", 2: "#fff", 4: "#fff", 5: "#fff" },
       strokeColor: "#000",
     });
 
@@ -75,19 +81,53 @@ describe("getLineGroupedRanges", () => {
     ).toEqual<utils.LineGroupedRanges>([
       [
         { color: "#000", text: "a" },
-        { color: "#000", text: "a" },
         // The range should apply to just the emoji
         { color: "#fff", text: "😀" },
         { color: "#000", text: "a" },
-        { color: "#000", text: "a" },
         { color: "#fff", text: "😀" },
-        { color: "#000", text: "a" },
         { color: "#000", text: "a" },
       ],
     ]);
   });
 
-  it.skip("handles multi codepoint unicode", () => {
+  it("groups adjacent characters with the same color buto only when on the same line", () => {
+    const element = API.createElement({
+      type: "text",
+      text: "xxx\nyyy\nzzz",
+      //     ^^    ^^ ^^^
+      //     01    56 78
+      // The above indices are marked as #fff
+      colorRanges: {
+        0: "#fff",
+        1: "#fff",
+        5: "#fff",
+        6: "#fff",
+        7: "#fff",
+        8: "#fff",
+        9: "#fff",
+      },
+      strokeColor: "#000",
+    });
+
+    expect(
+      utils.getLineGroupedRanges(element),
+    ).toEqual<utils.LineGroupedRanges>([
+      [
+        { color: "#fff", text: "xx" },
+        { color: "#000", text: "x" },
+      ],
+      [
+        { color: "#000", text: "y" },
+        { color: "#fff", text: "yy" },
+      ],
+      [
+        { color: "#fff", text: "zz" },
+        { color: "#000", text: "z" },
+      ],
+    ]);
+  });
+
+  it("handles multi codepoint unicode", () => {
     expect(
       utils.getLineGroupedRanges(
         API.createElement({
@@ -96,11 +136,6 @@ describe("getLineGroupedRanges", () => {
           strokeColor: "#000",
         }),
       ),
-    ).toEqual<utils.LineGroupedRanges>([
-      [
-        { color: "#000", text: "🤌🏼" },
-        { color: "#000", text: "👌🏿" },
-      ],
-    ]);
+    ).toEqual<utils.LineGroupedRanges>([[{ color: "#000", text: "🤌🏼👌🏿" }]]);
   });
 });

@@ -679,32 +679,37 @@ export const getLineGroupedRanges = (
 ): LineGroupedRanges => {
   const lines: LineGroupedRanges = [[]];
 
-  const characters = [...element.text];
+  const characters = element.text.split("");
   let index = 0;
-  let colorRangePosition = 0;
   while (index < characters.length) {
     const char = characters[index];
     if (char === "\r" && characters[index + 1] === "\n") {
       lines.push([]);
       // skip carriage returns
       index += 2;
-      colorRangePosition += 2;
       continue;
     }
 
     if (char === "\n") {
       lines.push([]);
       index++;
-      colorRangePosition++;
       continue;
     }
 
-    lines[lines.length - 1].push({
-      text: char,
-      color: element.colorRanges[colorRangePosition] ?? element.strokeColor,
-    });
+    const currentLine = lines[lines.length - 1];
+    const currentGroup = currentLine[currentLine.length - 1];
+    const characterColor = element.colorRanges[index] ?? element.strokeColor;
+
+    if (!currentGroup || characterColor !== currentGroup.color) {
+      currentLine.push({
+        text: char,
+        color: characterColor,
+      });
+    } else {
+      currentGroup.text += char;
+    }
+
     index++;
-    colorRangePosition += char.length;
   }
 
   return lines;
