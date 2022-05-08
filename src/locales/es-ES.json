@@ -172,7 +172,7 @@
     "uploadedSecurly": "La carga ha sido asegurada con cifrado de principio a fin, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido.",
     "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?",
     "collabStopOverridePrompt": "Detener la sesión sobrescribirá su dibujo anterior almacenado localmente. ¿Está seguro?\n\n(Si desea mantener su dibujo local, simplemente cierre la pestaña del navegador.)",
-    "errorAddingToLibrary": "No se pudo agregar elemento a la biblioteca",
+    "errorAddingToLibrary": "No se pudo agregar el elemento a la biblioteca",
     "errorRemovingFromLibrary": "No se pudo quitar el elemento de la biblioteca",
     "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?",
     "imageDoesNotContainScene": "Esta imagen no parece contener datos de escena. ¿Ha habilitado la inserción de la escena durante la exportación?",
