@@ -257,7 +257,7 @@ const useLibrary = (excalidrawAPI: ExcalidrawImperativeAPI | null) => {
         // openLibraryMenu: true,
       });
     };
-    const handler = (event: HashChangeEvent) => {
+    const onHashChange = (event: HashChangeEvent) => {
       event.preventDefault();
       const libraryUrlTokens = getLibraryUrlTokens();
       if (libraryUrlTokens) {
@@ -285,9 +285,9 @@ const useLibrary = (excalidrawAPI: ExcalidrawImperativeAPI | null) => {
     }
     // --------------------------------------------------------- init load -----
 
-    window.addEventListener(EVENT.HASHCHANGE, handler);
+    window.addEventListener(EVENT.HASHCHANGE, onHashChange);
     return () => {
-      window.removeEventListener(EVENT.HASHCHANGE, handler);
+      window.removeEventListener(EVENT.HASHCHANGE, onHashChange);
     };
   }, [excalidrawAPI]);
 };
