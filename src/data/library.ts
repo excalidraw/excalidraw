@@ -130,7 +130,6 @@ class Library {
     prompt = false,
     merge = false,
     openLibraryMenu = false,
-    handleError = false,
     defaultStatus = "unpublished",
   }: {
     libraryItems:
@@ -146,7 +145,6 @@ class Library {
     merge?: boolean;
     prompt?: boolean;
     openLibraryMenu?: boolean;
-    handleError?: boolean;
     defaultStatus?: "unpublished" | "published";
   }) => {
     if (openLibraryMenu) {
@@ -187,18 +185,9 @@ class Library {
           reject(error);
         }
       });
-    })
-      .catch((error) => {
-        if (handleError) {
-          console.error(error);
-          this.app.setState({ errorMessage: t("errors.importLibraryError") });
-        } else {
-          throw error;
-        }
-      })
-      .finally(() => {
-        this.app.focusContainer();
-      });
+    }).finally(() => {
+      this.app.focusContainer();
+    });
   };
 
   setLibrary = (

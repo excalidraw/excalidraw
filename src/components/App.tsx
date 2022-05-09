@@ -738,10 +738,14 @@ class App extends React.Component<AppProps, AppState> {
     try {
       initialData = (await this.props.initialData) || null;
       if (initialData?.libraryItems) {
-        this.library.updateLibrary({
-          libraryItems: initialData.libraryItems,
-          merge: true,
-        });
+        this.library
+          .updateLibrary({
+            libraryItems: initialData.libraryItems,
+            merge: true,
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       }
     } catch (error: any) {
       console.error(error);
@@ -5238,12 +5242,16 @@ class App extends React.Component<AppProps, AppState> {
           commitToHistory: true,
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
-        this.library.updateLibrary({
-          libraryItems: file,
-          merge: true,
-          openLibraryMenu: true,
-          handleError: true,
-        });
+        this.library
+          .updateLibrary({
+            libraryItems: file,
+            merge: true,
+            openLibraryMenu: true,
+          })
+          .catch((error) => {
+            console.error(error);
+            this.setState({ errorMessage: t("errors.importLibraryError") });
+          });
       }
     } catch (error: any) {
       this.setState({ isLoading: false, errorMessage: error.message });
