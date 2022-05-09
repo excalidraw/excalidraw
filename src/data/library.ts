@@ -122,7 +122,7 @@ class Library {
     });
   };
 
-  // NOTE this is a high-level public API (eposed on ExcalidrawAPI) with
+  // NOTE this is a high-level public API (exposed on ExcalidrawAPI) with
   // a slight overhead (always restoring library items). For internal use
   // where merging isn't needed, use `library.setLibrary()` directly.
   updateLibrary = async ({
