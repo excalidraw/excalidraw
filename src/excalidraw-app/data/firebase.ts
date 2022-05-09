@@ -135,7 +135,7 @@ class FirebaseSceneVersionCache {
   };
   static set = (
     socket: SocketIOClient.Socket,
-    elements: readonly ExcalidrawElement[],
+    elements: readonly SyncableExcalidrawElement[],
   ) => {
     FirebaseSceneVersionCache.cache.set(socket, getSceneVersion(elements));
   };
