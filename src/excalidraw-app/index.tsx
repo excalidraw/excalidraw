@@ -79,7 +79,7 @@ import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
 import { Provider, useAtom } from "jotai";
-import { jotaiStore, useAtomWithInitialValue } from "./jotai";
+import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 
 const languageDetector = new LanguageDetector();
