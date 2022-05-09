@@ -230,7 +230,10 @@ import {
   dataURLToFile,
   generateIdFromFile,
   getDataURL,
+  getFileFromEvent,
   isSupportedImageFile,
+  loadSceneOrLibraryFromBlob,
+  normalizeFile,
   loadLibraryFromBlob,
   resizeImageFile,
   SVGStringToFile,
@@ -242,7 +245,7 @@ import {
   updateImageCache as _updateImageCache,
 } from "../element/image";
 import throttle from "lodash.throttle";
-import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
+import { fileOpen, FileSystemHandle } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
   getApproxMinLineHeight,
@@ -771,25 +774,10 @@ class App extends React.Component<AppProps, AppState> {
           }
           const fileHandle = launchParams.files[0];
           const blob: Blob = await fileHandle.getFile();
-          blob.handle = fileHandle;
-          loadFromBlob(
-            blob,
-            this.state,
-            this.scene.getElementsIncludingDeleted(),
-          )
-            .then((scene) => {
-              this.syncActionResult({
-                ...scene,
-                appState: {
-                  ...(scene.appState || this.state),
-                  isLoading: false,
-                },
-                commitToHistory: true,
-              });
-            })
-            .catch((error) => {
-              this.setState({ isLoading: false, errorMessage: error.message });
-            });
+          this.loadFileToCanvas(
+            new File([blob], blob.name || "", { type: blob.type }),
+            fileHandle,
+          );
         },
       );
     }
@@ -1651,10 +1639,11 @@ class App extends React.Component<AppProps, AppState> {
     try {
       const webShareTargetCache = await caches.open("web-share-target");
 
-      const file = await webShareTargetCache.match("shared-file");
-      if (file) {
-        const blob = await file.blob();
-        this.loadFileToCanvas(blob);
+      const response = await webShareTargetCache.match("shared-file");
+      if (response) {
+        const blob = await response.blob();
+        const file = new File([blob], blob.name || "", { type: blob.type });
+        this.loadFileToCanvas(file, null);
         await webShareTargetCache.delete("shared-file");
         window.history.replaceState(null, APP_NAME, window.location.pathname);
       }
@@ -5240,32 +5229,21 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
-    try {
-      const file = event.dataTransfer.files.item(0);
+    // must be retrieved first, in the same frame
+    const { file, fileHandle } = await getFileFromEvent(event);
 
+    try {
       if (isSupportedImageFile(file)) {
         // first attempt to decode scene from the image if it's embedded
         // ---------------------------------------------------------------------
 
         if (file?.type === MIME_TYPES.png || file?.type === MIME_TYPES.svg) {
           try {
-            if (nativeFileSystemSupported) {
-              try {
-                // This will only work as of Chrome 86,
-                // but can be safely ignored on older releases.
-                const item = event.dataTransfer.items[0];
-                (file as any).handle = await (
-                  item as any
-                ).getAsFileSystemHandle();
-              } catch (error: any) {
-                console.warn(error.name, error.message);
-              }
-            }
-
             const scene = await loadFromBlob(
               file,
               this.state,
               this.scene.getElementsIncludingDeleted(),
+              fileHandle,
             );
             this.syncActionResult({
               ...scene,
@@ -5317,52 +5295,54 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const file = event.dataTransfer?.files.item(0);
-    if (
-      file?.type === MIME_TYPES.excalidrawlib ||
-      file?.name?.endsWith(".excalidrawlib")
-    ) {
-      this.setState({ isLibraryOpen: true });
-      this.library.importLibrary(file).catch((error) => {
-        console.error(error);
-        this.setState({
-          isLoading: false,
-          errorMessage: t("errors.importLibraryError"),
-        });
-      });
-      // default: assume an Excalidraw file regardless of extension/MimeType
-    } else if (file) {
-      this.setState({ isLoading: true });
-      if (nativeFileSystemSupported) {
-        try {
-          // This will only work as of Chrome 86,
-          // but can be safely ignored on older releases.
-          const item = event.dataTransfer.items[0];
-          (file as any).handle = await (item as any).getAsFileSystemHandle();
-        } catch (error: any) {
-          console.warn(error.name, error.message);
-        }
-      }
-      await this.loadFileToCanvas(file);
+    if (file) {
+      // atetmpt to parse an excalidraw/excalidrawlib file
+      await this.loadFileToCanvas(file, fileHandle);
     }
   };
 
-  loadFileToCanvas = (file: Blob) => {
-    loadFromBlob(file, this.state, this.scene.getElementsIncludingDeleted())
-      .then((scene) => {
+  loadFileToCanvas = async (
+    file: File,
+    fileHandle: FileSystemHandle | null,
+  ) => {
+    file = await normalizeFile(file);
+    try {
+      const ret = await loadSceneOrLibraryFromBlob(
+        file,
+        this.state,
+        this.scene.getElementsIncludingDeleted(),
+        fileHandle,
+      );
+      if (ret.type === MIME_TYPES.excalidraw) {
+        this.setState({ isLoading: true });
         this.syncActionResult({
-          ...scene,
+          ...ret.data,
           appState: {
-            ...(scene.appState || this.state),
+            ...(ret.data.appState || this.state),
             isLoading: false,
           },
           replaceFiles: true,
           commitToHistory: true,
         });
-      })
-      .catch((error) => {
-        this.setState({ isLoading: false, errorMessage: error.message });
-      });
+      } else if (ret.type === MIME_TYPES.excalidrawlib) {
+        this.library
+          .importLibrary(file)
+          .then(() => {
+            this.setState({
+              isLoading: false,
+            });
+          })
+          .catch((error) => {
+            console.error(error);
+            this.setState({
+              isLoading: false,
+              errorMessage: t("errors.importLibraryError"),
+            });
+          });
+      }
+    } catch (error: any) {
+      this.setState({ isLoading: false, errorMessage: error.message });
+    }
   };
 
   private handleCanvasContextMenu = (

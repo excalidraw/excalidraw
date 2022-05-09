@@ -5,6 +5,8 @@ import Sidebar from "./sidebar/Sidebar";
 
 import "./App.scss";
 import initialData from "./initialData";
+import { fileOpen } from "../../../data/filesystem";
+import { loadSceneOrLibraryFromBlob } from "../../utils";
 
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
@@ -104,6 +106,12 @@ export default function App() {
     };
   }, []);
 
+  const loadSceneOrLibrary = async () => {
+    const file = await fileOpen({ description: "Excalidraw or library file" });
+    const contents = await loadSceneOrLibraryFromBlob(file, null, null);
+    excalidrawRef.current.updateScene(contents.data);
+  };
+
   const updateScene = () => {
     const sceneData = {
       elements: [
@@ -165,6 +173,7 @@ export default function App() {
       <h1> Excalidraw Example</h1>
       <Sidebar>
         <div className="button-wrapper">
+          <button onClick={loadSceneOrLibrary}>Load Scene or Library</button>
           <button className="update-scene" onClick={updateScene}>
             Update Scene
           </button>
