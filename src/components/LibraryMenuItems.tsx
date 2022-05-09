@@ -1,5 +1,5 @@
 import { chunk } from "lodash";
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   importLibraryFromJSON,
   saveLibraryAsJSON,
@@ -15,7 +15,7 @@ import {
   LibraryItem,
   LibraryItems,
 } from "../types";
-import { muteFSAbortError } from "../utils";
+import { arrayToMap, muteFSAbortError } from "../utils";
 import { useDeviceType } from "./App";
 import ConfirmDialog from "./ConfirmDialog";
 import { exportToFileIcon, load, publishIcon, trash } from "./icons";
@@ -42,7 +42,7 @@ const LibraryMenuItems = ({
   files,
   id,
   selectedItems,
-  onToggle,
+  onSelectItems,
   onPublish,
   resetLibrary,
 }: {
@@ -59,7 +59,7 @@ const LibraryMenuItems = ({
   library: Library;
   id: string;
   selectedItems: LibraryItem["id"][];
-  onToggle: (id: LibraryItem["id"], event: React.MouseEvent) => void;
+  onSelectItems: (id: LibraryItem["id"][]) => void;
   onPublish: () => void;
   resetLibrary: () => void;
 }) => {
@@ -196,6 +196,55 @@ const LibraryMenuItems = ({
     (id) => libraryItems.find((item) => item.id === id)?.status === "published",
   );
 
+  const [lastSelectedItem, setLastSelectedItem] = useState<
+    LibraryItem["id"] | null
+  >(null);
+
+  const onItemSelectToggle = (
+    id: LibraryItem["id"],
+    event: React.MouseEvent,
+  ) => {
+    const shouldSelect = !selectedItems.includes(id);
+
+    const orderedItems = [...unpublishedItems, ...publishedItems];
+
+    if (shouldSelect) {
+      if (event.shiftKey && lastSelectedItem) {
+        const rangeStart = orderedItems.findIndex(
+          (item) => item.id === lastSelectedItem,
+        );
+        const rangeEnd = orderedItems.findIndex((item) => item.id === id);
+
+        if (rangeStart === -1 || rangeEnd === -1) {
+          onSelectItems([...selectedItems, id]);
+          return;
+        }
+
+        const selectedItemsMap = arrayToMap(selectedItems);
+        const nextSelectedIds = orderedItems.reduce(
+          (acc: LibraryItem["id"][], item, idx) => {
+            if (
+              (idx >= rangeStart && idx <= rangeEnd) ||
+              selectedItemsMap.has(item.id)
+            ) {
+              acc.push(item.id);
+            }
+            return acc;
+          },
+          [],
+        );
+
+        onSelectItems(nextSelectedIds);
+      } else {
+        onSelectItems([...selectedItems, id]);
+      }
+      setLastSelectedItem(id);
+    } else {
+      setLastSelectedItem(null);
+      onSelectItems(selectedItems.filter((_id) => _id !== id));
+    }
+  };
+
   const getInsertedElements = (id: string) => {
     let targetElements;
     if (selectedItems.includes(id)) {
@@ -228,9 +277,7 @@ const LibraryMenuItems = ({
           onClick={params.onClick || (() => {})}
           id={params.item?.id || null}
           selected={!!params.item?.id && selectedItems.includes(params.item.id)}
-          onToggle={(id, event) => {
-            onToggle(id, event);
-          }}
+          onToggle={onItemSelectToggle}
           onDrag={(id, event) => {
             event.dataTransfer.setData(
               MIME_TYPES.excalidrawlib,
@@ -294,16 +341,12 @@ const LibraryMenuItems = ({
     });
   };
 
+  const unpublishedItems = libraryItems.filter(
+    (item) => item.status !== "published",
+  );
   const publishedItems = libraryItems.filter(
     (item) => item.status === "published",
   );
-  const unpublishedItems = [
-    // append pending library item
-    ...(pendingElements.length
-      ? [{ id: null, elements: pendingElements }]
-      : []),
-    ...libraryItems.filter((item) => item.status !== "published"),
-  ];
 
   return (
     <div className="library-menu-items-container">
@@ -332,7 +375,13 @@ const LibraryMenuItems = ({
       >
         <>
           <div className="separator">{t("labels.personalLib")}</div>
-          {renderLibrarySection(unpublishedItems)}
+          {renderLibrarySection([
+            // append pending library item
+            ...(pendingElements.length
+              ? [{ id: null, elements: pendingElements }]
+              : []),
+            ...unpublishedItems,
+          ])}
         </>
 
         <>
