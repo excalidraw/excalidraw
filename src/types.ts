@@ -289,6 +289,15 @@ export interface ExcalidrawProps {
       nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
   ) => void;
+  onCustomElementPointerDown?: (
+    activeTool: AppState["activeTool"],
+    pointerDownState: PointerDownState,
+  ) => void;
+  onScrollChange?: (scrollX: number, scrollY: number) => void;
+  onOffsetsChange?: (
+    offsetLeft: AppState["offsetLeft"],
+    offsetTop: AppState["offsetTop"],
+  ) => void;
 }
 
 export type SceneData = {
@@ -449,6 +458,7 @@ export type ExcalidrawImperativeAPI = {
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
   id: string;
+  setCustomType: InstanceType<typeof App>["setCustomType"];
 };
 
 export type DeviceType = {

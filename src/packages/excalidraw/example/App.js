@@ -5,6 +5,15 @@ import Sidebar from "./sidebar/Sidebar";
 
 import "./App.scss";
 import initialData from "./initialData";
+import { nanoid } from "nanoid";
+import {
+  sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
+  withBatchedUpdates,
+  withBatchedUpdatesThrottled,
+} from "../../../utils";
+import { DRAGGING_THRESHOLD, EVENT } from "../../../constants";
+import { distance2d } from "../../../math";
 
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
@@ -17,6 +26,12 @@ const {
   Excalidraw,
   MIME_TYPES,
 } = window.ExcalidrawLib;
+
+const COMMENT_SVG = (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <path d="M256 32C114.6 32 .0272 125.1 .0272 240c0 47.63 19.91 91.25 52.91 126.2c-14.88 39.5-45.87 72.88-46.37 73.25c-6.625 7-8.375 17.25-4.625 26C5.818 474.2 14.38 480 24 480c61.5 0 109.1-25.75 139.1-46.25C191.1 442.8 223.3 448 256 448c141.4 0 255.1-93.13 255.1-208S397.4 32 256 32zM256.1 400c-26.75 0-53.12-4.125-78.38-12.12l-22.75-7.125l-19.5 13.75c-14.25 10.12-33.88 21.38-57.5 29c7.375-12.12 14.37-25.75 19.88-40.25l10.62-28l-20.62-21.87C69.82 314.1 48.07 282.2 48.07 240c0-88.25 93.25-160 208-160s208 71.75 208 160S370.8 400 256.1 400z" />
+  </svg>
+);
 
 const resolvablePromise = () => {
   let resolve;
@@ -42,17 +57,9 @@ const renderTopRightUI = () => {
   );
 };
 
-const renderFooter = () => {
-  return (
-    <button onClick={() => alert("This is dummy footer")}>
-      {" "}
-      custom footer{" "}
-    </button>
-  );
-};
-
 export default function App() {
   const excalidrawRef = useRef(null);
+  const appRef = useRef(null);
 
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
@@ -63,6 +70,8 @@ export default function App() {
   const [exportEmbedScene, setExportEmbedScene] = useState(false);
   const [theme, setTheme] = useState("light");
   const [isCollaborating, setIsCollaborating] = useState(false);
+  const [commentIcons, setCommentIcons] = useState({});
+  const [comment, setComment] = useState(null);
 
   const initialStatePromiseRef = useRef({ promise: null });
   if (!initialStatePromiseRef.current.promise) {
@@ -103,7 +112,23 @@ export default function App() {
       window.removeEventListener("hashchange", onHashChange);
     };
   }, []);
-
+  const renderFooter = () => {
+    return (
+      <>
+        {" "}
+        <button
+          className="custom-element"
+          onClick={() => excalidrawRef.current.setCustomType("comment")}
+        >
+          {COMMENT_SVG}
+        </button>
+        <button onClick={() => alert("This is dummy footer")}>
+          {" "}
+          custom footer{" "}
+        </button>
+      </>
+    );
+  };
   const updateScene = () => {
     const sceneData = {
       elements: [
@@ -160,8 +185,181 @@ export default function App() {
     });
     window.alert(`Copied to clipboard as ${type} sucessfully`);
   };
+
+  const onCustomElementPointerDown = (activeTool, pointerDownState) => {
+    if (activeTool.type === "custom" && activeTool.customType === "comment") {
+      const { x, y } = pointerDownState.origin;
+      setComment({ x, y, value: "" });
+    }
+  };
+
+  const rerenderCommentIcons = () => {
+    const commentIconsElements =
+      appRef.current.querySelectorAll(".comment-icon");
+    commentIconsElements.forEach((ele) => {
+      const id = ele.id;
+      const { x, y } = sceneCoordsToViewportCoords(
+        { sceneX: commentIcons[id].x, sceneY: commentIcons[id].y },
+        excalidrawRef.current.getAppState(),
+      );
+      ele.style.left = `${x - 16}px`;
+      ele.style.top = `${y - 16}px`;
+    });
+  };
+
+  const onPointerMoveFromPointerDownHandler = (pointerDownState) => {
+    return withBatchedUpdatesThrottled((event) => {
+      const { x, y } = viewportCoordsToSceneCoords(
+        { clientX: event.clientX, clientY: event.clientY },
+        excalidrawRef.current.getAppState(),
+      );
+      const distance = distance2d(
+        pointerDownState.x,
+        pointerDownState.y,
+        event.clientX,
+        event.clientY,
+      );
+      if (distance > DRAGGING_THRESHOLD) {
+        setCommentIcons({
+          ...commentIcons,
+          [pointerDownState.hitElement.id]: {
+            ...commentIcons[pointerDownState.hitElement.id],
+            x,
+            y,
+          },
+        });
+      }
+    });
+  };
+  const onPointerUpFromPointerDownHandler = (pointerDownState) => {
+    return withBatchedUpdates((event) => {
+      window.removeEventListener(EVENT.POINTER_MOVE, pointerDownState.onMove);
+      window.removeEventListener(EVENT.POINTER_UP, pointerDownState.onUp);
+      excalidrawRef.current.setCustomType(null);
+      const distance = distance2d(
+        pointerDownState.x,
+        pointerDownState.y,
+        event.clientX,
+        event.clientY,
+      );
+      if (distance === 0) {
+        if (!comment) {
+          setComment({
+            x: pointerDownState.hitElement.x + 60,
+            y: pointerDownState.hitElement.y,
+            value: pointerDownState.hitElement.value,
+            id: pointerDownState.hitElement.id,
+          });
+        } else {
+          setComment(null);
+        }
+      }
+    });
+  };
+  const renderCommentIcons = () => {
+    return Object.values(commentIcons).map((commentIcon) => {
+      const { x, y } = sceneCoordsToViewportCoords(
+        { sceneX: commentIcon.x, sceneY: commentIcon.y },
+        excalidrawRef.current.getAppState(),
+      );
+      return (
+        <div
+          id={commentIcon.id}
+          key={commentIcon.id}
+          style={{
+            top: `${y - 16}px`,
+            left: `${x - 16}px`,
+            position: "fixed",
+            zIndex: 1,
+            width: "32px",
+            height: "32px",
+          }}
+          className="comment-icon"
+          onPointerDown={(event) => {
+            event.preventDefault();
+            if (comment) {
+              commentIcon.value = comment.value;
+              saveComment();
+            }
+            const pointerDownState = {
+              x: event.clientX,
+              y: event.clientY,
+              hitElement: commentIcon,
+            };
+            const onPointerMove =
+              onPointerMoveFromPointerDownHandler(pointerDownState);
+            const onPointerUp =
+              onPointerUpFromPointerDownHandler(pointerDownState);
+            window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+            window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+
+            pointerDownState.onMove = onPointerMove;
+            pointerDownState.onUp = onPointerUp;
+
+            excalidrawRef.current.setCustomType("comment");
+          }}
+        >
+          <div className="comment-avatar">
+            <img src="doremon.png" alt="doremon" />
+          </div>
+        </div>
+      );
+    });
+  };
+
+  const saveComment = () => {
+    if (!comment.id && !comment.value) {
+      setComment(null);
+      return;
+    }
+    const id = comment.id || nanoid();
+    setCommentIcons({
+      ...commentIcons,
+      [id]: {
+        x: comment.id ? comment.x - 60 : comment.x,
+        y: comment.y,
+        id,
+        value: comment.value,
+      },
+    });
+    setComment(null);
+  };
+
+  const renderComment = () => {
+    const { x, y } = sceneCoordsToViewportCoords(
+      { sceneX: comment.x, sceneY: comment.y },
+      excalidrawRef.current.getAppState(),
+    );
+
+    return (
+      <textarea
+        className="comment"
+        style={{
+          top: `${y - 16}px`,
+          left: `${x - 16}px`,
+          position: "fixed",
+          zIndex: 1,
+        }}
+        ref={(ref) => {
+          setTimeout(() => ref?.focus());
+        }}
+        placeholder={comment.value ? "Reply" : "Comment"}
+        value={comment.value}
+        onChange={(event) => {
+          setComment({ ...comment, value: event.target.value });
+        }}
+        onBlur={saveComment}
+        onKeyDown={(event) => {
+          if (!event.shiftKey && event.key === "Enter") {
+            event.preventDefault();
+            saveComment();
+          }
+        }}
+      />
+    );
+  };
   return (
-    <div className="App">
+    <div className="App" ref={appRef}>
       <h1> Excalidraw Example</h1>
       <Sidebar>
         <div className="button-wrapper">
@@ -279,9 +477,9 @@ export default function App() {
           <Excalidraw
             ref={excalidrawRef}
             initialData={initialStatePromiseRef.current.promise}
-            onChange={(elements, state) =>
-              console.info("Elements :", elements, "State : ", state)
-            }
+            onChange={(elements, state) => {
+              console.info("Elements :", elements, "State : ", state);
+            }}
             onPointerUpdate={(payload) => console.info(payload)}
             onCollabButtonClick={() =>
               window.alert("You clicked on collab button")
@@ -295,7 +493,12 @@ export default function App() {
             renderTopRightUI={renderTopRightUI}
             renderFooter={renderFooter}
             onLinkOpen={onLinkOpen}
+            onCustomElementPointerDown={onCustomElementPointerDown}
+            onScrollChange={rerenderCommentIcons}
+            onOffsetsChange={rerenderCommentIcons}
           />
+          {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
+          {comment && renderComment()}
         </div>
 
         <div className="export-wrapper button-wrapper">
@@ -329,7 +532,8 @@ export default function App() {
                 embedScene: true,
                 files: excalidrawRef.current.getFiles(),
               });
-              document.querySelector(".export-svg").innerHTML = svg.outerHTML;
+              appRef.current.querySelector(".export-svg").innerHTML =
+                svg.outerHTML;
             }}
           >
             Export to SVG

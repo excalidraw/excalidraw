@@ -381,6 +381,7 @@ class App extends React.Component<AppProps, AppState> {
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
         id: this.id,
+        setCustomType: this.setCustomType,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1071,6 +1072,22 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     if (
+      prevState.scrollX !== this.state.scrollX ||
+      prevState.scrollY !== this.state.scrollY
+    ) {
+      this.props?.onScrollChange?.(this.state.scrollX, this.state.scrollY);
+    }
+    if (
+      prevState.offsetLeft !== this.state.offsetLeft ||
+      prevState.offsetTop !== this.state.offsetTop
+    ) {
+      this.props?.onOffsetsChange?.(
+        this.state.offsetLeft,
+        this.state.offsetTop,
+      );
+    }
+
+    if (
       Object.keys(this.state.selectedElementIds).length &&
       isEraserActive(this.state)
     ) {
@@ -1645,6 +1662,22 @@ class App extends React.Component<AppProps, AppState> {
 
   setToastMessage = (toastMessage: string) => {
     this.setState({ toastMessage });
+  };
+
+  setCustomType = (customType: string | null) => {
+    if (customType !== null) {
+      this.setState({
+        activeTool: { ...this.state.activeTool, type: "custom", customType },
+      });
+    } else {
+      this.setState({
+        activeTool: {
+          ...this.state.activeTool,
+          type: "selection",
+          customType,
+        },
+      });
+    }
   };
 
   restoreFileFromShare = async () => {
@@ -3072,6 +3105,10 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "custom") {
       setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
+      this.props?.onCustomElementPointerDown?.(
+        this.state.activeTool,
+        pointerDownState,
+      );
     } else if (this.state.activeTool.type !== "eraser") {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,

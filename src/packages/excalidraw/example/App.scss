@@ -1,6 +1,20 @@
 .App {
   font-family: sans-serif;
   text-align: center;
+
+  .comment-avatar {
+    background: #faa2c1;
+    border-radius: 66px 67px 67px 0px;
+    width: 2rem;
+    height: 2rem;
+    padding: 4px;
+    margin: 4px;
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+  }
 }
 
 .button-wrapper button {
