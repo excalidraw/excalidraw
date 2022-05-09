@@ -359,7 +359,7 @@ const getActualMimeTypeFromImage = (buffer: ArrayBuffer) => {
   const first8Bytes = `${[...new Uint8Array(buffer).slice(0, 8)].join(" ")} `;
 
   // uint8 leading bytes
-  const type_byte_headers = {
+  const headerBytes = {
     // https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
     png: "137 80 78 71 13 10 26 10 ",
     // https://en.wikipedia.org/wiki/JPEG#Syntax_and_structure
@@ -370,11 +370,11 @@ const getActualMimeTypeFromImage = (buffer: ArrayBuffer) => {
     gif: "71 73 70 56 57 97 ",
   };
 
-  if (first8Bytes === type_byte_headers.png) {
+  if (first8Bytes === headerBytes.png) {
     mimeType = MIME_TYPES.png;
-  } else if (first8Bytes.startsWith(type_byte_headers.jpg)) {
+  } else if (first8Bytes.startsWith(headerBytes.jpg)) {
     mimeType = MIME_TYPES.jpg;
-  } else if (first8Bytes.startsWith(type_byte_headers.gif)) {
+  } else if (first8Bytes.startsWith(headerBytes.gif)) {
     mimeType = MIME_TYPES.gif;
   }
   return mimeType;
@@ -408,19 +408,19 @@ export const normalizeFile = async (file: File) => {
         file.name,
       );
     } else {
-      const ab = await blobToArrayBuffer(file);
-      const mimeType = getActualMimeTypeFromImage(ab);
+      const buffer = await blobToArrayBuffer(file);
+      const mimeType = getActualMimeTypeFromImage(buffer);
       if (mimeType) {
-        file = createFile(ab, mimeType, file.name);
+        file = createFile(buffer, mimeType, file.name);
       }
     }
     // when the file is an image, make sure the extension corresponds to the
     // actual mimeType (this is an edge case, but happens sometime)
   } else if (isSupportedImageFile(file)) {
-    const ab = await blobToArrayBuffer(file);
-    const mimeType = getActualMimeTypeFromImage(ab);
+    const buffer = await blobToArrayBuffer(file);
+    const mimeType = getActualMimeTypeFromImage(buffer);
     if (mimeType && mimeType !== file.type) {
-      file = createFile(ab, mimeType, file.name);
+      file = createFile(buffer, mimeType, file.name);
     }
   }
 
@@ -436,7 +436,7 @@ export const blobToArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {
     const reader = new FileReader();
     reader.onload = (event) => {
       if (!event.target?.result) {
-        return reject(new Error("couldn't convert blob to ArrayBuffer"));
+        return reject(new Error("Couldn't convert blob to ArrayBuffer"));
       }
       resolve(event.target.result as ArrayBuffer);
     };
