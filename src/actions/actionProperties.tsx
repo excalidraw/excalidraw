@@ -485,10 +485,14 @@ export const actionChangeOpacity = register({
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          opacity: value,
-        }),
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) =>
+          newElementWith(el, {
+            opacity: value,
+          }),
+        true,
       ),
       appState: { ...appState, currentItemOpacity: value },
       commitToHistory: true,

@@ -45,6 +45,9 @@ export type Collaborator = {
     background: string;
     stroke: string;
   };
+  // The url of the collaborator's avatar, defaults to username intials
+  // if not present
+  src?: string;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
@@ -63,6 +66,16 @@ export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
+export type LastActiveToolBeforeEraser =
+  | {
+      type: typeof SHAPES[number]["value"] | "eraser";
+      customType: null;
+    }
+  | {
+      type: "custom";
+      customType: string;
+    }
+  | null;
 export type AppState = {
   isLoading: boolean;
   errorMessage: string | null;
@@ -77,11 +90,19 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
-  activeTool: {
-    type: typeof SHAPES[number]["value"] | "eraser";
-    lastActiveToolBeforeEraser: typeof SHAPES[number]["value"] | null;
-    locked: boolean;
-  };
+  activeTool:
+    | {
+        type: typeof SHAPES[number]["value"] | "eraser";
+        lastActiveToolBeforeEraser: LastActiveToolBeforeEraser;
+        locked: boolean;
+        customType: null;
+      }
+    | {
+        type: "custom";
+        customType: string;
+        lastActiveToolBeforeEraser: LastActiveToolBeforeEraser;
+        locked: boolean;
+      };
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
