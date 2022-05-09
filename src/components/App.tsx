@@ -5242,7 +5242,7 @@ class App extends React.Component<AppProps, AppState> {
           commitToHistory: true,
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
-        this.library
+        await this.library
           .updateLibrary({
             libraryItems: file,
             merge: true,

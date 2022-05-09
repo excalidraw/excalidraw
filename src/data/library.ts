@@ -146,12 +146,12 @@ class Library {
     prompt?: boolean;
     openLibraryMenu?: boolean;
     defaultStatus?: "unpublished" | "published";
-  }) => {
+  }): Promise<LibraryItems> => {
     if (openLibraryMenu) {
       this.app.setState({ isLibraryOpen: true });
     }
 
-    this.setLibrary(() => {
+    return this.setLibrary(() => {
       return new Promise<LibraryItems>(async (resolve, reject) => {
         try {
           const source = await (typeof libraryItems === "function"
