@@ -4,14 +4,7 @@ import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import {
-  APP_NAME,
-  EVENT,
-  TITLE_TIMEOUT,
-  URL_HASH_KEYS,
-  URL_QUERY_KEYS,
-  VERSION_TIMEOUT,
-} from "../constants";
+import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
 import { loadFromBlob } from "../data/blob";
 import {
   ExcalidrawElement,
@@ -73,6 +66,7 @@ import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
+import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -202,94 +196,6 @@ const PlusLinkJSX = (
   </p>
 );
 
-const getLibraryUrlTokens = () => {
-  const libraryUrl =
-    // current
-    new URLSearchParams(window.location.hash.slice(1)).get(
-      URL_HASH_KEYS.addLibrary,
-    ) ||
-    // legacy, kept for compat reasons
-    new URLSearchParams(window.location.search).get(URL_QUERY_KEYS.addLibrary);
-  const idToken = libraryUrl
-    ? new URLSearchParams(window.location.hash.slice(1)).get("token")
-    : null;
-
-  return libraryUrl ? { libraryUrl, idToken } : null;
-};
-
-const useLibrary = (excalidrawAPI: ExcalidrawImperativeAPI | null) => {
-  useEffect(() => {
-    if (!excalidrawAPI) {
-      return;
-    }
-    const importLibraryFromURL = ({
-      libraryUrl,
-      idToken,
-    }: {
-      libraryUrl: string;
-      idToken: string | null;
-    }) => {
-      if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
-        const hash = new URLSearchParams(window.location.hash.slice(1));
-        hash.delete(URL_HASH_KEYS.addLibrary);
-        window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
-      } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
-        const query = new URLSearchParams(window.location.search);
-        query.delete(URL_QUERY_KEYS.addLibrary);
-        window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
-      }
-
-      excalidrawAPI.updateLibrary({
-        libraryItems: new Promise<Blob>(async (resolve, reject) => {
-          try {
-            const request = await fetch(decodeURIComponent(libraryUrl));
-            const blob = await request.blob();
-            resolve(blob);
-          } catch (error: any) {
-            reject(error);
-          }
-        }),
-        prompt: idToken !== excalidrawAPI.id,
-        merge: true,
-        defaultStatus: "published",
-        openLibraryMenu: true,
-      });
-    };
-    const onHashChange = (event: HashChangeEvent) => {
-      event.preventDefault();
-      const libraryUrlTokens = getLibraryUrlTokens();
-      if (libraryUrlTokens) {
-        event.stopImmediatePropagation();
-        // If hash changed and it contains library url, import it and replace
-        // the url to its previous state (important in case of collaboration
-        // and similar).
-        // Using history API won't trigger another hashchange.
-        window.history.replaceState({}, "", event.oldURL);
-
-        importLibraryFromURL(libraryUrlTokens);
-      }
-    };
-
-    // -------------------------------------------------------------------------
-    // ------ init load --------------------------------------------------------
-    excalidrawAPI.updateLibrary({
-      libraryItems: getLibraryItemsFromStorage(),
-    });
-
-    const libraryUrlTokens = getLibraryUrlTokens();
-
-    if (libraryUrlTokens) {
-      importLibraryFromURL(libraryUrlTokens);
-    }
-    // --------------------------------------------------------- init load -----
-
-    window.addEventListener(EVENT.HASHCHANGE, onHashChange);
-    return () => {
-      window.removeEventListener(EVENT.HASHCHANGE, onHashChange);
-    };
-  }, [excalidrawAPI]);
-};
-
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   let currentLangCode = languageDetector.detect() || defaultLang.code;
@@ -321,7 +227,10 @@ const ExcalidrawWrapper = () => {
 
   const collabAPI = useContext(CollabContext)?.api;
 
-  useLibrary(excalidrawAPI);
+  useHandleLibrary({
+    excalidrawAPI,
+    getInitialLibraryItems: getLibraryItemsFromStorage,
+  });
 
   useEffect(() => {
     if (!collabAPI || !excalidrawAPI) {
@@ -401,7 +310,7 @@ const ExcalidrawWrapper = () => {
 
     const onHashChange = async (event: HashChangeEvent) => {
       event.preventDefault();
-      const libraryUrlTokens = getLibraryUrlTokens();
+      const libraryUrlTokens = parseLibraryTokensFromUrl();
       if (!libraryUrlTokens) {
         initializeScene({ collabAPI }).then((data) => {
           loadImages(data);

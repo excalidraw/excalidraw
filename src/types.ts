@@ -220,6 +220,17 @@ export type LibraryItem = {
 };
 export type LibraryItems = readonly LibraryItem[];
 export type LibraryItems_anyVersion = LibraryItems | LibraryItems_v1;
+
+export type LibraryItemsSource =
+  | ((
+      currentLibraryItems: LibraryItems,
+    ) =>
+      | Blob
+      | LibraryItems_anyVersion
+      | Promise<LibraryItems_anyVersion | Blob>)
+  | Blob
+  | LibraryItems_anyVersion
+  | Promise<LibraryItems_anyVersion | Blob>;
 // -----------------------------------------------------------------------------
 
 // NOTE ready/readyPromise props are optional for host apps' sake (our own
@@ -297,7 +308,6 @@ export type SceneData = {
   appState?: ImportedDataState["appState"];
   collaborators?: Map<string, Collaborator>;
   commitToHistory?: boolean;
-  libraryItems?: LibraryItems_anyVersion;
 };
 
 export enum UserIdleState {
