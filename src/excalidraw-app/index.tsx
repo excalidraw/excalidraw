@@ -239,7 +239,6 @@ const useLibrary = (excalidrawAPI: ExcalidrawImperativeAPI | null) => {
         window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
       }
 
-      // excalidrawAPI.updateScene({ appState: { isLibraryOpen: true } });
       excalidrawAPI.updateLibrary({
         libraryItems: new Promise<Blob>(async (resolve, reject) => {
           try {
@@ -254,7 +253,7 @@ const useLibrary = (excalidrawAPI: ExcalidrawImperativeAPI | null) => {
         prompt: idToken !== excalidrawAPI.id,
         merge: true,
         defaultStatus: "published",
-        // openLibraryMenu: true,
+        openLibraryMenu: true,
       });
     };
     const onHashChange = (event: HashChangeEvent) => {
