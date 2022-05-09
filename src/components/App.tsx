@@ -232,7 +232,6 @@ import {
   isSupportedImageFile,
   loadSceneOrLibraryFromBlob,
   normalizeFile,
-  loadLibraryFromBlob,
   resizeImageFile,
   SVGStringToFile,
 } from "../data/blob";
