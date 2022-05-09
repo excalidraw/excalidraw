@@ -60,4 +60,14 @@
   --color-primary-darker: #f783ac;
   --color-primary-darkest: #e64980;
   --color-primary-light: #fcc2d7;
+
+  button.custom-element {
+    width: 2rem;
+    height: 2rem;
+    margin: 0.4rem;
+    margin-left: -10px;
+  }
+  .layer-ui__wrapper__footer-center {
+    display: flex;
+  }
 }
