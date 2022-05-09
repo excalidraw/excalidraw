@@ -308,7 +308,14 @@ export const textWysiwyg = ({
       // using scrollHeight here since we need to calculate
       // number of lines so cannot use editable.style.height
       // as that gets updated below
-      const lines = editable.scrollHeight / getApproxLineHeight(font);
+      // Rounding here so that the lines calculated is more accurate in all browsers.
+      // The scrollHeight and approxLineHeight differs in diff browsers
+      // eg it gives 1.05 in firefox for handewritten small font due to which
+      // height gets updated as lines > 1 and leads to jumping text for first line in bound container
+      // hence rounding here to avoid that
+      const lines = Math.round(
+        editable.scrollHeight / getApproxLineHeight(font),
+      );
       // auto increase height only when lines  > 1 so its
       // measured correctly and vertically aligns for
       // first line as well as setting height to "auto"
@@ -323,7 +330,6 @@ export const textWysiwyg = ({
             font,
             container!.width,
           ).split("\n").length;
-
           // This is browser behaviour when setting height to "auto"
           // It sets the height needed for 2 lines even if actual
           // line count is 1 as mentioned above as well

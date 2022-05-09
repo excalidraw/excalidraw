@@ -46,6 +46,7 @@ export const getDefaultAppState = (): Omit<
     textOpts: {},
     activeTool: {
       type: "selection",
+      customType: null,
       locked: false,
       lastActiveToolBeforeEraser: null,
     },
