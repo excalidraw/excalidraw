@@ -1,4 +1,5 @@
 import { ENCRYPTION_KEY_BITS } from "../constants";
+import { blobToArrayBuffer } from "./blob";
 
 export const IV_LENGTH_BYTES = 12;
 
@@ -58,7 +59,7 @@ export const encryptData = async (
       : data instanceof Uint8Array
       ? data
       : data instanceof Blob
-      ? await data.arrayBuffer()
+      ? await blobToArrayBuffer(data)
       : data;
 
   // We use symmetric encryption. AES-GCM is the recommended algorithm and
