@@ -478,19 +478,20 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | --- | --- | --- |
 | ready | `boolean` | This is set to true once Excalidraw is rendered |
 | readyPromise | [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317) | This promise will be resolved with the api once excalidraw has rendered. This will be helpful when you want do some action on the host app once this promise resolves. For this to work you will have to pass ref as shown [here](#readyPromise) |
-| [updateScene](#updateScene) | <pre>(scene: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>) => void </pre> | updates the scene with the sceneData |
-| [addFiles](#addFiles) | <pre>(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void </pre> | add files data to the appState |
+| [updateScene](#updateScene) | <code>(scene: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>) => void </code> | updates the scene with the sceneData |
+| [updateLibrary](#updateLibrary) | <code>(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/library.ts#L136">opts</a>) => Promise<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>> </code> | updates the scene with the sceneData |
+| [addFiles](#addFiles) | <code>(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void </code> | add files data to the appState |
 | resetScene | `({ resetLoadingState: boolean }) => void` | Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false. |
-| getSceneElementsIncludingDeleted | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a></pre> | Returns all the elements including the deleted in the scene |
-| getSceneElements | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a></pre> | Returns all the elements excluding the deleted in the scene |
-| getAppState | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a></pre> | Returns current appState |
+| getSceneElementsIncludingDeleted | <code> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a></code> | Returns all the elements including the deleted in the scene |
+| getSceneElements | <code> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a></code> | Returns all the elements excluding the deleted in the scene |
+| getAppState | <code> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a></code> | Returns current appState |
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
-| scrollToContent | <pre> (target?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement</a> &#124; <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement</a>[]) => void </pre> | Scroll the nearest element out of the elements supplied to the center. Defaults to the elements on the scene. |
+| scrollToContent | <code> (target?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement</a> &#124; <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement</a>[]) => void </code> | Scroll the nearest element out of the elements supplied to the center. Defaults to the elements on the scene. |
 | refresh | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you should call this API. |
 | [importLibrary](#importlibrary) | `(url: string, token?: string) => void` | Imports library from given URL |
 | setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. |
 | [id](#id) | string | Unique ID for the excalidraw component. |
-| [getFiles](#getFiles) | <pre>() => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64">files</a> </pre> | This API can be used to get the files present in the scene. It may contain files that aren't referenced by any element, so if you're persisting the files to a storage, you should compare them against stored elements. |
+| [getFiles](#getFiles) | <code>() => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64">files</a> </code> | This API can be used to get the files present in the scene. It may contain files that aren't referenced by any element, so if you're persisting the files to a storage, you should compare them against stored elements. |
 
 #### `readyPromise`
 
@@ -515,6 +516,28 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `collaborators` | <pre>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L35">Collaborator></a></pre> | The list of collaborators to be updated in the scene. |
 | `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
 | `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise<[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)> &#124; ((currentItems: [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)>) => [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise<[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)>) | The `libraryItems` to be update in the scene. |
+
+### `updateLibrary`
+
+<pre>
+(opts: {
+  libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L224">LibraryItemsSource</a>;
+  merge?: boolean;
+  prompt?: boolean;
+  openLibraryMenu?: boolean;
+  defaultStatus?: "unpublished" | "published";
+}) => Promise<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>>
+</pre>
+
+You can use this function to update the library. It accepts the below attributes.
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L224) | The `libraryItems` to be replaced/merged with current library |
+| `prompt` | boolean | Whether to prompt user for confirmation. Defaults to `false`. |
+| `openLibraryMenu` | boolean | Whether to open the library menu before importing. |
+| `commitToHistory` | boolean | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
+| `defaultStatus` | <code>"unpublished" &#124; "published"</code> | Default library item's `status` if not present. Defaults to `unpublished`. |
 
 ### `addFiles`
 
@@ -1123,6 +1146,51 @@ mergeLibraryItems(localItems: <a href="https://github.com/excalidraw/excalidraw/
 </pre>
 
 This function merges two `LibraryItems` arrays, where unique items from `otherItems` are sorted first in the returned array.
+
+#### `parseLibraryTokensFromUrl`
+
+**How to use**
+
+```js
+import { parseLibraryTokensFromUrl } from "@excalidraw/excalidraw-next";
+```
+
+**Signature**
+
+<pre>
+parseLibraryTokensFromUrl(): {
+    libraryUrl: string;
+    idToken: string | null;
+} | null
+</pre>
+
+Parses library parameters from URL if present (expects the `#addLibrary` hash key), and returns an object with the `libraryUrl` and `idToken`. Returns `null` if `#addLibrary` hash key not found.
+
+#### `useHandleLibrary`
+
+**How to use**
+
+```js
+import { useHandleLibrary } from "@excalidraw/excalidraw-next";
+
+export const App = () => {
+  // ...
+  useHandleLibrary({ excalidrawAPI });
+};
+```
+
+**Signature**
+
+<pre>
+useHandleLibrary(opts: {
+  excalidrawAPI: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L432">ExcalidrawAPI</a>,
+  getInitialLibraryItems?: () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L224">LibraryItemsSource</a>
+});
+</pre>
+
+A hook that automatically imports library from url if `#addLibrary` hash key exists on initial load, or when it changes during the editing session (e.g. when a user installs a new library), and handles initial library load if `getInitialLibraryItems` getter is supplied.
+
+In the future, we will be adding support for handling library persistence to browser storage (or elsewhere).
 
 ### Exported constants
 
