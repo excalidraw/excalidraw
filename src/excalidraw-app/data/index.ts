@@ -7,6 +7,7 @@ import {
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
+import { isInvisiblySmallElement } from "../../element/sizeHelpers";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { ExcalidrawElement, FileId } from "../../element/types";
 import { t } from "../../i18n";
@@ -17,9 +18,34 @@ import {
   UserIdleState,
 } from "../../types";
 import { bytesToHexString } from "../../utils";
-import { FILE_UPLOAD_MAX_BYTES, ROOM_ID_BYTES } from "../app_constants";
+import {
+  DELETED_ELEMENT_TIMEOUT,
+  FILE_UPLOAD_MAX_BYTES,
+  ROOM_ID_BYTES,
+} from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
+
+export type SyncableExcalidrawElement = ExcalidrawElement & {
+  _brand: "SyncableExcalidrawElement";
+};
+
+export const isSyncableElement = (
+  element: ExcalidrawElement,
+): element is SyncableExcalidrawElement => {
+  if (element.isDeleted) {
+    if (element.updated > Date.now() - DELETED_ELEMENT_TIMEOUT) {
+      return true;
+    }
+    return false;
+  }
+  return !isInvisiblySmallElement(element);
+};
+
+export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
+  elements.filter((element) =>
+    isSyncableElement(element),
+  ) as SyncableExcalidrawElement[];
 
 const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
 const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;

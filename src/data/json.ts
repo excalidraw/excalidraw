@@ -9,12 +9,13 @@ import {
 import { clearElementsForDatabase, clearElementsForExport } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState, BinaryFiles, LibraryItems } from "../types";
-import { isImageFileHandle, loadFromBlob } from "./blob";
+import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
 
 import {
   ExportedDataState,
   ImportedDataState,
   ExportedLibraryData,
+  ImportedLibraryData,
 } from "./types";
 import Library from "./library";
 
@@ -92,13 +93,13 @@ export const loadFromJSON = async (
   localAppState: AppState,
   localElements: readonly ExcalidrawElement[] | null,
 ) => {
-  const blob = await fileOpen({
+  const file = await fileOpen({
     description: "Excalidraw files",
     // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
     // gets resolved. Else, iOS users cannot open `.excalidraw` files.
     // extensions: ["json", "excalidraw", "png", "svg"],
   });
-  return loadFromBlob(blob, localAppState, localElements);
+  return loadFromBlob(await normalizeFile(file), localAppState, localElements);
 };
 
 export const isValidExcalidrawData = (data?: {
@@ -114,7 +115,7 @@ export const isValidExcalidrawData = (data?: {
   );
 };
 
-export const isValidLibrary = (json: any) => {
+export const isValidLibrary = (json: any): json is ImportedLibraryData => {
   return (
     typeof json === "object" &&
     json &&

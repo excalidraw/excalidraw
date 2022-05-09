@@ -13,6 +13,7 @@ interface Window {
   ClipboardItem: any;
   __EXCALIDRAW_SHA__: string | undefined;
   EXCALIDRAW_ASSET_PATH: string | undefined;
+  EXCALIDRAW_EXPORT_SOURCE: string;
   gtag: Function;
 }
 
@@ -33,6 +34,10 @@ interface Clipboard extends EventTarget {
 type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
+
+type ValueOf<T> = T[keyof T];
+
+type Merge<M, N> = Omit<M, keyof N> & N;
 
 /** utility type to assert that the second type is a subtype of the first type.
  * Returns the subtype. */

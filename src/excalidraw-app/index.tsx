@@ -12,7 +12,6 @@ import {
   VERSION_TIMEOUT,
 } from "../constants";
 import { loadFromBlob } from "../data/blob";
-import { ImportedDataState } from "../data/types";
 import {
   ExcalidrawElement,
   FileId,
@@ -20,7 +19,8 @@ import {
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { Language, t } from "../i18n";
-import Excalidraw, {
+import {
+  Excalidraw,
   defaultLang,
   languages,
 } from "../packages/excalidraw/index";
@@ -29,6 +29,7 @@ import {
   LibraryItems,
   ExcalidrawImperativeAPI,
   BinaryFiles,
+  ExcalidrawInitialDataState,
 } from "../types";
 import {
   debounce,
@@ -93,7 +94,7 @@ languageDetector.init({
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
 }): Promise<
-  { scene: ImportedDataState | null } & (
+  { scene: ExcalidrawInitialDataState | null } & (
     | { isExternalScene: true; id: string; key: string }
     | { isExternalScene: false; id?: null; key?: null }
   )
@@ -220,11 +221,11 @@ const ExcalidrawWrapper = () => {
   // ---------------------------------------------------------------------------
 
   const initialStatePromiseRef = useRef<{
-    promise: ResolvablePromise<ImportedDataState | null>;
+    promise: ResolvablePromise<ExcalidrawInitialDataState | null>;
   }>({ promise: null! });
   if (!initialStatePromiseRef.current.promise) {
     initialStatePromiseRef.current.promise =
-      resolvablePromise<ImportedDataState | null>();
+      resolvablePromise<ExcalidrawInitialDataState | null>();
   }
 
   useEffect(() => {
