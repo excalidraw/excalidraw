@@ -242,7 +242,6 @@ const useLibrary = (excalidrawAPI: ExcalidrawImperativeAPI | null) => {
       excalidrawAPI.updateLibrary({
         libraryItems: new Promise<Blob>(async (resolve, reject) => {
           try {
-            // await new Promise((r) => setTimeout(r, 1500));
             const request = await fetch(decodeURIComponent(libraryUrl));
             const blob = await request.blob();
             resolve(blob);
