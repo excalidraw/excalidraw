@@ -19,8 +19,7 @@ Please add the latest change on the top under the correct section.
 
 - ##### BREAKING CHANGE
   - libraries are no longer automatically initialized from URL when `#addLibrary` hash key is present. Host apps now need to handle this themselves, either with the help of the [`parseLibraryTokensFromUrl`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#parseLibraryTokensFromUrl), or by using the newly exported [`useHandleLibrary`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#useHandleLibrary) hook.
-  - `updateScene` API no longer supports passing `libraryItems`. Instead, use the newly added (and more powerful) [`updateLibrary`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateLibrary).
-- Added API for updating libraries.
+  - `updateScene` API no longer supports passing `libraryItems`. Instead, use the newly added (and more powerful) [`updateLibrary`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateLibrary) API.
 - Exported [`loadSceneOrLibraryFromBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#loadSceneOrLibraryFromBlob) function [#5057](https://github.com/excalidraw/excalidraw/pull/5057).
 - Export [`MIME_TYPES`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L92) supported by Excalidraw [#5135](https://github.com/excalidraw/excalidraw/pull/5135).
 - Support [`src`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L50) for collaborators. Now onwards host can pass `src` to render the customized avatar for collaborators [#5114](https://github.com/excalidraw/excalidraw/pull/5114).
