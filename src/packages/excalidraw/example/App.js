@@ -123,7 +123,12 @@ export default function App() {
         {" "}
         <button
           className="custom-element"
-          onClick={() => excalidrawRef.current.setCustomType("comment")}
+          onClick={() =>
+            excalidrawRef.current.setActiveTool({
+              type: "custom",
+              customType: "comment",
+            })
+          }
         >
           {COMMENT_SVG}
         </button>
@@ -252,7 +257,7 @@ export default function App() {
     return withBatchedUpdates((event) => {
       window.removeEventListener(EVENT.POINTER_MOVE, pointerDownState.onMove);
       window.removeEventListener(EVENT.POINTER_UP, pointerDownState.onUp);
-      excalidrawRef.current.setCustomType(null);
+      excalidrawRef.current.setActiveTool({ type: "selection" });
       const distance = distance2d(
         pointerDownState.x,
         pointerDownState.y,

@@ -454,7 +454,7 @@ export type ExcalidrawImperativeAPI = {
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
   id: string;
-  setCustomType: InstanceType<typeof App>["setCustomType"];
+  setActiveTool: InstanceType<typeof App>["setActiveTool"];
 };
 
 export type DeviceType = {

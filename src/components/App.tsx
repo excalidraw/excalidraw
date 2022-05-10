@@ -384,7 +384,7 @@ class App extends React.Component<AppProps, AppState> {
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
         id: this.id,
-        setCustomType: this.setCustomType,
+        setActiveTool: this.setActiveTool,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1643,22 +1643,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ toastMessage });
   };
 
-  setCustomType = (customType: string | null) => {
-    if (customType !== null) {
-      this.setState({
-        activeTool: { ...this.state.activeTool, type: "custom", customType },
-      });
-    } else {
-      this.setState({
-        activeTool: {
-          ...this.state.activeTool,
-          type: "selection",
-          customType,
-        },
-      });
-    }
-  };
-
   restoreFileFromShare = async () => {
     try {
       const webShareTargetCache = await caches.open("web-share-target");
@@ -1990,11 +1974,11 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  private setActiveTool(
+  private setActiveTool = (
     tool:
       | { type: typeof SHAPES[number]["value"] | "eraser" }
       | { type: "custom"; customType: string },
-  ) {
+  ) => {
     const nextActiveTool = updateActiveTool(this.state, tool);
     if (!isHoldingSpace) {
       setCursorForShape(this.canvas, this.state);
@@ -2018,7 +2002,7 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.setState({ activeTool: nextActiveTool });
     }
-  }
+  };
 
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
