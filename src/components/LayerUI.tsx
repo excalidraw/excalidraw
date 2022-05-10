@@ -27,7 +27,7 @@ import { HelpDialog } from "./HelpDialog";
 import Stack from "./Stack";
 import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
-import Library from "../data/library";
+import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LibraryButton } from "./LibraryButton";
 import { isImageFileHandle } from "../data/blob";
@@ -38,7 +38,6 @@ import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
 import { useDeviceType } from "../components/App";
-import { distributeLibraryItemsOnSquareGrid } from "../distribute";
 
 interface LayerUIProps {
   actionManager: ActionManager;

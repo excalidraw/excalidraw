@@ -76,7 +76,7 @@ import {
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
-import Library from "../data/library";
+import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements, restoreLibraryItems } from "../data/restore";
 import {
   dragNewElement,
@@ -263,7 +263,6 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { AbortError } from "../errors";
-import { distributeLibraryItemsOnSquareGrid } from "../distribute";
 
 const defaultDeviceTypeContext: DeviceType = {
   isMobile: false,
