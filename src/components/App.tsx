@@ -2145,16 +2145,17 @@ class App extends React.Component<AppProps, AppState> {
               selectedTextRange: {
                 type: "cursor",
                 cursorPosition: selection.start,
-                newColorRange:
-                  state.selectedTextRange?.type === "cursor"
-                    ? state.selectedTextRange.newColorRange
-                    : null,
+                newColorRange: state.selectedTextRange?.newColorRange ?? null,
               },
             };
           }
 
           return {
-            selectedTextRange: { type: "range", ...selection },
+            selectedTextRange: {
+              type: "range",
+              ...selection,
+              newColorRange: state.selectedTextRange?.newColorRange ?? null,
+            },
           };
         }),
       ),

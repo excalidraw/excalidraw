@@ -77,12 +77,19 @@ export type LastActiveToolBeforeEraser =
     }
   | null;
 
+type NewColorRange = { color: string; position: number };
+
 export type Selection =
-  | { type: "range"; start: number; end: number }
+  | {
+      type: "range";
+      start: number;
+      end: number;
+      newColorRange: NewColorRange | null;
+    }
   | {
       type: "cursor";
       cursorPosition: number;
-      newColorRange: { color: string; position: number } | null;
+      newColorRange: NewColorRange | null;
     };
 
 export type AppState = {
