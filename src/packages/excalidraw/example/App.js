@@ -328,18 +328,19 @@ export default function App() {
   };
 
   const renderComment = () => {
+    const appState = excalidrawRef.current.getAppState();
     const { x, y } = sceneCoordsToViewportCoords(
       { sceneX: comment.x, sceneY: comment.y },
-      excalidrawRef.current.getAppState(),
+      appState,
     );
 
     return (
       <textarea
         className="comment"
         style={{
-          top: `${y - 16}px`,
-          left: `${x - 16}px`,
-          position: "fixed",
+          top: `${y - 16 - appState.offsetTop}px`,
+          left: `${x - 16 - appState.offsetLeft}px`,
+          position: "absolute",
           zIndex: 1,
         }}
         ref={(ref) => {
