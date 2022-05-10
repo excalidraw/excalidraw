@@ -2023,10 +2023,10 @@
     "@testing-library/dom" "^8.0.0"
     "@types/react-dom" "<18.0.0"
 
-"@tldraw/vec@1.4.3":
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/@tldraw/vec/-/vec-1.4.3.tgz#c1460da019063b8eb9c62d715c61dff44dd23b02"
-  integrity sha512-p7Nu9OWqorQ+nWPlvkN6Zn1oDbRgr4sheLzRif/+xB7BzMQFJh1T8syX6Jj/S88GPvn5PwZgYUKMnMFvvL5t/w==
+"@tldraw/vec@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@tldraw/vec/-/vec-1.7.0.tgz#8b7238825ae0a78cb2d262132e123a5de27b9dfe"
+  integrity sha512-uidcNCtm6kL6M4GcXvPb0+WxVeJ3H1csYqsPwDNhVwIrF6eCUKNCoh+70G0kUk2S0EIMmufp3COhagIS8Xnqig==
 
 "@types/anymatch@*":
   version "1.3.1"
