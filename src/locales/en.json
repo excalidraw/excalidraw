@@ -119,7 +119,8 @@
       "unlock": "Unlock",
       "lockAll": "Lock all",
       "unlockAll": "Unlock all"
-    }
+    },
+    "statusPublished": "Published"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
