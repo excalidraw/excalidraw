@@ -25,7 +25,7 @@ Please add the latest change on the top under the correct section.
 
   - Libraries are no longer automatically initialized from URL when `#addLibrary` hash key is present. Host apps now need to handle this themselves with the help of either of the above APIs (`useHandleLibrary` is recommended).
 
-- Added [`updateLibrary`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateLibrary) API to update (replace/merge) the library.
+- Added [`updateLibrary`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateLibrary) API to update (replace/merge) the library [#5115](https://github.com/excalidraw/excalidraw/pull/5115).
 
   ##### BREAKING CHANGE
 
