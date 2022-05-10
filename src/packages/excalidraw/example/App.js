@@ -198,12 +198,13 @@ export default function App() {
       appRef.current.querySelectorAll(".comment-icon");
     commentIconsElements.forEach((ele) => {
       const id = ele.id;
+      const appstate = excalidrawRef.current.getAppState();
       const { x, y } = sceneCoordsToViewportCoords(
         { sceneX: commentIcons[id].x, sceneY: commentIcons[id].y },
-        excalidrawRef.current.getAppState(),
+        appstate,
       );
-      ele.style.left = `${x - 16}px`;
-      ele.style.top = `${y - 16}px`;
+      ele.style.left = `${x - 16 - appstate.offsetLeft}px`;
+      ele.style.top = `${y - 16 - appstate.offsetTop}px`;
     });
   };
 
@@ -258,6 +259,7 @@ export default function App() {
   };
   const renderCommentIcons = () => {
     return Object.values(commentIcons).map((commentIcon) => {
+      const appState = excalidrawRef.current.getAppState();
       const { x, y } = sceneCoordsToViewportCoords(
         { sceneX: commentIcon.x, sceneY: commentIcon.y },
         excalidrawRef.current.getAppState(),
@@ -267,9 +269,9 @@ export default function App() {
           id={commentIcon.id}
           key={commentIcon.id}
           style={{
-            top: `${y - 16}px`,
-            left: `${x - 16}px`,
-            position: "fixed",
+            top: `${y - 16 - appState.offsetTop}px`,
+            left: `${x - 16 - appState.offsetLeft}px`,
+            position: "absolute",
             zIndex: 1,
             width: "32px",
             height: "32px",
