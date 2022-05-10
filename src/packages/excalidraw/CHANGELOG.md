@@ -17,7 +17,7 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
-- Added [`useHandleLibrary`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#useHandleLibrary) hook to automatically handle importing of libraries when `#addLibrary` URL hash key is present, and potentially for initializing library as well.
+- Added [`useHandleLibrary`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#useHandleLibrary) hook to automatically handle importing of libraries when `#addLibrary` URL hash key is present, and potentially for initializing library as well [#5115](https://github.com/excalidraw/excalidraw/pull/5115).
 
   Also added [`parseLibraryTokensFromUrl`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#parseLibraryTokensFromUrl) to help in manually importing library from URL if desired.
 
