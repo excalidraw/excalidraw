@@ -171,6 +171,8 @@ export default function App() {
     window.alert(`Copied to clipboard as ${type} sucessfully`);
   };
 
+  const [pointerData, setPointerData] = useState(null);
+
   return (
     <div className="App">
       <h1> Excalidraw Example</h1>
@@ -286,6 +288,17 @@ export default function App() {
               Copy to Clipboard as JSON
             </button>
           </div>
+          <div
+            style={{
+              display: "flex",
+              gap: "1em",
+              justifyContent: "center",
+              marginTop: "1em",
+            }}
+          >
+            <div>x: {pointerData?.pointer.x ?? 0}</div>
+            <div>y: {pointerData?.pointer.y ?? 0}</div>
+          </div>
         </div>
         <div className="excalidraw-wrapper">
           <Excalidraw
@@ -294,7 +307,7 @@ export default function App() {
             onChange={(elements, state) =>
               console.info("Elements :", elements, "State : ", state)
             }
-            onPointerUpdate={(payload) => console.info(payload)}
+            onPointerUpdate={(payload) => setPointerData(payload)}
             onCollabButtonClick={() =>
               window.alert("You clicked on collab button")
             }
