@@ -37,7 +37,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     autoFocus = false,
     generateIdForFile,
     onLinkOpen,
-    onCustomElementPointerDown,
+    onPointerDown,
     onScrollChange,
   } = props;
 
@@ -102,7 +102,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           autoFocus={autoFocus}
           generateIdForFile={generateIdForFile}
           onLinkOpen={onLinkOpen}
-          onCustomElementPointerDown={onCustomElementPointerDown}
+          onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
         />
       </Provider>

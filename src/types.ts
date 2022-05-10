@@ -289,7 +289,7 @@ export interface ExcalidrawProps {
       nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
   ) => void;
-  onCustomElementPointerDown?: (
+  onPointerDown?: (
     activeTool: AppState["activeTool"],
     pointerDownState: PointerDownState,
   ) => void;

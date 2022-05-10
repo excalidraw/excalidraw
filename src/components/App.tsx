@@ -3069,16 +3069,14 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "custom") {
       setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
-      this.props?.onCustomElementPointerDown?.(
-        this.state.activeTool,
-        pointerDownState,
-      );
     } else if (this.state.activeTool.type !== "eraser") {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
         pointerDownState,
       );
     }
+
+    this.props?.onPointerDown?.(this.state.activeTool, pointerDownState);
 
     const onPointerMove =
       this.onPointerMoveFromPointerDownHandler(pointerDownState);

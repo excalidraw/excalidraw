@@ -203,7 +203,7 @@ export default function App() {
     window.alert(`Copied to clipboard as ${type} sucessfully`);
   };
 
-  const onCustomElementPointerDown = (activeTool, pointerDownState) => {
+  const onPointerDown = (activeTool, pointerDownState) => {
     if (activeTool.type === "custom" && activeTool.customType === "comment") {
       const { x, y } = pointerDownState.origin;
       setComment({ x, y, value: "" });
@@ -540,7 +540,7 @@ export default function App() {
             renderTopRightUI={renderTopRightUI}
             renderFooter={renderFooter}
             onLinkOpen={onLinkOpen}
-            onCustomElementPointerDown={onCustomElementPointerDown}
+            onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
           />
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
