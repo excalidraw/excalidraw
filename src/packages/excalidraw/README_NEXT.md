@@ -1063,12 +1063,10 @@ This function loads the scene data from the blob (or file). If you pass `localAp
 import { loadSceneOrLibraryFromBlob, MIME_TYPES } from "@excalidraw/excalidraw";
 
 const contents = await loadSceneOrLibraryFromBlob(file, null, null);
-// if you need, you can check what data you're dealing with before
-// passing down
 if (contents.type === MIME_TYPES.excalidraw) {
   excalidrawAPI.updateScene(contents.data);
-} else {
-  excalidrawAPI.updateScene(contents.data);
+} else if (contents.type === MIME_TYPES.excalidrawlib) {
+  excalidrawAPI.updateLibrary(contents.data);
 }
 ```
 
