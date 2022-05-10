@@ -51,7 +51,7 @@
     "react-dom": "17.0.2",
     "react-scripts": "4.0.3",
     "roughjs": "4.5.2",
-    "sass": "1.49.7",
+    "sass": "1.51.0",
     "socket.io-client": "2.3.1",
     "typescript": "4.5.5"
   },
@@ -67,7 +67,7 @@
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.3.1",
     "husky": "7.0.4",
-    "jest-canvas-mock": "2.3.1",
+    "jest-canvas-mock": "2.4.0",
     "lint-staged": "12.3.7",
     "pepjs": "0.5.3",
     "prettier": "2.5.1",
