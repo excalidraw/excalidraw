@@ -64,7 +64,7 @@
     "@types/resize-observer-browser": "0.1.6",
     "chai": "4.3.6",
     "dotenv": "10.0.0",
-    "eslint-config-prettier": "8.3.0",
+    "eslint-config-prettier": "8.5.0",
     "eslint-plugin-prettier": "3.3.1",
     "husky": "7.0.4",
     "jest-canvas-mock": "2.4.0",
