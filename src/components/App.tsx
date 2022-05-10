@@ -1065,15 +1065,6 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.props?.onScrollChange?.(this.state.scrollX, this.state.scrollY);
     }
-    if (
-      prevState.offsetLeft !== this.state.offsetLeft ||
-      prevState.offsetTop !== this.state.offsetTop
-    ) {
-      this.props?.onOffsetsChange?.(
-        this.state.offsetLeft,
-        this.state.offsetTop,
-      );
-    }
 
     if (
       Object.keys(this.state.selectedElementIds).length &&

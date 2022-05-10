@@ -39,7 +39,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onLinkOpen,
     onCustomElementPointerDown,
     onScrollChange,
-    onOffsetsChange,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -105,7 +104,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onCustomElementPointerDown={onCustomElementPointerDown}
           onScrollChange={onScrollChange}
-          onOffsetsChange={onOffsetsChange}
         />
       </Provider>
     </InitializeApp>

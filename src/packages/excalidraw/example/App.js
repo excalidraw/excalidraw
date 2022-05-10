@@ -537,7 +537,6 @@ export default function App() {
             onLinkOpen={onLinkOpen}
             onCustomElementPointerDown={onCustomElementPointerDown}
             onScrollChange={rerenderCommentIcons}
-            onOffsetsChange={rerenderCommentIcons}
           />
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}

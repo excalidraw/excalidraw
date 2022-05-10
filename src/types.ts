@@ -294,10 +294,6 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
-  onOffsetsChange?: (
-    offsetLeft: AppState["offsetLeft"],
-    offsetTop: AppState["offsetTop"],
-  ) => void;
 }
 
 export type SceneData = {
