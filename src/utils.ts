@@ -15,7 +15,13 @@ import {
   FontFamilyValues,
   FontString,
 } from "./element/types";
-import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
+import {
+  AppState,
+  DataURL,
+  LastActiveToolBeforeEraser,
+  Selection,
+  Zoom,
+} from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 import { SHAPES } from "./shapes";
@@ -713,4 +719,27 @@ export const getLineGroupedRanges = (
   }
 
   return lines;
+};
+
+export const getSelectecTextColorRangeColor = (
+  element: ExcalidrawTextElement,
+  selectedTextRange: Selection,
+): string => {
+  if (selectedTextRange.type === "range") {
+    return element.colorRanges[selectedTextRange.start] ?? element.strokeColor;
+  }
+
+  if (
+    selectedTextRange.newColorRange?.position ===
+    selectedTextRange.cursorPosition
+  ) {
+    return selectedTextRange.newColorRange.color;
+  }
+
+  return (
+    element.colorRanges[
+      // TODO: Should + 1 here when in RTL mode
+      selectedTextRange.cursorPosition - 1
+    ] ?? element.strokeColor
+  );
 };

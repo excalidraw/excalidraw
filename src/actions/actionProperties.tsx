@@ -76,7 +76,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import { arrayToMap } from "../utils";
+import { arrayToMap, getSelectecTextColorRangeColor } from "../utils";
 import { register } from "./register";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
@@ -274,32 +274,13 @@ export const actionChangeStrokeColor = register({
           elements,
           appState,
           (element) => {
-            if (element.type !== "text") {
+            if (element.type !== "text" || !appState.selectedTextRange) {
               return element.strokeColor;
             }
 
-            const selectedRange = appState.selectedTextRange;
-
-            if (!selectedRange) {
-              return element.strokeColor;
-            }
-
-            if (selectedRange.type === "range") {
-              return element.colorRanges[selectedRange.start];
-            }
-
-            if (
-              selectedRange.newColorRange?.position ===
-              selectedRange.cursorPosition
-            ) {
-              return selectedRange.newColorRange.color;
-            }
-
-            return (
-              element.colorRanges[
-                // TODO: Should + 1 here if RTL
-                selectedRange.cursorPosition - 1
-              ] ?? element.strokeColor
+            return getSelectecTextColorRangeColor(
+              element,
+              appState.selectedTextRange,
             );
           },
           appState.currentItemStrokeColor,

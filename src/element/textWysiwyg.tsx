@@ -4,6 +4,7 @@ import {
   getFontString,
   getFontFamilyString,
   isTestEnv,
+  getSelectecTextColorRangeColor,
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
@@ -206,18 +207,6 @@ export const textWysiwyg = ({
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
       const angle = container ? container.angle : updatedElement.angle;
-      const caretColor =
-        appState.editingElement?.type === "text" &&
-        appState.selectedTextRange &&
-        appState.selectedTextRange.type === "cursor"
-          ? appState.selectedTextRange.newColorRange?.position ===
-            appState.selectedTextRange.cursorPosition
-            ? appState.selectedTextRange.newColorRange.color
-            : appState.editingElement.colorRanges[
-                // TODO: Should + 1 here when in RTL mode
-                appState.selectedTextRange.cursorPosition - 1
-              ] ?? appState.editingElement.strokeColor
-          : "currentcolor";
 
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
@@ -238,7 +227,13 @@ export const textWysiwyg = ({
         textAlign,
         verticalAlign,
         color: "transparent",
-        caretColor,
+        caretColor:
+          updatedElement && appState.selectedTextRange
+            ? getSelectecTextColorRangeColor(
+                updatedElement,
+                appState.selectedTextRange,
+              )
+            : "currentColor",
         opacity: updatedElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxWidth: `${maxWidth}px`,
