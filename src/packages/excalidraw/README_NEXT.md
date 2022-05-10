@@ -531,13 +531,13 @@ You can use this function to update the scene with the sceneData. It accepts the
 
 You can use this function to update the library. It accepts the below attributes.
 
-| Name | Type | Description |
-| --- | --- | --- |
-| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L224) | The `libraryItems` to be replaced/merged with current library |
-| `prompt` | boolean | Whether to prompt user for confirmation. Defaults to `false`. |
-| `openLibraryMenu` | boolean | Whether to open the library menu before importing. |
-| `commitToHistory` | boolean | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
-| `defaultStatus` | <code>"unpublished" &#124; "published"</code> | Default library item's `status` if not present. Defaults to `unpublished`. |
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `libraryItems` |  | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L224) | The `libraryItems` to be replaced/merged with current library |
+| `merge` | boolean | `false` | Whether to merge with existing library items. |
+| `prompt` | boolean | `false` | Whether to prompt user for confirmation. |
+| `openLibraryMenu` | boolean | `false` | Whether to open the library menu before importing. |
+| `defaultStatus` | <code>"unpublished" &#124; "published"</code> | `"unpublished"` | Default library item's `status` if not present. |
 
 ### `addFiles`
 
