@@ -81,6 +81,6 @@
     "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js"
   },
   "dependencies": {
-    "dotenv": "10.0.0"
+    "dotenv": "16.0.0"
   }
 }
