@@ -7,7 +7,6 @@ import { UI } from "./helpers/ui";
 import { serializeLibraryAsJSON } from "../data/json";
 import { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { ExcalidrawGenericElement } from "../element/types";
-import { getCommonBounds } from "../element";
 import { getCommonBoundingBox } from "../element/bounds";
 
 const { h } = window;
