@@ -16,6 +16,8 @@ import {
   copyToClipboard,
 } from "../clipboard";
 
+export { MIME_TYPES };
+
 type ExportOpts = {
   elements: readonly NonDeleted<ExcalidrawElement>[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
@@ -192,6 +194,10 @@ export const exportToClipboard = async (
 };
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";
-export { loadFromBlob, loadLibraryFromBlob } from "../data/blob";
+export {
+  loadFromBlob,
+  loadSceneOrLibraryFromBlob,
+  loadLibraryFromBlob,
+} from "../data/blob";
 export { getFreeDrawSvgPath } from "../renderer/renderElement";
 export { mergeLibraryItems } from "../data/library";

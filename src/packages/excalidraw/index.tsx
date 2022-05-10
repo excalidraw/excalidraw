@@ -202,6 +202,7 @@ export {
   serializeLibraryAsJSON,
   loadLibraryFromBlob,
   loadFromBlob,
+  loadSceneOrLibraryFromBlob,
   getFreeDrawSvgPath,
   exportToClipboard,
   mergeLibraryItems,
