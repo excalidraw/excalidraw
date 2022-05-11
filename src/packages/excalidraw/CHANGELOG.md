@@ -30,6 +30,7 @@ Please add the latest change on the top under the correct section.
   ##### BREAKING CHANGE
 
   - `updateScene` API no longer supports passing `libraryItems`. Instead, use the `updateLibrary` API.
+
 - Add support for integrating custom elements [#5164](https://github.com/excalidraw/excalidraw/pull/5164).
 
   - Add [`onPointerDown`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) callback which gets triggered on pointer down events.
