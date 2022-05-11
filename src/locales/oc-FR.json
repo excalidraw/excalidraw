@@ -119,7 +119,8 @@
       "unlock": "Desverrolhar",
       "lockAll": "Tot verrolhar",
       "unlockAll": "Tot desverrolhar"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
@@ -341,7 +342,8 @@
       "post": "que significa en brèu que qual que siá pòt l’utilizar sens cap de restriccion."
     },
     "noteItems": "Cada element de bibliotèca deu aver un nom pròpri per èsser filtrable. Los elements de bibliotèca seguentas seràn incluses :",
-    "atleastOneLibItem": "Volgatz seleccionar almens un element de bibliotèca per començar"
+    "atleastOneLibItem": "Volgatz seleccionar almens un element de bibliotèca per començar",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliotèca somesa",
