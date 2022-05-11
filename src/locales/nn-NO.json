@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -341,7 +342,8 @@
       "post": "som kort sagt betyr at kven som helst kan bruke det utan avgrensingar."
     },
     "noteItems": "Kvart bibliotekselement må ha eit eige namn, slik at det er mogleg å filtrere. Dei følgande bibliotekselementa blir inkludert:",
-    "atleastOneLibItem": "Ver vennleg å markere minst eitt bibliotekselement for å starte"
+    "atleastOneLibItem": "Ver vennleg å markere minst eitt bibliotekselement for å starte",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliotek innsendt",
