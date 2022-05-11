@@ -214,3 +214,8 @@ export {
   newElementWith,
   bumpVersion,
 } from "../../element/mutateElement";
+
+export {
+  parseLibraryTokensFromUrl,
+  useHandleLibrary,
+} from "../../data/library";
