@@ -119,7 +119,8 @@
       "unlock": "Sblocca",
       "lockAll": "Blocca tutto",
       "unlockAll": "Sblocca tutto"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -341,7 +342,8 @@
       "post": "che in breve significa che chiunque possa usarla senza restrizioni."
     },
     "noteItems": "Ogni elemento della libreria deve avere il proprio nome, così che sia filtrabile. Gli elementi della seguente libreria saranno inclusi:",
-    "atleastOneLibItem": "Sei pregato di selezionare almeno un elemento della libreria per iniziare"
+    "atleastOneLibItem": "Sei pregato di selezionare almeno un elemento della libreria per iniziare",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Libreria inviata",
