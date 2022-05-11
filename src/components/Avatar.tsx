@@ -1,6 +1,6 @@
 import "./Avatar.scss";
 
-import React from "react";
+import React, { useState } from "react";
 import { getClientInitials } from "../clients";
 
 type AvatarProps = {
@@ -13,17 +13,20 @@ type AvatarProps = {
 
 export const Avatar = ({ color, border, onClick, name, src }: AvatarProps) => {
   const shortName = getClientInitials(name);
-  const style = src
+  const [error, setError] = useState(false);
+  const loadImg = !error && src;
+  const style = loadImg
     ? undefined
     : { background: color, border: `1px solid ${border}` };
   return (
     <div className="Avatar" style={style} onClick={onClick}>
-      {src ? (
+      {loadImg ? (
         <img
           className="Avatar-img"
           src={src}
           alt={shortName}
           referrerPolicy="no-referrer"
+          onError={() => setError(true)}
         />
       ) : (
         shortName

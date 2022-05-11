@@ -497,6 +497,10 @@ export default function App() {
                     username: "Pika",
                     avatarUrl: "pika.jpeg",
                   });
+                  collaborators.set("id4", {
+                    username: "fallback",
+                    avatarUrl: "https://example.com",
+                  });
                   excalidrawRef.current.updateScene({ collaborators });
                 } else {
                   excalidrawRef.current.updateScene({
