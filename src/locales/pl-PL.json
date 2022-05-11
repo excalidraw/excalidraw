@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -341,7 +342,8 @@
       "post": "w skrócie, każdy może z nich korzystać bez ograniczeń."
     },
     "noteItems": "",
-    "atleastOneLibItem": "Proszę wybrać co najmniej jeden element biblioteki, by rozpocząć"
+    "atleastOneLibItem": "Proszę wybrać co najmniej jeden element biblioteki, by rozpocząć",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteka została przesłana",
