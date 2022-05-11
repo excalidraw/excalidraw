@@ -119,7 +119,8 @@
       "unlock": "ताले से बाहर",
       "lockAll": "सब ताले के अंदर रखे",
       "unlockAll": "सब ताले के बाहर निकाले"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -341,7 +342,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
