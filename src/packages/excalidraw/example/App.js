@@ -487,15 +487,15 @@ export default function App() {
                   const collaborators = new Map();
                   collaborators.set("id1", {
                     username: "Doremon",
-                    src: "doremon.png",
+                    avatarUrl: "doremon.png",
                   });
                   collaborators.set("id2", {
                     username: "Excalibot",
-                    src: "https://avatars.githubusercontent.com/excalibot",
+                    avatarUrl: "excalibot.png",
                   });
                   collaborators.set("id3", {
                     username: "Pika",
-                    src: "pika.jpeg",
+                    avatarUrl: "pika.jpeg",
                   });
                   excalidrawRef.current.updateScene({ collaborators });
                 } else {

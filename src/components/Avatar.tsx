@@ -19,7 +19,12 @@ export const Avatar = ({ color, border, onClick, name, src }: AvatarProps) => {
   return (
     <div className="Avatar" style={style} onClick={onClick}>
       {src ? (
-        <img className="Avatar-img" src={src} alt={shortName} />
+        <img
+          className="Avatar-img"
+          src={src}
+          alt={shortName}
+          referrerPolicy="no-referrer"
+        />
       ) : (
         shortName
       )}
