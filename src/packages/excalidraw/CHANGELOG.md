@@ -17,6 +17,20 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
+- Added [`useHandleLibrary`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#useHandleLibrary) hook to automatically handle importing of libraries when `#addLibrary` URL hash key is present, and potentially for initializing library as well [#5115](https://github.com/excalidraw/excalidraw/pull/5115).
+
+  Also added [`parseLibraryTokensFromUrl`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#parseLibraryTokensFromUrl) to help in manually importing library from URL if desired.
+
+  ##### BREAKING CHANGE
+
+  - Libraries are no longer automatically initialized from URL when `#addLibrary` hash key is present. Host apps now need to handle this themselves with the help of either of the above APIs (`useHandleLibrary` is recommended).
+
+- Added [`updateLibrary`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateLibrary) API to update (replace/merge) the library [#5115](https://github.com/excalidraw/excalidraw/pull/5115).
+
+  ##### BREAKING CHANGE
+
+  - `updateScene` API no longer supports passing `libraryItems`. Instead, use the `updateLibrary` API.
+
 - Add support for integrating custom elements [#5164](https://github.com/excalidraw/excalidraw/pull/5164).
 
   - Add [`onPointerDown`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) callback which gets triggered on pointer down events.

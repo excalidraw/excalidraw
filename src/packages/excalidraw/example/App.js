@@ -26,6 +26,7 @@ const {
   exportToBlob,
   exportToClipboard,
   Excalidraw,
+  useHandleLibrary,
   MIME_TYPES,
 } = window.ExcalidrawLib;
 
@@ -63,9 +64,7 @@ const renderTopRightUI = () => {
 };
 
 export default function App() {
-  const excalidrawRef = useRef(null);
   const appRef = useRef(null);
-
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
@@ -82,7 +81,15 @@ export default function App() {
   if (!initialStatePromiseRef.current.promise) {
     initialStatePromiseRef.current.promise = resolvablePromise();
   }
+
+  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+
+  useHandleLibrary({ excalidrawAPI });
+
   useEffect(() => {
+    if (!excalidrawAPI) {
+      return;
+    }
     const fetchData = async () => {
       const res = await fetch("/rocket.jpeg");
       const imageData = await res.blob();
@@ -100,23 +107,12 @@ export default function App() {
         ];
 
         initialStatePromiseRef.current.promise.resolve(InitialData);
-        excalidrawRef.current.addFiles(imagesArray);
+        excalidrawAPI.addFiles(imagesArray);
       };
     };
     fetchData();
+  }, [excalidrawAPI]);
 
-    const onHashChange = () => {
-      const hash = new URLSearchParams(window.location.hash.slice(1));
-      const libraryUrl = hash.get("addLibrary");
-      if (libraryUrl) {
-        excalidrawRef.current.importLibrary(libraryUrl, hash.get("token"));
-      }
-    };
-    window.addEventListener("hashchange", onHashChange, false);
-    return () => {
-      window.removeEventListener("hashchange", onHashChange);
-    };
-  }, []);
   const renderFooter = () => {
     return (
       <>
@@ -124,7 +120,7 @@ export default function App() {
         <button
           className="custom-element"
           onClick={() =>
-            excalidrawRef.current.setActiveTool({
+            excalidrawAPI.setActiveTool({
               type: "custom",
               customType: "comment",
             })
@@ -143,7 +139,14 @@ export default function App() {
   const loadSceneOrLibrary = async () => {
     const file = await fileOpen({ description: "Excalidraw or library file" });
     const contents = await loadSceneOrLibraryFromBlob(file, null, null);
-    excalidrawRef.current.updateScene(contents.data);
+    if (contents.type === MIME_TYPES.excalidraw) {
+      excalidrawAPI.updateScene(contents.data);
+    } else if (contents.type === MIME_TYPES.excalidrawlib) {
+      excalidrawAPI.updateLibrary({
+        libraryItems: contents.data.libraryItems,
+        openLibraryMenu: true,
+      });
+    }
   };
 
   const updateScene = () => {
@@ -175,7 +178,7 @@ export default function App() {
         viewBackgroundColor: "#edf2ff",
       },
     };
-    excalidrawRef.current.updateScene(sceneData);
+    excalidrawAPI.updateScene(sceneData);
   };
 
   const onLinkOpen = useCallback((element, event) => {
@@ -195,13 +198,15 @@ export default function App() {
 
   const onCopy = async (type) => {
     await exportToClipboard({
-      elements: excalidrawRef.current.getSceneElements(),
-      appState: excalidrawRef.current.getAppState(),
-      files: excalidrawRef.current.getFiles(),
+      elements: excalidrawAPI.getSceneElements(),
+      appState: excalidrawAPI.getAppState(),
+      files: excalidrawAPI.getFiles(),
       type,
     });
     window.alert(`Copied to clipboard as ${type} sucessfully`);
   };
+
+  const [pointerData, setPointerData] = useState(null);
 
   const onPointerDown = (activeTool, pointerDownState) => {
     if (activeTool.type === "custom" && activeTool.customType === "comment") {
@@ -215,7 +220,7 @@ export default function App() {
       appRef.current.querySelectorAll(".comment-icon");
     commentIconsElements.forEach((ele) => {
       const id = ele.id;
-      const appstate = excalidrawRef.current.getAppState();
+      const appstate = excalidrawAPI.getAppState();
       const { x, y } = sceneCoordsToViewportCoords(
         { sceneX: commentIcons[id].x, sceneY: commentIcons[id].y },
         appstate,
@@ -233,7 +238,7 @@ export default function App() {
     return withBatchedUpdatesThrottled((event) => {
       const { x, y } = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
-        excalidrawRef.current.getAppState(),
+        excalidrawAPI.getAppState(),
       );
       const distance = distance2d(
         pointerDownState.x,
@@ -257,7 +262,7 @@ export default function App() {
     return withBatchedUpdates((event) => {
       window.removeEventListener(EVENT.POINTER_MOVE, pointerDownState.onMove);
       window.removeEventListener(EVENT.POINTER_UP, pointerDownState.onUp);
-      excalidrawRef.current.setActiveTool({ type: "selection" });
+      excalidrawAPI.setActiveTool({ type: "selection" });
       const distance = distance2d(
         pointerDownState.x,
         pointerDownState.y,
@@ -280,10 +285,10 @@ export default function App() {
   };
   const renderCommentIcons = () => {
     return Object.values(commentIcons).map((commentIcon) => {
-      const appState = excalidrawRef.current.getAppState();
+      const appState = excalidrawAPI.getAppState();
       const { x, y } = sceneCoordsToViewportCoords(
         { sceneX: commentIcon.x, sceneY: commentIcon.y },
-        excalidrawRef.current.getAppState(),
+        excalidrawAPI.getAppState(),
       );
       return (
         <div
@@ -319,7 +324,10 @@ export default function App() {
             pointerDownState.onMove = onPointerMove;
             pointerDownState.onUp = onPointerUp;
 
-            excalidrawRef.current.setCustomType("comment");
+            excalidrawAPI.setActiveTool({
+              type: "custom",
+              customType: "comment",
+            });
           }}
         >
           <div className="comment-avatar">
@@ -349,7 +357,7 @@ export default function App() {
   };
 
   const renderComment = () => {
-    const appState = excalidrawRef.current.getAppState();
+    const appState = excalidrawAPI.getAppState();
     const { x, y } = sceneCoordsToViewportCoords(
       { sceneX: comment.x, sceneY: comment.y },
       appState,
@@ -416,14 +424,14 @@ export default function App() {
           <button
             className="reset-scene"
             onClick={() => {
-              excalidrawRef.current.resetScene();
+              excalidrawAPI.resetScene();
             }}
           >
             Reset Scene
           </button>
           <button
             onClick={() => {
-              excalidrawRef.current.updateScene({
+              excalidrawAPI.updateLibrary({
                 libraryItems: [
                   {
                     status: "published",
@@ -501,9 +509,9 @@ export default function App() {
                     username: "fallback",
                     avatarUrl: "https://example.com",
                   });
-                  excalidrawRef.current.updateScene({ collaborators });
+                  excalidrawAPI.updateScene({ collaborators });
                 } else {
-                  excalidrawRef.current.updateScene({
+                  excalidrawAPI.updateScene({
                     collaborators: new Map(),
                   });
                 }
@@ -523,15 +531,26 @@ export default function App() {
               Copy to Clipboard as JSON
             </button>
           </div>
+          <div
+            style={{
+              display: "flex",
+              gap: "1em",
+              justifyContent: "center",
+              marginTop: "1em",
+            }}
+          >
+            <div>x: {pointerData?.pointer.x ?? 0}</div>
+            <div>y: {pointerData?.pointer.y ?? 0}</div>
+          </div>
         </div>
         <div className="excalidraw-wrapper">
           <Excalidraw
-            ref={excalidrawRef}
+            ref={(api) => setExcalidrawAPI(api)}
             initialData={initialStatePromiseRef.current.promise}
             onChange={(elements, state) => {
               console.info("Elements :", elements, "State : ", state);
             }}
-            onPointerUpdate={(payload) => console.info(payload)}
+            onPointerUpdate={(payload) => setPointerData(payload)}
             onCollabButtonClick={() =>
               window.alert("You clicked on collab button")
             }
@@ -571,7 +590,7 @@ export default function App() {
           <button
             onClick={async () => {
               const svg = await exportToSvg({
-                elements: excalidrawRef.current.getSceneElements(),
+                elements: excalidrawAPI.getSceneElements(),
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,
@@ -580,7 +599,7 @@ export default function App() {
                   height: 100,
                 },
                 embedScene: true,
-                files: excalidrawRef.current.getFiles(),
+                files: excalidrawAPI.getFiles(),
               });
               appRef.current.querySelector(".export-svg").innerHTML =
                 svg.outerHTML;
@@ -593,14 +612,14 @@ export default function App() {
           <button
             onClick={async () => {
               const blob = await exportToBlob({
-                elements: excalidrawRef.current.getSceneElements(),
+                elements: excalidrawAPI.getSceneElements(),
                 mimeType: "image/png",
                 appState: {
                   ...initialData.appState,
                   exportEmbedScene,
                   exportWithDarkMode,
                 },
-                files: excalidrawRef.current.getFiles(),
+                files: excalidrawAPI.getFiles(),
               });
               setBlobUrl(window.URL.createObjectURL(blob));
             }}
@@ -614,12 +633,12 @@ export default function App() {
           <button
             onClick={async () => {
               const canvas = await exportToCanvas({
-                elements: excalidrawRef.current.getSceneElements(),
+                elements: excalidrawAPI.getSceneElements(),
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,
                 },
-                files: excalidrawRef.current.getFiles(),
+                files: excalidrawAPI.getFiles(),
               });
               const ctx = canvas.getContext("2d");
               ctx.font = "30px Virgil";

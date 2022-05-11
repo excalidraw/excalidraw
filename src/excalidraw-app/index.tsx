@@ -4,13 +4,7 @@ import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import {
-  APP_NAME,
-  EVENT,
-  TITLE_TIMEOUT,
-  URL_HASH_KEYS,
-  VERSION_TIMEOUT,
-} from "../constants";
+import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
 import { loadFromBlob } from "../data/blob";
 import {
   ExcalidrawElement,
@@ -72,6 +66,7 @@ import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
+import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -232,6 +227,11 @@ const ExcalidrawWrapper = () => {
 
   const collabAPI = useContext(CollabContext)?.api;
 
+  useHandleLibrary({
+    excalidrawAPI,
+    getInitialLibraryItems: getLibraryItemsFromStorage,
+  });
+
   useEffect(() => {
     if (!collabAPI || !excalidrawAPI) {
       return;
@@ -301,8 +301,6 @@ const ExcalidrawWrapper = () => {
           LocalData.fileStorage.clearObsoleteFiles({ currentFileIds: fileIds });
         }
       }
-
-      data.scene.libraryItems = getLibraryItemsFromStorage();
     };
 
     initializeScene({ collabAPI }).then((data) => {
@@ -310,18 +308,10 @@ const ExcalidrawWrapper = () => {
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });
 
-    const onHashChange = (event: HashChangeEvent) => {
+    const onHashChange = async (event: HashChangeEvent) => {
       event.preventDefault();
-      const hash = new URLSearchParams(window.location.hash.slice(1));
-      const libraryUrl = hash.get(URL_HASH_KEYS.addLibrary);
-      if (libraryUrl) {
-        // If hash changed and it contains library url, import it and replace
-        // the url to its previous state (important in case of collaboration
-        // and similar).
-        // Using history API won't trigger another hashchange.
-        window.history.replaceState({}, "", event.oldURL);
-        excalidrawAPI.importLibrary(libraryUrl, hash.get("token"));
-      } else {
+      const libraryUrlTokens = parseLibraryTokensFromUrl();
+      if (!libraryUrlTokens) {
         initializeScene({ collabAPI }).then((data) => {
           loadImages(data);
           if (data.scene) {
@@ -355,6 +345,8 @@ const ExcalidrawWrapper = () => {
           setLangCode(langCode);
           excalidrawAPI.updateScene({
             ...localDataState,
+          });
+          excalidrawAPI.updateLibrary({
             libraryItems: getLibraryItemsFromStorage(),
           });
           collabAPI.setUsername(username || "");
