@@ -5660,8 +5660,8 @@ class App extends React.Component<AppProps, AppState> {
       newZoom +=
         Math.log10(Math.max(1, this.state.zoom.value)) *
         -sign *
-         // reduced amplification for small deltas (small movements on a trackpad)
-         Math.min(1, absDelta / 20)
+        // reduced amplification for small deltas (small movements on a trackpad)
+        Math.min(1, absDelta / 20);
 
       this.setState((state) => ({
         ...getStateForZoom(
