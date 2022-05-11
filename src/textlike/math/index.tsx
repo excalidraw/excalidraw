@@ -142,13 +142,16 @@ const loadMathJax = async () => {
     mathJaxLoading = true;
 
     // MathJax components we use
-    const AsciiMath = await import("mathjax-full/js/input/asciimath.js");
-    const TeX = await import("mathjax-full/js/input/tex.js");
-    const SVG = await import("mathjax-full/js/output/svg.js");
-    const liteAdaptor = await import("mathjax-full/js/adaptors/liteAdaptor.js");
-    const HTMLDocument = await import(
-      "mathjax-full/js/handlers/html/HTMLDocument.js"
-    );
+    const AsciiMath = (await import("mathjax-full/js/input/asciimath.js"))
+      .AsciiMath;
+    const TeX = (await import("mathjax-full/js/input/tex.js")).TeX;
+    const SVG = (await import("mathjax-full/js/output/svg.js")).SVG;
+    const liteAdaptor = (
+      await import("mathjax-full/js/adaptors/liteAdaptor.js")
+    ).liteAdaptor;
+    const HTMLDocument = (
+      await import("mathjax-full/js/handlers/html/HTMLDocument.js")
+    ).HTMLDocument;
 
     // Import some TeX packages
     await import("mathjax-full/js/input/tex/ams/AmsConfiguration");
@@ -176,27 +179,43 @@ const loadMathJax = async () => {
       await import("mathjax-full/js/adaptors/lite/Document.js")
     ).LiteDocument;
 
-    // Now set up MathJax
-    const asciimath = new AsciiMath.AsciiMath<
+    // Set up shared output components
+    mathJax.adaptor = liteAdaptor();
+    const svg = new SVG({ fontCache: "local" });
+
+    // AsciiMath input
+    const asciimath = new AsciiMath<
       typeof LiteElement | typeof LiteText,
       typeof LiteText,
       typeof LiteDocument
     >({ displaystyle: false });
-    const tex = new TeX.TeX({ packages: texPackages });
-    const svg = new SVG.SVG({ fontCache: "local" });
-    mathJax.adaptor = liteAdaptor.liteAdaptor();
-    mathJax.amHtml = new HTMLDocument.HTMLDocument("", mathJax.adaptor, {
+    mathJax.amHtml = new HTMLDocument<
+      typeof LiteElement | typeof LiteText,
+      typeof LiteText,
+      typeof LiteDocument
+    >("", mathJax.adaptor, {
       InputJax: asciimath,
       OutputJax: svg,
     });
-    mathJax.texHtml = new HTMLDocument.HTMLDocument("", mathJax.adaptor, {
+
+    // LaTeX input
+    const tex = new TeX({ packages: texPackages });
+    mathJax.texHtml = new HTMLDocument<
+      typeof LiteElement | typeof LiteText,
+      typeof LiteText,
+      typeof LiteDocument
+    >("", mathJax.adaptor, {
       InputJax: tex,
       OutputJax: svg,
     });
-    mathJaxLoaded = true;
+
+    // Error indicator
     errorSvg = mathJax.adaptor.outerHTML(
       mathJax.texHtml.convert("ERR", { display: false }),
     );
+
+    // Finalize loading MathJax
+    mathJaxLoaded = true;
     if (mathJaxLoadedCallback !== undefined) {
       mathJaxLoadedCallback(isMathElement);
     }
@@ -261,7 +280,7 @@ const textAsMjxContainer = (
     container.childNodes &&
     container.childNodes.length > 0 &&
     container.childNodes[0].hasChildNodes() &&
-    (container.childNodes[0].childNodes[0] as Element).hasAttribute("viewBox");
+    container.childNodes[0].childNodes[0].nodeName === "svg";
   // Conditionally return the mjx-container
   return childIsSvg ? (container.children[0] as Element) : null;
 };
