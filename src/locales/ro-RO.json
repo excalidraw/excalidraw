@@ -119,7 +119,8 @@
       "unlock": "Deblocare",
       "lockAll": "Blocare toate",
       "unlockAll": "Deblocare toate"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -341,7 +342,8 @@
       "post": "care, pe scurt, înseamnă că oricine o poate folosi fără restricții."
     },
     "noteItems": "Fiecare element din bibliotecă trebuie să aibă propriul nume astfel încât să fie filtrabil. Următoarele elemente din bibliotecă vor fi incluse:",
-    "atleastOneLibItem": "Selectează cel puțin un element din bibliotecă pentru a începe"
+    "atleastOneLibItem": "Selectează cel puțin un element din bibliotecă pentru a începe",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliotecă trimisă",
