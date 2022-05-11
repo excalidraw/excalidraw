@@ -119,7 +119,8 @@
       "unlock": "Odkleni",
       "lockAll": "Zakleni vse",
       "unlockAll": "Odkleni vse"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Ponastavi platno",
@@ -341,7 +342,8 @@
       "post": "kar na kratko pomeni, da jo lahko kdorkoli uporablja brez omejitev."
     },
     "noteItems": "Vsak element knjižnice mora imeti svoje ime, tako da ga je mogoče filtrirati. Vključeni bodo naslednji elementi knjižnice:",
-    "atleastOneLibItem": "Za začetek izberite vsaj en element knjižnice"
+    "atleastOneLibItem": "Za začetek izberite vsaj en element knjižnice",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Knjižnica oddana",
