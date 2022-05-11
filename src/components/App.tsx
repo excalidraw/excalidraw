@@ -5637,7 +5637,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const { deltaX, deltaY } = event;
-    const { selectedElementIds, previousSelectedElementIds } = this.state;
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
       const sign = Math.sign(deltaY);
@@ -5647,14 +5646,6 @@ class App extends React.Component<AppProps, AppState> {
         delta = MAX_STEP;
       }
       delta *= sign;
-      if (Object.keys(previousSelectedElementIds).length !== 0) {
-        setTimeout(() => {
-          this.setState({
-            selectedElementIds: previousSelectedElementIds,
-            previousSelectedElementIds: {},
-          });
-        }, 1000);
-      }
 
       let newZoom = this.state.zoom.value - delta / 100;
       // increase zoom steps the more zoomed-in we are (applies to >100% only)
@@ -5671,11 +5662,6 @@ class App extends React.Component<AppProps, AppState> {
           },
           state,
         ),
-        selectedElementIds: {},
-        previousSelectedElementIds:
-          Object.keys(selectedElementIds).length !== 0
-            ? selectedElementIds
-            : previousSelectedElementIds,
         shouldCacheIgnoreZoom: true,
       }));
       this.resetShouldCacheIgnoreZoomDebounced();
