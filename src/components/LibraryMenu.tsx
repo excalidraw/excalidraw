@@ -76,7 +76,7 @@ const LibraryMenuWrapper = forwardRef<
 
 export const LibraryMenu = ({
   onClose,
-  onInsertShape,
+  onInsertLibraryItems,
   pendingElements,
   onAddToLibrary,
   theme,
@@ -90,7 +90,7 @@ export const LibraryMenu = ({
 }: {
   pendingElements: LibraryItem["elements"];
   onClose: () => void;
-  onInsertShape: (elements: LibraryItem["elements"]) => void;
+  onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: () => void;
   theme: AppState["theme"];
   files: BinaryFiles;
@@ -270,7 +270,7 @@ export const LibraryMenu = ({
         onAddToLibrary={(elements) =>
           addToLibrary(elements, libraryItemsData.libraryItems)
         }
-        onInsertShape={onInsertShape}
+        onInsertLibraryItems={onInsertLibraryItems}
         pendingElements={pendingElements}
         setAppState={setAppState}
         libraryReturnUrl={libraryReturnUrl}

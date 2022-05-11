@@ -1,6 +1,6 @@
 import { chunk } from "lodash";
 import React, { useCallback, useState } from "react";
-import { saveLibraryAsJSON } from "../data/json";
+import { saveLibraryAsJSON, serializeLibraryAsJSON } from "../data/json";
 import Library from "../data/library";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
@@ -21,7 +21,7 @@ import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 
 import "./LibraryMenuItems.scss";
-import { VERSIONS } from "../constants";
+import { MIME_TYPES, VERSIONS } from "../constants";
 import Spinner from "./Spinner";
 import { fileOpen } from "../data/filesystem";
 
@@ -30,7 +30,7 @@ const LibraryMenuItems = ({
   libraryItems,
   onRemoveFromLibrary,
   onAddToLibrary,
-  onInsertShape,
+  onInsertLibraryItems,
   pendingElements,
   theme,
   setAppState,
@@ -47,7 +47,7 @@ const LibraryMenuItems = ({
   libraryItems: LibraryItems;
   pendingElements: LibraryItem["elements"];
   onRemoveFromLibrary: () => void;
-  onInsertShape: (elements: LibraryItem["elements"]) => void;
+  onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: (elements: LibraryItem["elements"]) => void;
   theme: AppState["theme"];
   files: BinaryFiles;
@@ -252,6 +252,18 @@ const LibraryMenuItems = ({
     }
   };
 
+  const getInsertedElements = (id: string) => {
+    let targetElements;
+    if (selectedItems.includes(id)) {
+      targetElements = libraryItems.filter((item) =>
+        selectedItems.includes(item.id),
+      );
+    } else {
+      targetElements = libraryItems.filter((item) => item.id === id);
+    }
+    return targetElements;
+  };
+
   const createLibraryItemCompo = (params: {
     item:
       | LibraryItem
@@ -273,6 +285,12 @@ const LibraryMenuItems = ({
           id={params.item?.id || null}
           selected={!!params.item?.id && selectedItems.includes(params.item.id)}
           onToggle={onItemSelectToggle}
+          onDrag={(id, event) => {
+            event.dataTransfer.setData(
+              MIME_TYPES.excalidrawlib,
+              serializeLibraryAsJSON(getInsertedElements(id)),
+            );
+          }}
         />
       </Stack.Col>
     );
@@ -291,7 +309,7 @@ const LibraryMenuItems = ({
       if (item.id) {
         return createLibraryItemCompo({
           item,
-          onClick: () => onInsertShape(item.elements),
+          onClick: () => onInsertLibraryItems(getInsertedElements(item.id)),
           key: item.id,
         });
       }

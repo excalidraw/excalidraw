@@ -191,17 +191,23 @@ export const loadFromBlob = async (
   return ret.data;
 };
 
-export const loadLibraryFromBlob = async (
-  blob: Blob,
+export const parseLibraryJSON = (
+  json: string,
   defaultStatus: LibraryItem["status"] = "unpublished",
 ) => {
-  const contents = await parseFileContents(blob);
-  const data: ImportedLibraryData | undefined = JSON.parse(contents);
+  const data: ImportedLibraryData | undefined = JSON.parse(json);
   if (!isValidLibrary(data)) {
     throw new Error("Invalid library");
   }
   const libraryItems = data.libraryItems || data.library;
   return restoreLibraryItems(libraryItems, defaultStatus);
+};
+
+export const loadLibraryFromBlob = async (
+  blob: Blob,
+  defaultStatus: LibraryItem["status"] = "unpublished",
+) => {
+  return parseLibraryJSON(await parseFileContents(blob), defaultStatus);
 };
 
 export const canvasToBlob = async (

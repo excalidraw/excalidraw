@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import oc from "open-color";
 import { useEffect, useRef, useState } from "react";
-import { MIME_TYPES } from "../constants";
 import { useDeviceType } from "../components/App";
 import { exportToSvg } from "../scene/export";
 import { BinaryFiles, LibraryItem } from "../types";
@@ -29,6 +28,7 @@ export const LibraryUnit = ({
   onClick,
   selected,
   onToggle,
+  onDrag,
 }: {
   id: LibraryItem["id"] | /** for pending item */ null;
   elements?: LibraryItem["elements"];
@@ -37,6 +37,7 @@ export const LibraryUnit = ({
   onClick: () => void;
   selected: boolean;
   onToggle: (id: string, event: React.MouseEvent) => void;
+  onDrag: (id: string, event: React.DragEvent) => void;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -99,11 +100,12 @@ export const LibraryUnit = ({
             : undefined
         }
         onDragStart={(event) => {
+          if (!id) {
+            event.preventDefault();
+            return;
+          }
           setIsHovered(false);
-          event.dataTransfer.setData(
-            MIME_TYPES.excalidrawlib,
-            JSON.stringify(elements),
-          );
+          onDrag(id, event);
         }}
       />
       {adder}
