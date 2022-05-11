@@ -120,7 +120,7 @@
       "lockAll": "Blocare toate",
       "unlockAll": "Deblocare toate"
     },
-    "statusPublished": ""
+    "statusPublished": "Publicat"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -343,7 +343,7 @@
     },
     "noteItems": "Fiecare element din bibliotecă trebuie să aibă propriul nume astfel încât să fie filtrabil. Următoarele elemente din bibliotecă vor fi incluse:",
     "atleastOneLibItem": "Selectează cel puțin un element din bibliotecă pentru a începe",
-    "republishWarning": ""
+    "republishWarning": "Observație: unele dintre elementele selectate sunt marcate ca fiind deja publicate/trimise. Ar trebui să retrimiți elemente numai atunci când actualizezi o trimitere sau o bibliotecă existentă."
   },
   "publishSuccessDialog": {
     "title": "Bibliotecă trimisă",
