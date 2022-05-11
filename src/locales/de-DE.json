@@ -119,7 +119,8 @@
       "unlock": "Entsperren",
       "lockAll": "Alle sperren",
       "unlockAll": "Alle entsperren"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -341,7 +342,8 @@
       "post": "die zusammengefasst beinhaltet, dass jeder sie ohne Einschränkungen nutzen kann."
     },
     "noteItems": "Jedes Bibliothekselement muss einen eigenen Namen haben, damit es gefiltert werden kann. Die folgenden Bibliothekselemente werden hinzugefügt:",
-    "atleastOneLibItem": "Bitte wähle mindestens ein Bibliothekselement aus, um zu beginnen"
+    "atleastOneLibItem": "Bitte wähle mindestens ein Bibliothekselement aus, um zu beginnen",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliothek übermittelt",
