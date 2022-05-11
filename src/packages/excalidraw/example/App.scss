@@ -1,6 +1,20 @@
 .App {
   font-family: sans-serif;
   text-align: center;
+
+  .comment-avatar {
+    background: #faa2c1;
+    border-radius: 66px 67px 67px 0px;
+    width: 2rem;
+    height: 2rem;
+    padding: 4px;
+    margin: 4px;
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+  }
 }
 
 .button-wrapper button {
@@ -18,6 +32,8 @@
 .excalidraw-wrapper {
   height: 800px;
   margin: 50px;
+  position: relative;
+  overflow: hidden;
 }
 
 :root[dir="ltr"]
@@ -46,4 +62,14 @@
   --color-primary-darker: #f783ac;
   --color-primary-darkest: #e64980;
   --color-primary-light: #fcc2d7;
+
+  button.custom-element {
+    width: 2rem;
+    height: 2rem;
+    margin: 0.4rem;
+    margin-left: -10px;
+  }
+  .layer-ui__wrapper__footer-center {
+    display: flex;
+  }
 }

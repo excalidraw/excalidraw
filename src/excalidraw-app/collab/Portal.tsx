@@ -1,4 +1,8 @@
-import { SocketUpdateData, SocketUpdateDataSource } from "../data";
+import {
+  isSyncableElement,
+  SocketUpdateData,
+  SocketUpdateDataSource,
+} from "../data";
 
 import CollabWrapper from "./CollabWrapper";
 
@@ -143,7 +147,7 @@ class Portal {
             !this.broadcastedElementVersions.has(element.id) ||
             element.version >
               this.broadcastedElementVersions.get(element.id)!) &&
-          this.collab.isSyncableElement(element)
+          isSyncableElement(element)
         ) {
           acc.push({
             ...element,
