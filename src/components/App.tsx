@@ -74,7 +74,7 @@ import {
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
-import Library from "../data/library";
+import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
   dragNewElement,
@@ -232,6 +232,7 @@ import {
   isSupportedImageFile,
   loadSceneOrLibraryFromBlob,
   normalizeFile,
+  parseLibraryJSON,
   resizeImageFile,
   SVGStringToFile,
 } from "../data/blob";
@@ -5212,13 +5213,18 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    const libraryShapes = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
-    if (libraryShapes !== "") {
-      this.addElementsFromPasteOrLibrary({
-        elements: JSON.parse(libraryShapes),
-        position: event,
-        files: null,
-      });
+    const libraryJSON = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
+    if (libraryJSON && typeof libraryJSON === "string") {
+      try {
+        const libraryItems = parseLibraryJSON(libraryJSON);
+        this.addElementsFromPasteOrLibrary({
+          elements: distributeLibraryItemsOnSquareGrid(libraryItems),
+          position: event,
+          files: null,
+        });
+      } catch (error: any) {
+        this.setState({ errorMessage: error.message });
+      }
       return;
     }
 
