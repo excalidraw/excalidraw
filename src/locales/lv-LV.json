@@ -120,7 +120,7 @@
       "lockAll": "Fiksēt visu",
       "unlockAll": "Atbrīvot visu"
     },
-    "statusPublished": ""
+    "statusPublished": "Publicēts"
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
@@ -343,7 +343,7 @@
     },
     "noteItems": "Katram bibliotēkas vienumam jābūt savam nosaukumam, lai to varētu atrast filtrējot. Tiks iekļauti sekojošie bibliotēkas vienumi:",
     "atleastOneLibItem": "Lūdzu, atlasiet vismaz vienu bibliotēkas vienumu, lai sāktu darbu",
-    "republishWarning": ""
+    "republishWarning": "Ievēro: daži no atzīmētajiem objektiem jau atzīmēti kā publicēti vai iesniegti publicēšanai. Tos vajadzētu atkārtoti iesniegt tikai tad, ja vēlies labot esošo bibliotēku."
   },
   "publishSuccessDialog": {
     "title": "Bibliotēka iesniegta",
