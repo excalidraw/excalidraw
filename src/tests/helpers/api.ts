@@ -60,9 +60,10 @@ export class API {
   };
 
   static createElement = <
-    T extends Exclude<ExcalidrawElement["type"], "selection">,
+    T extends Exclude<ExcalidrawElement["type"], "selection"> = "rectangle",
   >({
-    type,
+    // @ts-ignore
+    type = "rectangle",
     id,
     x = 0,
     y = x,
@@ -72,7 +73,7 @@ export class API {
     groupIds = [],
     ...rest
   }: {
-    type: T;
+    type?: T;
     x?: number;
     y?: number;
     height?: number;
