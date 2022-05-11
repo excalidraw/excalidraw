@@ -119,7 +119,8 @@
       "unlock": "解除锁定",
       "lockAll": "全部锁定",
       "unlockAll": "全部解锁"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -341,7 +342,8 @@
       "post": "简而言之，任何人都可以不受限制地使用它们。"
     },
     "noteItems": "素材库中每个项目都有各自的名称以供筛选。以下项目将被包含：",
-    "atleastOneLibItem": "请选择至少一个素材库以开始"
+    "atleastOneLibItem": "请选择至少一个素材库以开始",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "素材库已提交",
