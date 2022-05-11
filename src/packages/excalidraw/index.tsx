@@ -44,6 +44,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onLinkOpen,
     onLinkHover, //zsviczian
     onViewModeChange, //zsviczian
+    onPointerDown,
+    onScrollChange,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -113,6 +115,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onLinkHover={onLinkHover} //zsviczian
           onViewModeChange={onViewModeChange} //zsviczian
+          onPointerDown={onPointerDown}
+          onScrollChange={onScrollChange}
         />
       </Provider>
     </InitializeApp>
@@ -209,6 +213,7 @@ export {
   serializeLibraryAsJSON,
   loadLibraryFromBlob,
   loadFromBlob,
+  loadSceneOrLibraryFromBlob,
   getFreeDrawSvgPath,
   getCommonBoundingBox, //zsviczian
   getMaximumGroups, //zsviczian
@@ -227,3 +232,8 @@ export {
   newElementWith,
   bumpVersion,
 } from "../../element/mutateElement";
+
+export {
+  parseLibraryTokensFromUrl,
+  useHandleLibrary,
+} from "../../data/library";

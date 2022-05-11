@@ -25,7 +25,6 @@ import "./LibraryMenu.scss";
 import LibraryMenuItems from "./LibraryMenuItems";
 import { EVENT } from "../constants";
 import { KEYS } from "../keys";
-import { arrayToMap } from "../utils";
 import { trackEvent } from "../analytics";
 import { useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
@@ -77,7 +76,7 @@ const LibraryMenuWrapper = forwardRef<
 
 export const LibraryMenu = ({
   onClose,
-  onInsertShape,
+  onInsertLibraryItems,
   pendingElements,
   onAddToLibrary,
   theme,
@@ -91,7 +90,7 @@ export const LibraryMenu = ({
 }: {
   pendingElements: LibraryItem["elements"];
   onClose: () => void;
-  onInsertShape: (elements: LibraryItem["elements"]) => void;
+  onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: () => void;
   theme: AppState["theme"];
   files: BinaryFiles;
@@ -225,10 +224,6 @@ export const LibraryMenu = ({
     [setShowPublishLibraryDialog, setPublishLibSuccess, selectedItems, library],
   );
 
-  const [lastSelectedItem, setLastSelectedItem] = useState<
-    LibraryItem["id"] | null
-  >(null);
-
   if (
     libraryItemsData.status === "loading" &&
     !libraryItemsData.isInitialized
@@ -275,7 +270,7 @@ export const LibraryMenu = ({
         onAddToLibrary={(elements) =>
           addToLibrary(elements, libraryItemsData.libraryItems)
         }
-        onInsertShape={onInsertShape}
+        onInsertLibraryItems={onInsertLibraryItems}
         pendingElements={pendingElements}
         setAppState={setAppState}
         libraryReturnUrl={libraryReturnUrl}
@@ -284,47 +279,7 @@ export const LibraryMenu = ({
         files={files}
         id={id}
         selectedItems={selectedItems}
-        onToggle={(id, event) => {
-          const shouldSelect = !selectedItems.includes(id);
-
-          if (shouldSelect) {
-            if (event.shiftKey && lastSelectedItem) {
-              const rangeStart = libraryItemsData.libraryItems.findIndex(
-                (item) => item.id === lastSelectedItem,
-              );
-              const rangeEnd = libraryItemsData.libraryItems.findIndex(
-                (item) => item.id === id,
-              );
-
-              if (rangeStart === -1 || rangeEnd === -1) {
-                setSelectedItems([...selectedItems, id]);
-                return;
-              }
-
-              const selectedItemsMap = arrayToMap(selectedItems);
-              const nextSelectedIds = libraryItemsData.libraryItems.reduce(
-                (acc: LibraryItem["id"][], item, idx) => {
-                  if (
-                    (idx >= rangeStart && idx <= rangeEnd) ||
-                    selectedItemsMap.has(item.id)
-                  ) {
-                    acc.push(item.id);
-                  }
-                  return acc;
-                },
-                [],
-              );
-
-              setSelectedItems(nextSelectedIds);
-            } else {
-              setSelectedItems([...selectedItems, id]);
-            }
-            setLastSelectedItem(id);
-          } else {
-            setLastSelectedItem(null);
-            setSelectedItems(selectedItems.filter((_id) => _id !== id));
-          }
-        }}
+        onSelectItems={(ids) => setSelectedItems(ids)}
         onPublish={() => setShowPublishLibraryDialog(true)}
         resetLibrary={resetLibrary}
       />

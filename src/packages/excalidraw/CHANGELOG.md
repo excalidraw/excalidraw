@@ -17,8 +17,29 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
+- Added [`useHandleLibrary`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#useHandleLibrary) hook to automatically handle importing of libraries when `#addLibrary` URL hash key is present, and potentially for initializing library as well [#5115](https://github.com/excalidraw/excalidraw/pull/5115).
+
+  Also added [`parseLibraryTokensFromUrl`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#parseLibraryTokensFromUrl) to help in manually importing library from URL if desired.
+
+  ##### BREAKING CHANGE
+
+  - Libraries are no longer automatically initialized from URL when `#addLibrary` hash key is present. Host apps now need to handle this themselves with the help of either of the above APIs (`useHandleLibrary` is recommended).
+
+- Added [`updateLibrary`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateLibrary) API to update (replace/merge) the library [#5115](https://github.com/excalidraw/excalidraw/pull/5115).
+
+  ##### BREAKING CHANGE
+
+  - `updateScene` API no longer supports passing `libraryItems`. Instead, use the `updateLibrary` API.
+
+- Add support for integrating custom elements [#5164](https://github.com/excalidraw/excalidraw/pull/5164).
+
+  - Add [`onPointerDown`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) callback which gets triggered on pointer down events.
+  - Add [`onScrollChange`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onScrollChange) callback which gets triggered when scrolling the canvas.
+  - Add API [`setActiveTool`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#setActiveTool) which host can call to set the active tool.
+
+- Exported [`loadSceneOrLibraryFromBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#loadSceneOrLibraryFromBlob) function [#5057](https://github.com/excalidraw/excalidraw/pull/5057).
 - Export [`MIME_TYPES`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L92) supported by Excalidraw [#5135](https://github.com/excalidraw/excalidraw/pull/5135).
-- Support [`src`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L50) for collaborators. Now onwards host can pass `src` to render the customized avatar for collaborators [#5114](https://github.com/excalidraw/excalidraw/pull/5114).
+- Support [`avatarUrl`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L50) for collaborators. Now onwards host can pass `avatarUrl` to render the customized avatar for collaborators [#5114](https://github.com/excalidraw/excalidraw/pull/5114), renamed in [#5177](https://github.com/excalidraw/excalidraw/pull/5177).
 - Support `libraryItems` argument in `initialData.libraryItems` and `updateScene({ libraryItems })` to be a Promise resolving to `LibraryItems`, and support functional update of `libraryItems` in [`updateScene({ libraryItems })`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene). [#5101](https://github.com/excalidraw/excalidraw/pull/5101).
 - Expose util [`mergeLibraryItems`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#mergeLibraryItems) [#5101](https://github.com/excalidraw/excalidraw/pull/5101).
 - Expose util [`exportToClipboard`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToClipboard) which allows to copy the scene contents to clipboard as `svg`, `png` or `json` [#5103](https://github.com/excalidraw/excalidraw/pull/5103).

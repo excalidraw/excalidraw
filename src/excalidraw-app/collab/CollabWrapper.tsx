@@ -30,7 +30,9 @@ import {
   generateCollaborationLinkData,
   getCollaborationLink,
   getCollabServer,
+  getSyncableElements,
   SocketUpdateDataSource,
+  SyncableExcalidrawElement,
 } from "../data";
 import {
   isSavedToFirebase,
@@ -50,7 +52,6 @@ import { t } from "../../i18n";
 import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 import { trackEvent } from "../../analytics";
-import { isInvisiblySmallElement } from "../../element";
 import {
   encodeFilesForUpload,
   FileManager,
@@ -202,7 +203,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
-    const syncableElements = this.getSyncableElements(
+    const syncableElements = getSyncableElements(
       this.getSceneElementsIncludingDeleted(),
     );
 
@@ -232,7 +233,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   });
 
   saveCollabRoomToFirebase = async (
-    syncableElements: readonly ExcalidrawElement[],
+    syncableElements: readonly SyncableExcalidrawElement[],
   ) => {
     try {
       const savedData = await saveToFirebase(
@@ -262,7 +263,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.loadImageFiles.cancel();
 
     this.saveCollabRoomToFirebase(
-      this.getSyncableElements(
+      getSyncableElements(
         this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       ),
     );
@@ -413,7 +414,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         commitToHistory: true,
       });
 
-      this.saveCollabRoomToFirebase(this.getSyncableElements(elements));
+      this.saveCollabRoomToFirebase(getSyncableElements(elements));
     }
 
     // fallback in case you're not alone in the room but still don't receive
@@ -749,7 +750,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   queueSaveToFirebase = throttle(() => {
     if (this.portal.socketInitialized) {
       this.saveCollabRoomToFirebase(
-        this.getSyncableElements(
+        getSyncableElements(
           this.excalidrawAPI.getSceneElementsIncludingDeleted(),
         ),
       );
@@ -774,13 +775,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       modalIsShown: true,
     });
   };
-
-  isSyncableElement = (element: ExcalidrawElement) => {
-    return element.isDeleted || !isInvisiblySmallElement(element);
-  };
-
-  getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
-    elements.filter((element) => this.isSyncableElement(element));
 
   /** PRIVATE. Use `this.getContextValue()` instead. */
   private contextValue: CollabAPI | null = null;
