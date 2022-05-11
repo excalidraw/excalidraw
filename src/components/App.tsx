@@ -5641,11 +5641,11 @@ class App extends React.Component<AppProps, AppState> {
     if (event.metaKey || event.ctrlKey) {
       const sign = Math.sign(deltaY);
       const MAX_STEP = 10;
-      let delta = Math.abs(deltaY);
-      if (delta > MAX_STEP) {
-        delta = MAX_STEP;
+      const absDelta = Math.abs(deltaY);
+      let delta = deltaY;
+      if (absDelta > MAX_STEP) {
+        delta = MAX_STEP * sign;
       }
-      delta *= sign;
       if (Object.keys(previousSelectedElementIds).length !== 0) {
         setTimeout(() => {
           this.setState({
@@ -5657,10 +5657,12 @@ class App extends React.Component<AppProps, AppState> {
 
       let newZoom = this.state.zoom.value - delta / 100;
       // increase zoom steps the more zoomed-in we are (applies to >100% only)
-      // do not amplify zoom steps for small deltas (small movements on a trackpad)
-      if (Math.abs(deltaY) > 10) {
-        newZoom += Math.log10(Math.max(1, this.state.zoom.value)) * -sign;
-      }
+      // reduced amplification for small deltas (small movements on a trackpad)
+      const smallDeltaAdjustment = Math.min(1, absDelta / 20);
+      newZoom +=
+        Math.log10(Math.max(1, this.state.zoom.value)) *
+        -sign *
+        smallDeltaAdjustment;
 
       this.setState((state) => ({
         ...getStateForZoom(
