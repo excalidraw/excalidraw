@@ -295,6 +295,11 @@ const PublishLibrary = ({
   }, [clonedLibItems, onClose, updateItemsInStorage, libraryData]);
 
   const shouldRenderForm = !!libraryItems.length;
+
+  const containsPublishedItems = libraryItems.some(
+    (item) => item.status === "published",
+  );
+
   return (
     <Dialog
       onCloseRequest={onDialogClose}
@@ -329,6 +334,11 @@ const PublishLibrary = ({
           <div className="publish-library-note">
             {t("publishDialog.noteItems")}
           </div>
+          {containsPublishedItems && (
+            <span className="publish-library-note publish-library-warning">
+              {t("publishDialog.republishWarning")}
+            </span>
+          )}
           {renderLibraryItems()}
           <div className="publish-library__fields">
             <label>

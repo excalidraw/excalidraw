@@ -3,11 +3,24 @@
 .excalidraw {
   .single-library-item {
     position: relative;
+
+    &-status {
+      position: absolute;
+      top: 0.3rem;
+      left: 0.3rem;
+      font-size: 0.7rem;
+      color: $oc-red-7;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 0.1rem 0.2rem;
+      border-radius: 0.2rem;
+    }
+
     &__svg {
+      background-color: $oc-white;
+      padding: 0.3rem;
       width: 7.5rem;
       height: 7.5rem;
       border: 1px solid var(--button-gray-2);
-      margin: 0.3rem;
       svg {
         width: 100%;
         height: 100%;
@@ -40,7 +53,7 @@
     &--remove {
       position: absolute;
       top: 0.2rem;
-      right: 1.3rem;
+      right: 1rem;
 
       .ToolIcon__icon {
         margin: 0;

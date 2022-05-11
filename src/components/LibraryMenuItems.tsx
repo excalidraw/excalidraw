@@ -172,7 +172,7 @@ const LibraryMenuItems = ({
             </ToolButton>
           </>
         )}
-        {itemsSelected && !isPublished && (
+        {itemsSelected && (
           <Tooltip label={t("hints.publishLibrary")}>
             <ToolButton
               type="button"
@@ -199,9 +199,6 @@ const LibraryMenuItems = ({
 
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;
-  const isPublished = selectedItems.some(
-    (id) => libraryItems.find((item) => item.id === id)?.status === "published",
-  );
 
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
