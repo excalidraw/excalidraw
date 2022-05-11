@@ -119,7 +119,8 @@
       "unlock": "Atbrīvot",
       "lockAll": "Fiksēt visu",
       "unlockAll": "Atbrīvot visu"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
@@ -341,7 +342,8 @@
       "post": "kas īsumā nozīmē, ka jebkurš to varēs izmantot bez ierobežojumiem."
     },
     "noteItems": "Katram bibliotēkas vienumam jābūt savam nosaukumam, lai to varētu atrast filtrējot. Tiks iekļauti sekojošie bibliotēkas vienumi:",
-    "atleastOneLibItem": "Lūdzu, atlasiet vismaz vienu bibliotēkas vienumu, lai sāktu darbu"
+    "atleastOneLibItem": "Lūdzu, atlasiet vismaz vienu bibliotēkas vienumu, lai sāktu darbu",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliotēka iesniegta",
