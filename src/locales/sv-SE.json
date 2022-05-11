@@ -119,7 +119,8 @@
       "unlock": "Lås upp",
       "lockAll": "Lås alla",
       "unlockAll": "Lås upp alla"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -341,7 +342,8 @@
       "post": "vilket kort sagt betyder att vem som helst kan använda det utan restriktioner."
     },
     "noteItems": "Varje objekt måste ha sitt eget namn så att det är filtrerbart. Följande objekt kommer att inkluderas:",
-    "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång"
+    "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliotek inskickat",
