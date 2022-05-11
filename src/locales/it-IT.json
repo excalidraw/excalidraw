@@ -119,7 +119,8 @@
       "unlock": "Sblocca",
       "lockAll": "Blocca tutto",
       "unlockAll": "Sblocca tutto"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto.",
     "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?",
     "collabStopOverridePrompt": "Interrompere la sessione sovrascriverà il precedente disegno memorizzato localmente. Sei sicuro?\n\n(Se vuoi mantenere il tuo disegno locale, chiudi semplicemente la scheda del browser.)",
-    "errorLoadingLibrary": "Si è verificato un errore nel caricamento della libreria di terze parti.",
     "errorAddingToLibrary": "Impossibile aggiungere l'elemento alla libreria",
     "errorRemovingFromLibrary": "Impossibile rimuovere l'elemento dalla libreria",
     "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua libreria. Sei sicuro?",
@@ -189,7 +189,8 @@
     "fileTooBig": "Il file è troppo grande. La dimensione massima consentita è {{maxSize}}.",
     "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
     "invalidSVGString": "SVG non valido.",
-    "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova."
+    "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
+    "importLibraryError": "Impossibile caricare la libreria"
   },
   "toolBar": {
     "selection": "Selezione",
@@ -341,7 +342,8 @@
       "post": "che in breve significa che chiunque possa usarla senza restrizioni."
     },
     "noteItems": "Ogni elemento della libreria deve avere il proprio nome, così che sia filtrabile. Gli elementi della seguente libreria saranno inclusi:",
-    "atleastOneLibItem": "Sei pregato di selezionare almeno un elemento della libreria per iniziare"
+    "atleastOneLibItem": "Sei pregato di selezionare almeno un elemento della libreria per iniziare",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Libreria inviata",
