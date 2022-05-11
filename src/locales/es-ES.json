@@ -119,7 +119,8 @@
       "unlock": "Desbloquear",
       "lockAll": "Bloquear todo",
       "unlockAll": "Desbloquear todo"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -341,7 +342,8 @@
       "post": "que en breve significa que cualquiera puede utilizarlos sin restricciones."
     },
     "noteItems": "Cada elemento de la biblioteca debe tener su propio nombre para que sea filtrable. Los siguientes elementos de la biblioteca serán incluidos:",
-    "atleastOneLibItem": "Por favor, seleccione al menos un elemento de la biblioteca para empezar"
+    "atleastOneLibItem": "Por favor, seleccione al menos un elemento de la biblioteca para empezar",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",
