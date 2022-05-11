@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -341,7 +342,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Бібліотека відправлена",
