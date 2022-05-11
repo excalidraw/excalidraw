@@ -119,7 +119,8 @@
       "unlock": "Kilidi Kaldır",
       "lockAll": "Hepsini kilitle",
       "unlockAll": "Hepsinin kilidini kaldır"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -341,7 +342,8 @@
       "post": "ki bu kısaca herkesin onu kısıtlama olmaksızın kullanabileceği anlamına gelmektedir."
     },
     "noteItems": "Her kütüphane kendi ismine sahip olmalı ki tarama yapabilelim. Şu kütüphane ögeleri dahil edilecek:",
-    "atleastOneLibItem": "Lütfen başlamak için en az bir tane kütüphane ögesi seçin"
+    "atleastOneLibItem": "Lütfen başlamak için en az bir tane kütüphane ögesi seçin",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Kütüphane gönderildi",
