@@ -120,7 +120,7 @@
       "lockAll": "全部鎖定",
       "unlockAll": "全部解鎖"
     },
-    "statusPublished": ""
+    "statusPublished": "已發布"
   },
   "buttons": {
     "clearReset": "重置 canvas",
