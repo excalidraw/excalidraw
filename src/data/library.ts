@@ -1,12 +1,20 @@
 import { loadLibraryFromBlob } from "./blob";
-import { LibraryItems, LibraryItem } from "../types";
+import {
+  LibraryItems,
+  LibraryItem,
+  ExcalidrawImperativeAPI,
+  LibraryItemsSource,
+} from "../types";
 import { restoreLibraryItems } from "./restore";
 import type App from "../components/App";
-import { ImportedDataState } from "./types";
 import { atom } from "jotai";
 import { jotaiStore } from "../jotai";
 import { ExcalidrawElement } from "../element/types";
 import { getCommonBoundingBox } from "../element/bounds";
+import { AbortError } from "../errors";
+import { t } from "../i18n";
+import { useEffect, useRef } from "react";
+import { URL_HASH_KEYS, URL_QUERY_KEYS, APP_NAME, EVENT } from "../constants";
 
 export const libraryItemsAtom = atom<{
   status: "loading" | "loaded";
@@ -105,36 +113,6 @@ class Library {
   };
 
   /**
-   * imports library (from blob or libraryItems), merging with current library
-   * (attempting to remove duplicates)
-   */
-  importLibrary(
-    library:
-      | Blob
-      | Required<ImportedDataState>["libraryItems"]
-      | Promise<Required<ImportedDataState>["libraryItems"]>,
-    defaultStatus: LibraryItem["status"] = "unpublished",
-  ): Promise<LibraryItems> {
-    return this.setLibrary(
-      () =>
-        new Promise<LibraryItems>(async (resolve, reject) => {
-          try {
-            let libraryItems: LibraryItems;
-            if (library instanceof Blob) {
-              libraryItems = await loadLibraryFromBlob(library, defaultStatus);
-            } else {
-              libraryItems = restoreLibraryItems(await library, defaultStatus);
-            }
-
-            resolve(mergeLibraryItems(this.lastLibraryItems, libraryItems));
-          } catch (error) {
-            reject(error);
-          }
-        }),
-    );
-  }
-
-  /**
    * @returns latest cloned libraryItems. Awaits all in-progress updates first.
    */
   getLatestLibrary = (): Promise<LibraryItems> => {
@@ -150,6 +128,65 @@ class Library {
       } catch (error) {
         return resolve(this.lastLibraryItems);
       }
+    });
+  };
+
+  // NOTE this is a high-level public API (exposed on ExcalidrawAPI) with
+  // a slight overhead (always restoring library items). For internal use
+  // where merging isn't needed, use `library.setLibrary()` directly.
+  updateLibrary = async ({
+    libraryItems,
+    prompt = false,
+    merge = false,
+    openLibraryMenu = false,
+    defaultStatus = "unpublished",
+  }: {
+    libraryItems: LibraryItemsSource;
+    merge?: boolean;
+    prompt?: boolean;
+    openLibraryMenu?: boolean;
+    defaultStatus?: "unpublished" | "published";
+  }): Promise<LibraryItems> => {
+    if (openLibraryMenu) {
+      this.app.setState({ isLibraryOpen: true });
+    }
+
+    return this.setLibrary(() => {
+      return new Promise<LibraryItems>(async (resolve, reject) => {
+        try {
+          const source = await (typeof libraryItems === "function"
+            ? libraryItems(this.lastLibraryItems)
+            : libraryItems);
+
+          let nextItems;
+
+          if (source instanceof Blob) {
+            nextItems = await loadLibraryFromBlob(source, defaultStatus);
+          } else {
+            nextItems = restoreLibraryItems(source, defaultStatus);
+          }
+          if (
+            !prompt ||
+            window.confirm(
+              t("alerts.confirmAddLibrary", {
+                numShapes: nextItems.length,
+              }),
+            )
+          ) {
+            if (merge) {
+              resolve(mergeLibraryItems(this.lastLibraryItems, nextItems));
+            } else {
+              resolve(nextItems);
+            }
+          } else {
+            reject(new AbortError());
+          }
+        } catch (error: any) {
+          reject(error);
+        }
+      });
+    }).finally(() => {
+      this.app.focusContainer();
     });
   };
 
@@ -297,4 +334,103 @@ export const distributeLibraryItemsOnSquareGrid = (
   }
 
   return resElements;
+};
+
+export const parseLibraryTokensFromUrl = () => {
+  const libraryUrl =
+    // current
+    new URLSearchParams(window.location.hash.slice(1)).get(
+      URL_HASH_KEYS.addLibrary,
+    ) ||
+    // legacy, kept for compat reasons
+    new URLSearchParams(window.location.search).get(URL_QUERY_KEYS.addLibrary);
+  const idToken = libraryUrl
+    ? new URLSearchParams(window.location.hash.slice(1)).get("token")
+    : null;
+
+  return libraryUrl ? { libraryUrl, idToken } : null;
+};
+
+export const useHandleLibrary = ({
+  excalidrawAPI,
+  getInitialLibraryItems,
+}: {
+  excalidrawAPI: ExcalidrawImperativeAPI | null;
+  getInitialLibraryItems?: () => LibraryItemsSource;
+}) => {
+  const getInitialLibraryRef = useRef(getInitialLibraryItems);
+
+  useEffect(() => {
+    if (!excalidrawAPI) {
+      return;
+    }
+
+    const importLibraryFromURL = ({
+      libraryUrl,
+      idToken,
+    }: {
+      libraryUrl: string;
+      idToken: string | null;
+    }) => {
+      if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
+        const hash = new URLSearchParams(window.location.hash.slice(1));
+        hash.delete(URL_HASH_KEYS.addLibrary);
+        window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
+      } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
+        const query = new URLSearchParams(window.location.search);
+        query.delete(URL_QUERY_KEYS.addLibrary);
+        window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
+      }
+
+      excalidrawAPI.updateLibrary({
+        libraryItems: new Promise<Blob>(async (resolve, reject) => {
+          try {
+            const request = await fetch(decodeURIComponent(libraryUrl));
+            const blob = await request.blob();
+            resolve(blob);
+          } catch (error: any) {
+            reject(error);
+          }
+        }),
+        prompt: idToken !== excalidrawAPI.id,
+        merge: true,
+        defaultStatus: "published",
+        openLibraryMenu: true,
+      });
+    };
+    const onHashChange = (event: HashChangeEvent) => {
+      event.preventDefault();
+      const libraryUrlTokens = parseLibraryTokensFromUrl();
+      if (libraryUrlTokens) {
+        event.stopImmediatePropagation();
+        // If hash changed and it contains library url, import it and replace
+        // the url to its previous state (important in case of collaboration
+        // and similar).
+        // Using history API won't trigger another hashchange.
+        window.history.replaceState({}, "", event.oldURL);
+
+        importLibraryFromURL(libraryUrlTokens);
+      }
+    };
+
+    // -------------------------------------------------------------------------
+    // ------ init load --------------------------------------------------------
+    if (getInitialLibraryRef.current) {
+      excalidrawAPI.updateLibrary({
+        libraryItems: getInitialLibraryRef.current(),
+      });
+    }
+
+    const libraryUrlTokens = parseLibraryTokensFromUrl();
+
+    if (libraryUrlTokens) {
+      importLibraryFromURL(libraryUrlTokens);
+    }
+    // --------------------------------------------------------- init load -----
+
+    window.addEventListener(EVENT.HASHCHANGE, onHashChange);
+    return () => {
+      window.removeEventListener(EVENT.HASHCHANGE, onHashChange);
+    };
+  }, [excalidrawAPI]);
 };
