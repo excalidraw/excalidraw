@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -341,7 +342,8 @@
       "post": "o que, em suma, significa que qualquer pessoa pode utilizá-los sem restrições."
     },
     "noteItems": "Cada item da biblioteca deve ter seu próprio nome para que seja filtrável. Os seguintes itens da biblioteca serão incluídos:",
-    "atleastOneLibItem": "Por favor, selecione pelo menos um item da biblioteca para começar"
+    "atleastOneLibItem": "Por favor, selecione pelo menos um item da biblioteca para começar",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",
