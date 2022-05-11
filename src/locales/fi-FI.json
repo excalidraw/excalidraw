@@ -120,7 +120,7 @@
       "lockAll": "",
       "unlockAll": ""
     },
-    "statusPublished": ""
+    "statusPublished": "Julkaistu"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -343,7 +343,7 @@
     },
     "noteItems": "Jokaisella kirjaston kohteella on oltava oma nimensä suodatusta varten. Seuraavat kirjaston kohteet sisältyvät:",
     "atleastOneLibItem": "Valitse vähintään yksi kirjaston kohde aloittaaksesi",
-    "republishWarning": ""
+    "republishWarning": "Huom! Osa valituista kohteista on merkitty jo julkaistu/lähetetyiksi. Lähetä kohteita uudelleen vain päivitettäessä olemassa olevaa kirjastoa tai ehdotusta."
   },
   "publishSuccessDialog": {
     "title": "Kirjasto lähetetty",
