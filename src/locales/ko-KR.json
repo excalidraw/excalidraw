@@ -119,7 +119,8 @@
       "unlock": "잠금 해제",
       "lockAll": "모두 잠금",
       "unlockAll": "모두 잠금 해제"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -341,7 +342,8 @@
       "post": "하에 배포됨을, 즉 아무나 제약 없이 사용할 수 있음에 동의합니다."
     },
     "noteItems": "각각의 라이브러리는 분류할 수 있도록 고유한 이름을 가져야 합니다. 다음의 라이브러리 항목이 포함됩니다:",
-    "atleastOneLibItem": "최소한 하나의 라이브러리를 선택해주세요"
+    "atleastOneLibItem": "최소한 하나의 라이브러리를 선택해주세요",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "라이브러리 제출됨",
