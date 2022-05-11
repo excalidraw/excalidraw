@@ -1,6 +1,6 @@
 import { chunk } from "lodash";
 import React, { useCallback, useState } from "react";
-import { importLibraryFromJSON, saveLibraryAsJSON } from "../data/json";
+import { saveLibraryAsJSON } from "../data/json";
 import Library from "../data/library";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
@@ -23,6 +23,7 @@ import { Tooltip } from "./Tooltip";
 import "./LibraryMenuItems.scss";
 import { VERSIONS } from "../constants";
 import Spinner from "./Spinner";
+import { fileOpen } from "../data/filesystem";
 
 const LibraryMenuItems = ({
   isLoading,
@@ -107,13 +108,23 @@ const LibraryMenuItems = ({
             title={t("buttons.load")}
             aria-label={t("buttons.load")}
             icon={load}
-            onClick={() => {
-              importLibraryFromJSON(library)
-                .catch(muteFSAbortError)
-                .catch((error) => {
-                  console.error(error);
-                  setAppState({ errorMessage: t("errors.importLibraryError") });
+            onClick={async () => {
+              try {
+                await fileOpen({
+                  description: "Excalidraw library files",
+                  // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
+                  // gets resolved. Else, iOS users cannot open `.excalidraw` files.
+                  /*
+                  extensions: [".json", ".excalidrawlib"],
+                  */
                 });
+              } catch (error: any) {
+                if (error?.name === "AbortError") {
+                  console.warn(error);
+                  return;
+                }
+                setAppState({ errorMessage: t("errors.importLibraryError") });
+              }
             }}
             className="library-actions--load"
           />
