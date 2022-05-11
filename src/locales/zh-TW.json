@@ -343,7 +343,7 @@
     },
     "noteItems": "每個資料庫項目都有獨立的名稱故可篩選。會包含下列資料庫項目：",
     "atleastOneLibItem": "請選擇至少一項資料庫項目",
-    "republishWarning": ""
+    "republishWarning": "注意：部分選取中的物件先前已發布/送出過。建議僅在要更新現存資料庫或已送出的物件時才重新送出這些物件。"
   },
   "publishSuccessDialog": {
     "title": "資料庫已送出",
