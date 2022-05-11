@@ -482,6 +482,7 @@ export type ExcalidrawImperativeAPI = {
   sendToBack: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   bringToFront: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   restore: InstanceType<typeof App>["restore"]; //zsviczian
+  setMobileModeAllowed: (allow: boolean) => void; //zsviczian
 };
 
 export type DeviceType = {
