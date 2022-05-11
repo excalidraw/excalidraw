@@ -5657,7 +5657,10 @@ class App extends React.Component<AppProps, AppState> {
 
       let newZoom = this.state.zoom.value - delta / 100;
       // increase zoom steps the more zoomed-in we are (applies to >100% only)
-      newZoom += Math.log10(Math.max(1, this.state.zoom.value)) * -sign;
+      // do not amplify zoom steps for small deltas (small movements on a trackpad)
+      if (Math.abs(deltaY) > 10) {
+        newZoom += Math.log10(Math.max(1, this.state.zoom.value)) * -sign;
+      }
 
       this.setState((state) => ({
         ...getStateForZoom(
