@@ -405,7 +405,9 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
-| [`onLinkOpen`](#onLinkOpen) | <pre>(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">NonDeletedExcalidrawElement</a>, event: CustomEvent) </pre> |  | This prop if passed will be triggered when link of an element is clicked |
+| [`onLinkOpen`](#onLinkOpen) | <pre>(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">NonDeletedExcalidrawElement</a>, event: CustomEvent) </pre> |  | This prop if passed will be triggered when link of an element is clicked. |
+| [`onPointerDown`](#onPointerDown) | <pre>(activeTool: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L93"> AppState["activeState"]</a>, pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L365">PointerDownState</a>) => void</pre> |  | This prop if passed gets triggered on pointer down evenets |
+| [`onScrollChange`](#scrollChange) | (scrollX: number, scrollY: number) |  | This prop if passed gets triggered when scrolling the canvas. |
 
 ### Dimensions of Excalidraw
 
@@ -491,6 +493,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. |
 | [id](#id) | string | Unique ID for the excalidraw component. |
 | [getFiles](#getFiles) | <pre>() => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64">files</a> </pre> | This API can be used to get the files present in the scene. It may contain files that aren't referenced by any element, so if you're persisting the files to a storage, you should compare them against stored elements. |
+| [setActiveTool](#setActiveTool) | <pre>(tool: { type: typeof <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L4">SHAPES</a>[number]["value"] &#124; "eraser" } &#124; { type: "custom"; customType: string }) => void</pre> | This API can be used to set the active tool |
 
 #### `readyPromise`
 
@@ -673,6 +676,14 @@ useEffect(() => {
 
 Try out the [Demo](#Demo) to see it in action.
 
+#### `setActiveTool`
+
+This API has the below signature. It sets the `tool` passed in param as the active tool.
+
+<pre>
+(tool: { type: typeof <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L4">SHAPES</a>[number]["value"] &#124; "eraser" } &#124; { type: "custom"; customType: string }) => void
+</pre>
+
 #### `detectScroll`
 
 Indicates whether Excalidraw should listen for `scroll` event on the nearest scrollable container in the DOM tree and recompute the coordinates (e.g. to correctly handle the cursor) when the component's position changes. You can disable this when you either know this doesn't affect your app or you want to take care of it yourself (calling the [`refresh()`](#ref) method).
@@ -740,6 +751,22 @@ const onLinkOpen: ExcalidrawProps["onLinkOpen"] = useCallback(
   },
   [history],
 );
+```
+
+#### `onPointerDown`
+
+This prop if passed will be triggered on pointer down events and has the below signature.
+
+<pre>
+(activeTool: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L93"> AppState["activeState"]</a>, pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L365">PointerDownState</a>) => void
+</pre>
+
+#### `onScrollChange`
+
+This prop if passed will be triggered when canvas is scrolled and has the below signature.
+
+```ts
+(scrollX: number, scrollY: number) => void
 ```
 
 ### Does it support collaboration ?
