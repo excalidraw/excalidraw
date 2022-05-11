@@ -119,7 +119,8 @@
       "unlock": "Atbrīvot",
       "lockAll": "Fiksēt visu",
       "unlockAll": "Atbrīvot visu"
-    }
+    },
+    "statusPublished": "Publicēts"
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "Augšuplāde nodrošināta ar šifrēšanu no gala līdz galam, kas nozīmē, ka Excalidraw serveri un trešās puses nevar lasīt saturu.",
     "loadSceneOverridePrompt": "Ārēja satura ielāde aizstās jūsu pašreizējo saturu. Vai vēlaties turpināt?",
     "collabStopOverridePrompt": "Sesijas pārtraukšana pārrakstīs jūsu iepriekšējo zīmējumu, kas saglabāts jūsu pārlūkā. Vai turpināt?\n\n(Ja vēlaties paturēt zīmējumu, kas saglabāts jūsu pārlūkā, vienkārši aizveriet pārlūka cilni.)",
-    "errorLoadingLibrary": "Lasot trešās puses bibliotēku, notika kļūda.",
     "errorAddingToLibrary": "Nevarēja pievienot vienumu bibliotēkai",
     "errorRemovingFromLibrary": "Nevarēja izņemt vienumu no bibliotēkas",
     "confirmAddLibrary": "Šī funkcija pievienos {{numShapes}} formu(-as) jūsu bibliotēkai. Vai turpināt?",
@@ -189,7 +189,8 @@
     "fileTooBig": "Datne ir par lielu. Lielākais atļautais izmērs ir {{maxSize}}.",
     "svgImageInsertError": "Nevarēja ievietot SVG attēlu. Šķiet, ka SVG marķējums nav derīgs.",
     "invalidSVGString": "Nederīgs SVG.",
-    "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz."
+    "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz.",
+    "importLibraryError": "Nevarēja ielādēt bibliotēku"
   },
   "toolBar": {
     "selection": "Atlase",
@@ -341,7 +342,8 @@
       "post": "kas īsumā nozīmē, ka jebkurš to varēs izmantot bez ierobežojumiem."
     },
     "noteItems": "Katram bibliotēkas vienumam jābūt savam nosaukumam, lai to varētu atrast filtrējot. Tiks iekļauti sekojošie bibliotēkas vienumi:",
-    "atleastOneLibItem": "Lūdzu, atlasiet vismaz vienu bibliotēkas vienumu, lai sāktu darbu"
+    "atleastOneLibItem": "Lūdzu, atlasiet vismaz vienu bibliotēkas vienumu, lai sāktu darbu",
+    "republishWarning": "Ievēro: daži no atzīmētajiem objektiem jau atzīmēti kā publicēti vai iesniegti publicēšanai. Tos vajadzētu atkārtoti iesniegt tikai tad, ja vēlies labot esošo bibliotēku."
   },
   "publishSuccessDialog": {
     "title": "Bibliotēka iesniegta",

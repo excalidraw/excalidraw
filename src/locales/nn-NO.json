@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "Opplastinga er kryptert og er ikkje mogleg å lese av Excalidraw-serveren eller tredjepartar.",
     "loadSceneOverridePrompt": "Innlasting av ekstern teikning erstattar ditt eksisterande innhald. Ynskjer du å fortsette?",
     "collabStopOverridePrompt": "Viss du avsluttar økta overskriv du den førre, lokalt lagra teikninga di. Er du sikker?\n\n(Ønsker du å halde fram med denne? Då er det berre å lukke denne fana.)",
-    "errorLoadingLibrary": "Det oppstod ein feil under lastinga av tredjepartsbibliotek.",
     "errorAddingToLibrary": "Kunne ikkje legge elementet i biblioteket",
     "errorRemovingFromLibrary": "Kunne ikkje fjerne elementet frå biblioteket",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} form(er) i biblioteket ditt. Er du sikker?",
@@ -189,7 +189,8 @@
     "fileTooBig": "Fila er for stor. Maksimal tillate storleik er {{maxSize}}.",
     "svgImageInsertError": "Kunne ikkje sette inn SVG-biletet. SVG-koden ser ugyldig ut.",
     "invalidSVGString": "Ugyldig SVG.",
-    "cannotResolveCollabServer": "Kunne ikkje kople til samarbeidsserveren. Ver vennleg å oppdatere inn sida og prøv på nytt."
+    "cannotResolveCollabServer": "Kunne ikkje kople til samarbeidsserveren. Ver vennleg å oppdatere inn sida og prøv på nytt.",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Vel",
@@ -341,7 +342,8 @@
       "post": "som kort sagt betyr at kven som helst kan bruke det utan avgrensingar."
     },
     "noteItems": "Kvart bibliotekselement må ha eit eige namn, slik at det er mogleg å filtrere. Dei følgande bibliotekselementa blir inkludert:",
-    "atleastOneLibItem": "Ver vennleg å markere minst eitt bibliotekselement for å starte"
+    "atleastOneLibItem": "Ver vennleg å markere minst eitt bibliotekselement for å starte",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliotek innsendt",
