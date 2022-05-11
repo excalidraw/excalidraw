@@ -17,6 +17,12 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
+- Add support for integrating custom elements [#5164](https://github.com/excalidraw/excalidraw/pull/5164).
+
+  - Add [`onPointerDown`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) callback which gets triggered on pointer down events.
+  - Add [`onScrollChange`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onScrollChange) callback which gets triggered when scrolling the canvas.
+  - Add API [`setActiveTool`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#setActiveTool) which host can call to set the active tool.
+
 - Exported [`loadSceneOrLibraryFromBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#loadSceneOrLibraryFromBlob) function [#5057](https://github.com/excalidraw/excalidraw/pull/5057).
 - Export [`MIME_TYPES`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L92) supported by Excalidraw [#5135](https://github.com/excalidraw/excalidraw/pull/5135).
 - Support [`src`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L50) for collaborators. Now onwards host can pass `src` to render the customized avatar for collaborators [#5114](https://github.com/excalidraw/excalidraw/pull/5114).

@@ -289,6 +289,11 @@ export interface ExcalidrawProps {
       nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
   ) => void;
+  onPointerDown?: (
+    activeTool: AppState["activeTool"],
+    pointerDownState: PointerDownState,
+  ) => void;
+  onScrollChange?: (scrollX: number, scrollY: number) => void;
 }
 
 export type SceneData = {
@@ -449,6 +454,7 @@ export type ExcalidrawImperativeAPI = {
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
   id: string;
+  setActiveTool: InstanceType<typeof App>["setActiveTool"];
 };
 
 export type DeviceType = {
