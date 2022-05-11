@@ -45,6 +45,11 @@ const SingleLibraryItem = ({
 
   return (
     <div className="single-library-item">
+      {libItem.status === "published" && (
+        <span className="single-library-item-status">
+          {t("labels.statusPublished")}
+        </span>
+      )}
       <div ref={svgRef} className="single-library-item__svg" />
       <ToolButton
         aria-label={t("buttons.remove")}
