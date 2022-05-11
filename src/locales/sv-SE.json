@@ -120,7 +120,7 @@
       "lockAll": "Lås alla",
       "unlockAll": "Lås upp alla"
     },
-    "statusPublished": ""
+    "statusPublished": "Publicerad"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -343,7 +343,7 @@
     },
     "noteItems": "Varje objekt måste ha sitt eget namn så att det är filtrerbart. Följande objekt kommer att inkluderas:",
     "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång",
-    "republishWarning": ""
+    "republishWarning": "Obs: några av de markerade objekten är redan markerade som publicerade/skickade. Du bör endast skicka objekt igen när du uppdaterar ett befintligt bibliotek eller inlämning."
   },
   "publishSuccessDialog": {
     "title": "Bibliotek inskickat",
