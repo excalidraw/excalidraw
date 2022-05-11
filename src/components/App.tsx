@@ -1921,23 +1921,47 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  /**
+   * returns whether user is making a gesture with >= 2 fingers (points)
+   * on o touch screen (not on a trackpad). Currently only relates to Darwin
+   * (iOS/iPadOS,MacOS), but may work on other devices in the future if
+   * GestureEvent is standardized.
+   */
+  private isTouchScreenMultiTouchGesture = () => {
+    // we don't want to deselect when using trackpad, and multi-point gestures
+    // only work on touch screens, so checking for >= pointers means we're on a
+    // touchscreen
+    return gesture.pointers.size >= 2;
+  };
+
+  // fires only on Safari
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    this.setState({
-      selectedElementIds: {},
-    });
+
+    // we only want to deselect on touch screens because user may have selected
+    // elements by mistake while zooming
+    if (this.isTouchScreenMultiTouchGesture()) {
+      this.setState({
+        selectedElementIds: {},
+      });
+    }
     gesture.initialScale = this.state.zoom.value;
   });
 
+  // fires only on Safari
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
 
     // onGestureChange only has zoom factor but not the center.
     // If we're on iPad or iPhone, then we recognize multi-touch and will
-    // zoom in at the right location on the touchMove handler already.
-    // On Macbook, we don't have those events so will zoom in at the
+    // zoom in at the right location in the touchmove handler
+    // (handleCanvasPointerMove).
+    //
+    // On Macbook trackpad, we don't have those events so will zoom in at the
     // current location instead.
-    if (gesture.pointers.size >= 2) {
+    //
+    // As such, bail from this handler on touch devices.
+    if (this.isTouchScreenMultiTouchGesture()) {
       return;
     }
 
@@ -1956,12 +1980,16 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
+  // fires only on Safari
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    this.setState({
-      previousSelectedElementIds: {},
-      selectedElementIds: this.state.previousSelectedElementIds,
-    });
+    // reselect elements only on touch screens (see onGestureStart)
+    if (this.isTouchScreenMultiTouchGesture()) {
+      this.setState({
+        previousSelectedElementIds: {},
+        selectedElementIds: this.state.previousSelectedElementIds,
+      });
+    }
     gesture.initialScale = null;
   });
 
@@ -5636,7 +5664,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const { deltaX, deltaY } = event;
-    const { selectedElementIds, previousSelectedElementIds } = this.state;
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
       const sign = Math.sign(deltaY);
@@ -5645,14 +5672,6 @@ class App extends React.Component<AppProps, AppState> {
       let delta = deltaY;
       if (absDelta > MAX_STEP) {
         delta = MAX_STEP * sign;
-      }
-      if (Object.keys(previousSelectedElementIds).length !== 0) {
-        setTimeout(() => {
-          this.setState({
-            selectedElementIds: previousSelectedElementIds,
-            previousSelectedElementIds: {},
-          });
-        }, 1000);
       }
 
       let newZoom = this.state.zoom.value - delta / 100;
@@ -5672,11 +5691,6 @@ class App extends React.Component<AppProps, AppState> {
           },
           state,
         ),
-        selectedElementIds: {},
-        previousSelectedElementIds:
-          Object.keys(selectedElementIds).length !== 0
-            ? selectedElementIds
-            : previousSelectedElementIds,
         shouldCacheIgnoreZoom: true,
       }));
       this.resetShouldCacheIgnoreZoomDebounced();
