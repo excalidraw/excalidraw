@@ -120,7 +120,7 @@
       "lockAll": "Hepsini kilitle",
       "unlockAll": "Hepsinin kilidini kaldır"
     },
-    "statusPublished": ""
+    "statusPublished": "Yayınlandı"
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -190,7 +190,7 @@
     "svgImageInsertError": "SVG resmi eklenemedi. SVG işaretlemesi geçersiz görünüyor.",
     "invalidSVGString": "Geçersiz SVG.",
     "cannotResolveCollabServer": "İş birliği sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin.",
-    "importLibraryError": ""
+    "importLibraryError": "Kütüphane yüklenemedi"
   },
   "toolBar": {
     "selection": "Seçme",
@@ -343,7 +343,7 @@
     },
     "noteItems": "Her kütüphane kendi ismine sahip olmalı ki tarama yapabilelim. Şu kütüphane ögeleri dahil edilecek:",
     "atleastOneLibItem": "Lütfen başlamak için en az bir tane kütüphane ögesi seçin",
-    "republishWarning": ""
+    "republishWarning": "Not: seçilen ögelerden bir kısmı zaten yayınlanmış/gönderilmiş. Yalnızca mevcut kütüphane ve gönderileri güncellerken yeniden gönderme işlemi yapmalısınız."
   },
   "publishSuccessDialog": {
     "title": "Kütüphane gönderildi",
