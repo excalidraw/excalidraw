@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -341,7 +342,8 @@
       "post": "ami röviden azt jelenti, hogy bárki korlátozás nélkül használhatja őket."
     },
     "noteItems": "Minden könyvtárelemnek saját nevével kell rendelkeznie, hogy szűrhető legyen. A következő könyvtári tételek kerülnek bele:",
-    "atleastOneLibItem": "A kezdéshez válassz ki legalább egy könyvtári elemet"
+    "atleastOneLibItem": "A kezdéshez válassz ki legalább egy könyvtári elemet",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "A könyvtár beküldve",
