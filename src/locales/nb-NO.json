@@ -120,7 +120,7 @@
       "lockAll": "Lås alle",
       "unlockAll": "Lås opp alle"
     },
-    "statusPublished": ""
+    "statusPublished": "Publisert"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -343,7 +343,7 @@
     },
     "noteItems": "Hvert bibliotek må ha sitt eget navn, så det er filtrerbart. Følgende bibliotekselementer vil bli inkludert:",
     "atleastOneLibItem": "Vennligst velg minst ett bibliotek for å komme i gang",
-    "republishWarning": ""
+    "republishWarning": "Merk: noen av de valgte elementene er merket som allerede publisert/sendt. Du bør kun sende inn elementer på nytt når du oppdaterer et eksisterende bibliotek eller innlevering."
   },
   "publishSuccessDialog": {
     "title": "Bibliotek innsendt",
