@@ -119,7 +119,8 @@
       "unlock": "解鎖",
       "lockAll": "全部鎖定",
       "unlockAll": "全部解鎖"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -341,7 +342,8 @@
       "post": "簡單來說是指任何人都能不受限制的使用。"
     },
     "noteItems": "每個資料庫項目都有獨立的名稱故可篩選。會包含下列資料庫項目：",
-    "atleastOneLibItem": "請選擇至少一項資料庫項目"
+    "atleastOneLibItem": "請選擇至少一項資料庫項目",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "資料庫已送出",
