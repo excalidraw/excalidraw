@@ -119,7 +119,8 @@
       "unlock": "Lås opp",
       "lockAll": "Lås alle",
       "unlockAll": "Lås opp alle"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -341,7 +342,8 @@
       "post": "som kortfattet betyr at andre kan bruke dem uten begrensninger."
     },
     "noteItems": "Hvert bibliotek må ha sitt eget navn, så det er filtrerbart. Følgende bibliotekselementer vil bli inkludert:",
-    "atleastOneLibItem": "Vennligst velg minst ett bibliotek for å komme i gang"
+    "atleastOneLibItem": "Vennligst velg minst ett bibliotek for å komme i gang",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliotek innsendt",
