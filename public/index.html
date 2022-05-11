@@ -80,6 +80,22 @@
 
     <link rel="stylesheet" href="fonts.css" type="text/css" />
     <script>
+      // Redirect Excalidraw plus users with set auto-redirect to app.excalidraw.com
+      // only root path - any other shared, json... paths are not redirected
+      //
+      // THIS SHOULD BE IDEALY DONE ON THE SERVER.
+      // However current Excalidraw is served from Vercel without any backend so trying to redirect as soon
+      // we can.
+      if (
+        window.location.pathname === "/" &&
+        !window.location.hash &&
+        // if its present redirect
+        document.cookie.includes("excplus-auto-redirect-from-oss-editor")
+      ) {
+        window.location.href = "https://app.excalidraw.com";
+      }
+    </script>
+    <script>
       window.EXCALIDRAW_ASSET_PATH = "/";
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
