@@ -119,7 +119,8 @@
       "unlock": "ביטול נעילה",
       "lockAll": "לנעול הכל",
       "unlockAll": "שחרור הכול"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -341,7 +342,8 @@
       "post": "שאומר בקצרה שכל אחד יכול לעשות בהם שימוש ללא מגבלות."
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "הספריה נשלחה",
