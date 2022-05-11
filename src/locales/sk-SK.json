@@ -119,7 +119,8 @@
       "unlock": "Odomknúť",
       "lockAll": "Zamknúť všetko",
       "unlockAll": "Odomknúť všetko"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -341,7 +342,8 @@
       "post": "čo v skratke znamená, že ju môže použiť hocikto bez obmedzení."
     },
     "noteItems": "Každá položka v knižnici musí mať svoje vlastné meno, aby sa dala vyhľadať. Súčasťou knižnice budú nasledujúce položky:",
-    "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice"
+    "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Knižnica uverejnená",
