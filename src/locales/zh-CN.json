@@ -64,7 +64,7 @@
     "artist": "艺术",
     "cartoonist": "漫画家",
     "fileTitle": "文件名",
-    "colorPicker": "调色盘",
+    "colorPicker": "取色器",
     "canvasColors": "画布上的",
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
@@ -116,7 +116,7 @@
     },
     "elementLock": {
       "lock": "锁定",
-      "unlock": "解锁​​​​",
+      "unlock": "解除锁定",
       "lockAll": "全部锁定",
       "unlockAll": "全部解锁"
     }
