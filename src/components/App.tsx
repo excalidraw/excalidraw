@@ -77,7 +77,12 @@ import {
 } from "../constants";
 import { loadFromBlob } from "../data";
 import Library from "../data/library";
-import { restore, restoreElements, restoreLibraryItems } from "../data/restore";
+import {
+  restore,
+  restoreAppState,
+  restoreElements,
+  restoreLibraryItems,
+} from "../data/restore";
 import {
   dragNewElement,
   dragSelectedElements,
@@ -1705,11 +1710,13 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.appState) {
-        this.setState(sceneData.appState);
+        this.setState(restoreAppState(sceneData.appState, null));
       }
 
       if (sceneData.elements) {
-        this.scene.replaceAllElements(sceneData.elements);
+        this.scene.replaceAllElements(
+          restoreElements(sceneData.elements, null),
+        );
       }
 
       if (sceneData.collaborators) {
