@@ -119,7 +119,8 @@
       "unlock": "Déverrouiller",
       "lockAll": "Tout verrouiller",
       "unlockAll": "Tout déverouiller"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
@@ -341,7 +342,8 @@
       "post": "ce qui en gros signifie que tout le monde peut l'utiliser sans restrictions."
     },
     "noteItems": "Chaque élément de la bibliothèque doit avoir son propre nom afin qu'il soit filtrable. Les éléments de bibliothèque suivants seront inclus :",
-    "atleastOneLibItem": "Veuillez sélectionner au moins un élément de bibliothèque pour commencer"
+    "atleastOneLibItem": "Veuillez sélectionner au moins un élément de bibliothèque pour commencer",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliothèque soumise",
