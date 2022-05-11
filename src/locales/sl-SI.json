@@ -120,7 +120,7 @@
       "lockAll": "Zakleni vse",
       "unlockAll": "Odkleni vse"
     },
-    "statusPublished": ""
+    "statusPublished": "Objavljeno"
   },
   "buttons": {
     "clearReset": "Ponastavi platno",
@@ -343,7 +343,7 @@
     },
     "noteItems": "Vsak element knjižnice mora imeti svoje ime, tako da ga je mogoče filtrirati. Vključeni bodo naslednji elementi knjižnice:",
     "atleastOneLibItem": "Za začetek izberite vsaj en element knjižnice",
-    "republishWarning": ""
+    "republishWarning": "Opomba: nekateri izbrani predmeti so označeni kot že objavljeni/oddani. Elemente lahko znova oddate samo, ko posodabljate obstoječo knjižnico ali oddajo."
   },
   "publishSuccessDialog": {
     "title": "Knjižnica oddana",
