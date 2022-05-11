@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -341,7 +342,8 @@
       "post": "alla, mikä lyhyesti antaa muiden käyttää sitä ilman rajoituksia."
     },
     "noteItems": "Jokaisella kirjaston kohteella on oltava oma nimensä suodatusta varten. Seuraavat kirjaston kohteet sisältyvät:",
-    "atleastOneLibItem": "Valitse vähintään yksi kirjaston kohde aloittaaksesi"
+    "atleastOneLibItem": "Valitse vähintään yksi kirjaston kohde aloittaaksesi",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Kirjasto lähetetty",
