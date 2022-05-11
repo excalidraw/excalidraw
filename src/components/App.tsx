@@ -71,7 +71,6 @@ import {
   THEME,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
-  ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -5659,8 +5658,6 @@ class App extends React.Component<AppProps, AppState> {
       let newZoom = this.state.zoom.value - delta / 100;
       // increase zoom steps the more zoomed-in we are (applies to >100% only)
       newZoom += Math.log10(Math.max(1, this.state.zoom.value)) * -sign;
-      // round to nearest step
-      newZoom = Math.round(newZoom * ZOOM_STEP * 100) / (ZOOM_STEP * 100);
 
       this.setState((state) => ({
         ...getStateForZoom(
