@@ -119,7 +119,8 @@
       "unlock": "Lepas",
       "lockAll": "Kunci semua",
       "unlockAll": "Lepas semua"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -341,7 +342,8 @@
       "post": "yang artinya siapa pun dapat menggunakannya tanpa batasan."
     },
     "noteItems": "Setiap item pustaka harus memiliki nama, sehingga bisa disortir. Item pustaka di bawah ini akan dimasukan:",
-    "atleastOneLibItem": "Pilih setidaknya satu item pustaka untuk mulai"
+    "atleastOneLibItem": "Pilih setidaknya satu item pustaka untuk mulai",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Pustaka telah dikirm",
