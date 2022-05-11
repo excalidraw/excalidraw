@@ -119,7 +119,8 @@
       "unlock": "Odomknúť",
       "lockAll": "Zamknúť všetko",
       "unlockAll": "Odomknúť všetko"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "Nahratie je zabezpečené end-to-end šifrovaním, takže Excalidraw server a tretie strany nedokážu prečítať jeho obsah.",
     "loadSceneOverridePrompt": "Nahratie externej kresby nahradí existujúci obsah. Prajete si pokračovať?",
     "collabStopOverridePrompt": "Ukončenie schôdze nahradí vašu predchádzajúcu lokálne uloženú scénu. Ste si istý?\n\n(Ak si chcete ponechať lokálnu scénu, jednoducho iba zavrite kartu prehliadača.)",
-    "errorLoadingLibrary": "Nepodarilo sa načítať externú knižnicu.",
     "errorAddingToLibrary": "Nepodarilo sa pridať položku do knižnice",
     "errorRemovingFromLibrary": "Nepodarilo sa odstrániť položku z knižnice",
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
@@ -189,7 +189,8 @@
     "fileTooBig": "Súbor je príliš veľký. Maximálna povolená veľkosť je {{maxSize}}.",
     "svgImageInsertError": "Nepodarilo sa vložiť SVG obrázok. SVG formát je pravdepodobne nevalidný.",
     "invalidSVGString": "Nevalidné SVG.",
-    "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu."
+    "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu.",
+    "importLibraryError": "Nepodarilo sa načítať knižnicu"
   },
   "toolBar": {
     "selection": "Výber",
@@ -341,7 +342,8 @@
       "post": "čo v skratke znamená, že ju môže použiť hocikto bez obmedzení."
     },
     "noteItems": "Každá položka v knižnici musí mať svoje vlastné meno, aby sa dala vyhľadať. Súčasťou knižnice budú nasledujúce položky:",
-    "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice"
+    "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Knižnica uverejnená",

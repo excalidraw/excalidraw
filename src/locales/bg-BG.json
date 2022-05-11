@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието.",
     "loadSceneOverridePrompt": "Зареждането на външна рисунка ще презапише настоящото ви съдържание. Желаете ли да продължите?",
     "collabStopOverridePrompt": "Прекратяването на сесията ще презапише предишната, локално запазена, рисунка. Сигурни ли сте?\n\n(Ако искате да продължите с локалната рисунка, просто затворете таба на браузъра.)",
-    "errorLoadingLibrary": "Възникна грешка при зареждането на външна библиотека.",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "Ще се добавят {{numShapes}} фигура(и) във вашата библиотека. Сигурни ли сте?",
@@ -189,7 +189,8 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Селекция",
@@ -341,7 +342,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",

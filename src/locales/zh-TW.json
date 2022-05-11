@@ -119,7 +119,8 @@
       "unlock": "解鎖",
       "lockAll": "全部鎖定",
       "unlockAll": "全部解鎖"
-    }
+    },
+    "statusPublished": "已發布"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "上傳已通過 end-to-end 加密，Excalidraw 伺服器和第三方無法皆讀取其內容。",
     "loadSceneOverridePrompt": "讀取外部圖樣將取代目前的內容。是否要繼續？",
     "collabStopOverridePrompt": "停止連線將覆蓋您先前於本機儲存的繪圖進度，是否確認？\n\n（如要保留原有的本機繪圖進度，直接關閉瀏覽器分頁即可。）",
-    "errorLoadingLibrary": "載入第三方套件時出現錯誤。",
     "errorAddingToLibrary": "無法於此資料庫加入項目",
     "errorRemovingFromLibrary": "無法由此資料庫移除項目",
     "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
@@ -189,7 +189,8 @@
     "fileTooBig": "檔案過大。可接受的最大尺寸為 {{maxSize}} 。",
     "svgImageInsertError": "無法插入 SVG 圖片。此 SVG 檔案有問題。",
     "invalidSVGString": "無效的 SVG。",
-    "cannotResolveCollabServer": "無法連結至 collab 伺服器。請重新整理後再試一次。"
+    "cannotResolveCollabServer": "無法連結至 collab 伺服器。請重新整理後再試一次。",
+    "importLibraryError": "無法載入資料庫"
   },
   "toolBar": {
     "selection": "選取",
@@ -341,7 +342,8 @@
       "post": "簡單來說是指任何人都能不受限制的使用。"
     },
     "noteItems": "每個資料庫項目都有獨立的名稱故可篩選。會包含下列資料庫項目：",
-    "atleastOneLibItem": "請選擇至少一項資料庫項目"
+    "atleastOneLibItem": "請選擇至少一項資料庫項目",
+    "republishWarning": "注意：部分選取中的物件先前已發布/送出過。建議僅在要更新現存資料庫或已送出的物件時才重新送出這些物件。"
   },
   "publishSuccessDialog": {
     "title": "資料庫已送出",

@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy egy harmadik fél nem tudja megnézni a tartalmát, beleértve az Excalidraw szervereit is.",
     "loadSceneOverridePrompt": "A betöltött külső rajz felül fogja írnia meglévőt. Szeretnéd folytatni?",
     "collabStopOverridePrompt": "A munkamenet leállítása felül fogja írni az előzőleg helyben tárolt rajzot. Biztosan ezt akarod?\n(Ha meg akarod tartani a helyben tárolt rajzot, egyszerűen csak zárd be a böngésző fület)",
-    "errorLoadingLibrary": "Hibába ütközött a harmarmadik féltől származó könyvtár betöltése.",
     "errorAddingToLibrary": "A tétel nem addható hozzá a könyvtárhoz",
     "errorRemovingFromLibrary": "A tétel nem távolítható el a könyvtárból",
     "confirmAddLibrary": "Ez a művelet {{numShapes}} formát fog hozzáadni a könyvtáradhoz. Biztos vagy benne?",
@@ -189,7 +189,8 @@
     "fileTooBig": "A fájl túl nagy. A megengedett maximális méret {{maxSize}}.",
     "svgImageInsertError": "Nem sikerült beszúrni az SVG-képet. Az SVG szintaktika érvénytelennek tűnik.",
     "invalidSVGString": "Érvénytelen SVG.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Kijelölés",
@@ -341,7 +342,8 @@
       "post": "ami röviden azt jelenti, hogy bárki korlátozás nélkül használhatja őket."
     },
     "noteItems": "Minden könyvtárelemnek saját nevével kell rendelkeznie, hogy szűrhető legyen. A következő könyvtári tételek kerülnek bele:",
-    "atleastOneLibItem": "A kezdéshez válassz ki legalább egy könyvtári elemet"
+    "atleastOneLibItem": "A kezdéshez válassz ki legalább egy könyvtári elemet",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "A könyvtár beküldve",

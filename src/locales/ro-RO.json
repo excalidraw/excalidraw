@@ -119,7 +119,8 @@
       "unlock": "Deblocare",
       "lockAll": "Blocare toate",
       "unlockAll": "Deblocare toate"
-    }
+    },
+    "statusPublished": "Publicat"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "Încărcarea a fost securizată prin criptare integrală, însemnând că serverul Excalidraw și terții nu pot citi conținutul.",
     "loadSceneOverridePrompt": "Încărcarea desenului extern va înlocui conținutul existent. Dorești să continui?",
     "collabStopOverridePrompt": "Oprirea sesiunii va suprascrie desenul anterior stocat local. Confirmi alegerea?\n\n(Dacă vrei să păstrezi desenul local, pur și simplu închide fila navigatorului în schimb.)",
-    "errorLoadingLibrary": "A apărut o eroare la încărcarea bibliotecii terțe.",
     "errorAddingToLibrary": "Elementul nu a putut fi adăugat în bibliotecă",
     "errorRemovingFromLibrary": "Elementul nu a putut fi eliminat din bibliotecă",
     "confirmAddLibrary": "Această acțiune va adăuga {{numShapes}} formă(e) la biblioteca ta. Confirmi?",
@@ -189,7 +189,8 @@
     "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
     "invalidSVGString": "SVG invalid.",
-    "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou."
+    "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou.",
+    "importLibraryError": "Biblioteca nu a putut fi încărcată"
   },
   "toolBar": {
     "selection": "Selecție",
@@ -341,7 +342,8 @@
       "post": "care, pe scurt, înseamnă că oricine o poate folosi fără restricții."
     },
     "noteItems": "Fiecare element din bibliotecă trebuie să aibă propriul nume astfel încât să fie filtrabil. Următoarele elemente din bibliotecă vor fi incluse:",
-    "atleastOneLibItem": "Selectează cel puțin un element din bibliotecă pentru a începe"
+    "atleastOneLibItem": "Selectează cel puțin un element din bibliotecă pentru a începe",
+    "republishWarning": "Observație: unele dintre elementele selectate sunt marcate ca fiind deja publicate/trimise. Ar trebui să retrimiți elemente numai atunci când actualizezi o trimitere sau o bibliotecă existentă."
   },
   "publishSuccessDialog": {
     "title": "Bibliotecă trimisă",

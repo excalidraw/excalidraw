@@ -9,7 +9,7 @@
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
-    "copyText": "",
+    "copyText": "Copiar al portapapeles como texto",
     "bringForward": "Traer hacia delante",
     "sendToBack": "Enviar al fondo",
     "bringToFront": "Traer al frente",
@@ -115,11 +115,12 @@
       "label": "Enlace"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
-    }
+      "lock": "Bloquear",
+      "unlock": "Desbloquear",
+      "lockAll": "Bloquear todo",
+      "unlockAll": "Desbloquear todo"
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -172,8 +173,7 @@
     "uploadedSecurly": "La carga ha sido asegurada con cifrado de principio a fin, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido.",
     "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?",
     "collabStopOverridePrompt": "Detener la sesión sobrescribirá su dibujo anterior almacenado localmente. ¿Está seguro?\n\n(Si desea mantener su dibujo local, simplemente cierre la pestaña del navegador.)",
-    "errorLoadingLibrary": "Se ha producido un error al cargar la biblioteca de terceros.",
-    "errorAddingToLibrary": "No se pudo agregar elemento a la biblioteca",
+    "errorAddingToLibrary": "No se pudo agregar el elemento a la biblioteca",
     "errorRemovingFromLibrary": "No se pudo quitar el elemento de la biblioteca",
     "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?",
     "imageDoesNotContainScene": "Esta imagen no parece contener datos de escena. ¿Ha habilitado la inserción de la escena durante la exportación?",
@@ -189,7 +189,8 @@
     "fileTooBig": "Archivo demasiado grande. El tamaño máximo permitido es {{maxSize}}.",
     "svgImageInsertError": "No se pudo insertar la imagen SVG. El código SVG parece inválido.",
     "invalidSVGString": "SVG no válido.",
-    "cannotResolveCollabServer": "No se pudo conectar al servidor colaborador. Por favor, vuelva a cargar la página y vuelva a intentarlo."
+    "cannotResolveCollabServer": "No se pudo conectar al servidor colaborador. Por favor, vuelva a cargar la página y vuelva a intentarlo.",
+    "importLibraryError": "No se pudo cargar la librería"
   },
   "toolBar": {
     "selection": "Selección",
@@ -299,7 +300,7 @@
     "view": "Vista",
     "zoomToFit": "Ajustar la vista para mostrar todos los elementos",
     "zoomToSelection": "Zoom a la selección",
-    "toggleElementLock": ""
+    "toggleElementLock": "Bloquear/desbloquear selección"
   },
   "clearCanvasDialog": {
     "title": "Borrar lienzo"
@@ -341,7 +342,8 @@
       "post": "que en breve significa que cualquiera puede utilizarlos sin restricciones."
     },
     "noteItems": "Cada elemento de la biblioteca debe tener su propio nombre para que sea filtrable. Los siguientes elementos de la biblioteca serán incluidos:",
-    "atleastOneLibItem": "Por favor, seleccione al menos un elemento de la biblioteca para empezar"
+    "atleastOneLibItem": "Por favor, seleccione al menos un elemento de la biblioteca para empezar",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",

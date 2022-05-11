@@ -119,7 +119,8 @@
       "unlock": "ताले से बाहर",
       "lockAll": "सब ताले के अंदर रखे",
       "unlockAll": "सब ताले के बाहर निकाले"
-    }
+    },
+    "statusPublished": "प्रकाशित"
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "अपलोड को एंड-टू-एंड एन्क्रिप्शन के साथ सुरक्षित किया गया है, जिसका मतलब है कि एक्सक्लूसिव सर्वर और थर्ड पार्टी कंटेंट नहीं पढ़ सकते हैं।",
     "loadSceneOverridePrompt": "लोड हो रहा है बाहरी ड्राइंग आपके मौजूदा सामग्री को बदल देगा। क्या आप जारी रखना चाहते हैं?",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "लाइब्रेरी लोड करने में त्रुटि",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
@@ -189,7 +189,8 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे."
+    "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे.",
+    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका"
   },
   "toolBar": {
     "selection": "चयन",
@@ -341,7 +342,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": "टिप्पणी: कुछ चुने हुवे आइटम पहले ही प्रकाशित/प्रस्तुत किए जा चुके हैं। किसी प्रकाशित संग्रह को अद्यतन करते समय या प्रस्तुतित आइटम को पुन्हा प्रस्तुत करते समय, आप बस उसे केवल अद्यतन करें ।"
   },
   "publishSuccessDialog": {
     "title": "",

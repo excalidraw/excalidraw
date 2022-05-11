@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "تم تأمين التحميل بتشفير النهاية إلى النهاية، مما يعني أن خادوم Excalidraw والأطراف الثالثة لا يمكنها قراءة المحتوى.",
     "loadSceneOverridePrompt": "تحميل الرسم الخارجي سيحل محل المحتوى الموجود لديك. هل ترغب في المتابعة؟",
     "collabStopOverridePrompt": "إيقاف الجلسة سيؤدي إلى الكتابة فوق رسومك السابقة المخزنة داخليا. هل أنت متأكد؟\n\n(إذا كنت ترغب في الاحتفاظ برسمك المخزن داخليا، ببساطة أغلق علامة تبويب المتصفح بدلاً من ذلك.)",
-    "errorLoadingLibrary": "حصل خطأ أثناء تحميل مكتبة الطرف الثالث.",
     "errorAddingToLibrary": "تعذر إضافة العنصر للمكتبة",
     "errorRemovingFromLibrary": "تعذر إزالة العنصر من المكتبة",
     "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
@@ -189,7 +189,8 @@
     "fileTooBig": "الملف كبير جداً. الحد الأقصى المسموح به للحجم هو {{maxSize}}.",
     "svgImageInsertError": "تعذر إدراج صورة SVG. يبدو أن ترميز SVG غير صحيح.",
     "invalidSVGString": "SVG غير صالح.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "تحديد",
@@ -341,7 +342,8 @@
       "post": "وهو ما يعني باختصار أنه يمكن لأي شخص استخدامها دون قيود."
     },
     "noteItems": "يجب أن يكون لكل عنصر مكتبة اسمه الخاص حتى يكون قابلاً للتصفية. سيتم تضمين عناصر المكتبة التالية:",
-    "atleastOneLibItem": "يرجى تحديد عنصر مكتبة واحد على الأقل للبدء"
+    "atleastOneLibItem": "يرجى تحديد عنصر مكتبة واحد على الأقل للبدء",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "تم إرسال المكتبة",
