@@ -47,7 +47,7 @@ export type Collaborator = {
   };
   // The url of the collaborator's avatar, defaults to username intials
   // if not present
-  src?: string;
+  avatarUrl?: string;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
@@ -301,6 +301,11 @@ export interface ExcalidrawProps {
       nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
   ) => void;
+  onPointerDown?: (
+    activeTool: AppState["activeTool"],
+    pointerDownState: PointerDownState,
+  ) => void;
+  onScrollChange?: (scrollX: number, scrollY: number) => void;
 }
 
 export type SceneData = {
@@ -460,6 +465,7 @@ export type ExcalidrawImperativeAPI = {
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
   id: string;
+  setActiveTool: InstanceType<typeof App>["setActiveTool"];
 };
 
 export type DeviceType = {

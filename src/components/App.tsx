@@ -382,6 +382,7 @@ class App extends React.Component<AppProps, AppState> {
         refresh: this.refresh,
         setToastMessage: this.setToastMessage,
         id: this.id,
+        setActiveTool: this.setActiveTool,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1000,6 +1001,13 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    if (
+      prevState.scrollX !== this.state.scrollX ||
+      prevState.scrollY !== this.state.scrollY
+    ) {
+      this.props?.onScrollChange?.(this.state.scrollX, this.state.scrollY);
+    }
+
     if (
       Object.keys(this.state.selectedElementIds).length &&
       isEraserActive(this.state)
@@ -1883,11 +1891,11 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  private setActiveTool(
+  private setActiveTool = (
     tool:
       | { type: typeof SHAPES[number]["value"] | "eraser" }
       | { type: "custom"; customType: string },
-  ) {
+  ) => {
     const nextActiveTool = updateActiveTool(this.state, tool);
     if (!isHoldingSpace) {
       setCursorForShape(this.canvas, this.state);
@@ -1911,7 +1919,7 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.setState({ activeTool: nextActiveTool });
     }
-  }
+  };
 
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
@@ -2984,6 +2992,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     }
+
+    this.props?.onPointerDown?.(this.state.activeTool, pointerDownState);
 
     const onPointerMove =
       this.onPointerMoveFromPointerDownHandler(pointerDownState);
