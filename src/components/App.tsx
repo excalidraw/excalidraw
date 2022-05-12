@@ -2134,21 +2134,20 @@ class App extends React.Component<AppProps, AppState> {
         this.focusContainer();
       }),
       onSelection: withBatchedUpdates((selection) =>
-        this.setState((state) => {
+        this.setState(() => {
           if (!selection) {
             return {
               selectedTextRange: null,
             };
           }
+
           if (selection.start === selection.end) {
             return {
               selectedTextRange: {
                 type: "cursor",
                 cursorPosition: selection.start,
-                newColorRange:
-                  state.selectedTextRange?.type === "cursor"
-                    ? state.selectedTextRange.newColorRange
-                    : null,
+                // Remove newColorRange when we move the cursor
+                newColorRange: null,
               },
             };
           }
