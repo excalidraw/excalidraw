@@ -231,7 +231,7 @@
     "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
     "publishLibrary": "自分のライブラリを公開",
     "bindTextToElement": "Enterを押してテキストを追加",
-    "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行う",
+    "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行います",
     "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す"
   },
   "canvasError": {
@@ -300,7 +300,7 @@
     "view": "表示",
     "zoomToFit": "すべての要素が収まるようにズーム",
     "zoomToSelection": "選択要素にズーム",
-    "toggleElementLock": ""
+    "toggleElementLock": "選択したアイテムをロック/ロック解除"
   },
   "clearCanvasDialog": {
     "title": "キャンバスを消去"
