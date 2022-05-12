@@ -1,6 +1,5 @@
 import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
-  ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -8,15 +7,14 @@ import {
   NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
-import { BOUND_TEXT_PADDING } from "../constants";
+import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
-import { AppState } from "../types";
+import { isTextElement } from ".";
 
 export const redrawTextBoundingBox = (
   element: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
-  appState: AppState,
 ) => {
   const maxWidth = container
     ? container.width - BOUND_TEXT_PADDING * 2
@@ -35,24 +33,32 @@ export const redrawTextBoundingBox = (
     getFontString(element),
     maxWidth,
   );
-
   let coordY = element.y;
+  let coordX = element.x;
   // Resize container and vertically center align the text
   if (container) {
-    coordY = container.y + container.height / 2 - metrics.height / 2;
     let nextHeight = container.height;
-    if (metrics.height > container.height - BOUND_TEXT_PADDING * 2) {
-      nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
-      coordY = container.y + nextHeight / 2 - metrics.height / 2;
+    coordX = container.x + BOUND_TEXT_PADDING;
+    if (element.verticalAlign === VERTICAL_ALIGN.TOP) {
+      coordY = container.y + BOUND_TEXT_PADDING;
+    } else if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+      coordY =
+        container.y + container.height - metrics.height - BOUND_TEXT_PADDING;
+    } else {
+      coordY = container.y + container.height / 2 - metrics.height / 2;
+      if (metrics.height > container.height - BOUND_TEXT_PADDING * 2) {
+        nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
+        coordY = container.y + nextHeight / 2 - metrics.height / 2;
+      }
     }
     mutateElement(container, { height: nextHeight });
   }
-
   mutateElement(element, {
     width: metrics.width,
     height: metrics.height,
     baseline: metrics.baseline,
     y: coordY,
+    x: coordX,
     text,
   });
 };
@@ -71,91 +77,99 @@ export const bindTextToShapeAfterDuplication = (
     const boundTextElementId = getBoundTextElementId(element);
 
     if (boundTextElementId) {
-      const newTextElementId = oldIdToDuplicatedId.get(boundTextElementId)!;
-      mutateElement(
-        sceneElementMap.get(newElementId) as ExcalidrawBindableElement,
-        {
-          boundElements: element.boundElements?.concat({
-            type: "text",
-            id: newTextElementId,
-          }),
-        },
-      );
-      mutateElement(
-        sceneElementMap.get(newTextElementId) as ExcalidrawTextElement,
-        {
-          containerId: newElementId,
-        },
-      );
+      const newTextElementId = oldIdToDuplicatedId.get(boundTextElementId);
+      if (newTextElementId) {
+        const newContainer = sceneElementMap.get(newElementId);
+        if (newContainer) {
+          mutateElement(newContainer, {
+            boundElements: element.boundElements?.concat({
+              type: "text",
+              id: newTextElementId,
+            }),
+          });
+        }
+        const newTextElement = sceneElementMap.get(newTextElementId);
+        if (newTextElement && isTextElement(newTextElement)) {
+          mutateElement(newTextElement, {
+            containerId: newContainer ? newElementId : null,
+          });
+        }
+      }
     }
   });
 };
 
 export const handleBindTextResize = (
-  elements: readonly NonDeletedExcalidrawElement[],
+  element: NonDeletedExcalidrawElement,
   transformHandleType: MaybeTransformHandleType,
 ) => {
-  elements.forEach((element) => {
-    const boundTextElementId = getBoundTextElementId(element);
-    if (boundTextElementId) {
-      const textElement = Scene.getScene(element)!.getElement(
-        boundTextElementId,
-      ) as ExcalidrawTextElement;
-      if (textElement && textElement.text) {
-        if (!element) {
-          return;
-        }
-        let text = textElement.text;
-        let nextHeight = textElement.height;
-        let containerHeight = element.height;
-        let nextBaseLine = textElement.baseline;
-        if (transformHandleType !== "n" && transformHandleType !== "s") {
-          if (text) {
-            text = wrapText(
-              textElement.originalText,
-              getFontString(textElement),
-              element.width,
-            );
-          }
-
-          const dimensions = measureText(
-            text,
+  const boundTextElementId = getBoundTextElementId(element);
+  if (boundTextElementId) {
+    const textElement = Scene.getScene(element)!.getElement(
+      boundTextElementId,
+    ) as ExcalidrawTextElement;
+    if (textElement && textElement.text) {
+      if (!element) {
+        return;
+      }
+      let text = textElement.text;
+      let nextHeight = textElement.height;
+      let containerHeight = element.height;
+      let nextBaseLine = textElement.baseline;
+      if (transformHandleType !== "n" && transformHandleType !== "s") {
+        if (text) {
+          text = wrapText(
+            textElement.originalText,
             getFontString(textElement),
             element.width,
           );
-          nextHeight = dimensions.height;
-          nextBaseLine = dimensions.baseline;
-        }
-        // increase height in case text element height exceeds
-        if (nextHeight > element.height - BOUND_TEXT_PADDING * 2) {
-          containerHeight = nextHeight + BOUND_TEXT_PADDING * 2;
-          const diff = containerHeight - element.height;
-          // fix the y coord when resizing from ne/nw/n
-          const updatedY =
-            transformHandleType === "ne" ||
-            transformHandleType === "nw" ||
-            transformHandleType === "n"
-              ? element.y - diff
-              : element.y;
-          mutateElement(element, {
-            height: containerHeight,
-            y: updatedY,
-          });
         }
 
-        const updatedY = element.y + containerHeight / 2 - nextHeight / 2;
-        mutateElement(textElement, {
+        const dimensions = measureText(
           text,
-          // preserve padding and set width correctly
-          width: element.width - BOUND_TEXT_PADDING * 2,
-          height: nextHeight,
-          x: element.x + BOUND_TEXT_PADDING,
+          getFontString(textElement),
+          element.width,
+        );
+        nextHeight = dimensions.height;
+        nextBaseLine = dimensions.baseline;
+      }
+      // increase height in case text element height exceeds
+      if (nextHeight > element.height - BOUND_TEXT_PADDING * 2) {
+        containerHeight = nextHeight + BOUND_TEXT_PADDING * 2;
+        const diff = containerHeight - element.height;
+        // fix the y coord when resizing from ne/nw/n
+        const updatedY =
+          transformHandleType === "ne" ||
+          transformHandleType === "nw" ||
+          transformHandleType === "n"
+            ? element.y - diff
+            : element.y;
+        mutateElement(element, {
+          height: containerHeight,
           y: updatedY,
-          baseline: nextBaseLine,
         });
       }
+
+      let updatedY;
+      if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
+        updatedY = element.y + BOUND_TEXT_PADDING;
+      } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+        updatedY = element.y + element.height - nextHeight - BOUND_TEXT_PADDING;
+      } else {
+        updatedY = element.y + element.height / 2 - nextHeight / 2;
+      }
+
+      mutateElement(textElement, {
+        text,
+        // preserve padding and set width correctly
+        width: element.width - BOUND_TEXT_PADDING * 2,
+        height: nextHeight,
+        x: element.x + BOUND_TEXT_PADDING,
+        y: updatedY,
+        baseline: nextBaseLine,
+      });
     }
-  });
+  }
 };
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
@@ -355,6 +369,7 @@ export const charWidth = (() => {
       const width = getTextWidth(char, font);
       cachedCharWidth[font][ascii] = width;
     }
+
     return cachedCharWidth[font][ascii];
   };
 
@@ -367,14 +382,14 @@ export const charWidth = (() => {
   };
 })();
 export const getApproxMinLineWidth = (font: FontString) => {
-  const minCharWidth = getMinCharWidth(font);
-  if (minCharWidth === 0) {
+  const maxCharWidth = getMaxCharWidth(font);
+  if (maxCharWidth === 0) {
     return (
       measureText(DUMMY_TEXT.split("").join("\n"), font).width +
       BOUND_TEXT_PADDING * 2
     );
   }
-  return minCharWidth + BOUND_TEXT_PADDING * 2;
+  return maxCharWidth + BOUND_TEXT_PADDING * 2;
 };
 
 export const getApproxMinLineHeight = (font: FontString) => {
@@ -389,6 +404,15 @@ export const getMinCharWidth = (font: FontString) => {
   const cacheWithOutEmpty = cache.filter((val) => val !== undefined);
 
   return Math.min(...cacheWithOutEmpty);
+};
+
+export const getMaxCharWidth = (font: FontString) => {
+  const cache = charWidth.getCache(font);
+  if (!cache) {
+    return 0;
+  }
+  const cacheWithOutEmpty = cache.filter((val) => val !== undefined);
+  return Math.max(...cacheWithOutEmpty);
 };
 
 export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
@@ -416,7 +440,10 @@ export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
 };
 
 export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
-  return container?.boundElements?.filter((ele) => ele.type === "text")[0]?.id;
+  return container?.boundElements?.length
+    ? container?.boundElements?.filter((ele) => ele.type === "text")[0]?.id ||
+        null
+    : null;
 };
 
 export const getBoundTextElement = (element: ExcalidrawElement | null) => {

@@ -7,6 +7,7 @@ import {
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
+import { isInvisiblySmallElement } from "../../element/sizeHelpers";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { ExcalidrawElement, FileId } from "../../element/types";
 import { t } from "../../i18n";
@@ -17,9 +18,34 @@ import {
   UserIdleState,
 } from "../../types";
 import { bytesToHexString } from "../../utils";
-import { FILE_UPLOAD_MAX_BYTES, ROOM_ID_BYTES } from "../app_constants";
+import {
+  DELETED_ELEMENT_TIMEOUT,
+  FILE_UPLOAD_MAX_BYTES,
+  ROOM_ID_BYTES,
+} from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
+
+export type SyncableExcalidrawElement = ExcalidrawElement & {
+  _brand: "SyncableExcalidrawElement";
+};
+
+export const isSyncableElement = (
+  element: ExcalidrawElement,
+): element is SyncableExcalidrawElement => {
+  if (element.isDeleted) {
+    if (element.updated > Date.now() - DELETED_ELEMENT_TIMEOUT) {
+      return true;
+    }
+    return false;
+  }
+  return !isInvisiblySmallElement(element);
+};
+
+export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
+  elements.filter((element) =>
+    isSyncableElement(element),
+  ) as SyncableExcalidrawElement[];
 
 const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
 const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
@@ -30,7 +56,34 @@ const generateRoomId = async () => {
   return bytesToHexString(buffer);
 };
 
-export const SOCKET_SERVER = process.env.REACT_APP_SOCKET_SERVER_URL;
+/**
+ * Right now the reason why we resolve connection params (url, polling...)
+ * from upstream is to allow changing the params immediately when needed without
+ * having to wait for clients to update the SW.
+ *
+ * If REACT_APP_WS_SERVER_URL env is set, we use that instead (useful for forks)
+ */
+export const getCollabServer = async (): Promise<{
+  url: string;
+  polling: boolean;
+}> => {
+  if (process.env.REACT_APP_WS_SERVER_URL) {
+    return {
+      url: process.env.REACT_APP_WS_SERVER_URL,
+      polling: true,
+    };
+  }
+
+  try {
+    const resp = await fetch(
+      `${process.env.REACT_APP_PORTAL_URL}/collab-server`,
+    );
+    return await resp.json();
+  } catch (error) {
+    console.error(error);
+    throw new Error(t("errors.cannotResolveCollabServer"));
+  }
+};
 
 export type EncryptedData = {
   data: ArrayBuffer;

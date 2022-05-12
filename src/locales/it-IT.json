@@ -9,6 +9,7 @@
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti come PNG",
     "copyAsSvg": "Copia negli appunti come SVG",
+    "copyText": "Copia negli appunti come testo",
     "bringForward": "Porta avanti",
     "sendToBack": "Manda in fondo",
     "bringToFront": "Porta in cima",
@@ -64,6 +65,7 @@
     "cartoonist": "Fumettista",
     "fileTitle": "Nome del file",
     "colorPicker": "Selettore colore",
+    "canvasColors": "Usato su tela",
     "canvasBackground": "Sfondo tela",
     "drawingCanvas": "Area di disegno",
     "layers": "Livelli",
@@ -103,8 +105,22 @@
     "toggleTheme": "Cambia tema",
     "personalLib": "Libreria Personale",
     "excalidrawLib": "Libreria di Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Riduci dimensione dei caratteri",
+    "increaseFontSize": "Aumenta la dimensione dei caratteri",
+    "unbindText": "Scollega testo",
+    "bindText": "Associa il testo al container",
+    "link": {
+      "edit": "Modifica link",
+      "create": "Crea link",
+      "label": "Link"
+    },
+    "elementLock": {
+      "lock": "Blocca",
+      "unlock": "Sblocca",
+      "lockAll": "Blocca tutto",
+      "unlockAll": "Sblocca tutto"
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -152,12 +168,11 @@
     "couldNotLoadInvalidFile": "Impossibile caricare un file no valido",
     "importBackendFailed": "Importazione dal server fallita.",
     "cannotExportEmptyCanvas": "Non è possibile esportare una tela vuota.",
-    "couldNotCopyToClipboard": "Impossibile copiare negli appunti. Provare usando il browser Chrome.",
+    "couldNotCopyToClipboard": "Impossibile copiare negli appunti.",
     "decryptFailed": "Impossibile decriptare i dati.",
     "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto.",
     "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?",
     "collabStopOverridePrompt": "Interrompere la sessione sovrascriverà il precedente disegno memorizzato localmente. Sei sicuro?\n\n(Se vuoi mantenere il tuo disegno locale, chiudi semplicemente la scheda del browser.)",
-    "errorLoadingLibrary": "Si è verificato un errore nel caricamento della libreria di terze parti.",
     "errorAddingToLibrary": "Impossibile aggiungere l'elemento alla libreria",
     "errorRemovingFromLibrary": "Impossibile rimuovere l'elemento dalla libreria",
     "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua libreria. Sei sicuro?",
@@ -173,7 +188,9 @@
     "imageInsertError": "Non è stato possibile inserire l'immagine. Riprova più tardi...",
     "fileTooBig": "Il file è troppo grande. La dimensione massima consentita è {{maxSize}}.",
     "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
-    "invalidSVGString": "SVG non valido."
+    "invalidSVGString": "SVG non valido.",
+    "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
+    "importLibraryError": "Impossibile caricare la libreria"
   },
   "toolBar": {
     "selection": "Selezione",
@@ -186,7 +203,10 @@
     "freedraw": "Disegno",
     "text": "Testo",
     "library": "Libreria",
-    "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
+    "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato",
+    "penMode": "Impedisci il pinch-zoom e accetta l'input di disegno libero solo dalla penna",
+    "link": "Aggiungi/ aggiorna il link per una forma selezionata",
+    "eraser": "Gomma"
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
@@ -206,12 +226,13 @@
     "resizeImage": "Puoi ridimensionare liberamente tenendo premuto SHIFT,\ntieni premuto ALT per ridimensionare dal centro",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Premi Elimina per rimuovere il punto(i),\nCtrlOCmd+D per duplicare o trascinare per spostare",
+    "lineEditor_nothingSelected": "Seleziona un punto da modificare (tieni premuto MAIUSC per selezionare più punti),\noppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
     "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente",
     "publishLibrary": "Pubblica la tua libreria",
     "bindTextToElement": "Premi invio per aggiungere il testo",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Tieni premuto CtrlOCmd per selezionare in profondità e per impedire il trascinamento",
+    "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione"
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
@@ -258,8 +279,8 @@
   "helpDialog": {
     "blog": "Leggi il nostro blog",
     "click": "click",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Selezione profonda",
+    "deepBoxSelect": "Seleziona in profondità all'interno della casella e previene il trascinamento",
     "curvedArrow": "Freccia curva",
     "curvedLine": "Linea curva",
     "documentation": "Documentazione",
@@ -271,14 +292,15 @@
     "howto": "Segui le nostre guide",
     "or": "oppure",
     "preventBinding": "Impedisci legame della freccia",
-    "shapes": "Forme",
+    "tools": "Stumenti",
     "shortcuts": "Scorciatoie da tastiera",
     "textFinish": "Completa la modifica (editor di testo)",
     "textNewLine": "Aggiungi nuova riga (editor di testo)",
     "title": "Guida",
     "view": "Vista",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
-    "zoomToSelection": "Zoom alla selezione"
+    "zoomToSelection": "Zoom alla selezione",
+    "toggleElementLock": "Blocca/sblocca selezione"
   },
   "clearCanvasDialog": {
     "title": "Svuota la tela"
@@ -320,7 +342,8 @@
       "post": "che in breve significa che chiunque possa usarla senza restrizioni."
     },
     "noteItems": "Ogni elemento della libreria deve avere il proprio nome, così che sia filtrabile. Gli elementi della seguente libreria saranno inclusi:",
-    "atleastOneLibItem": "Sei pregato di selezionare almeno un elemento della libreria per iniziare"
+    "atleastOneLibItem": "Sei pregato di selezionare almeno un elemento della libreria per iniziare",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Libreria inviata",

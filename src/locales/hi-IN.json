@@ -9,6 +9,7 @@
     "copy": "प्रतिलिपि",
     "copyAsPng": "क्लिपबोर्ड पर कॉपी करें ,पीएनजी के रूप में",
     "copyAsSvg": "क्लिपबोर्ड पर कॉपी करें,एसवीजी के रूप में",
+    "copyText": "लेखन के रूप में पटल पर कॉपी करें",
     "bringForward": "सामने लाएं",
     "sendToBack": "पीछे भेजें",
     "bringToFront": "सामने लाएँ",
@@ -35,11 +36,11 @@
     "arrowhead_arrow": "तीर",
     "arrowhead_bar": "बार",
     "arrowhead_dot": "बिंदु",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "त्रिकोण",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "onlySelected": "केवल चयनित",
-    "withBackground": "",
+    "withBackground": "पृष्ठभूमि",
     "exportEmbedScene": "",
     "exportEmbedScene_details": "निर्यात एम्बेड दृश्य विवरण",
     "addWatermark": "ऐड \"मेड विथ एक्सकैलिडराव\"",
@@ -64,6 +65,7 @@
     "cartoonist": "व्यंग्य चित्रकार",
     "fileTitle": "फ़ाइल का नाम",
     "colorPicker": "रंग चयन",
+    "canvasColors": "कॅनवास पर प्रयोगित",
     "canvasBackground": "कैनवास बैकग्राउंड",
     "drawingCanvas": "कैनवास बना रहे हैं",
     "layers": "परतें",
@@ -78,7 +80,7 @@
     "group": "समूह चयन",
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
-    "showGrid": "",
+    "showGrid": "ग्रिड दिखाएं",
     "addToLibrary": "लाइब्रेरी से जोड़ें",
     "removeFromLibrary": "लाइब्रेरी से निकालें",
     "libraryLoadingMessage": "लाइब्रेरी खुल रही है",
@@ -93,18 +95,32 @@
     "centerHorizontally": "क्षैतिज केन्द्रित",
     "distributeHorizontally": "क्षैतिज रूप से वितरित करें",
     "distributeVertically": "खड़ी रूप से वितरित करें",
-    "flipHorizontal": "",
-    "flipVertical": "",
-    "viewMode": "",
+    "flipHorizontal": "दायें बायें पलटे",
+    "flipVertical": "ऊपर नीचे पलटे",
+    "viewMode": "अलग अलग देखें",
     "toggleExportColorScheme": "",
-    "share": "",
+    "share": "शेयर करें",
     "showStroke": "",
     "showBackground": "",
     "toggleTheme": "",
     "personalLib": "",
     "excalidrawLib": "",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "आकार घटाइऐ",
+    "increaseFontSize": "फ़ॉन्ट आकार बढ़ाएँ",
+    "unbindText": "",
+    "bindText": "लेखन को कोश से जोड़े",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    },
+    "elementLock": {
+      "lock": "ताले में रखें",
+      "unlock": "ताले से बाहर",
+      "lockAll": "सब ताले के अंदर रखे",
+      "unlockAll": "सब ताले के बाहर निकाले"
+    },
+    "statusPublished": "प्रकाशित"
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -152,12 +168,11 @@
     "couldNotLoadInvalidFile": "अमान्य फ़ाइल लोड नहीं की जा सकी",
     "importBackendFailed": "बैकएंड से आयात करना विफल रहा।",
     "cannotExportEmptyCanvas": "खाली कैनवास निर्यात नहीं कर सकता।",
-    "couldNotCopyToClipboard": "क्लिपबोर्ड पर कॉपी नहीं किया जा सका। Chrome ब्राउज़र का उपयोग करने का प्रयास करें।",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "डेटा को डिक्रिप्ट नहीं किया जा सका।",
     "uploadedSecurly": "अपलोड को एंड-टू-एंड एन्क्रिप्शन के साथ सुरक्षित किया गया है, जिसका मतलब है कि एक्सक्लूसिव सर्वर और थर्ड पार्टी कंटेंट नहीं पढ़ सकते हैं।",
     "loadSceneOverridePrompt": "लोड हो रहा है बाहरी ड्राइंग आपके मौजूदा सामग्री को बदल देगा। क्या आप जारी रखना चाहते हैं?",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "लाइब्रेरी लोड करने में त्रुटि",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
@@ -173,7 +188,9 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे.",
+    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका"
   },
   "toolBar": {
     "selection": "चयन",
@@ -186,7 +203,10 @@
     "freedraw": "",
     "text": "पाठ",
     "library": "लाइब्रेरी",
-    "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें"
+    "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें",
+    "penMode": "",
+    "link": "",
+    "eraser": "रबड़"
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",
@@ -211,7 +231,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -271,14 +292,15 @@
     "howto": "हमारे गाइड का पालन करें",
     "or": "या",
     "preventBinding": "तीर बंधन रोकें",
-    "shapes": "आकृतियाँ",
+    "tools": "औज़ार",
     "shortcuts": "कीबोर्ड के शॉर्टकट्स",
     "textFinish": "",
     "textNewLine": "",
     "title": "मदद",
     "view": "दृश्य",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
-    "zoomToSelection": "चयन तक ज़ूम करे"
+    "zoomToSelection": "चयन तक ज़ूम करे",
+    "toggleElementLock": "ताले के अंदर/बाहर चुनाव"
   },
   "clearCanvasDialog": {
     "title": ""
@@ -320,7 +342,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": "टिप्पणी: कुछ चुने हुवे आइटम पहले ही प्रकाशित/प्रस्तुत किए जा चुके हैं। किसी प्रकाशित संग्रह को अद्यतन करते समय या प्रस्तुतित आइटम को पुन्हा प्रस्तुत करते समय, आप बस उसे केवल अद्यतन करें ।"
   },
   "publishSuccessDialog": {
     "title": "",
@@ -361,15 +384,15 @@
     "selection": ""
   },
   "colors": {
-    "ffffff": "",
+    "ffffff": "सफेद",
     "f8f9fa": "",
     "f1f3f5": "",
     "fff5f5": "",
     "fff0f6": "",
-    "f8f0fc": "",
+    "f8f0fc": "अंगूरी 0",
     "f3f0ff": "",
-    "edf2ff": "",
-    "e7f5ff": "",
+    "edf2ff": "नील 0",
+    "e7f5ff": "नीला 0",
     "e3fafc": "",
     "e6fcf5": "",
     "ebfbee": "",
@@ -400,11 +423,11 @@
     "5f3dc4": "",
     "364fc7": "",
     "1864ab": "",
-    "0b7285": "",
+    "0b7285": "आसमानी",
     "087f5b": "",
-    "2b8a3e": "",
+    "2b8a3e": "हरा",
     "5c940d": "",
-    "e67700": "",
-    "d9480f": ""
+    "e67700": "पीला",
+    "d9480f": "नारंगी"
   }
 }

@@ -9,14 +9,14 @@ import {
 import { clearElementsForDatabase, clearElementsForExport } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState, BinaryFiles, LibraryItems } from "../types";
-import { isImageFileHandle, loadFromBlob } from "./blob";
+import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
 
 import {
   ExportedDataState,
   ImportedDataState,
   ExportedLibraryData,
+  ImportedLibraryData,
 } from "./types";
-import Library from "./library";
 
 /**
  * Strips out files which are only referenced by deleted elements
@@ -92,13 +92,13 @@ export const loadFromJSON = async (
   localAppState: AppState,
   localElements: readonly ExcalidrawElement[] | null,
 ) => {
-  const blob = await fileOpen({
+  const file = await fileOpen({
     description: "Excalidraw files",
     // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
     // gets resolved. Else, iOS users cannot open `.excalidraw` files.
     // extensions: ["json", "excalidraw", "png", "svg"],
   });
-  return loadFromBlob(blob, localAppState, localElements);
+  return loadFromBlob(await normalizeFile(file), localAppState, localElements);
 };
 
 export const isValidExcalidrawData = (data?: {
@@ -114,7 +114,7 @@ export const isValidExcalidrawData = (data?: {
   );
 };
 
-export const isValidLibrary = (json: any) => {
+export const isValidLibrary = (json: any): json is ImportedLibraryData => {
   return (
     typeof json === "object" &&
     json &&
@@ -123,14 +123,18 @@ export const isValidLibrary = (json: any) => {
   );
 };
 
-export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
+export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
   const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
     version: VERSIONS.excalidrawLibrary,
     source: EXPORT_SOURCE,
     libraryItems,
   };
-  const serialized = JSON.stringify(data, null, 2);
+  return JSON.stringify(data, null, 2);
+};
+
+export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
+  const serialized = serializeLibraryAsJSON(libraryItems);
   await fileSave(
     new Blob([serialized], {
       type: MIME_TYPES.excalidrawlib,
@@ -141,16 +145,4 @@ export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
       description: "Excalidraw library file",
     },
   );
-};
-
-export const importLibraryFromJSON = async (library: Library) => {
-  const blob = await fileOpen({
-    description: "Excalidraw library files",
-    // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
-    // gets resolved. Else, iOS users cannot open `.excalidraw` files.
-    /*
-    extensions: [".json", ".excalidrawlib"],
-    */
-  });
-  await library.importLibrary(blob);
 };

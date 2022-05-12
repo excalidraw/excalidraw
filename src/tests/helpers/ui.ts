@@ -179,6 +179,14 @@ export class Pointer {
     this.upAt();
   }
 
+  rightClickAt(x: number, y: number) {
+    fireEvent.contextMenu(GlobalTestState.canvas, {
+      button: 2,
+      clientX: x,
+      clientY: y,
+    });
+  }
+
   doubleClickAt(x: number, y: number) {
     this.moveTo(x, y);
     fireEvent.doubleClick(GlobalTestState.canvas, this.getEvent());
@@ -219,6 +227,14 @@ const mouse = new Pointer("mouse");
 export class UI {
   static clickTool = (toolName: ToolName) => {
     fireEvent.click(GlobalTestState.renderResult.getByToolName(toolName));
+  };
+
+  static clickLabeledElement = (label: string) => {
+    const element = document.querySelector(`[aria-label='${label}']`);
+    if (!element) {
+      throw new Error(`No labeled element found: ${label}`);
+    }
+    fireEvent.click(element);
   };
 
   /**
@@ -301,4 +317,10 @@ export class UI {
       Keyboard.codePress(CODES.G);
     });
   }
+
+  static queryContextMenu = () => {
+    return GlobalTestState.renderResult.container.querySelector(
+      ".context-menu",
+    );
+  };
 }

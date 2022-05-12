@@ -52,18 +52,16 @@ class Scene {
   private elements: readonly ExcalidrawElement[] = [];
   private elementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
 
-  // TODO: getAllElementsIncludingDeleted
   getElementsIncludingDeleted() {
     return this.elements;
   }
 
-  // TODO: getAllNonDeletedElements
-  getElements(): readonly NonDeletedExcalidrawElement[] {
+  getNonDeletedElements(): readonly NonDeletedExcalidrawElement[] {
     return this.nonDeletedElements;
   }
 
-  getElement(id: ExcalidrawElement["id"]): ExcalidrawElement | null {
-    return this.elementsMap.get(id) || null;
+  getElement<T extends ExcalidrawElement>(id: T["id"]): T | null {
+    return (this.elementsMap.get(id) as T | undefined) || null;
   }
 
   getNonDeletedElement(
@@ -74,20 +72,6 @@ class Scene {
       return element;
     }
     return null;
-  }
-
-  // TODO: Rename methods here, this is confusing
-  getNonDeletedElements(
-    ids: readonly ExcalidrawElement["id"][],
-  ): NonDeleted<ExcalidrawElement>[] {
-    const result: NonDeleted<ExcalidrawElement>[] = [];
-    ids.forEach((id) => {
-      const element = this.getNonDeletedElement(id);
-      if (element != null) {
-        result.push(element);
-      }
-    });
-    return result;
   }
 
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {

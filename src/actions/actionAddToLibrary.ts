@@ -7,6 +7,7 @@ import { t } from "../i18n";
 
 export const actionAddToLibrary = register({
   name: "addToLibrary",
+  trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
@@ -24,9 +25,9 @@ export const actionAddToLibrary = register({
     }
 
     return app.library
-      .loadLibrary()
+      .getLatestLibrary()
       .then((items) => {
-        return app.library.saveLibrary([
+        return app.library.setLibrary([
           {
             id: randomId(),
             status: "unpublished",

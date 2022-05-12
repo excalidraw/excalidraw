@@ -1,18 +1,47 @@
 import React from "react";
 import {
   Action,
-  ActionsManagerInterface,
   UpdaterFn,
   ActionName,
   ActionResult,
   PanelComponentProps,
+  ActionSource,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { MODES } from "../constants";
+import { trackEvent } from "../analytics";
 
-export class ActionManager implements ActionsManagerInterface {
-  actions = {} as ActionsManagerInterface["actions"];
+const trackAction = (
+  action: Action,
+  source: ActionSource,
+  appState: Readonly<AppState>,
+  elements: readonly ExcalidrawElement[],
+  app: AppClassProperties,
+  value: any,
+) => {
+  if (action.trackEvent) {
+    try {
+      if (typeof action.trackEvent === "object") {
+        const shouldTrack = action.trackEvent.predicate
+          ? action.trackEvent.predicate(appState, elements, value)
+          : true;
+        if (shouldTrack) {
+          trackEvent(
+            action.trackEvent.category,
+            action.trackEvent.action || action.name,
+            `${source} (${app.deviceType.isMobile ? "mobile" : "desktop"})`,
+          );
+        }
+      }
+    } catch (error) {
+      console.error("error while logging action:", error);
+    }
+  }
+};
+
+export class ActionManager {
+  actions = {} as Record<ActionName, Action>;
 
   updater: (actionResult: ActionResult | Promise<ActionResult>) => void;
 
@@ -65,9 +94,15 @@ export class ActionManager implements ActionsManagerInterface {
           ),
       );
 
-    if (data.length === 0) {
+    if (data.length !== 1) {
+      if (data.length > 1) {
+        console.warn("Canceling as multiple actions match this shortcut", data);
+      }
       return false;
     }
+
+    const action = data[0];
+
     const { viewModeEnabled } = this.getAppState();
     if (viewModeEnabled) {
       if (!Object.values(MODES).includes(data[0].name)) {
@@ -75,27 +110,26 @@ export class ActionManager implements ActionsManagerInterface {
       }
     }
 
+    const elements = this.getElementsIncludingDeleted();
+    const appState = this.getAppState();
+    const value = null;
+
+    trackAction(action, "keyboard", appState, elements, this.app, null);
+
     event.preventDefault();
-    this.updater(
-      data[0].perform(
-        this.getElementsIncludingDeleted(),
-        this.getAppState(),
-        null,
-        this.app,
-      ),
-    );
+    event.stopPropagation();
+    this.updater(data[0].perform(elements, appState, value, this.app));
     return true;
   }
 
-  executeAction(action: Action) {
-    this.updater(
-      action.perform(
-        this.getElementsIncludingDeleted(),
-        this.getAppState(),
-        null,
-        this.app,
-      ),
-    );
+  executeAction(action: Action, source: ActionSource = "api") {
+    const elements = this.getElementsIncludingDeleted();
+    const appState = this.getAppState();
+    const value = null;
+
+    trackAction(action, source, appState, elements, this.app, value);
+
+    this.updater(action.perform(elements, appState, value, this.app));
   }
 
   /**
@@ -113,7 +147,11 @@ export class ActionManager implements ActionsManagerInterface {
     ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
+      const elements = this.getElementsIncludingDeleted();
+      const appState = this.getAppState();
       const updateData = (formState?: any) => {
+        trackAction(action, "ui", appState, elements, this.app, formState);
+
         this.updater(
           action.perform(
             this.getElementsIncludingDeleted(),

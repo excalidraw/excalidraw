@@ -9,6 +9,7 @@
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
+    "copyText": "העתק ללוח כ-PNG",
     "bringForward": "הבא שכבה קדימה",
     "sendToBack": "העבר לסוף",
     "bringToFront": "העבר לחזית",
@@ -35,7 +36,7 @@
     "arrowhead_arrow": "חץ",
     "arrowhead_bar": "שורה",
     "arrowhead_dot": "נקודה",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "משולש",
     "fontSize": "גודל גופן",
     "fontFamily": "סוג הגופן",
     "onlySelected": "רק מה שנבחר",
@@ -64,6 +65,7 @@
     "cartoonist": "קריקטוריסט",
     "fileTitle": "שם קובץ",
     "colorPicker": "בחירת צבע",
+    "canvasColors": "בשימוש בקנבס",
     "canvasBackground": "רקע הלוח",
     "drawingCanvas": "לוח ציור",
     "layers": "שכבות",
@@ -101,10 +103,24 @@
     "showStroke": "הצג צבעי קו מתאר",
     "showBackground": "הצג צבעי רקע",
     "toggleTheme": "שינוי ערכת העיצוב",
-    "personalLib": "",
-    "excalidrawLib": "",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "personalLib": "ספריה פרטית",
+    "excalidrawLib": "הספריה של Excalidraw",
+    "decreaseFontSize": "הקטן את גודל הגופן",
+    "increaseFontSize": "הגדל את גודל הגופן",
+    "unbindText": "ביטול קיבוע הטקסט",
+    "bindText": "קיבוע הטקסט לאוגד",
+    "link": {
+      "edit": "עריכת קישור",
+      "create": "יצירת קישור",
+      "label": "קישור"
+    },
+    "elementLock": {
+      "lock": "נעילה",
+      "unlock": "ביטול נעילה",
+      "lockAll": "לנעול הכל",
+      "unlockAll": "שחרור הכול"
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -138,12 +154,12 @@
     "lightMode": "מצב בהיר",
     "zenMode": "מצב זן",
     "exitZenMode": "צא ממצב תפריט מרחף",
-    "cancel": "",
-    "clear": "",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "cancel": "ביטול",
+    "clear": "ניקוי",
+    "remove": "מחיקה",
+    "publishLibrary": "פירסום",
+    "submit": "שליחה",
+    "confirm": "לאשר"
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
@@ -152,32 +168,33 @@
     "couldNotLoadInvalidFile": "לא ניתן לטעון קובץ שאיננו תואם",
     "importBackendFailed": "ייבוא מהשרת נכשל.",
     "cannotExportEmptyCanvas": "לא ניתן לייצא לוח ריק.",
-    "couldNotCopyToClipboard": "לא ניתן להעתיק ללוח. נסה להשתמש בדפדפן Chrome.",
+    "couldNotCopyToClipboard": "לא ניתן היה להעתיק ללוח",
     "decryptFailed": "לא ניתן לפענח מידע.",
     "uploadedSecurly": "ההעלאה הוצפנה מקצה לקצה, ולכן שרת Excalidraw וצד שלישי לא יכולים לקרוא את התוכן.",
     "loadSceneOverridePrompt": "טעינה של ציור חיצוני תחליף את התוכן הקיים שלך. האם תרצה להמשיך?",
     "collabStopOverridePrompt": "עצירת השיתוף תוביל למחיקת התרשימים השמורים בדפדפן. האם את/ה בטוח/ה?\n(אם תרצה לשמור את התרשימים הקיימים, תוכל לסגור את הדפדפן מבלי לסיים את השיתוף.)",
-    "errorLoadingLibrary": "קרתה שגיאה בטעינת הספריה החיצונית.",
     "errorAddingToLibrary": "לא ניתן להוסיף פריט לספרייה",
     "errorRemovingFromLibrary": "לא ניתן למחוק פריט מהספריה",
     "confirmAddLibrary": "הפעולה תוסיף {{numShapes}} צורה(ות) לספריה שלך. האם אתה בטוח?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "נראה שהתמונה לא מכילה מידע על הסצינה. האם אפשרת הטמעת מידע הסצינה בעת השמירה?",
     "cannotRestoreFromImage": "לא הצלחנו לשחזר את התצוגה מקובץ התמונה",
     "invalidSceneUrl": "ייבוא המידע מן סצינה מכתובת האינטרנט נכשלה. המידע בנוי באופן משובש או שהוא אינו קובץ JSON תקין של Excalidraw.",
     "resetLibrary": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
-    "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "removeItemsFromsLibrary": "מחיקת {{count}} פריטים(ים) מתוך הספריה?",
+    "invalidEncryptionKey": "מפתח ההצפנה חייב להיות בן 22 תוים. השיתוף החי מבוטל."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "unsupportedFileType": "סוג הקובץ אינו נתמך.",
+    "imageInsertError": "לא ניתן היה להטמיע את התמונה, אנא נסו שוב מאוחר יותר...",
+    "fileTooBig": "הקובץ כבד מדי. הגודל המקסימלי המותר הוא {{maxSize}}.",
+    "svgImageInsertError": "לא ניתן היה להטמיע את תמונת ה-SVG. קידוד ה-SVG אינו תקני.",
+    "invalidSVGString": "SVG בלתי תקני.",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": "לא ניתן היה לטעון את הספריה"
   },
   "toolBar": {
     "selection": "בחירה",
-    "image": "",
+    "image": "הוספת תמונה",
     "rectangle": "מרובע",
     "diamond": "מעוין",
     "ellipse": "אליפסה",
@@ -186,7 +203,10 @@
     "freedraw": "צייר",
     "text": "טקסט",
     "library": "ספריה",
-    "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור"
+    "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור",
+    "penMode": "",
+    "link": "הוספה/עדכון של קישור עבור הצורה הנבחרת",
+    "eraser": "מחק"
   },
   "headings": {
     "canvasActions": "פעולות הלוח",
@@ -194,7 +214,7 @@
     "shapes": "צורות"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "כדי להזיז את הקנבס לחצו על גלגל העכבר או על מקש הרווח תוך כדי גרירה",
     "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
@@ -209,9 +229,10 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": "",
-    "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "publishLibrary": "פירסום ספריה אישית",
+    "bindTextToElement": "יש להקיש Enter כדי להוסיף טקסט",
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "לא הצלחנו להציג את התצוגה המקדימה",
@@ -258,8 +279,8 @@
   "helpDialog": {
     "blog": "קרא את הבלוג שלנו",
     "click": "קליק",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "בחירה עמוקה",
+    "deepBoxSelect": "בחירה עמוקה בתוך קופסה ומניעת גרירה",
     "curvedArrow": "חץ מעוגל",
     "curvedLine": "קו מעוגל",
     "documentation": "תיעוד",
@@ -271,65 +292,67 @@
     "howto": "עקוב אחר המדריכים שלנו",
     "or": "או",
     "preventBinding": "למנוע נעיצת חיצים",
-    "shapes": "צורות",
+    "tools": "כלים",
     "shortcuts": "קיצורי מקלדת",
     "textFinish": "סיים עריכה (טקסט)",
     "textNewLine": "הוסף שורה חדשה (טקסט)",
     "title": "עזרה",
     "view": "תצוגה",
     "zoomToFit": "גלילה להצגת כל האלמנטים במסך",
-    "zoomToSelection": "התמקד בבחירה"
+    "zoomToSelection": "התמקד בבחירה",
+    "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "ניקוי הקנבס"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "פרסום ספריה",
+    "itemName": "שם הפריט",
+    "authorName": "שם היוצר",
+    "githubUsername": "שם המשתמש שלך ב-GitHub",
+    "twitterUsername": "שם המשתמש שלך ב-Twitter",
+    "libraryName": "שם הספריה",
+    "libraryDesc": "תיאור הספריה",
+    "website": "אתר",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
+      "authorName": "שם או שם משתמש",
+      "libraryName": "תנו שם לספריה",
+      "libraryDesc": "תיאור של הספריה שלך כדי לסייע למשתמשים להבין את השימוש בה",
       "githubHandle": "",
       "twitterHandle": "",
-      "website": ""
+      "website": "קישור לאתר הפרטי שלך או לכל מקום אחר (אופציונאלי)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "נדרש",
+      "website": "הזינו כתובת URL תקינה"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "להציע את הספריה שלך להיות כלולה ב",
+      "link": "מאגר הספריה הציבורי",
+      "post": "כך שאחרים יוכלו לעשות שימוש בציורים שלהם."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
+      "pre": "הספריה צריכה לקבל אישור ידני. אנא קרא את ",
+      "link": "הנחיות",
       "post": ""
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
-      "post": ""
+      "link": "רישיון MIT, ",
+      "post": "שאומר בקצרה שכל אחד יכול לעשות בהם שימוש ללא מגבלות."
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "הספריה נשלחה",
+    "content": "תודה {{authorName}}. הספריה שלך נשלחה לבחינה. תוכל לעקוב אחרי סטטוס הפרסום",
+    "link": "כאן"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "איפוס ספריה",
+    "removeItemsFromLib": "להסיר את הפריטים הנבחרים מהספריה"
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם.",
@@ -351,7 +374,7 @@
     "width": "רוחב"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "נוסף לספריה",
     "copyStyles": "העתק סגנונות.",
     "copyToClipboard": "הועתק אל הלוח.",
     "copyToClipboardAsPng": "{{exportSelection}} הועתקה ללוח כ-PNG\n({{exportColorScheme}})",

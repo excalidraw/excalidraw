@@ -9,6 +9,7 @@
     "copy": "Copiar",
     "copyAsPng": "Copiar al quichapapièrs coma PNG",
     "copyAsSvg": "Copiar al quichapapièrs coma SVG",
+    "copyText": "Copiar al quichapapièrs coma tèxt",
     "bringForward": "En avant",
     "sendToBack": "En arrièr",
     "bringToFront": "A l’endavant",
@@ -64,6 +65,7 @@
     "cartoonist": "Dessenhaire",
     "fileTitle": "Nom del fichièr",
     "colorPicker": "Selector de color",
+    "canvasColors": "Utilizada suls canabassses",
     "canvasBackground": "Rèireplan del canabàs",
     "drawingCanvas": "Zòna de dessenh",
     "layers": "Calques",
@@ -103,8 +105,22 @@
     "toggleTheme": "Alternar tèma",
     "personalLib": "Bibliotèca personala",
     "excalidrawLib": "Bibliotèca Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Reduire talha poliça",
+    "increaseFontSize": "Aumentar talha poliça",
+    "unbindText": "Dessociar lo tèxte",
+    "bindText": "Ligar lo tèxt al contenidor",
+    "link": {
+      "edit": "Modificar lo ligam",
+      "create": "Crear un ligam",
+      "label": "Ligam"
+    },
+    "elementLock": {
+      "lock": "Verrolhar",
+      "unlock": "Desverrolhar",
+      "lockAll": "Tot verrolhar",
+      "unlockAll": "Tot desverrolhar"
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
@@ -152,12 +168,11 @@
     "couldNotLoadInvalidFile": "Cargament impossible d’un fichièr invalid",
     "importBackendFailed": "Importacion fracassada.",
     "cannotExportEmptyCanvas": "Impossible d’exportar los canabasses voids.",
-    "couldNotCopyToClipboard": "Còpia impossibla al quichapapièrs. Ensajatz d’utilizar lo navegador Chrome.",
+    "couldNotCopyToClipboard": "Còpia impossibla al quichapapièrs.",
     "decryptFailed": "Deschiframent impossible de las donadas.",
     "uploadedSecurly": "Lo telecargament es estat securizat amb un chiframent del cap a la fin, significa que los servidors d’Excalidraw o que quina tèrça part que siá pòdon pas legir lo contengut.",
     "loadSceneOverridePrompt": "Cargar un dessenh extèrn remplaçarà vòstre contengut existent. Volètz contunhar ?",
     "collabStopOverridePrompt": "Arrestar la session remplaçarà vòstre precedent dessenh gardat localament. O volètz vertadièrament ?\n\n(Se volètz gardar vòstre dessenh local, tampatz simplament l’onglet del navegador a la plaça)",
-    "errorLoadingLibrary": "Una error s’es producha en cargant una bibliotèca tèrça.",
     "errorAddingToLibrary": "Apondon impossible de l’element a la bibliotèca",
     "errorRemovingFromLibrary": "Supression impossibla de l’element a la bibliotèca",
     "confirmAddLibrary": "Apondrà {{numShapes}} forma(s) a vòstra bibliotèca. Confirmatz ?",
@@ -173,7 +188,9 @@
     "imageInsertError": "Insercion d’imatge impossibla. Tornatz ensajar mai tard...",
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
-    "invalidSVGString": "SVG invalid."
+    "invalidSVGString": "SVG invalid.",
+    "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
+    "importLibraryError": "Impossible de cargar la bibliotèca"
   },
   "toolBar": {
     "selection": "Seleccion",
@@ -186,7 +203,10 @@
     "freedraw": "Dessenhar",
     "text": "Tèxt",
     "library": "Bibliotèca",
-    "lock": "Mantenir activa l’aisina aprèp dessenhar"
+    "lock": "Mantenir activa l’aisina aprèp dessenhar",
+    "penMode": "Empachar l’agradiment tactil e acceptar la picada liura solament amb un estilò",
+    "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
+    "eraser": "Goma"
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -210,8 +230,9 @@
     "lineEditor_nothingSelected": "Seleccionar un punt d’editar (manténer Maj. per ne seleccionar mantun),\no manténer Alt e clicar per n’apondre de novèls",
     "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament",
     "publishLibrary": "Publicar vòstra pròpria bibliotèca",
-    "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "bindTextToElement": "Quichatz Entrada per apondre de tèxte",
+    "deepBoxSelect": "Gardar CtrlOCmd per una seleccion gropada e empachar lo desplaçament",
+    "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression"
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
@@ -258,8 +279,8 @@
   "helpDialog": {
     "blog": "Legir nòstre blog",
     "click": "clic",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Seleccion prigonda",
+    "deepBoxSelect": "Seleccionar demest un grop e empacha lo desplaçament",
     "curvedArrow": "Sageta corba",
     "curvedLine": "Linha corba",
     "documentation": "Documentacion",
@@ -271,14 +292,15 @@
     "howto": "Seguissètz nòstras guidas",
     "or": "o",
     "preventBinding": "Empachar la fixacion de sagetas",
-    "shapes": "Formas",
+    "tools": "Aisinas",
     "shortcuts": "Acorchis clavièr",
     "textFinish": "Terminar l’edicion (editor de tèxt)",
     "textNewLine": "Apondre linha novèl (editor de tèxt)",
     "title": "Ajuda",
     "view": "Vista",
     "zoomToFit": "Zoomar per veire totes los elements",
-    "zoomToSelection": "Zoomar la seleccion"
+    "zoomToSelection": "Zoomar la seleccion",
+    "toggleElementLock": "Verrolhar/Desverrolhar la seleccion"
   },
   "clearCanvasDialog": {
     "title": "Escafar canabàs"
@@ -302,7 +324,7 @@
     },
     "errors": {
       "required": "Requerit",
-      "website": ""
+      "website": "Picatz una URL valida"
     },
     "noteDescription": {
       "pre": "Enviatz vòstra bibliotèca per èsser compresa al ",
@@ -320,7 +342,8 @@
       "post": "que significa en brèu que qual que siá pòt l’utilizar sens cap de restriccion."
     },
     "noteItems": "Cada element de bibliotèca deu aver un nom pròpri per èsser filtrable. Los elements de bibliotèca seguentas seràn incluses :",
-    "atleastOneLibItem": "Volgatz seleccionar almens un element de bibliotèca per començar"
+    "atleastOneLibItem": "Volgatz seleccionar almens un element de bibliotèca per començar",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliotèca somesa",

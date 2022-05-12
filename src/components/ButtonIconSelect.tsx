@@ -7,7 +7,7 @@ export const ButtonIconSelect = <T extends Object>({
   onChange,
   group,
 }: {
-  options: { value: T; text: string; icon: JSX.Element }[];
+  options: { value: T; text: string; icon: JSX.Element; testId?: string }[];
   value: T | null;
   onChange: (value: T) => void;
   group: string;
@@ -24,6 +24,7 @@ export const ButtonIconSelect = <T extends Object>({
           name={group}
           onChange={() => onChange(option.value)}
           checked={value === option.value}
+          data-testid={option.testId}
         />
         {option.icon}
       </label>

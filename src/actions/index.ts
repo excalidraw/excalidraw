@@ -17,6 +17,7 @@ export {
   actionChangeFontSize,
   actionChangeFontFamily,
   actionChangeTextAlign,
+  actionChangeVerticalAlign,
 } from "./actionProperties";
 
 export {
@@ -74,11 +75,13 @@ export {
   actionCut,
   actionCopyAsPng,
   actionCopyAsSvg,
+  copyText,
 } from "./actionClipboard";
 
 export { actionToggleGridMode } from "./actionToggleGridMode";
 export { actionToggleZenMode } from "./actionToggleZenMode";
 
 export { actionToggleStats } from "./actionToggleStats";
-export { actionUnbindText } from "./actionUnbindText";
+export { actionUnbindText, actionBindText } from "./actionBoundText";
 export { actionLink } from "../element/Hyperlink";
+export { actionToggleLock } from "./actionToggleLock";

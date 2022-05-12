@@ -1,20 +1,16 @@
 import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
-import {
-  ALLOWED_IMAGE_MIME_TYPES,
-  EXPORT_DATA_TYPES,
-  MIME_TYPES,
-} from "../constants";
+import { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
-import { AppState, DataURL } from "../types";
+import { AppState, DataURL, LibraryItem } from "../types";
 import { bytesToHexString } from "../utils";
-import { FileSystemHandle } from "./filesystem";
-import { isValidExcalidrawData } from "./json";
-import { restore } from "./restore";
+import { FileSystemHandle, nativeFileSystemSupported } from "./filesystem";
+import { isValidExcalidrawData, isValidLibrary } from "./json";
+import { restore, restoreLibraryItems } from "./restore";
 import { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File) => {
@@ -127,49 +123,91 @@ export const isSupportedImageFile = (
   );
 };
 
-export const loadFromBlob = async (
-  blob: Blob,
+export const loadSceneOrLibraryFromBlob = async (
+  blob: Blob | File,
   /** @see restore.localAppState */
   localAppState: AppState | null,
   localElements: readonly ExcalidrawElement[] | null,
+  /** FileSystemHandle. Defaults to `blob.handle` if defined, otherwise null. */
+  fileHandle?: FileSystemHandle | null,
 ) => {
   const contents = await parseFileContents(blob);
   try {
     const data = JSON.parse(contents);
-    if (!isValidExcalidrawData(data)) {
-      throw new Error(t("alerts.couldNotLoadInvalidFile"));
+    if (isValidExcalidrawData(data)) {
+      return {
+        type: MIME_TYPES.excalidraw,
+        data: restore(
+          {
+            elements: clearElementsForExport(data.elements || []),
+            appState: {
+              theme: localAppState?.theme,
+              fileHandle: fileHandle || blob.handle || null,
+              ...cleanAppStateForExport(data.appState || {}),
+              ...(localAppState
+                ? calculateScrollCenter(
+                    data.elements || [],
+                    localAppState,
+                    null,
+                  )
+                : {}),
+            },
+            files: data.files,
+          },
+          localAppState,
+          localElements,
+        ),
+      };
+    } else if (isValidLibrary(data)) {
+      return {
+        type: MIME_TYPES.excalidrawlib,
+        data,
+      };
     }
-    const result = restore(
-      {
-        elements: clearElementsForExport(data.elements || []),
-        appState: {
-          theme: localAppState?.theme,
-          fileHandle: blob.handle || null,
-          ...cleanAppStateForExport(data.appState || {}),
-          ...(localAppState
-            ? calculateScrollCenter(data.elements || [], localAppState, null)
-            : {}),
-        },
-        files: data.files,
-      },
-      localAppState,
-      localElements,
-    );
-
-    return result;
+    throw new Error(t("alerts.couldNotLoadInvalidFile"));
   } catch (error: any) {
     console.error(error.message);
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
 };
 
-export const loadLibraryFromBlob = async (blob: Blob) => {
-  const contents = await parseFileContents(blob);
-  const data: ImportedLibraryData = JSON.parse(contents);
-  if (data.type !== EXPORT_DATA_TYPES.excalidrawLibrary) {
+export const loadFromBlob = async (
+  blob: Blob,
+  /** @see restore.localAppState */
+  localAppState: AppState | null,
+  localElements: readonly ExcalidrawElement[] | null,
+  /** FileSystemHandle. Defaults to `blob.handle` if defined, otherwise null. */
+  fileHandle?: FileSystemHandle | null,
+) => {
+  const ret = await loadSceneOrLibraryFromBlob(
+    blob,
+    localAppState,
+    localElements,
+    fileHandle,
+  );
+  if (ret.type !== MIME_TYPES.excalidraw) {
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
-  return data;
+  return ret.data;
+};
+
+export const parseLibraryJSON = (
+  json: string,
+  defaultStatus: LibraryItem["status"] = "unpublished",
+) => {
+  const data: ImportedLibraryData | undefined = JSON.parse(json);
+  if (!isValidLibrary(data)) {
+    throw new Error("Invalid library");
+  }
+  const libraryItems = data.libraryItems || data.library;
+  return restoreLibraryItems(libraryItems, defaultStatus);
+};
+
+export const loadLibraryFromBlob = async (
+  blob: Blob,
+  defaultStatus: LibraryItem["status"] = "unpublished",
+) => {
+  return parseLibraryJSON(await parseFileContents(blob), defaultStatus);
 };
 
 export const canvasToBlob = async (
@@ -200,7 +238,7 @@ export const generateIdFromFile = async (file: File): Promise<FileId> => {
   try {
     const hashBuffer = await window.crypto.subtle.digest(
       "SHA-1",
-      await file.arrayBuffer(),
+      await blobToArrayBuffer(file),
     );
     return bytesToHexString(new Uint8Array(hashBuffer)) as FileId;
   } catch (error: any) {
@@ -288,4 +326,126 @@ export const SVGStringToFile = (SVGString: string, filename: string = "") => {
   return new File([new TextEncoder().encode(SVGString)], filename, {
     type: MIME_TYPES.svg,
   }) as File & { type: typeof MIME_TYPES.svg };
+};
+
+export const getFileFromEvent = async (
+  event: React.DragEvent<HTMLDivElement>,
+) => {
+  const file = event.dataTransfer.files.item(0);
+  const fileHandle = await getFileHandle(event);
+
+  return { file: file ? await normalizeFile(file) : null, fileHandle };
+};
+
+export const getFileHandle = async (
+  event: React.DragEvent<HTMLDivElement>,
+): Promise<FileSystemHandle | null> => {
+  if (nativeFileSystemSupported) {
+    try {
+      const item = event.dataTransfer.items[0];
+      const handle: FileSystemHandle | null =
+        (await (item as any).getAsFileSystemHandle()) || null;
+
+      return handle;
+    } catch (error: any) {
+      console.warn(error.name, error.message);
+      return null;
+    }
+  }
+  return null;
+};
+
+/**
+ * attemps to detect if a buffer is a valid image by checking its leading bytes
+ */
+const getActualMimeTypeFromImage = (buffer: ArrayBuffer) => {
+  let mimeType: ValueOf<Pick<typeof MIME_TYPES, "png" | "jpg" | "gif">> | null =
+    null;
+
+  const first8Bytes = `${[...new Uint8Array(buffer).slice(0, 8)].join(" ")} `;
+
+  // uint8 leading bytes
+  const headerBytes = {
+    // https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
+    png: "137 80 78 71 13 10 26 10 ",
+    // https://en.wikipedia.org/wiki/JPEG#Syntax_and_structure
+    // jpg is a bit wonky. Checking the first three bytes should be enough,
+    // but may yield false positives. (https://stackoverflow.com/a/23360709/927631)
+    jpg: "255 216 255 ",
+    // https://en.wikipedia.org/wiki/GIF#Example_GIF_file
+    gif: "71 73 70 56 57 97 ",
+  };
+
+  if (first8Bytes === headerBytes.png) {
+    mimeType = MIME_TYPES.png;
+  } else if (first8Bytes.startsWith(headerBytes.jpg)) {
+    mimeType = MIME_TYPES.jpg;
+  } else if (first8Bytes.startsWith(headerBytes.gif)) {
+    mimeType = MIME_TYPES.gif;
+  }
+  return mimeType;
+};
+
+export const createFile = (
+  blob: File | Blob | ArrayBuffer,
+  mimeType: ValueOf<typeof MIME_TYPES>,
+  name: string | undefined,
+) => {
+  return new File([blob], name || "", {
+    type: mimeType,
+  });
+};
+
+/** attemps to detect correct mimeType if none is set, or if an image
+ * has an incorrect extension.
+ * Note: doesn't handle missing .excalidraw/.excalidrawlib extension  */
+export const normalizeFile = async (file: File) => {
+  if (!file.type) {
+    if (file?.name?.endsWith(".excalidrawlib")) {
+      file = createFile(
+        await blobToArrayBuffer(file),
+        MIME_TYPES.excalidrawlib,
+        file.name,
+      );
+    } else if (file?.name?.endsWith(".excalidraw")) {
+      file = createFile(
+        await blobToArrayBuffer(file),
+        MIME_TYPES.excalidraw,
+        file.name,
+      );
+    } else {
+      const buffer = await blobToArrayBuffer(file);
+      const mimeType = getActualMimeTypeFromImage(buffer);
+      if (mimeType) {
+        file = createFile(buffer, mimeType, file.name);
+      }
+    }
+    // when the file is an image, make sure the extension corresponds to the
+    // actual mimeType (this is an edge case, but happens sometime)
+  } else if (isSupportedImageFile(file)) {
+    const buffer = await blobToArrayBuffer(file);
+    const mimeType = getActualMimeTypeFromImage(buffer);
+    if (mimeType && mimeType !== file.type) {
+      file = createFile(buffer, mimeType, file.name);
+    }
+  }
+
+  return file;
+};
+
+export const blobToArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {
+  if ("arrayBuffer" in blob) {
+    return blob.arrayBuffer();
+  }
+  // Safari
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (!event.target?.result) {
+        return reject(new Error("Couldn't convert blob to ArrayBuffer"));
+      }
+      resolve(event.target.result as ArrayBuffer);
+    };
+    reader.readAsArrayBuffer(blob);
+  });
 };

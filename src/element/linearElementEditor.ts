@@ -205,7 +205,7 @@ export class LinearElementEditor {
       );
 
       // suggest bindings for first and last point if selected
-      if (isBindingElement(element)) {
+      if (isBindingElement(element, false)) {
         const coords: { x: number; y: number }[] = [];
 
         const firstSelectedIndex = selectedPointsIndices[0];
@@ -401,7 +401,7 @@ export class LinearElementEditor {
       ret.hitElement = element;
     } else {
       // You might be wandering why we are storing the binding elements on
-      // LinearElementEditor and passing them in, insted of calculating them
+      // LinearElementEditor and passing them in, instead of calculating them
       // from the end points of the `linearElement` - this is to allow disabling
       // binding (which needs to happen at the point the user finishes moving
       // the point).

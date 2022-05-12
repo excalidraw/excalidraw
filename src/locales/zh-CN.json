@@ -9,6 +9,7 @@
     "copy": "拷贝",
     "copyAsPng": "复制为 PNG 到剪贴板",
     "copyAsSvg": "复制为 SVG 到剪贴板",
+    "copyText": "复制文本到剪贴板",
     "bringForward": "上移一层",
     "sendToBack": "置于底层",
     "bringToFront": "置于顶层",
@@ -63,7 +64,8 @@
     "artist": "艺术",
     "cartoonist": "漫画家",
     "fileTitle": "文件名",
-    "colorPicker": "调色盘",
+    "colorPicker": "取色器",
+    "canvasColors": "画布上的",
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
     "layers": "图层",
@@ -75,8 +77,8 @@
     "name": "名字",
     "yourName": "您的姓名",
     "madeWithExcalidraw": "使用 Excalidraw 创建",
-    "group": "组选",
-    "ungroup": "取消组选",
+    "group": "编组",
+    "ungroup": "解除编组",
     "collaborators": "协作者",
     "showGrid": "显示网格",
     "addToLibrary": "添加到素材库中",
@@ -104,7 +106,21 @@
     "personalLib": "个人素材库",
     "excalidrawLib": "Excalidraw 素材库",
     "decreaseFontSize": "缩小字体大小",
-    "increaseFontSize": "放大字体大小"
+    "increaseFontSize": "放大字体大小",
+    "unbindText": "取消文本绑定",
+    "bindText": "将文本绑定到容器",
+    "link": {
+      "edit": "编辑链接",
+      "create": "新建链接",
+      "label": "链接"
+    },
+    "elementLock": {
+      "lock": "锁定",
+      "unlock": "解除锁定",
+      "lockAll": "全部锁定",
+      "unlockAll": "全部解锁"
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -152,12 +168,11 @@
     "couldNotLoadInvalidFile": "无法加载无效的文件",
     "importBackendFailed": "从后端导入失败。",
     "cannotExportEmptyCanvas": "无法导出空白画布。",
-    "couldNotCopyToClipboard": "无法复制到剪贴板，请尝试使用 Chrome 浏览器。",
+    "couldNotCopyToClipboard": "无法复制到剪贴板。",
     "decryptFailed": "无法解密数据。",
     "uploadedSecurly": "上传已被端到端加密保护，这意味着 Excalidraw 的服务器和第三方都无法读取内容。",
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
     "collabStopOverridePrompt": "停止会话将覆盖您先前本地存储的绘图。 您确定吗？\n\n(如果您想保持本地绘图，只需关闭浏览器选项卡。)",
-    "errorLoadingLibrary": "加载第三方素材库时出错。",
     "errorAddingToLibrary": "无法将项目添加到素材库中",
     "errorRemovingFromLibrary": "无法从素材库中移除项目",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的素材库中。您确定吗？",
@@ -173,7 +188,9 @@
     "imageInsertError": "无法插入图像。请稍后再试……",
     "fileTooBig": "文件过大。最大允许的大小为 {{maxSize}}。",
     "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
-    "invalidSVGString": "无效的 SVG。"
+    "invalidSVGString": "无效的 SVG。",
+    "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。",
+    "importLibraryError": "无法加载素材库"
   },
   "toolBar": {
     "selection": "选择",
@@ -186,7 +203,10 @@
     "freedraw": "自由书写",
     "text": "文字",
     "library": "素材库",
-    "lock": "绘制后保持所选的工具栏状态"
+    "lock": "绘制后保持所选的工具栏状态",
+    "penMode": "禁用手势缩放并只接收来自触控笔的输入",
+    "link": "为选中的形状添加/更新链接",
+    "eraser": "橡皮"
   },
   "headings": {
     "canvasActions": "画布动作",
@@ -211,7 +231,8 @@
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
     "publishLibrary": "发布您自己的素材库",
     "bindTextToElement": "按下 Enter 以添加文本",
-    "deepBoxSelect": "按住 CtrlOrCmd 以深度选择，并避免拖拽"
+    "deepBoxSelect": "按住 CtrlOrCmd 以深度选择，并避免拖拽",
+    "eraserRevert": "按住 Alt 以反选被标记删除的元素"
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -271,14 +292,15 @@
     "howto": "帮助文档",
     "or": "或",
     "preventBinding": "禁用箭头吸附",
-    "shapes": "形状",
+    "tools": "工具",
     "shortcuts": "快捷键列表",
     "textFinish": "完成编辑 (文本编辑器)",
     "textNewLine": "添加新行(文本编辑器)",
     "title": "帮助",
     "view": "视图",
     "zoomToFit": "缩放以适应所有元素",
-    "zoomToSelection": "缩放到选区"
+    "zoomToSelection": "缩放到选区",
+    "toggleElementLock": "锁定/解锁"
   },
   "clearCanvasDialog": {
     "title": "清除画布"
@@ -312,7 +334,7 @@
     "noteGuidelines": {
       "pre": "提交的素材库需先经人工审核。在提交之前，请先阅读 ",
       "link": "指南",
-      "post": " 后续沟通和对库的修改需要 GitHub 帐号，但这不是必须的。"
+      "post": " 。后续沟通和对库的修改需要 GitHub 账号，但这不是必须的。"
     },
     "noteLicense": {
       "pre": "提交即表明您已同意素材库将遵循 ",
@@ -320,7 +342,8 @@
       "post": "简而言之，任何人都可以不受限制地使用它们。"
     },
     "noteItems": "素材库中每个项目都有各自的名称以供筛选。以下项目将被包含：",
-    "atleastOneLibItem": "请选择至少一个素材库以开始"
+    "atleastOneLibItem": "请选择至少一个素材库以开始",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "素材库已提交",

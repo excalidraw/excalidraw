@@ -2,11 +2,7 @@ import { duplicateElement } from "./newElement";
 import { mutateElement } from "./mutateElement";
 import { API } from "../tests/helpers/api";
 import { FONT_FAMILY } from "../constants";
-
-const isPrimitive = (val: any) => {
-  const type = typeof val;
-  return val == null || (type !== "object" && type !== "function");
-};
+import { isPrimitive } from "../utils";
 
 const assertCloneObjects = (source: any, clone: any) => {
   for (const key in clone) {

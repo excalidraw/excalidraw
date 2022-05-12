@@ -19,6 +19,7 @@ export let copiedStyles: string = "{}";
 
 export const actionCopyStyles = register({
   name: "copyStyles",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     const element = elements.find((el) => appState.selectedElementIds[el.id]);
     if (element) {
@@ -39,6 +40,7 @@ export const actionCopyStyles = register({
 
 export const actionPasteStyles = register({
   name: "pasteStyles",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     const pastedElement = JSON.parse(copiedStyles);
     if (!isExcalidrawElement(pastedElement)) {
@@ -63,11 +65,7 @@ export const actionPasteStyles = register({
               textAlign: pastedElement?.textAlign || DEFAULT_TEXT_ALIGN,
             });
 
-            redrawTextBoundingBox(
-              element,
-              getContainerElement(element),
-              appState,
-            );
+            redrawTextBoundingBox(newElement, getContainerElement(newElement));
           }
           return newElement;
         }

@@ -9,6 +9,7 @@
     "copy": "Copiere",
     "copyAsPng": "Copiere în memoria temporară ca PNG",
     "copyAsSvg": "Copiere în memoria temporară ca SVG",
+    "copyText": "Copiere în memoria temporară ca text",
     "bringForward": "Aducere în plan apropiat",
     "sendToBack": "Trimitere în ultimul plan",
     "bringToFront": "Aducere în prim plan",
@@ -64,6 +65,7 @@
     "cartoonist": "Caricaturist",
     "fileTitle": "Nume de fișier",
     "colorPicker": "Selector de culoare",
+    "canvasColors": "Folosite pe pânză",
     "canvasBackground": "Fundalul pânzei",
     "drawingCanvas": "Pânză pentru desenat",
     "layers": "Straturi",
@@ -104,7 +106,21 @@
     "personalLib": "Biblioteca personală",
     "excalidrawLib": "Biblioteca Excalidraw",
     "decreaseFontSize": "Micșorează dimensiunea fontului",
-    "increaseFontSize": "Mărește dimensiunea fontului"
+    "increaseFontSize": "Mărește dimensiunea fontului",
+    "unbindText": "Deconectare text",
+    "bindText": "Legare text de container",
+    "link": {
+      "edit": "Editare URL",
+      "create": "Creare URL",
+      "label": "URL"
+    },
+    "elementLock": {
+      "lock": "Blocare",
+      "unlock": "Deblocare",
+      "lockAll": "Blocare toate",
+      "unlockAll": "Deblocare toate"
+    },
+    "statusPublished": "Publicat"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -152,12 +168,11 @@
     "couldNotLoadInvalidFile": "Fișierul invalid nu a putut fi încărcat",
     "importBackendFailed": "Importarea de la nivel de server a eșuat.",
     "cannotExportEmptyCanvas": "Nu se poate exporta pânza goală.",
-    "couldNotCopyToClipboard": "Nu s-a putut copia în memoria temporară. Încearcă să utilizezi navigatorul Chrome.",
+    "couldNotCopyToClipboard": "Nu s-a putut copia în memoria temporară.",
     "decryptFailed": "Datele nu au putut fi decriptate.",
     "uploadedSecurly": "Încărcarea a fost securizată prin criptare integrală, însemnând că serverul Excalidraw și terții nu pot citi conținutul.",
     "loadSceneOverridePrompt": "Încărcarea desenului extern va înlocui conținutul existent. Dorești să continui?",
     "collabStopOverridePrompt": "Oprirea sesiunii va suprascrie desenul anterior stocat local. Confirmi alegerea?\n\n(Dacă vrei să păstrezi desenul local, pur și simplu închide fila navigatorului în schimb.)",
-    "errorLoadingLibrary": "A apărut o eroare la încărcarea bibliotecii terțe.",
     "errorAddingToLibrary": "Elementul nu a putut fi adăugat în bibliotecă",
     "errorRemovingFromLibrary": "Elementul nu a putut fi eliminat din bibliotecă",
     "confirmAddLibrary": "Această acțiune va adăuga {{numShapes}} formă(e) la biblioteca ta. Confirmi?",
@@ -173,7 +188,9 @@
     "imageInsertError": "Imaginea nu a putut fi introdusă. Reîncearcă mai târziu...",
     "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
-    "invalidSVGString": "SVG invalid."
+    "invalidSVGString": "SVG invalid.",
+    "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou.",
+    "importLibraryError": "Biblioteca nu a putut fi încărcată"
   },
   "toolBar": {
     "selection": "Selecție",
@@ -186,7 +203,10 @@
     "freedraw": "Desenare",
     "text": "Text",
     "library": "Bibliotecă",
-    "lock": "Menține activ instrumentul selectat după desenare"
+    "lock": "Menține activ instrumentul selectat după desenare",
+    "penMode": "Împiedică mărirea prin ciupire și acceptă desenarea liberă doar de la stilou",
+    "link": "Adăugare/actualizare URL pentru forma selectată",
+    "eraser": "Radieră"
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -211,7 +231,8 @@
     "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
     "publishLibrary": "Publică propria bibliotecă",
     "bindTextToElement": "Apasă tasta Enter pentru a adăuga text",
-    "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea"
+    "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea",
+    "eraserRevert": "Ține apăsată tasta Alt pentru a anula elementele marcate pentru ștergere"
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -271,14 +292,15 @@
     "howto": "Urmărește ghidurile noastre",
     "or": "sau",
     "preventBinding": "Împiedică legarea săgeții",
-    "shapes": "Forme",
+    "tools": "Instrumente",
     "shortcuts": "Comenzi rapide de la tastatură",
     "textFinish": "Finalizează editarea (editor de text)",
     "textNewLine": "Adaugă o linie nouă (editor de text)",
     "title": "Ajutor",
     "view": "Vizualizare",
     "zoomToFit": "Transfocare pentru a cuprinde totul",
-    "zoomToSelection": "Transfocare la selecție"
+    "zoomToSelection": "Transfocare la selecție",
+    "toggleElementLock": "Blocare/deblocare selecție"
   },
   "clearCanvasDialog": {
     "title": "Ștergere pânză"
@@ -320,7 +342,8 @@
       "post": "care, pe scurt, înseamnă că oricine o poate folosi fără restricții."
     },
     "noteItems": "Fiecare element din bibliotecă trebuie să aibă propriul nume astfel încât să fie filtrabil. Următoarele elemente din bibliotecă vor fi incluse:",
-    "atleastOneLibItem": "Selectează cel puțin un element din bibliotecă pentru a începe"
+    "atleastOneLibItem": "Selectează cel puțin un element din bibliotecă pentru a începe",
+    "republishWarning": "Observație: unele dintre elementele selectate sunt marcate ca fiind deja publicate/trimise. Ar trebui să retrimiți elemente numai atunci când actualizezi o trimitere sau o bibliotecă existentă."
   },
   "publishSuccessDialog": {
     "title": "Bibliotecă trimisă",

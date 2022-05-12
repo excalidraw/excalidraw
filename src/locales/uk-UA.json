@@ -9,6 +9,7 @@
     "copy": "Копіювати",
     "copyAsPng": "Копіювати як PNG",
     "copyAsSvg": "Копіювати як SVG",
+    "copyText": "Копіювати в буфер обміну як текст",
     "bringForward": "Перемістити вперед",
     "sendToBack": "На задній план",
     "bringToFront": "На передній план",
@@ -64,6 +65,7 @@
     "cartoonist": "Карикатурист",
     "fileTitle": "Назва файла",
     "colorPicker": "Палітра кольорів",
+    "canvasColors": "Використовується на полотні",
     "canvasBackground": "Тло полотна",
     "drawingCanvas": "Полотно",
     "layers": "Шари",
@@ -101,10 +103,24 @@
     "showStroke": "Показати палітру для контура",
     "showBackground": "Показати палітру для фону",
     "toggleTheme": "Перемкнути тему",
-    "personalLib": "",
-    "excalidrawLib": "",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "personalLib": "Персональна бібліотека",
+    "excalidrawLib": "Бібліотека Excalidraw",
+    "decreaseFontSize": "Зменшити розмір шрифту",
+    "increaseFontSize": "Збільшити розмір шрифту",
+    "unbindText": "Відв'язати текст",
+    "bindText": "Прив’язати текст до контейнера",
+    "link": {
+      "edit": "Редагування посилання",
+      "create": "Створити посилання",
+      "label": "Посилання"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -140,10 +156,10 @@
     "exitZenMode": "Вийти з дзен-режиму",
     "cancel": "Скасувати",
     "clear": "Очистити",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "remove": "Видалити",
+    "publishLibrary": "Опублікувати",
+    "submit": "Надіслати",
+    "confirm": "Підтвердити"
   },
   "alerts": {
     "clearReset": "Це очистить все полотно. Впевнені?",
@@ -152,12 +168,11 @@
     "couldNotLoadInvalidFile": "Файл з помилками не відкрився",
     "importBackendFailed": "Імпортування невдале.",
     "cannotExportEmptyCanvas": "Не вийшло експортувати пусте полотно.",
-    "couldNotCopyToClipboard": "Не копіюється до буферу обміну. Спробуйте в браузері Chrome.",
+    "couldNotCopyToClipboard": "Не вдалося скопіювати до буфера обміну.",
     "decryptFailed": "Не вдалося розшифрувати дані.",
     "uploadedSecurly": "Це завантаження було захищене наскрізним шифруванням, а це означає що сервер Excalidraw та інші не зможуть прочитати вміст.",
     "loadSceneOverridePrompt": "Завантаження зовнішнього креслення замінить ваш наявний контент. Продовжити?",
     "collabStopOverridePrompt": "Зупинка сесії перезапише ваш попередній, локально збережений малюнок. Ви впевнені?\n\n(Якщо ви хочете зберегти локальний малюнок, просто закрийте замість нього вкладку браузера.)",
-    "errorLoadingLibrary": "Помилка при завантаженні сторонньої бібліотеки.",
     "errorAddingToLibrary": "Не вдалося додати елемент до бібліотеки",
     "errorRemovingFromLibrary": "Не вдалося видалити елемент з бібліотеки",
     "confirmAddLibrary": "Це призведе до додавання {{numShapes}} фігур до вашої бібліотеки. Ви впевнені?",
@@ -173,7 +188,9 @@
     "imageInsertError": "Не вдалося вставити зображення. Повторіть спробу пізніше...",
     "fileTooBig": "Занадто великий розмір файлу, максимальний розмір файлу {{maxSize}}.",
     "svgImageInsertError": "Не вдалося вставити SVG-зображення. Помилка розмітки SVG.",
-    "invalidSVGString": ""
+    "invalidSVGString": "Недійсний SVG.",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Виділення",
@@ -186,7 +203,10 @@
     "freedraw": "Малювати",
     "text": "Текст",
     "library": "Бібліотека",
-    "lock": "Залишити обраний інструмент після креслення"
+    "lock": "Залишити обраний інструмент після креслення",
+    "penMode": "",
+    "link": "Додати/Оновити посилання для вибраної форми",
+    "eraser": "Очищувач"
   },
   "headings": {
     "canvasActions": "Дії з полотном",
@@ -209,9 +229,10 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": "",
-    "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "publishLibrary": "Опублікувати свою власну бібліотеку",
+    "bindTextToElement": "Натисніть Enter, щоб додати текст",
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не вдається показати попередній перегляд",
@@ -258,7 +279,7 @@
   "helpDialog": {
     "blog": "Наш блог",
     "click": "натиснути",
-    "deepSelect": "",
+    "deepSelect": "Глибокий вибір",
     "deepBoxSelect": "",
     "curvedArrow": "Крива стрілка",
     "curvedLine": "Крива лінія",
@@ -271,65 +292,67 @@
     "howto": "Дотримуйтесь наших інструкцій",
     "or": "або",
     "preventBinding": "Запобігти зв'язування зі стрілками",
-    "shapes": "Фігури",
+    "tools": "Інструменти",
     "shortcuts": "Гарячі клавіші",
     "textFinish": "Завершити редагування (текстовий редактор)",
     "textNewLine": "Додати новий рядок (текстовий редактор)",
     "title": "Допомога",
     "view": "Вигляд",
     "zoomToFit": "Збільшити щоб умістити всі елементи",
-    "zoomToSelection": "Наблизити вибране"
+    "zoomToSelection": "Наблизити вибране",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Очистити полотно"
   },
   "publishDialog": {
-    "title": "",
+    "title": "Опублікувати бібліотеку",
     "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "authorName": "Ім'я автора",
+    "githubUsername": "Ім'я користувача Github",
+    "twitterUsername": "Ім'я користувача Твитер",
+    "libraryName": "Назва бібліотеки",
+    "libraryDesc": "Опис бібліотеки",
+    "website": "Вебсайт",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
+      "authorName": "Ваше ім'я або ім'я користувача",
+      "libraryName": "Назва вашої бібліотеки",
+      "libraryDesc": "Опис вашої бібліотеки, щоб допомогти людям зрозуміти її використання",
       "githubHandle": "",
       "twitterHandle": "",
       "website": ""
     },
     "errors": {
       "required": "",
-      "website": ""
+      "website": "Введіть дійсну URL-адресу"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
+      "pre": "Подати бібліотеку, щоб вона була включена до ",
+      "link": "публічного репозиторія бібліотек",
       "post": ""
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "настанови",
       "post": ""
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
+      "link": "Ліцензія MIT, ",
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Бібліотека відправлена",
+    "content": "Дякуємо, {{authorName}}. Ваша бібліотека була відправлена для розгляду. Ви можете відстежувати статус",
+    "link": "тут"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Скинути бібліотеку",
+    "removeItemsFromLib": "Видалити вибрані елементи з бібліотеки"
   },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать.",
@@ -351,7 +374,7 @@
     "width": "Ширина"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Додано до бібліотеки",
     "copyStyles": "Скопійовані стилі.",
     "copyToClipboard": "Скопіювати до буферу обміну.",
     "copyToClipboardAsPng": "Скопійовано {{exportSelection}} до буфера обміну як PNG\n({{exportColorScheme}})",

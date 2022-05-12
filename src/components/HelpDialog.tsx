@@ -139,7 +139,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
         <Section title={t("helpDialog.shortcuts")}>
           <Columns>
             <Column>
-              <ShortcutIsland caption={t("helpDialog.shapes")}>
+              <ShortcutIsland caption={t("helpDialog.tools")}>
                 <Shortcut
                   label={t("toolBar.selection")}
                   shortcuts={["V", "1"]}
@@ -149,7 +149,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   shortcuts={["R", "2"]}
                 />
                 <Shortcut label={t("toolBar.diamond")} shortcuts={["D", "3"]} />
-                <Shortcut label={t("toolBar.ellipse")} shortcuts={["E", "4"]} />
+                <Shortcut label={t("toolBar.ellipse")} shortcuts={["O", "4"]} />
                 <Shortcut label={t("toolBar.arrow")} shortcuts={["A", "5"]} />
                 <Shortcut label={t("toolBar.line")} shortcuts={["P", "6"]} />
                 <Shortcut
@@ -159,6 +159,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
                 <Shortcut label={t("toolBar.image")} shortcuts={["9"]} />
                 <Shortcut label={t("toolBar.library")} shortcuts={["0"]} />
+                <Shortcut
+                  label={t("toolBar.eraser")}
+                  shortcuts={[getShortcutKey("E")]}
+                />
                 <Shortcut
                   label={t("helpDialog.editSelectedShape")}
                   shortcuts={[
@@ -358,6 +362,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                     getShortcutKey("CtrlOrCmd+D"),
                     getShortcutKey(`Alt+${t("helpDialog.drag")}`),
                   ]}
+                />
+                <Shortcut
+                  label={t("helpDialog.toggleElementLock")}
+                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+L")]}
                 />
                 <Shortcut
                   label={t("buttons.undo")}

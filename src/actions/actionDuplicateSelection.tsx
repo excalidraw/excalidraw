@@ -22,6 +22,7 @@ import { isBoundToContainer } from "../element/typeChecks";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {

@@ -2,6 +2,7 @@ import { ExcalidrawElement } from "./types";
 import { mutateElement } from "./mutateElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
+import { AppState } from "../types";
 
 export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
@@ -16,7 +17,7 @@ export const isInvisiblySmallElement = (
  * Makes a perfect shape or diagonal/horizontal/vertical line
  */
 export const getPerfectElementSize = (
-  elementType: string,
+  elementType: AppState["activeTool"]["type"],
   width: number,
   height: number,
 ): { width: number; height: number } => {

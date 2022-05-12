@@ -1,5 +1,5 @@
 import { fireEvent, GlobalTestState, render } from "../test-utils";
-import Excalidraw from "../../packages/excalidraw/index";
+import { Excalidraw } from "../../packages/excalidraw/index";
 import { queryByText, queryByTestId } from "@testing-library/react";
 import { GRID_SIZE, THEME } from "../../constants";
 import { t } from "../../i18n";

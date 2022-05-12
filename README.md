@@ -32,6 +32,10 @@ Last but not least, we're thankful to these companies for offering their service
 
 [![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io) [![Crowdin](./.github/assets/crowdin.svg)](https://crowdin.com)
 
+## Who's integrating Excalidraw
+
+[Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/) •
+
 ## Documentation
 
 ### Shortcuts
@@ -124,14 +128,41 @@ For collaboration, you will need to set up [collab server](https://github.com/ex
 
 #### Commands
 
-| Command            | Description                       |
-| ------------------ | --------------------------------- |
-| `yarn`             | Install the dependencies          |
-| `yarn start`       | Run the project                   |
-| `yarn fix`         | Reformat all files with Prettier  |
-| `yarn test`        | Run tests                         |
-| `yarn test:update` | Update test snapshots             |
-| `yarn test:code`   | Test for formatting with Prettier |
+##### Install the dependencies
+
+```
+yarn
+```
+
+##### Run the project
+
+```
+yarn start
+```
+
+##### Reformat all files with Prettier
+
+```
+yarn fix
+```
+
+##### Run tests
+
+```
+yarn test
+```
+
+##### Update test snapshots
+
+```
+yarn test:update
+```
+
+##### Test for formatting with Prettier
+
+```
+yarn test:code
+```
 
 #### Docker Compose
 

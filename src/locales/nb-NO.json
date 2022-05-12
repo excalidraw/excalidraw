@@ -9,6 +9,7 @@
     "copy": "Kopier",
     "copyAsPng": "Kopier til PNG",
     "copyAsSvg": "Kopier til utklippstavlen som SVG",
+    "copyText": "Kopier til utklippstavlen som tekst",
     "bringForward": "Flytt framover",
     "sendToBack": "Send bakerst",
     "bringToFront": "Flytt forrest",
@@ -64,6 +65,7 @@
     "cartoonist": "Tegner",
     "fileTitle": "Filnavn",
     "colorPicker": "Fargevelger",
+    "canvasColors": "Brukes på lerretet",
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
     "layers": "Lag",
@@ -104,7 +106,21 @@
     "personalLib": "Personlig bibliotek",
     "excalidrawLib": "Excalidraw-bibliotek",
     "decreaseFontSize": "Reduser skriftstørrelse",
-    "increaseFontSize": "Øk skriftstørrelse"
+    "increaseFontSize": "Øk skriftstørrelse",
+    "unbindText": "Avbind tekst",
+    "bindText": "Bind tekst til beholderen",
+    "link": {
+      "edit": "Rediger lenke",
+      "create": "Opprett lenke",
+      "label": "Lenke"
+    },
+    "elementLock": {
+      "lock": "Lås",
+      "unlock": "Lås opp",
+      "lockAll": "Lås alle",
+      "unlockAll": "Lås opp alle"
+    },
+    "statusPublished": "Publisert"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -152,12 +168,11 @@
     "couldNotLoadInvalidFile": "Kunne ikke laste inn ugyldig fil",
     "importBackendFailed": "Importering av backend feilet.",
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
-    "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
+    "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen.",
     "decryptFailed": "Kunne ikke dekryptere data.",
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter.",
     "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?",
     "collabStopOverridePrompt": "Hvis du slutter økten, overskrives din forrige, lokalt lagrede tegning. Er du sikker?\n\n(Hvis du ønsker å beholde din lokale tegning, bare lukk nettleserfanen i stedet.)",
-    "errorLoadingLibrary": "Det oppstod en feil under lasting av tredjepartsbiblioteket.",
     "errorAddingToLibrary": "Kunne ikke legge element i biblioteket",
     "errorRemovingFromLibrary": "Kunne ikke fjerne element fra biblioteket",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
@@ -173,7 +188,9 @@
     "imageInsertError": "Kunne ikke sette inn bildet. Prøv igjen senere...",
     "fileTooBig": "Filen er for stor. Maksimal tillatt størrelse er {{maxSize}}.",
     "svgImageInsertError": "Kunne ikke sette inn SVG-bilde. SVG-koden ser ugyldig ut.",
-    "invalidSVGString": "Ugyldig SVG."
+    "invalidSVGString": "Ugyldig SVG.",
+    "cannotResolveCollabServer": "Kunne ikke koble til samarbeidsserveren. Vennligst oppdater siden og prøv på nytt.",
+    "importLibraryError": "Kunne ikke laste bibliotek"
   },
   "toolBar": {
     "selection": "Velg",
@@ -186,7 +203,10 @@
     "freedraw": "Tegn",
     "text": "Tekst",
     "library": "Bibliotek",
-    "lock": "Behold merket verktøy som aktivt"
+    "lock": "Behold merket verktøy som aktivt",
+    "penMode": "Forhindre zoom ved kniping og godta frihåndstegning kun fra penn",
+    "link": "Legg til / oppdater link for en valgt figur",
+    "eraser": "Viskelær"
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
@@ -211,7 +231,8 @@
     "placeImage": "Klikk for å plassere bildet, eller klikk og dra for å angi størrelsen manuelt",
     "publishLibrary": "Publiser ditt eget bibliotek",
     "bindTextToElement": "Trykk Enter for å legge til tekst",
-    "deepBoxSelect": "Hold CTRL/CMD for å markere dypt og forhindre flytting"
+    "deepBoxSelect": "Hold CTRL/CMD for å markere dypt og forhindre flytting",
+    "eraserRevert": "Hold Alt for å reversere elementene merket for sletting"
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
@@ -271,14 +292,15 @@
     "howto": "Følg våre veiledninger",
     "or": "eller",
     "preventBinding": "Forhindre pilbinding",
-    "shapes": "Former",
+    "tools": "Verktøy",
     "shortcuts": "Tastatursnarveier",
     "textFinish": "Fullfør redigering (teksteditor)",
     "textNewLine": "Legg til ny linje (teksteditor)",
     "title": "Hjelp",
     "view": "Vis",
     "zoomToFit": "Zoom for å se alle elementer",
-    "zoomToSelection": "Zoom til utvalg"
+    "zoomToSelection": "Zoom til utvalg",
+    "toggleElementLock": "Lås/lås opp utvalg"
   },
   "clearCanvasDialog": {
     "title": "Tøm lerret"
@@ -320,7 +342,8 @@
       "post": "som kortfattet betyr at andre kan bruke dem uten begrensninger."
     },
     "noteItems": "Hvert bibliotek må ha sitt eget navn, så det er filtrerbart. Følgende bibliotekselementer vil bli inkludert:",
-    "atleastOneLibItem": "Vennligst velg minst ett bibliotek for å komme i gang"
+    "atleastOneLibItem": "Vennligst velg minst ett bibliotek for å komme i gang",
+    "republishWarning": "Merk: noen av de valgte elementene er merket som allerede publisert/sendt. Du bør kun sende inn elementer på nytt når du oppdaterer et eksisterende bibliotek eller innlevering."
   },
   "publishSuccessDialog": {
     "title": "Bibliotek innsendt",

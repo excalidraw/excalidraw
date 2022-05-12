@@ -3,27 +3,11 @@ import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
 import { stringToBase64, encode, decode, base64ToString } from "./encode";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
+import { blobToArrayBuffer } from "./blob";
 
 // -----------------------------------------------------------------------------
 // PNG
 // -----------------------------------------------------------------------------
-
-const blobToArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {
-  if ("arrayBuffer" in blob) {
-    return blob.arrayBuffer();
-  }
-  // Safari
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (!event.target?.result) {
-        return reject(new Error("couldn't convert blob to ArrayBuffer"));
-      }
-      resolve(event.target.result as ArrayBuffer);
-    };
-    reader.readAsArrayBuffer(blob);
-  });
-};
 
 export const getTEXtChunk = async (
   blob: Blob,
@@ -105,7 +89,9 @@ export const encodeSvgMetadata = async ({ text }: { text: string }) => {
 
 export const decodeSvgMetadata = async ({ svg }: { svg: string }) => {
   if (svg.includes(`payload-type:${MIME_TYPES.excalidraw}`)) {
-    const match = svg.match(/<!-- payload-start -->(.+?)<!-- payload-end -->/);
+    const match = svg.match(
+      /<!-- payload-start -->\s*(.+?)\s*<!-- payload-end -->/,
+    );
     if (!match) {
       throw new Error("INVALID");
     }

@@ -7,6 +7,53 @@ import { isArrowKey, KEYS } from "../keys";
 import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
+import { ExcalidrawElement } from "../element/types";
+import { AppState } from "../types";
+
+const MAX_CUSTOM_COLORS = 5;
+const MAX_DEFAULT_COLORS = 15;
+
+export const getCustomColors = (
+  elements: readonly ExcalidrawElement[],
+  type: "elementBackground" | "elementStroke",
+) => {
+  const customColors: string[] = [];
+  const updatedElements = elements
+    .filter((element) => !element.isDeleted)
+    .sort((ele1, ele2) => ele2.updated - ele1.updated);
+
+  let index = 0;
+  const elementColorTypeMap = {
+    elementBackground: "backgroundColor",
+    elementStroke: "strokeColor",
+  };
+  const colorType = elementColorTypeMap[type] as
+    | "backgroundColor"
+    | "strokeColor";
+  while (
+    index < updatedElements.length &&
+    customColors.length < MAX_CUSTOM_COLORS
+  ) {
+    const element = updatedElements[index];
+
+    if (
+      customColors.length < MAX_CUSTOM_COLORS &&
+      isCustomColor(element[colorType], type) &&
+      !customColors.includes(element[colorType])
+    ) {
+      customColors.push(element[colorType]);
+    }
+    index++;
+  }
+  return customColors;
+};
+
+const isCustomColor = (
+  color: string,
+  type: "elementBackground" | "elementStroke",
+) => {
+  return !colors[type].includes(color);
+};
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -35,6 +82,7 @@ const keyBindings = [
   ["1", "2", "3", "4", "5"],
   ["q", "w", "e", "r", "t"],
   ["a", "s", "d", "f", "g"],
+  ["z", "x", "c", "v", "b"],
 ].flat();
 
 const Picker = ({
@@ -45,6 +93,7 @@ const Picker = ({
   label,
   showInput = true,
   type,
+  elements,
 }: {
   colors: string[];
   color: string | null;
@@ -53,11 +102,19 @@ const Picker = ({
   label: string;
   showInput: boolean;
   type: "canvasBackground" | "elementBackground" | "elementStroke";
+  elements: readonly ExcalidrawElement[];
 }) => {
   const firstItem = React.useRef<HTMLButtonElement>();
   const activeItem = React.useRef<HTMLButtonElement>();
   const gallery = React.useRef<HTMLDivElement>();
   const colorInput = React.useRef<HTMLInputElement>();
+
+  const [customColors] = React.useState(() => {
+    if (type === "canvasBackground") {
+      return [];
+    }
+    return getCustomColors(elements, type);
+  });
 
   React.useEffect(() => {
     // After the component is first mounted focus on first input
@@ -85,23 +142,40 @@ const Picker = ({
     } else if (isArrowKey(event.key)) {
       const { activeElement } = document;
       const isRTL = getLanguage().rtl;
-      const index = Array.prototype.indexOf.call(
-        gallery!.current!.children,
+      let isCustom = false;
+      let index = Array.prototype.indexOf.call(
+        gallery.current!.querySelector(".color-picker-content--default")!
+          .children,
         activeElement,
       );
-      if (index !== -1) {
-        const length = gallery!.current!.children.length - (showInput ? 1 : 0);
+      if (index === -1) {
+        index = Array.prototype.indexOf.call(
+          gallery.current!.querySelector(
+            ".color-picker-content--canvas-colors",
+          )!.children,
+          activeElement,
+        );
+        if (index !== -1) {
+          isCustom = true;
+        }
+      }
+      const parentElement = isCustom
+        ? gallery.current?.querySelector(".color-picker-content--canvas-colors")
+        : gallery.current?.querySelector(".color-picker-content--default");
+
+      if (parentElement && index !== -1) {
+        const length = parentElement.children.length - (showInput ? 1 : 0);
         const nextIndex =
           event.key === (isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT)
             ? (index + 1) % length
             : event.key === (isRTL ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT)
             ? (length + index - 1) % length
-            : event.key === KEYS.ARROW_DOWN
+            : !isCustom && event.key === KEYS.ARROW_DOWN
             ? (index + 5) % length
-            : event.key === KEYS.ARROW_UP
+            : !isCustom && event.key === KEYS.ARROW_UP
             ? (length + index - 5) % length
             : index;
-        (gallery!.current!.children![nextIndex] as any).focus();
+        (parentElement.children[nextIndex] as HTMLElement | undefined)?.focus();
       }
       event.preventDefault();
     } else if (
@@ -109,7 +183,17 @@ const Picker = ({
       !isWritableElement(event.target)
     ) {
       const index = keyBindings.indexOf(event.key.toLowerCase());
-      (gallery!.current!.children![index] as any).focus();
+      const isCustom = index >= MAX_DEFAULT_COLORS;
+      const parentElement = isCustom
+        ? gallery?.current?.querySelector(
+            ".color-picker-content--canvas-colors",
+          )
+        : gallery?.current?.querySelector(".color-picker-content--default");
+      const actualIndex = isCustom ? index - MAX_DEFAULT_COLORS : index;
+      (
+        parentElement?.children[actualIndex] as HTMLElement | undefined
+      )?.focus();
+
       event.preventDefault();
     } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
       event.preventDefault();
@@ -117,6 +201,50 @@ const Picker = ({
     }
     event.nativeEvent.stopImmediatePropagation();
     event.stopPropagation();
+  };
+
+  const renderColors = (colors: Array<string>, custom: boolean = false) => {
+    return colors.map((_color, i) => {
+      const _colorWithoutHash = _color.replace("#", "");
+      const keyBinding = custom
+        ? keyBindings[i + MAX_DEFAULT_COLORS]
+        : keyBindings[i];
+      const label = custom
+        ? _colorWithoutHash
+        : t(`colors.${_colorWithoutHash}`);
+      return (
+        <button
+          className="color-picker-swatch"
+          onClick={(event) => {
+            (event.currentTarget as HTMLButtonElement).focus();
+            onChange(_color);
+          }}
+          title={`${label}${
+            !isTransparent(_color) ? ` (${_color})` : ""
+          } — ${keyBinding.toUpperCase()}`}
+          aria-label={label}
+          aria-keyshortcuts={keyBindings[i]}
+          style={{ color: _color }}
+          key={_color}
+          ref={(el) => {
+            if (!custom && el && i === 0) {
+              firstItem.current = el;
+            }
+            if (el && _color === color) {
+              activeItem.current = el;
+            }
+          }}
+          onFocus={() => {
+            onChange(_color);
+          }}
+        >
+          {isTransparent(_color) ? (
+            <div className="color-picker-transparent"></div>
+          ) : undefined}
+          <span className="color-picker-keybinding">{keyBinding}</span>
+        </button>
+      );
+    });
   };
 
   return (
@@ -138,41 +266,20 @@ const Picker = ({
         }}
         tabIndex={0}
       >
-        {colors.map((_color, i) => {
-          const _colorWithoutHash = _color.replace("#", "");
-          return (
-            <button
-              className="color-picker-swatch"
-              onClick={(event) => {
-                (event.currentTarget as HTMLButtonElement).focus();
-                onChange(_color);
-              }}
-              title={`${t(`colors.${_colorWithoutHash}`)}${
-                !isTransparent(_color) ? ` (${_color})` : ""
-              } — ${keyBindings[i].toUpperCase()}`}
-              aria-label={t(`colors.${_colorWithoutHash}`)}
-              aria-keyshortcuts={keyBindings[i]}
-              style={{ color: _color }}
-              key={_color}
-              ref={(el) => {
-                if (el && i === 0) {
-                  firstItem.current = el;
-                }
-                if (el && _color === color) {
-                  activeItem.current = el;
-                }
-              }}
-              onFocus={() => {
-                onChange(_color);
-              }}
-            >
-              {isTransparent(_color) ? (
-                <div className="color-picker-transparent"></div>
-              ) : undefined}
-              <span className="color-picker-keybinding">{keyBindings[i]}</span>
-            </button>
-          );
-        })}
+        <div className="color-picker-content--default">
+          {renderColors(colors)}
+        </div>
+        {!!customColors.length && (
+          <div className="color-picker-content--canvas">
+            <span className="color-picker-content--canvas-title">
+              {t("labels.canvasColors")}
+            </span>
+            <div className="color-picker-content--canvas-colors">
+              {renderColors(customColors, true)}
+            </div>
+          </div>
+        )}
+
         {showInput && (
           <ColorInput
             color={color}
@@ -246,6 +353,8 @@ export const ColorPicker = ({
   label,
   isActive,
   setActive,
+  elements,
+  appState,
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   color: string | null;
@@ -253,6 +362,8 @@ export const ColorPicker = ({
   label: string;
   isActive: boolean;
   setActive: (active: boolean) => void;
+  elements: readonly ExcalidrawElement[];
+  appState: AppState;
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
 
@@ -294,6 +405,7 @@ export const ColorPicker = ({
               label={label}
               showInput={false}
               type={type}
+              elements={elements}
             />
           </Popover>
         ) : null}
