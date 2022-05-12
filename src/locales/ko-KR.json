@@ -204,7 +204,7 @@
     "text": "텍스트",
     "library": "라이브러리",
     "lock": "선택된 도구 유지하기",
-    "penMode": "",
+    "penMode": "핀치 줌을 하지 않도록 하고 펜을 통해서 자유롭게 그리기",
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개"
   },
@@ -280,7 +280,7 @@
     "blog": "블로그 읽어보기",
     "click": "클릭",
     "deepSelect": "깊게 선택",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "영역을 깊게 선택하고, 드래그하지 않도록 하기",
     "curvedArrow": "곡선 화살표",
     "curvedLine": "곡선",
     "documentation": "설명서",
