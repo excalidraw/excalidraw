@@ -65,7 +65,7 @@
     "cartoonist": "만화가",
     "fileTitle": "파일 이름",
     "colorPicker": "색상 선택기",
-    "canvasColors": "",
+    "canvasColors": "캔버스에서 사용되었음",
     "canvasBackground": "캔버스 배경",
     "drawingCanvas": "캔버스 그리기",
     "layers": "레이어",
@@ -120,7 +120,7 @@
       "lockAll": "모두 잠금",
       "unlockAll": "모두 잠금 해제"
     },
-    "statusPublished": ""
+    "statusPublished": "게시됨"
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -343,7 +343,7 @@
     },
     "noteItems": "각각의 라이브러리는 분류할 수 있도록 고유한 이름을 가져야 합니다. 다음의 라이브러리 항목이 포함됩니다:",
     "atleastOneLibItem": "최소한 하나의 라이브러리를 선택해주세요",
-    "republishWarning": ""
+    "republishWarning": "참고: 선택된 항목의 일부는 이미 제출/게시되었습니다. 기존의 라이브러리나 제출물을 업데이트하는 경우에만 제출하세요."
   },
   "publishSuccessDialog": {
     "title": "라이브러리 제출됨",
