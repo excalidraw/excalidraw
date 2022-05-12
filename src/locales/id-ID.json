@@ -120,7 +120,7 @@
       "lockAll": "Kunci semua",
       "unlockAll": "Lepas semua"
     },
-    "statusPublished": ""
+    "statusPublished": "Telah terbit"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -190,7 +190,7 @@
     "svgImageInsertError": "Tidak dapat menyisipkan gambar SVG. Markup SVG sepertinya tidak valid.",
     "invalidSVGString": "SVG tidak valid.",
     "cannotResolveCollabServer": "Tidak dapat terhubung ke server kolab. Muat ulang laman dan coba lagi.",
-    "importLibraryError": ""
+    "importLibraryError": "Tidak dapat memuat pustaka"
   },
   "toolBar": {
     "selection": "Pilihan",
