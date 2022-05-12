@@ -1226,7 +1226,7 @@ import { sceneCoordsToViewportCoords } from "@excalidraw/excalidraw-next";
 **_Signature_**
 
 <pre>
-sceneCoordsToViewportCoords({sceneX: number, sceneY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>)
+sceneCoordsToViewportCoords({sceneX: number, sceneY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>): {x: number, y: number}
 </pre>
 
 This function returns equivalent viewport coords for the provided scene coords in params.
@@ -1240,7 +1240,7 @@ import { viewportCoordsToSceneCoords } from "@excalidraw/excalidraw-next";
 **_Signature_**
 
 <pre>
-viewportCoordsToSceneCoords({clientX: number, clientY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>)
+viewportCoordsToSceneCoords({clientX: number, clientY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>): {x: number, y: number}
 </pre>
 
 This function returns equivalent scene coords for the provided viewport coords in params.
