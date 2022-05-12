@@ -7,8 +7,6 @@ import "./App.scss";
 import initialData from "./initialData";
 import { nanoid } from "nanoid";
 import {
-  sceneCoordsToViewportCoords,
-  viewportCoordsToSceneCoords,
   withBatchedUpdates,
   withBatchedUpdatesThrottled,
 } from "../../../utils";
@@ -28,6 +26,8 @@ const {
   Excalidraw,
   useHandleLibrary,
   MIME_TYPES,
+  sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
 } = window.ExcalidrawLib;
 
 const COMMENT_SVG = (
