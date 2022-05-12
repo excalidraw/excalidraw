@@ -4,7 +4,7 @@ import {
   getFontString,
   getFontFamilyString,
   isTestEnv,
-  getSelectecTextColorRangeColor,
+  getSelectedTextColorRangeColor,
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
@@ -229,7 +229,7 @@ export const textWysiwyg = ({
         color: "transparent",
         caretColor:
           updatedElement && appState.selectedTextRange
-            ? getSelectecTextColorRangeColor(
+            ? getSelectedTextColorRangeColor(
                 updatedElement,
                 appState.selectedTextRange,
               )

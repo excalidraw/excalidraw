@@ -76,7 +76,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import { arrayToMap, getSelectecTextColorRangeColor } from "../utils";
+import { arrayToMap, getSelectedTextColorRangeColor } from "../utils";
 import { register } from "./register";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
@@ -278,7 +278,7 @@ export const actionChangeStrokeColor = register({
               return element.strokeColor;
             }
 
-            return getSelectecTextColorRangeColor(
+            return getSelectedTextColorRangeColor(
               element,
               appState.selectedTextRange,
             );

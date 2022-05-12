@@ -721,7 +721,7 @@ export const getLineGroupedRanges = (
   return lines;
 };
 
-export const getSelectecTextColorRangeColor = (
+export const getSelectedTextColorRangeColor = (
   element: ExcalidrawTextElement,
   selectedTextRange: Selection,
 ): string => {
