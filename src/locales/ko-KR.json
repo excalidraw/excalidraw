@@ -231,7 +231,7 @@
     "placeImage": "클릭해서 이미지를 배치하거나, 클릭하고 드래그해서 사이즈를 조정하기",
     "publishLibrary": "당신만의 라이브러리를 게시하기",
     "bindTextToElement": "Enter 키를 눌러서 텍스트 추가하기",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "CtrlOrCmd 키를 눌러서 깊게 선택하고, 드래그하지 않도록 하기",
     "eraserRevert": "Alt를 눌러서 삭제하도록 지정된 요소를 되돌리기"
   },
   "canvasError": {
@@ -279,7 +279,7 @@
   "helpDialog": {
     "blog": "블로그 읽어보기",
     "click": "클릭",
-    "deepSelect": "",
+    "deepSelect": "깊게 선택",
     "deepBoxSelect": "",
     "curvedArrow": "곡선 화살표",
     "curvedLine": "곡선",
