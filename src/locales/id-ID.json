@@ -343,7 +343,7 @@
     },
     "noteItems": "Setiap item pustaka harus memiliki nama, sehingga bisa disortir. Item pustaka di bawah ini akan dimasukan:",
     "atleastOneLibItem": "Pilih setidaknya satu item pustaka untuk mulai",
-    "republishWarning": ""
+    "republishWarning": "Catatan: beberapa item yang dipilih telah ditandai sebagai sudah dipublikasikan/diserahkan. Anda hanya dapat menyerahkan kembali item-item ketika memperbarui pustaka atau pengumpulan."
   },
   "publishSuccessDialog": {
     "title": "Pustaka telah dikirm",
