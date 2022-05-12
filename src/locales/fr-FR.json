@@ -120,7 +120,7 @@
       "lockAll": "Tout verrouiller",
       "unlockAll": "Tout déverouiller"
     },
-    "statusPublished": ""
+    "statusPublished": "Publié"
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
@@ -343,7 +343,7 @@
     },
     "noteItems": "Chaque élément de la bibliothèque doit avoir son propre nom afin qu'il soit filtrable. Les éléments de bibliothèque suivants seront inclus :",
     "atleastOneLibItem": "Veuillez sélectionner au moins un élément de bibliothèque pour commencer",
-    "republishWarning": ""
+    "republishWarning": "Remarque : certains des éléments sélectionnés sont marqués comme étant déjà publiés/affichés. Vous ne devez soumettre à nouveau des éléments que lorsque vous mettez à jour une soumission ou une bibliothèque existante."
   },
   "publishSuccessDialog": {
     "title": "Bibliothèque soumise",
