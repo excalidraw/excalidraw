@@ -14,8 +14,13 @@ import {
   hasText,
 } from "../scene";
 import { SHAPES } from "../shapes";
-import { AppState, UIOptions, Zoom } from "../types";
-import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
+import { AppState, Zoom, UIOptions } from "../types";
+import {
+  capitalizeString,
+  isTransparent,
+  updateActiveTool,
+  setCursorForShape,
+} from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
@@ -240,7 +245,9 @@ export const ShapesSwitcher = ({
             if (appState.activeTool.type !== value) {
               trackEvent("toolbar", value, "ui");
             }
-            const nextActiveTool = { ...activeTool, type: value };
+            const nextActiveTool = updateActiveTool(appState, {
+              type: value,
+            });
             setAppState({
               activeTool: nextActiveTool,
               multiElement: null,

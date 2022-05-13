@@ -37,6 +37,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     autoFocus = false,
     generateIdForFile,
     onLinkOpen,
+    onPointerDown,
+    onScrollChange,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -105,6 +107,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           autoFocus={autoFocus}
           generateIdForFile={generateIdForFile}
           onLinkOpen={onLinkOpen}
+          onPointerDown={onPointerDown}
+          onScrollChange={onScrollChange}
         />
       </Provider>
     </InitializeApp>
@@ -212,16 +216,27 @@ export {
   serializeLibraryAsJSON,
   loadLibraryFromBlob,
   loadFromBlob,
+  loadSceneOrLibraryFromBlob,
   getFreeDrawSvgPath,
   exportToClipboard,
   mergeLibraryItems,
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
 
-export { FONT_FAMILY, THEME } from "../../constants";
+export { FONT_FAMILY, THEME, MIME_TYPES } from "../../constants";
 
 export {
   mutateElement,
   newElementWith,
   bumpVersion,
 } from "../../element/mutateElement";
+
+export {
+  parseLibraryTokensFromUrl,
+  useHandleLibrary,
+} from "../../data/library";
+
+export {
+  sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
+} from "../../utils";

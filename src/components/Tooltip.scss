@@ -2,7 +2,7 @@
 
 // container in body where the actual tooltip is appended to
 .excalidraw-tooltip {
-  position: absolute;
+  position: fixed;
   z-index: 1000;
 
   padding: 8px;
