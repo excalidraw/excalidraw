@@ -223,21 +223,28 @@ export const actionChangeStrokeColor = register({
 
             if (el.type === "text") {
               if (appState.selectedTextRange?.type === "range") {
+                // Assertion is required because otherwise typescript will "forget" the narrowing in callbacks
+                const selectedRange = appState.selectedTextRange as Extract<
+                  Selection,
+                  { type: "range" }
+                >;
+
+                const rangeLength = selectedRange.end - selectedRange.start;
+
+                if (rangeLength === el.text.length) {
+                  return newElementWith(el, {
+                    colorRanges: {},
+                    strokeColor: value.currentItemStrokeColor,
+                  });
+                }
+
                 const newColorRange = Object.fromEntries(
                   Array.from(
                     {
-                      length:
-                        appState.selectedTextRange.end -
-                        appState.selectedTextRange.start,
+                      length: rangeLength,
                     },
                     (_, i) => [
-                      i +
-                        (
-                          appState.selectedTextRange as Extract<
-                            Selection,
-                            { type: "range" }
-                          >
-                        ).start,
+                      i + selectedRange.start,
                       value.currentItemStrokeColor,
                     ],
                   ),
