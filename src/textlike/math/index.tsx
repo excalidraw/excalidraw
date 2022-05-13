@@ -113,8 +113,12 @@ class GetMathOpts {
 }
 const getMathOpts = new GetMathOpts();
 
-const getDelimiter = (useTex: boolean): string => {
-  return useTex ? "$$" : "`";
+const getStartDelimiter = (useTex: boolean): string => {
+  return useTex ? "\\(" : "`";
+};
+
+const getEndDelimiter = (useTex: boolean): string => {
+  return useTex ? "\\)" : "`";
 };
 
 const mathJax = {} as {
@@ -222,6 +226,63 @@ const loadMathJax = async () => {
   }
 };
 
+const splitMath = (text: string, mathOpts: MathOpts) => {
+  const startDelimiter = getStartDelimiter(mathOpts.useTex);
+  const endDelimiter = getEndDelimiter(mathOpts.useTex);
+  let curIndex = 0;
+  let oldIndex = 0;
+  const array = [];
+
+  const mathFirst = text.indexOf(startDelimiter, 0) === 0;
+  let inText = !mathFirst;
+  if (!inText) {
+    array.push("");
+  }
+  while (oldIndex >= 0 && curIndex >= 0) {
+    oldIndex =
+      curIndex +
+      (inText
+        ? curIndex > 0
+          ? endDelimiter.length
+          : 0
+        : startDelimiter.length);
+    curIndex = text.indexOf(inText ? startDelimiter : endDelimiter, oldIndex);
+    if (curIndex >= oldIndex || (curIndex < 0 && oldIndex > 0)) {
+      inText = !inText;
+      array.push(
+        text.substring(oldIndex, curIndex >= 0 ? curIndex : text.length),
+      );
+    }
+  }
+  if (array.length === 0 && !mathFirst) {
+    array[0] = text;
+  }
+
+  return array;
+};
+
+const joinMath = (
+  text: string[],
+  mathOpts: MathOpts,
+  isMathJaxLoaded: boolean,
+) => {
+  const startDelimiter = getStartDelimiter(mathOpts.useTex);
+  const endDelimiter = getEndDelimiter(mathOpts.useTex);
+  let inText = true;
+  let joined = "";
+  for (let index = 0; index < text.length; index++) {
+    const space = index > 0 ? " " : "";
+    joined +=
+      mathOpts.mathOnly && isMathJaxLoaded
+        ? `${space}${text[index]}`
+        : inText
+        ? text[index]
+        : startDelimiter + text[index] + endDelimiter;
+    inText = !inText;
+  }
+  return joined;
+};
+
 // This lets math input run across multiple newlines.
 // Basically, replace with a space each newline between the delimiters.
 // Do so unless it's AsciiMath in math-only mode.
@@ -230,11 +291,7 @@ const consumeMathNewlines = (
   mathOpts: MathOpts,
   isMathJaxLoaded: boolean,
 ) => {
-  const delimiter = getDelimiter(mathOpts.useTex);
-  const tempText =
-    mathOpts.mathOnly || !isMathJaxLoaded
-      ? [text]
-      : text.replace(/\r\n?/g, "\n").split(delimiter);
+  const tempText = splitMath(text.replace(/\r\n?/g, "\n"), mathOpts);
   if (mathOpts.useTex || !mathOpts.mathOnly) {
     for (let i = 0; i < tempText.length; i++) {
       if (i % 2 === 1 || mathOpts.mathOnly) {
@@ -242,7 +299,7 @@ const consumeMathNewlines = (
       }
     }
   }
-  return tempText.join(delimiter);
+  return joinMath(tempText, mathOpts, isMathJaxLoaded);
 };
 
 // Cache the SVGs from MathJax
@@ -343,7 +400,7 @@ const markupText = (
     const lineArray =
       mathOpts.mathOnly || !isMathJaxLoaded
         ? [lines[index]]
-        : lines[index].split(getDelimiter(mathOpts.useTex));
+        : splitMath(lines[index], mathOpts);
     for (let i = 0; i < lineArray.length; i++) {
       // Don't guard the following as "isMathJaxLoaded && i % 2 === 1"
       // in order to ensure math2Svg() actually gets called, and thus
@@ -432,7 +489,9 @@ const measureMarkup = (
     // The mjx-container has child nodes, while Text nodes do not
     const childIsSvg =
       isMathJaxLoaded &&
-      (container.childNodes[i].hasChildNodes() || mathOpts.mathOnly);
+      ((container.childNodes[i].hasChildNodes() &&
+        container.childNodes[i].childNodes[0].nodeName === "svg") ||
+        mathOpts.mathOnly);
     // The mjx-container element or the Text node
     const child = container.childNodes[i] as HTMLElement | Text;
     if (isMathJaxLoaded && (mathOpts.mathOnly || childIsSvg)) {
@@ -990,7 +1049,6 @@ export const wrapTextElementMath = (
   const markup = markupText(text, mathOpts, isMathJaxLoaded);
   const metrics = getMetrics(markup, fontSize, mathOpts, isMathJaxLoaded);
 
-  const delimiter = getDelimiter(mathOpts.useTex);
   const lines = consumeMathNewlines(text, mathOpts, isMathJaxLoaded).split(
     "\n",
   );
@@ -1007,14 +1065,22 @@ export const wrapTextElementMath = (
     lineWidth.push([]);
     lineText[index].push("");
     lineWidth[index].push(0);
-    const lineArray = lines[index].split(delimiter);
-    for (let i = 0; i < markup[index].length; i++) {
-      const isSvg = i % 2 === 1 || mathOnly;
+    let lastIsSvg = false;
+    const lineArray = splitMath(lines[index], mathOpts).filter(
+      (value) => value !== "",
+    );
+    const markupArray = markup[index].filter((value) => value !== "");
+    for (let i = 0; i < lineArray.length; i++) {
+      const isSvg =
+        textAsMjxContainer(markupArray[i], isMathJaxLoaded) !== null;
       itemWidth = 0;
       let lineItem = lineArray[i];
-      if (isSvg) {
+      if (isSvg || mathOnly) {
         itemWidth = metrics.markupMetrics[index][i].width;
-        lineItem = delimiter + lineItem + delimiter;
+        lineItem =
+          getStartDelimiter(mathOpts.useTex) +
+          lineItem +
+          getEndDelimiter(mathOpts.useTex);
       }
       if (pushNew) {
         lineText[index].push(lineItem);
@@ -1024,15 +1090,16 @@ export const wrapTextElementMath = (
         lineText[index][lineIndex] += lineItem; // should always be text
       }
       pushNew = true;
+      lastIsSvg = isSvg;
     }
-    if (markup[index].length % 2 === 1 || mathOnly) {
+    if (!lastIsSvg || mathOnly) {
       // Last one was text
       pushNew = false;
     }
 
     for (let i = 0; i < lineText[index].length; i++) {
       // Now get the widths for all the concatenated text strings
-      if (lineIndex % 2 === 0) {
+      if (textAsMjxContainer(lineText[index][i], isMathJaxLoaded) === null) {
         lineWidth[index][i] = getTextWidth(lineText[index][i], font);
       }
     }
@@ -1040,7 +1107,10 @@ export const wrapTextElementMath = (
     // Now move onto wrapping
     let curWidth = 0;
     for (let i = 0; i < lineText[index].length; i++) {
-      if (i % 2 === 1 || mathOnly) {
+      if (
+        textAsMjxContainer(lineText[index][i], isMathJaxLoaded) !== null ||
+        mathOnly
+      ) {
         // lineText[index][i] is math here
         if (lineWidth[index][i] > maxWidth) {
           // If the math svg is greater than maxWidth, make it its
