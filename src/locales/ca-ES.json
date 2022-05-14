@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut.",
     "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?",
     "collabStopOverridePrompt": "Aturar la sessió provocarà la sobreescriptura del dibuix previ, que hi ha desat en l'emmagatzematge local. N'esteu segur?\n\n(Si voleu conservar el dibuix local, tanqueu la pentanya del navegador en comptes d'aturar la sessió).",
-    "errorLoadingLibrary": "S'ha produït un error en carregar la biblioteca de tercers.",
     "errorAddingToLibrary": "No s'ha pogut afegir l'element a la biblioteca",
     "errorRemovingFromLibrary": "No s'ha pogut eliminar l'element de la biblioteca",
     "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?",
@@ -189,7 +189,8 @@
     "fileTooBig": "El fitxer és massa gros. La mida màxima permesa és {{maxSize}}.",
     "svgImageInsertError": "No ha estat possible inserir la imatge SVG. Les marques SVG semblen invàlides.",
     "invalidSVGString": "SVG no vàlid.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Selecció",
@@ -341,7 +342,8 @@
       "post": "que, en resum, vol dir que qualsevol persona pot fer-ne ús sense restriccions."
     },
     "noteItems": "Cada element de la biblioteca ha de tenir el seu propi nom per tal que sigui filtrable. S'hi inclouran els elements següents:",
-    "atleastOneLibItem": "Si us plau, seleccioneu si més no un element de la biblioteca per a començar"
+    "atleastOneLibItem": "Si us plau, seleccioneu si més no un element de la biblioteca per a començar",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",

@@ -383,7 +383,7 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | [`onChange`](#onChange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
-| [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState<a> } </pre> | null | The initial data with which app loads. |
+| [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState<a> } </pre> | null | The initial data with which app loads. |
 | [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) &#124; [`useRef`](https://reactjs.org/docs/hooks-reference.html#useref) &#124; [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) &#124; <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
@@ -423,7 +423,7 @@ Every time component updates, this callback if passed will get triggered and has
 
 1.`excalidrawElements`: Array of [excalidrawElements](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106) in the scene.
 
-2.`appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66) of the scene.
+2.`appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79) of the scene.
 
 3. `files`: The [`BinaryFiles`]([BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) which are added to the scene.
 
@@ -436,7 +436,7 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 | Name | Type | Description |
 | --- | --- | --- |
 | `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106) | The elements with which Excalidraw should be mounted. |
-| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66) | The App state with which Excalidraw should be mounted. |
+| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79) | The App state with which Excalidraw should be mounted. |
 | `scrollToContent` | boolean | This attribute implies whether to scroll to the nearest element to center once Excalidraw is mounted. By default, it will not scroll the nearest element to the center. Make sure you pass `initialData.appState.scrollX` and `initialData.appState.scrollY` when `scrollToContent` is false so that scroll positions are retained |
 | `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise<[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)> | This library items with which Excalidraw should be mounted. |
 | `files` | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) | The files added to the scene. |
@@ -575,7 +575,7 @@ This callback is triggered when mouse pointer is updated.
 ```
 
 1. `exportedElements`: An array of [non deleted elements](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L87) which needs to be exported.
-2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66) of the scene.
+2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79) of the scene.
 3. `canvas`: The `HTMLCanvasElement` of the scene.
 
 #### `langCode`
@@ -594,7 +594,7 @@ import { defaultLang, languages } from "@excalidraw/excalidraw-next";
 #### `renderTopRightUI`
 
 <pre>
-(isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a>) => JSX
+(isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>) => JSX
 </pre>
 
 A function returning JSX to render custom UI in the top right corner of the app.
@@ -602,7 +602,7 @@ A function returning JSX to render custom UI in the top right corner of the app.
 #### `renderFooter`
 
 <pre>
-(isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a>) => JSX
+(isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>) => JSX
 </pre>
 
 A function returning JSX to render custom UI footer. For example, you can use this to render a language picker that was previously being rendered by Excalidraw itself (for now, you'll need to implement your own language picker).
@@ -803,7 +803,7 @@ No, Excalidraw package doesn't come with collaboration built in, since the imple
 **_Signature_**
 
 <pre>
-restoreAppState(appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L17">ImportedDataState["appState"]</a>, localAppState: Partial<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a>> | null): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a>
+restoreAppState(appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L17">ImportedDataState["appState"]</a>, localAppState: Partial<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>> | null): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>
 </pre>
 
 **_How to use_**
@@ -812,7 +812,7 @@ restoreAppState(appState: <a href="https://github.com/excalidraw/excalidraw/blob
 import { restoreAppState } from "@excalidraw/excalidraw-next";
 ```
 
-This function will make sure all the keys have appropriate values in [appState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66) and if any key is missing, it will be set to default value.
+This function will make sure all the keys have appropriate values in [appState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79) and if any key is missing, it will be set to default value.
 
 When `localAppState` is supplied, it's used in place of values that are missing (`undefined`) in `appState` instead of defaults. Use this as a way to not override user's defaults if you persist them. Required: supply `null`/`undefined` if not applicable.
 
@@ -839,7 +839,7 @@ When `localElements` are supplied, they are used to ensure that existing restore
 **_Signature_**
 
 <pre>
-restoreElements(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L12">ImportedDataState</a>, localAppState: Partial<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a>> | null | undefined, localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L4">DataState</a>
+restoreElements(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L12">ImportedDataState</a>, localAppState: Partial<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>> | null | undefined, localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L4">DataState</a>
 </pre>
 
 See [`restoreAppState()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreAppState) about `localAppState`, and [`restoreElements()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreElements) about `localElements`.
@@ -934,7 +934,7 @@ Returns a promise which resolves with a [blob](https://developer.mozilla.org/en-
 <pre>
 exportToSvg({
   elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>,
-  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a>,
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>,
   exportPadding?: number,
   metadata?: string,
   files?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64">BinaryFiles</a>
@@ -944,7 +944,7 @@ exportToSvg({
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | elements | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106) |  | The elements to exported as svg |
-| appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
+| appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
 | exportPadding | number | 10 | The padding to be added on canvas |
 | files | [BinaryFiles](The [`BinaryFiles`](<[BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64)>) | undefined | The files added to the scene. |
 
@@ -996,7 +996,7 @@ Copies the scene data in the specified format (determined by `type`) to clipboar
 <pre>
 serializeAsJSON({
   elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>,
-  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a>,
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>,
 }): string
 </pre>
 
@@ -1074,7 +1074,7 @@ excalidrawAPI.updateScene(scene);
 <pre>
 loadFromBlob(
   blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,
-  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a> | null,
+  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a> | null,
   localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a> | null,
   fileHandle?: FileSystemHandle | null
 ) => Promise<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L53">RestoredDataState</a>>
@@ -1102,7 +1102,7 @@ if (contents.type === MIME_TYPES.excalidraw) {
 <pre>
 loadSceneOrLibraryFromBlob(
   blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,
-  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a> | null,
+  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a> | null,
   localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a> | null,
   fileHandle?: FileSystemHandle | null
 ) => Promise<{ type: string, data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L53">RestoredDataState</a> | <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L33">ImportedLibraryState</a>}>
@@ -1216,6 +1216,34 @@ useHandleLibrary(opts: {
 A hook that automatically imports library from url if `#addLibrary` hash key exists on initial load, or when it changes during the editing session (e.g. when a user installs a new library), and handles initial library load if `getInitialLibraryItems` getter is supplied.
 
 In the future, we will be adding support for handling library persistence to browser storage (or elsewhere).
+
+#### `sceneCoordsToViewportCoords`
+
+```js
+import { sceneCoordsToViewportCoords } from "@excalidraw/excalidraw-next";
+```
+
+**_Signature_**
+
+<pre>
+sceneCoordsToViewportCoords({sceneX: number, sceneY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>): {x: number, y: number}
+</pre>
+
+This function returns equivalent viewport coords for the provided scene coords in params.
+
+#### `viewportCoordsToSceneCoords`
+
+```js
+import { viewportCoordsToSceneCoords } from "@excalidraw/excalidraw-next";
+```
+
+**_Signature_**
+
+<pre>
+viewportCoordsToSceneCoords({clientX: number, clientY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>): {x: number, y: number}
+</pre>
+
+This function returns equivalent scene coords for the provided viewport coords in params.
 
 ### Exported constants
 

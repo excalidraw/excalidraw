@@ -119,7 +119,8 @@
       "unlock": "Kilidi Kaldır",
       "lockAll": "Hepsini kilitle",
       "unlockAll": "Hepsinin kilidini kaldır"
-    }
+    },
+    "statusPublished": "Yayınlandı"
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır.",
     "loadSceneOverridePrompt": "Harici çizimler yüklemek mevcut olan içeriği değiştirecektir. Devam etmek istiyor musunuz?",
     "collabStopOverridePrompt": "Oturumu sonlandırmak daha önceki, yerel olarak kaydedilmiş çizimin üzerine kaydedilmesine sebep olacak. Emin misiniz?\n\n(Yerel çiziminizi kaybetmemek için tarayıcı sekmesini kapatabilirsiniz.)",
-    "errorLoadingLibrary": "Üçüncü taraf kitaplığı yüklerken bir hata oluştu.",
     "errorAddingToLibrary": "Öğe kütüphaneye eklenemedi",
     "errorRemovingFromLibrary": "Öğe kütüphaneden silinemedi",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
@@ -189,7 +189,8 @@
     "fileTooBig": "Dosya çok büyük. İzin verilen maksimum boyut {{maxSize}}.",
     "svgImageInsertError": "SVG resmi eklenemedi. SVG işaretlemesi geçersiz görünüyor.",
     "invalidSVGString": "Geçersiz SVG.",
-    "cannotResolveCollabServer": "İş birliği sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin."
+    "cannotResolveCollabServer": "İş birliği sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin.",
+    "importLibraryError": "Kütüphane yüklenemedi"
   },
   "toolBar": {
     "selection": "Seçme",
@@ -341,7 +342,8 @@
       "post": "ki bu kısaca herkesin onu kısıtlama olmaksızın kullanabileceği anlamına gelmektedir."
     },
     "noteItems": "Her kütüphane kendi ismine sahip olmalı ki tarama yapabilelim. Şu kütüphane ögeleri dahil edilecek:",
-    "atleastOneLibItem": "Lütfen başlamak için en az bir tane kütüphane ögesi seçin"
+    "atleastOneLibItem": "Lütfen başlamak için en az bir tane kütüphane ögesi seçin",
+    "republishWarning": "Not: seçilen ögelerden bir kısmı zaten yayınlanmış/gönderilmiş. Yalnızca mevcut kütüphane ve gönderileri güncellerken yeniden gönderme işlemi yapmalısınız."
   },
   "publishSuccessDialog": {
     "title": "Kütüphane gönderildi",
