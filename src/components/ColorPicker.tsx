@@ -9,6 +9,7 @@ import { isWritableElement } from "../utils";
 import colors from "../colors";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
+import { nanoid } from "nanoid"; //zsviczian
 
 const MAX_CUSTOM_COLORS = 5;
 const MAX_DEFAULT_COLORS = 15;
@@ -235,7 +236,7 @@ const Picker = ({
             custom || MAX_DEFAULT_COLORS > i ? keyBindings[i] : ""
           } //zsviczian
           style={{ color: _color }}
-          key={!custom && customPalette ? type + _color : _color} //zsviczian
+          key={`${_color} - ${nanoid(4)}`} //zsviczian
           ref={(el) => {
             if (!custom && el && i === 0) {
               firstItem.current = el;
