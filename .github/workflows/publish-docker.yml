@@ -11,13 +11,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: Prepare
         id: prep
         run: |
           DOCKER_IMAGE=${{ secrets.DOCKER_USERNAME }}/${GITHUB_REPOSITORY#*/}
           GITHUB_SHA=${{ github.sha }}
-          TAGS="${DOCKER_IMAGE}:${GITHUB_SHA},${DOCKER_IMAGE}:latest"
+          DATE=${{ steps.date.outputs.date }}
+          TAGS="${DOCKER_IMAGE}:${GITHUB_SHA}-${DATE},${DOCKER_IMAGE}:latest"
           # Set output parameters.
           echo ::set-output name=tags::${TAGS}
 
