@@ -65,7 +65,7 @@
     "artist": "艺术",
     "cartoonist": "漫画家",
     "fileTitle": "文件名",
-    "colorPicker": "调色盘",
+    "colorPicker": "取色器",
     "canvasColors": "画布上的",
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
@@ -117,10 +117,11 @@
     },
     "elementLock": {
       "lock": "锁定",
-      "unlock": "解锁​​​​",
+      "unlock": "解除锁定",
       "lockAll": "全部锁定",
       "unlockAll": "全部解锁"
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -173,7 +174,6 @@
     "uploadedSecurly": "上传已被端到端加密保护，这意味着 Excalidraw 的服务器和第三方都无法读取内容。",
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
     "collabStopOverridePrompt": "停止会话将覆盖您先前本地存储的绘图。 您确定吗？\n\n(如果您想保持本地绘图，只需关闭浏览器选项卡。)",
-    "errorLoadingLibrary": "加载第三方素材库时出错。",
     "errorAddingToLibrary": "无法将项目添加到素材库中",
     "errorRemovingFromLibrary": "无法从素材库中移除项目",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的素材库中。您确定吗？",
@@ -190,7 +190,8 @@
     "fileTooBig": "文件过大。最大允许的大小为 {{maxSize}}。",
     "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
     "invalidSVGString": "无效的 SVG。",
-    "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。"
+    "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。",
+    "importLibraryError": "无法加载素材库"
   },
   "toolBar": {
     "selection": "选择",
@@ -342,7 +343,8 @@
       "post": "简而言之，任何人都可以不受限制地使用它们。"
     },
     "noteItems": "素材库中每个项目都有各自的名称以供筛选。以下项目将被包含：",
-    "atleastOneLibItem": "请选择至少一个素材库以开始"
+    "atleastOneLibItem": "请选择至少一个素材库以开始",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "素材库已提交",
