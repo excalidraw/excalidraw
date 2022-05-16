@@ -120,7 +120,7 @@
       "lockAll": "Zamknúť všetko",
       "unlockAll": "Odomknúť všetko"
     },
-    "statusPublished": ""
+    "statusPublished": "Zverejnené"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -343,7 +343,7 @@
     },
     "noteItems": "Každá položka v knižnici musí mať svoje vlastné meno, aby sa dala vyhľadať. Súčasťou knižnice budú nasledujúce položky:",
     "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice",
-    "republishWarning": ""
+    "republishWarning": "Poznámka: Niektoré z vybraných položiek sú už označené ako zverejnené. Ich znovu uverejnenie by ste mali vykovať iba vtedy ak aktualizujete už existujúcu knižnicu alebo požiadavku na uverejnenie."
   },
   "publishSuccessDialog": {
     "title": "Knižnica uverejnená",
