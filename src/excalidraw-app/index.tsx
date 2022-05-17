@@ -204,7 +204,7 @@ const PlusLinkJSX = (
 
 const PlusButtonJSX = (
   <a
-    href="https://app.excalidraw.com/#auto-redirect"
+    href={`${process.env.REACT_APP_PLUS_APP}/#excalidraw-redirect`}
     target="_blank"
     rel="noreferrer"
     className="plus-button"
