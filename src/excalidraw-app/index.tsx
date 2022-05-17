@@ -74,6 +74,10 @@ import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 
+const isExcalidrawPlusSignedUser = document.cookie.includes(
+  COOKIES.AUTH_STATE_COOKIE,
+);
+
 const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {
@@ -188,7 +192,7 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
-const PlusLinkJSX = (
+const PlusLPLinkJSX = (
   <p style={{ direction: "ltr", unicodeBidi: "embed" }}>
     Introducing Excalidraw+
     <br />
@@ -202,14 +206,14 @@ const PlusLinkJSX = (
   </p>
 );
 
-const PlusButtonJSX = (
+const PlusAppLinkJSX = (
   <a
     href={`${process.env.REACT_APP_PLUS_APP}/#excalidraw-redirect`}
     target="_blank"
     rel="noreferrer"
     className="plus-button"
   >
-    Go to Excalidraw +
+    Go to Excalidraw+
   </a>
 );
 
@@ -542,22 +546,15 @@ const ExcalidrawWrapper = () => {
         return null;
       }
 
-      const isExcalidrawPlusSignedUser = document.cookie.includes(
-        COOKIES.AUTH_STATE_COOKIE,
-      );
-
       return (
         <div
           style={{
-            width: "24ch",
+            width: isExcalidrawPlusSignedUser ? "21ch" : "23ch",
             fontSize: "0.7em",
             textAlign: "center",
           }}
         >
-          {/* <GitHubCorner theme={appState.theme} dir={document.dir} /> */}
-          {/* FIXME remove after redesign */}
-          {!isExcalidrawPlusSignedUser && PlusLinkJSX}
-          {isExcalidrawPlusSignedUser && PlusButtonJSX}
+          {isExcalidrawPlusSignedUser ? PlusAppLinkJSX : PlusLPLinkJSX}
         </div>
       );
     },
@@ -609,12 +606,14 @@ const ExcalidrawWrapper = () => {
                 marginTop: isTinyDevice ? 16 : undefined,
                 marginLeft: "auto",
                 marginRight: isTinyDevice ? "auto" : undefined,
-                padding: "4px 2px",
-                border: "1px dashed #aaa",
+                padding: isExcalidrawPlusSignedUser ? undefined : "4px 2px",
+                border: isExcalidrawPlusSignedUser
+                  ? undefined
+                  : "1px dashed #aaa",
                 borderRadius: 12,
               }}
             >
-              {PlusLinkJSX}
+              {isExcalidrawPlusSignedUser ? PlusAppLinkJSX : PlusLPLinkJSX}
             </div>
           </div>
         );

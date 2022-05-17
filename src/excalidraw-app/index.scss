@@ -40,7 +40,7 @@
   align-items: center;
   border: 1px solid var(--color-primary);
   padding: 0.6em 0.7em;
-  border-radius: 4px;
+  border-radius: var(--space-factor);
   color: var(--color-primary) !important;
   margin: 8px;
   text-decoration: none !important;
@@ -48,5 +48,9 @@
   &:hover {
     background-color: var(--color-primary);
     color: white !important;
+  }
+
+  &:active {
+    background-color: var(--color-primary-darker);
   }
 }
