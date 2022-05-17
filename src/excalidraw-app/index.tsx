@@ -4,7 +4,13 @@ import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
+import {
+  APP_NAME,
+  COOKIES,
+  EVENT,
+  TITLE_TIMEOUT,
+  VERSION_TIMEOUT,
+} from "../constants";
 import { loadFromBlob } from "../data/blob";
 import {
   ExcalidrawElement,
@@ -194,6 +200,17 @@ const PlusLinkJSX = (
       Try out now!
     </a>
   </p>
+);
+
+const PlusButtonJSX = (
+  <a
+    href="https://app.excalidraw.com/#auto-redirect"
+    target="_blank"
+    rel="noreferrer"
+    className="plus-button"
+  >
+    Go to Excalidraw +
+  </a>
 );
 
 const ExcalidrawWrapper = () => {
@@ -524,6 +541,11 @@ const ExcalidrawWrapper = () => {
       if (isMobile) {
         return null;
       }
+
+      const isExcalidrawPlusSignedUser = document.cookie.includes(
+        COOKIES.AUTH_STATE_COOKIE,
+      );
+
       return (
         <div
           style={{
@@ -533,8 +555,9 @@ const ExcalidrawWrapper = () => {
           }}
         >
           {/* <GitHubCorner theme={appState.theme} dir={document.dir} /> */}
-          {/* FIXME remove after 2021-05-20 */}
-          {PlusLinkJSX}
+          {/* FIXME remove after redesign */}
+          {!isExcalidrawPlusSignedUser && PlusLinkJSX}
+          {isExcalidrawPlusSignedUser && PlusButtonJSX}
         </div>
       );
     },
