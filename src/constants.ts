@@ -193,3 +193,7 @@ export const VERTICAL_ALIGN = {
 };
 
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
+
+export const COOKIES = {
+  AUTH_STATE_COOKIE: "excplus-auth",
+} as const;

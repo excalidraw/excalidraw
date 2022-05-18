@@ -4,7 +4,13 @@ import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
+import {
+  APP_NAME,
+  COOKIES,
+  EVENT,
+  TITLE_TIMEOUT,
+  VERSION_TIMEOUT,
+} from "../constants";
 import { loadFromBlob } from "../data/blob";
 import {
   ExcalidrawElement,
@@ -67,6 +73,10 @@ import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
+
+const isExcalidrawPlusSignedUser = document.cookie.includes(
+  COOKIES.AUTH_STATE_COOKIE,
+);
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -182,7 +192,7 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
-const PlusLinkJSX = (
+const PlusLPLinkJSX = (
   <p style={{ direction: "ltr", unicodeBidi: "embed" }}>
     Introducing Excalidraw+
     <br />
@@ -194,6 +204,17 @@ const PlusLinkJSX = (
       Try out now!
     </a>
   </p>
+);
+
+const PlusAppLinkJSX = (
+  <a
+    href={`${process.env.REACT_APP_PLUS_APP}/#excalidraw-redirect`}
+    target="_blank"
+    rel="noreferrer"
+    className="plus-button"
+  >
+    Go to Excalidraw+
+  </a>
 );
 
 const ExcalidrawWrapper = () => {
@@ -524,17 +545,16 @@ const ExcalidrawWrapper = () => {
       if (isMobile) {
         return null;
       }
+
       return (
         <div
           style={{
-            width: "24ch",
+            width: isExcalidrawPlusSignedUser ? "21ch" : "23ch",
             fontSize: "0.7em",
             textAlign: "center",
           }}
         >
-          {/* <GitHubCorner theme={appState.theme} dir={document.dir} /> */}
-          {/* FIXME remove after 2021-05-20 */}
-          {PlusLinkJSX}
+          {isExcalidrawPlusSignedUser ? PlusAppLinkJSX : PlusLPLinkJSX}
         </div>
       );
     },
@@ -586,12 +606,14 @@ const ExcalidrawWrapper = () => {
                 marginTop: isTinyDevice ? 16 : undefined,
                 marginLeft: "auto",
                 marginRight: isTinyDevice ? "auto" : undefined,
-                padding: "4px 2px",
-                border: "1px dashed #aaa",
+                padding: isExcalidrawPlusSignedUser ? undefined : "4px 2px",
+                border: isExcalidrawPlusSignedUser
+                  ? undefined
+                  : "1px dashed #aaa",
                 borderRadius: 12,
               }}
             >
-              {PlusLinkJSX}
+              {isExcalidrawPlusSignedUser ? PlusAppLinkJSX : PlusLPLinkJSX}
             </div>
           </div>
         );
