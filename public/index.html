@@ -65,7 +65,7 @@
         !window.location.hash &&
         !window.location.search &&
         // if its present redirect
-        document.cookie.includes("excplus-autoredirect")
+        document.cookie.includes("excplus-autoredirect=true")
       ) {
         window.location.href = "https://app.excalidraw.com";
       }
