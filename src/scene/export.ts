@@ -2,6 +2,7 @@ import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
+import { generateElementShape } from "../renderer/renderElement";
 import { distance } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
@@ -102,6 +103,19 @@ export const exportToSvg = async (
       console.error(error);
     }
   }
+
+  const dummySvg = document.createElementNS(SVG_NS, "svg");
+  const rsvg = rough.svg(dummySvg);
+  elements
+    .filter((el) => !el.isDeleted)
+    .forEach((element) => {
+      try {
+        generateElementShape(element, rsvg.generator);
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
   // initialize SVG root
@@ -155,7 +169,6 @@ export const exportToSvg = async (
     svgRoot.appendChild(rect);
   }
 
-  const rsvg = rough.svg(svgRoot);
   renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,

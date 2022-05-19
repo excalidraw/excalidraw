@@ -401,7 +401,7 @@ export const generateRoughOptions = (
  * @param element
  * @param generator
  */
-const generateElementShape = (
+export const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
 ) => {
@@ -845,7 +845,6 @@ export const renderElementToSvg = (
   const cx = (x2 - x1) / 2 - (element.x - x1);
   const cy = (y2 - y1) / 2 - (element.y - y1);
   const degree = (180 * element.angle) / Math.PI;
-  const generator = rsvg.generator;
 
   // element to append node to, most of the time svgRoot
   let root = svgRoot;
@@ -867,7 +866,6 @@ export const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      generateElementShape(element, generator);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         getShapeForElement(element)!,
@@ -890,7 +888,6 @@ export const renderElementToSvg = (
     }
     case "line":
     case "arrow": {
-      generateElementShape(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       const opacity = element.opacity / 100;
       group.setAttribute("stroke-linecap", "round");
@@ -924,8 +921,6 @@ export const renderElementToSvg = (
       break;
     }
     case "freedraw": {
-      generateElementShape(element, generator);
-      generateFreeDrawShape(element);
       const opacity = element.opacity / 100;
       const shape = getShapeForElement(element);
       const node = shape
