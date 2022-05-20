@@ -495,6 +495,8 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | [id](#id) | string | Unique ID for the excalidraw component. |
 | [getFiles](#getFiles) | <code>() => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64">files</a> </code> | This API can be used to get the files present in the scene. It may contain files that aren't referenced by any element, so if you're persisting the files to a storage, you should compare them against stored elements. |
 | [setActiveTool](#setActiveTool) | <code>(tool: { type: typeof <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L4">SHAPES</a>[number]["value"] &#124; "eraser" } &#124; { type: "custom"; customType: string }) => void</code> | This API can be used to set the active tool |
+| [setCursor](#setCursor) | <code>(cursor: string) => void </code> | This API can be used to set customise the cursor on the canvas |
+| [setCursor](#resetCursor) | <code>() => void </code> | This API can be used to reset to default mouse cursor on the canvas |
 
 #### `readyPromise`
 
@@ -706,6 +708,18 @@ This API has the below signature. It sets the `tool` passed in param as the acti
 <pre>
 (tool: { type: typeof <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L4">SHAPES</a>[number]["value"] &#124; "eraser" } &#124; { type: "custom"; customType: string }) => void
 </pre>
+
+#### `setCursor`
+
+This API can be used to customise the mouse cursor on the canvas and has the below signature. It sets the mouse cursor to the cursor passed in param.
+
+<pre>
+(cursor: string) => void
+</pre>
+
+#### `resetCursor`
+
+This API can be used to reset to default mouse cursor.
 
 #### `detectScroll`
 
