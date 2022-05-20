@@ -4432,7 +4432,7 @@ class App extends React.Component<AppProps, AppState> {
               }),
               selectedElementIds: {
                 ...prevState.selectedElementIds,
-                [this.state.draggingElement!.id]: true,
+                [draggingElement.id]: true,
               },
             }));
           } else {
@@ -4440,7 +4440,7 @@ class App extends React.Component<AppProps, AppState> {
               draggingElement: null,
               selectedElementIds: {
                 ...prevState.selectedElementIds,
-                [this.state.draggingElement!.id]: true,
+                [draggingElement.id]: true,
               },
             }));
           }
