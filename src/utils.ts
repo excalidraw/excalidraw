@@ -301,7 +301,8 @@ export const setCursorForShape = (
     setEraserCursor(canvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
-  } else if (appState.activeTool.type !== "image") {
+    // Ignore custom type as well and let host decide
+  } else if (!["image", "custom"].includes(appState.activeTool.type)) {
     canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
