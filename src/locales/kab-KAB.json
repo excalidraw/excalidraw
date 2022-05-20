@@ -107,20 +107,20 @@
     "excalidrawLib": "Tamkarḍit n Excalidraw",
     "decreaseFontSize": "Senqes tiddi n tsefsit",
     "increaseFontSize": "Sali tiddi n tsefsit",
-    "unbindText": "",
-    "bindText": "",
+    "unbindText": "Serreḥ iweḍris",
+    "bindText": "Arez aḍris s anagbar",
     "link": {
       "edit": "Ẓreg aseɣwen",
       "create": "Snulfu-d aseɣwen",
       "label": "Aseɣwen"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Sekkeṛ",
+      "unlock": "Serreḥ",
+      "lockAll": "Sekkeṛ akk",
+      "unlockAll": "Serreḥ akk"
     },
-    "statusPublished": ""
+    "statusPublished": "Yeffeɣ-d"
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
@@ -190,7 +190,7 @@
     "svgImageInsertError": "D awezɣi tugra n tugna SVG. Acraḍ SVG yettban-d d armeɣtu.",
     "invalidSVGString": "SVG armeɣtu.",
     "cannotResolveCollabServer": "Ulamek tuqqna s aqeddac n umyalel. Ma ulac uɣilif ales asali n usebter sakin eɛreḍ tikkelt-nniḍen.",
-    "importLibraryError": ""
+    "importLibraryError": "Ur d-ssalay ara tamkarḍit"
   },
   "toolBar": {
     "selection": "Tafrayt",
@@ -343,7 +343,7 @@
     },
     "noteItems": "Yal aferdis n temkarḍit isefk ad isɛu isem-is i yiman-is akken ad yili wamek ara yettusizdeg. Iferdisen-agi n temkarḍit ad ddun:",
     "atleastOneLibItem": "Ma ulac uɣilif fern ma drus yiwen n uferdis n temkarḍit akken ad tebduḍ",
-    "republishWarning": ""
+    "republishWarning": "Tamawt: kra n yiferdisen yettwafernen ttwacerḍen ffeɣen-d/ttwaznen. Isefk ad talseḍ tuzzna n yiferdisen anagar mi ara tleqqemeḍ tamkarḍit neɣ tuzzna yellan."
   },
   "publishSuccessDialog": {
     "title": "Tamkarḍit tettwazen",
