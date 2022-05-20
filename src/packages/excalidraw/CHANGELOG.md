@@ -17,7 +17,7 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
-- Export api to [set](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#setCursor) and [reset](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#resetCursor) mouse cursor on the canvas [#5215](https://github.com/excalidraw/excalidraw/pull/5215).
+- Export API to [set](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#setCursor) and [reset](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#resetCursor) mouse cursor on the canvas [#5215](https://github.com/excalidraw/excalidraw/pull/5215).
 
 - Export [`sceneCoordsToViewportCoords`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) and [`viewportCoordsToSceneCoords`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) utilities [#5187](https://github.com/excalidraw/excalidraw/pull/5187).
 
