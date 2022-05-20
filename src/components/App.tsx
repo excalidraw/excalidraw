@@ -5197,6 +5197,9 @@ class App extends React.Component<AppProps, AppState> {
 
     try {
       if (isSupportedImageFile(file)) {
+        if (this.props.UIOptions.shapeActions.image === false) {
+          return;
+        }
         // first attempt to decode scene from the image if it's embedded
         // ---------------------------------------------------------------------
 
