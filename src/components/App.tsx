@@ -1345,6 +1345,10 @@ class App extends React.Component<AppProps, AppState> {
 
       // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
+        if (this.props.UIOptions.shapeActions.image === false) {
+          return;
+        }
+
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
           this.state,
