@@ -383,6 +383,8 @@ class App extends React.Component<AppProps, AppState> {
         setToastMessage: this.setToastMessage,
         id: this.id,
         setActiveTool: this.setActiveTool,
+        setCursor: this.setCursor,
+        resetCursor: this.resetCursor,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1921,6 +1923,13 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private setCursor = (cursor: string) => {
+    setCursor(this.canvas, cursor);
+  };
+
+  private resetCursor = () => {
+    resetCursor(this.canvas);
+  };
   /**
    * returns whether user is making a gesture with >= 2 fingers (points)
    * on o touch screen (not on a trackpad). Currently only relates to Darwin
@@ -3013,7 +3022,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "custom") {
-      setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
+      setCursor(this.canvas, CURSOR_TYPE.AUTO);
     } else if (this.state.activeTool.type !== "eraser") {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -4423,7 +4432,7 @@ class App extends React.Component<AppProps, AppState> {
               }),
               selectedElementIds: {
                 ...prevState.selectedElementIds,
-                [this.state.draggingElement!.id]: true,
+                [draggingElement.id]: true,
               },
             }));
           } else {
@@ -4431,7 +4440,7 @@ class App extends React.Component<AppProps, AppState> {
               draggingElement: null,
               selectedElementIds: {
                 ...prevState.selectedElementIds,
-                [this.state.draggingElement!.id]: true,
+                [draggingElement.id]: true,
               },
             }));
           }
