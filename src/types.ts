@@ -500,6 +500,8 @@ export type ExcalidrawImperativeAPI = {
   restore: InstanceType<typeof App>["restore"]; //zsviczian
   setMobileModeAllowed: (allow: boolean) => void; //zsviczian
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
+  setCursor: InstanceType<typeof App>["setCursor"];
+  resetCursor: InstanceType<typeof App>["resetCursor"];
 };
 
 export type DeviceType = {
