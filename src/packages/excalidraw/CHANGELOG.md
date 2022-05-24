@@ -91,6 +91,12 @@ In Browser :point_down:
 React.createElement(ExcalidrawLib.Excalidraw, opts);
 ```
 
+### Excalidraw Library
+
+#### Chore
+
+- Transpile `browser-fs-access` dependency so that its `for await` syntax doesn't force es2018 requirement onto dependent projects [#5041](https://github.com/excalidraw/excalidraw/pull/5041).
+
 ## 0.11.0 (2022-02-17)
 
 ## Excalidraw API
