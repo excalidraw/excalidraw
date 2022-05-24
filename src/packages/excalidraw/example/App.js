@@ -10,7 +10,7 @@ import {
   withBatchedUpdates,
   withBatchedUpdatesThrottled,
 } from "../../../utils";
-import { DRAGGING_THRESHOLD, EVENT } from "../../../constants";
+import { EVENT } from "../../../constants";
 import { distance2d } from "../../../math";
 import { fileOpen } from "../../../data/filesystem";
 import { loadSceneOrLibraryFromBlob } from "../../utils";
@@ -264,29 +264,21 @@ export default function App() {
 
   const onPointerMoveFromPointerDownHandler = (pointerDownState) => {
     return withBatchedUpdatesThrottled((event) => {
-      const distance = distance2d(
-        pointerDownState.x,
-        pointerDownState.y,
-        event.clientX,
-        event.clientY,
+      const { x, y } = viewportCoordsToSceneCoords(
+        {
+          clientX: event.clientX - pointerDownState.hitElementOffsets.x,
+          clientY: event.clientY - pointerDownState.hitElementOffsets.y,
+        },
+        excalidrawAPI.getAppState(),
       );
-      if (distance > DRAGGING_THRESHOLD) {
-        const { x, y } = viewportCoordsToSceneCoords(
-          {
-            clientX: event.clientX - pointerDownState.hitElementOffsets.x,
-            clientY: event.clientY - pointerDownState.hitElementOffsets.y,
-          },
-          excalidrawAPI.getAppState(),
-        );
-        setCommentIcons({
-          ...commentIcons,
-          [pointerDownState.hitElement.id]: {
-            ...commentIcons[pointerDownState.hitElement.id],
-            x,
-            y,
-          },
-        });
-      }
+      setCommentIcons({
+        ...commentIcons,
+        [pointerDownState.hitElement.id]: {
+          ...commentIcons[pointerDownState.hitElement.id],
+          x,
+          y,
+        },
+      });
     });
   };
   const onPointerUpFromPointerDownHandler = (pointerDownState) => {
