@@ -264,10 +264,6 @@ export default function App() {
 
   const onPointerMoveFromPointerDownHandler = (pointerDownState) => {
     return withBatchedUpdatesThrottled((event) => {
-      const { x, y } = viewportCoordsToSceneCoords(
-        { clientX: event.clientX, clientY: event.clientY },
-        excalidrawAPI.getAppState(),
-      );
       const distance = distance2d(
         pointerDownState.x,
         pointerDownState.y,
@@ -275,6 +271,13 @@ export default function App() {
         event.clientY,
       );
       if (distance > DRAGGING_THRESHOLD) {
+        const { x, y } = viewportCoordsToSceneCoords(
+          {
+            clientX: event.clientX - pointerDownState.hitElementOffsets.x,
+            clientY: event.clientY - pointerDownState.hitElementOffsets.y,
+          },
+          excalidrawAPI.getAppState(),
+        );
         setCommentIcons({
           ...commentIcons,
           [pointerDownState.hitElement.id]: {
@@ -329,6 +332,7 @@ export default function App() {
             zIndex: 1,
             width: `${COMMENT_ICON_DIMENSION}px`,
             height: `${COMMENT_ICON_DIMENSION}px`,
+            cursor: "pointer",
           }}
           className="comment-icon"
           onPointerDown={(event) => {
@@ -341,6 +345,7 @@ export default function App() {
               x: event.clientX,
               y: event.clientY,
               hitElement: commentIcon,
+              hitElementOffsets: { x: event.clientX - x, y: event.clientY - y },
             };
             const onPointerMove =
               onPointerMoveFromPointerDownHandler(pointerDownState);
