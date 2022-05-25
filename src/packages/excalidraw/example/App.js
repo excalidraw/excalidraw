@@ -325,6 +325,7 @@ export default function App() {
             width: `${COMMENT_ICON_DIMENSION}px`,
             height: `${COMMENT_ICON_DIMENSION}px`,
             cursor: "pointer",
+            touchAction: "none",
           }}
           className="comment-icon"
           onPointerDown={(event) => {
