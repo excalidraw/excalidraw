@@ -25,7 +25,6 @@ import {
   PointerDownState as ExcalidrawPointerDownState,
 } from "../../../types";
 import { ExcalidrawElement } from "../../../element/types";
-import { restoreElements } from "..";
 import { ImportedLibraryData } from "../../../data/types";
 
 declare global {
@@ -65,6 +64,7 @@ const {
   MIME_TYPES,
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
+  restoreElements,
 } = window.ExcalidrawLib;
 
 const COMMENT_SVG = (
