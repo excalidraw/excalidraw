@@ -572,6 +572,14 @@ export const arrayToMap = <T extends { id: string } | string>(
   }, new Map());
 };
 
+export const arrayToMapWithIndex = <T extends { id: string }>(
+  elements: readonly T[],
+) =>
+  elements.reduce((acc, element: T, idx) => {
+    acc.set(element.id, [element, idx]);
+    return acc;
+  }, new Map<string, [element: T, index: number]>());
+
 export const isTestEnv = () =>
   typeof process !== "undefined" && process.env?.NODE_ENV === "test";
 

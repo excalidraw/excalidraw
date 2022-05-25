@@ -22,7 +22,7 @@ import {
   getBoundTextElement,
 } from "../element/textElement";
 import { isBoundToContainer } from "../element/typeChecks";
-import { sortBoundTextElementsAndContainersTogether } from "../element/sortElements";
+import { normalizeElementOrder } from "../element/sortElements";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -68,7 +68,7 @@ const duplicateElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ): Partial<ActionResult> => {
-  const sortedElements = sortBoundTextElementsAndContainersTogether(elements);
+  const sortedElements = normalizeElementOrder(elements);
   const groupIdMap = new Map();
   const newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
@@ -100,9 +100,9 @@ const duplicateElements = (
     const element = sortedElements[index];
     const boundTextElement = getBoundTextElement(element);
     if (selectedElementIds.get(element.id)) {
+      // if a group or a container/bound-text, duplicate atomically
       if (element.groupIds.length || boundTextElement) {
         const groupId = getSelectedGroupForElement(appState, element);
-        // if group selected, duplicate it atomically
         if (groupId) {
           const groupElements = getElementsInGroup(sortedElements, groupId);
           finalElements.push(
@@ -111,10 +111,9 @@ const duplicateElements = (
               duplicateAndOffsetElement(element),
             ),
           );
-          index = index + groupElements.length;
+          index += groupElements.length;
           continue;
         }
-        // If container + bounding text(s), interweave z-index-wise
         if (boundTextElement) {
           finalElements.push(
             element,
@@ -122,9 +121,11 @@ const duplicateElements = (
             duplicateAndOffsetElement(element),
             duplicateAndOffsetElement(boundTextElement),
           );
-          // if multiple text elements can be bound to a container
-          // change 2 to boundTextElements.length
-          index = index + 2;
+          // when we make getBoundTextElement() return an array,
+          // this should be changed to `+= 1 + boundTextElements.length`
+          // (yeah, no one will remember this 😭)
+          index += 2;
+
           continue;
         }
       }
@@ -132,6 +133,7 @@ const duplicateElements = (
     } else {
       finalElements.push(element);
     }
+
     index++;
   }
   bindTextToShapeAfterDuplication(

@@ -1,5 +1,6 @@
 import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
+import { arrayToMapWithIndex } from "../../utils";
 
 export type ReconciledElements = readonly ExcalidrawElement[] & {
   _brand: "reconciledElements";
@@ -32,30 +33,13 @@ const shouldDiscardRemoteElement = (
   return false;
 };
 
-const getElementsMapWithIndex = <T extends ExcalidrawElement>(
-  elements: readonly T[],
-) =>
-  elements.reduce(
-    (
-      acc: {
-        [key: string]: [element: T, index: number] | undefined;
-      },
-      element: T,
-      idx,
-    ) => {
-      acc[element.id] = [element, idx];
-      return acc;
-    },
-    {},
-  );
-
 export const reconcileElements = (
   localElements: readonly ExcalidrawElement[],
   remoteElements: readonly BroadcastedExcalidrawElement[],
   localAppState: AppState,
 ): ReconciledElements => {
   const localElementsData =
-    getElementsMapWithIndex<ExcalidrawElement>(localElements);
+    arrayToMapWithIndex<ExcalidrawElement>(localElements);
 
   const reconciledElements: ExcalidrawElement[] = localElements.slice();
 
@@ -68,7 +52,7 @@ export const reconcileElements = (
   for (const remoteElement of remoteElements) {
     remoteElementIdx++;
 
-    const local = localElementsData[remoteElement.id];
+    const local = localElementsData.get(remoteElement.id);
 
     if (shouldDiscardRemoteElement(localAppState, local?.[0], remoteElement)) {
       if (remoteElement.parent) {
@@ -102,21 +86,21 @@ export const reconcileElements = (
         offset++;
         if (cursor === 0) {
           reconciledElements.unshift(remoteElement);
-          localElementsData[remoteElement.id] = [
+          localElementsData.set(remoteElement.id, [
             remoteElement,
             cursor - offset,
-          ];
+          ]);
         } else {
           reconciledElements.splice(cursor + 1, 0, remoteElement);
-          localElementsData[remoteElement.id] = [
+          localElementsData.set(remoteElement.id, [
             remoteElement,
             cursor + 1 - offset,
-          ];
+          ]);
           cursor++;
         }
       } else {
-        let idx = localElementsData[parent]
-          ? localElementsData[parent]![1]
+        let idx = localElementsData.has(parent)
+          ? localElementsData.get(parent)![1]
           : null;
         if (idx != null) {
           idx += offset;
@@ -124,38 +108,38 @@ export const reconcileElements = (
         if (idx != null && idx >= cursor) {
           reconciledElements.splice(idx + 1, 0, remoteElement);
           offset++;
-          localElementsData[remoteElement.id] = [
+          localElementsData.set(remoteElement.id, [
             remoteElement,
             idx + 1 - offset,
-          ];
+          ]);
           cursor = idx + 1;
         } else if (idx != null) {
           reconciledElements.splice(cursor + 1, 0, remoteElement);
           offset++;
-          localElementsData[remoteElement.id] = [
+          localElementsData.set(remoteElement.id, [
             remoteElement,
             cursor + 1 - offset,
-          ];
+          ]);
           cursor++;
         } else {
           reconciledElements.push(remoteElement);
-          localElementsData[remoteElement.id] = [
+          localElementsData.set(remoteElement.id, [
             remoteElement,
             reconciledElements.length - 1 - offset,
-          ];
+          ]);
         }
       }
       // no parent z-index information, local element exists → replace in place
     } else if (local) {
       reconciledElements[local[1]] = remoteElement;
-      localElementsData[remoteElement.id] = [remoteElement, local[1]];
+      localElementsData.set(remoteElement.id, [remoteElement, local[1]]);
       // otherwise push to the end
     } else {
       reconciledElements.push(remoteElement);
-      localElementsData[remoteElement.id] = [
+      localElementsData.set(remoteElement.id, [
         remoteElement,
         reconciledElements.length - 1 - offset,
-      ];
+      ]);
     }
   }
 
