@@ -120,7 +120,7 @@
       "lockAll": "Blocca tutto",
       "unlockAll": "Sblocca tutto"
     },
-    "statusPublished": ""
+    "statusPublished": "Pubblicato"
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -343,7 +343,7 @@
     },
     "noteItems": "Ogni elemento della libreria deve avere il proprio nome, così che sia filtrabile. Gli elementi della seguente libreria saranno inclusi:",
     "atleastOneLibItem": "Sei pregato di selezionare almeno un elemento della libreria per iniziare",
-    "republishWarning": ""
+    "republishWarning": "Nota: alcuni degli elementi selezionati sono contrassegnati come già pubblicati/presentati. È necessario reinviare gli elementi solo quando si aggiorna una libreria o una presentazione esistente."
   },
   "publishSuccessDialog": {
     "title": "Libreria inviata",
