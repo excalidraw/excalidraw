@@ -187,12 +187,19 @@ const loadMathJax = async () => {
     mathJax.adaptor = liteAdaptor();
     const svg = new SVG({ fontCache: "local" });
 
+    // Configure AsciiMath to use the "display" option.  See
+    // https://github.com/mathjax/MathJax/issues/2520#issuecomment-1128831182.
+    const MathJax = (
+      await require("mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax")
+    ).MathJax;
+    MathJax.InputJax.AsciiMath.AM.Augment({ displaystyle: false });
+
     // AsciiMath input
     const asciimath = new AsciiMath<
       typeof LiteElement | typeof LiteText,
       typeof LiteText,
       typeof LiteDocument
-    >({ displaystyle: false });
+    >({});
     mathJax.amHtml = new HTMLDocument<
       typeof LiteElement | typeof LiteText,
       typeof LiteText,
