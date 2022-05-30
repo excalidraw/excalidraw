@@ -119,7 +119,8 @@
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "ਅੱਪਲੋਡ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਸ਼ਨ ਨਾਲ ਸੁਰੱਖਿਅਤ ਕੀਤੀ ਹੋਈ ਹੈ, ਜਿਸਦਾ ਮਤਲਬ ਇਹ ਹੈ ਕਿ Excalidraw ਸਰਵਰ ਅਤੇ ਤੀਜੀ ਧਿਰ ਦੇ ਬੰਦੇ ਸਮੱਗਰੀ ਨੂੰ ਪੜ੍ਹ ਨਹੀਂ ਸਕਦੇ।",
     "loadSceneOverridePrompt": "ਬਾਹਰੀ ਡਰਾਇੰਗ ਨੂੰ ਲੋਡ ਕਰਨਾ ਤੁਹਾਡੀ ਮੌਜੂਦਾ ਸਮੱਗਰੀ ਦੀ ਥਾਂ ਲੈ ਲਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਜਾਰੀ ਰੱਖਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
     "collabStopOverridePrompt": "ਇਜਲਾਸ ਨੂੰ ਰੋਕਣਾ ਪਿਛਲੀ ਲੋਕਲ ਸਾਂਭੀ ਡਰਾਇੰਗ ਦੀ ਥਾਂ ਲੈ ਲਵੇਗਾ। ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?\n\n(ਜੇ ਤੁਸੀਂ ਆਪਣੀ ਲੋਕਲ ਡਰਾਇੰਗ ਨੂੰ ਬਰਕਰਾਰ ਰੱਖਣਾ ਚਾਹੁੰਦੇ ਹੋ ਤਾਂ ਇਹ ਕਰਨ ਦੀ ਬਜਾਏ ਬੱਸ ਆਪਣਾ ਟੈਬ ਬੰਦ ਕਰ ਦਿਉ।)",
-    "errorLoadingLibrary": "ਤੀਜੀ ਧਿਰ ਦੀ ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਲੋਡ ਕਰਨ ਵਿੱਚ ਗਲਤੀ ਹੋਈ ਸੀ।",
     "errorAddingToLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਸਮੱਗਰੀ ਨਹੀਂ ਜੋੜ ਸਕੇ",
     "errorRemovingFromLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ ਸਮੱਗਰੀ ਨਹੀਂ ਹਟਾ ਸਕੇ",
     "confirmAddLibrary": "ਇਹ ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ {{numShapes}} ਆਕ੍ਰਿਤੀ(ਆਂ) ਨੂੰ ਜੋੜ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
@@ -189,7 +189,8 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
@@ -341,7 +342,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
