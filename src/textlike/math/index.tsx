@@ -226,6 +226,12 @@ const loadMathJax = async () => {
   }
 };
 
+// Round `x` to `n` decimal places
+const roundDec = (x: number, n: number) => {
+  const powOfTen = Math.pow(10, n);
+  return Math.round(x * powOfTen) / powOfTen;
+};
+
 const splitMath = (text: string, mathOpts: MathOpts) => {
   const startDelimiter = getStartDelimiter(mathOpts.useTex);
   const endDelimiter = getEndDelimiter(mathOpts.useTex);
@@ -611,6 +617,7 @@ const renderMath = (
     text: string,
     rtl: boolean,
     childRtl: boolean,
+    lineHeight: number,
   ) => void,
   doRenderChild: (x: number, y: number, width: number, height: number) => void,
 ) => {
@@ -646,7 +653,8 @@ const renderMath = (
         ? false
         : isRTL(content[mathOpts.mathOnly ? 0 : i]);
       // Set up the child for rendering
-      doSetupChild(childIsSvg, svg, content[i], rtl, childRtl);
+      const height = lineMetrics.height;
+      doSetupChild(childIsSvg, svg, content[i], rtl, childRtl, height);
       // Don't offset when we have an empty string.
       const nullContent = content.length > 0 && content[i] === "";
       const childX = nullContent ? 0 : lineMarkupMetrics[i].x;
@@ -944,10 +952,36 @@ const renderSvgTextElementMath = (
     text: string,
     rtl: boolean,
     childRtl: boolean,
-  ) => void = function (childIsSvg, svg, text, rtl, childRtl) {
+    lineHeight: number,
+  ) => void = function (childIsSvg, svg, text, rtl, childRtl, lineHeight) {
     _rtl = rtl;
     if (childIsSvg && text !== "") {
       childNode = svg!;
+
+      // Scale the viewBox to have a centered height of 1.2 * lineHeight
+      const rect = childNode.viewBox.baseVal;
+      const scale = (1.2 * lineHeight) / rect.height;
+      const goffset = roundDec(0.12 * lineHeight, 3);
+      const gx = roundDec(rect.x * scale, 3) + goffset;
+      const gy = roundDec(rect.y * scale, 3) + goffset;
+      const gwidth = roundDec(rect.width * scale, 3);
+      const gheight = roundDec(rect.height * scale, 3);
+      childNode.setAttribute(
+        "viewBox",
+        `${-goffset} ${-goffset} ${gwidth} ${gheight}`,
+      );
+
+      // Set the transform on the svg's group node(s)
+      for (let i = 0; i < childNode.childNodes.length; i++) {
+        if (childNode.childNodes[i].nodeName === "g") {
+          const group = childNode.childNodes[i] as SVGGElement;
+          const transform = group.getAttribute("transform");
+          group.setAttribute(
+            "transform",
+            `translate(${-gx} ${-gy}) scale(${scale}) ${transform}`,
+          );
+        }
+      }
     } else {
       const textNode = tempSvg.ownerDocument.createElementNS(
         "http://www.w3.org/2000/svg",
