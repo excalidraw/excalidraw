@@ -115,11 +115,12 @@
       "label": "Länk"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
-    }
+      "lock": "Lås",
+      "unlock": "Lås upp",
+      "lockAll": "Lås alla",
+      "unlockAll": "Lås upp alla"
+    },
+    "statusPublished": "Publicerad"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -172,7 +173,6 @@
     "uploadedSecurly": "Uppladdning har säkrats med kryptering från ände till ände. vilket innebär att Excalidraw server och tredje part inte kan läsa innehållet.",
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
     "collabStopOverridePrompt": "Att stoppa sessionen kommer att skriva över din föregående, lokalt lagrade skiss. Är du säker?\n\n(Om du vill behålla din lokala skiss, stäng bara webbläsarfliken istället.)",
-    "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
     "errorAddingToLibrary": "Kunde inte lägga till objekt i biblioteket",
     "errorRemovingFromLibrary": "Kunde inte ta bort objekt från biblioteket",
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
@@ -189,7 +189,8 @@
     "fileTooBig": "Filen är för stor. Maximal tillåten storlek är {{maxSize}}.",
     "svgImageInsertError": "Kunde inte infoga SVG-bild. SVG-koden ser ogiltig ut.",
     "invalidSVGString": "Ogiltig SVG.",
-    "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen."
+    "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
+    "importLibraryError": "Kunde inte ladda bibliotek"
   },
   "toolBar": {
     "selection": "Markering",
@@ -299,7 +300,7 @@
     "view": "Visa",
     "zoomToFit": "Zooma för att rymma alla element",
     "zoomToSelection": "Zooma till markering",
-    "toggleElementLock": ""
+    "toggleElementLock": "Lås/Lås upp valda"
   },
   "clearCanvasDialog": {
     "title": "Rensa canvas"
@@ -341,7 +342,8 @@
       "post": "vilket kort sagt betyder att vem som helst kan använda det utan restriktioner."
     },
     "noteItems": "Varje objekt måste ha sitt eget namn så att det är filtrerbart. Följande objekt kommer att inkluderas:",
-    "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång"
+    "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång",
+    "republishWarning": "Obs: några av de markerade objekten är redan markerade som publicerade/skickade. Du bör endast skicka objekt igen när du uppdaterar ett befintligt bibliotek eller inlämning."
   },
   "publishSuccessDialog": {
     "title": "Bibliotek inskickat",
