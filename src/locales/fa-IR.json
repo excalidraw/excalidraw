@@ -9,7 +9,7 @@
     "copy": "کپی",
     "copyAsPng": "کپی در حافطه موقت به صورت PNG",
     "copyAsSvg": "کپی در حافطه موقت به صورت SVG",
-    "copyText": "",
+    "copyText": "کپی در حافطه موقت به صورت متن",
     "bringForward": "جلو آوردن",
     "sendToBack": "پس فرستادن",
     "bringToFront": "جلو آوردن",
@@ -106,21 +106,21 @@
     "personalLib": "کتابخانه شخصی",
     "excalidrawLib": "کتابخانه",
     "decreaseFontSize": "کاهش اندازه فونت",
-    "increaseFontSize": "",
+    "increaseFontSize": "افزایش دادن اندازه فونت",
     "unbindText": "بازکردن نوشته",
     "bindText": "بستن نوشته",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "ویرایش لینک",
+      "create": "ایجاد پیوند",
+      "label": "لینک"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "قفل",
+      "unlock": "باز کردن",
+      "lockAll": "قفل همه",
+      "unlockAll": "باز کردن قفل همه"
     },
-    "statusPublished": ""
+    "statusPublished": "منتشر شده"
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -154,12 +154,12 @@
     "lightMode": "حالت روشن",
     "zenMode": "حالت ذن",
     "exitZenMode": "خروج از حالت تمرکز",
-    "cancel": "",
-    "clear": "",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "cancel": "لغو",
+    "clear": "پاک کردن",
+    "remove": "پاک کردن",
+    "publishLibrary": "انتشار",
+    "submit": "ارسال",
+    "confirm": "تایید"
   },
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",
@@ -168,7 +168,7 @@
     "couldNotLoadInvalidFile": "عدم توانایی در بازگذاری فایل نامعتبر",
     "importBackendFailed": "بارگیری از پشت صحنه با شکست مواجه شد.",
     "cannotExportEmptyCanvas": "بوم خالی قابل تبدیل نیست.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "به کلیپ بورد کپی نشد.",
     "decryptFailed": "رمزگشایی داده ها امکان پذیر نیست.",
     "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
@@ -179,22 +179,22 @@
     "imageDoesNotContainScene": "به نظر نمی رسد این تصویر حاوی داده های بوم نقاشی باشد. آیا جاسازی صحنه را در حین خروجی فعال کرده اید?",
     "cannotRestoreFromImage": "صحنه را نمی توان از این فایل تصویری بازیابی کرد",
     "invalidSceneUrl": "بوم نقاشی از آدرس ارائه شده وارد نشد. این یا نادرست است، یا حاوی داده Excalidraw JSON معتبر نیست.",
-    "resetLibrary": "",
+    "resetLibrary": "ین کار کل صفحه را پاک میکند. آیا مطمئنید?",
     "removeItemsFromsLibrary": "حذف {{count}} آیتم(ها) از کتابخانه?",
     "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
+    "unsupportedFileType": "نوع فایل پشتیبانی نشده.",
+    "imageInsertError": "عکس ارسال نشد. بعداً دوباره تلاش کنید...",
     "fileTooBig": "فایل خیلی بزرگ است حداکثر اندازه مجاز {{maxSize}}.",
     "svgImageInsertError": "تصویر SVG وارد نشد. نشانه گذاری SVG نامعتبر به نظر می رسد.",
     "invalidSVGString": "SVG نادرست.",
     "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
-    "importLibraryError": ""
+    "importLibraryError": "داده‌ها بارگذاری نشدند"
   },
   "toolBar": {
     "selection": "گزینش",
-    "image": "",
+    "image": "وارد کردن تصویر",
     "rectangle": "مستطیل",
     "diamond": "لوزی",
     "ellipse": "بیضی",
@@ -206,7 +206,7 @@
     "lock": "ابزار انتخاب شده را بعد از کشیدن نگه دار",
     "penMode": "از زوم کوچک کردن جلوگیری کنید و ورودی آزاد را فقط از قلم بپذیرید",
     "link": "افزودن/به‌روزرسانی پیوند برای شکل انتخابی",
-    "eraser": ""
+    "eraser": "پاک کن"
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
@@ -218,7 +218,7 @@
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
-    "text_selected": "",
+    "text_selected": "دوبار کلیک کنید یا Enter را فشار دهید تا نقاط را ویرایش کنید",
     "text_editing": "Escape یا CtrlOrCmd+ENTER را فشار دهید تا ویرایش تمام شود",
     "linearElementMulti": "روی آخرین نقطه کلیک کنید یا کلید ESC را بزنید یا کلید Enter را بزنید برای اتمام کار",
     "lockAngle": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
@@ -226,13 +226,13 @@
     "resizeImage": "با نگه داشتن SHIFT می توانید آزادانه اندازه را تغییر دهید،\nبرای تغییر اندازه از مرکز، ALT را نگه دارید",
     "rotate": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
     "lineEditor_info": "دوبار کلیک کنید یا Enter را فشار دهید تا نقاط را ویرایش کنید",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
-    "placeImage": "",
-    "publishLibrary": "",
-    "bindTextToElement": "",
-    "deepBoxSelect": "",
-    "eraserRevert": ""
+    "lineEditor_pointSelected": "برای حذف نقطه Delete برای کپی زدن Ctrl یا Cmd+D را بزنید و یا برای جابجایی بکشید",
+    "lineEditor_nothingSelected": "یک نقطه را برای ویرایش انتخاب کنید (SHIFT را برای انتخاب چندگانه نگه دارید)،\nیا Alt را نگه دارید و برای افزودن نقاط جدید کلیک کنید",
+    "placeImage": "برای قرار دادن تصویر کلیک کنید، یا کلیک کنید و بکشید تا اندازه آن به صورت دستی تنظیم شود",
+    "publishLibrary": "کتابخانه خود را منتشر کنید",
+    "bindTextToElement": "برای افزودن اینتر را بزنید",
+    "deepBoxSelect": "CtrlOrCmd را برای انتخاب عمیق و جلوگیری از کشیدن نگه دارید",
+    "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند"
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -391,17 +391,17 @@
     "fff0f6": "صورتی 0",
     "f8f0fc": "انگوری 0",
     "f3f0ff": "بنفش 0",
-    "edf2ff": "",
-    "e7f5ff": "",
-    "e3fafc": "",
-    "e6fcf5": "",
-    "ebfbee": "",
-    "f4fce3": "",
-    "fff9db": "",
-    "fff4e6": "",
-    "transparent": "",
-    "ced4da": "",
-    "868e96": "",
+    "edf2ff": "نیلی 0",
+    "e7f5ff": "آبی 0",
+    "e3fafc": "آبی نفتی 0",
+    "e6fcf5": "آبی فیروزه ای 0",
+    "ebfbee": "سبز 0",
+    "f4fce3": "لیمویی 0",
+    "fff9db": "زرد 0",
+    "fff4e6": "نارنجی 0",
+    "transparent": "شفاف",
+    "ced4da": "خاکستری 4",
+    "868e96": "خاکستری 6",
     "fa5252": "",
     "e64980": "",
     "be4bdb": "",
