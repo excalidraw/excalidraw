@@ -260,27 +260,27 @@
     "desc_inProgressIntro": "جلسه همکاری آنلاین در حال انجام است.",
     "desc_shareLink": "این لینک را با هر کسی که می خواهید با او همکاری کنید به اشتراک بگذارید:",
     "desc_exitSession": "با پایان دادن جلسه، شما از اتاق حذف میکند، اما می توانید به صورت محلی کار خود را با بوم ادامه دهید. توجه داشته باشید که این مورد بر سایر افراد تأثیر نمی گذارد و همچنان می توانند در نسخه خود همکاری کنند.",
-    "shareTitle": ""
+    "shareTitle": "به یک جلسه همکاری زنده در Excalidraw بپیوندید"
   },
   "errorDialog": {
     "title": "خطا"
   },
   "exportDialog": {
     "disk_title": "ذخیره در دیسک",
-    "disk_details": "",
+    "disk_details": "داده های صحنه را به فایلی که بعداً می توانید از آن وارد کنید صادر کنید.",
     "disk_button": "ذخیره در فایل",
     "link_title": "لینک قابل اشتراک‌گذاری",
-    "link_details": "",
-    "link_button": "",
-    "excalidrawplus_description": "",
+    "link_details": "خروجی به عنوان یک پیوند فقط خواندنی.",
+    "link_button": "خروجی در فایل",
+    "excalidrawplus_description": "صحنه را در فضای کاری Excalidraw+ خود ذخیره کنید.",
     "excalidrawplus_button": "خروجی گرفتن",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_exportError": "در حال حاضر نمی‌توان به Excalidraw+ صادر کرد..."
   },
   "helpDialog": {
     "blog": "بلاگ ما را بخوانید",
     "click": "کلیک",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "انتخاب عمیق",
+    "deepBoxSelect": "انتخاب عمیق در کادر، و جلوگیری از کشیدن",
     "curvedArrow": "فلش خمیده",
     "curvedLine": "منحنی",
     "documentation": "مستندات",
@@ -292,7 +292,7 @@
     "howto": "راهنمای ما را دنبال کنید",
     "or": "یا",
     "preventBinding": "مانع شدن از چسبیدن فلش ها",
-    "tools": "",
+    "tools": "ابزار",
     "shortcuts": "میانبرهای صفحه کلید",
     "textFinish": "پایان ویرایش (ویرایشگر متن)",
     "textNewLine": "افزودن خط جدید (ویرایشگر متن)",
@@ -300,20 +300,20 @@
     "view": "مشاهده",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
     "zoomToSelection": "بزرگنمایی قسمت انتخاب شده",
-    "toggleElementLock": ""
+    "toggleElementLock": "قفل/بازکردن انتخاب شده ها"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "پاک کردن بوم"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "انتشار کتابخانه",
+    "itemName": "نام آیتم",
+    "authorName": "نام نویسنده",
+    "githubUsername": "نام کاربری گیت هاب",
+    "twitterUsername": "نام کاربری توییتر",
+    "libraryName": "نام کتابخانه",
+    "libraryDesc": "توضیحات کتابخانه",
+    "website": "تارنما",
     "placeholder": {
       "authorName": "نام یا نام کاربری شما",
       "libraryName": "اسم کتابخانه",
@@ -323,8 +323,8 @@
       "website": "پیوند به وب سایت شخصی شما یا هر جای دیگر (اختیاری)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "لازم",
+      "website": "وارد کردن آدرس درست"
     },
     "noteDescription": {
       "pre": "کتابخانه خود را ارسال کنید تا در آن گنجانده شود ",
