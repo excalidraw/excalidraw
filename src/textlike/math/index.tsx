@@ -39,10 +39,9 @@ import { registerAuxLangData } from "../../i18n";
 import { t } from "../../i18n";
 import { Action } from "../../actions/types";
 import { AppState } from "../../types";
-import { getFormValue } from "../../actions/actionProperties";
+import { changeProperty, getFormValue } from "../../actions/actionProperties";
 import { getSelectedElements } from "../../scene";
 import { getNonDeletedElements, redrawTextBoundingBox } from "../../element";
-import { invalidateShapeForElement } from "../../renderer/renderElement";
 import { ButtonSelect } from "../../components/ButtonSelect";
 
 import {
@@ -713,7 +712,7 @@ const applyTextElementMathOpts = (
 ): NonDeleted<ExcalidrawTextElement> => {
   const useTex = textOpts?.useTex !== undefined ? textOpts.useTex : true;
   const mathOnly = textOpts?.mathOnly !== undefined ? textOpts.mathOnly : false;
-  return newElementWith(element, {
+  return mutateElement(element, {
     useTex,
     mathOnly,
     fontFamily: FONT_FAMILY_MATH,
@@ -1299,54 +1298,6 @@ const enableActionChangeMathOpts = (
   return enabled;
 };
 
-const setMathOptsForSelectedElements = (
-  elements: readonly ExcalidrawElement[],
-  appState: Readonly<AppState>,
-  mathOpts: TextOptsMath,
-) => {
-  // Operate on the selected math elements only
-  const selectedElements = getSelectedMathElements(elements, appState);
-
-  selectedElements.forEach((element) => {
-    const el = (
-      getBoundTextElement(element) &&
-      isMathElement(getBoundTextElement(element))
-        ? getBoundTextElement(element)
-        : element
-    ) as NonDeleted<ExcalidrawTextElementMath>;
-    const isMathJaxLoaded = mathJaxLoaded;
-
-    // Set the useTex field
-    if (mathOpts.useTex !== undefined) {
-      mutateElement(el, { useTex: mathOpts.useTex });
-    }
-    // Set the mathOnly field
-    if (mathOpts.mathOnly !== undefined) {
-      mutateElement(el, { mathOnly: mathOpts.mathOnly });
-    }
-    // Mark the element for re-rendering
-    invalidateShapeForElement(el);
-    // Update the width/height of the element
-    const metrics = getImageMetrics(
-      el.text,
-      el.fontSize,
-      getMathOpts.ensureMathOpts(el.useTex, el.mathOnly),
-      isMathJaxLoaded,
-    );
-    mutateElement(el, metrics);
-    redrawTextBoundingBox(el, getContainerElement(element));
-  });
-
-  // Set the default value for new math-text elements.
-  return {
-    elements: elements.map(
-      (element) =>
-        selectedElements.find((ele) => ele.id === element.id) || element,
-    ),
-    appState: { ...appState, textOpts: mathOpts },
-  };
-};
-
 const registerActionsMath = () => {
   const mathActions: Action[] = [];
   const actionChangeUseTex: Action = {
@@ -1362,14 +1313,28 @@ const registerActionsMath = () => {
         if (useTex === null) {
           useTex = getMathOpts.getUseTex(appState);
         }
-        useTex = !useTex;
       }
-      const { elements: modElements, appState: modAppState } =
-        setMathOptsForSelectedElements(elements, appState, { useTex });
+      const modElements = changeProperty(
+        elements,
+        appState,
+        (oldElement) => {
+          if (isMathElement(oldElement)) {
+            const newElement: ExcalidrawTextElement = applyTextElementMathOpts(
+              newElementWith(oldElement, {}),
+              getMathOpts.ensureMathOpts(useTex, oldElement.mathOnly),
+            );
+            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
+            return newElement;
+          }
+
+          return oldElement;
+        },
+        true,
+      );
 
       return {
         elements: modElements,
-        appState: modAppState,
+        appState: { ...appState, textOpts: { useTex } },
         commitToHistory: true,
       };
     },
@@ -1452,14 +1417,28 @@ const registerActionsMath = () => {
         if (mathOnly === null) {
           mathOnly = getMathOpts.getMathOnly(appState);
         }
-        mathOnly = !mathOnly;
       }
-      const { elements: modElements, appState: modAppState } =
-        setMathOptsForSelectedElements(elements, appState, { mathOnly });
+      const modElements = changeProperty(
+        elements,
+        appState,
+        (oldElement) => {
+          if (isMathElement(oldElement)) {
+            const newElement: ExcalidrawTextElement = applyTextElementMathOpts(
+              newElementWith(oldElement, {}),
+              getMathOpts.ensureMathOpts(oldElement.useTex, mathOnly),
+            );
+            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
+            return newElement;
+          }
+
+          return oldElement;
+        },
+        true,
+      );
 
       return {
         elements: modElements,
-        appState: modAppState,
+        appState: { ...appState, textOpts: { mathOnly } },
         commitToHistory: true,
       };
     },
