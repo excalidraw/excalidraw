@@ -176,20 +176,20 @@
     "errorAddingToLibrary": "مورد به کتابخانه اضافه نشد",
     "errorRemovingFromLibrary": "مورد از کتابخانه حذف نشد",
     "confirmAddLibrary": "{{numShapes}} از اشکال به کتابخانه شما اضافه خواهد شد. مطمئن هستید؟",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "به نظر نمی رسد این تصویر حاوی داده های بوم نقاشی باشد. آیا جاسازی صحنه را در حین خروجی فعال کرده اید?",
     "cannotRestoreFromImage": "صحنه را نمی توان از این فایل تصویری بازیابی کرد",
-    "invalidSceneUrl": "",
+    "invalidSceneUrl": "بوم نقاشی از آدرس ارائه شده وارد نشد. این یا نادرست است، یا حاوی داده Excalidraw JSON معتبر نیست.",
     "resetLibrary": "",
-    "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "removeItemsFromsLibrary": "حذف {{count}} آیتم(ها) از کتابخانه?",
+    "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است."
   },
   "errors": {
     "unsupportedFileType": "",
     "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
-    "invalidSVGString": "",
-    "cannotResolveCollabServer": "",
+    "fileTooBig": "فایل خیلی بزرگ است حداکثر اندازه مجاز {{maxSize}}.",
+    "svgImageInsertError": "تصویر SVG وارد نشد. نشانه گذاری SVG نامعتبر به نظر می رسد.",
+    "invalidSVGString": "SVG نادرست.",
+    "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
     "importLibraryError": ""
   },
   "toolBar": {
@@ -204,8 +204,8 @@
     "text": "متن",
     "library": "کتابخانه",
     "lock": "ابزار انتخاب شده را بعد از کشیدن نگه دار",
-    "penMode": "",
-    "link": "",
+    "penMode": "از زوم کوچک کردن جلوگیری کنید و ورودی آزاد را فقط از قلم بپذیرید",
+    "link": "افزودن/به‌روزرسانی پیوند برای شکل انتخابی",
     "eraser": ""
   },
   "headings": {
