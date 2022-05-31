@@ -84,7 +84,7 @@ import { TEXT_SUBTYPE_ICONS } from "../textlike/icons";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
-const changeProperty = (
+export const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   callback: (element: ExcalidrawElement) => ExcalidrawElement,
