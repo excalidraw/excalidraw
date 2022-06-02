@@ -1,6 +1,6 @@
 export const TEXT_SUBTYPE_MATH = "math";
 
-export type TextOptsMath = { useTex?: boolean; mathOnly?: boolean };
+export type TextOptsMath = { useTex: boolean; mathOnly: boolean };
 
 export type TextActionNameMath = "changeUseTex" | "changeMathOnly";
 
