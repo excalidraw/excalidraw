@@ -5,7 +5,7 @@ import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { Point } from "../types";
 import { isTextElement } from "./typeChecks";
-import { cleanTextOptUpdates } from "../textlike";
+import { cleanTextElementUpdate } from "../textlike";
 import { getUpdatedTimestamp } from "../utils";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
@@ -23,9 +23,10 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   informMutation = true,
 ): TElement => {
   if (isTextElement(element)) {
-    updates = cleanTextOptUpdates(
-      element.subtype,
-      updates as ElementUpdate<ExcalidrawTextElement>,
+    const textUpdates = updates as ElementUpdate<ExcalidrawTextElement>;
+    updates = cleanTextElementUpdate(
+      textUpdates.subtype ?? element.subtype,
+      textUpdates,
     ) as ElementUpdate<TElement>;
   }
 
@@ -115,10 +116,12 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
   element: TElement,
   updates: ElementUpdate<TElement>,
 ): TElement => {
+  const oldUpdates = updates;
   if (isTextElement(element)) {
-    updates = cleanTextOptUpdates(
-      element.subtype,
-      updates as ElementUpdate<ExcalidrawTextElement>,
+    const textUpdates = updates as ElementUpdate<ExcalidrawTextElement>;
+    updates = cleanTextElementUpdate(
+      textUpdates.subtype ?? element.subtype,
+      textUpdates,
     ) as ElementUpdate<TElement>;
   }
   let didChange = false;
@@ -126,7 +129,9 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
     const value = (updates as any)[key];
     if (typeof value !== "undefined") {
       if (
-        (element as any)[key] === value &&
+        ((element as any)[key] === value ||
+          // Don't update if the subtype is enforcing an attribute value
+          typeof (oldUpdates as any)[key] === "undefined") &&
         // if object, always update because its attrs could have changed
         (typeof value !== "object" || value === null)
       ) {

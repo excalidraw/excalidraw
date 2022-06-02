@@ -79,7 +79,7 @@ import {
 import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
-import { applyTextOpts, isPanelComponentDisabled } from "../textlike";
+import { isPanelComponentDisabled } from "../textlike";
 import { TEXT_SUBTYPE_ICONS } from "../textlike/icons";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
@@ -134,11 +134,9 @@ export const actionChangeTextElementSubtype = register({
         appState,
         (oldElement) => {
           if (isTextElement(oldElement)) {
-            const newElement: ExcalidrawTextElement = applyTextOpts(
-              newElementWith(oldElement, {
-                subtype: value,
-              }),
-              appState.textOpts,
+            const newElement: ExcalidrawTextElement = newElementWith(
+              oldElement,
+              { subtype: value, textOpts: appState.textOpts },
             );
             redrawTextBoundingBox(newElement, getContainerElement(oldElement));
             return newElement;
