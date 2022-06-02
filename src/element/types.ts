@@ -1,3 +1,4 @@
+import { TextOpts } from "../textlike/types";
 import { Point } from "../types";
 import { FONT_FAMILY, THEME, VERTICAL_ALIGN } from "../constants";
 
@@ -126,6 +127,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     subtype: string;
+    textOpts: TextOpts;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
   }>;

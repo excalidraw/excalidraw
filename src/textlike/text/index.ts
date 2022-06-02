@@ -29,17 +29,18 @@ type ExcalidrawTextElementText = ExcalidrawTextElement &
     subtype: typeof TEXT_SUBTYPE_DEFAULT;
   }>;
 
-const applyTextElementTextOpts = (
-  element: ExcalidrawTextElementText,
-  textOpts: TextOptsText | undefined,
-): ExcalidrawTextElement => {
-  return element;
-};
-
-const cleanTextOptUpdatesText = (
-  opts: ElementUpdate<ExcalidrawTextElementText>,
+const cleanTextElementUpdateText = (
+  updates: ElementUpdate<ExcalidrawTextElementText>,
 ): ElementUpdate<ExcalidrawTextElementText> => {
-  return opts;
+  const newUpdates = {};
+  for (const key in updates) {
+    if (key === "textOpts") {
+      (newUpdates as any)[key] = {};
+    } else {
+      (newUpdates as any)[key] = (updates as any)[key];
+    }
+  }
+  return newUpdates;
 };
 
 const measureTextElementText = (
@@ -204,14 +205,9 @@ export const registerTextElementSubtypeText = (
   registerTextLikeShortcutNames(textShortcutMap, isTextShortcutNameText);
   registerTextLikeSubtypeName(TEXT_SUBTYPE_DEFAULT);
   registerTextLikeDisabledPanelComponents(TEXT_SUBTYPE_DEFAULT, []);
-  registerTextLikeMethod("apply", {
-    subtype: TEXT_SUBTYPE_DEFAULT,
-    method: applyTextElementTextOpts,
-    default: true,
-  });
   registerTextLikeMethod("clean", {
     subtype: TEXT_SUBTYPE_DEFAULT,
-    method: cleanTextOptUpdatesText,
+    method: cleanTextElementUpdateText,
     default: true,
   });
   registerTextLikeMethod("measure", {

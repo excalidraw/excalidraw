@@ -3,7 +3,7 @@ import {
   ExcalidrawTextElement,
   NonDeleted,
 } from "../element/types";
-import { ElementUpdate, mutateElement } from "../element/mutateElement";
+import { ElementUpdate } from "../element/mutateElement";
 import { getNonDeletedElements, isTextElement } from "../element";
 import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
@@ -20,7 +20,6 @@ import { hasBoundTextElement } from "../element/typeChecks";
 import { getBoundTextElement } from "../element/textElement";
 
 type TextLikeMethodName =
-  | "apply"
   | "clean"
   | "measure"
   | "render"
@@ -36,7 +35,6 @@ type TextLikeMethod = {
 
 type TextLikeMethods = Array<TextLikeMethod>;
 
-const applyMethodsA = [] as TextLikeMethods;
 const cleanMethodsA = [] as TextLikeMethods;
 const measureMethodsA = [] as TextLikeMethods;
 const renderMethodsA = [] as TextLikeMethods;
@@ -94,9 +92,6 @@ export const registerTextLikeMethod = (
 ): void => {
   let methodsA: TextLikeMethods;
   switch (name) {
-    case "apply":
-      methodsA = applyMethodsA;
-      break;
     case "clean":
       methodsA = cleanMethodsA;
       break;
@@ -122,10 +117,6 @@ export const registerTextLikeMethod = (
 };
 
 const textLikeSubtypes = Array<string>();
-
-export const getTextElementSubtypes = (): string[] => {
-  return textLikeSubtypes;
-};
 
 export const registerTextLikeSubtypeName = (subtypeName: string) => {
   // Only register a subtype name once
@@ -221,37 +212,23 @@ const isPanelComponentDisabledForSubtype = (
   return false;
 };
 
-export const applyTextOpts = (
-  element: ExcalidrawTextElement,
-  textOpts?: TextOpts,
-): ExcalidrawTextElement => {
-  mutateElement(element, cleanTextOptUpdates(element.subtype, element));
-  for (let i = 0; i < applyMethodsA.length; i++) {
-    if (applyMethodsA[i].subtype === element.subtype) {
-      return applyMethodsA[i].method(element, textOpts);
-    }
-  }
-  return applyMethodsA
-    .find((value, index, applyMethodsA) => {
-      return value.default !== undefined && value.default === true;
-    })!
-    .method(element, textOpts);
-};
-
-export const cleanTextOptUpdates = (
+// For the specified subtype, this method is responsible for:
+// - Ensuring textOpts has valid values.
+// - Enforcing special restrictions on standard ExcalidrawTextElement attributes.
+export const cleanTextElementUpdate = (
   subtype: string,
-  opts: ElementUpdate<ExcalidrawTextElement>,
+  updates: ElementUpdate<ExcalidrawTextElement>,
 ): ElementUpdate<ExcalidrawTextElement> => {
   for (let i = 0; i < cleanMethodsA.length; i++) {
     if (cleanMethodsA[i].subtype === subtype) {
-      return cleanMethodsA[i].method(opts);
+      return cleanMethodsA[i].method(updates);
     }
   }
   return cleanMethodsA
     .find((value, index, cleanMethodsA) => {
       return value.default !== undefined && value.default === true;
     })!
-    .method(opts);
+    .method(updates);
 };
 
 export const measureTextElement = (

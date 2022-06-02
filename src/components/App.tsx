@@ -250,6 +250,8 @@ import {
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
+  getContainerElement,
+  redrawTextBoundingBox,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
@@ -416,6 +418,8 @@ class App extends React.Component<AppProps, AppState> {
         // element for a re-render, and mark the scene for a refresh.
         if (isTextElementSubtype(element)) {
           invalidateShapeForElement(element);
+          const textElement = element as ExcalidrawTextElement;
+          redrawTextBoundingBox(textElement, getContainerElement(textElement));
           refreshNeeded = true;
         }
       });

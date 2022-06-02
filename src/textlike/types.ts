@@ -20,3 +20,7 @@ export type TextShortcutName = TextShortcutNameText | TextShortcutNameMath;
 const textSubtype = [TEXT_SUBTYPE_TEXT, TEXT_SUBTYPE_MATH] as const;
 export type TextSubtype = typeof textSubtype[number];
 export const TEXT_SUBTYPE_DEFAULT = TEXT_SUBTYPE_TEXT;
+
+export const getTextElementSubtypes = (): readonly TextSubtype[] => {
+  return textSubtype;
+};

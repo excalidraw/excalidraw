@@ -14,8 +14,7 @@ import {
   ExcalidrawRectangleElement,
 } from "../element/types";
 import {
-  applyTextOpts,
-  cleanTextOptUpdates,
+  cleanTextElementUpdate,
   measureTextElement,
   wrapTextElement,
 } from "../textlike";
@@ -133,12 +132,15 @@ export const newTextElement = (
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     subtype: string;
-    textOpts?: TextOpts;
+    textOpts: TextOpts;
     containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const cleanedOpts = cleanTextOptUpdates(opts.subtype, opts);
-  const metrics = measureTextElement(opts, cleanedOpts);
+  // Ensure the attributes in textOpts contain properly defined values
+  const textOpts = cleanTextElementUpdate(opts.subtype, {
+    textOpts: opts.textOpts,
+  }).textOpts!;
+  const metrics = measureTextElement(opts, { textOpts });
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
@@ -153,16 +155,14 @@ export const newTextElement = (
       width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
-      subtype: opts.subtype,
       containerId: opts.containerId || null,
       originalText: opts.text,
+      subtype: opts.subtype,
+      textOpts,
     },
     {},
   );
-  return applyTextOpts(
-    textElement,
-    opts.textOpts,
-  ) as NonDeleted<ExcalidrawTextElement>;
+  return textElement;
 };
 
 const getAdjustedDimensions = (

@@ -209,6 +209,7 @@ const chartXLabels = (
         textAlign: "center",
         verticalAlign: "top",
         subtype: TEXT_SUBTYPE_DEFAULT,
+        textOpts: {},
       });
     }) || []
   );
@@ -230,6 +231,7 @@ const chartYLabels = (
     text: "0",
     textAlign: "right",
     subtype: TEXT_SUBTYPE_DEFAULT,
+    textOpts: {},
   });
 
   const maxYLabel = newTextElement({
@@ -241,6 +243,7 @@ const chartYLabels = (
     text: Math.max(...spreadsheet.values).toLocaleString(),
     textAlign: "right",
     subtype: TEXT_SUBTYPE_DEFAULT,
+    textOpts: {},
   });
 
   return [minYLabel, maxYLabel];
@@ -330,6 +333,7 @@ const chartBaseElements = (
         strokeStyle: "solid",
         textAlign: "center",
         subtype: TEXT_SUBTYPE_DEFAULT,
+        textOpts: {},
       })
     : null;
 

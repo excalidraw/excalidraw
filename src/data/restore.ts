@@ -147,6 +147,7 @@ const restoreElement = (
         containerId: element.containerId ?? null,
         originalText: element.originalText || element.text,
         subtype: element.subtype,
+        textOpts: element.textOpts,
       };
       return restoreTextElement(
         element,
