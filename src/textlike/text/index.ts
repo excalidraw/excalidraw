@@ -9,12 +9,11 @@ import {
 } from "../../element/textElement";
 import {
   registerTextLikeDisabledPanelComponents,
-  registerTextLikeMethod,
   registerTextLikeShortcutNames,
   registerTextLikeSubtypeName,
 } from "../";
 
-import { TEXT_SUBTYPE_DEFAULT } from "../types";
+import { TEXT_SUBTYPE_DEFAULT, TextMethods, TextOmitProps } from "../types";
 
 import {
   isTextShortcutNameText,
@@ -44,25 +43,7 @@ const cleanTextElementUpdateText = (
 };
 
 const measureTextElementText = (
-  element: Omit<
-    ExcalidrawTextElementText,
-    | "id"
-    | "isDeleted"
-    | "type"
-    | "baseline"
-    | "width"
-    | "height"
-    | "angle"
-    | "seed"
-    | "version"
-    | "versionNonce"
-    | "groupIds"
-    | "boundElements"
-    | "containerId"
-    | "originalText"
-    | "updated"
-    | "link"
-  >,
+  element: Omit<ExcalidrawTextElementText, TextOmitProps | "originalText">,
   next?: {
     fontSize?: number;
     text?: string;
@@ -155,32 +136,8 @@ const renderSvgTextElementText = (
   }
 };
 
-const restoreTextElementText = (
-  element: ExcalidrawTextElement,
-  elementRestored: ExcalidrawTextElement,
-): ExcalidrawTextElement => {
-  return elementRestored;
-};
-
 export const wrapTextElementText = (
-  element: Omit<
-    ExcalidrawTextElementText,
-    | "id"
-    | "isDeleted"
-    | "type"
-    | "baseline"
-    | "width"
-    | "height"
-    | "angle"
-    | "seed"
-    | "version"
-    | "versionNonce"
-    | "groupIds"
-    | "boundElements"
-    | "containerId"
-    | "updated"
-    | "link"
-  >,
+  element: Omit<ExcalidrawTextElementText, TextOmitProps>,
   containerWidth: number,
   next?: {
     fontSize?: number;
@@ -200,39 +157,15 @@ export const wrapTextElementText = (
 };
 
 export const registerTextElementSubtype = (
+  textMethods: TextMethods,
   onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
 ) => {
   registerTextLikeShortcutNames(textShortcutMap, isTextShortcutNameText);
   registerTextLikeSubtypeName(TEXT_SUBTYPE_DEFAULT);
   registerTextLikeDisabledPanelComponents(TEXT_SUBTYPE_DEFAULT, []);
-  registerTextLikeMethod("clean", {
-    subtype: TEXT_SUBTYPE_DEFAULT,
-    method: cleanTextElementUpdateText,
-    default: true,
-  });
-  registerTextLikeMethod("measure", {
-    subtype: TEXT_SUBTYPE_DEFAULT,
-    method: measureTextElementText,
-    default: true,
-  });
-  registerTextLikeMethod("render", {
-    subtype: TEXT_SUBTYPE_DEFAULT,
-    method: renderTextElementText,
-    default: true,
-  });
-  registerTextLikeMethod("renderSvg", {
-    subtype: TEXT_SUBTYPE_DEFAULT,
-    method: renderSvgTextElementText,
-    default: true,
-  });
-  registerTextLikeMethod("restore", {
-    subtype: TEXT_SUBTYPE_DEFAULT,
-    method: restoreTextElementText,
-    default: true,
-  });
-  registerTextLikeMethod("wrap", {
-    subtype: TEXT_SUBTYPE_DEFAULT,
-    method: wrapTextElementText,
-    default: true,
-  });
+  textMethods.clean = cleanTextElementUpdateText;
+  textMethods.measure = measureTextElementText;
+  textMethods.render = renderTextElementText;
+  textMethods.renderSvg = renderSvgTextElementText;
+  textMethods.wrap = wrapTextElementText;
 };

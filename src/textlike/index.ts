@@ -9,40 +9,20 @@ import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
 
 import {
-  getTextElementSubtypes,
+  TEXT_SUBTYPE_DEFAULT,
   TextActionName,
+  TextMethods,
+  TextOmitProps,
   TextOpts,
   TextShortcutName,
   TextSubtype,
+  getTextElementSubtypes,
 } from "./types";
 
 import { Action, ActionName } from "../actions/types";
 import { register } from "../actions/register";
 import { hasBoundTextElement } from "../element/typeChecks";
 import { getBoundTextElement } from "../element/textElement";
-
-type TextLikeMethodName =
-  | "clean"
-  | "measure"
-  | "render"
-  | "renderSvg"
-  | "restore"
-  | "wrap";
-
-type TextLikeMethod = {
-  subtype: TextSubtype;
-  method: Function;
-  default?: boolean;
-};
-
-type TextLikeMethods = Array<TextLikeMethod>;
-
-const cleanMethodsA = [] as TextLikeMethods;
-const measureMethodsA = [] as TextLikeMethods;
-const renderMethodsA = [] as TextLikeMethods;
-const renderSvgMethodsA = [] as TextLikeMethods;
-const restoreMethodsA = [] as TextLikeMethods;
-const wrapMethodsA = [] as TextLikeMethods;
 
 // One element for each ExcalidrawTextElement subtype.
 // ShortcutMap arrays, then typeguards for these.
@@ -86,36 +66,6 @@ export const getShortcutFromTextShortcutName = (name: TextShortcutName) => {
     }
   }
   return shortcuts;
-};
-
-export const registerTextLikeMethod = (
-  name: TextLikeMethodName,
-  textLikeMethod: TextLikeMethod,
-): void => {
-  let methodsA: TextLikeMethods;
-  switch (name) {
-    case "clean":
-      methodsA = cleanMethodsA;
-      break;
-    case "measure":
-      methodsA = measureMethodsA;
-      break;
-    case "render":
-      methodsA = renderMethodsA;
-      break;
-    case "restore":
-      methodsA = restoreMethodsA;
-      break;
-    case "renderSvg":
-      methodsA = renderSvgMethodsA;
-      break;
-    case "wrap":
-      methodsA = wrapMethodsA;
-      break;
-  }
-  if (!methodsA.includes(textLikeMethod)) {
-    methodsA.push(textLikeMethod);
-  }
 };
 
 const textLikeSubtypes = Array<string>();
@@ -212,6 +162,16 @@ const isPanelComponentDisabledForSubtype = (
   return false;
 };
 
+type TextMethodMap = { subtype: TextSubtype; methods: TextMethods };
+const methodMaps = [] as Array<TextMethodMap>;
+
+// Assumption: registerTextElementSubtypes() has run first or is the caller
+const getMethods = (subtype: TextSubtype) => {
+  const _subtype = subtype !== undefined ? subtype : TEXT_SUBTYPE_DEFAULT;
+  const map = methodMaps.find((method) => method.subtype === _subtype);
+  return map!.methods;
+};
+
 // For the specified subtype, this method is responsible for:
 // - Ensuring textOpts has valid values.
 // - Enforcing special restrictions on standard ExcalidrawTextElement attributes.
@@ -219,31 +179,11 @@ export const cleanTextElementUpdate = (
   subtype: TextSubtype,
   updates: ElementUpdate<ExcalidrawTextElement>,
 ): ElementUpdate<ExcalidrawTextElement> => {
-  return cleanMethodsA
-    .find((method) => method.subtype === subtype)!
-    .method(updates);
+  return getMethods(subtype).clean(updates);
 };
 
 export const measureTextElement = (
-  element: Omit<
-    ExcalidrawTextElement,
-    | "id"
-    | "isDeleted"
-    | "type"
-    | "baseline"
-    | "width"
-    | "height"
-    | "angle"
-    | "seed"
-    | "version"
-    | "versionNonce"
-    | "groupIds"
-    | "boundElements"
-    | "containerId"
-    | "originalText"
-    | "updated"
-    | "link"
-  >,
+  element: Omit<ExcalidrawTextElement, TextOmitProps | "originalText">,
   next?: {
     fontSize?: number;
     text?: string;
@@ -251,9 +191,7 @@ export const measureTextElement = (
   },
   maxWidth?: number | null,
 ): { width: number; height: number; baseline: number } => {
-  return measureMethodsA
-    .find((method) => method.subtype === element.subtype)!
-    .method(element, next, maxWidth);
+  return getMethods(element.subtype).measure(element, next, maxWidth);
 };
 
 export const renderTextElement = (
@@ -261,9 +199,7 @@ export const renderTextElement = (
   context: CanvasRenderingContext2D,
   renderCb?: () => void,
 ): void => {
-  renderMethodsA
-    .find((method) => method.subtype === element.subtype)!
-    .method(element, context, renderCb);
+  getMethods(element.subtype).render(element, context, renderCb);
 };
 
 export const renderSvgTextElement = (
@@ -271,39 +207,11 @@ export const renderSvgTextElement = (
   node: SVGElement,
   element: NonDeleted<ExcalidrawTextElement>,
 ): void => {
-  renderSvgMethodsA
-    .find((method) => method.subtype === element.subtype)!
-    .method(svgRoot, node, element);
-};
-
-export const restoreTextElement = (
-  element: ExcalidrawTextElement,
-  elementRestored: ExcalidrawTextElement,
-): ExcalidrawTextElement => {
-  return restoreMethodsA
-    .find((method) => method.subtype === element.subtype)!
-    .method(element, elementRestored);
+  getMethods(element.subtype).renderSvg(svgRoot, node, element);
 };
 
 export const wrapTextElement = (
-  element: Omit<
-    ExcalidrawTextElement,
-    | "id"
-    | "isDeleted"
-    | "type"
-    | "baseline"
-    | "width"
-    | "height"
-    | "angle"
-    | "seed"
-    | "version"
-    | "versionNonce"
-    | "groupIds"
-    | "boundElements"
-    | "containerId"
-    | "updated"
-    | "link"
-  >,
+  element: Omit<ExcalidrawTextElement, TextOmitProps>,
   containerWidth: number,
   next?: {
     fontSize?: number;
@@ -311,9 +219,7 @@ export const wrapTextElement = (
     textOpts?: TextOpts;
   },
 ): string => {
-  return wrapMethodsA
-    .find((method) => method.subtype === element.subtype)!
-    .method(element, containerWidth, next);
+  return getMethods(element.subtype).wrap(element, containerWidth, next);
 };
 
 export const registerTextElementSubtypes = (
@@ -321,7 +227,10 @@ export const registerTextElementSubtypes = (
 ) => {
   const textSubtypes = getTextElementSubtypes();
   for (let index = 0; index < textSubtypes.length; index++) {
+    const subtype = textSubtypes[index];
+    methodMaps.push({ subtype, methods: {} as TextMethods });
     require(`./${textSubtypes[index]}/index`).registerTextElementSubtype(
+      getMethods(subtype),
       onSubtypesLoaded,
     );
   }

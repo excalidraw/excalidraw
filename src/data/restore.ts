@@ -3,7 +3,7 @@ import {
   ExcalidrawSelectionElement,
   FontFamilyValues,
 } from "../element/types";
-import { restoreTextElement } from "../textlike";
+import { cleanTextElementUpdate } from "../textlike";
 import {
   AppState,
   BinaryFiles,
@@ -149,9 +149,9 @@ const restoreElement = (
         subtype: element.subtype,
         textOpts: element.textOpts,
       };
-      return restoreTextElement(
+      return restoreElementWithProperties(
         element,
-        restoreElementWithProperties(element, opts),
+        cleanTextElementUpdate(opts.subtype, opts) as typeof opts,
       );
     case "freedraw": {
       return restoreElementWithProperties(element, {
