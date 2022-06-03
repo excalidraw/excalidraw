@@ -1018,7 +1018,7 @@ const restoreTextElementMath = (
   return elementRestored;
 };
 
-export const wrapTextElementMath = (
+const wrapTextElementMath = (
   element: Omit<
     ExcalidrawTextElementMath,
     | "id"
@@ -1309,9 +1309,10 @@ const registerActionsMath = () => {
         true,
       );
 
+      const mathOnly = getMathOpts.getMathOnly(appState);
       return {
         elements: modElements,
-        appState: { ...appState, textOpts: { useTex } },
+        appState: { ...appState, textOpts: { useTex, mathOnly } },
         commitToHistory: true,
       };
     },
@@ -1417,9 +1418,10 @@ const registerActionsMath = () => {
         true,
       );
 
+      const useTex = getMathOpts.getUseTex(appState);
       return {
         elements: modElements,
-        appState: { ...appState, textOpts: { mathOnly } },
+        appState: { ...appState, textOpts: { useTex, mathOnly } },
         commitToHistory: true,
       };
     },
