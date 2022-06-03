@@ -24,3 +24,28 @@ export const TEXT_SUBTYPE_DEFAULT = TEXT_SUBTYPE_TEXT;
 export const getTextElementSubtypes = (): readonly TextSubtype[] => {
   return textSubtype;
 };
+
+export type TextMethods = {
+  clean: Function;
+  measure: Function;
+  render: Function;
+  renderSvg: Function;
+  wrap: Function;
+};
+
+export type TextOmitProps =
+  | "id"
+  | "isDeleted"
+  | "type"
+  | "baseline"
+  | "width"
+  | "height"
+  | "angle"
+  | "seed"
+  | "version"
+  | "versionNonce"
+  | "groupIds"
+  | "boundElements"
+  | "containerId"
+  | "updated"
+  | "link";

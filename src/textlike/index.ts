@@ -8,39 +8,21 @@ import { getNonDeletedElements, isTextElement } from "../element";
 import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
 
-import { registerTextElementSubtypeMath } from "./math";
-
-import { registerTextElementSubtypeText } from "./text";
-
-import { TextActionName, TextOpts, TextShortcutName } from "./types";
+import {
+  TEXT_SUBTYPE_DEFAULT,
+  TextActionName,
+  TextMethods,
+  TextOmitProps,
+  TextOpts,
+  TextShortcutName,
+  TextSubtype,
+  getTextElementSubtypes,
+} from "./types";
 
 import { Action, ActionName } from "../actions/types";
 import { register } from "../actions/register";
 import { hasBoundTextElement } from "../element/typeChecks";
 import { getBoundTextElement } from "../element/textElement";
-
-type TextLikeMethodName =
-  | "clean"
-  | "measure"
-  | "render"
-  | "renderSvg"
-  | "restore"
-  | "wrap";
-
-type TextLikeMethod = {
-  subtype: string;
-  method: Function;
-  default?: boolean;
-};
-
-type TextLikeMethods = Array<TextLikeMethod>;
-
-const cleanMethodsA = [] as TextLikeMethods;
-const measureMethodsA = [] as TextLikeMethods;
-const renderMethodsA = [] as TextLikeMethods;
-const renderSvgMethodsA = [] as TextLikeMethods;
-const restoreMethodsA = [] as TextLikeMethods;
-const wrapMethodsA = [] as TextLikeMethods;
 
 // One element for each ExcalidrawTextElement subtype.
 // ShortcutMap arrays, then typeguards for these.
@@ -86,59 +68,29 @@ export const getShortcutFromTextShortcutName = (name: TextShortcutName) => {
   return shortcuts;
 };
 
-export const registerTextLikeMethod = (
-  name: TextLikeMethodName,
-  textLikeMethod: TextLikeMethod,
-): void => {
-  let methodsA: TextLikeMethods;
-  switch (name) {
-    case "clean":
-      methodsA = cleanMethodsA;
-      break;
-    case "measure":
-      methodsA = measureMethodsA;
-      break;
-    case "render":
-      methodsA = renderMethodsA;
-      break;
-    case "restore":
-      methodsA = restoreMethodsA;
-      break;
-    case "renderSvg":
-      methodsA = renderSvgMethodsA;
-      break;
-    case "wrap":
-      methodsA = wrapMethodsA;
-      break;
-  }
-  if (!methodsA.includes(textLikeMethod)) {
-    methodsA.push(textLikeMethod);
-  }
-};
-
 const textLikeSubtypes = Array<string>();
 
-export const registerTextLikeSubtypeName = (subtypeName: string) => {
+export const registerTextLikeSubtypeName = (subtype: TextSubtype) => {
   // Only register a subtype name once
-  if (!textLikeSubtypes.includes(subtypeName)) {
-    textLikeSubtypes.push(subtypeName);
+  if (!textLikeSubtypes.includes(subtype)) {
+    textLikeSubtypes.push(subtype);
   }
 };
 
 type DisabledPanelComponents = {
-  subtype: string;
+  subtype: TextSubtype;
   actions: (ActionName | TextActionName)[];
 };
 
 const textLikeDisabledPanelComponents = [] as DisabledPanelComponents[];
 
 export const registerTextLikeDisabledPanelComponents = (
-  subtypeName: string,
+  subtype: TextSubtype,
   actions: (ActionName | TextActionName)[],
 ) => {
-  if (textLikeSubtypes.includes(subtypeName)) {
+  if (textLikeSubtypes.includes(subtype)) {
     textLikeDisabledPanelComponents.push({
-      subtype: subtypeName,
+      subtype,
       actions,
     } as DisabledPanelComponents);
   }
@@ -195,15 +147,13 @@ export const isPanelComponentDisabled = (
 };
 
 const isPanelComponentDisabledForSubtype = (
-  subtypeName: string,
+  subtype: TextSubtype,
   action: ActionName | TextActionName,
 ) => {
-  if (textLikeSubtypes.includes(subtypeName)) {
+  if (textLikeSubtypes.includes(subtype)) {
     if (
       textLikeDisabledPanelComponents
-        .find((value, index, disabledComponent) => {
-          return value.subtype === subtypeName;
-        })!
+        .find((value) => value.subtype === subtype)!
         .actions.includes(action)
     ) {
       return true;
@@ -212,45 +162,28 @@ const isPanelComponentDisabledForSubtype = (
   return false;
 };
 
+type TextMethodMap = { subtype: TextSubtype; methods: TextMethods };
+const methodMaps = [] as Array<TextMethodMap>;
+
+// Assumption: registerTextElementSubtypes() has run first or is the caller
+const getMethods = (subtype: TextSubtype) => {
+  const _subtype = subtype !== undefined ? subtype : TEXT_SUBTYPE_DEFAULT;
+  const map = methodMaps.find((method) => method.subtype === _subtype);
+  return map!.methods;
+};
+
 // For the specified subtype, this method is responsible for:
 // - Ensuring textOpts has valid values.
 // - Enforcing special restrictions on standard ExcalidrawTextElement attributes.
 export const cleanTextElementUpdate = (
-  subtype: string,
+  subtype: TextSubtype,
   updates: ElementUpdate<ExcalidrawTextElement>,
 ): ElementUpdate<ExcalidrawTextElement> => {
-  for (let i = 0; i < cleanMethodsA.length; i++) {
-    if (cleanMethodsA[i].subtype === subtype) {
-      return cleanMethodsA[i].method(updates);
-    }
-  }
-  return cleanMethodsA
-    .find((value, index, cleanMethodsA) => {
-      return value.default !== undefined && value.default === true;
-    })!
-    .method(updates);
+  return getMethods(subtype).clean(updates);
 };
 
 export const measureTextElement = (
-  element: Omit<
-    ExcalidrawTextElement,
-    | "id"
-    | "isDeleted"
-    | "type"
-    | "baseline"
-    | "width"
-    | "height"
-    | "angle"
-    | "seed"
-    | "version"
-    | "versionNonce"
-    | "groupIds"
-    | "boundElements"
-    | "containerId"
-    | "originalText"
-    | "updated"
-    | "link"
-  >,
+  element: Omit<ExcalidrawTextElement, TextOmitProps | "originalText">,
   next?: {
     fontSize?: number;
     text?: string;
@@ -258,16 +191,7 @@ export const measureTextElement = (
   },
   maxWidth?: number | null,
 ): { width: number; height: number; baseline: number } => {
-  for (let i = 0; i < measureMethodsA.length; i++) {
-    if (measureMethodsA[i].subtype === element.subtype) {
-      return measureMethodsA[i].method(element, next, maxWidth);
-    }
-  }
-  return measureMethodsA
-    .find((value, index, measureMethodsA) => {
-      return value.default !== undefined && value.default === true;
-    })!
-    .method(element, next, maxWidth);
+  return getMethods(element.subtype).measure(element, next, maxWidth);
 };
 
 export const renderTextElement = (
@@ -275,17 +199,7 @@ export const renderTextElement = (
   context: CanvasRenderingContext2D,
   renderCb?: () => void,
 ): void => {
-  for (let i = 0; i < renderMethodsA.length; i++) {
-    if (renderMethodsA[i].subtype === element.subtype) {
-      renderMethodsA[i].method(element, context, renderCb);
-      return;
-    }
-  }
-  renderMethodsA
-    .find((value, index, renderMethodsA) => {
-      return value.default !== undefined && value.default === true;
-    })!
-    .method(element, context, renderCb);
+  getMethods(element.subtype).render(element, context, renderCb);
 };
 
 export const renderSvgTextElement = (
@@ -293,54 +207,11 @@ export const renderSvgTextElement = (
   node: SVGElement,
   element: NonDeleted<ExcalidrawTextElement>,
 ): void => {
-  for (let i = 0; i < renderSvgMethodsA.length; i++) {
-    if (renderSvgMethodsA[i].subtype === element.subtype) {
-      renderSvgMethodsA[i].method(svgRoot, node, element);
-      return;
-    }
-  }
-  renderSvgMethodsA
-    .find((value, index, renderSvgMethodsA) => {
-      return value.default !== undefined && value.default === true;
-    })!
-    .method(svgRoot, node, element);
-};
-
-export const restoreTextElement = (
-  element: ExcalidrawTextElement,
-  elementRestored: ExcalidrawTextElement,
-): ExcalidrawTextElement => {
-  for (let i = 0; i < restoreMethodsA.length; i++) {
-    if (restoreMethodsA[i].subtype === element.subtype) {
-      return restoreMethodsA[i].method(element, elementRestored);
-    }
-  }
-  return restoreMethodsA
-    .find((value, index, restoreMethodsA) => {
-      return value.default !== undefined && value.default === true;
-    })!
-    .method(element, elementRestored);
+  getMethods(element.subtype).renderSvg(svgRoot, node, element);
 };
 
 export const wrapTextElement = (
-  element: Omit<
-    ExcalidrawTextElement,
-    | "id"
-    | "isDeleted"
-    | "type"
-    | "baseline"
-    | "width"
-    | "height"
-    | "angle"
-    | "seed"
-    | "version"
-    | "versionNonce"
-    | "groupIds"
-    | "boundElements"
-    | "containerId"
-    | "updated"
-    | "link"
-  >,
+  element: Omit<ExcalidrawTextElement, TextOmitProps>,
   containerWidth: number,
   next?: {
     fontSize?: number;
@@ -348,34 +219,28 @@ export const wrapTextElement = (
     textOpts?: TextOpts;
   },
 ): string => {
-  for (let i = 0; i < wrapMethodsA.length; i++) {
-    if (wrapMethodsA[i].subtype === element.subtype) {
-      return wrapMethodsA[i].method(element, containerWidth, next);
-    }
-  }
-  return wrapMethodsA
-    .find((value, index, wrapMethodsA) => {
-      return value.default !== undefined && value.default === true;
-    })!
-    .method(element, containerWidth, next);
+  return getMethods(element.subtype).wrap(element, containerWidth, next);
 };
 
 export const registerTextElementSubtypes = (
   onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
 ) => {
-  registerTextElementSubtypeMath(onSubtypesLoaded);
-  registerTextElementSubtypeText(onSubtypesLoaded);
+  const textSubtypes = getTextElementSubtypes();
+  for (let index = 0; index < textSubtypes.length; index++) {
+    const subtype = textSubtypes[index];
+    methodMaps.push({ subtype, methods: {} as TextMethods });
+    require(`./${textSubtypes[index]}/index`).registerTextElementSubtype(
+      getMethods(subtype),
+      onSubtypesLoaded,
+    );
+  }
 };
 
 const textLikeActions: Action[] = [];
 
 export const addTextLikeActions = (actions: Action[]) => {
   actions.forEach((action) => {
-    if (
-      textLikeActions.every((value, index, actions) => {
-        return value.name !== action.name;
-      })
-    ) {
+    if (textLikeActions.every((value) => value.name !== action.name)) {
       textLikeActions.push(action);
       register(action);
     }
