@@ -199,7 +199,7 @@ export const wrapTextElementText = (
   );
 };
 
-export const registerTextElementSubtypeText = (
+export const registerTextElementSubtype = (
   onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
 ) => {
   registerTextLikeShortcutNames(textShortcutMap, isTextShortcutNameText);

@@ -18,7 +18,7 @@ import {
   measureTextElement,
   wrapTextElement,
 } from "../textlike";
-import { TextOpts } from "../textlike/types";
+import { TextOpts, TextSubtype } from "../textlike/types";
 import { getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { mutateElement, newElementWith } from "./mutateElement";
@@ -131,7 +131,7 @@ export const newTextElement = (
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    subtype: string;
+    subtype: TextSubtype;
     textOpts: TextOpts;
     containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
