@@ -25,7 +25,6 @@ import { ElementUpdate, newElementWith } from "../../element/mutateElement";
 import {
   addTextLikeActions,
   registerTextLikeDisabledPanelComponents,
-  registerTextLikeMethod,
   registerTextLikeShortcutNames,
   registerTextLikeSubtypeName,
 } from "../";
@@ -39,6 +38,8 @@ import { changeProperty, getFormValue } from "../../actions/actionProperties";
 import { getSelectedElements } from "../../scene";
 import { getNonDeletedElements, redrawTextBoundingBox } from "../../element";
 import { ButtonSelect } from "../../components/ButtonSelect";
+
+import { TextMethods, TextOmitProps } from "../types";
 
 import {
   isTextShortcutNameMath,
@@ -724,25 +725,7 @@ const cleanTextElementUpdateMath = (
 };
 
 const measureTextElementMath = (
-  element: Omit<
-    ExcalidrawTextElementMath,
-    | "id"
-    | "isDeleted"
-    | "type"
-    | "baseline"
-    | "width"
-    | "height"
-    | "angle"
-    | "seed"
-    | "version"
-    | "versionNonce"
-    | "groupIds"
-    | "boundElements"
-    | "containerId"
-    | "originalText"
-    | "updated"
-    | "link"
-  >,
+  element: Omit<ExcalidrawTextElementMath, TextOmitProps | "originalText">,
   next?: {
     fontSize?: number;
     text?: string;
@@ -1008,35 +991,8 @@ const renderSvgTextElementMath = (
   node.appendChild(tempSvg);
 };
 
-const restoreTextElementMath = (
-  element: ExcalidrawTextElementMath,
-  elementRestored: ExcalidrawTextElementMath,
-): ExcalidrawTextElement => {
-  const mathElement = element;
-  const textOpts = getMathOpts.ensureMathOpts(mathElement.textOpts);
-  elementRestored = newElementWith(elementRestored, { textOpts });
-  return elementRestored;
-};
-
 const wrapTextElementMath = (
-  element: Omit<
-    ExcalidrawTextElementMath,
-    | "id"
-    | "isDeleted"
-    | "type"
-    | "baseline"
-    | "width"
-    | "height"
-    | "angle"
-    | "seed"
-    | "version"
-    | "versionNonce"
-    | "groupIds"
-    | "boundElements"
-    | "containerId"
-    | "updated"
-    | "link"
-  >,
+  element: Omit<ExcalidrawTextElementMath, TextOmitProps>,
   containerWidth: number,
   next?: {
     fontSize?: number;
@@ -1210,7 +1166,8 @@ const wrapTextElementMath = (
   return wrappedText;
 };
 
-export const registerTextElementSubtypeMath = (
+export const registerTextElementSubtype = (
+  textMethods: TextMethods,
   onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
 ) => {
   registerTextLikeShortcutNames(textShortcutMap, isTextShortcutNameMath);
@@ -1221,30 +1178,11 @@ export const registerTextElementSubtypeMath = (
   // Set the callback first just in case anything in this method
   // calls loadMathJax().
   mathJaxLoadedCallback = onSubtypesLoaded;
-  registerTextLikeMethod("clean", {
-    subtype: TEXT_SUBTYPE_MATH,
-    method: cleanTextElementUpdateMath,
-  });
-  registerTextLikeMethod("measure", {
-    subtype: TEXT_SUBTYPE_MATH,
-    method: measureTextElementMath,
-  });
-  registerTextLikeMethod("render", {
-    subtype: TEXT_SUBTYPE_MATH,
-    method: renderTextElementMath,
-  });
-  registerTextLikeMethod("renderSvg", {
-    subtype: TEXT_SUBTYPE_MATH,
-    method: renderSvgTextElementMath,
-  });
-  registerTextLikeMethod("restore", {
-    subtype: TEXT_SUBTYPE_MATH,
-    method: restoreTextElementMath,
-  });
-  registerTextLikeMethod("wrap", {
-    subtype: TEXT_SUBTYPE_MATH,
-    method: wrapTextElementMath,
-  });
+  textMethods.clean = cleanTextElementUpdateMath;
+  textMethods.measure = measureTextElementMath;
+  textMethods.render = renderTextElementMath;
+  textMethods.renderSvg = renderSvgTextElementMath;
+  textMethods.wrap = wrapTextElementMath;
   registerActionsMath();
   registerAuxLangData(`./textlike/${TEXT_SUBTYPE_MATH}`);
   // Call loadMathJax() here if we want to be sure it's loaded.
