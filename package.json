@@ -1,22 +1,30 @@
 {
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not ie <= 11",
-      "not op_mini all",
-      "not safari < 12",
-      "not kaios <= 2.5",
-      "not edge < 79",
-      "not chrome < 70",
-      "not and_uc < 13",
-      "not samsung < 10"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "name": "excalidraw",
+  "private": true,
+  "scripts": {
+    "build-node": "node ./scripts/build-node.js",
+    "build:app:docker": "REACT_APP_DISABLE_SENTRY=true react-scripts build",
+    "build:app": "REACT_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA react-scripts build",
+    "build:version": "node ./scripts/build-version.js",
+    "build": "yarn build:app && yarn build:version",
+    "eject": "react-scripts eject",
+    "fix:code": "yarn test:code --fix",
+    "fix:other": "yarn prettier --write",
+    "fix": "yarn fix:other && yarn fix:code",
+    "locales-coverage": "node scripts/build-locales-coverage.js",
+    "locales-coverage:description": "node scripts/locales-coverage-description.js",
+    "prepare": "husky install",
+    "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
+    "start": "react-scripts start",
+    "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watchAll=false",
+    "test:app": "react-scripts test --passWithNoTests",
+    "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
+    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
+    "test:other": "yarn prettier --list-different",
+    "test:typecheck": "tsc",
+    "test:update": "yarn test:app --updateSnapshot --watchAll=false",
+    "test": "yarn test:app",
+    "autorelease": "node scripts/autorelease.js"
   },
   "dependencies": {
     "@sentry/browser": "6.2.5",
@@ -86,32 +94,24 @@
     ],
     "resetMocks": false
   },
-  "name": "excalidraw",
   "prettier": "@excalidraw/prettier-config",
-  "private": true,
-  "scripts": {
-    "build-node": "node ./scripts/build-node.js",
-    "build:app:docker": "REACT_APP_DISABLE_SENTRY=true react-scripts build",
-    "build:app": "REACT_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA react-scripts build",
-    "build:version": "node ./scripts/build-version.js",
-    "build": "yarn build:app && yarn build:version",
-    "eject": "react-scripts eject",
-    "fix:code": "yarn test:code --fix",
-    "fix:other": "yarn prettier --write",
-    "fix": "yarn fix:other && yarn fix:code",
-    "locales-coverage": "node scripts/build-locales-coverage.js",
-    "locales-coverage:description": "node scripts/locales-coverage-description.js",
-    "prepare": "husky install",
-    "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
-    "start": "react-scripts start",
-    "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watchAll=false",
-    "test:app": "react-scripts test --passWithNoTests",
-    "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
-    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
-    "test:other": "yarn prettier --list-different",
-    "test:typecheck": "tsc",
-    "test:update": "yarn test:app --updateSnapshot --watchAll=false",
-    "test": "yarn test:app",
-    "autorelease": "node scripts/autorelease.js"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not ie <= 11",
+      "not op_mini all",
+      "not safari < 12",
+      "not kaios <= 2.5",
+      "not edge < 79",
+      "not chrome < 70",
+      "not and_uc < 13",
+      "not samsung < 10"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
