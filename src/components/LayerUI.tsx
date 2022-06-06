@@ -60,7 +60,10 @@ interface LayerUIProps {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderCustomFooter?: (
+    isMobile: boolean,
+    appState: AppState,
+  ) => JSX.Element | null;
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   UIOptions: AppProps["UIOptions"];

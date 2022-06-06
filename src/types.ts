@@ -277,7 +277,7 @@ export interface ExcalidrawProps {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  renderFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderFooter?: (isMobile: boolean, appState: AppState) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;

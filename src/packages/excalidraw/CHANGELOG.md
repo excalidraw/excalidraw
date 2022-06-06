@@ -53,6 +53,8 @@ Please add the latest change on the top under the correct section.
 
 #### Fixes
 
+- Allow returning `null ` in [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop [#5282](https://github.com/excalidraw/excalidraw/pull/5282).
+
 - Use `window.EXCALIDRAW_ASSET_PATH` for fonts when exporting to svg [#5065](https://github.com/excalidraw/excalidraw/pull/5065).
 - Library menu now properly rerenders if open when library is updated using `updateScene({ libraryItems })` [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
 
