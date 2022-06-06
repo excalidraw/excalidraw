@@ -596,7 +596,7 @@ import { defaultLang, languages } from "@excalidraw/excalidraw-next";
 #### `renderTopRightUI`
 
 <pre>
-(isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>) => JSX
+(isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>) => JSX | null
 </pre>
 
 A function returning JSX to render custom UI in the top right corner of the app.
@@ -604,7 +604,7 @@ A function returning JSX to render custom UI in the top right corner of the app.
 #### `renderFooter`
 
 <pre>
-(isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>) => JSX
+(isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>) => JSX | null
 </pre>
 
 A function returning JSX to render custom UI footer. For example, you can use this to render a language picker that was previously being rendered by Excalidraw itself (for now, you'll need to implement your own language picker).

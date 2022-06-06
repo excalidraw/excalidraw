@@ -32,7 +32,10 @@ type MobileMenuProps = {
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
-  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderCustomFooter?: (
+    isMobile: boolean,
+    appState: AppState,
+  ) => JSX.Element | null;
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
