@@ -1,6 +1,10 @@
 @import "open-color/open-color";
 
 .layerUI_sidebar {
+  box-shadow: 0 0 0 2px var(--focus-highlight-color);
+  height: 100vh;
+  border-radius: var(--border-radius-lg); 
+
   .layer-ui__library {
     margin: 10px;
   }
@@ -22,7 +26,7 @@
           height: 15px;
         }
       }
-    }
+    }  
   }
 }
 

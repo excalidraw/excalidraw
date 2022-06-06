@@ -1458,7 +1458,7 @@ class App extends React.Component<AppProps, AppState> {
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          isLibraryOpen: false,
+          // isLibraryOpen: false,
           selectedElementIds: newElements.reduce((map, element) => {
             if (!isBoundToContainer(element)) {
               map[element.id] = true;
