@@ -1465,13 +1465,17 @@ class App extends React.Component<AppProps, AppState> {
       this.files = { ...this.files, ...opts.files };
     }
 
+    const libraryMenuStatus = !(
+      this.deviceType.isMobile || this.deviceType.isNonMobileSmallerScreen
+    );
+
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
     this.setState(
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          // isLibraryOpen: false,
+          isLibraryOpen: libraryMenuStatus,
           selectedElementIds: newElements.reduce((map, element) => {
             if (!isBoundToContainer(element)) {
               map[element.id] = true;

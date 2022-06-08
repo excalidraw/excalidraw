@@ -304,7 +304,7 @@ const LayerUI = ({
     return (
       <div className="layerUI_sidebar">
         <div className="ToolIcon__icon__close">
-          <button onClick={() => setAppState({ isLibraryOpen: false })}>
+          <button onClick={() => closeLibrary}>
             <div className="close_icon">{CLOSE_ICON}</div>
           </button>
         </div>
