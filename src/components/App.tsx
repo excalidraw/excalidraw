@@ -64,6 +64,9 @@ import {
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
   MQ_MAX_WIDTH_PORTRAIT,
+  NON_MOBILE_SMALLER_MAX_HEIGHT_LANDSCAPE,
+  NON_MOBILE_SMALLER_MAX_WIDTH_LANDSCAPE,
+  NON_MOBILE_SMALLER_MAX_WIDTH_PORTRAIT,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
@@ -262,6 +265,7 @@ import {
 const defaultDeviceTypeContext: DeviceType = {
   isMobile: false,
   isTouchScreen: false,
+  isNonMobileSmallerScreen: false,
 };
 const DeviceTypeContext = React.createContext(defaultDeviceTypeContext);
 export const useDeviceType = () => useContext(DeviceTypeContext);
@@ -299,6 +303,7 @@ class App extends React.Component<AppProps, AppState> {
   deviceType: DeviceType = {
     isMobile: false,
     isTouchScreen: false,
+    isNonMobileSmallerScreen: false,
   };
   detachIsMobileMqHandler?: () => void;
 
@@ -846,6 +851,10 @@ class App extends React.Component<AppProps, AppState> {
             width < MQ_MAX_WIDTH_PORTRAIT ||
             (height < MQ_MAX_HEIGHT_LANDSCAPE &&
               width < MQ_MAX_WIDTH_LANDSCAPE),
+          isNonMobileSmallerScreen:
+            width < NON_MOBILE_SMALLER_MAX_WIDTH_PORTRAIT ||
+            (height < NON_MOBILE_SMALLER_MAX_HEIGHT_LANDSCAPE &&
+              width < NON_MOBILE_SMALLER_MAX_WIDTH_LANDSCAPE),
         });
         // refresh offsets
         // ---------------------------------------------------------------------
@@ -856,9 +865,13 @@ class App extends React.Component<AppProps, AppState> {
       const mediaQuery = window.matchMedia(
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
+      const nonMobileSmallerScreenMediaQuery = window.matchMedia(
+        `(max-width: ${NON_MOBILE_SMALLER_MAX_WIDTH_PORTRAIT}px), (max-height: ${NON_MOBILE_SMALLER_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${NON_MOBILE_SMALLER_MAX_WIDTH_LANDSCAPE}px)`,
+      );
       const handler = () => {
         this.deviceType = updateObject(this.deviceType, {
           isMobile: mediaQuery.matches,
+          isNonMobileSmallerScreen: nonMobileSmallerScreenMediaQuery.matches,
         });
       };
       mediaQuery.addListener(handler);

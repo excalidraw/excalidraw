@@ -199,7 +199,7 @@ const LibraryMenuItems = ({
     );
   };
 
-  const CELLS_PER_ROW = isMobile ? 4 : 6;
+  const CELLS_PER_ROW = 4;
 
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;

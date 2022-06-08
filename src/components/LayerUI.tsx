@@ -300,6 +300,19 @@ const LayerUI = ({
     </svg>
   );
 
+  const renderFixedLibrarySidebar = () => {
+    return (
+      <div className="layerUI_sidebar">
+        <div className="ToolIcon__icon__close">
+          <button onClick={() => setAppState({ isLibraryOpen: false })}>
+            <div className="close_icon">{CLOSE_ICON}</div>
+          </button>
+        </div>
+        {libraryMenu}
+      </div>
+    );
+  };
+
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
       appState,
@@ -372,7 +385,7 @@ const LayerUI = ({
                       setAppState={setAppState}
                     />
                   </Stack.Row>
-                  {/* {libraryMenu} */}
+                  {deviceType.isNonMobileSmallerScreen && libraryMenu}
                 </Stack.Col>
               )}
             </Section>
@@ -403,37 +416,10 @@ const LayerUI = ({
             </UserList>
             {renderTopRightUI?.(deviceType.isMobile, appState)}
 
-            {appState.isLibraryOpen ? (
-              <div className="layerUI_sidebar">
-                <div className="ToolIcon__icon__close">
-                  <button onClick={() => setAppState({ isLibraryOpen: false })}>
-                    <div className="close_icon">{CLOSE_ICON}</div>
-                  </button>
-                </div>
-                <LibraryMenu
-                  pendingElements={getSelectedElements(
-                    elements,
-                    appState,
-                    true,
-                  )}
-                  // onClose={closeLibrary}
-                  onInsertLibraryItems={(libraryItems) => {
-                    onInsertElements(
-                      distributeLibraryItemsOnSquareGrid(libraryItems),
-                    );
-                  }}
-                  onAddToLibrary={deselectItems}
-                  setAppState={setAppState}
-                  libraryReturnUrl={libraryReturnUrl}
-                  focusContainer={focusContainer}
-                  library={library}
-                  theme={appState.theme}
-                  files={files}
-                  id={id}
-                  appState={appState}
-                />
-              </div>
-            ) : null}
+            {appState.isLibraryOpen &&
+              !deviceType.isMobile &&
+              !deviceType.isNonMobileSmallerScreen &&
+              renderFixedLibrarySidebar()}
           </div>
         </div>
       </FixedSideContainer>
