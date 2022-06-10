@@ -1023,146 +1023,105 @@ const wrapTextElementMath = (
   const lines = consumeMathNewlines(text, mathOpts, isMathJaxLoaded).split(
     "\n",
   );
-  const lineText: string[][] = [];
-  const lineWidth: number[][] = [];
-  const newText: string[] = [];
-  let newTextIndex = 0;
-  newText.push("");
-  for (let index = 0; index < markup.length; index++) {
-    let lineIndex = 0;
-    let itemWidth = 0;
-    let pushNew = false;
-    lineText.push([]);
-    lineWidth.push([]);
-    lineText[index].push("");
-    lineWidth[index].push(0);
-    let lastIsSvg = false;
+  const wrappedLines: string[] = [];
+  const spaceWidth = getTextWidth(" ", font);
+  for (let index = 0; index < lines.length; index++) {
     const lineArray = splitMath(lines[index], mathOpts).filter(
       (value) => value !== "",
     );
     const markupArray = markup[index].filter((value) => value !== "");
+    let curWidth = 0;
+    wrappedLines.push("");
+    // The following two boolean variables are to handle edge cases
+    let nlByText = false;
+    let nlByMath = false;
     for (let i = 0; i < lineArray.length; i++) {
       const isSvg =
         textAsMjxContainer(markupArray[i], isMathJaxLoaded) !== null;
-      itemWidth = 0;
-      let lineItem = lineArray[i];
       if (isSvg || mathOnly) {
-        itemWidth = metrics.markupMetrics[index][i].width;
-        lineItem =
+        const lineItem =
           getStartDelimiter(mathOpts.useTex) +
-          lineItem +
+          lineArray[i] +
           getEndDelimiter(mathOpts.useTex);
-      }
-      if (pushNew) {
-        lineText[index].push(lineItem);
-        lineWidth[index].push(itemWidth);
-        lineIndex++;
-      } else {
-        lineText[index][lineIndex] += lineItem; // should always be text
-      }
-      pushNew = true;
-      lastIsSvg = isSvg;
-    }
-    if (!lastIsSvg || mathOnly) {
-      // Last one was text
-      pushNew = false;
-    }
-
-    for (let i = 0; i < lineText[index].length; i++) {
-      // Now get the widths for all the concatenated text strings
-      if (textAsMjxContainer(lineText[index][i], isMathJaxLoaded) === null) {
-        lineWidth[index][i] = getTextWidth(lineText[index][i], font);
-      }
-    }
-
-    // Now move onto wrapping
-    let curWidth = 0;
-    for (let i = 0; i < lineText[index].length; i++) {
-      if (
-        textAsMjxContainer(lineText[index][i], isMathJaxLoaded) !== null ||
-        mathOnly
-      ) {
-        // lineText[index][i] is math here
-        if (lineWidth[index][i] > maxWidth) {
-          // If the math svg is greater than maxWidth, make it its
-          // own, new line.  Don't try to split the math rendering
-          // into multiple lines.
-          newText.push(lineText[index][i]);
-          newTextIndex++;
+        const itemWidth = metrics.markupMetrics[index][i].width;
+        if (itemWidth > maxWidth) {
+          // If the math svg is greater than maxWidth, make its source
+          // text be a new line and start on the next line.  Don't try
+          // to split the math rendering into multiple lines.
+          if (nlByText) {
+            wrappedLines.pop();
+            nlByText = false;
+          }
+          wrappedLines.push(lineItem);
+          wrappedLines.push("");
           curWidth = 0;
-        } else if (
-          curWidth <= maxWidth &&
-          curWidth + lineWidth[index][i] > maxWidth
-        ) {
+          nlByMath = true;
+        } else if (curWidth <= maxWidth && curWidth + itemWidth > maxWidth) {
           // If the math svg would push us past maxWidth, start a
-          // new line.  Store the math svg's width in curWidth.
-          newText.push(lineText[index][i]);
-          newTextIndex++;
-          curWidth = lineWidth[index][i];
+          // new line and continue on that new line.  Store the math
+          // svg's width in curWidth.
+          wrappedLines.push(lineItem);
+          curWidth = itemWidth;
+          nlByMath = false;
         } else {
           // If the math svg would not push us past maxWidth, then
-          // just append it to the current line.  Add the math
-          // svg's width to curWidth.
-          newText[newTextIndex] += lineText[index][i];
-          curWidth += lineWidth[index][i];
+          // just append its source text to the current line.  Add
+          // the math svg's width to curWidth.
+          wrappedLines[wrappedLines.length - 1] += lineItem;
+          curWidth += itemWidth;
+          nlByMath = false;
         }
-      } else if (
-        curWidth <= maxWidth &&
-        curWidth + lineWidth[index][i] > maxWidth
-      ) {
-        // lineText[index][i] is text from here on in the if blocks
-        const spaceWidth = getTextWidth(" ", font);
-        const words = lineText[index][i].split(" ");
-        let wordsIndex = 0;
+      } else {
+        // Don't have spaces at the start of a wrapped line.  But
+        // allow them at the start of new lines from the originalText.
+        const lineItem =
+          curWidth > 0 || i === 0 ? lineArray[i] : lineArray[i].trimStart();
         // Append words one-by-one until we would be over maxWidth;
         // then let wrapText() take effect.
-        while (curWidth <= maxWidth) {
-          const tempWidth =
-            getTextWidth(words[wordsIndex], font) +
-            (wordsIndex > 0 ? spaceWidth : 0);
-          if (curWidth + tempWidth <= maxWidth) {
-            if (wordsIndex > 0) {
-              newText[newTextIndex] += " ";
-            }
-            newText[newTextIndex] += words[wordsIndex];
-            curWidth += tempWidth;
+        const words = lineItem.split(" ");
+        let wordsIndex = 0;
+        while (curWidth <= maxWidth && wordsIndex < words.length) {
+          const wordWidth = getTextWidth(words[wordsIndex], font);
+          if (nlByMath && wordWidth + spaceWidth > maxWidth) {
+            wrappedLines.pop();
+            nlByMath = false;
+          }
+          if (curWidth + wordWidth + spaceWidth <= maxWidth) {
+            wrappedLines[wrappedLines.length - 1] += words[wordsIndex];
+            curWidth += wordWidth;
             wordsIndex++;
+            // Only append a space if we wouldn't go over maxWidth
+            // and we haven't appended the last word yet.
+            if (
+              curWidth + spaceWidth <= maxWidth &&
+              wordsIndex < words.length
+            ) {
+              wrappedLines[wrappedLines.length - 1] += " ";
+              curWidth += spaceWidth;
+            } else {
+              break;
+            }
           } else {
             break;
           }
         }
-        let toWrap = "";
-        let addSpace = false;
-        for (; wordsIndex < words.length; wordsIndex++) {
-          if (addSpace) {
-            toWrap += " ";
+        const toWrap = words.slice(wordsIndex).join(" ").trimStart();
+        if (toWrap !== "") {
+          wrappedLines.push(
+            ...wrapText(toWrap, font, containerWidth).split("\n"),
+          );
+          // Set curWidth to the width of the last wrapped line
+          curWidth = getTextWidth(wrappedLines[wrappedLines.length - 1], font);
+          // This means wrapText() caused us to start a new line
+          if (curWidth === 0) {
+            nlByText = true;
           }
-          addSpace = true;
-          toWrap += words[wordsIndex];
         }
-        const wrappedText = wrapText(toWrap, font, maxWidth);
-        const lastNewline = wrappedText.lastIndexOf("\n");
-        if (lastNewline >= 0) {
-          newText.push("");
-          newTextIndex++;
-          newText[newTextIndex] += wrappedText.substring(0, lastNewline);
-        }
-        newText.push(wrappedText.substring(lastNewline + 1));
-        newTextIndex++;
-        curWidth = getTextWidth(wrappedText.substring(lastNewline + 1), font);
-      } else {
-        newText[newTextIndex] += lineText[index][i];
-        curWidth += lineWidth[index][i];
       }
     }
   }
 
-  // Get the metrics for the newly wrapped text.
-  // Since we cache, no need to do anything with the return value
-  // of getImageMetrics().
-  const wrappedText = newText.join("\n");
-  getImageMetrics(wrappedText, fontSize, mathOpts, isMathJaxLoaded);
-  return wrappedText;
+  return wrappedLines.join("\n");
 };
 
 export const registerTextElementSubtype = (
