@@ -28,6 +28,7 @@ import {
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
+import { measureTextElement } from "../textlike";
 
 const normalizeText = (text: string) => {
   return (
@@ -88,20 +89,16 @@ export const textWysiwyg = ({
     updatedElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
   ) => {
-    // FIXME: Why is this try-catch block needed to keep tests
-    // for unbinding subtyped text from failing due to exceptions?
-    try {
-      const currentFont = editable.style.fontFamily.replace(/"/g, "");
-      if (
-        getFontFamilyString({ fontFamily: updatedElement.fontFamily }) !==
-        currentFont
-      ) {
-        return true;
-      }
-      if (`${updatedElement.fontSize}px` !== editable.style.fontSize) {
-        return true;
-      }
-    } catch {}
+    const currentFont = editable.style.fontFamily.replace(/"/g, "");
+    if (
+      getFontFamilyString({ fontFamily: updatedElement.fontFamily }) !==
+      currentFont
+    ) {
+      return true;
+    }
+    if (`${updatedElement.fontSize}px` !== editable.style.fontSize) {
+      return true;
+    }
     return false;
   };
   let originalContainerHeight: number;
@@ -119,12 +116,12 @@ export const textWysiwyg = ({
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
+      let coordYR = updatedElement.y;
       const container = getContainerElement(updatedElement);
 
-      const metrics = measureText(
-        container ? updatedElement.text : updatedElement.originalText,
-        getFontString(updatedElement),
-      );
+      const metrics = measureTextElement(updatedElement, {
+        text: container ? updatedElement.text : updatedElement.originalText,
+      });
       let maxWidth = metrics.width;
       let maxHeight = metrics.height;
       let width = metrics.width;
@@ -146,7 +143,11 @@ export const textWysiwyg = ({
 
           // update height of the editor after properties updated
           height = measureText(
-            updatedElement.text,
+            wrapText(
+              updatedElement.originalText,
+              getFontString(updatedElement),
+              container.width,
+            ),
             getFontString(updatedElement),
           ).height;
         }
@@ -179,10 +180,16 @@ export const textWysiwyg = ({
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
             coordY = container.y + container.height / 2 - height / 2;
+            coordYR = container.y + container.height / 2 - metrics.height / 2;
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
             coordY =
               container.y + container.height - height - BOUND_TEXT_PADDING;
+            coordYR =
+              container.y +
+              container.height -
+              metrics.height -
+              BOUND_TEXT_PADDING;
           }
         }
       }
@@ -258,7 +265,7 @@ export const textWysiwyg = ({
       if (isTestEnv()) {
         editable.style.fontFamily = getFontFamilyString(updatedElement);
       }
-      mutateElement(updatedElement, { x: coordX, y: coordY });
+      mutateElement(updatedElement, { x: coordX, y: coordYR });
     }
   };
 
