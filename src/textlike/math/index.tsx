@@ -1,5 +1,4 @@
 // Some imports
-import { FontString } from "../../element/types";
 import { BOUND_TEXT_PADDING, FONT_FAMILY, SVG_NS } from "../../constants";
 import {
   getFontString,
@@ -447,11 +446,12 @@ const getCacheKey = (
 
 const measureMarkup = (
   markup: Array<string | Element>,
-  font: FontString,
+  fontSize: number,
   mathOpts: MathOpts,
   isMathJaxLoaded: boolean,
   maxWidth?: number | null,
 ) => {
+  const font = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
   const container = document.createElement("div");
   container.style.position = "absolute";
   container.style.whiteSpace = "pre";
@@ -550,8 +550,7 @@ const getMetrics = (
   isMathJaxLoaded: boolean,
   maxWidth?: number | null,
 ) => {
-  const fontString = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
-  let key = fontString as string;
+  let key = `${fontSize} ${mathOpts.useTex} ${mathOpts.mathOnly} ${isMathJaxLoaded} ${maxWidth}`;
   for (let index = 0; index < markup.length; index++) {
     for (let i = 0; i < markup[index].length; i++) {
       key += markup[index][i];
@@ -589,7 +588,7 @@ const getMetrics = (
     // the rendered line to the document.body.
     const { width, height, baseline, childMetrics } = measureMarkup(
       lineMarkup,
-      fontString,
+      fontSize,
       mathOpts,
       isMathJaxLoaded,
       maxWidth,
