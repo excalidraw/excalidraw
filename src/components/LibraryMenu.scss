@@ -12,7 +12,7 @@
       display: flex;
       align-items: center;
       width: 100%;
-      margin: 2px 0;
+      margin: 2px 0 15px 0 ;
       .Spinner {
         margin-right: 1rem;
       }
@@ -27,6 +27,7 @@
         // 17px for scrollbar (needed for overlay scrollbars on Big Sur?) + 1px extra
         padding-inline-end: 18px;
         white-space: nowrap;
+        // display: none;
       }
     }
   }

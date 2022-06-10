@@ -64,9 +64,9 @@ import {
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
   MQ_MAX_WIDTH_PORTRAIT,
-  NON_MOBILE_SMALLER_MAX_HEIGHT_LANDSCAPE,
-  NON_MOBILE_SMALLER_MAX_WIDTH_LANDSCAPE,
-  NON_MOBILE_SMALLER_MAX_WIDTH_PORTRAIT,
+  MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE,
+  MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE,
+  MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
@@ -852,9 +852,9 @@ class App extends React.Component<AppProps, AppState> {
             (height < MQ_MAX_HEIGHT_LANDSCAPE &&
               width < MQ_MAX_WIDTH_LANDSCAPE),
           isNonMobileSmallerScreen:
-            width < NON_MOBILE_SMALLER_MAX_WIDTH_PORTRAIT ||
-            (height < NON_MOBILE_SMALLER_MAX_HEIGHT_LANDSCAPE &&
-              width < NON_MOBILE_SMALLER_MAX_WIDTH_LANDSCAPE),
+            width < MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT ||
+            (height < MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE &&
+              width < MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE),
         });
         // refresh offsets
         // ---------------------------------------------------------------------
@@ -866,7 +866,7 @@ class App extends React.Component<AppProps, AppState> {
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
       const nonMobileSmallerScreenMediaQuery = window.matchMedia(
-        `(max-width: ${NON_MOBILE_SMALLER_MAX_WIDTH_PORTRAIT}px), (max-height: ${NON_MOBILE_SMALLER_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${NON_MOBILE_SMALLER_MAX_WIDTH_LANDSCAPE}px)`,
+        `(max-width: ${MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE}px)`,
       );
       const handler = () => {
         this.deviceType = updateObject(this.deviceType, {

@@ -361,7 +361,7 @@ const LibraryMenuItems = ({
       {showRemoveLibAlert && renderRemoveLibAlert()}
       <div className="layer-ui__library-header" key="library-header">
         {renderLibraryActions()}
-        {isLoading ? (
+        {/* {isLoading ? (
           <Spinner />
         ) : (
           <a
@@ -374,8 +374,23 @@ const LibraryMenuItems = ({
           >
             {t("labels.libraries")}
           </a>
-        )}
+        )} */}
       </div>
+
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <a
+          href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+            window.name || "_blank"
+          }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+            VERSIONS.excalidrawLibrary
+          }`}
+          target="_excalidraw_libraries"
+        >
+          {t("labels.libraries")}
+        </a>
+      )}
       <Stack.Col
         className="library-menu-items-container__items"
         align="start"

@@ -96,7 +96,8 @@ const LayerUI = ({
   onImageAction,
 }: LayerUIProps) => {
   const deviceType = useDeviceType();
-
+  const layerUIwidth = "75%";
+  const sidebarWidth = "25%";
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
       return null;
@@ -256,12 +257,12 @@ const LayerUI = ({
   );
 
   const closeLibrary = useCallback(() => {
-    const isDialogOpen = !!document.querySelector(".Dialog");
+    // const isDialogOpen = !!document.querySelector(".Dialog");
 
-    // Prevent closing if any dialog is open
-    if (isDialogOpen) {
-      return;
-    }
+    // // Prevent closing if any dialog is open
+    // if (isDialogOpen) {
+    //   return;
+    // }
     setAppState({ isLibraryOpen: false });
   }, [setAppState]);
 
@@ -302,9 +303,12 @@ const LayerUI = ({
 
   const renderFixedLibrarySidebar = () => {
     return (
-      <div className="layerUI_sidebar">
+      <div
+        className="layerUI_sidebar"
+        style={appState.isLibraryOpen ? { width: sidebarWidth } : {}}
+      >
         <div className="ToolIcon__icon__close">
-          <button onClick={() => closeLibrary}>
+          <button onClick={() => setAppState({ isLibraryOpen: false })}>
             <div className="close_icon">{CLOSE_ICON}</div>
           </button>
         </div>
@@ -415,11 +419,6 @@ const LayerUI = ({
                   ))}
             </UserList>
             {renderTopRightUI?.(deviceType.isMobile, appState)}
-
-            {appState.isLibraryOpen &&
-              !deviceType.isMobile &&
-              !deviceType.isNonMobileSmallerScreen &&
-              renderFixedLibrarySidebar()}
           </div>
         </div>
       </FixedSideContainer>
@@ -573,30 +572,38 @@ const LayerUI = ({
       />
     </>
   ) : (
-    <div
-      className={clsx("layer-ui__wrapper", {
-        "disable-pointerEvents":
-          appState.draggingElement ||
-          appState.resizingElement ||
-          (appState.editingElement && !isTextElement(appState.editingElement)),
-      })}
-    >
-      {dialogs}
-      {renderFixedSideContainer()}
-      {renderBottomAppMenu()}
-      {appState.scrolledOutside && (
-        <button
-          className="scroll-back-to-content"
-          onClick={() => {
-            setAppState({
-              ...calculateScrollCenter(elements, appState, canvas),
-            });
-          }}
-        >
-          {t("buttons.scrollBackToContent")}
-        </button>
-      )}
-    </div>
+    <>
+      <div
+        className={clsx("layer-ui__wrapper", {
+          "disable-pointerEvents":
+            appState.draggingElement ||
+            appState.resizingElement ||
+            (appState.editingElement &&
+              !isTextElement(appState.editingElement)),
+        })}
+        style={appState.isLibraryOpen ? { width: layerUIwidth } : {}}
+      >
+        {dialogs}
+        {renderFixedSideContainer()}
+        {renderBottomAppMenu()}
+        {appState.scrolledOutside && (
+          <button
+            className="scroll-back-to-content"
+            onClick={() => {
+              setAppState({
+                ...calculateScrollCenter(elements, appState, canvas),
+              });
+            }}
+          >
+            {t("buttons.scrollBackToContent")}
+          </button>
+        )}
+      </div>
+      {appState.isLibraryOpen &&
+        !deviceType.isMobile &&
+        !deviceType.isNonMobileSmallerScreen &&
+        renderFixedLibrarySidebar()}
+    </>
   );
 };
 

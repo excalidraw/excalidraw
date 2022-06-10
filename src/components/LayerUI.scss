@@ -1,13 +1,14 @@
 @import "open-color/open-color";
 
 .layerUI_sidebar {
-  box-shadow: 0 0 0 2px var(--focus-highlight-color);
-  height: 100vh;
+  position: absolute;
+  right: 0;
+  z-index: 5;
+  background-color: var(--popup-secondary-bg-color);
+  box-shadow: var(--shadow-island);  height: 100vh;
+  width: 0%; 
   border-radius: var(--border-radius-lg); 
 
-  .layer-ui__library {
-    margin: 10px;
-  }
   .ToolIcon__icon__close {
     position: absolute;
     z-index: 3;
@@ -32,8 +33,11 @@
 
 .excalidraw {
   .layer-ui__wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
     z-index: var(--zIndex-layerUI);
-
     &__top-right {
       display: flex;
     }

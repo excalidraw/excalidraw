@@ -350,7 +350,7 @@
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
-    z-index: 100;
+    z-index: 0;
 
     :root[dir="ltr"] & {
       left: 0.25rem;
