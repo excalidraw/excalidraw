@@ -13,7 +13,10 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
-import { delUndefinedProps, newFreeDrawElement } from "../../element/newElement";
+import {
+  delUndefinedProps,
+  newFreeDrawElement,
+} from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { registerTextElementSubtypes } from "../../textlike";
