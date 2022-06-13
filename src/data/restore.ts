@@ -1,9 +1,15 @@
 import {
+  ExcalidrawDiamondElement,
   ExcalidrawElement,
+  ExcalidrawEllipseElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
+  ExcalidrawLinearElement,
+  ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
+  ExcalidrawTextElement,
   FontFamilyValues,
 } from "../element/types";
-import { cleanTextElementUpdate } from "../textlike";
 import {
   AppState,
   BinaryFiles,
@@ -29,6 +35,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
+import { delUndefinedProps } from "../element/newElement";
 
 type RestoredAppState = Omit<
   AppState,
@@ -71,7 +78,7 @@ const restoreElementWithProperties = <
   T extends ExcalidrawElement,
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
-  element: Required<T> & {
+  element: MarkOptional<Required<T>, "subtype" | "customProps"> & {
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
   },
@@ -83,7 +90,13 @@ const restoreElementWithProperties = <
   > &
     Partial<Pick<ExcalidrawElement, "type" | "x" | "y">>,
 ): T => {
+  const { subtype, customProps } = element;
+  const custom = delUndefinedProps({ subtype, customProps }, [
+    "subtype",
+    "customProps",
+  ]);
   const base: Pick<T, keyof ExcalidrawElement> = {
+    ...custom,
     type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
@@ -146,27 +159,25 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || element.text,
-        subtype: element.subtype,
-        textOpts: element.textOpts,
       };
       return restoreElementWithProperties(
         element,
-        cleanTextElementUpdate(opts.subtype, opts) as typeof opts,
-      );
+        opts,
+      ) as ExcalidrawTextElement;
     case "freedraw": {
       return restoreElementWithProperties(element, {
         points: element.points,
         lastCommittedPoint: null,
         simulatePressure: element.simulatePressure,
         pressures: element.pressures,
-      });
+      }) as ExcalidrawFreeDrawElement;
     }
     case "image":
       return restoreElementWithProperties(element, {
         status: element.status || "pending",
         fileId: element.fileId,
         scale: element.scale || [1, 1],
-      });
+      }) as ExcalidrawImageElement;
     case "line":
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough
@@ -204,16 +215,25 @@ const restoreElement = (
         points,
         x,
         y,
-      });
+      }) as ExcalidrawLinearElement;
     }
 
     // generic elements
     case "ellipse":
-      return restoreElementWithProperties(element, {});
+      return restoreElementWithProperties(
+        element,
+        {},
+      ) as ExcalidrawEllipseElement;
     case "rectangle":
-      return restoreElementWithProperties(element, {});
+      return restoreElementWithProperties(
+        element,
+        {},
+      ) as ExcalidrawRectangleElement;
     case "diamond":
-      return restoreElementWithProperties(element, {});
+      return restoreElementWithProperties(
+        element,
+        {},
+      ) as ExcalidrawDiamondElement;
 
     // Don't use default case so as to catch a missing an element type case.
     // We also don't want to throw, but instead return void so we filter

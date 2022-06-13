@@ -108,14 +108,19 @@ export const isPanelComponentDisabled = (
   );
   selectedElements.forEach((element) => {
     if (isTextElement(element)) {
-      if (isPanelComponentDisabledForSubtype(element.subtype, actionName)) {
+      if (
+        isPanelComponentDisabledForSubtype(
+          element.subtype ?? TEXT_SUBTYPE_DEFAULT,
+          actionName,
+        )
+      ) {
         disabled = true;
       }
     }
     if (hasBoundTextElement(element)) {
       if (
         isPanelComponentDisabledForSubtype(
-          getBoundTextElement(element)!.subtype,
+          getBoundTextElement(element)!.subtype ?? TEXT_SUBTYPE_DEFAULT,
           actionName,
         )
       ) {
@@ -126,7 +131,7 @@ export const isPanelComponentDisabled = (
   if (
     selectedElements.length === 0 &&
     isPanelComponentDisabledForSubtype(
-      appState.textElementSubtype,
+      appState.customSubtype ?? TEXT_SUBTYPE_DEFAULT,
       actionName,
     ) &&
     !(appState.editingElement && isTextElement(appState.editingElement))
@@ -137,7 +142,7 @@ export const isPanelComponentDisabled = (
     appState.editingElement &&
     isTextElement(appState.editingElement) &&
     isPanelComponentDisabledForSubtype(
-      appState.editingElement.subtype,
+      appState.editingElement.subtype ?? TEXT_SUBTYPE_DEFAULT,
       actionName,
     )
   ) {
@@ -175,10 +180,10 @@ const getMethods = (subtype: TextSubtype) => {
 // For the specified subtype, this method is responsible for:
 // - Ensuring textOpts has valid values.
 // - Enforcing special restrictions on standard ExcalidrawTextElement attributes.
-export const cleanTextElementUpdate = (
+export const cleanTextElementUpdate = <TElement extends ExcalidrawElement>(
   subtype: TextSubtype,
-  updates: ElementUpdate<ExcalidrawTextElement>,
-): ElementUpdate<ExcalidrawTextElement> => {
+  updates: ElementUpdate<TElement>,
+): ElementUpdate<TElement> => {
   return getMethods(subtype).clean(updates);
 };
 
@@ -187,11 +192,12 @@ export const measureTextElement = (
   next?: {
     fontSize?: number;
     text?: string;
-    textOpts?: TextOpts;
+    customProps?: TextOpts;
   },
   maxWidth?: number | null,
 ): { width: number; height: number; baseline: number } => {
-  return getMethods(element.subtype).measure(element, next, maxWidth);
+  const subtype = element.subtype ?? TEXT_SUBTYPE_DEFAULT;
+  return getMethods(subtype).measure(element, next, maxWidth);
 };
 
 export const renderTextElement = (
@@ -199,7 +205,8 @@ export const renderTextElement = (
   context: CanvasRenderingContext2D,
   renderCb?: () => void,
 ): void => {
-  getMethods(element.subtype).render(element, context, renderCb);
+  const subtype = element.subtype ?? TEXT_SUBTYPE_DEFAULT;
+  getMethods(subtype).render(element, context, renderCb);
 };
 
 export const renderSvgTextElement = (
@@ -207,7 +214,8 @@ export const renderSvgTextElement = (
   node: SVGElement,
   element: NonDeleted<ExcalidrawTextElement>,
 ): void => {
-  getMethods(element.subtype).renderSvg(svgRoot, node, element);
+  const subtype = element.subtype ?? TEXT_SUBTYPE_DEFAULT;
+  getMethods(subtype).renderSvg(svgRoot, node, element);
 };
 
 export const wrapTextElement = (
@@ -216,10 +224,11 @@ export const wrapTextElement = (
   next?: {
     fontSize?: number;
     text?: string;
-    textOpts?: TextOpts;
+    customProps?: TextOpts;
   },
 ): string => {
-  return getMethods(element.subtype).wrap(element, containerWidth, next);
+  const subtype = element.subtype ?? TEXT_SUBTYPE_DEFAULT;
+  return getMethods(subtype).wrap(element, containerWidth, next);
 };
 
 export const registerTextElementSubtypes = (
@@ -228,11 +237,13 @@ export const registerTextElementSubtypes = (
   const textSubtypes = getTextElementSubtypes();
   for (let index = 0; index < textSubtypes.length; index++) {
     const subtype = textSubtypes[index];
-    methodMaps.push({ subtype, methods: {} as TextMethods });
-    require(`./${textSubtypes[index]}/index`).registerTextElementSubtype(
-      getMethods(subtype),
-      onSubtypesLoaded,
-    );
+    if (!methodMaps.find((method) => method.subtype === subtype)) {
+      methodMaps.push({ subtype, methods: {} as TextMethods });
+      require(`./${textSubtypes[index]}/index`).registerTextElementSubtype(
+        getMethods(subtype),
+        onSubtypesLoaded,
+      );
+    }
   }
 };
 

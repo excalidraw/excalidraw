@@ -57,6 +57,8 @@ type _ExcalidrawElementBase = Readonly<{
   updated: number;
   link: string | null;
   locked: boolean;
+  subtype?: TextSubtype;
+  customProps?: TextOpts;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
@@ -126,8 +128,6 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     baseline: number;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    subtype: TextSubtype;
-    textOpts: TextOpts;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
   }>;

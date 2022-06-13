@@ -81,6 +81,7 @@ import { arrayToMap } from "../utils";
 import { register } from "./register";
 import { isPanelComponentDisabled } from "../textlike";
 import { TEXT_SUBTYPE_ICONS } from "../textlike/icons";
+import { TEXT_SUBTYPE_DEFAULT } from "../textlike/types";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -136,7 +137,7 @@ export const actionChangeTextElementSubtype = register({
           if (isTextElement(oldElement)) {
             const newElement: ExcalidrawTextElement = newElementWith(
               oldElement,
-              { subtype: value, textOpts: appState.textOpts },
+              { subtype: value, customProps: appState.customProps },
             );
             redrawTextBoundingBox(newElement, getContainerElement(oldElement));
             return newElement;
@@ -170,10 +171,10 @@ export const actionChangeTextElementSubtype = register({
           appState,
           (element) =>
             isTextElement(element)
-              ? element.subtype
+              ? element.subtype ?? TEXT_SUBTYPE_DEFAULT
               : hasBoundTextElement(element) &&
-                getBoundTextElement(element)!.subtype,
-          appState.textElementSubtype,
+                (getBoundTextElement(element)!.subtype ?? TEXT_SUBTYPE_DEFAULT),
+          appState.customSubtype,
         )}
         onChange={(value) => updateData(value)}
       />

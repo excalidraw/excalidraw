@@ -13,12 +13,7 @@ import {
   FontFamilyValues,
   ExcalidrawRectangleElement,
 } from "../element/types";
-import {
-  cleanTextElementUpdate,
-  measureTextElement,
-  wrapTextElement,
-} from "../textlike";
-import { TextOpts, TextSubtype } from "../textlike/types";
+import { measureTextElement, wrapTextElement } from "../textlike";
 import { getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { mutateElement, newElementWith } from "./mutateElement";
@@ -29,6 +24,15 @@ import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import { getContainerElement } from "./textElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+
+export const delUndefinedProps = (obj: any, keys: string[]) => {
+  keys.forEach((key) => {
+    if (key in obj && obj[key] === undefined) {
+      delete obj[key];
+    }
+  });
+  return obj;
+};
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -41,6 +45,8 @@ type ElementConstructorOpts = MarkOptional<
   | "version"
   | "versionNonce"
   | "link"
+  | "subtype"
+  | "customProps"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -66,7 +72,13 @@ const _newElementBase = <T extends ExcalidrawElement>(
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
+  const { subtype, customProps } = rest;
+  const custom = delUndefinedProps({ subtype, customProps }, [
+    "subtype",
+    "customProps",
+  ]);
   const element = {
+    ...custom,
     id: rest.id || randomId(),
     type,
     x,
@@ -131,16 +143,10 @@ export const newTextElement = (
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    subtype: TextSubtype;
-    textOpts: TextOpts;
     containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  // Ensure the attributes in textOpts contain properly defined values
-  const textOpts = cleanTextElementUpdate(opts.subtype, {
-    textOpts: opts.textOpts,
-  }).textOpts!;
-  const metrics = measureTextElement(opts, { textOpts });
+  const metrics = measureTextElement(opts, { customProps: opts.customProps });
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
@@ -157,8 +163,6 @@ export const newTextElement = (
       baseline: metrics.baseline,
       containerId: opts.containerId || null,
       originalText: opts.text,
-      subtype: opts.subtype,
-      textOpts,
     },
     {},
   );
