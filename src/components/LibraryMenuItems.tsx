@@ -90,7 +90,7 @@ const LibraryMenuItems = ({
   const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
 
   const isMobile = useDeviceType().isMobile;
-  const isNonMobileSmallerScreen = useDeviceType().isNonMobileSmallerScreen;
+  const isFloatingMenu = useDeviceType().isFloatingMenu;
   const renderLibraryActions = () => {
     const itemsSelected = !!selectedItems.length;
     const items = itemsSelected
@@ -364,7 +364,7 @@ const LibraryMenuItems = ({
         <div className="library_items_add">
           {isLoading ? (
             <Spinner />
-          ) : !isMobile && !isNonMobileSmallerScreen ? (
+          ) : !isMobile && !isFloatingMenu ? (
             <a
               href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
                 window.name || "_blank"
@@ -395,7 +395,7 @@ const LibraryMenuItems = ({
       <div className="library_url">
         {isLoading ? (
           <Spinner />
-        ) : isMobile || isNonMobileSmallerScreen ? (
+        ) : isMobile || isFloatingMenu ? (
           <a
             href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
               window.name || "_blank"

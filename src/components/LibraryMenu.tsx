@@ -105,13 +105,13 @@ export const LibraryMenu = ({
   const ref = useRef<HTMLDivElement | null>(null);
 
   const isMobile = useDeviceType().isMobile;
-  const isNonMobileSmallerScreen = useDeviceType().isNonMobileSmallerScreen;
+  const isFloatingMenu = useDeviceType().isFloatingMenu;
   useOnClickOutside(ref, (event) => {
     // If click on the library icon, do nothing.
     if ((event.target as Element).closest(".ToolIcon__library")) {
       return;
     }
-    if (isMobile || isNonMobileSmallerScreen) {
+    if (isMobile || isFloatingMenu) {
       onClose();
     }
   });

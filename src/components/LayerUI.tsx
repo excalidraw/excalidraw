@@ -384,7 +384,7 @@ const LayerUI = ({
                       setAppState={setAppState}
                     />
                   </Stack.Row>
-                  {deviceType.isNonMobileSmallerScreen && libraryMenu}
+                  {deviceType.isFloatingMenu && libraryMenu}
                 </Stack.Col>
               )}
             </Section>
@@ -596,7 +596,7 @@ const LayerUI = ({
       </div>
       {appState.isLibraryOpen &&
         !deviceType.isMobile &&
-        !deviceType.isNonMobileSmallerScreen &&
+        !deviceType.isFloatingMenu &&
         renderLibrarySidebar()}
     </>
   );

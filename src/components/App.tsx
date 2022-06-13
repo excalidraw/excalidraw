@@ -265,7 +265,7 @@ import {
 const defaultDeviceTypeContext: DeviceType = {
   isMobile: false,
   isTouchScreen: false,
-  isNonMobileSmallerScreen: false,
+  isFloatingMenu: false,
 };
 const DeviceTypeContext = React.createContext(defaultDeviceTypeContext);
 export const useDeviceType = () => useContext(DeviceTypeContext);
@@ -303,7 +303,7 @@ class App extends React.Component<AppProps, AppState> {
   deviceType: DeviceType = {
     isMobile: false,
     isTouchScreen: false,
-    isNonMobileSmallerScreen: false,
+    isFloatingMenu: false,
   };
   detachIsMobileMqHandler?: () => void;
 
@@ -851,7 +851,7 @@ class App extends React.Component<AppProps, AppState> {
             width < MQ_MAX_WIDTH_PORTRAIT ||
             (height < MQ_MAX_HEIGHT_LANDSCAPE &&
               width < MQ_MAX_WIDTH_LANDSCAPE),
-          isNonMobileSmallerScreen:
+           isFloatingMenu:
             width < MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT ||
             (height < MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE &&
               width < MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE),
@@ -865,13 +865,13 @@ class App extends React.Component<AppProps, AppState> {
       const mediaQuery = window.matchMedia(
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
-      const nonMobileSmallerScreenMediaQuery = window.matchMedia(
+      const isFloatingMenuMediaQuery = window.matchMedia(
         `(max-width: ${MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE}px)`,
       );
       const handler = () => {
         this.deviceType = updateObject(this.deviceType, {
           isMobile: mediaQuery.matches,
-          isNonMobileSmallerScreen: nonMobileSmallerScreenMediaQuery.matches,
+          isFloatingMenu: isFloatingMenuMediaQuery.matches,
         });
       };
       mediaQuery.addListener(handler);
@@ -1465,17 +1465,13 @@ class App extends React.Component<AppProps, AppState> {
       this.files = { ...this.files, ...opts.files };
     }
 
-    const libraryMenuStatus = !(
-      this.deviceType.isMobile || this.deviceType.isNonMobileSmallerScreen
-    );
-
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
     this.setState(
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          isLibraryOpen: libraryMenuStatus,
+          isLibraryOpen: !this.deviceType.isFloatingMenu,
           selectedElementIds: newElements.reduce((map, element) => {
             if (!isBoundToContainer(element)) {
               map[element.id] = true;
