@@ -100,8 +100,8 @@
     }
     .library_items_add{
       position: fixed;
-      bottom: 20px;
-      width: 300px !important;
+      bottom: 1.25rem;
+      width: 18.75rem !important    ;
       a {
         background-color: $oc-blue-9;
         padding: 10px 78px;
@@ -129,3 +129,4 @@
 ::-webkit-scrollbar-thumb:hover {
   background: $oc-blue-5; 
 }
+

@@ -299,7 +299,7 @@ const LayerUI = ({
     </svg>
   );
 
-  const renderFixedLibrarySidebar = () => {
+  const renderLibrarySidebar = () => {
     return (
       <div className="layerUI_sidebar">
         <div className="ToolIcon__icon__close">
@@ -597,7 +597,7 @@ const LayerUI = ({
       {appState.isLibraryOpen &&
         !deviceType.isMobile &&
         !deviceType.isNonMobileSmallerScreen &&
-        renderFixedLibrarySidebar()}
+        renderLibrarySidebar()}
     </>
   );
 };
