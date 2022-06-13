@@ -406,7 +406,7 @@ const LibraryMenuItems = ({
           >
             {t("labels.libraries")}
           </a>
-        ): null}
+        ) : null}
       </div>
       <Stack.Col
         className="library-menu-items-container__items"

@@ -7,10 +7,10 @@
     position: relative;
     transition: box-shadow 0.5s ease-in-out;
 
-    @media  screen and (max-width: 1229px) {
+    @media screen and (max-width: 1229px) {
       box-shadow: var(--shadow-island);
     }
-    
+
     &.zen-mode {
       box-shadow: none;
     }
