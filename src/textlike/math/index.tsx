@@ -781,7 +781,7 @@ const renderTextElementMath = (
     } else {
       context.save();
       context.canvas.setAttribute("dir", childRtl ? "rtl" : "ltr");
-      context.font = getFontString(element);
+      context.font = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
       context.fillStyle = element.strokeColor;
       context.textAlign = element.textAlign as CanvasTextAlign;
     }
