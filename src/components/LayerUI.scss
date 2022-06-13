@@ -10,6 +10,10 @@
   padding: 10px;
   border-left: 1px solid $oc-blue-5;
 
+  .Island {
+    box-shadow: none;
+  }
+
   .ToolIcon__icon__close {
     position: absolute;
     z-index: 3;

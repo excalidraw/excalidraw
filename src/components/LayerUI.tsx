@@ -576,7 +576,11 @@ const LayerUI = ({
             (appState.editingElement &&
               !isTextElement(appState.editingElement)),
         })}
-        style={appState.isLibraryOpen ? { width: `calc(100% - 300px)` } : {}}
+        style={
+          appState.isLibraryOpen && !deviceType.isFloatingMenu
+            ? { width: `calc(100% - 300px)` }
+            : {}
+        }
       >
         {dialogs}
         {renderFixedSideContainer()}
