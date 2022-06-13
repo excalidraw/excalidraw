@@ -4,19 +4,19 @@
   position: absolute;
   right: 0;
   z-index: 5;
-  background-color: var(--popup-secondary-bg-color);
-  box-shadow: var(--shadow-island);  height: 100vh;
-  width: 0%; 
-  border-radius: var(--border-radius-lg); 
-
+  background-color: var(--island-bg-color);
+  box-shadow: var(--shadow-island); 
+   height: 100vh;
+  padding: 10px;
+  border-left: 1px solid $oc-blue-5;
   .ToolIcon__icon__close {
     position: absolute;
     z-index: 3;
-    right: 0px;
-
+    right: 15px;
+    top: 14px;
     button {
       border-radius: 50%;
-      background-color: var(--color-primary);
+      background-color: $oc-blue-6;
       .close_icon {
         height: 20px;
         width: 20px;
@@ -27,7 +27,18 @@
           height: 15px;
         }
       }
+      &:hover {
+        background-color:  var(--color-primary);
+      }
     }  
+  }
+  .Island {
+    --padding: 0;
+    background-color: var(--island-bg-color);
+    border-radius: var(--border-radius-lg);
+    padding: calc(var(--padding) * var(--space-factor));
+    position: relative;
+    transition: box-shadow 0.5s ease-in-out;
   }
 }
 

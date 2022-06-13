@@ -87,7 +87,7 @@
       }
     }
     &__items {
-      max-height: 100vh;
+      max-height: 75vh;
       overflow: auto;
       margin-top: 0.5rem;
     }
@@ -98,5 +98,34 @@
       margin: 0.6em 0.2em;
       color: var(--text-primary-color);
     }
+    .library_items_add{
+      position: fixed;
+      bottom: 20px;
+      width: 300px !important;
+      a {
+        background-color: $oc-blue-9;
+        padding: 10px 78px;
+        color: var(--default-bg-color);
+        text-decoration: none;
+        &:hover{
+          background-color: $oc-blue-5;
+        }
+      }
+    }
   }
+}
+
+
+// custom Menu Library Sidebar
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $oc-blue-8; 
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: $oc-blue-5; 
 }

@@ -20,6 +20,7 @@ import { Dialog } from "./Dialog";
 import { Island } from "./Island";
 import PublishLibrary from "./PublishLibrary";
 import { ToolButton } from "./ToolButton";
+import { useDeviceType } from "./App";
 
 import "./LibraryMenu.scss";
 import LibraryMenuItems from "./LibraryMenuItems";
@@ -30,33 +31,33 @@ import { useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import Spinner from "./Spinner";
 
-// const useOnClickOutside = (
-//   ref: RefObject<HTMLElement>,
-//   cb: (event: MouseEvent) => void,
-// ) => {
-//   useEffect(() => {
-//     const listener = (event: MouseEvent) => {
-//       if (!ref.current) {
-//         return;
-//       }
+const useOnClickOutside = (
+  ref: RefObject<HTMLElement>,
+  cb: (event: MouseEvent) => void,
+) => {
+  useEffect(() => {
+    const listener = (event: MouseEvent) => {
+      if (!ref.current) {
+        return;
+      }
 
-//       if (
-//         event.target instanceof Element &&
-//         (ref.current.contains(event.target) ||
-//           !document.body.contains(event.target))
-//       ) {
-//         return;
-//       }
+      if (
+        event.target instanceof Element &&
+        (ref.current.contains(event.target) ||
+          !document.body.contains(event.target))
+      ) {
+        return;
+      }
 
-//       cb(event);
-//     };
-//     document.addEventListener("pointerdown", listener, false);
+      cb(event);
+    };
+    document.addEventListener("pointerdown", listener, false);
 
-//     return () => {
-//       document.removeEventListener("pointerdown", listener);
-//     };
-//   }, [ref, cb]);
-// };
+    return () => {
+      document.removeEventListener("pointerdown", listener);
+    };
+  }, [ref, cb]);
+};
 
 const getSelectedItems = (
   libraryItems: LibraryItems,
@@ -75,7 +76,7 @@ const LibraryMenuWrapper = forwardRef<
 });
 
 export const LibraryMenu = ({
-  // onClose,
+  onClose,
   onInsertLibraryItems,
   pendingElements,
   onAddToLibrary,
@@ -89,7 +90,7 @@ export const LibraryMenu = ({
   appState,
 }: {
   pendingElements: LibraryItem["elements"];
-  // onClose: () => void;
+  onClose: () => void;
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: () => void;
   theme: AppState["theme"];
@@ -103,25 +104,29 @@ export const LibraryMenu = ({
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
-  // useOnClickOutside(ref, (event) => {
-  //   // If click on the library icon, do nothing.
-  //   if ((event.target as Element).closest(".ToolIcon__library")) {
-  //     return;
-  //   }
-  //   onClose();
-  // });
+  const isMobile = useDeviceType().isMobile;
+  const isNonMobileSmallerScreen = useDeviceType().isNonMobileSmallerScreen;
+  useOnClickOutside(ref, (event) => {
+    // If click on the library icon, do nothing.
+    if ((event.target as Element).closest(".ToolIcon__library")) {
+      return;
+    }
+    if (isMobile || isNonMobileSmallerScreen) {
+      onClose();
+    }
+  });
 
-  // useEffect(() => {
-  //   const handleKeyDown = (event: KeyboardEvent) => {
-  //     if (event.key === KEYS.ESCAPE) {
-  //       onClose();
-  //     }
-  //   };
-  //   document.addEventListener(EVENT.KEYDOWN, handleKeyDown);
-  //   return () => {
-  //     document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
-  //   };
-  // }, [onClose]);
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === KEYS.ESCAPE) {
+        onClose();
+      }
+    };
+    document.addEventListener(EVENT.KEYDOWN, handleKeyDown);
+    return () => {
+      document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
+    };
+  }, [onClose]);
 
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
   const [showPublishLibraryDialog, setShowPublishLibraryDialog] =

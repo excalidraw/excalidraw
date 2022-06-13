@@ -96,8 +96,6 @@ const LayerUI = ({
   onImageAction,
 }: LayerUIProps) => {
   const deviceType = useDeviceType();
-  const layerUIwidth = "75%";
-  const sidebarWidth = "25%";
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
       return null;
@@ -257,12 +255,12 @@ const LayerUI = ({
   );
 
   const closeLibrary = useCallback(() => {
-    // const isDialogOpen = !!document.querySelector(".Dialog");
+    const isDialogOpen = !!document.querySelector(".Dialog");
 
-    // // Prevent closing if any dialog is open
-    // if (isDialogOpen) {
-    //   return;
-    // }
+    // Prevent closing if any dialog is open
+    if (isDialogOpen) {
+      return;
+    }
     setAppState({ isLibraryOpen: false });
   }, [setAppState]);
 
@@ -276,7 +274,7 @@ const LayerUI = ({
   const libraryMenu = appState.isLibraryOpen ? (
     <LibraryMenu
       pendingElements={getSelectedElements(elements, appState, true)}
-      // onClose={closeLibrary}
+      onClose={closeLibrary}
       onInsertLibraryItems={(libraryItems) => {
         onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
       }}
@@ -303,10 +301,7 @@ const LayerUI = ({
 
   const renderFixedLibrarySidebar = () => {
     return (
-      <div
-        className="layerUI_sidebar"
-        style={appState.isLibraryOpen ? { width: sidebarWidth } : {}}
-      >
+      <div className="layerUI_sidebar">
         <div className="ToolIcon__icon__close">
           <button onClick={() => setAppState({ isLibraryOpen: false })}>
             <div className="close_icon">{CLOSE_ICON}</div>
@@ -581,7 +576,7 @@ const LayerUI = ({
             (appState.editingElement &&
               !isTextElement(appState.editingElement)),
         })}
-        style={appState.isLibraryOpen ? { width: layerUIwidth } : {}}
+        style={appState.isLibraryOpen ? { width: `calc(100% - 300px)` } : {}}
       >
         {dialogs}
         {renderFixedSideContainer()}

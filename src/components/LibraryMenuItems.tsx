@@ -90,7 +90,7 @@ const LibraryMenuItems = ({
   const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
 
   const isMobile = useDeviceType().isMobile;
-
+  const isNonMobileSmallerScreen = useDeviceType().isNonMobileSmallerScreen;
   const renderLibraryActions = () => {
     const itemsSelected = !!selectedItems.length;
     const items = itemsSelected
@@ -361,6 +361,22 @@ const LibraryMenuItems = ({
       {showRemoveLibAlert && renderRemoveLibAlert()}
       <div className="layer-ui__library-header" key="library-header">
         {renderLibraryActions()}
+        <div className="library_items_add">
+          {isLoading ? (
+            <Spinner />
+          ) : !isMobile && !isNonMobileSmallerScreen ? (
+            <a
+              href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+                window.name || "_blank"
+              }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+                VERSIONS.excalidrawLibrary
+              }`}
+              target="_excalidraw_libraries"
+            >
+              {t("labels.libraries")}
+            </a>
+          ) : null}
+        </div>
         {/* {isLoading ? (
           <Spinner />
         ) : (
@@ -376,21 +392,22 @@ const LibraryMenuItems = ({
           </a>
         )} */}
       </div>
-
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <a
-          href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-            window.name || "_blank"
-          }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
-            VERSIONS.excalidrawLibrary
-          }`}
-          target="_excalidraw_libraries"
-        >
-          {t("labels.libraries")}
-        </a>
-      )}
+      <div className="library_url">
+        {isLoading ? (
+          <Spinner />
+        ) : isMobile || isNonMobileSmallerScreen ? (
+          <a
+            href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+              window.name || "_blank"
+            }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+              VERSIONS.excalidrawLibrary
+            }`}
+            target="_excalidraw_libraries"
+          >
+            {t("labels.libraries")}
+          </a>
+        ): null}
+      </div>
       <Stack.Col
         className="library-menu-items-container__items"
         align="start"

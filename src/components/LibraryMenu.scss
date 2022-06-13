@@ -6,13 +6,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--shadow-island);
 
     .layer-ui__library-header {
       display: flex;
       align-items: center;
       width: 100%;
-      margin: 2px 0 15px 0 ;
+      margin: 2px 0 15px 0 ;  
       .Spinner {
         margin-right: 1rem;
       }
