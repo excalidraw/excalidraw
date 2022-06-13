@@ -7,9 +7,6 @@ import {
   decodeSvgMetadata,
 } from "../data/image";
 import { serializeAsJSON } from "../data/json";
-import { registerTextElementSubtypes } from "../textlike";
-
-registerTextElementSubtypes();
 
 const { h } = window;
 

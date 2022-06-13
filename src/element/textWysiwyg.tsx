@@ -119,12 +119,14 @@ export const textWysiwyg = ({
       let coordYR = updatedElement.y;
       const container = getContainerElement(updatedElement);
 
-      const metrics = measureTextElement(updatedElement, {
-        text: container ? updatedElement.text : updatedElement.originalText,
-      });
-      let maxWidth = metrics.width;
+      const text = container
+        ? updatedElement.text
+        : updatedElement.originalText;
+      const metrics = measureTextElement(updatedElement, { text });
+      const metricsW = measureText(text, getFontString(updatedElement));
+      let maxWidth = metricsW.width;
       let maxHeight = metrics.height;
-      let width = metrics.width;
+      let width = metricsW.width;
       // Set to element height by default since that's
       // what is going to be used for unbounded text
       let height = metrics.height;

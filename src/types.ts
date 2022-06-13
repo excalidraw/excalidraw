@@ -15,7 +15,6 @@ import {
   Theme,
 } from "./element/types";
 import { SHAPES } from "./shapes";
-import { TextOpts, TextSubtype } from "./textlike/types";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
@@ -91,8 +90,8 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
-  textElementSubtype: TextSubtype;
-  textOpts: TextOpts;
+  customSubtype?: ExcalidrawElement["subtype"];
+  customProps?: ExcalidrawElement["customProps"];
   activeTool:
     | {
         type: typeof SHAPES[number]["value"] | "eraser";

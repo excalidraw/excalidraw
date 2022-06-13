@@ -1,11 +1,9 @@
-import { ExcalidrawElement, ExcalidrawTextElement } from "./types";
+import { ExcalidrawElement } from "./types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { Point } from "../types";
-import { isTextElement } from "./typeChecks";
-import { cleanTextElementUpdate } from "../textlike";
 import { getUpdatedTimestamp } from "../utils";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
@@ -22,14 +20,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   updates: ElementUpdate<TElement>,
   informMutation = true,
 ): TElement => {
-  if (isTextElement(element)) {
-    const textUpdates = updates as ElementUpdate<ExcalidrawTextElement>;
-    updates = cleanTextElementUpdate(
-      textUpdates.subtype ?? element.subtype,
-      textUpdates,
-    ) as ElementUpdate<TElement>;
-  }
-
   let didChange = false;
 
   // casting to any because can't use `in` operator
@@ -116,22 +106,12 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
   element: TElement,
   updates: ElementUpdate<TElement>,
 ): TElement => {
-  const oldUpdates = updates;
-  if (isTextElement(element)) {
-    const textUpdates = updates as ElementUpdate<ExcalidrawTextElement>;
-    updates = cleanTextElementUpdate(
-      textUpdates.subtype ?? element.subtype,
-      textUpdates,
-    ) as ElementUpdate<TElement>;
-  }
   let didChange = false;
   for (const key in updates) {
     const value = (updates as any)[key];
     if (typeof value !== "undefined") {
       if (
-        ((element as any)[key] === value ||
-          // Don't update if the subtype is enforcing an attribute value
-          typeof (oldUpdates as any)[key] === "undefined") &&
+        (element as any)[key] === value &&
         // if object, always update because its attrs could have changed
         (typeof value !== "object" || value === null)
       ) {

@@ -9,7 +9,6 @@ import {
 import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
 import { getDateTime } from "./utils";
-import { TEXT_SUBTYPE_DEFAULT } from "./textlike/types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio
@@ -42,8 +41,6 @@ export const getDefaultAppState = (): Omit<
     editingElement: null,
     editingGroupId: null,
     editingLinearElement: null,
-    textElementSubtype: TEXT_SUBTYPE_DEFAULT,
-    textOpts: {},
     activeTool: {
       type: "selection",
       customType: null,
@@ -138,8 +135,8 @@ const APP_STATE_STORAGE_CONF = (<
   editingGroupId: { browser: true, export: false, server: false },
   editingLinearElement: { browser: false, export: false, server: false },
   activeTool: { browser: true, export: false, server: false },
-  textElementSubtype: { browser: true, export: false, server: false },
-  textOpts: { browser: true, export: false, server: false },
+  customSubtype: { browser: true, export: false, server: false },
+  customProps: { browser: true, export: false, server: false },
   penMode: { browser: true, export: false, server: false },
   penDetected: { browser: true, export: false, server: false },
   errorMessage: { browser: false, export: false, server: false },

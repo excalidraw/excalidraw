@@ -33,7 +33,7 @@ const cleanTextElementUpdateText = (
 ): ElementUpdate<ExcalidrawTextElementText> => {
   const newUpdates = {};
   for (const key in updates) {
-    if (key === "textOpts") {
+    if (key === "customProps" && (updates as any)[key] !== undefined) {
       (newUpdates as any)[key] = {};
     } else {
       (newUpdates as any)[key] = (updates as any)[key];
@@ -47,7 +47,7 @@ const measureTextElementText = (
   next?: {
     fontSize?: number;
     text?: string;
-    textOpts?: TextOptsText;
+    customProps?: TextOptsText;
   },
   maxWidth?: number | null,
 ) => {
@@ -142,7 +142,7 @@ export const wrapTextElementText = (
   next?: {
     fontSize?: number;
     text?: string;
-    textOpts?: TextOptsText;
+    customProps?: TextOptsText;
   },
 ): string => {
   const fontSize =

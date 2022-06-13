@@ -13,10 +13,12 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
-import { newFreeDrawElement } from "../../element/newElement";
-import { TextOpts, TEXT_SUBTYPE_DEFAULT } from "../../textlike/types";
+import { delUndefinedProps, newFreeDrawElement } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
+import { registerTextElementSubtypes } from "../../textlike";
+
+registerTextElementSubtypes();
 
 const readFile = util.promisify(fs.readFile);
 
@@ -98,8 +100,8 @@ export class API {
     verticalAlign?: T extends "text"
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
-    subtype?: T extends "text" ? ExcalidrawTextElement["subtype"] : never;
-    textOpts?: T extends "text" ? TextOpts : never;
+    subtype?: ExcalidrawElement["subtype"];
+    customProps?: ExcalidrawElement["customProps"];
     boundElements?: ExcalidrawGenericElement["boundElements"];
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
@@ -117,7 +119,15 @@ export class API {
 
     const appState = h?.state || getDefaultAppState();
 
+    const custom = delUndefinedProps(
+      {
+        subtype: rest.subtype ?? appState.customSubtype,
+        customProps: rest.customProps ?? appState.customProps,
+      },
+      ["subtype", "customProps"],
+    );
     const base = {
+      ...custom,
       x,
       y,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
@@ -152,8 +162,6 @@ export class API {
           fontFamily: rest.fontFamily ?? appState.currentItemFontFamily,
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
-          subtype: rest.subtype ?? TEXT_SUBTYPE_DEFAULT,
-          textOpts: rest.textOpts ?? {},
           containerId: rest.containerId ?? undefined,
         });
         element.width = width;
