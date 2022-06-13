@@ -53,7 +53,7 @@ const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;
 type ExcalidrawTextElementMath = ExcalidrawTextElement &
   Readonly<{
     subtype: typeof TEXT_SUBTYPE_MATH;
-    textOpts: MathOpts;
+    customProps: MathOpts;
   }>;
 
 type MathOpts = {
@@ -80,7 +80,7 @@ class GetMathOpts {
   private useTex: boolean = true;
   private mathOnly: boolean = false;
   getUseTex = (appState?: AppState): boolean => {
-    const textOptsMath = appState?.textOpts as TextOptsMath;
+    const textOptsMath = appState?.customProps as TextOptsMath;
     if (textOptsMath !== undefined) {
       this.useTex =
         textOptsMath.useTex !== undefined ? textOptsMath.useTex : true;
@@ -89,7 +89,7 @@ class GetMathOpts {
   };
 
   getMathOnly = (appState?: AppState): boolean => {
-    const textOptsMath = appState?.textOpts as TextOptsMath;
+    const textOptsMath = appState?.customProps as TextOptsMath;
     if (textOptsMath !== undefined) {
       this.mathOnly =
         textOptsMath.mathOnly !== undefined ? textOptsMath.mathOnly : false;
@@ -712,9 +712,9 @@ const cleanTextElementUpdateMath = (
 ): ElementUpdate<ExcalidrawTextElementMath> => {
   const newUpdates = {};
   for (const key in updates) {
-    if (key === "textOpts") {
-      const textOpts = (updates as any)[key] as TextOptsMath;
-      (newUpdates as any)[key] = getMathOpts.ensureMathOpts(textOpts);
+    if (key === "customProps") {
+      const customProps = (updates as any)[key] as TextOptsMath;
+      (newUpdates as any)[key] = getMathOpts.ensureMathOpts(customProps);
     } else {
       (newUpdates as any)[key] = (updates as any)[key];
     }
@@ -728,23 +728,15 @@ const measureTextElementMath = (
   next?: {
     fontSize?: number;
     text?: string;
-    textOpts?: TextOptsMath;
+    customProps?: TextOptsMath;
   },
   maxWidth?: number | null,
 ) => {
   const isMathJaxLoaded = mathJaxLoaded;
-  const fontSize =
-    next?.fontSize !== undefined ? next.fontSize : element.fontSize;
-  const text = next?.text !== undefined ? next.text : element.text;
-  const useTex =
-    next?.textOpts !== undefined && next.textOpts.useTex !== undefined
-      ? next.textOpts.useTex
-      : element.textOpts.useTex;
-  const mathOnly =
-    next?.textOpts !== undefined && next.textOpts.mathOnly !== undefined
-      ? next.textOpts.mathOnly
-      : element.textOpts.mathOnly;
-  const mathOpts = getMathOpts.ensureMathOpts({ useTex, mathOnly });
+  const fontSize = next?.fontSize ?? element.fontSize;
+  const text = next?.text ?? element.text;
+  const customProps = next?.customProps ?? element.customProps;
+  const mathOpts = getMathOpts.ensureMathOpts(customProps);
   return getImageMetrics(text, fontSize, mathOpts, isMathJaxLoaded, maxWidth);
 };
 
@@ -760,7 +752,7 @@ const renderTextElementMath = (
   const strokeColor = element.strokeColor;
   const textAlign = element.textAlign;
   const opacity = element.opacity / 100;
-  const mathOpts = getMathOpts.ensureMathOpts(element.textOpts);
+  const mathOpts = getMathOpts.ensureMathOpts(element.customProps);
 
   let _childIsSvg: boolean;
   let _text: string;
@@ -876,7 +868,7 @@ const renderSvgTextElementMath = (
   element: NonDeleted<ExcalidrawTextElementMath>,
 ): void => {
   const isMathJaxLoaded = mathJaxLoaded;
-  const mathOpts = getMathOpts.ensureMathOpts(element.textOpts);
+  const mathOpts = getMathOpts.ensureMathOpts(element.customProps);
   const text = element.text;
   const fontSize = element.fontSize;
   const strokeColor = element.strokeColor;
@@ -996,22 +988,15 @@ const wrapTextElementMath = (
   next?: {
     fontSize?: number;
     text?: string;
-    textOpts?: TextOptsMath;
+    customProps?: TextOptsMath;
   },
 ): string => {
   const isMathJaxLoaded = mathJaxLoaded;
   const fontSize =
     next?.fontSize !== undefined ? next.fontSize : element.fontSize;
   const text = next?.text !== undefined ? next.text : element.originalText;
-  const useTex =
-    next?.textOpts !== undefined && next.textOpts.useTex !== undefined
-      ? next.textOpts.useTex
-      : element.textOpts.useTex;
-  const mathOnly =
-    next?.textOpts !== undefined && next.textOpts.mathOnly !== undefined
-      ? next.textOpts.mathOnly
-      : element.textOpts.mathOnly;
-  const mathOpts = getMathOpts.ensureMathOpts({ useTex, mathOnly });
+  const customProps = next?.customProps ?? element.customProps;
+  const mathOpts = getMathOpts.ensureMathOpts(customProps);
 
   const font = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
 
@@ -1038,7 +1023,7 @@ const wrapTextElementMath = (
     for (let i = 0; i < lineArray.length; i++) {
       const isSvg =
         textAsMjxContainer(markupArray[i], isMathJaxLoaded) !== null;
-      if (isSvg || mathOnly) {
+      if (isSvg || mathOpts.mathOnly) {
         const lineItem =
           getStartDelimiter(mathOpts.useTex) +
           lineArray[i] +
@@ -1176,7 +1161,7 @@ const registerActionsMath = () => {
           const el = hasBoundTextElement(element)
             ? getBoundTextElement(element)
             : element;
-          return isMathElement(el) && el.textOpts.useTex;
+          return isMathElement(el) && el.customProps.useTex;
         });
         if (useTex === null) {
           useTex = getMathOpts.getUseTex(appState);
@@ -1190,9 +1175,9 @@ const registerActionsMath = () => {
             const newElement: ExcalidrawTextElement = newElementWith(
               oldElement,
               {
-                textOpts: getMathOpts.ensureMathOpts({
+                customProps: getMathOpts.ensureMathOpts({
                   useTex,
-                  mathOnly: oldElement.textOpts.mathOnly,
+                  mathOnly: oldElement.customProps.mathOnly,
                 }),
               },
             );
@@ -1208,7 +1193,7 @@ const registerActionsMath = () => {
       const mathOnly = getMathOpts.getMathOnly(appState);
       return {
         elements: modElements,
-        appState: { ...appState, textOpts: { useTex, mathOnly } },
+        appState: { ...appState, customProps: { useTex, mathOnly } },
         commitToHistory: true,
       };
     },
@@ -1237,7 +1222,7 @@ const registerActionsMath = () => {
       }
       if (
         appState.activeTool.type === "text" &&
-        appState.textElementSubtype !== TEXT_SUBTYPE_MATH
+        appState.customSubtype !== TEXT_SUBTYPE_MATH
       ) {
         enabled = false;
       }
@@ -1265,9 +1250,10 @@ const registerActionsMath = () => {
               const el = hasBoundTextElement(element)
                 ? getBoundTextElement(element)
                 : element;
-              return isMathElement(el) && el.textOpts.useTex !== undefined
-                ? el.textOpts.useTex
-                : true;
+              return (
+                isMathElement(el) &&
+                (el.customProps?.useTex ?? getMathOpts.getUseTex())
+              );
             },
             getMathOpts.getUseTex(appState),
           )}
@@ -1286,7 +1272,7 @@ const registerActionsMath = () => {
           const el = hasBoundTextElement(element)
             ? getBoundTextElement(element)
             : element;
-          return isMathElement(el) && el.textOpts.mathOnly;
+          return isMathElement(el) && el.customProps.mathOnly;
         });
         if (mathOnly === null) {
           mathOnly = getMathOpts.getMathOnly(appState);
@@ -1297,13 +1283,13 @@ const registerActionsMath = () => {
         appState,
         (oldElement) => {
           if (isMathElement(oldElement)) {
-            const textOpts = getMathOpts.ensureMathOpts({
-              useTex: oldElement.textOpts.useTex,
+            const customProps = getMathOpts.ensureMathOpts({
+              useTex: oldElement.customProps.useTex,
               mathOnly,
             });
             const newElement: ExcalidrawTextElement = newElementWith(
               oldElement,
-              { textOpts },
+              { customProps },
             );
             redrawTextBoundingBox(newElement, getContainerElement(oldElement));
             return newElement;
@@ -1317,7 +1303,7 @@ const registerActionsMath = () => {
       const useTex = getMathOpts.getUseTex(appState);
       return {
         elements: modElements,
-        appState: { ...appState, textOpts: { useTex, mathOnly } },
+        appState: { ...appState, customProps: { useTex, mathOnly } },
         commitToHistory: true,
       };
     },
@@ -1346,7 +1332,7 @@ const registerActionsMath = () => {
       }
       if (
         appState.activeTool.type === "text" &&
-        appState.textElementSubtype !== TEXT_SUBTYPE_MATH
+        appState.customSubtype !== TEXT_SUBTYPE_MATH
       ) {
         enabled = false;
       }
@@ -1374,9 +1360,10 @@ const registerActionsMath = () => {
               const el = hasBoundTextElement(element)
                 ? getBoundTextElement(element)
                 : element;
-              return isMathElement(el) && el.textOpts.mathOnly !== undefined
-                ? el.textOpts.mathOnly
-                : false;
+              return (
+                isMathElement(el) &&
+                (el.customProps?.mathOnly ?? getMathOpts.getMathOnly())
+              );
             },
             getMathOpts.getMathOnly(appState),
           )}
