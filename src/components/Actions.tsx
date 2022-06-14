@@ -23,10 +23,13 @@ import {
 } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
-import { getTextLikeActions } from "../textlike";
+import { getCustomActions } from "../textlike";
+import { CustomSubtype } from "../textlike/types";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
+import { getCustomSubtypes } from "../textlike/types";
+import { delUndefinedProps } from "../element/newElement";
 
 export const SelectedShapeActions = ({
   appState,
@@ -112,8 +115,6 @@ export const SelectedShapeActions = ({
       {(hasText(activeTool) ||
         targetElements.some((element) => hasText(element.type))) && (
         <>
-          {renderAction("changeTextSubtype")}
-
           {renderAction("changeFontSize")}
 
           {renderAction("changeFontFamily")}
@@ -126,11 +127,14 @@ export const SelectedShapeActions = ({
         (element) =>
           hasBoundTextElement(element) || isBoundToContainer(element),
       ) && renderAction("changeVerticalAlign")}
-      {(hasText(activeTool) ||
-        targetElements.some((element) => hasText(element.type))) && (
+      {(appState.customSubtype ||
+        targetElements.some((element) => element.subtype)) && (
         <>
-          {getTextLikeActions().map((action) => {
-            return renderAction(action.name);
+          {getCustomActions().map((action) => {
+            if (!getCustomSubtypes().includes(action.name as CustomSubtype)) {
+              return renderAction(action.name);
+            }
+            return null;
           })}
         </>
       )}
@@ -248,11 +252,17 @@ export const ShapesSwitcher = ({
             const nextActiveTool = updateActiveTool(appState, {
               type: value,
             });
-            setAppState({
-              activeTool: nextActiveTool,
-              multiElement: null,
-              selectedElementIds: {},
-            });
+            setAppState(
+              delUndefinedProps(
+                {
+                  activeTool: nextActiveTool,
+                  multiElement: null,
+                  selectedElementIds: {},
+                  customSubtype: undefined,
+                },
+                ["customSubtype"],
+              ),
+            );
             setCursorForShape(canvas, {
               ...appState,
               activeTool: nextActiveTool,

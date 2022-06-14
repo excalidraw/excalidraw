@@ -38,6 +38,7 @@ import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
 import { useDeviceType } from "../components/App";
+import { getCustomSubtypes } from "../textlike/types";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -444,6 +445,9 @@ const LayerUI = ({
                     })}
                   >
                     {actionManager.renderAction("eraser", { size: "small" })}
+                    {getCustomSubtypes().map((subtype) =>
+                      actionManager.renderAction(subtype, { size: "small" }),
+                    )}
                   </div>
                 </>
               )}

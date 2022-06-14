@@ -1,22 +1,15 @@
-import {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  NonDeleted,
-} from "../element/types";
-import { ElementUpdate } from "../element/mutateElement";
-import { getNonDeletedElements, isTextElement } from "../element";
+import { ExcalidrawElement } from "../element/types";
+import { getNonDeletedElements } from "../element";
 import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
 
 import {
-  TEXT_SUBTYPE_DEFAULT,
-  TextActionName,
-  TextMethods,
-  TextOmitProps,
-  TextOpts,
-  TextShortcutName,
-  TextSubtype,
-  getTextElementSubtypes,
+  CustomActionName,
+  CustomMethods,
+  CustomShortcutName,
+  CustomSubtype,
+  getCustomSubtypes,
+  isCustomActionName,
 } from "./types";
 
 import { Action, ActionName } from "../actions/types";
@@ -26,238 +19,148 @@ import { getBoundTextElement } from "../element/textElement";
 
 // One element for each ExcalidrawTextElement subtype.
 // ShortcutMap arrays, then typeguards for these.
-type TextShortcutMapArray = Array<Record<string, string[]>>;
-const textShortcutMaps: TextShortcutMapArray = [];
-type TextShortcutNameChecks = Array<Function>;
-const textShortcutNameChecks: TextShortcutNameChecks = [];
+type CustomShortcutMapArray = Array<Record<string, string[]>>;
+const CustomShortcutMaps: CustomShortcutMapArray = [];
+type CustomShortcutNameChecks = Array<Function>;
+const customShortcutNameChecks: CustomShortcutNameChecks = [];
 
 // Register shortcutMap and typeguard for subtype
-export const registerTextLikeShortcutNames = (
-  textShortcutMap: Record<string, string[]>,
-  isTextShortcutNameCheck: Function,
+export const registerCustomShortcutNames = (
+  customShortcutMap: Record<string, string[]>,
+  isCustomShortcutNameCheck: Function,
 ): void => {
-  // If either textShortcutMap or isTextShortcutNameCheck is already registered, do nothing
+  // If either customShortcutMap or isCustomShortcutNameCheck is already registered, do nothing
   if (
-    !textShortcutMaps.includes(textShortcutMap) &&
-    !textShortcutNameChecks.includes(isTextShortcutNameCheck)
+    !CustomShortcutMaps.includes(customShortcutMap) &&
+    !customShortcutNameChecks.includes(isCustomShortcutNameCheck)
   ) {
-    textShortcutMaps.push(textShortcutMap);
-    textShortcutNameChecks.push(isTextShortcutNameCheck);
+    CustomShortcutMaps.push(customShortcutMap);
+    customShortcutNameChecks.push(isCustomShortcutNameCheck);
   }
 };
 
-// Typeguard for TextShortcutName (including all subtypes)
-export const isTextShortcutName = (s: any): s is TextShortcutName => {
-  for (let i = 0; i < textShortcutNameChecks.length; i++) {
-    if (textShortcutNameChecks[i](s)) {
+// Typeguard for CustomShortcutName (including all subtypes)
+export const isCustomShortcutName = (s: any): s is CustomShortcutName => {
+  for (let i = 0; i < customShortcutNameChecks.length; i++) {
+    if (customShortcutNameChecks[i](s)) {
       return true;
     }
   }
   return false;
 };
 
-// Return the shortcut by TextShortcutName.
-// Assume textShortcutMaps and textShortcutNameChecks are matchingly sorted.
-export const getShortcutFromTextShortcutName = (name: TextShortcutName) => {
+// Return the shortcut by CustomShortcutName.
+// Assume CustomShortcutMaps and CustomShortcutNameChecks are matchingly sorted.
+export const getShortcutFromCustomShortcutName = (name: CustomShortcutName) => {
   let shortcuts: string[] = [];
-  for (let i = 0; i < textShortcutMaps.length; i++) {
-    if (textShortcutNameChecks[i](name)) {
-      shortcuts = textShortcutMaps[i][name];
+  for (let i = 0; i < CustomShortcutMaps.length; i++) {
+    if (customShortcutNameChecks[i](name)) {
+      shortcuts = CustomShortcutMaps[i][name];
     }
   }
   return shortcuts;
 };
 
-const textLikeSubtypes = Array<string>();
-
-export const registerTextLikeSubtypeName = (subtype: TextSubtype) => {
-  // Only register a subtype name once
-  if (!textLikeSubtypes.includes(subtype)) {
-    textLikeSubtypes.push(subtype);
-  }
-};
-
 type DisabledPanelComponents = {
-  subtype: TextSubtype;
-  actions: (ActionName | TextActionName)[];
+  subtype: CustomSubtype;
+  actions: (ActionName | CustomActionName)[];
 };
 
-const textLikeDisabledPanelComponents = [] as DisabledPanelComponents[];
+const disabledPanelComponents = [] as DisabledPanelComponents[];
 
-export const registerTextLikeDisabledPanelComponents = (
-  subtype: TextSubtype,
-  actions: (ActionName | TextActionName)[],
+export const registerDisabledPanelComponents = (
+  subtype: CustomSubtype,
+  actions: (ActionName | CustomActionName)[],
 ) => {
-  if (textLikeSubtypes.includes(subtype)) {
-    textLikeDisabledPanelComponents.push({
+  if (getCustomSubtypes().includes(subtype)) {
+    disabledPanelComponents.push({
       subtype,
       actions,
     } as DisabledPanelComponents);
   }
 };
 
-export const isPanelComponentDisabled = (
+export const isActionEnabled = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-  actionName: ActionName | TextActionName,
+  actionName: ActionName | CustomActionName,
 ) => {
-  let disabled = false;
+  let enabled = false;
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
     appState,
   );
   selectedElements.forEach((element) => {
-    if (isTextElement(element)) {
-      if (
-        isPanelComponentDisabledForSubtype(
-          element.subtype ?? TEXT_SUBTYPE_DEFAULT,
-          actionName,
-        )
-      ) {
-        disabled = true;
-      }
-    }
-    if (hasBoundTextElement(element)) {
-      if (
-        isPanelComponentDisabledForSubtype(
-          getBoundTextElement(element)!.subtype ?? TEXT_SUBTYPE_DEFAULT,
-          actionName,
-        )
-      ) {
-        disabled = true;
-      }
+    const subtype = hasBoundTextElement(element)
+      ? getBoundTextElement(element)!.subtype
+      : element.subtype;
+    if (isActionEnabledForSubtype(subtype, actionName)) {
+      enabled = true;
     }
   });
-  if (
-    selectedElements.length === 0 &&
-    isPanelComponentDisabledForSubtype(
-      appState.customSubtype ?? TEXT_SUBTYPE_DEFAULT,
-      actionName,
-    ) &&
-    !(appState.editingElement && isTextElement(appState.editingElement))
-  ) {
-    disabled = true;
+  if (selectedElements.length === 0) {
+    const subtype = appState.editingElement
+      ? appState.editingElement?.subtype
+      : appState.customSubtype;
+    if (isActionEnabledForSubtype(subtype, actionName)) {
+      enabled = true;
+    }
   }
-  if (
-    appState.editingElement &&
-    isTextElement(appState.editingElement) &&
-    isPanelComponentDisabledForSubtype(
-      appState.editingElement.subtype ?? TEXT_SUBTYPE_DEFAULT,
-      actionName,
-    )
-  ) {
-    disabled = true;
-  }
-  return !disabled;
+  return enabled;
 };
 
-const isPanelComponentDisabledForSubtype = (
-  subtype: TextSubtype,
-  action: ActionName | TextActionName,
+const isActionEnabledForSubtype = (
+  subtype: CustomSubtype | undefined,
+  action: ActionName | CustomActionName,
 ) => {
-  if (textLikeSubtypes.includes(subtype)) {
+  if (subtype && getCustomSubtypes().includes(subtype)) {
     if (
-      textLikeDisabledPanelComponents
+      disabledPanelComponents
         .find((value) => value.subtype === subtype)!
         .actions.includes(action)
     ) {
-      return true;
+      return false;
     }
   }
-  return false;
+  return subtype || !isCustomActionName(action);
 };
 
-type TextMethodMap = { subtype: TextSubtype; methods: TextMethods };
-const methodMaps = [] as Array<TextMethodMap>;
+type MethodMap = { subtype: CustomSubtype; methods: CustomMethods };
+const methodMaps = [] as Array<MethodMap>;
 
 // Assumption: registerTextElementSubtypes() has run first or is the caller
-const getMethods = (subtype: TextSubtype) => {
-  const _subtype = subtype !== undefined ? subtype : TEXT_SUBTYPE_DEFAULT;
-  const map = methodMaps.find((method) => method.subtype === _subtype);
-  return map!.methods;
+export const getCustomMethods = (subtype: CustomSubtype | undefined) => {
+  const map = methodMaps.find((method) => method.subtype === subtype);
+  return map?.methods;
 };
 
-// For the specified subtype, this method is responsible for:
-// - Ensuring textOpts has valid values.
-// - Enforcing special restrictions on standard ExcalidrawTextElement attributes.
-export const cleanTextElementUpdate = <TElement extends ExcalidrawElement>(
-  subtype: TextSubtype,
-  updates: ElementUpdate<TElement>,
-): ElementUpdate<TElement> => {
-  return getMethods(subtype).clean(updates);
-};
-
-export const measureTextElement = (
-  element: Omit<ExcalidrawTextElement, TextOmitProps | "originalText">,
-  next?: {
-    fontSize?: number;
-    text?: string;
-    customProps?: TextOpts;
-  },
-  maxWidth?: number | null,
-): { width: number; height: number; baseline: number } => {
-  const subtype = element.subtype ?? TEXT_SUBTYPE_DEFAULT;
-  return getMethods(subtype).measure(element, next, maxWidth);
-};
-
-export const renderTextElement = (
-  element: NonDeleted<ExcalidrawTextElement>,
-  context: CanvasRenderingContext2D,
-  renderCb?: () => void,
-): void => {
-  const subtype = element.subtype ?? TEXT_SUBTYPE_DEFAULT;
-  getMethods(subtype).render(element, context, renderCb);
-};
-
-export const renderSvgTextElement = (
-  svgRoot: SVGElement,
-  node: SVGElement,
-  element: NonDeleted<ExcalidrawTextElement>,
-): void => {
-  const subtype = element.subtype ?? TEXT_SUBTYPE_DEFAULT;
-  getMethods(subtype).renderSvg(svgRoot, node, element);
-};
-
-export const wrapTextElement = (
-  element: Omit<ExcalidrawTextElement, TextOmitProps>,
-  containerWidth: number,
-  next?: {
-    fontSize?: number;
-    text?: string;
-    customProps?: TextOpts;
-  },
-): string => {
-  const subtype = element.subtype ?? TEXT_SUBTYPE_DEFAULT;
-  return getMethods(subtype).wrap(element, containerWidth, next);
-};
-
-export const registerTextElementSubtypes = (
-  onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
+export const registerCustomSubtypes = (
+  onSubtypesLoaded?: (isCustomSubtype: Function) => void,
 ) => {
-  const textSubtypes = getTextElementSubtypes();
+  const textSubtypes = getCustomSubtypes();
   for (let index = 0; index < textSubtypes.length; index++) {
     const subtype = textSubtypes[index];
     if (!methodMaps.find((method) => method.subtype === subtype)) {
-      methodMaps.push({ subtype, methods: {} as TextMethods });
+      methodMaps.push({ subtype, methods: {} as CustomMethods });
       require(`./${textSubtypes[index]}/index`).registerTextElementSubtype(
-        getMethods(subtype),
+        getCustomMethods(subtype),
         onSubtypesLoaded,
       );
     }
   }
 };
 
-const textLikeActions: Action[] = [];
+const customActions: Action[] = [];
 
-export const addTextLikeActions = (actions: Action[]) => {
+export const addCustomActions = (actions: Action[]) => {
   actions.forEach((action) => {
-    if (textLikeActions.every((value) => value.name !== action.name)) {
-      textLikeActions.push(action);
+    if (customActions.every((value) => value.name !== action.name)) {
+      customActions.push(action);
       register(action);
     }
   });
 };
 
-export const getTextLikeActions = (): readonly Action[] => {
-  return textLikeActions;
+export const getCustomActions = (): readonly Action[] => {
+  return customActions;
 };

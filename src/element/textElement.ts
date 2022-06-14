@@ -1,4 +1,3 @@
-import { measureTextElement, wrapTextElement } from "../textlike";
 import { arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
@@ -12,6 +11,7 @@ import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
+import { measureTextElement, wrapTextElement } from "./textWysiwyg";
 
 export const redrawTextBoundingBox = (
   element: ExcalidrawTextElement,

@@ -26,7 +26,6 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import { measureTextElement } from "../textlike";
 import { getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
@@ -43,6 +42,7 @@ import {
   getBoundTextElementId,
   handleBindTextResize,
 } from "./textElement";
+import { measureTextElement } from "./textWysiwyg";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {

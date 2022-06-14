@@ -24,14 +24,21 @@ import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
-import { distance, isRTL } from "../utils";
+import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
-import { renderTextElement, renderSvgTextElement } from "../textlike";
-import { MAX_DECIMALS_FOR_SVG_EXPORT, MIME_TYPES, SVG_NS } from "../constants";
+import { getCustomMethods } from "../textlike";
+import {
+  BOUND_TEXT_PADDING,
+  MAX_DECIMALS_FOR_SVG_EXPORT,
+  MIME_TYPES,
+  SVG_NS,
+  VERTICAL_ALIGN,
+} from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
+import { getApproxLineHeight } from "../element/textElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -190,6 +197,12 @@ const drawElementOnCanvas = (
   renderConfig: RenderConfig,
 ) => {
   context.globalAlpha = element.opacity / 100;
+  const map = getCustomMethods(element.subtype);
+  if (map) {
+    map.render(element, context, renderConfig.renderCb);
+    context.globalAlpha = 1;
+    return;
+  }
   switch (element.type) {
     case "rectangle":
     case "diamond":
@@ -253,7 +266,36 @@ const drawElementOnCanvas = (
           // to the DOM
           document.body.appendChild(context.canvas);
         }
-        renderTextElement(element, context, renderConfig.renderCb);
+        context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
+        context.save();
+        context.font = getFontString(element);
+        context.fillStyle = element.strokeColor;
+        context.textAlign = element.textAlign as CanvasTextAlign;
+
+        // Canvas does not support multiline text by default
+        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const lineHeight = element.containerId
+          ? getApproxLineHeight(getFontString(element))
+          : element.height / lines.length;
+        let verticalOffset = element.height - element.baseline;
+        if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+          verticalOffset = BOUND_TEXT_PADDING;
+        }
+
+        const horizontalOffset =
+          element.textAlign === "center"
+            ? element.width / 2
+            : element.textAlign === "right"
+            ? element.width
+            : 0;
+        for (let index = 0; index < lines.length; index++) {
+          context.fillText(
+            lines[index],
+            horizontalOffset,
+            (index + 1) * lineHeight - verticalOffset,
+          );
+        }
+        context.restore();
         if (shouldTemporarilyAttach) {
           context.canvas.remove();
         }
@@ -823,6 +865,11 @@ export const renderElementToSvg = (
     root = anchorTag;
   }
 
+  const map = getCustomMethods(element.subtype);
+  if (map) {
+    map.renderSvg(svgRoot, root, element);
+    return;
+  }
   switch (element.type) {
     case "selection": {
       // Since this is used only during editing experience, which is canvas based,
@@ -971,7 +1018,35 @@ export const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
-        renderSvgTextElement(svgRoot, node, element);
+        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const lineHeight = element.height / lines.length;
+        const verticalOffset = element.height - element.baseline;
+        const horizontalOffset =
+          element.textAlign === "center"
+            ? element.width / 2
+            : element.textAlign === "right"
+            ? element.width
+            : 0;
+        const direction = isRTL(element.text) ? "rtl" : "ltr";
+        const textAnchor =
+          element.textAlign === "center"
+            ? "middle"
+            : element.textAlign === "right" || direction === "rtl"
+            ? "end"
+            : "start";
+        for (let i = 0; i < lines.length; i++) {
+          const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
+          text.textContent = lines[i];
+          text.setAttribute("x", `${horizontalOffset}`);
+          text.setAttribute("y", `${(i + 1) * lineHeight - verticalOffset}`);
+          text.setAttribute("font-family", getFontFamilyString(element));
+          text.setAttribute("font-size", `${element.fontSize}px`);
+          text.setAttribute("fill", element.strokeColor);
+          text.setAttribute("text-anchor", textAnchor);
+          text.setAttribute("style", "white-space: pre;");
+          text.setAttribute("direction", direction);
+          node.appendChild(text);
+        }
         root.appendChild(node);
       } else {
         // @ts-ignore
