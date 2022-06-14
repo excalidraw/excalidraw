@@ -13,6 +13,7 @@ import {
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
 import { getContainerElement } from "../element/textElement";
+import { isLinearElement } from "../element/typeChecks";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";
@@ -58,7 +59,7 @@ export const actionPasteStyles = register({
             opacity: pastedElement?.opacity,
             roughness: pastedElement?.roughness,
           });
-          if (isTextElement(newElement) && isTextElement(element)) {
+          if (isTextElement(newElement)) {
             mutateElement(newElement, {
               fontSize: pastedElement?.fontSize || DEFAULT_FONT_SIZE,
               fontFamily: pastedElement?.fontFamily || DEFAULT_FONT_FAMILY,
@@ -67,6 +68,13 @@ export const actionPasteStyles = register({
 
             redrawTextBoundingBox(newElement, getContainerElement(newElement));
           }
+          if (isLinearElement(newElement)) {
+            mutateElement(newElement, {
+              startArrowhead: pastedElement.startArrowhead,
+              endArrowhead: pastedElement.endArrowhead,
+            });
+          }
+
           return newElement;
         }
         return element;
