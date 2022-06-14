@@ -2,10 +2,10 @@ import { t } from "../i18n";
 import { isDarwin } from "../keys";
 import { getShortcutKey } from "../utils";
 import {
-  getShortcutFromCustomShortcutName,
+  getCustomShortcutKey,
   isCustomShortcutName,
-} from "../textlike";
-import { CustomShortcutName } from "../textlike/types";
+  CustomShortcutName,
+} from "../subtypes";
 import { ActionName } from "./types";
 
 export type ShortcutName = SubtypeOf<
@@ -80,7 +80,7 @@ export const getShortcutFromShortcutName = (
   name: ShortcutName | CustomShortcutName,
 ) => {
   const shortcuts = isCustomShortcutName(name)
-    ? getShortcutFromCustomShortcutName(name)
+    ? getCustomShortcutKey(name)
     : shortcutMap[name as ShortcutName];
   // if multiple shortcuts available, take the first one
   return shortcuts && shortcuts.length > 0 ? shortcuts[0] : "";

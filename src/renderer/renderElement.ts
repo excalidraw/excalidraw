@@ -29,7 +29,7 @@ import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
-import { getCustomMethods } from "../textlike";
+import { getCustomMethods } from "../subtypes";
 import {
   BOUND_TEXT_PADDING,
   MAX_DECIMALS_FOR_SVG_EXPORT,

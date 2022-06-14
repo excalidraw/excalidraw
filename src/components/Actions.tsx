@@ -23,12 +23,14 @@ import {
 } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
-import { getCustomActions } from "../textlike";
-import { CustomSubtype } from "../textlike/types";
+import {
+  getCustomActions,
+  getCustomSubtypes,
+  CustomSubtype,
+} from "../subtypes";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
-import { getCustomSubtypes } from "../textlike/types";
 import { delUndefinedProps } from "../element/newElement";
 
 export const SelectedShapeActions = ({

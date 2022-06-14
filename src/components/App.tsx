@@ -224,7 +224,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { getCustomActions, registerCustomSubtypes } from "../textlike";
+import { getCustomActions, registerCustomSubtypes } from "../subtypes";
 import {
   dataURLToFile,
   generateIdFromFile,
@@ -407,7 +407,7 @@ class App extends React.Component<AppProps, AppState> {
     this.scene = new Scene();
 
     // Call this method after finishing any async loading for
-    // subtypes of ExcalidrawTextElement if the newly loaded code
+    // subtypes of ExcalidrawElement if the newly loaded code
     // would change the rendering.
     const refresh = (isCustomSubtype: Function) => {
       const elements = this.scene.getElementsIncludingDeleted();
@@ -418,8 +418,9 @@ class App extends React.Component<AppProps, AppState> {
         // element for a re-render, and mark the scene for a refresh.
         if (isCustomSubtype(element)) {
           invalidateShapeForElement(element);
-          const textElement = element as ExcalidrawTextElement;
-          redrawTextBoundingBox(textElement, getContainerElement(textElement));
+          if (isTextElement(element)) {
+            redrawTextBoundingBox(element, getContainerElement(element));
+          }
           refreshNeeded = true;
         }
       });
@@ -1170,8 +1171,8 @@ class App extends React.Component<AppProps, AppState> {
     const refresh = () => {
       // If a scene refresh is cued, restart the countdown.
       // This way we are not calling this.setState({}) once per
-      // ExcalidrawTextElement. The countdown improves performance
-      // when there are large numbers of ExcalidrawTextElements
+      // ExcalidrawElement. The countdown improves performance
+      // when there are large numbers of ExcalidrawElements
       // executing this refresh() callback.
       if (refreshTimer !== 0) {
         window.clearTimeout(refreshTimer);

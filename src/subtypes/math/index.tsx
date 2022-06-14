@@ -22,11 +22,7 @@ import {
   NonDeleted,
 } from "../../element/types";
 import { ElementUpdate, newElementWith } from "../../element/mutateElement";
-import {
-  addCustomActions,
-  registerDisabledPanelComponents,
-  registerCustomShortcutNames,
-} from "../";
+import { addCustomActions } from "../";
 import { registerAuxLangData } from "../../i18n";
 
 // Imports for actions
@@ -40,17 +36,13 @@ import { ButtonSelect } from "../../components/ButtonSelect";
 import { ToolButton } from "../../components/ToolButton";
 import clsx from "clsx";
 
-import { CustomMethods, TextOmitProps } from "../types";
+import { CustomMethods } from "../";
 
 import { SUBTYPE_MATH_ICON } from "./icon";
 
-import {
-  isMathShortcutName,
-  MathProps,
-  MathShortcutName,
-  SUBTYPE_MATH,
-} from "./types";
-import { delUndefinedProps } from "../../element/newElement";
+import { mathProps, SUBTYPE_MATH } from "./types";
+
+type MathProps = typeof mathProps[number];
 
 const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;
 
@@ -69,11 +61,6 @@ const isMathElement = (
     "subtype" in element &&
     element.subtype === SUBTYPE_MATH
   );
-};
-
-const mathShortcutMap: Record<MathShortcutName, string[]> = {
-  changeUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
-  changeMathOnly: [getShortcutKey("CtrlOrCmd+Shift+O")],
 };
 
 class GetMathProps {
@@ -721,7 +708,10 @@ const cleanMathElementUpdate = (
 };
 
 const measureMathElement = (
-  element: Omit<ExcalidrawMathElement, TextOmitProps | "originalText">,
+  element: Pick<
+    ExcalidrawMathElement,
+    "subtype" | "customProps" | "fontSize" | "fontFamily" | "text"
+  >,
   next?: {
     fontSize?: number;
     text?: string;
@@ -983,7 +973,10 @@ const renderSvgMathElement = (
 };
 
 const wrapMathElement = (
-  element: Omit<ExcalidrawMathElement, TextOmitProps>,
+  element: Pick<
+    ExcalidrawMathElement,
+    "subtype" | "customProps" | "fontSize" | "fontFamily" | "originalText"
+  >,
   containerWidth: number,
   next?: {
     fontSize?: number;
@@ -1109,22 +1102,20 @@ const wrapMathElement = (
   return wrappedLines.join("\n");
 };
 
-export const registerTextElementSubtype = (
-  textMethods: CustomMethods,
+export const registerCustomSubtype = (
+  methods: CustomMethods,
   onSubtypesLoaded?: (isCustomSubtype: Function) => void,
 ) => {
-  registerCustomShortcutNames(mathShortcutMap, isMathShortcutName);
-  registerDisabledPanelComponents(SUBTYPE_MATH, ["changeFontFamily"]);
   // Set the callback first just in case anything in this method
   // calls loadMathJax().
   mathJaxLoadedCallback = onSubtypesLoaded;
-  textMethods.clean = cleanMathElementUpdate;
-  textMethods.measure = measureMathElement;
-  textMethods.render = renderMathElement;
-  textMethods.renderSvg = renderSvgMathElement;
-  textMethods.wrap = wrapMathElement;
+  methods.clean = cleanMathElementUpdate;
+  methods.measureText = measureMathElement;
+  methods.render = renderMathElement;
+  methods.renderSvg = renderSvgMathElement;
+  methods.wrap = wrapMathElement;
   registerActionsMath();
-  registerAuxLangData(`./textlike/${SUBTYPE_MATH}`);
+  registerAuxLangData(`./subtypes/${SUBTYPE_MATH}`);
   // Call loadMathJax() here if we want to be sure it's loaded.
 };
 
@@ -1158,7 +1149,7 @@ const registerActionsMath = () => {
           const el = hasBoundTextElement(element)
             ? getBoundTextElement(element)
             : element;
-          return isMathElement(el) && el.customProps.useTex;
+          return isMathElement(el) && el.customProps?.useTex;
         });
         if (useTex === null) {
           useTex = getMathProps.getUseTex(appState);
@@ -1174,7 +1165,7 @@ const registerActionsMath = () => {
               {
                 customProps: getMathProps.ensureMathProps({
                   useTex,
-                  mathOnly: oldElement.customProps.mathOnly,
+                  mathOnly: oldElement.customProps?.mathOnly,
                 }),
               },
             );
@@ -1221,10 +1212,8 @@ const registerActionsMath = () => {
               const el = hasBoundTextElement(element)
                 ? getBoundTextElement(element)
                 : element;
-              return (
-                isMathElement(el) &&
-                (el.customProps?.useTex ?? getMathProps.getUseTex())
-              );
+              const useTex = getMathProps.getUseTex(appState);
+              return isMathElement(el) && (el.customProps?.useTex ?? useTex);
             },
             getMathProps.getUseTex(appState),
           )}
@@ -1243,7 +1232,7 @@ const registerActionsMath = () => {
           const el = hasBoundTextElement(element)
             ? getBoundTextElement(element)
             : element;
-          return isMathElement(el) && el.customProps.mathOnly;
+          return isMathElement(el) && el.customProps?.mathOnly;
         });
         if (mathOnly === null) {
           mathOnly = getMathProps.getMathOnly(appState);
@@ -1255,7 +1244,7 @@ const registerActionsMath = () => {
         (oldElement) => {
           if (isMathElement(oldElement)) {
             const customProps = getMathProps.ensureMathProps({
-              useTex: oldElement.customProps.useTex,
+              useTex: oldElement.customProps?.useTex,
               mathOnly,
             });
             const newElement: ExcalidrawTextElement = newElementWith(
@@ -1305,9 +1294,9 @@ const registerActionsMath = () => {
               const el = hasBoundTextElement(element)
                 ? getBoundTextElement(element)
                 : element;
+              const mathOnly = getMathProps.getMathOnly(appState);
               return (
-                isMathElement(el) &&
-                (el.customProps?.mathOnly ?? getMathProps.getMathOnly())
+                isMathElement(el) && (el.customProps?.mathOnly ?? mathOnly)
               );
             },
             getMathProps.getMathOnly(appState),
@@ -1323,16 +1312,22 @@ const registerActionsMath = () => {
     name: "math",
     trackEvent: false,
     perform: (elements, appState) => {
-      const activeTool = updateActiveTool(appState, { type: "text" });
-      const customSubtype =
-        appState.customSubtype !== SUBTYPE_MATH ? SUBTYPE_MATH : undefined;
+      const mathInactive = appState.customSubtype !== SUBTYPE_MATH;
+      const customSubtype = mathInactive ? SUBTYPE_MATH : undefined;
+      const activeTool = !mathInactive
+        ? appState.activeTool
+        : updateActiveTool(appState, { type: "text" });
+      const selectedElementIds = mathInactive
+        ? {}
+        : appState.selectedElementIds;
+      const selectedGroupIds = mathInactive ? {} : appState.selectedGroupIds;
 
-      const nextAppState = delUndefinedProps({ ...appState, customSubtype }, [
-        "customSubtype",
-      ]);
       return {
         appState: {
-          ...nextAppState,
+          ...appState,
+          customSubtype,
+          selectedElementIds,
+          selectedGroupIds,
           activeTool,
         },
         commitToHistory: true,

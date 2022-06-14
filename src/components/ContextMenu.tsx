@@ -11,7 +11,7 @@ import {
 import { Action } from "../actions/types";
 import { ActionManager } from "../actions/manager";
 import { AppState } from "../types";
-import { CustomShortcutName } from "../textlike/types";
+import { CustomShortcutName } from "../subtypes";
 import { NonDeletedExcalidrawElement } from "../element/types";
 
 export type ContextMenuOption = "separator" | Action;

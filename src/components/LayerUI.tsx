@@ -38,7 +38,7 @@ import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
 import { useDeviceType } from "../components/App";
-import { getCustomSubtypes } from "../textlike/types";
+import { getCustomSubtypes } from "../subtypes";
 
 interface LayerUIProps {
   actionManager: ActionManager;
