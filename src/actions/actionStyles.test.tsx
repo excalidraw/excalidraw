@@ -48,7 +48,7 @@ describe("actionStyles", () => {
     Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
       Keyboard.codeDown(CODES.C);
     });
-    const secondRect = JSON.parse(copiedStyles);
+    const secondRect = JSON.parse(copiedStyles)[0];
     expect(secondRect.id).toBe(h.elements[1].id);
 
     mouse.reset();
