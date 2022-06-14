@@ -6,7 +6,7 @@ import {
 import { CODES, KEYS } from "../keys";
 import { t } from "../i18n";
 import { register } from "./register";
-import { mutateElement, newElementWith } from "../element/mutateElement";
+import { newElementWith } from "../element/mutateElement";
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
@@ -49,7 +49,7 @@ export const actionPasteStyles = register({
     return {
       elements: elements.map((element) => {
         if (appState.selectedElementIds[element.id]) {
-          const newElement = newElementWith(element, {
+          let newElement = newElementWith(element, {
             backgroundColor: pastedElement?.backgroundColor,
             strokeWidth: pastedElement?.strokeWidth,
             strokeColor: pastedElement?.strokeColor,
@@ -58,8 +58,9 @@ export const actionPasteStyles = register({
             opacity: pastedElement?.opacity,
             roughness: pastedElement?.roughness,
           });
-          if (isTextElement(newElement) && isTextElement(element)) {
-            mutateElement(newElement, {
+
+          if (isTextElement(newElement)) {
+            newElement = newElementWith(newElement, {
               fontSize: pastedElement?.fontSize || DEFAULT_FONT_SIZE,
               fontFamily: pastedElement?.fontFamily || DEFAULT_FONT_FAMILY,
               textAlign: pastedElement?.textAlign || DEFAULT_TEXT_ALIGN,
@@ -67,6 +68,14 @@ export const actionPasteStyles = register({
 
             redrawTextBoundingBox(newElement, getContainerElement(newElement));
           }
+
+          if (newElement.type === "arrow") {
+            newElement = newElementWith(newElement, {
+              startArrowhead: pastedElement.startArrowhead,
+              endArrowhead: pastedElement.endArrowhead,
+            });
+          }
+
           return newElement;
         }
         return element;
