@@ -887,6 +887,19 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private onResize = withBatchedUpdates(() => {
+    if (!this.deviceType.isMobile) {
+      const scrollBarWidth = 10;
+      const widthRatio =
+        (window.outerWidth - scrollBarWidth) / window.innerWidth;
+      const isBrowserZoomed =
+        // Device pixel ratio is 2 when zoom is 100%
+        window.devicePixelRatio !== 2 || widthRatio < 0.9 || widthRatio > 1;
+      if (isBrowserZoomed) {
+        this.setToastMessage(t("alerts.browserZoom"));
+      } else {
+        this.clearToast();
+      }
+    }
     this.scene
       .getElementsIncludingDeleted()
       .forEach((element) => invalidateShapeForElement(element));
