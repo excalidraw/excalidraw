@@ -2,7 +2,7 @@ import { Theme } from "../../element/types";
 import { createIcon, iconFillColor } from "../../components/icons";
 
 // We inline font-awesome icons in order to save on js size rather than including the font awesome react library
-export const TEXT_SUBTYPE_MATH_ICON = ({ theme }: { theme: Theme }) =>
+export const SUBTYPE_MATH_ICON = ({ theme }: { theme: Theme }) =>
   createIcon(
     <path
       fill={iconFillColor(theme)}

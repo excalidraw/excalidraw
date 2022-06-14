@@ -1,11 +1,16 @@
-export const TEXT_SUBTYPE_MATH = "math";
+export const SUBTYPE_MATH = "math";
 
-export type TextOptsMath = { useTex: boolean; mathOnly: boolean };
+export type MathProps = { useTex: boolean; mathOnly: boolean };
 
-export type TextActionNameMath = "changeUseTex" | "changeMathOnly";
+export const mathActionName = [
+  "changeUseTex",
+  "changeMathOnly",
+  SUBTYPE_MATH,
+] as const;
+export type MathActionName = typeof mathActionName[number];
 
-const textShortcutNamesMath = ["changeUseTex", "changeMathOnly"] as const;
-export type TextShortcutNameMath = typeof textShortcutNamesMath[number];
+const mathShortcutNames = ["changeUseTex", "changeMathOnly"] as const;
+export type MathShortcutName = typeof mathShortcutNames[number];
 
-export const isTextShortcutNameMath = (s: any): s is TextShortcutNameMath =>
-  textShortcutNamesMath.includes(s);
+export const isMathShortcutName = (s: any): s is MathShortcutName =>
+  mathShortcutNames.includes(s);

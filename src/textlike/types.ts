@@ -1,14 +1,21 @@
-// Types to export, union over all ExcalidrawTextElement subtypes
-export type CustomProps = never;
-export type CustomShortcutName = never;
+import {
+  mathActionName,
+  MathProps,
+  MathShortcutName,
+  SUBTYPE_MATH,
+} from "./math/types";
 
-const customSubtype = [] as const;
+// Types to export, union over all ExcalidrawTextElement subtypes
+export type CustomProps = never | MathProps;
+export type CustomShortcutName = never | MathShortcutName;
+
+const customSubtype = [SUBTYPE_MATH] as const;
 export type CustomSubtype = typeof customSubtype[number];
 
-const customActionName = [] as const;
+const customActionName = [...mathActionName] as const;
 export type CustomActionName = typeof customActionName[number];
 
-export const isCustomActionName = (name: string) => {
+export const isCustomActionName = (name: any): name is CustomActionName => {
   return (
     customActionName.includes(name as CustomActionName) &&
     !customSubtype.includes(name as CustomSubtype)
