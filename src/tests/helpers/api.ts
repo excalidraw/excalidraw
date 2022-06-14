@@ -129,6 +129,9 @@ export class API {
       },
       ["subtype", "customProps"],
     );
+    if (!("subtype" in custom) && "customProps" in custom) {
+      delete custom.customProps;
+    }
     const base = {
       ...custom,
       x,

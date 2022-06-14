@@ -78,6 +78,9 @@ const _newElementBase = <T extends ExcalidrawElement>(
     "subtype",
     "customProps",
   ]);
+  if (!("subtype" in custom) && "customProps" in custom) {
+    delete custom.customProps;
+  }
   const element = {
     ...custom,
     id: rest.id || randomId(),
