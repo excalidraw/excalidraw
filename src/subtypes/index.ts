@@ -8,50 +8,40 @@ import { register } from "../actions/register";
 import { hasBoundTextElement } from "../element/typeChecks";
 import { getBoundTextElement } from "../element/textElement";
 
-import {
-  mathActionName,
-  mathDisabledActions,
-  mathProps,
-  mathShortcutMap,
-  mathShortcutName,
-  SUBTYPE_MATH,
-  SUBTYPE_MATH_ICON,
-} from "./math/types";
+// Start adding subtype imports here
+
+const customSubtype = [] as const;
+const customProps = [] as const;
+const customShortcutName = [] as const;
+const disabledActions = [] as DisabledActions[];
+const customActionName = [] as const;
+
+// Custom Shortcuts
+export const customShortcutMap: Record<CustomShortcutName, string[]> = {};
+
+// Custom Icons
+export const CUSTOM_SUBTYPE_ICONS = [] as const;
+
+// End adding subtype imports here
 
 // Types to export, union over all ExcalidrawElement subtypes
 
-// Custom Icons
-export const CUSTOM_SUBTYPE_ICONS = [
-  { icon: SUBTYPE_MATH_ICON, value: SUBTYPE_MATH },
-] as const;
-
 // Custom Subtypes
-const customSubtype = [SUBTYPE_MATH] as const;
 export type CustomSubtype = typeof customSubtype[number];
-
 export const getCustomSubtypes = (): readonly CustomSubtype[] => {
   return customSubtype;
 };
 
 // Custom Properties
-const customProps = [...mathProps] as const;
 export type CustomProps = typeof customProps[number];
 
 // Custom Shortcuts
-const customShortcutName = [...mathShortcutName] as const;
 export type CustomShortcutName = typeof customShortcutName[number];
-
 export const isCustomShortcutName = (s: any): s is CustomShortcutName =>
-  customShortcutName.includes(s);
-
-export const customShortcutMap: Record<CustomShortcutName, string[]> = {
-  ...mathShortcutMap,
-};
+  customShortcutName.includes(s as CustomShortcutName);
 
 // Custom Actions
-const customActionName = [...mathActionName] as const;
 export type CustomActionName = typeof customActionName[number];
-
 export const isCustomActionName = (name: any): name is CustomActionName => {
   return (
     customActionName.includes(name as CustomActionName) &&
@@ -59,7 +49,7 @@ export const isCustomActionName = (name: any): name is CustomActionName => {
   );
 };
 
-// Return the shortcut by CustomShortcutName.
+// Return the shortcut by CustomShortcutName
 export const getCustomShortcutKey = (name: CustomShortcutName) => {
   let shortcuts: string[] = [];
   if (isCustomShortcutName(name)) {
@@ -68,21 +58,11 @@ export const getCustomShortcutKey = (name: CustomShortcutName) => {
   return shortcuts;
 };
 
-// Custom methods
-export type CustomMethods = {
-  clean: Function;
-  measureText: Function;
-  render: Function;
-  renderSvg: Function;
-  wrap: Function;
-};
-
+// Permit subtypes to disable actions for their ExcalidrawElement type
 type DisabledActions = {
   subtype: CustomSubtype;
   actions: ActionName[];
 };
-
-const disabledActions = [...mathDisabledActions] as DisabledActions[];
 
 export const isActionEnabled = (
   elements: readonly ExcalidrawElement[],
@@ -130,6 +110,7 @@ const isActionEnabledForSubtype = (
   return subtype || !isCustomActionName(action);
 };
 
+//Custom Actions
 const customActions: Action[] = [];
 
 export const addCustomActions = (actions: Action[]) => {
@@ -145,15 +126,28 @@ export const getCustomActions = (): readonly Action[] => {
   return customActions;
 };
 
+// Custom Methods
+export type CustomMethods = {
+  clean: Function;
+  measureText: Function;
+  render: Function;
+  renderSvg: Function;
+  wrap: Function;
+};
+
 type MethodMap = { subtype: CustomSubtype; methods: CustomMethods };
 const methodMaps = [] as Array<MethodMap>;
 
-// Assumption: registerCustomSubtypes() has run first or is the caller
+// Assumption: registerCustomSubtypes() has run first or is the caller.
+// Use `getCustomMethods` to call subtype-specialized methods, like `render`.
 export const getCustomMethods = (subtype: CustomSubtype | undefined) => {
   const map = methodMaps.find((method) => method.subtype === subtype);
   return map?.methods;
 };
 
+// Register all custom subtypes.  Each subtype must provide a
+// `registerCustomSubtype` method, which should call `addCustomActions`
+// if necessary.
 export const registerCustomSubtypes = (
   onSubtypesLoaded?: (isCustomSubtype: Function) => void,
 ) => {
