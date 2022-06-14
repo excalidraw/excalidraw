@@ -10,7 +10,8 @@ import {
 import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { MODES } from "../constants";
-import { TextActionName } from "../textlike/types";
+import { CustomActionName } from "../textlike/types";
+import { isActionEnabled } from "../textlike";
 import { trackEvent } from "../analytics";
 
 const trackAction = (
@@ -42,7 +43,7 @@ const trackAction = (
 };
 
 export class ActionManager {
-  actions = {} as Record<ActionName | TextActionName, Action>;
+  actions = {} as Record<ActionName | CustomActionName, Action>;
 
   updater: (actionResult: ActionResult | Promise<ActionResult>) => void;
 
@@ -142,7 +143,7 @@ export class ActionManager {
    * @param data additional data sent to the PanelComponent
    */
   renderAction = (
-    name: ActionName | TextActionName,
+    name: ActionName | CustomActionName,
     data?: PanelComponentProps["data"],
   ) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
@@ -152,12 +153,11 @@ export class ActionManager {
       "PanelComponent" in this.actions[name] &&
       (name in canvasActions
         ? canvasActions[name as keyof typeof canvasActions]
-        : "PanelComponentPredicate" in this.actions[name]
-        ? this.actions[name].PanelComponentPredicate!(
+        : isActionEnabled(
             this.getElementsIncludingDeleted(),
             this.getAppState(),
-          )
-        : true)
+            name,
+          ))
     ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;

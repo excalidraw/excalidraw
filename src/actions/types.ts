@@ -7,7 +7,7 @@ import {
   BinaryFiles,
 } from "../types";
 import { ToolButtonSize } from "../components/ToolButton";
-import { TextActionName } from "../textlike/types";
+import { CustomActionName } from "../textlike/types";
 
 export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
 
@@ -53,7 +53,6 @@ export type ActionName =
   | "gridMode"
   | "zenMode"
   | "stats"
-  | "changeTextSubtype"
   | "changeStrokeColor"
   | "changeBackgroundColor"
   | "changeFillStyle"
@@ -125,7 +124,7 @@ export type PanelComponentProps = {
 };
 
 export interface Action {
-  name: ActionName | TextActionName;
+  name: ActionName | CustomActionName;
   PanelComponent?: React.FC<PanelComponentProps>;
   PanelComponentPredicate?: (
     elements: readonly ExcalidrawElement[],

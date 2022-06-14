@@ -1,4 +1,3 @@
-import { measureTextElement } from "../textlike";
 import { VERTICAL_ALIGN } from "../constants";
 import { getNonDeletedElements, isTextElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
@@ -6,6 +5,7 @@ import {
   getBoundTextElement,
   redrawTextBoundingBox,
 } from "../element/textElement";
+import { measureTextElement } from "../element/textWysiwyg";
 import {
   hasBoundTextElement,
   isTextBindableContainer,

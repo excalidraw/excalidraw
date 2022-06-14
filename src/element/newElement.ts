@@ -13,7 +13,6 @@ import {
   FontFamilyValues,
   ExcalidrawRectangleElement,
 } from "../element/types";
-import { measureTextElement, wrapTextElement } from "../textlike";
 import { getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { mutateElement, newElementWith } from "./mutateElement";
@@ -23,6 +22,7 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import { getContainerElement } from "./textElement";
+import { measureTextElement, wrapTextElement } from "./textWysiwyg";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 
 export const delUndefinedProps = (obj: any, keys: string[]) => {

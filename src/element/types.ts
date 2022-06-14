@@ -1,4 +1,4 @@
-import { TextOpts, TextSubtype } from "../textlike/types";
+import { CustomProps, CustomSubtype } from "../textlike/types";
 import { Point } from "../types";
 import { FONT_FAMILY, THEME, VERTICAL_ALIGN } from "../constants";
 
@@ -57,8 +57,8 @@ type _ExcalidrawElementBase = Readonly<{
   updated: number;
   link: string | null;
   locked: boolean;
-  subtype?: TextSubtype;
-  customProps?: TextOpts;
+  subtype?: CustomSubtype;
+  customProps?: CustomProps;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {

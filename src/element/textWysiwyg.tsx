@@ -22,13 +22,14 @@ import {
   getContainerElement,
   wrapText,
 } from "./textElement";
+import { getCustomMethods } from "../textlike";
+import { CustomProps, TextOmitProps } from "../textlike/types";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
-import { measureTextElement } from "../textlike";
 
 const normalizeText = (text: string) => {
   return (
@@ -60,6 +61,50 @@ const getTransform = (
     translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg) translate(${offsetX}px, 0px)`;
+};
+
+export const measureTextElement = (
+  element: Omit<ExcalidrawTextElement, TextOmitProps | "originalText">,
+  next?: {
+    fontSize?: number;
+    text?: string;
+    customProps?: CustomProps;
+  },
+  maxWidth?: number | null,
+) => {
+  const map = getCustomMethods(element.subtype);
+  if (map) {
+    return map.measure(element, next, maxWidth);
+  }
+
+  const fontSize = next?.fontSize ?? element.fontSize;
+  return measureText(
+    next?.text ?? element.text,
+    getFontString({ fontSize, fontFamily: element.fontFamily }),
+    maxWidth,
+  );
+};
+
+export const wrapTextElement = (
+  element: Omit<ExcalidrawTextElement, TextOmitProps>,
+  containerWidth: number,
+  next?: {
+    fontSize?: number;
+    text?: string;
+    customProps?: CustomProps;
+  },
+): string => {
+  const map = getCustomMethods(element.subtype);
+  if (map) {
+    return map.wrap(element, containerWidth, next);
+  }
+
+  const fontSize = next?.fontSize ?? element.fontSize;
+  return wrapText(
+    next?.text ?? element.originalText,
+    getFontString({ fontSize, fontFamily: element.fontFamily }),
+    containerWidth,
+  );
 };
 
 export const textWysiwyg = ({

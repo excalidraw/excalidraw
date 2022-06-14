@@ -19,9 +19,9 @@ import {
 } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
-import { registerTextElementSubtypes } from "../../textlike";
+import { registerCustomSubtypes } from "../../textlike";
 
-registerTextElementSubtypes();
+registerCustomSubtypes();
 
 const readFile = util.promisify(fs.readFile);
 

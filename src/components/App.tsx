@@ -224,7 +224,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { getTextLikeActions, registerTextElementSubtypes } from "../textlike";
+import { getCustomActions, registerCustomSubtypes } from "../textlike";
 import {
   dataURLToFile,
   generateIdFromFile,
@@ -409,27 +409,27 @@ class App extends React.Component<AppProps, AppState> {
     // Call this method after finishing any async loading for
     // subtypes of ExcalidrawTextElement if the newly loaded code
     // would change the rendering.
-    const refresh = (isTextElementSubtype: Function) => {
+    const refresh = (isCustomSubtype: Function) => {
       const elements = this.scene.getElementsIncludingDeleted();
       let refreshNeeded = false;
       getNonDeletedElements(elements).forEach((element) => {
-        // If the text element is of the subtype that was just
+        // If the element is of the subtype that was just
         // registered, update the element's dimensions, mark the
         // element for a re-render, and mark the scene for a refresh.
-        if (isTextElementSubtype(element)) {
+        if (isCustomSubtype(element)) {
           invalidateShapeForElement(element);
           const textElement = element as ExcalidrawTextElement;
           redrawTextBoundingBox(textElement, getContainerElement(textElement));
           refreshNeeded = true;
         }
       });
-      // If there are any text elements of the just-registered subtype,
+      // If there are any elements of the just-registered subtype,
       // refresh the scene to re-render each such element.
       if (refreshNeeded) {
         this.setState({});
       }
     };
-    registerTextElementSubtypes(refresh);
+    registerCustomSubtypes(refresh);
 
     this.library = new Library(this);
     this.history = new History();
@@ -5549,7 +5549,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const maybeUse: boolean[] = [];
-    getTextLikeActions().forEach((action) => {
+    getCustomActions().forEach((action) => {
       if (action.contextItemPredicate) {
         maybeUse.push(
           action.contextItemPredicate!(
@@ -5680,7 +5680,7 @@ class App extends React.Component<AppProps, AppState> {
               options.push(separator);
               firstAdded = false;
             }
-            options.push(getTextLikeActions()[index]);
+            options.push(getCustomActions()[index]);
           }
         }
         ContextMenu.push({

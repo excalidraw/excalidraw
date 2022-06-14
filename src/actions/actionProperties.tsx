@@ -51,7 +51,6 @@ import {
   getContainerElement,
 } from "../element/textElement";
 import {
-  hasBoundTextElement,
   isBoundToContainer,
   isLinearElement,
   isLinearElementType,
@@ -79,9 +78,6 @@ import {
 import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
-import { isPanelComponentDisabled } from "../textlike";
-import { TEXT_SUBTYPE_ICONS } from "../textlike/icons";
-import { TEXT_SUBTYPE_DEFAULT } from "../textlike/types";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -125,69 +121,6 @@ export const getFormValue = function <T>(
     null
   );
 };
-
-export const actionChangeTextElementSubtype = register({
-  name: "changeTextSubtype",
-  perform: (elements, appState, value) => {
-    return {
-      elements: changeProperty(
-        elements,
-        appState,
-        (oldElement) => {
-          if (isTextElement(oldElement)) {
-            const newElement: ExcalidrawTextElement = newElementWith(
-              oldElement,
-              { subtype: value, customProps: appState.customProps },
-            );
-            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
-            return newElement;
-          }
-
-          return oldElement;
-        },
-        true,
-      ),
-      appState: {
-        ...appState,
-        textElementSubtype: value,
-      },
-      commitToHistory: !!value,
-    };
-  },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <>
-      <h3 aria-hidden="true">{t("labels.textType")}</h3>
-      <ButtonIconSelect
-        group="subtype"
-        options={TEXT_SUBTYPE_ICONS.map(({ icon, value }) => {
-          return {
-            value,
-            icon: icon.call(this, { theme: appState.theme })!,
-            text: t(`toolBar.${value}`),
-          };
-        })}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) =>
-            isTextElement(element)
-              ? element.subtype ?? TEXT_SUBTYPE_DEFAULT
-              : hasBoundTextElement(element) &&
-                (getBoundTextElement(element)!.subtype ?? TEXT_SUBTYPE_DEFAULT),
-          appState.customSubtype,
-        )}
-        onChange={(value) => updateData(value)}
-      />
-    </>
-  ),
-  PanelComponentPredicate: (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) => {
-    return TEXT_SUBTYPE_ICONS.length > 1;
-  },
-  trackEvent: false,
-});
 
 const offsetElementAfterFontResize = (
   prevElement: ExcalidrawTextElement,
@@ -593,12 +526,6 @@ export const actionChangeFontSize = register({
   perform: (elements, appState, value) => {
     return changeFontSize(elements, appState, () => value, value);
   },
-  PanelComponentPredicate: (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) => {
-    return isPanelComponentDisabled(elements, appState, "changeFontSize");
-  },
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
@@ -722,12 +649,6 @@ export const actionChangeFontFamily = register({
       commitToHistory: true,
     };
   },
-  PanelComponentPredicate: (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) => {
-    return isPanelComponentDisabled(elements, appState, "changeFontFamily");
-  },
   PanelComponent: ({ elements, appState, updateData }) => {
     const options: {
       value: FontFamilyValues;
@@ -807,12 +728,6 @@ export const actionChangeTextAlign = register({
       },
       commitToHistory: true,
     };
-  },
-  PanelComponentPredicate: (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) => {
-    return isPanelComponentDisabled(elements, appState, "changeTextAlign");
   },
   PanelComponent: ({ elements, appState, updateData }) => {
     return (
