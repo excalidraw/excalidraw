@@ -50,7 +50,7 @@ export const actionPasteStyles = register({
     return {
       elements: elements.map((element) => {
         if (appState.selectedElementIds[element.id]) {
-          const newElement = newElementWith(element, {
+          let newElement = newElementWith(element, {
             backgroundColor: pastedElement?.backgroundColor,
             strokeWidth: pastedElement?.strokeWidth,
             strokeColor: pastedElement?.strokeColor,
@@ -59,8 +59,9 @@ export const actionPasteStyles = register({
             opacity: pastedElement?.opacity,
             roughness: pastedElement?.roughness,
           });
+
           if (isTextElement(newElement)) {
-            mutateElement(newElement, {
+            newElement = newElementWith(newElement, {
               fontSize: pastedElement?.fontSize || DEFAULT_FONT_SIZE,
               fontFamily: pastedElement?.fontFamily || DEFAULT_FONT_FAMILY,
               textAlign: pastedElement?.textAlign || DEFAULT_TEXT_ALIGN,
@@ -68,8 +69,9 @@ export const actionPasteStyles = register({
 
             redrawTextBoundingBox(newElement, getContainerElement(newElement));
           }
-          if (isLinearElement(newElement)) {
-            mutateElement(newElement, {
+
+          if (newElement.type === "arrow") {
+            newElement = newElementWith(newElement, {
               startArrowhead: pastedElement.startArrowhead,
               endArrowhead: pastedElement.endArrowhead,
             });
