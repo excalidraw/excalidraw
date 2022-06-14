@@ -23,15 +23,15 @@ export const actionCopyStyles = register({
   name: "copyStyles",
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
-    const selectedElements = [];
+    const elementsCopied = [];
     const element = elements.find((el) => appState.selectedElementIds[el.id]);
-    selectedElements.push(element);
+    elementsCopied.push(element);
     if (element && hasBoundTextElement(element)) {
       const boundTextElement = getBoundTextElement(element);
-      selectedElements.push(boundTextElement);
+      elementsCopied.push(boundTextElement);
     }
     if (element) {
-      copiedStyles = JSON.stringify(selectedElements);
+      copiedStyles = JSON.stringify(elementsCopied);
     }
     return {
       appState: {
