@@ -4,21 +4,15 @@
   position: absolute;
   right: 0;
   z-index: 5;
-  background-color: var(--island-bg-color);
-  box-shadow: var(--shadow-island);
-  height: 100vh;
-  padding: 10px;
-  border-left: 1px solid $oc-blue-5;
+  // background-color: var(--island-bg-color);
+  // box-shadow: var(--shadow-island);
+  // border-left: 1px solid $oc-blue-5;
 
   .Island {
     box-shadow: none;
   }
 
   .ToolIcon__icon__close {
-    position: absolute;
-    z-index: 3;
-    right: 15px;
-    top: 14px;
     button {
       border-radius: 50%;
       background-color: $oc-blue-6;

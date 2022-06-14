@@ -2,6 +2,13 @@
 
 .excalidraw {
   .library-menu-items-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
+    border-left: 1px solid $oc-blue-5;
+    padding: 0.5rem;
     .library-actions {
       display: flex;
 
@@ -87,9 +94,9 @@
       }
     }
     &__items {
-      max-height: 75vh;
-      overflow: auto;
-      margin-top: 0.5rem;
+      flex: 1;
+      overflow-y: scroll;
+      margin-bottom: 1.5rem;
     }
 
     .separator {
@@ -99,11 +106,10 @@
       color: var(--text-primary-color);
     }
     .library_items_add {
-      position: fixed;
-      bottom: 1.25rem;
-      width: 18.75rem !important    ;
+      margin-bottom: 1.5rem;
       a {
         background-color: var(--color-primary);
+        // margin-top: 20px;
         padding: 10px 78px;
         color: var(--default-bg-color);
         text-decoration: none;

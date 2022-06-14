@@ -42,6 +42,7 @@ const LibraryMenuItems = ({
   onSelectItems,
   onPublish,
   resetLibrary,
+  isInsideSidebar,
 }: {
   isLoading: boolean;
   libraryItems: LibraryItems;
@@ -59,6 +60,7 @@ const LibraryMenuItems = ({
   onSelectItems: (id: LibraryItem["id"][]) => void;
   onPublish: () => void;
   resetLibrary: () => void;
+  isInsideSidebar: boolean;
 }) => {
   const renderRemoveLibAlert = useCallback(() => {
     const content = selectedItems.length
@@ -90,7 +92,6 @@ const LibraryMenuItems = ({
   const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
 
   const isMobile = useDeviceType().isMobile;
-  const isFloatingMenu = useDeviceType().isFloatingMenu;
   const renderLibraryActions = () => {
     const itemsSelected = !!selectedItems.length;
     const items = itemsSelected
@@ -356,15 +357,32 @@ const LibraryMenuItems = ({
     (item) => item.status === "published",
   );
 
-  return (
-    <div className="library-menu-items-container">
-      {showRemoveLibAlert && renderRemoveLibAlert()}
-      <div className="layer-ui__library-header" key="library-header">
-        {renderLibraryActions()}
-        <div className="library_items_add">
+  const CLOSE_ICON = (
+    <svg viewBox="0 0 128 128">
+      <path
+        fill="#FFFFFF"
+        d="M81.5879028,64 L125.605715,19.9821876 C128.751004,16.8368988 128.754391,11.5017055 125.465832,8.21314718 L119.786853,2.53416752 C116.427547,-0.825138422 111.229116,-0.817018406 108.017812,2.39428484 L64,46.4120972 L19.9821876,2.39428484 C16.8368988,-0.751003978 11.5017055,-0.7543908 8.21314718,2.53416752 L2.53416752,8.21314718 C-0.825138422,11.5724531 -0.817018406,16.7708844 2.39428484,19.9821876 L46.4120972,64 L2.39428484,108.017812 C-0.751003978,111.163101 -0.7543908,116.498295 2.53416752,119.786853 L8.21314718,125.465832 C11.5724531,128.825138 16.7708844,128.817018 19.9821876,125.605715 L64,81.5879028 L108.017812,125.605715 C111.163101,128.751004 116.498295,128.754391 119.786853,125.465832 L125.465832,119.786853 C128.825138,116.427547 128.817018,111.229116 125.605715,108.017812 L81.5879028,64 L81.5879028,64 Z"
+      ></path>
+    </svg>
+  );
+
+  const renderLibraryHeader = () => {
+    return (
+      <>
+        <div className="layer-ui__library-header" key="library-header">
+          {renderLibraryActions()}
+          {isInsideSidebar && (
+            <div className="ToolIcon__icon__close">
+              <button onClick={() => setAppState({ isLibraryOpen: false })}>
+                <div className="close_icon">{CLOSE_ICON}</div>
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="library_url">
           {isLoading ? (
             <Spinner />
-          ) : !isMobile && !isFloatingMenu ? (
+          ) : !isInsideSidebar ? (
             <a
               href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
                 window.name || "_blank"
@@ -377,37 +395,12 @@ const LibraryMenuItems = ({
             </a>
           ) : null}
         </div>
-        {/* {isLoading ? (
-          <Spinner />
-        ) : (
-          <a
-            href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-              window.name || "_blank"
-            }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
-              VERSIONS.excalidrawLibrary
-            }`}
-            target="_excalidraw_libraries"
-          >
-            {t("labels.libraries")}
-          </a>
-        )} */}
-      </div>
-      <div className="library_url">
-        {isLoading ? (
-          <Spinner />
-        ) : isMobile || isFloatingMenu ? (
-          <a
-            href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-              window.name || "_blank"
-            }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
-              VERSIONS.excalidrawLibrary
-            }`}
-            target="_excalidraw_libraries"
-          >
-            {t("labels.libraries")}
-          </a>
-        ) : null}
-      </div>
+      </>
+    );
+  };
+
+  const renderLibraryMenuItems = () => {
+    return (
       <Stack.Col
         className="library-menu-items-container__items"
         align="start"
@@ -430,6 +423,39 @@ const LibraryMenuItems = ({
           {renderLibrarySection(publishedItems)}
         </>
       </Stack.Col>
+    );
+  };
+
+  const renderLibraryFooter = () => {
+    return (
+      <div className="library_items_add">
+        {isLoading ? (
+          <Spinner />
+        ) : isInsideSidebar ? (
+          <a
+            href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+              window.name || "_blank"
+            }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+              VERSIONS.excalidrawLibrary
+            }`}
+            target="_excalidraw_libraries"
+          >
+            {t("labels.libraries")}
+          </a>
+        ) : null}
+      </div>
+    );
+  };
+
+  return (
+    <div
+      className="library-menu-items-container"
+      style={!isInsideSidebar ? { height: "50vh" } : {}}
+    >
+      {showRemoveLibAlert && renderRemoveLibAlert()}
+      {renderLibraryHeader()}
+      {renderLibraryMenuItems()}
+      {isInsideSidebar && renderLibraryFooter()}
     </div>
   );
 };

@@ -2,13 +2,14 @@
 
 .excalidraw {
   .layer-ui__library {
-    margin: auto;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: auto;
 
     .layer-ui__library-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
       width: 100%;
       margin: 2px 0 15px 0;

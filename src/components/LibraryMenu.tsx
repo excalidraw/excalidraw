@@ -20,7 +20,6 @@ import { Dialog } from "./Dialog";
 import { Island } from "./Island";
 import PublishLibrary from "./PublishLibrary";
 import { ToolButton } from "./ToolButton";
-import { useDeviceType } from "./App";
 
 import "./LibraryMenu.scss";
 import LibraryMenuItems from "./LibraryMenuItems";
@@ -88,6 +87,7 @@ export const LibraryMenu = ({
   library,
   id,
   appState,
+  isInsideSidebar,
 }: {
   pendingElements: LibraryItem["elements"];
   onClose: () => void;
@@ -101,17 +101,16 @@ export const LibraryMenu = ({
   library: Library;
   id: string;
   appState: AppState;
+  isInsideSidebar: boolean;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
-  const isMobile = useDeviceType().isMobile;
-  const isFloatingMenu = useDeviceType().isFloatingMenu;
   useOnClickOutside(ref, (event) => {
     // If click on the library icon, do nothing.
     if ((event.target as Element).closest(".ToolIcon__library")) {
       return;
     }
-    if (isMobile || isFloatingMenu) {
+    if (!isInsideSidebar) {
       onClose();
     }
   });
@@ -287,6 +286,7 @@ export const LibraryMenu = ({
         onSelectItems={(ids) => setSelectedItems(ids)}
         onPublish={() => setShowPublishLibraryDialog(true)}
         resetLibrary={resetLibrary}
+        isInsideSidebar={isInsideSidebar}
       />
     </LibraryMenuWrapper>
   );

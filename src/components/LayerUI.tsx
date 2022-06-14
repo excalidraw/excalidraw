@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React, { useCallback } from "react";
 import { ActionManager } from "../actions/manager";
-import { CLASSES } from "../constants";
+import { CLASSES, LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { exportCanvas } from "../data";
 import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
@@ -96,6 +96,11 @@ const LayerUI = ({
   onImageAction,
 }: LayerUIProps) => {
   const deviceType = useDeviceType();
+  const isInsideSidebar: boolean =
+    appState.isLibraryOpen &&
+    !deviceType.isMobile &&
+    !deviceType.isFloatingMenu;
+
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
       return null;
@@ -287,29 +292,12 @@ const LayerUI = ({
       files={files}
       id={id}
       appState={appState}
+      isInsideSidebar={isInsideSidebar}
     />
   ) : null;
 
-  const CLOSE_ICON = (
-    <svg viewBox="0 0 128 128">
-      <path
-        fill="#FFFFFF"
-        d="M81.5879028,64 L125.605715,19.9821876 C128.751004,16.8368988 128.754391,11.5017055 125.465832,8.21314718 L119.786853,2.53416752 C116.427547,-0.825138422 111.229116,-0.817018406 108.017812,2.39428484 L64,46.4120972 L19.9821876,2.39428484 C16.8368988,-0.751003978 11.5017055,-0.7543908 8.21314718,2.53416752 L2.53416752,8.21314718 C-0.825138422,11.5724531 -0.817018406,16.7708844 2.39428484,19.9821876 L46.4120972,64 L2.39428484,108.017812 C-0.751003978,111.163101 -0.7543908,116.498295 2.53416752,119.786853 L8.21314718,125.465832 C11.5724531,128.825138 16.7708844,128.817018 19.9821876,125.605715 L64,81.5879028 L108.017812,125.605715 C111.163101,128.751004 116.498295,128.754391 119.786853,125.465832 L125.465832,119.786853 C128.825138,116.427547 128.817018,111.229116 125.605715,108.017812 L81.5879028,64 L81.5879028,64 Z"
-      ></path>
-    </svg>
-  );
-
   const renderLibrarySidebar = () => {
-    return (
-      <div className="layerUI_sidebar">
-        <div className="ToolIcon__icon__close">
-          <button onClick={() => setAppState({ isLibraryOpen: false })}>
-            <div className="close_icon">{CLOSE_ICON}</div>
-          </button>
-        </div>
-        {libraryMenu}
-      </div>
-    );
+    return <div className="layerUI_sidebar">{libraryMenu}</div>;
   };
 
   const renderFixedSideContainer = () => {
@@ -577,8 +565,8 @@ const LayerUI = ({
               !isTextElement(appState.editingElement)),
         })}
         style={
-          appState.isLibraryOpen && !deviceType.isFloatingMenu
-            ? { width: `calc(100% - 300px)` }
+          isInsideSidebar
+            ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
             : {}
         }
       >
@@ -598,10 +586,7 @@ const LayerUI = ({
           </button>
         )}
       </div>
-      {appState.isLibraryOpen &&
-        !deviceType.isMobile &&
-        !deviceType.isFloatingMenu &&
-        renderLibrarySidebar()}
+      {isInsideSidebar && renderLibrarySidebar()}
     </>
   );
 };
