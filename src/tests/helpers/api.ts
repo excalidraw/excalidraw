@@ -19,7 +19,7 @@ import {
 } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
-import { registerCustomSubtypes } from "../../textlike";
+import { registerCustomSubtypes } from "../../subtypes";
 
 registerCustomSubtypes();
 

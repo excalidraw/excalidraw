@@ -1,4 +1,4 @@
-import { CustomProps, CustomSubtype } from "../textlike/types";
+import { CustomProps, CustomSubtype } from "../subtypes";
 import { Point } from "../types";
 import { FONT_FAMILY, THEME, VERTICAL_ALIGN } from "../constants";
 

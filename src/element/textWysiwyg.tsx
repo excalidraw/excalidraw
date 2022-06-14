@@ -22,8 +22,7 @@ import {
   getContainerElement,
   wrapText,
 } from "./textElement";
-import { getCustomMethods } from "../textlike";
-import { CustomProps, TextOmitProps } from "../textlike/types";
+import { getCustomMethods, CustomProps } from "../subtypes";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -64,7 +63,10 @@ const getTransform = (
 };
 
 export const measureTextElement = (
-  element: Omit<ExcalidrawTextElement, TextOmitProps | "originalText">,
+  element: Pick<
+    ExcalidrawTextElement,
+    "subtype" | "customProps" | "fontSize" | "fontFamily" | "text"
+  >,
   next?: {
     fontSize?: number;
     text?: string;
@@ -74,7 +76,7 @@ export const measureTextElement = (
 ) => {
   const map = getCustomMethods(element.subtype);
   if (map) {
-    return map.measure(element, next, maxWidth);
+    return map.measureText(element, next, maxWidth);
   }
 
   const fontSize = next?.fontSize ?? element.fontSize;
@@ -86,7 +88,10 @@ export const measureTextElement = (
 };
 
 export const wrapTextElement = (
-  element: Omit<ExcalidrawTextElement, TextOmitProps>,
+  element: Pick<
+    ExcalidrawTextElement,
+    "subtype" | "customProps" | "fontSize" | "fontFamily" | "originalText"
+  >,
   containerWidth: number,
   next?: {
     fontSize?: number;
@@ -167,11 +172,10 @@ export const textWysiwyg = ({
       const text = container
         ? updatedElement.text
         : updatedElement.originalText;
-      const metrics = measureTextElement(updatedElement, { text });
-      const metricsW = measureText(text, getFontString(updatedElement));
-      let maxWidth = metricsW.width;
+      const metrics = measureText(text, getFontString(updatedElement));
+      let maxWidth = metrics.width;
       let maxHeight = metrics.height;
-      let width = metricsW.width;
+      let width = metrics.width;
       // Set to element height by default since that's
       // what is going to be used for unbounded text
       let height = metrics.height;

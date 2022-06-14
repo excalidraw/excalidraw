@@ -7,7 +7,7 @@ import {
   BinaryFiles,
 } from "../types";
 import { ToolButtonSize } from "../components/ToolButton";
-import { CustomActionName } from "../textlike/types";
+import { CustomActionName } from "../subtypes";
 
 export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
 
@@ -126,10 +126,6 @@ export type PanelComponentProps = {
 export interface Action {
   name: ActionName | CustomActionName;
   PanelComponent?: React.FC<PanelComponentProps>;
-  PanelComponentPredicate?: (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) => boolean;
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (

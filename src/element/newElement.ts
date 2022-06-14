@@ -24,6 +24,7 @@ import { getResizedElementAbsoluteCoords } from "./bounds";
 import { getContainerElement } from "./textElement";
 import { measureTextElement, wrapTextElement } from "./textWysiwyg";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+import { getCustomMethods } from "../subtypes";
 
 export const delUndefinedProps = (obj: any, keys: string[]) => {
   keys.forEach((key) => {
@@ -146,6 +147,11 @@ export const newTextElement = (
     containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
+  const map = getCustomMethods(opts?.subtype);
+  if (map) {
+    opts = map.clean(opts) as typeof opts;
+  }
+
   const metrics = measureTextElement(opts, { customProps: opts.customProps });
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
