@@ -112,8 +112,13 @@ export const newElement = (
   opts: {
     type: ExcalidrawGenericElement["type"];
   } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawGenericElement> =>
-  _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
+): NonDeleted<ExcalidrawGenericElement> => {
+  const map = getCustomMethods(opts?.subtype);
+  if (map) {
+    opts = map.clean(opts) as typeof opts;
+  }
+  return _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
+};
 
 /** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (
@@ -151,7 +156,6 @@ export const newTextElement = (
   if (map) {
     opts = map.clean(opts) as typeof opts;
   }
-
   const metrics = measureTextElement(opts, { customProps: opts.customProps });
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
@@ -300,6 +304,10 @@ export const newFreeDrawElement = (
     simulatePressure: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
+  const map = getCustomMethods(opts?.subtype);
+  if (map) {
+    opts = map.clean(opts) as typeof opts;
+  }
   return {
     ..._newElementBase<ExcalidrawFreeDrawElement>(opts.type, opts),
     points: opts.points || [],
@@ -317,6 +325,10 @@ export const newLinearElement = (
     points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
+  const map = getCustomMethods(opts?.subtype);
+  if (map) {
+    opts = map.clean(opts) as typeof opts;
+  }
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: opts.points || [],
@@ -333,6 +345,10 @@ export const newImageElement = (
     type: ExcalidrawImageElement["type"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
+  const map = getCustomMethods(opts?.subtype);
+  if (map) {
+    opts = map.clean(opts) as typeof opts;
+  }
   return {
     ..._newElementBase<ExcalidrawImageElement>("image", opts),
     // in the future we'll support changing stroke color for some SVG elements,
