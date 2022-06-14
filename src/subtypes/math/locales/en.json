@@ -5,13 +5,9 @@
     "mathOnlyTrue": "Math only",
     "mathOnlyFalse": "Mixed text",
     "changeUseTex": "Math input",
-    "toggleUseTex": "Toggle using AsciiMath",
+    "toggleUseTex": "Toggle simplified input",
     "useTexTrue": "Standard",
     "useTexFalse": "Simplified"
-  },
-  "alerts": {
-    "useTexTrue": "Using LaTeX for math mode.",
-    "useTexFalse": "Using AsciiMath for math mode."
   },
   "toolBar": {
     "math": "Math"
