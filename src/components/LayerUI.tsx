@@ -68,6 +68,7 @@ interface LayerUIProps {
   library: Library;
   id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
+  isInsideSidebar: boolean;
 }
 const LayerUI = ({
   actionManager,
@@ -94,12 +95,9 @@ const LayerUI = ({
   library,
   id,
   onImageAction,
+  isInsideSidebar,
 }: LayerUIProps) => {
   const deviceType = useDeviceType();
-  const isInsideSidebar: boolean =
-    appState.isLibraryOpen &&
-    !deviceType.isMobile &&
-    !deviceType.isFloatingMenu;
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {

@@ -4,9 +4,6 @@
   position: absolute;
   right: 0;
   z-index: 5;
-  // background-color: var(--island-bg-color);
-  // box-shadow: var(--shadow-island);
-  // border-left: 1px solid $oc-blue-5;
 
   .Island {
     box-shadow: none;
@@ -14,8 +11,8 @@
 
   .ToolIcon__icon__close {
     button {
-      border-radius: 50%;
-      background-color: $oc-blue-6;
+      border-radius: var(--border-radius-md);
+      background-color: var(--color-primary);
       .close_icon {
         height: 1.25rem;
         width: 1.25rem;
@@ -27,7 +24,7 @@
         }
       }
       &:hover {
-        background-color: var(--color-primary);
+        background-color: var(--color-primary-darker);
       }
     }
   }

@@ -6,8 +6,8 @@
     flex-direction: column;
     height: 100vh;
     background-color: var(--island-bg-color);
-    box-shadow: var(--shadow-island);
     border-left: 1px solid $oc-blue-5;
+
     padding: 0.5rem;
     .library-actions {
       display: flex;
@@ -108,6 +108,7 @@
     .library_items_add {
       margin-bottom: 1.5rem;
       a {
+        border-radius: var(--border-radius-lg);
         background-color: var(--color-primary);
         // margin-top: 20px;
         padding: 10px 78px;
@@ -133,7 +134,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: $oc-blue-8;
+  background: var(--color-primary-darker);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {

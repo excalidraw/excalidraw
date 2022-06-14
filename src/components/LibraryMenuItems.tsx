@@ -200,7 +200,7 @@ const LibraryMenuItems = ({
     );
   };
 
-  const CELLS_PER_ROW = 4;
+  const CELLS_PER_ROW = isInsideSidebar ? 4 : 5;
 
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;
@@ -380,7 +380,7 @@ const LibraryMenuItems = ({
           )}
         </div>
         <div className="library_url">
-          {isLoading ? (
+          {isLoading && !isInsideSidebar ? (
             <Spinner />
           ) : !isInsideSidebar ? (
             <a
@@ -450,7 +450,11 @@ const LibraryMenuItems = ({
   return (
     <div
       className="library-menu-items-container"
-      style={!isInsideSidebar ? { height: "50vh" } : {}}
+      style={
+        !isInsideSidebar
+          ? { height: "50vh", boxShadow: "none", borderLeft: "none" }
+          : {}
+      }
     >
       {showRemoveLibAlert && renderRemoveLibAlert()}
       {renderLibraryHeader()}

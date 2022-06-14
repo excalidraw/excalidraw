@@ -325,6 +325,7 @@ class App extends React.Component<AppProps, AppState> {
     container: HTMLDivElement | null;
     id: string;
   };
+  public isInsideSidebar: boolean;
 
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
@@ -363,7 +364,7 @@ class App extends React.Component<AppProps, AppState> {
     this.id = nanoid();
 
     this.library = new Library(this);
-
+    this.isInsideSidebar = false;
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -486,6 +487,11 @@ class App extends React.Component<AppProps, AppState> {
       renderCustomStats,
     } = this.props;
 
+    this.isInsideSidebar =
+      this.state.isLibraryOpen &&
+      !this.deviceType.isMobile &&
+      !this.deviceType.isFloatingMenu;
+
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -541,6 +547,7 @@ class App extends React.Component<AppProps, AppState> {
               library={this.library}
               id={this.id}
               onImageAction={this.onImageAction}
+              isInsideSidebar={this.isInsideSidebar}
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
@@ -560,6 +567,7 @@ class App extends React.Component<AppProps, AppState> {
                 elements={this.scene.getNonDeletedElements()}
                 onClose={this.toggleStats}
                 renderCustomStats={renderCustomStats}
+                isInsideSidebar={this.isInsideSidebar}
               />
             )}
             {this.state.toastMessage !== null && (
