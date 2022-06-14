@@ -12,7 +12,9 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
-import { getContainerElement } from "../element/textElement";
+import { getBoundTextElement } from "../element/textElement";
+import { hasBoundTextElement } from "../element/typeChecks";
+import { getSelectedElements } from "../scene";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";
@@ -21,9 +23,15 @@ export const actionCopyStyles = register({
   name: "copyStyles",
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
+    const selectedElements = [];
     const element = elements.find((el) => appState.selectedElementIds[el.id]);
+    selectedElements.push(element);
+    if (element && hasBoundTextElement(element)) {
+      const boundTextElement = getBoundTextElement(element);
+      selectedElements.push(boundTextElement);
+    }
     if (element) {
-      copiedStyles = JSON.stringify(element);
+      copiedStyles = JSON.stringify(selectedElements);
     }
     return {
       appState: {
@@ -42,37 +50,59 @@ export const actionPasteStyles = register({
   name: "pasteStyles",
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
-    const pastedElement = JSON.parse(copiedStyles);
+    const elementsCopied = JSON.parse(copiedStyles);
+    const pastedElement = elementsCopied[0];
+    const boundTextElement = elementsCopied[1];
     if (!isExcalidrawElement(pastedElement)) {
       return { elements, commitToHistory: false };
     }
+
+    const selectedElements = getSelectedElements(elements, appState, true);
+    const selectedElementIds = selectedElements.map((element) => element.id);
     return {
       elements: elements.map((element) => {
-        if (appState.selectedElementIds[element.id]) {
+        if (selectedElementIds.includes(element.id)) {
+          let elementStylesToCopyFrom = pastedElement;
+          if (isTextElement(element) && element.containerId) {
+            elementStylesToCopyFrom = boundTextElement;
+          }
+          if (!elementStylesToCopyFrom) {
+            return element;
+          }
           let newElement = newElementWith(element, {
-            backgroundColor: pastedElement?.backgroundColor,
-            strokeWidth: pastedElement?.strokeWidth,
-            strokeColor: pastedElement?.strokeColor,
-            strokeStyle: pastedElement?.strokeStyle,
-            fillStyle: pastedElement?.fillStyle,
-            opacity: pastedElement?.opacity,
-            roughness: pastedElement?.roughness,
+            backgroundColor: elementStylesToCopyFrom?.backgroundColor,
+            strokeWidth: elementStylesToCopyFrom?.strokeWidth,
+            strokeColor: elementStylesToCopyFrom?.strokeColor,
+            strokeStyle: elementStylesToCopyFrom?.strokeStyle,
+            fillStyle: elementStylesToCopyFrom?.fillStyle,
+            opacity: elementStylesToCopyFrom?.opacity,
+            roughness: elementStylesToCopyFrom?.roughness,
           });
 
           if (isTextElement(newElement)) {
             newElement = newElementWith(newElement, {
-              fontSize: pastedElement?.fontSize || DEFAULT_FONT_SIZE,
-              fontFamily: pastedElement?.fontFamily || DEFAULT_FONT_FAMILY,
-              textAlign: pastedElement?.textAlign || DEFAULT_TEXT_ALIGN,
+              fontSize: elementStylesToCopyFrom?.fontSize || DEFAULT_FONT_SIZE,
+              fontFamily:
+                elementStylesToCopyFrom?.fontFamily || DEFAULT_FONT_FAMILY,
+              textAlign:
+                elementStylesToCopyFrom?.textAlign || DEFAULT_TEXT_ALIGN,
             });
-
-            redrawTextBoundingBox(newElement, getContainerElement(newElement));
+            let container = null;
+            if (newElement.containerId) {
+              container =
+                selectedElements.find(
+                  (element) =>
+                    isTextElement(newElement) &&
+                    element.id === newElement.containerId,
+                ) || null;
+            }
+            redrawTextBoundingBox(newElement, container);
           }
 
           if (newElement.type === "arrow") {
             newElement = newElementWith(newElement, {
-              startArrowhead: pastedElement.startArrowhead,
-              endArrowhead: pastedElement.endArrowhead,
+              startArrowhead: elementStylesToCopyFrom.startArrowhead,
+              endArrowhead: elementStylesToCopyFrom.endArrowhead,
             });
           }
 

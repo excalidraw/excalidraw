@@ -450,6 +450,7 @@ export const getBoundTextElement = (element: ExcalidrawElement | null) => {
   if (!element) {
     return null;
   }
+
   const boundTextElementId = getBoundTextElementId(element);
   if (boundTextElementId) {
     return (
