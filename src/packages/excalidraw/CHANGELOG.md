@@ -17,6 +17,8 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
+- Render math notation using the MathJax library. Both standard Latex input and simplified AsciiMath input are supported. MathJax support is implemented as a `math` subtype of `ExcalidrawTextElement`. [#2993](https://github.com/excalidraw/excalidraw/pull/2993).
+
 - Plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code. [#3915](https://github.com/excalidraw/excalidraw/pull/3915).
 
 - Added support for supplying user `id` in the Collaborator object (see `collaborators` in [`updateScene()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene)), which will be used to deduplicate users when rendering collaborator avatar list. Cursors will still be rendered for every user. [#5309](https://github.com/excalidraw/excalidraw/pull/5309)
@@ -947,10 +949,6 @@ React.createElement(ExcalidrawLib.Excalidraw, opts);
 ## Excalidraw API
 
 ### Features
-
-- Render math notation using the MathJax library. Both Latex input (the default) and AsciiMath input are supported. Math mode is activated by selecting the "normal" font and typing math between delimiters. [#2993](https://github.com/excalidraw/excalidraw/pull/2993).
-
-  The delimiters are double dollar signs ('$$') for Latex and grave accents ('`') for AsciiMath. Press "Control Shift M" to toggle between Latex and AsciiMath. This toggles the input mode for each selected text element which could be in math mode. With only one text element selected, this also sets the default input mode for new text elements. Press "Shift M" to check which input mode the selected text element uses, or the default input mode if no text element is selected.
 
 - Expose `window.EXCALIDRAW_ASSET_PATH` which host can use to load assets from a different URL. By default it will be loaded from `https://unpkg.com/@excalidraw/excalidraw{currentVersion}/dist/`[#3068](https://github.com/excalidraw/excalidraw/pull/3068).
 

@@ -21,7 +21,7 @@ import {
   ExcalidrawTextElement,
   NonDeleted,
 } from "../../element/types";
-import { ElementUpdate, newElementWith } from "../../element/mutateElement";
+import { newElementWith } from "../../element/mutateElement";
 import { addCustomActions } from "../";
 import { registerAuxLangData } from "../../i18n";
 
@@ -691,9 +691,7 @@ const getSelectedMathElements = (
   return eligibleElements;
 };
 
-const cleanMathElementUpdate = (
-  updates: ElementUpdate<ExcalidrawMathElement>,
-): ElementUpdate<ExcalidrawMathElement> => {
+const cleanMathElementUpdate = function (updates) {
   const newUpdates = {};
   for (const key in updates) {
     if (key === "customProps") {
@@ -705,41 +703,26 @@ const cleanMathElementUpdate = (
   }
   (newUpdates as any).fontFamily = FONT_FAMILY_MATH;
   return newUpdates;
-};
+} as CustomMethods["clean"];
 
-const measureMathElement = (
-  element: Pick<
-    ExcalidrawMathElement,
-    "subtype" | "customProps" | "fontSize" | "fontFamily" | "text"
-  >,
-  next?: {
-    fontSize?: number;
-    text?: string;
-    customProps?: MathProps;
-  },
-  maxWidth?: number | null,
-) => {
+const measureMathElement = function (element, next, maxWidth) {
   const isMathJaxLoaded = mathJaxLoaded;
   const fontSize = next?.fontSize ?? element.fontSize;
   const text = next?.text ?? element.text;
   const customProps = next?.customProps ?? element.customProps;
-  const mathProps = getMathProps.ensureMathProps(customProps);
+  const mathProps = getMathProps.ensureMathProps(customProps!);
   return getImageMetrics(text, fontSize, mathProps, isMathJaxLoaded, maxWidth);
-};
+} as CustomMethods["measureText"];
 
-const renderMathElement = (
-  element: NonDeleted<ExcalidrawMathElement>,
-  context: CanvasRenderingContext2D,
-  renderCb?: () => void,
-) => {
+const renderMathElement = function (element, context, renderCb) {
   const isMathJaxLoaded = mathJaxLoaded;
-
-  const text = element.text;
-  const fontSize = element.fontSize;
-  const strokeColor = element.strokeColor;
-  const textAlign = element.textAlign;
-  const opacity = element.opacity / 100;
-  const mathProps = getMathProps.ensureMathProps(element.customProps);
+  const _element = element as NonDeleted<ExcalidrawMathElement>;
+  const text = _element.text;
+  const fontSize = _element.fontSize;
+  const strokeColor = _element.strokeColor;
+  const textAlign = _element.textAlign;
+  const opacity = _element.opacity / 100;
+  const mathProps = getMathProps.ensureMathProps(_element.customProps);
 
   let _childIsSvg: boolean;
   let _text: string;
@@ -761,8 +744,8 @@ const renderMathElement = (
       context.save();
       context.canvas.setAttribute("dir", childRtl ? "rtl" : "ltr");
       context.font = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
-      context.fillStyle = element.strokeColor;
-      context.textAlign = element.textAlign as CanvasTextAlign;
+      context.fillStyle = _element.strokeColor;
+      context.textAlign = _element.textAlign as CanvasTextAlign;
     }
   };
 
@@ -847,20 +830,18 @@ const renderMathElement = (
     doSetupChild,
     doRenderChild,
   );
-};
+} as CustomMethods["render"];
 
-const renderSvgMathElement = (
-  svgRoot: SVGElement,
-  root: SVGElement,
-  element: NonDeleted<ExcalidrawMathElement>,
-): void => {
+const renderSvgMathElement = function (svgRoot, root, element) {
   const isMathJaxLoaded = mathJaxLoaded;
-  const mathProps = getMathProps.ensureMathProps(element.customProps);
-  const text = element.text;
-  const fontSize = element.fontSize;
-  const strokeColor = element.strokeColor;
-  const textAlign = element.textAlign;
-  const opacity = element.opacity / 100;
+
+  const _element = element as NonDeleted<ExcalidrawMathElement>;
+  const mathProps = getMathProps.ensureMathProps(_element.customProps);
+  const text = _element.text;
+  const fontSize = _element.fontSize;
+  const strokeColor = _element.strokeColor;
+  const textAlign = _element.textAlign;
+  const opacity = _element.opacity / 100;
 
   const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
   const key = getCacheKey(
@@ -970,26 +951,15 @@ const renderSvgMathElement = (
   }
   node.appendChild(tempSvg);
   root.appendChild(node);
-};
+} as CustomMethods["renderSvg"];
 
-const wrapMathElement = (
-  element: Pick<
-    ExcalidrawMathElement,
-    "subtype" | "customProps" | "fontSize" | "fontFamily" | "originalText"
-  >,
-  containerWidth: number,
-  next?: {
-    fontSize?: number;
-    text?: string;
-    customProps?: MathProps;
-  },
-): string => {
+const wrapMathElement = function (element, containerWidth, next) {
   const isMathJaxLoaded = mathJaxLoaded;
   const fontSize =
     next?.fontSize !== undefined ? next.fontSize : element.fontSize;
   const text = next?.text !== undefined ? next.text : element.originalText;
   const customProps = next?.customProps ?? element.customProps;
-  const mathProps = getMathProps.ensureMathProps(customProps);
+  const mathProps = getMathProps.ensureMathProps(customProps!);
 
   const font = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
 
@@ -1100,7 +1070,7 @@ const wrapMathElement = (
   }
 
   return wrappedLines.join("\n");
-};
+} as CustomMethods["wrapText"];
 
 export const registerCustomSubtype = (
   methods: CustomMethods,
@@ -1113,7 +1083,7 @@ export const registerCustomSubtype = (
   methods.measureText = measureMathElement;
   methods.render = renderMathElement;
   methods.renderSvg = renderSvgMathElement;
-  methods.wrap = wrapMathElement;
+  methods.wrapText = wrapMathElement;
   registerActionsMath();
   registerAuxLangData(`./subtypes/${SUBTYPE_MATH}`);
   // Call loadMathJax() here if we want to be sure it's loaded.
