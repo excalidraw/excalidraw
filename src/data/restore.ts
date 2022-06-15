@@ -276,8 +276,14 @@ export const restoreAppState = (
         : defaultValue;
   }
 
+  const { customSubtype, customProps } = appState;
+  const custom = delUndefinedProps({ customSubtype, customProps }, [
+    "customSubtype",
+    "customProps",
+  ]);
   return {
     ...nextAppState,
+    ...custom,
     cursorButton: localAppState?.cursorButton || "up",
     // reset on fresh restore so as to hide the UI button if penMode not active
     penDetected:
