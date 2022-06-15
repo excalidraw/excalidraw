@@ -70,39 +70,30 @@ export const exportToCanvas = async (
     renderGrid: false,
     isExporting: true,
     renderCb: () => {
-      // If a scene refresh is cued, restart the countdown.
-      // This way we are not calling renderScene once per
-      // ExcalidrawTextElement. The countdown improves performance
-      // when there are large numbers of ExcalidrawTextElements
-      // executing this callback.
       if (refreshTimer !== 0) {
         window.clearTimeout(refreshTimer);
       }
       refreshTimer = window.setTimeout(() => {
         renderConfig.renderCb = () => {};
         window.clearTimeout(refreshTimer);
-        renderScene(
-          elements,
-          appState,
-          null,
-          scale,
-          rough.canvas(canvas),
-          canvas,
-          renderConfig,
-        );
+        // Here instead of setState({}), call renderScene() again
+        render();
       }, 50);
     },
   };
 
-  renderScene(
-    elements,
-    appState,
-    null,
-    scale,
-    rough.canvas(canvas),
-    canvas,
-    renderConfig,
-  );
+  const render = () => {
+    renderScene(
+      elements,
+      appState,
+      null,
+      scale,
+      rough.canvas(canvas),
+      canvas,
+      renderConfig,
+    );
+  };
+  render();
 
   return canvas;
 };

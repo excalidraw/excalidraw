@@ -6,7 +6,7 @@ import { randomInteger } from "../random";
 import { Point } from "../types";
 import { getUpdatedTimestamp } from "../utils";
 
-export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
+type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
   "id" | "version" | "versionNonce"
 >;

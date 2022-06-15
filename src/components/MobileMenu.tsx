@@ -86,6 +86,9 @@ export const MobileMenu = ({
                         });
                       }}
                     />
+                    {getCustomSubtypes().map((subtype) =>
+                      actionManager.renderAction(subtype),
+                    )}
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
@@ -140,9 +143,6 @@ export const MobileMenu = ({
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
         {showEraser && actionManager.renderAction("eraser")}
-        {getCustomSubtypes().map((subtype) =>
-          actionManager.renderAction(subtype),
-        )}
 
         {actionManager.renderAction(
           appState.multiElement ? "finalize" : "duplicateSelection",

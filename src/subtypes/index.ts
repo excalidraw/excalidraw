@@ -1,4 +1,8 @@
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+} from "../element/types";
 import { getNonDeletedElements } from "../element";
 import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
@@ -128,11 +132,46 @@ export const getCustomActions = (): readonly Action[] => {
 
 // Custom Methods
 export type CustomMethods = {
-  clean: Function;
-  measureText: Function;
-  render: Function;
-  renderSvg: Function;
-  wrap: Function;
+  clean: (
+    updates: Omit<
+      Partial<ExcalidrawElement>,
+      "id" | "version" | "versionNonce"
+    >,
+  ) => Omit<Partial<ExcalidrawElement>, "id" | "version" | "versionNonce">;
+  measureText: (
+    element: Pick<
+      ExcalidrawTextElement,
+      "subtype" | "customProps" | "fontSize" | "fontFamily" | "text"
+    >,
+    next?: {
+      fontSize?: number;
+      text?: string;
+      customProps?: CustomProps;
+    },
+    maxWidth?: number | null,
+  ) => { width: number; height: number; baseline: number };
+  render: (
+    element: NonDeleted<ExcalidrawElement>,
+    context: CanvasRenderingContext2D,
+    renderCb?: () => void,
+  ) => void;
+  renderSvg: (
+    svgRoot: SVGElement,
+    root: SVGElement,
+    element: NonDeleted<ExcalidrawElement>,
+  ) => void;
+  wrapText: (
+    element: Pick<
+      ExcalidrawTextElement,
+      "subtype" | "customProps" | "fontSize" | "fontFamily" | "originalText"
+    >,
+    containerWidth: number,
+    next?: {
+      fontSize?: number;
+      text?: string;
+      customProps?: CustomProps;
+    },
+  ) => string;
 };
 
 type MethodMap = { subtype: CustomSubtype; methods: CustomMethods };
@@ -151,12 +190,12 @@ export const getCustomMethods = (subtype: CustomSubtype | undefined) => {
 export const registerCustomSubtypes = (
   onSubtypesLoaded?: (isCustomSubtype: Function) => void,
 ) => {
-  const textSubtypes = getCustomSubtypes();
-  for (let index = 0; index < textSubtypes.length; index++) {
-    const subtype = textSubtypes[index];
+  const subtypes = getCustomSubtypes();
+  for (let index = 0; index < subtypes.length; index++) {
+    const subtype = subtypes[index];
     if (!methodMaps.find((method) => method.subtype === subtype)) {
       methodMaps.push({ subtype, methods: {} as CustomMethods });
-      require(`./${textSubtypes[index]}/index`).registerCustomSubtype(
+      require(`./${subtypes[index]}/index`).registerCustomSubtype(
         getCustomMethods(subtype),
         onSubtypesLoaded,
       );

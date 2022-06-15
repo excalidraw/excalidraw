@@ -17,6 +17,8 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
+- Plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code. [#3915](https://github.com/excalidraw/excalidraw/pull/3915).
+
 - Export API to [set](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#setCursor) and [reset](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#resetCursor) mouse cursor on the canvas [#5215](https://github.com/excalidraw/excalidraw/pull/5215).
 
 - Export [`sceneCoordsToViewportCoords`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) and [`viewportCoordsToSceneCoords`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) utilities [#5187](https://github.com/excalidraw/excalidraw/pull/5187).
@@ -146,10 +148,6 @@ React.createElement(ExcalidrawLib.Excalidraw, opts);
 ## Excalidraw API
 
 ### Features
-
-- Plugin-like subtypes for `ExcalidrawTextElement`. These allow easily supporting specialized `ExcalidrawTextElement`s such as for MathJax, Markdown, or inline code. Rendered text dimensions no longer have to match editing text dimensions. [#3915](https://github.com/excalidraw/excalidraw/pull/3915).
-
-### Fixes
 
 - Export [`isLinearElement`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#isLinearElement) and [`getNonDeletedElements`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#getNonDeletedElements) [#4072](https://github.com/excalidraw/excalidraw/pull/4072).
 

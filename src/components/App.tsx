@@ -432,7 +432,6 @@ class App extends React.Component<AppProps, AppState> {
     };
     registerCustomSubtypes(refresh);
 
-    this.library = new Library(this);
     this.history = new History();
     this.actionManager = new ActionManager(
       this.syncActionResult,

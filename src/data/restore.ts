@@ -139,6 +139,7 @@ const restoreElementWithProperties = <
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
 ): typeof element | null => {
+  let el;
   switch (element.type) {
     case "text":
       let fontSize = element.fontSize;
@@ -150,7 +151,7 @@ const restoreElement = (
         fontSize = parseInt(fontPx, 10);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
-      const opts = {
+      return restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
         text: element.text ?? "",
@@ -159,11 +160,7 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || element.text,
-      };
-      return restoreElementWithProperties(
-        element,
-        opts,
-      ) as ExcalidrawTextElement;
+      }) as ExcalidrawTextElement;
     case "freedraw": {
       return restoreElementWithProperties(element, {
         points: element.points,
@@ -220,20 +217,14 @@ const restoreElement = (
 
     // generic elements
     case "ellipse":
-      return restoreElementWithProperties(
-        element,
-        {},
-      ) as ExcalidrawEllipseElement;
+      el = restoreElementWithProperties(element, {});
+      return el as ExcalidrawEllipseElement;
     case "rectangle":
-      return restoreElementWithProperties(
-        element,
-        {},
-      ) as ExcalidrawRectangleElement;
+      el = restoreElementWithProperties(element, {});
+      return el as ExcalidrawRectangleElement;
     case "diamond":
-      return restoreElementWithProperties(
-        element,
-        {},
-      ) as ExcalidrawDiamondElement;
+      el = restoreElementWithProperties(element, {});
+      return el as ExcalidrawDiamondElement;
 
     // Don't use default case so as to catch a missing an element type case.
     // We also don't want to throw, but instead return void so we filter

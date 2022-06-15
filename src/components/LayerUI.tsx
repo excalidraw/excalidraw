@@ -361,6 +361,9 @@ const LayerUI = ({
                             });
                           }}
                         />
+                        {getCustomSubtypes().map((subtype) =>
+                          actionManager.renderAction(subtype),
+                        )}
                       </Stack.Row>
                     </Island>
                     <LibraryButton
@@ -445,9 +448,6 @@ const LayerUI = ({
                     })}
                   >
                     {actionManager.renderAction("eraser", { size: "small" })}
-                    {getCustomSubtypes().map((subtype) =>
-                      actionManager.renderAction(subtype, { size: "small" }),
-                    )}
                   </div>
                 </>
               )}
