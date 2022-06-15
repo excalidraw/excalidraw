@@ -6,7 +6,6 @@ import {
   ExcalidrawProps,
   BinaryFiles,
 } from "../types";
-import { ToolButtonSize } from "../components/ToolButton";
 
 export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
 
@@ -119,7 +118,7 @@ export type PanelComponentProps = {
   appState: AppState;
   updateData: (formData?: any) => void;
   appProps: ExcalidrawProps;
-  data?: Partial<{ id: string; size: ToolButtonSize }>;
+  data?: Record<string, any>;
 };
 
 export interface Action {

@@ -48,6 +48,8 @@ export type Collaborator = {
   // The url of the collaborator's avatar, defaults to username intials
   // if not present
   avatarUrl?: string;
+  // user id. If supplied, we'll filter out duplicates when rendering user avatars.
+  id?: string;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
