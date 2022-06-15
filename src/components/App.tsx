@@ -2227,6 +2227,8 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
       }
+    } else {
+      existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
 
     // bind to container when shouldBind is true or
