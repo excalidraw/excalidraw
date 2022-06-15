@@ -2224,11 +2224,12 @@ class App extends React.Component<AppProps, AppState> {
         existingTextElement = selectedElements[0];
       } else if (isTextBindableContainer(selectedElements[0], false)) {
         existingTextElement = getBoundTextElement(selectedElements[0]);
+      } else {
+        existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
       }
+    } else {
+      existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
-
-    existingTextElement =
-      existingTextElement ?? this.getTextElementAtPosition(sceneX, sceneY);
 
     // bind to container when shouldBind is true or
     // clicked on center of container
