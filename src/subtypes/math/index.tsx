@@ -1306,10 +1306,13 @@ const registerActionsMath = () => {
     keyTest: (event) => event.key === "KeyM",
     PanelComponent: ({ elements, appState, updateData, data }) => (
       <ToolButton
-        type="button"
+        type="icon"
         icon={SUBTYPE_MATH_ICON.call(this, { theme: appState.theme })}
-        className={clsx(`${SUBTYPE_MATH}`, {
-          active:
+        selected={
+          appState.customSubtype && appState.customSubtype === SUBTYPE_MATH
+        }
+        className={clsx({
+          selected:
             appState.customSubtype && appState.customSubtype === SUBTYPE_MATH,
         })}
         title={`${t(`toolBar.${SUBTYPE_MATH}`)}-${getShortcutKey("M")}`}
