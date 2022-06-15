@@ -81,7 +81,7 @@ export const isActionEnabled = (
   appState: AppState,
   actionName: ActionName | CustomActionName,
 ) => {
-  let enabled = false;
+  let enabled = true;
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
     appState,
@@ -90,16 +90,16 @@ export const isActionEnabled = (
     const subtype = hasBoundTextElement(element)
       ? getBoundTextElement(element)!.subtype
       : element.subtype;
-    if (isActionEnabledForSubtype(subtype, actionName)) {
-      enabled = true;
+    if (!isActionEnabledForSubtype(subtype, actionName)) {
+      enabled = false;
     }
   });
   if (selectedElements.length === 0) {
     const subtype = appState.editingElement
       ? appState.editingElement?.subtype
       : appState.customSubtype;
-    if (isActionEnabledForSubtype(subtype, actionName)) {
-      enabled = true;
+    if (!isActionEnabledForSubtype(subtype, actionName)) {
+      enabled = false;
     }
   }
   return enabled;
