@@ -26,13 +26,17 @@ export const UserList: React.FC<{
     uniqueCollaborators.size > 0 &&
     Array.from(uniqueCollaborators)
       .filter(([_, client]) => Object.keys(client).length !== 0)
-      .map(([clientId, client]) => {
-        const avatarJSX = actionManager.renderAction("goToCollaborator", {
-          id: clientId,
-        });
+      .map(([clientId, collaborator]) => {
+        const avatarJSX = actionManager.renderAction("goToCollaborator", [
+          clientId,
+          collaborator,
+        ]);
 
         return mobile ? (
-          <Tooltip label={client.username || "Unknown user"} key={clientId}>
+          <Tooltip
+            label={collaborator.username || "Unknown user"}
+            key={clientId}
+          >
             {avatarJSX}
           </Tooltip>
         ) : (
