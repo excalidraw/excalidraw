@@ -116,10 +116,7 @@ export const newElement = (
     type: ExcalidrawGenericElement["type"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawGenericElement> => {
-  const map = getCustomMethods(opts?.subtype);
-  if (map) {
-    opts = map.clean(opts) as typeof opts;
-  }
+  opts = (getCustomMethods(opts?.subtype)?.clean(opts) as typeof opts) ?? opts;
   return _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 };
 
@@ -155,10 +152,7 @@ export const newTextElement = (
     containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const map = getCustomMethods(opts?.subtype);
-  if (map) {
-    opts = map.clean(opts) as typeof opts;
-  }
+  opts = (getCustomMethods(opts?.subtype)?.clean(opts) as typeof opts) ?? opts;
   const metrics = measureTextElement(opts, { customProps: opts.customProps });
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
@@ -307,10 +301,7 @@ export const newFreeDrawElement = (
     simulatePressure: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
-  const map = getCustomMethods(opts?.subtype);
-  if (map) {
-    opts = map.clean(opts) as typeof opts;
-  }
+  opts = (getCustomMethods(opts?.subtype)?.clean(opts) as typeof opts) ?? opts;
   return {
     ..._newElementBase<ExcalidrawFreeDrawElement>(opts.type, opts),
     points: opts.points || [],
@@ -328,10 +319,7 @@ export const newLinearElement = (
     points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
-  const map = getCustomMethods(opts?.subtype);
-  if (map) {
-    opts = map.clean(opts) as typeof opts;
-  }
+  opts = (getCustomMethods(opts?.subtype)?.clean(opts) as typeof opts) ?? opts;
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: opts.points || [],
@@ -348,10 +336,7 @@ export const newImageElement = (
     type: ExcalidrawImageElement["type"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
-  const map = getCustomMethods(opts?.subtype);
-  if (map) {
-    opts = map.clean(opts) as typeof opts;
-  }
+  opts = (getCustomMethods(opts?.subtype)?.clean(opts) as typeof opts) ?? opts;
   return {
     ..._newElementBase<ExcalidrawImageElement>("image", opts),
     // in the future we'll support changing stroke color for some SVG elements,

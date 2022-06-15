@@ -86,6 +86,9 @@ export const MobileMenu = ({
                         });
                       }}
                     />
+                    {getCustomSubtypes().map((subtype) =>
+                      actionManager.renderAction(subtype),
+                    )}
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
@@ -140,9 +143,6 @@ export const MobileMenu = ({
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
         {showEraser && actionManager.renderAction("eraser")}
-        {getCustomSubtypes().map((subtype) =>
-          actionManager.renderAction(subtype),
-        )}
 
         {actionManager.renderAction(
           appState.multiElement ? "finalize" : "duplicateSelection",
@@ -206,20 +206,11 @@ export const MobileMenu = ({
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>
-                      <UserList mobile>
-                        {Array.from(appState.collaborators)
-                          // Collaborator is either not initialized or is actually the current user.
-                          .filter(
-                            ([_, client]) => Object.keys(client).length !== 0,
-                          )
-                          .map(([clientId, client]) => (
-                            <React.Fragment key={clientId}>
-                              {actionManager.renderAction("goToCollaborator", {
-                                id: clientId,
-                              })}
-                            </React.Fragment>
-                          ))}
-                      </UserList>
+                      <UserList
+                        mobile
+                        collaborators={appState.collaborators}
+                        actionManager={actionManager}
+                      />
                     </fieldset>
                   )}
                 </Stack.Col>

@@ -115,6 +115,9 @@ describe("textWysiwyg", () => {
         height: textSize,
         containerId: container.id,
       });
+      mutateElement(container, {
+        boundElements: [{ type: "text", id: text.id }],
+      });
 
       h.elements = [container, text];
 

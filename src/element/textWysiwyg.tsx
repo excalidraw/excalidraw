@@ -22,7 +22,7 @@ import {
   getContainerElement,
   wrapText,
 } from "./textElement";
-import { getCustomMethods, CustomProps } from "../subtypes";
+import { getCustomMethods, CustomMethods } from "../subtypes";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -62,18 +62,7 @@ const getTransform = (
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg) translate(${offsetX}px, 0px)`;
 };
 
-export const measureTextElement = (
-  element: Pick<
-    ExcalidrawTextElement,
-    "subtype" | "customProps" | "fontSize" | "fontFamily" | "text"
-  >,
-  next?: {
-    fontSize?: number;
-    text?: string;
-    customProps?: CustomProps;
-  },
-  maxWidth?: number | null,
-) => {
+export const measureTextElement = function (element, next, maxWidth) {
   const map = getCustomMethods(element.subtype);
   if (map) {
     return map.measureText(element, next, maxWidth);
@@ -85,23 +74,12 @@ export const measureTextElement = (
     getFontString({ fontSize, fontFamily: element.fontFamily }),
     maxWidth,
   );
-};
+} as CustomMethods["measureText"];
 
-export const wrapTextElement = (
-  element: Pick<
-    ExcalidrawTextElement,
-    "subtype" | "customProps" | "fontSize" | "fontFamily" | "originalText"
-  >,
-  containerWidth: number,
-  next?: {
-    fontSize?: number;
-    text?: string;
-    customProps?: CustomProps;
-  },
-): string => {
+export const wrapTextElement = function (element, containerWidth, next) {
   const map = getCustomMethods(element.subtype);
   if (map) {
-    return map.wrap(element, containerWidth, next);
+    return map.wrapText(element, containerWidth, next);
   }
 
   const fontSize = next?.fontSize ?? element.fontSize;
@@ -110,7 +88,7 @@ export const wrapTextElement = (
     getFontString({ fontSize, fontFamily: element.fontFamily }),
     containerWidth,
   );
-};
+} as CustomMethods["wrapText"];
 
 export const textWysiwyg = ({
   id,
