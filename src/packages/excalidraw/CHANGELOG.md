@@ -19,6 +19,8 @@ Please add the latest change on the top under the correct section.
 
 - Plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code. [#3915](https://github.com/excalidraw/excalidraw/pull/3915).
 
+- Added support for supplying user `id` in the Collaborator object (see `collaborators` in [`updateScene()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene)), which will be used to deduplicate users when rendering collaborator avatar list. Cursors will still be rendered for every user. [#5309](https://github.com/excalidraw/excalidraw/pull/5309)
+
 - Export API to [set](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#setCursor) and [reset](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#resetCursor) mouse cursor on the canvas [#5215](https://github.com/excalidraw/excalidraw/pull/5215).
 
 - Export [`sceneCoordsToViewportCoords`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) and [`viewportCoordsToSceneCoords`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) utilities [#5187](https://github.com/excalidraw/excalidraw/pull/5187).
