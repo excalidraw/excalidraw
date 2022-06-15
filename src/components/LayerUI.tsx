@@ -370,7 +370,7 @@ const LayerUI = ({
                       setAppState={setAppState}
                     />
                   </Stack.Row>
-                  {deviceType.isFloatingMenu && libraryMenu}
+                  {!isInsideSidebar && libraryMenu}
                 </Stack.Col>
               )}
             </Section>
