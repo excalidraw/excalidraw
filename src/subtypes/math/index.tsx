@@ -1303,7 +1303,7 @@ const registerActionsMath = () => {
         commitToHistory: true,
       };
     },
-    keyTest: (event) => event.key === "KeyM",
+    keyTest: (event) => event.code === "KeyM",
     PanelComponent: ({ elements, appState, updateData, data }) => (
       <ToolButton
         type="icon"
