@@ -25,7 +25,6 @@ import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
 import { HelpDialog } from "./HelpDialog";
 import Stack from "./Stack";
-import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { JSONExportDialog } from "./JSONExportDialog";
@@ -60,7 +59,10 @@ interface LayerUIProps {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderCustomFooter?: (
+    isMobile: boolean,
+    appState: AppState,
+  ) => JSX.Element | null;
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   UIOptions: AppProps["UIOptions"];
@@ -393,22 +395,10 @@ const LayerUI = ({
               },
             )}
           >
-            <UserList>
-              {appState.collaborators.size > 0 &&
-                Array.from(appState.collaborators)
-                  // Collaborator is either not initialized or is actually the current user.
-                  .filter(([_, client]) => Object.keys(client).length !== 0)
-                  .map(([clientId, client]) => (
-                    <Tooltip
-                      label={client.username || "Unknown user"}
-                      key={clientId}
-                    >
-                      {actionManager.renderAction("goToCollaborator", {
-                        id: clientId,
-                      })}
-                    </Tooltip>
-                  ))}
-            </UserList>
+            <UserList
+              collaborators={appState.collaborators}
+              actionManager={actionManager}
+            />
           </div>
         </div>
       </FixedSideContainer>
