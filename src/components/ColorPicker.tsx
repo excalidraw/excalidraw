@@ -147,15 +147,14 @@ const Picker = ({
       const isRTL = getLanguage().rtl;
       let isCustom = false;
       let index = Array.prototype.indexOf.call(
-        gallery.current!.querySelector(".color-picker-content--default")!
-          .children,
+        gallery.current!.querySelector(".color-picker-content--default")
+          ?.children,
         activeElement,
       );
       if (index === -1) {
         index = Array.prototype.indexOf.call(
-          gallery.current!.querySelector(
-            ".color-picker-content--canvas-colors",
-          )!.children,
+          gallery.current!.querySelector(".color-picker-content--canvas-colors")
+            ?.children,
           activeElement,
         );
         if (index !== -1) {
