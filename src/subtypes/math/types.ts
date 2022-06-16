@@ -1,31 +1,26 @@
 import { ActionName } from "../../actions/types";
 import { getShortcutKey } from "../../utils";
-export const SUBTYPE_MATH = "math";
-export { SUBTYPE_MATH_ICON } from "./icon";
 
+export const mathSubtype = "math";
 export const mathProps = [
   { useTex: true, mathOnly: false } as { useTex: boolean; mathOnly: boolean },
 ] as const;
-
-export const mathActionName = [
-  "changeUseTex",
-  "changeMathOnly",
-  SUBTYPE_MATH,
-] as const;
-export type MathActionName = typeof mathActionName[number];
-
 export const mathDisabledActions = [
-  { subtype: SUBTYPE_MATH, actions: ["changeFontFamily"] } as {
-    subtype: typeof SUBTYPE_MATH;
+  { subtype: mathSubtype, actions: ["changeFontFamily"] } as {
+    subtype: typeof mathSubtype;
     actions: ActionName[];
   },
 ] as const;
-export type MathDisabledActions = typeof mathDisabledActions[number];
-
-type MathShortcutName = typeof mathShortcutName[number];
+export const mathActionName = [
+  "changeUseTex",
+  "changeMathOnly",
+  mathSubtype,
+] as const;
 export const mathShortcutName = ["changeUseTex", "changeMathOnly"] as const;
-
-export const mathShortcutMap: Record<MathShortcutName, string[]> = {
+export const mathShortcutMap: Record<
+  typeof mathShortcutName[number],
+  string[]
+> = {
   changeUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
   changeMathOnly: [getShortcutKey("CtrlOrCmd+Shift+O")],
 };

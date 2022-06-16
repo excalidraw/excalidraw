@@ -22,11 +22,9 @@ import {
   NonDeleted,
 } from "../../element/types";
 import { newElementWith } from "../../element/mutateElement";
-import { addCustomActions } from "../";
-import { registerAuxLangData } from "../../i18n";
 
 // Imports for actions
-import { t } from "../../i18n";
+import { t, registerAuxLangData } from "../../i18n";
 import { Action } from "../../actions/types";
 import { AppState } from "../../types";
 import { changeProperty, getFormValue } from "../../actions/actionProperties";
@@ -36,20 +34,18 @@ import { ButtonSelect } from "../../components/ButtonSelect";
 import { ToolButton } from "../../components/ToolButton";
 import clsx from "clsx";
 
-import { CustomMethods } from "../";
-
-import { SUBTYPE_MATH_ICON } from "./icon";
-
-import { mathProps, SUBTYPE_MATH } from "./types";
+// Subtype imports
+import { addCustomActions, CustomMethods } from "../";
+import { mathSubtypeIcon } from "./icon";
+import { mathProps, mathSubtype } from "./types";
 
 type MathProps = typeof mathProps[number];
-
 const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;
 
 // Begin exports
 type ExcalidrawMathElement = ExcalidrawTextElement &
   Readonly<{
-    subtype: typeof SUBTYPE_MATH;
+    subtype: typeof mathSubtype;
     customProps: MathProps;
   }>;
 
@@ -59,7 +55,7 @@ const isMathElement = (
   return (
     isTextElement(element) &&
     "subtype" in element &&
-    element.subtype === SUBTYPE_MATH
+    element.subtype === mathSubtype
   );
 };
 
@@ -1085,7 +1081,7 @@ export const registerCustomSubtype = (
   methods.renderSvg = renderSvgMathElement;
   methods.wrapText = wrapMathElement;
   registerActionsMath();
-  registerAuxLangData(`./subtypes/${SUBTYPE_MATH}`);
+  registerAuxLangData(`./subtypes/${mathSubtype}`);
   // Call loadMathJax() here if we want to be sure it's loaded.
 };
 
@@ -1282,8 +1278,8 @@ const registerActionsMath = () => {
     name: "math",
     trackEvent: false,
     perform: (elements, appState) => {
-      const mathInactive = appState.customSubtype !== SUBTYPE_MATH;
-      const customSubtype = mathInactive ? SUBTYPE_MATH : undefined;
+      const mathInactive = appState.customSubtype !== mathSubtype;
+      const customSubtype = mathInactive ? mathSubtype : undefined;
       const activeTool = !mathInactive
         ? appState.activeTool
         : updateActiveTool(appState, { type: "text" });
@@ -1307,16 +1303,16 @@ const registerActionsMath = () => {
     PanelComponent: ({ elements, appState, updateData, data }) => (
       <ToolButton
         type="icon"
-        icon={SUBTYPE_MATH_ICON.call(this, { theme: appState.theme })}
+        icon={mathSubtypeIcon.call(this, { theme: appState.theme })}
         selected={
-          appState.customSubtype && appState.customSubtype === SUBTYPE_MATH
+          appState.customSubtype && appState.customSubtype === mathSubtype
         }
         className={clsx({
           selected:
-            appState.customSubtype && appState.customSubtype === SUBTYPE_MATH,
+            appState.customSubtype && appState.customSubtype === mathSubtype,
         })}
-        title={`${t(`toolBar.${SUBTYPE_MATH}`)}-${getShortcutKey("M")}`}
-        aria-label={t(`toolBar.${SUBTYPE_MATH}`)}
+        title={`${t(`toolBar.${mathSubtype}`)} - ${getShortcutKey("M")}`}
+        aria-label={t(`toolBar.${mathSubtype}`)}
         onClick={() => {
           updateData(null);
         }}

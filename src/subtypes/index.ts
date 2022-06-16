@@ -20,23 +20,19 @@ import {
   mathProps,
   mathShortcutMap,
   mathShortcutName,
-  SUBTYPE_MATH,
-  SUBTYPE_MATH_ICON,
+  mathSubtype,
 } from "./math/types";
 
-const customSubtype = [SUBTYPE_MATH] as const;
+const customSubtype = [mathSubtype] as const;
 const customProps = [...mathProps] as const;
-const customShortcutName = [...mathShortcutName] as const;
 const disabledActions = [...mathDisabledActions] as DisabledActions[];
 const customActionName = [...mathActionName] as const;
+const customShortcutName = [...mathShortcutName] as const;
 
 // Custom Shortcuts
 export const customShortcutMap: Record<CustomShortcutName, string[]> = {
   ...mathShortcutMap,
 };
-
-// Custom Icons
-export const CUSTOM_SUBTYPE_ICONS = [SUBTYPE_MATH_ICON] as const;
 
 // End adding subtype imports here
 
