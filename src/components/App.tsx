@@ -861,10 +861,7 @@ class App extends React.Component<AppProps, AppState> {
             (height < MQ_MAX_HEIGHT_LANDSCAPE &&
               width < MQ_MAX_WIDTH_LANDSCAPE),
         });
-        this.canDeviceFitSidebar =
-          width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT
-          // (height > MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE &&
-          //   width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE);
+        this.canDeviceFitSidebar = width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT;
         // refresh offsets
         // ---------------------------------------------------------------------
         this.updateDOMRect();
