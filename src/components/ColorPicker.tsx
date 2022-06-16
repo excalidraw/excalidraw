@@ -180,6 +180,8 @@ const Picker = ({
       event.preventDefault();
     } else if (
       keyBindings.includes(event.key.toLowerCase()) &&
+      !event[KEYS.CTRL_OR_CMD] &&
+      !event.altKey &&
       !isWritableElement(event.target)
     ) {
       const index = keyBindings.indexOf(event.key.toLowerCase());
