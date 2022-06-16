@@ -358,6 +358,7 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
       showHyperlinkPopup: false,
+      isLibraryMenuDocked: false,
     };
 
     this.id = nanoid();
@@ -547,6 +548,7 @@ class App extends React.Component<AppProps, AppState> {
               id={this.id}
               onImageAction={this.onImageAction}
               isInsideSidebar={this.isInsideSidebar}
+              canDeviceFitSidebar={this.canDeviceFitSidebar}
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
@@ -860,9 +862,9 @@ class App extends React.Component<AppProps, AppState> {
               width < MQ_MAX_WIDTH_LANDSCAPE),
         });
         this.canDeviceFitSidebar =
-          width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT ||
-          (height > MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE &&
-            width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE);
+          width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT
+          // (height > MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE &&
+          //   width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE);
         // refresh offsets
         // ---------------------------------------------------------------------
         this.updateDOMRect();
@@ -1478,7 +1480,7 @@ class App extends React.Component<AppProps, AppState> {
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          isLibraryOpen: this.canDeviceFitSidebar,
+          isLibraryOpen: this.state.isLibraryMenuDocked,
           selectedElementIds: newElements.reduce((map, element) => {
             if (!isBoundToContainer(element)) {
               map[element.id] = true;

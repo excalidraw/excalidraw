@@ -110,7 +110,7 @@ export const LibraryMenu = ({
     if ((event.target as Element).closest(".ToolIcon__library")) {
       return;
     }
-    if (!isInsideSidebar) {
+    if (!appState.isLibraryMenuDocked) {
       onClose();
     }
   });
@@ -277,6 +277,7 @@ export const LibraryMenu = ({
         onInsertLibraryItems={onInsertLibraryItems}
         pendingElements={pendingElements}
         setAppState={setAppState}
+        appState={appState}
         libraryReturnUrl={libraryReturnUrl}
         library={library}
         theme={theme}

@@ -22,6 +22,10 @@
   }
 }
 
+.sidebar_lock_btn {
+  @include toolbarButtonColorStates;
+}
+
 .excalidraw {
   .App-toolbar-container {
     .ToolIcon_type_floating {

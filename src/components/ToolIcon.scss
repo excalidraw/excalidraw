@@ -125,6 +125,10 @@
       }
     }
 
+    &:not(.ToolIcon_toggle_opaque):checked + .side_lock_icon {
+      background-color: var(--color-primary);
+    }
+
     &:focus-visible + .ToolIcon__icon {
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
     }

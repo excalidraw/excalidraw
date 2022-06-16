@@ -160,6 +160,7 @@ export type AppState = {
   offsetLeft: number;
 
   isLibraryOpen: boolean;
+  isLibraryMenuDocked: boolean;
   fileHandle: FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;

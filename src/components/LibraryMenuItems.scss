@@ -4,7 +4,7 @@
   .library-menu-items-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 95vh;
     background-color: var(--island-bg-color);
     border-left: 1px solid $oc-blue-5;
 
@@ -106,7 +106,6 @@
       color: var(--text-primary-color);
     }
     .library_items_add {
-      margin-bottom: 1.5rem;
       a {
         border-radius: var(--border-radius-lg);
         background-color: var(--color-primary);

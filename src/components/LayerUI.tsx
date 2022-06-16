@@ -69,6 +69,7 @@ interface LayerUIProps {
   id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   isInsideSidebar: boolean;
+  canDeviceFitSidebar: boolean;
 }
 const LayerUI = ({
   actionManager,
@@ -96,6 +97,7 @@ const LayerUI = ({
   id,
   onImageAction,
   isInsideSidebar,
+  canDeviceFitSidebar,
 }: LayerUIProps) => {
   const deviceType = useDeviceType();
 
@@ -296,6 +298,7 @@ const LayerUI = ({
 
   const renderLibrarySidebar = () => {
     return <div className="layerUI_sidebar">{libraryMenu}</div>;
+    // return <div className="">{libraryMenu}</div>;
   };
 
   const renderFixedSideContainer = () => {
@@ -316,6 +319,9 @@ const LayerUI = ({
               : renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
+          {!canDeviceFitSidebar && (
+            <div className="layerUI_medium_sidebar">{libraryMenu}</div>
+          )}
           {!viewModeEnabled && (
             <Section heading="shapes">
               {(heading) => (
@@ -370,7 +376,6 @@ const LayerUI = ({
                       setAppState={setAppState}
                     />
                   </Stack.Row>
-                  {!isInsideSidebar && libraryMenu}
                 </Stack.Col>
               )}
             </Section>

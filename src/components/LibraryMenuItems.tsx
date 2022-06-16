@@ -25,6 +25,8 @@ import { MIME_TYPES, VERSIONS } from "../constants";
 import Spinner from "./Spinner";
 import { fileOpen } from "../data/filesystem";
 
+import { SidebarLockButton } from "./SidebarLockButton";
+
 const LibraryMenuItems = ({
   isLoading,
   libraryItems,
@@ -34,6 +36,7 @@ const LibraryMenuItems = ({
   pendingElements,
   theme,
   setAppState,
+  appState,
   libraryReturnUrl,
   library,
   files,
@@ -53,6 +56,7 @@ const LibraryMenuItems = ({
   theme: AppState["theme"];
   files: BinaryFiles;
   setAppState: React.Component<any, AppState>["setState"];
+  appState: AppState;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   library: Library;
   id: string;
@@ -90,7 +94,6 @@ const LibraryMenuItems = ({
   }, [selectedItems, onRemoveFromLibrary, resetLibrary]);
 
   const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
-
   const isMobile = useDeviceType().isMobile;
   const renderLibraryActions = () => {
     const itemsSelected = !!selectedItems.length;
@@ -200,7 +203,7 @@ const LibraryMenuItems = ({
     );
   };
 
-  const CELLS_PER_ROW = isInsideSidebar ? 4 : 5;
+  const CELLS_PER_ROW = 4;
 
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;
@@ -357,32 +360,32 @@ const LibraryMenuItems = ({
     (item) => item.status === "published",
   );
 
-  const CLOSE_ICON = (
-    <svg viewBox="0 0 128 128">
-      <path
-        fill="#FFFFFF"
-        d="M81.5879028,64 L125.605715,19.9821876 C128.751004,16.8368988 128.754391,11.5017055 125.465832,8.21314718 L119.786853,2.53416752 C116.427547,-0.825138422 111.229116,-0.817018406 108.017812,2.39428484 L64,46.4120972 L19.9821876,2.39428484 C16.8368988,-0.751003978 11.5017055,-0.7543908 8.21314718,2.53416752 L2.53416752,8.21314718 C-0.825138422,11.5724531 -0.817018406,16.7708844 2.39428484,19.9821876 L46.4120972,64 L2.39428484,108.017812 C-0.751003978,111.163101 -0.7543908,116.498295 2.53416752,119.786853 L8.21314718,125.465832 C11.5724531,128.825138 16.7708844,128.817018 19.9821876,125.605715 L64,81.5879028 L108.017812,125.605715 C111.163101,128.751004 116.498295,128.754391 119.786853,125.465832 L125.465832,119.786853 C128.825138,116.427547 128.817018,111.229116 125.605715,108.017812 L81.5879028,64 L81.5879028,64 Z"
-      ></path>
-    </svg>
-  );
-
   const renderLibraryHeader = () => {
     return (
       <>
         <div className="layer-ui__library-header" key="library-header">
           {renderLibraryActions()}
-          {isInsideSidebar && (
-            <div className="ToolIcon__icon__close">
-              <button onClick={() => setAppState({ isLibraryOpen: false })}>
-                <div className="close_icon">{CLOSE_ICON}</div>
-              </button>
-            </div>
+          {!isMobile && (
+            <>
+              <div className="sidebar_lock_btn">
+                <SidebarLockButton
+                  title="toolBar.lock"
+                  name="lock"
+                  checked={appState.isLibraryMenuDocked}
+                  onChange={() =>
+                    setAppState({
+                      isLibraryMenuDocked: !appState.isLibraryMenuDocked,
+                    })
+                  }
+                />
+              </div>
+            </>
           )}
         </div>
         <div className="library_url">
           {isLoading && !isInsideSidebar ? (
             <Spinner />
-          ) : !isInsideSidebar ? (
+          ) : isMobile ? (
             <a
               href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
                 window.name || "_blank"
@@ -431,7 +434,7 @@ const LibraryMenuItems = ({
       <div className="library_items_add">
         {isLoading ? (
           <Spinner />
-        ) : isInsideSidebar ? (
+        ) : !isMobile ? (
           <a
             href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
               window.name || "_blank"
@@ -447,19 +450,28 @@ const LibraryMenuItems = ({
     );
   };
 
+  const mobileStyles = {
+    height: "50vh",
+    boxShadow: "none",
+    borderLeft: "none",
+  };
+  const nonMobileMediumScreenStyles = { height: "85vh" };
+
   return (
     <div
       className="library-menu-items-container"
       style={
-        !isInsideSidebar
-          ? { height: "50vh", boxShadow: "none", borderLeft: "none" }
+        isMobile
+          ? mobileStyles
+          : !isInsideSidebar
+          ? nonMobileMediumScreenStyles
           : {}
       }
     >
       {showRemoveLibAlert && renderRemoveLibAlert()}
       {renderLibraryHeader()}
       {renderLibraryMenuItems()}
-      {isInsideSidebar && renderLibraryFooter()}
+      {!isMobile && renderLibraryFooter()}
     </div>
   );
 };
