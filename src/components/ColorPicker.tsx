@@ -128,7 +128,9 @@ const Picker = ({
   }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
+    let handled = false;
     if (event.key === KEYS.TAB) {
+      handled = true;
       const { activeElement } = document;
       if (event.shiftKey) {
         if (activeElement === firstItem.current) {
@@ -140,6 +142,7 @@ const Picker = ({
         event.preventDefault();
       }
     } else if (isArrowKey(event.key)) {
+      handled = true;
       const { activeElement } = document;
       const isRTL = getLanguage().rtl;
       let isCustom = false;
@@ -184,6 +187,7 @@ const Picker = ({
       !event.altKey &&
       !isWritableElement(event.target)
     ) {
+      handled = true;
       const index = keyBindings.indexOf(event.key.toLowerCase());
       const isCustom = index >= MAX_DEFAULT_COLORS;
       const parentElement = isCustom
@@ -198,11 +202,14 @@ const Picker = ({
 
       event.preventDefault();
     } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
+      handled = true;
       event.preventDefault();
       onClose();
     }
-    event.nativeEvent.stopImmediatePropagation();
-    event.stopPropagation();
+    if (handled) {
+      event.nativeEvent.stopImmediatePropagation();
+      event.stopPropagation();
+    }
   };
 
   const renderColors = (colors: Array<string>, custom: boolean = false) => {
