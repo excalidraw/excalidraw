@@ -1473,7 +1473,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
-    
+
     this.setState(
       selectGroupsForSelectedElements(
         {
