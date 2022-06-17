@@ -4,9 +4,9 @@
   .library-menu-items-container {
     display: flex;
     flex-direction: column;
-    height: 95vh;
+    height: 100vh;
     background-color: var(--island-bg-color);
-    border-left: 1px solid $oc-blue-5;
+    box-shadow: var(--shadow-island);  
 
     padding: 0.5rem;
     .library-actions {
@@ -96,7 +96,7 @@
     &__items {
       flex: 1;
       overflow-y: scroll;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .separator {
@@ -106,10 +106,10 @@
       color: var(--text-primary-color);
     }
     .library_items_add {
+      margin-bottom: 1.5rem;
       a {
         border-radius: var(--border-radius-lg);
         background-color: var(--color-primary);
-        // margin-top: 20px;
         padding: 10px 78px;
         color: var(--default-bg-color);
         text-decoration: none;

@@ -320,7 +320,7 @@ const LayerUI = ({
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
           {!canDeviceFitSidebar && (
-            <div className="layerUI_medium_sidebar">{libraryMenu}</div>
+            <div className="layerUI_sidebar">{libraryMenu}</div>
           )}
           {!viewModeEnabled && (
             <Section heading="shapes">

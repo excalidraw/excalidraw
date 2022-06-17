@@ -110,7 +110,7 @@ export const LibraryMenu = ({
     if ((event.target as Element).closest(".ToolIcon__library")) {
       return;
     }
-    if (!appState.isLibraryMenuDocked) {
+    if (!appState.isLibraryMenuDocked || !isInsideSidebar) {
       onClose();
     }
   });

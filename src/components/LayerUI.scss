@@ -15,21 +15,13 @@
   }
 
   .ToolIcon__icon__close {
-    button {
-      border-radius: var(--border-radius-md);
-      background-color: var(--color-primary);
-      .close_icon {
-        height: 1.8rem;
-        width: 1.8rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        svg {
-          height: 1.3rem;
-        }
-      }
-      &:hover {
-        background-color: var(--color-primary-darker);
+    .Modal__close {
+      height: calc(var(--space-factor) * 6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      svg {
+        height: calc(var(--space-factor) * 3);
       }
     }
   }

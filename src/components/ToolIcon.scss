@@ -117,7 +117,7 @@
     position: absolute;
     opacity: 0;
     pointer-events: none;
-
+    
     &:not(.ToolIcon_toggle_opaque):checked + .ToolIcon__icon {
       background-color: var(--button-gray-2);
       &:active {

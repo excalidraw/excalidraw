@@ -1473,11 +1473,14 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
+    
     this.setState(
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          isLibraryOpen: this.state.isLibraryMenuDocked,
+          isLibraryOpen: this.isInsideSidebar
+            ? this.state.isLibraryMenuDocked
+            : false,
           selectedElementIds: newElements.reduce((map, element) => {
             if (!isBoundToContainer(element)) {
               map[element.id] = true;
