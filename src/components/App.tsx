@@ -5885,10 +5885,10 @@ if (
     elements: {
       configurable: true,
       get() {
-        return this.app.scene.getElementsIncludingDeleted();
+        return this.app?.scene.getElementsIncludingDeleted();
       },
       set(elements: ExcalidrawElement[]) {
-        return this.app.scene.replaceAllElements(elements);
+        return this.app?.scene.replaceAllElements(elements);
       },
     },
   });
