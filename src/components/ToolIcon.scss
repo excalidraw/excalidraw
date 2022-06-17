@@ -161,6 +161,13 @@
       width: 2rem;
       height: 2rem;
     }
+    .side_lock_icon {
+      height: 2.5rem;
+      width: 2.5rem;
+      svg {
+        height: 1.5em;
+      }
+    }
   }
 
   .ToolIcon__keybinding {
