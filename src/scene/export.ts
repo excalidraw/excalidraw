@@ -11,6 +11,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
+import { ensureSubtypesLoaded } from "../subtypes";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -182,10 +183,12 @@ export const exportToSvg = async (
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
-    offsetX: -minX + exportPadding,
-    offsetY: -minY + exportPadding,
-    exportWithDarkMode: appState.exportWithDarkMode,
+  ensureSubtypesLoaded(elements, () => {
+    renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
+      offsetX: -minX + exportPadding,
+      offsetY: -minY + exportPadding,
+      exportWithDarkMode: appState.exportWithDarkMode,
+    });
   });
 
   return svgRoot;

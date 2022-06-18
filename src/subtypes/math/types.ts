@@ -1,7 +1,8 @@
 import { ActionName } from "../../actions/types";
 import { getShortcutKey } from "../../utils";
 
-export const mathSubtype = "math";
+export const mathSubtype = "math" as const;
+export const mathParentType = "text" as const;
 export const mathProps = [
   { useTex: true, mathOnly: false } as { useTex: boolean; mathOnly: boolean },
 ] as const;

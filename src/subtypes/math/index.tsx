@@ -22,6 +22,7 @@ import {
   NonDeleted,
 } from "../../element/types";
 import { newElementWith } from "../../element/mutateElement";
+import { getElementAbsoluteCoords } from "../../element/bounds";
 
 // Imports for actions
 import { t, registerAuxLangData } from "../../i18n";
@@ -109,6 +110,7 @@ const mathJax = {} as {
   texHtml: any;
 };
 
+let stopLoadingMathJax = false;
 let mathJaxLoaded = false;
 let mathJaxLoading = false;
 let mathJaxLoadedCallback: ((isCustomSubtype: Function) => void) | undefined;
@@ -116,13 +118,16 @@ let mathJaxLoadedCallback: ((isCustomSubtype: Function) => void) | undefined;
 let errorSvg: string;
 
 const loadMathJax = async () => {
-  if (
+  const shouldLoad =
     !mathJaxLoaded &&
     !mathJaxLoading &&
     (mathJax.adaptor === undefined ||
       mathJax.amHtml === undefined ||
-      mathJax.texHtml === undefined)
-  ) {
+      mathJax.texHtml === undefined);
+  if (!shouldLoad && !mathJaxLoaded) {
+    stopLoadingMathJax = true;
+  }
+  if (!mathJaxLoaded) {
     mathJaxLoading = true;
 
     // MathJax components we use
@@ -163,10 +168,6 @@ const loadMathJax = async () => {
       await import("mathjax-full/js/adaptors/lite/Document.js")
     ).LiteDocument;
 
-    // Set up shared output components
-    mathJax.adaptor = liteAdaptor();
-    const svg = new SVG({ fontCache: "local" });
-
     // Configure AsciiMath to use the "display" option.  See
     // https://github.com/mathjax/MathJax/issues/2520#issuecomment-1128831182.
     const MathJax = (
@@ -174,28 +175,28 @@ const loadMathJax = async () => {
     ).MathJax;
     MathJax.InputJax.AsciiMath.AM.Augment({ displaystyle: false });
 
+    type E = typeof LiteElement;
+    type T = typeof LiteText;
+    type D = typeof LiteDocument;
+    if (stopLoadingMathJax) {
+      stopLoadingMathJax = false;
+      return;
+    }
+
+    // Set up shared output components
+    const svg = new SVG<E | T, T, D>({ fontCache: "local" });
+    const asciimath = new AsciiMath<E | T, T, D>({});
+    const tex = new TeX<E | T, T, D>({ packages: texPackages });
+
     // AsciiMath input
-    const asciimath = new AsciiMath<
-      typeof LiteElement | typeof LiteText,
-      typeof LiteText,
-      typeof LiteDocument
-    >({});
-    mathJax.amHtml = new HTMLDocument<
-      typeof LiteElement | typeof LiteText,
-      typeof LiteText,
-      typeof LiteDocument
-    >("", mathJax.adaptor, {
+    mathJax.adaptor = liteAdaptor();
+    mathJax.amHtml = new HTMLDocument<E | T, T, D>("", mathJax.adaptor, {
       InputJax: asciimath,
       OutputJax: svg,
     });
 
     // LaTeX input
-    const tex = new TeX({ packages: texPackages });
-    mathJax.texHtml = new HTMLDocument<
-      typeof LiteElement | typeof LiteText,
-      typeof LiteText,
-      typeof LiteDocument
-    >("", mathJax.adaptor, {
+    mathJax.texHtml = new HTMLDocument<E | T, T, D>("", mathJax.adaptor, {
       InputJax: tex,
       OutputJax: svg,
     });
@@ -688,17 +689,20 @@ const getSelectedMathElements = (
 };
 
 const cleanMathElementUpdate = function (updates) {
-  const newUpdates = {};
+  const oldUpdates = {};
   for (const key in updates) {
+    if (key !== "fontFamily") {
+      (oldUpdates as any)[key] = (updates as any)[key];
+    }
     if (key === "customProps") {
       const customProps = (updates as any)[key] as MathProps;
-      (newUpdates as any)[key] = getMathProps.ensureMathProps(customProps);
+      (updates as any)[key] = getMathProps.ensureMathProps(customProps);
     } else {
-      (newUpdates as any)[key] = (updates as any)[key];
+      (updates as any)[key] = (updates as any)[key];
     }
   }
-  (newUpdates as any).fontFamily = FONT_FAMILY_MATH;
-  return newUpdates;
+  (updates as any).fontFamily = FONT_FAMILY_MATH;
+  return oldUpdates;
 } as CustomMethods["clean"];
 
 const measureMathElement = function (element, next, maxWidth) {
@@ -828,7 +832,7 @@ const renderMathElement = function (element, context, renderCb) {
   );
 } as CustomMethods["render"];
 
-const renderSvgMathElement = function (svgRoot, root, element) {
+const renderSvgMathElement = function (svgRoot, root, element, opt) {
   const isMathJaxLoaded = mathJaxLoaded;
 
   const _element = element as NonDeleted<ExcalidrawMathElement>;
@@ -838,8 +842,19 @@ const renderSvgMathElement = function (svgRoot, root, element) {
   const strokeColor = _element.strokeColor;
   const textAlign = _element.textAlign;
   const opacity = _element.opacity / 100;
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x2 - x1) / 2 - (element.x - x1);
+  const cy = (y2 - y1) / 2 - (element.y - y1);
+  const degree = (180 * element.angle) / Math.PI;
 
   const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+  node.setAttribute(
+    "transform",
+    `translate(${opt?.offsetX || 0} ${
+      opt?.offsetY || 0
+    }) rotate(${degree} ${cx} ${cy})`,
+  );
+
   const key = getCacheKey(
     text,
     fontSize,
@@ -861,8 +876,10 @@ const renderSvgMathElement = function (svgRoot, root, element) {
   groupNode.setAttribute("font-family", `${font}`);
   groupNode.setAttribute("font-size", `${fontSize}px`);
   groupNode.setAttribute("color", `${strokeColor}`);
-  groupNode.setAttribute("stroke-opacity", `${opacity}`);
-  groupNode.setAttribute("fill-opacity", `${opacity}`);
+  if (opacity !== 1) {
+    groupNode.setAttribute("stroke-opacity", `${opacity}`);
+    groupNode.setAttribute("fill-opacity", `${opacity}`);
+  }
   tempSvg.appendChild(groupNode);
 
   const { width, height } = getImageMetrics(
@@ -1076,6 +1093,7 @@ export const registerCustomSubtype = (
   // calls loadMathJax().
   mathJaxLoadedCallback = onSubtypesLoaded;
   methods.clean = cleanMathElementUpdate;
+  methods.ensureLoaded = ensureMathJaxLoaded;
   methods.measureText = measureMathElement;
   methods.render = renderMathElement;
   methods.renderSvg = renderSvgMathElement;
@@ -1084,6 +1102,13 @@ export const registerCustomSubtype = (
   registerAuxLangData(`./subtypes/${mathSubtype}`);
   // Call loadMathJax() here if we want to be sure it's loaded.
 };
+
+const ensureMathJaxLoaded = async function (callback) {
+  await loadMathJax();
+  if (callback) {
+    callback();
+  }
+} as CustomMethods["ensureLoaded"];
 
 const enableActionChangeMathProps = (
   elements: readonly ExcalidrawElement[],
@@ -1178,8 +1203,7 @@ const registerActionsMath = () => {
               const el = hasBoundTextElement(element)
                 ? getBoundTextElement(element)
                 : element;
-              const useTex = getMathProps.getUseTex(appState);
-              return isMathElement(el) && (el.customProps?.useTex ?? useTex);
+              return isMathElement(el) ? el.customProps?.useTex : null;
             },
             getMathProps.getUseTex(appState),
           )}
@@ -1260,10 +1284,7 @@ const registerActionsMath = () => {
               const el = hasBoundTextElement(element)
                 ? getBoundTextElement(element)
                 : element;
-              const mathOnly = getMathProps.getMathOnly(appState);
-              return (
-                isMathElement(el) && (el.customProps?.mathOnly ?? mathOnly)
-              );
+              return isMathElement(el) ? el.customProps?.mathOnly : null;
             },
             getMathProps.getMathOnly(appState),
           )}

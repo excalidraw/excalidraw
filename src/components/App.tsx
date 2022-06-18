@@ -1381,7 +1381,7 @@ class App extends React.Component<AppProps, AppState> {
       // (something something security)
       let file = event?.clipboardData?.files[0];
 
-      const data = await parseClipboard(event);
+      const data = await parseClipboard(event, this.state);
 
       if (!file && data.text) {
         const string = data.text.trim();
