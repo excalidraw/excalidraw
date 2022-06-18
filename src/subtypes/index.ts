@@ -89,17 +89,20 @@ export const isActionEnabled = (
     ? [appState.editingElement, ...selectedElements]
     : selectedElements;
   let enabled = chosen.some((el) =>
-    customParents.some(
-      (parent) =>
-        el.type === parent.parentType &&
-        el.subtype === undefined &&
-        !customActionNames.includes(actionName as CustomActionName),
-    ),
+    customParents.some((parent) => {
+      const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
+      return (
+        ((el.type === parent.parentType && el.subtype === undefined) ||
+          (e.type === parent.parentType && e.subtype === undefined)) &&
+        !customActionNames.includes(actionName as CustomActionName)
+      );
+    }),
   );
-  enabled ||=
-    chosen.length === 0 &&
-    (appState.customSubtype === undefined ||
-      isActionForSubtype(appState.customSubtype, actionName));
+  enabled =
+    enabled ||
+    (chosen.length === 0 &&
+      (appState.customSubtype === undefined ||
+        isActionForSubtype(appState.customSubtype, actionName)));
   !enabled &&
     chosen.forEach((el) => {
       const subtype = hasBoundTextElement(el)
