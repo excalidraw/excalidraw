@@ -8,6 +8,12 @@ import { exportToSvg } from "../scene/export";
 import { AppState, LibraryItem } from "../types";
 import { Dialog } from "./Dialog";
 import "./PasteChartDialog.scss";
+import { ensureSubtypesLoaded } from "../subtypes";
+import { isTextElement } from "../element";
+import {
+  getContainerElement,
+  redrawTextBoundingBox,
+} from "../element/textElement";
 
 type OnInsertChart = (chartType: ChartType, elements: ChartElements) => void;
 
@@ -33,7 +39,16 @@ const ChartPreviewBtn = (props: {
       0,
       0,
     );
-    setChartElements(elements);
+    (async () => {
+      await ensureSubtypesLoaded(elements, () => {
+        elements.forEach(
+          (el) =>
+            isTextElement(el) &&
+            redrawTextBoundingBox(el, getContainerElement(el)),
+        );
+        setChartElements(elements);
+      });
+    })();
     let svg: SVGSVGElement;
     const previewNode = previewRef.current!;
 

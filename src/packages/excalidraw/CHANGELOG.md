@@ -17,7 +17,9 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
-- Plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code. [#3915](https://github.com/excalidraw/excalidraw/pull/3915).
+- Render math notation using the MathJax library. Both standard Latex input and simplified AsciiMath input are supported. MathJax support is implemented as a `math` subtype of `ExcalidrawTextElement`.
+
+  Also added plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code. [#5311](https://github.com/excalidraw/excalidraw/pull/5311).
 
 - Added support for supplying user `id` in the Collaborator object (see `collaborators` in [`updateScene()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene)), which will be used to deduplicate users when rendering collaborator avatar list. Cursors will still be rendered for every user. [#5309](https://github.com/excalidraw/excalidraw/pull/5309)
 

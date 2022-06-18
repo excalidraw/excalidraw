@@ -24,7 +24,7 @@ import { getResizedElementAbsoluteCoords } from "./bounds";
 import { getContainerElement } from "./textElement";
 import { measureTextElement, wrapTextElement } from "./textWysiwyg";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
-import { getCustomMethods } from "../subtypes";
+import { getCustomMethods, isValidSubtype } from "../subtypes";
 
 export const delUndefinedProps = (obj: any, keys: string[]) => {
   keys.forEach((key) => {
@@ -33,6 +33,27 @@ export const delUndefinedProps = (obj: any, keys: string[]) => {
     }
   });
   return obj;
+};
+
+export const maybeGetCustom = (
+  obj: {
+    subtype?: ExcalidrawElement["subtype"];
+    customProps?: ExcalidrawElement["customProps"];
+  },
+  type: ExcalidrawElement["type"],
+) => {
+  const { subtype, customProps } = obj;
+  const custom = delUndefinedProps({ subtype, customProps }, [
+    "subtype",
+    "customProps",
+  ]);
+  if ("subtype" in custom && !isValidSubtype(custom.subtype, type)) {
+    delete custom.subtype;
+  }
+  if (!("subtype" in custom) && "customProps" in custom) {
+    delete custom.customProps;
+  }
+  return custom as typeof obj;
 };
 
 type ElementConstructorOpts = MarkOptional<
@@ -74,15 +95,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
   const { subtype, customProps } = rest;
-  const custom = delUndefinedProps({ subtype, customProps }, [
-    "subtype",
-    "customProps",
-  ]);
-  if (!("subtype" in custom) && "customProps" in custom) {
-    delete custom.customProps;
-  }
   const element = {
-    ...custom,
+    ...maybeGetCustom({ subtype, customProps }, type),
     id: rest.id || randomId(),
     type,
     x,

@@ -3,9 +3,6 @@ import { mutateElement } from "./mutateElement";
 import { API } from "../tests/helpers/api";
 import { FONT_FAMILY } from "../constants";
 import { isPrimitive } from "../utils";
-import { registerCustomSubtypes } from "../subtypes";
-
-registerCustomSubtypes();
 
 const assertCloneObjects = (source: any, clone: any) => {
   for (const key in clone) {

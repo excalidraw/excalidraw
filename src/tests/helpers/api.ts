@@ -13,21 +13,20 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
-import {
-  delUndefinedProps,
-  newFreeDrawElement,
-} from "../../element/newElement";
+import { maybeGetCustom, newFreeDrawElement } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { registerCustomSubtypes } from "../../subtypes";
-
-registerCustomSubtypes();
 
 const readFile = util.promisify(fs.readFile);
 
 const { h } = window;
 
 export class API {
+  constructor() {
+    registerCustomSubtypes();
+  }
+
   static setSelectedElements = (elements: ExcalidrawElement[]) => {
     h.setState({
       selectedElementIds: elements.reduce((acc, element) => {
@@ -122,16 +121,13 @@ export class API {
 
     const appState = h?.state || getDefaultAppState();
 
-    const custom = delUndefinedProps(
+    const custom = maybeGetCustom(
       {
         subtype: rest.subtype ?? appState.customSubtype,
         customProps: rest.customProps ?? appState.customProps,
       },
-      ["subtype", "customProps"],
+      type,
     );
-    if (!("subtype" in custom) && "customProps" in custom) {
-      delete custom.customProps;
-    }
     const base = {
       ...custom,
       x,

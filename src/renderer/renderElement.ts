@@ -867,7 +867,7 @@ export const renderElementToSvg = (
 
   const map = getCustomMethods(element.subtype);
   if (map) {
-    map.renderSvg(svgRoot, root, element);
+    map.renderSvg(svgRoot, root, element, { offsetX, offsetY });
     return;
   }
   switch (element.type) {
