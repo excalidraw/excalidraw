@@ -14,31 +14,38 @@ import { getBoundTextElement } from "../element/textElement";
 
 // Start adding subtype imports here
 
-const customSubtype = [] as const;
-const customParents = [
-  {} as { subtype: never, parentType: never },
-] as const;
-const customProps = [] as const;
-const disabledActions = [
-  {} as { subtype: never, actions: ActionName[] },
-] as const;
-const subtypeActions = [
-  {} as { subtype: never, actions: ActionName[] },
-] as const;
-const customActionName = [] as const;
-const customShortcutName = [] as const;
+const customSubtypes = [...[]] as const;
+const customParents = [...[]] as readonly {
+  subtype: CustomSubtype;
+  parentType: ExcalidrawElement["type"];
+}[];
+const customProps = [...[]] as const;
+const customActionNames = [...[]] as const;
+const customActions = [...[]] as readonly {
+  subtype: CustomSubtype;
+  actions: CustomActionName[];
+}[];
+const disabledActionNames = [...[]] as readonly ActionName[];
+const disabledActions = [...[]] as readonly {
+  subtype: CustomSubtype;
+  actions: DisabledActionName[];
+}[];
+const customShortcutNames = [...[]] as const;
 
 // Custom Shortcuts
-export const customShortcutMap: Record<CustomShortcutName, string[]> = {};
+export const customShortcutMap = { ...{} } as Record<
+  CustomShortcutName,
+  string[]
+>;
 
 // End adding subtype imports here
 
 // Types to export, union over all ExcalidrawElement subtypes
 
 // Custom Subtypes
-export type CustomSubtype = typeof customSubtype[number];
+export type CustomSubtype = typeof customSubtypes[number];
 export const getCustomSubtypes = (): readonly CustomSubtype[] => {
-  return customSubtype;
+  return customSubtypes;
 };
 export const isValidSubtype = (s: any, t: any): s is CustomSubtype =>
   customParents.find(
@@ -48,13 +55,92 @@ export const isValidSubtype = (s: any, t: any): s is CustomSubtype =>
 // Custom Properties
 export type CustomProps = typeof customProps[number];
 
-// Custom Shortcuts
-export type CustomShortcutName = typeof customShortcutName[number];
-export const isCustomShortcutName = (s: any): s is CustomShortcutName =>
-  customShortcutName.includes(s as CustomShortcutName);
-
 // Custom Actions
-export type CustomActionName = typeof customActionName[number];
+export type CustomActionName = typeof customActionNames[number];
+
+const customActionMap: Action[] = [];
+export const getCustomActions = (): readonly Action[] => {
+  return customActionMap;
+};
+
+const addCustomAction = (action: Action) => {
+  if (customActionMap.every((value) => value.name !== action.name)) {
+    const customName = action.name as CustomActionName;
+    if (customActionNames.includes(customName)) {
+      customActionMap.push(action);
+      register(action);
+    }
+  }
+};
+
+// Standard actions disabled by subtypes
+type DisabledActionName = typeof disabledActionNames[number];
+
+export const isActionEnabled = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  actionName: ActionName | CustomActionName,
+) => {
+  const selectedElements = getSelectedElements(
+    getNonDeletedElements(elements),
+    appState,
+  );
+  const chosen = appState.editingElement
+    ? [appState.editingElement, ...selectedElements]
+    : selectedElements;
+  let enabled = chosen.some((el) =>
+    customParents.some(
+      (parent) =>
+        el.type === parent.parentType &&
+        el.subtype === undefined &&
+        !customActionNames.includes(actionName as CustomActionName),
+    ),
+  );
+  enabled ||=
+    chosen.length === 0 &&
+    (appState.customSubtype === undefined ||
+      isActionForSubtype(appState.customSubtype, actionName));
+  !enabled &&
+    chosen.forEach((el) => {
+      const subtype = hasBoundTextElement(el)
+        ? getBoundTextElement(el)!.subtype
+        : el.subtype;
+      if (!enabled && isActionForSubtype(subtype, actionName)) {
+        enabled = true;
+      }
+    });
+  if (customSubtypes.includes(actionName as CustomSubtype)) {
+    enabled = true;
+  }
+  return enabled;
+};
+
+const isActionForSubtype = (
+  subtype: CustomSubtype | undefined,
+  action: ActionName | CustomActionName,
+) => {
+  const name = action as DisabledActionName;
+  const customName = action as CustomActionName;
+  if (subtype && customSubtypes.includes(subtype)) {
+    return (
+      !disabledActions // Not disabled by subtype
+        .find((value) => value.subtype === subtype)!
+        .actions.includes(name) ||
+      customActions // Added by subtype
+        .find((value) => value.subtype === subtype)!
+        .actions.includes(customName)
+    );
+  }
+  return (
+    !customActionNames.includes(customName) &&
+    !disabledActions.some((disabled) => disabled.actions.includes(name))
+  );
+};
+
+// Custom Shortcuts (for custom actions)
+export type CustomShortcutName = typeof customShortcutNames[number];
+export const isCustomShortcutName = (s: any): s is CustomShortcutName =>
+  customShortcutNames.includes(s as CustomShortcutName);
 
 // Return the shortcut by CustomShortcutName
 export const getCustomShortcutKey = (name: CustomShortcutName) => {
@@ -63,84 +149,6 @@ export const getCustomShortcutKey = (name: CustomShortcutName) => {
     shortcuts = customShortcutMap[name];
   }
   return shortcuts;
-};
-
-// Permit subtypes to disable actions for their ExcalidrawElement type
-export const isActionEnabled = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  actionName: ActionName | CustomActionName,
-) => {
-  let enabled = false;
-  const selectedElements = getSelectedElements(
-    getNonDeletedElements(elements),
-    appState,
-  );
-  const chosen = appState.editingElement
-    ? [appState.editingElement, ...selectedElements]
-    : selectedElements;
-  const standard =
-    chosen.some((el) =>
-      customParents.some(
-        (parent) =>
-          el.type === parent.parentType &&
-          el.subtype === undefined &&
-          !customActionName.includes(actionName as CustomActionName),
-      ),
-    ) ||
-    (chosen.length === 0 &&
-      (appState.customSubtype === undefined ||
-        isActionForSubtype(appState.customSubtype, actionName)));
-  chosen.forEach((el) => {
-    const subtype = hasBoundTextElement(el)
-      ? getBoundTextElement(el)!.subtype
-      : el.subtype;
-    if (isActionForSubtype(subtype, actionName)) {
-      enabled = true;
-    }
-  });
-  if (customSubtype.includes(actionName as CustomSubtype)) {
-    enabled = true;
-  }
-  return enabled || standard;
-};
-
-const isActionForSubtype = (
-  subtype: CustomSubtype | undefined,
-  action: ActionName | CustomActionName,
-) => {
-  const name = action as ActionName;
-  const customName = action as CustomActionName;
-  if (subtype && customSubtype.includes(subtype)) {
-    return (
-      !disabledActions // Not disabled by subtype
-        .find((value) => value.subtype === subtype)!
-        .actions.includes(name) ||
-      subtypeActions // Added by subtype
-        .find((value) => value.subtype === subtype)!
-        .actions.includes(customName)
-    );
-  }
-  return (
-    !customActionName.includes(customName) &&
-    !disabledActions.some((disabled) => disabled.actions.includes(name))
-  );
-};
-
-//Custom Actions
-const customActions: Action[] = [];
-
-export const addCustomActions = (actions: Action[]) => {
-  actions.forEach((action) => {
-    if (customActions.every((value) => value.name !== action.name)) {
-      customActions.push(action);
-      register(action);
-    }
-  });
-};
-
-export const getCustomActions = (): readonly Action[] => {
-  return customActions;
 };
 
 // Custom Methods
@@ -200,19 +208,23 @@ export const getCustomMethods = (subtype: CustomSubtype | undefined) => {
 };
 
 // Register all custom subtypes.  Each subtype must provide a
-// `registerCustomSubtype` method, which should call `addCustomActions`
-// if necessary.
+// `registerCustomSubtype` method, which should have these params:
+// - methods: CustomMethods
+// - addCustomAction: (action: Action) => void
+// - onSubtypeLoaded?: (isCustomSubtype: Function) => void
 export const registerCustomSubtypes = (
-  onSubtypesLoaded?: (isCustomSubtype: Function) => void,
+  onSubtypeLoaded?: (isCustomSubtype: Function) => void,
 ) => {
-  const subtypes = getCustomSubtypes();
+  const subtypes = customSubtypes;
   for (let index = 0; index < subtypes.length; index++) {
     const subtype = subtypes[index];
     if (!methodMaps.find((method) => method.subtype === subtype)) {
-      methodMaps.push({ subtype, methods: {} as CustomMethods });
+      const methods = {} as CustomMethods;
+      methodMaps.push({ subtype, methods });
       require(`./${subtypes[index]}/index`).registerCustomSubtype(
-        getCustomMethods(subtype),
-        onSubtypesLoaded,
+        methods,
+        addCustomAction,
+        onSubtypeLoaded,
       );
     }
   }
@@ -238,8 +250,8 @@ export const ensureSubtypesLoaded = async (
   for (let i = 0; i < subtypesUsed.length; i++) {
     const subtype = subtypesUsed[i];
     // Should be defined if registerCustomSubtypes() has run
-    const map = getCustomMethods(subtype);
-    await map!.ensureLoaded();
+    const map = getCustomMethods(subtype)!;
+    await map.ensureLoaded();
   }
   if (callback) {
     callback();
