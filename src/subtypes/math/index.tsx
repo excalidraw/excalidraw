@@ -36,7 +36,7 @@ import { ToolButton } from "../../components/ToolButton";
 import clsx from "clsx";
 
 // Subtype imports
-import { addCustomActions, CustomMethods } from "../";
+import { CustomMethods } from "../";
 import { mathSubtypeIcon } from "./icon";
 import { mathProps, mathSubtype } from "./types";
 
@@ -1087,18 +1087,19 @@ const wrapMathElement = function (element, containerWidth, next) {
 
 export const registerCustomSubtype = (
   methods: CustomMethods,
-  onSubtypesLoaded?: (isCustomSubtype: Function) => void,
+  addCustomAction: (action: Action) => void,
+  onSubtypeLoaded?: (isCustomSubtype: Function) => void,
 ) => {
   // Set the callback first just in case anything in this method
   // calls loadMathJax().
-  mathJaxLoadedCallback = onSubtypesLoaded;
+  mathJaxLoadedCallback = onSubtypeLoaded;
   methods.clean = cleanMathElementUpdate;
   methods.ensureLoaded = ensureMathJaxLoaded;
   methods.measureText = measureMathElement;
   methods.render = renderMathElement;
   methods.renderSvg = renderSvgMathElement;
   methods.wrapText = wrapMathElement;
-  registerActionsMath();
+  createMathActions().forEach((action) => addCustomAction(action));
   registerAuxLangData(`./subtypes/${mathSubtype}`);
   // Call loadMathJax() here if we want to be sure it's loaded.
 };
@@ -1130,7 +1131,7 @@ const enableActionChangeMathProps = (
   return enabled;
 };
 
-const registerActionsMath = () => {
+const createMathActions = () => {
   const mathActions: Action[] = [];
   const actionChangeUseTex: Action = {
     name: "changeUseTex",
@@ -1344,5 +1345,5 @@ const registerActionsMath = () => {
   mathActions.push(actionChangeUseTex);
   mathActions.push(actionChangeMathOnly);
   mathActions.push(actionMath);
-  addCustomActions(mathActions);
+  return mathActions;
 };
