@@ -4,11 +4,11 @@
   .library-menu-items-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100%;
     background-color: var(--island-bg-color);
-    box-shadow: var(--shadow-island);
-
     padding: 0.5rem;
+    box-sizing: border-box;
+
     .library-actions {
       display: flex;
       margin-right: auto;
@@ -106,9 +106,10 @@
       margin: 0.6em 0.2em;
       color: var(--text-primary-color);
     }
+
     .library_items_add {
-      margin-bottom: 1.5rem;
       a {
+        display: block;
         border-radius: var(--border-radius-lg);
         background-color: var(--color-primary);
         padding: 10px 78px;

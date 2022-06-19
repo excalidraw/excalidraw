@@ -5,7 +5,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: auto;
 
     .layer-ui__library-header {
       display: flex;
@@ -27,6 +26,16 @@
         padding-inline-end: 18px;
         white-space: nowrap;
       }
+    }
+  }
+
+  .layer-ui__sidebar {
+    .layer-ui__library {
+      padding: 0;
+      height: 100%;
+    }
+    .library-menu-items-container {
+      height: 100%;
     }
   }
 

@@ -2,8 +2,15 @@
 
 .layer-ui__sidebar {
   position: absolute;
-  right: 0;
+  top: var(--sat);
+  bottom: var(--sab);
+  right: var(--sar);
   z-index: 5;
+
+  box-shadow: var(--shadow-island);
+  overflow: hidden;
+  border-radius: var(--border-radius-lg);
+  margin: var(--space-factor);
 
   .Island {
     box-shadow: none;
