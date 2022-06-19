@@ -197,7 +197,7 @@ import {
   LibraryItems,
   PointerDownState,
   SceneData,
-  DeviceType,
+  Device,
 } from "../types";
 import {
   debounce,
@@ -261,12 +261,11 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 
-const defaultDeviceTypeContext: DeviceType = {
+const DeviceContext = React.createContext<Device>({
   isMobile: false,
   isTouchScreen: false,
-};
-const DeviceTypeContext = React.createContext(defaultDeviceTypeContext);
-export const useDeviceType = () => useContext(DeviceTypeContext);
+});
+export const useDevice = () => useContext<Device>(DeviceContext);
 const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
   id: string | null;
@@ -298,7 +297,7 @@ class App extends React.Component<AppProps, AppState> {
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
-  deviceType: DeviceType = {
+  device: Device = {
     isMobile: false,
     isTouchScreen: false,
   };
@@ -489,13 +488,13 @@ class App extends React.Component<AppProps, AppState> {
 
     this.isInsideSidebar =
       this.state.isLibraryOpen &&
-      !this.deviceType.isMobile &&
+      !this.device.isMobile &&
       this.canDeviceFitSidebar;
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": viewModeEnabled,
-          "excalidraw--mobile": this.deviceType.isMobile,
+          "excalidraw--mobile": this.device.isMobile,
         })}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -507,7 +506,7 @@ class App extends React.Component<AppProps, AppState> {
         <ExcalidrawContainerContext.Provider
           value={this.excalidrawContainerValue}
         >
-          <DeviceTypeContext.Provider value={this.deviceType}>
+          <DeviceContext.Provider value={this.device}>
             <LayerUI
               canvas={this.canvas}
               appState={this.state}
@@ -568,7 +567,7 @@ class App extends React.Component<AppProps, AppState> {
               />
             )}
             <main>{this.renderCanvas()}</main>
-          </DeviceTypeContext.Provider>
+          </DeviceContext.Provider>
         </ExcalidrawContainerContext.Provider>
       </div>
     );
@@ -845,7 +844,7 @@ class App extends React.Component<AppProps, AppState> {
         // ---------------------------------------------------------------------
         const { width, height } =
           this.excalidrawContainerRef.current!.getBoundingClientRect();
-        this.deviceType = updateObject(this.deviceType, {
+        this.device = updateObject(this.device, {
           isMobile:
             width < MQ_MAX_WIDTH_PORTRAIT ||
             (height < MQ_MAX_HEIGHT_LANDSCAPE &&
@@ -865,7 +864,7 @@ class App extends React.Component<AppProps, AppState> {
         `(min-width: ${MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT}px), (min-height: ${MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE}px) and (min-width: ${MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE}px)`,
       );
       const handler = () => {
-        this.deviceType = updateObject(this.deviceType, {
+        this.device = updateObject(this.device, {
           isMobile: mediaQuery.matches,
         });
         this.canDeviceFitSidebar = canDeviceFitSidebarMediaQuery.matches;
@@ -1185,7 +1184,7 @@ class App extends React.Component<AppProps, AppState> {
         theme: this.state.theme,
         imageCache: this.imageCache,
         isExporting: false,
-        renderScrollbars: !this.deviceType.isMobile,
+        renderScrollbars: !this.device.isMobile,
       },
     );
 
@@ -1542,7 +1541,7 @@ class App extends React.Component<AppProps, AppState> {
       trackEvent(
         "toolbar",
         "toggleLock",
-        `${source} (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
+        `${source} (${this.device.isMobile ? "mobile" : "desktop"})`,
       );
     }
     this.setState((prevState) => {
@@ -1822,7 +1821,7 @@ class App extends React.Component<AppProps, AppState> {
             trackEvent(
               "toolbar",
               shape,
-              `keyboard (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
+              `keyboard (${this.device.isMobile ? "mobile" : "desktop"})`,
             );
           }
           this.setActiveTool({ type: shape });
@@ -2446,7 +2445,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
-          this.deviceType.isMobile,
+          this.device.isMobile,
         )
       );
     });
@@ -2478,7 +2477,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
-      this.deviceType.isMobile,
+      this.device.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUp!,
@@ -2488,7 +2487,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
-      this.deviceType.isMobile,
+      this.device.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement.link;
@@ -2927,10 +2926,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      !this.deviceType.isTouchScreen &&
+      !this.device.isTouchScreen &&
       ["pen", "touch"].includes(event.pointerType)
     ) {
-      this.deviceType = updateObject(this.deviceType, { isTouchScreen: true });
+      this.device = updateObject(this.device, { isTouchScreen: true });
     }
 
     if (isPanning) {
@@ -3067,7 +3066,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
-    if (this.deviceType.isTouchScreen) {
+    if (this.device.isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
@@ -3085,7 +3084,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event, this.deviceType.isTouchScreen);
+      this.redirectToLink(event, this.device.isTouchScreen);
     }
 
     this.removePointer(event);
@@ -3457,7 +3456,7 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState.hit.element,
               this.state,
               [pointerDownState.origin.x, pointerDownState.origin.y],
-              this.deviceType.isMobile,
+              this.device.isMobile,
             )
           ) {
             return false;
@@ -5564,7 +5563,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.deviceType.isMobile &&
+            this.device.isMobile &&
               navigator.clipboard && {
                 trackEvent: false,
                 name: "paste",
@@ -5576,7 +5575,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.deviceType.isMobile && navigator.clipboard && separator,
+            this.device.isMobile && navigator.clipboard && separator,
             probablySupportsClipboardBlob &&
               elements.length > 0 &&
               actionCopyAsPng,
@@ -5621,9 +5620,9 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.deviceType.isMobile && actionCut,
-            this.deviceType.isMobile && navigator.clipboard && actionCopy,
-            this.deviceType.isMobile &&
+            this.device.isMobile && actionCut,
+            this.device.isMobile && navigator.clipboard && actionCopy,
+            this.device.isMobile &&
               navigator.clipboard && {
                 name: "paste",
                 trackEvent: false,
@@ -5635,7 +5634,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.deviceType.isMobile && separator,
+            this.device.isMobile && separator,
             ...options,
             separator,
             actionCopyStyles,

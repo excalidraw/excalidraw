@@ -377,7 +377,7 @@ export type AppClassProperties = {
     }
   >;
   files: BinaryFiles;
-  deviceType: App["deviceType"];
+  device: App["device"];
 };
 
 export type PointerDownState = Readonly<{
@@ -472,7 +472,7 @@ export type ExcalidrawImperativeAPI = {
   resetCursor: InstanceType<typeof App>["resetCursor"];
 };
 
-export type DeviceType = {
+export type Device = {
   isMobile: boolean;
   isTouchScreen: boolean;
 };

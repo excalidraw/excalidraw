@@ -12,7 +12,7 @@ import {
   LibraryItems,
 } from "../types";
 import { arrayToMap, muteFSAbortError } from "../utils";
-import { useDeviceType } from "./App";
+import { useDevice } from "./App";
 import ConfirmDialog from "./ConfirmDialog";
 import { exportToFileIcon, load, publishIcon, trash } from "./icons";
 import { LibraryUnit } from "./LibraryUnit";
@@ -94,7 +94,7 @@ const LibraryMenuItems = ({
   }, [selectedItems, onRemoveFromLibrary, resetLibrary]);
 
   const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
-  const isMobile = useDeviceType().isMobile;
+  const isMobile = useDevice().isMobile;
   const renderLibraryActions = () => {
     const itemsSelected = !!selectedItems.length;
     const items = itemsSelected
