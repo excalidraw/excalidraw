@@ -394,22 +394,24 @@ const LibraryMenuItems = ({
             </div>
           )}
         </div>
-        <div className="library_url">
-          {isLoading && !device.canDeviceFitSidebar ? (
-            <Spinner />
-          ) : device.isMobile ? (
-            <a
-              href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-                window.name || "_blank"
-              }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
-                VERSIONS.excalidrawLibrary
-              }`}
-              target="_excalidraw_libraries"
-            >
-              {t("labels.libraries")}
-            </a>
-          ) : null}
-        </div>
+        {device.isMobile && (
+          <div className="library-menu-browse-button--mobile">
+            {isLoading ? (
+              <Spinner />
+            ) : (
+              <a
+                href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+                  window.name || "_blank"
+                }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+                  VERSIONS.excalidrawLibrary
+                }`}
+                target="_excalidraw_libraries"
+              >
+                {t("labels.libraries")}
+              </a>
+            )}
+          </div>
+        )}
       </>
     );
   };
@@ -443,22 +445,27 @@ const LibraryMenuItems = ({
 
   const renderLibraryFooter = () => {
     return (
-      <div className="library_items_add">
+      <a
+        className="library-menu-browse-button"
+        style={{
+          width: isLoading ? "15%" : "80%",
+          pointerEvents: isLoading ? "none" : undefined,
+        }}
+        href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+          window.name || "_blank"
+        }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+          VERSIONS.excalidrawLibrary
+        }`}
+        target="_excalidraw_libraries"
+      >
         {isLoading ? (
           <Spinner />
         ) : !device.isMobile ? (
-          <a
-            href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-              window.name || "_blank"
-            }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
-              VERSIONS.excalidrawLibrary
-            }`}
-            target="_excalidraw_libraries"
-          >
+          <div className="library-menu-browse-button__text">
             {t("labels.libraries")}
-          </a>
+          </div>
         ) : null}
-      </div>
+      </a>
     );
   };
 

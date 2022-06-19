@@ -106,25 +106,6 @@
       margin: 0.6em 0.2em;
       color: var(--text-primary-color);
     }
-
-    .library_items_add {
-      a {
-        display: block;
-        border-radius: var(--border-radius-lg);
-        background-color: var(--color-primary);
-        padding: 10px 78px;
-        color: var(--default-bg-color);
-        text-decoration: none;
-        &:hover {
-          background-color: var(--color-primary-darker);
-        }
-        &:focus,
-        &:active,
-        &:focus {
-          background-color: var(--color-primary-darkest);
-        }
-      }
-    }
   }
 }
 
