@@ -176,7 +176,7 @@ export type AppState = {
         data: Spreadsheet;
       };
   /** imageElement waiting to be placed on canvas */
-  pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
+  pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
 };
 
@@ -378,6 +378,7 @@ export type AppClassProperties = {
   >;
   files: BinaryFiles;
   deviceType: App["deviceType"];
+  scene: App["scene"];
 };
 
 export type PointerDownState = Readonly<{
