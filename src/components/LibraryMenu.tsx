@@ -29,6 +29,7 @@ import { trackEvent } from "../analytics";
 import { useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import Spinner from "./Spinner";
+import { useDevice } from "./App";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -87,7 +88,6 @@ export const LibraryMenu = ({
   library,
   id,
   appState,
-  isInsideSidebar,
 }: {
   pendingElements: LibraryItem["elements"];
   onClose: () => void;
@@ -101,16 +101,17 @@ export const LibraryMenu = ({
   library: Library;
   id: string;
   appState: AppState;
-  isInsideSidebar: boolean;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
+
+  const device = useDevice();
 
   useOnClickOutside(ref, (event) => {
     // If click on the library icon, do nothing.
     if ((event.target as Element).closest(".ToolIcon__library")) {
       return;
     }
-    if (!appState.isLibraryMenuDocked || !isInsideSidebar) {
+    if (!appState.isLibraryMenuDocked || !device.canDeviceFitSidebar) {
       onClose();
     }
   });
@@ -287,7 +288,6 @@ export const LibraryMenu = ({
         onSelectItems={(ids) => setSelectedItems(ids)}
         onPublish={() => setShowPublishLibraryDialog(true)}
         resetLibrary={resetLibrary}
-        isInsideSidebar={isInsideSidebar}
       />
     </LibraryMenuWrapper>
   );

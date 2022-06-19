@@ -68,7 +68,6 @@ interface LayerUIProps {
   library: Library;
   id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
-  isInsideSidebar: boolean;
 }
 const LayerUI = ({
   actionManager,
@@ -96,7 +95,6 @@ const LayerUI = ({
   library,
   id,
   onImageAction,
-  isInsideSidebar,
 }: LayerUIProps) => {
   const device = useDevice();
 
@@ -291,7 +289,6 @@ const LayerUI = ({
       files={files}
       id={id}
       appState={appState}
-      isInsideSidebar={isInsideSidebar}
     />
   ) : null;
 
@@ -585,7 +582,7 @@ const LayerUI = ({
               !isTextElement(appState.editingElement)),
         })}
         style={
-          isInsideSidebar
+          appState.isLibraryOpen && device.canDeviceFitSidebar
             ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
             : {}
         }
@@ -607,7 +604,7 @@ const LayerUI = ({
           </button>
         )}
       </div>
-      {isInsideSidebar && renderLibrarySidebar()}
+      {device.canDeviceFitSidebar && renderLibrarySidebar()}
     </>
   );
 };

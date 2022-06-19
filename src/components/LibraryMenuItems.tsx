@@ -45,7 +45,6 @@ const LibraryMenuItems = ({
   onSelectItems,
   onPublish,
   resetLibrary,
-  isInsideSidebar,
 }: {
   isLoading: boolean;
   libraryItems: LibraryItems;
@@ -64,7 +63,6 @@ const LibraryMenuItems = ({
   onSelectItems: (id: LibraryItem["id"][]) => void;
   onPublish: () => void;
   resetLibrary: () => void;
-  isInsideSidebar: boolean;
 }) => {
   const renderRemoveLibAlert = useCallback(() => {
     const content = selectedItems.length
@@ -94,7 +92,7 @@ const LibraryMenuItems = ({
   }, [selectedItems, onRemoveFromLibrary, resetLibrary]);
 
   const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
-  const isMobile = useDevice().isMobile;
+  const device = useDevice();
   const renderLibraryActions = () => {
     const itemsSelected = !!selectedItems.length;
     const items = itemsSelected
@@ -105,7 +103,7 @@ const LibraryMenuItems = ({
       : t("buttons.resetLibrary");
     return (
       <div className="library-actions">
-        {(!itemsSelected || !isMobile) && (
+        {(!itemsSelected || !device.isMobile) && (
           <ToolButton
             key="import"
             type="button"
@@ -190,7 +188,7 @@ const LibraryMenuItems = ({
               className="library-actions--publish"
               onClick={onPublish}
             >
-              {!isMobile && <label>{t("buttons.publishLibrary")}</label>}
+              {!device.isMobile && <label>{t("buttons.publishLibrary")}</label>}
               {selectedItems.length > 0 && (
                 <span className="library-actions-counter">
                   {selectedItems.length}
@@ -374,7 +372,7 @@ const LibraryMenuItems = ({
       <>
         <div className="layer-ui__library-header" key="library-header">
           {renderLibraryActions()}
-          {isInsideSidebar && (
+          {device.canDeviceFitSidebar && (
             <>
               <div className="sidebar_lock_btn">
                 <SidebarLockButton
@@ -390,7 +388,7 @@ const LibraryMenuItems = ({
               </div>
             </>
           )}
-          {!isMobile && (
+          {!device.isMobile && (
             <div className="ToolIcon__icon__close">
               <button
                 className="Modal__close"
@@ -408,9 +406,9 @@ const LibraryMenuItems = ({
           )}
         </div>
         <div className="library_url">
-          {isLoading && !isInsideSidebar ? (
+          {isLoading && !device.canDeviceFitSidebar ? (
             <Spinner />
-          ) : isMobile ? (
+          ) : device.isMobile ? (
             <a
               href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
                 window.name || "_blank"
@@ -459,7 +457,7 @@ const LibraryMenuItems = ({
       <div className="library_items_add">
         {isLoading ? (
           <Spinner />
-        ) : !isMobile ? (
+        ) : !device.isMobile ? (
           <a
             href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
               window.name || "_blank"
@@ -484,12 +482,12 @@ const LibraryMenuItems = ({
   return (
     <div
       className="library-menu-items-container"
-      style={isMobile ? mobileStyles : {}}
+      style={device.isMobile ? mobileStyles : {}}
     >
       {showRemoveLibAlert && renderRemoveLibAlert()}
       {renderLibraryHeader()}
       {renderLibraryMenuItems()}
-      {!isMobile && renderLibraryFooter()}
+      {!device.isMobile && renderLibraryFooter()}
     </div>
   );
 };

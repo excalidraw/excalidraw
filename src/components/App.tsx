@@ -323,7 +323,6 @@ class App extends React.Component<AppProps, AppState> {
     container: HTMLDivElement | null;
     id: string;
   };
-  public isInsideSidebar: boolean;
 
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
@@ -363,7 +362,6 @@ class App extends React.Component<AppProps, AppState> {
     this.id = nanoid();
 
     this.library = new Library(this);
-    this.isInsideSidebar = false;
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -486,10 +484,6 @@ class App extends React.Component<AppProps, AppState> {
       renderCustomStats,
     } = this.props;
 
-    this.isInsideSidebar =
-      this.state.isLibraryOpen &&
-      !this.device.isMobile &&
-      this.device.canDeviceFitSidebar;
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -546,7 +540,6 @@ class App extends React.Component<AppProps, AppState> {
               library={this.library}
               id={this.id}
               onImageAction={this.onImageAction}
-              isInsideSidebar={this.isInsideSidebar}
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
@@ -1466,9 +1459,10 @@ class App extends React.Component<AppProps, AppState> {
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          isLibraryOpen: this.isInsideSidebar
-            ? this.state.isLibraryMenuDocked
-            : false,
+          isLibraryOpen:
+            this.state.isLibraryOpen && this.device.canDeviceFitSidebar
+              ? this.state.isLibraryMenuDocked
+              : false,
           selectedElementIds: newElements.reduce((map, element) => {
             if (!isBoundToContainer(element)) {
               map[element.id] = true;
