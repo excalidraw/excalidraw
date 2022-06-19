@@ -292,11 +292,6 @@ const LayerUI = ({
     />
   ) : null;
 
-  const renderLibrarySidebar = () => {
-    return <div className="layerUI_sidebar">{libraryMenu}</div>;
-    // return <div className="">{libraryMenu}</div>;
-  };
-
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
       appState,
@@ -315,9 +310,6 @@ const LayerUI = ({
               : renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
-          {!device.canDeviceFitSidebar && (
-            <div className="layerUI_sidebar">{libraryMenu}</div>
-          )}
           {!viewModeEnabled && (
             <Section heading="shapes">
               {(heading) => (
@@ -604,7 +596,7 @@ const LayerUI = ({
           </button>
         )}
       </div>
-      {device.canDeviceFitSidebar && renderLibrarySidebar()}
+      <div className="layerUI_sidebar">{libraryMenu}</div>
     </>
   );
 };
