@@ -261,11 +261,12 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 
-const DeviceContext = React.createContext<Device>({
+const deviceContextInitialValue = {
   isMobile: false,
   isTouchScreen: false,
   canDeviceFitSidebar: false,
-});
+};
+const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 export const useDevice = () => useContext<Device>(DeviceContext);
 const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
@@ -298,11 +299,7 @@ class App extends React.Component<AppProps, AppState> {
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
-  device: Device = {
-    isMobile: false,
-    isTouchScreen: false,
-    canDeviceFitSidebar: false,
-  };
+  device: Device = deviceContextInitialValue;
   detachIsMobileMqHandler?: () => void;
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();

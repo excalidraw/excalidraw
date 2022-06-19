@@ -472,8 +472,8 @@ export type ExcalidrawImperativeAPI = {
   resetCursor: InstanceType<typeof App>["resetCursor"];
 };
 
-export type Device = {
+export type Device = Readonly<{
   isMobile: boolean;
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
-};
+}>;
