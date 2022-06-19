@@ -1,4 +1,4 @@
-import { AppState } from "../../src/types";
+import { AppState, Selection } from "../../src/types";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
@@ -76,7 +76,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import { arrayToMap } from "../utils";
+import { arrayToMap, getSelectedTextColorRangeColor } from "../utils";
 import { register } from "./register";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
@@ -196,25 +196,78 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   trackEvent: false,
   perform: (elements, appState, value) => {
+    const newAppState: AppState = {
+      ...appState,
+      ...value,
+    };
+
+    if (
+      newAppState.selectedTextRange?.type === "cursor" &&
+      typeof value.currentItemStrokeColor === "string"
+    ) {
+      newAppState.selectedTextRange.newColorRange = {
+        color: value.currentItemStrokeColor,
+        position: newAppState.selectedTextRange.cursorPosition,
+      };
+    }
+
     return {
       ...(value.currentItemStrokeColor && {
         elements: changeProperty(
           elements,
           appState,
           (el) => {
-            return hasStrokeColor(el.type)
-              ? newElementWith(el, {
-                  strokeColor: value.currentItemStrokeColor,
-                })
-              : el;
+            if (!hasStrokeColor(el.type)) {
+              return el;
+            }
+
+            if (el.type === "text") {
+              if (appState.selectedTextRange?.type === "range") {
+                // Assertion is required because otherwise typescript will "forget" the narrowing in callbacks
+                const selectedRange = appState.selectedTextRange as Extract<
+                  Selection,
+                  { type: "range" }
+                >;
+
+                const rangeLength = selectedRange.end - selectedRange.start;
+
+                if (rangeLength === el.text.length) {
+                  return newElementWith(el, {
+                    colorRanges: {},
+                    strokeColor: value.currentItemStrokeColor,
+                  });
+                }
+
+                const newColorRange = Object.fromEntries(
+                  Array.from(
+                    {
+                      length: rangeLength,
+                    },
+                    (_, i) => [
+                      i + selectedRange.start,
+                      value.currentItemStrokeColor,
+                    ],
+                  ),
+                );
+                return newElementWith(el, {
+                  colorRanges: {
+                    ...el.colorRanges,
+                    ...newColorRange,
+                  },
+                });
+              }
+
+              return el;
+            }
+
+            return newElementWith(el, {
+              strokeColor: value.currentItemStrokeColor,
+            });
           },
           true,
         ),
       }),
-      appState: {
-        ...appState,
-        ...value,
-      },
+      appState: newAppState,
       commitToHistory: !!value.currentItemStrokeColor,
     };
   },
@@ -227,7 +280,16 @@ export const actionChangeStrokeColor = register({
         color={getFormValue(
           elements,
           appState,
-          (element) => element.strokeColor,
+          (element) => {
+            if (element.type !== "text" || !appState.selectedTextRange) {
+              return element.strokeColor;
+            }
+
+            return getSelectedTextColorRangeColor(
+              element,
+              appState.selectedTextRange,
+            );
+          },
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}

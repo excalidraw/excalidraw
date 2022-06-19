@@ -12,6 +12,7 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawRectangleElement,
+  TextColorRanges,
 } from "../element/types";
 import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -126,6 +127,7 @@ export const newTextElement = (
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     containerId?: ExcalidrawRectangleElement["id"];
+    colorRanges?: TextColorRanges;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const metrics = measureText(opts.text, getFontString(opts));
@@ -145,6 +147,7 @@ export const newTextElement = (
       baseline: metrics.baseline,
       containerId: opts.containerId || null,
       originalText: opts.text,
+      colorRanges: opts.colorRanges ?? {},
     },
     {},
   );
@@ -250,8 +253,10 @@ export const updateTextElement = (
     text,
     isDeleted,
     originalText,
+    colorRanges,
   }: {
     text: string;
+    colorRanges?: TextColorRanges;
     isDeleted?: boolean;
     originalText: string;
   },
@@ -265,6 +270,7 @@ export const updateTextElement = (
     text,
     originalText,
     isDeleted: isDeleted ?? element.isDeleted,
+    colorRanges: colorRanges ?? element.colorRanges,
     ...dimensions,
   });
 };

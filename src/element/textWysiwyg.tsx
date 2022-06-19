@@ -4,6 +4,7 @@ import {
   getFontString,
   getFontFamilyString,
   isTestEnv,
+  getSelectedTextColorRangeColor,
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
@@ -63,6 +64,7 @@ export const textWysiwyg = ({
   id,
   onChange,
   onSubmit,
+  onSelection,
   getViewportCoords,
   element,
   canvas,
@@ -76,6 +78,7 @@ export const textWysiwyg = ({
     viaKeyboard: boolean;
     originalText: string;
   }) => void;
+  onSelection: (selection: { start: number; end: number } | null) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement | null;
@@ -204,6 +207,7 @@ export const textWysiwyg = ({
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
       const angle = container ? container.angle : updatedElement.angle;
+
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -222,7 +226,14 @@ export const textWysiwyg = ({
         ),
         textAlign,
         verticalAlign,
-        color: updatedElement.strokeColor,
+        color: "transparent",
+        caretColor:
+          updatedElement && appState.selectedTextRange
+            ? getSelectedTextColorRangeColor(
+                updatedElement,
+                appState.selectedTextRange,
+              )
+            : "currentColor",
         opacity: updatedElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxWidth: `${maxWidth}px`,
@@ -265,6 +276,7 @@ export const textWysiwyg = ({
     resize: "none",
     background: "transparent",
     overflow: "hidden",
+    color: "transparent",
     // must be specified because in dark mode canvas creates a stacking context
     zIndex: "var(--zIndex-wysiwyg)",
     wordBreak,
@@ -317,9 +329,17 @@ export const textWysiwyg = ({
         editable.style.height = height;
         editable.style.height = `${editable.scrollHeight}px`;
       }
+
       onChange(normalizeText(editable.value));
     };
   }
+
+  const handleSelectionChange = () => {
+    onSelection({ start: editable.selectionStart, end: editable.selectionEnd });
+    updateWysiwygStyle();
+  };
+
+  document.addEventListener("selectionchange", handleSelectionChange);
 
   editable.onkeydown = (event) => {
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
@@ -503,6 +523,8 @@ export const textWysiwyg = ({
       }
     }
 
+    onSelection(null);
+
     onSubmit({
       text,
       viaKeyboard: submittedViaKeyboard,
@@ -529,6 +551,7 @@ export const textWysiwyg = ({
     window.removeEventListener("pointerdown", onPointerDown);
     window.removeEventListener("pointerup", bindBlurEvent);
     window.removeEventListener("blur", handleSubmit);
+    document.removeEventListener("selectionchange", handleSelectionChange);
 
     unbindUpdate();
 

@@ -116,6 +116,14 @@ export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
 
+/**
+ * Indicates the color of each character at the position of the key in the record.
+ * If a key doesn't exist then the character is assumed to be the standard text color.
+ * Note that positions are character positions, similar to iterating a string via str.split('') eg. emoji are colored via two keys in this object. It also applies color to newline and other special characters.
+ * This makes TextColorRanges indexes semantically match the `selectionStart`/`selectionEnd` of `HTMLTextAreaElement`.
+ */
+export type TextColorRanges = Readonly<Record<number, string>>;
+
 export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
@@ -127,6 +135,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
+    colorRanges: TextColorRanges;
   }>;
 
 export type ExcalidrawBindableElement =

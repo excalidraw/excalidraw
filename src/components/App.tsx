@@ -141,6 +141,7 @@ import {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
+  TextColorRanges,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -1146,13 +1147,8 @@ class App extends React.Component<AppProps, AppState> {
             return false;
           }
         }
-        // don't render text element that's being currently edited (it's
-        // rendered on remote only)
-        return (
-          !this.state.editingElement ||
-          this.state.editingElement.type !== "text" ||
-          element.id !== this.state.editingElement.id
-        );
+
+        return true;
       });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       renderingElements,
@@ -2015,6 +2011,7 @@ class App extends React.Component<AppProps, AppState> {
       text: string,
       originalText: string,
       isDeleted: boolean,
+      colorRanges?: TextColorRanges,
     ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
@@ -2023,6 +2020,7 @@ class App extends React.Component<AppProps, AppState> {
               text,
               isDeleted,
               originalText,
+              colorRanges,
             });
           }
           return _element;
@@ -2047,14 +2045,14 @@ class App extends React.Component<AppProps, AppState> {
         ];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text, text, false);
+        updateElement(text, text, false, undefined);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
       }),
       onSubmit: withBatchedUpdates(({ text, viaKeyboard, originalText }) => {
         const isDeleted = !text.trim();
-        updateElement(text, originalText, isDeleted);
+        updateElement(text, originalText, isDeleted, undefined);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -2087,6 +2085,30 @@ class App extends React.Component<AppProps, AppState> {
 
         this.focusContainer();
       }),
+      onSelection: withBatchedUpdates((selection) =>
+        this.setState(() => {
+          if (!selection) {
+            return {
+              selectedTextRange: null,
+            };
+          }
+
+          if (selection.start === selection.end) {
+            return {
+              selectedTextRange: {
+                type: "cursor",
+                cursorPosition: selection.start,
+                // Remove newColorRange when we move the cursor
+                newColorRange: null,
+              },
+            };
+          }
+
+          return {
+            selectedTextRange: { type: "range", ...selection },
+          };
+        }),
+      ),
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
       app: this,
@@ -2096,7 +2118,12 @@ class App extends React.Component<AppProps, AppState> {
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text, element.originalText, false);
+    updateElement(
+      element.text,
+      element.originalText,
+      false,
+      element.colorRanges,
+    );
   }
 
   private deselectElements() {

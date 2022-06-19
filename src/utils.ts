@@ -10,8 +10,18 @@ import {
   THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import { FontFamilyValues, FontString } from "./element/types";
-import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
+import {
+  ExcalidrawTextElement,
+  FontFamilyValues,
+  FontString,
+} from "./element/types";
+import {
+  AppState,
+  DataURL,
+  LastActiveToolBeforeEraser,
+  Selection,
+  Zoom,
+} from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 import { SHAPES } from "./shapes";
@@ -666,5 +676,71 @@ export const isPromiseLike = (
     "then" in value &&
     "catch" in value &&
     "finally" in value
+  );
+};
+
+export type LineGroupedRanges = { color: string; text: string }[][];
+
+export const getLineGroupedRanges = (
+  element: ExcalidrawTextElement,
+): LineGroupedRanges => {
+  const lines: LineGroupedRanges = [[]];
+
+  const characters = element.text.split("");
+  let index = 0;
+  while (index < characters.length) {
+    const char = characters[index];
+    if (char === "\r" && characters[index + 1] === "\n") {
+      lines.push([]);
+      // skip carriage returns
+      index += 2;
+      continue;
+    }
+
+    if (char === "\n") {
+      lines.push([]);
+      index++;
+      continue;
+    }
+
+    const currentLine = lines[lines.length - 1];
+    const currentGroup = currentLine[currentLine.length - 1];
+    const characterColor = element.colorRanges[index] ?? element.strokeColor;
+
+    if (!currentGroup || characterColor !== currentGroup.color) {
+      currentLine.push({
+        text: char,
+        color: characterColor,
+      });
+    } else {
+      currentGroup.text += char;
+    }
+
+    index++;
+  }
+
+  return lines;
+};
+
+export const getSelectedTextColorRangeColor = (
+  element: ExcalidrawTextElement,
+  selectedTextRange: Selection,
+): string => {
+  if (selectedTextRange.type === "range") {
+    return element.colorRanges[selectedTextRange.start] ?? element.strokeColor;
+  }
+
+  if (
+    selectedTextRange.newColorRange?.position ===
+    selectedTextRange.cursorPosition
+  ) {
+    return selectedTextRange.newColorRange.color;
+  }
+
+  return (
+    element.colorRanges[
+      // TODO: Should + 1 here when in RTL mode
+      selectedTextRange.cursorPosition - 1
+    ] ?? element.strokeColor
   );
 };

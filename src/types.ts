@@ -78,6 +78,15 @@ export type LastActiveToolBeforeEraser =
       customType: string;
     }
   | null;
+
+export type Selection =
+  | { type: "range"; start: number; end: number }
+  | {
+      type: "cursor";
+      cursorPosition: number;
+      newColorRange: { color: string; position: number } | null;
+    };
+
 export type AppState = {
   isLoading: boolean;
   errorMessage: string | null;
@@ -178,6 +187,7 @@ export type AppState = {
   /** imageElement waiting to be placed on canvas */
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
+  selectedTextRange: null | Selection;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
