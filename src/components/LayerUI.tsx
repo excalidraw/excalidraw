@@ -598,7 +598,7 @@ const LayerUI = ({
           </button>
         )}
       </div>
-      <div className="layerUI_sidebar">{libraryMenu}</div>
+      <div className="layer-ui__sidebar">{libraryMenu}</div>
     </>
   );
 };
