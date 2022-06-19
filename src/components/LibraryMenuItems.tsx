@@ -365,7 +365,7 @@ const LibraryMenuItems = ({
           {renderLibraryActions()}
           {device.canDeviceFitSidebar && (
             <>
-              <div className="sidebar_lock_btn">
+              <div className="layer-ui__sidebar-lock-button">
                 <SidebarLockButton
                   checked={appState.isLibraryMenuDocked}
                   onChange={() =>

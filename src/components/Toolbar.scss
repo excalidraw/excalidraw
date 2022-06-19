@@ -22,8 +22,9 @@
   }
 }
 
-.sidebar_lock_btn {
+.layer-ui__sidebar-lock-button {
   @include toolbarButtonColorStates;
+  margin-right: 0.2rem;
 }
 
 .excalidraw {
