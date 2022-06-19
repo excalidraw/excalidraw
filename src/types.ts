@@ -290,7 +290,9 @@ export interface ExcalidrawProps {
     elements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
   ) => JSX.Element;
-  UIOptions?: UIOptions;
+  UIOptions?: {
+    canvasActions?: CanvasActions;
+  };
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
@@ -348,18 +350,17 @@ type CanvasActions = {
   saveAsImage?: boolean;
 };
 
-export type UIOptions = {
-  canvasActions?: CanvasActions;
-};
-
-export type AppProps = ExcalidrawProps & {
-  UIOptions: {
-    canvasActions: Required<CanvasActions> & { export: ExportOpts };
-  };
-  detectScroll: boolean;
-  handleKeyboardGlobally: boolean;
-  isCollaborating: boolean;
-};
+export type AppProps = Merge<
+  ExcalidrawProps,
+  {
+    UIOptions: {
+      canvasActions: Required<CanvasActions> & { export: ExportOpts };
+    };
+    detectScroll: boolean;
+    handleKeyboardGlobally: boolean;
+    isCollaborating: boolean;
+  }
+>;
 
 /** A subset of App class properties that we need to use elsewhere
  * in the app, eg Manager. Factored out into a separate type to keep DRY. */

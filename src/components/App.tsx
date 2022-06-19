@@ -223,7 +223,6 @@ import {
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
-import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
@@ -532,6 +531,7 @@ class App extends React.Component<AppProps, AppState> {
               isCollaborating={this.props.isCollaborating}
               renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
+              renderCustomStats={renderCustomStats}
               viewModeEnabled={viewModeEnabled}
               showExitZenModeBtn={
                 typeof this.props?.zenModeEnabled === "undefined" &&
@@ -559,16 +559,6 @@ class App extends React.Component<AppProps, AppState> {
                 appState={this.state}
                 setAppState={this.setAppState}
                 onLinkOpen={this.props.onLinkOpen}
-              />
-            )}
-            {this.state.showStats && (
-              <Stats
-                appState={this.state}
-                setAppState={this.setAppState}
-                elements={this.scene.getNonDeletedElements()}
-                onClose={this.toggleStats}
-                renderCustomStats={renderCustomStats}
-                isInsideSidebar={this.isInsideSidebar}
               />
             )}
             {this.state.toastMessage !== null && (
@@ -1581,10 +1571,6 @@ class App extends React.Component<AppProps, AppState> {
 
   toggleZenMode = () => {
     this.actionManager.executeAction(actionToggleZenMode);
-  };
-
-  toggleStats = () => {
-    this.actionManager.executeAction(actionToggleStats);
   };
 
   scrollToContent = (

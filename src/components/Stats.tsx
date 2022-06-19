@@ -1,6 +1,5 @@
 import React from "react";
 import { getCommonBounds } from "../element/bounds";
-import { LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { useDeviceType } from "../components/App";
@@ -16,21 +15,16 @@ export const Stats = (props: {
   elements: readonly NonDeletedExcalidrawElement[];
   onClose: () => void;
   renderCustomStats: ExcalidrawProps["renderCustomStats"];
-  isInsideSidebar: boolean;
 }) => {
   const deviceType = useDeviceType();
   const boundingBox = getCommonBounds(props.elements);
   const selectedElements = getTargetElements(props.elements, props.appState);
   const selectedBoundingBox = getCommonBounds(selectedElements);
-  const isInsideSidebar = props.isInsideSidebar;
   if (deviceType.isMobile && props.appState.openMenu) {
     return null;
   }
   return (
-    <div
-      className="Stats"
-      style={isInsideSidebar ? { right: `${LIBRARY_SIDEBAR_WIDTH}px` } : {}}
-    >
+    <div className="Stats">
       <Island padding={2}>
         <div className="close" onClick={props.onClose}>
           {close}

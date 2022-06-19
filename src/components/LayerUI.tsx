@@ -38,6 +38,8 @@ import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
 import { useDeviceType } from "../components/App";
+import { Stats } from "./Stats";
+import { actionToggleStats } from "../actions/actionToggleStats";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -56,11 +58,9 @@ interface LayerUIProps {
   toggleZenMode: () => void;
   langCode: Language["code"];
   isCollaborating: boolean;
-  renderTopRightUI?: (
-    isMobile: boolean,
-    appState: AppState,
-  ) => JSX.Element | null;
-  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
+  renderCustomFooter?: ExcalidrawProps["renderFooter"];
+  renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   UIOptions: AppProps["UIOptions"];
@@ -89,6 +89,7 @@ const LayerUI = ({
   isCollaborating,
   renderTopRightUI,
   renderCustomFooter,
+  renderCustomStats,
   viewModeEnabled,
   libraryReturnUrl,
   UIOptions,
@@ -534,6 +535,23 @@ const LayerUI = ({
     </>
   );
 
+  const renderStats = () => {
+    if (!appState.showStats) {
+      return null;
+    }
+    return (
+      <Stats
+        appState={appState}
+        setAppState={setAppState}
+        elements={elements}
+        onClose={() => {
+          actionManager.executeAction(actionToggleStats);
+        }}
+        renderCustomStats={renderCustomStats}
+      />
+    );
+  };
+
   return deviceType.isMobile ? (
     <>
       {dialogs}
@@ -555,6 +573,7 @@ const LayerUI = ({
         showThemeBtn={showThemeBtn}
         onImageAction={onImageAction}
         renderTopRightUI={renderTopRightUI}
+        renderStats={renderStats}
       />
     </>
   ) : (
@@ -576,6 +595,7 @@ const LayerUI = ({
         {dialogs}
         {renderFixedSideContainer()}
         {renderBottomAppMenu()}
+        {renderStats()}
         {appState.scrolledOutside && (
           <button
             className="scroll-back-to-content"
