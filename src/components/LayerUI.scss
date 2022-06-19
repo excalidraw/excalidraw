@@ -16,6 +16,10 @@
     box-shadow: none;
   }
 
+  .ToolIcon__icon {
+    border-radius: var(--border-radius-md);
+  }
+
   .ToolIcon__icon__close {
     .Modal__close {
       width: calc(var(--space-factor) * 7);
@@ -23,9 +27,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      svg {
-        height: calc(var(--space-factor) * 2.8);
-      }
+      color: var(--color-text);
     }
   }
 
