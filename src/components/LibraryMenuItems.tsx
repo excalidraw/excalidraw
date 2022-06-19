@@ -387,7 +387,6 @@ const LibraryMenuItems = ({
                 onClick={() =>
                   setAppState({
                     isLibraryOpen: false,
-                    isLibraryMenuDocked: false,
                   })
                 }
                 aria-label={t("buttons.close")}
