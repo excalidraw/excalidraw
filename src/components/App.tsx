@@ -264,6 +264,7 @@ import {
 const DeviceContext = React.createContext<Device>({
   isMobile: false,
   isTouchScreen: false,
+  canDeviceFitSidebar: false,
 });
 export const useDevice = () => useContext<Device>(DeviceContext);
 const ExcalidrawContainerContext = React.createContext<{
@@ -300,6 +301,7 @@ class App extends React.Component<AppProps, AppState> {
   device: Device = {
     isMobile: false,
     isTouchScreen: false,
+    canDeviceFitSidebar: false,
   };
   detachIsMobileMqHandler?: () => void;
 
@@ -322,7 +324,6 @@ class App extends React.Component<AppProps, AppState> {
     id: string;
   };
   public isInsideSidebar: boolean;
-  public canDeviceFitSidebar: boolean;
 
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
@@ -363,7 +364,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.library = new Library(this);
     this.isInsideSidebar = false;
-    this.canDeviceFitSidebar = false;
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -489,7 +489,7 @@ class App extends React.Component<AppProps, AppState> {
     this.isInsideSidebar =
       this.state.isLibraryOpen &&
       !this.device.isMobile &&
-      this.canDeviceFitSidebar;
+      this.device.canDeviceFitSidebar;
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -547,7 +547,6 @@ class App extends React.Component<AppProps, AppState> {
               id={this.id}
               onImageAction={this.onImageAction}
               isInsideSidebar={this.isInsideSidebar}
-              canDeviceFitSidebar={this.canDeviceFitSidebar}
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
@@ -849,8 +848,8 @@ class App extends React.Component<AppProps, AppState> {
             width < MQ_MAX_WIDTH_PORTRAIT ||
             (height < MQ_MAX_HEIGHT_LANDSCAPE &&
               width < MQ_MAX_WIDTH_LANDSCAPE),
+          canDeviceFitSidebar: width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT,
         });
-        this.canDeviceFitSidebar = width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT;
         // refresh offsets
         // ---------------------------------------------------------------------
         this.updateDOMRect();
@@ -866,8 +865,8 @@ class App extends React.Component<AppProps, AppState> {
       const handler = () => {
         this.device = updateObject(this.device, {
           isMobile: mediaQuery.matches,
+          canDeviceFitSidebar: canDeviceFitSidebarMediaQuery.matches,
         });
-        this.canDeviceFitSidebar = canDeviceFitSidebarMediaQuery.matches;
       };
       mediaQuery.addListener(handler);
       this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);

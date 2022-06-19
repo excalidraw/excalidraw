@@ -475,4 +475,5 @@ export type ExcalidrawImperativeAPI = {
 export type Device = {
   isMobile: boolean;
   isTouchScreen: boolean;
+  canDeviceFitSidebar: boolean;
 };
