@@ -830,19 +830,25 @@ class App extends React.Component<AppProps, AppState> {
       this.focusContainer();
     }
 
+    const refreshDeviceState = (container: HTMLDivElement) => {
+      const { width, height } = container.getBoundingClientRect();
+      this.device = updateObject(this.device, {
+        isMobile:
+          width < MQ_MAX_WIDTH_PORTRAIT ||
+          (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE),
+        canDeviceFitSidebar: width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT,
+      });
+    };
+
+    if (this.excalidrawContainerRef.current) {
+      refreshDeviceState(this.excalidrawContainerRef.current);
+    }
+
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => {
-        // compute isMobile state
+        // recompute device dimensions state
         // ---------------------------------------------------------------------
-        const { width, height } =
-          this.excalidrawContainerRef.current!.getBoundingClientRect();
-        this.device = updateObject(this.device, {
-          isMobile:
-            width < MQ_MAX_WIDTH_PORTRAIT ||
-            (height < MQ_MAX_HEIGHT_LANDSCAPE &&
-              width < MQ_MAX_WIDTH_LANDSCAPE),
-          canDeviceFitSidebar: width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT,
-        });
+        refreshDeviceState(this.excalidrawContainerRef.current!);
         // refresh offsets
         // ---------------------------------------------------------------------
         this.updateDOMRect();
