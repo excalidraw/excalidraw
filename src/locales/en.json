@@ -120,7 +120,8 @@
       "lockAll": "Lock all",
       "unlockAll": "Unlock all"
     },
-    "statusPublished": "Published"
+    "statusPublished": "Published",
+    "sidebarLock": "Keep sidebar open"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

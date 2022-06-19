@@ -103,7 +103,7 @@ const LibraryMenuItems = ({
       : t("buttons.resetLibrary");
     return (
       <div className="library-actions">
-        {(!itemsSelected || !device.isMobile) && (
+        {!itemsSelected && (
           <ToolButton
             key="import"
             type="button"
@@ -376,8 +376,6 @@ const LibraryMenuItems = ({
             <>
               <div className="sidebar_lock_btn">
                 <SidebarLockButton
-                  title="toolBar.lock"
-                  name="lock"
                   checked={appState.isLibraryMenuDocked}
                   onChange={() =>
                     setAppState({

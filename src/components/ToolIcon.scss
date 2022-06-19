@@ -162,10 +162,11 @@
       height: 2rem;
     }
     .side_lock_icon {
-      height: 2.5rem;
-      width: 2.5rem;
+      width: calc(var(--space-factor) * 7);
+      height: calc(var(--space-factor) * 7);
       svg {
-        height: 1.5em;
+        // mirror
+        transform: scale(-1, 1);
       }
     }
   }

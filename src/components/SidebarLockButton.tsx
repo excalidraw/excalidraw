@@ -3,10 +3,9 @@ import "./ToolIcon.scss";
 import React from "react";
 import clsx from "clsx";
 import { ToolButtonSize } from "./ToolButton";
+import { t } from "../i18n";
 
 type SidebarLockIconProps = {
-  title?: string;
-  name?: string;
   checked: boolean;
   onChange?(): void;
 };
@@ -26,15 +25,14 @@ export const SidebarLockButton = (props: SidebarLockIconProps) => {
         "ToolIcon ToolIcon__lock ToolIcon_type_floating",
         `ToolIcon_size_${DEFAULT_SIZE}`,
       )}
-      title={`${props.title} — Q`}
+      title={t("labels.sidebarLock")}
     >
       <input
         className="ToolIcon_type_checkbox"
         type="checkbox"
-        name={props.name}
         onChange={props.onChange}
         checked={props.checked}
-        aria-label={props.title}
+        aria-label={t("labels.sidebarLock")}
       />
       <div className="ToolIcon__icon side_lock_icon">
         {SIDE_LIBRARY_TOGGLE_ICON}

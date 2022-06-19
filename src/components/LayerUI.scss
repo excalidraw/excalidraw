@@ -16,12 +16,13 @@
 
   .ToolIcon__icon__close {
     .Modal__close {
-      height: calc(var(--space-factor) * 6);
+      width: calc(var(--space-factor) * 7);
+      height: calc(var(--space-factor) * 7);
       display: flex;
       justify-content: center;
       align-items: center;
       svg {
-        height: calc(var(--space-factor) * 3);
+        height: calc(var(--space-factor) * 2.8);
       }
     }
   }
