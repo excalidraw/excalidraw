@@ -574,7 +574,9 @@ const LayerUI = ({
               !isTextElement(appState.editingElement)),
         })}
         style={
-          appState.isLibraryOpen && device.canDeviceFitSidebar
+          appState.isLibraryOpen &&
+          appState.isLibraryMenuDocked &&
+          device.canDeviceFitSidebar
             ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
             : {}
         }
