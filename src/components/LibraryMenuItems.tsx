@@ -368,11 +368,14 @@ const LibraryMenuItems = ({
               <div className="layer-ui__sidebar-lock-button">
                 <SidebarLockButton
                   checked={appState.isLibraryMenuDocked}
-                  onChange={() =>
+                  onChange={() => {
+                    document
+                      .querySelector(".layer-ui__wrapper")
+                      ?.classList.add("animate");
                     setAppState({
                       isLibraryMenuDocked: !appState.isLibraryMenuDocked,
-                    })
-                  }
+                    });
+                  }}
                 />
               </div>
             </>

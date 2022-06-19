@@ -42,6 +42,9 @@
 }
 
 .excalidraw {
+  .layer-ui__wrapper.animate {
+    transition: width 0.1s ease-in-out;
+  }
   .layer-ui__wrapper {
     position: absolute;
     width: 100%;

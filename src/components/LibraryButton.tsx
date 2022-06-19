@@ -34,6 +34,9 @@ export const LibraryButton: React.FC<{
         type="checkbox"
         name="editor-library"
         onChange={(event) => {
+          document
+            .querySelector(".layer-ui__wrapper")
+            ?.classList.remove("animate");
           setAppState({ isLibraryOpen: event.target.checked });
         }}
         checked={appState.isLibraryOpen}
