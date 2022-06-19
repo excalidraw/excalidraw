@@ -53,7 +53,7 @@ Object {
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElement": null,
+  "pendingImageElementId": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
