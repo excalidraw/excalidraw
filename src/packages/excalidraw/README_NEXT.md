@@ -639,7 +639,7 @@ This prop sets the name of the drawing which will be used when exporting the dra
 
 #### `UIOptions`
 
-This prop can be used to customise UI of Excalidraw. Currently we support customising only [`canvasActions`](#canvasActions). It accepts the below parameters
+This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasActions) and [`dockedSidebarBreakpoint`](dockedSidebarBreakpoint). It accepts the below parameters
 
 <pre>
 { canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }
@@ -656,6 +656,12 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
 | `theme` | boolean | true | Implies whether to show `Theme toggle` |
 | `saveAsImage` | boolean | true | Implies whether to show `Save as image button` |
+
+##### `dockedSidebarBreakpoint`
+
+This prop indicates whether the device can fit the sidebar. If not passed it defaults to [`MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L167). If the `width` of `excalidraw` container exceeds `dockedSidebarBreakpoint`, the sidebar will have the toggle button to dock the sidebar else it won't. Once the sidebar is docked it will push the right part of the UI towards left making space for the sidebar as shown below. This is only applicable for non mobile devices.
+
+![image](https://user-images.githubusercontent.com/11256141/174664866-c698c3fa-197b-43ff-956c-d79852c7b326.png)
 
 #### `exportOpts`
 
