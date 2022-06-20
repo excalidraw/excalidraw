@@ -114,17 +114,3 @@
     }
   }
 }
-
-// custom Menu Library Sidebar
-
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-primary-darker);
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: $oc-blue-5;
-}
