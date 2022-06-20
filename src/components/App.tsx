@@ -64,8 +64,6 @@ import {
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
   MQ_MAX_WIDTH_PORTRAIT,
-  MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE,
-  MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE,
   MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
@@ -856,7 +854,7 @@ class App extends React.Component<AppProps, AppState> {
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
       const canDeviceFitSidebarMediaQuery = window.matchMedia(
-        `(min-width: ${MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT}px), (min-height: ${MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE}px) and (min-width: ${MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE}px)`,
+        `(min-width: ${MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT}px)`,
       );
       const handler = () => {
         this.device = updateObject(this.device, {
