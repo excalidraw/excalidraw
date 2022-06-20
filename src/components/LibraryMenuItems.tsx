@@ -426,11 +426,16 @@ const LibraryMenuItems = ({
         gap={1}
         style={{
           flex: publishedItems.length > 0 ? 1 : "0 0 auto",
+          marginBottom: !publishedItems.length ? "2rem" : 0,
         }}
       >
         <>
           <div className="separator">
-            <div>{t("labels.personalLib")}</div>
+            {(pendingElements.length > 0 ||
+              unpublishedItems.length > 0 ||
+              publishedItems.length > 0) && (
+              <div>{t("labels.personalLib")}</div>
+            )}
             {isLoading && (
               <div
                 style={{
@@ -452,12 +457,26 @@ const LibraryMenuItems = ({
               style={{
                 height: 65,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
                 width: "100%",
+                fontSize: ".9rem",
               }}
             >
-              No items yet...
+              No items yet!
+              <div
+                style={{
+                  margin: ".6rem 0",
+                  fontSize: ".8em",
+                  width: "70%",
+                  textAlign: "center",
+                }}
+              >
+                {publishedItems.length > 0
+                  ? t("library.hint_emptyPrivateLibrary")
+                  : t("library.hint_emptyLibrary")}
+              </div>
             </div>
           ) : (
             renderLibrarySection([
@@ -471,7 +490,11 @@ const LibraryMenuItems = ({
         </>
 
         <>
-          <div className="separator">{t("labels.excalidrawLib")} </div>
+          {(pendingElements.length > 0 ||
+            unpublishedItems.length > 0 ||
+            publishedItems.length > 0) && (
+            <div className="separator">{t("labels.excalidrawLib")}</div>
+          )}
           {publishedItems.length > 0 && renderLibrarySection(publishedItems)}
         </>
       </Stack.Col>
