@@ -786,6 +786,21 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private refreshDeviceState = (container: HTMLDivElement) => {
+    const { width, height } = container.getBoundingClientRect();
+    const sidebarBreakpoint =
+      this.props.UIOptions.sidebarBreakpoint != null
+        ? this.props.UIOptions.sidebarBreakpoint
+        : MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT;
+    this.device = updateObject(this.device, {
+      isSmScreen: width < MQ_SM_MAX_WIDTH,
+      isMobile:
+        width < MQ_MAX_WIDTH_PORTRAIT ||
+        (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE),
+      canDeviceFitSidebar: width > sidebarBreakpoint,
+    });
+  };
+
   public async componentDidMount() {
     this.unmounted = false;
     this.excalidrawContainerValue.container =
@@ -827,26 +842,15 @@ class App extends React.Component<AppProps, AppState> {
       this.focusContainer();
     }
 
-    const refreshDeviceState = (container: HTMLDivElement) => {
-      const { width, height } = container.getBoundingClientRect();
-      this.device = updateObject(this.device, {
-        isSmScreen: width < MQ_SM_MAX_WIDTH,
-        isMobile:
-          width < MQ_MAX_WIDTH_PORTRAIT ||
-          (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE),
-        canDeviceFitSidebar: width > MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT,
-      });
-    };
-
     if (this.excalidrawContainerRef.current) {
-      refreshDeviceState(this.excalidrawContainerRef.current);
+      this.refreshDeviceState(this.excalidrawContainerRef.current);
     }
 
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => {
         // recompute device dimensions state
         // ---------------------------------------------------------------------
-        refreshDeviceState(this.excalidrawContainerRef.current!);
+        this.refreshDeviceState(this.excalidrawContainerRef.current!);
         // refresh offsets
         // ---------------------------------------------------------------------
         this.updateDOMRect();
@@ -860,7 +864,13 @@ class App extends React.Component<AppProps, AppState> {
         `(max-width: ${MQ_SM_MAX_WIDTH}px)`,
       );
       const canDeviceFitSidebarMediaQuery = window.matchMedia(
-        `(min-width: ${MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT}px)`,
+        `(min-width: ${
+          // NOTE this won't update if a different breakpoint is supplied
+          // after mount
+          this.props.UIOptions.sidebarBreakpoint != null
+            ? this.props.UIOptions.sidebarBreakpoint
+            : MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT
+        }px)`,
       );
       const handler = () => {
         this.excalidrawContainerRef.current!.getBoundingClientRect();
@@ -1013,6 +1023,14 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    if (
+      this.excalidrawContainerRef.current &&
+      prevProps.UIOptions.sidebarBreakpoint !==
+        this.props.UIOptions.sidebarBreakpoint
+    ) {
+      this.refreshDeviceState(this.excalidrawContainerRef.current);
+    }
+
     if (
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY

@@ -291,6 +291,7 @@ export interface ExcalidrawProps {
     appState: AppState,
   ) => JSX.Element;
   UIOptions?: {
+    sidebarBreakpoint?: number;
     canvasActions?: CanvasActions;
   };
   detectScroll?: boolean;
@@ -355,6 +356,7 @@ export type AppProps = Merge<
   {
     UIOptions: {
       canvasActions: Required<CanvasActions> & { export: ExportOpts };
+      sidebarBreakpoint?: number;
     };
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
