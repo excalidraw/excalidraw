@@ -513,16 +513,17 @@ const LibraryMenuItems = ({
     );
   };
 
-  const mobileStyles = {
-    height: "50vh",
-    boxShadow: "none",
-    borderLeft: "none",
-  };
-
   return (
     <div
       className="library-menu-items-container"
-      style={device.isMobile ? mobileStyles : {}}
+      style={
+        device.isMobile
+          ? {
+              minHeight: "200px",
+              maxHeight: "70vh",
+            }
+          : undefined
+      }
     >
       {showRemoveLibAlert && renderRemoveLibAlert()}
       {renderLibraryHeader()}
