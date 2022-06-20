@@ -755,7 +755,12 @@ class App extends React.Component<AppProps, AppState> {
     const scene = restore(initialData, null, null);
     scene.appState = {
       ...scene.appState,
-      isLibraryOpen: this.state.isLibraryOpen,
+      // we're falling back to current (pre-init) state when deciding
+      // whether to open the library, to handle a case where we
+      // update the state outside of initialData (e.g. when loading the app
+      // with a library install link, which should auto-open the library)
+      isLibraryOpen:
+        initialData?.appState?.isLibraryOpen || this.state.isLibraryOpen,
       activeTool:
         scene.appState.activeTool.type === "image"
           ? { ...scene.appState.activeTool, type: "selection" }

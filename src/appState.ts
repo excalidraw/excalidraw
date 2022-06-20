@@ -147,7 +147,7 @@ const APP_STATE_STORAGE_CONF = (<
   gridSize: { browser: true, export: true, server: true },
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: false, export: false, server: false },
-  isLibraryOpen: { browser: false, export: false, server: false },
+  isLibraryOpen: { browser: true, export: false, server: false },
   isLibraryMenuDocked: { browser: true, export: false, server: false },
   isLoading: { browser: false, export: false, server: false },
   isResizing: { browser: false, export: false, server: false },
