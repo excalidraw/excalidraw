@@ -789,8 +789,8 @@ class App extends React.Component<AppProps, AppState> {
   private refreshDeviceState = (container: HTMLDivElement) => {
     const { width, height } = container.getBoundingClientRect();
     const sidebarBreakpoint =
-      this.props.UIOptions.sidebarBreakpoint != null
-        ? this.props.UIOptions.sidebarBreakpoint
+      this.props.UIOptions.dockedSidebarBreakpoint != null
+        ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT;
     this.device = updateObject(this.device, {
       isSmScreen: width < MQ_SM_MAX_WIDTH,
@@ -873,8 +873,8 @@ class App extends React.Component<AppProps, AppState> {
         `(min-width: ${
           // NOTE this won't update if a different breakpoint is supplied
           // after mount
-          this.props.UIOptions.sidebarBreakpoint != null
-            ? this.props.UIOptions.sidebarBreakpoint
+          this.props.UIOptions.dockedSidebarBreakpoint != null
+            ? this.props.UIOptions.dockedSidebarBreakpoint
             : MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT
         }px)`,
       );
@@ -1031,8 +1031,8 @@ class App extends React.Component<AppProps, AppState> {
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     if (
       this.excalidrawContainerRef.current &&
-      prevProps.UIOptions.sidebarBreakpoint !==
-        this.props.UIOptions.sidebarBreakpoint
+      prevProps.UIOptions.dockedSidebarBreakpoint !==
+        this.props.UIOptions.dockedSidebarBreakpoint
     ) {
       this.refreshDeviceState(this.excalidrawContainerRef.current);
     }
