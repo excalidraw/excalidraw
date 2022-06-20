@@ -65,6 +65,7 @@ import {
   MQ_MAX_WIDTH_LANDSCAPE,
   MQ_MAX_WIDTH_PORTRAIT,
   MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT,
+  MQ_SM_MAX_WIDTH,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
@@ -260,6 +261,7 @@ import {
 } from "../element/Hyperlink";
 
 const deviceContextInitialValue = {
+  isSmScreen: false,
   isMobile: false,
   isTouchScreen: false,
   canDeviceFitSidebar: false,
@@ -828,6 +830,7 @@ class App extends React.Component<AppProps, AppState> {
     const refreshDeviceState = (container: HTMLDivElement) => {
       const { width, height } = container.getBoundingClientRect();
       this.device = updateObject(this.device, {
+        isSmScreen: width < MQ_SM_MAX_WIDTH,
         isMobile:
           width < MQ_MAX_WIDTH_PORTRAIT ||
           (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE),
@@ -850,20 +853,26 @@ class App extends React.Component<AppProps, AppState> {
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     } else if (window.matchMedia) {
-      const mediaQuery = window.matchMedia(
+      const mdScreenQuery = window.matchMedia(
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
+      );
+      const smScreenQuery = window.matchMedia(
+        `(max-width: ${MQ_SM_MAX_WIDTH}px)`,
       );
       const canDeviceFitSidebarMediaQuery = window.matchMedia(
         `(min-width: ${MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT}px)`,
       );
       const handler = () => {
+        this.excalidrawContainerRef.current!.getBoundingClientRect();
         this.device = updateObject(this.device, {
-          isMobile: mediaQuery.matches,
+          isSmScreen: smScreenQuery.matches,
+          isMobile: mdScreenQuery.matches,
           canDeviceFitSidebar: canDeviceFitSidebarMediaQuery.matches,
         });
       };
-      mediaQuery.addListener(handler);
-      this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
+      mdScreenQuery.addListener(handler);
+      this.detachIsMobileMqHandler = () =>
+        mdScreenQuery.removeListener(handler);
     }
 
     const searchParams = new URLSearchParams(window.location.search.slice(1));

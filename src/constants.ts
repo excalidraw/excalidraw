@@ -155,11 +155,18 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
   },
 };
 
+// breakpoints
+// -----------------------------------------------------------------------------
+// sm screen
+export const MQ_SM_MAX_WIDTH = 640;
+// md screen
 export const MQ_MAX_WIDTH_PORTRAIT = 730;
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
 export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
-
+// sidebar
 export const MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT = 1229;
+// -----------------------------------------------------------------------------
+
 export const LIBRARY_SIDEBAR_WIDTH = parseInt(cssVariables.rightSidebarWidth);
 
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
