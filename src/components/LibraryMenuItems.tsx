@@ -424,6 +424,9 @@ const LibraryMenuItems = ({
         className="library-menu-items-container__items"
         align="start"
         gap={1}
+        style={{
+          flex: publishedItems.length > 0 ? 1 : "0 0 auto",
+        }}
       >
         <>
           <div className="separator">
@@ -444,19 +447,32 @@ const LibraryMenuItems = ({
               </div>
             )}
           </div>
-          {renderLibrarySection([
-            // append pending library item
-            ...(pendingElements.length
-              ? [{ id: null, elements: pendingElements }]
-              : []),
-            ...unpublishedItems,
-          ])}
+          {!pendingElements.length && !unpublishedItems.length ? (
+            <div
+              style={{
+                height: 65,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              No items yet...
+            </div>
+          ) : (
+            renderLibrarySection([
+              // append pending library item
+              ...(pendingElements.length
+                ? [{ id: null, elements: pendingElements }]
+                : []),
+              ...unpublishedItems,
+            ])
+          )}
         </>
 
         <>
           <div className="separator">{t("labels.excalidrawLib")} </div>
-
-          {renderLibrarySection(publishedItems)}
+          {publishedItems.length > 0 && renderLibrarySection(publishedItems)}
         </>
       </Stack.Col>
     );
