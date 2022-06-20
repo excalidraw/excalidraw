@@ -4,6 +4,7 @@ import React from "react";
 import clsx from "clsx";
 import { ToolButtonSize } from "./ToolButton";
 import { t } from "../i18n";
+import { Tooltip } from "./Tooltip";
 
 type SidebarLockIconProps = {
   checked: boolean;
@@ -20,23 +21,25 @@ const SIDE_LIBRARY_TOGGLE_ICON = (
 
 export const SidebarLockButton = (props: SidebarLockIconProps) => {
   return (
-    <label
-      className={clsx(
-        "ToolIcon ToolIcon__lock ToolIcon_type_floating",
-        `ToolIcon_size_${DEFAULT_SIZE}`,
-      )}
-      title={t("labels.sidebarLock")}
-    >
-      <input
-        className="ToolIcon_type_checkbox"
-        type="checkbox"
-        onChange={props.onChange}
-        checked={props.checked}
-        aria-label={t("labels.sidebarLock")}
-      />
-      <div className="ToolIcon__icon side_lock_icon">
-        {SIDE_LIBRARY_TOGGLE_ICON}
-      </div>
-    </label>
+    <Tooltip label={t("labels.sidebarLock")}>
+      <label
+        className={clsx(
+          "ToolIcon ToolIcon__lock ToolIcon_type_floating",
+          `ToolIcon_size_${DEFAULT_SIZE}`,
+        )}
+        title={t("labels.sidebarLock")}
+      >
+        <input
+          className="ToolIcon_type_checkbox"
+          type="checkbox"
+          onChange={props.onChange}
+          checked={props.checked}
+          aria-label={t("labels.sidebarLock")}
+        />{" "}
+        <div className="ToolIcon__icon side_lock_icon" tabIndex={0}>
+          {SIDE_LIBRARY_TOGGLE_ICON}
+        </div>{" "}
+      </label>{" "}
+    </Tooltip>
   );
 };
