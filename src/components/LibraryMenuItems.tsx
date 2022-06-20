@@ -426,7 +426,24 @@ const LibraryMenuItems = ({
         gap={1}
       >
         <>
-          <div className="separator">{t("labels.personalLib")}</div>
+          <div className="separator">
+            <div>{t("labels.personalLib")}</div>
+            {isLoading && (
+              <div
+                style={{
+                  marginLeft: "auto",
+                  marginRight: "1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  fontWeight: "normal",
+                }}
+              >
+                <div style={{ transform: "translateY(2px)" }}>
+                  <Spinner />
+                </div>
+              </div>
+            )}
+          </div>
           {renderLibrarySection([
             // append pending library item
             ...(pendingElements.length
@@ -449,10 +466,6 @@ const LibraryMenuItems = ({
     return (
       <a
         className="library-menu-browse-button"
-        style={{
-          width: isLoading ? "15%" : "80%",
-          pointerEvents: isLoading ? "none" : undefined,
-        }}
         href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
           window.name || "_blank"
         }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
@@ -460,13 +473,7 @@ const LibraryMenuItems = ({
         }`}
         target="_excalidraw_libraries"
       >
-        {isLoading ? (
-          <Spinner />
-        ) : !device.isMobile ? (
-          <div className="library-menu-browse-button__text">
-            {t("labels.libraries")}
-          </div>
-        ) : null}
+        {t("labels.libraries")}
       </a>
     );
   };

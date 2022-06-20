@@ -102,6 +102,9 @@
     }
 
     .separator {
+      width: 100%;
+      display: flex;
+      align-items: center;
       font-weight: 500;
       font-size: 0.9rem;
       margin: 0.6em 0.2em;
