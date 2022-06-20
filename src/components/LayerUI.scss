@@ -1,4 +1,5 @@
 @import "open-color/open-color";
+@import "../css/variables.module";
 
 .layer-ui__sidebar {
   position: absolute;
@@ -11,6 +12,7 @@
   overflow: hidden;
   border-radius: var(--border-radius-lg);
   margin: var(--space-factor);
+  width: calc(#{$right-sidebar-width} - var(--space-factor) * 2);
 
   .Island {
     box-shadow: none;

@@ -7,7 +7,9 @@
 }
 
 $theme-filter: "invert(93%) hue-rotate(180deg)";
+$right-sidebar-width: "302px";
 
 :export {
   themeFilter: unquote($theme-filter);
+  rightSidebarWidth: unquote($right-sidebar-width);
 }

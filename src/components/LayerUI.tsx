@@ -598,7 +598,9 @@ const LayerUI = ({
           </button>
         )}
       </div>
-      <div className="layer-ui__sidebar">{libraryMenu}</div>
+      {appState.isLibraryOpen && (
+        <div className="layer-ui__sidebar">{libraryMenu}</div>
+      )}
     </>
   );
 };

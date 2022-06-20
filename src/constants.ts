@@ -162,7 +162,7 @@ export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
 export const MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT = 1229;
 export const MQ_RIGHT_SIDEBAR_MAX_WIDTH_LANDSCAPE = 1024;
 export const MQ_RIGHT_SIDEBAR_MAX_HEIGHT_LANDSCAPE = 768;
-export const LIBRARY_SIDEBAR_WIDTH = 300;
+export const LIBRARY_SIDEBAR_WIDTH = parseInt(cssVariables.rightSidebarWidth);
 
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 
