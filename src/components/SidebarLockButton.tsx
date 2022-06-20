@@ -27,7 +27,6 @@ export const SidebarLockButton = (props: SidebarLockIconProps) => {
           "ToolIcon ToolIcon__lock ToolIcon_type_floating",
           `ToolIcon_size_${DEFAULT_SIZE}`,
         )}
-        title={t("labels.sidebarLock")}
       >
         <input
           className="ToolIcon_type_checkbox"
