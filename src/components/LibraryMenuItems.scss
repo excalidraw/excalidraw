@@ -96,7 +96,8 @@
     }
     &__items {
       flex: 1;
-      overflow-y: scroll;
+      overflow-y: auto;
+      overflow-x: hidden;
       margin-bottom: 1rem;
     }
 
