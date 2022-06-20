@@ -486,9 +486,9 @@ const LibraryMenuItems = ({
         </>
 
         <>
-          {(pendingElements.length > 0 ||
-            unpublishedItems.length > 0 ||
-            publishedItems.length > 0) && (
+          {(publishedItems.length > 0 ||
+            (!device.isMobile &&
+              (pendingElements.length > 0 || unpublishedItems.length > 0))) && (
             <div className="separator">{t("labels.excalidrawLib")}</div>
           )}
           {publishedItems.length > 0 && renderLibrarySection(publishedItems)}
