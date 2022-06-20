@@ -842,7 +842,13 @@ class App extends React.Component<AppProps, AppState> {
       this.focusContainer();
     }
 
-    if (this.excalidrawContainerRef.current) {
+    if (
+      this.excalidrawContainerRef.current &&
+      // bounding rects don't work in tests so updating
+      // the state on init would result in making the test enviro run
+      // in mobile breakpoint (0 width/height), making everything fail
+      process.env.NODE_ENV !== "test"
+    ) {
       this.refreshDeviceState(this.excalidrawContainerRef.current);
     }
 
