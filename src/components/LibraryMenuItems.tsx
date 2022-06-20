@@ -197,6 +197,20 @@ const LibraryMenuItems = ({
             </ToolButton>
           </Tooltip>
         )}
+        {device.isMobile && (
+          <div className="library-menu-browse-button--mobile">
+            <a
+              href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+                window.name || "_blank"
+              }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+                VERSIONS.excalidrawLibrary
+              }`}
+              target="_excalidraw_libraries"
+            >
+              {t("labels.libraries")}
+            </a>
+          </div>
+        )}
       </div>
     );
   };
@@ -396,24 +410,6 @@ const LibraryMenuItems = ({
             </div>
           )}
         </div>
-        {device.isMobile && (
-          <div className="library-menu-browse-button--mobile">
-            {isLoading ? (
-              <Spinner />
-            ) : (
-              <a
-                href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-                  window.name || "_blank"
-                }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
-                  VERSIONS.excalidrawLibrary
-                }`}
-                target="_excalidraw_libraries"
-              >
-                {t("labels.libraries")}
-              </a>
-            )}
-          </div>
-        )}
       </>
     );
   };

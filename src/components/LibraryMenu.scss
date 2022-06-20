@@ -19,13 +19,6 @@
         // 2px from the left to account for focus border of left-most button
         margin: 0 2px;
       }
-
-      a {
-        margin-inline-start: auto;
-        // 17px for scrollbar (needed for overlay scrollbars on Big Sur?) + 1px extra
-        padding-inline-end: 18px;
-        white-space: nowrap;
-      }
     }
   }
 
@@ -103,5 +96,9 @@
 
   .library-menu-browse-button--mobile {
     min-height: 22px;
+    margin-left: auto;
+    a {
+      padding-right: 0;
+    }
   }
 }

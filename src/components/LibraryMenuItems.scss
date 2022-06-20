@@ -10,8 +10,10 @@
     box-sizing: border-box;
 
     .library-actions {
+      width: 100%;
       display: flex;
       margin-right: auto;
+      align-items: center;
 
       button .library-actions-counter {
         position: absolute;
