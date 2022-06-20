@@ -309,7 +309,7 @@ class App extends React.Component<AppProps, AppState> {
     UIOptions: DEFAULT_UI_OPTIONS,
   };
 
-  private scene: Scene;
+  public scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
@@ -1169,8 +1169,7 @@ class App extends React.Component<AppProps, AppState> {
         if (isImageElement(element)) {
           if (
             // not placed on canvas yet (but in elements array)
-            this.state.pendingImageElement &&
-            element.id === this.state.pendingImageElement.id
+            this.state.pendingImageElementId === element.id
           ) {
             return false;
           }
@@ -1722,7 +1721,9 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
+        (isWritableElement(event.target) &&
+          !event[KEYS.CTRL_OR_CMD] &&
+          event.key !== KEYS.ESCAPE) ||
         // case: using arrows to move between buttons
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {
@@ -2252,11 +2253,12 @@ class App extends React.Component<AppProps, AppState> {
         existingTextElement = selectedElements[0];
       } else if (isTextBindableContainer(selectedElements[0], false)) {
         existingTextElement = getBoundTextElement(selectedElements[0]);
+      } else {
+        existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
       }
+    } else {
+      existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
-
-    existingTextElement =
-      existingTextElement ?? this.getTextElementAtPosition(sceneX, sceneY);
 
     // bind to container when shouldBind is true or
     // clicked on center of container
@@ -3027,19 +3029,24 @@ class App extends React.Component<AppProps, AppState> {
       // reset image preview on pointerdown
       setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
 
-      if (!this.state.pendingImageElement) {
+      // retrieve the latest element as the state may be stale
+      const pendingImageElement =
+        this.state.pendingImageElementId &&
+        this.scene.getElement(this.state.pendingImageElementId);
+
+      if (!pendingImageElement) {
         return;
       }
 
       this.setState({
-        draggingElement: this.state.pendingImageElement,
-        editingElement: this.state.pendingImageElement,
-        pendingImageElement: null,
+        draggingElement: pendingImageElement,
+        editingElement: pendingImageElement,
+        pendingImageElementId: null,
         multiElement: null,
       });
 
       const { x, y } = viewportCoordsToSceneCoords(event, this.state);
-      mutateElement(this.state.pendingImageElement, {
+      mutateElement(pendingImageElement, {
         x,
         y,
       });
@@ -4355,8 +4362,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.eventListeners.onKeyUp!,
       );
 
-      if (this.state.pendingImageElement) {
-        this.setState({ pendingImageElement: null });
+      if (this.state.pendingImageElementId) {
+        this.setState({ pendingImageElementId: null });
       }
 
       if (draggingElement?.type === "freedraw") {
@@ -4844,7 +4851,7 @@ class App extends React.Component<AppProps, AppState> {
             await cachedImageData.image;
           }
           if (
-            this.state.pendingImageElement?.id !== imageElement.id &&
+            this.state.pendingImageElementId !== imageElement.id &&
             this.state.draggingElement?.id !== imageElement.id
           ) {
             this.initializeImageDimensions(imageElement, true);
@@ -4926,7 +4933,7 @@ class App extends React.Component<AppProps, AppState> {
       previewDataURL = canvas.toDataURL(MIME_TYPES.svg) as DataURL;
     }
 
-    if (this.state.pendingImageElement) {
+    if (this.state.pendingImageElementId) {
       setCursor(this.canvas, `url(${previewDataURL}) 4 4, auto`);
     }
   };
@@ -4967,7 +4974,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         this.setState(
           {
-            pendingImageElement: imageElement,
+            pendingImageElementId: imageElement.id,
           },
           () => {
             this.insertImageElement(
@@ -4986,7 +4993,7 @@ class App extends React.Component<AppProps, AppState> {
       }
       this.setState(
         {
-          pendingImageElement: null,
+          pendingImageElementId: null,
           editingElement: null,
           activeTool: updateActiveTool(this.state, { type: "selection" }),
         },
@@ -5906,10 +5913,10 @@ if (
     elements: {
       configurable: true,
       get() {
-        return this.app.scene.getElementsIncludingDeleted();
+        return this.app?.scene.getElementsIncludingDeleted();
       },
       set(elements: ExcalidrawElement[]) {
-        return this.app.scene.replaceAllElements(elements);
+        return this.app?.scene.replaceAllElements(elements);
       },
     },
   });

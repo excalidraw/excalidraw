@@ -17,6 +17,8 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
+- Added support for supplying user `id` in the Collaborator object (see `collaborators` in [`updateScene()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene)), which will be used to deduplicate users when rendering collaborator avatar list. Cursors will still be rendered for every user. [#5309](https://github.com/excalidraw/excalidraw/pull/5309)
+
 - Export API to [set](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#setCursor) and [reset](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#resetCursor) mouse cursor on the canvas [#5215](https://github.com/excalidraw/excalidraw/pull/5215).
 
 - Export [`sceneCoordsToViewportCoords`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) and [`viewportCoordsToSceneCoords`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPointerDown) utilities [#5187](https://github.com/excalidraw/excalidraw/pull/5187).
@@ -52,6 +54,8 @@ Please add the latest change on the top under the correct section.
 - Exported [`restoreLibraryItems`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreLibraryItems) API [#4995](https://github.com/excalidraw/excalidraw/pull/4995).
 
 #### Fixes
+
+- Allow returning `null ` in [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop [#5282](https://github.com/excalidraw/excalidraw/pull/5282).
 
 - Use `window.EXCALIDRAW_ASSET_PATH` for fonts when exporting to svg [#5065](https://github.com/excalidraw/excalidraw/pull/5065).
 - Library menu now properly rerenders if open when library is updated using `updateScene({ libraryItems })` [#4995](https://github.com/excalidraw/excalidraw/pull/4995).

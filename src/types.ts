@@ -48,6 +48,8 @@ export type Collaborator = {
   // The url of the collaborator's avatar, defaults to username intials
   // if not present
   avatarUrl?: string;
+  // user id. If supplied, we'll filter out duplicates when rendering user avatars.
+  id?: string;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
@@ -175,7 +177,7 @@ export type AppState = {
         data: Spreadsheet;
       };
   /** imageElement waiting to be placed on canvas */
-  pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
+  pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
 };
 
@@ -278,7 +280,7 @@ export interface ExcalidrawProps {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  renderFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderFooter?: (isMobile: boolean, appState: AppState) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
@@ -380,6 +382,7 @@ export type AppClassProperties = {
   >;
   files: BinaryFiles;
   device: App["device"];
+  scene: App["scene"];
 };
 
 export type PointerDownState = Readonly<{
