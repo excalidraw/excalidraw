@@ -313,7 +313,7 @@ const metricsCache = {} as {
   };
 };
 // Cache the SVGs for renderSvgMathElement()
-const svgCache = {} as { [key: string]: SVGSVGElement };
+const svgCache = {} as { [key: string]: string };
 // Cache the rendered MathJax images for renderMathElement()
 const imageCache = {} as { [key: string]: HTMLImageElement };
 
@@ -883,7 +883,9 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
     mathProps,
   );
   if (isMathJaxLoaded && svgCache[key]) {
-    node.appendChild(svgCache[key]);
+    const cachedDiv = svgRoot.ownerDocument!.createElement("div");
+    cachedDiv.innerHTML = svgCache[key];
+    node.appendChild(cachedDiv.firstElementChild!);
     root.appendChild(node);
     return;
   }
@@ -983,7 +985,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   tempSvg.setAttribute("width", `${width}`);
   tempSvg.setAttribute("height", `${height}`);
   if (isMathJaxLoaded) {
-    svgCache[key] = tempSvg;
+    svgCache[key] = tempSvg.outerHTML;
   }
   node.appendChild(tempSvg);
   root.appendChild(node);
