@@ -120,7 +120,12 @@
       "lockAll": "",
       "unlockAll": ""
     },
-    "statusPublished": ""
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Limpar a área de desenho e redefinir a cor de fundo",
