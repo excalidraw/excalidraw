@@ -120,7 +120,12 @@
       "lockAll": "Blocca tutto",
       "unlockAll": "Sblocca tutto"
     },
-    "statusPublished": "Pubblicato"
+    "statusPublished": "Pubblicato",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Svuota la tela",
