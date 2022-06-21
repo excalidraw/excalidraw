@@ -2,11 +2,11 @@
   .Island {
     --padding: 0;
     background-color: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
     border-radius: var(--border-radius-lg);
     padding: calc(var(--padding) * var(--space-factor));
     position: relative;
     transition: box-shadow 0.5s ease-in-out;
-    box-shadow: var(--shadow-island);
 
     &.zen-mode {
       box-shadow: none;
