@@ -64,6 +64,8 @@ import {
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
   MQ_MAX_WIDTH_PORTRAIT,
+  MQ_RIGHT_SIDEBAR_MIN_WIDTH,
+  MQ_SM_MAX_WIDTH,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
@@ -194,7 +196,7 @@ import {
   LibraryItems,
   PointerDownState,
   SceneData,
-  DeviceType,
+  Device,
 } from "../types";
 import {
   debounce,
@@ -220,7 +222,6 @@ import {
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
-import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
@@ -259,12 +260,14 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 
-const defaultDeviceTypeContext: DeviceType = {
+const deviceContextInitialValue = {
+  isSmScreen: false,
   isMobile: false,
   isTouchScreen: false,
+  canDeviceFitSidebar: false,
 };
-const DeviceTypeContext = React.createContext(defaultDeviceTypeContext);
-export const useDeviceType = () => useContext(DeviceTypeContext);
+const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
+export const useDevice = () => useContext<Device>(DeviceContext);
 const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
   id: string | null;
@@ -296,10 +299,7 @@ class App extends React.Component<AppProps, AppState> {
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
-  deviceType: DeviceType = {
-    isMobile: false,
-    isTouchScreen: false,
-  };
+  device: Device = deviceContextInitialValue;
   detachIsMobileMqHandler?: () => void;
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
@@ -353,12 +353,12 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
       showHyperlinkPopup: false,
+      isLibraryMenuDocked: false,
     };
 
     this.id = nanoid();
 
     this.library = new Library(this);
-
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -485,7 +485,7 @@ class App extends React.Component<AppProps, AppState> {
       <div
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": viewModeEnabled,
-          "excalidraw--mobile": this.deviceType.isMobile,
+          "excalidraw--mobile": this.device.isMobile,
         })}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -497,7 +497,7 @@ class App extends React.Component<AppProps, AppState> {
         <ExcalidrawContainerContext.Provider
           value={this.excalidrawContainerValue}
         >
-          <DeviceTypeContext.Provider value={this.deviceType}>
+          <DeviceContext.Provider value={this.device}>
             <LayerUI
               canvas={this.canvas}
               appState={this.state}
@@ -521,6 +521,7 @@ class App extends React.Component<AppProps, AppState> {
               isCollaborating={this.props.isCollaborating}
               renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
+              renderCustomStats={renderCustomStats}
               viewModeEnabled={viewModeEnabled}
               showExitZenModeBtn={
                 typeof this.props?.zenModeEnabled === "undefined" &&
@@ -548,15 +549,6 @@ class App extends React.Component<AppProps, AppState> {
                 onLinkOpen={this.props.onLinkOpen}
               />
             )}
-            {this.state.showStats && (
-              <Stats
-                appState={this.state}
-                setAppState={this.setAppState}
-                elements={this.scene.getNonDeletedElements()}
-                onClose={this.toggleStats}
-                renderCustomStats={renderCustomStats}
-              />
-            )}
             {this.state.toastMessage !== null && (
               <Toast
                 message={this.state.toastMessage}
@@ -564,7 +556,7 @@ class App extends React.Component<AppProps, AppState> {
               />
             )}
             <main>{this.renderCanvas()}</main>
-          </DeviceTypeContext.Provider>
+          </DeviceContext.Provider>
         </ExcalidrawContainerContext.Provider>
       </div>
     );
@@ -763,7 +755,12 @@ class App extends React.Component<AppProps, AppState> {
     const scene = restore(initialData, null, null);
     scene.appState = {
       ...scene.appState,
-      isLibraryOpen: this.state.isLibraryOpen,
+      // we're falling back to current (pre-init) state when deciding
+      // whether to open the library, to handle a case where we
+      // update the state outside of initialData (e.g. when loading the app
+      // with a library install link, which should auto-open the library)
+      isLibraryOpen:
+        initialData?.appState?.isLibraryOpen || this.state.isLibraryOpen,
       activeTool:
         scene.appState.activeTool.type === "image"
           ? { ...scene.appState.activeTool, type: "selection" }
@@ -791,6 +788,21 @@ class App extends React.Component<AppProps, AppState> {
     this.syncActionResult({
       ...scene,
       commitToHistory: true,
+    });
+  };
+
+  private refreshDeviceState = (container: HTMLDivElement) => {
+    const { width, height } = container.getBoundingClientRect();
+    const sidebarBreakpoint =
+      this.props.UIOptions.dockedSidebarBreakpoint != null
+        ? this.props.UIOptions.dockedSidebarBreakpoint
+        : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
+    this.device = updateObject(this.device, {
+      isSmScreen: width < MQ_SM_MAX_WIDTH,
+      isMobile:
+        width < MQ_MAX_WIDTH_PORTRAIT ||
+        (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE),
+      canDeviceFitSidebar: width > sidebarBreakpoint,
     });
   };
 
@@ -835,34 +847,53 @@ class App extends React.Component<AppProps, AppState> {
       this.focusContainer();
     }
 
+    if (
+      this.excalidrawContainerRef.current &&
+      // bounding rects don't work in tests so updating
+      // the state on init would result in making the test enviro run
+      // in mobile breakpoint (0 width/height), making everything fail
+      process.env.NODE_ENV !== "test"
+    ) {
+      this.refreshDeviceState(this.excalidrawContainerRef.current);
+    }
+
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => {
-        // compute isMobile state
+        // recompute device dimensions state
         // ---------------------------------------------------------------------
-        const { width, height } =
-          this.excalidrawContainerRef.current!.getBoundingClientRect();
-        this.deviceType = updateObject(this.deviceType, {
-          isMobile:
-            width < MQ_MAX_WIDTH_PORTRAIT ||
-            (height < MQ_MAX_HEIGHT_LANDSCAPE &&
-              width < MQ_MAX_WIDTH_LANDSCAPE),
-        });
+        this.refreshDeviceState(this.excalidrawContainerRef.current!);
         // refresh offsets
         // ---------------------------------------------------------------------
         this.updateDOMRect();
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     } else if (window.matchMedia) {
-      const mediaQuery = window.matchMedia(
+      const mdScreenQuery = window.matchMedia(
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
+      const smScreenQuery = window.matchMedia(
+        `(max-width: ${MQ_SM_MAX_WIDTH}px)`,
+      );
+      const canDeviceFitSidebarMediaQuery = window.matchMedia(
+        `(min-width: ${
+          // NOTE this won't update if a different breakpoint is supplied
+          // after mount
+          this.props.UIOptions.dockedSidebarBreakpoint != null
+            ? this.props.UIOptions.dockedSidebarBreakpoint
+            : MQ_RIGHT_SIDEBAR_MIN_WIDTH
+        }px)`,
+      );
       const handler = () => {
-        this.deviceType = updateObject(this.deviceType, {
-          isMobile: mediaQuery.matches,
+        this.excalidrawContainerRef.current!.getBoundingClientRect();
+        this.device = updateObject(this.device, {
+          isSmScreen: smScreenQuery.matches,
+          isMobile: mdScreenQuery.matches,
+          canDeviceFitSidebar: canDeviceFitSidebarMediaQuery.matches,
         });
       };
-      mediaQuery.addListener(handler);
-      this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
+      mdScreenQuery.addListener(handler);
+      this.detachIsMobileMqHandler = () =>
+        mdScreenQuery.removeListener(handler);
     }
 
     const searchParams = new URLSearchParams(window.location.search.slice(1));
@@ -1003,6 +1034,14 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    if (
+      this.excalidrawContainerRef.current &&
+      prevProps.UIOptions.dockedSidebarBreakpoint !==
+        this.props.UIOptions.dockedSidebarBreakpoint
+    ) {
+      this.refreshDeviceState(this.excalidrawContainerRef.current);
+    }
+
     if (
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY
@@ -1175,7 +1214,7 @@ class App extends React.Component<AppProps, AppState> {
         theme: this.state.theme,
         imageCache: this.imageCache,
         isExporting: false,
-        renderScrollbars: !this.deviceType.isMobile,
+        renderScrollbars: !this.device.isMobile,
       },
     );
 
@@ -1453,11 +1492,15 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
+
     this.setState(
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          isLibraryOpen: false,
+          isLibraryOpen:
+            this.state.isLibraryOpen && this.device.canDeviceFitSidebar
+              ? this.state.isLibraryMenuDocked
+              : false,
           selectedElementIds: newElements.reduce((map, element) => {
             if (!isBoundToContainer(element)) {
               map[element.id] = true;
@@ -1529,7 +1572,7 @@ class App extends React.Component<AppProps, AppState> {
       trackEvent(
         "toolbar",
         "toggleLock",
-        `${source} (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
+        `${source} (${this.device.isMobile ? "mobile" : "desktop"})`,
       );
     }
     this.setState((prevState) => {
@@ -1558,10 +1601,6 @@ class App extends React.Component<AppProps, AppState> {
 
   toggleZenMode = () => {
     this.actionManager.executeAction(actionToggleZenMode);
-  };
-
-  toggleStats = () => {
-    this.actionManager.executeAction(actionToggleStats);
   };
 
   scrollToContent = (
@@ -1721,7 +1760,16 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.code === CODES.ZERO) {
-        this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
+        const nextState = !this.state.isLibraryOpen;
+        this.setState({ isLibraryOpen: nextState });
+        // track only openings
+        if (nextState) {
+          trackEvent(
+            "library",
+            "toggleLibrary (open)",
+            `keyboard (${this.device.isMobile ? "mobile" : "desktop"})`,
+          );
+        }
       }
 
       if (isArrowKey(event.key)) {
@@ -1815,7 +1863,7 @@ class App extends React.Component<AppProps, AppState> {
             trackEvent(
               "toolbar",
               shape,
-              `keyboard (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
+              `keyboard (${this.device.isMobile ? "mobile" : "desktop"})`,
             );
           }
           this.setActiveTool({ type: shape });
@@ -2440,7 +2488,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
-          this.deviceType.isMobile,
+          this.device.isMobile,
         )
       );
     });
@@ -2472,7 +2520,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
-      this.deviceType.isMobile,
+      this.device.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUp!,
@@ -2482,7 +2530,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
-      this.deviceType.isMobile,
+      this.device.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement.link;
@@ -2921,10 +2969,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      !this.deviceType.isTouchScreen &&
+      !this.device.isTouchScreen &&
       ["pen", "touch"].includes(event.pointerType)
     ) {
-      this.deviceType = updateObject(this.deviceType, { isTouchScreen: true });
+      this.device = updateObject(this.device, { isTouchScreen: true });
     }
 
     if (isPanning) {
@@ -3066,7 +3114,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
-    if (this.deviceType.isTouchScreen) {
+    if (this.device.isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
@@ -3084,7 +3132,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event, this.deviceType.isTouchScreen);
+      this.redirectToLink(event, this.device.isTouchScreen);
     }
 
     this.removePointer(event);
@@ -3456,7 +3504,7 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState.hit.element,
               this.state,
               [pointerDownState.origin.x, pointerDownState.origin.y],
-              this.deviceType.isMobile,
+              this.device.isMobile,
             )
           ) {
             return false;
@@ -5563,7 +5611,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.deviceType.isMobile &&
+            this.device.isMobile &&
               navigator.clipboard && {
                 trackEvent: false,
                 name: "paste",
@@ -5575,7 +5623,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.deviceType.isMobile && navigator.clipboard && separator,
+            this.device.isMobile && navigator.clipboard && separator,
             probablySupportsClipboardBlob &&
               elements.length > 0 &&
               actionCopyAsPng,
@@ -5620,9 +5668,9 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.deviceType.isMobile && actionCut,
-            this.deviceType.isMobile && navigator.clipboard && actionCopy,
-            this.deviceType.isMobile &&
+            this.device.isMobile && actionCut,
+            this.device.isMobile && navigator.clipboard && actionCopy,
+            this.device.isMobile &&
               navigator.clipboard && {
                 name: "paste",
                 trackEvent: false,
@@ -5634,7 +5682,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.deviceType.isMobile && separator,
+            this.device.isMobile && separator,
             ...options,
             separator,
             actionCopyStyles,

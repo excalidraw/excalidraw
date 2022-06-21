@@ -1,0 +1,22 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .layer-ui__sidebar-lock-button {
+    @include toolbarButtonColorStates;
+    margin-right: 0.2rem;
+  }
+  .ToolIcon_type_floating .side_lock_icon {
+    width: calc(var(--space-factor) * 7);
+    height: calc(var(--space-factor) * 7);
+    svg {
+      // mirror
+      transform: scale(-1, 1);
+    }
+  }
+
+  .ToolIcon_type_checkbox {
+    &:not(.ToolIcon_toggle_opaque):checked + .side_lock_icon {
+      background-color: var(--color-primary);
+    }
+  }
+}

@@ -5,7 +5,7 @@ import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
-import { useDeviceType } from "./App";
+import { useDevice } from "./App";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../scene/export";
 import { AppState, BinaryFiles } from "../types";
@@ -250,7 +250,7 @@ export const ImageExportDialog = ({
         icon={exportImage}
         type="button"
         aria-label={t("buttons.exportImage")}
-        showAriaLabel={useDeviceType().isMobile}
+        showAriaLabel={useDevice().isMobile}
         title={t("buttons.exportImage")}
       />
       {modalIsShown && (

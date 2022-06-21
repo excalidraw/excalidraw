@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React, { useCallback } from "react";
 import { ActionManager } from "../actions/manager";
-import { CLASSES } from "../constants";
+import { CLASSES, LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { exportCanvas } from "../data";
 import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
@@ -36,7 +36,9 @@ import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
-import { useDeviceType } from "../components/App";
+import { useDevice } from "../components/App";
+import { Stats } from "./Stats";
+import { actionToggleStats } from "../actions/actionToggleStats";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -55,14 +57,9 @@ interface LayerUIProps {
   toggleZenMode: () => void;
   langCode: Language["code"];
   isCollaborating: boolean;
-  renderTopRightUI?: (
-    isMobile: boolean,
-    appState: AppState,
-  ) => JSX.Element | null;
-  renderCustomFooter?: (
-    isMobile: boolean,
-    appState: AppState,
-  ) => JSX.Element | null;
+  renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
+  renderCustomFooter?: ExcalidrawProps["renderFooter"];
+  renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   UIOptions: AppProps["UIOptions"];
@@ -71,7 +68,6 @@ interface LayerUIProps {
   id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
 }
-
 const LayerUI = ({
   actionManager,
   appState,
@@ -90,6 +86,7 @@ const LayerUI = ({
   isCollaborating,
   renderTopRightUI,
   renderCustomFooter,
+  renderCustomStats,
   viewModeEnabled,
   libraryReturnUrl,
   UIOptions,
@@ -98,7 +95,7 @@ const LayerUI = ({
   id,
   onImageAction,
 }: LayerUIProps) => {
-  const deviceType = useDeviceType();
+  const device = useDevice();
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -344,7 +341,7 @@ const LayerUI = ({
                       <HintViewer
                         appState={appState}
                         elements={elements}
-                        isMobile={deviceType.isMobile}
+                        isMobile={device.isMobile}
                       />
                       {heading}
                       <Stack.Row gap={1}>
@@ -366,7 +363,6 @@ const LayerUI = ({
                       setAppState={setAppState}
                     />
                   </Stack.Row>
-                  {libraryMenu}
                 </Stack.Col>
               )}
             </Section>
@@ -383,7 +379,7 @@ const LayerUI = ({
               collaborators={appState.collaborators}
               actionManager={actionManager}
             />
-            {renderTopRightUI?.(deviceType.isMobile, appState)}
+            {renderTopRightUI?.(device.isMobile, appState)}
           </div>
         </div>
       </FixedSideContainer>
@@ -436,7 +432,7 @@ const LayerUI = ({
               )}
               {!viewModeEnabled &&
                 appState.multiElement &&
-                deviceType.isTouchScreen && (
+                device.isTouchScreen && (
                   <div
                     className={clsx("finalize-button zen-mode-transition", {
                       "layer-ui__wrapper__footer-left--transition-left":
@@ -513,7 +509,24 @@ const LayerUI = ({
     </>
   );
 
-  return deviceType.isMobile ? (
+  const renderStats = () => {
+    if (!appState.showStats) {
+      return null;
+    }
+    return (
+      <Stats
+        appState={appState}
+        setAppState={setAppState}
+        elements={elements}
+        onClose={() => {
+          actionManager.executeAction(actionToggleStats);
+        }}
+        renderCustomStats={renderCustomStats}
+      />
+    );
+  };
+
+  return device.isMobile ? (
     <>
       {dialogs}
       <MobileMenu
@@ -534,33 +547,48 @@ const LayerUI = ({
         showThemeBtn={showThemeBtn}
         onImageAction={onImageAction}
         renderTopRightUI={renderTopRightUI}
+        renderStats={renderStats}
       />
     </>
   ) : (
-    <div
-      className={clsx("layer-ui__wrapper", {
-        "disable-pointerEvents":
-          appState.draggingElement ||
-          appState.resizingElement ||
-          (appState.editingElement && !isTextElement(appState.editingElement)),
-      })}
-    >
-      {dialogs}
-      {renderFixedSideContainer()}
-      {renderBottomAppMenu()}
-      {appState.scrolledOutside && (
-        <button
-          className="scroll-back-to-content"
-          onClick={() => {
-            setAppState({
-              ...calculateScrollCenter(elements, appState, canvas),
-            });
-          }}
-        >
-          {t("buttons.scrollBackToContent")}
-        </button>
+    <>
+      <div
+        className={clsx("layer-ui__wrapper", {
+          "disable-pointerEvents":
+            appState.draggingElement ||
+            appState.resizingElement ||
+            (appState.editingElement &&
+              !isTextElement(appState.editingElement)),
+        })}
+        style={
+          appState.isLibraryOpen &&
+          appState.isLibraryMenuDocked &&
+          device.canDeviceFitSidebar
+            ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
+            : {}
+        }
+      >
+        {dialogs}
+        {renderFixedSideContainer()}
+        {renderBottomAppMenu()}
+        {renderStats()}
+        {appState.scrolledOutside && (
+          <button
+            className="scroll-back-to-content"
+            onClick={() => {
+              setAppState({
+                ...calculateScrollCenter(elements, appState, canvas),
+              });
+            }}
+          >
+            {t("buttons.scrollBackToContent")}
+          </button>
+        )}
+      </div>
+      {appState.isLibraryOpen && (
+        <div className="layer-ui__sidebar">{libraryMenu}</div>
       )}
-    </div>
+    </>
   );
 };
 

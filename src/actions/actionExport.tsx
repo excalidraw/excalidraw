@@ -7,7 +7,7 @@ import { DarkModeToggle } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { resaveAsImageWithScene } from "../data/resave";
 import { t } from "../i18n";
-import { useDeviceType } from "../components/App";
+import { useDevice } from "../components/App";
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { CheckboxItem } from "../components/CheckboxItem";
@@ -204,7 +204,7 @@ export const actionSaveFileToDisk = register({
       icon={saveAs}
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
-      showAriaLabel={useDeviceType().isMobile}
+      showAriaLabel={useDevice().isMobile}
       hidden={!nativeFileSystemSupported}
       onClick={() => updateData(null)}
       data-testid="save-as-button"
@@ -248,7 +248,7 @@ export const actionLoadScene = register({
       icon={load}
       title={t("buttons.load")}
       aria-label={t("buttons.load")}
-      showAriaLabel={useDeviceType().isMobile}
+      showAriaLabel={useDevice().isMobile}
       onClick={updateData}
       data-testid="load-button"
     />
