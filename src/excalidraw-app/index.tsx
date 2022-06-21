@@ -18,7 +18,7 @@ import {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
-import { Language, t } from "../i18n";
+import { t } from "../i18n";
 import {
   Excalidraw,
   defaultLang,
@@ -80,11 +80,7 @@ const isExcalidrawPlusSignedUser = document.cookie.includes(
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
-  languageUtils: {
-    formatLanguageCode: (langCode: Language["code"]) => langCode,
-    isWhitelisted: () => true,
-  },
-  checkWhitelist: false,
+  languageUtils: {},
 });
 
 const initializeScene = async (opts: {
