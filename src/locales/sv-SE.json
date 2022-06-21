@@ -120,7 +120,12 @@
       "lockAll": "Lås alla",
       "unlockAll": "Lås upp alla"
     },
-    "statusPublished": "Publicerad"
+    "statusPublished": "Publicerad",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
