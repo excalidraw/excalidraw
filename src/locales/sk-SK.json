@@ -120,7 +120,12 @@
       "lockAll": "Zamknúť všetko",
       "unlockAll": "Odomknúť všetko"
     },
-    "statusPublished": "Zverejnené"
+    "statusPublished": "Zverejnené",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
