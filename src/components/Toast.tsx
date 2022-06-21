@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useRef } from "react";
-import { TOAST_TIMEOUT } from "../constants";
 import { close } from "./icons";
 import "./Toast.scss";
 import { ToolButton } from "./ToolButton";
+
+const DEFAULT_TOAST_TIMEOUT = 5000;
 
 export const Toast = ({
   message,
   clearToast,
   closable = true,
   // To prevent autoclose, pass duration as Infinity
-  duration = TOAST_TIMEOUT,
+  duration = DEFAULT_TOAST_TIMEOUT,
 }: {
   message: string;
   clearToast: () => void;
