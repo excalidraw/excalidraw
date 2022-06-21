@@ -120,7 +120,12 @@
       "lockAll": "Tot verrolhar",
       "unlockAll": "Tot desverrolhar"
     },
-    "statusPublished": ""
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
