@@ -120,7 +120,12 @@
       "lockAll": "全部锁定",
       "unlockAll": "全部解锁"
     },
-    "statusPublished": "已发布"
+    "statusPublished": "已发布",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "重置画布",
