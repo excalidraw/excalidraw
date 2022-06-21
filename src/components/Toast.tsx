@@ -8,35 +8,35 @@ export const Toast = ({
   message,
   clearToast,
   closable = true,
-  // pass null to prevent auto dismiss
-  duration,
+  // To prevent autoclose, pass duration as Infinity
+  duration = TOAST_TIMEOUT,
 }: {
   message: string;
   clearToast: () => void;
   closable?: boolean;
-  duration?: number | null;
+  duration?: number;
 }) => {
   const timerRef = useRef<number>(0);
-  const toastDuration = duration === undefined ? TOAST_TIMEOUT : duration;
+  const shouldAutoClose = duration === Infinity;
   const scheduleTimeout = useCallback(() => {
-    if (!toastDuration) {
+    if (shouldAutoClose) {
       return;
     }
-    timerRef.current = window.setTimeout(() => clearToast(), toastDuration);
-  }, [clearToast, toastDuration]);
+    timerRef.current = window.setTimeout(() => clearToast(), duration);
+  }, [clearToast, duration, shouldAutoClose]);
 
   useEffect(() => {
-    if (!toastDuration) {
+    if (shouldAutoClose) {
       return;
     }
     scheduleTimeout();
     return () => clearTimeout(timerRef.current);
-  }, [scheduleTimeout, message, toastDuration]);
+  }, [scheduleTimeout, message, duration, shouldAutoClose]);
 
-  const onMouseEnter = toastDuration
+  const onMouseEnter = shouldAutoClose
     ? () => clearTimeout(timerRef?.current)
     : undefined;
-  const onMouseLeave = toastDuration ? scheduleTimeout : undefined;
+  const onMouseLeave = shouldAutoClose ? scheduleTimeout : undefined;
   return (
     <div
       className="Toast"
