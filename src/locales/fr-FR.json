@@ -120,7 +120,12 @@
       "lockAll": "Tout verrouiller",
       "unlockAll": "Tout déverouiller"
     },
-    "statusPublished": "Publié"
+    "statusPublished": "Publié",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
