@@ -121,11 +121,11 @@
       "unlockAll": "Lås opp alle"
     },
     "statusPublished": "Publisert",
-    "sidebarLock": ""
+    "sidebarLock": "Holde sidemenyen åpen"
   },
   "library": {
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Velg et objekt på lerretet for å legge det til her, eller installer et bibliotek fra den offentlige samlingen under.",
+    "hint_emptyPrivateLibrary": "Velg et objekt på lerretet for å legge det til her."
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
