@@ -121,11 +121,11 @@
       "unlockAll": "Lås upp alla"
     },
     "statusPublished": "Publicerad",
-    "sidebarLock": ""
+    "sidebarLock": "Håll sidofältet öppet"
   },
   "library": {
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Välj ett objekt på canvasen för att lägga till det här, eller installera ett bibliotek från det publika arkivet, nedan.",
+    "hint_emptyPrivateLibrary": "Välj ett objekt på canvasen för att lägga till det här."
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
