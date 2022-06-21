@@ -121,11 +121,11 @@
       "unlockAll": "Desbloquear todo"
     },
     "statusPublished": "Publicado",
-    "sidebarLock": ""
+    "sidebarLock": "Mantener barra lateral abierta"
   },
   "library": {
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Seleccione un elemento en el lienzo para añadirlo aquí, o instale una biblioteca del repositorio público, a continuación.",
+    "hint_emptyPrivateLibrary": "Seleccione un elemento del lienzo para añadirlo aquí."
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
