@@ -64,7 +64,7 @@ import {
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
   MQ_MAX_WIDTH_PORTRAIT,
-  MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT,
+  MQ_RIGHT_SIDEBAR_MIN_WIDTH,
   MQ_SM_MAX_WIDTH,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
@@ -796,7 +796,7 @@ class App extends React.Component<AppProps, AppState> {
     const sidebarBreakpoint =
       this.props.UIOptions.dockedSidebarBreakpoint != null
         ? this.props.UIOptions.dockedSidebarBreakpoint
-        : MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT;
+        : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
     this.device = updateObject(this.device, {
       isSmScreen: width < MQ_SM_MAX_WIDTH,
       isMobile:
@@ -880,7 +880,7 @@ class App extends React.Component<AppProps, AppState> {
           // after mount
           this.props.UIOptions.dockedSidebarBreakpoint != null
             ? this.props.UIOptions.dockedSidebarBreakpoint
-            : MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT
+            : MQ_RIGHT_SIDEBAR_MIN_WIDTH
         }px)`,
       );
       const handler = () => {
