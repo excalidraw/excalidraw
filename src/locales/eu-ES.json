@@ -120,7 +120,12 @@
       "lockAll": "Blokeatu guztiak",
       "unlockAll": "Desblokeatu guztiak"
     },
-    "statusPublished": "Argitaratua"
+    "statusPublished": "Argitaratua",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Garbitu oihala",
