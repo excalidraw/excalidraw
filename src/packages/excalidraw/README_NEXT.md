@@ -659,7 +659,7 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 
 ##### `dockedSidebarBreakpoint`
 
-This prop indicates whether the device can fit the sidebar. If not passed it defaults to [`MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L167). If the `width` of `excalidraw` container exceeds `dockedSidebarBreakpoint`, the sidebar will have the toggle button to dock the sidebar else it won't. Once the sidebar is docked it will push the right part of the UI towards left making space for the sidebar as shown below. This is only applicable for non mobile devices.
+This prop indicates at what point should we break to a docked, permanent sidebar. If not passed it defaults to [`MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L167). If the `width` of the `excalidraw` container exceeds `dockedSidebarBreakpoint`, the sidebar will be dockable. If user choses to dock the sidebar, it will push the right part of the UI towards the left, making space for the sidebar as shown below.
 
 ![image](https://user-images.githubusercontent.com/11256141/174664866-c698c3fa-197b-43ff-956c-d79852c7b326.png)
 
