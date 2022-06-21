@@ -277,6 +277,10 @@ const joinMath = (
   return joined;
 };
 
+const getMathNewline = (mathProps: MathProps) => {
+  return mathProps.useTex && mathProps.mathOnly ? "\\\\" : "\n";
+};
+
 // This lets math input run across multiple newlines.
 // Basically, replace with a space each newline between the delimiters.
 // Do so unless it's AsciiMath in math-only mode.
@@ -380,7 +384,7 @@ const markupText = (
   isMathJaxLoaded: boolean,
 ) => {
   const lines = consumeMathNewlines(text, mathProps, isMathJaxLoaded).split(
-    "\n",
+    getMathNewline(mathProps),
   );
   const markup = [] as Array<string>[];
   for (let index = 0; index < lines.length; index++) {
@@ -611,7 +615,7 @@ const renderMath = (
   parentWidth?: number,
 ) => {
   const mathLines = consumeMathNewlines(text, mathProps, isMathJaxLoaded).split(
-    "\n",
+    getMathNewline(mathProps),
   );
   const markup = markupText(text, mathProps, isMathJaxLoaded);
   const metrics = getMetrics(markup, fontSize, mathProps, isMathJaxLoaded);
@@ -1002,6 +1006,11 @@ const wrapMathElement = function (element, containerWidth, next) {
 
   const font = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
 
+  // Use regular text-wrapping for math-only mode
+  if (mathProps.mathOnly) {
+    return wrapText(text, font, containerWidth);
+  }
+
   const maxWidth = containerWidth - BOUND_TEXT_PADDING * 2;
 
   const markup = markupText(text, mathProps, isMathJaxLoaded);
@@ -1025,7 +1034,7 @@ const wrapMathElement = function (element, containerWidth, next) {
     for (let i = 0; i < lineArray.length; i++) {
       const isSvg =
         textAsMjxContainer(markupArray[i], isMathJaxLoaded) !== null;
-      if (isSvg || mathProps.mathOnly) {
+      if (isSvg) {
         const lineItem =
           getStartDelimiter(mathProps.useTex) +
           lineArray[i] +
@@ -1108,6 +1117,9 @@ const wrapMathElement = function (element, containerWidth, next) {
     }
   }
 
+  if (wrappedLines[0] === "") {
+    wrappedLines.splice(0, 1);
+  }
   return wrappedLines.join("\n");
 } as CustomMethods["wrapText"];
 
