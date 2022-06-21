@@ -608,13 +608,14 @@ const renderMath = (
     lineHeight: number,
   ) => void,
   doRenderChild: (x: number, y: number, width: number, height: number) => void,
+  parentWidth?: number,
 ) => {
   const mathLines = consumeMathNewlines(text, mathProps, isMathJaxLoaded).split(
     "\n",
   );
   const markup = markupText(text, mathProps, isMathJaxLoaded);
   const metrics = getMetrics(markup, fontSize, mathProps, isMathJaxLoaded);
-  const imageMetrics = metrics.imageMetrics;
+  const width = parentWidth ?? metrics.imageMetrics.width;
 
   let y = 0;
   for (let index = 0; index < markup.length; index++) {
@@ -623,10 +624,10 @@ const renderMath = (
     const rtl = isRTL(mathLines[index]);
     const x =
       textAlign === "right"
-        ? imageMetrics.width - lineMetrics.width
+        ? width - lineMetrics.width
         : textAlign === "left"
         ? 0
-        : (imageMetrics.width - lineMetrics.width) / 2;
+        : (width - lineMetrics.width) / 2;
     // Drop any empty strings from this line to match childMetrics
     const content = markup[index].filter((value) => value !== "");
     for (let i = 0; i < content.length; i += 1) {
@@ -688,6 +689,17 @@ const getSelectedMathElements = (
   return eligibleElements;
 };
 
+// Be sure customProps is defined with proper values for ExcalidrawMathElements
+const ensureMathElement = (element: Partial<ExcalidrawElement>) => {
+  if (!isMathElement(element as Required<ExcalidrawElement>)) {
+    return;
+  }
+  const mathProps = getMathProps.ensureMathProps(element.customProps!);
+  if (!("customProps" in element)) {
+    (element as any).customProps = mathProps;
+  }
+};
+
 const cleanMathElementUpdate = function (updates) {
   const oldUpdates = {};
   for (const key in updates) {
@@ -706,6 +718,7 @@ const cleanMathElementUpdate = function (updates) {
 } as CustomMethods["clean"];
 
 const measureMathElement = function (element, next, maxWidth) {
+  ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
   const fontSize = next?.fontSize ?? element.fontSize;
   const text = next?.text ?? element.text;
@@ -715,6 +728,7 @@ const measureMathElement = function (element, next, maxWidth) {
 } as CustomMethods["measureText"];
 
 const renderMathElement = function (element, context, renderCb) {
+  ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
   const _element = element as NonDeleted<ExcalidrawMathElement>;
   const text = _element.text;
@@ -821,6 +835,9 @@ const renderMathElement = function (element, context, renderCb) {
       context.restore();
     }
   };
+  const parentWidth = _element.containerId
+    ? getContainerElement(_element)!.width - BOUND_TEXT_PADDING * 2
+    : undefined;
   renderMath(
     text,
     fontSize,
@@ -829,10 +846,12 @@ const renderMathElement = function (element, context, renderCb) {
     isMathJaxLoaded,
     doSetupChild,
     doRenderChild,
+    parentWidth,
   );
 } as CustomMethods["render"];
 
 const renderSvgMathElement = function (svgRoot, root, element, opt) {
+  ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
 
   const _element = element as NonDeleted<ExcalidrawMathElement>;
@@ -945,6 +964,9 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
     childNode.setAttribute("y", `${y}`);
     groupNode.appendChild(childNode);
   };
+  const parentWidth = _element.containerId
+    ? getContainerElement(_element)!.width - BOUND_TEXT_PADDING * 2
+    : undefined;
   renderMath(
     text,
     fontSize,
@@ -953,6 +975,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
     isMathJaxLoaded,
     doSetupChild,
     doRenderChild,
+    parentWidth,
   );
 
   tempSvg.setAttribute("version", "1.1");
@@ -967,6 +990,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
 } as CustomMethods["renderSvg"];
 
 const wrapMathElement = function (element, containerWidth, next) {
+  ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
   const fontSize =
     next?.fontSize !== undefined ? next.fontSize : element.fontSize;
@@ -1204,7 +1228,9 @@ const createMathActions = () => {
               const el = hasBoundTextElement(element)
                 ? getBoundTextElement(element)
                 : element;
-              return isMathElement(el) ? el.customProps?.useTex : null;
+              return isMathElement(el)
+                ? getMathProps.ensureMathProps(element.customProps!).useTex
+                : null;
             },
             getMathProps.getUseTex(appState),
           )}
@@ -1285,7 +1311,9 @@ const createMathActions = () => {
               const el = hasBoundTextElement(element)
                 ? getBoundTextElement(element)
                 : element;
-              return isMathElement(el) ? el.customProps?.mathOnly : null;
+              return isMathElement(el)
+                ? getMathProps.ensureMathProps(element.customProps!).mathOnly
+                : null;
             },
             getMathProps.getMathOnly(appState),
           )}
