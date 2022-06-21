@@ -120,7 +120,12 @@
       "lockAll": "सब ताले के अंदर रखे",
       "unlockAll": "सब ताले के बाहर निकाले"
     },
-    "statusPublished": "प्रकाशित"
+    "statusPublished": "प्रकाशित",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
