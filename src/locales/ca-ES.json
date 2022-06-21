@@ -120,7 +120,12 @@
       "lockAll": "Bloca-ho tot",
       "unlockAll": "Desbloca-ho tot"
     },
-    "statusPublished": "Publicat"
+    "statusPublished": "Publicat",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
