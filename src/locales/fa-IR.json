@@ -120,7 +120,12 @@
       "lockAll": "قفل همه",
       "unlockAll": "باز کردن قفل همه"
     },
-    "statusPublished": "منتشر شده"
+    "statusPublished": "منتشر شده",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
