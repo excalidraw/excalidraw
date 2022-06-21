@@ -120,7 +120,12 @@
       "lockAll": "सर्व कुलूपात ठेवा",
       "unlockAll": "सर्व कुलूपातून बाहेर"
     },
-    "statusPublished": "प्रकाशित करा"
+    "statusPublished": "प्रकाशित करा",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "पटल पुसा",
