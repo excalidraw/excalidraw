@@ -121,11 +121,11 @@
       "unlockAll": "Atbrīvot visu"
     },
     "statusPublished": "Publicēts",
-    "sidebarLock": ""
+    "sidebarLock": "Paturēt atvērtu sānjoslu"
   },
   "library": {
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Atlasiet objektu tāfelē, lai to šeit pievienotu, vai pievienojiet publisku bibliotēku zemāk.",
+    "hint_emptyPrivateLibrary": "Atlasiet objektu tāfelē, lai to šeit pievienotu."
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
