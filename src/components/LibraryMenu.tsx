@@ -29,6 +29,7 @@ import { trackEvent } from "../analytics";
 import { useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import Spinner from "./Spinner";
+import { useDevice } from "./App";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -103,17 +104,30 @@ export const LibraryMenu = ({
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
-  useOnClickOutside(ref, (event) => {
-    // If click on the library icon, do nothing.
-    if ((event.target as Element).closest(".ToolIcon__library")) {
-      return;
-    }
-    onClose();
-  });
+  const device = useDevice();
+
+  useOnClickOutside(
+    ref,
+    useCallback(
+      (event) => {
+        // If click on the library icon, do nothing.
+        if ((event.target as Element).closest(".ToolIcon__library")) {
+          return;
+        }
+        if (!appState.isLibraryMenuDocked || !device.canDeviceFitSidebar) {
+          onClose();
+        }
+      },
+      [onClose, appState.isLibraryMenuDocked, device.canDeviceFitSidebar],
+    ),
+  );
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === KEYS.ESCAPE) {
+      if (
+        event.key === KEYS.ESCAPE &&
+        (!appState.isLibraryMenuDocked || !device.canDeviceFitSidebar)
+      ) {
         onClose();
       }
     };
@@ -121,7 +135,7 @@ export const LibraryMenu = ({
     return () => {
       document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
     };
-  }, [onClose]);
+  }, [onClose, appState.isLibraryMenuDocked, device.canDeviceFitSidebar]);
 
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
   const [showPublishLibraryDialog, setShowPublishLibraryDialog] =
@@ -273,6 +287,7 @@ export const LibraryMenu = ({
         onInsertLibraryItems={onInsertLibraryItems}
         pendingElements={pendingElements}
         setAppState={setAppState}
+        appState={appState}
         libraryReturnUrl={libraryReturnUrl}
         library={library}
         theme={theme}
