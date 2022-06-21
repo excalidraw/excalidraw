@@ -120,7 +120,12 @@
       "lockAll": "Alle sperren",
       "unlockAll": "Alle entsperren"
     },
-    "statusPublished": "Veröffentlicht"
+    "statusPublished": "Veröffentlicht",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
