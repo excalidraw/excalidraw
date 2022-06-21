@@ -121,11 +121,11 @@
       "unlockAll": "Разблокировать все"
     },
     "statusPublished": "Опубликовано",
-    "sidebarLock": ""
+    "sidebarLock": "Держать боковую панель открытой"
   },
   "library": {
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Выберите объект на холсте, чтобы добавить его сюда, или установите библиотеку из публичного репозитория ниже.",
+    "hint_emptyPrivateLibrary": "Выберите объект на холсте, чтобы добавить его сюда."
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
