@@ -26,6 +26,7 @@ import Spinner from "./Spinner";
 import { fileOpen } from "../data/filesystem";
 
 import { SidebarLockButton } from "./SidebarLockButton";
+import { trackEvent } from "../analytics";
 
 const LibraryMenuItems = ({
   isLoading,
@@ -386,9 +387,15 @@ const LibraryMenuItems = ({
                     document
                       .querySelector(".layer-ui__wrapper")
                       ?.classList.add("animate");
+                    const nextState = !appState.isLibraryMenuDocked;
                     setAppState({
-                      isLibraryMenuDocked: !appState.isLibraryMenuDocked,
+                      isLibraryMenuDocked: nextState,
                     });
+                    trackEvent(
+                      "library",
+                      `toggleLibraryDock (${nextState ? "dock" : "undock"})`,
+                      `sidebar (${device.isMobile ? "mobile" : "desktop"})`,
+                    );
                   }}
                 />
               </div>

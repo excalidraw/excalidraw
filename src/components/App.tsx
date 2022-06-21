@@ -1760,7 +1760,16 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.code === CODES.ZERO) {
-        this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
+        const nextState = !this.state.isLibraryOpen;
+        this.setState({ isLibraryOpen: nextState });
+        // track only openings
+        if (nextState) {
+          trackEvent(
+            "library",
+            "toggleLibrary (open)",
+            `keyboard (${this.device.isMobile ? "mobile" : "desktop"})`,
+          );
+        }
       }
 
       if (isArrowKey(event.key)) {
