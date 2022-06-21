@@ -479,19 +479,17 @@ const ExcalidrawWrapper = () => {
         if (excalidrawAPI) {
           let didChange = false;
 
-          let pendingImageElement = appState.pendingImageElement;
           const elements = excalidrawAPI
             .getSceneElementsIncludingDeleted()
             .map((element) => {
               if (
                 LocalData.fileStorage.shouldUpdateImageElementStatus(element)
               ) {
-                didChange = true;
-                const newEl = newElementWith(element, { status: "saved" });
-                if (pendingImageElement === element) {
-                  pendingImageElement = newEl;
+                const newElement = newElementWith(element, { status: "saved" });
+                if (newElement !== element) {
+                  didChange = true;
                 }
-                return newEl;
+                return newElement;
               }
               return element;
             });
@@ -499,9 +497,6 @@ const ExcalidrawWrapper = () => {
           if (didChange) {
             excalidrawAPI.updateScene({
               elements,
-              appState: {
-                pendingImageElement,
-              },
             });
           }
         }

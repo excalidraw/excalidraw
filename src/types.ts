@@ -164,6 +164,7 @@ export type AppState = {
   offsetLeft: number;
 
   isLibraryOpen: boolean;
+  isLibraryMenuDocked: boolean;
   fileHandle: FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
@@ -178,7 +179,7 @@ export type AppState = {
         data: Spreadsheet;
       };
   /** imageElement waiting to be placed on canvas */
-  pendingImageElement: NonDeleted<ExcalidrawImageElement> | null;
+  pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
 };
 
@@ -293,7 +294,10 @@ export interface ExcalidrawProps {
     elements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
   ) => JSX.Element;
-  UIOptions?: UIOptions;
+  UIOptions?: {
+    dockedSidebarBreakpoint?: number;
+    canvasActions?: CanvasActions;
+  };
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
@@ -351,18 +355,18 @@ type CanvasActions = {
   saveAsImage?: boolean;
 };
 
-export type UIOptions = {
-  canvasActions?: CanvasActions;
-};
-
-export type AppProps = ExcalidrawProps & {
-  UIOptions: {
-    canvasActions: Required<CanvasActions> & { export: ExportOpts };
-  };
-  detectScroll: boolean;
-  handleKeyboardGlobally: boolean;
-  isCollaborating: boolean;
-};
+export type AppProps = Merge<
+  ExcalidrawProps,
+  {
+    UIOptions: {
+      canvasActions: Required<CanvasActions> & { export: ExportOpts };
+      dockedSidebarBreakpoint?: number;
+    };
+    detectScroll: boolean;
+    handleKeyboardGlobally: boolean;
+    isCollaborating: boolean;
+  }
+>;
 
 /** A subset of App class properties that we need to use elsewhere
  * in the app, eg Manager. Factored out into a separate type to keep DRY. */
@@ -379,7 +383,8 @@ export type AppClassProperties = {
     }
   >;
   files: BinaryFiles;
-  deviceType: App["deviceType"];
+  device: App["device"];
+  scene: App["scene"];
 };
 
 export type PointerDownState = Readonly<{
@@ -474,7 +479,9 @@ export type ExcalidrawImperativeAPI = {
   resetCursor: InstanceType<typeof App>["resetCursor"];
 };
 
-export type DeviceType = {
+export type Device = Readonly<{
+  isSmScreen: boolean;
   isMobile: boolean;
   isTouchScreen: boolean;
-};
+  canDeviceFitSidebar: boolean;
+}>;

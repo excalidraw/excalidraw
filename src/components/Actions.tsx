@@ -3,7 +3,7 @@ import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
-import { useDeviceType } from "../components/App";
+import { useDevice } from "../components/App";
 import {
   canChangeSharpness,
   canHaveArrowheads,
@@ -58,7 +58,7 @@ export const SelectedShapeActions = ({
     isSingleElementBoundContainer = true;
   }
   const isEditing = Boolean(appState.editingElement);
-  const deviceType = useDeviceType();
+  const device = useDevice();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
@@ -194,8 +194,8 @@ export const SelectedShapeActions = ({
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
-            {!deviceType.isMobile && renderAction("duplicateSelection")}
-            {!deviceType.isMobile && renderAction("deleteSelectedElements")}
+            {!device.isMobile && renderAction("duplicateSelection")}
+            {!device.isMobile && renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
             {showLinkIcon && renderAction("hyperlink")}
