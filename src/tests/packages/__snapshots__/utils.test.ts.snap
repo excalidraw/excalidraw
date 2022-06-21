@@ -38,6 +38,7 @@ Object {
   "fileHandle": null,
   "gridSize": null,
   "isBindingEnabled": true,
+  "isLibraryMenuDocked": false,
   "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,

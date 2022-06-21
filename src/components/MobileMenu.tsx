@@ -43,6 +43,7 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
+  renderStats: () => JSX.Element | null;
 };
 
 export const MobileMenu = ({
@@ -63,6 +64,7 @@ export const MobileMenu = ({
   showThemeBtn,
   onImageAction,
   renderTopRightUI,
+  renderStats,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -184,6 +186,7 @@ export const MobileMenu = ({
   return (
     <>
       {!viewModeEnabled && renderToolbar()}
+      {renderStats()}
       <div
         className="App-bottom-bar"
         style={{

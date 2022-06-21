@@ -2,7 +2,7 @@ import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import { useExcalidrawContainer, useDeviceType } from "../components/App";
+import { useExcalidrawContainer, useDevice } from "../components/App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
 import { back, close } from "./icons";
@@ -94,7 +94,7 @@ export const Dialog = (props: DialogProps) => {
             onClick={onClose}
             aria-label={t("buttons.close")}
           >
-            {useDeviceType().isMobile ? back : close}
+            {useDevice().isMobile ? back : close}
           </button>
         </h2>
         <div className="Dialog__content">{props.children}</div>

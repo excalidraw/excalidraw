@@ -30,7 +30,7 @@ const trackAction = (
           trackEvent(
             action.trackEvent.category,
             action.trackEvent.action || action.name,
-            `${source} (${app.deviceType.isMobile ? "mobile" : "desktop"})`,
+            `${source} (${app.device.isMobile ? "mobile" : "desktop"})`,
           );
         }
       }
