@@ -120,7 +120,12 @@
       "lockAll": "Заблокировать все",
       "unlockAll": "Разблокировать все"
     },
-    "statusPublished": "Опубликовано"
+    "statusPublished": "Опубликовано",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
