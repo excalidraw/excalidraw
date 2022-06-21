@@ -120,7 +120,12 @@
       "lockAll": "Zakleni vse",
       "unlockAll": "Odkleni vse"
     },
-    "statusPublished": "Objavljeno"
+    "statusPublished": "Objavljeno",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Ponastavi platno",
