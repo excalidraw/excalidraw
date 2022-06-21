@@ -120,7 +120,12 @@
       "lockAll": "Fiksēt visu",
       "unlockAll": "Atbrīvot visu"
     },
-    "statusPublished": "Publicēts"
+    "statusPublished": "Publicēts",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
