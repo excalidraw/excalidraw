@@ -1229,7 +1229,7 @@ const createMathActions = () => {
                 ? getBoundTextElement(element)
                 : element;
               return isMathElement(el)
-                ? getMathProps.ensureMathProps(element.customProps!).useTex
+                ? getMathProps.ensureMathProps(el.customProps!).useTex
                 : null;
             },
             getMathProps.getUseTex(appState),
@@ -1312,7 +1312,7 @@ const createMathActions = () => {
                 ? getBoundTextElement(element)
                 : element;
               return isMathElement(el)
-                ? getMathProps.ensureMathProps(element.customProps!).mathOnly
+                ? getMathProps.ensureMathProps(el.customProps!).mathOnly
                 : null;
             },
             getMathProps.getMathOnly(appState),
