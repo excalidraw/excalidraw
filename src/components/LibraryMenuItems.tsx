@@ -215,7 +215,7 @@ const LibraryMenuItems = ({
     );
   };
 
-  const CELLS_PER_ROW = device.canDeviceFitSidebar || device.isSmScreen ? 4 : 6;
+  const CELLS_PER_ROW = device.isMobile && !device.isSmScreen ? 6 : 4;
 
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;
