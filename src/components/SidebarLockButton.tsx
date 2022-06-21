@@ -6,6 +6,8 @@ import { ToolButtonSize } from "./ToolButton";
 import { t } from "../i18n";
 import { Tooltip } from "./Tooltip";
 
+import "./SidebarLockButton.scss";
+
 type SidebarLockIconProps = {
   checked: boolean;
   onChange?(): void;

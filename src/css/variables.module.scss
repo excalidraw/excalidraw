@@ -6,6 +6,28 @@
   }
 }
 
+@mixin toolbarButtonColorStates {
+  .ToolIcon_type_radio,
+  .ToolIcon_type_checkbox {
+    & + .ToolIcon__icon:active {
+      background: var(--color-primary-light);
+    }
+    &:checked + .ToolIcon__icon {
+      background: var(--color-primary);
+      --icon-fill-color: #{$oc-white};
+      --keybinding-color: #{$oc-white};
+    }
+    &:checked + .ToolIcon__icon:active {
+      background: var(--color-primary-darker);
+    }
+  }
+
+  .ToolIcon__keybinding {
+    bottom: 4px;
+    right: 4px;
+  }
+}
+
 $theme-filter: "invert(93%) hue-rotate(180deg)";
 $right-sidebar-width: "302px";
 
