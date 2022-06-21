@@ -121,11 +121,11 @@
       "unlockAll": ""
     },
     "statusPublished": "Julkaistu",
-    "sidebarLock": ""
+    "sidebarLock": "Pidä sivupalkki avoinna"
   },
   "library": {
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Valitse lisättävä kohde piirtoalueelta, tai asenna alta julkinen kirjasto.",
+    "hint_emptyPrivateLibrary": "Valitse lisättävä kohde piirtoalueelta."
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
