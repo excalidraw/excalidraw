@@ -120,7 +120,12 @@
       "lockAll": "Sekkeṛ akk",
       "unlockAll": "Serreḥ akk"
     },
-    "statusPublished": "Yeffeɣ-d"
+    "statusPublished": "Yeffeɣ-d",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
