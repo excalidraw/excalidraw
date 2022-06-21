@@ -120,7 +120,12 @@
       "lockAll": "すべてロック",
       "unlockAll": "すべてのロックを解除"
     },
-    "statusPublished": "公開済み"
+    "statusPublished": "公開済み",
+    "sidebarLock": ""
+  },
+  "library": {
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
