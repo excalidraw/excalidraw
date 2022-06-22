@@ -18,16 +18,16 @@ export const Toast = ({
   duration?: number;
 }) => {
   const timerRef = useRef<number>(0);
-  const shouldAutoClose = duration === Infinity;
+  const shouldAutoClose = duration !== Infinity;
   const scheduleTimeout = useCallback(() => {
-    if (shouldAutoClose) {
+    if (!shouldAutoClose) {
       return;
     }
     timerRef.current = window.setTimeout(() => clearToast(), duration);
   }, [clearToast, duration, shouldAutoClose]);
 
   useEffect(() => {
-    if (shouldAutoClose) {
+    if (!shouldAutoClose) {
       return;
     }
     scheduleTimeout();
