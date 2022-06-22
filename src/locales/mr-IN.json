@@ -121,11 +121,11 @@
       "unlockAll": "सर्व कुलूपातून बाहेर"
     },
     "statusPublished": "प्रकाशित करा",
-    "sidebarLock": ""
+    "sidebarLock": "साइडबार उघडं ठेवा"
   },
   "library": {
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "पटल वर एक वस्तु निवडुन एथे जोडा, किव्हा एक संग्रह जन कोष कडुन खाली स्थापित करा.",
+    "hint_emptyPrivateLibrary": "ईथे जोडण्या साठी पटल वरून एक वस्तु निवडा."
   },
   "buttons": {
     "clearReset": "पटल पुसा",
