@@ -121,11 +121,11 @@
       "unlockAll": "Alle entsperren"
     },
     "statusPublished": "Veröffentlicht",
-    "sidebarLock": ""
+    "sidebarLock": "Seitenleiste offen lassen"
   },
   "library": {
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Wähle ein Element auf der Zeichenfläche, um es hier hinzuzufügen. Oder installiere eine Bibliothek aus dem öffentlichen Verzeichnis.",
+    "hint_emptyPrivateLibrary": "Wähle ein Element von der Zeichenfläche, um es hier hinzuzufügen."
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
