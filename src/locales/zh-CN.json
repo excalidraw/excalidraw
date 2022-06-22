@@ -121,11 +121,11 @@
       "unlockAll": "全部解锁"
     },
     "statusPublished": "已发布",
-    "sidebarLock": ""
+    "sidebarLock": "侧边栏常驻"
   },
   "library": {
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "选中画布上的项目添加到此处，或从下方的公共素材库中导入。",
+    "hint_emptyPrivateLibrary": "选中画布上的项目添加到此处。"
   },
   "buttons": {
     "clearReset": "重置画布",
