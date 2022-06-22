@@ -18,7 +18,7 @@ const publish = () => {
     execSync(`yarn  --frozen-lockfile`);
     execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
     execSync(`yarn run build:umd`, { cwd: excalidrawDir });
-    execSync(`yarn --cwd ${excalidrawDir} publish ${tag}`);
+    execSync(`yarn --cwd ${excalidrawDir} publish --tag ${tag}`);
     console.info(`Published ${pkg.name}@${tag}🎉`);
     core.setOutput(
       "result",
