@@ -1342,8 +1342,8 @@ const createMathActions = () => {
     name: "math",
     trackEvent: false,
     perform: (elements, appState) => {
-      const mathInactive = appState.customSubtype !== mathSubtype;
-      const customSubtype = mathInactive ? mathSubtype : undefined;
+      const mathInactive = appState.activeSubtype !== mathSubtype;
+      const activeSubtype = mathInactive ? mathSubtype : undefined;
       const activeTool = !mathInactive
         ? appState.activeTool
         : updateActiveTool(appState, { type: "text" });
@@ -1355,7 +1355,7 @@ const createMathActions = () => {
       return {
         appState: {
           ...appState,
-          customSubtype,
+          activeSubtype,
           selectedElementIds,
           selectedGroupIds,
           activeTool,
@@ -1369,11 +1369,11 @@ const createMathActions = () => {
         type="icon"
         icon={mathSubtypeIcon.call(this, { theme: appState.theme })}
         selected={
-          appState.customSubtype && appState.customSubtype === mathSubtype
+          appState.activeSubtype && appState.activeSubtype === mathSubtype
         }
         className={clsx({
           selected:
-            appState.customSubtype && appState.customSubtype === mathSubtype,
+            appState.activeSubtype && appState.activeSubtype === mathSubtype,
         })}
         title={`${t(`toolBar.${mathSubtype}`)} - ${getShortcutKey("M")}`}
         aria-label={t(`toolBar.${mathSubtype}`)}
