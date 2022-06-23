@@ -17,13 +17,9 @@ const cleanUpdates = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
 ): ElementUpdate<TElement> => {
-  let oldUpdates = updates;
-  const { subtype } = maybeGetCustom(element, element.type);
-  const map = getCustomMethods(subtype);
-  if (map) {
-    oldUpdates = map.clean(updates) as typeof updates;
-  }
-  return oldUpdates;
+  const subtype = maybeGetCustom(element, element.type).subtype;
+  const old = getCustomMethods(subtype)?.clean(updates) as typeof updates;
+  return old ?? updates;
 };
 
 // This function tracks updates of text elements for the purposes for collaboration.
@@ -148,14 +144,15 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
     return element;
   }
 
+  if (!increment) {
+    return { ...element, ...updates };
+  }
   return {
     ...element,
     ...updates,
-    ...(increment && {
-      updated: getUpdatedTimestamp(),
-      version: element.version + 1,
-      versionNonce: randomInteger(),
-    }),
+    updated: getUpdatedTimestamp(),
+    version: element.version + 1,
+    versionNonce: randomInteger(),
   };
 };
 

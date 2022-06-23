@@ -69,11 +69,9 @@ export const measureTextElement = function (element, next, maxWidth) {
   }
 
   const fontSize = next?.fontSize ?? element.fontSize;
-  return measureText(
-    next?.text ?? element.text,
-    getFontString({ fontSize, fontFamily: element.fontFamily }),
-    maxWidth,
-  );
+  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
+  const text = next?.text ?? element.text;
+  return measureText(text, font, maxWidth);
 } as CustomMethods["measureText"];
 
 export const wrapTextElement = function (element, containerWidth, next) {
@@ -83,11 +81,9 @@ export const wrapTextElement = function (element, containerWidth, next) {
   }
 
   const fontSize = next?.fontSize ?? element.fontSize;
-  return wrapText(
-    next?.text ?? element.originalText,
-    getFontString({ fontSize, fontFamily: element.fontFamily }),
-    containerWidth,
-  );
+  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
+  const text = next?.text ?? element.originalText;
+  return wrapText(text, font, containerWidth);
 } as CustomMethods["wrapText"];
 
 export const textWysiwyg = ({
@@ -138,25 +134,30 @@ export const textWysiwyg = ({
     if (!updatedElement) {
       return;
     }
-    const { verticalAlign } = updatedElement;
+    const { textAlign, verticalAlign } = updatedElement;
 
     const approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
-      let coordYR = updatedElement.y;
+      let wCoordY = coordY;
+      let rCoordY = coordY;
       const container = getContainerElement(updatedElement);
 
       const text = container
         ? updatedElement.text
         : updatedElement.originalText;
-      const metrics = measureText(text, getFontString(updatedElement));
-      let maxWidth = metrics.width;
-      let maxHeight = metrics.height;
-      let width = metrics.width;
+      // Wysiwyg metrics
+      const wMetrics = measureText(text, getFontString(updatedElement));
+      // Rendered metrics
+      const rMetrics = measureTextElement(updatedElement);
+
+      let maxWidth = wMetrics.width;
+      let maxHeight = wMetrics.height;
+      let width = rMetrics.width;
       // Set to element height by default since that's
       // what is going to be used for unbounded text
-      let height = metrics.height;
+      let height = rMetrics.height;
       if (container && updatedElement.containerId) {
         const propertiesUpdated = textPropertiesUpdated(
           updatedElement,
@@ -171,14 +172,8 @@ export const textWysiwyg = ({
           originalContainerHeight = container.height;
 
           // update height of the editor after properties updated
-          height = measureText(
-            wrapText(
-              updatedElement.originalText,
-              getFontString(updatedElement),
-              container.width,
-            ),
-            getFontString(updatedElement),
-          ).height;
+          const font = getFontString(updatedElement);
+          height = measureText(updatedElement.text, font).height;
         }
         if (!originalContainerHeight) {
           originalContainerHeight = container.height;
@@ -208,21 +203,28 @@ export const textWysiwyg = ({
         else {
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
-            coordY = container.y + container.height / 2 - height / 2;
-            coordYR = container.y + container.height / 2 - metrics.height / 2;
+            coordY = container.y + container.height / 2;
+            wCoordY = coordY - wMetrics.height / 2;
+            rCoordY = coordY - rMetrics.height / 2;
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-            coordY =
-              container.y + container.height - height - BOUND_TEXT_PADDING;
-            coordYR =
-              container.y +
-              container.height -
-              metrics.height -
-              BOUND_TEXT_PADDING;
+            coordY = container.y + container.height - BOUND_TEXT_PADDING;
+            wCoordY = coordY - wMetrics.height;
+            rCoordY = coordY - rMetrics.height;
           }
         }
       }
-      const { textAlign } = updatedElement;
+      const lHeight = wMetrics.height / updatedElement.text.split("\n").length;
+      const offsetY = !container
+        ? 0
+        : verticalAlign === VERTICAL_ALIGN.BOTTOM
+        ? lHeight
+        : verticalAlign === VERTICAL_ALIGN.MIDDLE
+        ? lHeight / 2
+        : 0;
+      wCoordY += offsetY;
+
+      const [viewportX, viewportY] = getViewportCoords(coordX, wCoordY);
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
       const initialLength = editable.value.length;
@@ -242,21 +244,23 @@ export const textWysiwyg = ({
       }
 
       const lines = updatedElement.originalText.split("\n");
-      const offsetX = container
-        ? 0
-        : textAlign === "right"
-        ? updatedElement.width - metrics.width
-        : textAlign === "center"
-        ? (updatedElement.width - metrics.width) / 2
-        : 0;
-      const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
-
       const lineHeight = updatedElement.containerId
         ? approxLineHeight
-        : metrics.height / lines.length;
+        : wMetrics.height / lines.length;
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
       }
+      // Horizontal offset in case updatedElement has a non-WYSIWYG subtype
+      const offWidth =
+        Math.min(maxWidth, updatedElement.width) -
+        Math.min(maxWidth, rMetrics.width);
+      const offsetX = container
+        ? 0
+        : textAlign === "right"
+        ? offWidth
+        : textAlign === "center"
+        ? offWidth / 2
+        : 0;
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
@@ -294,7 +298,7 @@ export const textWysiwyg = ({
       if (isTestEnv()) {
         editable.style.fontFamily = getFontFamilyString(updatedElement);
       }
-      mutateElement(updatedElement, { x: coordX, y: coordYR });
+      mutateElement(updatedElement, { x: coordX, y: rCoordY });
     }
   };
 

@@ -123,7 +123,7 @@ export class API {
 
     const custom = maybeGetCustom(
       {
-        subtype: rest.subtype ?? appState.customSubtype,
+        subtype: rest.subtype ?? appState.activeSubtype,
         customProps: rest.customProps ?? appState.customProps,
       },
       type,

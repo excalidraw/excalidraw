@@ -27,10 +27,7 @@ export const redrawTextBoundingBox = (
   }
   const metrics = measureTextElement(
     element,
-    {
-      text: element.originalText,
-      fontSize: element.fontSize,
-    },
+    { text: element.originalText },
     maxWidth,
   );
   let coordY = element.y;
