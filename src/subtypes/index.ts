@@ -101,8 +101,8 @@ export const isActionEnabled = (
   enabled =
     enabled ||
     (chosen.length === 0 &&
-      (appState.customSubtype === undefined ||
-        isActionForSubtype(appState.customSubtype, actionName)));
+      (appState.activeSubtype === undefined ||
+        isActionForSubtype(appState.activeSubtype, actionName)));
   !enabled &&
     chosen.forEach((el) => {
       const subtype = hasBoundTextElement(el)

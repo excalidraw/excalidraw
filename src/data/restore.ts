@@ -35,7 +35,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
-import { delUndefinedProps } from "../element/newElement";
+import { delUndefinedProps, maybeGetCustom } from "../element/newElement";
 
 type RestoredAppState = Omit<
   AppState,
@@ -90,13 +90,8 @@ const restoreElementWithProperties = <
   > &
     Partial<Pick<ExcalidrawElement, "type" | "x" | "y">>,
 ): T => {
-  const { subtype, customProps } = element;
-  const custom = delUndefinedProps({ subtype, customProps }, [
-    "subtype",
-    "customProps",
-  ]);
   const base: Pick<T, keyof ExcalidrawElement> = {
-    ...custom,
+    ...maybeGetCustom(element, extra.type || element.type),
     type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
@@ -276,14 +271,13 @@ export const restoreAppState = (
         : defaultValue;
   }
 
-  const { customSubtype, customProps } = appState;
-  const custom = delUndefinedProps({ customSubtype, customProps }, [
-    "customSubtype",
-    "customProps",
-  ]);
+  const { activeSubtype, customProps } = appState;
   return {
     ...nextAppState,
-    ...custom,
+    ...delUndefinedProps({ activeSubtype, customProps }, [
+      "activeSubtype",
+      "customProps",
+    ]),
     cursorButton: localAppState?.cursorButton || "up",
     // reset on fresh restore so as to hide the UI button if penMode not active
     penDetected:

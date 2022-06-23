@@ -1589,7 +1589,7 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
-      subtype: this.state.customSubtype,
+      subtype: this.state.activeSubtype,
       customProps: this.state.customProps,
       locked: false,
     });
@@ -2397,7 +2397,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? VERTICAL_ALIGN.MIDDLE
             : DEFAULT_VERTICAL_ALIGN,
-          subtype: this.state.customSubtype,
+          subtype: this.state.activeSubtype,
           customProps: this.state.customProps,
           containerId: container?.id ?? undefined,
           groupIds: container?.groupIds ?? [],

@@ -36,6 +36,7 @@ export type UpdaterFn = (res: ActionResult) => void;
 export type ActionFilterFn = (action: Action) => void;
 
 export type ActionName =
+  | CustomActionName
   | "copy"
   | "cut"
   | "paste"
@@ -123,7 +124,7 @@ export type PanelComponentProps = {
 };
 
 export interface Action {
-  name: ActionName | CustomActionName;
+  name: ActionName;
   PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
   keyPriority?: number;
