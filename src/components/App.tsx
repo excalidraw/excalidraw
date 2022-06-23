@@ -1735,11 +1735,6 @@ class App extends React.Component<AppProps, AppState> {
       if (
         // inside an input
         (isWritableElement(event.target) &&
-          // unless pressing cmd/ctrl, except when using in conjunction of
-          // backspace/delete (we want to allow word-deleting)
-          (!event[KEYS.CTRL_OR_CMD] ||
-            event.key === KEYS.BACKSPACE ||
-            event.key === KEYS.DELETE) &&
           // unless pressing escape (finalize action)
           event.key !== KEYS.ESCAPE) ||
         // or unless using arrows (to move between buttons)
