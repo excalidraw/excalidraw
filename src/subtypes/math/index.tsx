@@ -728,7 +728,18 @@ const measureMathElement = function (element, next, maxWidth) {
   const text = next?.text ?? element.text;
   const customProps = next?.customProps ?? element.customProps;
   const mathProps = getMathProps.ensureMathProps(customProps!);
-  return getImageMetrics(text, fontSize, mathProps, isMathJaxLoaded, maxWidth);
+  const noMaxWidth = mathProps.mathOnly;
+  const cWidth = noMaxWidth ? undefined : maxWidth;
+  const metrics = getImageMetrics(
+    text,
+    fontSize,
+    mathProps,
+    isMathJaxLoaded,
+    cWidth,
+  );
+  const { height, baseline } = metrics;
+  const width = noMaxWidth ? maxWidth ?? metrics.width : metrics.width;
+  return { width, height, baseline };
 } as CustomMethods["measureText"];
 
 const renderMathElement = function (element, context, renderCb) {
