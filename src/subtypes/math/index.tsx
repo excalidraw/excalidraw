@@ -918,11 +918,15 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   }
   tempSvg.appendChild(groupNode);
 
+  const parentWidth = _element.containerId
+    ? getContainerElement(_element)!.width - BOUND_TEXT_PADDING * 2
+    : undefined;
   const { width, height } = getImageMetrics(
     text,
     fontSize,
     mathProps,
     isMathJaxLoaded,
+    parentWidth,
   );
 
   let _rtl: boolean;
@@ -981,9 +985,6 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
     childNode.setAttribute("y", `${y}`);
     groupNode.appendChild(childNode);
   };
-  const parentWidth = _element.containerId
-    ? getContainerElement(_element)!.width - BOUND_TEXT_PADDING * 2
-    : undefined;
   renderMath(
     text,
     fontSize,
