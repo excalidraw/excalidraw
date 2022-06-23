@@ -1,6 +1,8 @@
 import React, { useLayoutEffect, useRef, useEffect } from "react";
 import "./Popover.scss";
 import { unstable_batchedUpdates } from "react-dom";
+import { queryFocusableElements } from "../utils";
+import { KEYS } from "../keys";
 
 type Props = {
   top?: number;
@@ -26,6 +28,41 @@ export const Popover = ({
   viewportHeight = window.innerHeight,
 }: Props) => {
   const popoverRef = useRef<HTMLDivElement>(null);
+
+  const container = popoverRef.current;
+
+  useEffect(() => {
+    if (!container) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === KEYS.TAB) {
+        const focusableElements = queryFocusableElements(container);
+        const { activeElement } = document;
+        const currentIndex = focusableElements.findIndex(
+          (element) => element === activeElement,
+        );
+
+        if (currentIndex === 0 && event.shiftKey) {
+          focusableElements[focusableElements.length - 1].focus();
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        } else if (
+          currentIndex === focusableElements.length - 1 &&
+          !event.shiftKey
+        ) {
+          focusableElements[0].focus();
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      }
+    };
+
+    container.addEventListener("keydown", handleKeyDown);
+
+    return () => container.removeEventListener("keydown", handleKeyDown);
+  }, [container]);
 
   // ensure the popover doesn't overflow the viewport
   useLayoutEffect(() => {
