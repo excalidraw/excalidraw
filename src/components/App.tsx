@@ -1780,11 +1780,13 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      // bail if
       if (
+        // inside an input
         (isWritableElement(event.target) &&
-          !event[KEYS.CTRL_OR_CMD] &&
+          // unless pressing escape (finalize action)
           event.key !== KEYS.ESCAPE) ||
-        // case: using arrows to move between buttons
+        // or unless using arrows (to move between buttons)
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {
         return;
