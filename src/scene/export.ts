@@ -183,7 +183,7 @@ export const exportToSvg = async (
   }
 
   const rsvg = rough.svg(svgRoot);
-  ensureSubtypesLoaded(elements, () => {
+  await ensureSubtypesLoaded(elements, () => {
     renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
       offsetX: -minX + exportPadding,
       offsetY: -minY + exportPadding,

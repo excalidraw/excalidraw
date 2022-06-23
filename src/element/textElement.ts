@@ -25,11 +25,7 @@ export const redrawTextBoundingBox = (
   if (container) {
     text = wrapTextElement(element, container.width);
   }
-  const metrics = measureTextElement(
-    element,
-    { text: element.originalText },
-    maxWidth,
-  );
+  const metrics = measureTextElement(element, { text }, maxWidth);
   let coordY = element.y;
   let coordX = element.x;
   // Resize container and vertically center align the text
