@@ -1731,11 +1731,18 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      // bail if
       if (
+        // inside an input
         (isWritableElement(event.target) &&
-          !event[KEYS.CTRL_OR_CMD] &&
+          // unless pressing cmd/ctrl, except when using in conjunction of
+          // backspace/delete (we want to allow word-deleting)
+          (!event[KEYS.CTRL_OR_CMD] ||
+            event.key === KEYS.BACKSPACE ||
+            event.key === KEYS.DELETE) &&
+          // unless pressing escape (finalize action)
           event.key !== KEYS.ESCAPE) ||
-        // case: using arrows to move between buttons
+        // or unless using arrows (to move between buttons)
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {
         return;
