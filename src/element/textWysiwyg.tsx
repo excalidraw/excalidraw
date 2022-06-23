@@ -154,7 +154,7 @@ export const textWysiwyg = ({
 
       let maxWidth = wMetrics.width;
       let maxHeight = wMetrics.height;
-      let width = rMetrics.width;
+      let width = wMetrics.width;
       // Set to element height by default since that's
       // what is going to be used for unbounded text
       let height = rMetrics.height;
