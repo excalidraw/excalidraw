@@ -124,6 +124,7 @@
     "sidebarLock": ""
   },
   "library": {
+    "noItems": "",
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
