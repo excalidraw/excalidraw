@@ -124,6 +124,7 @@
     "sidebarLock": "Obdrži stransko vrstico odprto"
   },
   "library": {
+    "noItems": "",
     "hint_emptyLibrary": "Izberite element na platnu, da ga dodate sem, ali namestite knjižnico iz javnega skladišča spodaj.",
     "hint_emptyPrivateLibrary": "Izberite element na platnu, da ga dodate sem."
   },
