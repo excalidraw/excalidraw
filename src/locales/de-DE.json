@@ -124,7 +124,7 @@
     "sidebarLock": "Seitenleiste offen lassen"
   },
   "library": {
-    "noItems": "",
+    "noItems": "Noch keine Elemente hinzugefügt...",
     "hint_emptyLibrary": "Wähle ein Element auf der Zeichenfläche, um es hier hinzuzufügen. Oder installiere eine Bibliothek aus dem öffentlichen Verzeichnis.",
     "hint_emptyPrivateLibrary": "Wähle ein Element von der Zeichenfläche, um es hier hinzuzufügen."
   },
