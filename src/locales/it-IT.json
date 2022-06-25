@@ -124,7 +124,7 @@
     "sidebarLock": ""
   },
   "library": {
-    "noItems": "",
+    "noItems": "Nessun elemento ancora aggiunto...",
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
