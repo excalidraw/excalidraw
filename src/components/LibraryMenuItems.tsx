@@ -428,7 +428,7 @@ const LibraryMenuItems = ({
         align="start"
         gap={1}
         style={{
-          flex: publishedItems.length > 0 ? 1 : "0 0 auto",
+          flex: publishedItems.length > 0 ? 1 : "0 1 auto",
           marginBottom: 0,
         }}
       >
