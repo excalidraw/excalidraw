@@ -124,6 +124,7 @@
     "sidebarLock": "Paturēt atvērtu sānjoslu"
   },
   "library": {
+    "noItems": "",
     "hint_emptyLibrary": "Atlasiet objektu tāfelē, lai to šeit pievienotu, vai pievienojiet publisku bibliotēku zemāk.",
     "hint_emptyPrivateLibrary": "Atlasiet objektu tāfelē, lai to šeit pievienotu."
   },
