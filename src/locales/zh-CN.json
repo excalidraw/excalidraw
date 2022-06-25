@@ -124,7 +124,7 @@
     "sidebarLock": "侧边栏常驻"
   },
   "library": {
-    "noItems": "",
+    "noItems": "尚未添加任何项目……",
     "hint_emptyLibrary": "选中画布上的项目添加到此处，或从下方的公共素材库中导入。",
     "hint_emptyPrivateLibrary": "选中画布上的项目添加到此处。"
   },
