@@ -46,7 +46,7 @@
     "cross-env": "7.0.3",
     "css-loader": "6.7.1",
     "file-loader": "6.2.0",
-    "sass-loader": "12.6.0",
+    "sass-loader": "13.0.1",
     "ts-loader": "9.3.0",
     "webpack": "5.72.1",
     "webpack-bundle-analyzer": "4.5.0",
