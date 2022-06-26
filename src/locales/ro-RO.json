@@ -124,7 +124,7 @@
     "sidebarLock": "Păstrează deschisă bara laterală"
   },
   "library": {
-    "noItems": "",
+    "noItems": "Niciun element adăugat încă...",
     "hint_emptyLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici sau instalează o bibliotecă din depozitul public, de mai jos.",
     "hint_emptyPrivateLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici."
   },
