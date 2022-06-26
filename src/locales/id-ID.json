@@ -121,12 +121,12 @@
       "unlockAll": "Lepas semua"
     },
     "statusPublished": "Telah terbit",
-    "sidebarLock": ""
+    "sidebarLock": "Biarkan sidebar tetap terbuka"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "Belum ada item yang ditambahkan...",
+    "hint_emptyLibrary": "Pilih item pada kanvas untuk menambahkan nya di sini, atau pasang pustaka dari gudang di bawah ini.",
+    "hint_emptyPrivateLibrary": "Pilih item pada kanvas untuk menambahkan nya di sini."
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
