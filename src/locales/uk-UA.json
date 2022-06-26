@@ -115,16 +115,16 @@
       "label": "Посилання"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Блокувати",
+      "unlock": "Розблокувати",
+      "lockAll": "Заблокувати все",
+      "unlockAll": "Розблокувати все"
     },
-    "statusPublished": "",
-    "sidebarLock": ""
+    "statusPublished": "Опубліковано",
+    "sidebarLock": "Не закривати бокове меню"
   },
   "library": {
-    "noItems": "",
+    "noItems": "Тут поки пусто...",
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
@@ -196,7 +196,7 @@
     "svgImageInsertError": "Не вдалося вставити SVG-зображення. Помилка розмітки SVG.",
     "invalidSVGString": "Недійсний SVG.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "Не вдалося завантажити бібліотеку"
   },
   "toolBar": {
     "selection": "Виділення",
@@ -306,14 +306,14 @@
     "view": "Вигляд",
     "zoomToFit": "Збільшити щоб умістити всі елементи",
     "zoomToSelection": "Наблизити вибране",
-    "toggleElementLock": ""
+    "toggleElementLock": "Заблокувати/розблокувати вибране"
   },
   "clearCanvasDialog": {
     "title": "Очистити полотно"
   },
   "publishDialog": {
     "title": "Опублікувати бібліотеку",
-    "itemName": "",
+    "itemName": "Назва елементу",
     "authorName": "Ім'я автора",
     "githubUsername": "Ім'я користувача Github",
     "twitterUsername": "Ім'я користувача Твитер",
@@ -329,7 +329,7 @@
       "website": ""
     },
     "errors": {
-      "required": "",
+      "required": "Обов’язково",
       "website": "Введіть дійсну URL-адресу"
     },
     "noteDescription": {
