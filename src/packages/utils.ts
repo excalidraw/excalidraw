@@ -131,7 +131,7 @@ export const exportToBlob = async (
               opts.elements,
               opts.appState,
               opts.files || {},
-              "local",
+              "image",
             ),
           });
         }

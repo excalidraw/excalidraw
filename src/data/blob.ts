@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { cleanAppStateForExport } from "../appState";
+import { cleanAppStateForTextExport } from "../appState";
 import { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { ExcalidrawElement, FileId } from "../element/types";
@@ -143,7 +143,7 @@ export const loadSceneOrLibraryFromBlob = async (
             appState: {
               theme: localAppState?.theme,
               fileHandle: fileHandle || blob.handle || null,
-              ...cleanAppStateForExport(data.appState || {}),
+              ...cleanAppStateForTextExport(data.appState || {}),
               ...(localAppState
                 ? calculateScrollCenter(
                     data.elements || [],

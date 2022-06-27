@@ -5,7 +5,7 @@ import {
   LibraryItems,
   LibraryItems_anyVersion,
 } from "../types";
-import type { cleanAppStateForExport } from "../appState";
+import type { cleanAppStateForTextExport } from "../appState";
 import { VERSIONS } from "../constants";
 
 export interface ExportedDataState {
@@ -13,7 +13,7 @@ export interface ExportedDataState {
   version: number;
   source: string;
   elements: readonly ExcalidrawElement[];
-  appState: ReturnType<typeof cleanAppStateForExport>;
+  appState: ReturnType<typeof cleanAppStateForTextExport>;
   files: BinaryFiles | undefined;
 }
 

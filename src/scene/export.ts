@@ -96,7 +96,7 @@ export const exportToSvg = async (
       metadata = await (
         await import(/* webpackChunkName: "image" */ "../../src/data/image")
       ).encodeSvgMetadata({
-        text: serializeAsJSON(elements, appState, files || {}, "local"),
+        text: serializeAsJSON(elements, appState, files || {}, "image"),
       });
     } catch (error: any) {
       console.error(error);

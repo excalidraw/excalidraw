@@ -82,7 +82,7 @@ export const exportCanvas = async (
         await import(/* webpackChunkName: "image" */ "./image")
       ).encodePngMetadata({
         blob,
-        metadata: serializeAsJSON(elements, appState, files, "local"),
+        metadata: serializeAsJSON(elements, appState, files, "image"),
       });
     }
 

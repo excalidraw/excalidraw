@@ -1,5 +1,9 @@
 import { fileOpen, fileSave } from "./filesystem";
-import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
+import {
+  cleanAppStateForImageExport,
+  cleanAppStateForTextExport,
+  clearAppStateForDatabase,
+} from "../appState";
 import {
   EXPORT_DATA_TYPES,
   EXPORT_SOURCE,
@@ -43,25 +47,32 @@ export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
   appState: Partial<AppState>,
   files: BinaryFiles,
-  type: "local" | "database",
+  destination: "text" | "image" | "database",
 ): string => {
+  const cleanAppState = () => {
+    switch (destination) {
+      case "database":
+        return clearAppStateForDatabase(appState);
+      case "text":
+        return cleanAppStateForTextExport(appState);
+      case "image":
+        return cleanAppStateForImageExport(appState);
+    }
+  };
   const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,
     version: VERSIONS.excalidraw,
     source: EXPORT_SOURCE,
     elements:
-      type === "local"
-        ? clearElementsForExport(elements)
-        : clearElementsForDatabase(elements),
-    appState:
-      type === "local"
-        ? cleanAppStateForExport(appState)
-        : clearAppStateForDatabase(appState),
+      destination === "database"
+        ? clearElementsForDatabase(elements)
+        : clearElementsForExport(elements),
+    appState: cleanAppState(),
     files:
-      type === "local"
-        ? filterOutDeletedFiles(elements, files)
-        : // will be stripped from JSON
-          undefined,
+      destination === "database"
+        ? // will be stripped from JSON
+          undefined
+        : filterOutDeletedFiles(elements, files),
   };
 
   return JSON.stringify(data, null, 2);
@@ -72,7 +83,7 @@ export const saveAsJSON = async (
   appState: AppState,
   files: BinaryFiles,
 ) => {
-  const serialized = serializeAsJSON(elements, appState, files, "local");
+  const serialized = serializeAsJSON(elements, appState, files, "text");
   const blob = new Blob([serialized], {
     type: MIME_TYPES.excalidraw,
   });
