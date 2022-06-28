@@ -121,12 +121,12 @@
       "unlockAll": "எல்லாம் பூட்டவிழ்"
     },
     "statusPublished": "வெளியிடப்பட்டது",
-    "sidebarLock": ""
+    "sidebarLock": "பக்கப்பட்டையைத் திறந்தே வை"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "இதுவரை உருப்படிகள் சேரக்கப்படவில்லை...",
+    "hint_emptyLibrary": "கித்தானிலுள்ள உருப்படியை இங்குச் சேர்க்க தேர்ந்தெடு, அல்லது கீழுள்ள பொது களஞ்சியத்திலிருந்து நூலகத்தை நிறுவு.",
+    "hint_emptyPrivateLibrary": "கித்தானிலுள்ள உருப்படியை இங்குச் சேர்க்க தேர்ந்தெடு."
   },
   "buttons": {
     "clearReset": "கித்தானை அகரமாக்கு",
