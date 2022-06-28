@@ -101,7 +101,7 @@ const APP_STATE_STORAGE_CONF = (<
   Values extends {
     /** whether to keep when storing to browser storage (localStorage/IDB) */
     browser: boolean;
-    /** whether to keep when exporting to text file */
+    /** whether to keep when exporting to a text file */
     text: boolean;
     /** whether to keep when exporting to an image file */
     image: boolean;
