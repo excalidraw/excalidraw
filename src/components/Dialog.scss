@@ -38,18 +38,22 @@
       --inset-right: #{"max(var(--metric), var(--sar))"};
     }
 
+    .Dialog__content {
+      margin-bottom: 16px;
+    }
+
     .Dialog__title {
       grid-template-columns: calc(var(--space-factor) * 7) 1fr calc(
           var(--space-factor) * 7
         );
-      position: sticky;
-      top: 0;
+      position: fixed;
+      bottom: 0;
       padding: calc(var(--space-factor) * 2);
       background: var(--island-bg-color);
       font-size: 1.25em;
-
+      margin: 0;
       box-sizing: border-box;
-      border-bottom: 1px solid var(--button-gray-2);
+      border-top: 1px solid var(--button-gray-2);
       z-index: 1;
     }
 
