@@ -43,6 +43,7 @@
     }
 
     .Dialog__title {
+      width:100%;
       grid-template-columns: calc(var(--space-factor) * 7) 1fr calc(
           var(--space-factor) * 7
         );
