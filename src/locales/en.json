@@ -119,7 +119,14 @@
       "unlock": "Unlock",
       "lockAll": "Lock all",
       "unlockAll": "Unlock all"
-    }
+    },
+    "statusPublished": "Published",
+    "sidebarLock": "Keep sidebar open"
+  },
+  "library": {
+    "noItems": "No items added yet...",
+    "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
+    "hint_emptyPrivateLibrary": "Select an item on canvas to add it here."
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -341,7 +348,8 @@
       "post": "which in short means anyone can use them without restrictions."
     },
     "noteItems": "Each library item must have its own name so it's filterable. The following library items will be included:",
-    "atleastOneLibItem": "Please select at least one library item to get started"
+    "atleastOneLibItem": "Please select at least one library item to get started",
+    "republishWarning": "Note: some of the selected items are marked as already published/submitted. You should only resubmit items when updating an existing library or submission."
   },
   "publishSuccessDialog": {
     "title": "Library submitted",

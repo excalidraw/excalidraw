@@ -19,7 +19,7 @@ import { AppState } from "../types";
 export const actionFinalize = register({
   name: "finalize",
   trackEvent: false,
-  perform: (elements, appState, _, { canvas, focusContainer }) => {
+  perform: (elements, appState, _, { canvas, focusContainer, scene }) => {
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
         appState.editingLinearElement;
@@ -50,8 +50,12 @@ export const actionFinalize = register({
 
     let newElements = elements;
 
-    if (appState.pendingImageElement) {
-      mutateElement(appState.pendingImageElement, { isDeleted: true }, false);
+    const pendingImageElement =
+      appState.pendingImageElementId &&
+      scene.getElement(appState.pendingImageElementId);
+
+    if (pendingImageElement) {
+      mutateElement(pendingImageElement, { isDeleted: true }, false);
     }
 
     if (window.document.activeElement instanceof HTMLElement) {
@@ -177,7 +181,7 @@ export const actionFinalize = register({
                 [multiPointElement.id]: true,
               }
             : appState.selectedElementIds,
-        pendingImageElement: null,
+        pendingImageElementId: null,
       },
       commitToHistory: appState.activeTool.type === "freedraw",
     };

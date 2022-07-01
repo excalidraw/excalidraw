@@ -37,11 +37,14 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     autoFocus = false,
     generateIdForFile,
     onLinkOpen,
+    onPointerDown,
+    onScrollChange,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
 
   const UIOptions: AppProps["UIOptions"] = {
+    ...props.UIOptions,
     canvasActions: {
       ...DEFAULT_UI_OPTIONS.canvasActions,
       ...canvasActions,
@@ -100,6 +103,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           autoFocus={autoFocus}
           generateIdForFile={generateIdForFile}
           onLinkOpen={onLinkOpen}
+          onPointerDown={onPointerDown}
+          onScrollChange={onScrollChange}
         />
       </Provider>
     </InitializeApp>
@@ -210,3 +215,13 @@ export {
   newElementWith,
   bumpVersion,
 } from "../../element/mutateElement";
+
+export {
+  parseLibraryTokensFromUrl,
+  useHandleLibrary,
+} from "../../data/library";
+
+export {
+  sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
+} from "../../utils";

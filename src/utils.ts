@@ -301,7 +301,8 @@ export const setCursorForShape = (
     setEraserCursor(canvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
-  } else if (appState.activeTool.type !== "image") {
+    // Ignore custom type as well and let host decide
+  } else if (!["image", "custom"].includes(appState.activeTool.type)) {
     canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
@@ -666,4 +667,17 @@ export const isPromiseLike = (
     "catch" in value &&
     "finally" in value
   );
+};
+
+export const queryFocusableElements = (container: HTMLElement | null) => {
+  const focusableElements = container?.querySelectorAll<HTMLElement>(
+    "button, a, input, select, textarea, div[tabindex], label[tabindex]",
+  );
+
+  return focusableElements
+    ? Array.from(focusableElements).filter(
+        (element) =>
+          element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
+      )
+    : [];
 };

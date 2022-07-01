@@ -1,6 +1,6 @@
 import { chunk } from "lodash";
 import React, { useCallback, useState } from "react";
-import { importLibraryFromJSON, saveLibraryAsJSON } from "../data/json";
+import { saveLibraryAsJSON, serializeLibraryAsJSON } from "../data/json";
 import Library from "../data/library";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
@@ -12,27 +12,32 @@ import {
   LibraryItems,
 } from "../types";
 import { arrayToMap, muteFSAbortError } from "../utils";
-import { useDeviceType } from "./App";
+import { useDevice } from "./App";
 import ConfirmDialog from "./ConfirmDialog";
-import { exportToFileIcon, load, publishIcon, trash } from "./icons";
+import { close, exportToFileIcon, load, publishIcon, trash } from "./icons";
 import { LibraryUnit } from "./LibraryUnit";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 
 import "./LibraryMenuItems.scss";
-import { VERSIONS } from "../constants";
+import { MIME_TYPES, VERSIONS } from "../constants";
 import Spinner from "./Spinner";
+import { fileOpen } from "../data/filesystem";
+
+import { SidebarLockButton } from "./SidebarLockButton";
+import { trackEvent } from "../analytics";
 
 const LibraryMenuItems = ({
   isLoading,
   libraryItems,
   onRemoveFromLibrary,
   onAddToLibrary,
-  onInsertShape,
+  onInsertLibraryItems,
   pendingElements,
   theme,
   setAppState,
+  appState,
   libraryReturnUrl,
   library,
   files,
@@ -46,11 +51,12 @@ const LibraryMenuItems = ({
   libraryItems: LibraryItems;
   pendingElements: LibraryItem["elements"];
   onRemoveFromLibrary: () => void;
-  onInsertShape: (elements: LibraryItem["elements"]) => void;
+  onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: (elements: LibraryItem["elements"]) => void;
   theme: AppState["theme"];
   files: BinaryFiles;
   setAppState: React.Component<any, AppState>["setState"];
+  appState: AppState;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   library: Library;
   id: string;
@@ -87,9 +93,7 @@ const LibraryMenuItems = ({
   }, [selectedItems, onRemoveFromLibrary, resetLibrary]);
 
   const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
-
-  const isMobile = useDeviceType().isMobile;
-
+  const device = useDevice();
   const renderLibraryActions = () => {
     const itemsSelected = !!selectedItems.length;
     const items = itemsSelected
@@ -100,20 +104,34 @@ const LibraryMenuItems = ({
       : t("buttons.resetLibrary");
     return (
       <div className="library-actions">
-        {(!itemsSelected || !isMobile) && (
+        {!itemsSelected && (
           <ToolButton
             key="import"
             type="button"
             title={t("buttons.load")}
             aria-label={t("buttons.load")}
             icon={load}
-            onClick={() => {
-              importLibraryFromJSON(library)
-                .catch(muteFSAbortError)
-                .catch((error) => {
-                  console.error(error);
-                  setAppState({ errorMessage: t("errors.importLibraryError") });
+            onClick={async () => {
+              try {
+                await library.updateLibrary({
+                  libraryItems: fileOpen({
+                    description: "Excalidraw library files",
+                    // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
+                    // gets resolved. Else, iOS users cannot open `.excalidraw` files.
+                    /*
+                    extensions: [".json", ".excalidrawlib"],
+                    */
+                  }),
+                  merge: true,
+                  openLibraryMenu: true,
                 });
+              } catch (error: any) {
+                if (error?.name === "AbortError") {
+                  console.warn(error);
+                  return;
+                }
+                setAppState({ errorMessage: t("errors.importLibraryError") });
+              }
             }}
             className="library-actions--load"
           />
@@ -161,7 +179,7 @@ const LibraryMenuItems = ({
             </ToolButton>
           </>
         )}
-        {itemsSelected && !isPublished && (
+        {itemsSelected && (
           <Tooltip label={t("hints.publishLibrary")}>
             <ToolButton
               type="button"
@@ -171,7 +189,7 @@ const LibraryMenuItems = ({
               className="library-actions--publish"
               onClick={onPublish}
             >
-              {!isMobile && <label>{t("buttons.publishLibrary")}</label>}
+              {!device.isMobile && <label>{t("buttons.publishLibrary")}</label>}
               {selectedItems.length > 0 && (
                 <span className="library-actions-counter">
                   {selectedItems.length}
@@ -180,17 +198,28 @@ const LibraryMenuItems = ({
             </ToolButton>
           </Tooltip>
         )}
+        {device.isMobile && (
+          <div className="library-menu-browse-button--mobile">
+            <a
+              href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+                window.name || "_blank"
+              }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+                VERSIONS.excalidrawLibrary
+              }`}
+              target="_excalidraw_libraries"
+            >
+              {t("labels.libraries")}
+            </a>
+          </div>
+        )}
       </div>
     );
   };
 
-  const CELLS_PER_ROW = isMobile ? 4 : 6;
+  const CELLS_PER_ROW = device.isMobile && !device.isSmScreen ? 6 : 4;
 
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;
-  const isPublished = selectedItems.some(
-    (id) => libraryItems.find((item) => item.id === id)?.status === "published",
-  );
 
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
@@ -241,6 +270,18 @@ const LibraryMenuItems = ({
     }
   };
 
+  const getInsertedElements = (id: string) => {
+    let targetElements;
+    if (selectedItems.includes(id)) {
+      targetElements = libraryItems.filter((item) =>
+        selectedItems.includes(item.id),
+      );
+    } else {
+      targetElements = libraryItems.filter((item) => item.id === id);
+    }
+    return targetElements;
+  };
+
   const createLibraryItemCompo = (params: {
     item:
       | LibraryItem
@@ -262,6 +303,12 @@ const LibraryMenuItems = ({
           id={params.item?.id || null}
           selected={!!params.item?.id && selectedItems.includes(params.item.id)}
           onToggle={onItemSelectToggle}
+          onDrag={(id, event) => {
+            event.dataTransfer.setData(
+              MIME_TYPES.excalidrawlib,
+              serializeLibraryAsJSON(getInsertedElements(id)),
+            );
+          }}
         />
       </Stack.Col>
     );
@@ -280,7 +327,7 @@ const LibraryMenuItems = ({
       if (item.id) {
         return createLibraryItemCompo({
           item,
-          onClick: () => onInsertShape(item.elements),
+          onClick: () => onInsertLibraryItems(getInsertedElements(item.id)),
           key: item.id,
         });
       }
@@ -326,48 +373,185 @@ const LibraryMenuItems = ({
     (item) => item.status === "published",
   );
 
-  return (
-    <div className="library-menu-items-container">
-      {showRemoveLibAlert && renderRemoveLibAlert()}
-      <div className="layer-ui__library-header" key="library-header">
-        {renderLibraryActions()}
-        {isLoading ? (
-          <Spinner />
-        ) : (
-          <a
-            href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-              window.name || "_blank"
-            }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
-              VERSIONS.excalidrawLibrary
-            }`}
-            target="_excalidraw_libraries"
-          >
-            {t("labels.libraries")}
-          </a>
-        )}
-      </div>
+  const renderLibraryHeader = () => {
+    return (
+      <>
+        <div className="layer-ui__library-header" key="library-header">
+          {renderLibraryActions()}
+          {device.canDeviceFitSidebar && (
+            <>
+              <div className="layer-ui__sidebar-lock-button">
+                <SidebarLockButton
+                  checked={appState.isLibraryMenuDocked}
+                  onChange={() => {
+                    document
+                      .querySelector(".layer-ui__wrapper")
+                      ?.classList.add("animate");
+                    const nextState = !appState.isLibraryMenuDocked;
+                    setAppState({
+                      isLibraryMenuDocked: nextState,
+                    });
+                    trackEvent(
+                      "library",
+                      `toggleLibraryDock (${nextState ? "dock" : "undock"})`,
+                      `sidebar (${device.isMobile ? "mobile" : "desktop"})`,
+                    );
+                  }}
+                />
+              </div>
+            </>
+          )}
+          {!device.isMobile && (
+            <div className="ToolIcon__icon__close">
+              <button
+                className="Modal__close"
+                onClick={() =>
+                  setAppState({
+                    isLibraryOpen: false,
+                  })
+                }
+                aria-label={t("buttons.close")}
+              >
+                {close}
+              </button>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  };
+
+  const renderLibraryMenuItems = () => {
+    return (
       <Stack.Col
         className="library-menu-items-container__items"
         align="start"
         gap={1}
+        style={{
+          flex: publishedItems.length > 0 ? 1 : "0 1 auto",
+          marginBottom: 0,
+        }}
       >
         <>
-          <div className="separator">{t("labels.personalLib")}</div>
-          {renderLibrarySection([
-            // append pending library item
-            ...(pendingElements.length
-              ? [{ id: null, elements: pendingElements }]
-              : []),
-            ...unpublishedItems,
-          ])}
+          <div className="separator">
+            {(pendingElements.length > 0 ||
+              unpublishedItems.length > 0 ||
+              publishedItems.length > 0) && (
+              <div>{t("labels.personalLib")}</div>
+            )}
+            {isLoading && (
+              <div
+                style={{
+                  marginLeft: "auto",
+                  marginRight: "1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  fontWeight: "normal",
+                }}
+              >
+                <div style={{ transform: "translateY(2px)" }}>
+                  <Spinner />
+                </div>
+              </div>
+            )}
+          </div>
+          {!pendingElements.length && !unpublishedItems.length ? (
+            <div
+              style={{
+                height: 65,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                fontSize: ".9rem",
+              }}
+            >
+              {t("library.noItems")}
+              <div
+                style={{
+                  margin: ".6rem 0",
+                  fontSize: ".8em",
+                  width: "70%",
+                  textAlign: "center",
+                }}
+              >
+                {publishedItems.length > 0
+                  ? t("library.hint_emptyPrivateLibrary")
+                  : t("library.hint_emptyLibrary")}
+              </div>
+            </div>
+          ) : (
+            renderLibrarySection([
+              // append pending library item
+              ...(pendingElements.length
+                ? [{ id: null, elements: pendingElements }]
+                : []),
+              ...unpublishedItems,
+            ])
+          )}
         </>
 
         <>
-          <div className="separator">{t("labels.excalidrawLib")} </div>
-
-          {renderLibrarySection(publishedItems)}
+          {(publishedItems.length > 0 ||
+            (!device.isMobile &&
+              (pendingElements.length > 0 || unpublishedItems.length > 0))) && (
+            <div className="separator">{t("labels.excalidrawLib")}</div>
+          )}
+          {publishedItems.length > 0 ? (
+            renderLibrarySection(publishedItems)
+          ) : unpublishedItems.length > 0 ? (
+            <div
+              style={{
+                margin: "1rem 0",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                fontSize: ".9rem",
+              }}
+            >
+              {t("library.noItems")}
+            </div>
+          ) : null}
         </>
       </Stack.Col>
+    );
+  };
+
+  const renderLibraryFooter = () => {
+    return (
+      <a
+        className="library-menu-browse-button"
+        href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+          window.name || "_blank"
+        }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
+          VERSIONS.excalidrawLibrary
+        }`}
+        target="_excalidraw_libraries"
+      >
+        {t("labels.libraries")}
+      </a>
+    );
+  };
+
+  return (
+    <div
+      className="library-menu-items-container"
+      style={
+        device.isMobile
+          ? {
+              minHeight: "200px",
+              maxHeight: "70vh",
+            }
+          : undefined
+      }
+    >
+      {showRemoveLibAlert && renderRemoveLibAlert()}
+      {renderLibraryHeader()}
+      {renderLibraryMenuItems()}
+      {!device.isMobile && renderLibraryFooter()}
     </div>
   );
 };

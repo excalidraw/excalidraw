@@ -64,20 +64,19 @@ import {
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
   MQ_MAX_WIDTH_PORTRAIT,
+  MQ_RIGHT_SIDEBAR_MIN_WIDTH,
+  MQ_SM_MAX_WIDTH,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   THEME,
   TOUCH_CTX_MENU_TIMEOUT,
-  URL_HASH_KEYS,
-  URL_QUERY_KEYS,
   VERTICAL_ALIGN,
-  ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
-import Library from "../data/library";
-import { restore, restoreElements, restoreLibraryItems } from "../data/restore";
+import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import { restore, restoreElements } from "../data/restore";
 import {
   dragNewElement,
   dragSelectedElements,
@@ -197,7 +196,7 @@ import {
   LibraryItems,
   PointerDownState,
   SceneData,
-  DeviceType,
+  Device,
 } from "../types";
 import {
   debounce,
@@ -223,7 +222,6 @@ import {
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
-import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
@@ -234,7 +232,7 @@ import {
   isSupportedImageFile,
   loadSceneOrLibraryFromBlob,
   normalizeFile,
-  loadLibraryFromBlob,
+  parseLibraryJSON,
   resizeImageFile,
   SVGStringToFile,
 } from "../data/blob";
@@ -261,14 +259,15 @@ import {
   isPointHittingLinkIcon,
   isLocalLink,
 } from "../element/Hyperlink";
-import { AbortError } from "../errors";
 
-const defaultDeviceTypeContext: DeviceType = {
+const deviceContextInitialValue = {
+  isSmScreen: false,
   isMobile: false,
   isTouchScreen: false,
+  canDeviceFitSidebar: false,
 };
-const DeviceTypeContext = React.createContext(defaultDeviceTypeContext);
-export const useDeviceType = () => useContext(DeviceTypeContext);
+const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
+export const useDevice = () => useContext<Device>(DeviceContext);
 const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
   id: string | null;
@@ -300,10 +299,7 @@ class App extends React.Component<AppProps, AppState> {
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
-  deviceType: DeviceType = {
-    isMobile: false,
-    isTouchScreen: false,
-  };
+  device: Device = deviceContextInitialValue;
   detachIsMobileMqHandler?: () => void;
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
@@ -313,7 +309,7 @@ class App extends React.Component<AppProps, AppState> {
     UIOptions: DEFAULT_UI_OPTIONS,
   };
 
-  private scene: Scene;
+  public scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
@@ -357,10 +353,12 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
       showHyperlinkPopup: false,
+      isLibraryMenuDocked: false,
     };
 
     this.id = nanoid();
 
+    this.library = new Library(this);
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -370,6 +368,7 @@ class App extends React.Component<AppProps, AppState> {
         ready: true,
         readyPromise,
         updateScene: this.updateScene,
+        updateLibrary: this.library.updateLibrary,
         addFiles: this.addFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
@@ -381,9 +380,11 @@ class App extends React.Component<AppProps, AppState> {
         getAppState: () => this.state,
         getFiles: () => this.files,
         refresh: this.refresh,
-        importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
         id: this.id,
+        setActiveTool: this.setActiveTool,
+        setCursor: this.setCursor,
+        resetCursor: this.resetCursor,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -399,7 +400,6 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.scene = new Scene();
-    this.library = new Library(this);
     this.history = new History();
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -485,7 +485,7 @@ class App extends React.Component<AppProps, AppState> {
       <div
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": viewModeEnabled,
-          "excalidraw--mobile": this.deviceType.isMobile,
+          "excalidraw--mobile": this.device.isMobile,
         })}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -497,7 +497,7 @@ class App extends React.Component<AppProps, AppState> {
         <ExcalidrawContainerContext.Provider
           value={this.excalidrawContainerValue}
         >
-          <DeviceTypeContext.Provider value={this.deviceType}>
+          <DeviceContext.Provider value={this.device}>
             <LayerUI
               canvas={this.canvas}
               appState={this.state}
@@ -521,6 +521,7 @@ class App extends React.Component<AppProps, AppState> {
               isCollaborating={this.props.isCollaborating}
               renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
+              renderCustomStats={renderCustomStats}
               viewModeEnabled={viewModeEnabled}
               showExitZenModeBtn={
                 typeof this.props?.zenModeEnabled === "undefined" &&
@@ -548,15 +549,6 @@ class App extends React.Component<AppProps, AppState> {
                 onLinkOpen={this.props.onLinkOpen}
               />
             )}
-            {this.state.showStats && (
-              <Stats
-                appState={this.state}
-                setAppState={this.setAppState}
-                elements={this.scene.getNonDeletedElements()}
-                onClose={this.toggleStats}
-                renderCustomStats={renderCustomStats}
-              />
-            )}
             {this.state.toastMessage !== null && (
               <Toast
                 message={this.state.toastMessage}
@@ -564,7 +556,7 @@ class App extends React.Component<AppProps, AppState> {
               />
             )}
             <main>{this.renderCanvas()}</main>
-          </DeviceTypeContext.Provider>
+          </DeviceContext.Provider>
         </ExcalidrawContainerContext.Provider>
       </div>
     );
@@ -697,54 +689,6 @@ class App extends React.Component<AppProps, AppState> {
     this.onSceneUpdated();
   };
 
-  private importLibraryFromUrl = async (url: string, token?: string | null) => {
-    if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
-      const hash = new URLSearchParams(window.location.hash.slice(1));
-      hash.delete(URL_HASH_KEYS.addLibrary);
-      window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
-    } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
-      const query = new URLSearchParams(window.location.search);
-      query.delete(URL_QUERY_KEYS.addLibrary);
-      window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
-    }
-
-    const defaultStatus = "published";
-
-    this.setState({ isLibraryOpen: true });
-
-    try {
-      await this.library.importLibrary(
-        new Promise<LibraryItems>(async (resolve, reject) => {
-          try {
-            const request = await fetch(decodeURIComponent(url));
-            const blob = await request.blob();
-            const libraryItems = await loadLibraryFromBlob(blob, defaultStatus);
-
-            if (
-              token === this.id ||
-              window.confirm(
-                t("alerts.confirmAddLibrary", {
-                  numShapes: libraryItems.length,
-                }),
-              )
-            ) {
-              resolve(libraryItems);
-            } else {
-              reject(new AbortError());
-            }
-          } catch (error: any) {
-            reject(error);
-          }
-        }),
-      );
-    } catch (error: any) {
-      console.error(error);
-      this.setState({ errorMessage: t("errors.importLibraryError") });
-    } finally {
-      this.focusContainer();
-    }
-  };
-
   private resetHistory = () => {
     this.history.clear();
   };
@@ -789,7 +733,14 @@ class App extends React.Component<AppProps, AppState> {
     try {
       initialData = (await this.props.initialData) || null;
       if (initialData?.libraryItems) {
-        this.library.importLibrary(initialData.libraryItems, "unpublished");
+        this.library
+          .updateLibrary({
+            libraryItems: initialData.libraryItems,
+            merge: true,
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       }
     } catch (error: any) {
       console.error(error);
@@ -801,10 +752,15 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-
     const scene = restore(initialData, null, null);
     scene.appState = {
       ...scene.appState,
+      // we're falling back to current (pre-init) state when deciding
+      // whether to open the library, to handle a case where we
+      // update the state outside of initialData (e.g. when loading the app
+      // with a library install link, which should auto-open the library)
+      isLibraryOpen:
+        initialData?.appState?.isLibraryOpen || this.state.isLibraryOpen,
       activeTool:
         scene.appState.activeTool.type === "image"
           ? { ...scene.appState.activeTool, type: "selection" }
@@ -833,20 +789,21 @@ class App extends React.Component<AppProps, AppState> {
       ...scene,
       commitToHistory: true,
     });
+  };
 
-    const libraryUrl =
-      // current
-      new URLSearchParams(window.location.hash.slice(1)).get(
-        URL_HASH_KEYS.addLibrary,
-      ) ||
-      // legacy, kept for compat reasons
-      new URLSearchParams(window.location.search).get(
-        URL_QUERY_KEYS.addLibrary,
-      );
-
-    if (libraryUrl) {
-      await this.importLibraryFromUrl(libraryUrl);
-    }
+  private refreshDeviceState = (container: HTMLDivElement) => {
+    const { width, height } = container.getBoundingClientRect();
+    const sidebarBreakpoint =
+      this.props.UIOptions.dockedSidebarBreakpoint != null
+        ? this.props.UIOptions.dockedSidebarBreakpoint
+        : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
+    this.device = updateObject(this.device, {
+      isSmScreen: width < MQ_SM_MAX_WIDTH,
+      isMobile:
+        width < MQ_MAX_WIDTH_PORTRAIT ||
+        (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE),
+      canDeviceFitSidebar: width > sidebarBreakpoint,
+    });
   };
 
   public async componentDidMount() {
@@ -890,34 +847,53 @@ class App extends React.Component<AppProps, AppState> {
       this.focusContainer();
     }
 
+    if (
+      this.excalidrawContainerRef.current &&
+      // bounding rects don't work in tests so updating
+      // the state on init would result in making the test enviro run
+      // in mobile breakpoint (0 width/height), making everything fail
+      process.env.NODE_ENV !== "test"
+    ) {
+      this.refreshDeviceState(this.excalidrawContainerRef.current);
+    }
+
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => {
-        // compute isMobile state
+        // recompute device dimensions state
         // ---------------------------------------------------------------------
-        const { width, height } =
-          this.excalidrawContainerRef.current!.getBoundingClientRect();
-        this.deviceType = updateObject(this.deviceType, {
-          isMobile:
-            width < MQ_MAX_WIDTH_PORTRAIT ||
-            (height < MQ_MAX_HEIGHT_LANDSCAPE &&
-              width < MQ_MAX_WIDTH_LANDSCAPE),
-        });
+        this.refreshDeviceState(this.excalidrawContainerRef.current!);
         // refresh offsets
         // ---------------------------------------------------------------------
         this.updateDOMRect();
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     } else if (window.matchMedia) {
-      const mediaQuery = window.matchMedia(
+      const mdScreenQuery = window.matchMedia(
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
+      const smScreenQuery = window.matchMedia(
+        `(max-width: ${MQ_SM_MAX_WIDTH}px)`,
+      );
+      const canDeviceFitSidebarMediaQuery = window.matchMedia(
+        `(min-width: ${
+          // NOTE this won't update if a different breakpoint is supplied
+          // after mount
+          this.props.UIOptions.dockedSidebarBreakpoint != null
+            ? this.props.UIOptions.dockedSidebarBreakpoint
+            : MQ_RIGHT_SIDEBAR_MIN_WIDTH
+        }px)`,
+      );
       const handler = () => {
-        this.deviceType = updateObject(this.deviceType, {
-          isMobile: mediaQuery.matches,
+        this.excalidrawContainerRef.current!.getBoundingClientRect();
+        this.device = updateObject(this.device, {
+          isSmScreen: smScreenQuery.matches,
+          isMobile: mdScreenQuery.matches,
+          canDeviceFitSidebar: canDeviceFitSidebarMediaQuery.matches,
         });
       };
-      mediaQuery.addListener(handler);
-      this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
+      mdScreenQuery.addListener(handler);
+      this.detachIsMobileMqHandler = () =>
+        mdScreenQuery.removeListener(handler);
     }
 
     const searchParams = new URLSearchParams(window.location.search.slice(1));
@@ -1059,6 +1035,21 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     if (
+      this.excalidrawContainerRef.current &&
+      prevProps.UIOptions.dockedSidebarBreakpoint !==
+        this.props.UIOptions.dockedSidebarBreakpoint
+    ) {
+      this.refreshDeviceState(this.excalidrawContainerRef.current);
+    }
+
+    if (
+      prevState.scrollX !== this.state.scrollX ||
+      prevState.scrollY !== this.state.scrollY
+    ) {
+      this.props?.onScrollChange?.(this.state.scrollX, this.state.scrollY);
+    }
+
+    if (
       Object.keys(this.state.selectedElementIds).length &&
       isEraserActive(this.state)
     ) {
@@ -1189,8 +1180,7 @@ class App extends React.Component<AppProps, AppState> {
         if (isImageElement(element)) {
           if (
             // not placed on canvas yet (but in elements array)
-            this.state.pendingImageElement &&
-            element.id === this.state.pendingImageElement.id
+            this.state.pendingImageElementId === element.id
           ) {
             return false;
           }
@@ -1224,7 +1214,7 @@ class App extends React.Component<AppProps, AppState> {
         theme: this.state.theme,
         imageCache: this.imageCache,
         isExporting: false,
-        renderScrollbars: !this.deviceType.isMobile,
+        renderScrollbars: !this.device.isMobile,
       },
     );
 
@@ -1502,11 +1492,15 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
+
     this.setState(
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          isLibraryOpen: false,
+          isLibraryOpen:
+            this.state.isLibraryOpen && this.device.canDeviceFitSidebar
+              ? this.state.isLibraryMenuDocked
+              : false,
           selectedElementIds: newElements.reduce((map, element) => {
             if (!isBoundToContainer(element)) {
               map[element.id] = true;
@@ -1578,7 +1572,7 @@ class App extends React.Component<AppProps, AppState> {
       trackEvent(
         "toolbar",
         "toggleLock",
-        `${source} (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
+        `${source} (${this.device.isMobile ? "mobile" : "desktop"})`,
       );
     }
     this.setState((prevState) => {
@@ -1607,10 +1601,6 @@ class App extends React.Component<AppProps, AppState> {
 
   toggleZenMode = () => {
     this.actionManager.executeAction(actionToggleZenMode);
-  };
-
-  toggleStats = () => {
-    this.actionManager.executeAction(actionToggleStats);
   };
 
   scrollToContent = (
@@ -1683,14 +1673,6 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
-      libraryItems?:
-        | ((
-            currentLibraryItems: LibraryItems,
-          ) =>
-            | Required<SceneData>["libraryItems"]
-            | Promise<Required<SceneData>["libraryItems"]>)
-        | Required<SceneData>["libraryItems"]
-        | Promise<Required<SceneData>["libraryItems"]>;
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1706,23 +1688,6 @@ class App extends React.Component<AppProps, AppState> {
 
       if (sceneData.collaborators) {
         this.setState({ collaborators: sceneData.collaborators });
-      }
-
-      if (sceneData.libraryItems) {
-        this.library.setLibrary((currentLibraryItems) => {
-          const nextItems =
-            typeof sceneData.libraryItems === "function"
-              ? sceneData.libraryItems(currentLibraryItems)
-              : sceneData.libraryItems;
-
-          return new Promise<LibraryItems>(async (resolve, reject) => {
-            try {
-              resolve(restoreLibraryItems(await nextItems, "unpublished"));
-            } catch (error: any) {
-              reject(error);
-            }
-          });
-        });
       }
     },
   );
@@ -1766,9 +1731,13 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      // bail if
       if (
-        (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
-        // case: using arrows to move between buttons
+        // inside an input
+        (isWritableElement(event.target) &&
+          // unless pressing escape (finalize action)
+          event.key !== KEYS.ESCAPE) ||
+        // or unless using arrows (to move between buttons)
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {
         return;
@@ -1793,7 +1762,16 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.code === CODES.ZERO) {
-        this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
+        const nextState = !this.state.isLibraryOpen;
+        this.setState({ isLibraryOpen: nextState });
+        // track only openings
+        if (nextState) {
+          trackEvent(
+            "library",
+            "toggleLibrary (open)",
+            `keyboard (${this.device.isMobile ? "mobile" : "desktop"})`,
+          );
+        }
       }
 
       if (isArrowKey(event.key)) {
@@ -1887,7 +1865,7 @@ class App extends React.Component<AppProps, AppState> {
             trackEvent(
               "toolbar",
               shape,
-              `keyboard (${this.deviceType.isMobile ? "mobile" : "desktop"})`,
+              `keyboard (${this.device.isMobile ? "mobile" : "desktop"})`,
             );
           }
           this.setActiveTool({ type: shape });
@@ -1966,11 +1944,11 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  private setActiveTool(
+  private setActiveTool = (
     tool:
       | { type: typeof SHAPES[number]["value"] | "eraser" }
       | { type: "custom"; customType: string },
-  ) {
+  ) => {
     const nextActiveTool = updateActiveTool(this.state, tool);
     if (!isHoldingSpace) {
       setCursorForShape(this.canvas, this.state);
@@ -1994,25 +1972,56 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.setState({ activeTool: nextActiveTool });
     }
-  }
+  };
 
+  private setCursor = (cursor: string) => {
+    setCursor(this.canvas, cursor);
+  };
+
+  private resetCursor = () => {
+    resetCursor(this.canvas);
+  };
+  /**
+   * returns whether user is making a gesture with >= 2 fingers (points)
+   * on o touch screen (not on a trackpad). Currently only relates to Darwin
+   * (iOS/iPadOS,MacOS), but may work on other devices in the future if
+   * GestureEvent is standardized.
+   */
+  private isTouchScreenMultiTouchGesture = () => {
+    // we don't want to deselect when using trackpad, and multi-point gestures
+    // only work on touch screens, so checking for >= pointers means we're on a
+    // touchscreen
+    return gesture.pointers.size >= 2;
+  };
+
+  // fires only on Safari
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    this.setState({
-      selectedElementIds: {},
-    });
+
+    // we only want to deselect on touch screens because user may have selected
+    // elements by mistake while zooming
+    if (this.isTouchScreenMultiTouchGesture()) {
+      this.setState({
+        selectedElementIds: {},
+      });
+    }
     gesture.initialScale = this.state.zoom.value;
   });
 
+  // fires only on Safari
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
 
     // onGestureChange only has zoom factor but not the center.
     // If we're on iPad or iPhone, then we recognize multi-touch and will
-    // zoom in at the right location on the touchMove handler already.
-    // On Macbook, we don't have those events so will zoom in at the
+    // zoom in at the right location in the touchmove handler
+    // (handleCanvasPointerMove).
+    //
+    // On Macbook trackpad, we don't have those events so will zoom in at the
     // current location instead.
-    if (gesture.pointers.size >= 2) {
+    //
+    // As such, bail from this handler on touch devices.
+    if (this.isTouchScreenMultiTouchGesture()) {
       return;
     }
 
@@ -2031,12 +2040,16 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
+  // fires only on Safari
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    this.setState({
-      previousSelectedElementIds: {},
-      selectedElementIds: this.state.previousSelectedElementIds,
-    });
+    // reselect elements only on touch screens (see onGestureStart)
+    if (this.isTouchScreenMultiTouchGesture()) {
+      this.setState({
+        previousSelectedElementIds: {},
+        selectedElementIds: this.state.previousSelectedElementIds,
+      });
+    }
     gesture.initialScale = null;
   });
 
@@ -2262,11 +2275,12 @@ class App extends React.Component<AppProps, AppState> {
         existingTextElement = selectedElements[0];
       } else if (isTextBindableContainer(selectedElements[0], false)) {
         existingTextElement = getBoundTextElement(selectedElements[0]);
+      } else {
+        existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
       }
+    } else {
+      existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
-
-    existingTextElement =
-      existingTextElement ?? this.getTextElementAtPosition(sceneX, sceneY);
 
     // bind to container when shouldBind is true or
     // clicked on center of container
@@ -2476,7 +2490,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
-          this.deviceType.isMobile,
+          this.device.isMobile,
         )
       );
     });
@@ -2508,7 +2522,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
-      this.deviceType.isMobile,
+      this.device.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUp!,
@@ -2518,7 +2532,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
-      this.deviceType.isMobile,
+      this.device.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       const url = this.hitLinkElement.link;
@@ -2957,10 +2971,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      !this.deviceType.isTouchScreen &&
+      !this.device.isTouchScreen &&
       ["pen", "touch"].includes(event.pointerType)
     ) {
-      this.deviceType = updateObject(this.deviceType, { isTouchScreen: true });
+      this.device = updateObject(this.device, { isTouchScreen: true });
     }
 
     if (isPanning) {
@@ -3037,19 +3051,24 @@ class App extends React.Component<AppProps, AppState> {
       // reset image preview on pointerdown
       setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
 
-      if (!this.state.pendingImageElement) {
+      // retrieve the latest element as the state may be stale
+      const pendingImageElement =
+        this.state.pendingImageElementId &&
+        this.scene.getElement(this.state.pendingImageElementId);
+
+      if (!pendingImageElement) {
         return;
       }
 
       this.setState({
-        draggingElement: this.state.pendingImageElement,
-        editingElement: this.state.pendingImageElement,
-        pendingImageElement: null,
+        draggingElement: pendingImageElement,
+        editingElement: pendingImageElement,
+        pendingImageElementId: null,
         multiElement: null,
       });
 
       const { x, y } = viewportCoordsToSceneCoords(event, this.state);
-      mutateElement(this.state.pendingImageElement, {
+      mutateElement(pendingImageElement, {
         x,
         y,
       });
@@ -3060,13 +3079,15 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "custom") {
-      setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
+      setCursor(this.canvas, CURSOR_TYPE.AUTO);
     } else if (this.state.activeTool.type !== "eraser") {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
         pointerDownState,
       );
     }
+
+    this.props?.onPointerDown?.(this.state.activeTool, pointerDownState);
 
     const onPointerMove =
       this.onPointerMoveFromPointerDownHandler(pointerDownState);
@@ -3095,7 +3116,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
-    if (this.deviceType.isTouchScreen) {
+    if (this.device.isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
         this.state,
@@ -3113,7 +3134,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event, this.deviceType.isTouchScreen);
+      this.redirectToLink(event, this.device.isTouchScreen);
     }
 
     this.removePointer(event);
@@ -3485,7 +3506,7 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState.hit.element,
               this.state,
               [pointerDownState.origin.x, pointerDownState.origin.y],
-              this.deviceType.isMobile,
+              this.device.isMobile,
             )
           ) {
             return false;
@@ -4363,8 +4384,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.eventListeners.onKeyUp!,
       );
 
-      if (this.state.pendingImageElement) {
-        this.setState({ pendingImageElement: null });
+      if (this.state.pendingImageElementId) {
+        this.setState({ pendingImageElementId: null });
       }
 
       if (draggingElement?.type === "freedraw") {
@@ -4468,7 +4489,7 @@ class App extends React.Component<AppProps, AppState> {
               }),
               selectedElementIds: {
                 ...prevState.selectedElementIds,
-                [this.state.draggingElement!.id]: true,
+                [draggingElement.id]: true,
               },
             }));
           } else {
@@ -4476,7 +4497,7 @@ class App extends React.Component<AppProps, AppState> {
               draggingElement: null,
               selectedElementIds: {
                 ...prevState.selectedElementIds,
-                [this.state.draggingElement!.id]: true,
+                [draggingElement.id]: true,
               },
             }));
           }
@@ -4852,7 +4873,7 @@ class App extends React.Component<AppProps, AppState> {
             await cachedImageData.image;
           }
           if (
-            this.state.pendingImageElement?.id !== imageElement.id &&
+            this.state.pendingImageElementId !== imageElement.id &&
             this.state.draggingElement?.id !== imageElement.id
           ) {
             this.initializeImageDimensions(imageElement, true);
@@ -4934,7 +4955,7 @@ class App extends React.Component<AppProps, AppState> {
       previewDataURL = canvas.toDataURL(MIME_TYPES.svg) as DataURL;
     }
 
-    if (this.state.pendingImageElement) {
+    if (this.state.pendingImageElementId) {
       setCursor(this.canvas, `url(${previewDataURL}) 4 4, auto`);
     }
   };
@@ -4975,7 +4996,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         this.setState(
           {
-            pendingImageElement: imageElement,
+            pendingImageElementId: imageElement.id,
           },
           () => {
             this.insertImageElement(
@@ -4994,7 +5015,7 @@ class App extends React.Component<AppProps, AppState> {
       }
       this.setState(
         {
-          pendingImageElement: null,
+          pendingImageElementId: null,
           editingElement: null,
           activeTool: updateActiveTool(this.state, { type: "selection" }),
         },
@@ -5285,13 +5306,18 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    const libraryShapes = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
-    if (libraryShapes !== "") {
-      this.addElementsFromPasteOrLibrary({
-        elements: JSON.parse(libraryShapes),
-        position: event,
-        files: null,
-      });
+    const libraryJSON = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
+    if (libraryJSON && typeof libraryJSON === "string") {
+      try {
+        const libraryItems = parseLibraryJSON(libraryJSON);
+        this.addElementsFromPasteOrLibrary({
+          elements: distributeLibraryItemsOnSquareGrid(libraryItems),
+          position: event,
+          files: null,
+        });
+      } catch (error: any) {
+        this.setState({ errorMessage: error.message });
+      }
       return;
     }
 
@@ -5325,19 +5351,15 @@ class App extends React.Component<AppProps, AppState> {
           commitToHistory: true,
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
-        this.library
-          .importLibrary(file)
-          .then(() => {
-            this.setState({
-              isLoading: false,
-            });
+        await this.library
+          .updateLibrary({
+            libraryItems: file,
+            merge: true,
+            openLibraryMenu: true,
           })
           .catch((error) => {
             console.error(error);
-            this.setState({
-              isLoading: false,
-              errorMessage: t("errors.importLibraryError"),
-            });
+            this.setState({ errorMessage: t("errors.importLibraryError") });
           });
       }
     } catch (error: any) {
@@ -5591,7 +5613,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.deviceType.isMobile &&
+            this.device.isMobile &&
               navigator.clipboard && {
                 trackEvent: false,
                 name: "paste",
@@ -5603,7 +5625,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.deviceType.isMobile && navigator.clipboard && separator,
+            this.device.isMobile && navigator.clipboard && separator,
             probablySupportsClipboardBlob &&
               elements.length > 0 &&
               actionCopyAsPng,
@@ -5648,9 +5670,9 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.deviceType.isMobile && actionCut,
-            this.deviceType.isMobile && navigator.clipboard && actionCopy,
-            this.deviceType.isMobile &&
+            this.device.isMobile && actionCut,
+            this.device.isMobile && navigator.clipboard && actionCopy,
+            this.device.isMobile &&
               navigator.clipboard && {
                 name: "paste",
                 trackEvent: false,
@@ -5662,7 +5684,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.deviceType.isMobile && separator,
+            this.device.isMobile && separator,
             ...options,
             separator,
             actionCopyStyles,
@@ -5708,30 +5730,23 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const { deltaX, deltaY } = event;
-    const { selectedElementIds, previousSelectedElementIds } = this.state;
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
       const sign = Math.sign(deltaY);
       const MAX_STEP = 10;
-      let delta = Math.abs(deltaY);
-      if (delta > MAX_STEP) {
-        delta = MAX_STEP;
-      }
-      delta *= sign;
-      if (Object.keys(previousSelectedElementIds).length !== 0) {
-        setTimeout(() => {
-          this.setState({
-            selectedElementIds: previousSelectedElementIds,
-            previousSelectedElementIds: {},
-          });
-        }, 1000);
+      const absDelta = Math.abs(deltaY);
+      let delta = deltaY;
+      if (absDelta > MAX_STEP) {
+        delta = MAX_STEP * sign;
       }
 
       let newZoom = this.state.zoom.value - delta / 100;
       // increase zoom steps the more zoomed-in we are (applies to >100% only)
-      newZoom += Math.log10(Math.max(1, this.state.zoom.value)) * -sign;
-      // round to nearest step
-      newZoom = Math.round(newZoom * ZOOM_STEP * 100) / (ZOOM_STEP * 100);
+      newZoom +=
+        Math.log10(Math.max(1, this.state.zoom.value)) *
+        -sign *
+        // reduced amplification for small deltas (small movements on a trackpad)
+        Math.min(1, absDelta / 20);
 
       this.setState((state) => ({
         ...getStateForZoom(
@@ -5742,11 +5757,6 @@ class App extends React.Component<AppProps, AppState> {
           },
           state,
         ),
-        selectedElementIds: {},
-        previousSelectedElementIds:
-          Object.keys(selectedElementIds).length !== 0
-            ? selectedElementIds
-            : previousSelectedElementIds,
         shouldCacheIgnoreZoom: true,
       }));
       this.resetShouldCacheIgnoreZoomDebounced();
@@ -5925,10 +5935,10 @@ if (
     elements: {
       configurable: true,
       get() {
-        return this.app.scene.getElementsIncludingDeleted();
+        return this.app?.scene.getElementsIncludingDeleted();
       },
       set(elements: ExcalidrawElement[]) {
-        return this.app.scene.replaceAllElements(elements);
+        return this.app?.scene.replaceAllElements(elements);
       },
     },
   });
