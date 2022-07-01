@@ -424,8 +424,9 @@ class Collab extends PureComponent<Props, CollabState> {
       this.initializeRoom({
         roomLinkData: existingRoomLinkData,
         fetchScene: true,
+      }).then((scene) => {
+        scenePromise.resolve(scene);
       });
-      scenePromise.resolve(null);
     }, INITIAL_SCENE_UPDATE_TIMEOUT);
 
     // All socket listeners are moving to Portal
