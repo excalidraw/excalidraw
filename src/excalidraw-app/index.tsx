@@ -18,7 +18,7 @@ import {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
-import { Language, t } from "../i18n";
+import { t } from "../i18n";
 import {
   Excalidraw,
   defaultLang,
@@ -80,11 +80,7 @@ const isExcalidrawPlusSignedUser = document.cookie.includes(
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
-  languageUtils: {
-    formatLanguageCode: (langCode: Language["code"]) => langCode,
-    isWhitelisted: () => true,
-  },
-  checkWhitelist: false,
+  languageUtils: {},
 });
 
 const initializeScene = async (opts: {
@@ -479,19 +475,17 @@ const ExcalidrawWrapper = () => {
         if (excalidrawAPI) {
           let didChange = false;
 
-          let pendingImageElement = appState.pendingImageElement;
           const elements = excalidrawAPI
             .getSceneElementsIncludingDeleted()
             .map((element) => {
               if (
                 LocalData.fileStorage.shouldUpdateImageElementStatus(element)
               ) {
-                didChange = true;
-                const newEl = newElementWith(element, { status: "saved" });
-                if (pendingImageElement === element) {
-                  pendingImageElement = newEl;
+                const newElement = newElementWith(element, { status: "saved" });
+                if (newElement !== element) {
+                  didChange = true;
                 }
-                return newEl;
+                return newElement;
               }
               return element;
             });
@@ -499,9 +493,6 @@ const ExcalidrawWrapper = () => {
           if (didChange) {
             excalidrawAPI.updateScene({
               elements,
-              appState: {
-                pendingImageElement,
-              },
             });
           }
         }

@@ -45,7 +45,7 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
     return t("hints.text");
   }
 
-  if (appState.activeTool.type === "image" && appState.pendingImageElement) {
+  if (appState.activeTool.type === "image" && appState.pendingImageElementId) {
     return t("hints.placeImage");
   }
 

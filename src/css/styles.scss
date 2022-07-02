@@ -351,7 +351,6 @@
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
-    z-index: 100;
 
     :root[dir="ltr"] & {
       left: 0.25rem;
@@ -392,6 +391,7 @@
 
   .App-menu__left {
     overflow-y: auto;
+    box-shadow: var(--shadow-island);
   }
 
   .dropdown-select {
@@ -450,6 +450,7 @@
     bottom: 30px;
     transform: translateX(-50%);
     padding: 10px 20px;
+    pointer-events: all;
   }
 
   .help-icon {
@@ -567,6 +568,22 @@
     .layer-ui__wrapper {
       display: none;
     }
+  }
+
+  // use custom, minimalistic scrollbar
+  // (doesn't work in Firefox)
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--button-gray-2);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--button-gray-3);
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background: var(--button-gray-2);
   }
 }
 

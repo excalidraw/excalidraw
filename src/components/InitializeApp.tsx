@@ -14,11 +14,11 @@ export const InitializeApp = (props: Props) => {
   useEffect(() => {
     const updateLang = async () => {
       await setLanguage(currentLang);
+      setLoading(false);
     };
     const currentLang =
       languages.find((lang) => lang.code === props.langCode) || defaultLang;
     updateLang();
-    setLoading(false);
   }, [props.langCode]);
 
   return loading ? <LoadingMessage /> : props.children;
