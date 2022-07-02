@@ -121,12 +121,12 @@
       "unlockAll": "Sblocca tutto"
     },
     "statusPublished": "Pubblicato",
-    "sidebarLock": ""
+    "sidebarLock": "Mantieni aperta la barra laterale"
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Selezionare un elemento su tela per aggiungerlo qui, o installare una libreria dal repository pubblico, sotto.",
+    "hint_emptyPrivateLibrary": "Selezionare un elemento su tela per aggiungerlo qui."
   },
   "buttons": {
     "clearReset": "Svuota la tela",
