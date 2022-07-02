@@ -70,6 +70,7 @@ export const MobileMenu = ({
   const device = useDevice();
   const renderToolbar = () => {
     return (
+      //zsviczian (added <> for library docking)
       <>
         <FixedSideContainer side="top" className="App-top-bar">
           <Section heading="shapes">
