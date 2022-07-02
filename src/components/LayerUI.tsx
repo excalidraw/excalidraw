@@ -543,7 +543,7 @@ const LayerUI = ({
 
   return device.isMobile ||
     (!(appState.viewModeEnabled || appState.zenModeEnabled) &&
-      appState.trayModeEnabled) ? ( //zsviczian
+      appState.trayModeEnabled) ? ( //zsviczian this is THE line that allows tray mode
     <>
       {dialogs}
       <MobileMenu

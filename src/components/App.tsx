@@ -333,7 +333,6 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   contextMenuOpen: boolean = false;
   lastScenePointer: { x: number; y: number } | null = null;
-  allowMobileMode: boolean = true; //zsviczian
 
   constructor(props: AppProps) {
     super(props);
@@ -396,7 +395,6 @@ class App extends React.Component<AppProps, AppState> {
         sendToBack: this.sendToBack, //zsviczian
         bringToFront: this.bringToFront, //zsviczian
         restore: this.restore, //zsviczian
-        setMobileModeAllowed: this.setMobileModeAllowed, //zsviczian
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
@@ -818,9 +816,8 @@ class App extends React.Component<AppProps, AppState> {
     this.device = updateObject(this.device, {
       isSmScreen: width < MQ_SM_MAX_WIDTH,
       isMobile:
-        this.allowMobileMode && //zsviczian
-        (width < MQ_MAX_WIDTH_PORTRAIT ||
-          (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)),
+        width < MQ_MAX_WIDTH_PORTRAIT ||
+        (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE),
       canDeviceFitSidebar: width > sidebarBreakpoint,
     });
   };
@@ -906,7 +903,7 @@ class App extends React.Component<AppProps, AppState> {
         this.excalidrawContainerRef.current!.getBoundingClientRect();
         this.device = updateObject(this.device, {
           isSmScreen: smScreenQuery.matches,
-          isMobile: mdScreenQuery.matches && this.allowMobileMode, //zsviczian
+          isMobile: mdScreenQuery.matches,
           canDeviceFitSidebar: canDeviceFitSidebarMediaQuery.matches,
         });
       };
@@ -1732,27 +1729,6 @@ class App extends React.Component<AppProps, AppState> {
       this.addNewImagesToImageCache();
     },
   );
-
-  //zsviczian
-  public setMobileModeAllowed: ExcalidrawImperativeAPI["setMobileModeAllowed"] =
-    (allow: boolean) => {
-      const { width, height } =
-        this.excalidrawContainerRef.current!.getBoundingClientRect();
-      this.allowMobileMode = allow;
-      if (allow) {
-        this.device = updateObject(this.device, {
-          isMobile:
-            width < MQ_MAX_WIDTH_PORTRAIT ||
-            (height < MQ_MAX_HEIGHT_LANDSCAPE &&
-              width < MQ_MAX_WIDTH_LANDSCAPE),
-        });
-      } else {
-        this.device = updateObject(this.device, {
-          isMobile: false,
-        });
-      }
-      this.forceUpdate();
-    };
 
   //zsviczian
   public setLocalFont: ExcalidrawImperativeAPI["setLocalFont"] = (

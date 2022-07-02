@@ -18,6 +18,7 @@ import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
+import { useDevice } from "./App";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -66,55 +67,64 @@ export const MobileMenu = ({
   renderTopRightUI,
   renderStats,
 }: MobileMenuProps) => {
+  const device = useDevice();
   const renderToolbar = () => {
     return (
-      <FixedSideContainer side="top" className="App-top-bar">
-        <Section heading="shapes">
-          {(heading) => (
-            <Stack.Col gap={4} align="center">
-              <Stack.Row gap={1} className="App-toolbar-container">
-                <Island padding={1} className="App-toolbar">
-                  {heading}
-                  <Stack.Row gap={1}>
-                    <ShapesSwitcher
-                      appState={appState}
-                      canvas={canvas}
-                      activeTool={appState.activeTool}
-                      setAppState={setAppState}
-                      onImageAction={({ pointerType }) => {
-                        onImageAction({
-                          insertOnCanvasDirectly: pointerType !== "mouse",
-                        });
-                      }}
-                    />
-                  </Stack.Row>
-                </Island>
-                {renderTopRightUI && renderTopRightUI(true, appState)}
-                <LockButton
-                  checked={appState.activeTool.locked}
-                  onChange={onLockToggle}
-                  title={t("toolBar.lock")}
-                  isMobile
-                />
-                <LibraryButton
-                  appState={appState}
-                  setAppState={setAppState}
-                  isMobile
-                />
-                <PenModeButton
-                  checked={appState.penMode}
-                  onChange={onPenModeToggle}
-                  title={t("toolBar.penMode")}
-                  isMobile
-                  penDetected={appState.penDetected}
-                />
-              </Stack.Row>
-              {libraryMenu}
-            </Stack.Col>
+      <>
+        <FixedSideContainer side="top" className="App-top-bar">
+          <Section heading="shapes">
+            {(heading) => (
+              <Stack.Col gap={4} align="center">
+                <Stack.Row gap={1} className="App-toolbar-container">
+                  <Island padding={1} className="App-toolbar">
+                    {heading}
+                    <Stack.Row gap={1}>
+                      <ShapesSwitcher
+                        appState={appState}
+                        canvas={canvas}
+                        activeTool={appState.activeTool}
+                        setAppState={setAppState}
+                        onImageAction={({ pointerType }) => {
+                          onImageAction({
+                            insertOnCanvasDirectly: pointerType !== "mouse",
+                          });
+                        }}
+                      />
+                    </Stack.Row>
+                  </Island>
+                  {renderTopRightUI && renderTopRightUI(true, appState)}
+                  <LockButton
+                    checked={appState.activeTool.locked}
+                    onChange={onLockToggle}
+                    title={t("toolBar.lock")}
+                    isMobile
+                  />
+                  <LibraryButton
+                    appState={appState}
+                    setAppState={setAppState}
+                    isMobile
+                  />
+                  <PenModeButton
+                    checked={appState.penMode}
+                    onChange={onPenModeToggle}
+                    title={t("toolBar.penMode")}
+                    isMobile
+                    penDetected={appState.penDetected}
+                  />
+                </Stack.Row>
+                {
+                  device.isMobile && libraryMenu //zsviczian
+                }
+              </Stack.Col>
+            )}
+          </Section>
+          <HintViewer appState={appState} elements={elements} isMobile={true} />
+        </FixedSideContainer>
+        {!device.isMobile && //zsviczian
+          appState.isLibraryOpen && (
+            <div className="layer-ui__sidebar">{libraryMenu}</div>
           )}
-        </Section>
-        <HintViewer appState={appState} elements={elements} isMobile={true} />
-      </FixedSideContainer>
+      </>
     );
   };
 
