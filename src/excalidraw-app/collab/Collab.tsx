@@ -8,7 +8,10 @@ import {
   ExcalidrawElement,
   InitializedExcalidrawImageElement,
 } from "../../element/types";
-import { getSceneVersion } from "../../packages/excalidraw/index";
+import {
+  getSceneVersion,
+  restoreElements,
+} from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
 import {
   preventUnload,
@@ -568,6 +571,8 @@ class Collab extends PureComponent<Props, CollabState> {
   ): ReconciledElements => {
     const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
+
+    remoteElements = restoreElements(remoteElements, null);
 
     const reconciledElements = _reconcileElements(
       localElements,
