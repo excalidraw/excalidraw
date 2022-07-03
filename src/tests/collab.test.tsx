@@ -50,6 +50,7 @@ jest.mock("socket.io-client", () => {
     return {
       close: () => {},
       on: () => {},
+      once: () => {},
       off: () => {},
       emit: () => {},
     };
