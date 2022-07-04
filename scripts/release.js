@@ -1,11 +1,21 @@
 const fs = require("fs");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
-const updateReadme = require("./updateReadme");
 const updateChangelog = require("./updateChangelog");
 
 const excalidrawDir = `${__dirname}/../src/packages/excalidraw`;
 const excalidrawPackage = `${excalidrawDir}/package.json`;
+const originalReadMe = fs.readFileSync(`${excalidrawDir}/README.md`, "utf8");
+
+const updateReadme = () => {
+  const excalidrawIndex = originalReadMe.indexOf("### Excalidraw");
+
+  // remove note for stable readme
+  const data = originalReadMe.slice(excalidrawIndex);
+
+  // update readme
+  fs.writeFileSync(`${excalidrawDir}/README.md`, data, "utf8");
+};
 
 const updatePackageVersion = (nextVersion) => {
   const pkg = require(excalidrawPackage);
@@ -23,8 +33,10 @@ const release = async (nextVersion) => {
     await exec(
       `git commit -m "docs: release @excalidraw/excalidraw@${nextVersion}  🎉"`,
     );
-    /* eslint-disable no-console */
-    console.log("Done!");
+    // revert readme after release
+    fs.writeFileSync(`${excalidrawDir}/README.md`, originalReadMe, "utf8");
+
+    console.info("Done!");
   } catch (error) {
     console.error(error);
     process.exit(1);
