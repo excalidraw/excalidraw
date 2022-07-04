@@ -5,7 +5,7 @@ on:
       - master
 
 jobs:
-  Auto-release-excalidraw@next:
+  Auto-release-excalidraw-next:
     runs-on: ubuntu-latest
 
     steps:
