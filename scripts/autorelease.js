@@ -57,20 +57,16 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   let version = `${pkg.version}-${getShortCommitHash()}`;
 
   // update readme
-  let data = fs.readFileSync(`${excalidrawDir}/README_NEXT.md`, "utf8");
 
   if (isPreview) {
     // use pullNumber-commithash as the version for preview
     const pullRequestNumber = process.argv.slice(3)[0];
     version = `${pkg.version}-${pullRequestNumber}-${getShortCommitHash()}`;
-
-    data = data.trim();
   }
   pkg.version = version;
 
   fs.writeFileSync(excalidrawPackage, JSON.stringify(pkg, null, 2), "utf8");
 
-  fs.writeFileSync(`${excalidrawDir}/README.md`, data, "utf8");
   console.info("Publish in progress...");
   publish();
 });
