@@ -165,7 +165,7 @@ React.createElement(ExcalidrawLib.Excalidraw, opts);
 
 ### Build
 
-- Release preview version of [@excalidraw/excalidraw](https://www.npmjs.com/package/@excalidraw/excalidraw) when triggered via comment.
+- Release preview package [@excalidraw/excalidraw-preview](https://www.npmjs.com/package/@excalidraw/excalidraw-preview) when triggered via comment
 
 ```
  @excalibot trigger release
