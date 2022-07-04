@@ -2,6 +2,10 @@
 
 Excalidraw exported as a component to directly embed in your projects.
 
+#### Note
+
+You are viewing the docs for the **next** release, in case you want to check the docs for the stable release, you can view it [here](https://www.npmjs.com/package/@excalidraw/excalidraw).
+
 ### Installation
 
 You can use npm
@@ -26,7 +30,7 @@ If you want to load assets from a different path you can set a variable `window.
 
 #### Note
 
-**If you don't want to wait for the next stable release and try out the unreleased changes you can use [@excalidraw/excalidraw-next](https://www.npmjs.com/package/@excalidraw/excalidraw-next).**
+**If you don't want to wait for the next stable release and try out the unreleased changes you can use `@excalidraw/excalidraw@next`.**
 
 ### Demo
 
