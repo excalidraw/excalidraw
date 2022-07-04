@@ -26,9 +26,7 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
   description: string;
   multiple?: M;
-}): Promise<
-  M extends false | undefined ? FileWithHandle : FileWithHandle[]
-> => {
+}): Promise<M extends false | undefined ? File : File[]> => {
   // an unsafe TS hack, alas not much we can do AFAIK
   type RetType = M extends false | undefined
     ? FileWithHandle
