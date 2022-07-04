@@ -13,7 +13,7 @@ const updateReadme = () => {
   const noteIndex = data.indexOf("#### Note");
   const installlationIndex = data.indexOf("### Installation");
 
-  // remove  note for stable readme
+  // remove note for stable readme
   data = data.slice(0, noteIndex) + data.slice(installlationIndex);
 
   // update readme
