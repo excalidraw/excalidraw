@@ -66,7 +66,7 @@
     "webpack": "5.72.0",
     "webpack-bundle-analyzer": "4.5.0",
     "webpack-cli": "4.9.2",
-    "webpack-dev-server": "4.9.0",
+    "webpack-dev-server": "4.9.3",
     "webpack-merge": "5.8.0"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
