@@ -1,3 +1,7 @@
+#### Note
+
+⚠️ ⚠️ ⚠️ You are viewing the docs for the **next** release, in case you want to check the docs for the stable release, you can view it [here](https://www.npmjs.com/package/@excalidraw/excalidraw).
+
 ### Excalidraw
 
 Excalidraw exported as a component to directly embed in your projects.
