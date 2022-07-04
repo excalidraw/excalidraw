@@ -129,19 +129,7 @@ const Picker = ({
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     let handled = false;
-    if (event.key === KEYS.TAB) {
-      handled = true;
-      const { activeElement } = document;
-      if (event.shiftKey) {
-        if (activeElement === firstItem.current) {
-          colorInput.current?.focus();
-          event.preventDefault();
-        }
-      } else if (activeElement === colorInput.current) {
-        firstItem.current?.focus();
-        event.preventDefault();
-      }
-    } else if (isArrowKey(event.key)) {
+    if (isArrowKey(event.key)) {
       handled = true;
       const { activeElement } = document;
       const isRTL = getLanguage().rtl;
@@ -272,7 +260,8 @@ const Picker = ({
             gallery.current = el;
           }
         }}
-        tabIndex={0}
+        // to allow focusing by clicking but not by tabbing
+        tabIndex={-1}
       >
         <div className="color-picker-content--default">
           {renderColors(colors)}
