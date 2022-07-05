@@ -25,6 +25,7 @@ const publish = () => {
     execSync(`yarn --cwd ${excalidrawDir} publish`);
   } catch (error) {
     console.error(error);
+    process.exit(1);
   }
 };
 
