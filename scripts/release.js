@@ -1,10 +1,10 @@
 const fs = require("fs");
-const util = require("util");
-const exec = util.promisify(require("child_process").exec);
-const updateChangelog = require("./updateChangelog");
+const { execSync } = require("child_process");
 
 const excalidrawDir = `${__dirname}/../src/packages/excalidraw`;
 const excalidrawPackage = `${excalidrawDir}/package.json`;
+const pkg = require(excalidrawPackage);
+
 const originalReadMe = fs.readFileSync(`${excalidrawDir}/README.md`, "utf8");
 
 const updateReadme = () => {
@@ -17,35 +17,27 @@ const updateReadme = () => {
   fs.writeFileSync(`${excalidrawDir}/README.md`, data, "utf8");
 };
 
-const updatePackageVersion = (nextVersion) => {
-  const pkg = require(excalidrawPackage);
-  pkg.version = nextVersion;
-  const content = `${JSON.stringify(pkg, null, 2)}\n`;
-  fs.writeFileSync(excalidrawPackage, content, "utf-8");
-};
-
-const release = async (nextVersion) => {
+const publish = () => {
   try {
-    updateReadme();
-    await updateChangelog(nextVersion);
-    updatePackageVersion(nextVersion);
-    await exec(`git add -u`);
-    await exec(
-      `git commit -m "docs: release @excalidraw/excalidraw@${nextVersion}  🎉"`,
-    );
-    // revert readme after release
-    fs.writeFileSync(`${excalidrawDir}/README.md`, originalReadMe, "utf8");
-
-    console.info("Done!");
+    execSync(`yarn  --frozen-lockfile`);
+    execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
+    execSync(`yarn run build:umd`, { cwd: excalidrawDir });
+    execSync(`yarn --cwd ${excalidrawDir} publish`);
   } catch (error) {
     console.error(error);
-    process.exit(1);
   }
 };
 
-const nextVersion = process.argv.slice(2)[0];
-if (!nextVersion) {
-  console.error("Pass the next version to release!");
-  process.exit(1);
-}
-release(nextVersion);
+const release = () => {
+  updateReadme();
+  console.info("Note for stable readme removed");
+
+  publish();
+  console.info(`Published ${pkg.version}!`);
+
+  // revert readme after release
+  fs.writeFileSync(`${excalidrawDir}/README.md`, originalReadMe, "utf8");
+  console.info("Readme reverted");
+};
+
+release();
