@@ -668,3 +668,16 @@ export const isPromiseLike = (
     "finally" in value
   );
 };
+
+export const queryFocusableElements = (container: HTMLElement | null) => {
+  const focusableElements = container?.querySelectorAll<HTMLElement>(
+    "button, a, input, select, textarea, div[tabindex], label[tabindex]",
+  );
+
+  return focusableElements
+    ? Array.from(focusableElements).filter(
+        (element) =>
+          element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
+      )
+    : [];
+};
