@@ -8,7 +8,7 @@ const DEFAULT_TOAST_TIMEOUT = 5000;
 export const Toast = ({
   message,
   clearToast,
-  closable = true,
+  closable = false,
   // To prevent autoclose, pass duration as Infinity
   duration = DEFAULT_TOAST_TIMEOUT,
 }: {

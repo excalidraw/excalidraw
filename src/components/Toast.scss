@@ -19,13 +19,18 @@
     .Toast__message {
       color: var(--popup-text-color);
       white-space: pre-wrap;
-      padding: 0.75rem;
     }
 
     .close {
       position: absolute;
       top: 0;
       right: 0;
+      padding: 0.1rem;
+
+      .ToolIcon__icon {
+        width: 1.2rem;
+        height: 1.2rem;
+      }
     }
   }
 
