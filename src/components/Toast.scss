@@ -29,11 +29,11 @@
       position: absolute;
       top: 0;
       right: 0;
-      padding: 0.4rem;
+      padding: $closeButtonPadding;
 
       .ToolIcon__icon {
-        width: 1.2rem;
-        height: 1.2rem;
+        width: $closeButtonSize;
+        height: $closeButtonSize;
       }
     }
   }
