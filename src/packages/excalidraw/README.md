@@ -1337,7 +1337,7 @@ The example is same as the [codesandbox example](https://ehlz3.csb.app/)
 You can create a test release by posting the below comment in your pull request
 
 ```
-@excalibot release package
+@excalibot trigger release
 ```
 
 Once the version is released `@excalibot` will post a comment with the release version.
