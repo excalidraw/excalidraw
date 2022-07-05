@@ -86,7 +86,7 @@
     ],
     "resetMocks": false
   },
-  "name": "excalidraw",
+  "name": "changed-stroke-width-options-to-a-slider",
   "prettier": "@excalidraw/prettier-config",
   "private": true,
   "scripts": {
@@ -114,5 +114,7 @@
     "test:update": "yarn test:app --updateSnapshot --watchAll=false",
     "test": "yarn test:app",
     "autorelease": "node scripts/autorelease.js"
-  }
+  },
+  "keywords": [],
+  "description": ""
 }

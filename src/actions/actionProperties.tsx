@@ -335,6 +335,7 @@ export const actionChangeFillStyle = register({
   ),
 });
 
+
 export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   trackEvent: false,
@@ -350,36 +351,24 @@ export const actionChangeStrokeWidth = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.strokeWidth")}</legend>
-      <ButtonIconSelect
-        group="stroke-width"
-        options={[
-          {
-            value: 1,
-            text: t("labels.thin"),
-            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={2} />,
-          },
-          {
-            value: 2,
-            text: t("labels.bold"),
-            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={6} />,
-          },
-          {
-            value: 4,
-            text: t("labels.extraBold"),
-            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={10} />,
-          },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => element.strokeWidth,
-          appState.currentItemStrokeWidth,
-        )}
-        onChange={(value) => updateData(value)}
+    <label className="control-label">
+      {t("labels.strokeWidth")}
+      <input
+        type="range"
+        min="0.5"
+        max="8"
+        step="0.1"
+        onChange={(event) => updateData(+event.target.value)}
+        value={
+          getFormValue(
+            elements,
+            appState,
+            (element) => element.strokeWidth,
+            appState.currentItemStrokeWidth,
+          ) ?? undefined
+        }
       />
-    </fieldset>
+    </label>
   ),
 });
 
