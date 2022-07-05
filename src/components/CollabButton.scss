@@ -18,13 +18,15 @@
       left: -5px;
     }
     min-width: 1em;
+    min-height: 1em;
+    line-height: 1;
     position: absolute;
     bottom: -5px;
     padding: 3px;
     border-radius: 50%;
     background-color: $oc-green-6;
     color: $oc-white;
-    font-size: 0.7em;
-    font-family: var(--ui-font);
+    font-size: 0.6em;
+    font-family: "Cascadia";
   }
 }
