@@ -113,6 +113,8 @@
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --updateSnapshot --watchAll=false",
     "test": "yarn test:app",
-    "autorelease": "node scripts/autorelease.js"
+    "autorelease": "node scripts/autorelease.js",
+    "prerelease": "node scripts/prerelease.js",
+    "release": "node scripts/release.js"
   }
 }
