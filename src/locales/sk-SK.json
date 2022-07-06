@@ -121,12 +121,12 @@
       "unlockAll": "Odomknúť všetko"
     },
     "statusPublished": "Zverejnené",
-    "sidebarLock": ""
+    "sidebarLock": "Nechať bočný panel otvorený"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "Zatiaľ neboli pridané žiadne položky...",
+    "hint_emptyLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice alebo použite knižnicu z verejného zoznamu knižníc nižšie.",
+    "hint_emptyPrivateLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice."
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
