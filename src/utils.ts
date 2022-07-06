@@ -134,16 +134,15 @@ export const throttleRAF = <T extends any[]>(
   let lastArgs: T | null = null;
   let lastArgsTrailing: T | null = null;
 
-  const scheduleFunc = (args: T, trailing = false) => {
+  const scheduleFunc = (args: T) => {
     timerId = window.requestAnimationFrame(() => {
       timerId = null;
-      // @ts-ignore
-      fn(...[...args, trailing]);
+      fn(...args);
       lastArgs = null;
       if (lastArgsTrailing) {
         lastArgs = lastArgsTrailing;
         lastArgsTrailing = null;
-        scheduleFunc(lastArgs, true);
+        scheduleFunc(lastArgs);
       }
     });
   };
