@@ -229,18 +229,20 @@ export const MobileMenu = ({
           ) : null}
           <footer className="App-toolbar">
             {renderAppToolbar()}
-            {appState.scrolledOutside && !appState.openMenu && (
-              <button
-                className="scroll-back-to-content"
-                onClick={() => {
-                  setAppState({
-                    ...calculateScrollCenter(elements, appState, canvas),
-                  });
-                }}
-              >
-                {t("buttons.scrollBackToContent")}
-              </button>
-            )}
+            {appState.scrolledOutside &&
+              !appState.openMenu &&
+              !appState.isLibraryOpen && (
+                <button
+                  className="scroll-back-to-content"
+                  onClick={() => {
+                    setAppState({
+                      ...calculateScrollCenter(elements, appState, canvas),
+                    });
+                  }}
+                >
+                  {t("buttons.scrollBackToContent")}
+                </button>
+              )}
           </footer>
         </Island>
       </div>
