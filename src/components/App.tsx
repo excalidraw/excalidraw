@@ -166,7 +166,7 @@ import {
   isAndroid,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
-import { renderScene } from "../renderer";
+import { renderSceneThrottled } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
@@ -1193,7 +1193,8 @@ class App extends React.Component<AppProps, AppState> {
           element.id !== this.state.editingElement.id
         );
       });
-    const { atLeastOneVisibleElement, scrollBars } = renderScene(
+
+    renderSceneThrottled(
       renderingElements,
       this.state,
       this.state.selectionElement,
@@ -1216,23 +1217,24 @@ class App extends React.Component<AppProps, AppState> {
         isExporting: false,
         renderScrollbars: !this.device.isMobile,
       },
+      ({ atLeastOneVisibleElement, scrollBars }) => {
+        if (scrollBars) {
+          currentScrollBars = scrollBars;
+        }
+        const scrolledOutside =
+          // hide when editing text
+          isTextElement(this.state.editingElement)
+            ? false
+            : !atLeastOneVisibleElement && renderingElements.length > 0;
+        if (this.state.scrolledOutside !== scrolledOutside) {
+          this.setState({ scrolledOutside });
+        }
+
+        this.scheduleImageRefresh();
+      },
     );
 
-    if (scrollBars) {
-      currentScrollBars = scrollBars;
-    }
-    const scrolledOutside =
-      // hide when editing text
-      isTextElement(this.state.editingElement)
-        ? false
-        : !atLeastOneVisibleElement && renderingElements.length > 0;
-    if (this.state.scrolledOutside !== scrolledOutside) {
-      this.setState({ scrolledOutside });
-    }
-
     this.history.record(this.state, this.scene.getElementsIncludingDeleted());
-
-    this.scheduleImageRefresh();
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
