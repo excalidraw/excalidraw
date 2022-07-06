@@ -1,19 +1,15 @@
 import clsx from "clsx";
-import { iconFillColor } from "../components/icons";
-import { Theme } from "../element/types";
 
 export const ButtonSelect = <T extends Object>({
   options,
   value,
   onChange,
   group,
-  theme,
 }: {
   options: { value: T; text: string }[];
   value: T | null;
   onChange: (value: T) => void;
   group: string;
-  theme: Theme;
 }) => (
   <div className="buttonList">
     {options.map((option) => (
@@ -29,7 +25,7 @@ export const ButtonSelect = <T extends Object>({
         />
         <span
           style={{
-            color: iconFillColor(theme),
+            color: "var(--icon-fill-color)",
             fontWeight: "bold",
             opacity: value === option.value ? 1.0 : 0.6,
           }}

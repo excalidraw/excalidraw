@@ -1261,7 +1261,6 @@ const createMathActions = () => {
             getMathProps.getUseTex(appState),
           )}
           onChange={(value) => updateData(value)}
-          theme={appState.theme}
         />
       </fieldset>
     ),
@@ -1344,7 +1343,6 @@ const createMathActions = () => {
             getMathProps.getMathOnly(appState),
           )}
           onChange={(value) => updateData(value)}
-          theme={appState.theme}
         />
       </fieldset>
     ),
