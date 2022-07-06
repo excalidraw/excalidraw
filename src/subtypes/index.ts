@@ -228,9 +228,11 @@ export const getCustomMethods = (subtype: CustomSubtype | undefined) => {
 // `registerCustomSubtype` method, which should have these params:
 // - methods: CustomMethods
 // - addCustomAction: (action: Action) => void
-// - onSubtypeLoaded?: (isCustomSubtype: Function) => void
+// - onSubtypeLoaded?: (hasSubtype: (element: ExcalidrawElement) => boolean) => void
 export const registerCustomSubtypes = (
-  onSubtypeLoaded?: (isCustomSubtype: Function) => void,
+  onSubtypeLoaded?: (
+    hasSubtype: (element: ExcalidrawElement) => boolean,
+  ) => void,
 ) => {
   const subtypes = customSubtypes;
   for (let index = 0; index < subtypes.length; index++) {

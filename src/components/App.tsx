@@ -409,14 +409,14 @@ class App extends React.Component<AppProps, AppState> {
     // Call this method after finishing any async loading for
     // subtypes of ExcalidrawElement if the newly loaded code
     // would change the rendering.
-    const refresh = (isCustomSubtype: Function) => {
+    const refresh = (hasSubtype: (element: ExcalidrawElement) => boolean) => {
       const elements = this.scene.getElementsIncludingDeleted();
       let refreshNeeded = false;
       getNonDeletedElements(elements).forEach((element) => {
         // If the element is of the subtype that was just
         // registered, update the element's dimensions, mark the
         // element for a re-render, and mark the scene for a refresh.
-        if (isCustomSubtype(element)) {
+        if (hasSubtype(element)) {
           invalidateShapeForElement(element);
           if (isTextElement(element)) {
             redrawTextBoundingBox(element, getContainerElement(element));
