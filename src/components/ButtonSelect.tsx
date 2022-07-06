@@ -23,7 +23,15 @@ export const ButtonSelect = <T extends Object>({
           onChange={() => onChange(option.value)}
           checked={value === option.value}
         />
-        {option.text}
+        <span
+          style={{
+            color: "var(--icon-fill-color)",
+            fontWeight: "bold",
+            opacity: value === option.value ? 1.0 : 0.6,
+          }}
+        >
+          {option.text}
+        </span>
       </label>
     ))}
   </div>

@@ -23,9 +23,15 @@ import {
 } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
+import {
+  getCustomActions,
+  getCustomSubtypes,
+  CustomSubtype,
+} from "../subtypes";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
+import { delUndefinedProps } from "../element/newElement";
 
 export const SelectedShapeActions = ({
   appState,
@@ -123,6 +129,17 @@ export const SelectedShapeActions = ({
         (element) =>
           hasBoundTextElement(element) || isBoundToContainer(element),
       ) && renderAction("changeVerticalAlign")}
+      {(appState.activeSubtype ||
+        targetElements.some((element) => element.subtype)) && (
+        <>
+          {getCustomActions().map((action) => {
+            if (!getCustomSubtypes().includes(action.name as CustomSubtype)) {
+              return renderAction(action.name);
+            }
+            return null;
+          })}
+        </>
+      )}
       {(canHaveArrowheads(activeTool) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
@@ -237,11 +254,17 @@ export const ShapesSwitcher = ({
             const nextActiveTool = updateActiveTool(appState, {
               type: value,
             });
-            setAppState({
-              activeTool: nextActiveTool,
-              multiElement: null,
-              selectedElementIds: {},
-            });
+            setAppState(
+              delUndefinedProps(
+                {
+                  activeTool: nextActiveTool,
+                  multiElement: null,
+                  selectedElementIds: {},
+                  customSubtype: undefined,
+                },
+                ["customSubtype"],
+              ),
+            );
             setCursorForShape(canvas, {
               ...appState,
               activeTool: nextActiveTool,

@@ -92,6 +92,8 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
+  activeSubtype?: ExcalidrawElement["subtype"];
+  customProps?: ExcalidrawElement["customProps"];
   activeTool:
     | {
         type: typeof SHAPES[number]["value"] | "eraser";

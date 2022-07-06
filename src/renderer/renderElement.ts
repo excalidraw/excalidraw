@@ -29,6 +29,7 @@ import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
+import { getCustomMethods } from "../subtypes";
 import {
   BOUND_TEXT_PADDING,
   MAX_DECIMALS_FOR_SVG_EXPORT,
@@ -196,6 +197,12 @@ const drawElementOnCanvas = (
   renderConfig: RenderConfig,
 ) => {
   context.globalAlpha = element.opacity / 100;
+  const map = getCustomMethods(element.subtype);
+  if (map) {
+    map.render(element, context, renderConfig.renderCb);
+    context.globalAlpha = 1;
+    return;
+  }
   switch (element.type) {
     case "rectangle":
     case "diamond":
@@ -858,6 +865,11 @@ export const renderElementToSvg = (
     root = anchorTag;
   }
 
+  const map = getCustomMethods(element.subtype);
+  if (map) {
+    map.renderSvg(svgRoot, root, element, { offsetX, offsetY });
+    return;
+  }
   switch (element.type) {
     case "selection": {
       // Since this is used only during editing experience, which is canvas based,

@@ -5,11 +5,22 @@ import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { Point } from "../types";
 import { getUpdatedTimestamp } from "../utils";
+import { maybeGetCustom } from "./newElement";
+import { getCustomMethods } from "../subtypes";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
   "id" | "version" | "versionNonce"
 >;
+
+const cleanUpdates = <TElement extends Mutable<ExcalidrawElement>>(
+  element: TElement,
+  updates: ElementUpdate<TElement>,
+): ElementUpdate<TElement> => {
+  const subtype = maybeGetCustom(element, element.type).subtype;
+  const old = getCustomMethods(subtype)?.clean(updates) as typeof updates;
+  return old ?? updates;
+};
 
 // This function tracks updates of text elements for the purposes for collaboration.
 // The version is used to compare updates when more than one user is working in
@@ -21,6 +32,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   informMutation = true,
 ): TElement => {
   let didChange = false;
+  let increment = false;
+  const oldUpdates = cleanUpdates(element, updates);
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
@@ -76,6 +89,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
       (element as any)[key] = value;
       didChange = true;
+      key in oldUpdates && (increment = true);
     }
   }
   if (!didChange) {
@@ -91,9 +105,11 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     invalidateShapeForElement(element);
   }
 
-  element.version++;
-  element.versionNonce = randomInteger();
-  element.updated = getUpdatedTimestamp();
+  if (increment) {
+    element.version++;
+    element.versionNonce = randomInteger();
+    element.updated = getUpdatedTimestamp();
+  }
 
   if (informMutation) {
     Scene.getScene(element)?.informMutation();
@@ -107,6 +123,8 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
   updates: ElementUpdate<TElement>,
 ): TElement => {
   let didChange = false;
+  let increment = false;
+  const oldUpdates = cleanUpdates(element, updates);
   for (const key in updates) {
     const value = (updates as any)[key];
     if (typeof value !== "undefined") {
@@ -118,6 +136,7 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
         continue;
       }
       didChange = true;
+      key in oldUpdates && (increment = true);
     }
   }
 
@@ -125,6 +144,9 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
     return element;
   }
 
+  if (!increment) {
+    return { ...element, ...updates };
+  }
   return {
     ...element,
     ...updates,

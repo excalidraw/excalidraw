@@ -6,6 +6,7 @@ import {
   ExcalidrawProps,
   BinaryFiles,
 } from "../types";
+import { CustomActionName } from "../subtypes";
 
 export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
 
@@ -35,6 +36,7 @@ export type UpdaterFn = (res: ActionResult) => void;
 export type ActionFilterFn = (action: Action) => void;
 
 export type ActionName =
+  | CustomActionName
   | "copy"
   | "cut"
   | "paste"

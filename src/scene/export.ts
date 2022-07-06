@@ -11,6 +11,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
+import { ensureSubtypesLoaded } from "../subtypes";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -51,7 +52,9 @@ export const exportToCanvas = async (
     files,
   });
 
-  renderScene(elements, appState, null, scale, rough.canvas(canvas), canvas, {
+  let refreshTimer = 0;
+
+  const renderConfig = {
     viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
     scrollX: -minX + exportPadding,
     scrollY: -minY + exportPadding,
@@ -67,7 +70,31 @@ export const exportToCanvas = async (
     renderSelection: false,
     renderGrid: false,
     isExporting: true,
-  });
+    renderCb: () => {
+      if (refreshTimer !== 0) {
+        window.clearTimeout(refreshTimer);
+      }
+      refreshTimer = window.setTimeout(() => {
+        renderConfig.renderCb = () => {};
+        window.clearTimeout(refreshTimer);
+        // Here instead of setState({}), call renderScene() again
+        render();
+      }, 50);
+    },
+  };
+
+  const render = () => {
+    renderScene(
+      elements,
+      appState,
+      null,
+      scale,
+      rough.canvas(canvas),
+      canvas,
+      renderConfig,
+    );
+  };
+  render();
 
   return canvas;
 };
@@ -156,10 +183,12 @@ export const exportToSvg = async (
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
-    offsetX: -minX + exportPadding,
-    offsetY: -minY + exportPadding,
-    exportWithDarkMode: appState.exportWithDarkMode,
+  await ensureSubtypesLoaded(elements, () => {
+    renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
+      offsetX: -minX + exportPadding,
+      offsetY: -minY + exportPadding,
+      exportWithDarkMode: appState.exportWithDarkMode,
+    });
   });
 
   return svgRoot;

@@ -10,6 +10,7 @@ import {
 import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { MODES } from "../constants";
+import { isActionEnabled } from "../subtypes";
 import { trackEvent } from "../analytics";
 
 const trackAction = (
@@ -85,7 +86,11 @@ export class ActionManager {
         (action) =>
           (action.name in canvasActions
             ? canvasActions[action.name as keyof typeof canvasActions]
-            : true) &&
+            : isActionEnabled(
+                this.getElementsIncludingDeleted(),
+                this.getAppState(),
+                action.name,
+              )) &&
           action.keyTest &&
           action.keyTest(
             event,
@@ -138,13 +143,19 @@ export class ActionManager {
   renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
+    let key: string;
     if (
       this.actions[name] &&
       "PanelComponent" in this.actions[name] &&
       (name in canvasActions
         ? canvasActions[name as keyof typeof canvasActions]
-        : true)
+        : isActionEnabled(
+            this.getElementsIncludingDeleted(),
+            this.getAppState(),
+            name,
+          ))
     ) {
+      key = name;
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
       const elements = this.getElementsIncludingDeleted();
@@ -164,6 +175,7 @@ export class ActionManager {
 
       return (
         <PanelComponent
+          key={key}
           elements={this.getElementsIncludingDeleted()}
           appState={this.getAppState()}
           updateData={updateData}

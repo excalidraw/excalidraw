@@ -11,6 +11,7 @@ import {
 import { Action } from "../actions/types";
 import { ActionManager } from "../actions/manager";
 import { AppState } from "../types";
+import { CustomShortcutName } from "../subtypes";
 import { NonDeletedExcalidrawElement } from "../element/types";
 
 export type ContextMenuOption = "separator" | Action;
@@ -77,7 +78,9 @@ const ContextMenu = ({
                 <div className="context-menu-option__label">{label}</div>
                 <kbd className="context-menu-option__shortcut">
                   {actionName
-                    ? getShortcutFromShortcutName(actionName as ShortcutName)
+                    ? getShortcutFromShortcutName(
+                        actionName as ShortcutName | CustomShortcutName,
+                      )
                     : ""}
                 </kbd>
               </button>

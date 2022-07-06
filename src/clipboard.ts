@@ -129,6 +129,7 @@ const getSystemClipboard = async (
  */
 export const parseClipboard = async (
   event: ClipboardEvent | null,
+  appState?: AppState,
 ): Promise<ClipboardData> => {
   const systemClipboard = await getSystemClipboard(event);
 
@@ -143,6 +144,10 @@ export const parseClipboard = async (
   // technically possible it's staler than in-app clipboard
   const spreadsheetResult = parsePotentialSpreadsheet(systemClipboard);
   if (spreadsheetResult) {
+    if ("spreadsheet" in spreadsheetResult) {
+      spreadsheetResult.spreadsheet.subtype = appState?.activeSubtype;
+      spreadsheetResult.spreadsheet.customProps = appState?.customProps;
+    }
     return spreadsheetResult;
   }
 

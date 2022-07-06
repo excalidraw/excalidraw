@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import React, { useCallback } from "react";
+import { getCustomSubtypes } from "../subtypes";
 import { ActionManager } from "../actions/manager";
 import { CLASSES, LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { exportCanvas } from "../data";
@@ -356,6 +357,9 @@ const LayerUI = ({
                             });
                           }}
                         />
+                        {getCustomSubtypes().map((subtype) =>
+                          actionManager.renderAction(subtype),
+                        )}
                       </Stack.Row>
                     </Island>
                     <LibraryButton

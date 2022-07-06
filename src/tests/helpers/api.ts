@@ -13,15 +13,20 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
-import { newFreeDrawElement } from "../../element/newElement";
+import { maybeGetCustom, newFreeDrawElement } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
+import { registerCustomSubtypes } from "../../subtypes";
 
 const readFile = util.promisify(fs.readFile);
 
 const { h } = window;
 
 export class API {
+  constructor() {
+    registerCustomSubtypes();
+  }
+
   static setSelectedElements = (elements: ExcalidrawElement[]) => {
     h.setState({
       selectedElementIds: elements.reduce((acc, element) => {
@@ -97,6 +102,8 @@ export class API {
     verticalAlign?: T extends "text"
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
+    subtype?: ExcalidrawElement["subtype"];
+    customProps?: ExcalidrawElement["customProps"];
     boundElements?: ExcalidrawGenericElement["boundElements"];
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
@@ -114,7 +121,15 @@ export class API {
 
     const appState = h?.state || getDefaultAppState();
 
+    const custom = maybeGetCustom(
+      {
+        subtype: rest.subtype ?? appState.activeSubtype,
+        customProps: rest.customProps ?? appState.customProps,
+      },
+      type,
+    );
     const base = {
+      ...custom,
       x,
       y,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,

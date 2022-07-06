@@ -77,6 +77,21 @@ if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
 let currentLang: Language = defaultLang;
 let currentLangData = {};
 
+const auxLangDataRoots = Array<string>();
+const auxCurrentLangData = Array<Object>();
+const auxFallbackLangData = Array<Object>();
+
+export const registerAuxLangData = (root: string) => {
+  if (auxLangDataRoots.includes(root)) {
+    return;
+  }
+  auxLangDataRoots.push(root);
+  // Assume root contains a fallback locale file
+  auxFallbackLangData.push(
+    require(/* webpackChunkName: "i18n-[request]" */ `${root}/locales/en.json`),
+  );
+};
+
 export const setLanguage = async (lang: Language) => {
   currentLang = lang;
   document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
@@ -88,6 +103,22 @@ export const setLanguage = async (lang: Language) => {
     currentLangData = await import(
       /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
     );
+    // Empty the auxCurrentLangData array
+    while (auxCurrentLangData.length > 0) {
+      auxCurrentLangData.pop();
+    }
+    // Fill the auxCurrentLangData array with each locale file found in auxLangDataRoots for this language
+    auxLangDataRoots.forEach(async (dataRoot) => {
+      // Do not assume auxLangDataRoots[i] contains a locale file for this language
+      try {
+        const condData = await import(
+          /* webpackChunkName: "i18n-[request]" */ `${dataRoot}/locales/${currentLang.code}.json`
+        );
+        if (condData) {
+          auxCurrentLangData.push(condData);
+        }
+      } catch (e) {}
+    });
   }
 };
 
@@ -122,6 +153,13 @@ export const t = (
   let translation =
     findPartsForData(currentLangData, parts) ||
     findPartsForData(fallbackLangData, parts);
+  const auxData = Array<Object>().concat(
+    auxCurrentLangData,
+    auxFallbackLangData,
+  );
+  for (let i = 0; i < auxData.length; i++) {
+    translation = translation || findPartsForData(auxData[i], parts);
+  }
   if (translation === undefined) {
     throw new Error(`Can't find translation for ${path}`);
   }

@@ -1,4 +1,4 @@
-import { getFontString, arrayToMap, isTestEnv } from "../utils";
+import { arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -11,6 +11,7 @@ import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
+import { measureTextElement, wrapTextElement } from "./textWysiwyg";
 
 export const redrawTextBoundingBox = (
   element: ExcalidrawTextElement,
@@ -22,17 +23,9 @@ export const redrawTextBoundingBox = (
   let text = element.text;
 
   if (container) {
-    text = wrapText(
-      element.originalText,
-      getFontString(element),
-      container.width,
-    );
+    text = wrapTextElement(element, container.width);
   }
-  const metrics = measureText(
-    element.originalText,
-    getFontString(element),
-    maxWidth,
-  );
+  const metrics = measureTextElement(element, { text }, maxWidth);
   let coordY = element.y;
   let coordX = element.x;
   // Resize container and vertically center align the text
@@ -118,18 +111,13 @@ export const handleBindTextResize = (
       let nextBaseLine = textElement.baseline;
       if (transformHandleType !== "n" && transformHandleType !== "s") {
         if (text) {
-          text = wrapText(
-            textElement.originalText,
-            getFontString(textElement),
-            element.width,
-          );
+          text = wrapTextElement(textElement, element.width);
         }
 
-        const dimensions = measureText(
+        const dimensions = measureTextElement(textElement, {
           text,
-          getFontString(textElement),
-          element.width,
-        );
+          fontSize: textElement.fontSize,
+        });
         nextHeight = dimensions.height;
         nextBaseLine = dimensions.baseline;
       }
@@ -229,7 +217,7 @@ export const getApproxLineHeight = (font: FontString) => {
 };
 
 let canvas: HTMLCanvasElement | undefined;
-const getTextWidth = (text: string, font: FontString) => {
+export const getTextWidth = (text: string, font: FontString) => {
   if (!canvas) {
     canvas = document.createElement("canvas");
   }

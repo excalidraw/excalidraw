@@ -85,6 +85,7 @@ import {
   getCursorForResizingElement,
   getDragOffsetXY,
   getElementWithTransformHandleType,
+  getNonDeletedElements,
   getNormalizedDimensions,
   getPerfectElementSize,
   getResizeArrowDirection,
@@ -224,6 +225,7 @@ import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import { getCustomActions, registerCustomSubtypes } from "../subtypes";
 import {
   dataURLToFile,
   generateIdFromFile,
@@ -249,6 +251,8 @@ import {
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
+  getContainerElement,
+  redrawTextBoundingBox,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
@@ -275,6 +279,7 @@ const ExcalidrawContainerContext = React.createContext<{
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 
+let refreshTimer = 0;
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let cursorX = 0;
@@ -400,6 +405,33 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.scene = new Scene();
+
+    // Call this method after finishing any async loading for
+    // subtypes of ExcalidrawElement if the newly loaded code
+    // would change the rendering.
+    const refresh = (hasSubtype: (element: ExcalidrawElement) => boolean) => {
+      const elements = this.scene.getElementsIncludingDeleted();
+      let refreshNeeded = false;
+      getNonDeletedElements(elements).forEach((element) => {
+        // If the element is of the subtype that was just
+        // registered, update the element's dimensions, mark the
+        // element for a re-render, and mark the scene for a refresh.
+        if (hasSubtype(element)) {
+          invalidateShapeForElement(element);
+          if (isTextElement(element)) {
+            redrawTextBoundingBox(element, getContainerElement(element));
+          }
+          refreshNeeded = true;
+        }
+      });
+      // If there are any elements of the just-registered subtype,
+      // refresh the scene to re-render each such element.
+      if (refreshNeeded) {
+        this.setState({});
+      }
+    };
+    registerCustomSubtypes(refresh);
+
     this.history = new History();
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -1174,6 +1206,20 @@ class App extends React.Component<AppProps, AppState> {
       );
       cursorButton[socketId] = user.button;
     });
+    const refresh = () => {
+      // If a scene refresh is cued, restart the countdown.
+      // This way we are not calling this.setState({}) once per
+      // ExcalidrawElement. The countdown improves performance
+      // when there are large numbers of ExcalidrawElements
+      // executing this refresh() callback.
+      if (refreshTimer !== 0) {
+        window.clearTimeout(refreshTimer);
+      }
+      refreshTimer = window.setTimeout(() => {
+        this.setState({});
+        window.clearTimeout(refreshTimer);
+      }, 50);
+    };
     const renderingElements = this.scene
       .getNonDeletedElements()
       .filter((element) => {
@@ -1215,6 +1261,7 @@ class App extends React.Component<AppProps, AppState> {
         imageCache: this.imageCache,
         isExporting: false,
         renderScrollbars: !this.device.isMobile,
+        renderCb: refresh,
       },
     );
 
@@ -1372,7 +1419,7 @@ class App extends React.Component<AppProps, AppState> {
       // (something something security)
       let file = event?.clipboardData?.files[0];
 
-      const data = await parseClipboard(event);
+      const data = await parseClipboard(event, this.state);
 
       if (!file && data.text) {
         const string = data.text.trim();
@@ -1542,6 +1589,8 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
+      subtype: this.state.activeSubtype,
+      customProps: this.state.customProps,
       locked: false,
     });
 
@@ -2350,6 +2399,8 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? VERTICAL_ALIGN.MIDDLE
             : DEFAULT_VERTICAL_ALIGN,
+          subtype: this.state.activeSubtype,
+          customProps: this.state.customProps,
           containerId: container?.id ?? undefined,
           groupIds: container?.groupIds ?? [],
           locked: false,
@@ -5554,6 +5605,17 @@ class App extends React.Component<AppProps, AppState> {
       this.actionManager.getAppState(),
     );
 
+    const maybeUse: boolean[] = [];
+    getCustomActions().forEach((action) => {
+      if (action.contextItemPredicate) {
+        maybeUse.push(
+          action.contextItemPredicate!(
+            this.actionManager.getElementsIncludingDeleted(),
+            this.actionManager.getAppState(),
+          ),
+        );
+      }
+    });
     const mayBeAllowUnbinding = actionUnbindText.contextItemPredicate(
       this.actionManager.getElementsIncludingDeleted(),
       this.actionManager.getAppState(),
@@ -5668,6 +5730,16 @@ class App extends React.Component<AppProps, AppState> {
           elements,
         });
       } else {
+        let firstAdded = true;
+        for (let index = 0; index < maybeUse.length; index++) {
+          if (maybeUse[index]) {
+            if (firstAdded) {
+              options.push(separator);
+              firstAdded = false;
+            }
+            options.push(getCustomActions()[index]);
+          }
+        }
         ContextMenu.push({
           options: [
             this.device.isMobile && actionCut,

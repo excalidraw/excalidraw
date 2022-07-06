@@ -1,4 +1,5 @@
 import React from "react";
+import { getCustomSubtypes } from "../subtypes";
 import { AppState } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
@@ -87,6 +88,9 @@ export const MobileMenu = ({
                         });
                       }}
                     />
+                    {getCustomSubtypes().map((subtype) =>
+                      actionManager.renderAction(subtype),
+                    )}
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
