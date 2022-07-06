@@ -110,28 +110,28 @@
     "unbindText": "Desvincular texto",
     "bindText": "",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Editar ligazón",
+      "create": "Crear ligazón",
+      "label": "Ligazón"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Bloquear",
+      "unlock": "Desbloquear",
+      "lockAll": "Bloquear todo",
+      "unlockAll": "Desbloquear todo"
     },
-    "statusPublished": "",
-    "sidebarLock": ""
+    "statusPublished": "Publicado",
+    "sidebarLock": "Manter a barra lateral aberta"
   },
   "library": {
-    "noItems": "",
+    "noItems": "Aínda non hai elementos engadidos...",
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Limpar o lenzo",
-    "exportJSON": "",
-    "exportImage": "",
+    "exportJSON": "Exportar a arquivo",
+    "exportImage": "Gardar como imaxe",
     "export": "Exportar",
     "exportToPng": "Exportar a PNG",
     "exportToSvg": "Exportar a SVG",
