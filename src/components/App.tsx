@@ -553,6 +553,12 @@ class App extends React.Component<AppProps, AppState> {
               <Toast
                 message={this.state.toastMessage}
                 clearToast={this.clearToast}
+                duration={
+                  this.state.toastMessage === t("alerts.browserZoom")
+                    ? Infinity
+                    : undefined
+                }
+                closable={this.state.toastMessage === t("alerts.browserZoom")}
               />
             )}
             <main>{this.renderCanvas()}</main>
