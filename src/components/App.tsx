@@ -772,6 +772,7 @@ class App extends React.Component<AppProps, AppState> {
           ? { ...scene.appState.activeTool, type: "selection" }
           : scene.appState.activeTool,
       isLoading: false,
+      toastMessage: this.state.toastMessage || null,
     };
     if (initialData?.scrollToContent) {
       scene.appState = {
@@ -910,6 +911,7 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.updateDOMRect(this.initializeScene);
     }
+    this.checkIfBrowserZoomed();
   }
 
   public componentWillUnmount() {
@@ -922,8 +924,7 @@ class App extends React.Component<AppProps, AppState> {
     clearTimeout(touchTimeout);
     touchTimeout = 0;
   }
-
-  private onResize = withBatchedUpdates(() => {
+  private checkIfBrowserZoomed = () => {
     if (!this.device.isMobile) {
       const scrollBarWidth = 10;
       const widthRatio =
@@ -935,6 +936,9 @@ class App extends React.Component<AppProps, AppState> {
         this.clearToast();
       }
     }
+  };
+  private onResize = withBatchedUpdates(() => {
+    this.checkIfBrowserZoomed();
     this.scene
       .getElementsIncludingDeleted()
       .forEach((element) => invalidateShapeForElement(element));
