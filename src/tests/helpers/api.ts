@@ -16,7 +16,7 @@ import { getMimeType } from "../../data/blob";
 import { maybeGetCustom, newFreeDrawElement } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
-import { registerCustomSubtypes } from "../../subtypes";
+import { prepareSubtypes, testUseSubtypes } from "../../subtypes";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -24,7 +24,8 @@ const { h } = window;
 
 export class API {
   constructor() {
-    registerCustomSubtypes();
+    testUseSubtypes();
+    prepareSubtypes();
   }
 
   static setSelectedElements = (elements: ExcalidrawElement[]) => {

@@ -38,12 +38,10 @@ import clsx from "clsx";
 // Subtype imports
 import { CustomMethods } from "../";
 import { mathSubtypeIcon } from "./icon";
-import { mathProps, mathSubtype } from "./types";
+import { MathProps, mathSubtype } from "./types";
 
-type MathProps = typeof mathProps[number];
 const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;
 
-// Begin exports
 type ExcalidrawMathElement = ExcalidrawTextElement &
   Readonly<{
     subtype: typeof mathSubtype;
@@ -113,7 +111,9 @@ const mathJax = {} as {
 let stopLoadingMathJax = false;
 let mathJaxLoaded = false;
 let mathJaxLoading = false;
-let mathJaxLoadedCallback: ((isCustomSubtype: Function) => void) | undefined;
+let mathJaxLoadedCallback:
+  | ((hasSubtype: (element: ExcalidrawElement) => boolean) => void)
+  | undefined;
 
 let errorSvg: string;
 
@@ -1135,25 +1135,6 @@ const wrapMathElement = function (element, containerWidth, next) {
   return wrappedLines.join("\n");
 } as CustomMethods["wrapText"];
 
-export const registerCustomSubtype = (
-  methods: CustomMethods,
-  addCustomAction: (action: Action) => void,
-  onSubtypeLoaded?: (isCustomSubtype: Function) => void,
-) => {
-  // Set the callback first just in case anything in this method
-  // calls loadMathJax().
-  mathJaxLoadedCallback = onSubtypeLoaded;
-  methods.clean = cleanMathElementUpdate;
-  methods.ensureLoaded = ensureMathJaxLoaded;
-  methods.measureText = measureMathElement;
-  methods.render = renderMathElement;
-  methods.renderSvg = renderSvgMathElement;
-  methods.wrapText = wrapMathElement;
-  createMathActions().forEach((action) => addCustomAction(action));
-  registerAuxLangData(`./subtypes/${mathSubtype}`);
-  // Call loadMathJax() here if we want to be sure it's loaded.
-};
-
 const ensureMathJaxLoaded = async function (callback) {
   await loadMathJax();
   if (callback) {
@@ -1379,7 +1360,8 @@ const createMathActions = () => {
         type="icon"
         icon={mathSubtypeIcon.call(this, { theme: appState.theme })}
         selected={
-          appState.activeSubtype && appState.activeSubtype === mathSubtype
+          appState.activeSubtype !== undefined &&
+          appState.activeSubtype === mathSubtype
         }
         className={clsx({
           selected:
@@ -1398,4 +1380,25 @@ const createMathActions = () => {
   mathActions.push(actionChangeMathOnly);
   mathActions.push(actionMath);
   return mathActions;
+};
+
+export const prepareSubtype = (
+  methods: CustomMethods,
+  addCustomAction: (action: Action) => void,
+  onSubtypeLoaded?: (
+    hasSubtype: (element: ExcalidrawElement) => boolean,
+  ) => void,
+) => {
+  // Set the callback first just in case anything in this method
+  // calls loadMathJax().
+  mathJaxLoadedCallback = onSubtypeLoaded;
+  methods.clean = cleanMathElementUpdate;
+  methods.ensureLoaded = ensureMathJaxLoaded;
+  methods.measureText = measureMathElement;
+  methods.render = renderMathElement;
+  methods.renderSvg = renderSvgMathElement;
+  methods.wrapText = wrapMathElement;
+  createMathActions().forEach((action) => addCustomAction(action));
+  registerAuxLangData(`./subtypes/${mathSubtype}`);
+  // Call loadMathJax() here if we want to be sure it's loaded.
 };

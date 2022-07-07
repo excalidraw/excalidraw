@@ -225,7 +225,7 @@ import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { getCustomActions, registerCustomSubtypes } from "../subtypes";
+import { getCustomActions, prepareSubtypes } from "../subtypes";
 import {
   dataURLToFile,
   generateIdFromFile,
@@ -430,7 +430,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({});
       }
     };
-    registerCustomSubtypes(refresh);
+    prepareSubtypes(refresh);
 
     this.history = new History();
     this.actionManager = new ActionManager(

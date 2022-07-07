@@ -1,42 +1,32 @@
-import { ExcalidrawTextElement } from "../../element/types";
+import { useEffect } from "react";
 import { getShortcutKey } from "../../utils";
+import { SubtypeTypes } from "../";
 
-type MathSubtype = typeof mathSubtype;
-type MathParentType = ExcalidrawTextElement["type"];
-type MathActionName = typeof mathActionNames[number];
-type MathDisabledActionName = typeof mathDisabledActionNames[number];
-type MathShortcutName = typeof mathShortcutNames[number];
-const mathParentType = "text" as const;
+// Exports
 export const mathSubtype = "math" as const;
-export const mathParent = [
-  { subtype: mathSubtype, parentType: mathParentType } as {
-    subtype: MathSubtype;
-    parentType: MathParentType;
-  },
-] as const;
-export const mathProps = [
+export type MathProps = typeof mathProps[number];
+export const useSubtype = (setup: (types: SubtypeTypes) => void) =>
+  useEffect(() => setup(mathSubtypeTypes));
+export const testUseSubtype = (setup: (types: SubtypeTypes) => void) =>
+  setup(mathSubtypeTypes);
+
+// Define this separately so we can do `export type MathProps`
+const mathProps = [
   { useTex: true, mathOnly: false } as { useTex: boolean; mathOnly: boolean },
 ] as const;
-export const mathDisabledActionNames = ["changeFontFamily"] as const;
-export const mathDisabledActions = [
-  { subtype: mathSubtype, actions: [...mathDisabledActionNames] } as {
-    subtype: MathSubtype;
-    actions: MathDisabledActionName[];
+const mathSubtypeTypes: SubtypeTypes = {
+  parents: [{ subtype: mathSubtype, parentType: "text" }],
+  customProps: mathProps,
+  customActions: [
+    {
+      subtype: mathSubtype,
+      actions: ["changeUseTex", "changeMathOnly", mathSubtype],
+    },
+  ],
+  disabledActions: [{ subtype: mathSubtype, actions: ["changeFontFamily"] }],
+  customShortcutNames: ["changeUseTex", "changeMathOnly"],
+  customShortcutMap: {
+    changeUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
+    changeMathOnly: [getShortcutKey("CtrlOrCmd+Shift+O")],
   },
-] as const;
-export const mathActionNames = [
-  "changeUseTex",
-  "changeMathOnly",
-  mathSubtype,
-] as const;
-export const mathActions = [
-  { subtype: mathSubtype, actions: [...mathActionNames] } as {
-    subtype: MathSubtype;
-    actions: MathActionName[];
-  },
-] as const;
-export const mathShortcutNames = ["changeUseTex", "changeMathOnly"] as const;
-export const mathShortcutMap = {
-  changeUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
-  changeMathOnly: [getShortcutKey("CtrlOrCmd+Shift+O")],
-} as Record<MathShortcutName, string[]>;
+};
