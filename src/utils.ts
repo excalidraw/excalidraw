@@ -126,47 +126,54 @@ export const debounce = <T extends any[]>(
 };
 
 // throttle callback to execute once per animation frame
-export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
-  let handle: number | null = null;
+export const throttleRAF = <T extends any[]>(
+  fn: (...args: T) => void,
+  opts?: { trailing?: boolean },
+) => {
+  let timerId: number | null = null;
   let lastArgs: T | null = null;
-  let callback: ((...args: T) => void) | null = null;
+  let lastArgsTrailing: T | null = null;
+
+  const scheduleFunc = (args: T) => {
+    timerId = window.requestAnimationFrame(() => {
+      timerId = null;
+      fn(...args);
+      lastArgs = null;
+      if (lastArgsTrailing) {
+        lastArgs = lastArgsTrailing;
+        lastArgsTrailing = null;
+        scheduleFunc(lastArgs);
+      }
+    });
+  };
+
   const ret = (...args: T) => {
     if (process.env.NODE_ENV === "test") {
       fn(...args);
       return;
     }
     lastArgs = args;
-    callback = fn;
-    if (handle === null) {
-      handle = window.requestAnimationFrame(() => {
-        handle = null;
-        lastArgs = null;
-        callback = null;
-        fn(...args);
-      });
+    if (timerId === null) {
+      scheduleFunc(lastArgs);
+    } else if (opts?.trailing) {
+      lastArgsTrailing = args;
     }
   };
   ret.flush = () => {
-    if (handle !== null) {
-      cancelAnimationFrame(handle);
-      handle = null;
+    if (timerId !== null) {
+      cancelAnimationFrame(timerId);
+      timerId = null;
     }
     if (lastArgs) {
-      const _lastArgs = lastArgs;
-      const _callback = callback;
-      lastArgs = null;
-      callback = null;
-      if (_callback !== null) {
-        _callback(..._lastArgs);
-      }
+      fn(...(lastArgsTrailing || lastArgs));
+      lastArgs = lastArgsTrailing = null;
     }
   };
   ret.cancel = () => {
-    lastArgs = null;
-    callback = null;
-    if (handle !== null) {
-      cancelAnimationFrame(handle);
-      handle = null;
+    lastArgs = lastArgsTrailing = null;
+    if (timerId !== null) {
+      cancelAnimationFrame(timerId);
+      timerId = null;
     }
   };
   return ret;

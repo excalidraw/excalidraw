@@ -47,7 +47,11 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
+import {
+  viewportCoordsToSceneCoords,
+  supportsEmoji,
+  throttleRAF,
+} from "../utils";
 import { UserIdleState } from "../types";
 import { THEME_FILTER } from "../constants";
 import {
@@ -567,6 +571,32 @@ export const renderScene = (
   context.restore();
   return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
 };
+
+/** renderScene throttled to animation framerate */
+export const renderSceneThrottled = throttleRAF(
+  (
+    elements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+    selectionElement: NonDeletedExcalidrawElement | null,
+    scale: number,
+    rc: RoughCanvas,
+    canvas: HTMLCanvasElement,
+    renderConfig: RenderConfig,
+    callback?: (data: ReturnType<typeof renderScene>) => void,
+  ) => {
+    const ret = renderScene(
+      elements,
+      appState,
+      selectionElement,
+      scale,
+      rc,
+      canvas,
+      renderConfig,
+    );
+    callback?.(ret);
+  },
+  { trailing: true },
+);
 
 const renderTransformHandles = (
   context: CanvasRenderingContext2D,
