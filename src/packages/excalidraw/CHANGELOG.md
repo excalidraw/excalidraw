@@ -17,7 +17,7 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
-- Add `[UIOptions.dockedSidebarBreakpoint]`(https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#dockedSidebarBreakpoint) to customize at which point to break from the docked sidebar [#5274](https://github.com/excalidraw/excalidraw/pull/5274).
+- Add [`UIOptions.dockedSidebarBreakpoint`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#dockedSidebarBreakpoint) to customize at which point to break from the docked sidebar [#5274](https://github.com/excalidraw/excalidraw/pull/5274).
 
 - Added support for supplying user `id` in the Collaborator object (see `collaborators` in [`updateScene()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene)), which will be used to deduplicate users when rendering collaborator avatar list. Cursors will still be rendered for every user. [#5309](https://github.com/excalidraw/excalidraw/pull/5309)
 
