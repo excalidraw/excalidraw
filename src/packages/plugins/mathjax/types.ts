@@ -1,20 +1,19 @@
-import { useEffect } from "react";
-import { getShortcutKey } from "../../utils";
-import { SubtypeTypes } from "../";
+import { getShortcutKey } from "../../../utils";
+import { SubtypeTypes } from "../../../subtypes";
 
 // Exports
 export const mathSubtype = "math" as const;
 export type MathProps = typeof mathProps[number];
-export const useSubtype = (setup: (types: SubtypeTypes) => void) =>
-  useEffect(() => setup(mathSubtypeTypes));
-export const testUseSubtype = (setup: (types: SubtypeTypes) => void) =>
-  setup(mathSubtypeTypes);
+export const getMathSubtypeTypes = () => mathSubtypeTypes;
 
 // Define this separately so we can do `export type MathProps`
 const mathProps = [
   { useTex: true, mathOnly: false } as { useTex: boolean; mathOnly: boolean },
 ] as const;
+
+// Use the `getMathSubtypeTypes` so we don't have to export this
 const mathSubtypeTypes: SubtypeTypes = {
+  subtype: mathSubtype,
   parents: [{ subtype: mathSubtype, parentType: "text" }],
   customProps: mathProps,
   customActions: [

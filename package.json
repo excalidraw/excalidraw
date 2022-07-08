@@ -19,6 +19,7 @@
     ]
   },
   "dependencies": {
+    "@excalidraw/plugins": "link:src/packages/plugins",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
     "@testing-library/jest-dom": "5.16.2",
@@ -38,7 +39,6 @@
     "image-blob-reduce": "3.0.1",
     "jotai": "1.6.4",
     "lodash.throttle": "4.1.1",
-    "mathjax-full": "3.2.2",
     "nanoid": "3.3.3",
     "open-color": "1.9.1",
     "pako": "1.0.11",

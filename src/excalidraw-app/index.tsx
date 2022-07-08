@@ -82,7 +82,7 @@ import { Provider, useAtom } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
-import { useSubtypes } from "../subtypes";
+import { usePlugins } from "@excalidraw/plugins/index";
 
 const isExcalidrawPlusSignedUser = document.cookie.includes(
   COOKIES.AUTH_STATE_COOKIE,
@@ -224,7 +224,7 @@ const PlusAppLinkJSX = (
 );
 
 const ExcalidrawWrapper = () => {
-  useSubtypes();
+  usePlugins();
   const [errorMessage, setErrorMessage] = useState("");
   let currentLangCode = languageDetector.detect() || defaultLang.code;
   if (Array.isArray(currentLangCode)) {

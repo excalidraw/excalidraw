@@ -1,5 +1,5 @@
-import { Theme } from "../../element/types";
-import { createIcon, iconFillColor } from "../../components/icons";
+import { Theme } from "../../../element/types";
+import { createIcon, iconFillColor } from "../../../components/icons";
 
 // We inline font-awesome icons in order to save on js size rather than including the font awesome react library
 export const mathSubtypeIcon = ({ theme }: { theme: Theme }) =>

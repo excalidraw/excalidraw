@@ -88,7 +88,7 @@ export const registerAuxLangData = (root: string) => {
   auxLangDataRoots.push(root);
   // Assume root contains a fallback locale file
   auxFallbackLangData.push(
-    require(/* webpackChunkName: "i18n-[request]" */ `${root}/locales/en.json`),
+    require(/* webpackChunkName: "locales/[request]" */ `${root}/locales/en.json`),
   );
 };
 
@@ -112,7 +112,7 @@ export const setLanguage = async (lang: Language) => {
       // Do not assume auxLangDataRoots[i] contains a locale file for this language
       try {
         const condData = await import(
-          /* webpackChunkName: "i18n-[request]" */ `${dataRoot}/locales/${currentLang.code}.json`
+          /* webpackChunkName: "locales/[request]" */ `${dataRoot}/locales/${currentLang.code}.json`
         );
         if (condData) {
           auxCurrentLangData.push(condData);

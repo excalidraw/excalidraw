@@ -1,12 +1,12 @@
 // Some imports
-import { BOUND_TEXT_PADDING, FONT_FAMILY, SVG_NS } from "../../constants";
+import { BOUND_TEXT_PADDING, FONT_FAMILY, SVG_NS } from "../../../constants";
 import {
   getFontString,
   getFontFamilyString,
   getShortcutKey,
   isRTL,
   updateActiveTool,
-} from "../../utils";
+} from "../../../utils";
 import {
   getApproxLineHeight,
   getBoundTextElement,
@@ -14,29 +14,35 @@ import {
   getTextWidth,
   measureText,
   wrapText,
-} from "../../element/textElement";
-import { hasBoundTextElement, isTextElement } from "../../element/typeChecks";
+} from "../../../element/textElement";
+import {
+  hasBoundTextElement,
+  isTextElement,
+} from "../../../element/typeChecks";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   NonDeleted,
-} from "../../element/types";
-import { newElementWith } from "../../element/mutateElement";
-import { getElementAbsoluteCoords } from "../../element/bounds";
+} from "../../../element/types";
+import { newElementWith } from "../../../element/mutateElement";
+import { getElementAbsoluteCoords } from "../../../element/bounds";
 
 // Imports for actions
-import { t, registerAuxLangData } from "../../i18n";
-import { Action } from "../../actions/types";
-import { AppState } from "../../types";
-import { changeProperty, getFormValue } from "../../actions/actionProperties";
-import { getSelectedElements } from "../../scene";
-import { getNonDeletedElements, redrawTextBoundingBox } from "../../element";
-import { ButtonSelect } from "../../components/ButtonSelect";
-import { ToolButton } from "../../components/ToolButton";
+import { t, registerAuxLangData } from "../../../i18n";
+import { Action } from "../../../actions/types";
+import { AppState } from "../../../types";
+import {
+  changeProperty,
+  getFormValue,
+} from "../../../actions/actionProperties";
+import { getSelectedElements } from "../../../scene";
+import { getNonDeletedElements, redrawTextBoundingBox } from "../../../element";
+import { ButtonSelect } from "../../../components/ButtonSelect";
+import { ToolButton } from "../../../components/ToolButton";
 import clsx from "clsx";
 
 // Subtype imports
-import { CustomMethods } from "../";
+import { CustomMethods, SubtypePrepFn } from "../../../subtypes";
 import { mathSubtypeIcon } from "./icon";
 import { MathProps, mathSubtype } from "./types";
 
@@ -1382,13 +1388,11 @@ const createMathActions = () => {
   return mathActions;
 };
 
-export const prepareSubtype = (
-  methods: CustomMethods,
-  addCustomAction: (action: Action) => void,
-  onSubtypeLoaded?: (
-    hasSubtype: (element: ExcalidrawElement) => boolean,
-  ) => void,
-) => {
+export const prepareMathSubtype = function (
+  methods,
+  addCustomAction,
+  onSubtypeLoaded,
+) {
   // Set the callback first just in case anything in this method
   // calls loadMathJax().
   mathJaxLoadedCallback = onSubtypeLoaded;
@@ -1399,6 +1403,6 @@ export const prepareSubtype = (
   methods.renderSvg = renderSvgMathElement;
   methods.wrapText = wrapMathElement;
   createMathActions().forEach((action) => addCustomAction(action));
-  registerAuxLangData(`./subtypes/${mathSubtype}`);
+  registerAuxLangData(`./packages/plugins/mathjax`);
   // Call loadMathJax() here if we want to be sure it's loaded.
-};
+} as SubtypePrepFn;

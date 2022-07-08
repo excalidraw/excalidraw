@@ -16,7 +16,8 @@ import { getMimeType } from "../../data/blob";
 import { maybeGetCustom, newFreeDrawElement } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
-import { prepareSubtypes, testUseSubtypes } from "../../subtypes";
+import { prepareSubtypes } from "../../subtypes";
+import { testPlugins } from "@excalidraw/plugins/index";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -24,7 +25,7 @@ const { h } = window;
 
 export class API {
   constructor() {
-    testUseSubtypes();
+    testPlugins();
     prepareSubtypes();
   }
 
