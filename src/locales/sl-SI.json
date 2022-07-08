@@ -188,7 +188,7 @@
     "resetLibrary": "To bo počistilo vašo knjižnico. Ali ste prepričani?",
     "removeItemsFromsLibrary": "Izbriši elemente ({{count}}) iz knjižnice?",
     "invalidEncryptionKey": "Ključ za šifriranje mora vsebovati 22 znakov. Sodelovanje v živo je onemogočeno.",
-    "browserZoom": ""
+    "browserZoom": "Stopnja povečave vašega brskalnika ni nastavljena na 100 %, kar lahko povzroči nepravilen prikaz table"
   },
   "errors": {
     "unsupportedFileType": "Nepodprt tip datoteke.",
