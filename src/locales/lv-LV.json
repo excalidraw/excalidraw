@@ -188,7 +188,7 @@
     "resetLibrary": "Šī funkcija iztukšos bibliotēku. Vai turpināt?",
     "removeItemsFromsLibrary": "Vai izņemt {{count}} vienumu(s) no bibliotēkas?",
     "invalidEncryptionKey": "Šifrēšanas atslēgai jābūt 22 simbolus garai. Tiešsaistes sadarbība ir izslēgta.",
-    "browserZoom": ""
+    "browserZoom": "Pārlūka pietuvināšanas līmenis nav 100%; šis var sakropļot tāfeles izskatu"
   },
   "errors": {
     "unsupportedFileType": "Neatbalstīts datnes veids.",
