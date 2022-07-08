@@ -188,7 +188,7 @@
     "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?",
     "removeItemsFromsLibrary": "Slett {{count}} element(er) fra biblioteket?",
     "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert.",
-    "browserZoom": ""
+    "browserZoom": "Nettleserens zoomnivå er ikke satt til 100%, som kan føre til at lerretet vises feil"
   },
   "errors": {
     "unsupportedFileType": "Filtypen støttes ikke.",
