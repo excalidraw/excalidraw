@@ -187,7 +187,8 @@
     "invalidSceneUrl": "Não foi possível importar a cena da URL fornecida. Ela está incompleta ou não contém dados JSON válidos do Excalidraw.",
     "resetLibrary": "Isto limpará a sua biblioteca. Você tem certeza?",
     "removeItemsFromsLibrary": "Excluir {{count}} item(ns) da biblioteca?",
-    "invalidEncryptionKey": "A chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desabilitada."
+    "invalidEncryptionKey": "A chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desabilitada.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Tipo de arquivo não suportado.",
