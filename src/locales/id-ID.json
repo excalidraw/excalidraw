@@ -187,7 +187,8 @@
     "invalidSceneUrl": "Tidak dapat impor pemandangan dari URL. Kemungkinan URL itu rusak atau tidak berisi data JSON Excalidraw yang valid.",
     "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?",
     "removeItemsFromsLibrary": "Hapus {{count}} item dari pustaka?",
-    "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan."
+    "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Tipe file tidak didukung.",
