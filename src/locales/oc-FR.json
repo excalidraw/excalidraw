@@ -187,7 +187,8 @@
     "invalidSceneUrl": "Importacion impossibla de la scèna a partir de l’URL provesida. Es siá mal formatada o siá conten pas cap de donada JSON Excalidraw valida.",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. O volètz vertadièrament ?",
     "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la bibliotèca ?",
-    "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada."
+    "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Tipe de fichièr pas pres en carga.",
