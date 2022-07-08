@@ -187,7 +187,8 @@
     "invalidSceneUrl": "Kunne ikkje hente noko scene frå den URL-en. Ho er anten øydelagd eller inneheld ikkje gyldig Excalidraw JSON-data.",
     "resetLibrary": "Dette vil fjerne alt innhald frå biblioteket. Er du sikker?",
     "removeItemsFromsLibrary": "Slette {{count}} element frå biblioteket?",
-    "invalidEncryptionKey": "Krypteringsnøkkelen må ha 22 teikn. Sanntidssamarbeid er deaktivert."
+    "invalidEncryptionKey": "Krypteringsnøkkelen må ha 22 teikn. Sanntidssamarbeid er deaktivert.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Filtypen er ikkje støtta.",
