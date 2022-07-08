@@ -187,7 +187,8 @@
     "invalidSceneUrl": "بوم نقاشی از آدرس ارائه شده وارد نشد. این یا نادرست است، یا حاوی داده Excalidraw JSON معتبر نیست.",
     "resetLibrary": "ین کار کل صفحه را پاک میکند. آیا مطمئنید?",
     "removeItemsFromsLibrary": "حذف {{count}} آیتم(ها) از کتابخانه?",
-    "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است."
+    "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "نوع فایل پشتیبانی نشده.",
