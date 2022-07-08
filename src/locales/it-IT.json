@@ -188,7 +188,7 @@
     "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
     "removeItemsFromsLibrary": "Eliminare {{count}} elementi dalla libreria?",
     "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata.",
-    "browserZoom": ""
+    "browserZoom": "Il livello di zoom del tuo browser non è impostato al 100%, il che potrebbe causare una visualizzazione scorretta della scheda"
   },
   "errors": {
     "unsupportedFileType": "Tipo di file non supportato.",
