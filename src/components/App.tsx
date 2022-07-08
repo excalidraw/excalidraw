@@ -468,6 +468,15 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  getToastParams = () => {
+    const isBrowserZoomed = this.state.toastMessage === t("alerts.browserZoom");
+    return {
+      message: this.state.toastMessage!,
+      duration: isBrowserZoomed ? Infinity : undefined,
+      closable: isBrowserZoomed,
+      clearToast: this.clearToast,
+    };
+  };
   public render() {
     const { zenModeEnabled, viewModeEnabled } = this.state;
     const selectedElement = getSelectedElements(
@@ -550,16 +559,7 @@ class App extends React.Component<AppProps, AppState> {
               />
             )}
             {this.state.toastMessage !== null && (
-              <Toast
-                message={this.state.toastMessage}
-                clearToast={this.clearToast}
-                duration={
-                  this.state.toastMessage === t("alerts.browserZoom")
-                    ? Infinity
-                    : undefined
-                }
-                closable={this.state.toastMessage === t("alerts.browserZoom")}
-              />
+              <Toast {...this.getToastParams()} />
             )}
             <main>{this.renderCanvas()}</main>
           </DeviceContext.Provider>
