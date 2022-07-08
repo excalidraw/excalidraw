@@ -126,47 +126,54 @@ export const debounce = <T extends any[]>(
 };
 
 // throttle callback to execute once per animation frame
-export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
-  let handle: number | null = null;
+export const throttleRAF = <T extends any[]>(
+  fn: (...args: T) => void,
+  opts?: { trailing?: boolean },
+) => {
+  let timerId: number | null = null;
   let lastArgs: T | null = null;
-  let callback: ((...args: T) => void) | null = null;
+  let lastArgsTrailing: T | null = null;
+
+  const scheduleFunc = (args: T) => {
+    timerId = window.requestAnimationFrame(() => {
+      timerId = null;
+      fn(...args);
+      lastArgs = null;
+      if (lastArgsTrailing) {
+        lastArgs = lastArgsTrailing;
+        lastArgsTrailing = null;
+        scheduleFunc(lastArgs);
+      }
+    });
+  };
+
   const ret = (...args: T) => {
     if (process.env.NODE_ENV === "test") {
       fn(...args);
       return;
     }
     lastArgs = args;
-    callback = fn;
-    if (handle === null) {
-      handle = window.requestAnimationFrame(() => {
-        handle = null;
-        lastArgs = null;
-        callback = null;
-        fn(...args);
-      });
+    if (timerId === null) {
+      scheduleFunc(lastArgs);
+    } else if (opts?.trailing) {
+      lastArgsTrailing = args;
     }
   };
   ret.flush = () => {
-    if (handle !== null) {
-      cancelAnimationFrame(handle);
-      handle = null;
+    if (timerId !== null) {
+      cancelAnimationFrame(timerId);
+      timerId = null;
     }
     if (lastArgs) {
-      const _lastArgs = lastArgs;
-      const _callback = callback;
-      lastArgs = null;
-      callback = null;
-      if (_callback !== null) {
-        _callback(..._lastArgs);
-      }
+      fn(...(lastArgsTrailing || lastArgs));
+      lastArgs = lastArgsTrailing = null;
     }
   };
   ret.cancel = () => {
-    lastArgs = null;
-    callback = null;
-    if (handle !== null) {
-      cancelAnimationFrame(handle);
-      handle = null;
+    lastArgs = lastArgsTrailing = null;
+    if (timerId !== null) {
+      cancelAnimationFrame(timerId);
+      timerId = null;
     }
   };
   return ret;
@@ -301,7 +308,8 @@ export const setCursorForShape = (
     setEraserCursor(canvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
-  } else if (appState.activeTool.type !== "image") {
+    // Ignore custom type as well and let host decide
+  } else if (!["image", "custom"].includes(appState.activeTool.type)) {
     canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
@@ -666,4 +674,17 @@ export const isPromiseLike = (
     "catch" in value &&
     "finally" in value
   );
+};
+
+export const queryFocusableElements = (container: HTMLElement | null) => {
+  const focusableElements = container?.querySelectorAll<HTMLElement>(
+    "button, a, input, select, textarea, div[tabindex], label[tabindex]",
+  );
+
+  return focusableElements
+    ? Array.from(focusableElements).filter(
+        (element) =>
+          element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
+      )
+    : [];
 };

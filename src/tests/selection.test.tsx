@@ -16,7 +16,7 @@ import { Keyboard, Pointer } from "./helpers/ui";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderScene = jest.spyOn(Renderer, "renderSceneThrottled");
 beforeEach(() => {
   localStorage.clear();
   renderScene.mockClear();

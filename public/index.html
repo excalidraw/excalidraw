@@ -52,6 +52,25 @@
       content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
 
+    <script>
+      // Redirect Excalidraw+ users which have auto-redirect enabled.
+      //
+      // Redirect only the bare root path, so link/room/library urls are not
+      // redirected.
+      //
+      // Putting into index.html for best performance (can't redirect on server
+      // due to location.hash checks).
+      if (
+        window.location.pathname === "/" &&
+        !window.location.hash &&
+        !window.location.search &&
+        // if its present redirect
+        document.cookie.includes("excplus-autoredirect=true")
+      ) {
+        window.location.href = "https://app.excalidraw.com";
+      }
+    </script>
+
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
     <!-- Excalidraw version -->
@@ -79,6 +98,22 @@
     />
 
     <link rel="stylesheet" href="fonts.css" type="text/css" />
+    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD === "true") { %>
+    <script>
+      {
+        const _WebSocket = window.WebSocket;
+        window.WebSocket = function (url) {
+          if (/ws:\/\/localhost:.+?\/sockjs-node/.test(url)) {
+            console.info(
+              "[!!!] Live reload is disabled via process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD [!!!]",
+            );
+          } else {
+            return new _WebSocket(url);
+          }
+        };
+      }
+    </script>
+    <% } %>
     <script>
       window.EXCALIDRAW_ASSET_PATH = "/";
       // setting this so that libraries installation reuses this window tab.

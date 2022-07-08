@@ -39,7 +39,7 @@ const mouse = new Pointer("mouse");
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderScene = jest.spyOn(Renderer, "renderSceneThrottled");
 beforeEach(() => {
   localStorage.clear();
   renderScene.mockClear();
@@ -289,7 +289,7 @@ describe("contextMenu element", () => {
     expect(copiedStyles).toBe("{}");
     fireEvent.click(queryByText(contextMenu as HTMLElement, "Copy styles")!);
     expect(copiedStyles).not.toBe("{}");
-    const element = JSON.parse(copiedStyles);
+    const element = JSON.parse(copiedStyles)[0];
     expect(element).toEqual(API.getSelectedElement());
   });
 
@@ -329,7 +329,7 @@ describe("contextMenu element", () => {
     });
     let contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu as HTMLElement, "Copy styles")!);
-    const secondRect = JSON.parse(copiedStyles);
+    const secondRect = JSON.parse(copiedStyles)[0];
     expect(secondRect.id).toBe(h.elements[1].id);
 
     mouse.reset();

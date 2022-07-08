@@ -32,7 +32,10 @@ type MobileMenuProps = {
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
-  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderCustomFooter?: (
+    isMobile: boolean,
+    appState: AppState,
+  ) => JSX.Element | null;
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
@@ -40,6 +43,7 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
+  renderStats: () => JSX.Element | null;
 };
 
 export const MobileMenu = ({
@@ -60,6 +64,7 @@ export const MobileMenu = ({
   showThemeBtn,
   onImageAction,
   renderTopRightUI,
+  renderStats,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -181,6 +186,7 @@ export const MobileMenu = ({
   return (
     <>
       {!viewModeEnabled && renderToolbar()}
+      {renderStats()}
       <div
         className="App-bottom-bar"
         style={{
@@ -199,20 +205,11 @@ export const MobileMenu = ({
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>
-                      <UserList mobile>
-                        {Array.from(appState.collaborators)
-                          // Collaborator is either not initialized or is actually the current user.
-                          .filter(
-                            ([_, client]) => Object.keys(client).length !== 0,
-                          )
-                          .map(([clientId, client]) => (
-                            <React.Fragment key={clientId}>
-                              {actionManager.renderAction("goToCollaborator", {
-                                id: clientId,
-                              })}
-                            </React.Fragment>
-                          ))}
-                      </UserList>
+                      <UserList
+                        mobile
+                        collaborators={appState.collaborators}
+                        actionManager={actionManager}
+                      />
                     </fieldset>
                   )}
                 </Stack.Col>
