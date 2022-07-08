@@ -929,6 +929,7 @@ class App extends React.Component<AppProps, AppState> {
     document.removeEventListener(EVENT.COPY, this.onCopy);
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.removeEventListener(EVENT.CUT, this.onCut);
+    document.removeEventListener(EVENT.WHEEL, this.onWheel);
     this.nearestScrollableContainer?.removeEventListener(
       EVENT.SCROLL,
       this.onScroll,
@@ -977,6 +978,8 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     document.addEventListener(EVENT.POINTER_UP, this.removePointer); // #3553
     document.addEventListener(EVENT.COPY, this.onCopy);
+    document.addEventListener(EVENT.WHEEL, this.onWheel, { passive: false });
+
     if (this.props.handleKeyboardGlobally) {
       document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
     }
@@ -1710,6 +1713,7 @@ class App extends React.Component<AppProps, AppState> {
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
       // normalize `event.key` when CapsLock is pressed #2372
+
       if (
         "Proxy" in window &&
         ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
@@ -1731,6 +1735,14 @@ class App extends React.Component<AppProps, AppState> {
               : value;
           },
         });
+      }
+
+      // prevent browser zoom in input fields
+      if (event[KEYS.CTRL_OR_CMD] && isWritableElement(event.target)) {
+        if (event.code === CODES.MINUS || event.code === CODES.EQUAL) {
+          event.preventDefault();
+          return;
+        }
       }
 
       // bail if
@@ -1914,6 +1926,13 @@ class App extends React.Component<AppProps, AppState> {
       }
     },
   );
+
+  private onWheel = withBatchedUpdates((event: MouseEvent) => {
+    // prevent browser pinch zoom on DOM elements
+    if (!(event.target instanceof HTMLCanvasElement)) {
+      event.preventDefault();
+    }
+  });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
@@ -5726,7 +5745,6 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
     event.preventDefault();
-
     if (isPanning) {
       return;
     }
