@@ -188,7 +188,7 @@
     "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?",
     "removeItemsFromsLibrary": "Ta bort {{count}} objekt från biblioteket?",
     "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat.",
-    "browserZoom": ""
+    "browserZoom": "Din webbläsares zoomnivå är inte satt till 100% vilket kan orsaka att tavlan visas felaktigt"
   },
   "errors": {
     "unsupportedFileType": "Filtypen stöds inte.",
