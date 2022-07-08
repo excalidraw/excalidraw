@@ -187,7 +187,8 @@
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "",
