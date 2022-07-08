@@ -187,7 +187,8 @@
     "invalidSceneUrl": "Kunne ikke importere scene fra den oppgitte URL-en. Den er enten ødelagt, eller inneholder ikke gyldig Excalidraw JSON-data.",
     "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?",
     "removeItemsFromsLibrary": "Slett {{count}} element(er) fra biblioteket?",
-    "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert."
+    "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Filtypen støttes ikke.",
