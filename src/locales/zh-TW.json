@@ -188,7 +188,7 @@
     "resetLibrary": "這會清除您的資料庫，是否確定？",
     "removeItemsFromsLibrary": "從資料庫刪除 {{count}} 項？",
     "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。",
-    "browserZoom": ""
+    "browserZoom": "因瀏覽器之縮放值目前並非 100%，可能造成顯示錯誤"
   },
   "errors": {
     "unsupportedFileType": "不支援的檔案類型。",
