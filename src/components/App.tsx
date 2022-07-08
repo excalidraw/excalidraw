@@ -1739,8 +1739,8 @@ class App extends React.Component<AppProps, AppState> {
 
       // prevent browser zoom in input fields
       if (event[KEYS.CTRL_OR_CMD] && isWritableElement(event.target)) {
-        event.preventDefault();
         if (event.code === CODES.MINUS || event.code === CODES.EQUAL) {
+          event.preventDefault();
           return;
         }
       }
@@ -1928,6 +1928,7 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private onWheel = withBatchedUpdates((event: MouseEvent) => {
+    // prevent browser pinch zoom on DOM elements
     if (!(event.target instanceof HTMLCanvasElement)) {
       event.preventDefault();
     }
