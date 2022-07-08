@@ -187,7 +187,8 @@
     "invalidSceneUrl": "無法由提供的 URL 匯入場景。可能是發生異常，或未包含有效的 Excalidraw JSON 資料。",
     "resetLibrary": "這會清除您的資料庫，是否確定？",
     "removeItemsFromsLibrary": "從資料庫刪除 {{count}} 項？",
-    "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。"
+    "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "不支援的檔案類型。",
