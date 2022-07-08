@@ -145,7 +145,7 @@ export type AppState = {
   previousSelectedElementIds: { [id: string]: boolean };
   shouldCacheIgnoreZoom: boolean;
   showHelpDialog: boolean;
-  toastMessage: string | null;
+  toast: { message: string | null; closable?: boolean; duration?: number };
   zenModeEnabled: boolean;
   theme: Theme;
   gridSize: number | null;
@@ -467,7 +467,7 @@ export type ExcalidrawImperativeAPI = {
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
   refresh: InstanceType<typeof App>["refresh"];
-  setToastMessage: InstanceType<typeof App>["setToastMessage"];
+  setToast: InstanceType<typeof App>["setToast"];
   addFiles: (data: BinaryFileData[]) => void;
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;

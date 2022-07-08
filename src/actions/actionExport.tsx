@@ -144,14 +144,16 @@ export const actionSaveToActiveFile = register({
         appState: {
           ...appState,
           fileHandle,
-          toastMessage: fileHandleExists
-            ? fileHandle?.name
-              ? t("toast.fileSavedToFilename").replace(
-                  "{filename}",
-                  `"${fileHandle.name}"`,
-                )
-              : t("toast.fileSaved")
-            : null,
+          toast: {
+            message: fileHandleExists
+              ? fileHandle?.name
+                ? t("toast.fileSavedToFilename").replace(
+                    "{filename}",
+                    `"${fileHandle.name}"`,
+                  )
+                : t("toast.fileSaved")
+              : null,
+          },
         },
       };
     } catch (error: any) {

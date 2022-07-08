@@ -380,7 +380,7 @@ class App extends React.Component<AppProps, AppState> {
         getAppState: () => this.state,
         getFiles: () => this.files,
         refresh: this.refresh,
-        setToastMessage: this.setToastMessage,
+        setToast: this.setToast,
         id: this.id,
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
@@ -549,10 +549,12 @@ class App extends React.Component<AppProps, AppState> {
                 onLinkOpen={this.props.onLinkOpen}
               />
             )}
-            {this.state.toastMessage !== null && (
+            {this.state.toast.message !== null && (
               <Toast
-                message={this.state.toastMessage}
+                message={this.state.toast.message}
                 clearToast={this.clearToast}
+                duration={this.state.toast.duration}
+                closable={this.state.toast.closable}
               />
             )}
             <main>{this.renderCanvas()}</main>
@@ -1623,11 +1625,11 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   clearToast = () => {
-    this.setState({ toastMessage: null });
+    this.setState({ toast: { message: null } });
   };
 
-  setToastMessage = (toastMessage: string) => {
-    this.setState({ toastMessage });
+  setToast = (message: string, closable?: false, duration?: number) => {
+    this.setState({ toast: { message, closable, duration } });
   };
 
   restoreFileFromShare = async () => {
