@@ -166,7 +166,7 @@ import {
   isAndroid,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
-import { renderScene } from "../renderer";
+import { renderSceneThrottled } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
@@ -950,6 +950,7 @@ class App extends React.Component<AppProps, AppState> {
     document.removeEventListener(EVENT.COPY, this.onCopy);
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.removeEventListener(EVENT.CUT, this.onCut);
+    document.removeEventListener(EVENT.WHEEL, this.onWheel);
     this.nearestScrollableContainer?.removeEventListener(
       EVENT.SCROLL,
       this.onScroll,
@@ -998,6 +999,8 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     document.addEventListener(EVENT.POINTER_UP, this.removePointer); // #3553
     document.addEventListener(EVENT.COPY, this.onCopy);
+    document.addEventListener(EVENT.WHEEL, this.onWheel, { passive: false });
+
     if (this.props.handleKeyboardGlobally) {
       document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
     }
@@ -1214,7 +1217,8 @@ class App extends React.Component<AppProps, AppState> {
           element.id !== this.state.editingElement.id
         );
       });
-    const { atLeastOneVisibleElement, scrollBars } = renderScene(
+
+    renderSceneThrottled(
       renderingElements,
       this.state,
       this.state.selectionElement,
@@ -1237,23 +1241,24 @@ class App extends React.Component<AppProps, AppState> {
         isExporting: false,
         renderScrollbars: !this.device.isMobile,
       },
+      ({ atLeastOneVisibleElement, scrollBars }) => {
+        if (scrollBars) {
+          currentScrollBars = scrollBars;
+        }
+        const scrolledOutside =
+          // hide when editing text
+          isTextElement(this.state.editingElement)
+            ? false
+            : !atLeastOneVisibleElement && renderingElements.length > 0;
+        if (this.state.scrolledOutside !== scrolledOutside) {
+          this.setState({ scrolledOutside });
+        }
+
+        this.scheduleImageRefresh();
+      },
     );
 
-    if (scrollBars) {
-      currentScrollBars = scrollBars;
-    }
-    const scrolledOutside =
-      // hide when editing text
-      isTextElement(this.state.editingElement)
-        ? false
-        : !atLeastOneVisibleElement && renderingElements.length > 0;
-    if (this.state.scrolledOutside !== scrolledOutside) {
-      this.setState({ scrolledOutside });
-    }
-
     this.history.record(this.state, this.scene.getElementsIncludingDeleted());
-
-    this.scheduleImageRefresh();
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -1729,6 +1734,7 @@ class App extends React.Component<AppProps, AppState> {
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
       // normalize `event.key` when CapsLock is pressed #2372
+
       if (
         "Proxy" in window &&
         ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
@@ -1750,6 +1756,14 @@ class App extends React.Component<AppProps, AppState> {
               : value;
           },
         });
+      }
+
+      // prevent browser zoom in input fields
+      if (event[KEYS.CTRL_OR_CMD] && isWritableElement(event.target)) {
+        if (event.code === CODES.MINUS || event.code === CODES.EQUAL) {
+          event.preventDefault();
+          return;
+        }
       }
 
       // bail if
@@ -1933,6 +1947,13 @@ class App extends React.Component<AppProps, AppState> {
       }
     },
   );
+
+  private onWheel = withBatchedUpdates((event: MouseEvent) => {
+    // prevent browser pinch zoom on DOM elements
+    if (!(event.target instanceof HTMLCanvasElement)) {
+      event.preventDefault();
+    }
+  });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
@@ -5745,7 +5766,6 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
     event.preventDefault();
-
     if (isPanning) {
       return;
     }
