@@ -89,8 +89,8 @@
     "align": "Hizala",
     "alignTop": "Yukarı hizala",
     "alignBottom": "Aşağı hizala",
-    "alignLeft": "Sola yasla",
-    "alignRight": "Sağa yasla",
+    "alignLeft": "Sola hizala",
+    "alignRight": "Sağa hizala",
     "centerVertically": "Dikeyde ortala",
     "centerHorizontally": "Yatayda ortala",
     "distributeHorizontally": "Yatay dağıt",
@@ -120,7 +120,13 @@
       "lockAll": "Hepsini kilitle",
       "unlockAll": "Hepsinin kilidini kaldır"
     },
-    "statusPublished": "Yayınlandı"
+    "statusPublished": "Yayınlandı",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "Verilen bağlantıdan çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
     "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?",
     "removeItemsFromsLibrary": "{{count}} öğe(ler) kitaplıktan kaldırılsın mı?",
-    "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı."
+    "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Desteklenmeyen dosya türü.",
