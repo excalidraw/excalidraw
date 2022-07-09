@@ -1200,6 +1200,10 @@
   resolved "https://registry.npmjs.org/@excalidraw/eslint-config/-/eslint-config-1.0.0.tgz"
   integrity sha512-5SQFsQXO4vzny7OFSJr/DDPr1Mzeh6w0uwmZ0Fk2qjBcS5nhPtnx5KOTRPmpc6Hf5Ao57WK/MKI4lhCzw66V/A==
 
+"@excalidraw/plugins@link:src/packages/plugins":
+  version "0.0.0"
+  uid ""
+
 "@excalidraw/prettier-config@1.0.2":
   version "1.0.2"
   resolved "https://registry.npmjs.org/@excalidraw/prettier-config/-/prettier-config-1.0.2.tgz"

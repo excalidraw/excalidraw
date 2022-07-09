@@ -12,6 +12,7 @@ import { GlobalTestState, createEvent, fireEvent } from "../test-utils";
 import fs from "fs";
 import util from "util";
 import path from "path";
+import { testPlugins } from "@excalidraw/plugins";
 import { getMimeType } from "../../data/blob";
 import { newFreeDrawElement } from "../../element/newElement";
 import { Point } from "../../types";
@@ -22,6 +23,10 @@ const readFile = util.promisify(fs.readFile);
 const { h } = window;
 
 export class API {
+  constructor() {
+    testPlugins();
+  }
+
   static setSelectedElements = (elements: ExcalidrawElement[]) => {
     h.setState({
       selectedElementIds: elements.reduce((acc, element) => {

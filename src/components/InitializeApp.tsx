@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { usePlugins } from "@excalidraw/plugins";
 
 import { LoadingMessage } from "./LoadingMessage";
 import { defaultLang, Language, languages, setLanguage } from "../i18n";
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export const InitializeApp = (props: Props) => {
+  usePlugins();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 import LanguageDetector from "i18next-browser-languagedetector";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePlugins } from "@excalidraw/plugins";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
@@ -223,6 +224,7 @@ const PlusAppLinkJSX = (
 );
 
 const ExcalidrawWrapper = () => {
+  usePlugins();
   const [errorMessage, setErrorMessage] = useState("");
   let currentLangCode = languageDetector.detect() || defaultLang.code;
   if (Array.isArray(currentLangCode)) {

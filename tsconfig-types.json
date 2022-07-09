@@ -1,5 +1,5 @@
 {
-  "include": ["src/packages/excalidraw", "src/global.d.ts", "src/css.d.ts"],
+  "include": ["src/packages/excalidraw", "src/packages/plugins", "src/global.d.ts", "src/css.d.ts"],
   "compilerOptions": {
     "allowJs": true,
     "declaration": true,
