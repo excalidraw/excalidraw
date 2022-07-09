@@ -120,7 +120,13 @@
       "lockAll": "Zamknúť všetko",
       "unlockAll": "Odomknúť všetko"
     },
-    "statusPublished": ""
+    "statusPublished": "Zverejnené",
+    "sidebarLock": "Nechať bočný panel otvorený"
+  },
+  "library": {
+    "noItems": "Zatiaľ neboli pridané žiadne položky...",
+    "hint_emptyLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice alebo použite knižnicu z verejného zoznamu knižníc nižšie.",
+    "hint_emptyPrivateLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice."
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "Nepodarilo sa načítať scénu z poskytnutej URL. Je nevalidná alebo neobsahuje žiadne validné Excalidraw JSON dáta.",
     "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?",
     "removeItemsFromsLibrary": "Odstrániť {{count}} položiek z knižnice?",
-    "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá."
+    "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Nepodporovaný typ súboru.",
@@ -343,7 +350,7 @@
     },
     "noteItems": "Každá položka v knižnici musí mať svoje vlastné meno, aby sa dala vyhľadať. Súčasťou knižnice budú nasledujúce položky:",
     "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice",
-    "republishWarning": ""
+    "republishWarning": "Poznámka: Niektoré z vybraných položiek sú už označené ako zverejnené. Ich znovu uverejnenie by ste mali vykovať iba vtedy ak aktualizujete už existujúcu knižnicu alebo požiadavku na uverejnenie."
   },
   "publishSuccessDialog": {
     "title": "Knižnica uverejnená",

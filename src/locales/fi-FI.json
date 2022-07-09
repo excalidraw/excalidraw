@@ -120,7 +120,13 @@
       "lockAll": "",
       "unlockAll": ""
     },
-    "statusPublished": "Julkaistu"
+    "statusPublished": "Julkaistu",
+    "sidebarLock": "Pidä sivupalkki avoinna"
+  },
+  "library": {
+    "noItems": "Kirjastossa ei ole vielä yhtään kohdetta...",
+    "hint_emptyLibrary": "Valitse lisättävä kohde piirtoalueelta, tai asenna alta julkinen kirjasto.",
+    "hint_emptyPrivateLibrary": "Valitse lisättävä kohde piirtoalueelta."
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "Teosta ei voitu tuoda annetusta URL-osoitteesta. Tallenne on vioittunut, tai osoitteessa ei ole Excalidraw JSON-dataa.",
     "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?",
     "removeItemsFromsLibrary": "Poista {{count}} kohdetta kirjastosta?",
-    "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä."
+    "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Tiedostotyyppiä ei tueta.",

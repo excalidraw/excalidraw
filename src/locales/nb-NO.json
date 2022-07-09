@@ -120,7 +120,13 @@
       "lockAll": "Lås alle",
       "unlockAll": "Lås opp alle"
     },
-    "statusPublished": "Publisert"
+    "statusPublished": "Publisert",
+    "sidebarLock": "Holde sidemenyen åpen"
+  },
+  "library": {
+    "noItems": "Ingen elementer lagt til ennå...",
+    "hint_emptyLibrary": "Velg et objekt på lerretet for å legge det til her, eller installer et bibliotek fra den offentlige samlingen under.",
+    "hint_emptyPrivateLibrary": "Velg et objekt på lerretet for å legge det til her."
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "Kunne ikke importere scene fra den oppgitte URL-en. Den er enten ødelagt, eller inneholder ikke gyldig Excalidraw JSON-data.",
     "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?",
     "removeItemsFromsLibrary": "Slett {{count}} element(er) fra biblioteket?",
-    "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert."
+    "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert.",
+    "browserZoom": "Nettleserens zoomnivå er ikke satt til 100%, som kan føre til at lerretet vises feil"
   },
   "errors": {
     "unsupportedFileType": "Filtypen støttes ikke.",
