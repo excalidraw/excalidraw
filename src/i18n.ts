@@ -48,7 +48,7 @@ const allLanguages: Language[] = [
   { code: "ru-RU", label: "Русский" },
   { code: "sk-SK", label: "Slovenčina" },
   { code: "sv-SE", label: "Svenska" },
-  { code: "sl-SL", label: "Slovenščina" },
+  { code: "sl-SI", label: "Slovenščina" },
   { code: "tr-TR", label: "Türkçe" },
   { code: "uk-UA", label: "Українська" },
   { code: "zh-CN", label: "简体中文" },
