@@ -62,7 +62,7 @@
     "extraBold": "Azuran aṭas",
     "architect": "Amasdag",
     "artist": "Anaẓur",
-    "cartoonist": "",
+    "cartoonist": "Amefɣul",
     "fileTitle": "Isem n ufaylu",
     "colorPicker": "Amafran n yini",
     "canvasColors": "Yettwaseqdec di teɣzut n usuneɣ",
@@ -107,20 +107,26 @@
     "excalidrawLib": "Tamkarḍit n Excalidraw",
     "decreaseFontSize": "Senqes tiddi n tsefsit",
     "increaseFontSize": "Sali tiddi n tsefsit",
-    "unbindText": "",
-    "bindText": "",
+    "unbindText": "Serreḥ iweḍris",
+    "bindText": "Arez aḍris s anagbar",
     "link": {
       "edit": "Ẓreg aseɣwen",
       "create": "Snulfu-d aseɣwen",
       "label": "Aseɣwen"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Sekkeṛ",
+      "unlock": "Serreḥ",
+      "lockAll": "Sekkeṛ akk",
+      "unlockAll": "Serreḥ akk"
     },
-    "statusPublished": ""
+    "statusPublished": "Yeffeɣ-d",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "Ulamek taktert n usayes seg URL i d-ittunefken. Ahat mačči d tameɣtut neɣ ur tegbir ara isefka JSON n Excalidraw.",
     "resetLibrary": "Ayagi ad isfeḍ tamkarḍit-inek•m. Tetḥeqqeḍ?",
     "removeItemsFromsLibrary": "Ad tekkseḍ {{count}} n uferdis (en) si temkarḍit?",
-    "invalidEncryptionKey": "Tasarut n uwgelhen isefk ad tesɛu 22 n yiekkilen. Amɛiwen srid yensa."
+    "invalidEncryptionKey": "Tasarut n uwgelhen isefk ad tesɛu 22 n yiekkilen. Amɛiwen srid yensa.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Anaw n ufaylu ur yettwasefrak ara.",
@@ -190,7 +197,7 @@
     "svgImageInsertError": "D awezɣi tugra n tugna SVG. Acraḍ SVG yettban-d d armeɣtu.",
     "invalidSVGString": "SVG armeɣtu.",
     "cannotResolveCollabServer": "Ulamek tuqqna s aqeddac n umyalel. Ma ulac uɣilif ales asali n usebter sakin eɛreḍ tikkelt-nniḍen.",
-    "importLibraryError": ""
+    "importLibraryError": "Ur d-ssalay ara tamkarḍit"
   },
   "toolBar": {
     "selection": "Tafrayt",
@@ -333,7 +340,7 @@
     },
     "noteGuidelines": {
       "pre": "Tamkarḍit teḥwaǧ ad tettwaqbel s ufus qbel. Ma ulac uɣilif ɣer ",
-      "link": "",
+      "link": "iwellihen",
       "post": " send ad tazneḍ. Tesriḍ amiḍan n GitHub akken ad tmmeslayeḍ yerna ad tgeḍ ibeddilen ma yelaq, maca mačči d ayen yettwaḥetmen."
     },
     "noteLicense": {
@@ -343,7 +350,7 @@
     },
     "noteItems": "Yal aferdis n temkarḍit isefk ad isɛu isem-is i yiman-is akken ad yili wamek ara yettusizdeg. Iferdisen-agi n temkarḍit ad ddun:",
     "atleastOneLibItem": "Ma ulac uɣilif fern ma drus yiwen n uferdis n temkarḍit akken ad tebduḍ",
-    "republishWarning": ""
+    "republishWarning": "Tamawt: kra n yiferdisen yettwafernen ttwacerḍen ffeɣen-d/ttwaznen. Isefk ad talseḍ tuzzna n yiferdisen anagar mi ara tleqqemeḍ tamkarḍit neɣ tuzzna yellan."
   },
   "publishSuccessDialog": {
     "title": "Tamkarḍit tettwazen",

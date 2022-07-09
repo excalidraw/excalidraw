@@ -9,7 +9,7 @@
     "copy": "コピー",
     "copyAsPng": "PNGとしてクリップボードへコピー",
     "copyAsSvg": "SVGとしてクリップボードへコピー",
-    "copyText": "",
+    "copyText": "テキストとしてクリップボードにコピー",
     "bringForward": "前面に移動",
     "sendToBack": "最背面に移動",
     "bringToFront": "最前面に移動",
@@ -120,7 +120,13 @@
       "lockAll": "すべてロック",
       "unlockAll": "すべてのロックを解除"
     },
-    "statusPublished": ""
+    "statusPublished": "公開済み",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -168,7 +174,7 @@
     "couldNotLoadInvalidFile": "無効なファイルを読み込めませんでした。",
     "importBackendFailed": "サーバーからの読み込みに失敗しました。",
     "cannotExportEmptyCanvas": "空のキャンバスはエクスポートできません。",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "クリップボードにコピーできませんでした。",
     "decryptFailed": "データを復号できませんでした。",
     "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。",
     "loadSceneOverridePrompt": "外部図面を読み込むと、既存のコンテンツが置き換わります。続行しますか？",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "指定された URL からシーンをインポートできませんでした。不正な形式であるか、有効な Excalidraw JSON データが含まれていません。",
     "resetLibrary": "ライブラリを消去します。本当によろしいですか？",
     "removeItemsFromsLibrary": "{{count}} 個のアイテムをライブラリから削除しますか？",
-    "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。"
+    "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "サポートされていないファイル形式です。",
@@ -190,7 +197,7 @@
     "svgImageInsertError": "SVGイメージを挿入できませんでした。SVGマークアップは無効に見えます。",
     "invalidSVGString": "無効なSVGです。",
     "cannotResolveCollabServer": "コラボレーションサーバに接続できませんでした。ページを再読み込みして、もう一度お試しください。",
-    "importLibraryError": ""
+    "importLibraryError": "ライブラリを読み込めませんでした。"
   },
   "toolBar": {
     "selection": "選択",
@@ -231,7 +238,7 @@
     "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
     "publishLibrary": "自分のライブラリを公開",
     "bindTextToElement": "Enterを押してテキストを追加",
-    "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行う",
+    "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行います",
     "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す"
   },
   "canvasError": {
@@ -300,7 +307,7 @@
     "view": "表示",
     "zoomToFit": "すべての要素が収まるようにズーム",
     "zoomToSelection": "選択要素にズーム",
-    "toggleElementLock": ""
+    "toggleElementLock": "選択したアイテムをロック/ロック解除"
   },
   "clearCanvasDialog": {
     "title": "キャンバスを消去"
@@ -343,7 +350,7 @@
     },
     "noteItems": "各ライブラリ項目は、フィルタリングのために独自の名前を持つ必要があります。以下のライブラリアイテムが含まれます:",
     "atleastOneLibItem": "開始するには少なくとも1つのライブラリ項目を選択してください",
-    "republishWarning": ""
+    "republishWarning": "注意: 選択された項目の中には、すでに公開/投稿済みと表示されているものがあります。既存のライブラリや投稿を更新する場合のみ、アイテムを再投稿してください。"
   },
   "publishSuccessDialog": {
     "title": "ライブラリを送信しました",

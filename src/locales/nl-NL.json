@@ -120,7 +120,13 @@
       "lockAll": "",
       "unlockAll": ""
     },
-    "statusPublished": ""
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "Kan scène niet importeren vanuit de opgegeven URL. Het is onjuist of bevat geen geldige Excalidraw JSON-gegevens.",
     "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?",
     "removeItemsFromsLibrary": "Verwijder {{count}} item(s) uit bibliotheek?",
-    "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld."
+    "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Niet-ondersteund bestandstype.",

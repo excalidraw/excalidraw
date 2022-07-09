@@ -120,7 +120,13 @@
       "lockAll": "",
       "unlockAll": ""
     },
-    "statusPublished": ""
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Limpar a área de desenho e redefinir a cor de fundo",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "Não foi possível importar a cena a partir do URL fornecido. Ou está mal formado ou não contém dados JSON do Excalidraw válidos.",
     "resetLibrary": "Isto irá limpar a sua biblioteca. Tem a certeza?",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": "Chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desativada."
+    "invalidEncryptionKey": "Chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desativada.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Tipo de ficheiro não suportado.",
@@ -310,12 +317,12 @@
     "itemName": "",
     "authorName": "",
     "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
+    "twitterUsername": "Nome de utilizador no Twitter",
+    "libraryName": "Nome da biblioteca",
+    "libraryDesc": "Descrição da biblioteca",
     "website": "",
     "placeholder": {
-      "authorName": "",
+      "authorName": "Introduza o seu nome ou nome de utilizador",
       "libraryName": "",
       "libraryDesc": "",
       "githubHandle": "",
@@ -333,7 +340,7 @@
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "orientações",
       "post": ""
     },
     "noteLicense": {

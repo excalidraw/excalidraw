@@ -120,7 +120,13 @@
       "lockAll": "",
       "unlockAll": ""
     },
-    "statusPublished": ""
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "",
     "resetLibrary": "Αυτό θα καθαρίσει τη βιβλιοθήκη σας. Είστε σίγουροι;",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": "Το κλειδί κρυπτογράφησης πρέπει να είναι 22 χαρακτήρες. Η ζωντανή συνεργασία είναι απενεργοποιημένη."
+    "invalidEncryptionKey": "Το κλειδί κρυπτογράφησης πρέπει να είναι 22 χαρακτήρες. Η ζωντανή συνεργασία είναι απενεργοποιημένη.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Μη υποστηριζόμενος τύπος αρχείου.",

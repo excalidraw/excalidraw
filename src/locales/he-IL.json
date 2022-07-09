@@ -120,7 +120,13 @@
       "lockAll": "לנעול הכל",
       "unlockAll": "שחרור הכול"
     },
-    "statusPublished": ""
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "ייבוא המידע מן סצינה מכתובת האינטרנט נכשלה. המידע בנוי באופן משובש או שהוא אינו קובץ JSON תקין של Excalidraw.",
     "resetLibrary": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
     "removeItemsFromsLibrary": "מחיקת {{count}} פריטים(ים) מתוך הספריה?",
-    "invalidEncryptionKey": "מפתח ההצפנה חייב להיות בן 22 תוים. השיתוף החי מבוטל."
+    "invalidEncryptionKey": "מפתח ההצפנה חייב להיות בן 22 תוים. השיתוף החי מבוטל.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "סוג הקובץ אינו נתמך.",

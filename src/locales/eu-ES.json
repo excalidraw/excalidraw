@@ -115,12 +115,18 @@
       "label": "Esteka"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Blokeatu",
+      "unlock": "Desblokeatu",
+      "lockAll": "Blokeatu guztiak",
+      "unlockAll": "Desblokeatu guztiak"
     },
-    "statusPublished": ""
+    "statusPublished": "Argitaratua",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Garbitu oihala",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "Ezin izan da eszena inportatu emandako URLtik. Gaizki eratuta dago edo ez du baliozko Excalidraw JSON daturik.",
     "resetLibrary": "Honek zure liburutegia garbituko du. Ziur zaude?",
     "removeItemsFromsLibrary": "Liburutegitik {{count}} elementu ezabatu?",
-    "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago."
+    "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Onartu gabeko fitxategi mota.",
@@ -190,7 +197,7 @@
     "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
     "invalidSVGString": "SVG baliogabea.",
     "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro.",
-    "importLibraryError": ""
+    "importLibraryError": "Ezin izan da liburutegia kargatu"
   },
   "toolBar": {
     "selection": "Hautapena",
@@ -300,7 +307,7 @@
     "view": "Bistaratu",
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
     "zoomToSelection": "Zooma hautapenera",
-    "toggleElementLock": ""
+    "toggleElementLock": "Blokeatu/desbloketatu hautapena"
   },
   "clearCanvasDialog": {
     "title": "Garbitu oihala"
@@ -343,7 +350,7 @@
     },
     "noteItems": "Liburutegiko elementu bakoitzak bere izena eduki behar du iragazi ahal izateko. Liburutegiko hurrengo elementuak barne daude:",
     "atleastOneLibItem": "Hautatu gutxienez liburutegiko elementu bat gutxienez hasi ahal izateko",
-    "republishWarning": ""
+    "republishWarning": "Oharra: hautatutako elementu batzuk dagoeneko argitaratuta/bidalita bezala markatuta daude. Elementuak berriro bidali behar dituzu lehendik dagoen liburutegi edo bidalketa eguneratzen duzunean."
   },
   "publishSuccessDialog": {
     "title": "Liburutegia bidali da",

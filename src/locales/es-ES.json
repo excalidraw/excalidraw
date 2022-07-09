@@ -120,7 +120,13 @@
       "lockAll": "Bloquear todo",
       "unlockAll": "Desbloquear todo"
     },
-    "statusPublished": ""
+    "statusPublished": "Publicado",
+    "sidebarLock": "Mantener barra lateral abierta"
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "Seleccione un elemento en el lienzo para añadirlo aquí, o instale una biblioteca del repositorio público, a continuación.",
+    "hint_emptyPrivateLibrary": "Seleccione un elemento del lienzo para añadirlo aquí."
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "No se ha podido importar la escena desde la URL proporcionada. Está mal formada, o no contiene datos de Excalidraw JSON válidos.",
     "resetLibrary": "Esto borrará tu biblioteca. ¿Estás seguro?",
     "removeItemsFromsLibrary": "¿Eliminar {{count}} elemento(s) de la biblioteca?",
-    "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada."
+    "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada.",
+    "browserZoom": "El nivel de zoom de tu navegador no está configurado al 100%, lo que puede causar que el tablero se muestre de manera incorrecta"
   },
   "errors": {
     "unsupportedFileType": "Tipo de archivo no admitido.",
@@ -343,7 +350,7 @@
     },
     "noteItems": "Cada elemento de la biblioteca debe tener su propio nombre para que sea filtrable. Los siguientes elementos de la biblioteca serán incluidos:",
     "atleastOneLibItem": "Por favor, seleccione al menos un elemento de la biblioteca para empezar",
-    "republishWarning": ""
+    "republishWarning": "Nota: algunos de los elementos seleccionados están marcados como ya publicados/enviados. Sólo debería volver a enviar elementos cuando se actualice una biblioteca o envío."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",

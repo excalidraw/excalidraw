@@ -120,7 +120,13 @@
       "lockAll": "Blocare toate",
       "unlockAll": "Deblocare toate"
     },
-    "statusPublished": "Publicat"
+    "statusPublished": "Publicat",
+    "sidebarLock": "Păstrează deschisă bara laterală"
+  },
+  "library": {
+    "noItems": "Niciun element adăugat încă...",
+    "hint_emptyLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici sau instalează o bibliotecă din depozitul public, de mai jos.",
+    "hint_emptyPrivateLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici."
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "Scena nu a putut fi importată din URL-ul furnizat. Este fie incorect formată, fie nu conține date JSON Excalidraw valide.",
     "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?",
     "removeItemsFromsLibrary": "Ștergi {{count}} element(e) din bibliotecă?",
-    "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată."
+    "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Tip de fișier neacceptat.",
