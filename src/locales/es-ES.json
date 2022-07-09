@@ -188,7 +188,7 @@
     "resetLibrary": "Esto borrará tu biblioteca. ¿Estás seguro?",
     "removeItemsFromsLibrary": "¿Eliminar {{count}} elemento(s) de la biblioteca?",
     "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada.",
-    "browserZoom": ""
+    "browserZoom": "El nivel de zoom de tu navegador no está configurado al 100%, lo que puede causar que el tablero se muestre de manera incorrecta"
   },
   "errors": {
     "unsupportedFileType": "Tipo de archivo no admitido.",
