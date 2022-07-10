@@ -188,7 +188,7 @@
     "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?",
     "removeItemsFromsLibrary": "Hapus {{count}} item dari pustaka?",
     "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan.",
-    "browserZoom": ""
+    "browserZoom": "Pembesaran peramban Anda tidak 100% yang mana dapat menyebabkan layar tidak menampilkan dengan benar"
   },
   "errors": {
     "unsupportedFileType": "Tipe file tidak didukung.",
