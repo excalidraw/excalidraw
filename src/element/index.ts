@@ -10,6 +10,7 @@ export {
   newElement,
   newTextElement,
   updateTextElement,
+  refreshTextDimensions,
   newLinearElement,
   newImageElement,
   duplicateElement,

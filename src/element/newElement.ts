@@ -244,6 +244,18 @@ const getAdjustedDimensions = (
   };
 };
 
+export const refreshTextDimensions = (
+  element: ExcalidrawTextElement,
+  text = element.text,
+) => {
+  const container = getContainerElement(element);
+  if (container) {
+    text = wrapText(text, getFontString(element), container.width);
+  }
+  const dimensions = getAdjustedDimensions(element, text);
+  return { text, ...dimensions };
+};
+
 export const updateTextElement = (
   element: ExcalidrawTextElement,
   {
@@ -256,16 +268,10 @@ export const updateTextElement = (
     originalText: string;
   },
 ): ExcalidrawTextElement => {
-  const container = getContainerElement(element);
-  if (container) {
-    text = wrapText(text, getFontString(element), container.width);
-  }
-  const dimensions = getAdjustedDimensions(element, text);
   return newElementWith(element, {
-    text,
     originalText,
     isDeleted: isDeleted ?? element.isDeleted,
-    ...dimensions,
+    ...refreshTextDimensions(element, text),
   });
 };
 
