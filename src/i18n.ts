@@ -78,19 +78,20 @@ if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
 let currentLang: Language = defaultLang;
 let currentLangData = {};
 
-const auxLangDataRoots = Array<string>();
 const auxCurrentLangData = Array<Object>();
 const auxFallbackLangData = Array<Object>();
+const auxSetLanguageFuncs =
+  Array<(langCode: string) => Promise<Object | undefined>>();
 
-export const registerAuxLangData = (root: string) => {
-  if (auxLangDataRoots.includes(root)) {
+export const registerAuxLangData = (
+  fallbackLangData: Object,
+  setLanguageAux: (langCode: string) => Promise<Object | undefined>,
+) => {
+  if (auxFallbackLangData.includes(fallbackLangData)) {
     return;
   }
-  auxLangDataRoots.push(root);
-  // Assume root contains a fallback locale file
-  auxFallbackLangData.push(
-    require(/* webpackChunkName: "locales/[request]" */ `${root}/locales/en.json`),
-  );
+  auxFallbackLangData.push(fallbackLangData);
+  auxSetLanguageFuncs.push(setLanguageAux);
 };
 
 export const setLanguage = async (lang: Language) => {
@@ -109,16 +110,11 @@ export const setLanguage = async (lang: Language) => {
       auxCurrentLangData.pop();
     }
     // Fill the auxCurrentLangData array with each locale file found in auxLangDataRoots for this language
-    auxLangDataRoots.forEach(async (dataRoot) => {
-      // Do not assume auxLangDataRoots[i] contains a locale file for this language
-      try {
-        const condData = await import(
-          /* webpackChunkName: "locales/[request]" */ `${dataRoot}/locales/${currentLang.code}.json`
-        );
-        if (condData) {
-          auxCurrentLangData.push(condData);
-        }
-      } catch (e) {}
+    auxSetLanguageFuncs.forEach(async (setLanguageFn) => {
+      const condData = await setLanguageFn(currentLang.code);
+      if (condData) {
+        auxCurrentLangData.push(condData);
+      }
     });
   }
 };

@@ -1,4 +1,5 @@
 // Some imports
+import fallbackMathJaxLangData from "./locales/en.json";
 import { BOUND_TEXT_PADDING, FONT_FAMILY, SVG_NS } from "../../../constants";
 import {
   getFontString,
@@ -1403,6 +1404,21 @@ export const prepareMathSubtype = function (
   methods.renderSvg = renderSvgMathElement;
   methods.wrapText = wrapMathElement;
   createMathActions().forEach((action) => addCustomAction(action));
-  registerAuxLangData(`./packages/plugins/mathjax`);
+
+  registerAuxLangData(
+    fallbackMathJaxLangData,
+    async (langCode: string): Promise<Object | undefined> => {
+      try {
+        const condData = await import(
+          /* webpackChunkName: "locales/[request]" */ `./locales/${langCode}.json`
+        );
+        if (condData) {
+          return condData;
+        }
+      } catch (e) {}
+      return undefined;
+    },
+  );
+
   // Call loadMathJax() here if we want to be sure it's loaded.
 } as SubtypePrepFn;
