@@ -4,7 +4,7 @@ import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { usePlugins } from "@excalidraw/plugins/index";
+import { usePlugins } from "@excalidraw/plugins";
 import {
   APP_NAME,
   COOKIES,

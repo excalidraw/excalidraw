@@ -12,7 +12,7 @@ import { GlobalTestState, createEvent, fireEvent } from "../test-utils";
 import fs from "fs";
 import util from "util";
 import path from "path";
-import { testPlugins } from "@excalidraw/plugins/index";
+import { testPlugins } from "@excalidraw/plugins";
 import { getMimeType } from "../../data/blob";
 import { newFreeDrawElement } from "../../element/newElement";
 import { Point } from "../../types";
