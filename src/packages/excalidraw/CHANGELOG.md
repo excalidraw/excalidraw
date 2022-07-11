@@ -11,6 +11,14 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+### Excalidraw API
+
+#### Breaking Changes
+
+- `setToastMessage` API is now renamed to `setToast` API and the function signature is also updated [#5427](https://github.com/excalidraw/excalidraw/pull/5427). You can also pass `duration` and `closable` attributes along with `message`.
+
 ## 0.12.0 (2022-07-07)
 
 ### Excalidraw API

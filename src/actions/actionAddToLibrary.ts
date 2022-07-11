@@ -42,7 +42,7 @@ export const actionAddToLibrary = register({
           commitToHistory: false,
           appState: {
             ...appState,
-            toastMessage: t("toast.addedToLibrary"),
+            toast: { message: t("toast.addedToLibrary") },
           },
         };
       })

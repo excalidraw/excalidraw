@@ -7,13 +7,13 @@ const DEFAULT_TOAST_TIMEOUT = 5000;
 
 export const Toast = ({
   message,
-  clearToast,
+  onClose,
   closable = false,
   // To prevent autoclose, pass duration as Infinity
   duration = DEFAULT_TOAST_TIMEOUT,
 }: {
   message: string;
-  clearToast: () => void;
+  onClose: () => void;
   closable?: boolean;
   duration?: number;
 }) => {
@@ -23,8 +23,8 @@ export const Toast = ({
     if (!shouldAutoClose) {
       return;
     }
-    timerRef.current = window.setTimeout(() => clearToast(), duration);
-  }, [clearToast, duration, shouldAutoClose]);
+    timerRef.current = window.setTimeout(() => onClose(), duration);
+  }, [onClose, duration, shouldAutoClose]);
 
   useEffect(() => {
     if (!shouldAutoClose) {
@@ -50,7 +50,7 @@ export const Toast = ({
           icon={close}
           aria-label="close"
           type="icon"
-          onClick={clearToast}
+          onClick={onClose}
           className="close"
         />
       )}

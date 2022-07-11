@@ -81,7 +81,7 @@ export const getDefaultAppState = (): Omit<
     showStats: false,
     startBoundElement: null,
     suggestedBindings: [],
-    toastMessage: null,
+    toast: null,
     viewBackgroundColor: oc.white,
     zenModeEnabled: false,
     zoom: {
@@ -173,7 +173,7 @@ const APP_STATE_STORAGE_CONF = (<
   showStats: { browser: true, export: false, server: false },
   startBoundElement: { browser: false, export: false, server: false },
   suggestedBindings: { browser: false, export: false, server: false },
-  toastMessage: { browser: false, export: false, server: false },
+  toast: { browser: false, export: false, server: false },
   viewBackgroundColor: { browser: true, export: true, server: true },
   width: { browser: false, export: false, server: false },
   zenModeEnabled: { browser: true, export: false, server: false },
