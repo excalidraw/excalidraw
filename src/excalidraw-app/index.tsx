@@ -1,10 +1,10 @@
 import LanguageDetector from "i18next-browser-languagedetector";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { usePlugins } from "@excalidraw/plugins/index";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
+import { usePlugins } from "@excalidraw/plugins/index";
 import {
   APP_NAME,
   COOKIES,

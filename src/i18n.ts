@@ -78,6 +78,22 @@ if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
 let currentLang: Language = defaultLang;
 let currentLangData = {};
 
+const auxCurrentLangData = Array<Object>();
+const auxFallbackLangData = Array<Object>();
+const auxSetLanguageFuncs =
+  Array<(langCode: string) => Promise<Object | undefined>>();
+
+export const registerAuxLangData = (
+  fallbackLangData: Object,
+  setLanguageAux: (langCode: string) => Promise<Object | undefined>,
+) => {
+  if (auxFallbackLangData.includes(fallbackLangData)) {
+    return;
+  }
+  auxFallbackLangData.push(fallbackLangData);
+  auxSetLanguageFuncs.push(setLanguageAux);
+};
+
 export const setLanguage = async (lang: Language) => {
   currentLang = lang;
   document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
@@ -89,6 +105,17 @@ export const setLanguage = async (lang: Language) => {
     currentLangData = await import(
       /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
     );
+    // Empty the auxCurrentLangData array
+    while (auxCurrentLangData.length > 0) {
+      auxCurrentLangData.pop();
+    }
+    // Fill the auxCurrentLangData array with each locale file found in auxLangDataRoots for this language
+    auxSetLanguageFuncs.forEach(async (setLanguageFn) => {
+      const condData = await setLanguageFn(currentLang.code);
+      if (condData) {
+        auxCurrentLangData.push(condData);
+      }
+    });
   }
 };
 
