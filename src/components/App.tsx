@@ -1625,11 +1625,17 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   clearToast = () => {
-    this.setState({ toast: { message: null } });
+    this.setState({
+      toast: { message: null, closable: undefined, duration: undefined },
+    });
   };
 
-  setToast = (message: string, closable?: false, duration?: number) => {
-    this.setState({ toast: { message, closable, duration } });
+  setToast = (toast: {
+    message: string;
+    closable?: boolean;
+    duration?: number;
+  }) => {
+    this.setState({ toast });
   };
 
   restoreFileFromShare = async () => {

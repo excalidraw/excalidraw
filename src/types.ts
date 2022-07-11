@@ -145,7 +145,9 @@ export type AppState = {
   previousSelectedElementIds: { [id: string]: boolean };
   shouldCacheIgnoreZoom: boolean;
   showHelpDialog: boolean;
-  toast: { message: string | null; closable?: boolean; duration?: number };
+  toast:
+    | { message: string; closable?: boolean; duration?: number }
+    | { message: null; closable: undefined; duration: undefined };
   zenModeEnabled: boolean;
   theme: Theme;
   gridSize: number | null;

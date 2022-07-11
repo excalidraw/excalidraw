@@ -153,6 +153,8 @@ export const actionSaveToActiveFile = register({
                   )
                 : t("toast.fileSaved")
               : null,
+            closable: undefined,
+            duration: undefined,
           },
         },
       };

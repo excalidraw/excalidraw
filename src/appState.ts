@@ -81,7 +81,7 @@ export const getDefaultAppState = (): Omit<
     showStats: false,
     startBoundElement: null,
     suggestedBindings: [],
-    toast: { message: null },
+    toast: { message: null, closable: undefined, duration: undefined },
     viewBackgroundColor: oc.white,
     zenModeEnabled: false,
     zoom: {
