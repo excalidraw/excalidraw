@@ -549,7 +549,7 @@ class App extends React.Component<AppProps, AppState> {
                 onLinkOpen={this.props.onLinkOpen}
               />
             )}
-            {this.state.toast.message !== null && (
+            {this.state.toast !== null && (
               <Toast
                 message={this.state.toast.message}
                 clearToast={this.clearToast}
@@ -1645,7 +1645,7 @@ class App extends React.Component<AppProps, AppState> {
 
   clearToast = () => {
     this.setState({
-      toast: { message: null, closable: undefined, duration: undefined },
+      toast: null,
     });
   };
 
