@@ -12,12 +12,12 @@ import { GlobalTestState, createEvent, fireEvent } from "../test-utils";
 import fs from "fs";
 import util from "util";
 import path from "path";
+import { testPlugins } from "@excalidraw/plugins/index";
 import { getMimeType } from "../../data/blob";
 import { maybeGetCustom, newFreeDrawElement } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { prepareSubtypes } from "../../subtypes";
-import { testPlugins } from "@excalidraw/plugins/index";
 
 const readFile = util.promisify(fs.readFile);
 
