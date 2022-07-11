@@ -1,7 +1,7 @@
 {
   "name": "@excalidraw/plugins",
   "version": "0.12.0",
-  "main": "main.js",
+  "main": "entry.js",
   "files": [
     "dist/*"
   ],
