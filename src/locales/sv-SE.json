@@ -120,7 +120,13 @@
       "lockAll": "Lås alla",
       "unlockAll": "Lås upp alla"
     },
-    "statusPublished": "Publicerad"
+    "statusPublished": "Publicerad",
+    "sidebarLock": "Håll sidofältet öppet"
+  },
+  "library": {
+    "noItems": "Inga objekt tillagda ännu...",
+    "hint_emptyLibrary": "Välj ett objekt på canvasen för att lägga till det här, eller installera ett bibliotek från det publika arkivet, nedan.",
+    "hint_emptyPrivateLibrary": "Välj ett objekt på canvasen för att lägga till det här."
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -181,7 +187,8 @@
     "invalidSceneUrl": "Det gick inte att importera skiss från den angivna webbadressen. Antingen har den fel format, eller så innehåller den ingen giltig Excalidraw JSON data.",
     "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?",
     "removeItemsFromsLibrary": "Ta bort {{count}} objekt från biblioteket?",
-    "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat."
+    "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat.",
+    "browserZoom": "Din webbläsares zoomnivå är inte satt till 100% vilket kan orsaka att tavlan visas felaktigt"
   },
   "errors": {
     "unsupportedFileType": "Filtypen stöds inte.",
