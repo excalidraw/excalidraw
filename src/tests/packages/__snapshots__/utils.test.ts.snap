@@ -70,7 +70,11 @@ Object {
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
-  "toastMessage": null,
+  "toast": Object {
+    "closable": undefined,
+    "duration": undefined,
+    "message": null,
+  },
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "zenModeEnabled": false,
