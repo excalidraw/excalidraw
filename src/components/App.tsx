@@ -552,7 +552,7 @@ class App extends React.Component<AppProps, AppState> {
             {this.state.toast !== null && (
               <Toast
                 message={this.state.toast.message}
-                clearToast={this.clearToast}
+                onClose={() => this.setToast(null)}
                 duration={this.state.toast.duration}
                 closable={this.state.toast.closable}
               />
@@ -933,7 +933,7 @@ class App extends React.Component<AppProps, AppState> {
           duration: Infinity,
         });
       } else {
-        this.clearToast();
+        this.setToast(null);
       }
     }
   };
@@ -1643,17 +1643,13 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  clearToast = () => {
-    this.setState({
-      toast: null,
-    });
-  };
-
-  setToast = (toast: {
-    message: string;
-    closable?: boolean;
-    duration?: number;
-  }) => {
+  setToast = (
+    toast: {
+      message: string;
+      closable?: boolean;
+      duration?: number;
+    } | null,
+  ) => {
     this.setState({ toast });
   };
 
