@@ -38,6 +38,7 @@
     ]
   },
   "peerDependencies": {
+    "mathjax-full": "3.2.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },
@@ -77,7 +78,6 @@
     "install:deps": "yarn install --frozen-lockfile && yarn --cwd ../../../"
   },
   "dependencies": {
-    "mathjax-full": "3.2.2",
     "dotenv": "10.0.0"
   }
 }
