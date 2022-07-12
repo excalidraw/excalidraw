@@ -212,7 +212,7 @@ const zoomValueToFitBoundsOnViewport = (
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
-const zoomToFitElements = (
+export const zoomToFitElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   zoomToSelection: boolean,

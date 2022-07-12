@@ -66,6 +66,7 @@ Object {
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showHyperlinkPopup": false,
+  "showSearch": false,
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],

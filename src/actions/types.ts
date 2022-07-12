@@ -111,7 +111,9 @@ export type ActionName =
   | "hyperlink"
   | "eraser"
   | "bindText"
-  | "toggleLock";
+  | "toggleLock"
+  | "openSearch"
+  | "closeSearch";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

@@ -39,6 +39,8 @@ import { trackEvent } from "../analytics";
 import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
+import { Search } from "./Search";
+import { actionCloseSearch } from "../actions/actionCloseSearch";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -526,6 +528,23 @@ const LayerUI = ({
     );
   };
 
+  const renderSearch = () => {
+    if (!appState.showSearch) {
+      return null;
+    }
+    return (
+      <Search
+        appState={appState}
+        setAppState={setAppState}
+        elements={elements}
+        onClose={() => {
+          actionManager.executeAction(actionCloseSearch);
+        }}
+        renderCustomStats={renderCustomStats}
+      />
+    );
+  };
+
   return device.isMobile ? (
     <>
       {dialogs}
@@ -572,6 +591,7 @@ const LayerUI = ({
         {renderFixedSideContainer()}
         {renderBottomAppMenu()}
         {renderStats()}
+        {renderSearch()}
         {appState.scrolledOutside && (
           <button
             className="scroll-back-to-content"

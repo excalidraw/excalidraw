@@ -85,3 +85,5 @@ export { actionToggleStats } from "./actionToggleStats";
 export { actionUnbindText, actionBindText } from "./actionBoundText";
 export { actionLink } from "../element/Hyperlink";
 export { actionToggleLock } from "./actionToggleLock";
+export { actionOpenSearch } from "./actionOpenSearch";
+export { actionCloseSearch } from "./actionCloseSearch";

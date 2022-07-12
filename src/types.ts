@@ -166,6 +166,7 @@ export type AppState = {
   fileHandle: FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
+  showSearch: boolean;
   currentChartType: ChartType;
   pasteDialog:
     | {

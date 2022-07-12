@@ -436,5 +436,10 @@
     "5c940d": "Lime 9",
     "e67700": "Yellow 9",
     "d9480f": "Orange 9"
+  },
+  "search": {
+    "open": "Open text search",
+    "close": "Close text search",
+    "noMatch": "No matching elements"
   }
 }
