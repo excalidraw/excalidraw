@@ -385,7 +385,7 @@ class App extends React.Component<AppProps, AppState> {
         getAppState: () => this.state,
         getFiles: () => this.files,
         refresh: this.refresh,
-        setToastMessage: this.setToastMessage,
+        setToast: this.setToast,
         id: this.id,
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
@@ -581,16 +581,12 @@ class App extends React.Component<AppProps, AppState> {
                 onLinkOpen={this.props.onLinkOpen}
               />
             )}
-            {this.state.toastMessage !== null && (
+            {this.state.toast !== null && (
               <Toast
-                message={this.state.toastMessage}
-                clearToast={this.clearToast}
-                duration={
-                  this.state.toastMessage === t("alerts.browserZoom")
-                    ? Infinity
-                    : undefined
-                }
-                closable={this.state.toastMessage === t("alerts.browserZoom")}
+                message={this.state.toast.message}
+                onClose={() => this.setToast(null)}
+                duration={this.state.toast.duration}
+                closable={this.state.toast.closable}
               />
             )}
             <main>{this.renderCanvas()}</main>
@@ -804,7 +800,7 @@ class App extends React.Component<AppProps, AppState> {
           ? { ...scene.appState.activeTool, type: "selection" }
           : scene.appState.activeTool,
       isLoading: false,
-      toastMessage: this.state.toastMessage || null,
+      toast: this.state.toast,
     };
     if (initialData?.scrollToContent) {
       scene.appState = {
@@ -963,9 +959,13 @@ class App extends React.Component<AppProps, AppState> {
         (window.outerWidth - scrollBarWidth) / window.innerWidth;
       const isBrowserZoomed = widthRatio < 0.75 || widthRatio > 1.1;
       if (isBrowserZoomed) {
-        this.setToastMessage(t("alerts.browserZoom"));
+        this.setToast({
+          message: t("alerts.browserZoom"),
+          closable: true,
+          duration: Infinity,
+        });
       } else {
-        this.clearToast();
+        this.setToast(null);
       }
     }
   };
@@ -1692,12 +1692,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  clearToast = () => {
-    this.setState({ toastMessage: null });
-  };
-
-  setToastMessage = (toastMessage: string) => {
-    this.setState({ toastMessage });
+  setToast = (
+    toast: {
+      message: string;
+      closable?: boolean;
+      duration?: number;
+    } | null,
+  ) => {
+    this.setState({ toast });
   };
 
   restoreFileFromShare = async () => {

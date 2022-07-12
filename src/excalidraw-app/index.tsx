@@ -660,7 +660,7 @@ const ExcalidrawWrapper = () => {
   const renderCustomStats = () => {
     return (
       <CustomStats
-        setToastMessage={(message) => excalidrawAPI!.setToastMessage(message)}
+        setToast={(message) => excalidrawAPI!.setToast({ message })}
       />
     );
   };
