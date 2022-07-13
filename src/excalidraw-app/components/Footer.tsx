@@ -1,4 +1,5 @@
 import { isExcalidrawPlusSignedUser, PlusAppLinkJSX, PlusLPLinkJSX } from "..";
+import { useDevice } from "../../components/App";
 import { shield } from "../../components/icons";
 import { Tooltip } from "../../components/Tooltip";
 import { t } from "../../i18n";
@@ -20,15 +21,14 @@ const EncryptedIcon = () => (
 );
 
 const Footer = ({
-  isMobile,
   langCode,
   onLangChange,
 }: {
-  isMobile: boolean;
   langCode: string;
   onLangChange: (langCode: string) => void;
 }) => {
-  if (isMobile) {
+  const device = useDevice();
+  if (device.isMobile) {
     const isTinyDevice = window.innerWidth < 362;
     return (
       <div

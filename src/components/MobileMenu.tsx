@@ -32,10 +32,7 @@ type MobileMenuProps = {
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
-  renderCustomFooter?: (
-    isMobile: boolean,
-    appState: AppState,
-  ) => JSX.Element | null;
+
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
@@ -44,6 +41,7 @@ type MobileMenuProps = {
     appState: AppState,
   ) => JSX.Element | null;
   renderStats: () => JSX.Element | null;
+  children?: React.ReactNode;
 };
 
 export const MobileMenu = ({
@@ -59,12 +57,12 @@ export const MobileMenu = ({
   onPenModeToggle,
   canvas,
   isCollaborating,
-  renderCustomFooter,
   viewModeEnabled,
   showThemeBtn,
   onImageAction,
   renderTopRightUI,
   renderStats,
+  children,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -201,7 +199,7 @@ export const MobileMenu = ({
               <div className="panelColumn">
                 <Stack.Col gap={4}>
                   {renderCanvasActions()}
-                  {renderCustomFooter?.(true, appState)}
+                  {children}
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>

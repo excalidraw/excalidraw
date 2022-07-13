@@ -645,7 +645,6 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
       >
         <Footer
-          isMobile={false}
           langCode={langCode}
           onLangChange={(langCode) => setLangCode(langCode)}
         />

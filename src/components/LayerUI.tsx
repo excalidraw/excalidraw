@@ -547,7 +547,9 @@ const LayerUI = ({
         onImageAction={onImageAction}
         renderTopRightUI={renderTopRightUI}
         renderStats={renderStats}
-      />
+      >
+        {children}
+      </MobileMenu>
     </>
   ) : (
     <>
