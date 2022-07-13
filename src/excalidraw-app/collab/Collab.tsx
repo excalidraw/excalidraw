@@ -201,6 +201,9 @@ class Collab extends PureComponent<Props, CollabState> {
 
   isCollaborating = () => jotaiStore.get(isCollaboratingAtom)!;
 
+  // determine if we do recording of the collaboration
+  isRecording = () => true;
+
   private setIsCollaborating = (isCollaborating: boolean) => {
     jotaiStore.set(isCollaboratingAtom, isCollaborating);
   };
