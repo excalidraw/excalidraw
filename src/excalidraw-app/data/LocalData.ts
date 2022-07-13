@@ -36,6 +36,7 @@ class LocalFileManager extends FileManager {
 
 const saveDataStateToLocalStorage = (
   elements: readonly ExcalidrawElement[],
+  elementsSnapShots: Map<Number, ExcalidrawElement[]>,
   appState: AppState,
 ) => {
   try {
@@ -46,6 +47,10 @@ const saveDataStateToLocalStorage = (
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
       JSON.stringify(clearAppStateForLocalStorage(appState)),
+    );
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS_SNAPSHOT,
+      JSON.stringify(Array.from(elementsSnapShots.entries())),
     );
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
   } catch (error: any) {
@@ -60,11 +65,12 @@ export class LocalData {
   private static _save = debounce(
     async (
       elements: readonly ExcalidrawElement[],
+      elementsSnapshots: Map<Number, ExcalidrawElement[]>,
       appState: AppState,
       files: BinaryFiles,
       onFilesSaved: () => void,
     ) => {
-      saveDataStateToLocalStorage(elements, appState);
+      saveDataStateToLocalStorage(elements, elementsSnapshots, appState);
 
       await this.fileStorage.saveFiles({
         elements,
@@ -78,13 +84,14 @@ export class LocalData {
   /** Saves DataState, including files. Bails if saving is paused */
   static save = (
     elements: readonly ExcalidrawElement[],
+    elementsSnapShots: Map<Number, ExcalidrawElement[]>,
     appState: AppState,
     files: BinaryFiles,
     onFilesSaved: () => void,
   ) => {
     // we need to make the `isSavePaused` check synchronously (undebounced)
     if (!this.isSavePaused()) {
-      this._save(elements, appState, files, onFilesSaved);
+      this._save(elements, elementsSnapShots, appState, files, onFilesSaved);
     }
   };
 

@@ -257,6 +257,7 @@ export type ExcalidrawInitialDataState = Merge<
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly ExcalidrawElement[],
+    elementsSnapShots: Map<Number, ExcalidrawElement[]>,
     appState: AppState,
     files: BinaryFiles,
   ) => void;

@@ -497,6 +497,7 @@ const ExcalidrawWrapper = () => {
 
   const onChange = (
     elements: readonly ExcalidrawElement[],
+    elementsSnapshots: Map<Number, ExcalidrawElement[]>,
     appState: AppState,
     files: BinaryFiles,
   ) => {
@@ -507,7 +508,7 @@ const ExcalidrawWrapper = () => {
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
     if (!LocalData.isSavePaused()) {
-      LocalData.save(elements, appState, files, () => {
+      LocalData.save(elements, elementsSnapshots, appState, files, () => {
         if (excalidrawAPI) {
           let didChange = false;
 

@@ -59,6 +59,10 @@ class Scene {
     return this.elements;
   }
 
+  getElementsSnapshots() {
+    return this.elementsSnapshots;
+  }
+
   getNonDeletedElements(): readonly NonDeletedExcalidrawElement[] {
     return this.nonDeletedElements;
   }
@@ -85,6 +89,7 @@ class Scene {
       Scene.mapElementToScene(element, this);
     });
     this.nonDeletedElements = getNonDeletedElements(this.elements);
+    this.elementsSnapshots.set(Date.now(), [...this.nonDeletedElements]);
     this.informMutation();
   }
 
