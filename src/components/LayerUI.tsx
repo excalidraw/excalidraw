@@ -58,7 +58,6 @@ interface LayerUIProps {
   langCode: Language["code"];
   isCollaborating: boolean;
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
-  renderCustomFooter?: ExcalidrawProps["renderFooter"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -67,6 +66,7 @@ interface LayerUIProps {
   library: Library;
   id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
+  children?: React.ReactNode;
 }
 const LayerUI = ({
   actionManager,
@@ -85,7 +85,6 @@ const LayerUI = ({
   toggleZenMode,
   isCollaborating,
   renderTopRightUI,
-  renderCustomFooter,
   renderCustomStats,
   viewModeEnabled,
   libraryReturnUrl,
@@ -94,6 +93,7 @@ const LayerUI = ({
   library,
   id,
   onImageAction,
+  children,
 }: LayerUIProps) => {
   const device = useDevice();
 
@@ -454,7 +454,7 @@ const LayerUI = ({
             },
           )}
         >
-          {renderCustomFooter?.(false, appState)}
+          {children}
         </div>
         <div
           className={clsx(
@@ -542,7 +542,6 @@ const LayerUI = ({
         onPenModeToggle={onPenModeToggle}
         canvas={canvas}
         isCollaborating={isCollaborating}
-        renderCustomFooter={renderCustomFooter}
         viewModeEnabled={viewModeEnabled}
         showThemeBtn={showThemeBtn}
         onImageAction={onImageAction}
@@ -606,7 +605,6 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
 
   const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
   return (
-    prev.renderCustomFooter === next.renderCustomFooter &&
     prev.langCode === next.langCode &&
     prev.elements === next.elements &&
     prev.files === next.files &&

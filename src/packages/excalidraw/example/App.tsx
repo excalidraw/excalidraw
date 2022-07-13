@@ -654,11 +654,12 @@ export default function App() {
             name="Custom name of drawing"
             UIOptions={{ canvasActions: { loadScene: false } }}
             renderTopRightUI={renderTopRightUI}
-            renderFooter={renderFooter}
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
-          />
+          >
+            {renderFooter()}
+          </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}
         </div>

@@ -21,7 +21,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     isCollaborating = false,
     onPointerUpdate,
     renderTopRightUI,
-    renderFooter,
     langCode = defaultLang.code,
     viewModeEnabled,
     zenModeEnabled,
@@ -39,6 +38,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onLinkOpen,
     onPointerDown,
     onScrollChange,
+    children,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -86,7 +86,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
           renderTopRightUI={renderTopRightUI}
-          renderFooter={renderFooter}
           langCode={langCode}
           viewModeEnabled={viewModeEnabled}
           zenModeEnabled={zenModeEnabled}
@@ -105,7 +104,9 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
-        />
+        >
+          {children}
+        </App>
       </Provider>
     </InitializeApp>
   );

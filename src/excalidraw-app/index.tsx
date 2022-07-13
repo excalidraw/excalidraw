@@ -19,11 +19,7 @@ import {
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import {
-  Excalidraw,
-  defaultLang,
-  languages,
-} from "../packages/excalidraw/index";
+import { Excalidraw, defaultLang } from "../packages/excalidraw/index";
 import {
   AppState,
   LibraryItems,
@@ -51,7 +47,6 @@ import Collab, {
   collabDialogShownAtom,
   isCollaboratingAtom,
 } from "./collab/Collab";
-import { LanguageList } from "./components/LanguageList";
 import {
   exportToBackend,
   getCollaborationLinkData,
@@ -65,8 +60,6 @@ import {
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { restore, restoreAppState, RestoredDataState } from "../data/restore";
-import { Tooltip } from "../components/Tooltip";
-import { shield } from "../components/icons";
 
 import "./index.scss";
 import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
@@ -82,8 +75,9 @@ import { Provider, useAtom } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
+import Footer from "./components/Footer";
 
-const isExcalidrawPlusSignedUser = document.cookie.includes(
+export const isExcalidrawPlusSignedUser = document.cookie.includes(
   COOKIES.AUTH_STATE_COOKIE,
 );
 
@@ -197,7 +191,7 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
-const PlusLPLinkJSX = (
+export const PlusLPLinkJSX = (
   <p style={{ direction: "ltr", unicodeBidi: "embed" }}>
     Introducing Excalidraw+
     <br />
@@ -211,7 +205,7 @@ const PlusLPLinkJSX = (
   </p>
 );
 
-const PlusAppLinkJSX = (
+export const PlusAppLinkJSX = (
   <a
     href={`${process.env.REACT_APP_PLUS_APP}/#excalidraw-redirect`}
     target="_blank"
@@ -588,73 +582,6 @@ const ExcalidrawWrapper = () => {
     [],
   );
 
-  const renderFooter = useCallback(
-    (isMobile: boolean) => {
-      const renderEncryptedIcon = () => (
-        <a
-          className="encrypted-icon tooltip"
-          href="https://blog.excalidraw.com/end-to-end-encryption/"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={t("encrypted.link")}
-        >
-          <Tooltip label={t("encrypted.tooltip")} long={true}>
-            {shield}
-          </Tooltip>
-        </a>
-      );
-
-      const renderLanguageList = () => (
-        <LanguageList
-          onChange={(langCode) => setLangCode(langCode)}
-          languages={languages}
-          currentLangCode={langCode}
-        />
-      );
-      if (isMobile) {
-        const isTinyDevice = window.innerWidth < 362;
-        return (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: isTinyDevice ? "column" : "row",
-            }}
-          >
-            <fieldset>
-              <legend>{t("labels.language")}</legend>
-              {renderLanguageList()}
-            </fieldset>
-            {/* FIXME remove after 2021-05-20 */}
-            <div
-              style={{
-                width: "24ch",
-                fontSize: "0.7em",
-                textAlign: "center",
-                marginTop: isTinyDevice ? 16 : undefined,
-                marginLeft: "auto",
-                marginRight: isTinyDevice ? "auto" : undefined,
-                padding: isExcalidrawPlusSignedUser ? undefined : "4px 2px",
-                border: isExcalidrawPlusSignedUser
-                  ? undefined
-                  : "1px dashed #aaa",
-                borderRadius: 12,
-              }}
-            >
-              {isExcalidrawPlusSignedUser ? PlusAppLinkJSX : PlusLPLinkJSX}
-            </div>
-          </div>
-        );
-      }
-      return (
-        <>
-          {renderEncryptedIcon()}
-          {renderLanguageList()}
-        </>
-      );
-    },
-    [langCode],
-  );
-
   const renderCustomStats = () => {
     return (
       <CustomStats
@@ -710,14 +637,19 @@ const ExcalidrawWrapper = () => {
           },
         }}
         renderTopRightUI={renderTopRightUI}
-        renderFooter={renderFooter}
         langCode={langCode}
         renderCustomStats={renderCustomStats}
         detectScroll={false}
         handleKeyboardGlobally={true}
         onLibraryChange={onLibraryChange}
         autoFocus={true}
-      />
+      >
+        <Footer
+          isMobile={false}
+          langCode={langCode}
+          onLangChange={(langCode) => setLangCode(langCode)}
+        />
+      </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
         <ErrorDialog
