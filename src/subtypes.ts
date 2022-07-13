@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -7,6 +6,7 @@ import {
 import { getNonDeletedElements } from "./element";
 import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
+import { registerAuxLangData } from "./i18n";
 
 import { Action, ActionName } from "./actions/types";
 import { register } from "./actions/register";
@@ -205,53 +205,53 @@ export type CustomMethods = {
 type MethodMap = { subtype: CustomSubtype; methods: CustomMethods };
 const methodMaps = [] as Array<MethodMap>;
 
-// Assumption: prepareSubtypes() has run first or is the caller.
 // Use `getCustomMethods` to call subtype-specialized methods, like `render`.
 export const getCustomMethods = (subtype: CustomSubtype | undefined) => {
   const map = methodMaps.find((method) => method.subtype === subtype);
   return map?.methods;
 };
 
+export const addCustomMethods = (
+  subtype: CustomSubtype,
+  methods: CustomMethods,
+) => {
+  if (!methodMaps.find((method) => method.subtype === subtype)) {
+    methodMaps.push({ subtype, methods });
+  }
+};
+
 // Functions to prepare subtypes for use
 export type SubtypePrepFn = (
-  methods: CustomMethods,
   addCustomAction: (action: Action) => void,
+  addLangData: (
+    fallbackLangData: Object,
+    setLanguageAux: (langCode: string) => Promise<Object | undefined>,
+  ) => void,
   onSubtypeLoaded?: (
     hasSubtype: (element: ExcalidrawElement) => boolean,
   ) => void,
-) => void;
-
-const subtypePreps: { [key: CustomSubtype]: SubtypePrepFn } = {};
-
-// Hook to register the subtype so it can be prepared for use
-// when `prepareSubtypes()` is called.
-export const useSubtypePrep = (
-  subtypeTypes: SubtypeTypes,
-  prepareSubtype: SubtypePrepFn,
-  enabled: boolean,
 ) => {
-  useEffect(() => setSubtypeTypes(subtypeTypes, enabled));
-  subtypePreps[subtypeTypes.subtype] = prepareSubtype;
+  actions: Action[];
+  methods: CustomMethods;
 };
 
-// This is a non-hook form of `useSubtypePrep` for use in the
-// test helper API constructor.
-export const testSubtypePrep = (
-  subtypeTypes: SubtypeTypes,
-  prepareSubtype: SubtypePrepFn,
-  enabled: boolean,
-) => {
-  setSubtypeTypes(subtypeTypes, enabled);
-  subtypePreps[subtypeTypes.subtype] = prepareSubtype;
-};
-
-// The following method populates the typename arrays.
-// This MUST be done before calling prepareSubtypes().
-// The `enabled` parameter allows using this inside hooks.
-const setSubtypeTypes = (types: SubtypeTypes, enabled: boolean) => {
-  if (!enabled || customSubtypes.includes(types.subtype)) {
-    return;
+// This is the main method to set up the subtype.  The optional
+// `onSubtypeLoaded` callback may be used to re-render subtyped
+// `ExcalidrawElement`s after the subtype has finished async loading.
+// See the MathJax plugin in `@excalidraw/plugins` for example.
+export const prepareSubtype = (
+  types: SubtypeTypes,
+  subtypePrepFn: SubtypePrepFn,
+  onSubtypeLoaded?: (
+    hasSubtype: (element: ExcalidrawElement) => boolean,
+  ) => void,
+): { actions: Action[] | null; methods: CustomMethods } => {
+  const map = getCustomMethods(types.subtype);
+  if (map) {
+    return { actions: null, methods: map };
   }
+
+  // Register the types
   customSubtypes = [...customSubtypes, types.subtype];
   customParents = [...customParents, ...types.parents];
   customProps = [...customProps, ...types.customProps];
@@ -259,27 +259,15 @@ const setSubtypeTypes = (types: SubtypeTypes, enabled: boolean) => {
   disabledActions = [...disabledActions, ...types.disabledActions];
   customShortcutNames = [...customShortcutNames, ...types.customShortcutNames];
   customShortcutMap = { ...customShortcutMap, ...types.customShortcutMap };
-};
 
-// Prepare all custom subtypes.  Each subtype must first be registered
-// with `useSubtypePrep` or `testSubtypePrep` respectively.  This calls
-// the `SubtypePrepFn` provided at subtype registration.  The optional
-// `onSubtypeLoaded` callback may be used to re-render subtyped
-// `ExcalidrawElement`s after the subtype has finished async loading.
-// See the MathJax plugin in `@excalidraw/plugins` for example.
-export const prepareSubtypes = (
-  onSubtypeLoaded?: (
-    hasSubtype: (element: ExcalidrawElement) => boolean,
-  ) => void,
-) => {
-  customSubtypes.forEach((subtype) => {
-    if (!methodMaps.find((method) => method.subtype === subtype)) {
-      const methods = {} as CustomMethods;
-      methodMaps.push({ subtype, methods });
-      const prepareSubtype = subtypePreps[subtype];
-      prepareSubtype(methods, addCustomAction, onSubtypeLoaded);
-    }
-  });
+  // Prepare the subtype
+  const { actions, methods } = subtypePrepFn(
+    addCustomAction,
+    registerAuxLangData,
+    onSubtypeLoaded,
+  );
+  addCustomMethods(types.subtype, methods);
+  return { actions, methods };
 };
 
 // Ensure all subtypes are loaded before continuing, eg to
@@ -305,9 +293,11 @@ export const ensureSubtypesLoaded = async (
   // Use a for loop so we can do `await map.ensureLoaded()`
   for (let i = 0; i < subtypesUsed.length; i++) {
     const subtype = subtypesUsed[i];
-    // Should be defined if prepareSubtypes() has run
-    const map = getCustomMethods(subtype)!;
-    await map.ensureLoaded();
+    // Should be defined if prepareSubtype() has run
+    const map = getCustomMethods(subtype);
+    if (map) {
+      await map.ensureLoaded();
+    }
   }
   if (callback) {
     callback();

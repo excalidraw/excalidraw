@@ -1,13 +1,8 @@
-import {
-  EmptyPlugin,
-  setEmptyPluginLoadable,
-  testEmptyPlugin,
-  useEmptyPlugin,
-} from "./empty";
+import { ExcalidrawImperativeAPI } from "../../types";
+import { EmptyPlugin, setEmptyPluginLoadable, useEmptyPlugin } from "./empty";
 import {
   MathJaxPlugin,
   setMathJaxPluginLoadable,
-  testMathJaxPlugin,
   useMathJaxPlugin,
 } from "./mathjax";
 
@@ -16,7 +11,6 @@ import {
 // import {
 //   MyPlugin,
 //   setMyPluginLoadable,
-//   testMyPlugin,
 //   useMyPlugin,
 // } from "./myplugin";
 // ```
@@ -26,20 +20,15 @@ const validPlugins: readonly string[] = [EmptyPlugin, MathJaxPlugin];
 const pluginsUsed: string[] = [];
 
 // The main invocation hook for use in the UI (excalidraw.com and
-// `@excalidraw/excalidraw`)
-export const usePlugins = (plugins?: string[]) => {
+// with `@excalidraw/excalidraw`)
+export const usePlugins = (
+  api: ExcalidrawImperativeAPI | null,
+  plugins?: string[],
+) => {
   selectPluginsToLoad(plugins);
-  useEmptyPlugin();
-  useMathJaxPlugin();
+  useEmptyPlugin(api);
+  useMathJaxPlugin(api);
   // Plugin authors: add a line here like `useMyPlugin();`
-};
-
-// The main invocation function for use in the test helper API.
-export const testPlugins = (plugins?: string[]) => {
-  selectPluginsToLoad(plugins);
-  testEmptyPlugin();
-  testMathJaxPlugin();
-  // Plugin authors: add a line here like `testMyPlugin();`
 };
 
 // This MUST be called before the `usePlugin`/`testPlugin` calls.

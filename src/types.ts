@@ -14,6 +14,7 @@ import {
   ExcalidrawImageElement,
   Theme,
 } from "./element/types";
+import { Action } from "./actions/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
@@ -29,6 +30,7 @@ import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
+import { SubtypeTypes, SubtypePrepFn, CustomMethods } from "./subtypes";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -468,6 +470,10 @@ export type ExcalidrawImperativeAPI = {
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
+  addSubtype: (
+    subtypeTypes: SubtypeTypes,
+    SubtypePrepFn: SubtypePrepFn,
+  ) => { actions: Action[] | null; methods: CustomMethods };
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
   addFiles: (data: BinaryFileData[]) => void;

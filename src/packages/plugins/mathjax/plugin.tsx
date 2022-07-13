@@ -1390,35 +1390,38 @@ const createMathActions = () => {
 };
 
 export const prepareMathSubtype = function (
-  methods,
   addCustomAction,
+  addLangData,
   onSubtypeLoaded,
 ) {
   // Set the callback first just in case anything in this method
   // calls loadMathJax().
   mathJaxLoadedCallback = onSubtypeLoaded;
+
+  const methods = {} as CustomMethods;
   methods.clean = cleanMathElementUpdate;
   methods.ensureLoaded = ensureMathJaxLoaded;
   methods.measureText = measureMathElement;
   methods.render = renderMathElement;
   methods.renderSvg = renderSvgMathElement;
   methods.wrapText = wrapMathElement;
-  createMathActions().forEach((action) => addCustomAction(action));
+  const getLangData = async (langCode: string): Promise<Object | undefined> => {
+    try {
+      const condData = await import(
+        /* webpackChunkName: "locales/[request]" */ `./locales/${langCode}.json`
+      );
+      if (condData) {
+        return condData;
+      }
+    } catch (e) {}
+    return undefined;
+  };
+  addLangData(fallbackMathJaxLangData, getLangData);
+  registerAuxLangData(fallbackMathJaxLangData, getLangData);
 
-  registerAuxLangData(
-    fallbackMathJaxLangData,
-    async (langCode: string): Promise<Object | undefined> => {
-      try {
-        const condData = await import(
-          /* webpackChunkName: "locales/[request]" */ `./locales/${langCode}.json`
-        );
-        if (condData) {
-          return condData;
-        }
-      } catch (e) {}
-      return undefined;
-    },
-  );
-
+  const actions = createMathActions();
+  actions.forEach((action) => addCustomAction(action));
   // Call loadMathJax() here if we want to be sure it's loaded.
+
+  return { actions, methods };
 } as SubtypePrepFn;

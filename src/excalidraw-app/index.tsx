@@ -4,7 +4,7 @@ import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { usePlugins } from "@excalidraw/plugins";
+import { usePlugins } from "@excalidraw/plugins/index";
 import {
   APP_NAME,
   COOKIES,
@@ -224,7 +224,6 @@ const PlusAppLinkJSX = (
 );
 
 const ExcalidrawWrapper = () => {
-  usePlugins();
   const [errorMessage, setErrorMessage] = useState("");
   let currentLangCode = languageDetector.detect() || defaultLang.code;
   if (Array.isArray(currentLangCode)) {
@@ -252,6 +251,8 @@ const ExcalidrawWrapper = () => {
 
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
+
+  usePlugins(excalidrawAPI);
 
   const [collabAPI] = useAtom(collabAPIAtom);
   const [, setCollabDialogShown] = useAtom(collabDialogShownAtom);

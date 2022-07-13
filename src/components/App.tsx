@@ -225,7 +225,13 @@ import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { getCustomActions, prepareSubtypes } from "../subtypes";
+import {
+  SubtypePrepFn,
+  SubtypeTypes,
+  getCustomActions,
+  getCustomSubtypes,
+  prepareSubtype,
+} from "../subtypes";
 import {
   dataURLToFile,
   generateIdFromFile,
@@ -364,46 +370,6 @@ class App extends React.Component<AppProps, AppState> {
     this.id = nanoid();
 
     this.library = new Library(this);
-    if (excalidrawRef) {
-      const readyPromise =
-        ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
-        resolvablePromise<ExcalidrawImperativeAPI>();
-
-      const api: ExcalidrawImperativeAPI = {
-        ready: true,
-        readyPromise,
-        updateScene: this.updateScene,
-        updateLibrary: this.library.updateLibrary,
-        addFiles: this.addFiles,
-        resetScene: this.resetScene,
-        getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
-        history: {
-          clear: this.resetHistory,
-        },
-        scrollToContent: this.scrollToContent,
-        getSceneElements: this.getSceneElements,
-        getAppState: () => this.state,
-        getFiles: () => this.files,
-        refresh: this.refresh,
-        setToast: this.setToast,
-        id: this.id,
-        setActiveTool: this.setActiveTool,
-        setCursor: this.setCursor,
-        resetCursor: this.resetCursor,
-      } as const;
-      if (typeof excalidrawRef === "function") {
-        excalidrawRef(api);
-      } else {
-        excalidrawRef.current = api;
-      }
-      readyPromise.resolve(api);
-    }
-
-    this.excalidrawContainerValue = {
-      container: this.excalidrawContainerRef.current,
-      id: this.id,
-    };
-
     this.scene = new Scene();
 
     // Call this method after finishing any async loading for
@@ -430,7 +396,56 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({});
       }
     };
-    prepareSubtypes(refresh);
+
+    if (excalidrawRef) {
+      const readyPromise =
+        ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
+        resolvablePromise<ExcalidrawImperativeAPI>();
+
+      const api: ExcalidrawImperativeAPI = {
+        ready: true,
+        readyPromise,
+        updateScene: this.updateScene,
+        updateLibrary: this.library.updateLibrary,
+        addFiles: this.addFiles,
+        resetScene: this.resetScene,
+        getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
+        history: {
+          clear: this.resetHistory,
+        },
+        scrollToContent: this.scrollToContent,
+        getSceneElements: this.getSceneElements,
+        getAppState: () => this.state,
+        getFiles: () => this.files,
+        addSubtype: (
+          subtypeTypes: SubtypeTypes,
+          subtypePrepFn: SubtypePrepFn,
+        ) => {
+          const prep = prepareSubtype(subtypeTypes, subtypePrepFn, refresh);
+          if (prep.actions) {
+            this.actionManager.registerAll(prep.actions);
+          }
+          return prep;
+        },
+        refresh: this.refresh,
+        setToast: this.setToast,
+        id: this.id,
+        setActiveTool: this.setActiveTool,
+        setCursor: this.setCursor,
+        resetCursor: this.resetCursor,
+      } as const;
+      if (typeof excalidrawRef === "function") {
+        excalidrawRef(api);
+      } else {
+        excalidrawRef.current = api;
+      }
+      readyPromise.resolve(api);
+    }
+
+    this.excalidrawContainerValue = {
+      container: this.excalidrawContainerRef.current,
+      id: this.id,
+    };
 
     this.history = new History();
     this.actionManager = new ActionManager(
@@ -531,6 +546,9 @@ class App extends React.Component<AppProps, AppState> {
         >
           <DeviceContext.Provider value={this.device}>
             <LayerUI
+              renderShapeToggles={getCustomSubtypes().map((subtype) =>
+                this.actionManager.renderAction(subtype),
+              )}
               canvas={this.canvas}
               appState={this.state}
               files={this.files}

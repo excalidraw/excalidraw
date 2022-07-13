@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import React, { useCallback } from "react";
-import { getCustomSubtypes } from "../subtypes";
 import { ActionManager } from "../actions/manager";
 import { CLASSES, LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { exportCanvas } from "../data";
@@ -58,6 +57,7 @@ interface LayerUIProps {
   toggleZenMode: () => void;
   langCode: Language["code"];
   isCollaborating: boolean;
+  renderShapeToggles?: (JSX.Element | null)[];
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomFooter?: ExcalidrawProps["renderFooter"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
@@ -85,6 +85,7 @@ const LayerUI = ({
   showThemeBtn,
   toggleZenMode,
   isCollaborating,
+  renderShapeToggles,
   renderTopRightUI,
   renderCustomFooter,
   renderCustomStats,
@@ -357,9 +358,7 @@ const LayerUI = ({
                             });
                           }}
                         />
-                        {getCustomSubtypes().map((subtype) =>
-                          actionManager.renderAction(subtype),
-                        )}
+                        {renderShapeToggles}
                       </Stack.Row>
                     </Island>
                     <LibraryButton
@@ -546,6 +545,7 @@ const LayerUI = ({
         onPenModeToggle={onPenModeToggle}
         canvas={canvas}
         isCollaborating={isCollaborating}
+        renderShapeToggles={renderShapeToggles}
         renderCustomFooter={renderCustomFooter}
         viewModeEnabled={viewModeEnabled}
         showThemeBtn={showThemeBtn}
