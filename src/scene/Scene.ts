@@ -52,6 +52,9 @@ class Scene {
   private elements: readonly ExcalidrawElement[] = [];
   private elementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
 
+  // ts -> elements
+  private elementsSnapshots = new Map<Number, ExcalidrawElement[]>();
+
   getElementsIncludingDeleted() {
     return this.elements;
   }
