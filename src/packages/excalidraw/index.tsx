@@ -226,3 +226,5 @@ export {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
 } from "../../utils";
+
+export { useDevice } from "../../components/App";

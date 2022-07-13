@@ -4,13 +4,7 @@ import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import {
-  APP_NAME,
-  COOKIES,
-  EVENT,
-  TITLE_TIMEOUT,
-  VERSION_TIMEOUT,
-} from "../constants";
+import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
 import { loadFromBlob } from "../data/blob";
 import {
   ExcalidrawElement,
@@ -76,10 +70,10 @@ import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 import Footer from "./components/Footer";
-
-export const isExcalidrawPlusSignedUser = document.cookie.includes(
-  COOKIES.AUTH_STATE_COOKIE,
-);
+import PlusAppLink, {
+  isExcalidrawPlusSignedUser,
+} from "./components/PlusAppLink";
+import PlusLPLink from "./components/PlusLPLink";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -190,31 +184,6 @@ const initializeScene = async (opts: {
   }
   return { scene: null, isExternalScene: false };
 };
-
-export const PlusLPLinkJSX = (
-  <p style={{ direction: "ltr", unicodeBidi: "embed" }}>
-    Introducing Excalidraw+
-    <br />
-    <a
-      href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=banner&utm_campaign=launch"
-      target="_blank"
-      rel="noreferrer"
-    >
-      Try out now!
-    </a>
-  </p>
-);
-
-export const PlusAppLinkJSX = (
-  <a
-    href={`${process.env.REACT_APP_PLUS_APP}/#excalidraw-redirect`}
-    target="_blank"
-    rel="noreferrer"
-    className="plus-button"
-  >
-    Go to Excalidraw+
-  </a>
-);
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -575,7 +544,7 @@ const ExcalidrawWrapper = () => {
             textAlign: "center",
           }}
         >
-          {isExcalidrawPlusSignedUser ? PlusAppLinkJSX : PlusLPLinkJSX}
+          {isExcalidrawPlusSignedUser ? <PlusAppLink /> : <PlusLPLink />}
         </div>
       );
     },

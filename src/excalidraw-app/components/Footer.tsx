@@ -1,10 +1,10 @@
-import { isExcalidrawPlusSignedUser, PlusAppLinkJSX, PlusLPLinkJSX } from "..";
-import { useDevice } from "../../components/App";
 import { shield } from "../../components/icons";
 import { Tooltip } from "../../components/Tooltip";
 import { t } from "../../i18n";
-import { languages } from "../../packages/excalidraw/index";
+import { languages, useDevice } from "../../packages/excalidraw/index";
 import { LanguageList } from "./LanguageList";
+import PlusAppLink, { isExcalidrawPlusSignedUser } from "./PlusAppLink";
+import PlusLPLink from "./PlusLPLink";
 
 const EncryptedIcon = () => (
   <a
@@ -59,7 +59,7 @@ const Footer = ({
             borderRadius: 12,
           }}
         >
-          {isExcalidrawPlusSignedUser ? PlusAppLinkJSX : PlusLPLinkJSX}
+          {isExcalidrawPlusSignedUser ? <PlusAppLink /> : <PlusLPLink />}
         </div>
       </div>
     );
