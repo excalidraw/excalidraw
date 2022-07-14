@@ -36,7 +36,6 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  viewModeEnabled: boolean;
   showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
@@ -60,7 +59,6 @@ export const MobileMenu = ({
   canvas,
   isCollaborating,
   renderCustomFooter,
-  viewModeEnabled,
   showThemeBtn,
   onImageAction,
   renderTopRightUI,
@@ -125,7 +123,7 @@ export const MobileMenu = ({
       !appState.editingElement &&
       getSelectedElements(elements, appState).length === 0;
 
-    if (viewModeEnabled) {
+    if (appState.viewModeEnabled) {
       return (
         <div className="App-toolbar-content">
           {actionManager.renderAction("toggleCanvasMenu")}
@@ -151,7 +149,7 @@ export const MobileMenu = ({
   };
 
   const renderCanvasActions = () => {
-    if (viewModeEnabled) {
+    if (appState.viewModeEnabled) {
       return (
         <>
           {renderJSONExportDialog()}
@@ -185,7 +183,7 @@ export const MobileMenu = ({
   };
   return (
     <>
-      {!viewModeEnabled && renderToolbar()}
+      {!appState.viewModeEnabled && renderToolbar()}
       {renderStats()}
       <div
         className="App-bottom-bar"
@@ -216,7 +214,7 @@ export const MobileMenu = ({
               </div>
             </Section>
           ) : appState.openMenu === "shape" &&
-            !viewModeEnabled &&
+            !appState.viewModeEnabled &&
             showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
               <SelectedShapeActions
