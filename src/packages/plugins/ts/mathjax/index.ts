@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { ExcalidrawImperativeAPI } from "../../../types";
-import { addCustomMethods } from "../../../subtypes";
+import { ExcalidrawImperativeAPI } from "../../../../types";
+import { addCustomMethods } from "../../../../subtypes";
 import { getMathSubtypeTypes, mathSubtype } from "./types";
 import { prepareMathSubtype } from "./plugin";
 

@@ -1,3 +1,3 @@
 import "./publicPath";
 
-export * from "./node-main";
+export * from "./ts/node-main";

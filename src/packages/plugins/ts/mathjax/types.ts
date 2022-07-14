@@ -1,5 +1,5 @@
-import { getShortcutKey } from "../../../utils";
-import { SubtypeTypes } from "../../../subtypes";
+import { getShortcutKey } from "../../../../utils";
+import { SubtypeTypes } from "../../../../subtypes";
 
 // Exports
 export const mathSubtype = "math" as const;

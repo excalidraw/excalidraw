@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { ExcalidrawImperativeAPI } from "../../../types";
+import { ExcalidrawImperativeAPI } from "../../../../types";
 
 // Plugin authors: provide a plugin name here like "myplugin"
 export const EmptyPlugin = "empty";

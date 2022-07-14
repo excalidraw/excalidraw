@@ -1,13 +1,13 @@
 // Some imports
 import fallbackMathJaxLangData from "./locales/en.json";
-import { BOUND_TEXT_PADDING, FONT_FAMILY, SVG_NS } from "../../../constants";
+import { BOUND_TEXT_PADDING, FONT_FAMILY, SVG_NS } from "../../../../constants";
 import {
   getFontString,
   getFontFamilyString,
   getShortcutKey,
   isRTL,
   updateActiveTool,
-} from "../../../utils";
+} from "../../../../utils";
 import {
   getApproxLineHeight,
   getBoundTextElement,
@@ -15,35 +15,38 @@ import {
   getTextWidth,
   measureText,
   wrapText,
-} from "../../../element/textElement";
+} from "../../../../element/textElement";
 import {
   hasBoundTextElement,
   isTextElement,
-} from "../../../element/typeChecks";
+} from "../../../../element/typeChecks";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   NonDeleted,
-} from "../../../element/types";
-import { newElementWith } from "../../../element/mutateElement";
-import { getElementAbsoluteCoords } from "../../../element/bounds";
+} from "../../../../element/types";
+import { newElementWith } from "../../../../element/mutateElement";
+import { getElementAbsoluteCoords } from "../../../../element/bounds";
 
 // Imports for actions
-import { t, registerAuxLangData } from "../../../i18n";
-import { Action } from "../../../actions/types";
-import { AppState } from "../../../types";
+import { t, registerAuxLangData } from "../../../../i18n";
+import { Action } from "../../../../actions/types";
+import { AppState } from "../../../../types";
 import {
   changeProperty,
   getFormValue,
-} from "../../../actions/actionProperties";
-import { getSelectedElements } from "../../../scene";
-import { getNonDeletedElements, redrawTextBoundingBox } from "../../../element";
-import { ButtonSelect } from "../../../components/ButtonSelect";
-import { ToolButton } from "../../../components/ToolButton";
+} from "../../../../actions/actionProperties";
+import { getSelectedElements } from "../../../../scene";
+import {
+  getNonDeletedElements,
+  redrawTextBoundingBox,
+} from "../../../../element";
+import { ButtonSelect } from "../../../../components/ButtonSelect";
+import { ToolButton } from "../../../../components/ToolButton";
 import clsx from "clsx";
 
 // Subtype imports
-import { CustomMethods, SubtypePrepFn } from "../../../subtypes";
+import { CustomMethods, SubtypePrepFn } from "../../../../subtypes";
 import { mathSubtypeIcon } from "./icon";
 import { MathProps, mathSubtype } from "./types";
 
@@ -857,8 +860,9 @@ const renderMathElement = function (element, context, renderCb) {
       context.restore();
     }
   };
-  const parentWidth = _element.containerId
-    ? getContainerElement(_element)!.width - BOUND_TEXT_PADDING * 2
+  const container = getContainerElement(_element);
+  const parentWidth = container
+    ? container.width - BOUND_TEXT_PADDING * 2
     : undefined;
   renderMath(
     text,
@@ -925,8 +929,9 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   }
   tempSvg.appendChild(groupNode);
 
-  const parentWidth = _element.containerId
-    ? getContainerElement(_element)!.width - BOUND_TEXT_PADDING * 2
+  const container = getContainerElement(_element);
+  const parentWidth = container
+    ? container.width - BOUND_TEXT_PADDING * 2
     : undefined;
   const { width, height } = getImageMetrics(
     text,

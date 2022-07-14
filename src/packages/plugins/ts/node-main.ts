@@ -1,4 +1,4 @@
-import { ExcalidrawImperativeAPI } from "../../types";
+import { ExcalidrawImperativeAPI } from "../../../types";
 import { EmptyPlugin, setEmptyPluginLoadable, useEmptyPlugin } from "./empty";
 import {
   MathJaxPlugin,
