@@ -469,7 +469,6 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public render() {
-    const { zenModeEnabled, viewModeEnabled } = this.state;
     const selectedElement = getSelectedElements(
       this.scene.getNonDeletedElements(),
       this.state,
@@ -484,7 +483,7 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
-          "excalidraw--view-mode": viewModeEnabled,
+          "excalidraw--view-mode": this.state.viewModeEnabled,
           "excalidraw--mobile": this.device.isMobile,
         })}
         ref={this.excalidrawContainerRef}
@@ -515,17 +514,14 @@ class App extends React.Component<AppProps, AppState> {
                   files: null,
                 })
               }
-              zenModeEnabled={zenModeEnabled}
-              toggleZenMode={this.toggleZenMode}
               langCode={getLanguage().code}
               isCollaborating={this.props.isCollaborating}
               renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
               renderCustomStats={renderCustomStats}
-              viewModeEnabled={viewModeEnabled}
               showExitZenModeBtn={
                 typeof this.props?.zenModeEnabled === "undefined" &&
-                zenModeEnabled
+                this.state.zenModeEnabled
               }
               showThemeBtn={
                 typeof this.props?.theme === "undefined" &&
@@ -1630,10 +1626,6 @@ class App extends React.Component<AppProps, AppState> {
         penMode: !prevState.penMode,
       };
     });
-  };
-
-  toggleZenMode = () => {
-    this.actionManager.executeAction(actionToggleZenMode);
   };
 
   scrollToContent = (
