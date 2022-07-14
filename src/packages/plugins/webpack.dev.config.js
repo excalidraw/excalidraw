@@ -1,72 +1,19 @@
 const path = require("path");
 const webpack = require("webpack");
-const autoprefixer = require("autoprefixer");
+const { merge } = require("webpack-merge");
 const { parseEnvVariables } = require("./env");
+const configCommon = require("../common.webpack.dev.config");
 
 const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
-module.exports = {
-  mode: "development",
-  devtool: false,
+config = {
   entry: {
     "excalidraw-plugins.development": "./index.ts",
   },
   output: {
     path: path.resolve(__dirname, outputDir),
-    library: "ExcalidrawPlugins",
-    libraryTarget: "umd",
-    filename: "[name].js",
+    library: "ExcalidrawPluginsLib",
     chunkFilename: "excalidraw-plugins-assets-dev/[name]-[contenthash].js",
     assetModuleFilename: "excalidraw-plugins-assets-dev/[name][ext]",
-
-    publicPath: "",
-  },
-  resolve: {
-    extensions: [".js", ".ts", ".tsx", ".css", ".scss"],
-  },
-  module: {
-    rules: [
-      {
-        test: /\.(sa|sc|c)ss$/,
-        exclude: /node_modules/,
-        use: [
-          "style-loader",
-          { loader: "css-loader" },
-          {
-            loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [autoprefixer()],
-              },
-            },
-          },
-          "sass-loader",
-        ],
-      },
-      {
-        test: /\.(ts|tsx|js|jsx|mjs)$/,
-        exclude: /node_modules\/(?!browser-fs-access)/,
-        use: [
-          {
-            loader: "ts-loader",
-            options: {
-              transpileOnly: true,
-              configFile: path.resolve(__dirname, "../tsconfig.dev.json"),
-            },
-          },
-        ],
-      },
-    ],
-  },
-  optimization: {
-    splitChunks: {
-      chunks: "async",
-      cacheGroups: {
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          name: "vendor",
-        },
-      },
-    },
   },
   plugins: [
     new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ }),
@@ -76,18 +23,5 @@ module.exports = {
       ),
     }),
   ],
-  externals: {
-    react: {
-      root: "React",
-      commonjs2: "react",
-      commonjs: "react",
-      amd: "react",
-    },
-    "react-dom": {
-      root: "ReactDOM",
-      commonjs2: "react-dom",
-      commonjs: "react-dom",
-      amd: "react-dom",
-    },
-  },
 };
+module.exports = merge(configCommon, config);
