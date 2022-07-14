@@ -61,8 +61,6 @@ module.exports = {
       },
     },
   },
-  plugins: [
-  ],
   externals: {
     react: {
       root: "React",

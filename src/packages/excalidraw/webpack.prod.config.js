@@ -7,7 +7,7 @@ const { merge } = require("webpack-merge");
 const { parseEnvVariables } = require("./env");
 const configCommon = require("../common.webpack.prod.config");
 
-config = {
+const config = {
   entry: {
     "excalidraw.production.min": "./entry.js",
   },

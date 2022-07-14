@@ -5,7 +5,7 @@ const { parseEnvVariables } = require("./env");
 const configCommon = require("../common.webpack.dev.config");
 
 const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
-config = {
+const config = {
   entry: {
     "excalidraw-plugins.development": "./index.ts",
   },
