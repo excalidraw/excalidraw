@@ -63,7 +63,7 @@
     "typescript": "4.6.4",
     "webpack": "5.72.0",
     "webpack-bundle-analyzer": "4.5.0",
-    "webpack-cli": "4.9.2",
+    "webpack-cli": "4.10.0",
     "webpack-dev-server": "4.9.3",
     "webpack-merge": "5.8.0"
   },
@@ -72,9 +72,12 @@
   "scripts": {
     "gen:types": "tsc --project ../../../tsconfig-types.json",
     "build:umd": "rm -rf dist && cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",
+    "build:umd:dev": "cross-env NODE_ENV=development webpack --config webpack.dev.config.js",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
     "pack": "yarn build:umd && yarn pack",
-    "install:deps": "yarn install --frozen-lockfile && yarn --cwd ../../../"
+    "start": "webpack serve --config webpack.dev-server.config.js",
+    "install:deps": "yarn install --frozen-lockfile && yarn --cwd ../../../",
+    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js"
   },
   "dependencies": {
     "mathjax-full": "3.2.2",

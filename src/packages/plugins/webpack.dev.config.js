@@ -3,7 +3,7 @@ const webpack = require("webpack");
 const autoprefixer = require("autoprefixer");
 const { parseEnvVariables } = require("./env");
 
-const outputDir = "dist";
+const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
 module.exports = {
   mode: "development",
   devtool: false,

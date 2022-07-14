@@ -96,6 +96,8 @@
     "build:app": "REACT_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA react-scripts build",
     "build:version": "node ./scripts/build-version.js",
     "build:prebuild": "node ./scripts/prebuild.js",
+    "build:packages": "yarn --cwd src/packages/excalidraw build:umd && yarn --cwd src/packages/plugins build:umd",
+    "build:packages:dev": "yarn --cwd src/packages/excalidraw build:umd:dev && yarn --cwd src/packages/plugins build:umd:dev",
     "build": "yarn build:prebuild && yarn build:app && yarn build:version",
     "eject": "react-scripts eject",
     "fix:code": "yarn test:code --fix",
