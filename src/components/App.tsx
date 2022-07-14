@@ -950,7 +950,10 @@ class App extends React.Component<AppProps, AppState> {
     document.removeEventListener(EVENT.COPY, this.onCopy);
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.removeEventListener(EVENT.CUT, this.onCut);
-    document.removeEventListener(EVENT.WHEEL, this.onWheel);
+    this.excalidrawContainerRef.current?.removeEventListener(
+      EVENT.WHEEL,
+      this.onWheel,
+    );
     this.nearestScrollableContainer?.removeEventListener(
       EVENT.SCROLL,
       this.onScroll,
@@ -999,7 +1002,11 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     document.addEventListener(EVENT.POINTER_UP, this.removePointer); // #3553
     document.addEventListener(EVENT.COPY, this.onCopy);
-    document.addEventListener(EVENT.WHEEL, this.onWheel, { passive: false });
+    this.excalidrawContainerRef.current?.addEventListener(
+      EVENT.WHEEL,
+      this.onWheel,
+      { passive: false },
+    );
 
     if (this.props.handleKeyboardGlobally) {
       document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
