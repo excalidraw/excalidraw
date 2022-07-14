@@ -5,10 +5,10 @@ import App from "../../excalidraw/example/App";
 
 declare global {
   interface Window {
-    ExcalidrawPlugins: any;
+    ExcalidrawPluginsLib: any;
   }
 }
-const { usePlugins } = window.ExcalidrawPlugins;
+const { usePlugins } = window.ExcalidrawPluginsLib;
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(
