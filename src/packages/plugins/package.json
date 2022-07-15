@@ -59,8 +59,8 @@
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
     "pack": "yarn build:umd && yarn pack",
     "start": "webpack serve --config webpack.dev-server.config.js",
-    "install:deps": "yarn install --frozen-lockfile --cwd ../ && yarn install --frozen-lockfile && yarn --cwd ../../../ && yarn --cwd ../excalidraw build:umd:dev",
-    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js"
+    "install:deps": "yarn --cwd ../ install --frozen-lockfile && yarn install --frozen-lockfile && yarn --cwd ../../../ install --frozen-lockfile",
+    "build:example": "yarn --cwd ../excalidraw build:umd:dev && EXAMPLE=true webpack --config webpack.dev-server.config.js"
   },
   "dependencies": {
     "mathjax-full": "3.2.2",
