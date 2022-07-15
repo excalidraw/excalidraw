@@ -1261,7 +1261,7 @@ class App extends React.Component<AppProps, AppState> {
 
         this.scheduleImageRefresh();
       },
-      THROTTLE_NEXT_RENDER,
+      THROTTLE_NEXT_RENDER && window.EXCALIDRAW_THROTTLE_RENDER === true,
     );
 
     if (!THROTTLE_NEXT_RENDER) {
