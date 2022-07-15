@@ -4,7 +4,7 @@ import { useExcalidrawContainer } from "./App";
 
 interface SectionProps extends React.HTMLProps<HTMLElement> {
   heading: string;
-  children: React.ReactNode | ((header: React.ReactNode) => React.ReactNode);
+  children?: any;
 }
 
 export const Section = ({ heading, children, ...props }: SectionProps) => {
