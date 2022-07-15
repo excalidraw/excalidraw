@@ -39,6 +39,7 @@ import { trackEvent } from "../analytics";
 import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
+import { actionToggleZenMode } from "../actions";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -51,17 +52,14 @@ interface LayerUIProps {
   onLockToggle: () => void;
   onPenModeToggle: () => void;
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
-  zenModeEnabled: boolean;
   showExitZenModeBtn: boolean;
   showThemeBtn: boolean;
-  toggleZenMode: () => void;
   langCode: Language["code"];
   isCollaborating: boolean;
   renderShapeToggles?: (JSX.Element | null)[];
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomFooter?: ExcalidrawProps["renderFooter"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
-  viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   UIOptions: AppProps["UIOptions"];
   focusContainer: () => void;
@@ -80,16 +78,13 @@ const LayerUI = ({
   onLockToggle,
   onPenModeToggle,
   onInsertElements,
-  zenModeEnabled,
   showExitZenModeBtn,
   showThemeBtn,
-  toggleZenMode,
   isCollaborating,
   renderShapeToggles,
   renderTopRightUI,
   renderCustomFooter,
   renderCustomStats,
-  viewModeEnabled,
   libraryReturnUrl,
   UIOptions,
   focusContainer,
@@ -173,7 +168,7 @@ const LayerUI = ({
       <Section
         heading="canvasActions"
         className={clsx("zen-mode-transition", {
-          "transition-left": zenModeEnabled,
+          "transition-left": appState.zenModeEnabled,
         })}
       >
         {/* the zIndex ensures this menu has higher stacking order,
@@ -194,7 +189,7 @@ const LayerUI = ({
     <Section
       heading="canvasActions"
       className={clsx("zen-mode-transition", {
-        "transition-left": zenModeEnabled,
+        "transition-left": appState.zenModeEnabled,
       })}
     >
       {/* the zIndex ensures this menu has higher stacking order,
@@ -234,7 +229,7 @@ const LayerUI = ({
     <Section
       heading="selectedShapeActions"
       className={clsx("zen-mode-transition", {
-        "transition-left": zenModeEnabled,
+        "transition-left": appState.zenModeEnabled,
       })}
     >
       <Island
@@ -304,32 +299,34 @@ const LayerUI = ({
         <div className="App-menu App-menu_top">
           <Stack.Col
             gap={4}
-            className={clsx({ "disable-pointerEvents": zenModeEnabled })}
+            className={clsx({
+              "disable-pointerEvents": appState.zenModeEnabled,
+            })}
           >
-            {viewModeEnabled
+            {appState.viewModeEnabled
               ? renderViewModeCanvasActions()
               : renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
-          {!viewModeEnabled && (
+          {!appState.viewModeEnabled && (
             <Section heading="shapes">
               {(heading) => (
                 <Stack.Col gap={4} align="start">
                   <Stack.Row
                     gap={1}
                     className={clsx("App-toolbar-container", {
-                      "zen-mode": zenModeEnabled,
+                      "zen-mode": appState.zenModeEnabled,
                     })}
                   >
                     <PenModeButton
-                      zenModeEnabled={zenModeEnabled}
+                      zenModeEnabled={appState.zenModeEnabled}
                       checked={appState.penMode}
                       onChange={onPenModeToggle}
                       title={t("toolBar.penMode")}
                       penDetected={appState.penDetected}
                     />
                     <LockButton
-                      zenModeEnabled={zenModeEnabled}
+                      zenModeEnabled={appState.zenModeEnabled}
                       checked={appState.activeTool.locked}
                       onChange={() => onLockToggle()}
                       title={t("toolBar.lock")}
@@ -337,7 +334,7 @@ const LayerUI = ({
                     <Island
                       padding={1}
                       className={clsx("App-toolbar", {
-                        "zen-mode": zenModeEnabled,
+                        "zen-mode": appState.zenModeEnabled,
                       })}
                     >
                       <HintViewer
@@ -374,7 +371,7 @@ const LayerUI = ({
             className={clsx(
               "layer-ui__wrapper__top-right zen-mode-transition",
               {
-                "transition-right": zenModeEnabled,
+                "transition-right": appState.zenModeEnabled,
               },
             )}
           >
@@ -399,7 +396,8 @@ const LayerUI = ({
           className={clsx(
             "layer-ui__wrapper__footer-left zen-mode-transition",
             {
-              "layer-ui__wrapper__footer-left--transition-left": zenModeEnabled,
+              "layer-ui__wrapper__footer-left--transition-left":
+                appState.zenModeEnabled,
             },
           )}
         >
@@ -411,12 +409,12 @@ const LayerUI = ({
                   zoom={appState.zoom}
                 />
               </Island>
-              {!viewModeEnabled && (
+              {!appState.viewModeEnabled && (
                 <>
                   <div
                     className={clsx("undo-redo-buttons zen-mode-transition", {
                       "layer-ui__wrapper__footer-left--transition-bottom":
-                        zenModeEnabled,
+                        appState.zenModeEnabled,
                     })}
                   >
                     {actionManager.renderAction("undo", { size: "small" })}
@@ -426,20 +424,20 @@ const LayerUI = ({
                   <div
                     className={clsx("eraser-buttons zen-mode-transition", {
                       "layer-ui__wrapper__footer-left--transition-left":
-                        zenModeEnabled,
+                        appState.zenModeEnabled,
                     })}
                   >
                     {actionManager.renderAction("eraser", { size: "small" })}
                   </div>
                 </>
               )}
-              {!viewModeEnabled &&
+              {!appState.viewModeEnabled &&
                 appState.multiElement &&
                 device.isTouchScreen && (
                   <div
                     className={clsx("finalize-button zen-mode-transition", {
                       "layer-ui__wrapper__footer-left--transition-left":
-                        zenModeEnabled,
+                        appState.zenModeEnabled,
                     })}
                   >
                     {actionManager.renderAction("finalize", { size: "small" })}
@@ -453,7 +451,7 @@ const LayerUI = ({
             "layer-ui__wrapper__footer-center zen-mode-transition",
             {
               "layer-ui__wrapper__footer-left--transition-bottom":
-                zenModeEnabled,
+                appState.zenModeEnabled,
             },
           )}
         >
@@ -463,7 +461,7 @@ const LayerUI = ({
           className={clsx(
             "layer-ui__wrapper__footer-right zen-mode-transition",
             {
-              "transition-right disable-pointerEvents": zenModeEnabled,
+              "transition-right disable-pointerEvents": appState.zenModeEnabled,
             },
           )}
         >
@@ -473,7 +471,7 @@ const LayerUI = ({
           className={clsx("disable-zen-mode", {
             "disable-zen-mode--visible": showExitZenModeBtn,
           })}
-          onClick={toggleZenMode}
+          onClick={() => actionManager.executeAction(actionToggleZenMode)}
         >
           {t("buttons.exitZenMode")}
         </button>
@@ -547,7 +545,6 @@ const LayerUI = ({
         isCollaborating={isCollaborating}
         renderShapeToggles={renderShapeToggles}
         renderCustomFooter={renderCustomFooter}
-        viewModeEnabled={viewModeEnabled}
         showThemeBtn={showThemeBtn}
         onImageAction={onImageAction}
         renderTopRightUI={renderTopRightUI}
