@@ -41,15 +41,6 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },
-  "devDependencies": {
-    "cross-env": "7.0.3",
-    "terser-webpack-plugin": "5.3.1",
-    "webpack": "5.72.0",
-    "webpack-bundle-analyzer": "4.5.0",
-    "webpack-cli": "4.10.0",
-    "webpack-dev-server": "4.9.3",
-    "webpack-merge": "5.8.0"
-  },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/plugins",
   "scripts": {
@@ -59,7 +50,7 @@
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
     "pack": "yarn build:umd && yarn pack",
     "start": "webpack serve --config webpack.dev-server.config.js",
-    "install:deps": "yarn --cwd ../ install --frozen-lockfile && yarn install --frozen-lockfile && yarn --cwd ../../../ install --frozen-lockfile",
+    "install:deps": "yarn --cwd ../ install --frozen-lockfile && yarn install --frozen-lockfile && yarn --cwd ../../../ install --frozen-lockfile && node ../../../scripts/prebuild-packages.js plugins",
     "build:example": "yarn --cwd ../excalidraw build:umd:dev && EXAMPLE=true webpack --config webpack.dev-server.config.js"
   },
   "dependencies": {
