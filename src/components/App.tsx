@@ -286,7 +286,7 @@ let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
 
-// FIXME remove this hack when we can sync render & resizeObserver (state update)
+// remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
 let THROTTLE_NEXT_RENDER = true;
 
