@@ -33,19 +33,12 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "cross-env": "7.0.3",
-    "file-loader": "6.2.0",
-    "webpack": "5.72.1",
-    "webpack-bundle-analyzer": "4.5.0",
-    "webpack-cli": "4.9.2"
-  },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
     "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
-    "install:deps": "yarn --cwd ../ install --frozen-lockfile && yarn install --frozen-lockfile && yarn --cwd ../../../ install --frozen-lockfile",
+    "install:deps": "yarn --cwd ../ install --frozen-lockfile && yarn install --frozen-lockfile && yarn --cwd ../../../ install --frozen-lockfile && node ../../../scripts/prebuild-packages.js utils",
     "pack": "yarn build:umd && yarn pack"
   }
 }
