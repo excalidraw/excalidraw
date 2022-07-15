@@ -286,6 +286,10 @@ let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
 
+// FIXME remove this hack when we can sync render & resizeObserver (state update)
+// to rAF. See #5439
+let THROTTLE_NEXT_RENDER = true;
+
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
   pointers: new Map(),
@@ -862,6 +866,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => {
+        THROTTLE_NEXT_RENDER = false;
         // recompute device dimensions state
         // ---------------------------------------------------------------------
         this.refreshDeviceState(this.excalidrawContainerRef.current!);
@@ -1256,7 +1261,12 @@ class App extends React.Component<AppProps, AppState> {
 
         this.scheduleImageRefresh();
       },
+      THROTTLE_NEXT_RENDER,
     );
+
+    if (!THROTTLE_NEXT_RENDER) {
+      THROTTLE_NEXT_RENDER = true;
+    }
 
     this.history.record(this.state, this.scene.getElementsIncludingDeleted());
 

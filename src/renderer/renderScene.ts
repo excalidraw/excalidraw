@@ -572,8 +572,7 @@ export const renderScene = (
   return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
 };
 
-/** renderScene throttled to animation framerate */
-export const renderSceneThrottled = throttleRAF(
+const _renderSceneThrottled = throttleRAF(
   (
     elements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
@@ -597,6 +596,43 @@ export const renderSceneThrottled = throttleRAF(
   },
   { trailing: true },
 );
+
+/** renderScene throttled to animation framerate */
+export const renderSceneThrottled = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+  selectionElement: NonDeletedExcalidrawElement | null,
+  scale: number,
+  rc: RoughCanvas,
+  canvas: HTMLCanvasElement,
+  renderConfig: RenderConfig,
+  callback?: (data: ReturnType<typeof renderScene>) => void,
+  throttle = true,
+) => {
+  if (throttle) {
+    _renderSceneThrottled(
+      elements,
+      appState,
+      selectionElement,
+      scale,
+      rc,
+      canvas,
+      renderConfig,
+      callback,
+    );
+  } else {
+    const ret = renderScene(
+      elements,
+      appState,
+      selectionElement,
+      scale,
+      rc,
+      canvas,
+      renderConfig,
+    );
+    callback?.(ret);
+  }
+};
 
 const renderTransformHandles = (
   context: CanvasRenderingContext2D,
