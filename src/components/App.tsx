@@ -166,7 +166,7 @@ import {
   isAndroid,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
-import { renderSceneThrottled } from "../renderer/renderScene";
+import { renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
@@ -1223,7 +1223,7 @@ class App extends React.Component<AppProps, AppState> {
         );
       });
 
-    renderSceneThrottled(
+    renderScene(
       renderingElements,
       this.state,
       this.state.selectionElement,
