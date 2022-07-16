@@ -83,6 +83,8 @@ import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 
+window.EXCALIDRAW_THROTTLE_RENDER = true;
+
 const isExcalidrawPlusSignedUser = document.cookie.includes(
   COOKIES.AUTH_STATE_COOKIE,
 );
