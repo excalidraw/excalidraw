@@ -380,7 +380,7 @@ class App extends React.Component<AppProps, AppState> {
         getAppState: () => this.state,
         getFiles: () => this.files,
         refresh: this.refresh,
-        setToastMessage: this.setToastMessage,
+        setToast: this.setToast,
         id: this.id,
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
@@ -469,7 +469,6 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public render() {
-    const { zenModeEnabled, viewModeEnabled } = this.state;
     const selectedElement = getSelectedElements(
       this.scene.getNonDeletedElements(),
       this.state,
@@ -484,7 +483,7 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
-          "excalidraw--view-mode": viewModeEnabled,
+          "excalidraw--view-mode": this.state.viewModeEnabled,
           "excalidraw--mobile": this.device.isMobile,
         })}
         ref={this.excalidrawContainerRef}
@@ -515,17 +514,14 @@ class App extends React.Component<AppProps, AppState> {
                   files: null,
                 })
               }
-              zenModeEnabled={zenModeEnabled}
-              toggleZenMode={this.toggleZenMode}
               langCode={getLanguage().code}
               isCollaborating={this.props.isCollaborating}
               renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
               renderCustomStats={renderCustomStats}
-              viewModeEnabled={viewModeEnabled}
               showExitZenModeBtn={
                 typeof this.props?.zenModeEnabled === "undefined" &&
-                zenModeEnabled
+                this.state.zenModeEnabled
               }
               showThemeBtn={
                 typeof this.props?.theme === "undefined" &&
@@ -549,16 +545,12 @@ class App extends React.Component<AppProps, AppState> {
                 onLinkOpen={this.props.onLinkOpen}
               />
             )}
-            {this.state.toastMessage !== null && (
+            {this.state.toast !== null && (
               <Toast
-                message={this.state.toastMessage}
-                clearToast={this.clearToast}
-                duration={
-                  this.state.toastMessage === t("alerts.browserZoom")
-                    ? Infinity
-                    : undefined
-                }
-                closable={this.state.toastMessage === t("alerts.browserZoom")}
+                message={this.state.toast.message}
+                onClose={() => this.setToast(null)}
+                duration={this.state.toast.duration}
+                closable={this.state.toast.closable}
               />
             )}
             <main>{this.renderCanvas()}</main>
@@ -772,7 +764,7 @@ class App extends React.Component<AppProps, AppState> {
           ? { ...scene.appState.activeTool, type: "selection" }
           : scene.appState.activeTool,
       isLoading: false,
-      toastMessage: this.state.toastMessage || null,
+      toast: this.state.toast,
     };
     if (initialData?.scrollToContent) {
       scene.appState = {
@@ -931,9 +923,13 @@ class App extends React.Component<AppProps, AppState> {
         (window.outerWidth - scrollBarWidth) / window.innerWidth;
       const isBrowserZoomed = widthRatio < 0.75 || widthRatio > 1.1;
       if (isBrowserZoomed) {
-        this.setToastMessage(t("alerts.browserZoom"));
+        this.setToast({
+          message: t("alerts.browserZoom"),
+          closable: true,
+          duration: Infinity,
+        });
       } else {
-        this.clearToast();
+        this.setToast(null);
       }
     }
   };
@@ -950,7 +946,10 @@ class App extends React.Component<AppProps, AppState> {
     document.removeEventListener(EVENT.COPY, this.onCopy);
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.removeEventListener(EVENT.CUT, this.onCut);
-    document.removeEventListener(EVENT.WHEEL, this.onWheel);
+    this.excalidrawContainerRef.current?.removeEventListener(
+      EVENT.WHEEL,
+      this.onWheel,
+    );
     this.nearestScrollableContainer?.removeEventListener(
       EVENT.SCROLL,
       this.onScroll,
@@ -999,7 +998,11 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     document.addEventListener(EVENT.POINTER_UP, this.removePointer); // #3553
     document.addEventListener(EVENT.COPY, this.onCopy);
-    document.addEventListener(EVENT.WHEEL, this.onWheel, { passive: false });
+    this.excalidrawContainerRef.current?.addEventListener(
+      EVENT.WHEEL,
+      this.onWheel,
+      { passive: false },
+    );
 
     if (this.props.handleKeyboardGlobally) {
       document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
@@ -1625,10 +1628,6 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  toggleZenMode = () => {
-    this.actionManager.executeAction(actionToggleZenMode);
-  };
-
   scrollToContent = (
     target:
       | ExcalidrawElement
@@ -1643,12 +1642,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  clearToast = () => {
-    this.setState({ toastMessage: null });
-  };
-
-  setToastMessage = (toastMessage: string) => {
-    this.setState({ toastMessage });
+  setToast = (
+    toast: {
+      message: string;
+      closable?: boolean;
+      duration?: number;
+    } | null,
+  ) => {
+    this.setState({ toast });
   };
 
   restoreFileFromShare = async () => {

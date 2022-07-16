@@ -19,7 +19,7 @@ const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
 }, STORAGE_SIZE_TIMEOUT);
 
 type Props = {
-  setToastMessage: (message: string) => void;
+  setToast: (message: string) => void;
 };
 const CustomStats = (props: Props) => {
   const [storageSizes, setStorageSizes] = useState<StorageSizes>({
@@ -68,7 +68,7 @@ const CustomStats = (props: Props) => {
           onClick={async () => {
             try {
               await copyTextToSystemClipboard(getVersion());
-              props.setToastMessage(t("toast.copyToClipboard"));
+              props.setToast(t("toast.copyToClipboard"));
             } catch {}
           }}
           title={t("stats.versionCopy")}
