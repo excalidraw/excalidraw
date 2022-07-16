@@ -1,18 +1,16 @@
+import { useEffect } from "react";
+import { ExcalidrawImperativeAPI } from "../../../../types";
+
 // Plugin authors: provide a plugin name here like "myplugin"
 export const EmptyPlugin = "empty";
 
 // Plugin authors: provide a hook like `useMyPlugin` in `myplugin/index`
-export const useEmptyPlugin = () => {
+export const useEmptyPlugin = (api: ExcalidrawImperativeAPI | null) => {
   const enabled = emptyPluginLoadable;
-  if (enabled) {
-  }
-};
-
-// Plugin authors: provide a function like `testMyPlugin` in `myplugin/index`
-export const testEmptyPlugin = () => {
-  const enabled = emptyPluginLoadable;
-  if (enabled) {
-  }
+  useEffect(() => {
+    if (enabled) {
+    }
+  }, [enabled, api]);
 };
 
 // Plugin authors: Use a variable like `myPluginLoadable` to determine
