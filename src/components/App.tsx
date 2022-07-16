@@ -167,7 +167,7 @@ import {
   isAndroid,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
-import { renderSceneThrottled } from "../renderer/renderScene";
+import { renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
@@ -296,6 +296,10 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+
+// remove this hack when we can sync render & resizeObserver (state update)
+// to rAF. See #5439
+let THROTTLE_NEXT_RENDER = true;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -908,6 +912,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => {
+        THROTTLE_NEXT_RENDER = false;
         // recompute device dimensions state
         // ---------------------------------------------------------------------
         this.refreshDeviceState(this.excalidrawContainerRef.current!);
@@ -1285,7 +1290,7 @@ class App extends React.Component<AppProps, AppState> {
         );
       });
 
-    renderSceneThrottled(
+    renderScene(
       renderingElements,
       this.state,
       this.state.selectionElement,
@@ -1324,7 +1329,12 @@ class App extends React.Component<AppProps, AppState> {
 
         this.scheduleImageRefresh();
       },
+      THROTTLE_NEXT_RENDER && window.EXCALIDRAW_THROTTLE_RENDER === true,
     );
+
+    if (!THROTTLE_NEXT_RENDER) {
+      THROTTLE_NEXT_RENDER = true;
+    }
 
     this.history.record(this.state, this.scene.getElementsIncludingDeleted());
 

@@ -15,6 +15,7 @@ interface Window {
   EXCALIDRAW_PLUGINS_ASSET_PATH: string | undefined;
   EXCALIDRAW_ASSET_PATH: string | undefined;
   EXCALIDRAW_EXPORT_SOURCE: string;
+  EXCALIDRAW_THROTTLE_RENDER: boolean | undefined;
   gtag: Function;
 }
 
