@@ -238,7 +238,7 @@
     "placeImage": "Cliquez pour placer l'image, ou cliquez et faites glisser pour définir sa taille manuellement",
     "publishLibrary": "Publier votre propre bibliothèque",
     "bindTextToElement": "Appuyer sur Entrée pour ajouter du texte",
-    "deepBoxSelect": "Maintenir CtrlOuCmd pour sélectionner dans les groupes, et empêcher le déplacement",
+    "deepBoxSelect": "Maintenir Ctrl ou Cmd pour sélectionner dans les groupes, et empêcher le déplacement",
     "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression"
   },
   "canvasError": {
