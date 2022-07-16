@@ -125,8 +125,8 @@
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
-    "hint_emptyLibrary": "Sélectionnez un élément sur le canvas pour l'ajouter ici, ou installez une bibliothèque depuis le dépôt public, ci-dessous.",
-    "hint_emptyPrivateLibrary": "Sélectionnez un élément sur le canvas pour l'ajouter ici."
+    "hint_emptyLibrary": "Sélectionnez un élément sur le canevas pour l'ajouter ici, ou installez une bibliothèque depuis le dépôt public, ci-dessous.",
+    "hint_emptyPrivateLibrary": "Sélectionnez un élément sur le canevas pour l'ajouter ici."
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
