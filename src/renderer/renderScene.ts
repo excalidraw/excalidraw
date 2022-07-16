@@ -181,7 +181,7 @@ const renderLinearPointHandles = (
   context.restore();
 };
 
-export const renderScene = (
+export const _renderScene = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   selectionElement: NonDeletedExcalidrawElement | null,
@@ -572,8 +572,7 @@ export const renderScene = (
   return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
 };
 
-/** renderScene throttled to animation framerate */
-export const renderSceneThrottled = throttleRAF(
+const renderSceneThrottled = throttleRAF(
   (
     elements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
@@ -582,9 +581,9 @@ export const renderSceneThrottled = throttleRAF(
     rc: RoughCanvas,
     canvas: HTMLCanvasElement,
     renderConfig: RenderConfig,
-    callback?: (data: ReturnType<typeof renderScene>) => void,
+    callback?: (data: ReturnType<typeof _renderScene>) => void,
   ) => {
-    const ret = renderScene(
+    const ret = _renderScene(
       elements,
       appState,
       selectionElement,
@@ -597,6 +596,46 @@ export const renderSceneThrottled = throttleRAF(
   },
   { trailing: true },
 );
+
+/** renderScene throttled to animation framerate */
+export const renderScene = <T extends boolean = false>(
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+  selectionElement: NonDeletedExcalidrawElement | null,
+  scale: number,
+  rc: RoughCanvas,
+  canvas: HTMLCanvasElement,
+  renderConfig: RenderConfig,
+  callback?: (data: ReturnType<typeof _renderScene>) => void,
+  /** Whether to throttle rendering. Defaults to false.
+   * When throttling, no value is returned. Use the callback instead. */
+  throttle?: T,
+): T extends true ? void : ReturnType<typeof _renderScene> => {
+  if (throttle) {
+    renderSceneThrottled(
+      elements,
+      appState,
+      selectionElement,
+      scale,
+      rc,
+      canvas,
+      renderConfig,
+      callback,
+    );
+    return undefined as T extends true ? void : ReturnType<typeof _renderScene>;
+  }
+  const ret = _renderScene(
+    elements,
+    appState,
+    selectionElement,
+    scale,
+    rc,
+    canvas,
+    renderConfig,
+  );
+  callback?.(ret);
+  return ret as T extends true ? void : ReturnType<typeof _renderScene>;
+};
 
 const renderTransformHandles = (
   context: CanvasRenderingContext2D,
