@@ -124,7 +124,7 @@
     "sidebarLock": "Maintenir la barre latérale ouverte"
   },
   "library": {
-    "noItems": "Aucun élément n'a encore été ajouté ...",
+    "noItems": "Aucun élément n'a encore été ajouté…",
     "hint_emptyLibrary": "Sélectionnez un élément sur le canevas pour l'ajouter ici, ou installez une bibliothèque depuis le dépôt public, ci-dessous.",
     "hint_emptyPrivateLibrary": "Sélectionnez un élément sur le canevas pour l'ajouter ici."
   },
@@ -192,7 +192,7 @@
   },
   "errors": {
     "unsupportedFileType": "Type de fichier non supporté.",
-    "imageInsertError": "Impossible d'insérer l'image. Réessayez plus tard...",
+    "imageInsertError": "Impossible d'insérer l'image. Réessayez plus tard…",
     "fileTooBig": "Le fichier est trop volumineux. La taille maximale autorisée est de {{maxSize}}.",
     "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
     "invalidSVGString": "SVG invalide.",
@@ -281,7 +281,7 @@
     "link_button": "Exporter comme lien",
     "excalidrawplus_description": "Enregistrer la scène dans votre espace de travail Excalidraw+.",
     "excalidrawplus_button": "Exporter",
-    "excalidrawplus_exportError": "Impossible d'exporter vers Excalidraw+ pour le moment..."
+    "excalidrawplus_exportError": "Impossible d'exporter vers Excalidraw+ pour le moment…"
   },
   "helpDialog": {
     "blog": "Lire notre blog",
