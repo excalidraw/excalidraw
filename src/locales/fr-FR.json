@@ -111,7 +111,7 @@
     "bindText": "Lier le texte au conteneur",
     "link": {
       "edit": "Modifier le lien",
-      "create": "Créer un lien",
+      "create": "Ajouter un lien",
       "label": "Lien"
     },
     "elementLock": {
