@@ -955,6 +955,7 @@ class App extends React.Component<AppProps, AppState> {
       EVENT.WHEEL,
       this.onWheel,
     );
+
     this.nearestScrollableContainer?.removeEventListener(
       EVENT.SCROLL,
       this.onScroll,
@@ -1959,9 +1960,9 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private onWheel = withBatchedUpdates((event: MouseEvent) => {
+  private onWheel = withBatchedUpdates((event: WheelEvent) => {
     // prevent browser pinch zoom on DOM elements
-    if (!(event.target instanceof HTMLCanvasElement)) {
+    if (!(event.target instanceof HTMLCanvasElement) && event.ctrlKey) {
       event.preventDefault();
     }
   });
