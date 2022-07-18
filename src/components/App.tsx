@@ -955,7 +955,6 @@ class App extends React.Component<AppProps, AppState> {
       EVENT.WHEEL,
       this.onWheel,
     );
-
     this.nearestScrollableContainer?.removeEventListener(
       EVENT.SCROLL,
       this.onScroll,
