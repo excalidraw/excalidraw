@@ -224,7 +224,7 @@ export const LibraryMenu = ({
   }, [setPublishLibSuccess, publishLibSuccess]);
 
   const onPublishLibSuccess = useCallback(
-    (data: any, libraryItems: LibraryItems) => {
+    (data: { url: string; authorName: string }, libraryItems: LibraryItems) => {
       setShowPublishLibraryDialog(false);
       setPublishLibSuccess({ url: data.url, authorName: data.authorName });
       const nextLibItems = libraryItems.slice();
