@@ -212,16 +212,14 @@
       }
     }
     .ToolIcon.ToolIcon__library {
-      top: 100px;
+      top: calc(var(--sat) + 100px);
     }
 
     .ToolIcon.ToolIcon__lock {
-      margin-inline-end: 0;
-      top: 60px;
+      top: calc(var(--sat) + 60px);
     }
     .ToolIcon.ToolIcon__penMode {
-      margin-inline-end: 0;
-      top: 140px;
+      top: calc(var(--sat) + 140px);
     }
   }
 
