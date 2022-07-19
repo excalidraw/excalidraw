@@ -4,7 +4,6 @@ import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
 import { showSelectedShapeActions } from "../element";
-import { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
@@ -18,14 +17,13 @@ import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
+import { useExcalidrawData } from "./App";
 
 type MobileMenuProps = {
-  appState: AppState;
   actionManager: ActionManager;
   renderJSONExportDialog: () => React.ReactNode;
   renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
-  elements: readonly NonDeletedExcalidrawElement[];
   libraryMenu: JSX.Element | null;
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
@@ -46,8 +44,6 @@ type MobileMenuProps = {
 };
 
 export const MobileMenu = ({
-  appState,
-  elements,
   libraryMenu,
   actionManager,
   renderJSONExportDialog,
@@ -64,6 +60,8 @@ export const MobileMenu = ({
   renderTopRightUI,
   renderStats,
 }: MobileMenuProps) => {
+  const { appState, elements } = useExcalidrawData();
+
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
@@ -217,12 +215,7 @@ export const MobileMenu = ({
             !appState.viewModeEnabled &&
             showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
-              <SelectedShapeActions
-                appState={appState}
-                elements={elements}
-                renderAction={actionManager.renderAction}
-                activeTool={appState.activeTool.type}
-              />
+              <SelectedShapeActions renderAction={actionManager.renderAction} />
             </Section>
           ) : null}
           <footer className="App-toolbar">

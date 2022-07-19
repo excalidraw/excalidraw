@@ -36,18 +36,16 @@ import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
-import { useDevice } from "../components/App";
+import { useDevice, useExcalidrawData } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import { actionToggleZenMode } from "../actions";
 
 interface LayerUIProps {
   actionManager: ActionManager;
-  appState: AppState;
   files: BinaryFiles;
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
-  elements: readonly NonDeletedExcalidrawElement[];
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   onPenModeToggle: () => void;
@@ -68,11 +66,9 @@ interface LayerUIProps {
 }
 const LayerUI = ({
   actionManager,
-  appState,
   files,
   setAppState,
   canvas,
-  elements,
   onCollabButtonClick,
   onLockToggle,
   onPenModeToggle,
@@ -91,6 +87,7 @@ const LayerUI = ({
   onImageAction,
 }: LayerUIProps) => {
   const device = useDevice();
+  const { appState, elements } = useExcalidrawData();
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -210,8 +207,8 @@ const LayerUI = ({
             )}
           </Stack.Row>
           <BackgroundPickerAndDarkModeToggle
-            actionManager={actionManager}
             appState={appState}
+            actionManager={actionManager}
             setAppState={setAppState}
             showThemeBtn={showThemeBtn}
           />
@@ -240,12 +237,7 @@ const LayerUI = ({
           maxHeight: `${appState.height - (appState.fileHandle ? 248 : 200)}px`,
         }}
       >
-        <SelectedShapeActions
-          appState={appState}
-          elements={elements}
-          renderAction={actionManager.renderAction}
-          activeTool={appState.activeTool.type}
-        />
+        <SelectedShapeActions renderAction={actionManager.renderAction} />
       </Island>
     </Section>
   );
@@ -279,10 +271,8 @@ const LayerUI = ({
       libraryReturnUrl={libraryReturnUrl}
       focusContainer={focusContainer}
       library={library}
-      theme={appState.theme}
       files={files}
       id={id}
-      appState={appState}
     />
   ) : null;
 
@@ -528,8 +518,6 @@ const LayerUI = ({
     <>
       {dialogs}
       <MobileMenu
-        appState={appState}
-        elements={elements}
         actionManager={actionManager}
         libraryMenu={libraryMenu}
         renderJSONExportDialog={renderJSONExportDialog}
@@ -590,24 +578,10 @@ const LayerUI = ({
 };
 
 const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
-  const getNecessaryObj = (appState: AppState): Partial<AppState> => {
-    const {
-      suggestedBindings,
-      startBoundElement: boundElement,
-      ...ret
-    } = appState;
-    return ret;
-  };
-  const prevAppState = getNecessaryObj(prev.appState);
-  const nextAppState = getNecessaryObj(next.appState);
-
-  const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
   return (
     prev.renderCustomFooter === next.renderCustomFooter &&
     prev.langCode === next.langCode &&
-    prev.elements === next.elements &&
-    prev.files === next.files &&
-    keys.every((key) => prevAppState[key] === nextAppState[key])
+    prev.files === next.files
   );
 };
 

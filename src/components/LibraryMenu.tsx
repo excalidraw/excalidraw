@@ -29,7 +29,7 @@ import { trackEvent } from "../analytics";
 import { useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import Spinner from "./Spinner";
-import { useDevice } from "./App";
+import { useDevice, useExcalidrawData } from "./App";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -80,32 +80,28 @@ export const LibraryMenu = ({
   onInsertLibraryItems,
   pendingElements,
   onAddToLibrary,
-  theme,
   setAppState,
   files,
   libraryReturnUrl,
   focusContainer,
   library,
   id,
-  appState,
 }: {
   pendingElements: LibraryItem["elements"];
   onClose: () => void;
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: () => void;
-  theme: AppState["theme"];
   files: BinaryFiles;
   setAppState: React.Component<any, AppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   focusContainer: () => void;
   library: Library;
   id: string;
-  appState: AppState;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
   const device = useDevice();
-
+  const { appState } = useExcalidrawData();
   useOnClickOutside(
     ref,
     useCallback(
@@ -290,7 +286,7 @@ export const LibraryMenu = ({
         appState={appState}
         libraryReturnUrl={libraryReturnUrl}
         library={library}
-        theme={theme}
+        theme={appState.theme}
         files={files}
         id={id}
         selectedItems={selectedItems}
