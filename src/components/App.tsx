@@ -564,7 +564,6 @@ class App extends React.Component<AppProps, AppState> {
                   <Hyperlink
                     key={selectedElement[0].id}
                     element={selectedElement[0]}
-                    appState={this.state}
                     setAppState={this.setAppState}
                     onLinkOpen={this.props.onLinkOpen}
                   />

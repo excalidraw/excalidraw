@@ -32,6 +32,7 @@ import { getElementAbsoluteCoords } from "./";
 
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
+import { useExcalidrawData } from "../components/App";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -48,15 +49,15 @@ let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
 
 export const Hyperlink = ({
   element,
-  appState,
   setAppState,
   onLinkOpen,
 }: {
   element: NonDeletedExcalidrawElement;
-  appState: AppState;
   setAppState: React.Component<any, AppState>["setState"];
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
 }) => {
+  const { appState } = useExcalidrawData();
+
   const linkVal = element.link || "";
 
   const [inputVal, setInputVal] = useState(linkVal);
