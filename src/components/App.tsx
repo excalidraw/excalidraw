@@ -268,6 +268,7 @@ const deviceContextInitialValue = {
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 export const useDevice = () => useContext<Device>(DeviceContext);
+
 const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
   id: string | null;

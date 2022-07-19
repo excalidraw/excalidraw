@@ -581,7 +581,8 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   return (
     prev.renderCustomFooter === next.renderCustomFooter &&
     prev.langCode === next.langCode &&
-    prev.files === next.files
+    prev.files === next.files &&
+    prev.showExitZenModeBtn === next.showExitZenModeBtn
   );
 };
 
