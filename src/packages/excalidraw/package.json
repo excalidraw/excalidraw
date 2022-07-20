@@ -57,6 +57,7 @@
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
     "css-loader": "6.7.1",
+    "dotenv": "10.0.0",
     "mini-css-extract-plugin": "2.6.0",
     "postcss-loader": "6.2.1",
     "sass-loader": "12.4.0",
@@ -79,8 +80,5 @@
     "start": "webpack serve --config webpack.dev-server.config.js",
     "install:deps": "yarn install --frozen-lockfile && yarn --cwd ../../../",
     "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js"
-  },
-  "dependencies": {
-    "dotenv": "10.0.0"
   }
 }
