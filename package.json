@@ -61,7 +61,7 @@
     "@types/chai": "4.3.0",
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.3",
-    "@types/resize-observer-browser": "0.1.6",
+    "@types/resize-observer-browser": "0.1.7",
     "chai": "4.3.6",
     "dotenv": "10.0.0",
     "eslint-config-prettier": "8.5.0",
