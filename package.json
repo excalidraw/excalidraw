@@ -49,7 +49,7 @@
     "pwacompat": "2.0.17",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-scripts": "4.0.3",
+    "react-scripts": "5.0.1",
     "roughjs": "4.5.2",
     "sass": "1.51.0",
     "socket.io-client": "2.3.1",
