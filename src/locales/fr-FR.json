@@ -350,7 +350,7 @@
     },
     "noteItems": "Chaque élément de la bibliothèque doit avoir son propre nom afin qu'il soit filtrable. Les éléments de bibliothèque suivants seront inclus :",
     "atleastOneLibItem": "Veuillez sélectionner au moins un élément de bibliothèque pour commencer",
-    "republishWarning": "Remarque : certains des éléments sélectionnés sont marqués comme étant déjà publiés/affichés. Vous ne devez soumettre à nouveau des éléments que lorsque vous mettez à jour une soumission ou une bibliothèque existante."
+    "republishWarning": "Remarque : certains des éléments sélectionnés sont marqués comme étant déjà publiés/soumis. Vous devez uniquement resoumettre des éléments lors de la mise à jour d'une bibliothèque ou d'une soumission existante."
   },
   "publishSuccessDialog": {
     "title": "Bibliothèque soumise",
