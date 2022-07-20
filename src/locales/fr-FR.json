@@ -105,13 +105,13 @@
     "toggleTheme": "Changer le thème",
     "personalLib": "Bibliothèque personnelle",
     "excalidrawLib": "Bibliothèque Excalidraw",
-    "decreaseFontSize": "Réduire la taille de police",
+    "decreaseFontSize": "Diminuer la taille de police",
     "increaseFontSize": "Augmenter la taille de police",
-    "unbindText": "Délier le texte",
-    "bindText": "Lier le texte au conteneur",
+    "unbindText": "Dissocier le texte",
+    "bindText": "Associer le texte au conteneur",
     "link": {
       "edit": "Modifier le lien",
-      "create": "Créer un lien",
+      "create": "Ajouter un lien",
       "label": "Lien"
     },
     "elementLock": {
@@ -125,8 +125,8 @@
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
-    "hint_emptyLibrary": "Sélectionnez un élément sur le canvas pour l'ajouter ici, ou installez une bibliothèque depuis le dépôt public, ci-dessous.",
-    "hint_emptyPrivateLibrary": "Sélectionnez un élément sur le canvas pour l'ajouter ici."
+    "hint_emptyLibrary": "Sélectionnez un élément sur le canevas pour l'ajouter ici ou installez une bibliothèque depuis le dépôt public, ci-dessous.",
+    "hint_emptyPrivateLibrary": "Sélectionnez un élément sur le canevas pour l'ajouter ici."
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
@@ -188,7 +188,7 @@
     "resetLibrary": "Cela va effacer votre bibliothèque. Êtes-vous sûr·e ?",
     "removeItemsFromsLibrary": "Supprimer {{count}} élément(s) de la bibliothèque ?",
     "invalidEncryptionKey": "La clé de chiffrement doit comporter 22 caractères. La collaboration en direct est désactivée.",
-    "browserZoom": "Le niveau de zoom de votre navigateur n'est pas à 100 %, ce qui peut entraîner un affichage incorrect du plan de travail."
+    "browserZoom": "Le niveau de zoom de votre navigateur n’est pas réglé en taille réelle à 100 %, ce qui peut entraîner un affichage incorrect du plan de travail"
   },
   "errors": {
     "unsupportedFileType": "Type de fichier non supporté.",
