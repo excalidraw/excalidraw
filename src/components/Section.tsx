@@ -2,12 +2,11 @@ import React from "react";
 import { t } from "../i18n";
 import { useExcalidrawContainer } from "./App";
 
-interface SectionProps extends React.HTMLProps<HTMLElement> {
+export const Section: React.FC<{
   heading: string;
-  children?: any;
-}
-
-export const Section = ({ heading, children, ...props }: SectionProps) => {
+  children?: React.ReactNode | ((heading: React.ReactNode) => React.ReactNode);
+  className?: string;
+}> = ({ heading, children, ...props }) => {
   const { id } = useExcalidrawContainer();
   const header = (
     <h2 className="visually-hidden" id={`${id}-${heading}-title`}>
