@@ -73,7 +73,7 @@ export const Popover = ({
 
       //Position correctly when clicked on rightmost part or the bottom part of viewport
       if (x + width - offsetLeft > viewportWidth) {
-        element.style.left = `${viewportWidth - width}px`;
+        element.style.left = `${viewportWidth - width - 10}px`;
       }
       if (y + height - offsetTop > viewportHeight) {
         element.style.top = `${viewportHeight - height}px`;
