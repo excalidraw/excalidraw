@@ -53,6 +53,8 @@ const allLanguages: Language[] = [
   { code: "uk-UA", label: "Українська" },
   { code: "zh-CN", label: "简体中文" },
   { code: "zh-TW", label: "繁體中文" },
+  { code: "vi-VN", label: "Tiếng Việt" },
+  { code: "mr-IN", label: "मराठी" },
 ].concat([defaultLang]);
 
 export const languages: Language[] = allLanguages

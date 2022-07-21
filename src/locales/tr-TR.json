@@ -124,9 +124,9 @@
     "sidebarLock": ""
   },
   "library": {
-    "noItems": "",
+    "noItems": "Öğe eklenmedi...",
     "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyPrivateLibrary": "Tuvalden bir eleman seçerek sayfaya ekleyin."
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -188,7 +188,7 @@
     "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?",
     "removeItemsFromsLibrary": "{{count}} öğe(ler) kitaplıktan kaldırılsın mı?",
     "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı.",
-    "browserZoom": ""
+    "browserZoom": "Tarayıcınızın yaklaştırma seviyesi %100 değil. Bu durum, tablonun yanlış görünmesine sebep olabilir"
   },
   "errors": {
     "unsupportedFileType": "Desteklenmeyen dosya türü.",

@@ -188,7 +188,7 @@
     "resetLibrary": "Dieses löscht deine Bibliothek. Bist du sicher?",
     "removeItemsFromsLibrary": "{{count}} Element(e) aus der Bibliothek löschen?",
     "invalidEncryptionKey": "Verschlüsselungsschlüssel muss 22 Zeichen lang sein. Die Live-Zusammenarbeit ist deaktiviert.",
-    "browserZoom": ""
+    "browserZoom": "Die Zoomstufe Deines Browsers ist nicht auf 100% gesetzt, was dazu führen kann, dass der Zeichenbereich falsch angezeigt wird"
   },
   "errors": {
     "unsupportedFileType": "Nicht unterstützter Dateityp.",
