@@ -71,23 +71,24 @@ export const Popover = ({
       const { x, y, width, height } = element.getBoundingClientRect();
       const { innerWidth: viewportWidth, innerHeight: viewportHeight } = window;
 
-      //Resize to fit viewport on smaller screens
-      if (height >= viewportHeight) {
-        element.style.height = `${viewportHeight}px`;
-        element.style.top = "0px";
-        element.style.overflowY = "scroll";
-      }
-      if (width >= viewportWidth) {
-        element.style.width = `${viewportWidth}px`;
-        element.style.left = "0px";
-        element.style.overflowX = "scroll";
-      }
       //Position correctly when clicked on rightmost part or the bottom part of viewport
       if (x + width - offsetLeft > viewportWidth) {
         element.style.left = `${viewportWidth - width}px`;
       }
       if (y + height - offsetTop > viewportHeight) {
         element.style.top = `${viewportHeight - height}px`;
+      }
+
+      //Resize to fit viewport on smaller screens
+      if (height >= viewportHeight) {
+        element.style.height = `${viewportHeight - 20}px`;
+        element.style.top = "10px";
+        element.style.overflowY = "scroll";
+      }
+      if (width >= viewportWidth) {
+        element.style.width = `${viewportWidth}px`;
+        element.style.left = "0px";
+        element.style.overflowX = "scroll";
       }
     }
   }, [fitInViewport, viewportWidth, viewportHeight, offsetLeft, offsetTop]);
