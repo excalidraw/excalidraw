@@ -54,7 +54,6 @@
     "build:example": "yarn --cwd ../excalidraw build:umd:dev && EXAMPLE=true webpack --config webpack.dev-server.config.js"
   },
   "dependencies": {
-    "mathjax-full": "3.2.2",
-    "dotenv": "10.0.0"
+    "mathjax-full": "3.2.2"
   }
 }

@@ -1605,12 +1605,15 @@ class App extends React.Component<AppProps, AppState> {
             this.state.isLibraryOpen && this.device.canDeviceFitSidebar
               ? this.state.isLibraryMenuDocked
               : false,
-          selectedElementIds: newElements.reduce((map, element) => {
-            if (!isBoundToContainer(element)) {
-              map[element.id] = true;
-            }
-            return map;
-          }, {} as any),
+          selectedElementIds: newElements.reduce(
+            (acc: Record<ExcalidrawElement["id"], true>, element) => {
+              if (!isBoundToContainer(element)) {
+                acc[element.id] = true;
+              }
+              return acc;
+            },
+            {},
+          ),
           selectedGroupIds: {},
         },
         this.scene.getNonDeletedElements(),
@@ -2026,9 +2029,9 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private onWheel = withBatchedUpdates((event: MouseEvent) => {
+  private onWheel = withBatchedUpdates((event: WheelEvent) => {
     // prevent browser pinch zoom on DOM elements
-    if (!(event.target instanceof HTMLCanvasElement)) {
+    if (!(event.target instanceof HTMLCanvasElement) && event.ctrlKey) {
       event.preventDefault();
     }
   });
@@ -4376,10 +4379,13 @@ class App extends React.Component<AppProps, AppState> {
                 ...prevState,
                 selectedElementIds: {
                   ...prevState.selectedElementIds,
-                  ...elementsWithinSelection.reduce((map, element) => {
-                    map[element.id] = true;
-                    return map;
-                  }, {} as any),
+                  ...elementsWithinSelection.reduce(
+                    (acc: Record<ExcalidrawElement["id"], true>, element) => {
+                      acc[element.id] = true;
+                      return acc;
+                    },
+                    {},
+                  ),
                   ...(pointerDownState.hit.element
                     ? {
                         // if using ctrl/cmd, select the hitElement only if we
