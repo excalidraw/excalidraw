@@ -15,6 +15,11 @@ Please add the latest change on the top under the correct section.
 
 ### Excalidraw API
 
+#### Features
+
+- Added [`compressData`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#compressData) and [`decompressData`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#decompressData)
+- Added [`generateEncryptionKey`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#generateEncryptionKey)
+
 #### Breaking Changes
 
 - `setToastMessage` API is now renamed to `setToast` API and the function signature is also updated [#5427](https://github.com/excalidraw/excalidraw/pull/5427). You can also pass `duration` and `closable` attributes along with `message`.

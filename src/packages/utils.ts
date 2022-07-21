@@ -193,6 +193,8 @@ export const exportToClipboard = async (
   }
 };
 
+export { decompressData, compressData } from "../data/encode";
+export { generateEncryptionKey } from "../data/encryption";
 export { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";
 export {
   loadFromBlob,

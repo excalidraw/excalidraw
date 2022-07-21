@@ -206,6 +206,9 @@ export {
   getFreeDrawSvgPath,
   exportToClipboard,
   mergeLibraryItems,
+  generateEncryptionKey,
+  compressData,
+  decompressData,
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
 

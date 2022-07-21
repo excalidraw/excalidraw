@@ -1150,6 +1150,29 @@ loadSceneOrLibraryFromBlob(
 
 This function loads either scene or library data from the supplied blob. If the blob contains scene data, and you pass `localAppState`, `localAppState` value will be preferred over the `appState` derived from `blob`. Throws if blob doesn't contain neither valid scene data or library data.
 
+#### `compressData`
+
+```js
+const encrytionKey = generateEncryptionKey();
+
+const buffer = await compressData(
+  new TextEncoder().encode(
+    serializeAsJSON(elements, appState, files, "database"),
+  ),
+  { encryptionKey },
+);
+```
+
+#### `decompressData`
+
+```js
+const { data: decodedBuffer } = await decompressData(new Uint8Array(payload), {
+  decryptionKey,
+});
+```
+
+#### `generateEncryptionKey`
+
 #### `getFreeDrawSvgPath`
 
 **How to use**
