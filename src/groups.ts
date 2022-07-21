@@ -1,6 +1,7 @@
 import { GroupId, ExcalidrawElement, NonDeleted } from "./element/types";
 import { AppState } from "./types";
 import { getSelectedElements } from "./scene";
+import { getBoundTextElement } from "./element/textElement";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -158,3 +159,30 @@ export const removeFromSelectedGroups = (
   groupIds: ExcalidrawElement["groupIds"],
   selectedGroupIds: { [groupId: string]: boolean },
 ) => groupIds.filter((groupId) => !selectedGroupIds[groupId]);
+
+export const getMaximumGroups = (
+  elements: ExcalidrawElement[],
+): ExcalidrawElement[][] => {
+  const groups: Map<String, ExcalidrawElement[]> = new Map<
+    String,
+    ExcalidrawElement[]
+  >();
+
+  elements.forEach((element: ExcalidrawElement) => {
+    const groupId =
+      element.groupIds.length === 0
+        ? element.id
+        : element.groupIds[element.groupIds.length - 1];
+
+    const currentGroupMembers = groups.get(groupId) || [];
+
+    // Include bound text if present when grouping
+    const boundTextElement = getBoundTextElement(element);
+    if (boundTextElement) {
+      currentGroupMembers.push(boundTextElement);
+    }
+    groups.set(groupId, [...currentGroupMembers, element]);
+  });
+
+  return Array.from(groups.values());
+};

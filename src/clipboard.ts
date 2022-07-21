@@ -2,20 +2,23 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { getSelectedElements } from "./scene";
-import { AppState } from "./types";
+import { AppState, BinaryFiles } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
-import { EXPORT_DATA_TYPES } from "./constants";
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "./constants";
+import { isInitializedImageElement } from "./element/typeChecks";
+import { isPromiseLike } from "./utils";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
-  elements: ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
+  files: BinaryFiles | undefined;
 };
 
 export interface ClipboardData {
   spreadsheet?: Spreadsheet;
   elements?: readonly ExcalidrawElement[];
+  files?: BinaryFiles;
   text?: string;
   errorMessage?: string;
 }
@@ -37,7 +40,7 @@ export const probablySupportsClipboardBlob =
 
 const clipboardContainsElements = (
   contents: any,
-): contents is { elements: ExcalidrawElement[] } => {
+): contents is { elements: ExcalidrawElement[]; files?: BinaryFiles } => {
   if (
     [
       EXPORT_DATA_TYPES.excalidraw,
@@ -53,17 +56,27 @@ const clipboardContainsElements = (
 export const copyToClipboard = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles | null,
 ) => {
+  // select binded text elements when copying
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
-    elements: getSelectedElements(elements, appState),
+    elements,
+    files: files
+      ? elements.reduce((acc, element) => {
+          if (isInitializedImageElement(element) && files[element.fileId]) {
+            acc[element.fileId] = files[element.fileId];
+          }
+          return acc;
+        }, {} as BinaryFiles)
+      : undefined,
   };
   const json = JSON.stringify(contents);
   CLIPBOARD = json;
   try {
     PREFER_APP_CLIPBOARD = false;
     await copyTextToSystemClipboard(json);
-  } catch (error) {
+  } catch (error: any) {
     PREFER_APP_CLIPBOARD = true;
     console.error(error);
   }
@@ -76,7 +89,7 @@ const getAppClipboard = (): Partial<ElementsClipboard> => {
 
   try {
     return JSON.parse(CLIPBOARD);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     return {};
   }
@@ -112,7 +125,7 @@ const getSystemClipboard = async (
 };
 
 /**
- * Attemps to parse clipboard. Prefers system clipboard.
+ * Attempts to parse clipboard. Prefers system clipboard.
  */
 export const parseClipboard = async (
   event: ClipboardEvent | null,
@@ -138,7 +151,10 @@ export const parseClipboard = async (
   try {
     const systemClipboardData = JSON.parse(systemClipboard);
     if (clipboardContainsElements(systemClipboardData)) {
-      return { elements: systemClipboardData.elements };
+      return {
+        elements: systemClipboardData.elements,
+        files: systemClipboardData.files,
+      };
     }
     return appClipboardData;
   } catch {
@@ -151,10 +167,35 @@ export const parseClipboard = async (
   }
 };
 
-export const copyBlobToClipboardAsPng = async (blob: Blob) => {
-  await navigator.clipboard.write([
-    new window.ClipboardItem({ "image/png": blob }),
-  ]);
+export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
+  let promise;
+  try {
+    // in Safari so far we need to construct the ClipboardItem synchronously
+    // (i.e. in the same tick) otherwise browser will complain for lack of
+    // user intent. Using a Promise ClipboardItem constructor solves this.
+    // https://bugs.webkit.org/show_bug.cgi?id=222262
+    //
+    // not await so that we can detect whether the thrown error likely relates
+    // to a lack of support for the Promise ClipboardItem constructor
+    promise = navigator.clipboard.write([
+      new window.ClipboardItem({
+        [MIME_TYPES.png]: blob,
+      }),
+    ]);
+  } catch (error: any) {
+    // if we're using a Promise ClipboardItem, let's try constructing
+    // with resolution value instead
+    if (isPromiseLike(blob)) {
+      await navigator.clipboard.write([
+        new window.ClipboardItem({
+          [MIME_TYPES.png]: await blob,
+        }),
+      ]);
+    } else {
+      throw error;
+    }
+  }
+  await promise;
 };
 
 export const copyTextToSystemClipboard = async (text: string | null) => {
@@ -165,7 +206,7 @@ export const copyTextToSystemClipboard = async (text: string | null) => {
       // not focused
       await navigator.clipboard.writeText(text || "");
       copied = true;
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
     }
   }
@@ -205,7 +246,7 @@ const copyTextViaExecCommand = (text: string) => {
     textarea.setSelectionRange(0, textarea.value.length);
 
     success = document.execCommand("copy");
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
   }
 

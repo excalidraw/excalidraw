@@ -1,30 +1,29 @@
-import React from "react";
-import { trackEvent } from "../analytics";
 import { load, questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
-import { DarkModeToggle, Appearence } from "../components/DarkModeToggle";
+import { DarkModeToggle } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { resaveAsImageWithScene } from "../data/resave";
 import { t } from "../i18n";
-import { useIsMobile } from "../components/App";
+import { useDevice } from "../components/App";
 import { KEYS } from "../keys";
 import { register } from "./register";
-import { supported as fsSupported } from "browser-fs-access";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
-import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES } from "../constants";
+import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { ActiveFile } from "../components/ActiveFile";
 import { isImageFileHandle } from "../data/blob";
+import { nativeFileSystemSupported } from "../data/filesystem";
+import { Theme } from "../element/types";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
+  trackEvent: false,
   perform: (_elements, appState, value) => {
-    trackEvent("change", "title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
   PanelComponent: ({ appState, updateData, appProps }) => (
@@ -41,6 +40,7 @@ export const actionChangeProjectName = register({
 
 export const actionChangeExportScale = register({
   name: "changeExportScale",
+  trackEvent: { category: "export", action: "scale" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportScale: value },
@@ -89,6 +89,7 @@ export const actionChangeExportScale = register({
 
 export const actionChangeExportBackground = register({
   name: "changeExportBackground",
+  trackEvent: { category: "export", action: "toggleBackground" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportBackground: value },
@@ -107,6 +108,7 @@ export const actionChangeExportBackground = register({
 
 export const actionChangeExportEmbedScene = register({
   name: "changeExportEmbedScene",
+  trackEvent: { category: "export", action: "embedScene" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportEmbedScene: value },
@@ -128,32 +130,37 @@ export const actionChangeExportEmbedScene = register({
 
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
-  perform: async (elements, appState, value) => {
+  trackEvent: { category: "export" },
+  perform: async (elements, appState, value, app) => {
     const fileHandleExists = !!appState.fileHandle;
 
     try {
       const { fileHandle } = isImageFileHandle(appState.fileHandle)
-        ? await resaveAsImageWithScene(elements, appState)
-        : await saveAsJSON(elements, appState);
+        ? await resaveAsImageWithScene(elements, appState, app.files)
+        : await saveAsJSON(elements, appState, app.files);
 
       return {
         commitToHistory: false,
         appState: {
           ...appState,
           fileHandle,
-          toastMessage: fileHandleExists
-            ? fileHandle?.name
-              ? t("toast.fileSavedToFilename").replace(
-                  "{filename}",
-                  `"${fileHandle.name}"`,
-                )
-              : t("toast.fileSaved")
+          toast: fileHandleExists
+            ? {
+                message: fileHandle?.name
+                  ? t("toast.fileSavedToFilename").replace(
+                      "{filename}",
+                      `"${fileHandle.name}"`,
+                    )
+                  : t("toast.fileSaved"),
+              }
             : null,
         },
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error?.name !== "AbortError") {
         console.error(error);
+      } else {
+        console.warn(error);
       }
       return { commitToHistory: false };
     }
@@ -170,16 +177,23 @@ export const actionSaveToActiveFile = register({
 
 export const actionSaveFileToDisk = register({
   name: "saveFileToDisk",
-  perform: async (elements, appState, value) => {
+  trackEvent: { category: "export" },
+  perform: async (elements, appState, value, app) => {
     try {
-      const { fileHandle } = await saveAsJSON(elements, {
-        ...appState,
-        fileHandle: null,
-      });
+      const { fileHandle } = await saveAsJSON(
+        elements,
+        {
+          ...appState,
+          fileHandle: null,
+        },
+        app.files,
+      );
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
-    } catch (error) {
+    } catch (error: any) {
       if (error?.name !== "AbortError") {
         console.error(error);
+      } else {
+        console.warn(error);
       }
       return { commitToHistory: false };
     }
@@ -192,8 +206,8 @@ export const actionSaveFileToDisk = register({
       icon={saveAs}
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
-      showAriaLabel={useIsMobile()}
-      hidden={!fsSupported}
+      showAriaLabel={useDevice().isMobile}
+      hidden={!nativeFileSystemSupported}
       onClick={() => updateData(null)}
       data-testid="save-as-button"
     />
@@ -202,24 +216,29 @@ export const actionSaveFileToDisk = register({
 
 export const actionLoadScene = register({
   name: "loadScene",
-  perform: async (elements, appState) => {
+  trackEvent: { category: "export" },
+  perform: async (elements, appState, _, app) => {
     try {
       const {
         elements: loadedElements,
         appState: loadedAppState,
+        files,
       } = await loadFromJSON(appState, elements);
       return {
         elements: loadedElements,
         appState: loadedAppState,
+        files,
         commitToHistory: true,
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error?.name === "AbortError") {
+        console.warn(error);
         return false;
       }
       return {
         elements,
         appState: { ...appState, errorMessage: error.message },
+        files: app.files,
         commitToHistory: false,
       };
     }
@@ -231,7 +250,7 @@ export const actionLoadScene = register({
       icon={load}
       title={t("buttons.load")}
       aria-label={t("buttons.load")}
-      showAriaLabel={useIsMobile()}
+      showAriaLabel={useDevice().isMobile}
       onClick={updateData}
       data-testid="load-button"
     />
@@ -240,6 +259,7 @@ export const actionLoadScene = register({
 
 export const actionExportWithDarkMode = register({
   name: "exportWithDarkMode",
+  trackEvent: { category: "export", action: "toggleTheme" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportWithDarkMode: value },
@@ -256,9 +276,9 @@ export const actionExportWithDarkMode = register({
       }}
     >
       <DarkModeToggle
-        value={appState.exportWithDarkMode ? "dark" : "light"}
-        onChange={(theme: Appearence) => {
-          updateData(theme === "dark");
+        value={appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT}
+        onChange={(theme: Theme) => {
+          updateData(theme === THEME.DARK);
         }}
         title={t("labels.toggleExportColorScheme")}
       />

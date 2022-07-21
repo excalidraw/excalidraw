@@ -2,15 +2,16 @@ import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import { useExcalidrawContainer, useIsMobile } from "../components/App";
+import { useExcalidrawContainer, useDevice } from "../components/App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
 import { back, close } from "./icons";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
 import { AppState } from "../types";
+import { queryFocusableElements } from "../utils";
 
-export const Dialog = (props: {
+export interface DialogProps {
   children: React.ReactNode;
   className?: string;
   small?: boolean;
@@ -18,7 +19,10 @@ export const Dialog = (props: {
   title: React.ReactNode;
   autofocus?: boolean;
   theme?: AppState["theme"];
-}) => {
+  closeOnClickOutside?: boolean;
+}
+
+export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
   const { id } = useExcalidrawContainer();
@@ -61,14 +65,6 @@ export const Dialog = (props: {
     return () => islandNode.removeEventListener("keydown", handleKeyDown);
   }, [islandNode, props.autofocus]);
 
-  const queryFocusableElements = (node: HTMLElement) => {
-    const focusableElements = node.querySelectorAll<HTMLElement>(
-      "button, a, input, select, textarea, div[tabindex]",
-    );
-
-    return focusableElements ? Array.from(focusableElements) : [];
-  };
-
   const onClose = () => {
     (lastActiveElement as HTMLElement).focus();
     props.onCloseRequest();
@@ -81,6 +77,7 @@ export const Dialog = (props: {
       maxWidth={props.small ? 550 : 800}
       onCloseRequest={onClose}
       theme={props.theme}
+      closeOnClickOutside={props.closeOnClickOutside}
     >
       <Island ref={setIslandNode}>
         <h2 id={`${id}-dialog-title`} className="Dialog__title">
@@ -90,7 +87,7 @@ export const Dialog = (props: {
             onClick={onClose}
             aria-label={t("buttons.close")}
           >
-            {useIsMobile() ? back : close}
+            {useDevice().isMobile ? back : close}
           </button>
         </h2>
         <div className="Dialog__content">{props.children}</div>

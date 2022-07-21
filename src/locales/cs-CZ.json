@@ -9,6 +9,7 @@
     "copy": "Kopírovat",
     "copyAsPng": "Zkopírovat do schránky jako PNG",
     "copyAsSvg": "Zkopírovat do schránky jako SVG",
+    "copyText": "Zkopírovat do schránky jako text",
     "bringForward": "Přenést blíž",
     "sendToBack": "Přenést do pozadí",
     "bringToFront": "Přenést do popředí",
@@ -20,10 +21,6 @@
     "background": "Pozadí",
     "fill": "Výplň",
     "strokeWidth": "Šířka obrysu",
-    "strokeShape": "Tvar tahu",
-    "strokeShape_gel": "Gelové pero",
-    "strokeShape_fountain": "Plnicí pero",
-    "strokeShape_brush": "Fixa",
     "strokeStyle": "Styl tahu",
     "strokeStyle_solid": "Plný",
     "strokeStyle_dashed": "Čárkovaný",
@@ -39,13 +36,14 @@
     "arrowhead_arrow": "Šipka",
     "arrowhead_bar": "Kóta",
     "arrowhead_dot": "Tečka",
+    "arrowhead_triangle": "Trojúhelník",
     "fontSize": "Velikost písma",
     "fontFamily": "Písmo",
     "onlySelected": "Pouze vybrané",
-    "withBackground": "",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
-    "addWatermark": "",
+    "withBackground": "Pozadí",
+    "exportEmbedScene": "Vložit scénu",
+    "exportEmbedScene_details": "Data scény budou uložena do exportovaného souboru PNG/SVG tak, aby z něj mohla být scéna obnovena.\nZvýší se velikost exportovaného souboru.",
+    "addWatermark": "Přidat \"Vyrobeno s Excalidraw\"",
     "handDrawn": "Od ruky",
     "normal": "Normální",
     "code": "Kód",
@@ -67,6 +65,7 @@
     "cartoonist": "",
     "fileTitle": "",
     "colorPicker": "",
+    "canvasColors": "",
     "canvasBackground": "Pozadí plátna",
     "drawingCanvas": "",
     "layers": "",
@@ -103,7 +102,31 @@
     "share": "Sdílet",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": "Přepnout tmavý řežim"
+    "toggleTheme": "Přepnout tmavý řežim",
+    "personalLib": "",
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": "",
+    "unbindText": "",
+    "bindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "",
@@ -136,7 +159,13 @@
     "darkMode": "Tmavý režim",
     "lightMode": "Světlý režim",
     "zenMode": "Zen mód",
-    "exitZenMode": "Opustit zen mód"
+    "exitZenMode": "Opustit zen mód",
+    "cancel": "",
+    "clear": "",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "",
@@ -150,17 +179,29 @@
     "uploadedSecurly": "",
     "loadSceneOverridePrompt": "",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "",
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "",
     "invalidSceneUrl": "",
-    "resetLibrary": ""
+    "resetLibrary": "",
+    "removeItemsFromsLibrary": "",
+    "invalidEncryptionKey": "",
+    "browserZoom": ""
+  },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Výběr",
+    "image": "",
     "rectangle": "Obdélník",
     "diamond": "Diamant",
     "ellipse": "Elipsa",
@@ -169,7 +210,10 @@
     "freedraw": "Kreslení",
     "text": "Text",
     "library": "",
-    "lock": ""
+    "lock": "",
+    "penMode": "",
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "",
@@ -177,6 +221,7 @@
     "shapes": "Tvary"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "",
     "freeDraw": "",
     "text": "",
@@ -185,10 +230,16 @@
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
+    "resizeImage": "",
     "rotate": "",
     "lineEditor_info": "",
     "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_nothingSelected": "",
+    "placeImage": "",
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -235,6 +286,8 @@
   "helpDialog": {
     "blog": "",
     "click": "kliknutí",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "",
@@ -246,14 +299,67 @@
     "howto": "",
     "or": "nebo",
     "preventBinding": "",
-    "shapes": "",
+    "tools": "",
     "shortcuts": "",
     "textFinish": "",
     "textNewLine": "",
     "title": "",
     "view": "",
     "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToSelection": "",
+    "toggleElementLock": ""
+  },
+  "clearCanvasDialog": {
+    "title": ""
+  },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": "",
+    "republishWarning": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
   },
   "encrypted": {
     "tooltip": "",
@@ -275,6 +381,7 @@
     "width": ""
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "",
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",

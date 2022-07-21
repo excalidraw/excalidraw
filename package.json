@@ -21,21 +21,27 @@
   "dependencies": {
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
-    "@testing-library/jest-dom": "5.11.10",
-    "@testing-library/react": "11.2.6",
-    "@types/jest": "26.0.22",
-    "@types/react": "17.0.3",
-    "@types/react-dom": "17.0.3",
+    "@testing-library/jest-dom": "5.16.2",
+    "@testing-library/react": "12.1.5",
+    "@tldraw/vec": "1.7.1",
+    "@types/jest": "27.4.0",
+    "@types/pica": "5.1.3",
+    "@types/react": "17.0.39",
+    "@types/react-dom": "17.0.11",
     "@types/socket.io-client": "1.4.36",
-    "browser-fs-access": "0.20.5",
+    "browser-fs-access": "0.29.1",
     "clsx": "1.1.1",
+    "fake-indexeddb": "3.1.7",
     "firebase": "8.3.3",
-    "i18next-browser-languagedetector": "6.1.0",
+    "i18next-browser-languagedetector": "6.1.4",
+    "idb-keyval": "6.0.3",
+    "image-blob-reduce": "3.0.1",
+    "jotai": "1.6.4",
     "lodash.throttle": "4.1.1",
-    "nanoid": "3.1.22",
-    "open-color": "1.8.0",
+    "nanoid": "3.3.3",
+    "open-color": "1.9.1",
     "pako": "1.0.11",
-    "perfect-freehand": "1.0.6",
+    "perfect-freehand": "1.0.16",
     "png-chunk-text": "1.0.0",
     "png-chunks-encode": "1.0.0",
     "png-chunks-extract": "1.0.0",
@@ -44,36 +50,36 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-scripts": "4.0.3",
-    "roughjs": "4.4.1",
-    "sass": "1.32.10",
+    "roughjs": "4.5.2",
+    "sass": "1.51.0",
     "socket.io-client": "2.3.1",
-    "typescript": "4.2.4"
+    "typescript": "4.5.5"
   },
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.0",
     "@excalidraw/prettier-config": "1.0.2",
-    "@types/lodash.throttle": "4.1.6",
-    "@types/pako": "1.0.1",
-    "@types/resize-observer-browser": "0.1.5",
-    "eslint-config-prettier": "8.3.0",
+    "@types/chai": "4.3.0",
+    "@types/lodash.throttle": "4.1.7",
+    "@types/pako": "1.0.3",
+    "@types/resize-observer-browser": "0.1.7",
+    "chai": "4.3.6",
+    "dotenv": "16.0.1",
+    "eslint-config-prettier": "8.5.0",
     "eslint-plugin-prettier": "3.3.1",
-    "firebase-tools": "9.9.0",
-    "husky": "4.3.8",
-    "jest-canvas-mock": "2.3.1",
-    "lint-staged": "10.5.4",
+    "husky": "7.0.4",
+    "jest-canvas-mock": "2.4.0",
+    "lint-staged": "12.3.7",
     "pepjs": "0.5.3",
-    "prettier": "2.2.1",
-    "rewire": "5.0.0"
+    "prettier": "2.6.2",
+    "rewire": "6.0.0"
+  },
+  "resolutions": {
+    "@typescript-eslint/typescript-estree": "5.10.2"
   },
   "engines": {
     "node": ">=14.0.0"
   },
   "homepage": ".",
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "jest": {
     "transformIgnorePatterns": [
       "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-fs-access)/)"
@@ -88,13 +94,15 @@
     "build:app:docker": "REACT_APP_DISABLE_SENTRY=true react-scripts build",
     "build:app": "REACT_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA react-scripts build",
     "build:version": "node ./scripts/build-version.js",
-    "build": "yarn build:app && yarn build:version",
+    "build:prebuild": "node ./scripts/prebuild.js",
+    "build": "yarn build:prebuild && yarn build:app && yarn build:version",
     "eject": "react-scripts eject",
     "fix:code": "yarn test:code --fix",
     "fix:other": "yarn prettier --write",
     "fix": "yarn fix:other && yarn fix:code",
     "locales-coverage": "node scripts/build-locales-coverage.js",
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
+    "prepare": "husky install",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watchAll=false",
@@ -105,6 +113,8 @@
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --updateSnapshot --watchAll=false",
     "test": "yarn test:app",
-    "autorelease": "node scripts/autorelease.js"
+    "autorelease": "node scripts/autorelease.js",
+    "prerelease": "node scripts/prerelease.js",
+    "release": "node scripts/release.js"
   }
 }

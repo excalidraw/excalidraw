@@ -3,6 +3,7 @@ import { ExcalidrawElement, PointerType } from "./types";
 import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
 import { Zoom } from "../types";
+import { isTextElement } from ".";
 
 export type TransformHandleDirection =
   | "n"
@@ -17,9 +18,9 @@ export type TransformHandleDirection =
 export type TransformHandleType = TransformHandleDirection | "rotation";
 
 export type TransformHandle = [number, number, number, number];
-export type TransformHandles = Partial<
-  { [T in TransformHandleType]: TransformHandle }
->;
+export type TransformHandles = Partial<{
+  [T in TransformHandleType]: TransformHandle;
+}>;
 export type MaybeTransformHandleType = TransformHandleType | false;
 
 const transformHandleSizes: { [k in PointerType]: number } = {
@@ -221,6 +222,13 @@ export const getTransformHandles = (
   zoom: Zoom,
   pointerType: PointerType = "mouse",
 ): TransformHandles => {
+  // so that when locked element is selected (especially when you toggle lock
+  // via keyboard) the locked element is visually distinct, indicating
+  // you can't move/resize
+  if (element.locked) {
+    return {};
+  }
+
   let omitSides: { [T in TransformHandleType]?: boolean } = {};
   if (
     element.type === "arrow" ||
@@ -242,7 +250,7 @@ export const getTransformHandles = (
         omitSides = OMIT_SIDES_FOR_LINE_BACKSLASH;
       }
     }
-  } else if (element.type === "text") {
+  } else if (isTextElement(element)) {
     omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   }
 

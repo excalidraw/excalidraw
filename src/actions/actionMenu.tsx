@@ -1,4 +1,3 @@
-import React from "react";
 import { menu, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
@@ -10,6 +9,7 @@ import { HelpIcon } from "../components/HelpIcon";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
+  trackEvent: { category: "menu" },
   perform: (_, appState) => ({
     appState: {
       ...appState,
@@ -30,6 +30,7 @@ export const actionToggleCanvasMenu = register({
 
 export const actionToggleEditMenu = register({
   name: "toggleEditMenu",
+  trackEvent: { category: "menu" },
   perform: (_elements, appState) => ({
     appState: {
       ...appState,
@@ -54,6 +55,7 @@ export const actionToggleEditMenu = register({
 
 export const actionFullScreen = register({
   name: "toggleFullScreen",
+  trackEvent: { category: "canvas", predicate: (appState) => !isFullScreen() },
   perform: () => {
     if (!isFullScreen()) {
       allowFullScreen();
@@ -70,6 +72,7 @@ export const actionFullScreen = register({
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
+  trackEvent: { category: "menu", action: "toggleHelpDialog" },
   perform: (_elements, appState, _, { focusContainer }) => {
     if (appState.showHelpDialog) {
       focusContainer();

@@ -20,7 +20,7 @@ const headerForType = {
   perf: "Performance",
   build: "Build",
 };
-
+const badCommits = [];
 const getCommitHashForLastVersion = async () => {
   try {
     const commitMessage = `"release @excalidraw/excalidraw@${lastVersion}"`;
@@ -28,8 +28,8 @@ const getCommitHashForLastVersion = async () => {
       `git log --format=format:"%H" --grep=${commitMessage}`,
     );
     return stdout;
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
   }
 };
 
@@ -53,19 +53,26 @@ const getLibraryCommitsSinceLastRelease = async () => {
     const messageWithoutType = commit.slice(indexOfColon + 1).trim();
     const messageWithCapitalizeFirst =
       messageWithoutType.charAt(0).toUpperCase() + messageWithoutType.slice(1);
-    const prNumber = commit.match(/\(#([0-9]*)\)/)[1];
+    const prMatch = commit.match(/\(#([0-9]*)\)/);
+    if (prMatch) {
+      const prNumber = prMatch[1];
 
-    // return if the changelog already contains the pr number which would happen for package updates
-    if (existingChangeLog.includes(prNumber)) {
-      return;
+      // return if the changelog already contains the pr number which would happen for package updates
+      if (existingChangeLog.includes(prNumber)) {
+        return;
+      }
+      const prMarkdown = `[#${prNumber}](https://github.com/excalidraw/excalidraw/pull/${prNumber})`;
+      const messageWithPRLink = messageWithCapitalizeFirst.replace(
+        /\(#[0-9]*\)/,
+        prMarkdown,
+      );
+      commitList[type].push(messageWithPRLink);
+    } else {
+      badCommits.push(commit);
+      commitList[type].push(messageWithCapitalizeFirst);
     }
-    const prMarkdown = `[#${prNumber}](https://github.com/excalidraw/excalidraw/pull/${prNumber})`;
-    const messageWithPRLink = messageWithCapitalizeFirst.replace(
-      /\(#[0-9]*\)/,
-      prMarkdown,
-    );
-    commitList[type].push(messageWithPRLink);
   });
+  console.info("Bad commits:", badCommits);
   return commitList;
 };
 

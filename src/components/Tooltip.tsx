@@ -2,7 +2,7 @@ import "./Tooltip.scss";
 
 import React, { useEffect } from "react";
 
-const getTooltipDiv = () => {
+export const getTooltipDiv = () => {
   const existingDiv = document.querySelector<HTMLDivElement>(
     ".excalidraw-tooltip",
   );
@@ -13,6 +13,50 @@ const getTooltipDiv = () => {
   document.body.appendChild(div);
   div.classList.add("excalidraw-tooltip");
   return div;
+};
+
+export const updateTooltipPosition = (
+  tooltip: HTMLDivElement,
+  item: {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  },
+  position: "bottom" | "top" = "bottom",
+) => {
+  const tooltipRect = tooltip.getBoundingClientRect();
+
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  const margin = 5;
+
+  let left = item.left + item.width / 2 - tooltipRect.width / 2;
+  if (left < 0) {
+    left = margin;
+  } else if (left + tooltipRect.width >= viewportWidth) {
+    left = viewportWidth - tooltipRect.width - margin;
+  }
+
+  let top: number;
+
+  if (position === "bottom") {
+    top = item.top + item.height + margin;
+    if (top + tooltipRect.height >= viewportHeight) {
+      top = item.top - tooltipRect.height - margin;
+    }
+  } else {
+    top = item.top - tooltipRect.height - margin;
+    if (top < 0) {
+      top = item.top + item.height + margin;
+    }
+  }
+
+  Object.assign(tooltip.style, {
+    top: `${top}px`,
+    left: `${left}px`,
+  });
 };
 
 const updateTooltip = (
@@ -27,51 +71,27 @@ const updateTooltip = (
 
   tooltip.textContent = label;
 
-  const {
-    x: itemX,
-    bottom: itemBottom,
-    top: itemTop,
-    width: itemWidth,
-  } = item.getBoundingClientRect();
-
-  const {
-    width: labelWidth,
-    height: labelHeight,
-  } = tooltip.getBoundingClientRect();
-
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-
-  const margin = 5;
-
-  const left = itemX + itemWidth / 2 - labelWidth / 2;
-  const offsetLeft =
-    left + labelWidth >= viewportWidth ? left + labelWidth - viewportWidth : 0;
-
-  const top = itemBottom + margin;
-  const offsetTop =
-    top + labelHeight >= viewportHeight
-      ? itemBottom - itemTop + labelHeight + margin * 2
-      : 0;
-
-  Object.assign(tooltip.style, {
-    top: `${top - offsetTop}px`,
-    left: `${left - offsetLeft}px`,
-  });
+  const itemRect = item.getBoundingClientRect();
+  updateTooltipPosition(tooltip, itemRect);
 };
 
 type TooltipProps = {
   children: React.ReactNode;
   label: string;
   long?: boolean;
+  style?: React.CSSProperties;
 };
 
-export const Tooltip = ({ children, label, long = false }: TooltipProps) => {
+export const Tooltip = ({
+  children,
+  label,
+  long = false,
+  style,
+}: TooltipProps) => {
   useEffect(() => {
     return () =>
       getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
   }, []);
-
   return (
     <div
       className="excalidraw-tooltip-wrapper"
@@ -86,6 +106,7 @@ export const Tooltip = ({ children, label, long = false }: TooltipProps) => {
       onPointerLeave={() =>
         getTooltipDiv().classList.remove("excalidraw-tooltip--visible")
       }
+      style={style}
     >
       {children}
     </div>

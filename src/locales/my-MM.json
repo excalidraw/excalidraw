@@ -9,6 +9,7 @@
     "copy": "ကူး",
     "copyAsPng": "PNG အနေဖြင့်ကူး",
     "copyAsSvg": "SVG အနေဖြင့်ကူး",
+    "copyText": "",
     "bringForward": "ရှေ့ပို့",
     "sendToBack": "နောက်ဆုံးထား",
     "bringToFront": "ရှေ့ဆုံးထား",
@@ -20,10 +21,6 @@
     "background": "နောက်ခံ",
     "fill": "ဖြည့်",
     "strokeWidth": "မျဉ်းအထူ",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "မျဉ်းပုံစံ",
     "strokeStyle_solid": "အပြည့်",
     "strokeStyle_dashed": "မျဉ်းပြတ်",
@@ -39,6 +36,7 @@
     "arrowhead_arrow": "မြှား",
     "arrowhead_bar": "",
     "arrowhead_dot": "အစက်",
+    "arrowhead_triangle": "",
     "fontSize": "စာလုံးအရွယ်",
     "fontFamily": "စာလုံးပုံစံ",
     "onlySelected": "ရွေးထားသလောက်",
@@ -67,6 +65,7 @@
     "cartoonist": "ကာတွန်း",
     "fileTitle": "",
     "colorPicker": "အရောင်ရွေး",
+    "canvasColors": "",
     "canvasBackground": "ကားချပ်နောက်ခံ",
     "drawingCanvas": "ပုံဆွဲကားချပ်",
     "layers": "အလွှာများ",
@@ -103,7 +102,31 @@
     "share": "",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": ""
+    "toggleTheme": "",
+    "personalLib": "",
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": "",
+    "unbindText": "",
+    "bindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
@@ -136,7 +159,13 @@
     "darkMode": "",
     "lightMode": "",
     "zenMode": "",
-    "exitZenMode": "ဇင်မြင်ကွင်းမှထွက်"
+    "exitZenMode": "ဇင်မြင်ကွင်းမှထွက်",
+    "cancel": "",
+    "clear": "",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "ကားချပ်တစ်ခုလုံးရှင်းလင်းပါတော့မည်။ အတည်ပြုပါ။",
@@ -145,22 +174,34 @@
     "couldNotLoadInvalidFile": "လွဲမှားနေသောဖိုင်အား တင်၍မရပါ။",
     "importBackendFailed": "Backend မှမလုပ်ဆောင်နိုင်သေးပါ။",
     "cannotExportEmptyCanvas": "ကားချပ်အလွတ်အားထုတ်ယူ၍မရပါ။",
-    "couldNotCopyToClipboard": "ကူးယူ၍မရပါ။ Google Chrome တွင်စမ်းကြည့်ပါ။",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "အချက်အလက်ဖော်ယူ၍မရပါ။",
     "uploadedSecurly": "တင်သွင်းအချက်အလက်များအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်စနစ်အသုံးပြု၍လုံခြုံစွာထိန်းသိမ်းထားပါသဖြင့် Excalidraw ဆာဗာနှင့်ဆက်စပ်အဖွဲ့အစည်းများပင်လျှင်မဖတ်ရှုနိုင်ပါ။",
     "loadSceneOverridePrompt": "လက်ရှိရေးဆွဲထားသမျှအား ပြင်ပမှတင်သွင်းသောပုံနှင့်အစားထိုးပါမည်။ ဆက်လက်ဆောင်ရွက်လိုပါသလား။",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "ပြင်ပမှမှတ်တမ်းအားတင်သွင်းရာတွင်အမှားအယွင်းရှိနေသည်။",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "{{numShapes}} ခုသောပုံသဏ္ဌာန်အားမှတ်တမ်းတင်ပါမည်။ အတည်ပြုပါ။",
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "ဤပုံဖြင့်မြင်ကွင်းပြန်လည်မရယူနိုင်ပါ။",
     "invalidSceneUrl": "",
-    "resetLibrary": ""
+    "resetLibrary": "",
+    "removeItemsFromsLibrary": "",
+    "invalidEncryptionKey": "",
+    "browserZoom": ""
+  },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
+    "image": "",
     "rectangle": "စတုဂံ",
     "diamond": "စိန်",
     "ellipse": "အဝိုင်း",
@@ -169,7 +210,10 @@
     "freedraw": "",
     "text": "စာသား",
     "library": "မှတ်တမ်း",
-    "lock": "ရွေးချယ်ထားသောကိရိယာကိုသာဆက်သုံး"
+    "lock": "ရွေးချယ်ထားသောကိရိယာကိုသာဆက်သုံး",
+    "penMode": "",
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "ကားချပ်လုပ်ဆောင်ချက်",
@@ -177,6 +221,7 @@
     "shapes": "ပုံသဏ္ဌာန်များ"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "အမှတ်များချမှတ်ရေးဆွဲရန်ကလစ်နှိပ်ပါ၊ မျဉ်းတစ်ကြောင်းတည်းအတွက် တရွတ်ဆွဲပါ။",
     "freeDraw": "ကလစ်နှိပ်၍ တရွတ်ဆွဲပါ၊ ပြီးလျှင်လွှတ်ပါ။",
     "text": "မှတ်ချက်။ ။မည်သည့်ကိရိယာရွေးထားသည်ဖြစ်စေ ကလစ်နှစ်ချက်နှိပ်၍စာသားထည့်နိုင်သည်",
@@ -185,10 +230,16 @@
     "linearElementMulti": "နောက်ဆုံးအမှတ်ပေါ်တွင်ကလစ်နှိပ်ခြင်း၊ Escape (သို့) Enter နှိပ်ခြင်းတို့ဖြင့်အဆုံးသတ်နိုင်",
     "lockAngle": "",
     "resize": "အချိုးအစားကန့်သတ်ရန် Shift နှင့် ဗဟိုမှချိန်ညှိရန် Alt တို့ကိုနှိပ်ထားနိုင်သည်",
+    "resizeImage": "",
     "rotate": "Shift ကိုနှိပ်ထားခြင်းဖြင့် ထောင့်အလိုက်လှည့်နိုင်သည်",
     "lineEditor_info": "အမှတ်များပြင်ဆင်သတ်မှတ်ရင် ကလစ်နှစ်ချက် (သို့) Enter ကိုနှိပ်ပါ",
-    "lineEditor_pointSelected": "အမှတ်များအား ဖျက်ရန် Delete နှင့် ပွားရန် Ctrl/Cmd + D သုံးပါ၊ ရွှေ့လိုပါက တရွတ်ဆွဲပါ",
-    "lineEditor_nothingSelected": "ရွှေ့လို (သို့) ဖယ်ရှားလိုသောအမှတ်ကိုရွေးပါ၊ Alt နှင့် ကလစ်တွဲနှိပ်၍လည်းအမှတ်အသစ်ထပ်ထည့်နိုင်သည်"
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
+    "placeImage": "",
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "နမူနာမပြသနိုင်ပါ",
@@ -235,6 +286,8 @@
   "helpDialog": {
     "blog": "",
     "click": "",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "",
@@ -246,14 +299,67 @@
     "howto": "",
     "or": "",
     "preventBinding": "",
-    "shapes": "",
+    "tools": "",
     "shortcuts": "",
     "textFinish": "",
     "textNewLine": "",
     "title": "",
     "view": "",
     "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToSelection": "",
+    "toggleElementLock": ""
+  },
+  "clearCanvasDialog": {
+    "title": ""
+  },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": "",
+    "republishWarning": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
   },
   "encrypted": {
     "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။",
@@ -275,6 +381,7 @@
     "width": "အကျယ်"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "",
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",

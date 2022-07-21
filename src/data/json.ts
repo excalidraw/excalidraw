@@ -1,28 +1,67 @@
-import { fileOpen, fileSave } from "browser-fs-access";
-import { cleanAppStateForExport } from "../appState";
-import { EXPORT_DATA_TYPES, EXPORT_SOURCE, MIME_TYPES } from "../constants";
-import { clearElementsForExport } from "../element";
+import { fileOpen, fileSave } from "./filesystem";
+import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
+import {
+  EXPORT_DATA_TYPES,
+  EXPORT_SOURCE,
+  MIME_TYPES,
+  VERSIONS,
+} from "../constants";
+import { clearElementsForDatabase, clearElementsForExport } from "../element";
 import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
-import { isImageFileHandle, loadFromBlob } from "./blob";
+import { AppState, BinaryFiles, LibraryItems } from "../types";
+import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
 
 import {
   ExportedDataState,
   ImportedDataState,
   ExportedLibraryData,
+  ImportedLibraryData,
 } from "./types";
-import Library from "./library";
+
+/**
+ * Strips out files which are only referenced by deleted elements
+ */
+const filterOutDeletedFiles = (
+  elements: readonly ExcalidrawElement[],
+  files: BinaryFiles,
+) => {
+  const nextFiles: BinaryFiles = {};
+  for (const element of elements) {
+    if (
+      !element.isDeleted &&
+      "fileId" in element &&
+      element.fileId &&
+      files[element.fileId]
+    ) {
+      nextFiles[element.fileId] = files[element.fileId];
+    }
+  }
+  return nextFiles;
+};
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
   appState: Partial<AppState>,
+  files: BinaryFiles,
+  type: "local" | "database",
 ): string => {
   const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,
-    version: 2,
+    version: VERSIONS.excalidraw,
     source: EXPORT_SOURCE,
-    elements: clearElementsForExport(elements),
-    appState: cleanAppStateForExport(appState),
+    elements:
+      type === "local"
+        ? clearElementsForExport(elements)
+        : clearElementsForDatabase(elements),
+    appState:
+      type === "local"
+        ? cleanAppStateForExport(appState)
+        : clearAppStateForDatabase(appState),
+    files:
+      type === "local"
+        ? filterOutDeletedFiles(elements, files)
+        : // will be stripped from JSON
+          undefined,
   };
 
   return JSON.stringify(data, null, 2);
@@ -31,21 +70,21 @@ export const serializeAsJSON = (
 export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
 ) => {
-  const serialized = serializeAsJSON(elements, appState);
+  const serialized = serializeAsJSON(elements, appState, files, "local");
   const blob = new Blob([serialized], {
     type: MIME_TYPES.excalidraw,
   });
 
-  const fileHandle = await fileSave(
-    blob,
-    {
-      fileName: `${appState.name}.excalidraw`,
-      description: "Excalidraw file",
-      extensions: [".excalidraw"],
-    },
-    isImageFileHandle(appState.fileHandle) ? null : appState.fileHandle,
-  );
+  const fileHandle = await fileSave(blob, {
+    name: appState.name,
+    extension: "excalidraw",
+    description: "Excalidraw file",
+    fileHandle: isImageFileHandle(appState.fileHandle)
+      ? null
+      : appState.fileHandle,
+  });
   return { fileHandle };
 };
 
@@ -53,21 +92,18 @@ export const loadFromJSON = async (
   localAppState: AppState,
   localElements: readonly ExcalidrawElement[] | null,
 ) => {
-  const blob = await fileOpen({
+  const file = await fileOpen({
     description: "Excalidraw files",
     // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
     // gets resolved. Else, iOS users cannot open `.excalidraw` files.
-    /*
-    extensions: [".json", ".excalidraw", ".png", ".svg"],
-    mimeTypes: [
-      MIME_TYPES.excalidraw,
-      "application/json",
-      "image/png",
-      "image/svg+xml",
-    ],
-    */
+    // extensions: ["json", "excalidraw", "png", "svg"],
   });
-  return loadFromBlob(blob, localAppState, localElements);
+  return loadFromBlob(
+    await normalizeFile(file),
+    localAppState,
+    localElements,
+    file.handle,
+  );
 };
 
 export const isValidExcalidrawData = (data?: {
@@ -83,43 +119,35 @@ export const isValidExcalidrawData = (data?: {
   );
 };
 
-export const isValidLibrary = (json: any) => {
+export const isValidLibrary = (json: any): json is ImportedLibraryData => {
   return (
     typeof json === "object" &&
     json &&
     json.type === EXPORT_DATA_TYPES.excalidrawLibrary &&
-    json.version === 1
+    (json.version === 1 || json.version === 2)
   );
 };
 
-export const saveLibraryAsJSON = async (library: Library) => {
-  const libraryItems = await library.loadLibrary();
+export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
   const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
-    version: 1,
+    version: VERSIONS.excalidrawLibrary,
     source: EXPORT_SOURCE,
-    library: libraryItems,
+    libraryItems,
   };
-  const serialized = JSON.stringify(data, null, 2);
-  const fileName = "library.excalidrawlib";
-  const blob = new Blob([serialized], {
-    type: MIME_TYPES.excalidrawlib,
-  });
-  await fileSave(blob, {
-    fileName,
-    description: "Excalidraw library file",
-    extensions: [".excalidrawlib"],
-  });
+  return JSON.stringify(data, null, 2);
 };
 
-export const importLibraryFromJSON = async (library: Library) => {
-  const blob = await fileOpen({
-    description: "Excalidraw library files",
-    // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
-    // gets resolved. Else, iOS users cannot open `.excalidraw` files.
-    /*
-    extensions: [".json", ".excalidrawlib"],
-    */
-  });
-  await library.importLibrary(blob);
+export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
+  const serialized = serializeLibraryAsJSON(libraryItems);
+  await fileSave(
+    new Blob([serialized], {
+      type: MIME_TYPES.excalidrawlib,
+    }),
+    {
+      name: "library",
+      extension: "excalidrawlib",
+      description: "Excalidraw library file",
+    },
+  );
 };

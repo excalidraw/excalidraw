@@ -1,30 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { LoadingMessage } from "./LoadingMessage";
 import { defaultLang, Language, languages, setLanguage } from "../i18n";
 
 interface Props {
   langCode: Language["code"];
+  children: React.ReactElement;
 }
-interface State {
-  isLoading: boolean;
-}
-export class InitializeApp extends React.Component<Props, State> {
-  public state: { isLoading: boolean } = {
-    isLoading: true,
-  };
 
-  async componentDidMount() {
+export const InitializeApp = (props: Props) => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const updateLang = async () => {
+      await setLanguage(currentLang);
+      setLoading(false);
+    };
     const currentLang =
-      languages.find((lang) => lang.code === this.props.langCode) ||
-      defaultLang;
-    await setLanguage(currentLang);
-    this.setState({
-      isLoading: false,
-    });
-  }
+      languages.find((lang) => lang.code === props.langCode) || defaultLang;
+    updateLang();
+  }, [props.langCode]);
 
-  public render() {
-    return this.state.isLoading ? <LoadingMessage /> : this.props.children;
-  }
-}
+  return loading ? <LoadingMessage /> : props.children;
+};

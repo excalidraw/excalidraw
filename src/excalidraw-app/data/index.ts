@@ -1,35 +1,89 @@
+import { compressData, decompressData } from "../../data/encode";
+import {
+  decryptData,
+  generateEncryptionKey,
+  IV_LENGTH_BYTES,
+} from "../../data/encryption";
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
-import { ExcalidrawElement } from "../../element/types";
+import { isInvisiblySmallElement } from "../../element/sizeHelpers";
+import { isInitializedImageElement } from "../../element/typeChecks";
+import { ExcalidrawElement, FileId } from "../../element/types";
 import { t } from "../../i18n";
-import { AppState, UserIdleState } from "../../types";
+import {
+  AppState,
+  BinaryFileData,
+  BinaryFiles,
+  UserIdleState,
+} from "../../types";
+import { bytesToHexString } from "../../utils";
+import {
+  DELETED_ELEMENT_TIMEOUT,
+  FILE_UPLOAD_MAX_BYTES,
+  ROOM_ID_BYTES,
+} from "../app_constants";
+import { encodeFilesForUpload } from "./FileManager";
+import { saveFilesToFirebase } from "./firebase";
 
-const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
+export type SyncableExcalidrawElement = ExcalidrawElement & {
+  _brand: "SyncableExcalidrawElement";
+};
 
-const BACKEND_GET = process.env.REACT_APP_BACKEND_V1_GET_URL;
+export const isSyncableElement = (
+  element: ExcalidrawElement,
+): element is SyncableExcalidrawElement => {
+  if (element.isDeleted) {
+    if (element.updated > Date.now() - DELETED_ELEMENT_TIMEOUT) {
+      return true;
+    }
+    return false;
+  }
+  return !isInvisiblySmallElement(element);
+};
+
+export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
+  elements.filter((element) =>
+    isSyncableElement(element),
+  ) as SyncableExcalidrawElement[];
+
 const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
 const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
 
-const generateRandomID = async () => {
-  const arr = new Uint8Array(10);
-  window.crypto.getRandomValues(arr);
-  return Array.from(arr, byteToHex).join("");
+const generateRoomId = async () => {
+  const buffer = new Uint8Array(ROOM_ID_BYTES);
+  window.crypto.getRandomValues(buffer);
+  return bytesToHexString(buffer);
 };
 
-export const generateEncryptionKey = async () => {
-  const key = await window.crypto.subtle.generateKey(
-    {
-      name: "AES-GCM",
-      length: 128,
-    },
-    true, // extractable
-    ["encrypt", "decrypt"],
-  );
-  return (await window.crypto.subtle.exportKey("jwk", key)).k;
-};
+/**
+ * Right now the reason why we resolve connection params (url, polling...)
+ * from upstream is to allow changing the params immediately when needed without
+ * having to wait for clients to update the SW.
+ *
+ * If REACT_APP_WS_SERVER_URL env is set, we use that instead (useful for forks)
+ */
+export const getCollabServer = async (): Promise<{
+  url: string;
+  polling: boolean;
+}> => {
+  if (process.env.REACT_APP_WS_SERVER_URL) {
+    return {
+      url: process.env.REACT_APP_WS_SERVER_URL,
+      polling: true,
+    };
+  }
 
-export const SOCKET_SERVER = process.env.REACT_APP_SOCKET_SERVER_URL;
+  try {
+    const resp = await fetch(
+      `${process.env.REACT_APP_PORTAL_URL}/collab-server`,
+    );
+    return await resp.json();
+  } catch (error) {
+    console.error(error);
+    throw new Error(t("errors.cannotResolveCollabServer"));
+  }
+};
 
 export type EncryptedData = {
   data: ArrayBuffer;
@@ -75,68 +129,21 @@ export type SocketUpdateDataIncoming =
       type: "INVALID_RESPONSE";
     };
 
-export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-  _brand: "socketUpdateData";
-};
-
-const IV_LENGTH_BYTES = 12; // 96 bits
-
-export const createIV = () => {
-  const arr = new Uint8Array(IV_LENGTH_BYTES);
-  return window.crypto.getRandomValues(arr);
-};
-
-export const encryptAESGEM = async (
-  data: Uint8Array,
-  key: string,
-): Promise<EncryptedData> => {
-  const importedKey = await getImportedKey(key, "encrypt");
-  const iv = createIV();
-  return {
-    data: await window.crypto.subtle.encrypt(
-      {
-        name: "AES-GCM",
-        iv,
-      },
-      importedKey,
-      data,
-    ),
-    iv,
+export type SocketUpdateData =
+  SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
+    _brand: "socketUpdateData";
   };
-};
 
-export const decryptAESGEM = async (
-  data: ArrayBuffer,
-  key: string,
-  iv: Uint8Array,
-): Promise<SocketUpdateDataIncoming> => {
-  try {
-    const importedKey = await getImportedKey(key, "decrypt");
-    const decrypted = await window.crypto.subtle.decrypt(
-      {
-        name: "AES-GCM",
-        iv,
-      },
-      importedKey,
-      data,
-    );
+const RE_COLLAB_LINK = /^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/;
 
-    const decodedData = new TextDecoder("utf-8").decode(
-      new Uint8Array(decrypted) as any,
-    );
-    return JSON.parse(decodedData);
-  } catch (error) {
-    window.alert(t("alerts.decryptFailed"));
-    console.error(error);
-  }
-  return {
-    type: "INVALID_RESPONSE",
-  };
+export const isCollaborationLink = (link: string) => {
+  const hash = new URL(link).hash;
+  return RE_COLLAB_LINK.test(hash);
 };
 
 export const getCollaborationLinkData = (link: string) => {
   const hash = new URL(link).hash;
-  const match = hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+  const match = hash.match(RE_COLLAB_LINK);
   if (match && match[2].length !== 22) {
     window.alert(t("alerts.invalidEncryptionKey"));
     return null;
@@ -145,7 +152,7 @@ export const getCollaborationLinkData = (link: string) => {
 };
 
 export const generateCollaborationLinkData = async () => {
-  const roomId = await generateRandomID();
+  const roomId = await generateRoomId();
   const roomKey = await generateEncryptionKey();
 
   if (!roomKey) {
@@ -162,84 +169,78 @@ export const getCollaborationLink = (data: {
   return `${window.location.origin}${window.location.pathname}#room=${data.roomId},${data.roomKey}`;
 };
 
-export const getImportedKey = (key: string, usage: KeyUsage) =>
-  window.crypto.subtle.importKey(
-    "jwk",
-    {
-      alg: "A128GCM",
-      ext: true,
-      k: key,
-      key_ops: ["encrypt", "decrypt"],
-      kty: "oct",
-    },
-    {
-      name: "AES-GCM",
-      length: 128,
-    },
-    false, // extractable
-    [usage],
-  );
+/**
+ * Decodes shareLink data using the legacy buffer format.
+ * @deprecated
+ */
+const legacy_decodeFromBackend = async ({
+  buffer,
+  decryptionKey,
+}: {
+  buffer: ArrayBuffer;
+  decryptionKey: string;
+}) => {
+  let decrypted: ArrayBuffer;
 
-export const decryptImported = async (
-  iv: ArrayBuffer,
-  encrypted: ArrayBuffer,
-  privateKey: string,
-): Promise<ArrayBuffer> => {
-  const key = await getImportedKey(privateKey, "decrypt");
-  return window.crypto.subtle.decrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    key,
-    encrypted,
+  try {
+    // Buffer should contain both the IV (fixed length) and encrypted data
+    const iv = buffer.slice(0, IV_LENGTH_BYTES);
+    const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
+    decrypted = await decryptData(new Uint8Array(iv), encrypted, decryptionKey);
+  } catch (error: any) {
+    // Fixed IV (old format, backward compatibility)
+    const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
+    decrypted = await decryptData(fixedIv, buffer, decryptionKey);
+  }
+
+  // We need to convert the decrypted array buffer to a string
+  const string = new window.TextDecoder("utf-8").decode(
+    new Uint8Array(decrypted),
   );
+  const data: ImportedDataState = JSON.parse(string);
+
+  return {
+    elements: data.elements || null,
+    appState: data.appState || null,
+  };
 };
 
 const importFromBackend = async (
-  id: string | null,
-  privateKey?: string | null,
+  id: string,
+  decryptionKey: string,
 ): Promise<ImportedDataState> => {
   try {
-    const response = await fetch(
-      privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
-    );
+    const response = await fetch(`${BACKEND_V2_GET}${id}`);
 
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
       return {};
     }
-    let data: ImportedDataState;
-    if (privateKey) {
-      const buffer = await response.arrayBuffer();
+    const buffer = await response.arrayBuffer();
 
-      let decrypted: ArrayBuffer;
-      try {
-        // Buffer should contain both the IV (fixed length) and encrypted data
-        const iv = buffer.slice(0, IV_LENGTH_BYTES);
-        const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
-        decrypted = await decryptImported(iv, encrypted, privateKey);
-      } catch (error) {
-        // Fixed IV (old format, backward compatibility)
-        const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
-        decrypted = await decryptImported(fixedIv, buffer, privateKey);
-      }
-
-      // We need to convert the decrypted array buffer to a string
-      const string = new window.TextDecoder("utf-8").decode(
-        new Uint8Array(decrypted) as any,
+    try {
+      const { data: decodedBuffer } = await decompressData(
+        new Uint8Array(buffer),
+        {
+          decryptionKey,
+        },
       );
-      data = JSON.parse(string);
-    } else {
-      // Legacy format
-      data = await response.json();
-    }
+      const data: ImportedDataState = JSON.parse(
+        new TextDecoder().decode(decodedBuffer),
+      );
 
-    return {
-      elements: data.elements || null,
-      appState: data.appState || null,
-    };
-  } catch (error) {
+      return {
+        elements: data.elements || null,
+        appState: data.appState || null,
+      };
+    } catch (error: any) {
+      console.warn(
+        "error when decoding shareLink data using the new format:",
+        error,
+      );
+      return legacy_decodeFromBackend({ buffer, decryptionKey });
+    }
+  } catch (error: any) {
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
     return {};
@@ -255,7 +256,7 @@ export const loadScene = async (
   localDataState: ImportedDataState | undefined | null,
 ) => {
   let data;
-  if (id != null) {
+  if (id != null && privateKey != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
     data = restore(
@@ -270,6 +271,10 @@ export const loadScene = async (
   return {
     elements: data.elements,
     appState: data.appState,
+    // note: this will always be empty because we're not storing files
+    // in the scene database/localStorage, and instead fetch them async
+    // from a different database
+    files: data.files,
     commitToHistory: false,
   };
 };
@@ -277,58 +282,55 @@ export const loadScene = async (
 export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
 ) => {
-  const json = serializeAsJSON(elements, appState);
-  const encoded = new TextEncoder().encode(json);
+  const encryptionKey = await generateEncryptionKey("string");
 
-  const key = await window.crypto.subtle.generateKey(
-    {
-      name: "AES-GCM",
-      length: 128,
-    },
-    true, // extractable
-    ["encrypt", "decrypt"],
+  const payload = await compressData(
+    new TextEncoder().encode(
+      serializeAsJSON(elements, appState, files, "database"),
+    ),
+    { encryptionKey },
   );
-
-  const iv = createIV();
-  // We use symmetric encryption. AES-GCM is the recommended algorithm and
-  // includes checks that the ciphertext has not been modified by an attacker.
-  const encrypted = await window.crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    key,
-    encoded,
-  );
-
-  // Concatenate IV with encrypted data (IV does not have to be secret).
-  const payloadBlob = new Blob([iv.buffer, encrypted]);
-  const payload = await new Response(payloadBlob).arrayBuffer();
-
-  // We use jwk encoding to be able to extract just the base64 encoded key.
-  // We will hardcode the rest of the attributes when importing back the key.
-  const exportedKey = await window.crypto.subtle.exportKey("jwk", key);
 
   try {
+    const filesMap = new Map<FileId, BinaryFileData>();
+    for (const element of elements) {
+      if (isInitializedImageElement(element) && files[element.fileId]) {
+        filesMap.set(element.fileId, files[element.fileId]);
+      }
+    }
+
+    const filesToUpload = await encodeFilesForUpload({
+      files: filesMap,
+      encryptionKey,
+      maxBytes: FILE_UPLOAD_MAX_BYTES,
+    });
+
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
-      body: payload,
+      body: payload.buffer,
     });
     const json = await response.json();
     if (json.id) {
       const url = new URL(window.location.href);
       // We need to store the key (and less importantly the id) as hash instead
       // of queryParam in order to never send it to the server
-      url.hash = `json=${json.id},${exportedKey.k!}`;
+      url.hash = `json=${json.id},${encryptionKey}`;
       const urlString = url.toString();
+
+      await saveFilesToFirebase({
+        prefix: `/files/shareLinks/${json.id}`,
+        files: filesToUpload,
+      });
+
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
     } else if (json.error_class === "RequestTooLargeError") {
       window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }

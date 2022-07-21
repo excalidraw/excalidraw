@@ -9,6 +9,7 @@
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
     "copyAsSvg": "Copy to clipboard as SVG",
+    "copyText": "Copy to clipboard as text",
     "bringForward": "Bring forward",
     "sendToBack": "Send to back",
     "bringToFront": "Bring to front",
@@ -20,10 +21,6 @@
     "background": "Background",
     "fill": "Fill",
     "strokeWidth": "Stroke width",
-    "strokeShape": "Stroke shape",
-    "strokeShape_gel": "Gel pen",
-    "strokeShape_fountain": "Fountain pen",
-    "strokeShape_brush": "Brush pen",
     "strokeStyle": "Stroke style",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Dashed",
@@ -39,6 +36,7 @@
     "arrowhead_arrow": "Arrow",
     "arrowhead_bar": "Bar",
     "arrowhead_dot": "Dot",
+    "arrowhead_triangle": "Triangle",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
@@ -67,6 +65,7 @@
     "cartoonist": "Cartoonist",
     "fileTitle": "File name",
     "colorPicker": "Color picker",
+    "canvasColors": "Used on canvas",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing canvas",
     "layers": "Layers",
@@ -103,7 +102,31 @@
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
-    "toggleTheme": "Toggle theme"
+    "toggleTheme": "Toggle theme",
+    "personalLib": "Personal Library",
+    "excalidrawLib": "Excalidraw Library",
+    "decreaseFontSize": "Decrease font size",
+    "increaseFontSize": "Increase font size",
+    "unbindText": "Unbind text",
+    "bindText": "Bind text to the container",
+    "link": {
+      "edit": "Edit link",
+      "create": "Create link",
+      "label": "Link"
+    },
+    "elementLock": {
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "lockAll": "Lock all",
+      "unlockAll": "Unlock all"
+    },
+    "statusPublished": "Published",
+    "sidebarLock": "Keep sidebar open"
+  },
+  "library": {
+    "noItems": "No items added yet...",
+    "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
+    "hint_emptyPrivateLibrary": "Select an item on canvas to add it here."
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -136,7 +159,13 @@
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
     "zenMode": "Zen mode",
-    "exitZenMode": "Exit zen mode"
+    "exitZenMode": "Exit zen mode",
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "remove": "Remove",
+    "publishLibrary": "Publish",
+    "submit": "Submit",
+    "confirm": "Confirm"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -145,23 +174,34 @@
     "couldNotLoadInvalidFile": "Couldn't load invalid file",
     "importBackendFailed": "Importing from backend failed.",
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
-    "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
+    "couldNotCopyToClipboard": "Couldn't copy to clipboard.",
     "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
     "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
     "collabStopOverridePrompt": "Stopping the session will overwrite your previous, locally stored drawing. Are you sure?\n\n(If you want to keep your local drawing, simply close the browser tab instead.)",
-    "errorLoadingLibrary": "There was an error loading the third party library.",
     "errorAddingToLibrary": "Couldn't add item to the library",
     "errorRemovingFromLibrary": "Couldn't remove item from the library",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
-    "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
+    "imageDoesNotContainScene": "This image does not seem to contain any scene data. Have you enabled scene embedding during export?",
     "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
     "invalidSceneUrl": "Couldn't import scene from the supplied URL. It's either malformed, or doesn't contain valid Excalidraw JSON data.",
     "resetLibrary": "This will clear your library. Are you sure?",
-    "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled."
+    "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
+    "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
+    "browserZoom": "Your browser's zoom level is not set to 100% which may cause the board to display incorrectly"
+  },
+  "errors": {
+    "unsupportedFileType": "Unsupported file type.",
+    "imageInsertError": "Couldn't insert image. Try again later...",
+    "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
+    "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
+    "invalidSVGString": "Invalid SVG.",
+    "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
+    "importLibraryError": "Couldn't load library"
   },
   "toolBar": {
     "selection": "Selection",
+    "image": "Insert image",
     "rectangle": "Rectangle",
     "diamond": "Diamond",
     "ellipse": "Ellipse",
@@ -170,7 +210,10 @@
     "freedraw": "Draw",
     "text": "Text",
     "library": "Library",
-    "lock": "Keep selected tool active after drawing"
+    "lock": "Keep selected tool active after drawing",
+    "penMode": "Prevent pinch-zoom and accept freedraw input only from pen",
+    "link": "Add/ Update link for a selected shape",
+    "eraser": "Eraser"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -178,6 +221,7 @@
     "shapes": "Shapes"
   },
   "hints": {
+    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging",
     "linearElement": "Click to start multiple points, drag for single line",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
@@ -186,10 +230,16 @@
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "lockAngle": "You can constrain angle by holding SHIFT",
     "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
+    "resizeImage": "You can resize freely by holding SHIFT,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating",
     "lineEditor_info": "Double-click or press Enter to edit points",
-    "lineEditor_pointSelected": "Press Delete to remove point, CtrlOrCmd+D to duplicate, or drag to move",
-    "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points"
+    "lineEditor_pointSelected": "Press Delete to remove point(s),\nCtrlOrCmd+D to duplicate, or drag to move",
+    "lineEditor_nothingSelected": "Select a point to edit (hold SHIFT to select multiple),\nor hold Alt and click to add new points",
+    "placeImage": "Click to place the image, or click and drag to set its size manually",
+    "publishLibrary": "Publish your own library",
+    "bindTextToElement": "Press enter to add text",
+    "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
+    "eraserRevert": "Hold Alt to revert the elements marked for deletion"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -236,6 +286,8 @@
   "helpDialog": {
     "blog": "Read our blog",
     "click": "click",
+    "deepSelect": "Deep select",
+    "deepBoxSelect": "Deep select within box, and prevent dragging",
     "curvedArrow": "Curved arrow",
     "curvedLine": "Curved line",
     "documentation": "Documentation",
@@ -247,14 +299,67 @@
     "howto": "Follow our guides",
     "or": "or",
     "preventBinding": "Prevent arrow binding",
-    "shapes": "Shapes",
+    "tools": "Tools",
     "shortcuts": "Keyboard shortcuts",
     "textFinish": "Finish editing (text editor)",
     "textNewLine": "Add new line (text editor)",
     "title": "Help",
     "view": "View",
     "zoomToFit": "Zoom to fit all elements",
-    "zoomToSelection": "Zoom to selection"
+    "zoomToSelection": "Zoom to selection",
+    "toggleElementLock": "Lock/unlock selection"
+  },
+  "clearCanvasDialog": {
+    "title": "Clear canvas"
+  },
+  "publishDialog": {
+    "title": "Publish library",
+    "itemName": "Item name",
+    "authorName": "Author name",
+    "githubUsername": "GitHub username",
+    "twitterUsername": "Twitter username",
+    "libraryName": "Library name",
+    "libraryDesc": "Library description",
+    "website": "Website",
+    "placeholder": {
+      "authorName": "Your name or username",
+      "libraryName": "Name of your library",
+      "libraryDesc": "Description of your library to help people understand its usage",
+      "githubHandle": "GitHub handle (optional), so you can edit the library once submitted for review",
+      "twitterHandle": "Twitter username (optional), so we know who to credit when promoting over Twitter",
+      "website": "Link to your personal website or elsewhere (optional)"
+    },
+    "errors": {
+      "required": "Required",
+      "website": "Enter a valid URL"
+    },
+    "noteDescription": {
+      "pre": "Submit your library to be included in the ",
+      "link": "public library repository",
+      "post": "for other people to use in their drawings."
+    },
+    "noteGuidelines": {
+      "pre": "The library needs to be manually approved first. Please read the ",
+      "link": "guidelines",
+      "post": " before submitting. You will need a GitHub account to communicate and make changes if requested, but it is not strictly required."
+    },
+    "noteLicense": {
+      "pre": "By submitting, you agree the library will be published under the ",
+      "link": "MIT License, ",
+      "post": "which in short means anyone can use them without restrictions."
+    },
+    "noteItems": "Each library item must have its own name so it's filterable. The following library items will be included:",
+    "atleastOneLibItem": "Please select at least one library item to get started",
+    "republishWarning": "Note: some of the selected items are marked as already published/submitted. You should only resubmit items when updating an existing library or submission."
+  },
+  "publishSuccessDialog": {
+    "title": "Library submitted",
+    "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",
+    "link": "here"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Reset library",
+    "removeItemsFromLib": "Remove selected items from library"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
@@ -276,6 +381,7 @@
     "width": "Width"
   },
   "toast": {
+    "addedToLibrary": "Added to library",
     "copyStyles": "Copied styles.",
     "copyToClipboard": "Copied to clipboard.",
     "copyToClipboardAsPng": "Copied {{exportSelection}} to clipboard as PNG\n({{exportColorScheme}})",

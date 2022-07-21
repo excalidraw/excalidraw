@@ -139,7 +139,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
         <Section title={t("helpDialog.shortcuts")}>
           <Columns>
             <Column>
-              <ShortcutIsland caption={t("helpDialog.shapes")}>
+              <ShortcutIsland caption={t("helpDialog.tools")}>
                 <Shortcut
                   label={t("toolBar.selection")}
                   shortcuts={["V", "1"]}
@@ -149,14 +149,20 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   shortcuts={["R", "2"]}
                 />
                 <Shortcut label={t("toolBar.diamond")} shortcuts={["D", "3"]} />
-                <Shortcut label={t("toolBar.ellipse")} shortcuts={["E", "4"]} />
+                <Shortcut label={t("toolBar.ellipse")} shortcuts={["O", "4"]} />
                 <Shortcut label={t("toolBar.arrow")} shortcuts={["A", "5"]} />
                 <Shortcut label={t("toolBar.line")} shortcuts={["P", "6"]} />
                 <Shortcut
                   label={t("toolBar.freedraw")}
-                  shortcuts={["Shift+P", "7"]}
+                  shortcuts={["Shift + P", "X", "7"]}
                 />
                 <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
+                <Shortcut label={t("toolBar.image")} shortcuts={["9"]} />
+                <Shortcut label={t("toolBar.library")} shortcuts={["0"]} />
+                <Shortcut
+                  label={t("toolBar.eraser")}
+                  shortcuts={[getShortcutKey("E")]}
+                />
                 <Shortcut
                   label={t("helpDialog.editSelectedShape")}
                   shortcuts={[
@@ -202,6 +208,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut
                   label={t("helpDialog.preventBinding")}
                   shortcuts={[getShortcutKey("CtrlOrCmd")]}
+                />
+                <Shortcut
+                  label={t("toolBar.link")}
+                  shortcuts={[getShortcutKey("CtrlOrCmd+K")]}
                 />
               </ShortcutIsland>
               <ShortcutIsland caption={t("helpDialog.view")}>
@@ -257,6 +267,18 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut
                   label={t("labels.multiSelect")}
                   shortcuts={[getShortcutKey(`Shift+${t("helpDialog.click")}`)]}
+                />
+                <Shortcut
+                  label={t("helpDialog.deepSelect")}
+                  shortcuts={[
+                    getShortcutKey(`CtrlOrCmd+${t("helpDialog.click")}`),
+                  ]}
+                />
+                <Shortcut
+                  label={t("helpDialog.deepBoxSelect")}
+                  shortcuts={[
+                    getShortcutKey(`CtrlOrCmd+${t("helpDialog.drag")}`),
+                  ]}
                 />
                 <Shortcut
                   label={t("labels.moveCanvas")}
@@ -342,6 +364,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   ]}
                 />
                 <Shortcut
+                  label={t("helpDialog.toggleElementLock")}
+                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+L")]}
+                />
+                <Shortcut
                   label={t("buttons.undo")}
                   shortcuts={[getShortcutKey("CtrlOrCmd+Z")]}
                 />
@@ -379,6 +405,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut
                   label={t("labels.showBackground")}
                   shortcuts={[getShortcutKey("G")]}
+                />
+                <Shortcut
+                  label={t("labels.decreaseFontSize")}
+                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+<")]}
+                />
+                <Shortcut
+                  label={t("labels.increaseFontSize")}
+                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+>")]}
                 />
               </ShortcutIsland>
             </Column>

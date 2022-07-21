@@ -2,71 +2,85 @@ import React from "react";
 import { Card } from "../../components/Card";
 import { ToolButton } from "../../components/ToolButton";
 import { serializeAsJSON } from "../../data/json";
-import { getImportedKey, createIV, generateEncryptionKey } from "../data";
-import { loadFirebaseStorage } from "../data/firebase";
-import { NonDeletedExcalidrawElement } from "../../element/types";
-import { AppState } from "../../types";
+import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
+import { FileId, NonDeletedExcalidrawElement } from "../../element/types";
+import { AppState, BinaryFileData, BinaryFiles } from "../../types";
 import { nanoid } from "nanoid";
 import { t } from "../../i18n";
 import { excalidrawPlusIcon } from "./icons";
-
-const encryptData = async (
-  key: string,
-  json: string,
-): Promise<{ blob: Blob; iv: Uint8Array }> => {
-  const importedKey = await getImportedKey(key, "encrypt");
-  const iv = createIV();
-  const encoded = new TextEncoder().encode(json);
-  const ciphertext = await window.crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    importedKey,
-    encoded,
-  );
-
-  return { blob: new Blob([new Uint8Array(ciphertext)]), iv };
-};
+import { encryptData, generateEncryptionKey } from "../../data/encryption";
+import { isInitializedImageElement } from "../../element/typeChecks";
+import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
+import { encodeFilesForUpload } from "../data/FileManager";
+import { MIME_TYPES } from "../../constants";
+import { trackEvent } from "../../analytics";
+import { getFrame } from "../../utils";
 
 const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
 ) => {
   const firebase = await loadFirebaseStorage();
 
   const id = `${nanoid(12)}`;
 
-  const key = (await generateEncryptionKey())!;
+  const encryptionKey = (await generateEncryptionKey())!;
   const encryptedData = await encryptData(
-    key,
-    serializeAsJSON(elements, appState),
+    encryptionKey,
+    serializeAsJSON(elements, appState, files, "database"),
   );
 
-  const blob = new Blob([encryptedData.iv, encryptedData.blob], {
-    type: "application/octet-stream",
-  });
+  const blob = new Blob(
+    [encryptedData.iv, new Uint8Array(encryptedData.encryptedBuffer)],
+    {
+      type: MIME_TYPES.binary,
+    },
+  );
 
   await firebase
     .storage()
     .ref(`/migrations/scenes/${id}`)
     .put(blob, {
       customMetadata: {
-        data: JSON.stringify({ version: 1, name: appState.name }),
+        data: JSON.stringify({ version: 2, name: appState.name }),
         created: Date.now().toString(),
       },
     });
 
-  window.open(`https://plus.excalidraw.com/import?excalidraw=${id},${key}`);
+  const filesMap = new Map<FileId, BinaryFileData>();
+  for (const element of elements) {
+    if (isInitializedImageElement(element) && files[element.fileId]) {
+      filesMap.set(element.fileId, files[element.fileId]);
+    }
+  }
+
+  if (filesMap.size) {
+    const filesToUpload = await encodeFilesForUpload({
+      files: filesMap,
+      encryptionKey,
+      maxBytes: FILE_UPLOAD_MAX_BYTES,
+    });
+
+    await saveFilesToFirebase({
+      prefix: `/migrations/files/scenes/${id}`,
+      files: filesToUpload,
+    });
+  }
+
+  window.open(
+    `https://plus.excalidraw.com/import?excalidraw=${id},${encryptionKey}`,
+  );
 };
 
 export const ExportToExcalidrawPlus: React.FC<{
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
+  files: BinaryFiles;
   onError: (error: Error) => void;
-}> = ({ elements, appState, onError }) => {
+}> = ({ elements, appState, files, onError }) => {
   return (
-    <Card color="indigo">
+    <Card color="primary">
       <div className="Card-icon">{excalidrawPlusIcon}</div>
       <h2>Excalidraw+</h2>
       <div className="Card-details">
@@ -80,10 +94,13 @@ export const ExportToExcalidrawPlus: React.FC<{
         showAriaLabel={true}
         onClick={async () => {
           try {
-            await exportToExcalidrawPlus(elements, appState);
-          } catch (error) {
+            trackEvent("export", "eplus", `ui (${getFrame()})`);
+            await exportToExcalidrawPlus(elements, appState, files);
+          } catch (error: any) {
             console.error(error);
-            onError(new Error(t("exportDialog.excalidrawplus_exportError")));
+            if (error.name !== "AbortError") {
+              onError(new Error(t("exportDialog.excalidrawplus_exportError")));
+            }
           }
         }}
       />

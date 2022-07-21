@@ -14,6 +14,8 @@ import { t } from "../../i18n";
 import "./RoomDialog.scss";
 import Stack from "../../components/Stack";
 import { AppState } from "../../types";
+import { trackEvent } from "../../analytics";
+import { getFrame } from "../../utils";
 
 const getShareIcon = () => {
   const navigator = window.navigator as any;
@@ -53,7 +55,7 @@ const RoomDialog = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
-    } catch (error) {
+    } catch (error: any) {
       setErrorMessage(error.message);
     }
     if (roomLinkInput.current) {
@@ -68,7 +70,7 @@ const RoomDialog = ({
         text: t("roomDialog.shareTitle"),
         url: activeRoomLink,
       });
-    } catch (error) {
+    } catch (error: any) {
       // Just ignore.
     }
   };
@@ -95,7 +97,10 @@ const RoomDialog = ({
                 title={t("roomDialog.button_startSession")}
                 aria-label={t("roomDialog.button_startSession")}
                 showAriaLabel={true}
-                onClick={onRoomCreate}
+                onClick={() => {
+                  trackEvent("share", "room creation", `ui (${getFrame()})`);
+                  onRoomCreate();
+                }}
               />
             </div>
           </>
@@ -124,6 +129,7 @@ const RoomDialog = ({
                 />
               </Stack.Row>
               <input
+                type="text"
                 value={activeRoomLink}
                 readOnly={true}
                 className="RoomDialog-link"
@@ -136,6 +142,7 @@ const RoomDialog = ({
                 {t("labels.yourName")}
               </label>
               <input
+                type="text"
                 id="username"
                 value={username || ""}
                 className="RoomDialog-username TextInput"
@@ -158,7 +165,10 @@ const RoomDialog = ({
                 title={t("roomDialog.button_stopSession")}
                 aria-label={t("roomDialog.button_stopSession")}
                 showAriaLabel={true}
-                onClick={onRoomDestroy}
+                onClick={() => {
+                  trackEvent("share", "room closed");
+                  onRoomDestroy();
+                }}
               />
             </div>
           </>

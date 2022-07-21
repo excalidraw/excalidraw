@@ -1,10 +1,12 @@
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { selectGroupsForSelectedElements } from "../groups";
-import { getNonDeletedElements } from "../element";
+import { getNonDeletedElements, isTextElement } from "../element";
+import { ExcalidrawElement } from "../element/types";
 
 export const actionSelectAll = register({
   name: "selectAll",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState) => {
     if (appState.editingLinearElement) {
       return false;
@@ -14,12 +16,19 @@ export const actionSelectAll = register({
         {
           ...appState,
           editingGroupId: null,
-          selectedElementIds: elements.reduce((map, element) => {
-            if (!element.isDeleted) {
-              map[element.id] = true;
-            }
-            return map;
-          }, {} as any),
+          selectedElementIds: elements.reduce(
+            (map: Record<ExcalidrawElement["id"], true>, element) => {
+              if (
+                !element.isDeleted &&
+                !(isTextElement(element) && element.containerId) &&
+                !element.locked
+              ) {
+                map[element.id] = true;
+              }
+              return map;
+            },
+            {},
+          ),
         },
         getNonDeletedElements(elements),
       ),

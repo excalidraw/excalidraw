@@ -1,5 +1,6 @@
 import {
   ExcalidrawElement,
+  ExcalidrawImageElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
   ExcalidrawGenericElement,
@@ -10,26 +11,30 @@ import {
   Arrowhead,
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
+  ExcalidrawRectangleElement,
 } from "../element/types";
-import { measureText, getFontString } from "../utils";
+import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
-import { newElementWith } from "./mutateElement";
+import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
+import { getContainerElement, measureText, wrapText } from "./textElement";
+import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
-  Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted">,
+  Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
   | "width"
   | "height"
   | "angle"
   | "groupIds"
-  | "boundElementIds"
+  | "boundElements"
   | "seed"
   | "version"
   | "versionNonce"
+  | "link"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -49,32 +54,40 @@ const _newElementBase = <T extends ExcalidrawElement>(
     angle = 0,
     groupIds = [],
     strokeSharpness,
-    boundElementIds = null,
+    boundElements = null,
+    link = null,
+    locked,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
-) => ({
-  id: rest.id || randomId(),
-  type,
-  x,
-  y,
-  width,
-  height,
-  angle,
-  strokeColor,
-  backgroundColor,
-  fillStyle,
-  strokeWidth,
-  strokeStyle,
-  roughness,
-  opacity,
-  groupIds,
-  strokeSharpness,
-  seed: rest.seed ?? randomInteger(),
-  version: rest.version || 1,
-  versionNonce: rest.versionNonce ?? 0,
-  isDeleted: false as false,
-  boundElementIds,
-});
+) => {
+  const element = {
+    id: rest.id || randomId(),
+    type,
+    x,
+    y,
+    width,
+    height,
+    angle,
+    strokeColor,
+    backgroundColor,
+    fillStyle,
+    strokeWidth,
+    strokeStyle,
+    roughness,
+    opacity,
+    groupIds,
+    strokeSharpness,
+    seed: rest.seed ?? randomInteger(),
+    version: rest.version || 1,
+    versionNonce: rest.versionNonce ?? 0,
+    isDeleted: false as false,
+    boundElements,
+    updated: getUpdatedTimestamp(),
+    link,
+    locked,
+  };
+  return element;
+};
 
 export const newElement = (
   opts: {
@@ -112,6 +125,7 @@ export const newTextElement = (
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
+    containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const metrics = measureText(opts.text, getFontString(opts));
@@ -129,6 +143,8 @@ export const newTextElement = (
       width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
+      containerId: opts.containerId || null,
+      originalText: opts.text,
     },
     {},
   );
@@ -145,18 +161,29 @@ const getAdjustedDimensions = (
   height: number;
   baseline: number;
 } => {
+  let maxWidth = null;
+  const container = getContainerElement(element);
+  if (container) {
+    maxWidth = container.width - BOUND_TEXT_PADDING * 2;
+  }
   const {
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureText(nextText, getFontString(element));
+  } = measureText(nextText, getFontString(element), maxWidth);
   const { textAlign, verticalAlign } = element;
-
   let x: number;
   let y: number;
-
-  if (textAlign === "center" && verticalAlign === "middle") {
-    const prevMetrics = measureText(element.text, getFontString(element));
+  if (
+    textAlign === "center" &&
+    verticalAlign === VERTICAL_ALIGN.MIDDLE &&
+    !element.containerId
+  ) {
+    const prevMetrics = measureText(
+      element.text,
+      getFontString(element),
+      maxWidth,
+    );
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
       height: nextHeight - prevMetrics.height,
@@ -193,6 +220,21 @@ const getAdjustedDimensions = (
     );
   }
 
+  // make sure container dimensions are set properly when
+  // text editor overflows beyond viewport dimensions
+  if (container) {
+    let height = container.height;
+    let width = container.width;
+    if (nextHeight > height - BOUND_TEXT_PADDING * 2) {
+      height = nextHeight + BOUND_TEXT_PADDING * 2;
+    }
+    if (nextWidth > width - BOUND_TEXT_PADDING * 2) {
+      width = nextWidth + BOUND_TEXT_PADDING * 2;
+    }
+    if (height !== container.height || width !== container.width) {
+      mutateElement(container, { height, width });
+    }
+  }
   return {
     width: nextWidth,
     height: nextHeight,
@@ -204,12 +246,26 @@ const getAdjustedDimensions = (
 
 export const updateTextElement = (
   element: ExcalidrawTextElement,
-  { text, isDeleted }: { text: string; isDeleted?: boolean },
+  {
+    text,
+    isDeleted,
+    originalText,
+  }: {
+    text: string;
+    isDeleted?: boolean;
+    originalText: string;
+  },
 ): ExcalidrawTextElement => {
+  const container = getContainerElement(element);
+  if (container) {
+    text = wrapText(text, getFontString(element), container.width);
+  }
+  const dimensions = getAdjustedDimensions(element, text);
   return newElementWith(element, {
     text,
+    originalText,
     isDeleted: isDeleted ?? element.isDeleted,
-    ...getAdjustedDimensions(element, text),
+    ...dimensions,
   });
 };
 
@@ -245,6 +301,22 @@ export const newLinearElement = (
     endBinding: null,
     startArrowhead: opts.startArrowhead,
     endArrowhead: opts.endArrowhead,
+  };
+};
+
+export const newImageElement = (
+  opts: {
+    type: ExcalidrawImageElement["type"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawImageElement> => {
+  return {
+    ..._newElementBase<ExcalidrawImageElement>("image", opts),
+    // in the future we'll support changing stroke color for some SVG elements,
+    // and `transparent` will likely mean "use original colors of the image"
+    strokeColor: "transparent",
+    status: "pending",
+    fileId: null,
+    scale: [1, 1],
   };
 };
 
@@ -307,7 +379,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   overrides?: Partial<TElement>,
 ): TElement => {
   let copy: TElement = deepCopyElement(element);
-  if (process.env.NODE_ENV === "test") {
+  if (isTestEnv()) {
     copy.id = `${copy.id}_copy`;
     // `window.h` may not be defined in some unit tests
     if (
@@ -320,6 +392,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   } else {
     copy.id = randomId();
   }
+  copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();
   copy.groupIds = getNewGroupIdsForDuplication(
     copy.groupIds,

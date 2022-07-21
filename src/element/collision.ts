@@ -23,6 +23,8 @@ import {
   ExcalidrawEllipseElement,
   NonDeleted,
   ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
+  ExcalidrawLinearElement,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -30,6 +32,9 @@ import { Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
+import { hasBoundTextElement, isImageElement } from "./typeChecks";
+import { isTextElement } from ".";
+import { isTransparent } from "../utils";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -41,14 +46,12 @@ const isElementDraggableFromInside = (
   if (element.type === "freedraw") {
     return true;
   }
-
-  const isDraggableFromInside = element.backgroundColor !== "transparent";
-
+  const isDraggableFromInside =
+    !isTransparent(element.backgroundColor) || hasBoundTextElement(element);
   if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
-
-  return isDraggableFromInside;
+  return isDraggableFromInside || isImageElement(element);
 };
 
 export const hitTest = (
@@ -82,20 +85,18 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
   );
 };
 
-const isHittingElementNotConsideringBoundingBox = (
+export const isHittingElementNotConsideringBoundingBox = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   point: Point,
 ): boolean => {
   const threshold = 10 / appState.zoom.value;
 
-  const check =
-    element.type === "text"
-      ? isStrictlyInside
-      : isElementDraggableFromInside(element)
-      ? isInsideCheck
-      : isNearCheck;
-
+  const check = isTextElement(element)
+    ? isStrictlyInside
+    : isElementDraggableFromInside(element)
+    ? isInsideCheck
+    : isNearCheck;
   return hitTestPointAgainstElement({ element, point, threshold, check });
 };
 
@@ -104,7 +105,7 @@ const isElementSelected = (
   element: NonDeleted<ExcalidrawElement>,
 ) => appState.selectedElementIds[element.id];
 
-const isPointHittingElementBoundingBox = (
+export const isPointHittingElementBoundingBox = (
   element: NonDeleted<ExcalidrawElement>,
   [x, y]: Point,
   threshold: number,
@@ -161,6 +162,7 @@ type HitTestArgs = {
 const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
   switch (args.element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
     case "ellipse":
@@ -195,6 +197,7 @@ export const distanceToBindableElement = (
 ): number => {
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return distanceToRectangle(element, point);
     case "diamond":
@@ -224,7 +227,8 @@ const distanceToRectangle = (
   element:
     | ExcalidrawRectangleElement
     | ExcalidrawTextElement
-    | ExcalidrawFreeDrawElement,
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawImageElement,
   point: Point,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);
@@ -328,15 +332,15 @@ const hitTestFreeDrawElement = (
   let P: readonly [number, number];
 
   // For freedraw dots
-  if (element.points.length === 2) {
-    return (
-      distance2d(A[0], A[1], x, y) < threshold ||
-      distance2d(B[0], B[1], x, y) < threshold
-    );
+  if (
+    distance2d(A[0], A[1], x, y) < threshold ||
+    distance2d(B[0], B[1], x, y) < threshold
+  ) {
+    return true;
   }
 
   // For freedraw lines
-  for (let i = 1; i < element.points.length - 1; i++) {
+  for (let i = 0; i < element.points.length; i++) {
     const delta = [B[0] - A[0], B[1] - A[1]];
     const length = Math.hypot(delta[1], delta[0]);
 
@@ -356,6 +360,14 @@ const hitTestFreeDrawElement = (
 
     A = B;
     B = element.points[i + 1];
+  }
+
+  const shape = getShapeForElement(element);
+
+  // for filled freedraw shapes, support
+  // selecting from inside
+  if (shape && shape.sets.length) {
+    return hitTestRoughShape(shape, x, y, threshold);
   }
 
   return false;
@@ -380,7 +392,11 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
   }
   const [relX, relY] = GAPoint.toTuple(point);
 
-  const shape = getShapeForElement(element) as Drawable[];
+  const shape = getShapeForElement(element as ExcalidrawLinearElement);
+
+  if (!shape) {
+    return false;
+  }
 
   if (args.check === isInsideCheck) {
     const hit = shape.some((subshape) =>
@@ -486,6 +502,7 @@ export const determineFocusDistance = (
   const nabs = Math.abs(n);
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return c / (hwidth * (nabs + q * mabs));
     case "diamond":
@@ -516,6 +533,7 @@ export const determineFocusPoint = (
   let point;
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
       point = findFocusPointForRectangulars(element, focus, adjecentPointRel);
@@ -565,6 +583,7 @@ const getSortedElementLineIntersections = (
   let intersections: GA.Point[];
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
       const corners = getCorners(element);
@@ -598,6 +617,7 @@ const getSortedElementLineIntersections = (
 const getCorners = (
   element:
     | ExcalidrawRectangleElement
+    | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement,
   scale: number = 1,
@@ -606,6 +626,7 @@ const getCorners = (
   const hy = (scale * element.height) / 2;
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return [
         GA.point(hx, hy),
@@ -625,7 +646,7 @@ const getCorners = (
 
 // Returns intersection of `line` with `segment`, with `segment` moved by
 // `gap` in its polar direction.
-// If intersection conincides with second segment point returns empty array.
+// If intersection coincides with second segment point returns empty array.
 const intersectSegment = (
   line: GA.Line,
   segment: [GA.Point, GA.Point],
@@ -747,6 +768,7 @@ export const findFocusPointForEllipse = (
 export const findFocusPointForRectangulars = (
   element:
     | ExcalidrawRectangleElement
+    | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement,
   // Between -1 and 1 for how far away should the focus point be relative
@@ -812,7 +834,7 @@ const hitTestCurveInside = (
   sharpness: ExcalidrawElement["strokeSharpness"],
 ) => {
   const ops = getCurvePathOps(drawable);
-  const points: Point[] = [];
+  const points: Mutable<Point>[] = [];
   let odd = false; // select one line out of double lines
   for (const operation of ops) {
     if (operation.op === "move") {
@@ -826,13 +848,17 @@ const hitTestCurveInside = (
         points.push([operation.data[2], operation.data[3]]);
         points.push([operation.data[4], operation.data[5]]);
       }
+    } else if (operation.op === "lineTo") {
+      if (odd) {
+        points.push([operation.data[0], operation.data[1]]);
+      }
     }
   }
   if (points.length >= 4) {
     if (sharpness === "sharp") {
       return isPointInPolygon(points, x, y);
     }
-    const polygonPoints = pointsOnBezierCurves(points as any, 10, 5);
+    const polygonPoints = pointsOnBezierCurves(points, 10, 5);
     return isPointInPolygon(polygonPoints, x, y);
   }
   return false;
@@ -856,7 +882,7 @@ const hitTestRoughShape = (
     // move, bcurveTo, lineTo, and curveTo
     if (op === "move") {
       // change starting point
-      currentP = (data as unknown) as Point;
+      currentP = data as unknown as Point;
       // move operation does not draw anything; so, it always
       // returns false
     } else if (op === "bcurveTo") {
@@ -887,9 +913,10 @@ const hitTestRoughShape = (
       // position of the previous operation
       return retVal;
     } else if (op === "lineTo") {
-      // TODO: Implement this
+      return hitTestCurveInside(drawable, x, y, "sharp");
     } else if (op === "qcurveTo") {
       // TODO: Implement this
+      console.warn("qcurveTo is not implemented yet");
     }
 
     return false;

@@ -1,16 +1,30 @@
+@import "../css/variables.module";
+
 .excalidraw {
   .library-unit {
     align-items: center;
-    border: 1px solid var(--button-gray-2);
+    border: 1px solid transparent;
     display: flex;
     justify-content: center;
     position: relative;
     width: 63px;
     height: 63px; // match width
+
+    &--hover {
+      box-shadow: inset 0px 0px 0px 2px $oc-blue-5;
+      border-color: $oc-blue-5;
+    }
+
+    &--selected {
+      box-shadow: inset 0px 0px 0px 2px $oc-blue-8;
+      border-color: $oc-blue-8;
+    }
   }
 
   .library-unit__dragger {
     display: flex;
+    align-items: center;
+    justify-content: center;
     height: 100%;
     width: 100%;
   }
@@ -22,9 +36,9 @@
     max-width: 100%;
   }
 
-  .library-unit__removeFromLibrary,
-  .library-unit__removeFromLibrary:hover,
-  .library-unit__removeFromLibrary:active {
+  .library-unit__checkbox-container,
+  .library-unit__checkbox-container:hover,
+  .library-unit__checkbox-container:active {
     align-items: center;
     background: none;
     border: none;
@@ -32,10 +46,35 @@
     display: flex;
     justify-content: center;
     margin: 0;
-    padding: 0;
+    padding: 0.5rem;
     position: absolute;
-    right: 5px;
-    top: 5px;
+    left: 2rem;
+    bottom: 2rem;
+    cursor: pointer;
+
+    input {
+      cursor: pointer;
+    }
+  }
+
+  .library-unit__checkbox {
+    position: absolute;
+    left: 2.3rem;
+    bottom: 2.3rem;
+
+    .Checkbox-box {
+      width: 13px;
+      height: 13px;
+      border-radius: 2px;
+      margin: 0.5em 0.5em 0.2em 0.2em;
+      background-color: $oc-blue-1;
+    }
+
+    &.Checkbox:hover {
+      .Checkbox-box {
+        background-color: $oc-blue-2;
+      }
+    }
   }
 
   .library-unit__removeFromLibrary > svg {
@@ -43,29 +82,37 @@
     width: 16px;
   }
 
-  .library-unit__pulse {
+  .library-unit__adder {
     transform: scale(1);
-    animation: library-unit__pulse-animation 1s ease-in infinite;
+    animation: library-unit__adder-animation 1s ease-in infinite;
   }
 
   .library-unit__adder {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 20px;
-    height: 20px;
+    left: 40%;
+    top: 40%;
+    width: 2rem;
+    height: 2rem;
     margin-left: -10px;
     margin-top: -10px;
     pointer-events: none;
+  }
+  .library-unit:hover .library-unit__adder {
+    fill: $oc-blue-7;
+  }
+  .library-unit:active .library-unit__adder {
+    animation: none;
+    transform: scale(0.8);
+    fill: $oc-black;
   }
 
   .library-unit__active {
     cursor: pointer;
   }
 
-  @keyframes library-unit__pulse-animation {
+  @keyframes library-unit__adder-animation {
     0% {
-      transform: scale(0.95);
+      transform: scale(0.85);
     }
 
     50% {
@@ -73,7 +120,7 @@
     }
 
     100% {
-      transform: scale(0.95);
+      transform: scale(0.85);
     }
   }
 }

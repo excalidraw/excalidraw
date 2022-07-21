@@ -1,11 +1,10 @@
-import React from "react";
 import {
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
   waitFor,
 } from "./test-utils";
-import Excalidraw from "../packages/excalidraw/index";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { API } from "./helpers/api";
 
 const { h } = window;

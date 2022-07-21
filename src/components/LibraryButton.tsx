@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { t } from "../i18n";
 import { AppState } from "../types";
 import { capitalizeString } from "../utils";
+import { trackEvent } from "../analytics";
+import { useDevice } from "./App";
 
 const LIBRARY_ICON = (
   <svg viewBox="0 0 576 512">
@@ -16,29 +18,42 @@ const LIBRARY_ICON = (
 export const LibraryButton: React.FC<{
   appState: AppState;
   setAppState: React.Component<any, AppState>["setState"];
-}> = ({ appState, setAppState }) => {
+  isMobile?: boolean;
+}> = ({ appState, setAppState, isMobile }) => {
+  const device = useDevice();
   return (
     <label
       className={clsx(
-        "ToolIcon ToolIcon_type_floating ToolIcon__library zen-mode-visibility",
+        "ToolIcon ToolIcon_type_floating ToolIcon__library",
         `ToolIcon_size_medium`,
         {
-          "zen-mode-visibility--hidden": appState.zenModeEnabled,
+          "is-mobile": isMobile,
         },
       )}
-      title={`${capitalizeString(t("toolBar.library"))} — 9`}
-      style={{ marginInlineStart: "var(--space-factor)" }}
+      title={`${capitalizeString(t("toolBar.library"))} — 0`}
     >
       <input
         className="ToolIcon_type_checkbox"
         type="checkbox"
         name="editor-library"
         onChange={(event) => {
-          setAppState({ isLibraryOpen: event.target.checked });
+          document
+            .querySelector(".layer-ui__wrapper")
+            ?.classList.remove("animate");
+          const nextState = event.target.checked;
+          setAppState({ isLibraryOpen: nextState });
+          // track only openings
+          if (nextState) {
+            trackEvent(
+              "library",
+              "toggleLibrary (open)",
+              `toolbar (${device.isMobile ? "mobile" : "desktop"})`,
+            );
+          }
         }}
         checked={appState.isLibraryOpen}
         aria-label={capitalizeString(t("toolBar.library"))}
-        aria-keyshortcuts="9"
+        aria-keyshortcuts="0"
       />
       <div className="ToolIcon__icon">{LIBRARY_ICON}</div>
     </label>

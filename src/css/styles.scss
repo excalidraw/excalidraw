@@ -180,7 +180,7 @@
   }
 
   .buttonList label:focus-within,
-  input:focus {
+  input:focus-visible {
     outline: transparent;
     box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
@@ -190,14 +190,14 @@
     user-select: none;
     background-color: var(--button-gray-1);
     border: 0;
-    border-radius: 4px;
+    border-radius: var(--border-radius-md);
     margin: 0.125rem 0;
     padding: 0.25rem;
     white-space: nowrap;
 
     cursor: pointer;
 
-    &:focus {
+    &:focus-visible {
       outline: transparent;
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
     }
@@ -217,14 +217,16 @@
 
   .active,
   .buttonList label.active {
-    background-color: var(--button-gray-2);
+    background-color: var(--color-primary);
+
+    --icon-fill-color: #{$oc-white};
 
     &:hover {
-      background-color: var(--button-gray-2);
+      background-color: var(--color-primary-darker);
     }
 
     &:active {
-      background-color: var(--button-gray-3);
+      background-color: var(--color-primary-darkest);
     }
   }
 
@@ -234,7 +236,7 @@
       justify-content: center;
       align-items: center;
       svg {
-        width: 36px;
+        width: 35px;
         height: 14px;
         padding: 2px;
         opacity: 0.6;
@@ -288,6 +290,16 @@
     width: 100%;
 
     box-sizing: border-box;
+
+    .eraser {
+      &.ToolIcon:hover {
+        --icon-fill-color: #fff;
+        --keybinding-color: #fff;
+      }
+      &.active {
+        background-color: var(--color-primary);
+      }
+    }
   }
 
   .App-toolbar-content {
@@ -311,7 +323,7 @@
   }
 
   .App-menu_top {
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: auto max-content auto;
     grid-gap: 4px;
     align-items: flex-start;
     cursor: default;
@@ -338,7 +350,6 @@
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
-    z-index: 100;
 
     :root[dir="ltr"] & {
       left: 0.25rem;
@@ -379,6 +390,7 @@
 
   .App-menu__left {
     overflow-y: auto;
+    box-shadow: var(--shadow-island);
   }
 
   .dropdown-select {
@@ -437,6 +449,7 @@
     bottom: 30px;
     transform: translateX(-50%);
     padding: 10px 20px;
+    pointer-events: all;
   }
 
   .help-icon {
@@ -465,7 +478,17 @@
     font-family: var(--ui-font);
   }
 
-  .undo-redo-buttons {
+  .finalize-button {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 0.4em;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-inline-start: 0.6em;
+  }
+
+  .undo-redo-buttons,
+  .eraser-buttons {
     display: grid;
     grid-auto-flow: column;
     gap: 0.4em;
@@ -517,12 +540,49 @@
     }
   }
 
+  input[type="text"],
+  textarea:not(.excalidraw-wysiwyg) {
+    color: var(--text-primary-color);
+    border: 1.5px solid var(--input-border-color);
+    padding: 0.75rem;
+    white-space: nowrap;
+    border-radius: var(--space-factor);
+    background-color: var(--input-bg-color);
+
+    &:not(:focus) {
+      &:hover {
+        background-color: var(--input-hover-bg-color);
+      }
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--focus-highlight-color);
+    }
+  }
+
   @media print {
     .App-bottom-bar,
     .FixedSideContainer,
     .layer-ui__wrapper {
       display: none;
     }
+  }
+
+  // use custom, minimalistic scrollbar
+  // (doesn't work in Firefox)
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--button-gray-2);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--button-gray-3);
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background: var(--button-gray-2);
   }
 }
 

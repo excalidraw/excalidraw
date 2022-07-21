@@ -1,0 +1,104 @@
+@import "open-color/open-color";
+
+.excalidraw {
+  .layer-ui__library {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .layer-ui__library-header {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      margin: 2px 0 15px 0;
+      .Spinner {
+        margin-right: 1rem;
+      }
+
+      button {
+        // 2px from the left to account for focus border of left-most button
+        margin: 0 2px;
+      }
+    }
+  }
+
+  .layer-ui__sidebar {
+    .layer-ui__library {
+      padding: 0;
+      height: 100%;
+    }
+    .library-menu-items-container {
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .layer-ui__library-message {
+    padding: 2em 4em;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .Spinner {
+      margin-bottom: 1em;
+    }
+    span {
+      font-size: 0.8em;
+    }
+  }
+
+  .publish-library-success {
+    .Dialog__content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &-close.ToolIcon_type_button {
+      background-color: $oc-blue-6;
+      align-self: flex-end;
+      &:hover {
+        background-color: $oc-blue-8;
+      }
+      .ToolIcon__icon {
+        width: auto;
+        font-size: 1rem;
+        color: $oc-white;
+        padding: 0 0.5rem;
+      }
+    }
+  }
+
+  .library-menu-browse-button {
+    width: 80%;
+    min-height: 22px;
+    margin: 0 auto;
+    margin-top: 1rem;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-primary);
+    color: $oc-white;
+    text-align: center;
+    white-space: nowrap;
+    text-decoration: none !important;
+    &:hover {
+      background-color: var(--color-primary-darker);
+    }
+    &:active {
+      background-color: var(--color-primary-darkest);
+    }
+  }
+
+  .library-menu-browse-button--mobile {
+    min-height: 22px;
+    margin-left: auto;
+    a {
+      padding-right: 0;
+    }
+  }
+}

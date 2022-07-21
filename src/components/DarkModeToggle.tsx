@@ -1,16 +1,15 @@
 import "./ToolIcon.scss";
 
-import React from "react";
 import { t } from "../i18n";
 import { ToolButton } from "./ToolButton";
-
-export type Appearence = "light" | "dark";
+import { THEME } from "../constants";
+import { Theme } from "../element/types";
 
 // We chose to use only explicit toggle and not a third option for system value,
 // but this could be added in the future.
 export const DarkModeToggle = (props: {
-  value: Appearence;
-  onChange: (value: Appearence) => void;
+  value: Theme;
+  onChange: (value: Theme) => void;
   title?: string;
 }) => {
   const title =
@@ -20,10 +19,12 @@ export const DarkModeToggle = (props: {
   return (
     <ToolButton
       type="icon"
-      icon={props.value === "light" ? ICONS.MOON : ICONS.SUN}
+      icon={props.value === THEME.LIGHT ? ICONS.MOON : ICONS.SUN}
       title={title}
       aria-label={title}
-      onClick={() => props.onChange(props.value === "dark" ? "light" : "dark")}
+      onClick={() =>
+        props.onChange(props.value === THEME.DARK ? THEME.LIGHT : THEME.DARK)
+      }
       data-testid="toggle-dark-mode"
     />
   );

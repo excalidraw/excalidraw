@@ -9,6 +9,7 @@
     "copy": "Kopiera",
     "copyAsPng": "Kopiera till urklipp som PNG",
     "copyAsSvg": "Kopiera till urklipp som SVG",
+    "copyText": "Kopiera till urklipp som text",
     "bringForward": "Flytta framåt",
     "sendToBack": "Flytta underst",
     "bringToFront": "Flytta främst",
@@ -20,10 +21,6 @@
     "background": "Bakgrund",
     "fill": "Fyllnad",
     "strokeWidth": "Linjebredd",
-    "strokeShape": "Linjeform",
-    "strokeShape_gel": "Gelépenna",
-    "strokeShape_fountain": "Reservoarpenna",
-    "strokeShape_brush": "Penselpenna",
     "strokeStyle": "Linjestil",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Streckad",
@@ -39,6 +36,7 @@
     "arrowhead_arrow": "Pil",
     "arrowhead_bar": "Stolpe",
     "arrowhead_dot": "Punkt",
+    "arrowhead_triangle": "Triangel",
     "fontSize": "Teckenstorlek",
     "fontFamily": "Teckensnitt",
     "onlySelected": "Endast markering",
@@ -67,6 +65,7 @@
     "cartoonist": "Serietecknare",
     "fileTitle": "Filnamn",
     "colorPicker": "Färgväljare",
+    "canvasColors": "Används på canvas",
     "canvasBackground": "Canvas-bakgrund",
     "drawingCanvas": "Ritar canvas",
     "layers": "Lager",
@@ -103,7 +102,31 @@
     "share": "Dela",
     "showStroke": "Visa färgväljare för linjefärg",
     "showBackground": "Visa färgväljare för bakgrundsfärg",
-    "toggleTheme": "Växla tema"
+    "toggleTheme": "Växla tema",
+    "personalLib": "Personligt bibliotek",
+    "excalidrawLib": "Excalidraw bibliotek",
+    "decreaseFontSize": "Minska fontstorleken",
+    "increaseFontSize": "Öka fontstorleken",
+    "unbindText": "Koppla bort text",
+    "bindText": "Bind texten till behållaren",
+    "link": {
+      "edit": "Redigera länk",
+      "create": "Skapa länk",
+      "label": "Länk"
+    },
+    "elementLock": {
+      "lock": "Lås",
+      "unlock": "Lås upp",
+      "lockAll": "Lås alla",
+      "unlockAll": "Lås upp alla"
+    },
+    "statusPublished": "Publicerad",
+    "sidebarLock": "Håll sidofältet öppet"
+  },
+  "library": {
+    "noItems": "Inga objekt tillagda ännu...",
+    "hint_emptyLibrary": "Välj ett objekt på canvasen för att lägga till det här, eller installera ett bibliotek från det publika arkivet, nedan.",
+    "hint_emptyPrivateLibrary": "Välj ett objekt på canvasen för att lägga till det här."
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -136,7 +159,13 @@
     "darkMode": "Mörkt läge",
     "lightMode": "Ljust läge",
     "zenMode": "Zen-läge",
-    "exitZenMode": "Gå ur zen-läge"
+    "exitZenMode": "Gå ur zen-läge",
+    "cancel": "Avbryt",
+    "clear": "Rensa",
+    "remove": "Ta bort",
+    "publishLibrary": "Publicera",
+    "submit": "Skicka",
+    "confirm": "Bekräfta"
   },
   "alerts": {
     "clearReset": "Detta rensar hela canvasen. Är du säker?",
@@ -145,22 +174,34 @@
     "couldNotLoadInvalidFile": "Kunde inte ladda ogiltig fil",
     "importBackendFailed": "Importering från backend misslyckades.",
     "cannotExportEmptyCanvas": "Kan inte exportera tom canvas.",
-    "couldNotCopyToClipboard": "Det gick inte att kopiera till urklipp. Prova att använda en annan webbläsare.",
+    "couldNotCopyToClipboard": "Kunde inte kopiera till urklipp.",
     "decryptFailed": "Kunde inte avkryptera data.",
     "uploadedSecurly": "Uppladdning har säkrats med kryptering från ände till ände. vilket innebär att Excalidraw server och tredje part inte kan läsa innehållet.",
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
     "collabStopOverridePrompt": "Att stoppa sessionen kommer att skriva över din föregående, lokalt lagrade skiss. Är du säker?\n\n(Om du vill behålla din lokala skiss, stäng bara webbläsarfliken istället.)",
-    "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
     "errorAddingToLibrary": "Kunde inte lägga till objekt i biblioteket",
     "errorRemovingFromLibrary": "Kunde inte ta bort objekt från biblioteket",
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
-    "imageDoesNotContainScene": "Importering av bilder stöds inte just nu.\n\nVill du importera en skiss? Den här bilden verkar inte innehålla någon skissdata. Har du aktiverat detta under export?",
+    "imageDoesNotContainScene": "Den här bilden verkar inte innehålla någon skissdata. Har du aktiverat inbäddning av skiss under export?",
     "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil",
     "invalidSceneUrl": "Det gick inte att importera skiss från den angivna webbadressen. Antingen har den fel format, eller så innehåller den ingen giltig Excalidraw JSON data.",
-    "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?"
+    "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?",
+    "removeItemsFromsLibrary": "Ta bort {{count}} objekt från biblioteket?",
+    "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat.",
+    "browserZoom": "Din webbläsares zoomnivå är inte satt till 100% vilket kan orsaka att tavlan visas felaktigt"
+  },
+  "errors": {
+    "unsupportedFileType": "Filtypen stöds inte.",
+    "imageInsertError": "Kunde inte infoga bild. Försök igen senare...",
+    "fileTooBig": "Filen är för stor. Maximal tillåten storlek är {{maxSize}}.",
+    "svgImageInsertError": "Kunde inte infoga SVG-bild. SVG-koden ser ogiltig ut.",
+    "invalidSVGString": "Ogiltig SVG.",
+    "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
+    "importLibraryError": "Kunde inte ladda bibliotek"
   },
   "toolBar": {
     "selection": "Markering",
+    "image": "Infoga bild",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellips",
@@ -169,7 +210,10 @@
     "freedraw": "Rita",
     "text": "Text",
     "library": "Bibliotek",
-    "lock": "Håll valt verktyg aktivt efter ritande"
+    "lock": "Håll valt verktyg aktivt efter ritande",
+    "penMode": "Förhindra nypzoom och acceptera endast frihandsteckning från penna",
+    "link": "Lägg till / Uppdatera länk för en vald form",
+    "eraser": "Radergummi"
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",
@@ -177,6 +221,7 @@
     "shapes": "Former"
   },
   "hints": {
+    "canvasPanning": "För att flytta canvas, håll mushjulet eller mellanslagstangenten medan du drar",
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
@@ -185,10 +230,16 @@
     "linearElementMulti": "Klicka på sista punkten eller tryck Escape eller Enter för att avsluta",
     "lockAngle": "Du kan begränsa vinkeln genom att hålla SKIFT",
     "resize": "Du kan behålla proportioner genom att hålla SHIFT medan du ändrar storlek,\nhåller du ALT ändras storlek relativt mitten",
+    "resizeImage": "Du kan ändra storlek fritt genom att hålla SHIFT,\nhåll ALT för att ändra storlek från mitten",
     "rotate": "Du kan begränsa vinklar genom att hålla SHIFT medan du roterar",
     "lineEditor_info": "Dubbelklicka eller tryck på Enter för att redigera punkter",
-    "lineEditor_pointSelected": "Tryck på Ta bort för att ta bort punkt, Ctrl + D eller Cmd + D för att duplicera, eller dra för att flytta",
-    "lineEditor_nothingSelected": "Välj en punkt att flytta eller ta bort, eller håll ned ALT och klicka för att lägga till nya punkter"
+    "lineEditor_pointSelected": "Tryck på Ta bort för att ta bort punkt(er), Ctrl + D eller Cmd + D för att duplicera, eller dra för att flytta",
+    "lineEditor_nothingSelected": "Välj en punkt att redigera (håll SHIFT för att välja flera),\neller håll ned Alt och klicka för att lägga till nya punkter",
+    "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt",
+    "publishLibrary": "Publicera ditt eget bibliotek",
+    "bindTextToElement": "Tryck på Enter för att lägga till text",
+    "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra",
+    "eraserRevert": "Håll Alt för att återställa de element som är markerade för borttagning"
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
@@ -235,6 +286,8 @@
   "helpDialog": {
     "blog": "Läs vår blogg",
     "click": "klicka",
+    "deepSelect": "Djupval",
+    "deepBoxSelect": "Djupval inom boxen, och förhindra att dra",
     "curvedArrow": "Böjd pil",
     "curvedLine": "Böjd linje",
     "documentation": "Dokumentation",
@@ -246,14 +299,67 @@
     "howto": "Följ våra guider",
     "or": "eller",
     "preventBinding": "Förhindra pilbindning",
-    "shapes": "Former",
+    "tools": "Verktyg",
     "shortcuts": "Tangentbordsgenvägar",
     "textFinish": "Slutför redigering (text)",
     "textNewLine": "Lägg till ny rad (text)",
     "title": "Hjälp",
     "view": "Visa",
     "zoomToFit": "Zooma för att rymma alla element",
-    "zoomToSelection": "Zooma till markering"
+    "zoomToSelection": "Zooma till markering",
+    "toggleElementLock": "Lås/Lås upp valda"
+  },
+  "clearCanvasDialog": {
+    "title": "Rensa canvas"
+  },
+  "publishDialog": {
+    "title": "Publicera bibliotek",
+    "itemName": "Objektnamn",
+    "authorName": "Upphovsmannens namn",
+    "githubUsername": "GitHub-användarnamn",
+    "twitterUsername": "Twitter-användarnamn",
+    "libraryName": "Biblioteksnamn",
+    "libraryDesc": "Biblioteksbeskrivning",
+    "website": "Webbplats",
+    "placeholder": {
+      "authorName": "Ditt namn eller användarnamn",
+      "libraryName": "Namn på ditt bibliotek",
+      "libraryDesc": "Beskrivning av ditt bibliotek för att hjälpa människor att förstå dess användning",
+      "githubHandle": "Github-användarnamn (valfritt), så att du kan redigera biblioteket när du har skickat in det för granskning",
+      "twitterHandle": "Twitter-användarnamn (valfritt), så vi vet vem att kreditera när du marknadsför på Twitter",
+      "website": "Länk till din personliga webbplats eller någon annan (valfritt)"
+    },
+    "errors": {
+      "required": "Obligatoriskt",
+      "website": "Ange en giltig URL"
+    },
+    "noteDescription": {
+      "pre": "Skicka ditt bibliotek för att inkluderas i ",
+      "link": "det offentliga bibliotekets arkiv",
+      "post": "för andra människor att använda i sina skisser."
+    },
+    "noteGuidelines": {
+      "pre": "Biblioteket måste godkännas manuellt först. Vänligen läs ",
+      "link": "riktlinjerna",
+      "post": " innan du skickar in. Du behöver ett GitHub-konto för att kommunicera och göra ändringar om så önskas, men det krävs inte."
+    },
+    "noteLicense": {
+      "pre": "Genom att skicka in godkänner du att biblioteket kommer att publiceras under ",
+      "link": "MIT-licens, ",
+      "post": "vilket kort sagt betyder att vem som helst kan använda det utan restriktioner."
+    },
+    "noteItems": "Varje objekt måste ha sitt eget namn så att det är filtrerbart. Följande objekt kommer att inkluderas:",
+    "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång",
+    "republishWarning": "Obs: några av de markerade objekten är redan markerade som publicerade/skickade. Du bör endast skicka objekt igen när du uppdaterar ett befintligt bibliotek eller inlämning."
+  },
+  "publishSuccessDialog": {
+    "title": "Bibliotek inskickat",
+    "content": "Tack {{authorName}}. Ditt bibliotek har skickats för granskning. Du kan följa status",
+    "link": "här"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Återställ bibliotek",
+    "removeItemsFromLib": "Ta bort markerade objekt från biblioteket"
   },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",
@@ -275,6 +381,7 @@
     "width": "Bredd"
   },
   "toast": {
+    "addedToLibrary": "Tillagd i biblioteket",
     "copyStyles": "Kopierade stilar.",
     "copyToClipboard": "Kopierad till urklipp.",
     "copyToClipboardAsPng": "Kopierade {{exportSelection}} till urklipp som PNG\n({{exportColorScheme}})",

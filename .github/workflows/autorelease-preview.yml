@@ -1,0 +1,55 @@
+name: Auto release excalidraw preview
+on:
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  Auto-release-excalidraw-preview:
+    name: Auto release preview
+    if: github.event.comment.body == '@excalibot trigger release' && github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    steps:
+      - name: React to release comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
+          comment-id: ${{ github.event.comment.id }}
+          reactions: "+1"
+      - name: Get PR SHA
+        id: sha
+        uses: actions/github-script@v4
+        with:
+          result-encoding: string
+          script: |
+            const { owner, repo, number } = context.issue;
+            const pr = await github.pulls.get({
+              owner,
+              repo,
+              pull_number: number,
+            });
+            return pr.data.head.sha
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ steps.sha.outputs.result }}
+          fetch-depth: 2
+      - name: Setup Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - name: Set up publish access
+        run: |
+          npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Auto release preview
+        id: "autorelease"
+        run: |
+          yarn add @actions/core
+          yarn autorelease preview ${{ github.event.issue.number }}
+      - name: Post comment post release
+        if: always()
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
+          issue-number: ${{ github.event.issue.number }}
+          body: "@${{ github.event.comment.user.login }} ${{ steps.autorelease.outputs.result }}"

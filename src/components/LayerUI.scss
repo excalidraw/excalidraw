@@ -1,45 +1,63 @@
 @import "open-color/open-color";
+@import "../css/variables.module";
 
-.excalidraw {
-  .layer-ui__library {
-    margin: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.layer-ui__sidebar {
+  position: absolute;
+  top: var(--sat);
+  bottom: var(--sab);
+  right: var(--sar);
+  z-index: 5;
 
-    .layer-ui__library-header {
+  box-shadow: var(--shadow-island);
+  overflow: hidden;
+  border-radius: var(--border-radius-lg);
+  margin: var(--space-factor);
+  width: calc(#{$right-sidebar-width} - var(--space-factor) * 2);
+
+  .Island {
+    box-shadow: none;
+  }
+
+  .ToolIcon__icon {
+    border-radius: var(--border-radius-md);
+  }
+
+  .ToolIcon__icon__close {
+    .Modal__close {
+      width: calc(var(--space-factor) * 7);
+      height: calc(var(--space-factor) * 7);
       display: flex;
+      justify-content: center;
       align-items: center;
-      width: 100%;
-      margin: 2px 0;
-
-      button {
-        // 2px from the left to account for focus border of left-most button
-        margin: 0 2px;
-      }
-
-      a {
-        margin-inline-start: auto;
-        // 17px for scrollbar (needed for overlay scrollbars on Big Sur?) + 1px extra
-        padding-inline-end: 18px;
-        white-space: nowrap;
-      }
+      color: var(--color-text);
     }
   }
 
-  .layer-ui__library-message {
-    padding: 10px 20px;
-    max-width: 200px;
+  .Island {
+    --padding: 0;
+    background-color: var(--island-bg-color);
+    border-radius: var(--border-radius-lg);
+    padding: calc(var(--padding) * var(--space-factor));
+    position: relative;
+    transition: box-shadow 0.5s ease-in-out;
   }
+}
 
-  .layer-ui__library-items {
-    max-height: 50vh;
-    overflow: auto;
+.excalidraw {
+  .layer-ui__wrapper.animate {
+    transition: width 0.1s ease-in-out;
   }
-
   .layer-ui__wrapper {
+    // when the rightside sidebar is docked, we need to resize the UI by its
+    // width, making the nested UI content shift to the left. To do this,
+    // we need the UI container to actually have dimensions set, but
+    // then we also need to disable pointer events else the canvas below
+    // wouldn't be interactive.
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
     z-index: var(--zIndex-layerUI);
-
     &__top-right {
       display: flex;
     }

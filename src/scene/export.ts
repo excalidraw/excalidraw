@@ -2,17 +2,22 @@ import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, SVG_NS } from "../utils";
-import { AppState } from "../types";
-import { DEFAULT_EXPORT_PADDING, THEME_FILTER } from "../constants";
+import { distance } from "../utils";
+import { AppState, BinaryFiles } from "../types";
+import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
+import {
+  getInitializedImageElements,
+  updateImageCache,
+} from "../element/image";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
-export const exportToCanvas = (
+export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
   {
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
@@ -36,32 +41,33 @@ export const exportToCanvas = (
 
   const { canvas, scale = 1 } = createCanvas(width, height);
 
-  renderScene(
-    elements,
-    appState,
-    null,
-    scale,
-    rough.canvas(canvas),
-    canvas,
-    {
-      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      exportWithDarkMode: appState.exportWithDarkMode,
-      scrollX: -minX + exportPadding,
-      scrollY: -minY + exportPadding,
-      zoom: getDefaultAppState().zoom,
-      remotePointerViewportCoords: {},
-      remoteSelectedElementIds: {},
-      shouldCacheIgnoreZoom: false,
-      remotePointerUsernames: {},
-      remotePointerUserStates: {},
-    },
-    {
-      renderScrollbars: false,
-      renderSelection: false,
-      renderOptimizations: false,
-      renderGrid: false,
-    },
-  );
+  const defaultAppState = getDefaultAppState();
+
+  const { imageCache } = await updateImageCache({
+    imageCache: new Map(),
+    fileIds: getInitializedImageElements(elements).map(
+      (element) => element.fileId,
+    ),
+    files,
+  });
+
+  renderScene(elements, appState, null, scale, rough.canvas(canvas), canvas, {
+    viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+    scrollX: -minX + exportPadding,
+    scrollY: -minY + exportPadding,
+    zoom: defaultAppState.zoom,
+    remotePointerViewportCoords: {},
+    remoteSelectedElementIds: {},
+    shouldCacheIgnoreZoom: false,
+    remotePointerUsernames: {},
+    remotePointerUserStates: {},
+    theme: appState.exportWithDarkMode ? "dark" : "light",
+    imageCache,
+    renderScrollbars: false,
+    renderSelection: false,
+    renderGrid: false,
+    isExporting: true,
+  });
 
   return canvas;
 };
@@ -76,6 +82,7 @@ export const exportToSvg = async (
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
   },
+  files: BinaryFiles | null,
 ): Promise<SVGSVGElement> => {
   const {
     exportPadding = DEFAULT_EXPORT_PADDING,
@@ -89,15 +96,15 @@ export const exportToSvg = async (
       metadata = await (
         await import(/* webpackChunkName: "image" */ "../../src/data/image")
       ).encodeSvgMetadata({
-        text: serializeAsJSON(elements, appState),
+        text: serializeAsJSON(elements, appState, files || {}, "local"),
       });
-    } catch (err) {
-      console.error(err);
+    } catch (error: any) {
+      console.error(error);
     }
   }
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
-  // initialze SVG root
+  // initialize SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
@@ -108,6 +115,19 @@ export const exportToSvg = async (
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
+  let assetPath = "https://excalidraw.com/";
+
+  // Asset path needs to be determined only when using package
+  if (process.env.IS_EXCALIDRAW_NPM_PACKAGE) {
+    assetPath =
+      window.EXCALIDRAW_ASSET_PATH ||
+      `https://unpkg.com/${process.env.PKG_NAME}@${process.env.PKG_VERSION}`;
+
+    if (assetPath?.startsWith("/")) {
+      assetPath = assetPath.replace("/", `${window.location.origin}/`);
+    }
+    assetPath = `${assetPath}/dist/excalidraw-assets/`;
+  }
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
@@ -115,16 +135,15 @@ export const exportToSvg = async (
     <style>
       @font-face {
         font-family: "Virgil";
-        src: url("https://excalidraw.com/Virgil.woff2");
+        src: url("${assetPath}Virgil.woff2");
       }
       @font-face {
         font-family: "Cascadia";
-        src: url("https://excalidraw.com/Cascadia.woff2");
+        src: url("${assetPath}Cascadia.woff2");
       }
     </style>
   </defs>
   `;
-
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
@@ -137,9 +156,10 @@ export const exportToSvg = async (
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elements, rsvg, svgRoot, {
+  renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,
+    exportWithDarkMode: appState.exportWithDarkMode,
   });
 
   return svgRoot;
@@ -162,10 +182,9 @@ export const getExportSize = (
   exportPadding: number,
   scale: number,
 ): [number, number] => {
-  const [, , width, height] = getCanvasSize(
-    elements,
-    exportPadding,
-  ).map((dimension) => Math.trunc(dimension * scale));
+  const [, , width, height] = getCanvasSize(elements, exportPadding).map(
+    (dimension) => Math.trunc(dimension * scale),
+  );
 
   return [width, height];
 };

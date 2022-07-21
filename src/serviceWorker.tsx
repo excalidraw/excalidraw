@@ -26,7 +26,11 @@ type Config = {
 };
 
 export const register = (config?: Config) => {
-  if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
+  if (
+    (process.env.NODE_ENV === "production" ||
+      process.env.REACT_APP_DEV_ENABLE_SW?.toLowerCase() === "true") &&
+    "serviceWorker" in navigator
+  ) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {
@@ -37,6 +41,13 @@ export const register = (config?: Config) => {
     }
 
     window.addEventListener("load", () => {
+      const isWebexLP = window.location.pathname.startsWith("/webex");
+      if (isWebexLP) {
+        unregister(() => {
+          window.location.reload();
+        });
+        return false;
+      }
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
       if (isLocalhost) {
@@ -135,11 +146,14 @@ const checkValidServiceWorker = (swUrl: string, config?: Config) => {
     });
 };
 
-export const unregister = () => {
+export const unregister = (callback?: () => void) => {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.ready
       .then((registration) => {
-        registration.unregister();
+        return registration.unregister();
+      })
+      .then(() => {
+        callback?.();
       })
       .catch((error) => {
         console.error(error.message);

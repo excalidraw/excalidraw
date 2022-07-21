@@ -6,16 +6,19 @@ import "./CheckboxItem.scss";
 
 export const CheckboxItem: React.FC<{
   checked: boolean;
-  onChange: (checked: boolean) => void;
-}> = ({ children, checked, onChange }) => {
+  onChange: (checked: boolean, event: React.MouseEvent) => void;
+  className?: string;
+}> = ({ children, checked, onChange, className }) => {
   return (
     <div
-      className={clsx("Checkbox", { "is-checked": checked })}
+      className={clsx("Checkbox", className, { "is-checked": checked })}
       onClick={(event) => {
-        onChange(!checked);
-        ((event.currentTarget as HTMLDivElement).querySelector(
-          ".Checkbox-box",
-        ) as HTMLButtonElement).focus();
+        onChange(!checked, event);
+        (
+          (event.currentTarget as HTMLDivElement).querySelector(
+            ".Checkbox-box",
+          ) as HTMLButtonElement
+        ).focus();
       }}
     >
       <button className="Checkbox-box" role="checkbox" aria-checked={checked}>

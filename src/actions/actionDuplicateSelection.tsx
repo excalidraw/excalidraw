@@ -1,15 +1,13 @@
-import React from "react";
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { ExcalidrawElement } from "../element/types";
 import { duplicateElement, getNonDeletedElements } from "../element";
-import { isSomeElementSelected } from "../scene";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
 import { clone } from "../components/icons";
 import { t } from "../i18n";
-import { getShortcutKey } from "../utils";
+import { arrayToMap, getShortcutKey } from "../utils";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { mutateElement } from "../element/mutateElement";
 import {
   selectGroupsForSelectedElements,
   getSelectedGroupForElement,
@@ -19,41 +17,24 @@ import { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
 import { ActionResult } from "./types";
 import { GRID_SIZE } from "../constants";
+import { bindTextToShapeAfterDuplication } from "../element/textElement";
+import { isBoundToContainer } from "../element/typeChecks";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
-    // duplicate point if selected while editing multi-point element
+    // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {
-      const { activePointIndex, elementId } = appState.editingLinearElement;
-      const element = LinearElementEditor.getElement(elementId);
-      if (!element || activePointIndex === null) {
+      const ret = LinearElementEditor.duplicateSelectedPoints(appState);
+
+      if (!ret) {
         return false;
       }
-      const { points } = element;
-      const selectedPoint = points[activePointIndex];
-      const nextPoint = points[activePointIndex + 1];
-      mutateElement(element, {
-        points: [
-          ...points.slice(0, activePointIndex + 1),
-          nextPoint
-            ? [
-                (selectedPoint[0] + nextPoint[0]) / 2,
-                (selectedPoint[1] + nextPoint[1]) / 2,
-              ]
-            : [selectedPoint[0] + 30, selectedPoint[1] + 30],
-          ...points.slice(activePointIndex + 1),
-        ],
-      });
+
       return {
-        appState: {
-          ...appState,
-          editingLinearElement: {
-            ...appState.editingLinearElement,
-            activePointIndex: activePointIndex + 1,
-          },
-        },
         elements,
+        appState: ret.appState,
         commitToHistory: true,
       };
     }
@@ -107,9 +88,12 @@ const duplicateElements = (
   const finalElements: ExcalidrawElement[] = [];
 
   let index = 0;
+  const selectedElementIds = arrayToMap(
+    getSelectedElements(elements, appState, true),
+  );
   while (index < elements.length) {
     const element = elements[index];
-    if (appState.selectedElementIds[element.id]) {
+    if (selectedElementIds.get(element.id)) {
       if (element.groupIds.length) {
         const groupId = getSelectedGroupForElement(appState, element);
         // if group selected, duplicate it atomically
@@ -131,7 +115,11 @@ const duplicateElements = (
     }
     index++;
   }
-
+  bindTextToShapeAfterDuplication(
+    finalElements,
+    oldElements,
+    oldIdToDuplicatedId,
+  );
   fixBindingsAfterDuplication(finalElements, oldElements, oldIdToDuplicatedId);
 
   return {
@@ -140,10 +128,15 @@ const duplicateElements = (
       {
         ...appState,
         selectedGroupIds: {},
-        selectedElementIds: newElements.reduce((acc, element) => {
-          acc[element.id] = true;
-          return acc;
-        }, {} as any),
+        selectedElementIds: newElements.reduce(
+          (acc: Record<ExcalidrawElement["id"], true>, element) => {
+            if (!isBoundToContainer(element)) {
+              acc[element.id] = true;
+            }
+            return acc;
+          },
+          {},
+        ),
       },
       getNonDeletedElements(finalElements),
     ),

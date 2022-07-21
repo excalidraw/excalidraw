@@ -1,24 +1,25 @@
-import { fileSave, FileSystemHandle } from "browser-fs-access";
 import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
-import { DEFAULT_EXPORT_PADDING } from "../constants";
+import { DEFAULT_EXPORT_PADDING, MIME_TYPES } from "../constants";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { exportToCanvas, exportToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
-import { AppState } from "../types";
+import { AppState, BinaryFiles } from "../types";
 import { canvasToBlob } from "./blob";
+import { fileSave, FileSystemHandle } from "./filesystem";
 import { serializeAsJSON } from "./json";
 
 export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
 
 export const exportCanvas = async (
-  type: ExportType,
+  type: Omit<ExportType, "backend">,
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
   {
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
@@ -37,22 +38,27 @@ export const exportCanvas = async (
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
-    const tempSvg = await exportToSvg(elements, {
-      exportBackground,
-      exportWithDarkMode: appState.exportWithDarkMode,
-      viewBackgroundColor,
-      exportPadding,
-      exportScale: appState.exportScale,
-      exportEmbedScene: appState.exportEmbedScene && type === "svg",
-    });
+    const tempSvg = await exportToSvg(
+      elements,
+      {
+        exportBackground,
+        exportWithDarkMode: appState.exportWithDarkMode,
+        viewBackgroundColor,
+        exportPadding,
+        exportScale: appState.exportScale,
+        exportEmbedScene: appState.exportEmbedScene && type === "svg",
+      },
+      files,
+    );
     if (type === "svg") {
       return await fileSave(
-        new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }),
+        new Blob([tempSvg.outerHTML], { type: MIME_TYPES.svg }),
         {
-          fileName: `${name}.svg`,
-          extensions: [".svg"],
+          description: "Export to SVG",
+          name,
+          extension: appState.exportEmbedScene ? "excalidraw.svg" : "svg",
+          fileHandle,
         },
-        fileHandle,
       );
     } else if (type === "clipboard-svg") {
       await copyTextToSystemClipboard(tempSvg.outerHTML);
@@ -60,43 +66,47 @@ export const exportCanvas = async (
     }
   }
 
-  const tempCanvas = exportToCanvas(elements, appState, {
+  const tempCanvas = await exportToCanvas(elements, appState, files, {
     exportBackground,
     viewBackgroundColor,
     exportPadding,
   });
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);
-  let blob = await canvasToBlob(tempCanvas);
-  tempCanvas.remove();
 
   if (type === "png") {
-    const fileName = `${name}.png`;
+    let blob = await canvasToBlob(tempCanvas);
+    tempCanvas.remove();
     if (appState.exportEmbedScene) {
       blob = await (
         await import(/* webpackChunkName: "image" */ "./image")
       ).encodePngMetadata({
         blob,
-        metadata: serializeAsJSON(elements, appState),
+        metadata: serializeAsJSON(elements, appState, files, "local"),
       });
     }
 
-    return await fileSave(
-      blob,
-      {
-        fileName,
-        extensions: [".png"],
-      },
+    return await fileSave(blob, {
+      description: "Export to PNG",
+      name,
+      extension: appState.exportEmbedScene ? "excalidraw.png" : "png",
       fileHandle,
-    );
+    });
   } else if (type === "clipboard") {
     try {
+      const blob = canvasToBlob(tempCanvas);
       await copyBlobToClipboardAsPng(blob);
-    } catch (error) {
+    } catch (error: any) {
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
       }
       throw new Error(t("alerts.couldNotCopyToClipboard"));
+    } finally {
+      tempCanvas.remove();
     }
+  } else {
+    tempCanvas.remove();
+    // shouldn't happen
+    throw new Error("Unsupported export type");
   }
 };

@@ -22,7 +22,7 @@
     align-items: center;
     justify-content: center;
 
-    &:focus {
+    &:focus-visible {
       outline: transparent;
       background-color: var(--button-gray-2);
       & svg {
@@ -90,7 +90,7 @@
   .picker-content {
     padding: 0.5rem;
     display: grid;
-    grid-auto-flow: column;
+    grid-template-columns: repeat(3, auto);
     grid-gap: 0.5rem;
     border-radius: 4px;
     :root[dir="rtl"] & {

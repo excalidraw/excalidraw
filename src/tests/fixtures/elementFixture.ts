@@ -20,7 +20,10 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   version: 120,
   versionNonce: 1188004276,
   isDeleted: false,
-  boundElementIds: null,
+  boundElements: null,
+  updated: 1,
+  link: null,
+  locked: false,
 };
 
 export const rectangleFixture: ExcalidrawElement = {
@@ -34,4 +37,9 @@ export const ellipseFixture: ExcalidrawElement = {
 export const diamondFixture: ExcalidrawElement = {
   ...elementBase,
   type: "diamond",
+};
+export const rectangleWithLinkFixture: ExcalidrawElement = {
+  ...elementBase,
+  type: "rectangle",
+  link: "excalidraw.com",
 };

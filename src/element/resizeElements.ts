@@ -1,4 +1,4 @@
-import { SHIFT_LOCKING_ANGLE } from "../constants";
+import { BOUND_TEXT_PADDING, SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
 import {
@@ -12,6 +12,7 @@ import {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
+  ExcalidrawElement,
 } from "./types";
 import {
   getElementAbsoluteCoords,
@@ -25,7 +26,7 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import { measureText, getFontString } from "../utils";
+import { getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
   TransformHandleType,
@@ -33,6 +34,15 @@ import {
   TransformHandleDirection,
 } from "./transformHandles";
 import { Point, PointerDownState } from "../types";
+import Scene from "../scene/Scene";
+import {
+  getApproxMinLineHeight,
+  getApproxMinLineWidth,
+  getBoundTextElement,
+  getBoundTextElementId,
+  handleBindTextResize,
+  measureText,
+} from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -47,9 +57,9 @@ export const transformElements = (
   transformHandleType: MaybeTransformHandleType,
   selectedElements: readonly NonDeletedExcalidrawElement[],
   resizeArrowDirection: "origin" | "end",
-  isRotateWithDiscreteAngle: boolean,
-  isResizeCenterPoint: boolean,
-  shouldKeepSidesRatio: boolean,
+  shouldRotateWithDiscreteAngle: boolean,
+  shouldResizeFromCenter: boolean,
+  shouldMaintainAspectRatio: boolean,
   pointerX: number,
   pointerY: number,
   centerX: number,
@@ -62,7 +72,7 @@ export const transformElements = (
         element,
         pointerX,
         pointerY,
-        isRotateWithDiscreteAngle,
+        shouldRotateWithDiscreteAngle,
       );
       updateBoundElements(element);
     } else if (
@@ -76,7 +86,7 @@ export const transformElements = (
       reshapeSingleTwoPointElement(
         element,
         resizeArrowDirection,
-        isRotateWithDiscreteAngle,
+        shouldRotateWithDiscreteAngle,
         pointerX,
         pointerY,
       );
@@ -90,18 +100,18 @@ export const transformElements = (
       resizeSingleTextElement(
         element,
         transformHandleType,
-        isResizeCenterPoint,
+        shouldResizeFromCenter,
         pointerX,
         pointerY,
       );
       updateBoundElements(element);
     } else if (transformHandleType) {
       resizeSingleElement(
-        pointerDownState.originalElements.get(element.id) as typeof element,
-        shouldKeepSidesRatio,
+        pointerDownState.originalElements,
+        shouldMaintainAspectRatio,
         element,
         transformHandleType,
-        isResizeCenterPoint,
+        shouldResizeFromCenter,
         pointerX,
         pointerY,
       );
@@ -115,7 +125,7 @@ export const transformElements = (
         selectedElements,
         pointerX,
         pointerY,
-        isRotateWithDiscreteAngle,
+        shouldRotateWithDiscreteAngle,
         centerX,
         centerY,
       );
@@ -142,18 +152,23 @@ const rotateSingleElement = (
   element: NonDeletedExcalidrawElement,
   pointerX: number,
   pointerY: number,
-  isRotateWithDiscreteAngle: boolean,
+  shouldRotateWithDiscreteAngle: boolean,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   let angle = (5 * Math.PI) / 2 + Math.atan2(pointerY - cy, pointerX - cx);
-  if (isRotateWithDiscreteAngle) {
+  if (shouldRotateWithDiscreteAngle) {
     angle += SHIFT_LOCKING_ANGLE / 2;
     angle -= angle % SHIFT_LOCKING_ANGLE;
   }
   angle = normalizeAngle(angle);
   mutateElement(element, { angle });
+  const boundTextElementId = getBoundTextElementId(element);
+  if (boundTextElementId) {
+    const textElement = Scene.getScene(element)!.getElement(boundTextElementId);
+    mutateElement(textElement!, { angle });
+  }
 };
 
 // used in DEV only
@@ -172,7 +187,7 @@ const validateTwoPointElementNormalized = (
 };
 
 const getPerfectElementSizeWithRotation = (
-  elementType: string,
+  elementType: ExcalidrawElement["type"],
   width: number,
   height: number,
   angle: number,
@@ -187,7 +202,7 @@ const getPerfectElementSizeWithRotation = (
 export const reshapeSingleTwoPointElement = (
   element: NonDeleted<ExcalidrawLinearElement>,
   resizeArrowDirection: "origin" | "end",
-  isRotateWithDiscreteAngle: boolean,
+  shouldRotateWithDiscreteAngle: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
@@ -212,7 +227,7 @@ export const reshapeSingleTwoPointElement = (
           element.x + element.points[1][0] - rotatedX,
           element.y + element.points[1][1] - rotatedY,
         ];
-  if (isRotateWithDiscreteAngle) {
+  if (shouldRotateWithDiscreteAngle) {
     [width, height] = getPerfectElementSizeWithRotation(
       element.type,
       width,
@@ -272,6 +287,7 @@ const measureFontSizeFromWH = (
   const metrics = measureText(
     element.text,
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
+    element.containerId ? element.width : null,
   );
   return {
     size: nextFontSize,
@@ -281,28 +297,28 @@ const measureFontSizeFromWH = (
 
 const getSidesForTransformHandle = (
   transformHandleType: TransformHandleType,
-  isResizeFromCenter: boolean,
+  shouldResizeFromCenter: boolean,
 ) => {
   return {
     n:
       /^(n|ne|nw)$/.test(transformHandleType) ||
-      (isResizeFromCenter && /^(s|se|sw)$/.test(transformHandleType)),
+      (shouldResizeFromCenter && /^(s|se|sw)$/.test(transformHandleType)),
     s:
       /^(s|se|sw)$/.test(transformHandleType) ||
-      (isResizeFromCenter && /^(n|ne|nw)$/.test(transformHandleType)),
+      (shouldResizeFromCenter && /^(n|ne|nw)$/.test(transformHandleType)),
     w:
       /^(w|nw|sw)$/.test(transformHandleType) ||
-      (isResizeFromCenter && /^(e|ne|se)$/.test(transformHandleType)),
+      (shouldResizeFromCenter && /^(e|ne|se)$/.test(transformHandleType)),
     e:
       /^(e|ne|se)$/.test(transformHandleType) ||
-      (isResizeFromCenter && /^(w|nw|sw)$/.test(transformHandleType)),
+      (shouldResizeFromCenter && /^(w|nw|sw)$/.test(transformHandleType)),
   };
 };
 
 const resizeSingleTextElement = (
   element: NonDeleted<ExcalidrawTextElement>,
   transformHandleType: "nw" | "ne" | "sw" | "se",
-  isResizeFromCenter: boolean,
+  shouldResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
@@ -361,7 +377,7 @@ const resizeSingleTextElement = (
     const deltaX2 = (x2 - nextX2) / 2;
     const deltaY2 = (y2 - nextY2) / 2;
     const [nextElementX, nextElementY] = adjustXYWithRotation(
-      getSidesForTransformHandle(transformHandleType, isResizeFromCenter),
+      getSidesForTransformHandle(transformHandleType, shouldResizeFromCenter),
       element.x,
       element.y,
       element.angle,
@@ -382,14 +398,15 @@ const resizeSingleTextElement = (
 };
 
 export const resizeSingleElement = (
-  stateAtResizeStart: NonDeletedExcalidrawElement,
-  shouldKeepSidesRatio: boolean,
+  originalElements: PointerDownState["originalElements"],
+  shouldMaintainAspectRatio: boolean,
   element: NonDeletedExcalidrawElement,
   transformHandleDirection: TransformHandleDirection,
-  isResizeFromCenter: boolean,
+  shouldResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
+  const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
   const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
     stateAtResizeStart,
@@ -413,6 +430,7 @@ export const resizeSingleElement = (
     element.width,
     element.height,
   );
+
   const boundsCurrentWidth = esx2 - esx1;
   const boundsCurrentHeight = esy2 - esy1;
 
@@ -422,6 +440,9 @@ export const resizeSingleElement = (
   const atStartBoundsHeight = startBottomRight[1] - startTopLeft[1];
   let scaleX = atStartBoundsWidth / boundsCurrentWidth;
   let scaleY = atStartBoundsHeight / boundsCurrentHeight;
+
+  let boundTextFont: { fontSize?: number; baseline?: number } = {};
+  const boundTextElement = getBoundTextElement(element);
 
   if (transformHandleDirection.includes("e")) {
     scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
@@ -435,6 +456,7 @@ export const resizeSingleElement = (
   if (transformHandleDirection.includes("n")) {
     scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsCurrentHeight;
   }
+
   // Linear elements dimensions differ from bounds dimensions
   const eleInitialWidth = stateAtResizeStart.width;
   const eleInitialHeight = stateAtResizeStart.height;
@@ -444,13 +466,13 @@ export const resizeSingleElement = (
   let eleNewHeight = element.height * scaleY;
 
   // adjust dimensions for resizing from center
-  if (isResizeFromCenter) {
+  if (shouldResizeFromCenter) {
     eleNewWidth = 2 * eleNewWidth - eleInitialWidth;
     eleNewHeight = 2 * eleNewHeight - eleInitialHeight;
   }
 
   // adjust dimensions to keep sides ratio
-  if (shouldKeepSidesRatio) {
+  if (shouldMaintainAspectRatio) {
     const widthRatio = Math.abs(eleNewWidth) / eleInitialWidth;
     const heightRatio = Math.abs(eleNewHeight) / eleInitialHeight;
     if (transformHandleDirection.length === 1) {
@@ -464,16 +486,43 @@ export const resizeSingleElement = (
     }
   }
 
-  const [
-    newBoundsX1,
-    newBoundsY1,
-    newBoundsX2,
-    newBoundsY2,
-  ] = getResizedElementAbsoluteCoords(
-    stateAtResizeStart,
-    eleNewWidth,
-    eleNewHeight,
-  );
+  if (boundTextElement) {
+    const stateOfBoundTextElementAtResize = originalElements.get(
+      boundTextElement.id,
+    ) as typeof boundTextElement | undefined;
+    if (stateOfBoundTextElementAtResize) {
+      boundTextFont = {
+        fontSize: stateOfBoundTextElementAtResize.fontSize,
+        baseline: stateOfBoundTextElementAtResize.baseline,
+      };
+    }
+    if (shouldMaintainAspectRatio) {
+      const nextFont = measureFontSizeFromWH(
+        boundTextElement,
+        eleNewWidth - BOUND_TEXT_PADDING * 2,
+        eleNewHeight - BOUND_TEXT_PADDING * 2,
+      );
+      if (nextFont === null) {
+        return;
+      }
+      boundTextFont = {
+        fontSize: nextFont.size,
+        baseline: nextFont.baseline,
+      };
+    } else {
+      const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
+      const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
+      eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
+      eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
+    }
+  }
+
+  const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
+    getResizedElementAbsoluteCoords(
+      stateAtResizeStart,
+      eleNewWidth,
+      eleNewHeight,
+    );
   const newBoundsWidth = newBoundsX2 - newBoundsX1;
   const newBoundsHeight = newBoundsY2 - newBoundsY1;
 
@@ -495,7 +544,7 @@ export const resizeSingleElement = (
   }
 
   // Keeps opposite handle fixed during resize
-  if (shouldKeepSidesRatio) {
+  if (shouldMaintainAspectRatio) {
     if (["s", "n"].includes(transformHandleDirection)) {
       newTopLeft[0] = startCenter[0] - newBoundsWidth / 2;
     }
@@ -523,7 +572,7 @@ export const resizeSingleElement = (
     }
   }
 
-  if (isResizeFromCenter) {
+  if (shouldResizeFromCenter) {
     newTopLeft[0] = startCenter[0] - Math.abs(newBoundsWidth) / 2;
     newTopLeft[1] = startCenter[1] - Math.abs(newBoundsHeight) / 2;
   }
@@ -558,6 +607,18 @@ export const resizeSingleElement = (
     ...rescaledPoints,
   };
 
+  if ("scale" in element && "scale" in stateAtResizeStart) {
+    mutateElement(element, {
+      scale: [
+        // defaulting because scaleX/Y can be 0/-0
+        (Math.sign(scaleX) || stateAtResizeStart.scale[0]) *
+          stateAtResizeStart.scale[0],
+        (Math.sign(scaleY) || stateAtResizeStart.scale[1]) *
+          stateAtResizeStart.scale[1],
+      ],
+    });
+  }
+
   if (
     resizedElement.width !== 0 &&
     resizedElement.height !== 0 &&
@@ -568,6 +629,10 @@ export const resizeSingleElement = (
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
     mutateElement(element, resizedElement);
+    if (boundTextElement && boundTextFont) {
+      mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
+    }
+    handleBindTextResize(element, transformHandleDirection);
   }
 };
 
@@ -638,8 +703,26 @@ const resizeMultipleElements = (
         }
         const width = element.width * scale;
         const height = element.height * scale;
+        const boundTextElement = getBoundTextElement(element);
         let font: { fontSize?: number; baseline?: number } = {};
-        if (element.type === "text") {
+
+        if (boundTextElement) {
+          const nextFont = measureFontSizeFromWH(
+            boundTextElement,
+            width - BOUND_TEXT_PADDING * 2,
+            height - BOUND_TEXT_PADDING * 2,
+          );
+
+          if (nextFont === null) {
+            return null;
+          }
+          font = {
+            fontSize: nextFont.size,
+            baseline: nextFont.baseline,
+          };
+        }
+
+        if (isTextElement(element)) {
           const nextFont = measureFontSizeFromWH(element, width, height);
           if (nextFont === null) {
             return null;
@@ -682,6 +765,15 @@ const resizeMultipleElements = (
     if (updates) {
       elements.forEach((element, index) => {
         mutateElement(element, updates[index]);
+        const boundTextElement = getBoundTextElement(element);
+
+        if (boundTextElement) {
+          mutateElement(boundTextElement, {
+            fontSize: updates[index].fontSize,
+            baseline: updates[index].baseline,
+          });
+          handleBindTextResize(element, transformHandleType);
+        }
       });
     }
   }
@@ -692,13 +784,13 @@ const rotateMultipleElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   pointerX: number,
   pointerY: number,
-  isRotateWithDiscreteAngle: boolean,
+  shouldRotateWithDiscreteAngle: boolean,
   centerX: number,
   centerY: number,
 ) => {
   let centerAngle =
     (5 * Math.PI) / 2 + Math.atan2(pointerY - centerY, pointerX - centerX);
-  if (isRotateWithDiscreteAngle) {
+  if (shouldRotateWithDiscreteAngle) {
     centerAngle += SHIFT_LOCKING_ANGLE / 2;
     centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
@@ -720,6 +812,16 @@ const rotateMultipleElements = (
       y: element.y + (rotatedCY - cy),
       angle: normalizeAngle(centerAngle + origAngle),
     });
+    const boundTextElementId = getBoundTextElementId(element);
+    if (boundTextElementId) {
+      const textElement =
+        Scene.getScene(element)!.getElement(boundTextElementId)!;
+      mutateElement(textElement, {
+        x: textElement.x + (rotatedCX - cx),
+        y: textElement.y + (rotatedCY - cy),
+        angle: normalizeAngle(centerAngle + origAngle),
+      });
+    }
   });
 };
 

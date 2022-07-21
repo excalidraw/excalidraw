@@ -30,12 +30,8 @@ export const getScrollBars = (
     };
   }
   // This is the bounding box of all the elements
-  const [
-    elementsMinX,
-    elementsMinY,
-    elementsMaxX,
-    elementsMaxY,
-  ] = getCommonBounds(elements);
+  const [elementsMinX, elementsMinY, elementsMaxX, elementsMaxY] =
+    getCommonBounds(elements);
 
   // Apply zoom
   const viewportWidthWithZoom = viewportWidth / zoom.value;

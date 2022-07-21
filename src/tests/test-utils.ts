@@ -10,11 +10,13 @@ import {
 
 import * as toolQueries from "./queries/toolQueries";
 import { ImportedDataState } from "../data/types";
-import { STORAGE_KEYS } from "../excalidraw-app/data/localStorage";
+import { STORAGE_KEYS } from "../excalidraw-app/app_constants";
 
 import { SceneData } from "../types";
 import { getSelectedElements } from "../scene/selection";
 import { ExcalidrawElement } from "../element/types";
+
+require("fake-indexeddb/auto");
 
 const customQueries = {
   ...queries,
@@ -124,7 +126,8 @@ export const mockBoundingClientRect = () => {
 };
 
 export const restoreOriginalGetBoundingClientRect = () => {
-  global.window.HTMLDivElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+  global.window.HTMLDivElement.prototype.getBoundingClientRect =
+    originalGetBoundingClientRect;
 };
 
 export const assertSelectedElements = (

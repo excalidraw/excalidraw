@@ -9,6 +9,7 @@
     "copy": "प्रतिलिपि",
     "copyAsPng": "क्लिपबोर्ड पर कॉपी करें ,पीएनजी के रूप में",
     "copyAsSvg": "क्लिपबोर्ड पर कॉपी करें,एसवीजी के रूप में",
+    "copyText": "लेखन के रूप में पटल पर कॉपी करें",
     "bringForward": "सामने लाएं",
     "sendToBack": "पीछे भेजें",
     "bringToFront": "सामने लाएँ",
@@ -20,10 +21,6 @@
     "background": "पृष्ठभूमि",
     "fill": "भरें",
     "strokeWidth": "रेखा की चौड़ाई",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "स्ट्रोक का आकार",
     "strokeStyle_solid": "ठोस",
     "strokeStyle_dashed": "डैश",
@@ -39,10 +36,11 @@
     "arrowhead_arrow": "तीर",
     "arrowhead_bar": "बार",
     "arrowhead_dot": "बिंदु",
+    "arrowhead_triangle": "त्रिकोण",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "onlySelected": "केवल चयनित",
-    "withBackground": "",
+    "withBackground": "पृष्ठभूमि",
     "exportEmbedScene": "",
     "exportEmbedScene_details": "निर्यात एम्बेड दृश्य विवरण",
     "addWatermark": "ऐड \"मेड विथ एक्सकैलिडराव\"",
@@ -67,6 +65,7 @@
     "cartoonist": "व्यंग्य चित्रकार",
     "fileTitle": "फ़ाइल का नाम",
     "colorPicker": "रंग चयन",
+    "canvasColors": "कॅनवास पर प्रयोगित",
     "canvasBackground": "कैनवास बैकग्राउंड",
     "drawingCanvas": "कैनवास बना रहे हैं",
     "layers": "परतें",
@@ -81,7 +80,7 @@
     "group": "समूह चयन",
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
-    "showGrid": "",
+    "showGrid": "ग्रिड दिखाएं",
     "addToLibrary": "लाइब्रेरी से जोड़ें",
     "removeFromLibrary": "लाइब्रेरी से निकालें",
     "libraryLoadingMessage": "लाइब्रेरी खुल रही है",
@@ -96,14 +95,38 @@
     "centerHorizontally": "क्षैतिज केन्द्रित",
     "distributeHorizontally": "क्षैतिज रूप से वितरित करें",
     "distributeVertically": "खड़ी रूप से वितरित करें",
-    "flipHorizontal": "",
-    "flipVertical": "",
-    "viewMode": "",
+    "flipHorizontal": "दायें बायें पलटे",
+    "flipVertical": "ऊपर नीचे पलटे",
+    "viewMode": "अलग अलग देखें",
     "toggleExportColorScheme": "",
-    "share": "",
+    "share": "शेयर करें",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": ""
+    "toggleTheme": "",
+    "personalLib": "",
+    "excalidrawLib": "",
+    "decreaseFontSize": "आकार घटाइऐ",
+    "increaseFontSize": "फ़ॉन्ट आकार बढ़ाएँ",
+    "unbindText": "",
+    "bindText": "लेखन को कोश से जोड़े",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    },
+    "elementLock": {
+      "lock": "ताले में रखें",
+      "unlock": "ताले से बाहर",
+      "lockAll": "सब ताले के अंदर रखे",
+      "unlockAll": "सब ताले के बाहर निकाले"
+    },
+    "statusPublished": "प्रकाशित",
+    "sidebarLock": "साइडबार खुला रखे."
+  },
+  "library": {
+    "noItems": "अभी तक कोई आइटम जोडा नहीं गया.",
+    "hint_emptyLibrary": "यहाँ जोड़ने के लिए पटल से एक वस्तु चुने, अथवा जन कोष से एक संग्रह नीचे स्थापित करें.",
+    "hint_emptyPrivateLibrary": "यहाँ जोड़ने के लिए पटल से एक वस्तु चुने."
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -136,7 +159,13 @@
     "darkMode": "डार्क मोड",
     "lightMode": "लाइट मोड",
     "zenMode": "ज़ेन मोड",
-    "exitZenMode": "जेन मोड से बाहर निकलें"
+    "exitZenMode": "जेन मोड से बाहर निकलें",
+    "cancel": "",
+    "clear": "",
+    "remove": "",
+    "publishLibrary": "",
+    "submit": "",
+    "confirm": ""
   },
   "alerts": {
     "clearReset": "इससे पूरा कैनवास साफ हो जाएगा। क्या आपको यकीन है?",
@@ -145,22 +174,34 @@
     "couldNotLoadInvalidFile": "अमान्य फ़ाइल लोड नहीं की जा सकी",
     "importBackendFailed": "बैकएंड से आयात करना विफल रहा।",
     "cannotExportEmptyCanvas": "खाली कैनवास निर्यात नहीं कर सकता।",
-    "couldNotCopyToClipboard": "क्लिपबोर्ड पर कॉपी नहीं किया जा सका। Chrome ब्राउज़र का उपयोग करने का प्रयास करें।",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "डेटा को डिक्रिप्ट नहीं किया जा सका।",
     "uploadedSecurly": "अपलोड को एंड-टू-एंड एन्क्रिप्शन के साथ सुरक्षित किया गया है, जिसका मतलब है कि एक्सक्लूसिव सर्वर और थर्ड पार्टी कंटेंट नहीं पढ़ सकते हैं।",
     "loadSceneOverridePrompt": "लोड हो रहा है बाहरी ड्राइंग आपके मौजूदा सामग्री को बदल देगा। क्या आप जारी रखना चाहते हैं?",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "लाइब्रेरी लोड करने में त्रुटि",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
-    "imageDoesNotContainScene": "दृश्य में छवि नहीं है",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है",
     "invalidSceneUrl": "",
-    "resetLibrary": ""
+    "resetLibrary": "",
+    "removeItemsFromsLibrary": "",
+    "invalidEncryptionKey": "",
+    "browserZoom": "आपके ब्राउज़र का ज़ूम लेवल 100% नहीं हैं इस कारण दृष्य पटल ग़लत दिख सकता हैं"
+  },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे.",
+    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका"
   },
   "toolBar": {
     "selection": "चयन",
+    "image": "",
     "rectangle": "आयात",
     "diamond": "तिर्यग्वर्ग",
     "ellipse": "दीर्घवृत्त",
@@ -169,7 +210,10 @@
     "freedraw": "",
     "text": "पाठ",
     "library": "लाइब्रेरी",
-    "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें"
+    "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें",
+    "penMode": "",
+    "link": "",
+    "eraser": "रबड़"
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",
@@ -177,6 +221,7 @@
     "shapes": "आकृतियाँ"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, सिंगल लाइन के लिए खींचें",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोड़ो",
     "text": "आप चयन टूल से कहीं भी डबल-क्लिक करके टेक्स्ट जोड़ सकते हैं",
@@ -185,10 +230,16 @@
     "linearElementMulti": "अंतिम बिंदु पर क्लिक करें या समाप्त होने के लिए एस्केप या एंटर दबाएं",
     "lockAngle": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को मोड़ सकते हैं",
     "resize": "आकार बदलते समय आप SHIFT को पकड़ कर अनुपात में कमी कर सकते हैं,\nकेंद्र से आकार बदलने के लिए ALT दबाए रखें",
+    "resizeImage": "",
     "rotate": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को विवश कर सकते हैं",
     "lineEditor_info": "बिंदुओं को संपादित करने के लिए Enter पर डबल-क्लिक करें या दबाएँ",
-    "lineEditor_pointSelected": "बिंदु हटाने के लिए डिलीट दबाएं, प्रतिरूपित करने के लिए कण्ट्रोल या कमांड डी दबाएं या स्थानांतरित करने के लिए खींचे",
-    "lineEditor_nothingSelected": "स्थानांतरित करने या हटाने के लिए एक बिंदु का चयन करें, या Alt दबाए रखें और नए बिंदुओं को जोड़ने के लिए क्लिक करें"
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
+    "placeImage": "",
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -235,6 +286,8 @@
   "helpDialog": {
     "blog": "हमारा ब्लॉग पढे",
     "click": "क्लिक करें",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "वक्र तीर",
     "curvedLine": "वक्र रेखा",
     "documentation": "",
@@ -246,14 +299,67 @@
     "howto": "हमारे गाइड का पालन करें",
     "or": "या",
     "preventBinding": "तीर बंधन रोकें",
-    "shapes": "आकृतियाँ",
+    "tools": "औज़ार",
     "shortcuts": "कीबोर्ड के शॉर्टकट्स",
     "textFinish": "",
     "textNewLine": "",
     "title": "मदद",
     "view": "दृश्य",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
-    "zoomToSelection": "चयन तक ज़ूम करे"
+    "zoomToSelection": "चयन तक ज़ूम करे",
+    "toggleElementLock": "ताले के अंदर/बाहर चुनाव"
+  },
+  "clearCanvasDialog": {
+    "title": ""
+  },
+  "publishDialog": {
+    "title": "",
+    "itemName": "",
+    "authorName": "",
+    "githubUsername": "",
+    "twitterUsername": "",
+    "libraryName": "",
+    "libraryDesc": "",
+    "website": "",
+    "placeholder": {
+      "authorName": "",
+      "libraryName": "",
+      "libraryDesc": "",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "",
+      "website": ""
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": "",
+    "republishWarning": "टिप्पणी: कुछ चुने हुवे आइटम पहले ही प्रकाशित/प्रस्तुत किए जा चुके हैं। किसी प्रकाशित संग्रह को अद्यतन करते समय या प्रस्तुतित आइटम को पुन्हा प्रस्तुत करते समय, आप बस उसे केवल अद्यतन करें ।"
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": ""
+  },
+  "confirmDialog": {
+    "resetLibrary": "",
+    "removeItemsFromLib": ""
   },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।",
@@ -275,6 +381,7 @@
     "width": "चौड़ाई"
   },
   "toast": {
+    "addedToLibrary": "",
     "copyStyles": "काॅपी कीए स्टाइल",
     "copyToClipboard": "क्लिपबोर्ड में कॉपी कीए",
     "copyToClipboardAsPng": "",
@@ -284,15 +391,15 @@
     "selection": ""
   },
   "colors": {
-    "ffffff": "",
+    "ffffff": "सफेद",
     "f8f9fa": "",
     "f1f3f5": "",
     "fff5f5": "",
     "fff0f6": "",
-    "f8f0fc": "",
+    "f8f0fc": "अंगूरी 0",
     "f3f0ff": "",
-    "edf2ff": "",
-    "e7f5ff": "",
+    "edf2ff": "नील 0",
+    "e7f5ff": "नीला 0",
     "e3fafc": "",
     "e6fcf5": "",
     "ebfbee": "",
@@ -323,11 +430,11 @@
     "5f3dc4": "",
     "364fc7": "",
     "1864ab": "",
-    "0b7285": "",
+    "0b7285": "आसमानी",
     "087f5b": "",
-    "2b8a3e": "",
+    "2b8a3e": "हरा",
     "5c940d": "",
-    "e67700": "",
-    "d9480f": ""
+    "e67700": "पीला",
+    "d9480f": "नारंगी"
   }
 }

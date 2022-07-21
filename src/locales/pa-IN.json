@@ -9,6 +9,7 @@
     "copy": "ਕਾਪੀ ਕਰੋ",
     "copyAsPng": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
     "copyAsSvg": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ SVG ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
+    "copyText": "",
     "bringForward": "ਅੱਗੇ ਲਿਆਓ",
     "sendToBack": "ਸਭ ਤੋਂ ਪਿੱਛੇ ਭੇਜੋ",
     "bringToFront": "ਸਭ ਤੋਂ ਅੱਗੇ ਲਿਆਓ",
@@ -20,10 +21,6 @@
     "background": "ਬੈਕਗਰਾਉਂਡ",
     "fill": "ਭਰਨਾ",
     "strokeWidth": "ਰੇਖਾ ਦੀ ਚੌੜਾਈ",
-    "strokeShape": "ਰੇਖਾ ਦਾ ਰੂਪ",
-    "strokeShape_gel": "ਜੈੱਲ ਪੈੱਨ",
-    "strokeShape_fountain": "ਫਾਉਨਟੇਨ ਪੈੱਨ",
-    "strokeShape_brush": "ਬੁਰਸ਼ ਪੈੱਨ",
     "strokeStyle": "ਰੇਖਾ ਦਾ ਸਟਾਇਲ",
     "strokeStyle_solid": "ਠੋਸ",
     "strokeStyle_dashed": "ਡੈਸ਼ ਵਾਲੀ",
@@ -39,6 +36,7 @@
     "arrowhead_arrow": "ਤੀਰ",
     "arrowhead_bar": "ਡੰਡੀ",
     "arrowhead_dot": "ਬਿੰਦੀ",
+    "arrowhead_triangle": "ਤਿਕੋਣ",
     "fontSize": "ਫੌਂਟ ਅਕਾਰ",
     "fontFamily": "ਫੌਂਟ ਪਰਿਵਾਰ",
     "onlySelected": "ਸਿਰਫ ਚੁਣੇ ਹੋਏ ਹੀ",
@@ -67,6 +65,7 @@
     "cartoonist": "ਕਾਰਟੂਨਿਸਟ",
     "fileTitle": "ਫਾਈਲ ਦਾ ਨਾਂ",
     "colorPicker": "ਰੰਗ ਚੋਣਕਾਰ",
+    "canvasColors": "ਕੈਨਵਸ 'ਤੇ ਵਰਤਿਆ",
     "canvasBackground": "ਕੈਨਵਸ ਦਾ ਬੈਕਗਰਾਉਂਡ",
     "drawingCanvas": "ਡਰਾਇੰਗ ਕੈਨਵਸ",
     "layers": "ਪਰਤਾਂ",
@@ -103,7 +102,31 @@
     "share": "ਸਾਂਝਾ ਕਰੋ",
     "showStroke": "ਰੇਖਾ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
     "showBackground": "ਬੈਕਗਰਾਉਂਡ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
-    "toggleTheme": "ਥੀਮ ਬਦਲੋ"
+    "toggleTheme": "ਥੀਮ ਬਦਲੋ",
+    "personalLib": "ਨਿੱਜੀ ਲਾਇਬ੍ਰੇਰੀ",
+    "excalidrawLib": "ਐਕਸਕਲੀਡਰਾਅ ਲਾਇਬ੍ਰੇਰੀ",
+    "decreaseFontSize": "ਫੌਂਟ ਦਾ ਅਕਾਰ ਘਟਾਓ",
+    "increaseFontSize": "ਫੌਂਟ ਦਾ ਅਕਾਰ ਵਧਾਓ",
+    "unbindText": "",
+    "bindText": "ਪਾਠ ਨੂੰ ਕੰਟੇਨਰ ਨਾਲ ਬੰਨ੍ਹੋ",
+    "link": {
+      "edit": "ਕੜੀ ਸੋਧੋ",
+      "create": "ਕੜੀ ਬਣਾਓ",
+      "label": "ਕੜੀ"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
@@ -136,7 +159,13 @@
     "darkMode": "ਡਾਰਕ ਮੋਡ",
     "lightMode": "ਲਾਇਟ ਮੋਡ",
     "zenMode": "ਜ਼ੈੱਨ ਮੋਡ",
-    "exitZenMode": "ਜ਼ੈੱਨ ਮੋਡ 'ਚੋਂ ਬਾਹਰ ਨਿਕਲੋ"
+    "exitZenMode": "ਜ਼ੈੱਨ ਮੋਡ 'ਚੋਂ ਬਾਹਰ ਨਿਕਲੋ",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "clear": "ਸਾਫ਼ ਕਰੋ",
+    "remove": "ਹਟਾਓ",
+    "publishLibrary": "ਪ੍ਰਕਾਸ਼ਤ ਕਰੋ",
+    "submit": "ਜਮ੍ਹਾ ਕਰਵਾਓ",
+    "confirm": "ਪੁਸ਼ਟੀ ਕਰੋ"
   },
   "alerts": {
     "clearReset": "ਇਹ ਸਾਰਾ ਕੈਨਵਸ ਸਾਫ ਕਰ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
@@ -145,22 +174,34 @@
     "couldNotLoadInvalidFile": "ਨਜਾਇਜ਼ ਫਾਈਲ ਲੋਡ ਨਹੀਂ ਕਰ ਸਕੇ",
     "importBackendFailed": "ਬੈਕਐੱਨਡ ਤੋਂ ਆਯਾਤ ਕਰਨ ਵਿੱਚ ਅਸਫਲ ਰਹੇ।",
     "cannotExportEmptyCanvas": "ਖਾਲੀ ਕੈਨਵਸ ਨਿਰਯਾਤ ਨਹੀਂ ਕਰ ਸਕਦੇ।",
-    "couldNotCopyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਨਹੀਂ ਕਰ ਸਕੇ। ਕਰੋਮ ਬਰਾਉਜ਼ਰ ਵਰਤ ਕੇ ਦੇਖੋ।",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "ਡਾਟਾ ਡੀਕਰਿਪਟ ਨਹੀਂ ਕਰ ਸਕੇ।",
     "uploadedSecurly": "ਅੱਪਲੋਡ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਸ਼ਨ ਨਾਲ ਸੁਰੱਖਿਅਤ ਕੀਤੀ ਹੋਈ ਹੈ, ਜਿਸਦਾ ਮਤਲਬ ਇਹ ਹੈ ਕਿ Excalidraw ਸਰਵਰ ਅਤੇ ਤੀਜੀ ਧਿਰ ਦੇ ਬੰਦੇ ਸਮੱਗਰੀ ਨੂੰ ਪੜ੍ਹ ਨਹੀਂ ਸਕਦੇ।",
     "loadSceneOverridePrompt": "ਬਾਹਰੀ ਡਰਾਇੰਗ ਨੂੰ ਲੋਡ ਕਰਨਾ ਤੁਹਾਡੀ ਮੌਜੂਦਾ ਸਮੱਗਰੀ ਦੀ ਥਾਂ ਲੈ ਲਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਜਾਰੀ ਰੱਖਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
     "collabStopOverridePrompt": "ਇਜਲਾਸ ਨੂੰ ਰੋਕਣਾ ਪਿਛਲੀ ਲੋਕਲ ਸਾਂਭੀ ਡਰਾਇੰਗ ਦੀ ਥਾਂ ਲੈ ਲਵੇਗਾ। ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?\n\n(ਜੇ ਤੁਸੀਂ ਆਪਣੀ ਲੋਕਲ ਡਰਾਇੰਗ ਨੂੰ ਬਰਕਰਾਰ ਰੱਖਣਾ ਚਾਹੁੰਦੇ ਹੋ ਤਾਂ ਇਹ ਕਰਨ ਦੀ ਬਜਾਏ ਬੱਸ ਆਪਣਾ ਟੈਬ ਬੰਦ ਕਰ ਦਿਉ।)",
-    "errorLoadingLibrary": "ਤੀਜੀ ਧਿਰ ਦੀ ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਲੋਡ ਕਰਨ ਵਿੱਚ ਗਲਤੀ ਹੋਈ ਸੀ।",
     "errorAddingToLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਸਮੱਗਰੀ ਨਹੀਂ ਜੋੜ ਸਕੇ",
     "errorRemovingFromLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ ਸਮੱਗਰੀ ਨਹੀਂ ਹਟਾ ਸਕੇ",
     "confirmAddLibrary": "ਇਹ ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ {{numShapes}} ਆਕ੍ਰਿਤੀ(ਆਂ) ਨੂੰ ਜੋੜ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
-    "imageDoesNotContainScene": "ਫਿਲਹਾਲ ਤਸਵੀਰਾਂ ਨੂੰ ਆਯਾਤ ਕਰਨ ਦਾ ਸਮਰਥਨ ਨਹੀਂ ਕਰਦਾ।\n\nਕੀ ਤੁਸੀਂ ਦ੍ਰਿਸ਼ ਨੂੰ ਆਯਾਤ ਕਰਨਾ ਚਾਹੁੰਦੇ ਸੀ? ਇਸ ਤਸਵੀਰ ਵਿੱਚ ਦ੍ਰਿਸ਼ ਦਾ ਕੋਈ ਵੀ ਡਾਟਾ ਨਜ਼ਰ ਨਹੀਂ ਆ ਰਿਹਾ। ਕੀ ਨਿਰਯਾਤ ਦੌਰਾਨ ਤੁਸੀਂ ਇਹ ਸਮਰੱਥ ਕੀਤਾ ਸੀ?",
+    "imageDoesNotContainScene": "ਇਸ ਤਸਵੀਰ ਵਿੱਚ ਦ੍ਰਿਸ਼ ਦਾ ਕੋਈ ਵੀ ਡਾਟਾ ਨਜ਼ਰ ਨਹੀਂ ਆ ਰਿਹਾ। ਕੀ ਤੁਸੀਂ ਨਿਰਯਾਤ ਕਰਦੇ ਸਮੇਂ ਦ੍ਰਿਸ਼ ਨੂੰ ਮੜ੍ਹਣਾ ਸਮਰੱਥ ਕੀਤਾ ਸੀ?",
     "cannotRestoreFromImage": "ਇਸ ਤਸਵੀਰ ਫਾਈਲ ਤੋਂ ਦ੍ਰਿਸ਼ ਬਹਾਲ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ",
     "invalidSceneUrl": "ਦਿੱਤੀ ਗਈ URL 'ਚੋਂ ਦ੍ਰਿਸ਼ ਨੂੰ ਆਯਾਤ ਨਹੀਂ ਕਰ ਸਕੇ। ਇਹ ਜਾਂ ਤਾਂ ਖਰਾਬ ਹੈ, ਜਾਂ ਇਸ ਵਿੱਚ ਜਾਇਜ਼ Excalidraw JSON ਡਾਟਾ ਸ਼ਾਮਲ ਨਹੀਂ ਹੈ।",
-    "resetLibrary": "ਇਹ ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਸਾਫ ਕਰ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
+    "resetLibrary": "ਇਹ ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਸਾਫ ਕਰ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
+    "removeItemsFromsLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ {{count}} ਚੀਜ਼(-ਜ਼ਾਂ) ਮਿਟਾਉਣੀਆਂ ਹਨ?",
+    "invalidEncryptionKey": "",
+    "browserZoom": ""
+  },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
+    "image": "ਤਸਵੀਰ ਸ਼ਾਮਲ ਕਰੋ",
     "rectangle": "ਆਇਤ",
     "diamond": "ਹੀਰਾ",
     "ellipse": "ਅੰਡਾਕਾਰ",
@@ -169,7 +210,10 @@
     "freedraw": "ਵਾਹੋ",
     "text": "ਪਾਠ",
     "library": "ਲਾਇਬ੍ਰੇਰੀ",
-    "lock": "ਡਰਾਇੰਗ ਤੋਂ ਬਾਅਦ ਵੀ ਚੁਣੇ ਹੋਏ ਸੰਦ ਨੂੰ ਸਰਗਰਮ ਰੱਖੋ "
+    "lock": "ਡਰਾਇੰਗ ਤੋਂ ਬਾਅਦ ਵੀ ਚੁਣੇ ਹੋਏ ਸੰਦ ਨੂੰ ਸਰਗਰਮ ਰੱਖੋ ",
+    "penMode": "",
+    "link": "",
+    "eraser": "ਰਬੜ"
   },
   "headings": {
     "canvasActions": "ਕੈਨਵਸ ਦੀਆਂ ਕਾਰਵਾਈਆਂ",
@@ -177,6 +221,7 @@
     "shapes": "ਆਕ੍ਰਿਤੀਆਂ"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "ਇੱਕ ਤੋਂ ਜ਼ਿਆਦਾ ਬਿੰਦੂਆਂ ਲਈ ਕਲਿੱਕ ਕਰਕੇ ਸ਼ੁਰੂਆਤ ਕਰੋ, ਇਕਹਿਰੀ ਲਕੀਰ ਲਈ ਘਸੀਟੋ",
     "freeDraw": "ਕਲਿੱਕ ਕਰਕੇ ਘਸੀਟੋ, ਪੂਰਾ ਹੋਣ 'ਤੇ ਛੱਡ ਦਿਉ",
     "text": "ਨੁਸਖਾ: ਤੁਸੀਂ ਚੋਣਕਾਰ ਸੰਦ ਰਾਹੀਂ ਕਿਤੇ ਵੀ ਡਬਲ-ਕਲਿੱਕ ਕਰਕੇ ਵੀ ਪਾਠ ਜੋੜ ਸਕਦੇ ਹੋ",
@@ -185,10 +230,16 @@
     "linearElementMulti": "ਮੁਕੰਮਲ ਕਰਨ ਲਈ ਆਖਰੀ ਬਿੰਦੂ 'ਤੇ ਕਲਿੱਕ ਕਰੋ ਜਾਂ ਇਸਕੇਪ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
     "lockAngle": "ਤੁਸੀਂ SHIFT ਦਬਾਈ ਰੱਖ ਕੇ ਕੋਣਾਂ ਨੂੰ ਕਾਬੂ ਕਰ ਸਕਦੇ ਹੋ",
     "resize": "ਤੁਸੀਂ ਅਕਾਰ ਬਦਲਦੇ ਸਮੇਂ SHIFT ਦਬਾਈ ਰੱਖ ਕੇ ਅਨੁਪਾਤ ਨੂੰ ਕਾਬੂ ਕਰ ਸਕਦੇ ਹੋ, ਵਿਚਕਾਰ ਤੋਂ ਅਕਾਰ ਬਦਲਣ ਲਈ ALT ਦਬਾਓ",
+    "resizeImage": "",
     "rotate": "ਤੁਸੀਂ ਘੁਮਾਉਂਦੇ ਹੋਏ SHIFT ਦਬਾਈ ਰੱਖ ਕੇ ਕੋਣਾਂ ਨੂੰ ਕਾਬੂ ਕਰ ਸਕਦੇ ਹੋ",
     "lineEditor_info": "ਬਿੰਦੂਆਂ ਨੂੰ ਸੋਧਣ ਲਈ ਡਬਲ-ਕਲਿੱਕ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
-    "lineEditor_pointSelected": "ਬਿੰਦੀ ਹਟਾਉਣ ਲਈ ਡਲੀਟ ਦਬਾਓ, ਡੁਪਲੀਕੇਟ ਬਣਾਉਣ ਲਈ CtrlOrCmd+D, ਜਾਂ ਹਿਲਾਉਣ ਲਈ ਘਸੀਟੋ",
-    "lineEditor_nothingSelected": "ਹਿਲਾਉਣ ਜਾਂ ਹਟਾਉਣ ਲਈ ਬਿੰਦੂ ਚੁਣੋ, ਜਾਂ ਨਵਾਂ ਬਿੰਦੂ ਜੋੜਨ ਲਈ Alt ਦਬਾਕੇ ਕਲਿੱਕ ਕਰੋ"
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
+    "placeImage": "",
+    "publishLibrary": "ਆਪਣੀ ਲਾਇਬ੍ਰੇਰੀ ਪ੍ਰਕਾਸ਼ਿਤ ਕਰੋ",
+    "bindTextToElement": "ਪਾਠ ਜੋੜਨ ਲਈ ਐੰਟਰ ਦਬਾਓ",
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "ਝਲਕ ਨਹੀਂ ਦਿਖਾ ਸਕਦੇ",
@@ -235,6 +286,8 @@
   "helpDialog": {
     "blog": "ਸਾਡਾ ਬਲੌਗ ਪੜ੍ਹੋ",
     "click": "ਕਲਿੱਕ",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "ਵਿੰਗਾ ਤੀਰ",
     "curvedLine": "ਵਿੰਗੀ ਲਕੀਰ",
     "documentation": "ਕਾਗਜ਼ਾਤ",
@@ -246,14 +299,67 @@
     "howto": "ਸਾਡੀਆਂ ਗਾਈਡਾਂ ਦੀ ਪਾਲਣਾ ਕਰੋ",
     "or": "ਜਾਂ",
     "preventBinding": "ਤੀਰ ਬੱਝਣਾ ਰੋਕੋ",
-    "shapes": "ਆਕ੍ਰਿਤੀਆਂ",
+    "tools": "ਟੂਲ",
     "shortcuts": "ਕੀਬੋਰਡ ਸ਼ਾਰਟਕੱਟ",
     "textFinish": "ਸੋਧਣਾ ਮੁਕੰਮਲ ਕਰੋ (ਪਾਠ ਸੋਧਕ)",
     "textNewLine": "ਨਵੀਂ ਪੰਕਤੀ ਜੋੜੋ (ਪਾਠ ਸੋਧਕ)",
     "title": "ਮਦਦ",
     "view": "ਦਿੱਖ",
     "zoomToFit": "ਸਾਰੇ ਐਲੀਮੈਂਟਾਂ ਨੂੰ ਫਿੱਟ ਕਰਨ ਲਈ ਜ਼ੂਮ ਕਰੋ",
-    "zoomToSelection": "ਚੋਣ ਤੱਕ ਜ਼ੂਮ ਕਰੋ"
+    "zoomToSelection": "ਚੋਣ ਤੱਕ ਜ਼ੂਮ ਕਰੋ",
+    "toggleElementLock": ""
+  },
+  "clearCanvasDialog": {
+    "title": "ਕੈਨਵਸ ਨੂੰ ਸਾਫ਼ ਕਰੋ"
+  },
+  "publishDialog": {
+    "title": "ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਪ੍ਰਕਾਸ਼ਤ ਕਰੋ",
+    "itemName": "ਚੀਜ਼ ਦਾ ਨਾਂ",
+    "authorName": "ਲੇਖਕ ਦਾ ਨਾਂ",
+    "githubUsername": "ਗਿੱਟਹੱਬ ਵਰਤੋਂਕਾਰ ਨਾਂ",
+    "twitterUsername": "ਟਵਿੱਟਰ ਦਾ ਵਰਤੋਂਕਾਰ-ਨਾਂ",
+    "libraryName": "ਲਾਇਬ੍ਰੇਰੀ ਦਾ ਨਾਂ",
+    "libraryDesc": "ਲਾਇਬ੍ਰੇਰੀ ਦਾ ਵੇਰਵਾ",
+    "website": "ਵੈੱਬਸਾਇਟ",
+    "placeholder": {
+      "authorName": "ਤੁਹਾਡਾ ਨਾਂ ਜਾਂ ਵਰਤੋਂਕਾਰ-ਨਾਂ",
+      "libraryName": "ਤੁਹਾਡੀ ਲਾਇਬਰ੍ਰੀ ਦਾ ਨਾਂ",
+      "libraryDesc": "ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਦਾ ਵੇਰਵਾ ਤਾਂ ਜੋ ਲੋਕਾਂ ਨੂੰ ਇਸ ਤੋੰਂ ਇਸਦੀ ਵਰਤੋਂ ਕਰਨ ਸਬੰਧੀ ਮਦਦ ਮਿਲ ਸਕੇ",
+      "githubHandle": "",
+      "twitterHandle": "",
+      "website": ""
+    },
+    "errors": {
+      "required": "ਲੋੜੀਂਦਾ",
+      "website": "ਜਾਇਜ਼ URL ਭਰੋ"
+    },
+    "noteDescription": {
+      "pre": "",
+      "link": "ਜਨਤਕ ਲਾਇਬ੍ਰੇਰੀ ਦੀ ਰਿਪਾਜ਼ੀਟਰੀ",
+      "post": ""
+    },
+    "noteGuidelines": {
+      "pre": "",
+      "link": "ਦਿਸ਼ਾ ਨਿਰਦੇਸ਼",
+      "post": ""
+    },
+    "noteLicense": {
+      "pre": "",
+      "link": "MIT ਲਾਇਸੈਂਸ, ",
+      "post": ""
+    },
+    "noteItems": "",
+    "atleastOneLibItem": "",
+    "republishWarning": ""
+  },
+  "publishSuccessDialog": {
+    "title": "",
+    "content": "",
+    "link": "ਇੱਥੇ"
+  },
+  "confirmDialog": {
+    "resetLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਰੀਸੈੱਟ ਕਰੋ",
+    "removeItemsFromLib": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ ਚੁਣੀਆਂ ਹੋਈਆਂ ਆਈਟਮਾਂ ਹਟਾਓ"
   },
   "encrypted": {
     "tooltip": "ਤੁਹਾਡੀ ਡਰਾਇੰਗਾਂ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਟ ਕੀਤੀਆਂ ਹੋਈਆਂ ਹਨ, ਇਸ ਲਈ Excalidraw ਦੇ ਸਰਵਰ ਉਹਨਾਂ ਨੂੰ ਕਦੇ ਵੀ ਨਹੀਂ ਦੇਖਣਗੇ।",
@@ -275,6 +381,7 @@
     "width": "ਚੌੜਾਈ"
   },
   "toast": {
+    "addedToLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਜੋੜਿਆ",
     "copyStyles": "ਕਾਪੀ ਕੀਤੇ ਸਟਾਇਲ।",
     "copyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕੀਤਾ।",
     "copyToClipboardAsPng": "{{exportSelection}} ਨੂੰ ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕੀਤਾ ({{exportColorScheme}})",

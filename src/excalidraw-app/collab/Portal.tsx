@@ -1,25 +1,33 @@
 import {
-  encryptAESGEM,
+  isSyncableElement,
   SocketUpdateData,
   SocketUpdateDataSource,
 } from "../data";
 
-import CollabWrapper from "./CollabWrapper";
+import { TCollabClass } from "./Collab";
 
 import { ExcalidrawElement } from "../../element/types";
-import { BROADCAST, SCENE } from "../app_constants";
+import {
+  WS_EVENTS,
+  FILE_UPLOAD_TIMEOUT,
+  WS_SCENE_EVENT_TYPES,
+} from "../app_constants";
 import { UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
+import { throttle } from "lodash";
+import { newElementWith } from "../../element/mutateElement";
+import { BroadcastedExcalidrawElement } from "./reconciliation";
+import { encryptData } from "../../data/encryption";
 
 class Portal {
-  collab: CollabWrapper;
+  collab: TCollabClass;
   socket: SocketIOClient.Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initialized
   roomId: string | null = null;
   roomKey: string | null = null;
   broadcastedElementVersions: Map<string, number> = new Map();
 
-  constructor(collab: CollabWrapper) {
+  constructor(collab: TCollabClass) {
     this.collab = collab;
   }
 
@@ -37,22 +45,23 @@ class Portal {
     });
     this.socket.on("new-user", async (_socketId: string) => {
       this.broadcastScene(
-        SCENE.INIT,
-        this.collab.getSyncableElements(
-          this.collab.getSceneElementsIncludingDeleted(),
-        ),
+        WS_SCENE_EVENT_TYPES.INIT,
+        this.collab.getSceneElementsIncludingDeleted(),
         /* syncAll */ true,
       );
     });
     this.socket.on("room-user-change", (clients: string[]) => {
       this.collab.setCollaborators(clients);
     });
+
+    return socket;
   }
 
   close() {
     if (!this.socket) {
       return;
     }
+    this.queueFileUpload.flush();
     this.socket.close();
     this.socket = null;
     this.roomId = null;
@@ -77,39 +86,82 @@ class Portal {
     if (this.isOpen()) {
       const json = JSON.stringify(data);
       const encoded = new TextEncoder().encode(json);
-      const encrypted = await encryptAESGEM(encoded, this.roomKey!);
-      this.socket!.emit(
-        volatile ? BROADCAST.SERVER_VOLATILE : BROADCAST.SERVER,
+      const { encryptedBuffer, iv } = await encryptData(this.roomKey!, encoded);
+
+      this.socket?.emit(
+        volatile ? WS_EVENTS.SERVER_VOLATILE : WS_EVENTS.SERVER,
         this.roomId,
-        encrypted.data,
-        encrypted.iv,
+        encryptedBuffer,
+        iv,
       );
     }
   }
 
+  queueFileUpload = throttle(async () => {
+    try {
+      await this.collab.fileManager.saveFiles({
+        elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
+        files: this.collab.excalidrawAPI.getFiles(),
+      });
+    } catch (error: any) {
+      if (error.name !== "AbortError") {
+        this.collab.excalidrawAPI.updateScene({
+          appState: {
+            errorMessage: error.message,
+          },
+        });
+      }
+    }
+
+    this.collab.excalidrawAPI.updateScene({
+      elements: this.collab.excalidrawAPI
+        .getSceneElementsIncludingDeleted()
+        .map((element) => {
+          if (this.collab.fileManager.shouldUpdateImageElementStatus(element)) {
+            // this will signal collaborators to pull image data from server
+            // (using mutation instead of newElementWith otherwise it'd break
+            // in-progress dragging)
+            return newElementWith(element, { status: "saved" });
+          }
+          return element;
+        }),
+    });
+  }, FILE_UPLOAD_TIMEOUT);
+
   broadcastScene = async (
-    sceneType: SCENE.INIT | SCENE.UPDATE,
-    syncableElements: ExcalidrawElement[],
+    updateType: WS_SCENE_EVENT_TYPES.INIT | WS_SCENE_EVENT_TYPES.UPDATE,
+    allElements: readonly ExcalidrawElement[],
     syncAll: boolean,
   ) => {
-    if (sceneType === SCENE.INIT && !syncAll) {
+    if (updateType === WS_SCENE_EVENT_TYPES.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
 
-    if (!syncAll) {
-      // sync out only the elements we think we need to to save bandwidth.
-      // periodically we'll resync the whole thing to make sure no one diverges
-      // due to a dropped message (server goes down etc).
-      syncableElements = syncableElements.filter(
-        (syncableElement) =>
-          !this.broadcastedElementVersions.has(syncableElement.id) ||
-          syncableElement.version >
-            this.broadcastedElementVersions.get(syncableElement.id)!,
-      );
-    }
+    // sync out only the elements we think we need to to save bandwidth.
+    // periodically we'll resync the whole thing to make sure no one diverges
+    // due to a dropped message (server goes down etc).
+    const syncableElements = allElements.reduce(
+      (acc, element: BroadcastedExcalidrawElement, idx, elements) => {
+        if (
+          (syncAll ||
+            !this.broadcastedElementVersions.has(element.id) ||
+            element.version >
+              this.broadcastedElementVersions.get(element.id)!) &&
+          isSyncableElement(element)
+        ) {
+          acc.push({
+            ...element,
+            // z-index info for the reconciler
+            parent: idx === 0 ? "^" : elements[idx - 1]?.id,
+          });
+        }
+        return acc;
+      },
+      [] as BroadcastedExcalidrawElement[],
+    );
 
-    const data: SocketUpdateDataSource[typeof sceneType] = {
-      type: sceneType,
+    const data: SocketUpdateDataSource[typeof updateType] = {
+      type: updateType,
       payload: {
         elements: syncableElements,
       },
@@ -122,18 +174,9 @@ class Portal {
       );
     }
 
-    const broadcastPromise = this._broadcastSocketData(
-      data as SocketUpdateData,
-    );
+    this.queueFileUpload();
 
-    if (syncAll && this.collab.isCollaborating) {
-      await Promise.all([
-        broadcastPromise,
-        this.collab.saveCollabRoomToFirebase(syncableElements),
-      ]);
-    } else {
-      await broadcastPromise;
-    }
+    await this._broadcastSocketData(data as SocketUpdateData);
   };
 
   broadcastIdleChange = (userState: UserIdleState) => {
@@ -164,8 +207,8 @@ class Portal {
           socketId: this.socket.id,
           pointer: payload.pointer,
           button: payload.button || "up",
-          selectedElementIds: this.collab.excalidrawAPI.getAppState()
-            .selectedElementIds,
+          selectedElementIds:
+            this.collab.excalidrawAPI.getAppState().selectedElementIds,
           username: this.collab.state.username,
         },
       };

@@ -9,6 +9,7 @@
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
     "copyAsSvg": "In Zwischenablage kopieren (SVG)",
+    "copyText": "In die Zwischenablage als Text kopieren",
     "bringForward": "Nach vorne",
     "sendToBack": "In den Hintergrund",
     "bringToFront": "In den Vordergrund",
@@ -20,10 +21,6 @@
     "background": "Hintergrund",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
-    "strokeShape": "Strichform",
-    "strokeShape_gel": "Gelschreiber",
-    "strokeShape_fountain": "Füllfederhalter",
-    "strokeShape_brush": "Pinselstift",
     "strokeStyle": "Konturstil",
     "strokeStyle_solid": "Durchgezogen",
     "strokeStyle_dashed": "Gestrichelt",
@@ -39,6 +36,7 @@
     "arrowhead_arrow": "Pfeil",
     "arrowhead_bar": "Balken",
     "arrowhead_dot": "Punkt",
+    "arrowhead_triangle": "Dreieck",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
@@ -67,6 +65,7 @@
     "cartoonist": "Karikaturist",
     "fileTitle": "Dateiname",
     "colorPicker": "Farbauswähler",
+    "canvasColors": "Auf Leinwand verwendet",
     "canvasBackground": "Zeichenflächenhintergrund",
     "drawingCanvas": "Leinwand",
     "layers": "Ebenen",
@@ -102,8 +101,32 @@
     "toggleExportColorScheme": "Exportfarbschema umschalten",
     "share": "Teilen",
     "showStroke": "Auswahl für Strichfarbe anzeigen",
-    "showBackground": "Auswahl für Hintergrundfarbe anzeigen",
-    "toggleTheme": "Design umschalten"
+    "showBackground": "Hintergrundfarbe auswählen",
+    "toggleTheme": "Thema umschalten",
+    "personalLib": "Persönliche Bibliothek",
+    "excalidrawLib": "Excalidraw-Bibliothek",
+    "decreaseFontSize": "Schrift verkleinern",
+    "increaseFontSize": "Schrift vergrößern",
+    "unbindText": "Text lösen",
+    "bindText": "Text an Container binden",
+    "link": {
+      "edit": "Link bearbeiten",
+      "create": "Link erstellen",
+      "label": "Link"
+    },
+    "elementLock": {
+      "lock": "Sperren",
+      "unlock": "Entsperren",
+      "lockAll": "Alle sperren",
+      "unlockAll": "Alle entsperren"
+    },
+    "statusPublished": "Veröffentlicht",
+    "sidebarLock": "Seitenleiste offen lassen"
+  },
+  "library": {
+    "noItems": "Noch keine Elemente hinzugefügt...",
+    "hint_emptyLibrary": "Wähle ein Element auf der Zeichenfläche, um es hier hinzuzufügen. Oder installiere eine Bibliothek aus dem öffentlichen Verzeichnis.",
+    "hint_emptyPrivateLibrary": "Wähle ein Element von der Zeichenfläche, um es hier hinzuzufügen."
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -136,7 +159,13 @@
     "darkMode": "Dunkler Modus",
     "lightMode": "Heller Modus",
     "zenMode": "Zen-Modus",
-    "exitZenMode": "Zen-Modus verlassen"
+    "exitZenMode": "Zen-Modus verlassen",
+    "cancel": "Abbrechen",
+    "clear": "Löschen",
+    "remove": "Entfernen",
+    "publishLibrary": "Veröffentlichen",
+    "submit": "Absenden",
+    "confirm": "Bestätigen"
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -145,22 +174,34 @@
     "couldNotLoadInvalidFile": "Ungültige Datei konnte nicht geladen werden",
     "importBackendFailed": "Import vom Server ist fehlgeschlagen.",
     "cannotExportEmptyCanvas": "Leere Zeichenfläche kann nicht exportiert werden.",
-    "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome Browser.",
+    "couldNotCopyToClipboard": "Kopieren in die Zwischenablage fehlgeschlagen.",
     "decryptFailed": "Daten konnten nicht entschlüsselt werden.",
     "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen.",
     "loadSceneOverridePrompt": "Das Laden einer externen Zeichnung ersetzt den vorhandenen Inhalt. Möchtest du fortfahren?",
     "collabStopOverridePrompt": "Das Stoppen der Sitzung wird deine vorherige, lokal gespeicherte Zeichnung überschreiben. Bist du dir sicher?\n\n(Wenn du deine lokale Zeichnung behalten möchtest, schließe stattdessen den Browser-Tab.)",
-    "errorLoadingLibrary": "Beim Laden der Drittanbieter-Bibliothek ist ein Fehler aufgetreten.",
     "errorAddingToLibrary": "Das Element konnte nicht zur Bibliothek hinzugefügt werden",
     "errorRemovingFromLibrary": "Das Element konnte nicht aus der Bibliothek entfernt werden",
     "confirmAddLibrary": "Dies fügt {{numShapes}} Form(en) zu deiner Bibliothek hinzu. Bist du dir sicher?",
-    "imageDoesNotContainScene": "Das Importieren von Bildern wird derzeit nicht unterstützt.\n\nMöchtest du eine Szene importieren? Dieses Bild scheint keine Zeichnungsdaten zu enthalten. Hast du dies beim Exportieren aktiviert?",
+    "imageDoesNotContainScene": "Dieses Bild scheint keine Szenendaten zu enthalten. Hast Du das Einbetten der Szene während des Exports aktiviert?",
     "cannotRestoreFromImage": "Die Zeichnung konnte aus dieser Bilddatei nicht wiederhergestellt werden",
     "invalidSceneUrl": "Die Szene konnte nicht von der angegebenen URL importiert werden. Sie ist entweder fehlerhaft oder enthält keine gültigen Excalidraw JSON-Daten.",
-    "resetLibrary": "Dieses löscht deine Bibliothek. Bist du sicher?"
+    "resetLibrary": "Dieses löscht deine Bibliothek. Bist du sicher?",
+    "removeItemsFromsLibrary": "{{count}} Element(e) aus der Bibliothek löschen?",
+    "invalidEncryptionKey": "Verschlüsselungsschlüssel muss 22 Zeichen lang sein. Die Live-Zusammenarbeit ist deaktiviert.",
+    "browserZoom": "Die Zoomstufe Deines Browsers ist nicht auf 100% gesetzt, was dazu führen kann, dass der Zeichenbereich falsch angezeigt wird"
+  },
+  "errors": {
+    "unsupportedFileType": "Nicht unterstützter Dateityp.",
+    "imageInsertError": "Das Bild konnte nicht eingefügt werden. Versuche es später erneut...",
+    "fileTooBig": "Die Datei ist zu groß. Die maximal zulässige Größe ist {{maxSize}}.",
+    "svgImageInsertError": "SVG-Bild konnte nicht eingefügt werden. Das SVG-Markup sieht ungültig aus.",
+    "invalidSVGString": "Ungültige SVG.",
+    "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
+    "importLibraryError": "Bibliothek konnte nicht geladen werden"
   },
   "toolBar": {
     "selection": "Auswahl",
+    "image": "Bild einfügen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
     "ellipse": "Ellipse",
@@ -169,7 +210,10 @@
     "freedraw": "Zeichnen",
     "text": "Text",
     "library": "Bibliothek",
-    "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen"
+    "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen",
+    "penMode": "Verhindere Pinch-Zoom und akzeptiere Eingabe nur vom Stift",
+    "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
+    "eraser": "Radierer"
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
@@ -177,18 +221,25 @@
     "shapes": "Formen"
   },
   "hints": {
+    "canvasPanning": "Um die Zeichenfläche zu verschieben, halte das Mausrad oder die Leertaste während des Ziehens",
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
     "text_selected": "Doppelklicken oder Eingabetaste drücken, um Text zu bearbeiten",
-    "text_editing": "Drücke Escape oder Strg/Cmd+Eingabetaste, um die Bearbeitung abzuschließen",
+    "text_editing": "Drücke Escape oder CtrlOrCmd+Eingabetaste, um die Bearbeitung abzuschließen",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
     "lockAngle": "Du kannst Winkel einschränken, indem du SHIFT gedrückt hältst",
     "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
+    "resizeImage": "Du kannst die Größe frei ändern, indem du SHIFT gedrückt hältst; halte ALT, um die Größe vom Zentrum aus zu ändern",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
     "lineEditor_info": "Doppelklicken oder Eingabetaste drücken, um Punkte zu bearbeiten",
-    "lineEditor_pointSelected": "Drücke Löschen, um Punkt zu entfernen, Strg+D oder Cmd+D zum Duplizieren oder ziehe zum Verschieben",
-    "lineEditor_nothingSelected": "Wähle einen Punkt zum Verschieben oder Löschen oder halte die Alt-Taste gedrückt und klicke, um neue Punkte hinzuzufügen"
+    "lineEditor_pointSelected": "Drücke Löschen, um Punkt(e) zu entfernen, CtrlOrCmd+D zum Duplizieren oder ziehe zum Verschieben",
+    "lineEditor_nothingSelected": "Wähle einen zu bearbeitenden Punkt (halte SHIFT gedrückt um mehrere Punkte auszuwählen),\noder halte Alt gedrückt und klicke um neue Punkte hinzuzufügen",
+    "placeImage": "Klicken, um das Bild zu platzieren oder klicken und ziehen um seine Größe manuell zu setzen",
+    "publishLibrary": "Veröffentliche deine eigene Bibliothek",
+    "bindTextToElement": "Zum Hinzufügen Eingabetaste drücken",
+    "deepBoxSelect": "Halte CtrlOrCmd gedrückt, um innerhalb der Gruppe auszuwählen, und um Ziehen zu vermeiden",
+    "eraserRevert": "Halte Alt gedrückt, um die zum Löschen markierten Elemente zurückzusetzen"
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
@@ -224,7 +275,7 @@
   "exportDialog": {
     "disk_title": "Auf Festplatte speichern",
     "disk_details": "Exportiere die Zeichnungsdaten in eine Datei, die Du später importieren kannst.",
-    "disk_button": "In Datei speichern",
+    "disk_button": "Als Datei speichern",
     "link_title": "Teilbarer Link",
     "link_details": "Als schreibgeschützten Link exportieren.",
     "link_button": "Als Link exportieren",
@@ -235,6 +286,8 @@
   "helpDialog": {
     "blog": "Lies unseren Blog",
     "click": "klicken",
+    "deepSelect": "Auswahl innerhalb der Gruppe",
+    "deepBoxSelect": "Auswahl innerhalb der Gruppe, und Ziehen vermeiden",
     "curvedArrow": "Gebogener Pfeil",
     "curvedLine": "Gebogene Linie",
     "documentation": "Dokumentation",
@@ -246,14 +299,67 @@
     "howto": "Folge unseren Anleitungen",
     "or": "oder",
     "preventBinding": "Pfeil-Bindung verhindern",
-    "shapes": "Formen",
+    "tools": "Werkzeuge",
     "shortcuts": "Tastaturkürzel",
     "textFinish": "Bearbeitung beenden (Texteditor)",
     "textNewLine": "Neue Zeile hinzufügen (Texteditor)",
     "title": "Hilfe",
     "view": "Ansicht",
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
-    "zoomToSelection": "Auf Auswahl zoomen"
+    "zoomToSelection": "Auf Auswahl zoomen",
+    "toggleElementLock": "Auswahl sperren/entsperren"
+  },
+  "clearCanvasDialog": {
+    "title": "Zeichenfläche löschen"
+  },
+  "publishDialog": {
+    "title": "Bibliothek veröffentlichen",
+    "itemName": "Elementname",
+    "authorName": "Name des Autors",
+    "githubUsername": "GitHub-Benutzername",
+    "twitterUsername": "Twitter-Benutzername",
+    "libraryName": "Name der Bibliothek",
+    "libraryDesc": "Beschreibung der Bibliothek",
+    "website": "Webseite",
+    "placeholder": {
+      "authorName": "Dein Name oder Benutzername",
+      "libraryName": "Name deiner Bibliothek",
+      "libraryDesc": "Beschreibung deiner Bibliothek, um anderen Nutzern bei der Verwendung zu helfen",
+      "githubHandle": "GitHub-Handle (optional), damit du die Bibliothek bearbeiten kannst, wenn sie zur Überprüfung eingereicht wurde",
+      "twitterHandle": "Twitter-Benutzername (optional), damit wir wissen, wen wir bei Werbung über Twitter nennen können",
+      "website": "Link zu deiner persönlichen Webseite oder zu anderer Seite (optional)"
+    },
+    "errors": {
+      "required": "Erforderlich",
+      "website": "Gültige URL eingeben"
+    },
+    "noteDescription": {
+      "pre": "Sende deine Bibliothek ein, um in die ",
+      "link": "öffentliche Bibliotheks-Repository aufgenommen zu werden",
+      "post": "damit andere Nutzer sie in ihren Zeichnungen verwenden können."
+    },
+    "noteGuidelines": {
+      "pre": "Die Bibliothek muss zuerst manuell freigegeben werden. Bitte lies die ",
+      "link": "Richtlinien",
+      "post": " vor dem Absenden. Du benötigst ein GitHub-Konto, um zu kommunizieren und Änderungen vorzunehmen, falls erforderlich, aber es ist nicht unbedingt erforderlich."
+    },
+    "noteLicense": {
+      "pre": "Mit dem Absenden stimmst du zu, dass die Bibliothek unter der ",
+      "link": "MIT-Lizenz, ",
+      "post": "die zusammengefasst beinhaltet, dass jeder sie ohne Einschränkungen nutzen kann."
+    },
+    "noteItems": "Jedes Bibliothekselement muss einen eigenen Namen haben, damit es gefiltert werden kann. Die folgenden Bibliothekselemente werden hinzugefügt:",
+    "atleastOneLibItem": "Bitte wähle mindestens ein Bibliothekselement aus, um zu beginnen",
+    "republishWarning": "Hinweis: Einige der ausgewählten Elemente sind bereits als veröffentlicht/eingereicht markiert. Du solltest Elemente nur erneut einreichen, wenn Du eine existierende Bibliothek oder Einreichung aktualisierst."
+  },
+  "publishSuccessDialog": {
+    "title": "Bibliothek übermittelt",
+    "content": "Vielen Dank {{authorName}}. Deine Bibliothek wurde zur Überprüfung eingereicht. Du kannst den Status verfolgen",
+    "link": "hier"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Bibliothek zurücksetzen",
+    "removeItemsFromLib": "Ausgewählte Elemente aus der Bibliothek entfernen"
   },
   "encrypted": {
     "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals.",
@@ -275,6 +381,7 @@
     "width": "Breite"
   },
   "toast": {
+    "addedToLibrary": "Zur Bibliothek hinzugefügt",
     "copyStyles": "Formatierungen kopiert.",
     "copyToClipboard": "In die Zwischenablage kopiert.",
     "copyToClipboardAsPng": "{{exportSelection}} als PNG in die Zwischenablage kopiert\n({{exportColorScheme}})",
@@ -296,7 +403,7 @@
     "e3fafc": "Cyan 0",
     "e6fcf5": "Teal 0",
     "ebfbee": "Grün 0",
-    "f4fce3": "Limette 0",
+    "f4fce3": "Hellgrün 0",
     "fff9db": "Gelb 0",
     "fff4e6": "Orange 0",
     "transparent": "Transparent",
@@ -311,7 +418,7 @@
     "15aabf": "Cyan 6",
     "12b886": "Teal 6",
     "40c057": "Grün 6",
-    "82c91e": "Limette 6",
+    "82c91e": "Hellgrün 6",
     "fab005": "Gelb 6",
     "fd7e14": "Orange 6",
     "000000": "Schwarz",
@@ -326,7 +433,7 @@
     "0b7285": "Cyan 9",
     "087f5b": "Teal 9",
     "2b8a3e": "Grün 9",
-    "5c940d": "Limette 9",
+    "5c940d": "Hellgrün 9",
     "e67700": "Gelb 9",
     "d9480f": "Orange 9"
   }

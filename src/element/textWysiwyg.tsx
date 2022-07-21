@@ -1,10 +1,32 @@
 import { CODES, KEYS } from "../keys";
-import { isWritableElement, getFontString } from "../utils";
+import {
+  isWritableElement,
+  getFontString,
+  getFontFamilyString,
+  isTestEnv,
+} from "../utils";
 import Scene from "../scene/Scene";
-import { isTextElement } from "./typeChecks";
-import { CLASSES } from "../constants";
-import { ExcalidrawElement } from "./types";
+import { isBoundToContainer, isTextElement } from "./typeChecks";
+import { CLASSES, BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  ExcalidrawLinearElement,
+} from "./types";
 import { AppState } from "../types";
+import { mutateElement } from "./mutateElement";
+import {
+  getApproxLineHeight,
+  getBoundTextElementId,
+  getContainerElement,
+  wrapText,
+} from "./textElement";
+import {
+  actionDecreaseFontSize,
+  actionIncreaseFontSize,
+} from "../actions/actionProperties";
+import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
+import App from "../components/App";
 
 const normalizeText = (text: string) => {
   return (
@@ -22,82 +44,196 @@ const getTransform = (
   angle: number,
   appState: AppState,
   maxWidth: number,
+  maxHeight: number,
 ) => {
-  const { zoom, offsetTop, offsetLeft } = appState;
+  const { zoom } = appState;
   const degree = (180 * angle) / Math.PI;
-  // offsets must be multiplied by 2 to account for the division by 2 of
-  // the whole expression afterwards
-  let translateX = ((width - offsetLeft * 2) * (zoom.value - 1)) / 2;
-  const translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
+  let translateX = (width * (zoom.value - 1)) / 2;
+  let translateY = (height * (zoom.value - 1)) / 2;
   if (width > maxWidth && zoom.value !== 1) {
-    translateX = (maxWidth / 2) * (zoom.value - 1);
+    translateX = (maxWidth * (zoom.value - 1)) / 2;
+  }
+  if (height > maxHeight && zoom.value !== 1) {
+    translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
 export const textWysiwyg = ({
   id,
-  appState,
   onChange,
   onSubmit,
   getViewportCoords,
   element,
   canvas,
   excalidrawContainer,
+  app,
 }: {
   id: ExcalidrawElement["id"];
-  appState: AppState;
   onChange?: (text: string) => void;
-  onSubmit: (data: { text: string; viaKeyboard: boolean }) => void;
+  onSubmit: (data: {
+    text: string;
+    viaKeyboard: boolean;
+    originalText: string;
+  }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
-  element: ExcalidrawElement;
+  element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement | null;
   excalidrawContainer: HTMLDivElement | null;
+  app: App;
 }) => {
+  const textPropertiesUpdated = (
+    updatedElement: ExcalidrawTextElement,
+    editable: HTMLTextAreaElement,
+  ) => {
+    const currentFont = editable.style.fontFamily.replace(/"/g, "");
+    if (
+      getFontFamilyString({ fontFamily: updatedElement.fontFamily }) !==
+      currentFont
+    ) {
+      return true;
+    }
+    if (`${updatedElement.fontSize}px` !== editable.style.fontSize) {
+      return true;
+    }
+    return false;
+  };
+  let originalContainerHeight: number;
+
   const updateWysiwygStyle = () => {
-    const updatedElement = Scene.getScene(element)?.getElement(id);
+    const appState = app.state;
+    const updatedElement =
+      Scene.getScene(element)?.getElement<ExcalidrawTextElement>(id);
+    if (!updatedElement) {
+      return;
+    }
+    const { textAlign, verticalAlign } = updatedElement;
+
+    const approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
     if (updatedElement && isTextElement(updatedElement)) {
-      const [viewportX, viewportY] = getViewportCoords(
-        updatedElement.x,
-        updatedElement.y,
-      );
-      const { textAlign, angle } = updatedElement;
+      let coordX = updatedElement.x;
+      let coordY = updatedElement.y;
+      const container = getContainerElement(updatedElement);
+      let maxWidth = updatedElement.width;
 
-      editable.value = updatedElement.text;
-
-      const lines = updatedElement.text.replace(/\r\n?/g, "\n").split("\n");
-      const lineHeight = updatedElement.height / lines.length;
-      const maxWidth =
-        (appState.offsetLeft + appState.width - viewportX - 8) /
-          appState.zoom.value -
-        // margin-right of parent if any
-        Number(
-          getComputedStyle(
-            excalidrawContainer?.parentNode as Element,
-          ).marginRight.slice(0, -2),
+      let maxHeight = updatedElement.height;
+      let width = updatedElement.width;
+      // Set to element height by default since that's
+      // what is going to be used for unbounded text
+      let height = updatedElement.height;
+      if (container && updatedElement.containerId) {
+        const propertiesUpdated = textPropertiesUpdated(
+          updatedElement,
+          editable,
         );
+        // using editor.style.height to get the accurate height of text editor
+        const editorHeight = Number(editable.style.height.slice(0, -2));
+        if (editorHeight > 0) {
+          height = editorHeight;
+        }
+        if (propertiesUpdated) {
+          originalContainerHeight = container.height;
 
+          // update height of the editor after properties updated
+          height = updatedElement.height;
+        }
+        if (!originalContainerHeight) {
+          originalContainerHeight = container.height;
+        }
+        maxWidth = container.width - BOUND_TEXT_PADDING * 2;
+        maxHeight = container.height - BOUND_TEXT_PADDING * 2;
+        width = maxWidth;
+        // The coordinates of text box set a distance of
+        // 5px to preserve padding
+        coordX = container.x + BOUND_TEXT_PADDING;
+        // autogrow container height if text exceeds
+        if (height > maxHeight) {
+          const diff = Math.min(height - maxHeight, approxLineHeight);
+          mutateElement(container, { height: container.height + diff });
+          return;
+        } else if (
+          // autoshrink container height until original container height
+          // is reached when text is removed
+          container.height > originalContainerHeight &&
+          height < maxHeight
+        ) {
+          const diff = Math.min(maxHeight - height, approxLineHeight);
+          mutateElement(container, { height: container.height - diff });
+        }
+        // Start pushing text upward until a diff of 30px (padding)
+        // is reached
+        else {
+          // vertically center align the text
+          if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
+            coordY = container.y + container.height / 2 - height / 2;
+          }
+          if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+            coordY =
+              container.y + container.height - height - BOUND_TEXT_PADDING;
+          }
+        }
+      }
+      const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
+      const initialSelectionStart = editable.selectionStart;
+      const initialSelectionEnd = editable.selectionEnd;
+      const initialLength = editable.value.length;
+      editable.value = updatedElement.originalText;
+
+      // restore cursor position after value updated so it doesn't
+      // go to the end of text when container auto expanded
+      if (
+        initialSelectionStart === initialSelectionEnd &&
+        initialSelectionEnd !== initialLength
+      ) {
+        // get diff between length and selection end and shift
+        // the cursor by "diff" times to position correctly
+        const diff = initialLength - initialSelectionEnd;
+        editable.selectionStart = editable.value.length - diff;
+        editable.selectionEnd = editable.value.length - diff;
+      }
+
+      const lines = updatedElement.originalText.split("\n");
+      const lineHeight = updatedElement.containerId
+        ? approxLineHeight
+        : updatedElement.height / lines.length;
+      if (!container) {
+        maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
+      }
+
+      // Make sure text editor height doesn't go beyond viewport
+      const editorMaxHeight =
+        (appState.height - viewportY) / appState.zoom.value;
+      const angle = container ? container.angle : updatedElement.angle;
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
-        width: `${updatedElement.width}px`,
-        height: `${updatedElement.height}px`,
+        width: `${width}px`,
+        height: `${height}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
         transform: getTransform(
-          updatedElement.width,
-          updatedElement.height,
+          width,
+          height,
           angle,
           appState,
           maxWidth,
+          editorMaxHeight,
         ),
         textAlign,
+        verticalAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxWidth: `${maxWidth}px`,
+        maxHeight: `${editorMaxHeight}px`,
       });
+      // For some reason updating font attribute doesn't set font family
+      // hence updating font family explicitly for test environment
+      if (isTestEnv()) {
+        editable.style.fontFamily = getFontFamilyString(updatedElement);
+      }
+      mutateElement(updatedElement, { x: coordX, y: coordY });
     }
   };
 
@@ -108,7 +244,15 @@ export const textWysiwyg = ({
   editable.dataset.type = "wysiwyg";
   // prevent line wrapping on Safari
   editable.wrap = "off";
+  editable.classList.add("excalidraw-wysiwyg");
 
+  let whiteSpace = "pre";
+  let wordBreak = "normal";
+
+  if (isBoundToContainer(element)) {
+    whiteSpace = "pre-wrap";
+    wordBreak = "break-word";
+  }
   Object.assign(editable.style, {
     position: "absolute",
     display: "inline-block",
@@ -121,23 +265,76 @@ export const textWysiwyg = ({
     resize: "none",
     background: "transparent",
     overflow: "hidden",
-    // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
-    whiteSpace: "pre",
     // must be specified because in dark mode canvas creates a stacking context
     zIndex: "var(--zIndex-wysiwyg)",
+    wordBreak,
+    // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
+    whiteSpace,
+    overflowWrap: "break-word",
   });
-
   updateWysiwygStyle();
 
   if (onChange) {
     editable.oninput = () => {
+      const updatedElement = Scene.getScene(element)?.getElement(
+        id,
+      ) as ExcalidrawTextElement;
+      const font = getFontString(updatedElement);
+      // using scrollHeight here since we need to calculate
+      // number of lines so cannot use editable.style.height
+      // as that gets updated below
+      // Rounding here so that the lines calculated is more accurate in all browsers.
+      // The scrollHeight and approxLineHeight differs in diff browsers
+      // eg it gives 1.05 in firefox for handewritten small font due to which
+      // height gets updated as lines > 1 and leads to jumping text for first line in bound container
+      // hence rounding here to avoid that
+      const lines = Math.round(
+        editable.scrollHeight / getApproxLineHeight(font),
+      );
+      // auto increase height only when lines  > 1 so its
+      // measured correctly and vertically aligns for
+      // first line as well as setting height to "auto"
+      // doubles the height as soon as user starts typing
+      if (isBoundToContainer(element) && lines > 1) {
+        let height = "auto";
+
+        if (lines === 2) {
+          const container = getContainerElement(element);
+          const actualLineCount = wrapText(
+            editable.value,
+            font,
+            container!.width,
+          ).split("\n").length;
+          // This is browser behaviour when setting height to "auto"
+          // It sets the height needed for 2 lines even if actual
+          // line count is 1 as mentioned above as well
+          // hence reducing the height by half if actual line count is 1
+          // so single line aligns vertically when deleting
+          if (actualLineCount === 1) {
+            height = `${editable.scrollHeight / 2}px`;
+          }
+        }
+        editable.style.height = height;
+        editable.style.height = `${editable.scrollHeight}px`;
+      }
       onChange(normalizeText(editable.value));
     };
   }
 
   editable.onkeydown = (event) => {
-    event.stopPropagation();
-    if (event.key === KEYS.ESCAPE) {
+    if (!event.shiftKey && actionZoomIn.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionZoomIn);
+      updateWysiwygStyle();
+    } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionZoomOut);
+      updateWysiwygStyle();
+    } else if (actionDecreaseFontSize.keyTest(event)) {
+      app.actionManager.executeAction(actionDecreaseFontSize);
+    } else if (actionIncreaseFontSize.keyTest(event)) {
+      app.actionManager.executeAction(actionIncreaseFontSize);
+    } else if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       submittedViaKeyboard = true;
       handleSubmit();
@@ -173,7 +370,7 @@ export const textWysiwyg = ({
     const linesStartIndices = getSelectedLinesStartIndices();
 
     let value = editable.value;
-    linesStartIndices.forEach((startIndex) => {
+    linesStartIndices.forEach((startIndex: number) => {
       const startValue = value.slice(0, startIndex);
       const endValue = value.slice(startIndex);
 
@@ -231,7 +428,7 @@ export const textWysiwyg = ({
   };
 
   /**
-   * @returns indeces of start positions of selected lines, in reverse order
+   * @returns indices of start positions of selected lines, in reverse order
    */
   const getSelectedLinesStartIndices = () => {
     let { selectionStart, selectionEnd, value } = editable;
@@ -273,9 +470,43 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
+    const updateElement = Scene.getScene(element)?.getElement(
+      element.id,
+    ) as ExcalidrawTextElement;
+    if (!updateElement) {
+      return;
+    }
+    let text = editable.value;
+    const container = getContainerElement(updateElement);
+
+    if (container) {
+      text = updateElement.text;
+      if (editable.value) {
+        const boundTextElementId = getBoundTextElementId(container);
+        if (!boundTextElementId || boundTextElementId !== element.id) {
+          mutateElement(container, {
+            boundElements: (container.boundElements || []).concat({
+              type: "text",
+              id: element.id,
+            }),
+          });
+        }
+      } else {
+        mutateElement(container, {
+          boundElements: container.boundElements?.filter(
+            (ele) =>
+              !isTextElement(
+                ele as ExcalidrawTextElement | ExcalidrawLinearElement,
+              ),
+          ),
+        });
+      }
+    }
+
     onSubmit({
-      text: normalizeText(editable.value),
+      text,
       viaKeyboard: submittedViaKeyboard,
+      originalText: editable.value,
     });
   };
 
@@ -304,26 +535,45 @@ export const textWysiwyg = ({
     editable.remove();
   };
 
-  const bindBlurEvent = () => {
+  const bindBlurEvent = (event?: MouseEvent) => {
     window.removeEventListener("pointerup", bindBlurEvent);
     // Deferred so that the pointerdown that initiates the wysiwyg doesn't
     // trigger the blur on ensuing pointerup.
     // Also to handle cases such as picking a color which would trigger a blur
     // in that same tick.
+    const target = event?.target;
+
+    const isTargetColorPicker =
+      target instanceof HTMLInputElement &&
+      target.closest(".color-picker-input") &&
+      isWritableElement(target);
+
     setTimeout(() => {
       editable.onblur = handleSubmit;
+      if (target && isTargetColorPicker) {
+        target.onblur = () => {
+          editable.focus();
+        };
+      }
       // case: clicking on the same property → no change → no update → no focus
-      editable.focus();
+      if (!isTargetColorPicker) {
+        editable.focus();
+      }
     });
   };
 
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
+    const isTargetColorPicker =
+      event.target instanceof HTMLInputElement &&
+      event.target.closest(".color-picker-input") &&
+      isWritableElement(event.target);
     if (
-      (event.target instanceof HTMLElement ||
+      ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-      event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
-      !isWritableElement(event.target)
+        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
+        !isWritableElement(event.target)) ||
+      isTargetColorPicker
     ) {
       editable.onblur = null;
       window.addEventListener("pointerup", bindBlurEvent);
@@ -336,7 +586,12 @@ export const textWysiwyg = ({
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
     updateWysiwygStyle();
-    editable.focus();
+    const isColorPickerActive = !!document.activeElement?.closest(
+      ".color-picker-input",
+    );
+    if (!isColorPickerActive) {
+      editable.focus();
+    }
   });
 
   // ---------------------------------------------------------------------------

@@ -1,30 +1,39 @@
-import { NormalizedZoomValue, PointerCoords, Zoom } from "../types";
-
-export const getNewZoom = (
-  newZoomValue: NormalizedZoomValue,
-  prevZoom: Zoom,
-  canvasOffset: { left: number; top: number },
-  zoomOnViewportPoint: PointerCoords = { x: 0, y: 0 },
-): Zoom => {
-  return {
-    value: newZoomValue,
-    translation: {
-      x:
-        zoomOnViewportPoint.x -
-        canvasOffset.left -
-        (zoomOnViewportPoint.x - canvasOffset.left - prevZoom.translation.x) *
-          (newZoomValue / prevZoom.value),
-      y:
-        zoomOnViewportPoint.y -
-        canvasOffset.top -
-        (zoomOnViewportPoint.y - canvasOffset.top - prevZoom.translation.y) *
-          (newZoomValue / prevZoom.value),
-    },
-  };
-};
+import { AppState, NormalizedZoomValue } from "../types";
 
 export const getNormalizedZoom = (zoom: number): NormalizedZoomValue => {
-  const normalizedZoom = parseFloat(zoom.toFixed(2));
-  const clampedZoom = Math.max(0.1, Math.min(normalizedZoom, 10));
-  return clampedZoom as NormalizedZoomValue;
+  return Math.max(0.1, Math.min(zoom, 30)) as NormalizedZoomValue;
+};
+
+export const getStateForZoom = (
+  {
+    viewportX,
+    viewportY,
+    nextZoom,
+  }: {
+    viewportX: number;
+    viewportY: number;
+    nextZoom: NormalizedZoomValue;
+  },
+  appState: AppState,
+) => {
+  const appLayerX = viewportX - appState.offsetLeft;
+  const appLayerY = viewportY - appState.offsetTop;
+
+  const currentZoom = appState.zoom.value;
+
+  // get original scroll position without zoom
+  const baseScrollX = appState.scrollX + (appLayerX - appLayerX / currentZoom);
+  const baseScrollY = appState.scrollY + (appLayerY - appLayerY / currentZoom);
+
+  // get scroll offsets for target zoom level
+  const zoomOffsetScrollX = -(appLayerX - appLayerX / nextZoom);
+  const zoomOffsetScrollY = -(appLayerY - appLayerY / nextZoom);
+
+  return {
+    scrollX: baseScrollX + zoomOffsetScrollX,
+    scrollY: baseScrollY + zoomOffsetScrollY,
+    zoom: {
+      value: nextZoom,
+    },
+  };
 };

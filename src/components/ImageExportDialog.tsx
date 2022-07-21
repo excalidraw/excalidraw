@@ -1,24 +1,24 @@
 import React, { useEffect, useRef, useState } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-import { ActionsManagerInterface } from "../actions/types";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
-import { useIsMobile } from "./App";
+import { useDevice } from "./App";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../scene/export";
-import { AppState } from "../types";
+import { AppState, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
 import { clipboard, exportImage } from "./icons";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import "./ExportDialog.scss";
-import { supported as fsSupported } from "browser-fs-access";
 import OpenColor from "open-color";
 import { CheckboxItem } from "./CheckboxItem";
 import { DEFAULT_EXPORT_PADDING } from "../constants";
+import { nativeFileSystemSupported } from "../data/filesystem";
+import { ActionManager } from "../actions/manager";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -79,6 +79,7 @@ const ExportButton: React.FC<{
 const ImageExportModal = ({
   elements,
   appState,
+  files,
   exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
   onExportToPng,
@@ -87,8 +88,9 @@ const ImageExportModal = ({
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
+  files: BinaryFiles;
   exportPadding?: number;
-  actionManager: ActionsManagerInterface;
+  actionManager: ActionManager;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
@@ -100,7 +102,7 @@ const ImageExportModal = ({
   const { exportBackground, viewBackgroundColor } = appState;
 
   const exportedElements = exportSelected
-    ? getSelectedElements(elements, appState)
+    ? getSelectedElements(elements, appState, true)
     : elements;
 
   useEffect(() => {
@@ -112,29 +114,25 @@ const ImageExportModal = ({
     if (!previewNode) {
       return;
     }
-    try {
-      const canvas = exportToCanvas(exportedElements, appState, {
-        exportBackground,
-        viewBackgroundColor,
-        exportPadding,
-      });
-
-      // if converting to blob fails, there's some problem that will
-      // likely prevent preview and export (e.g. canvas too big)
-      canvasToBlob(canvas)
-        .then(() => {
+    exportToCanvas(exportedElements, appState, files, {
+      exportBackground,
+      viewBackgroundColor,
+      exportPadding,
+    })
+      .then((canvas) => {
+        // if converting to blob fails, there's some problem that will
+        // likely prevent preview and export (e.g. canvas too big)
+        return canvasToBlob(canvas).then(() => {
           renderPreview(canvas, previewNode);
-        })
-        .catch((error) => {
-          console.error(error);
-          renderPreview(new CanvasError(), previewNode);
         });
-    } catch (error) {
-      console.error(error);
-      renderPreview(new CanvasError(), previewNode);
-    }
+      })
+      .catch((error) => {
+        console.error(error);
+        renderPreview(new CanvasError(), previewNode);
+      });
   }, [
     appState,
+    files,
     exportedElements,
     exportBackground,
     exportPadding,
@@ -172,7 +170,9 @@ const ImageExportModal = ({
         <Stack.Row gap={2}>
           {actionManager.renderAction("changeExportScale")}
         </Stack.Row>
-        <p style={{ marginLeft: "1em", userSelect: "none" }}>Scale</p>
+        <p style={{ marginLeft: "1em", userSelect: "none" }}>
+          {t("buttons.scale")}
+        </p>
       </div>
       <div
         style={{
@@ -182,7 +182,8 @@ const ImageExportModal = ({
           margin: ".6em 0",
         }}
       >
-        {!fsSupported && actionManager.renderAction("changeProjectName")}
+        {!nativeFileSystemSupported &&
+          actionManager.renderAction("changeProjectName")}
       </div>
       <Stack.Row gap={2} justifyContent="center" style={{ margin: "2em 0" }}>
         <ExportButton
@@ -219,6 +220,7 @@ const ImageExportModal = ({
 export const ImageExportDialog = ({
   elements,
   appState,
+  files,
   exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
   onExportToPng,
@@ -227,8 +229,9 @@ export const ImageExportDialog = ({
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
+  files: BinaryFiles;
   exportPadding?: number;
-  actionManager: ActionsManagerInterface;
+  actionManager: ActionManager;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
@@ -249,7 +252,7 @@ export const ImageExportDialog = ({
         icon={exportImage}
         type="button"
         aria-label={t("buttons.exportImage")}
-        showAriaLabel={useIsMobile()}
+        showAriaLabel={useDevice().isMobile}
         title={t("buttons.exportImage")}
       />
       {modalIsShown && (
@@ -257,6 +260,7 @@ export const ImageExportDialog = ({
           <ImageExportModal
             elements={elements}
             appState={appState}
+            files={files}
             exportPadding={exportPadding}
             actionManager={actionManager}
             onExportToPng={onExportToPng}

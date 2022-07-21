@@ -9,6 +9,7 @@
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
+    "copyText": "",
     "bringForward": "Trazer para a frente",
     "sendToBack": "Enviar para o fundo",
     "bringToFront": "Trazer para o primeiro plano",
@@ -20,10 +21,6 @@
     "background": "Fundo",
     "fill": "Preenchimento",
     "strokeWidth": "Espessura do traço",
-    "strokeShape": "Estilo do traço",
-    "strokeShape_gel": "Caneta de gel",
-    "strokeShape_fountain": "Caneta de fonte",
-    "strokeShape_brush": "Pincel",
     "strokeStyle": "Estilo de traço",
     "strokeStyle_solid": "Sólido",
     "strokeStyle_dashed": "Tracejado",
@@ -39,6 +36,7 @@
     "arrowhead_arrow": "Flecha",
     "arrowhead_bar": "Barra",
     "arrowhead_dot": "Ponto",
+    "arrowhead_triangle": "Triângulo",
     "fontSize": "Tamanho da fonte",
     "fontFamily": "Família da fonte",
     "onlySelected": "Somente a seleção",
@@ -67,6 +65,7 @@
     "cartoonist": "Cartunista",
     "fileTitle": "Nome do arquivo",
     "colorPicker": "Seletor de cores",
+    "canvasColors": "Usado na tela",
     "canvasBackground": "Fundo da tela",
     "drawingCanvas": "Tela de desenho",
     "layers": "Camadas",
@@ -103,7 +102,31 @@
     "share": "Compartilhar",
     "showStroke": "Exibir seletor de cores do traço",
     "showBackground": "Exibir seletor de cores do fundo",
-    "toggleTheme": "Alternar tema"
+    "toggleTheme": "Alternar tema",
+    "personalLib": "Biblioteca Pessoal",
+    "excalidrawLib": "Biblioteca do Excalidraw",
+    "decreaseFontSize": "Diminuir o tamanho da fonte",
+    "increaseFontSize": "Aumentar o tamanho da fonte",
+    "unbindText": "Desvincular texto",
+    "bindText": "",
+    "link": {
+      "edit": "Editar link",
+      "create": "Criar link",
+      "label": "Link"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -136,7 +159,13 @@
     "darkMode": "Modo escuro",
     "lightMode": "Modo claro",
     "zenMode": "Modo Zen",
-    "exitZenMode": "Sair do modo zen"
+    "exitZenMode": "Sair do modo zen",
+    "cancel": "Cancelar",
+    "clear": "Limpar",
+    "remove": "Remover",
+    "publishLibrary": "Publicar",
+    "submit": "Enviar",
+    "confirm": "Confirmar"
   },
   "alerts": {
     "clearReset": "Isto irá limpar toda a tela. Você tem certeza?",
@@ -145,22 +174,34 @@
     "couldNotLoadInvalidFile": "Não foi possível carregar o arquivo inválido",
     "importBackendFailed": "A importação do servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazio.",
-    "couldNotCopyToClipboard": "Não foi possível copiar para a área de transferência. Experimente usando o navegador Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "Não foi possível descriptografar os dados.",
     "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo.",
     "loadSceneOverridePrompt": "Carregar um desenho externo substituirá o seu conteúdo existente. Deseja continuar?",
     "collabStopOverridePrompt": "Ao interromper a sessão, você substituirá seu desenho anterior, armazenado localmente. Você tem certeza?\n\n(Se você deseja manter seu desenho local, simplesmente feche a aba do navegador.)",
-    "errorLoadingLibrary": "Houve um erro ao carregar a biblioteca de terceiros.",
     "errorAddingToLibrary": "Não foi possível adicionar o item à biblioteca",
     "errorRemovingFromLibrary": "Não foi possível remover o item da biblioteca",
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem certeza?",
-    "imageDoesNotContainScene": "A importação de imagens não é suportada no momento.\n\nVocê deseja importar uma cena? Esta imagem parece não conter dados de cena. Você ativou isto durante a exportação?",
+    "imageDoesNotContainScene": "Esta imagem parece não conter dados de cenas. Você ativou a incorporação da cena durante a exportação?",
     "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem",
     "invalidSceneUrl": "Não foi possível importar a cena da URL fornecida. Ela está incompleta ou não contém dados JSON válidos do Excalidraw.",
-    "resetLibrary": "Isto limpará a sua biblioteca. Você tem certeza?"
+    "resetLibrary": "Isto limpará a sua biblioteca. Você tem certeza?",
+    "removeItemsFromsLibrary": "Excluir {{count}} item(ns) da biblioteca?",
+    "invalidEncryptionKey": "A chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desabilitada.",
+    "browserZoom": ""
+  },
+  "errors": {
+    "unsupportedFileType": "Tipo de arquivo não suportado.",
+    "imageInsertError": "Não foi possível inserir imagem. Tente novamente mais tarde...",
+    "fileTooBig": "O arquivo é muito grande. O tamanho máximo permitido é {{maxSize}}.",
+    "svgImageInsertError": "Não foi possível inserir a imagem SVG. A marcação SVG parece inválida.",
+    "invalidSVGString": "SVG Inválido.",
+    "cannotResolveCollabServer": "Não foi possível conectar-se ao servidor colaborativo. Por favor, recarregue a página e tente novamente.",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Seleção",
+    "image": "Inserir imagem",
     "rectangle": "Retângulo",
     "diamond": "Losango",
     "ellipse": "Elipse",
@@ -169,7 +210,10 @@
     "freedraw": "Desenhar",
     "text": "Texto",
     "library": "Biblioteca",
-    "lock": "Manter ativa a ferramenta selecionada após desenhar"
+    "lock": "Manter ativa a ferramenta selecionada após desenhar",
+    "penMode": "Prevenir a ação de tocar-ampliar e permitir apenas interações da caneta",
+    "link": "Adicionar/Atualizar link para uma forma selecionada",
+    "eraser": "Borracha"
   },
   "headings": {
     "canvasActions": "Ações da tela",
@@ -177,6 +221,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "canvasPanning": "Para mover a tela, segure a roda do mouse ou a barra de espaço enquanto arrasta",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Toque e arraste, solte quando terminar",
     "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
@@ -185,10 +230,16 @@
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
     "lockAngle": "Você pode restringir o ângulo segurando o SHIFT",
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
+    "resizeImage": "Você pode redimensionar livremente segurando SHIFT,\nsegure ALT para redimensionar a partir do centro",
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",
     "lineEditor_info": "Clique duas vezes ou pressione Enter para editar os pontos",
-    "lineEditor_pointSelected": "Pressione Deletar para remover o ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
-    "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos"
+    "lineEditor_pointSelected": "Pressione Delete para remover o(s) ponto(s),\nCtrl/Cmd+D para duplicar ou arraste para mover",
+    "lineEditor_nothingSelected": "Selecione um ponto para editar (segure SHIFT para selecionar vários) ou segure Alt e clique para adicionar novos pontos",
+    "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
+    "publishLibrary": "Publicar sua própria biblioteca",
+    "bindTextToElement": "Pressione Enter para adicionar o texto",
+    "deepBoxSelect": "Segure Ctrl/Cmd para seleção profunda e para evitar arrastar",
+    "eraserRevert": "Segure a tecla Alt para inverter os elementos marcados para exclusão"
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -235,6 +286,8 @@
   "helpDialog": {
     "blog": "Leia o nosso blog",
     "click": "clicar",
+    "deepSelect": "Seleção profunda",
+    "deepBoxSelect": "Use a seleção profunda dentro da caixa para previnir arrastar",
     "curvedArrow": "Seta curva",
     "curvedLine": "Linha curva",
     "documentation": "Documentação",
@@ -246,14 +299,67 @@
     "howto": "Siga nossos guias",
     "or": "ou",
     "preventBinding": "Evitar fixação de seta",
-    "shapes": "Formas",
+    "tools": "",
     "shortcuts": "Atalhos de teclado",
     "textFinish": "Encerrar edição (editor de texto)",
     "textNewLine": "Adicionar nova linha (editor de texto)",
     "title": "Ajudar",
     "view": "Visualizar",
     "zoomToFit": "Ampliar para encaixar todos os elementos",
-    "zoomToSelection": "Ampliar a seleção"
+    "zoomToSelection": "Ampliar a seleção",
+    "toggleElementLock": ""
+  },
+  "clearCanvasDialog": {
+    "title": "Limpar a tela"
+  },
+  "publishDialog": {
+    "title": "Publicar biblioteca",
+    "itemName": "Nome do item",
+    "authorName": "Nome do autor",
+    "githubUsername": "Nome de usuário do GitHub",
+    "twitterUsername": "Nome de usuário do Twitter",
+    "libraryName": "Nome da Biblioteca",
+    "libraryDesc": "Descrição da biblioteca",
+    "website": "Site",
+    "placeholder": {
+      "authorName": "Seu nome ou nome de usuário",
+      "libraryName": "Nome da sua biblioteca",
+      "libraryDesc": "Descrição para ajudar as pessoas a entenderem o uso da sua da sua biblioteca",
+      "githubHandle": "Identificador do GitHub (opcional), para que você possa editar a biblioteca depois de enviar para revisão",
+      "twitterHandle": "Nome de usuário do Twitter (opcional), para que saibamos quem deve ser creditado se promovermos no Twitter",
+      "website": "Link para o seu site pessoal ou outro lugar (opcional)"
+    },
+    "errors": {
+      "required": "Obrigatório",
+      "website": "Informe uma URL válida"
+    },
+    "noteDescription": {
+      "pre": "Envie sua biblioteca para ser incluída no ",
+      "link": "repositório de biblioteca pública",
+      "post": "para outras pessoas usarem em seus desenhos."
+    },
+    "noteGuidelines": {
+      "pre": "A biblioteca precisa ser aprovada manualmente primeiro. Por favor leia o ",
+      "link": "orientações",
+      "post": " antes de enviar. Você precisará de uma conta do GitHub para se comunicar e fazer alterações quando solicitado, mas não é estritamente necessário."
+    },
+    "noteLicense": {
+      "pre": "Ao enviar, você concorda que a biblioteca será publicada sob a ",
+      "link": "Licença MIT, ",
+      "post": "o que, em suma, significa que qualquer pessoa pode utilizá-los sem restrições."
+    },
+    "noteItems": "Cada item da biblioteca deve ter seu próprio nome para que seja filtrável. Os seguintes itens da biblioteca serão incluídos:",
+    "atleastOneLibItem": "Por favor, selecione pelo menos um item da biblioteca para começar",
+    "republishWarning": ""
+  },
+  "publishSuccessDialog": {
+    "title": "Biblioteca enviada",
+    "content": "Obrigado {{authorName}}. Sua biblioteca foi enviada para análise. Você pode acompanhar o status",
+    "link": "aqui"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Redefinir biblioteca",
+    "removeItemsFromLib": "Remover itens selecionados da biblioteca"
   },
   "encrypted": {
     "tooltip": "Seus desenhos são criptografados de ponta a ponta, então os servidores do Excalidraw nunca os verão.",
@@ -275,6 +381,7 @@
     "width": "Largura"
   },
   "toast": {
+    "addedToLibrary": "Adicionado à biblioteca",
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado para área de transferência.",
     "copyToClipboardAsPng": "{{exportSelection}} copiado para a área de transferência como PNG ({{exportColorScheme}})",

@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
 import App from "../components/App";
@@ -9,7 +8,10 @@ import {
   getTransformHandles,
   TransformHandleDirection,
 } from "../element/transformHandles";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import ExcalidrawApp from "../excalidraw-app";
+import { API } from "./helpers/api";
+import { KEYS } from "../keys";
 
 const mouse = new Pointer("mouse");
 
@@ -144,3 +146,31 @@ const resize = (
     mouse.up();
   });
 };
+
+describe("Test text element", () => {
+  it("should update font size via keyboard", async () => {
+    await render(<ExcalidrawApp />);
+
+    const textElement = API.createElement({
+      type: "text",
+      text: "abc",
+    });
+
+    window.h.elements = [textElement];
+
+    API.setSelectedElements([textElement]);
+
+    const origFontSize = textElement.fontSize;
+
+    Keyboard.withModifierKeys({ shift: true, ctrl: true }, () => {
+      Keyboard.keyDown(KEYS.CHEVRON_RIGHT);
+      expect((window.h.elements[0] as ExcalidrawTextElement).fontSize).toBe(
+        origFontSize * 1.1,
+      );
+      Keyboard.keyDown(KEYS.CHEVRON_LEFT);
+      expect((window.h.elements[0] as ExcalidrawTextElement).fontSize).toBe(
+        origFontSize,
+      );
+    });
+  });
+});

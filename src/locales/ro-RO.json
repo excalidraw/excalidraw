@@ -9,6 +9,7 @@
     "copy": "Copiere",
     "copyAsPng": "Copiere în memoria temporară ca PNG",
     "copyAsSvg": "Copiere în memoria temporară ca SVG",
+    "copyText": "Copiere în memoria temporară ca text",
     "bringForward": "Aducere în plan apropiat",
     "sendToBack": "Trimitere în ultimul plan",
     "bringToFront": "Aducere în prim plan",
@@ -20,10 +21,6 @@
     "background": "Fundal",
     "fill": "Umplere",
     "strokeWidth": "Lățimea conturului",
-    "strokeShape": "Forma conturului",
-    "strokeShape_gel": "Pix cu gel",
-    "strokeShape_fountain": "Stilou",
-    "strokeShape_brush": "Pensulă tip stilou",
     "strokeStyle": "Stilul conturului",
     "strokeStyle_solid": "Neîntrerupt",
     "strokeStyle_dashed": "Liniuțe",
@@ -39,6 +36,7 @@
     "arrowhead_arrow": "Săgeată",
     "arrowhead_bar": "Bară",
     "arrowhead_dot": "Bulină",
+    "arrowhead_triangle": "Triunghi",
     "fontSize": "Dimensiune font",
     "fontFamily": "Familia de fonturi",
     "onlySelected": "Numai selecția",
@@ -67,6 +65,7 @@
     "cartoonist": "Caricaturist",
     "fileTitle": "Nume de fișier",
     "colorPicker": "Selector de culoare",
+    "canvasColors": "Folosite pe pânză",
     "canvasBackground": "Fundalul pânzei",
     "drawingCanvas": "Pânză pentru desenat",
     "layers": "Straturi",
@@ -103,7 +102,31 @@
     "share": "Distribuie",
     "showStroke": "Afișare selector culoare contur",
     "showBackground": "Afișare selector culoare fundal",
-    "toggleTheme": "Comutare temă"
+    "toggleTheme": "Comutare temă",
+    "personalLib": "Biblioteca personală",
+    "excalidrawLib": "Biblioteca Excalidraw",
+    "decreaseFontSize": "Micșorează dimensiunea fontului",
+    "increaseFontSize": "Mărește dimensiunea fontului",
+    "unbindText": "Deconectare text",
+    "bindText": "Legare text de container",
+    "link": {
+      "edit": "Editare URL",
+      "create": "Creare URL",
+      "label": "URL"
+    },
+    "elementLock": {
+      "lock": "Blocare",
+      "unlock": "Deblocare",
+      "lockAll": "Blocare toate",
+      "unlockAll": "Deblocare toate"
+    },
+    "statusPublished": "Publicat",
+    "sidebarLock": "Păstrează deschisă bara laterală"
+  },
+  "library": {
+    "noItems": "Niciun element adăugat încă...",
+    "hint_emptyLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici sau instalează o bibliotecă din depozitul public, de mai jos.",
+    "hint_emptyPrivateLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici."
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -136,7 +159,13 @@
     "darkMode": "Mod întunecat",
     "lightMode": "Mod luminos",
     "zenMode": "Mod zen",
-    "exitZenMode": "Ieșire din modul zen"
+    "exitZenMode": "Ieșire din modul zen",
+    "cancel": "Anulare",
+    "clear": "Ștergere",
+    "remove": "Eliminare",
+    "publishLibrary": "Publicare",
+    "submit": "Trimitere",
+    "confirm": "Confirmare"
   },
   "alerts": {
     "clearReset": "Această opțiune va șterge întreaga pânză. Confirmi?",
@@ -145,22 +174,34 @@
     "couldNotLoadInvalidFile": "Fișierul invalid nu a putut fi încărcat",
     "importBackendFailed": "Importarea de la nivel de server a eșuat.",
     "cannotExportEmptyCanvas": "Nu se poate exporta pânza goală.",
-    "couldNotCopyToClipboard": "Nu s-a putut copia în memoria temporară. Încearcă să utilizezi navigatorul Chrome.",
+    "couldNotCopyToClipboard": "Nu s-a putut copia în memoria temporară.",
     "decryptFailed": "Datele nu au putut fi decriptate.",
     "uploadedSecurly": "Încărcarea a fost securizată prin criptare integrală, însemnând că serverul Excalidraw și terții nu pot citi conținutul.",
     "loadSceneOverridePrompt": "Încărcarea desenului extern va înlocui conținutul existent. Dorești să continui?",
     "collabStopOverridePrompt": "Oprirea sesiunii va suprascrie desenul anterior stocat local. Confirmi alegerea?\n\n(Dacă vrei să păstrezi desenul local, pur și simplu închide fila navigatorului în schimb.)",
-    "errorLoadingLibrary": "A apărut o eroare la încărcarea bibliotecii terțe.",
     "errorAddingToLibrary": "Elementul nu a putut fi adăugat în bibliotecă",
     "errorRemovingFromLibrary": "Elementul nu a putut fi eliminat din bibliotecă",
     "confirmAddLibrary": "Această acțiune va adăuga {{numShapes}} formă(e) la biblioteca ta. Confirmi?",
-    "imageDoesNotContainScene": "Importarea imaginilor nu este acceptată în acest moment.\n\nVoiai să imporți o scenă? Această imagine nu pare să conțină date de scenă. Ai activat această opțiune pe durata exportării?",
+    "imageDoesNotContainScene": "Această imagine nu pare să conțină date de scenă. Ai activat încorporarea scenei în timpul exportului?",
     "cannotRestoreFromImage": "Scena nu a putut fi restaurată din acest fișier de imagine",
     "invalidSceneUrl": "Scena nu a putut fi importată din URL-ul furnizat. Este fie incorect formată, fie nu conține date JSON Excalidraw valide.",
-    "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?"
+    "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?",
+    "removeItemsFromsLibrary": "Ștergi {{count}} element(e) din bibliotecă?",
+    "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată.",
+    "browserZoom": "Nivelul de transfocare al navigatorului tău nu este setat la 100% ceea ce poate face ca panoul să fie afișat incorect"
+  },
+  "errors": {
+    "unsupportedFileType": "Tip de fișier neacceptat.",
+    "imageInsertError": "Imaginea nu a putut fi introdusă. Reîncearcă mai târziu...",
+    "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
+    "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
+    "invalidSVGString": "SVG invalid.",
+    "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou.",
+    "importLibraryError": "Biblioteca nu a putut fi încărcată"
   },
   "toolBar": {
     "selection": "Selecție",
+    "image": "Introducere imagine",
     "rectangle": "Dreptunghi",
     "diamond": "Romb",
     "ellipse": "Elipsă",
@@ -169,7 +210,10 @@
     "freedraw": "Desenare",
     "text": "Text",
     "library": "Bibliotecă",
-    "lock": "Menține activ instrumentul selectat după desenare"
+    "lock": "Menține activ instrumentul selectat după desenare",
+    "penMode": "Împiedică mărirea prin ciupire și acceptă desenarea liberă doar de la stilou",
+    "link": "Adăugare/actualizare URL pentru forma selectată",
+    "eraser": "Radieră"
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -177,6 +221,7 @@
     "shapes": "Forme"
   },
   "hints": {
+    "canvasPanning": "Pentru a muta pânză, ține apăsată rotița mausului sau bara de spațiu în timpul glisării",
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
@@ -185,10 +230,16 @@
     "linearElementMulti": "Dă clic pe ultimul punct sau apasă tasta Escape sau tasta Enter pentru a termina",
     "lockAngle": "Poți constrânge unghiul prin ținerea apăsată a tastei SHIFT",
     "resize": "Poți constrânge proporțiile, ținând apăsată tasta SHIFT în timp ce redimensionezi,\nține apăsată tasta ALT pentru a redimensiona de la centru",
+    "resizeImage": "Poți redimensiona liber ținând apăsată tasta SHIFT,\nține apăsată tasta ALT pentru a redimensiona din centru",
     "rotate": "Poți constrânge unghiurile, ținând apăsată tasta SHIFT în timp ce rotești",
     "lineEditor_info": "Dă dublu clic sau apasă tasta Enter pentru a edita punctele",
-    "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctul, combinația de taste Ctrl sau Cmd + D pentru a-l duplica sau glisează-l pentru a-i schimba poziția",
-    "lineEditor_nothingSelected": "Selectează un punct pentru a-l muta sau elimina sau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi"
+    "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctele,\ncombinația de taste Ctrl sau Cmd + D pentru a le duplica sau glisează-le pentru a le schimba poziția",
+    "lineEditor_nothingSelected": "Selectează un punct pentru a-l edita (ține apăsată tasta SHIFT pentru a selecta mai multe),\nsau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi",
+    "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
+    "publishLibrary": "Publică propria bibliotecă",
+    "bindTextToElement": "Apasă tasta Enter pentru a adăuga text",
+    "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea",
+    "eraserRevert": "Ține apăsată tasta Alt pentru a anula elementele marcate pentru ștergere"
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -235,6 +286,8 @@
   "helpDialog": {
     "blog": "Citește blogul nostru",
     "click": "clic",
+    "deepSelect": "Selectare de adâncime",
+    "deepBoxSelect": "Selectare de adâncime în casetă și prevenire glisare",
     "curvedArrow": "Săgeată curbată",
     "curvedLine": "Linie curbată",
     "documentation": "Documentație",
@@ -246,14 +299,67 @@
     "howto": "Urmărește ghidurile noastre",
     "or": "sau",
     "preventBinding": "Împiedică legarea săgeții",
-    "shapes": "Forme",
+    "tools": "Instrumente",
     "shortcuts": "Comenzi rapide de la tastatură",
     "textFinish": "Finalizează editarea (editor de text)",
     "textNewLine": "Adaugă o linie nouă (editor de text)",
     "title": "Ajutor",
     "view": "Vizualizare",
     "zoomToFit": "Transfocare pentru a cuprinde totul",
-    "zoomToSelection": "Transfocare la selecție"
+    "zoomToSelection": "Transfocare la selecție",
+    "toggleElementLock": "Blocare/deblocare selecție"
+  },
+  "clearCanvasDialog": {
+    "title": "Ștergere pânză"
+  },
+  "publishDialog": {
+    "title": "Publicare bibliotecă",
+    "itemName": "Denumirea elementului",
+    "authorName": "Numele autorului",
+    "githubUsername": "Numele de utilizator GitHub",
+    "twitterUsername": "Numele de utilizator Twitter",
+    "libraryName": "Denumirea bibliotecii",
+    "libraryDesc": "Descrierea bibliotecii",
+    "website": "Pagină de internet",
+    "placeholder": {
+      "authorName": "Numele sau numele tău de utilizator",
+      "libraryName": "Numele bibliotecii tale",
+      "libraryDesc": "Descrierea bibliotecii tale pentru a ajuta oamenii să înțeleagă utilizarea acesteia",
+      "githubHandle": "Numele de utilizator GitHub (opțional), pentru a putea edita biblioteca odată ce este trimisă spre revizuire",
+      "twitterHandle": "Numele de utilizator Twitter (opțional), pentru a indica sursa la promovarea pe Twitter",
+      "website": "Trimitere către pagina ta personală de internet sau altundeva (opțional)"
+    },
+    "errors": {
+      "required": "Obligatoriu",
+      "website": "Introdu un URL valid"
+    },
+    "noteDescription": {
+      "pre": "Trimite-ți biblioteca pentru fi inclus în ",
+      "link": "depozitul de biblioteci publice",
+      "post": "pentru utilizarea de către alte persoane în desenele lor."
+    },
+    "noteGuidelines": {
+      "pre": "Biblioteca trebuie aprobată manual. Citește ",
+      "link": "orientările",
+      "post": " înainte de trimitere. Vei avea nevoie de un cont GitHub pentru a comunica și efectua modificări, dacă este cazul, însă nu este strict necesar."
+    },
+    "noteLicense": {
+      "pre": "Prin trimiterea bibliotecii, ești de acord că aceasta va fi publicată sub ",
+      "link": "Licența MIT, ",
+      "post": "care, pe scurt, înseamnă că oricine o poate folosi fără restricții."
+    },
+    "noteItems": "Fiecare element din bibliotecă trebuie să aibă propriul nume astfel încât să fie filtrabil. Următoarele elemente din bibliotecă vor fi incluse:",
+    "atleastOneLibItem": "Selectează cel puțin un element din bibliotecă pentru a începe",
+    "republishWarning": "Observație: unele dintre elementele selectate sunt marcate ca fiind deja publicate/trimise. Ar trebui să retrimiți elemente numai atunci când actualizezi o trimitere sau o bibliotecă existentă."
+  },
+  "publishSuccessDialog": {
+    "title": "Bibliotecă trimisă",
+    "content": "Îți mulțumim, {{authorName}}. Biblioteca ta a fost trimisă spre revizuire. Poți urmări starea",
+    "link": "aici"
+  },
+  "confirmDialog": {
+    "resetLibrary": "Resetare bibliotecă",
+    "removeItemsFromLib": "Elimină elementele selectate din bibliotecă"
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată.",
@@ -275,6 +381,7 @@
     "width": "Lățime"
   },
   "toast": {
+    "addedToLibrary": "Adăugat în bibliotecă",
     "copyStyles": "Stiluri copiate.",
     "copyToClipboard": "Copiat în memoria temporară.",
     "copyToClipboardAsPng": "S-a copiat {{exportSelection}} în memoria temporară sub formă de PNG\n({{exportColorScheme}})",

@@ -1,6 +1,7 @@
 import * as utils from "../../packages/utils";
 import { diagramFactory } from "../fixtures/diagramFixture";
 import * as mockedSceneExportUtils from "../../scene/export";
+import { MIME_TYPES } from "../../constants";
 
 jest.mock("../../scene/export", () => ({
   __esmodule: true,
@@ -11,8 +12,8 @@ jest.mock("../../scene/export", () => ({
 describe("exportToCanvas", () => {
   const EXPORT_PADDING = 10;
 
-  it("with default arguments", () => {
-    const canvas = utils.exportToCanvas({
+  it("with default arguments", async () => {
+    const canvas = await utils.exportToCanvas({
       ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
     });
 
@@ -20,8 +21,8 @@ describe("exportToCanvas", () => {
     expect(canvas.height).toBe(100 + 2 * EXPORT_PADDING);
   });
 
-  it("when custom width and height", () => {
-    const canvas = utils.exportToCanvas({
+  it("when custom width and height", async () => {
+    const canvas = await utils.exportToCanvas({
       ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
       getDimensions: () => ({ width: 200, height: 200, scale: 1 }),
     });
@@ -39,16 +40,20 @@ describe("exportToBlob", () => {
       const blob = await utils.exportToBlob({
         ...diagramFactory(),
         getDimensions: (width, height) => ({ width, height, scale: 1 }),
+        // testing typo in MIME type (jpg → jpeg)
         mimeType: "image/jpg",
+        appState: {
+          exportBackground: true,
+        },
       });
-      expect(blob?.type).toBe("image/jpeg");
+      expect(blob?.type).toBe(MIME_TYPES.jpg);
     });
 
     it("should default to image/png", async () => {
       const blob = await utils.exportToBlob({
         ...diagramFactory(),
       });
-      expect(blob?.type).toBe("image/png");
+      expect(blob?.type).toBe(MIME_TYPES.png);
     });
 
     it("should warn when using quality with image/png", async () => {
@@ -58,12 +63,12 @@ describe("exportToBlob", () => {
 
       await utils.exportToBlob({
         ...diagramFactory(),
-        mimeType: "image/png",
+        mimeType: MIME_TYPES.png,
         quality: 1,
       });
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        '"quality" will be ignored for "image/png" mimeType',
+        `"quality" will be ignored for "${MIME_TYPES.png}" mimeType`,
       );
     });
   });

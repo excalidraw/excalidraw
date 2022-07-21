@@ -10,13 +10,16 @@ import React from "react";
 
 import oc from "open-color";
 import clsx from "clsx";
+import { Theme } from "../element/types";
+import { THEME } from "../constants";
 
-const activeElementColor = (theme: "light" | "dark") =>
-  theme === "light" ? oc.orange[4] : oc.orange[9];
-const iconFillColor = (theme: "light" | "dark") =>
-  theme === "light" ? oc.black : oc.gray[4];
-const handlerColor = (theme: "light" | "dark") =>
-  theme === "light" ? oc.white : "#1e1e1e";
+const activeElementColor = (theme: Theme) =>
+  theme === THEME.LIGHT ? oc.orange[4] : oc.orange[9];
+
+const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";
+
+const handlerColor = (theme: Theme) =>
+  theme === THEME.LIGHT ? oc.white : "#1e1e1e";
 
 type Opts = {
   width?: number;
@@ -28,8 +31,12 @@ export const createIcon = (
   d: string | React.ReactNode,
   opts: number | Opts = 512,
 ) => {
-  const { width = 512, height = width, mirror, style } =
-    typeof opts === "number" ? ({ width: opts } as Opts) : opts;
+  const {
+    width = 512,
+    height = width,
+    mirror,
+    style,
+  } = typeof opts === "number" ? ({ width: opts } as Opts) : opts;
   return (
     <svg
       aria-hidden="true"
@@ -79,6 +86,7 @@ export const clipboard = createIcon(
 
 export const trash = createIcon(
   "M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z",
+
   { width: 448, height: 512 },
 );
 
@@ -175,88 +183,84 @@ export const resetZoom = createIcon(
   { width: 1024 },
 );
 
-export const BringForwardIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path
-          d="M22 9.556C22 8.696 21.303 8 20.444 8H16v8H8v4.444C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
-          fill={iconFillColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-        />
-        <path
-          d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-      </>,
-      { width: 24, mirror: true },
-    ),
+export const BringForwardIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
+      <path
+        d="M22 9.556C22 8.696 21.303 8 20.444 8H16v8H8v4.444C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
+        fill={iconFillColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+      />
+      <path
+        d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
+        fill={activeElementColor(theme)}
+        stroke={activeElementColor(theme)}
+        strokeWidth="2"
+      />
+    </>,
+    { width: 24, mirror: true },
+  ),
 );
 
-export const SendBackwardIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path
-          d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-        <path
-          d="M22 9.556C22 8.696 21.303 8 20.444 8H9.556C8.696 8 8 8.697 8 9.556v10.888C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
-          fill={iconFillColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-        />
-      </>,
-      { width: 24, mirror: true },
-    ),
+export const SendBackwardIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
+      <path
+        d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
+        fill={activeElementColor(theme)}
+        stroke={activeElementColor(theme)}
+        strokeWidth="2"
+      />
+      <path
+        d="M22 9.556C22 8.696 21.303 8 20.444 8H9.556C8.696 8 8 8.697 8 9.556v10.888C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
+        fill={iconFillColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+      />
+    </>,
+    { width: 24, mirror: true },
+  ),
 );
 
-export const BringToFrontIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path
-          d="M13 21a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1h-3v5h-5v3zM11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h3V6h5V3z"
-          fill={iconFillColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-        />
-        <path
-          d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-      </>,
-      { width: 24, mirror: true },
-    ),
+export const BringToFrontIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
+      <path
+        d="M13 21a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1h-3v5h-5v3zM11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h3V6h5V3z"
+        fill={iconFillColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+      />
+      <path
+        d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
+        fill={activeElementColor(theme)}
+        stroke={activeElementColor(theme)}
+        strokeWidth="2"
+      />
+    </>,
+    { width: 24, mirror: true },
+  ),
 );
 
-export const SendToBackIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path
-          d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-        <path
-          d="M11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h8V3zM22 14a1 1 0 00-1-1h-7a1 1 0 00-1 1v7a1 1 0 001 1h8v-8z"
-          fill={iconFillColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-        />
-      </>,
-      { width: 24, mirror: true },
-    ),
+export const SendToBackIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
+      <path
+        d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
+        fill={activeElementColor(theme)}
+        stroke={activeElementColor(theme)}
+        strokeWidth="2"
+      />
+      <path
+        d="M11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h8V3zM22 14a1 1 0 00-1-1h-7a1 1 0 00-1 1v7a1 1 0 001 1h8v-8z"
+        fill={iconFillColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+      />
+    </>,
+    { width: 24, mirror: true },
+  ),
 );
 
 //
@@ -265,96 +269,92 @@ export const SendToBackIcon = React.memo(
 // first one the user sees. Horizontal align icons should not be flipped since
 // that would make them lie about their function.
 //
-export const AlignTopIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path
-          d="M 2,5 H 22"
-          fill={iconFillColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 6,7 C 5.446,7 5,7.446 5,8 v 9.999992 c 0,0.554 0.446,1 1,1 h 3.0000001 c 0.554,0 0.9999999,-0.446 0.9999999,-1 V 8 C 10,7.446 9.5540001,7 9.0000001,7 Z m 9,0 c -0.554,0 -1,0.446 -1,1 v 5.999992 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 V 8 C 19,7.446 18.554,7 18,7 Z"
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-      </>,
-      { width: 24, mirror: true },
-    ),
+export const AlignTopIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
+      <path
+        d="M 2,5 H 22"
+        fill={iconFillColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M 6,7 C 5.446,7 5,7.446 5,8 v 9.999992 c 0,0.554 0.446,1 1,1 h 3.0000001 c 0.554,0 0.9999999,-0.446 0.9999999,-1 V 8 C 10,7.446 9.5540001,7 9.0000001,7 Z m 9,0 c -0.554,0 -1,0.446 -1,1 v 5.999992 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 V 8 C 19,7.446 18.554,7 18,7 Z"
+        fill={activeElementColor(theme)}
+        stroke={activeElementColor(theme)}
+        strokeWidth="2"
+      />
+    </>,
+    { width: 24, mirror: true },
+  ),
 );
 
-export const AlignBottomIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path
-          d="M 2,19 H 22"
-          fill={iconFillColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="m 6,16.999992 c -0.554,0 -1,-0.446 -1,-1 V 6 C 5,5.446 5.446,5 6,5 H 9.0000001 C 9.5540001,5 10,5.446 10,6 v 9.999992 c 0,0.554 -0.4459999,1 -0.9999999,1 z m 9,0 c -0.554,0 -1,-0.446 -1,-1 V 10 c 0,-0.554 0.446,-1 1,-1 h 3 c 0.554,0 1,0.446 1,1 v 5.999992 c 0,0.554 -0.446,1 -1,1 z"
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-      </>,
-      { width: 24, mirror: true },
-    ),
+export const AlignBottomIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
+      <path
+        d="M 2,19 H 22"
+        fill={iconFillColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="m 6,16.999992 c -0.554,0 -1,-0.446 -1,-1 V 6 C 5,5.446 5.446,5 6,5 H 9.0000001 C 9.5540001,5 10,5.446 10,6 v 9.999992 c 0,0.554 -0.4459999,1 -0.9999999,1 z m 9,0 c -0.554,0 -1,-0.446 -1,-1 V 10 c 0,-0.554 0.446,-1 1,-1 h 3 c 0.554,0 1,0.446 1,1 v 5.999992 c 0,0.554 -0.446,1 -1,1 z"
+        fill={activeElementColor(theme)}
+        stroke={activeElementColor(theme)}
+        strokeWidth="2"
+      />
+    </>,
+    { width: 24, mirror: true },
+  ),
 );
 
-export const AlignLeftIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path
-          d="M 5,2 V 22"
-          fill={iconFillColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="m 7.000004,5.999996 c 0,-0.554 0.446,-1 1,-1 h 9.999992 c 0.554,0 1,0.446 1,1 v 3.0000001 c 0,0.554 -0.446,0.9999999 -1,0.9999999 H 8.000004 c -0.554,0 -1,-0.4459999 -1,-0.9999999 z m 0,9 c 0,-0.554 0.446,-1 1,-1 h 5.999992 c 0.554,0 1,0.446 1,1 v 3 c 0,0.554 -0.446,1 -1,1 H 8.000004 c -0.554,0 -1,-0.446 -1,-1 z"
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-      </>,
-      { width: 24 },
-    ),
+export const AlignLeftIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
+      <path
+        d="M 5,2 V 22"
+        fill={iconFillColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="m 7.000004,5.999996 c 0,-0.554 0.446,-1 1,-1 h 9.999992 c 0.554,0 1,0.446 1,1 v 3.0000001 c 0,0.554 -0.446,0.9999999 -1,0.9999999 H 8.000004 c -0.554,0 -1,-0.4459999 -1,-0.9999999 z m 0,9 c 0,-0.554 0.446,-1 1,-1 h 5.999992 c 0.554,0 1,0.446 1,1 v 3 c 0,0.554 -0.446,1 -1,1 H 8.000004 c -0.554,0 -1,-0.446 -1,-1 z"
+        fill={activeElementColor(theme)}
+        stroke={activeElementColor(theme)}
+        strokeWidth="2"
+      />
+    </>,
+    { width: 24 },
+  ),
 );
 
-export const AlignRightIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path
-          d="M 19,2 V 22"
-          fill={iconFillColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="m 16.999996,5.999996 c 0,-0.554 -0.446,-1 -1,-1 H 6.000004 c -0.554,0 -1,0.446 -1,1 v 3.0000001 c 0,0.554 0.446,0.9999999 1,0.9999999 h 9.999992 c 0.554,0 1,-0.4459999 1,-0.9999999 z m 0,9 c 0,-0.554 -0.446,-1 -1,-1 h -5.999992 c -0.554,0 -1,0.446 -1,1 v 3 c 0,0.554 0.446,1 1,1 h 5.999992 c 0.554,0 1,-0.446 1,-1 z"
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-      </>,
-      { width: 24 },
-    ),
+export const AlignRightIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
+      <path
+        d="M 19,2 V 22"
+        fill={iconFillColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="m 16.999996,5.999996 c 0,-0.554 -0.446,-1 -1,-1 H 6.000004 c -0.554,0 -1,0.446 -1,1 v 3.0000001 c 0,0.554 0.446,0.9999999 1,0.9999999 h 9.999992 c 0.554,0 1,-0.4459999 1,-0.9999999 z m 0,9 c 0,-0.554 -0.446,-1 -1,-1 h -5.999992 c -0.554,0 -1,0.446 -1,1 v 3 c 0,0.554 0.446,1 1,1 h 5.999992 c 0.554,0 1,-0.446 1,-1 z"
+        fill={activeElementColor(theme)}
+        stroke={activeElementColor(theme)}
+        strokeWidth="2"
+      />
+    </>,
+    { width: 24 },
+  ),
 );
 
 export const DistributeHorizontallyIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
+  ({ theme }: { theme: Theme }) =>
     createIcon(
       <>
         <path
@@ -375,7 +375,7 @@ export const DistributeHorizontallyIcon = React.memo(
 );
 
 export const DistributeVerticallyIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
+  ({ theme }: { theme: Theme }) =>
     createIcon(
       <>
         <path
@@ -396,31 +396,30 @@ export const DistributeVerticallyIcon = React.memo(
     ),
 );
 
-export const CenterVerticallyIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path
-          d="m 5.000004,16.999996 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 v -10 c 0,-0.554 -0.446,-1 -1,-1 h -3 c -0.554,0 -1,0.446 -1,1 z m 9,-2 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 v -6 c 0,-0.554 -0.446,-1 -1,-1 h -3 c -0.554,0 -1,0.446 -1,1 z"
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-        <path
-          d="M 2,12 H 22"
-          fill={iconFillColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-          strokeDasharray="1, 2.8"
-          strokeLinecap="round"
-        />
-      </>,
-      { width: 24, mirror: true },
-    ),
+export const CenterVerticallyIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
+      <path
+        d="m 5.000004,16.999996 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 v -10 c 0,-0.554 -0.446,-1 -1,-1 h -3 c -0.554,0 -1,0.446 -1,1 z m 9,-2 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 v -6 c 0,-0.554 -0.446,-1 -1,-1 h -3 c -0.554,0 -1,0.446 -1,1 z"
+        fill={activeElementColor(theme)}
+        stroke={activeElementColor(theme)}
+        strokeWidth="2"
+      />
+      <path
+        d="M 2,12 H 22"
+        fill={iconFillColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+        strokeDasharray="1, 2.8"
+        strokeLinecap="round"
+      />
+    </>,
+    { width: 24, mirror: true },
+  ),
 );
 
 export const CenterHorizontallyIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
+  ({ theme }: { theme: Theme }) =>
     createIcon(
       <>
         <path
@@ -482,7 +481,7 @@ export const file = createIcon(
   { width: 384, height: 512 },
 );
 
-export const GroupIcon = React.memo(({ theme }: { theme: "light" | "dark" }) =>
+export const GroupIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <>
       <path d="M25 26H111V111H25" fill={iconFillColor(theme)} />
@@ -512,73 +511,69 @@ export const GroupIcon = React.memo(({ theme }: { theme: "light" | "dark" }) =>
   ),
 );
 
-export const UngroupIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path d="M25 26H111V111H25" fill={iconFillColor(theme)} />
-        <path
-          d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-        />
-        <path d="M100 100H160V160H100" fill={iconFillColor(theme)} />
-        <path
-          d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-        />
-        <g
-          fill={handlerColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="6"
-        >
-          <rect x="2.5" y="2.5" width="30" height="30" />
-          <rect x="78.5" y="149.5" width="30" height="30" />
-          <rect x="147.5" y="149.5" width="30" height="30" />
-          <rect x="147.5" y="78.5" width="30" height="30" />
-          <rect x="105.5" y="2.5" width="30" height="30" />
-          <rect x="2.5" y="102.5" width="30" height="30" />
-        </g>
-      </>,
-      { width: 182, height: 182, mirror: true },
-    ),
-);
-
-export const FillHachureIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
+export const UngroupIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
+      <path d="M25 26H111V111H25" fill={iconFillColor(theme)} />
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z"
-        fill={iconFillColor(theme)}
-      />,
-      { width: 40, height: 20 },
-    ),
+        d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+      />
+      <path d="M100 100H160V160H100" fill={iconFillColor(theme)} />
+      <path
+        d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+      />
+      <g
+        fill={handlerColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="6"
+      >
+        <rect x="2.5" y="2.5" width="30" height="30" />
+        <rect x="78.5" y="149.5" width="30" height="30" />
+        <rect x="147.5" y="149.5" width="30" height="30" />
+        <rect x="147.5" y="78.5" width="30" height="30" />
+        <rect x="105.5" y="2.5" width="30" height="30" />
+        <rect x="2.5" y="102.5" width="30" height="30" />
+      </g>
+    </>,
+    { width: 182, height: 182, mirror: true },
+  ),
 );
 
-export const FillCrossHatchIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <g fill={iconFillColor(theme)} fillRule="evenodd" clipRule="evenodd">
-        <path d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z" />
-        <path d="M14.0001 18L3.00006 4.00002L4.5727 2.76438L15.5727 16.7644L14.0001 18ZM25.0001 18L14.0001 4.00002L15.5727 2.76438L26.5727 16.7644L25.0001 18ZM36.0001 18L25.0001 4.00002L26.5727 2.76438L37.5727 16.7644L36.0001 18Z" />
-      </g>,
-      { width: 40, height: 20 },
-    ),
+export const FillHachureIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z"
+      fill={iconFillColor(theme)}
+    />,
+    { width: 40, height: 20 },
+  ),
 );
 
-export const FillSolidIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(<path d="M2 2H38V18H2V2Z" fill={iconFillColor(theme)} />, {
-      width: 40,
-      height: 20,
-    }),
+export const FillCrossHatchIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <g fill={iconFillColor(theme)} fillRule="evenodd" clipRule="evenodd">
+      <path d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z" />
+      <path d="M14.0001 18L3.00006 4.00002L4.5727 2.76438L15.5727 16.7644L14.0001 18ZM25.0001 18L14.0001 4.00002L15.5727 2.76438L26.5727 16.7644L25.0001 18ZM36.0001 18L25.0001 4.00002L26.5727 2.76438L37.5727 16.7644L36.0001 18Z" />
+    </g>,
+    { width: 40, height: 20 },
+  ),
+);
+
+export const FillSolidIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(<path d="M2 2H38V18H2V2Z" fill={iconFillColor(theme)} />, {
+    width: 40,
+    height: 20,
+  }),
 );
 
 export const StrokeWidthIcon = React.memo(
-  ({ theme, strokeWidth }: { theme: "light" | "dark"; strokeWidth: number }) =>
+  ({ theme, strokeWidth }: { theme: Theme; strokeWidth: number }) =>
     createIcon(
       <path
         d="M6 10H32"
@@ -591,55 +586,52 @@ export const StrokeWidthIcon = React.memo(
     ),
 );
 
-export const StrokeStyleSolidIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <path
-        d="M6 10H34"
-        stroke={iconFillColor(theme)}
-        strokeWidth={2}
-        fill="none"
-        strokeLinecap="round"
-      />,
-      {
-        width: 40,
-        height: 20,
-      },
-    ),
+export const StrokeStyleSolidIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="M6 10H34"
+      stroke={iconFillColor(theme)}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+    />,
+    {
+      width: 40,
+      height: 20,
+    },
+  ),
 );
 
-export const StrokeStyleDashedIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <path
-        d="M6 10H34"
-        stroke={iconFillColor(theme)}
-        strokeWidth={2.5}
-        strokeDasharray={"10, 8"}
-        fill="none"
-        strokeLinecap="round"
-      />,
-      { width: 40, height: 20 },
-    ),
+export const StrokeStyleDashedIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="M6 10H34"
+      stroke={iconFillColor(theme)}
+      strokeWidth={2.5}
+      strokeDasharray={"10, 8"}
+      fill="none"
+      strokeLinecap="round"
+    />,
+    { width: 40, height: 20 },
+  ),
 );
 
-export const StrokeStyleDottedIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <path
-        d="M6 10H36"
-        stroke={iconFillColor(theme)}
-        strokeWidth={2.5}
-        strokeDasharray={"2, 4.5"}
-        fill="none"
-        strokeLinecap="round"
-      />,
-      { width: 40, height: 20 },
-    ),
+export const StrokeStyleDottedIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="M6 10H36"
+      stroke={iconFillColor(theme)}
+      strokeWidth={2.5}
+      strokeDasharray={"2, 4.5"}
+      fill="none"
+      strokeLinecap="round"
+    />,
+    { width: 40, height: 20 },
+  ),
 );
 
 export const SloppinessArchitectIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
+  ({ theme }: { theme: Theme }) =>
     createIcon(
       <path
         d="M3.00098 16.1691C6.28774 13.9744 19.6399 2.8905 22.7215 3.00082C25.8041 3.11113 19.1158 15.5488 21.4962 16.8309C23.8757 18.1131 34.4155 11.7148 37.0001 10.6919"
@@ -652,22 +644,21 @@ export const SloppinessArchitectIcon = React.memo(
     ),
 );
 
-export const SloppinessArtistIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <path
-        d="M3 17C6.68158 14.8752 16.1296 9.09849 22.0648 6.54922C28 3.99995 22.2896 13.3209 25 14C27.7104 14.6791 36.3757 9.6471 36.3757 9.6471M6.40706 15C13 11.1918 20.0468 1.51045 23.0234 3.0052C26 4.49995 20.457 12.8659 22.7285 16.4329C25 20 36.3757 13 36.3757 13"
-        stroke={iconFillColor(theme)}
-        strokeWidth={2}
-        strokeLinecap="round"
-        fill="none"
-      />,
-      { width: 40, height: 20, mirror: true },
-    ),
+export const SloppinessArtistIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="M3 17C6.68158 14.8752 16.1296 9.09849 22.0648 6.54922C28 3.99995 22.2896 13.3209 25 14C27.7104 14.6791 36.3757 9.6471 36.3757 9.6471M6.40706 15C13 11.1918 20.0468 1.51045 23.0234 3.0052C26 4.49995 20.457 12.8659 22.7285 16.4329C25 20 36.3757 13 36.3757 13"
+      stroke={iconFillColor(theme)}
+      strokeWidth={2}
+      strokeLinecap="round"
+      fill="none"
+    />,
+    { width: 40, height: 20, mirror: true },
+  ),
 );
 
 export const SloppinessCartoonistIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
+  ({ theme }: { theme: Theme }) =>
     createIcon(
       <path
         d="M3 15.6468C6.93692 13.5378 22.5544 2.81528 26.6206 3.00242C30.6877 3.18956 25.6708 15.3346 27.4009 16.7705C29.1309 18.2055 35.4001 12.4762 37 11.6177M3.97143 10.4917C6.61158 9.24563 16.3706 2.61886 19.8104 3.01724C23.2522 3.41472 22.0773 12.2013 24.6181 12.8783C27.1598 13.5536 33.3179 8.04068 35.0571 7.07244"
@@ -680,52 +671,49 @@ export const SloppinessCartoonistIcon = React.memo(
     ),
 );
 
-export const EdgeSharpIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <path
-        d="M10 17L10 5L35 5"
-        stroke={iconFillColor(theme)}
-        strokeWidth={2}
-        strokeLinecap="round"
-        fill="none"
-      />,
-      { width: 40, height: 20, mirror: true },
-    ),
+export const EdgeSharpIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="M10 17L10 5L35 5"
+      stroke={iconFillColor(theme)}
+      strokeWidth={2}
+      strokeLinecap="round"
+      fill="none"
+    />,
+    { width: 40, height: 20, mirror: true },
+  ),
 );
 
-export const EdgeRoundIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <path
-        d="M10 17V15C10 8 13 5 21 5L33.5 5"
-        stroke={iconFillColor(theme)}
-        strokeWidth={2}
-        strokeLinecap="round"
-        fill="none"
-      />,
-      { width: 40, height: 20, mirror: true },
-    ),
+export const EdgeRoundIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="M10 17V15C10 8 13 5 21 5L33.5 5"
+      stroke={iconFillColor(theme)}
+      strokeWidth={2}
+      strokeLinecap="round"
+      fill="none"
+    />,
+    { width: 40, height: 20, mirror: true },
+  ),
 );
 
-export const ArrowheadNoneIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <path
-        d="M6 10H34"
-        stroke={iconFillColor(theme)}
-        strokeWidth={2}
-        fill="none"
-      />,
-      {
-        width: 40,
-        height: 20,
-      },
-    ),
+export const ArrowheadNoneIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="M6 10H34"
+      stroke={iconFillColor(theme)}
+      strokeWidth={2}
+      fill="none"
+    />,
+    {
+      width: 40,
+      height: 20,
+    },
+  ),
 );
 
 export const ArrowheadArrowIcon = React.memo(
-  ({ theme, flip = false }: { theme: "light" | "dark"; flip?: boolean }) =>
+  ({ theme, flip = false }: { theme: Theme; flip?: boolean }) =>
     createIcon(
       <g
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
@@ -741,7 +729,7 @@ export const ArrowheadArrowIcon = React.memo(
 );
 
 export const ArrowheadDotIcon = React.memo(
-  ({ theme, flip = false }: { theme: "light" | "dark"; flip?: boolean }) =>
+  ({ theme, flip = false }: { theme: Theme; flip?: boolean }) =>
     createIcon(
       <g
         stroke={iconFillColor(theme)}
@@ -756,7 +744,7 @@ export const ArrowheadDotIcon = React.memo(
 );
 
 export const ArrowheadBarIcon = React.memo(
-  ({ theme, flip = false }: { theme: "light" | "dark"; flip?: boolean }) =>
+  ({ theme, flip = false }: { theme: Theme; flip?: boolean }) =>
     createIcon(
       <g transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}>
         <path
@@ -770,41 +758,53 @@ export const ArrowheadBarIcon = React.memo(
     ),
 );
 
-export const FontSizeSmallIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
+export const ArrowheadTriangleIcon = React.memo(
+  ({ theme, flip = false }: { theme: Theme; flip?: boolean }) =>
     createIcon(
-      <path
+      <g
+        stroke={iconFillColor(theme)}
         fill={iconFillColor(theme)}
-        d="M 0 69.092 L 0 55.03 A 124.24 124.24 0 0 0 4.706 57.02 Q 6.826 57.863 8.708 58.5 A 53.466 53.466 0 0 0 12.231 59.571 Q 17.236 60.889 21.387 60.889 A 20.909 20.909 0 0 0 24.265 60.704 Q 25.719 60.502 26.903 60.077 A 8.649 8.649 0 0 0 29.028 58.985 Q 31.689 57.08 31.689 53.321 Q 31.689 51.221 30.518 49.585 A 10.126 10.126 0 0 0 29.282 48.177 Q 28.352 47.287 27.075 46.436 A 23.719 23.719 0 0 0 25.752 45.627 Q 23.774 44.492 20.176 42.735 A 254.44 254.44 0 0 0 17.822 41.602 Q 11.503 38.631 8.236 35.888 A 19.742 19.742 0 0 1 8.008 35.694 A 22.18 22.18 0 0 1 2.783 29.102 Q 0.83 25.342 0.83 20.313 A 22.471 22.471 0 0 1 1.733 13.778 A 17.283 17.283 0 0 1 7.251 5.42 A 21.486 21.486 0 0 1 15.177 1.272 Q 18.361 0.338 22.166 0.09 A 43.573 43.573 0 0 1 25 0 A 42.399 42.399 0 0 1 34.349 1.01 A 39.075 39.075 0 0 1 35.62 1.319 A 67.407 67.407 0 0 1 42.108 3.382 A 83.357 83.357 0 0 1 46.191 5.03 L 41.309 16.797 Q 35.596 14.453 31.86 13.526 A 30.762 30.762 0 0 0 25.417 12.612 A 28.337 28.337 0 0 0 24.512 12.598 A 14.846 14.846 0 0 0 22.022 12.793 Q 19.498 13.224 17.92 14.6 Q 15.625 16.602 15.625 19.824 Q 15.625 21.826 16.553 23.316 Q 17.48 24.805 19.507 26.197 A 18.343 18.343 0 0 0 20.659 26.912 Q 22.596 28.035 26.516 29.953 A 299.99 299.99 0 0 0 29.102 31.201 Q 37.91 35.412 41.841 39.642 A 16.553 16.553 0 0 1 42.822 40.796 A 17.675 17.675 0 0 1 46.301 49.233 A 23.517 23.517 0 0 1 46.533 52.588 A 21.581 21.581 0 0 1 45.471 59.515 A 17.733 17.733 0 0 1 39.575 67.823 Q 33.745 72.486 24.094 73.243 A 49.683 49.683 0 0 1 20.215 73.389 A 51.712 51.712 0 0 1 9.448 72.315 A 40.672 40.672 0 0 1 0 69.092 Z"
-      />,
-      { width: 47, height: 77 },
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+      >
+        <path d="M32 10L6 10" strokeWidth={2} />
+        <path d="M27.5 5.5L34.5 10L27.5 14.5L27.5 5.5" />
+      </g>,
+      { width: 40, height: 20 },
     ),
 );
 
-export const FontSizeMediumIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <path
-        fill={iconFillColor(theme)}
-        d="M 44.092 71.387 L 30.225 71.387 L 13.037 15.381 L 12.598 15.381 A 1505.093 1505.093 0 0 1 12.959 22.313 Q 13.426 31.715 13.508 36.4 A 102.991 102.991 0 0 1 13.525 38.184 L 13.525 71.387 L 0 71.387 L 0 0 L 20.605 0 L 37.5 54.59 L 37.793 54.59 L 55.713 0 L 76.318 0 L 76.318 71.387 L 62.207 71.387 L 62.207 37.598 Q 62.207 35.205 62.28 32.08 A 160.703 160.703 0 0 1 62.326 30.544 Q 62.452 26.754 62.866 17.168 A 5390.536 5390.536 0 0 1 62.939 15.479 L 62.5 15.479 L 44.092 71.387 Z"
-      />,
-      { width: 77, height: 75 },
-    ),
+export const FontSizeSmallIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      fill={iconFillColor(theme)}
+      d="M 0 69.092 L 0 55.03 A 124.24 124.24 0 0 0 4.706 57.02 Q 6.826 57.863 8.708 58.5 A 53.466 53.466 0 0 0 12.231 59.571 Q 17.236 60.889 21.387 60.889 A 20.909 20.909 0 0 0 24.265 60.704 Q 25.719 60.502 26.903 60.077 A 8.649 8.649 0 0 0 29.028 58.985 Q 31.689 57.08 31.689 53.321 Q 31.689 51.221 30.518 49.585 A 10.126 10.126 0 0 0 29.282 48.177 Q 28.352 47.287 27.075 46.436 A 23.719 23.719 0 0 0 25.752 45.627 Q 23.774 44.492 20.176 42.735 A 254.44 254.44 0 0 0 17.822 41.602 Q 11.503 38.631 8.236 35.888 A 19.742 19.742 0 0 1 8.008 35.694 A 22.18 22.18 0 0 1 2.783 29.102 Q 0.83 25.342 0.83 20.313 A 22.471 22.471 0 0 1 1.733 13.778 A 17.283 17.283 0 0 1 7.251 5.42 A 21.486 21.486 0 0 1 15.177 1.272 Q 18.361 0.338 22.166 0.09 A 43.573 43.573 0 0 1 25 0 A 42.399 42.399 0 0 1 34.349 1.01 A 39.075 39.075 0 0 1 35.62 1.319 A 67.407 67.407 0 0 1 42.108 3.382 A 83.357 83.357 0 0 1 46.191 5.03 L 41.309 16.797 Q 35.596 14.453 31.86 13.526 A 30.762 30.762 0 0 0 25.417 12.612 A 28.337 28.337 0 0 0 24.512 12.598 A 14.846 14.846 0 0 0 22.022 12.793 Q 19.498 13.224 17.92 14.6 Q 15.625 16.602 15.625 19.824 Q 15.625 21.826 16.553 23.316 Q 17.48 24.805 19.507 26.197 A 18.343 18.343 0 0 0 20.659 26.912 Q 22.596 28.035 26.516 29.953 A 299.99 299.99 0 0 0 29.102 31.201 Q 37.91 35.412 41.841 39.642 A 16.553 16.553 0 0 1 42.822 40.796 A 17.675 17.675 0 0 1 46.301 49.233 A 23.517 23.517 0 0 1 46.533 52.588 A 21.581 21.581 0 0 1 45.471 59.515 A 17.733 17.733 0 0 1 39.575 67.823 Q 33.745 72.486 24.094 73.243 A 49.683 49.683 0 0 1 20.215 73.389 A 51.712 51.712 0 0 1 9.448 72.315 A 40.672 40.672 0 0 1 0 69.092 Z"
+    />,
+    { width: 47, height: 77 },
+  ),
 );
 
-export const FontSizeLargeIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <path
-        fill={iconFillColor(theme)}
-        d="M 44.092 71.387 L 0 71.387 L 0 0 L 15.137 0 L 15.137 58.887 L 44.092 58.887 L 44.092 71.387 Z"
-      />,
-      { width: 45, height: 75 },
-    ),
+export const FontSizeMediumIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      fill={iconFillColor(theme)}
+      d="M 44.092 71.387 L 30.225 71.387 L 13.037 15.381 L 12.598 15.381 A 1505.093 1505.093 0 0 1 12.959 22.313 Q 13.426 31.715 13.508 36.4 A 102.991 102.991 0 0 1 13.525 38.184 L 13.525 71.387 L 0 71.387 L 0 0 L 20.605 0 L 37.5 54.59 L 37.793 54.59 L 55.713 0 L 76.318 0 L 76.318 71.387 L 62.207 71.387 L 62.207 37.598 Q 62.207 35.205 62.28 32.08 A 160.703 160.703 0 0 1 62.326 30.544 Q 62.452 26.754 62.866 17.168 A 5390.536 5390.536 0 0 1 62.939 15.479 L 62.5 15.479 L 44.092 71.387 Z"
+    />,
+    { width: 77, height: 75 },
+  ),
+);
+
+export const FontSizeLargeIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      fill={iconFillColor(theme)}
+      d="M 44.092 71.387 L 0 71.387 L 0 0 L 15.137 0 L 15.137 58.887 L 44.092 58.887 L 44.092 71.387 Z"
+    />,
+    { width: 45, height: 75 },
+  ),
 );
 
 export const FontSizeExtraLargeIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
+  ({ theme }: { theme: Theme }) =>
     createIcon(
       <path
         fill={iconFillColor(theme)}
@@ -815,7 +815,7 @@ export const FontSizeExtraLargeIcon = React.memo(
 );
 
 export const FontFamilyHandDrawnIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
+  ({ theme }: { theme: Theme }) =>
     createIcon(
       <path
         fill={iconFillColor(theme)}
@@ -825,67 +825,116 @@ export const FontFamilyHandDrawnIcon = React.memo(
     ),
 );
 
-export const FontFamilyNormalIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path
-          fill={iconFillColor(theme)}
-          d="M 63.818 71.68 L 54.492 71.68 L 45.898 49.561 L 17.578 49.561 L 9.082 71.68 L 0 71.68 L 27.881 0 L 35.986 0 L 63.818 71.68 Z M 20.605 41.602 L 43.213 41.602 L 35.205 19.971 L 31.787 9.277 Q 30.322 15.137 28.711 19.971 L 20.605 41.602 Z"
-        />
-        <path
-          fill={iconFillColor(theme)}
-          d="M 68.994 71.68 L 52.686 71.68 L 47.51 54.688 L 21.484 54.688 L 16.309 71.68 L 0 71.68 L 25.195 0 L 43.701 0 L 68.994 71.68 Z M 25.293 41.992 L 43.896 41.992 A 27590.463 27590.463 0 0 1 42.2 36.532 Q 36.965 19.676 35.937 16.273 A 120.932 120.932 0 0 1 35.815 15.869 A 131.65 131.65 0 0 1 35.396 14.435 Q 34.951 12.879 34.675 11.741 A 34.866 34.866 0 0 1 34.521 11.084 A 141.762 141.762 0 0 1 33.706 14.075 Q 31.482 21.957 25.293 41.992 Z"
-        />
-      </>,
-      { width: 70, height: 78 },
-    ),
-);
-
-export const FontFamilyCodeIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path
-          fill={iconFillColor(theme)}
-          d="M278.9 511.5l-61-17.7c-6.4-1.8-10-8.5-8.2-14.9L346.2 8.7c1.8-6.4 8.5-10 14.9-8.2l61 17.7c6.4 1.8 10 8.5 8.2 14.9L293.8 503.3c-1.9 6.4-8.5 10.1-14.9 8.2zm-114-112.2l43.5-46.4c4.6-4.9 4.3-12.7-.8-17.2L117 256l90.6-79.7c5.1-4.5 5.5-12.3.8-17.2l-43.5-46.4c-4.5-4.8-12.1-5.1-17-.5L3.8 247.2c-5.1 4.7-5.1 12.8 0 17.5l144.1 135.1c4.9 4.6 12.5 4.4 17-.5zm327.2.6l144.1-135.1c5.1-4.7 5.1-12.8 0-17.5L492.1 112.1c-4.8-4.5-12.4-4.3-17 .5L431.6 159c-4.6 4.9-4.3 12.7.8 17.2L523 256l-90.6 79.7c-5.1 4.5-5.5 12.3-.8 17.2l43.5 46.4c4.5 4.9 12.1 5.1 17 .6z"
-        />
-      </>,
-      { width: 640, height: 512 },
-    ),
-);
-
-export const TextAlignLeftIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
+export const FontFamilyNormalIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
       <path
-        d="M12.83 352h262.34A12.82 12.82 0 00288 339.17v-38.34A12.82 12.82 0 00275.17 288H12.83A12.82 12.82 0 000 300.83v38.34A12.82 12.82 0 0012.83 352zm0-256h262.34A12.82 12.82 0 00288 83.17V44.83A12.82 12.82 0 00275.17 32H12.83A12.82 12.82 0 000 44.83v38.34A12.82 12.82 0 0012.83 96zM432 160H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm0 256H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16z"
         fill={iconFillColor(theme)}
-        strokeLinecap="round"
-      />,
-      { width: 448, height: 512 },
-    ),
+        d="M 63.818 71.68 L 54.492 71.68 L 45.898 49.561 L 17.578 49.561 L 9.082 71.68 L 0 71.68 L 27.881 0 L 35.986 0 L 63.818 71.68 Z M 20.605 41.602 L 43.213 41.602 L 35.205 19.971 L 31.787 9.277 Q 30.322 15.137 28.711 19.971 L 20.605 41.602 Z"
+      />
+      <path
+        fill={iconFillColor(theme)}
+        d="M 68.994 71.68 L 52.686 71.68 L 47.51 54.688 L 21.484 54.688 L 16.309 71.68 L 0 71.68 L 25.195 0 L 43.701 0 L 68.994 71.68 Z M 25.293 41.992 L 43.896 41.992 A 27590.463 27590.463 0 0 1 42.2 36.532 Q 36.965 19.676 35.937 16.273 A 120.932 120.932 0 0 1 35.815 15.869 A 131.65 131.65 0 0 1 35.396 14.435 Q 34.951 12.879 34.675 11.741 A 34.866 34.866 0 0 1 34.521 11.084 A 141.762 141.762 0 0 1 33.706 14.075 Q 31.482 21.957 25.293 41.992 Z"
+      />
+    </>,
+    { width: 70, height: 78 },
+  ),
 );
 
-export const TextAlignCenterIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
+export const FontFamilyCodeIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
       <path
-        d="M432 160H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm0 256H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zM108.1 96h231.81A12.09 12.09 0 00352 83.9V44.09A12.09 12.09 0 00339.91 32H108.1A12.09 12.09 0 0096 44.09V83.9A12.1 12.1 0 00108.1 96zm231.81 256A12.09 12.09 0 00352 339.9v-39.81A12.09 12.09 0 00339.91 288H108.1A12.09 12.09 0 0096 300.09v39.81a12.1 12.1 0 0012.1 12.1z"
         fill={iconFillColor(theme)}
-      />,
-      { width: 448, height: 512 },
-    ),
+        d="M278.9 511.5l-61-17.7c-6.4-1.8-10-8.5-8.2-14.9L346.2 8.7c1.8-6.4 8.5-10 14.9-8.2l61 17.7c6.4 1.8 10 8.5 8.2 14.9L293.8 503.3c-1.9 6.4-8.5 10.1-14.9 8.2zm-114-112.2l43.5-46.4c4.6-4.9 4.3-12.7-.8-17.2L117 256l90.6-79.7c5.1-4.5 5.5-12.3.8-17.2l-43.5-46.4c-4.5-4.8-12.1-5.1-17-.5L3.8 247.2c-5.1 4.7-5.1 12.8 0 17.5l144.1 135.1c4.9 4.6 12.5 4.4 17-.5zm327.2.6l144.1-135.1c5.1-4.7 5.1-12.8 0-17.5L492.1 112.1c-4.8-4.5-12.4-4.3-17 .5L431.6 159c-4.6 4.9-4.3 12.7.8 17.2L523 256l-90.6 79.7c-5.1 4.5-5.5 12.3-.8 17.2l43.5 46.4c4.5 4.9 12.1 5.1 17 .6z"
+      />
+    </>,
+    { width: 640, height: 512 },
+  ),
 );
 
-export const TextAlignRightIcon = React.memo(
-  ({ theme }: { theme: "light" | "dark" }) =>
-    createIcon(
-      <path
-        d="M16 224h416a16 16 0 0016-16v-32a16 16 0 00-16-16H16a16 16 0 00-16 16v32a16 16 0 0016 16zm416 192H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm3.17-384H172.83A12.82 12.82 0 00160 44.83v38.34A12.82 12.82 0 00172.83 96h262.34A12.82 12.82 0 00448 83.17V44.83A12.82 12.82 0 00435.17 32zm0 256H172.83A12.82 12.82 0 00160 300.83v38.34A12.82 12.82 0 00172.83 352h262.34A12.82 12.82 0 00448 339.17v-38.34A12.82 12.82 0 00435.17 288z"
-        fill={iconFillColor(theme)}
-        strokeLinecap="round"
-      />,
-      { width: 448, height: 512 },
-    ),
+export const TextAlignLeftIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="M12.83 352h262.34A12.82 12.82 0 00288 339.17v-38.34A12.82 12.82 0 00275.17 288H12.83A12.82 12.82 0 000 300.83v38.34A12.82 12.82 0 0012.83 352zm0-256h262.34A12.82 12.82 0 00288 83.17V44.83A12.82 12.82 0 00275.17 32H12.83A12.82 12.82 0 000 44.83v38.34A12.82 12.82 0 0012.83 96zM432 160H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm0 256H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16z"
+      fill={iconFillColor(theme)}
+      strokeLinecap="round"
+    />,
+    { width: 448, height: 512 },
+  ),
+);
+
+export const TextAlignCenterIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="M432 160H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm0 256H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zM108.1 96h231.81A12.09 12.09 0 00352 83.9V44.09A12.09 12.09 0 00339.91 32H108.1A12.09 12.09 0 0096 44.09V83.9A12.1 12.1 0 00108.1 96zm231.81 256A12.09 12.09 0 00352 339.9v-39.81A12.09 12.09 0 00339.91 288H108.1A12.09 12.09 0 0096 300.09v39.81a12.1 12.1 0 0012.1 12.1z"
+      fill={iconFillColor(theme)}
+    />,
+    { width: 448, height: 512 },
+  ),
+);
+
+export const TextAlignRightIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="M16 224h416a16 16 0 0016-16v-32a16 16 0 00-16-16H16a16 16 0 00-16 16v32a16 16 0 0016 16zm416 192H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm3.17-384H172.83A12.82 12.82 0 00160 44.83v38.34A12.82 12.82 0 00172.83 96h262.34A12.82 12.82 0 00448 83.17V44.83A12.82 12.82 0 00435.17 32zm0 256H172.83A12.82 12.82 0 00160 300.83v38.34A12.82 12.82 0 00172.83 352h262.34A12.82 12.82 0 00448 339.17v-38.34A12.82 12.82 0 00435.17 288z"
+      fill={iconFillColor(theme)}
+      strokeLinecap="round"
+    />,
+    { width: 448, height: 512 },
+  ),
+);
+
+export const TextAlignTopIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="m16,132l416,0c8.837,0 16,-7.163 16,-16l0,-40c0,-8.837 -7.163,-16 -16,-16l-416,0c-8.837,0 -16,7.163 -16,16l0,40c0,8.837 7.163,16 16,16zm0,160l416,0c8.837,0 16,-7.163 16,-16l0,-40c0,-8.837 -7.163,-16 -16,-16l-416,0c-8.837,0 -16,7.163 -16,16l0,40c0,8.837 7.163,16 16,16z"
+      fill={iconFillColor(theme)}
+      strokeLinecap="round"
+    />,
+    { width: 448, height: 512 },
+  ),
+);
+
+export const TextAlignBottomIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      d="M16,292L432,292C440.837,292 448,284.837 448,276L448,236C448,227.163 440.837,220 432,220L16,220C7.163,220 0,227.163 0,236L0,276C0,284.837 7.163,292 16,292ZM16,452L432,452C440.837,452 448,444.837 448,436L448,396C448,387.163 440.837,380 432,380L16,380C7.163,380 0,387.163 0,396L0,436C0,444.837 7.163,452 16,452Z"
+      fill={iconFillColor(theme)}
+      strokeLinecap="round"
+    />,
+    { width: 448, height: 512 },
+  ),
+);
+
+export const TextAlignMiddleIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <path
+      transform="matrix(1,0,0,1,0,80)"
+      d="M16,132L432,132C440.837,132 448,124.837 448,116L448,76C448,67.163 440.837,60 432,60L16,60C7.163,60 0,67.163 0,76L0,116C0,124.837 7.163,132 16,132ZM16,292L432,292C440.837,292 448,284.837 448,276L448,236C448,227.163 440.837,220 432,220L16,220C7.163,220 0,227.163 0,236L0,276C0,284.837 7.163,292 16,292Z"
+      fill={iconFillColor(theme)}
+      strokeLinecap="round"
+    />,
+    { width: 448, height: 512 },
+  ),
+);
+
+export const publishIcon = createIcon(
+  <path
+    d="M537.6 226.6c4.1-10.7 6.4-22.4 6.4-34.6 0-53-43-96-96-96-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32c-88.4 0-160 71.6-160 160 0 2.7.1 5.4.2 8.1C40.2 219.8 0 273.2 0 336c0 79.5 64.5 144 144 144h368c70.7 0 128-57.3 128-128 0-61.9-44-113.6-102.4-125.4zM393.4 288H328v112c0 8.8-7.2 16-16 16h-48c-8.8 0-16-7.2-16-16V288h-65.4c-14.3 0-21.4-17.2-11.3-27.3l105.4-105.4c6.2-6.2 16.4-6.2 22.6 0l105.4 105.4c10.1 10.1 2.9 27.3-11.3 27.3z"
+    fill="currentColor"
+  />,
+  { width: 640, height: 512 },
+);
+
+export const editIcon = createIcon(
+  <path
+    fill="currentColor"
+    d="M402.3 344.9l32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zm156.6-201.8L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8zM460.1 174L402 115.9 216.2 301.8l-7.3 65.3 65.3-7.3L460.1 174zm64.8-79.7l-43.2-43.2c-4.1-4.1-10.8-4.1-14.8 0L436 82l58.1 58.1 30.9-30.9c4-4.2 4-10.8-.1-14.9z"
+  ></path>,
+  { width: 640, height: 512 },
+);
+
+export const eraser = createIcon(
+  <path d="M480 416C497.7 416 512 430.3 512 448C512 465.7 497.7 480 480 480H150.6C133.7 480 117.4 473.3 105.4 461.3L25.37 381.3C.3786 356.3 .3786 315.7 25.37 290.7L258.7 57.37C283.7 32.38 324.3 32.38 349.3 57.37L486.6 194.7C511.6 219.7 511.6 260.3 486.6 285.3L355.9 416H480zM265.4 416L332.7 348.7L195.3 211.3L70.63 336L150.6 416L265.4 416z" />,
 );
