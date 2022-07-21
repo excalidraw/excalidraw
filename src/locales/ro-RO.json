@@ -188,7 +188,7 @@
     "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?",
     "removeItemsFromsLibrary": "Ștergi {{count}} element(e) din bibliotecă?",
     "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată.",
-    "browserZoom": ""
+    "browserZoom": "Nivelul de transfocare al navigatorului tău nu este setat la 100% ceea ce poate face ca panoul să fie afișat incorect"
   },
   "errors": {
     "unsupportedFileType": "Tip de fișier neacceptat.",
