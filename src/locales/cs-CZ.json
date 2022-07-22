@@ -9,6 +9,7 @@
     "copy": "Kopírovat",
     "copyAsPng": "Zkopírovat do schránky jako PNG",
     "copyAsSvg": "Zkopírovat do schránky jako SVG",
+    "copyText": "Zkopírovat do schránky jako text",
     "bringForward": "Přenést blíž",
     "sendToBack": "Přenést do pozadí",
     "bringToFront": "Přenést do popředí",
@@ -35,14 +36,14 @@
     "arrowhead_arrow": "Šipka",
     "arrowhead_bar": "Kóta",
     "arrowhead_dot": "Tečka",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "Trojúhelník",
     "fontSize": "Velikost písma",
     "fontFamily": "Písmo",
     "onlySelected": "Pouze vybrané",
-    "withBackground": "",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
-    "addWatermark": "",
+    "withBackground": "Pozadí",
+    "exportEmbedScene": "Vložit scénu",
+    "exportEmbedScene_details": "Data scény budou uložena do exportovaného souboru PNG/SVG tak, aby z něj mohla být scéna obnovena.\nZvýší se velikost exportovaného souboru.",
+    "addWatermark": "Přidat \"Vyrobeno s Excalidraw\"",
     "handDrawn": "Od ruky",
     "normal": "Normální",
     "code": "Kód",
@@ -64,6 +65,7 @@
     "cartoonist": "",
     "fileTitle": "",
     "colorPicker": "",
+    "canvasColors": "",
     "canvasBackground": "Pozadí plátna",
     "drawingCanvas": "",
     "layers": "",
@@ -104,7 +106,27 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "bindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "",
@@ -157,7 +179,6 @@
     "uploadedSecurly": "",
     "loadSceneOverridePrompt": "",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "",
@@ -166,14 +187,17 @@
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "",
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Výběr",
@@ -186,7 +210,10 @@
     "freedraw": "Kreslení",
     "text": "Text",
     "library": "",
-    "lock": ""
+    "lock": "",
+    "penMode": "",
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "",
@@ -211,7 +238,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -271,14 +299,15 @@
     "howto": "",
     "or": "nebo",
     "preventBinding": "",
-    "shapes": "",
+    "tools": "",
     "shortcuts": "",
     "textFinish": "",
     "textNewLine": "",
     "title": "",
     "view": "",
     "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToSelection": "",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -320,7 +349,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",

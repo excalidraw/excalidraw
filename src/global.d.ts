@@ -13,6 +13,8 @@ interface Window {
   ClipboardItem: any;
   __EXCALIDRAW_SHA__: string | undefined;
   EXCALIDRAW_ASSET_PATH: string | undefined;
+  EXCALIDRAW_EXPORT_SOURCE: string;
+  EXCALIDRAW_THROTTLE_RENDER: boolean | undefined;
   gtag: Function;
 }
 
@@ -21,7 +23,7 @@ declare namespace NodeJS {
   interface ProcessEnv {
     readonly REACT_APP_BACKEND_V2_GET_URL: string;
     readonly REACT_APP_BACKEND_V2_POST_URL: string;
-    readonly REACT_APP_SOCKET_SERVER_URL: string;
+    readonly REACT_APP_PORTAL_URL: string;
     readonly REACT_APP_FIREBASE_CONFIG: string;
   }
 }
@@ -33,6 +35,14 @@ interface Clipboard extends EventTarget {
 type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
+
+type ValueOf<T> = T[keyof T];
+
+type Merge<M, N> = Omit<M, keyof N> & N;
+
+/** utility type to assert that the second type is a subtype of the first type.
+ * Returns the subtype. */
+type SubtypeOf<Supertype, Subtype extends Supertype> = Subtype;
 
 type ResolutionType<T extends (...args: any) => any> = T extends (
   ...args: any

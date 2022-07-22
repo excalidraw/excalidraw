@@ -1,5 +1,10 @@
 import colors from "./colors";
-import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, ENV } from "./constants";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  ENV,
+  VERTICAL_ALIGN,
+} from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
@@ -24,18 +29,24 @@ type ParseSpreadsheetResult =
   | { type: typeof NOT_SPREADSHEET; reason: string }
   | { type: typeof VALID_SPREADSHEET; spreadsheet: Spreadsheet };
 
-const tryParseNumber = (s: string): number | null => {
-  const match = /^[$€£¥₩]?([0-9,]+(\.[0-9]+)?)$/.exec(s);
+/**
+ * @private exported for testing
+ */
+export const tryParseNumber = (s: string): number | null => {
+  const match = /^([-+]?)[$€£¥₩]?([-+]?)([\d.,]+)[%]?$/.exec(s);
   if (!match) {
     return null;
   }
-  return parseFloat(match[1].replace(/,/g, ""));
+  return parseFloat(`${(match[1] || match[2]) + match[3]}`.replace(/,/g, ""));
 };
 
 const isNumericColumn = (lines: string[][], columnIndex: number) =>
   lines.slice(1).every((line) => tryParseNumber(line[columnIndex]) !== null);
 
-const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
+/**
+ * @private exported for testing
+ */
+export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const numCols = cells[0].length;
 
   if (numCols > 2) {
@@ -66,13 +77,16 @@ const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
     };
   }
 
-  const valueColumnIndex = isNumericColumn(cells, 0) ? 0 : 1;
+  const labelColumnNumeric = isNumericColumn(cells, 0);
+  const valueColumnNumeric = isNumericColumn(cells, 1);
 
-  if (!isNumericColumn(cells, valueColumnIndex)) {
+  if (!labelColumnNumeric && !valueColumnNumeric) {
     return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
   }
 
-  const labelColumnIndex = (valueColumnIndex + 1) % 2;
+  const [labelColumnIndex, valueColumnIndex] = valueColumnNumeric
+    ? [0, 1]
+    : [1, 0];
   const hasHeader = tryParseNumber(cells[0][valueColumnIndex]) === null;
   const rows = hasHeader ? cells.slice(1) : cells;
 
@@ -103,7 +117,7 @@ const transposeCells = (cells: string[][]) => {
 };
 
 export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
-  // Copy/paste from excel, spreadhseets, tsv, csv.
+  // Copy/paste from excel, spreadsheets, tsv, csv.
   // For now we only accept 2 columns with an optional header
 
   // Check for tab separated values
@@ -161,7 +175,8 @@ const commonProps = {
   strokeSharpness: "sharp",
   strokeStyle: "solid",
   strokeWidth: 1,
-  verticalAlign: "middle",
+  verticalAlign: VERTICAL_ALIGN.MIDDLE,
+  locked: false,
 } as const;
 
 const getChartDimentions = (spreadsheet: Spreadsheet) => {

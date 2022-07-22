@@ -9,6 +9,7 @@
     "copy": "Kopiëren",
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer naar klembord als SVG",
+    "copyText": "Kopiëren naar klembord als tekst",
     "bringForward": "Breng naar voren",
     "sendToBack": "Stuur naar achtergrond",
     "bringToFront": "Breng naar voorgrond",
@@ -64,6 +65,7 @@
     "cartoonist": "Cartoonist",
     "fileTitle": "Bestandsnaam",
     "colorPicker": "Kleurenkiezer",
+    "canvasColors": "Gebruikt op canvas",
     "canvasBackground": "Canvas achtergrond",
     "drawingCanvas": "Canvas",
     "layers": "Lagen",
@@ -104,7 +106,27 @@
     "personalLib": "Persoonlijke bibliotheek",
     "excalidrawLib": "Excalidraw bibliotheek",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "Ontkoppel tekst",
+    "bindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -152,12 +174,11 @@
     "couldNotLoadInvalidFile": "Kan ongeldig bestand niet laden",
     "importBackendFailed": "Importeren vanuit backend mislukt.",
     "cannotExportEmptyCanvas": "Kan geen leeg canvas exporteren.",
-    "couldNotCopyToClipboard": "Kan niet kopiëren. Probeer in de Chrome-browser.",
+    "couldNotCopyToClipboard": "Kon niet naar klembord kopiëren.",
     "decryptFailed": "Kan gegevens niet decoderen.",
     "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
     "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wil je doorgaan?",
     "collabStopOverridePrompt": "Wanneer de sessie wordt gestopt, overschrijft u de eerdere, lokaal opgeslagen tekening. Weet je het zeker?\n\n(Als je de lokale tekening wilt behouden, sluit je in plaats daarvan het browsertabblad)",
-    "errorLoadingLibrary": "Bij het laden van de externe bibliotheek is een fout opgetreden.",
     "errorAddingToLibrary": "Kan item niet toevoegen aan de bibliotheek",
     "errorRemovingFromLibrary": "Kan item niet uit de bibliotheek verwijderen",
     "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
@@ -166,14 +187,17 @@
     "invalidSceneUrl": "Kan scène niet importeren vanuit de opgegeven URL. Het is onjuist of bevat geen geldige Excalidraw JSON-gegevens.",
     "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?",
     "removeItemsFromsLibrary": "Verwijder {{count}} item(s) uit bibliotheek?",
-    "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld."
+    "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Niet-ondersteund bestandstype.",
     "imageInsertError": "Afbeelding invoegen mislukt. Probeer het later opnieuw...",
     "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
     "svgImageInsertError": "",
-    "invalidSVGString": "Ongeldige SVG."
+    "invalidSVGString": "Ongeldige SVG.",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Selectie",
@@ -186,7 +210,10 @@
     "freedraw": "Tekenen",
     "text": "Tekst",
     "library": "Bibliotheek",
-    "lock": "Geselecteerde tool actief houden na tekenen"
+    "lock": "Geselecteerde tool actief houden na tekenen",
+    "penMode": "Voorkom pinch-zoom en accepteer freedraw invoer alleen van pen",
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Canvasacties",
@@ -211,7 +238,8 @@
     "placeImage": "",
     "publishLibrary": "Publiceer je eigen bibliotheek",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan voorbeeld niet tonen",
@@ -271,14 +299,15 @@
     "howto": "Volg onze handleidingen",
     "or": "of",
     "preventBinding": "Pijlbinding voorkomen",
-    "shapes": "Vormen",
+    "tools": "",
     "shortcuts": "Sneltoetsen",
     "textFinish": "Voltooi het bewerken (teksteditor)",
     "textNewLine": "Nieuwe regel toevoegen (teksteditor)",
     "title": "Help",
     "view": "Weergave",
     "zoomToFit": "Zoom in op alle elementen",
-    "zoomToSelection": "Inzoomen op selectie"
+    "zoomToSelection": "Inzoomen op selectie",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -320,7 +349,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",

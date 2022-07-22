@@ -8,7 +8,7 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
-import { calculateScrollCenter } from "../scene";
+import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import CollabButton from "./CollabButton";
@@ -17,6 +17,7 @@ import { LockButton } from "./LockButton";
 import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { LibraryButton } from "./LibraryButton";
+import { PenModeButton } from "./PenModeButton";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -28,16 +29,20 @@ type MobileMenuProps = {
   libraryMenu: JSX.Element | null;
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
+  onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
-  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
-  viewModeEnabled: boolean;
+  renderCustomFooter?: (
+    isMobile: boolean,
+    appState: AppState,
+  ) => JSX.Element | null;
   showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
+  renderStats: () => JSX.Element | null;
 };
 
 export const MobileMenu = ({
@@ -50,27 +55,29 @@ export const MobileMenu = ({
   setAppState,
   onCollabButtonClick,
   onLockToggle,
+  onPenModeToggle,
   canvas,
   isCollaborating,
   renderCustomFooter,
-  viewModeEnabled,
   showThemeBtn,
   onImageAction,
   renderTopRightUI,
+  renderStats,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
         <Section heading="shapes">
-          {(heading) => (
+          {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
               <Stack.Row gap={1} className="App-toolbar-container">
                 <Island padding={1} className="App-toolbar">
                   {heading}
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
+                      appState={appState}
                       canvas={canvas}
-                      elementType={appState.elementType}
+                      activeTool={appState.activeTool}
                       setAppState={setAppState}
                       onImageAction={({ pointerType }) => {
                         onImageAction({
@@ -82,7 +89,7 @@ export const MobileMenu = ({
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
                 <LockButton
-                  checked={appState.elementLocked}
+                  checked={appState.activeTool.locked}
                   onChange={onLockToggle}
                   title={t("toolBar.lock")}
                   isMobile
@@ -91,6 +98,13 @@ export const MobileMenu = ({
                   appState={appState}
                   setAppState={setAppState}
                   isMobile
+                />
+                <PenModeButton
+                  checked={appState.penMode}
+                  onChange={onPenModeToggle}
+                  title={t("toolBar.penMode")}
+                  isMobile
+                  penDetected={appState.penDetected}
                 />
               </Stack.Row>
               {libraryMenu}
@@ -103,19 +117,29 @@ export const MobileMenu = ({
   };
 
   const renderAppToolbar = () => {
-    if (viewModeEnabled) {
+    // Render eraser conditionally in mobile
+    const showEraser =
+      !appState.viewModeEnabled &&
+      !appState.editingElement &&
+      getSelectedElements(elements, appState).length === 0;
+
+    if (appState.viewModeEnabled) {
       return (
         <div className="App-toolbar-content">
           {actionManager.renderAction("toggleCanvasMenu")}
         </div>
       );
     }
+
     return (
       <div className="App-toolbar-content">
         {actionManager.renderAction("toggleCanvasMenu")}
         {actionManager.renderAction("toggleEditMenu")}
+
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
+        {showEraser && actionManager.renderAction("eraser")}
+
         {actionManager.renderAction(
           appState.multiElement ? "finalize" : "duplicateSelection",
         )}
@@ -125,7 +149,7 @@ export const MobileMenu = ({
   };
 
   const renderCanvasActions = () => {
-    if (viewModeEnabled) {
+    if (appState.viewModeEnabled) {
       return (
         <>
           {renderJSONExportDialog()}
@@ -159,7 +183,8 @@ export const MobileMenu = ({
   };
   return (
     <>
-      {!viewModeEnabled && renderToolbar()}
+      {!appState.viewModeEnabled && renderToolbar()}
+      {renderStats()}
       <div
         className="App-bottom-bar"
         style={{
@@ -178,51 +203,44 @@ export const MobileMenu = ({
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>
-                      <UserList mobile>
-                        {Array.from(appState.collaborators)
-                          // Collaborator is either not initialized or is actually the current user.
-                          .filter(
-                            ([_, client]) => Object.keys(client).length !== 0,
-                          )
-                          .map(([clientId, client]) => (
-                            <React.Fragment key={clientId}>
-                              {actionManager.renderAction("goToCollaborator", {
-                                id: clientId,
-                              })}
-                            </React.Fragment>
-                          ))}
-                      </UserList>
+                      <UserList
+                        mobile
+                        collaborators={appState.collaborators}
+                        actionManager={actionManager}
+                      />
                     </fieldset>
                   )}
                 </Stack.Col>
               </div>
             </Section>
           ) : appState.openMenu === "shape" &&
-            !viewModeEnabled &&
+            !appState.viewModeEnabled &&
             showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
               <SelectedShapeActions
                 appState={appState}
                 elements={elements}
                 renderAction={actionManager.renderAction}
-                elementType={appState.elementType}
+                activeTool={appState.activeTool.type}
               />
             </Section>
           ) : null}
           <footer className="App-toolbar">
             {renderAppToolbar()}
-            {appState.scrolledOutside && !appState.openMenu && (
-              <button
-                className="scroll-back-to-content"
-                onClick={() => {
-                  setAppState({
-                    ...calculateScrollCenter(elements, appState, canvas),
-                  });
-                }}
-              >
-                {t("buttons.scrollBackToContent")}
-              </button>
-            )}
+            {appState.scrolledOutside &&
+              !appState.openMenu &&
+              !appState.isLibraryOpen && (
+                <button
+                  className="scroll-back-to-content"
+                  onClick={() => {
+                    setAppState({
+                      ...calculateScrollCenter(elements, appState, canvas),
+                    });
+                  }}
+                >
+                  {t("buttons.scrollBackToContent")}
+                </button>
+              )}
           </footer>
         </Island>
       </div>

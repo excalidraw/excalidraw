@@ -9,6 +9,7 @@
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
     "copyAsSvg": "Copy to clipboard as SVG",
+    "copyText": "Copy to clipboard as text",
     "bringForward": "Bring forward",
     "sendToBack": "Send to back",
     "bringToFront": "Bring to front",
@@ -64,6 +65,7 @@
     "cartoonist": "Cartoonist",
     "fileTitle": "File name",
     "colorPicker": "Color picker",
+    "canvasColors": "Used on canvas",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing canvas",
     "layers": "Layers",
@@ -104,7 +106,27 @@
     "personalLib": "Personal Library",
     "excalidrawLib": "Excalidraw Library",
     "decreaseFontSize": "Decrease font size",
-    "increaseFontSize": "Increase font size"
+    "increaseFontSize": "Increase font size",
+    "unbindText": "Unbind text",
+    "bindText": "Bind text to the container",
+    "link": {
+      "edit": "Edit link",
+      "create": "Create link",
+      "label": "Link"
+    },
+    "elementLock": {
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "lockAll": "Lock all",
+      "unlockAll": "Unlock all"
+    },
+    "statusPublished": "Published",
+    "sidebarLock": "Keep sidebar open"
+  },
+  "library": {
+    "noItems": "No items added yet...",
+    "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
+    "hint_emptyPrivateLibrary": "Select an item on canvas to add it here."
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -152,12 +174,11 @@
     "couldNotLoadInvalidFile": "Couldn't load invalid file",
     "importBackendFailed": "Importing from backend failed.",
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
-    "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
+    "couldNotCopyToClipboard": "Couldn't copy to clipboard.",
     "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
     "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
     "collabStopOverridePrompt": "Stopping the session will overwrite your previous, locally stored drawing. Are you sure?\n\n(If you want to keep your local drawing, simply close the browser tab instead.)",
-    "errorLoadingLibrary": "There was an error loading the third party library.",
     "errorAddingToLibrary": "Couldn't add item to the library",
     "errorRemovingFromLibrary": "Couldn't remove item from the library",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
@@ -166,14 +187,17 @@
     "invalidSceneUrl": "Couldn't import scene from the supplied URL. It's either malformed, or doesn't contain valid Excalidraw JSON data.",
     "resetLibrary": "This will clear your library. Are you sure?",
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
-    "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled."
+    "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
+    "browserZoom": "Your browser's zoom level is not set to 100% which may cause the board to display incorrectly"
   },
   "errors": {
     "unsupportedFileType": "Unsupported file type.",
     "imageInsertError": "Couldn't insert image. Try again later...",
     "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
-    "invalidSVGString": "Invalid SVG."
+    "invalidSVGString": "Invalid SVG.",
+    "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
+    "importLibraryError": "Couldn't load library"
   },
   "toolBar": {
     "selection": "Selection",
@@ -186,7 +210,10 @@
     "freedraw": "Draw",
     "text": "Text",
     "library": "Library",
-    "lock": "Keep selected tool active after drawing"
+    "lock": "Keep selected tool active after drawing",
+    "penMode": "Prevent pinch-zoom and accept freedraw input only from pen",
+    "link": "Add/ Update link for a selected shape",
+    "eraser": "Eraser"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -211,7 +238,8 @@
     "placeImage": "Click to place the image, or click and drag to set its size manually",
     "publishLibrary": "Publish your own library",
     "bindTextToElement": "Press enter to add text",
-    "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging"
+    "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
+    "eraserRevert": "Hold Alt to revert the elements marked for deletion"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -271,14 +299,15 @@
     "howto": "Follow our guides",
     "or": "or",
     "preventBinding": "Prevent arrow binding",
-    "shapes": "Shapes",
+    "tools": "Tools",
     "shortcuts": "Keyboard shortcuts",
     "textFinish": "Finish editing (text editor)",
     "textNewLine": "Add new line (text editor)",
     "title": "Help",
     "view": "View",
     "zoomToFit": "Zoom to fit all elements",
-    "zoomToSelection": "Zoom to selection"
+    "zoomToSelection": "Zoom to selection",
+    "toggleElementLock": "Lock/unlock selection"
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"
@@ -320,9 +349,9 @@
       "post": "which in short means anyone can use them without restrictions."
     },
     "noteItems": "Each library item must have its own name so it's filterable. The following library items will be included:",
-    "atleastOneLibItem": "Please select at least one library item to get started"
+    "atleastOneLibItem": "Please select at least one library item to get started",
+    "republishWarning": "Note: some of the selected items are marked as already published/submitted. You should only resubmit items when updating an existing library or submission."
   },
-
   "publishSuccessDialog": {
     "title": "Library submitted",
     "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",

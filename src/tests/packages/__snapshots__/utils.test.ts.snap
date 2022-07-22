@@ -2,6 +2,12 @@
 
 exports[`exportToSvg with default arguments 1`] = `
 Object {
+  "activeTool": Object {
+    "customType": null,
+    "lastActiveToolBeforeEraser": null,
+    "locked": false,
+    "type": "selection",
+  },
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -23,8 +29,6 @@ Object {
   "editingElement": null,
   "editingGroupId": null,
   "editingLinearElement": null,
-  "elementLocked": false,
-  "elementType": "selection",
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
@@ -34,6 +38,7 @@ Object {
   "fileHandle": null,
   "gridSize": null,
   "isBindingEnabled": true,
+  "isLibraryMenuDocked": false,
   "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
@@ -47,7 +52,9 @@ Object {
     "data": null,
     "shown": false,
   },
-  "pendingImageElement": null,
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -58,19 +65,16 @@ Object {
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
+  "showHyperlinkPopup": false,
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
-  "toastMessage": null,
+  "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "zenModeEnabled": false,
   "zoom": Object {
-    "translation": Object {
-      "x": 0,
-      "y": 0,
-    },
     "value": 1,
   },
 }

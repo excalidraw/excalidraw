@@ -9,6 +9,7 @@
     "copy": "Copia",
     "copyAsPng": "Copia al porta-retalls com a PNG",
     "copyAsSvg": "Copia al porta-retalls com a SVG",
+    "copyText": "Copia al porta-retalls com a text",
     "bringForward": "Porta endavant",
     "sendToBack": "Envia enrere",
     "bringToFront": "Porta al davant",
@@ -64,6 +65,7 @@
     "cartoonist": "Dibuixant",
     "fileTitle": "Nom del fitxer",
     "colorPicker": "Selector de colors",
+    "canvasColors": "Usat al llenç",
     "canvasBackground": "Fons del llenç",
     "drawingCanvas": "Llenç de dibuix",
     "layers": "Capes",
@@ -103,8 +105,28 @@
     "toggleTheme": "Activa o desactiva el tema",
     "personalLib": "Biblioteca personal",
     "excalidrawLib": "Biblioteca d'Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Redueix la mida de la lletra",
+    "increaseFontSize": "Augmenta la mida de la lletra",
+    "unbindText": "Desvincular el text",
+    "bindText": "",
+    "link": {
+      "edit": "Edita l'enllaç",
+      "create": "Crea un enllaç",
+      "label": "Enllaç"
+    },
+    "elementLock": {
+      "lock": "Bloca",
+      "unlock": "Desbloca",
+      "lockAll": "Bloca-ho tot",
+      "unlockAll": "Desbloca-ho tot"
+    },
+    "statusPublished": "Publicat",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
@@ -152,28 +174,30 @@
     "couldNotLoadInvalidFile": "No s'ha pogut carregar un fitxer no vàlid",
     "importBackendFailed": "Importació fallida.",
     "cannotExportEmptyCanvas": "No es pot exportar un llenç buit.",
-    "couldNotCopyToClipboard": "No s'ha pogut copiar al porta-retalls. Intentar amb el navegador Google Chrome.",
+    "couldNotCopyToClipboard": "No s'ha pogut copiar al porta-retalls.",
     "decryptFailed": "No s'ha pogut desencriptar.",
     "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut.",
     "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?",
     "collabStopOverridePrompt": "Aturar la sessió provocarà la sobreescriptura del dibuix previ, que hi ha desat en l'emmagatzematge local. N'esteu segur?\n\n(Si voleu conservar el dibuix local, tanqueu la pentanya del navegador en comptes d'aturar la sessió).",
-    "errorLoadingLibrary": "S'ha produït un error en carregar la biblioteca de tercers.",
     "errorAddingToLibrary": "No s'ha pogut afegir l'element a la biblioteca",
     "errorRemovingFromLibrary": "No s'ha pogut eliminar l'element de la biblioteca",
     "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Aquesta imatge no sembla contenir cap dada d'escena. Heu activat l'incrustació de l'escena durant l'exportació?",
     "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge",
     "invalidSceneUrl": "No s'ha pogut importar l'escena des de l'adreça URL proporcionada. Està malformada o no conté dades Excalidraw JSON vàlides.",
     "resetLibrary": "Això buidarà la biblioteca. N'esteu segur?",
     "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la biblioteca?",
-    "invalidEncryptionKey": "La clau d'encriptació ha de tenir 22 caràcters. La col·laboració en directe està desactivada."
+    "invalidEncryptionKey": "La clau d'encriptació ha de tenir 22 caràcters. La col·laboració en directe està desactivada.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Tipus de fitxer no suportat.",
     "imageInsertError": "No s'ha pogut insertar la imatge, torneu-ho a provar més tard...",
     "fileTooBig": "El fitxer és massa gros. La mida màxima permesa és {{maxSize}}.",
     "svgImageInsertError": "No ha estat possible inserir la imatge SVG. Les marques SVG semblen invàlides.",
-    "invalidSVGString": "SVG no vàlid."
+    "invalidSVGString": "SVG no vàlid.",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": "No s'ha pogut carregar la biblioteca"
   },
   "toolBar": {
     "selection": "Selecció",
@@ -186,7 +210,10 @@
     "freedraw": "Dibuix",
     "text": "Text",
     "library": "Biblioteca",
-    "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar"
+    "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
+    "penMode": "Evita el zoom i accepta solament el dibuix lliure amb bolígraf",
+    "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
+    "eraser": "Esborrador"
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -206,12 +233,13 @@
     "resizeImage": "Podeu redimensionar lliurement prement MAJÚSCULA;\nper a redimensionar des del centre, premeu ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
     "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Premeu Suprimir per a eliminar el(s) punt(s), CtrlOrCmd+D per a duplicar-lo, o arrossegueu-lo per a moure'l",
+    "lineEditor_nothingSelected": "Seleccioneu un punt per a editar-lo (premeu SHIFT si voleu\nselecció múltiple), o manteniu Alt i feu clic per a afegir més punts",
     "placeImage": "Feu clic per a col·locar la imatge o clic i arrossegar per a establir-ne la mida manualment",
     "publishLibrary": "Publiqueu la vostra pròpia llibreria",
     "bindTextToElement": "Premeu enter per a afegir-hi text",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
+    "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar"
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
@@ -258,7 +286,7 @@
   "helpDialog": {
     "blog": "Llegiu el nostre blog",
     "click": "clic",
-    "deepSelect": "",
+    "deepSelect": "Selecció profunda",
     "deepBoxSelect": "",
     "curvedArrow": "Fletxa corba",
     "curvedLine": "Línia corba",
@@ -271,14 +299,15 @@
     "howto": "Seguiu les nostres guies",
     "or": "o",
     "preventBinding": "Prevenir vinculació de la fletxa",
-    "shapes": "Formes",
+    "tools": "Eines",
     "shortcuts": "Dreceres de teclat",
     "textFinish": "Finalitza l'edició (editor de text)",
     "textNewLine": "Afegeix una línia nova (editor de text)",
     "title": "Ajuda",
     "view": "Visualització",
     "zoomToFit": "Zoom per veure tots els elements",
-    "zoomToSelection": "Zoom per veure la selecció"
+    "zoomToSelection": "Zoom per veure la selecció",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Neteja el llenç"
@@ -297,7 +326,7 @@
       "libraryName": "Nom de la vostra biblioteca",
       "libraryDesc": "Descripció de la biblioteca per a ajudar a la gent a entendre'n el funcionament",
       "githubHandle": "",
-      "twitterHandle": "",
+      "twitterHandle": "Usuari de twitter (opcional), per tal que puguem donar-vos crèdit quan fem la promoció a Twitter",
       "website": "Enllaç al vostre lloc web personal o a qualsevol altre (opcional)"
     },
     "errors": {
@@ -320,7 +349,8 @@
       "post": "que, en resum, vol dir que qualsevol persona pot fer-ne ús sense restriccions."
     },
     "noteItems": "Cada element de la biblioteca ha de tenir el seu propi nom per tal que sigui filtrable. S'hi inclouran els elements següents:",
-    "atleastOneLibItem": "Si us plau, seleccioneu si més no un element de la biblioteca per a començar"
+    "atleastOneLibItem": "Si us plau, seleccioneu si més no un element de la biblioteca per a començar",
+    "republishWarning": "Nota: alguns dels elements seleccionats s'han marcat com a publicats/enviats. Només hauríeu de reenviar elements quan actualitzeu una biblioteca existent."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",

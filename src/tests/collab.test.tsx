@@ -15,6 +15,14 @@ Object.defineProperty(window, "crypto", {
   },
 });
 
+jest.mock("../excalidraw-app/data/index.ts", () => ({
+  __esmodule: true,
+  ...jest.requireActual("../excalidraw-app/data/index.ts"),
+  getCollabServer: jest.fn(() => ({
+    url: /* doesn't really matter */ "http://localhost:3002",
+  })),
+}));
+
 jest.mock("../excalidraw-app/data/firebase.ts", () => {
   const loadFromFirebase = async () => null;
   const saveToFirebase = () => {};
@@ -42,6 +50,7 @@ jest.mock("socket.io-client", () => {
     return {
       close: () => {},
       on: () => {},
+      once: () => {},
       off: () => {},
       emit: () => {},
     };
@@ -69,7 +78,7 @@ describe("collaboration", () => {
       ]);
       expect(API.getStateHistory().length).toBe(1);
     });
-    window.collab.openPortal();
+    window.collab.startCollaboration(null);
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
       expect(API.getStateHistory().length).toBe(1);

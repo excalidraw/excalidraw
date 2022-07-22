@@ -24,7 +24,7 @@ export const POINTER_BUTTON = {
   WHEEL: 1,
   SECONDARY: 2,
   TOUCH: -1,
-};
+} as const;
 
 export enum EVENT {
   COPY = "copy",
@@ -52,6 +52,8 @@ export enum EVENT {
   HASHCHANGE = "hashchange",
   VISIBILITY_CHANGE = "visibilitychange",
   SCROLL = "scroll",
+  // custom events
+  EXCALIDRAW_LINK = "excalidraw-link",
 }
 
 export const ENV = {
@@ -92,7 +94,9 @@ export const MIME_TYPES = {
   excalidrawlib: "application/vnd.excalidrawlib+json",
   json: "application/json",
   svg: "image/svg+xml",
+  "excalidraw.svg": "image/svg+xml",
   png: "image/png",
+  "excalidraw.png": "image/png",
   jpg: "image/jpeg",
   gif: "image/gif",
   binary: "application/octet-stream",
@@ -104,17 +108,18 @@ export const EXPORT_DATA_TYPES = {
   excalidrawLibrary: "excalidrawlib",
 } as const;
 
-export const EXPORT_SOURCE = window.location.origin;
+export const EXPORT_SOURCE =
+  window.EXCALIDRAW_EXPORT_SOURCE || window.location.origin;
 
 // time in milliseconds
 export const IMAGE_RENDER_TIMEOUT = 500;
 export const TAP_TWICE_TIMEOUT = 300;
 export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
-export const TOAST_TIMEOUT = 5000;
 export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
 export const ZOOM_STEP = 0.1;
+export const HYPERLINK_TOOLTIP_DELAY = 300;
 
 // Report a user inactive after IDLE_THRESHOLD milliseconds
 export const IDLE_THRESHOLD = 60_000;
@@ -149,9 +154,19 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
   },
 };
 
+// breakpoints
+// -----------------------------------------------------------------------------
+// sm screen
+export const MQ_SM_MAX_WIDTH = 640;
+// md screen
 export const MQ_MAX_WIDTH_PORTRAIT = 730;
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
 export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
+// sidebar
+export const MQ_RIGHT_SIDEBAR_MIN_WIDTH = 1229;
+// -----------------------------------------------------------------------------
+
+export const LIBRARY_SIDEBAR_WIDTH = parseInt(cssVariables.rightSidebarWidth);
 
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 
@@ -179,3 +194,15 @@ export const VERSIONS = {
 } as const;
 
 export const BOUND_TEXT_PADDING = 5;
+
+export const VERTICAL_ALIGN = {
+  TOP: "top",
+  MIDDLE: "middle",
+  BOTTOM: "bottom",
+};
+
+export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
+
+export const COOKIES = {
+  AUTH_STATE_COOKIE: "excplus-auth",
+} as const;

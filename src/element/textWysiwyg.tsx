@@ -7,7 +7,7 @@ import {
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
-import { CLASSES, BOUND_TEXT_PADDING } from "../constants";
+import { CLASSES, BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -25,6 +25,7 @@ import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
+import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 
 const normalizeText = (text: string) => {
@@ -45,24 +46,21 @@ const getTransform = (
   maxWidth: number,
   maxHeight: number,
 ) => {
-  const { zoom, offsetTop, offsetLeft } = appState;
+  const { zoom } = appState;
   const degree = (180 * angle) / Math.PI;
-  // offsets must be multiplied by 2 to account for the division by 2 of
-  // the whole expression afterwards
-  let translateX = ((width - offsetLeft * 2) * (zoom.value - 1)) / 2;
-  let translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
+  let translateX = (width * (zoom.value - 1)) / 2;
+  let translateY = (height * (zoom.value - 1)) / 2;
   if (width > maxWidth && zoom.value !== 1) {
-    translateX = (maxWidth / 2) * (zoom.value - 1);
+    translateX = (maxWidth * (zoom.value - 1)) / 2;
   }
   if (height > maxHeight && zoom.value !== 1) {
-    translateY = ((maxHeight - offsetTop * 2) * (zoom.value - 1)) / 2;
+    translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
 export const textWysiwyg = ({
   id,
-  appState,
   onChange,
   onSubmit,
   getViewportCoords,
@@ -72,7 +70,6 @@ export const textWysiwyg = ({
   app,
 }: {
   id: ExcalidrawElement["id"];
-  appState: AppState;
   onChange?: (text: string) => void;
   onSubmit: (data: {
     text: string;
@@ -89,7 +86,7 @@ export const textWysiwyg = ({
     updatedElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
   ) => {
-    const currentFont = editable.style.fontFamily.replaceAll('"', "");
+    const currentFont = editable.style.fontFamily.replace(/"/g, "");
     if (
       getFontFamilyString({ fontFamily: updatedElement.fontFamily }) !==
       currentFont
@@ -102,10 +99,17 @@ export const textWysiwyg = ({
     return false;
   };
   let originalContainerHeight: number;
-  let approxLineHeight = getApproxLineHeight(getFontString(element));
 
   const updateWysiwygStyle = () => {
-    const updatedElement = Scene.getScene(element)?.getElement(id);
+    const appState = app.state;
+    const updatedElement =
+      Scene.getScene(element)?.getElement<ExcalidrawTextElement>(id);
+    if (!updatedElement) {
+      return;
+    }
+    const { textAlign, verticalAlign } = updatedElement;
+
+    const approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
     if (updatedElement && isTextElement(updatedElement)) {
       let coordX = updatedElement.x;
       let coordY = updatedElement.y;
@@ -114,7 +118,7 @@ export const textWysiwyg = ({
 
       let maxHeight = updatedElement.height;
       let width = updatedElement.width;
-      // Set to element height by default since thats
+      // Set to element height by default since that's
       // what is going to be used for unbounded text
       let height = updatedElement.height;
       if (container && updatedElement.containerId) {
@@ -128,8 +132,6 @@ export const textWysiwyg = ({
           height = editorHeight;
         }
         if (propertiesUpdated) {
-          approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
-
           originalContainerHeight = container.height;
 
           // update height of the editor after properties updated
@@ -142,7 +144,7 @@ export const textWysiwyg = ({
         maxHeight = container.height - BOUND_TEXT_PADDING * 2;
         width = maxWidth;
         // The coordinates of text box set a distance of
-        // 30px to preserve padding
+        // 5px to preserve padding
         coordX = container.x + BOUND_TEXT_PADDING;
         // autogrow container height if text exceeds
         if (height > maxHeight) {
@@ -162,40 +164,45 @@ export const textWysiwyg = ({
         // is reached
         else {
           // vertically center align the text
-          coordY = container.y + container.height / 2 - height / 2;
+          if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
+            coordY = container.y + container.height / 2 - height / 2;
+          }
+          if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+            coordY =
+              container.y + container.height - height - BOUND_TEXT_PADDING;
+          }
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
-      const { textAlign } = updatedElement;
+      const initialSelectionStart = editable.selectionStart;
+      const initialSelectionEnd = editable.selectionEnd;
+      const initialLength = editable.value.length;
       editable.value = updatedElement.originalText;
+
+      // restore cursor position after value updated so it doesn't
+      // go to the end of text when container auto expanded
+      if (
+        initialSelectionStart === initialSelectionEnd &&
+        initialSelectionEnd !== initialLength
+      ) {
+        // get diff between length and selection end and shift
+        // the cursor by "diff" times to position correctly
+        const diff = initialLength - initialSelectionEnd;
+        editable.selectionStart = editable.value.length - diff;
+        editable.selectionEnd = editable.value.length - diff;
+      }
+
       const lines = updatedElement.originalText.split("\n");
       const lineHeight = updatedElement.containerId
         ? approxLineHeight
         : updatedElement.height / lines.length;
       if (!container) {
-        maxWidth =
-          (appState.offsetLeft + appState.width - viewportX - 8) /
-            appState.zoom.value -
-          // margin-right of parent if any
-          Number(
-            getComputedStyle(
-              excalidrawContainer?.parentNode as Element,
-            ).marginRight.slice(0, -2),
-          );
+        maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
       }
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
-        (appState.height -
-          viewportY -
-          // There is a ~14px difference which keeps on increasing
-          // with every zoom step when offset present hence I am subtracting it here
-          // However this is not the best fix and breaks in
-          // few scenarios
-          (appState.offsetTop
-            ? ((appState.zoom.value * 100 - 100) / 10) * 14
-            : 0)) /
-        appState.zoom.value;
+        (appState.height - viewportY) / appState.zoom.value;
       const angle = container ? container.angle : updatedElement.angle;
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
@@ -214,6 +221,7 @@ export const textWysiwyg = ({
           editorMaxHeight,
         ),
         textAlign,
+        verticalAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
         filter: "var(--theme-filter)",
@@ -268,12 +276,23 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.oninput = () => {
+      const updatedElement = Scene.getScene(element)?.getElement(
+        id,
+      ) as ExcalidrawTextElement;
+      const font = getFontString(updatedElement);
       // using scrollHeight here since we need to calculate
       // number of lines so cannot use editable.style.height
       // as that gets updated below
-      const lines = editable.scrollHeight / approxLineHeight;
+      // Rounding here so that the lines calculated is more accurate in all browsers.
+      // The scrollHeight and approxLineHeight differs in diff browsers
+      // eg it gives 1.05 in firefox for handewritten small font due to which
+      // height gets updated as lines > 1 and leads to jumping text for first line in bound container
+      // hence rounding here to avoid that
+      const lines = Math.round(
+        editable.scrollHeight / getApproxLineHeight(font),
+      );
       // auto increase height only when lines  > 1 so its
-      // measured correctly and vertically alignes for
+      // measured correctly and vertically aligns for
       // first line as well as setting height to "auto"
       // doubles the height as soon as user starts typing
       if (isBoundToContainer(element) && lines > 1) {
@@ -283,10 +302,9 @@ export const textWysiwyg = ({
           const container = getContainerElement(element);
           const actualLineCount = wrapText(
             editable.value,
-            getFontString(element),
+            font,
             container!.width,
           ).split("\n").length;
-
           // This is browser behaviour when setting height to "auto"
           // It sets the height needed for 2 lines even if actual
           // line count is 1 as mentioned above as well
@@ -304,9 +322,15 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
-    event.stopPropagation();
-
-    if (actionDecreaseFontSize.keyTest(event)) {
+    if (!event.shiftKey && actionZoomIn.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionZoomIn);
+      updateWysiwygStyle();
+    } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionZoomOut);
+      updateWysiwygStyle();
+    } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionIncreaseFontSize);
@@ -404,7 +428,7 @@ export const textWysiwyg = ({
   };
 
   /**
-   * @returns indeces of start positions of selected lines, in reverse order
+   * @returns indices of start positions of selected lines, in reverse order
    */
   const getSelectedLinesStartIndices = () => {
     let { selectionStart, selectionEnd, value } = editable;

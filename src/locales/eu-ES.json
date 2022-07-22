@@ -9,6 +9,7 @@
     "copy": "Kopiatu",
     "copyAsPng": "Kopiatu arbelera PNG gisa",
     "copyAsSvg": "Kopiatu arbelera SVG gisa",
+    "copyText": "Kopiatu arbelera testu gisa",
     "bringForward": "Ekarri aurrerago",
     "sendToBack": "Eraman atzera",
     "bringToFront": "Ekarri aurrera",
@@ -64,6 +65,7 @@
     "cartoonist": "Marrazkilaria",
     "fileTitle": "Fitxategi izena",
     "colorPicker": "Kolore-hautatzailea",
+    "canvasColors": "Oihalean erabilita",
     "canvasBackground": "Oihalaren atzeko planoa",
     "drawingCanvas": "Marrazteko oihala",
     "layers": "Geruzak",
@@ -103,8 +105,28 @@
     "toggleTheme": "Aldatu gaia",
     "personalLib": "Liburutegi pertsonala",
     "excalidrawLib": "Excalidraw liburutegia",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Txikitu letra tamaina",
+    "increaseFontSize": "Handitu letra tamaina",
+    "unbindText": "Askatu testua",
+    "bindText": "Lotu testua edukiontziari",
+    "link": {
+      "edit": "Editatu esteka",
+      "create": "Sortu esteka",
+      "label": "Esteka"
+    },
+    "elementLock": {
+      "lock": "Blokeatu",
+      "unlock": "Desblokeatu",
+      "lockAll": "Blokeatu guztiak",
+      "unlockAll": "Desblokeatu guztiak"
+    },
+    "statusPublished": "Argitaratua",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Garbitu oihala",
@@ -143,7 +165,7 @@
     "remove": "Kendu",
     "publishLibrary": "Argitaratu",
     "submit": "Bidali",
-    "confirm": "Baieztatu"
+    "confirm": "Bai"
   },
   "alerts": {
     "clearReset": "Honek oihal osoa garbituko du. Ziur zaude?",
@@ -156,70 +178,76 @@
     "decryptFailed": "Ezin izan da deszifratu.",
     "uploadedSecurly": "Kargatzea muturretik muturrerako zifratze bidez ziurtatu da, hau da, Excalidraw zerbitzariak eta hirugarrenek ezin dutela edukia irakurri.",
     "loadSceneOverridePrompt": "Kanpoko marrazkia kargatzeak lehendik duzun edukia ordezkatuko du. Jarraitu nahi duzu?",
-    "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "",
-    "errorAddingToLibrary": "",
-    "errorRemovingFromLibrary": "",
-    "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": "",
-    "invalidSceneUrl": "",
-    "resetLibrary": "",
-    "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "collabStopOverridePrompt": "Saioa gelditzeak lokalean gordetako zure aurreko marrazkia gainidatziko du. Ziur zaude?\n\n(Zure marrazki lokala mantendu nahi baduzu, itxi arakatzailearen fitxa.)",
+    "errorAddingToLibrary": "Ezin izan da elementua liburutegian gehitu",
+    "errorRemovingFromLibrary": "Ezin izan da elementua liburutegitik kendu",
+    "confirmAddLibrary": "Honek {{numShapes}} forma gehituko ditu zure liburutegian. Ziur zaude?",
+    "imageDoesNotContainScene": "Irudi honek ez dirudi eszena daturik duenik. Eszena kapsulatzea gaitu al duzu esportazioan?",
+    "cannotRestoreFromImage": "Ezin izan da eszena leheneratu irudi fitxategi honetatik",
+    "invalidSceneUrl": "Ezin izan da eszena inportatu emandako URLtik. Gaizki eratuta dago edo ez du baliozko Excalidraw JSON daturik.",
+    "resetLibrary": "Honek zure liburutegia garbituko du. Ziur zaude?",
+    "removeItemsFromsLibrary": "Liburutegitik {{count}} elementu ezabatu?",
+    "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago.",
+    "browserZoom": ""
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "unsupportedFileType": "Onartu gabeko fitxategi mota.",
+    "imageInsertError": "Ezin izan da irudia txertatu. Saiatu berriro geroago...",
+    "fileTooBig": "Fitxategia handiegia da. Onartutako gehienezko tamaina {{maxSize}} da.",
+    "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
+    "invalidSVGString": "SVG baliogabea.",
+    "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro.",
+    "importLibraryError": "Ezin izan da liburutegia kargatu"
   },
   "toolBar": {
-    "selection": "",
-    "image": "",
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
-    "freedraw": "",
-    "text": "",
-    "library": "",
-    "lock": ""
+    "selection": "Hautapena",
+    "image": "Txertatu irudia",
+    "rectangle": "Laukizuzena",
+    "diamond": "Diamantea",
+    "ellipse": "Elipsea",
+    "arrow": "Gezia",
+    "line": "Lerroa",
+    "freedraw": "Marraztu",
+    "text": "Testua",
+    "library": "Liburutegia",
+    "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
+    "penMode": "Saihestu txikiagotzea eta onartu marrazte libreko idazketa solik arkatza bidez",
+    "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
+    "eraser": "Borragoma"
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
-    "shapes": ""
+    "canvasActions": "Canvas ekintzak",
+    "selectedShapeActions": "Hautatutako formaren ekintzak",
+    "shapes": "Formak"
   },
   "hints": {
-    "canvasPanning": "",
-    "linearElement": "",
-    "freeDraw": "",
-    "text": "",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
-    "placeImage": "",
-    "publishLibrary": "",
-    "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "canvasPanning": "Oihala mugitzeko, sakatu saguaren gurpila edo zuriune-barra arrastatzean",
+    "linearElement": "Egin klik hainbat puntu hasteko, arrastatu lerro bakarrerako",
+    "freeDraw": "Egin klik eta arrastatu, askatu amaitutakoan",
+    "text": "Aholkua: testua gehitu dezakezu edozein lekutan klik bikoitza eginez hautapen tresnarekin",
+    "text_selected": "Egin klik bikoitza edo sakatu SARTU testua editatzeko",
+    "text_editing": "Sakatu Esc edo Ctrl+SARTU editatzen amaitzeko",
+    "linearElementMulti": "Egin klik azken puntuan edo sakatu Esc edo Sartu amaitzeko",
+    "lockAngle": "SHIFT sakatuta angelua mantendu dezakezu",
+    "resize": "Proportzioak mantendu ditzakezu SHIFT sakatuta tamaina aldatzen duzun bitartean.\nsakatu ALT erditik tamaina aldatzeko",
+    "resizeImage": "Tamaina libreki alda dezakezu SHIFT sakatuta,\nsakatu ALT erditik tamaina aldatzeko",
+    "rotate": "Angeluak mantendu ditzakezu SHIFT sakatuta biratzen duzun bitartean",
+    "lineEditor_info": "Egin klik bikoitza edo sakatu Sartu puntuak editatzeko",
+    "lineEditor_pointSelected": "Sakatu Ezabatu puntuak kentzeko,\nKtrl+D bikoizteko, edo arrastatu mugitzeko",
+    "lineEditor_nothingSelected": "Hautatu editatzeko puntu bat (SHIFT sakatuta anitz hautatzeko),\nedo eduki Alt sakatuta eta egin klik puntu berriak gehitzeko",
+    "placeImage": "Egin klik irudia kokatzeko, edo egin klik eta arrastatu bere tamaina eskuz ezartzeko",
+    "publishLibrary": "Argitaratu zure liburutegia",
+    "bindTextToElement": "Sakatu Sartu testua gehitzeko",
+    "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko",
+    "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "Ezin da oihala aurreikusi",
+    "canvasTooBig": "Agian oihala handiegia da.",
+    "canvasTooBigTip": "Aholkua: saiatu urrunen dauden elementuak pixka bat hurbiltzen."
   },
   "errorSplash": {
-    "headingMain_pre": "",
+    "headingMain_pre": "Errore bat aurkitu da. Saiatu ",
     "headingMain_button": "orria birkargatzen.",
     "clearCanvasMessage": "Birkargatzea ez bada burutzen, saiatu ",
     "clearCanvasMessage_button": "oihala garbitzen.",
@@ -258,8 +286,8 @@
   "helpDialog": {
     "blog": "Irakurri gure bloga",
     "click": "sakatu",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Hautapen sakona",
+    "deepBoxSelect": "Hautapen sakona egin laukizuzen bidez, eta saihestu arrastatzea",
     "curvedArrow": "Gezi kurbatua",
     "curvedLine": "Lerro kurbatua",
     "documentation": "Dokumentazioa",
@@ -271,14 +299,15 @@
     "howto": "Jarraitu gure gidak",
     "or": "edo",
     "preventBinding": "Saihestu gezien gainjartzea",
-    "shapes": "Formak",
+    "tools": "Tresnak",
     "shortcuts": "Laster-teklak",
     "textFinish": "Bukatu edizioa (testu editorea)",
     "textNewLine": "Gehitu lerro berri bat (testu editorea)",
     "title": "Laguntza",
     "view": "Bistaratu",
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
-    "zoomToSelection": "Zooma hautapenera"
+    "zoomToSelection": "Zooma hautapenera",
+    "toggleElementLock": "Blokeatu/desbloketatu hautapena"
   },
   "clearCanvasDialog": {
     "title": "Garbitu oihala"
@@ -320,7 +349,8 @@
       "post": "zeinak, laburbilduz, esan nahi du edozeinek erabiltzen ahal duela murrizketarik gabe."
     },
     "noteItems": "Liburutegiko elementu bakoitzak bere izena eduki behar du iragazi ahal izateko. Liburutegiko hurrengo elementuak barne daude:",
-    "atleastOneLibItem": "Hautatu gutxienez liburutegiko elementu bat gutxienez hasi ahal izateko"
+    "atleastOneLibItem": "Hautatu gutxienez liburutegiko elementu bat gutxienez hasi ahal izateko",
+    "republishWarning": "Oharra: hautatutako elementu batzuk dagoeneko argitaratuta/bidalita bezala markatuta daude. Elementuak berriro bidali behar dituzu lehendik dagoen liburutegi edo bidalketa eguneratzen duzunean."
   },
   "publishSuccessDialog": {
     "title": "Liburutegia bidali da",

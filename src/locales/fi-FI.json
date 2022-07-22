@@ -9,6 +9,7 @@
     "copy": "Kopioi",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
+    "copyText": "Kopioi tekstinä",
     "bringForward": "Tuo eteenpäin",
     "sendToBack": "Vie taakse",
     "bringToFront": "Tuo eteen",
@@ -64,6 +65,7 @@
     "cartoonist": "Sarjakuva",
     "fileTitle": "Tiedostonimi",
     "colorPicker": "Värin valinta",
+    "canvasColors": "Käytössä piirtoalueella",
     "canvasBackground": "Piirtoalueen tausta",
     "drawingCanvas": "Piirtoalue",
     "layers": "Tasot",
@@ -103,8 +105,28 @@
     "toggleTheme": "Vaihda teema",
     "personalLib": "Oma kirjasto",
     "excalidrawLib": "Excalidraw kirjasto",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Pienennä kirjasinkokoa",
+    "increaseFontSize": "Kasvata kirjasinkokoa",
+    "unbindText": "Irroita teksti",
+    "bindText": "Kiinnitä teksti säiliöön",
+    "link": {
+      "edit": "Muokkaa linkkiä",
+      "create": "Luo linkki",
+      "label": "Linkki"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": "Julkaistu",
+    "sidebarLock": "Pidä sivupalkki avoinna"
+  },
+  "library": {
+    "noItems": "Kirjastossa ei ole vielä yhtään kohdetta...",
+    "hint_emptyLibrary": "Valitse lisättävä kohde piirtoalueelta, tai asenna alta julkinen kirjasto.",
+    "hint_emptyPrivateLibrary": "Valitse lisättävä kohde piirtoalueelta."
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -152,12 +174,11 @@
     "couldNotLoadInvalidFile": "Virheellistä tiedostoa ei voitu avata",
     "importBackendFailed": "Palvelimelta tuonti epäonnistui.",
     "cannotExportEmptyCanvas": "Tyhjää piirtoaluetta ei voi viedä.",
-    "couldNotCopyToClipboard": "Leikepöydälle kopiointi epäonnistui. Kokeile Chrome-selainta.",
+    "couldNotCopyToClipboard": "Leikepöydälle vieminen epäonnistui.",
     "decryptFailed": "Salauksen purkaminen epäonnistui.",
     "uploadedSecurly": "Lähetys on turvattu päästä-päähän-salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
     "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Jatketaanko?",
     "collabStopOverridePrompt": "Istunnon lopettaminen korvaa aiemman, paikallisesti tallennetun piirustuksen. Jatketaanko?\n\n(Jos haluat säilyttää paikallisesti tallennetun piirustuksen, sulje selaimen välilehti lopettamisen sijaan.)",
-    "errorLoadingLibrary": "Virhe ladattaessa kolmannen osapuolen kirjastoa.",
     "errorAddingToLibrary": "Kohdetta ei voitu lisätä kirjastoon",
     "errorRemovingFromLibrary": "Kohdetta ei voitu poistaa kirjastosta",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Jatketaanko?",
@@ -166,14 +187,17 @@
     "invalidSceneUrl": "Teosta ei voitu tuoda annetusta URL-osoitteesta. Tallenne on vioittunut, tai osoitteessa ei ole Excalidraw JSON-dataa.",
     "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?",
     "removeItemsFromsLibrary": "Poista {{count}} kohdetta kirjastosta?",
-    "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä."
+    "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Tiedostotyyppiä ei tueta.",
     "imageInsertError": "Kuvan lisääminen epäonnistui. Yritä myöhemmin uudelleen...",
     "fileTooBig": "Tiedosto on liian suuri. Suurin sallittu koko on {{maxSize}}.",
     "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
-    "invalidSVGString": "Virheellinen SVG."
+    "invalidSVGString": "Virheellinen SVG.",
+    "cannotResolveCollabServer": "Yhteyden muodostaminen collab-palvelimeen epäonnistui. Virkistä sivu ja yritä uudelleen.",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Valinta",
@@ -186,7 +210,10 @@
     "freedraw": "Piirrä",
     "text": "Teksti",
     "library": "Kirjasto",
-    "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen"
+    "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen",
+    "penMode": "Estä nipistyszoomaus ja vastaanota ainoastaan kynällä piirretty",
+    "link": "Lisää/päivitä linkki valitulle muodolle",
+    "eraser": "Poistotyökalu"
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
@@ -206,12 +233,13 @@
     "resizeImage": "Voit muuttaa kokoa vapaasti pitämällä SHIFTiä pohjassa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen ympäri",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Poista piste(et) painamalla delete, monista painamalla CtrlOrCmd+D, tai liikuta raahaamalla",
+    "lineEditor_nothingSelected": "Valitse muokattava piste (monivalinta pitämällä SHIFT pohjassa), tai paina Alt ja klikkaa lisätäksesi uusia pisteitä",
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
     "publishLibrary": "Julkaise oma kirjasto",
-    "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "bindTextToElement": "Lisää tekstiä painamalla enter",
+    "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus painamalla CtrlOrCmd",
+    "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen"
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
@@ -258,8 +286,8 @@
   "helpDialog": {
     "blog": "Lue blogiamme",
     "click": "klikkaa",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Syvävalinta",
+    "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus",
     "curvedArrow": "Kaareva nuoli",
     "curvedLine": "Kaareva viiva",
     "documentation": "Käyttöohjeet",
@@ -271,14 +299,15 @@
     "howto": "Seuraa oppaitamme",
     "or": "tai",
     "preventBinding": "Estä nuolten kiinnitys",
-    "shapes": "Muodot",
+    "tools": "Työkalut",
     "shortcuts": "Pikanäppäimet",
     "textFinish": "Lopeta muokkaus (tekstieditori)",
     "textNewLine": "Lisää uusi rivi (tekstieditori)",
     "title": "Ohjeet",
     "view": "Näkymä",
     "zoomToFit": "Näytä kaikki elementit",
-    "zoomToSelection": "Näytä valinta"
+    "zoomToSelection": "Näytä valinta",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": "Pyyhi piirtoalue"
@@ -320,7 +349,8 @@
       "post": "alla, mikä lyhyesti antaa muiden käyttää sitä ilman rajoituksia."
     },
     "noteItems": "Jokaisella kirjaston kohteella on oltava oma nimensä suodatusta varten. Seuraavat kirjaston kohteet sisältyvät:",
-    "atleastOneLibItem": "Valitse vähintään yksi kirjaston kohde aloittaaksesi"
+    "atleastOneLibItem": "Valitse vähintään yksi kirjaston kohde aloittaaksesi",
+    "republishWarning": "Huom! Osa valituista kohteista on merkitty jo julkaistu/lähetetyiksi. Lähetä kohteita uudelleen vain päivitettäessä olemassa olevaa kirjastoa tai ehdotusta."
   },
   "publishSuccessDialog": {
     "title": "Kirjasto lähetetty",

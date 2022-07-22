@@ -11,6 +11,7 @@ import {
 import { Action } from "../actions/types";
 import { ActionManager } from "../actions/manager";
 import { AppState } from "../types";
+import { NonDeletedExcalidrawElement } from "../element/types";
 
 export type ContextMenuOption = "separator" | Action;
 
@@ -21,6 +22,7 @@ type ContextMenuProps = {
   left: number;
   actionManager: ActionManager;
   appState: Readonly<AppState>;
+  elements: readonly NonDeletedExcalidrawElement[];
 };
 
 const ContextMenu = ({
@@ -30,6 +32,7 @@ const ContextMenu = ({
   left,
   actionManager,
   appState,
+  elements,
 }: ContextMenuProps) => {
   return (
     <Popover
@@ -37,6 +40,10 @@ const ContextMenu = ({
       top={top}
       left={left}
       fitInViewport={true}
+      offsetLeft={appState.offsetLeft}
+      offsetTop={appState.offsetTop}
+      viewportWidth={appState.width}
+      viewportHeight={appState.height}
     >
       <ul
         className="context-menu"
@@ -48,9 +55,14 @@ const ContextMenu = ({
           }
 
           const actionName = option.name;
-          const label = option.contextItemLabel
-            ? t(option.contextItemLabel)
-            : "";
+          let label = "";
+          if (option.contextItemLabel) {
+            if (typeof option.contextItemLabel === "function") {
+              label = t(option.contextItemLabel(elements, appState));
+            } else {
+              label = t(option.contextItemLabel);
+            }
+          }
           return (
             <li key={idx} data-testid={actionName} onClick={onCloseRequest}>
               <button
@@ -58,7 +70,9 @@ const ContextMenu = ({
                   dangerous: actionName === "deleteSelectedElements",
                   checkmark: option.checked?.(appState),
                 })}
-                onClick={() => actionManager.executeAction(option)}
+                onClick={() =>
+                  actionManager.executeAction(option, "contextMenu")
+                }
               >
                 <div className="context-menu-option__label">{label}</div>
                 <kbd className="context-menu-option__shortcut">
@@ -97,6 +111,7 @@ type ContextMenuParams = {
   actionManager: ContextMenuProps["actionManager"];
   appState: Readonly<AppState>;
   container: HTMLElement;
+  elements: readonly NonDeletedExcalidrawElement[];
 };
 
 const handleClose = (container: HTMLElement) => {
@@ -125,6 +140,7 @@ export default {
           onCloseRequest={() => handleClose(params.container)}
           actionManager={params.actionManager}
           appState={params.appState}
+          elements={params.elements}
         />,
         getContextMenuNode(params.container),
       );

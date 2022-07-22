@@ -9,6 +9,7 @@
     "copy": "Kopēt",
     "copyAsPng": "Kopēt starpliktuvē kā PNG",
     "copyAsSvg": "Kopēt starpliktuvē kā SVG",
+    "copyText": "Kopēt starpliktuvē kā tekstu",
     "bringForward": "Pārvietot vienu slāni augstāk",
     "sendToBack": "Pārvietot uz zemāko slāni",
     "bringToFront": "Pārvietot uz virsējo slāni",
@@ -64,6 +65,7 @@
     "cartoonist": "Karikatūrists",
     "fileTitle": "Datnes nosaukums",
     "colorPicker": "Krāsu atlasītājs",
+    "canvasColors": "Izmantots tāfelei",
     "canvasBackground": "Ainas fons",
     "drawingCanvas": "Tāfele",
     "layers": "Slāņi",
@@ -104,7 +106,27 @@
     "personalLib": "Personīgā bibliotēka",
     "excalidrawLib": "Excalidraw bibliotēka",
     "decreaseFontSize": "Samazināt fonta izmēru",
-    "increaseFontSize": "Palielināt fonta izmēru"
+    "increaseFontSize": "Palielināt fonta izmēru",
+    "unbindText": "Atdalīt tekstu",
+    "bindText": "Piesaistīt tekstu figūrai",
+    "link": {
+      "edit": "Rediģēt saiti",
+      "create": "Izveidot saiti",
+      "label": "Saite"
+    },
+    "elementLock": {
+      "lock": "Fiksēt",
+      "unlock": "Atbrīvot",
+      "lockAll": "Fiksēt visu",
+      "unlockAll": "Atbrīvot visu"
+    },
+    "statusPublished": "Publicēts",
+    "sidebarLock": "Paturēt atvērtu sānjoslu"
+  },
+  "library": {
+    "noItems": "Neviena vienība vēl nav pievienota...",
+    "hint_emptyLibrary": "Atlasiet objektu tāfelē, lai to šeit pievienotu, vai pievienojiet publisku bibliotēku zemāk.",
+    "hint_emptyPrivateLibrary": "Atlasiet objektu tāfelē, lai to šeit pievienotu."
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
@@ -151,13 +173,12 @@
     "couldNotCreateShareableLinkTooBig": "Nevarēja izveidot kopīgojamo saiti – aina ir par lielu",
     "couldNotLoadInvalidFile": "Nevarēja ielādēt nederīgu datni",
     "importBackendFailed": "Ielāde no krātuves neizdevās.",
-    "cannotExportEmptyCanvas": "Nevar eksportēt tukšu zīmējumu.",
-    "couldNotCopyToClipboard": "Neizdevās kopēt starpliktuvē. Mēģiniet vēlreiz, izmantojot pārlūku Chrome.",
+    "cannotExportEmptyCanvas": "Nevar eksportēt tukšu tāfeli.",
+    "couldNotCopyToClipboard": "Nevarēja nokopēt starpliktuvē.",
     "decryptFailed": "Nevarēja atšifrēt datus.",
     "uploadedSecurly": "Augšuplāde nodrošināta ar šifrēšanu no gala līdz galam, kas nozīmē, ka Excalidraw serveri un trešās puses nevar lasīt saturu.",
     "loadSceneOverridePrompt": "Ārēja satura ielāde aizstās jūsu pašreizējo saturu. Vai vēlaties turpināt?",
     "collabStopOverridePrompt": "Sesijas pārtraukšana pārrakstīs jūsu iepriekšējo zīmējumu, kas saglabāts jūsu pārlūkā. Vai turpināt?\n\n(Ja vēlaties paturēt zīmējumu, kas saglabāts jūsu pārlūkā, vienkārši aizveriet pārlūka cilni.)",
-    "errorLoadingLibrary": "Lasot trešās puses bibliotēku, notika kļūda.",
     "errorAddingToLibrary": "Nevarēja pievienot vienumu bibliotēkai",
     "errorRemovingFromLibrary": "Nevarēja izņemt vienumu no bibliotēkas",
     "confirmAddLibrary": "Šī funkcija pievienos {{numShapes}} formu(-as) jūsu bibliotēkai. Vai turpināt?",
@@ -166,14 +187,17 @@
     "invalidSceneUrl": "Nevarēja importēt ainu no norādītā URL. Vai nu tas ir nederīgs, vai nesatur derīgus Excalidraw JSON datus.",
     "resetLibrary": "Šī funkcija iztukšos bibliotēku. Vai turpināt?",
     "removeItemsFromsLibrary": "Vai izņemt {{count}} vienumu(s) no bibliotēkas?",
-    "invalidEncryptionKey": "Šifrēšanas atslēgai jābūt 22 simbolus garai. Tiešsaistes sadarbība ir izslēgta."
+    "invalidEncryptionKey": "Šifrēšanas atslēgai jābūt 22 simbolus garai. Tiešsaistes sadarbība ir izslēgta.",
+    "browserZoom": "Pārlūka pietuvināšanas līmenis nav 100%; šis var sakropļot tāfeles izskatu"
   },
   "errors": {
     "unsupportedFileType": "Neatbalstīts datnes veids.",
     "imageInsertError": "Nevarēja ievietot attēlu. Mēģiniet vēlāk...",
     "fileTooBig": "Datne ir par lielu. Lielākais atļautais izmērs ir {{maxSize}}.",
     "svgImageInsertError": "Nevarēja ievietot SVG attēlu. Šķiet, ka SVG marķējums nav derīgs.",
-    "invalidSVGString": "Nederīgs SVG."
+    "invalidSVGString": "Nederīgs SVG.",
+    "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz.",
+    "importLibraryError": "Nevarēja ielādēt bibliotēku"
   },
   "toolBar": {
     "selection": "Atlase",
@@ -186,7 +210,10 @@
     "freedraw": "Zīmēt",
     "text": "Teksts",
     "library": "Bibliotēka",
-    "lock": "Paturēt izvēlēto rīku pēc darbības"
+    "lock": "Paturēt izvēlēto rīku pēc darbības",
+    "penMode": "Lietojot pildspalvu, bloķēt tuvināšanu un atļaut tikai zīmēšanu",
+    "link": "Pievienot/rediģēt atlasītās figūras saiti",
+    "eraser": "Dzēšgumija"
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
@@ -211,7 +238,8 @@
     "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru",
     "publishLibrary": "Publicēt savu bibliotēku",
     "bindTextToElement": "Spiediet ievades taustiņu, lai pievienotu tekstu",
-    "deepBoxSelect": "Turient nospiestu Ctrl vai Cmd, lai atlasītu dziļumā un lai nepieļautu objektu pavilkšanu"
+    "deepBoxSelect": "Turient nospiestu Ctrl vai Cmd, lai atlasītu dziļumā un lai nepieļautu objektu pavilkšanu",
+    "eraserRevert": "Turiet Alt, lai noņemtu elementus no dzēsšanas atlases"
   },
   "canvasError": {
     "cannotShowPreview": "Nevar rādīt priekšskatījumu",
@@ -222,7 +250,7 @@
     "headingMain_pre": "Notikusi kļūda. Mēģiniet ",
     "headingMain_button": "pārlādēt lapu.",
     "clearCanvasMessage": "Ja pārlādēšana nestrādā, mēģiniet ",
-    "clearCanvasMessage_button": "notīrīt tāfeli.",
+    "clearCanvasMessage_button": "notīrot tāfeli.",
     "clearCanvasCaveat": " Tas novedīs pie darba zaudēšanas ",
     "trackedToSentry_pre": "Kļūda ar kodu ",
     "trackedToSentry_post": " tika noteikta mūsu sistēmā.",
@@ -266,19 +294,20 @@
     "doubleClick": "dubultklikšķis",
     "drag": "vilkt",
     "editor": "Redaktors",
-    "editSelectedShape": "Rediģēt atlasīto formu (tekstu/bultu/līniju)",
+    "editSelectedShape": "Rediģēt atlasīto figūru (tekstu/bultu/līniju)",
     "github": "Sastapāt kļūdu? Ziņot",
     "howto": "Sekojiet mūsu instrukcijām",
     "or": "vai",
     "preventBinding": "Novērst bultu piesaistīšanos",
-    "shapes": "Formas",
+    "tools": "Rīki",
     "shortcuts": "Tastatūras saīsnes",
     "textFinish": "Pabeigt rediģēšanu (teksta redaktorā)",
     "textNewLine": "Nākamā rindiņa (teksta redaktorā)",
     "title": "Palīdzība",
     "view": "Skatīt",
     "zoomToFit": "Iestatīt mērogu, kas iekļauj visus elementus",
-    "zoomToSelection": "Iestatīt mērogu, lai rādītu atlasi"
+    "zoomToSelection": "Iestatīt mērogu, lai rādītu atlasi",
+    "toggleElementLock": "Fiksēt/atbrīvot atlasīto"
   },
   "clearCanvasDialog": {
     "title": "Notīrīt tāfeli"
@@ -320,7 +349,8 @@
       "post": "kas īsumā nozīmē, ka jebkurš to varēs izmantot bez ierobežojumiem."
     },
     "noteItems": "Katram bibliotēkas vienumam jābūt savam nosaukumam, lai to varētu atrast filtrējot. Tiks iekļauti sekojošie bibliotēkas vienumi:",
-    "atleastOneLibItem": "Lūdzu, atlasiet vismaz vienu bibliotēkas vienumu, lai sāktu darbu"
+    "atleastOneLibItem": "Lūdzu, atlasiet vismaz vienu bibliotēkas vienumu, lai sāktu darbu",
+    "republishWarning": "Ievēro: daži no atzīmētajiem objektiem jau atzīmēti kā publicēti vai iesniegti publicēšanai. Tos vajadzētu atkārtoti iesniegt tikai tad, ja vēlies labot esošo bibliotēku."
   },
   "publishSuccessDialog": {
     "title": "Bibliotēka iesniegta",

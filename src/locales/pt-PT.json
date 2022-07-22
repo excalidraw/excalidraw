@@ -9,6 +9,7 @@
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
+    "copyText": "",
     "bringForward": "Trazer para o primeiro plano",
     "sendToBack": "Enviar para o plano de fundo",
     "bringToFront": "Trazer para o primeiro plano",
@@ -64,6 +65,7 @@
     "cartoonist": "Caricaturista",
     "fileTitle": "Nome do ficheiro",
     "colorPicker": "Seletor de cores",
+    "canvasColors": "",
     "canvasBackground": "Fundo da área de desenho",
     "drawingCanvas": "Área de desenho",
     "layers": "Camadas",
@@ -104,7 +106,27 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "bindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Limpar a área de desenho e redefinir a cor de fundo",
@@ -152,12 +174,11 @@
     "couldNotLoadInvalidFile": "Não foi possível carregar o ficheiro inválido",
     "importBackendFailed": "A importação do servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar uma área de desenho vazia.",
-    "couldNotCopyToClipboard": "Não foi possível copiar para a área de transferência. Experimente no navegador Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "Não foi possível desencriptar os dados.",
     "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo.",
     "loadSceneOverridePrompt": "Se carregar um desenho externo substituirá o conteúdo existente. Quer continuar?",
     "collabStopOverridePrompt": "Ao interromper a sessão irá substituir o último desenho guardado. Tem a certeza?\n\n(Caso queira manter o último desenho, simplesmente feche a janela do navegador.)",
-    "errorLoadingLibrary": "Houve um erro ao carregar a biblioteca de terceiros.",
     "errorAddingToLibrary": "Não foi possível adicionar o item à biblioteca",
     "errorRemovingFromLibrary": "Não foi possível remover o item da biblioteca",
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem a certeza?",
@@ -166,14 +187,17 @@
     "invalidSceneUrl": "Não foi possível importar a cena a partir do URL fornecido. Ou está mal formado ou não contém dados JSON do Excalidraw válidos.",
     "resetLibrary": "Isto irá limpar a sua biblioteca. Tem a certeza?",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": "Chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desativada."
+    "invalidEncryptionKey": "Chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desativada.",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "Tipo de ficheiro não suportado.",
     "imageInsertError": "Não foi possível inserir a imagem, tente novamente mais tarde...",
     "fileTooBig": "O ficheiro é muito grande. O tamanho máximo permitido é {{maxSize}}.",
     "svgImageInsertError": "Não foi possível inserir a imagem SVG. A marcação SVG parece inválida.",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "Seleção",
@@ -186,7 +210,10 @@
     "freedraw": "Desenhar",
     "text": "Texto",
     "library": "Biblioteca",
-    "lock": "Manter a ferramenta selecionada ativa após desenhar"
+    "lock": "Manter a ferramenta selecionada ativa após desenhar",
+    "penMode": "",
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "Ações da área de desenho",
@@ -211,7 +238,8 @@
     "placeImage": "Clique para colocar a imagem ou clique e arraste para definir o seu tamanho manualmente",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar uma pré-visualização",
@@ -271,14 +299,15 @@
     "howto": "Siga os nossos guias",
     "or": "ou",
     "preventBinding": "Prevenir fixação de seta",
-    "shapes": "Formas",
+    "tools": "",
     "shortcuts": "Atalhos de teclado",
     "textFinish": "Finalizar edição (editor texto)",
     "textNewLine": "Adicionar nova linha (editor de texto)",
     "title": "Ajuda",
     "view": "Visualizar",
     "zoomToFit": "Ajustar para todos os elementos caberem",
-    "zoomToSelection": "Ampliar a seleção"
+    "zoomToSelection": "Ampliar a seleção",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -288,12 +317,12 @@
     "itemName": "",
     "authorName": "",
     "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
+    "twitterUsername": "Nome de utilizador no Twitter",
+    "libraryName": "Nome da biblioteca",
+    "libraryDesc": "Descrição da biblioteca",
     "website": "",
     "placeholder": {
-      "authorName": "",
+      "authorName": "Introduza o seu nome ou nome de utilizador",
       "libraryName": "",
       "libraryDesc": "",
       "githubHandle": "",
@@ -311,7 +340,7 @@
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "orientações",
       "post": ""
     },
     "noteLicense": {
@@ -320,7 +349,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",

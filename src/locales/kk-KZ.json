@@ -9,6 +9,7 @@
     "copy": "Көшіру",
     "copyAsPng": "",
     "copyAsSvg": "",
+    "copyText": "",
     "bringForward": "",
     "sendToBack": "",
     "bringToFront": "",
@@ -64,6 +65,7 @@
     "cartoonist": "",
     "fileTitle": "Файл атауы",
     "colorPicker": "",
+    "canvasColors": "",
     "canvasBackground": "",
     "drawingCanvas": "",
     "layers": "",
@@ -104,7 +106,27 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "bindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "",
@@ -157,7 +179,6 @@
     "uploadedSecurly": "",
     "loadSceneOverridePrompt": "",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "",
@@ -166,14 +187,17 @@
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "",
     "imageInsertError": "Суретті жүктеу мүмкін болмады. Кейінірек қайталап көріңіз...",
     "fileTooBig": "Файл өте үлкен. Максималды рұқсат етілген көлем {{maxSize}}.",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "",
@@ -186,7 +210,10 @@
     "freedraw": "",
     "text": "Мәтін",
     "library": "",
-    "lock": ""
+    "lock": "",
+    "penMode": "",
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "",
@@ -211,7 +238,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -271,14 +299,15 @@
     "howto": "Біздің нұсқаулықтарды орындаңыз",
     "or": "немесе",
     "preventBinding": "Нұсқарды байланыстыруға жол бермеу",
-    "shapes": "Пішіндер",
+    "tools": "",
     "shortcuts": "Пернетақта пәрмендері",
     "textFinish": "Өңдеуді аяқтау (мәтіндік редактор)",
     "textNewLine": "Жаңа жолға көшу (мәтіндік редактор)",
     "title": "Көмек",
     "view": "Көру",
     "zoomToFit": "Барлық элементтердің көлеміне сәйкес үлкейту",
-    "zoomToSelection": "Таңдалғанды үлкейту"
+    "zoomToSelection": "Таңдалғанды үлкейту",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -320,7 +349,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",

@@ -35,6 +35,7 @@ const enableActionFlipVertical = (
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
       elements: flipSelectedElements(elements, appState, "horizontal"),
@@ -50,6 +51,7 @@ export const actionFlipHorizontal = register({
 
 export const actionFlipVertical = register({
   name: "flipVertical",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
       elements: flipSelectedElements(elements, appState, "vertical"),
@@ -155,7 +157,7 @@ const flipElement = (
     // calculate new x-coord for transformation
     newNCoordsX = usingNWHandle ? element.x + 2 * width : element.x - 2 * width;
     resizeSingleElement(
-      element,
+      new Map().set(element.id, element),
       true,
       element,
       usingNWHandle ? "nw" : "ne",

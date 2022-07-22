@@ -2,13 +2,14 @@ import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import { useExcalidrawContainer, useIsMobile } from "../components/App";
+import { useExcalidrawContainer, useDevice } from "../components/App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
 import { back, close } from "./icons";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
 import { AppState } from "../types";
+import { queryFocusableElements } from "../utils";
 
 export interface DialogProps {
   children: React.ReactNode;
@@ -64,14 +65,6 @@ export const Dialog = (props: DialogProps) => {
     return () => islandNode.removeEventListener("keydown", handleKeyDown);
   }, [islandNode, props.autofocus]);
 
-  const queryFocusableElements = (node: HTMLElement) => {
-    const focusableElements = node.querySelectorAll<HTMLElement>(
-      "button, a, input, select, textarea, div[tabindex]",
-    );
-
-    return focusableElements ? Array.from(focusableElements) : [];
-  };
-
   const onClose = () => {
     (lastActiveElement as HTMLElement).focus();
     props.onCloseRequest();
@@ -94,7 +87,7 @@ export const Dialog = (props: DialogProps) => {
             onClick={onClose}
             aria-label={t("buttons.close")}
           >
-            {useIsMobile() ? back : close}
+            {useDevice().isMobile ? back : close}
           </button>
         </h2>
         <div className="Dialog__content">{props.children}</div>

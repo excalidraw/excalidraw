@@ -5,7 +5,7 @@ const devConfig = require("./webpack.dev.config");
 
 const devServerConfig = {
   entry: {
-    bundle: "./example/index.js",
+    bundle: "./example/index.tsx",
   },
   // Server Configuration options
   devServer: {
@@ -14,7 +14,7 @@ const devServerConfig = {
     hot: true,
     compress: true,
     static: {
-      directory: path.join(__dirname, "example"),
+      directory: path.join(__dirname, "./example/public"),
     },
     client: {
       progress: true,

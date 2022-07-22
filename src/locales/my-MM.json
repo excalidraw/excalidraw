@@ -9,6 +9,7 @@
     "copy": "ကူး",
     "copyAsPng": "PNG အနေဖြင့်ကူး",
     "copyAsSvg": "SVG အနေဖြင့်ကူး",
+    "copyText": "",
     "bringForward": "ရှေ့ပို့",
     "sendToBack": "နောက်ဆုံးထား",
     "bringToFront": "ရှေ့ဆုံးထား",
@@ -64,6 +65,7 @@
     "cartoonist": "ကာတွန်း",
     "fileTitle": "",
     "colorPicker": "အရောင်ရွေး",
+    "canvasColors": "",
     "canvasBackground": "ကားချပ်နောက်ခံ",
     "drawingCanvas": "ပုံဆွဲကားချပ်",
     "layers": "အလွှာများ",
@@ -104,7 +106,27 @@
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "increaseFontSize": "",
+    "unbindText": "",
+    "bindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
@@ -152,12 +174,11 @@
     "couldNotLoadInvalidFile": "လွဲမှားနေသောဖိုင်အား တင်၍မရပါ။",
     "importBackendFailed": "Backend မှမလုပ်ဆောင်နိုင်သေးပါ။",
     "cannotExportEmptyCanvas": "ကားချပ်အလွတ်အားထုတ်ယူ၍မရပါ။",
-    "couldNotCopyToClipboard": "ကူးယူ၍မရပါ။ Google Chrome တွင်စမ်းကြည့်ပါ။",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "အချက်အလက်ဖော်ယူ၍မရပါ။",
     "uploadedSecurly": "တင်သွင်းအချက်အလက်များအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်စနစ်အသုံးပြု၍လုံခြုံစွာထိန်းသိမ်းထားပါသဖြင့် Excalidraw ဆာဗာနှင့်ဆက်စပ်အဖွဲ့အစည်းများပင်လျှင်မဖတ်ရှုနိုင်ပါ။",
     "loadSceneOverridePrompt": "လက်ရှိရေးဆွဲထားသမျှအား ပြင်ပမှတင်သွင်းသောပုံနှင့်အစားထိုးပါမည်။ ဆက်လက်ဆောင်ရွက်လိုပါသလား။",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "ပြင်ပမှမှတ်တမ်းအားတင်သွင်းရာတွင်အမှားအယွင်းရှိနေသည်။",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "{{numShapes}} ခုသောပုံသဏ္ဌာန်အားမှတ်တမ်းတင်ပါမည်။ အတည်ပြုပါ။",
@@ -166,14 +187,17 @@
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "",
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
@@ -186,7 +210,10 @@
     "freedraw": "",
     "text": "စာသား",
     "library": "မှတ်တမ်း",
-    "lock": "ရွေးချယ်ထားသောကိရိယာကိုသာဆက်သုံး"
+    "lock": "ရွေးချယ်ထားသောကိရိယာကိုသာဆက်သုံး",
+    "penMode": "",
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "ကားချပ်လုပ်ဆောင်ချက်",
@@ -211,7 +238,8 @@
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "နမူနာမပြသနိုင်ပါ",
@@ -271,14 +299,15 @@
     "howto": "",
     "or": "",
     "preventBinding": "",
-    "shapes": "",
+    "tools": "",
     "shortcuts": "",
     "textFinish": "",
     "textNewLine": "",
     "title": "",
     "view": "",
     "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToSelection": "",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -320,7 +349,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",

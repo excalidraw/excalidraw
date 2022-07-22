@@ -1,5 +1,4 @@
 import {
-  FileWithHandle,
   fileOpen as _fileOpen,
   fileSave as _fileSave,
   FileSystemHandle,
@@ -13,7 +12,9 @@ type FILE_EXTENSION =
   | "gif"
   | "jpg"
   | "png"
+  | "excalidraw.png"
   | "svg"
+  | "excalidraw.svg"
   | "json"
   | "excalidraw"
   | "excalidrawlib";
@@ -24,13 +25,9 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
   description: string;
   multiple?: M;
-}): Promise<
-  M extends false | undefined ? FileWithHandle : FileWithHandle[]
-> => {
+}): Promise<M extends false | undefined ? File : File[]> => {
   // an unsafe TS hack, alas not much we can do AFAIK
-  type RetType = M extends false | undefined
-    ? FileWithHandle
-    : FileWithHandle[];
+  type RetType = M extends false | undefined ? File : File[];
 
   const mimeTypes = opts.extensions?.reduce((mimeTypes, type) => {
     mimeTypes.push(MIME_TYPES[type]);

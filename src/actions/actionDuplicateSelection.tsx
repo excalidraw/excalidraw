@@ -22,6 +22,7 @@ import { isBoundToContainer } from "../element/typeChecks";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
+  trackEvent: { category: "element" },
   perform: (elements, appState) => {
     // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {
@@ -127,12 +128,15 @@ const duplicateElements = (
       {
         ...appState,
         selectedGroupIds: {},
-        selectedElementIds: newElements.reduce((acc, element) => {
-          if (!isBoundToContainer(element)) {
-            acc[element.id] = true;
-          }
-          return acc;
-        }, {} as any),
+        selectedElementIds: newElements.reduce(
+          (acc: Record<ExcalidrawElement["id"], true>, element) => {
+            if (!isBoundToContainer(element)) {
+              acc[element.id] = true;
+            }
+            return acc;
+          },
+          {},
+        ),
       },
       getNonDeletedElements(finalElements),
     ),

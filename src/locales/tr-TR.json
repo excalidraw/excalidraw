@@ -9,6 +9,7 @@
     "copy": "Kopyala",
     "copyAsPng": "Panoya PNG olarak kopyala",
     "copyAsSvg": "Panoya SVG olarak kopyala",
+    "copyText": "Panoya metin olarak kopyala",
     "bringForward": "Bir öne getir",
     "sendToBack": "Arkaya gönder",
     "bringToFront": "En öne getir",
@@ -41,7 +42,7 @@
     "onlySelected": "Sadece seçilen",
     "withBackground": "Arka plan",
     "exportEmbedScene": "Gömülü sahne",
-    "exportEmbedScene_details": "Sahne datası, daha sonra geri kullanılabilmesi için çıktı alınan PNG/SVG dosyasına dahil edicelek. Bu işlem dosya boyutunu arttıracaktır.",
+    "exportEmbedScene_details": "Sahne verileri, sahnenin geri yüklenebilmesi için dışa aktarılan PNG/SVG dosyasına kaydedilecektir.\nDışa aktarılan dosya boyutunu artıracaktır.",
     "addWatermark": "\"Excalidraw ile yapıldı\" yazısını ekle",
     "handDrawn": "El-yazısı",
     "normal": "Normal",
@@ -64,6 +65,7 @@
     "cartoonist": "Karikatürist",
     "fileTitle": "Dosya adı",
     "colorPicker": "Renk seçici",
+    "canvasColors": "Tuvallerin üzerinde kullanıldı",
     "canvasBackground": "Tuval arka planı",
     "drawingCanvas": "Çizim tuvali",
     "layers": "Katmanlar",
@@ -83,12 +85,12 @@
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor…",
     "libraries": "Kütüphanelere gözat",
-    "loadingScene": "Çalışma alanı yükleniyor…",
+    "loadingScene": "Sahne yükleniyor…",
     "align": "Hizala",
     "alignTop": "Yukarı hizala",
     "alignBottom": "Aşağı hizala",
-    "alignLeft": "Sola yasla",
-    "alignRight": "Sağa yasla",
+    "alignLeft": "Sola hizala",
+    "alignRight": "Sağa hizala",
     "centerVertically": "Dikeyde ortala",
     "centerHorizontally": "Yatayda ortala",
     "distributeHorizontally": "Yatay dağıt",
@@ -103,8 +105,28 @@
     "toggleTheme": "Temayı etkinleştir/devre dışı bırak",
     "personalLib": "Kişisel Kitaplık",
     "excalidrawLib": "Excalidraw Kitaplığı",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Yazı Tipi Boyutunu Küçült",
+    "increaseFontSize": "Yazı Tipi Boyutunu Büyült",
+    "unbindText": "Metni çöz",
+    "bindText": "Metni taşıyıcıya bağla",
+    "link": {
+      "edit": "Bağlantıyı düzenle",
+      "create": "Bağlantı oluştur",
+      "label": "Bağlantı"
+    },
+    "elementLock": {
+      "lock": "Kilitle",
+      "unlock": "Kilidi Kaldır",
+      "lockAll": "Hepsini kilitle",
+      "unlockAll": "Hepsinin kilidini kaldır"
+    },
+    "statusPublished": "Yayınlandı",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "Öğe eklenmedi...",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": "Tuvalden bir eleman seçerek sayfaya ekleyin."
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -152,28 +174,30 @@
     "couldNotLoadInvalidFile": "Bilinmeyen dosya yüklenemiyor",
     "importBackendFailed": "Sunucudan içe aktarma başarısız.",
     "cannotExportEmptyCanvas": "Boş tuval dışarıya aktarılamaz.",
-    "couldNotCopyToClipboard": "Panoya kopyalanamadı. Chrome tarayıcısını deneyiniz.",
+    "couldNotCopyToClipboard": "Panoya kopyalanamıyor.",
     "decryptFailed": "Şifrelenmiş veri çözümlenemedi.",
     "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır.",
     "loadSceneOverridePrompt": "Harici çizimler yüklemek mevcut olan içeriği değiştirecektir. Devam etmek istiyor musunuz?",
     "collabStopOverridePrompt": "Oturumu sonlandırmak daha önceki, yerel olarak kaydedilmiş çizimin üzerine kaydedilmesine sebep olacak. Emin misiniz?\n\n(Yerel çiziminizi kaybetmemek için tarayıcı sekmesini kapatabilirsiniz.)",
-    "errorLoadingLibrary": "Üçüncü taraf kitaplığı yüklerken bir hata oluştu.",
     "errorAddingToLibrary": "Öğe kütüphaneye eklenemedi",
     "errorRemovingFromLibrary": "Öğe kütüphaneden silinemedi",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
     "imageDoesNotContainScene": "Bu görüntü herhangi bir sahne verisi içermiyor gibi görünüyor. Dışa aktarma sırasında sahne yerleştirmeyi etkinleştirdiniz mi?",
-    "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
-    "invalidSceneUrl": "Verilen URL'den çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
+    "cannotRestoreFromImage": "Sahne bu resim dosyasından geri yüklenemedi",
+    "invalidSceneUrl": "Verilen bağlantıdan çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
     "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?",
     "removeItemsFromsLibrary": "{{count}} öğe(ler) kitaplıktan kaldırılsın mı?",
-    "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı."
+    "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı.",
+    "browserZoom": "Tarayıcınızın yaklaştırma seviyesi %100 değil. Bu durum, tablonun yanlış görünmesine sebep olabilir"
   },
   "errors": {
     "unsupportedFileType": "Desteklenmeyen dosya türü.",
     "imageInsertError": "Görsel eklenemedi. Daha sonra tekrar deneyin...",
     "fileTooBig": "Dosya çok büyük. İzin verilen maksimum boyut {{maxSize}}.",
     "svgImageInsertError": "SVG resmi eklenemedi. SVG işaretlemesi geçersiz görünüyor.",
-    "invalidSVGString": "Geçersiz SVG."
+    "invalidSVGString": "Geçersiz SVG.",
+    "cannotResolveCollabServer": "İş birliği sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin.",
+    "importLibraryError": "Kütüphane yüklenemedi"
   },
   "toolBar": {
     "selection": "Seçme",
@@ -186,7 +210,10 @@
     "freedraw": "Çiz",
     "text": "Yazı",
     "library": "Kütüphane",
-    "lock": "Seçilen aracı çizimden sonra aktif tut"
+    "lock": "Seçilen aracı çizimden sonra aktif tut",
+    "penMode": "Çift parmak sıkıştırmayı önle ve serbest çizimi yalnızca kalemle yap",
+    "link": "Seçilen şekil için bağlantı Ekle/Güncelle",
+    "eraser": "Silgi"
   },
   "headings": {
     "canvasActions": "Tuval eylemleri",
@@ -200,18 +227,19 @@
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
     "text_selected": "Metni düzenlemek için çift tıklayın veya ENTER'a basın",
     "text_editing": "Düzenlemeyi bitirmek için ESC veya Ctrl/Cmd+ENTER tuşlarına basın",
-    "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
+    "linearElementMulti": "Bitirmek için son noktaya tıklayın ya da Escape veya Enter tuşuna basın",
     "lockAngle": "SHIFT tuşuna basılı tutarak açıyı koruyabilirsiniz",
-    "resize": "Yeniden boyutlandırırken SHIFT'e basılı tutarak oranları kısıtlayabilirsiniz, merkezden yeniden boyutlandırmak için ALT'a basılı tutun",
+    "resize": "Yeniden boyutlandırırken SHIFT tuşunu basılı tutarak oranları sınırlayabilirsiniz,\nmerkezden yeniden boyutlandırmak için ALT tuşunu basılı tutun",
     "resizeImage": "SHIFT'e basılı tutarak serbestçe yeniden boyutlandırabilirsiniz, merkezden yeniden boyutlandırmak için ALT tuşunu basılı tutun",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",
     "lineEditor_info": "Noktaları düzenlemek için çift-tıklayın veya Enter'a basın",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_pointSelected": "Sil tuşuna basarak noktaları silin,\nCtrl/Cmd + D ile çoğaltın, ya da sürükleyerek taşıyın",
+    "lineEditor_nothingSelected": "Düzenlemek için bir nokta seçin (birden fazla seçmek için SHIFT tuşunu basılı tutun),\nveya Alt tuşunu basılı tutun ve yeni noktalar eklemek için tıklayın",
     "placeImage": "Resmi yerleştirmek için tıklayın ya da boyutunu manuel olarak ayarlamak için tıklayıp sürükleyin",
     "publishLibrary": "Kendi kitaplığınızı yayınlayın",
-    "bindTextToElement": "",
-    "deepBoxSelect": ""
+    "bindTextToElement": "Enter tuşuna basarak metin ekleyin",
+    "deepBoxSelect": "Ctrl/Cmd tuşuna basılı tutarak derin seçim yapın ya da sürüklemeyi engelleyin",
+    "eraserRevert": "Alt tuşuna basılı tutarak silinme için işaretlenmiş ögeleri tersine çevirin"
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
@@ -258,8 +286,8 @@
   "helpDialog": {
     "blog": "Blog'umuzu okuyun",
     "click": "tıkla",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Derin seçim",
+    "deepBoxSelect": "Kutu içerisinde derin seçim yapın, sürüklemeyi engelleyin",
     "curvedArrow": "Eğri ok",
     "curvedLine": "Eğri çizgi",
     "documentation": "Dokümantasyon",
@@ -271,14 +299,15 @@
     "howto": "Rehberlerimizi takip edin",
     "or": "veya",
     "preventBinding": "Ok bağlamayı önleyin",
-    "shapes": "Şekiller",
+    "tools": "Araçlar",
     "shortcuts": "Klavye kısayolları",
     "textFinish": "Düzenlemeyi bitir (metin düzenleyici)",
     "textNewLine": "Yeni satır ekle (metin düzenleyici)",
     "title": "Yardım",
     "view": "Görünüm",
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
-    "zoomToSelection": "Seçime yakınlaş"
+    "zoomToSelection": "Seçime yakınlaş",
+    "toggleElementLock": "Seçimi Kilitle/çöz"
   },
   "clearCanvasDialog": {
     "title": "Tuvali temizle"
@@ -296,40 +325,41 @@
       "authorName": "Adınız ya da kullanıcı adınız",
       "libraryName": "Kitaplığınızın adı",
       "libraryDesc": "İnsanların kullanımını anlamasına yardımcı olmak için kitaplığınızın açıklaması",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "githubHandle": "Github bağlantısı ( tercihe bağlı), kütüphane gözden geçirme için onaylandığında düzenleyebiliesiniz diye",
+      "twitterHandle": "Twitter kullanıcı adı ( tercihe bağlı), bu sayede Twitter üzerinde paylaşıren çalışmanızı size atfedebiliriz",
+      "website": "Kişisel web sayfanızı ya da başka bir yeri bağlayın (tercihe bağlı)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Gerekli",
+      "website": "Geçerli bir URL girin"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Submit your library to be included in the ",
+      "link": "genel kütüphane reposu",
+      "post": "diğer insanlar çizimlerinde kullanabilsin diye."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Önce kütüphane elle onaylanmalı. şunu okuyun ",
+      "link": "yönergeler",
+      "post": " onaylamadan önce. gerekli olması halinde iletişim kurmak için ve değişiklik için Github hesabı gerekli, ama çok da illaki olmalı değil."
     },
     "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "Bunu onaylayarak, kütüğhanenin şu lisansla yayınlanmasını onaylıyorsunuz ",
+      "link": "MIT Lisans, ",
+      "post": "ki bu kısaca herkesin onu kısıtlama olmaksızın kullanabileceği anlamına gelmektedir."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "Her kütüphane kendi ismine sahip olmalı ki tarama yapabilelim. Şu kütüphane ögeleri dahil edilecek:",
+    "atleastOneLibItem": "Lütfen başlamak için en az bir tane kütüphane ögesi seçin",
+    "republishWarning": "Not: seçilen ögelerden bir kısmı zaten yayınlanmış/gönderilmiş. Yalnızca mevcut kütüphane ve gönderileri güncellerken yeniden gönderme işlemi yapmalısınız."
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "Kütüphane gönderildi",
+    "content": "Teşekkürler {{authorName}}. Kütüphaneniz gözden geçirme için alındı. Durumu takip edebilirsiniz",
+    "link": "burada"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Kütüphaneyi sıfırla",
+    "removeItemsFromLib": "Seçilen ögeleri kütüphaneden kaldır"
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez.",
@@ -351,7 +381,7 @@
     "width": "Genişlik"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Kütüphaneye eklendi",
     "copyStyles": "Stiller kopyalandı.",
     "copyToClipboard": "Panoya kopyalandı.",
     "copyToClipboardAsPng": "{{exportSelection}} panoya PNG olarak\n({{exportColorScheme}}) kopyalandı",
@@ -366,14 +396,14 @@
     "f1f3f5": "Gri 1",
     "fff5f5": "Kırmızı 0",
     "fff0f6": "Pembe 0",
-    "f8f0fc": "",
-    "f3f0ff": "",
-    "edf2ff": "",
+    "f8f0fc": "Koyu Mor 0",
+    "f3f0ff": "Mor 0",
+    "edf2ff": "Çivit 0",
     "e7f5ff": "Mavi 0",
-    "e3fafc": "",
-    "e6fcf5": "",
+    "e3fafc": "Camgöbeği 0",
+    "e6fcf5": "Deniz Mavisi 0",
     "ebfbee": "Yeşil 0",
-    "f4fce3": "",
+    "f4fce3": "Yeşil 0",
     "fff9db": "Sarı 0",
     "fff4e6": "Turuncu 0",
     "transparent": "Şeffaf",
@@ -381,14 +411,14 @@
     "868e96": "Gri 6",
     "fa5252": "Kırmızı 6",
     "e64980": "Pembe 6",
-    "be4bdb": "",
-    "7950f2": "",
-    "4c6ef5": "",
+    "be4bdb": "Koyu Mor 6",
+    "7950f2": "Mor 6",
+    "4c6ef5": "Çivit 6",
     "228be6": "Mavi 6",
-    "15aabf": "",
-    "12b886": "",
+    "15aabf": "Camgöbeği 6",
+    "12b886": "Deniz Mavisi 6",
     "40c057": "Yeşil 6",
-    "82c91e": "",
+    "82c91e": "Green 6",
     "fab005": "Sarı 6",
     "fd7e14": "Turuncu 6",
     "000000": "Siyah",
@@ -396,14 +426,14 @@
     "495057": "Gri 7",
     "c92a2a": "Kırmızı 9",
     "a61e4d": "Pembe 9",
-    "862e9c": "",
-    "5f3dc4": "",
-    "364fc7": "",
+    "862e9c": "Koyu Mor 9",
+    "5f3dc4": "Mor 9",
+    "364fc7": "Çivit 9",
     "1864ab": "Mavi 9",
-    "0b7285": "",
-    "087f5b": "",
+    "0b7285": "Camgöbeği 9",
+    "087f5b": "Deniz Mavisi 9",
     "2b8a3e": "Yeşil 9",
-    "5c940d": "",
+    "5c940d": "Yeşil 9",
     "e67700": "Sarı 9",
     "d9480f": "Turuncu 9"
   }

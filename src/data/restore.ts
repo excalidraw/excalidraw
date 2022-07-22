@@ -10,7 +10,11 @@ import {
   NormalizedZoomValue,
 } from "../types";
 import { ImportedDataState } from "./types";
-import { getNormalizedDimensions, isInvisiblySmallElement } from "../element";
+import {
+  getNonDeletedElements,
+  getNormalizedDimensions,
+  isInvisiblySmallElement,
+} from "../element";
 import { isLinearElementType } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
@@ -22,7 +26,7 @@ import {
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
-import { getUpdatedTimestamp } from "../utils";
+import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 
 type RestoredAppState = Omit<
@@ -30,9 +34,9 @@ type RestoredAppState = Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;
 
-export const AllowedExcalidrawElementTypes: Record<
-  ExcalidrawElement["type"],
-  true
+export const AllowedExcalidrawActiveTools: Record<
+  AppState["activeTool"]["type"],
+  boolean
 > = {
   selection: true,
   text: true,
@@ -43,6 +47,8 @@ export const AllowedExcalidrawElementTypes: Record<
   image: true,
   arrow: true,
   freedraw: true,
+  eraser: false,
+  custom: true,
 };
 
 export type RestoredDataState = {
@@ -105,6 +111,8 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
+    link: element.link ?? null,
+    locked: element.locked ?? false,
   };
 
   return {
@@ -191,6 +199,7 @@ const restoreElement = (
         y,
       });
     }
+
     // generic elements
     case "ellipse":
       return restoreElementWithProperties(element, {});
@@ -233,10 +242,8 @@ export const restoreAppState = (
   localAppState: Partial<AppState> | null | undefined,
 ): RestoredAppState => {
   appState = appState || {};
-
   const defaultAppState = getDefaultAppState();
   const nextAppState = {} as typeof defaultAppState;
-
   for (const [key, defaultValue] of Object.entries(defaultAppState) as [
     keyof typeof defaultAppState,
     any,
@@ -253,22 +260,39 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
-    elementType: AllowedExcalidrawElementTypes[nextAppState.elementType]
-      ? nextAppState.elementType
-      : "selection",
+    cursorButton: localAppState?.cursorButton || "up",
+    // reset on fresh restore so as to hide the UI button if penMode not active
+    penDetected:
+      localAppState?.penDetected ??
+      (appState.penMode ? appState.penDetected ?? false : false),
+    activeTool: {
+      ...updateActiveTool(
+        defaultAppState,
+        nextAppState.activeTool.type &&
+          AllowedExcalidrawActiveTools[nextAppState.activeTool.type]
+          ? nextAppState.activeTool
+          : { type: "selection" },
+      ),
+      lastActiveToolBeforeEraser: null,
+      locked: nextAppState.activeTool.locked ?? false,
+    },
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"
         ? {
             value: appState.zoom as NormalizedZoomValue,
-            translation: defaultAppState.zoom.translation,
           }
         : appState.zoom || defaultAppState.zoom,
+    // when sidebar docked and user left it open in last session,
+    // keep it open. If not docked, keep it closed irrespective of last state.
+    isLibraryOpen: nextAppState.isLibraryMenuDocked
+      ? nextAppState.isLibraryOpen
+      : false,
   };
 };
 
 export const restore = (
-  data: ImportedDataState | null,
+  data: Pick<ImportedDataState, "appState" | "elements" | "files"> | null,
   /**
    * Local AppState (`this.state` or initial state from localStorage) so that we
    * don't overwrite local state with default values (when values not
@@ -285,28 +309,45 @@ export const restore = (
   };
 };
 
+const restoreLibraryItem = (libraryItem: LibraryItem) => {
+  const elements = restoreElements(
+    getNonDeletedElements(libraryItem.elements),
+    null,
+  );
+  return elements.length ? { ...libraryItem, elements } : null;
+};
+
 export const restoreLibraryItems = (
-  libraryItems: NonOptional<ImportedDataState["libraryItems"]>,
+  libraryItems: ImportedDataState["libraryItems"] = [],
   defaultStatus: LibraryItem["status"],
 ) => {
   const restoredItems: LibraryItem[] = [];
   for (const item of libraryItems) {
     // migrate older libraries
     if (Array.isArray(item)) {
-      restoredItems.push({
+      const restoredItem = restoreLibraryItem({
         status: defaultStatus,
         elements: item,
         id: randomId(),
         created: Date.now(),
       });
+      if (restoredItem) {
+        restoredItems.push(restoredItem);
+      }
     } else {
-      const _item = item as MarkOptional<LibraryItem, "id" | "status">;
-      restoredItems.push({
+      const _item = item as MarkOptional<
+        LibraryItem,
+        "id" | "status" | "created"
+      >;
+      const restoredItem = restoreLibraryItem({
         ..._item,
         id: _item.id || randomId(),
         status: _item.status || defaultStatus,
         created: _item.created || Date.now(),
       });
+      if (restoredItem) {
+        restoredItems.push(restoredItem);
+      }
     }
   }
   return restoredItems;

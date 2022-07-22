@@ -1,4 +1,4 @@
-name: Auto release @excalidraw/excalidraw-next
+name: Auto release excalidraw next
 on:
   push:
     branches:
@@ -23,4 +23,5 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Auto release
         run: |
+          yarn add @actions/core
           yarn autorelease

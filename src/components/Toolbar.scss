@@ -1,26 +1,5 @@
 @import "open-color/open-color.scss";
-
-@mixin toolbarButtonColorStates {
-  .ToolIcon_type_radio,
-  .ToolIcon_type_checkbox {
-    & + .ToolIcon__icon:active {
-      background: var(--color-primary-light);
-    }
-    &:checked + .ToolIcon__icon {
-      background: var(--color-primary);
-      --icon-fill-color: #{$oc-white};
-      --keybinding-color: #{$oc-white};
-    }
-    &:checked + .ToolIcon__icon:active {
-      background: var(--color-primary-darker);
-    }
-  }
-
-  .ToolIcon__keybinding {
-    bottom: 4px;
-    right: 4px;
-  }
-}
+@import "../css/variables.module";
 
 .excalidraw {
   .App-toolbar-container {
@@ -46,8 +25,13 @@
       }
     }
 
+    .ToolIcon__hidden {
+      box-shadow: none !important;
+      background-color: transparent !important;
+      pointer-events: none !important;
+    }
+
     .ToolIcon.ToolIcon__lock {
-      margin-inline-end: var(--space-factor);
       &.ToolIcon_type_floating {
         margin-left: 0.1rem;
       }
@@ -81,8 +65,14 @@
 
     .ToolIcon {
       &:hover {
-        --icon-fill-color: var(--color-primary-chubb);
-        --keybinding-color: var(--color-primary-chubb);
+        --icon-fill-color: var(
+          --color-primary-contrast-offset,
+          var(--color-primary)
+        );
+        --keybinding-color: var(
+          --color-primary-contrast-offset,
+          var(--color-primary)
+        );
       }
       &:active {
         --icon-fill-color: #{$oc-gray-9};

@@ -7,19 +7,20 @@
     "moveCanvas": "移動畫布",
     "cut": "剪下",
     "copy": "複製",
-    "copyAsPng": "複製 PNG 至剪貼簿",
-    "copyAsSvg": "複製 SVG 至剪貼簿",
-    "bringForward": "往前移一層",
-    "sendToBack": "移到最後面",
-    "bringToFront": "移到最前面",
+    "copyAsPng": "以PNG格式儲存到剪貼板",
+    "copyAsSvg": "以SVG格式複製到剪貼板",
+    "copyText": "以文字格式複製至剪貼簿",
+    "bringForward": "上移一層",
+    "sendToBack": "移到最底層",
+    "bringToFront": "置於最頂層",
     "sendBackward": "往後移一層",
     "delete": "刪除",
     "copyStyles": "複製樣式",
     "pasteStyles": "貼上樣式",
     "stroke": "筆畫",
     "background": "背景",
-    "fill": "填充",
-    "strokeWidth": "筆劃寬度",
+    "fill": "填滿",
+    "strokeWidth": "筆跡寬度",
     "strokeStyle": "筆畫樣式",
     "strokeStyle_solid": "實線",
     "strokeStyle_dashed": "虛線",
@@ -33,19 +34,19 @@
     "arrowheads": "箭頭",
     "arrowhead_none": "無",
     "arrowhead_arrow": "箭頭",
-    "arrowhead_bar": "塊",
-    "arrowhead_dot": "點",
+    "arrowhead_bar": "條狀箭頭",
+    "arrowhead_dot": "點箭頭",
     "arrowhead_triangle": "三角形",
     "fontSize": "字型大小",
-    "fontFamily": "字體",
+    "fontFamily": "字體集",
     "onlySelected": "僅選取物件",
-    "withBackground": "背景",
+    "withBackground": "含有背景",
     "exportEmbedScene": "嵌入場景",
     "exportEmbedScene_details": "用於回復場景的場景資料會被包含在輸出的 PNG/SVG 檔案中。\n會增加輸出的檔案大小。",
-    "addWatermark": "加上 \"Made with Excalidraw\"",
+    "addWatermark": "加上 \"Made with Excalidraw\" 浮水印",
     "handDrawn": "手寫",
     "normal": "一般",
-    "code": "等寬",
+    "code": "代碼",
     "small": "小",
     "medium": "中",
     "large": "大",
@@ -64,6 +65,7 @@
     "cartoonist": "卡通",
     "fileTitle": "檔案名稱",
     "colorPicker": "色彩選擇工具",
+    "canvasColors": "使用於畫布",
     "canvasBackground": "Canvas 背景",
     "drawingCanvas": "繪圖 canvas",
     "layers": "圖層",
@@ -104,7 +106,27 @@
     "personalLib": "個人資料庫",
     "excalidrawLib": "Excalidraw 資料庫",
     "decreaseFontSize": "縮小文字",
-    "increaseFontSize": "放大文字"
+    "increaseFontSize": "放大文字",
+    "unbindText": "取消綁定文字",
+    "bindText": "結合文字至容器",
+    "link": {
+      "edit": "編輯連結",
+      "create": "建立連結",
+      "label": "連結"
+    },
+    "elementLock": {
+      "lock": "鎖定",
+      "unlock": "解鎖",
+      "lockAll": "全部鎖定",
+      "unlockAll": "全部解鎖"
+    },
+    "statusPublished": "已發布",
+    "sidebarLock": "側欄維持開啟"
+  },
+  "library": {
+    "noItems": "尚未加入任何物件...",
+    "hint_emptyLibrary": "選取畫布上的物件以加入，或從下方的公開 repository 中安裝資料庫",
+    "hint_emptyPrivateLibrary": "選擇畫布上的物件以在此加入"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -152,12 +174,11 @@
     "couldNotLoadInvalidFile": "無法讀取失效的檔案。",
     "importBackendFailed": "後端讀取失敗。",
     "cannotExportEmptyCanvas": "無法輸出空白的 canvas。",
-    "couldNotCopyToClipboard": "無法複製至剪貼簿。請使用 Chrome 瀏覽器再試試看。",
+    "couldNotCopyToClipboard": "無法複製到剪貼簿",
     "decryptFailed": "無法解密資料。",
     "uploadedSecurly": "上傳已通過 end-to-end 加密，Excalidraw 伺服器和第三方無法皆讀取其內容。",
     "loadSceneOverridePrompt": "讀取外部圖樣將取代目前的內容。是否要繼續？",
     "collabStopOverridePrompt": "停止連線將覆蓋您先前於本機儲存的繪圖進度，是否確認？\n\n（如要保留原有的本機繪圖進度，直接關閉瀏覽器分頁即可。）",
-    "errorLoadingLibrary": "載入第三方套件時出現錯誤。",
     "errorAddingToLibrary": "無法於此資料庫加入項目",
     "errorRemovingFromLibrary": "無法由此資料庫移除項目",
     "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
@@ -166,14 +187,17 @@
     "invalidSceneUrl": "無法由提供的 URL 匯入場景。可能是發生異常，或未包含有效的 Excalidraw JSON 資料。",
     "resetLibrary": "這會清除您的資料庫，是否確定？",
     "removeItemsFromsLibrary": "從資料庫刪除 {{count}} 項？",
-    "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。"
+    "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。",
+    "browserZoom": "因瀏覽器之縮放值目前並非 100%，可能造成顯示錯誤"
   },
   "errors": {
     "unsupportedFileType": "不支援的檔案類型。",
     "imageInsertError": "無法插入圖片。請稍後再試…",
     "fileTooBig": "檔案過大。可接受的最大尺寸為 {{maxSize}} 。",
     "svgImageInsertError": "無法插入 SVG 圖片。此 SVG 檔案有問題。",
-    "invalidSVGString": "無效的 SVG。"
+    "invalidSVGString": "無效的 SVG。",
+    "cannotResolveCollabServer": "無法連結至 collab 伺服器。請重新整理後再試一次。",
+    "importLibraryError": "無法載入資料庫"
   },
   "toolBar": {
     "selection": "選取",
@@ -186,7 +210,10 @@
     "freedraw": "繪圖",
     "text": "文字",
     "library": "資料庫",
-    "lock": "可連續使用選取的工具"
+    "lock": "可連續使用選取的工具",
+    "penMode": "停止使用手勢縮放並接受以繪圖筆繪圖輸入",
+    "link": "為所選的形狀增加\b/更新連結",
+    "eraser": "橡皮擦"
   },
   "headings": {
     "canvasActions": "canvas 動作",
@@ -211,7 +238,8 @@
     "placeImage": "點擊以放置圖片，或點擊並拖曳以手動調整其尺寸。",
     "publishLibrary": "發布個人資料庫",
     "bindTextToElement": "按下 Enter 以加入文字。",
-    "deepBoxSelect": "按住 Ctrl 或 Cmd 以深度選取並避免拖曳"
+    "deepBoxSelect": "按住 Ctrl 或 Cmd 以深度選取並避免拖曳",
+    "eraserRevert": "按住 Alt 以反選取已標記待刪除的元素"
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
@@ -271,14 +299,15 @@
     "howto": "參照我們的說明",
     "or": "或",
     "preventBinding": "避免箭號連結",
-    "shapes": "形狀",
+    "tools": "工具",
     "shortcuts": "鍵盤快速鍵",
     "textFinish": "完成編輯（文字編輯器）",
     "textNewLine": "換行（文字編輯器）",
     "title": "說明",
     "view": "檢視",
     "zoomToFit": "放大至填滿畫面",
-    "zoomToSelection": "縮放至選取區"
+    "zoomToSelection": "縮放至選取區",
+    "toggleElementLock": "鎖定/解鎖已選的項目"
   },
   "clearCanvasDialog": {
     "title": "清除畫布"
@@ -320,7 +349,8 @@
       "post": "簡單來說是指任何人都能不受限制的使用。"
     },
     "noteItems": "每個資料庫項目都有獨立的名稱故可篩選。會包含下列資料庫項目：",
-    "atleastOneLibItem": "請選擇至少一項資料庫項目"
+    "atleastOneLibItem": "請選擇至少一項資料庫項目",
+    "republishWarning": "注意：部分選取中的物件先前已發布/送出過。建議僅在要更新現存資料庫或已送出的物件時才重新送出這些物件。"
   },
   "publishSuccessDialog": {
     "title": "資料庫已送出",

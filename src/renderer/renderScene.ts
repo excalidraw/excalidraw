@@ -47,9 +47,17 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
+import {
+  viewportCoordsToSceneCoords,
+  supportsEmoji,
+  throttleRAF,
+} from "../utils";
 import { UserIdleState } from "../types";
 import { THEME_FILTER } from "../constants";
+import {
+  EXTERNAL_LINK_IMG,
+  getLinkHandleFromCoords,
+} from "../element/Hyperlink";
 
 const hasEmojiSupport = supportsEmoji();
 
@@ -173,7 +181,7 @@ const renderLinearPointHandles = (
   context.restore();
 };
 
-export const renderScene = (
+export const _renderScene = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   selectionElement: NonDeletedExcalidrawElement | null,
@@ -227,10 +235,7 @@ export const renderScene = (
   }
 
   // Apply zoom
-  const zoomTranslationX = renderConfig.zoom.translation.x;
-  const zoomTranslationY = renderConfig.zoom.translation.y;
   context.save();
-  context.translate(zoomTranslationX, zoomTranslationY);
   context.scale(renderConfig.zoom.value, renderConfig.zoom.value);
 
   // Grid
@@ -238,14 +243,10 @@ export const renderScene = (
     strokeGrid(
       context,
       appState.gridSize,
-      -Math.ceil(
-        zoomTranslationX / renderConfig.zoom.value / appState.gridSize,
-      ) *
+      -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
         appState.gridSize +
         (renderConfig.scrollX % appState.gridSize),
-      -Math.ceil(
-        zoomTranslationY / renderConfig.zoom.value / appState.gridSize,
-      ) *
+      -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
         appState.gridSize +
         (renderConfig.scrollY % appState.gridSize),
       normalizedCanvasWidth / renderConfig.zoom.value,
@@ -267,6 +268,9 @@ export const renderScene = (
   visibleElements.forEach((element) => {
     try {
       renderElement(element, rc, context, renderConfig);
+      if (!isExporting) {
+        renderLinkIcon(element, context, appState);
+      }
     } catch (error: any) {
       console.error(error);
     }
@@ -413,7 +417,9 @@ export const renderScene = (
         "mouse",
         OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
       );
-      renderTransformHandles(context, renderConfig, transformHandles, 0);
+      if (locallySelectedElements.some((element) => !element.locked)) {
+        renderTransformHandles(context, renderConfig, transformHandles, 0);
+      }
     }
     context.restore();
   }
@@ -564,6 +570,71 @@ export const renderScene = (
 
   context.restore();
   return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
+};
+
+const renderSceneThrottled = throttleRAF(
+  (
+    elements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+    selectionElement: NonDeletedExcalidrawElement | null,
+    scale: number,
+    rc: RoughCanvas,
+    canvas: HTMLCanvasElement,
+    renderConfig: RenderConfig,
+    callback?: (data: ReturnType<typeof _renderScene>) => void,
+  ) => {
+    const ret = _renderScene(
+      elements,
+      appState,
+      selectionElement,
+      scale,
+      rc,
+      canvas,
+      renderConfig,
+    );
+    callback?.(ret);
+  },
+  { trailing: true },
+);
+
+/** renderScene throttled to animation framerate */
+export const renderScene = <T extends boolean = false>(
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+  selectionElement: NonDeletedExcalidrawElement | null,
+  scale: number,
+  rc: RoughCanvas,
+  canvas: HTMLCanvasElement,
+  renderConfig: RenderConfig,
+  callback?: (data: ReturnType<typeof _renderScene>) => void,
+  /** Whether to throttle rendering. Defaults to false.
+   * When throttling, no value is returned. Use the callback instead. */
+  throttle?: T,
+): T extends true ? void : ReturnType<typeof _renderScene> => {
+  if (throttle) {
+    renderSceneThrottled(
+      elements,
+      appState,
+      selectionElement,
+      scale,
+      rc,
+      canvas,
+      renderConfig,
+      callback,
+    );
+    return undefined as T extends true ? void : ReturnType<typeof _renderScene>;
+  }
+  const ret = _renderScene(
+    elements,
+    appState,
+    selectionElement,
+    scale,
+    rc,
+    canvas,
+    renderConfig,
+  );
+  callback?.(ret);
+  return ret as T extends true ? void : ReturnType<typeof _renderScene>;
 };
 
 const renderTransformHandles = (
@@ -745,6 +816,61 @@ const renderBindingHighlightForSuggestedPointBinding = (
     );
     fillCircle(context, x, y, threshold);
   });
+};
+
+let linkCanvasCache: any;
+const renderLinkIcon = (
+  element: NonDeletedExcalidrawElement,
+  context: CanvasRenderingContext2D,
+  appState: AppState,
+) => {
+  if (element.link && !appState.selectedElementIds[element.id]) {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const [x, y, width, height] = getLinkHandleFromCoords(
+      [x1, y1, x2, y2],
+      element.angle,
+      appState,
+    );
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    context.save();
+    context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
+    context.rotate(element.angle);
+
+    if (!linkCanvasCache || linkCanvasCache.zoom !== appState.zoom.value) {
+      linkCanvasCache = document.createElement("canvas");
+      linkCanvasCache.zoom = appState.zoom.value;
+      linkCanvasCache.width =
+        width * window.devicePixelRatio * appState.zoom.value;
+      linkCanvasCache.height =
+        height * window.devicePixelRatio * appState.zoom.value;
+      const linkCanvasCacheContext = linkCanvasCache.getContext("2d")!;
+      linkCanvasCacheContext.scale(
+        window.devicePixelRatio * appState.zoom.value,
+        window.devicePixelRatio * appState.zoom.value,
+      );
+      linkCanvasCacheContext.fillStyle = "#fff";
+      linkCanvasCacheContext.fillRect(0, 0, width, height);
+      linkCanvasCacheContext.drawImage(EXTERNAL_LINK_IMG, 0, 0, width, height);
+      linkCanvasCacheContext.restore();
+      context.drawImage(
+        linkCanvasCache,
+        x - centerX,
+        y - centerY,
+        width,
+        height,
+      );
+    } else {
+      context.drawImage(
+        linkCanvasCache,
+        x - centerX,
+        y - centerY,
+        width,
+        height,
+      );
+    }
+    context.restore();
+  }
 };
 
 const isVisibleElement = (

@@ -16,7 +16,7 @@ export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
 
 export const exportCanvas = async (
-  type: ExportType,
+  type: Omit<ExportType, "backend">,
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   files: BinaryFiles,
@@ -56,7 +56,7 @@ export const exportCanvas = async (
         {
           description: "Export to SVG",
           name,
-          extension: "svg",
+          extension: appState.exportEmbedScene ? "excalidraw.svg" : "svg",
           fileHandle,
         },
       );
@@ -73,10 +73,10 @@ export const exportCanvas = async (
   });
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);
-  let blob = await canvasToBlob(tempCanvas);
-  tempCanvas.remove();
 
   if (type === "png") {
+    let blob = await canvasToBlob(tempCanvas);
+    tempCanvas.remove();
     if (appState.exportEmbedScene) {
       blob = await (
         await import(/* webpackChunkName: "image" */ "./image")
@@ -89,17 +89,24 @@ export const exportCanvas = async (
     return await fileSave(blob, {
       description: "Export to PNG",
       name,
-      extension: "png",
+      extension: appState.exportEmbedScene ? "excalidraw.png" : "png",
       fileHandle,
     });
   } else if (type === "clipboard") {
     try {
+      const blob = canvasToBlob(tempCanvas);
       await copyBlobToClipboardAsPng(blob);
     } catch (error: any) {
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
       }
       throw new Error(t("alerts.couldNotCopyToClipboard"));
+    } finally {
+      tempCanvas.remove();
     }
+  } else {
+    tempCanvas.remove();
+    // shouldn't happen
+    throw new Error("Unsupported export type");
   }
 };

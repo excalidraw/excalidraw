@@ -5,14 +5,8 @@ import {
   getDefaultAppState,
 } from "../../appState";
 import { clearElementsForLocalStorage } from "../../element";
-
-export const STORAGE_KEYS = {
-  LOCAL_STORAGE_ELEMENTS: "excalidraw",
-  LOCAL_STORAGE_APP_STATE: "excalidraw-state",
-  LOCAL_STORAGE_COLLAB: "excalidraw-collab",
-  LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG: "collabLinkForceLoadFlag",
-  LOCAL_STORAGE_LIBRARY: "excalidraw-library",
-};
+import { STORAGE_KEYS } from "../app_constants";
+import { ImportedDataState } from "../../data/types";
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -38,25 +32,6 @@ export const importUsernameFromLocalStorage = (): string | null => {
   }
 
   return null;
-};
-
-export const saveToLocalStorage = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  try {
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(clearElementsForLocalStorage(elements)),
-    );
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(clearAppStateForLocalStorage(appState)),
-    );
-  } catch (error: any) {
-    // Unable to access window.localStorage
-    console.error(error);
-  }
 };
 
 export const importFromLocalStorage = () => {
@@ -123,5 +98,18 @@ export const getTotalStorageSize = () => {
   } catch (error: any) {
     console.error(error);
     return 0;
+  }
+};
+
+export const getLibraryItemsFromStorage = () => {
+  try {
+    const libraryItems: ImportedDataState["libraryItems"] = JSON.parse(
+      localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
+    );
+
+    return libraryItems || [];
+  } catch (error) {
+    console.error(error);
+    return [];
   }
 };

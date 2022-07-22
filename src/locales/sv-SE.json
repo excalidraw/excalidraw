@@ -9,6 +9,7 @@
     "copy": "Kopiera",
     "copyAsPng": "Kopiera till urklipp som PNG",
     "copyAsSvg": "Kopiera till urklipp som SVG",
+    "copyText": "Kopiera till urklipp som text",
     "bringForward": "Flytta framåt",
     "sendToBack": "Flytta underst",
     "bringToFront": "Flytta främst",
@@ -64,6 +65,7 @@
     "cartoonist": "Serietecknare",
     "fileTitle": "Filnamn",
     "colorPicker": "Färgväljare",
+    "canvasColors": "Används på canvas",
     "canvasBackground": "Canvas-bakgrund",
     "drawingCanvas": "Ritar canvas",
     "layers": "Lager",
@@ -103,8 +105,28 @@
     "toggleTheme": "Växla tema",
     "personalLib": "Personligt bibliotek",
     "excalidrawLib": "Excalidraw bibliotek",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "Minska fontstorleken",
+    "increaseFontSize": "Öka fontstorleken",
+    "unbindText": "Koppla bort text",
+    "bindText": "Bind texten till behållaren",
+    "link": {
+      "edit": "Redigera länk",
+      "create": "Skapa länk",
+      "label": "Länk"
+    },
+    "elementLock": {
+      "lock": "Lås",
+      "unlock": "Lås upp",
+      "lockAll": "Lås alla",
+      "unlockAll": "Lås upp alla"
+    },
+    "statusPublished": "Publicerad",
+    "sidebarLock": "Håll sidofältet öppet"
+  },
+  "library": {
+    "noItems": "Inga objekt tillagda ännu...",
+    "hint_emptyLibrary": "Välj ett objekt på canvasen för att lägga till det här, eller installera ett bibliotek från det publika arkivet, nedan.",
+    "hint_emptyPrivateLibrary": "Välj ett objekt på canvasen för att lägga till det här."
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -152,12 +174,11 @@
     "couldNotLoadInvalidFile": "Kunde inte ladda ogiltig fil",
     "importBackendFailed": "Importering från backend misslyckades.",
     "cannotExportEmptyCanvas": "Kan inte exportera tom canvas.",
-    "couldNotCopyToClipboard": "Det gick inte att kopiera till urklipp. Prova att använda en annan webbläsare.",
+    "couldNotCopyToClipboard": "Kunde inte kopiera till urklipp.",
     "decryptFailed": "Kunde inte avkryptera data.",
     "uploadedSecurly": "Uppladdning har säkrats med kryptering från ände till ände. vilket innebär att Excalidraw server och tredje part inte kan läsa innehållet.",
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
     "collabStopOverridePrompt": "Att stoppa sessionen kommer att skriva över din föregående, lokalt lagrade skiss. Är du säker?\n\n(Om du vill behålla din lokala skiss, stäng bara webbläsarfliken istället.)",
-    "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
     "errorAddingToLibrary": "Kunde inte lägga till objekt i biblioteket",
     "errorRemovingFromLibrary": "Kunde inte ta bort objekt från biblioteket",
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
@@ -166,14 +187,17 @@
     "invalidSceneUrl": "Det gick inte att importera skiss från den angivna webbadressen. Antingen har den fel format, eller så innehåller den ingen giltig Excalidraw JSON data.",
     "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?",
     "removeItemsFromsLibrary": "Ta bort {{count}} objekt från biblioteket?",
-    "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat."
+    "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat.",
+    "browserZoom": "Din webbläsares zoomnivå är inte satt till 100% vilket kan orsaka att tavlan visas felaktigt"
   },
   "errors": {
     "unsupportedFileType": "Filtypen stöds inte.",
     "imageInsertError": "Kunde inte infoga bild. Försök igen senare...",
     "fileTooBig": "Filen är för stor. Maximal tillåten storlek är {{maxSize}}.",
     "svgImageInsertError": "Kunde inte infoga SVG-bild. SVG-koden ser ogiltig ut.",
-    "invalidSVGString": "Ogiltig SVG."
+    "invalidSVGString": "Ogiltig SVG.",
+    "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
+    "importLibraryError": "Kunde inte ladda bibliotek"
   },
   "toolBar": {
     "selection": "Markering",
@@ -186,7 +210,10 @@
     "freedraw": "Rita",
     "text": "Text",
     "library": "Bibliotek",
-    "lock": "Håll valt verktyg aktivt efter ritande"
+    "lock": "Håll valt verktyg aktivt efter ritande",
+    "penMode": "Förhindra nypzoom och acceptera endast frihandsteckning från penna",
+    "link": "Lägg till / Uppdatera länk för en vald form",
+    "eraser": "Radergummi"
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",
@@ -211,7 +238,8 @@
     "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt",
     "publishLibrary": "Publicera ditt eget bibliotek",
     "bindTextToElement": "Tryck på Enter för att lägga till text",
-    "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra"
+    "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra",
+    "eraserRevert": "Håll Alt för att återställa de element som är markerade för borttagning"
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
@@ -271,14 +299,15 @@
     "howto": "Följ våra guider",
     "or": "eller",
     "preventBinding": "Förhindra pilbindning",
-    "shapes": "Former",
+    "tools": "Verktyg",
     "shortcuts": "Tangentbordsgenvägar",
     "textFinish": "Slutför redigering (text)",
     "textNewLine": "Lägg till ny rad (text)",
     "title": "Hjälp",
     "view": "Visa",
     "zoomToFit": "Zooma för att rymma alla element",
-    "zoomToSelection": "Zooma till markering"
+    "zoomToSelection": "Zooma till markering",
+    "toggleElementLock": "Lås/Lås upp valda"
   },
   "clearCanvasDialog": {
     "title": "Rensa canvas"
@@ -320,7 +349,8 @@
       "post": "vilket kort sagt betyder att vem som helst kan använda det utan restriktioner."
     },
     "noteItems": "Varje objekt måste ha sitt eget namn så att det är filtrerbart. Följande objekt kommer att inkluderas:",
-    "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång"
+    "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång",
+    "republishWarning": "Obs: några av de markerade objekten är redan markerade som publicerade/skickade. Du bör endast skicka objekt igen när du uppdaterar ett befintligt bibliotek eller inlämning."
   },
   "publishSuccessDialog": {
     "title": "Bibliotek inskickat",

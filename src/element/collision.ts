@@ -24,6 +24,7 @@ import {
   NonDeleted,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
+  ExcalidrawLinearElement,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -96,7 +97,6 @@ export const isHittingElementNotConsideringBoundingBox = (
     : isElementDraggableFromInside(element)
     ? isInsideCheck
     : isNearCheck;
-
   return hitTestPointAgainstElement({ element, point, threshold, check });
 };
 
@@ -105,7 +105,7 @@ const isElementSelected = (
   element: NonDeleted<ExcalidrawElement>,
 ) => appState.selectedElementIds[element.id];
 
-const isPointHittingElementBoundingBox = (
+export const isPointHittingElementBoundingBox = (
   element: NonDeleted<ExcalidrawElement>,
   [x, y]: Point,
   threshold: number,
@@ -362,6 +362,14 @@ const hitTestFreeDrawElement = (
     B = element.points[i + 1];
   }
 
+  const shape = getShapeForElement(element);
+
+  // for filled freedraw shapes, support
+  // selecting from inside
+  if (shape && shape.sets.length) {
+    return hitTestRoughShape(shape, x, y, threshold);
+  }
+
   return false;
 };
 
@@ -384,7 +392,11 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
   }
   const [relX, relY] = GAPoint.toTuple(point);
 
-  const shape = getShapeForElement(element) as Drawable[];
+  const shape = getShapeForElement(element as ExcalidrawLinearElement);
+
+  if (!shape) {
+    return false;
+  }
 
   if (args.check === isInsideCheck) {
     const hit = shape.some((subshape) =>
@@ -634,7 +646,7 @@ const getCorners = (
 
 // Returns intersection of `line` with `segment`, with `segment` moved by
 // `gap` in its polar direction.
-// If intersection conincides with second segment point returns empty array.
+// If intersection coincides with second segment point returns empty array.
 const intersectSegment = (
   line: GA.Line,
   segment: [GA.Point, GA.Point],
@@ -822,7 +834,7 @@ const hitTestCurveInside = (
   sharpness: ExcalidrawElement["strokeSharpness"],
 ) => {
   const ops = getCurvePathOps(drawable);
-  const points: Point[] = [];
+  const points: Mutable<Point>[] = [];
   let odd = false; // select one line out of double lines
   for (const operation of ops) {
     if (operation.op === "move") {
@@ -836,13 +848,17 @@ const hitTestCurveInside = (
         points.push([operation.data[2], operation.data[3]]);
         points.push([operation.data[4], operation.data[5]]);
       }
+    } else if (operation.op === "lineTo") {
+      if (odd) {
+        points.push([operation.data[0], operation.data[1]]);
+      }
     }
   }
   if (points.length >= 4) {
     if (sharpness === "sharp") {
       return isPointInPolygon(points, x, y);
     }
-    const polygonPoints = pointsOnBezierCurves(points as any, 10, 5);
+    const polygonPoints = pointsOnBezierCurves(points, 10, 5);
     return isPointInPolygon(polygonPoints, x, y);
   }
   return false;
@@ -897,9 +913,10 @@ const hitTestRoughShape = (
       // position of the previous operation
       return retVal;
     } else if (op === "lineTo") {
-      // TODO: Implement this
+      return hitTestCurveInside(drawable, x, y, "sharp");
     } else if (op === "qcurveTo") {
       // TODO: Implement this
+      console.warn("qcurveTo is not implemented yet");
     }
 
     return false;

@@ -9,6 +9,7 @@
     "copy": "コピー",
     "copyAsPng": "PNGとしてクリップボードへコピー",
     "copyAsSvg": "SVGとしてクリップボードへコピー",
+    "copyText": "テキストとしてクリップボードにコピー",
     "bringForward": "前面に移動",
     "sendToBack": "最背面に移動",
     "bringToFront": "最前面に移動",
@@ -16,17 +17,17 @@
     "delete": "削除",
     "copyStyles": "スタイルのコピー",
     "pasteStyles": "スタイルの貼り付け",
-    "stroke": "線の色",
-    "background": "背景の色",
+    "stroke": "線",
+    "background": "背景",
     "fill": "塗りつぶし",
-    "strokeWidth": "線の幅",
+    "strokeWidth": "線の太さ",
     "strokeStyle": "線の種類",
     "strokeStyle_solid": "実線",
     "strokeStyle_dashed": "破線",
     "strokeStyle_dotted": "点線",
-    "sloppiness": "線のばらつき",
+    "sloppiness": "ばらつき加減",
     "opacity": "透明度",
-    "textAlign": "テキストの配置",
+    "textAlign": "文字の配置",
     "edges": "角",
     "sharp": "四角",
     "round": "丸",
@@ -64,6 +65,7 @@
     "cartoonist": "漫画風",
     "fileTitle": "ファイル名",
     "colorPicker": "色選択",
+    "canvasColors": "キャンバス上で使用",
     "canvasBackground": "キャンバスの背景",
     "drawingCanvas": "キャンバスの描画",
     "layers": "レイヤー",
@@ -103,8 +105,28 @@
     "toggleTheme": "テーマの切り替え",
     "personalLib": "個人ライブラリ",
     "excalidrawLib": "Excalidrawライブラリ",
-    "decreaseFontSize": "",
-    "increaseFontSize": ""
+    "decreaseFontSize": "フォントサイズを縮小",
+    "increaseFontSize": "フォントサイズを拡大",
+    "unbindText": "テキストのバインド解除",
+    "bindText": "テキストをコンテナにバインド",
+    "link": {
+      "edit": "リンクを編集",
+      "create": "リンクを作成",
+      "label": "リンク"
+    },
+    "elementLock": {
+      "lock": "ロック",
+      "unlock": "ロック解除",
+      "lockAll": "すべてロック",
+      "unlockAll": "すべてのロックを解除"
+    },
+    "statusPublished": "公開済み",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -152,12 +174,11 @@
     "couldNotLoadInvalidFile": "無効なファイルを読み込めませんでした。",
     "importBackendFailed": "サーバーからの読み込みに失敗しました。",
     "cannotExportEmptyCanvas": "空のキャンバスはエクスポートできません。",
-    "couldNotCopyToClipboard": "クリップボードにコピーできません。Google Chromeでお試しください。",
+    "couldNotCopyToClipboard": "クリップボードにコピーできませんでした。",
     "decryptFailed": "データを復号できませんでした。",
     "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。",
     "loadSceneOverridePrompt": "外部図面を読み込むと、既存のコンテンツが置き換わります。続行しますか？",
     "collabStopOverridePrompt": "セッションを停止すると、ローカルに保存されている図が上書きされます。 本当によろしいですか？\n\n(ローカルの図を保持したい場合は、セッションを停止せずにブラウザタブを閉じてください。)",
-    "errorLoadingLibrary": "サードパーティライブラリの読み込み中にエラーが発生しました。",
     "errorAddingToLibrary": "アイテムをライブラリに追加できませんでした",
     "errorRemovingFromLibrary": "ライブラリからアイテムを削除できませんでした",
     "confirmAddLibrary": "{{numShapes}} 個の図形をライブラリに追加します。よろしいですか？",
@@ -166,14 +187,17 @@
     "invalidSceneUrl": "指定された URL からシーンをインポートできませんでした。不正な形式であるか、有効な Excalidraw JSON データが含まれていません。",
     "resetLibrary": "ライブラリを消去します。本当によろしいですか？",
     "removeItemsFromsLibrary": "{{count}} 個のアイテムをライブラリから削除しますか？",
-    "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。"
+    "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。",
+    "browserZoom": ""
   },
   "errors": {
     "unsupportedFileType": "サポートされていないファイル形式です。",
     "imageInsertError": "画像を挿入できませんでした。後でもう一度お試しください...",
     "fileTooBig": "ファイルが大きすぎます。許可される最大サイズは {{maxSize}} です。",
     "svgImageInsertError": "SVGイメージを挿入できませんでした。SVGマークアップは無効に見えます。",
-    "invalidSVGString": "無効なSVGです。"
+    "invalidSVGString": "無効なSVGです。",
+    "cannotResolveCollabServer": "コラボレーションサーバに接続できませんでした。ページを再読み込みして、もう一度お試しください。",
+    "importLibraryError": "ライブラリを読み込めませんでした。"
   },
   "toolBar": {
     "selection": "選択",
@@ -186,7 +210,10 @@
     "freedraw": "描画",
     "text": "テキスト",
     "library": "ライブラリ",
-    "lock": "描画後も使用中のツールを選択したままにする"
+    "lock": "描画後も使用中のツールを選択したままにする",
+    "penMode": "ピンチとズームを抑止し、ペンからのみ自由な入力を受け付けます",
+    "link": "選択した図形のリンクを追加/更新",
+    "eraser": "消しゴム"
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -211,7 +238,8 @@
     "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
     "publishLibrary": "自分のライブラリを公開",
     "bindTextToElement": "Enterを押してテキストを追加",
-    "deepBoxSelect": ""
+    "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行います",
+    "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す"
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
@@ -258,8 +286,8 @@
   "helpDialog": {
     "blog": "公式ブログを読む",
     "click": "クリック",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "深い選択",
+    "deepBoxSelect": "ボックス内の深い選択、およびドラッグの抑止",
     "curvedArrow": "カーブした矢印",
     "curvedLine": "曲線",
     "documentation": "ドキュメント",
@@ -271,14 +299,15 @@
     "howto": "ヘルプ・マニュアル",
     "or": "または",
     "preventBinding": "矢印を結合しない",
-    "shapes": "図形",
+    "tools": "ツール",
     "shortcuts": "キーボードショートカット",
     "textFinish": "編集を終了 (テキストエディタ)",
     "textNewLine": "新しい行を追加 (テキスト)",
     "title": "ヘルプ",
     "view": "表示",
     "zoomToFit": "すべての要素が収まるようにズーム",
-    "zoomToSelection": "選択要素にズーム"
+    "zoomToSelection": "選択要素にズーム",
+    "toggleElementLock": "選択したアイテムをロック/ロック解除"
   },
   "clearCanvasDialog": {
     "title": "キャンバスを消去"
@@ -316,11 +345,12 @@
     },
     "noteLicense": {
       "pre": "提出することにより、ライブラリが次の下で公開されることに同意します： ",
-      "link": "MIT ライセンス",
+      "link": "MIT ライセンス ",
       "post": "つまり誰でも制限なく使えるということです"
     },
-    "noteItems": "",
-    "atleastOneLibItem": "開始するには少なくとも1つのライブラリ項目を選択してください"
+    "noteItems": "各ライブラリ項目は、フィルタリングのために独自の名前を持つ必要があります。以下のライブラリアイテムが含まれます:",
+    "atleastOneLibItem": "開始するには少なくとも1つのライブラリ項目を選択してください",
+    "republishWarning": "注意: 選択された項目の中には、すでに公開/投稿済みと表示されているものがあります。既存のライブラリや投稿を更新する場合のみ、アイテムを再投稿してください。"
   },
   "publishSuccessDialog": {
     "title": "ライブラリを送信しました",

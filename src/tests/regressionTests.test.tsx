@@ -26,14 +26,6 @@ const mouse = new Pointer("mouse");
 const finger1 = new Pointer("touch", 1);
 const finger2 = new Pointer("touch", 2);
 
-const clickLabeledElement = (label: string) => {
-  const element = document.querySelector(`[aria-label='${label}']`);
-  if (!element) {
-    throw new Error(`No labeled element found: ${label}`);
-  }
-  fireEvent.click(element);
-};
-
 /**
  * This is always called at the end of your test, so usually you don't need to call it.
  * However, if you have a long test, you might want to call it during the test so it's easier
@@ -143,7 +135,7 @@ describe("regression tests", () => {
   for (const [keys, shape, shouldSelect] of [
     [`2${KEYS.R}`, "rectangle", true],
     [`3${KEYS.D}`, "diamond", true],
-    [`4${KEYS.E}`, "ellipse", true],
+    [`4${KEYS.O}`, "ellipse", true],
     [`5${KEYS.A}`, "arrow", true],
     [`6${KEYS.L}`, "line", true],
     [`7${KEYS.X}`, "freedraw", false],
@@ -152,7 +144,7 @@ describe("regression tests", () => {
       it(`key ${key} selects ${shape} tool`, () => {
         Keyboard.keyPress(key);
 
-        expect(h.state.elementType).toBe(shape);
+        expect(h.state.activeTool.type).toBe(shape);
 
         mouse.down(10, 10);
         mouse.up(10, 10);
@@ -168,10 +160,10 @@ describe("regression tests", () => {
     mouse.down(10, 10);
     mouse.up(10, 10);
 
-    clickLabeledElement("Background");
-    clickLabeledElement(t("colors.fa5252"));
-    clickLabeledElement("Stroke");
-    clickLabeledElement(t("colors.5f3dc4"));
+    UI.clickLabeledElement("Background");
+    UI.clickLabeledElement(t("colors.fa5252"));
+    UI.clickLabeledElement("Stroke");
+    UI.clickLabeledElement(t("colors.5f3dc4"));
     expect(API.getSelectedElement().backgroundColor).toBe("#fa5252");
     expect(API.getSelectedElement().strokeColor).toBe("#5f3dc4");
   });
@@ -287,22 +279,39 @@ describe("regression tests", () => {
   });
 
   it("two-finger scroll works", () => {
-    const startScrollY = h.state.scrollY;
-    finger1.down(50, 50);
-    finger2.down(60, 50);
+    // scroll horizontally vertically
 
-    finger1.up(0, -10);
-    finger2.up(0, -10);
+    const startScrollY = h.state.scrollY;
+
+    finger1.downAt(0, 0);
+    finger2.downAt(10, 0);
+
+    finger1.clientY -= 10;
+    finger2.clientY -= 10;
+
+    finger1.moveTo();
+    finger2.moveTo();
+
+    finger1.upAt();
+    finger2.upAt();
     expect(h.state.scrollY).toBeLessThan(startScrollY);
+
+    // scroll horizontally
 
     const startScrollX = h.state.scrollX;
 
-    finger1.restorePosition(50, 50);
-    finger2.restorePosition(50, 60);
-    finger1.down();
-    finger2.down();
-    finger1.up(10, 0);
-    finger2.up(10, 0);
+    finger1.downAt();
+    finger2.downAt();
+
+    finger1.clientX += 10;
+    finger2.clientX += 10;
+
+    finger1.moveTo();
+    finger2.moveTo();
+
+    finger1.upAt();
+    finger2.upAt();
+
     expect(h.state.scrollX).toBeGreaterThan(startScrollX);
   });
 
@@ -929,14 +938,14 @@ describe("regression tests", () => {
 
   it(
     "given a selected element A and a not selected element B with higher z-index than A " +
-      "and given B partialy overlaps A " +
+      "and given B partially overlaps A " +
       "when there's a shift-click on the overlapped section B is added to the selection",
     () => {
       UI.clickTool("rectangle");
       // change background color since default is transparent
       // and transparent elements can't be selected by clicking inside of them
-      clickLabeledElement("Background");
-      clickLabeledElement(t("colors.fa5252"));
+      UI.clickLabeledElement("Background");
+      UI.clickLabeledElement(t("colors.fa5252"));
       mouse.down();
       mouse.up(1000, 1000);
 
@@ -1042,8 +1051,8 @@ describe("regression tests", () => {
     mouse.up(10, 10);
     expect(screen.queryByText(/fill/i)).toBeNull();
 
-    clickLabeledElement("Background");
-    clickLabeledElement(t("colors.fa5252"));
+    UI.clickLabeledElement("Background");
+    UI.clickLabeledElement(t("colors.fa5252"));
     // select rectangle
     mouse.reset();
     mouse.click();

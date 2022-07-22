@@ -1,5 +1,5 @@
 import { Point } from "../types";
-import { FONT_FAMILY, THEME } from "../constants";
+import { FONT_FAMILY, THEME, VERTICAL_ALIGN } from "../constants";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid";
@@ -12,7 +12,9 @@ export type PointerType = "mouse" | "pen" | "touch";
 export type StrokeSharpness = "round" | "sharp";
 export type StrokeStyle = "solid" | "dashed" | "dotted";
 export type TextAlign = "left" | "center" | "right";
-export type VerticalAlign = "top" | "middle";
+
+type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
+export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;
@@ -52,6 +54,8 @@ type _ExcalidrawElementBase = Readonly<{
     | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
+  link: string | null;
+  locked: boolean;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
@@ -132,8 +136,14 @@ export type ExcalidrawBindableElement =
   | ExcalidrawTextElement
   | ExcalidrawImageElement;
 
+export type ExcalidrawTextContainer =
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement
+  | ExcalidrawImageElement;
+
 export type ExcalidrawTextElementWithContainer = {
-  containerId: ExcalidrawGenericElement["id"];
+  containerId: ExcalidrawTextContainer["id"];
 } & ExcalidrawTextElement;
 
 export type PointBinding = {

@@ -1,12 +1,10 @@
-import { SHAPES } from "../shapes";
 import { updateBoundElements } from "./binding";
 import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import Scene from "../scene/Scene";
 import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState } from "../types";
-import { getBoundTextElementId } from "./textElement";
+import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
 
 export const dragSelectedElements = (
@@ -39,16 +37,14 @@ export const dragSelectedElements = (
       // container is part of a group, but we're dragging the container directly
       (appState.editingGroupId && !isSelectedViaGroup(appState, element))
     ) {
-      const boundTextElementId = getBoundTextElementId(element);
-      if (boundTextElementId) {
-        const textElement =
-          Scene.getScene(element)!.getElement(boundTextElementId);
+      const textElement = getBoundTextElement(element);
+      if (textElement) {
         updateElementCoords(
           lockDirection,
           distanceX,
           distanceY,
           pointerDownState,
-          textElement!,
+          textElement,
           offset,
         );
       }
@@ -96,7 +92,7 @@ export const getDragOffsetXY = (
 
 export const dragNewElement = (
   draggingElement: NonDeletedExcalidrawElement,
-  elementType: typeof SHAPES[number]["value"],
+  elementType: AppState["activeTool"]["type"],
   originX: number,
   originY: number,
   x: number,
