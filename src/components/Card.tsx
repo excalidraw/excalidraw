@@ -4,6 +4,7 @@ import "./Card.scss";
 
 export const Card: React.FC<{
   color: keyof OpenColor | "primary";
+  children?: React.ReactNode;
 }> = ({ children, color }) => {
   return (
     <div

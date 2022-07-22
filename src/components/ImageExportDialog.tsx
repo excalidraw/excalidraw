@@ -58,6 +58,7 @@ const ExportButton: React.FC<{
   onClick: () => void;
   title: string;
   shade?: number;
+  children?: React.ReactNode;
 }> = ({ children, title, onClick, color, shade = 6 }) => {
   return (
     <button

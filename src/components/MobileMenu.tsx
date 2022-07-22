@@ -68,7 +68,7 @@ export const MobileMenu = ({
     return (
       <FixedSideContainer side="top" className="App-top-bar">
         <Section heading="shapes">
-          {(heading) => (
+          {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
               <Stack.Row gap={1} className="App-toolbar-container">
                 <Island padding={1} className="App-toolbar">
