@@ -30,8 +30,7 @@ body:
       description: |
         Please let us know which Operting System, Browser and Browser version you were using when the issue occurred.
       placeholder: |
-        - OS: [e.g. macOS, Windows, Linux, iOS, Android]
-        - Browser: [e.g. Chrome, Safari, Firefox, React Native]
-        - Version: [e.g. 91.1]
+        - OS + version: e.g. MacOS Big Sur, Windows 11, Linux, iOS 14, Android
+        - Browser + version: e.g. Chrome 104, Safari 15, Firefox 102
     validations:
       required: true
