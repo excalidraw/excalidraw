@@ -1,4 +1,4 @@
-name: '🐛 Bug report'
+name: "🐛 Bug report"
 description: Report a reproducible bug or regression
 body:
   - type: markdown
@@ -23,63 +23,6 @@ body:
       description: Provide a clear and concise description of the challenge you are running into.
     validations:
       required: true
-  - type: input
-    id: excalidraw-link
-    attributes:
-      label: Your minimal, reproducible example
-      description: |
-        Please share a link to your excalidraw file.
-        1. Export your excalidraw file to your computer
-        2. Copy the content of the `.excalidraw` file  (FYI: this is actually JSON content)
-        3. Open the following page to share your copied code & call the filename `my-excalidraw.json`: https://gist.github.com/
-        Note:
-        - Your bug may get fixed much faster if we can run your code
-        - Please read these tips for providing a minimal example: https://stackoverflow.com/help/mcve.
-      placeholder: |
-        A link to your excalidraw file: https://gist.github.com/....
-    validations:
-      required: false
-  - type: textarea
-    id: steps
-    attributes:
-      label: Steps to reproduce
-      description: Describe the steps we have to take to reproduce the behavior.
-      placeholder: |
-        1. Go to '...'
-        2. Click on '....'
-        3. Scroll down to '....'
-        4. See error
-    validations:
-      required: true
-  - type: textarea
-    id: expected
-    attributes:
-      label: Expected behavior
-      description: Provide a clear and concise description of what you expected to happen.
-      placeholder: |
-        As a user, I expected ___ behavior but i am seeing ___
-    validations:
-      required: true
-  - type: dropdown
-    attributes:
-      label: How often does this bug happen?
-      description: |
-        Following the repro steps above, how easily are you able to reproduce this bug?
-      options:
-        - Every time
-        - Often
-        - Sometimes
-        - Only once
-  - type: textarea
-    id: screenshots_or_videos
-    attributes:
-      label: Screenshots or Videos
-      description: |
-        If applicable, add screenshots or a video to help explain your problem.
-        For more information on the supported file image/file types and the file size limits, please refer
-        to the following link: https://docs.github.com/en/github/writing-on-github/working-with-advanced-formatting/attaching-files
-      placeholder: |
-        You can drag your video or image files inside of this editor ↓
   - type: textarea
     id: platform
     attributes:
@@ -92,8 +35,3 @@ body:
         - Version: [e.g. 91.1]
     validations:
       required: true
-  - type: textarea
-    id: additional
-    attributes:
-      label: Additional context
-      description: Add any other context about the problem here.
