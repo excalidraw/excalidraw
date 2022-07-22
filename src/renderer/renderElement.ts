@@ -752,12 +752,6 @@ export const renderElement = (
       generateElementShape(element, generator);
 
       if (renderConfig.isExporting) {
-        const elementWithCanvas = generateElementWithCanvas(
-          element,
-          renderConfig,
-        );
-        drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
-      } else {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + renderConfig.scrollX;
         const cy = (y1 + y2) / 2 + renderConfig.scrollY;
@@ -769,6 +763,12 @@ export const renderElement = (
         context.translate(-shiftX, -shiftY);
         drawElementOnCanvas(element, rc, context, renderConfig);
         context.restore();
+      } else {
+        const elementWithCanvas = generateElementWithCanvas(
+          element,
+          renderConfig,
+        );
+        drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
       }
 
       break;
