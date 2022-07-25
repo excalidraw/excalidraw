@@ -48,6 +48,8 @@ const crowdinMap = {
   "lv-LV": "en-lv",
   "cs-CZ": "en-cs",
   "kk-KZ": "en-kk",
+  "vi-vn": "en-vi",
+  "mr-in": "en-mr",
 };
 
 const flags = {
@@ -95,6 +97,9 @@ const flags = {
   "zh-CN": "🇨🇳",
   "zh-HK": "🇭🇰",
   "zh-TW": "🇹🇼",
+  "eu-ES": "🇪🇦",
+  "vi-VN": "🇻🇳",
+  "mr-IN": "🇮🇳",
 };
 
 const languages = {
@@ -143,6 +148,8 @@ const languages = {
   "zh-CN": "简体中文",
   "zh-HK": "繁體中文 (香港)",
   "zh-TW": "繁體中文",
+  "vi-VN": "Tiếng Việt",
+  "mr-IN": "मराठी",
 };
 
 const percentages = fs.readFileSync(

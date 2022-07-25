@@ -53,6 +53,6 @@
     "pack": "yarn build:umd && yarn pack",
     "start": "webpack serve --config webpack.dev-server.config.js",
     "install:deps": "yarn --cwd ../ install --frozen-lockfile && yarn install --frozen-lockfile && yarn --cwd ../../../ install --frozen-lockfile && node ../../../scripts/prebuild-packages.js excalidraw",
-    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js"
+    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js && yarn gen:types"
   }
 }

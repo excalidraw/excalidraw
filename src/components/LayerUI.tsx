@@ -310,7 +310,7 @@ const LayerUI = ({
           </Stack.Col>
           {!appState.viewModeEnabled && (
             <Section heading="shapes">
-              {(heading) => (
+              {(heading: React.ReactNode) => (
                 <Stack.Col gap={4} align="start">
                   <Stack.Row
                     gap={1}
