@@ -6,18 +6,16 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "My Site",
-  tagline: "Dinosaurs are cool",
-  url: "https://your-docusaurus-test-site.com",
+  title: "Excalidraw developer docs",
+  tagline:
+    "For Excalidraw contributors or those integrating the Excalidraw editor",
+  url: "https://docs.excalidraw.com.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
-
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: "facebook", // Usually your GitHub org/user name.
-  projectName: "docusaurus", // Usually your repo name.
+  organizationName: "Excalidraw", // Usually your GitHub org/user name.
+  projectName: "excalidraw", // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
@@ -35,16 +33,7 @@ const config = {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
-        },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          editUrl: "https://github.com/excalidraw/docs/tree/master/",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -57,21 +46,25 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: "My Site",
+        title: "Excalidraw Docs",
         logo: {
-          alt: "My Site Logo",
+          alt: "Excalidraw Logo",
           src: "img/logo.svg",
         },
         items: [
           {
             type: "doc",
-            docId: "intro",
+            docId: "get-started",
             position: "left",
-            label: "Tutorial",
+            label: "Get started",
           },
-          { to: "/blog", label: "Blog", position: "left" },
           {
-            href: "https://github.com/facebook/docusaurus",
+            to: "https://blog.excalidraw.com",
+            label: "Blog",
+            position: "left",
+          },
+          {
+            to: "https://github.com/excalidraw/excalidraw",
             label: "GitHub",
             position: "right",
           },
@@ -93,16 +86,12 @@ const config = {
             title: "Community",
             items: [
               {
-                label: "Stack Overflow",
-                href: "https://stackoverflow.com/questions/tagged/docusaurus",
-              },
-              {
                 label: "Discord",
-                href: "https://discordapp.com/invite/docusaurus",
+                href: "https://discord.gg/UexuTaE",
               },
               {
                 label: "Twitter",
-                href: "https://twitter.com/docusaurus",
+                href: "https://twitter.com/excalidraw",
               },
             ],
           },
@@ -111,16 +100,16 @@ const config = {
             items: [
               {
                 label: "Blog",
-                to: "/blog",
+                to: "https://blog.excalidraw.com",
               },
               {
                 label: "GitHub",
-                href: "https://github.com/facebook/docusaurus",
+                to: "https://github.com/excalidraw/excalidraw",
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Made with ❤️ Built with Docusaurus`,
       },
       prism: {
         theme: lightCodeTheme,
