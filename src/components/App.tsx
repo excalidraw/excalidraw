@@ -1872,32 +1872,32 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        if (
-          selectedElements.length === 1 &&
-          isLinearElement(selectedElements[0])
-        ) {
-          if (
-            !this.state.editingLinearElement ||
-            this.state.editingLinearElement.elementId !== selectedElements[0].id
-          ) {
-            this.history.resumeRecording();
-            this.setState({
-              editingLinearElement: new LinearElementEditor(
-                selectedElements[0],
-                this.scene,
-              ),
-            });
-          }
-        } else if (selectedElements.length === 1) {
-          const selectedElement = selectedElements[0];
+        if (selectedElements.length === 1) {
+          if (isLinearElement(selectedElements[0])) {
+            if (
+              !this.state.editingLinearElement ||
+              this.state.editingLinearElement.elementId !==
+                selectedElements[0].id
+            ) {
+              this.history.resumeRecording();
+              this.setState({
+                editingLinearElement: new LinearElementEditor(
+                  selectedElements[0],
+                  this.scene,
+                ),
+              });
+            }
+          } else {
+            const selectedElement = selectedElements[0];
 
-          this.startTextEditing({
-            sceneX: selectedElement.x + selectedElement.width / 2,
-            sceneY: selectedElement.y + selectedElement.height / 2,
-            shouldBind: true,
-          });
-          event.preventDefault();
-          return;
+            this.startTextEditing({
+              sceneX: selectedElement.x + selectedElement.width / 2,
+              sceneY: selectedElement.y + selectedElement.height / 2,
+              shouldBind: true,
+            });
+            event.preventDefault();
+            return;
+          }
         }
       } else if (
         !event.ctrlKey &&
