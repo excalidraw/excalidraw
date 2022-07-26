@@ -1,6 +1,4 @@
-const { exec, execSync } = require("child_process");
-
-const docsPath = `${__dirname}/../docs`;
+const { exec } = require("child_process");
 
 // get files changed between prev and head commit
 exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
@@ -18,5 +16,6 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
     console.info("Skipping building docs as no valid diff found");
     process.exit(0);
   }
-  execSync(`yarn run build`, { cwd: docsPath });
+  // Exit code 1 to build the docs in ignoredBuildStep
+  process.exit(1);
 });
