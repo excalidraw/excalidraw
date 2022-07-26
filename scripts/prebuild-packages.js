@@ -12,7 +12,7 @@ if (argv.length < 3) {
 const pkg = argv[2];
 
 // What we iterate over to link
-const bins = ["cross-env", "webpack"];
+const bins = ["cross-env", "tsc", "webpack"];
 
 // Directories
 const dirsA = ["packages"];
