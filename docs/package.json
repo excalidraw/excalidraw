@@ -6,7 +6,6 @@
     "docusaurus": "docusaurus",
     "start": "docusaurus start --port 3003",
     "build": "docusaurus build",
-    "build:docs": "node ../scripts/buildDocs.js",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
