@@ -1888,10 +1888,7 @@ class App extends React.Component<AppProps, AppState> {
               ),
             });
           }
-        } else if (
-          selectedElements.length === 1 &&
-          !isLinearElement(selectedElements[0])
-        ) {
+        } else if (selectedElements.length === 1) {
           const selectedElement = selectedElements[0];
 
           this.startTextEditing({
