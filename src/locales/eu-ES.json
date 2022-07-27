@@ -187,8 +187,7 @@
     "invalidSceneUrl": "Ezin izan da eszena inportatu emandako URLtik. Gaizki eratuta dago edo ez du baliozko Excalidraw JSON daturik.",
     "resetLibrary": "Honek zure liburutegia garbituko du. Ziur zaude?",
     "removeItemsFromsLibrary": "Liburutegitik {{count}} elementu ezabatu?",
-    "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago.",
-    "browserZoom": "Zure arakatzailearen zoom-maila ez dago %100ean ezarrita eta horrek arbela gaizki bistaratzea eragin dezake"
+    "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago."
   },
   "errors": {
     "unsupportedFileType": "Onartu gabeko fitxategi mota.",
