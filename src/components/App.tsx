@@ -908,7 +908,6 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.updateDOMRect(this.initializeScene);
     }
-    this.checkIfBrowserZoomed();
   }
 
   public componentWillUnmount() {
@@ -921,25 +920,8 @@ class App extends React.Component<AppProps, AppState> {
     clearTimeout(touchTimeout);
     touchTimeout = 0;
   }
-  private checkIfBrowserZoomed = () => {
-    if (!this.device.isMobile) {
-      const scrollBarWidth = 10;
-      const widthRatio =
-        (window.outerWidth - scrollBarWidth) / window.innerWidth;
-      const isBrowserZoomed = widthRatio < 0.75 || widthRatio > 1.1;
-      if (isBrowserZoomed) {
-        this.setToast({
-          message: t("alerts.browserZoom"),
-          closable: true,
-          duration: Infinity,
-        });
-      } else {
-        this.setToast(null);
-      }
-    }
-  };
+
   private onResize = withBatchedUpdates(() => {
-    this.checkIfBrowserZoomed();
     this.scene
       .getElementsIncludingDeleted()
       .forEach((element) => invalidateShapeForElement(element));
@@ -1872,35 +1854,32 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        if (
-          selectedElements.length === 1 &&
-          isLinearElement(selectedElements[0])
-        ) {
-          if (
-            !this.state.editingLinearElement ||
-            this.state.editingLinearElement.elementId !== selectedElements[0].id
-          ) {
-            this.history.resumeRecording();
-            this.setState({
-              editingLinearElement: new LinearElementEditor(
-                selectedElements[0],
-                this.scene,
-              ),
-            });
-          }
-        } else if (
-          selectedElements.length === 1 &&
-          !isLinearElement(selectedElements[0])
-        ) {
-          const selectedElement = selectedElements[0];
+        if (selectedElements.length === 1) {
+          if (isLinearElement(selectedElements[0])) {
+            if (
+              !this.state.editingLinearElement ||
+              this.state.editingLinearElement.elementId !==
+                selectedElements[0].id
+            ) {
+              this.history.resumeRecording();
+              this.setState({
+                editingLinearElement: new LinearElementEditor(
+                  selectedElements[0],
+                  this.scene,
+                ),
+              });
+            }
+          } else {
+            const selectedElement = selectedElements[0];
 
-          this.startTextEditing({
-            sceneX: selectedElement.x + selectedElement.width / 2,
-            sceneY: selectedElement.y + selectedElement.height / 2,
-            shouldBind: true,
-          });
-          event.preventDefault();
-          return;
+            this.startTextEditing({
+              sceneX: selectedElement.x + selectedElement.width / 2,
+              sceneY: selectedElement.y + selectedElement.height / 2,
+              shouldBind: true,
+            });
+            event.preventDefault();
+            return;
+          }
         }
       } else if (
         !event.ctrlKey &&
