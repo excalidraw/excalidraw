@@ -908,7 +908,6 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.updateDOMRect(this.initializeScene);
     }
-    this.checkIfBrowserZoomed();
   }
 
   public componentWillUnmount() {
@@ -921,25 +920,8 @@ class App extends React.Component<AppProps, AppState> {
     clearTimeout(touchTimeout);
     touchTimeout = 0;
   }
-  private checkIfBrowserZoomed = () => {
-    if (!this.device.isMobile) {
-      const scrollBarWidth = 10;
-      const widthRatio =
-        (window.outerWidth - scrollBarWidth) / window.innerWidth;
-      const isBrowserZoomed = widthRatio < 0.75 || widthRatio > 1.1;
-      if (isBrowserZoomed) {
-        this.setToast({
-          message: t("alerts.browserZoom"),
-          closable: true,
-          duration: Infinity,
-        });
-      } else {
-        this.setToast(null);
-      }
-    }
-  };
+
   private onResize = withBatchedUpdates(() => {
-    this.checkIfBrowserZoomed();
     this.scene
       .getElementsIncludingDeleted()
       .forEach((element) => invalidateShapeForElement(element));
