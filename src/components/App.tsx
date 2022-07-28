@@ -4450,16 +4450,26 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
       if (this.state.selectedLinearElement) {
-        const linearElementEditor = LinearElementEditor.handlePointerUp(
-          childEvent,
-          this.state.selectedLinearElement,
-          this.state,
-        );
-        if (linearElementEditor !== this.state.selectedLinearElement) {
+        if (
+          pointerDownState.hit?.element?.id !==
+            this.state.selectedLinearElement.elementId ||
+          !pointerDownState.hit.hasHitElementInside
+        ) {
           this.setState({
-            selectedLinearElement: linearElementEditor,
-            suggestedBindings: [],
+            selectedLinearElement: null,
           });
+        } else {
+          const linearElementEditor = LinearElementEditor.handlePointerUp(
+            childEvent,
+            this.state.selectedLinearElement,
+            this.state,
+          );
+          if (linearElementEditor !== this.state.selectedLinearElement) {
+            this.setState({
+              selectedLinearElement: linearElementEditor,
+              suggestedBindings: [],
+            });
+          }
         }
       }
 
