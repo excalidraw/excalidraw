@@ -58,6 +58,7 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
+import { isLinearElement } from "../element/typeChecks";
 
 const hasEmojiSupport = supportsEmoji();
 
@@ -163,11 +164,11 @@ const renderLinearPointHandles = (
 
   LinearElementEditor.getPointsGlobalCoordinates(element).forEach(
     (point, idx) => {
-      context.strokeStyle = "red";
+      context.strokeStyle = "#6965db";
       context.setLineDash([]);
       context.fillStyle =
         appState.editingLinearElement?.selectedPointsIndices?.includes(idx)
-          ? "rgba(255, 127, 127, 0.9)"
+          ? "rgba(151, 117, 250, 0.9)"
           : "rgba(255, 255, 255, 0.9)";
       const { POINT_HANDLE_SIZE } = LinearElementEditor;
       fillCircle(
@@ -308,70 +309,82 @@ export const _renderScene = (
     !appState.multiElement &&
     !appState.editingLinearElement
   ) {
-    const selections = elements.reduce((acc, element) => {
-      const selectionColors = [];
-      // local user
-      if (
-        appState.selectedElementIds[element.id] &&
-        !isSelectedViaGroup(appState, element)
-      ) {
-        selectionColors.push(oc.black);
-      }
-      // remote users
-      if (renderConfig.remoteSelectedElementIds[element.id]) {
-        selectionColors.push(
-          ...renderConfig.remoteSelectedElementIds[element.id].map(
-            (socketId) => {
-              const { background } = getClientColors(socketId, appState);
-              return background;
-            },
-          ),
-        );
-      }
-      if (selectionColors.length) {
-        const [elementX1, elementY1, elementX2, elementY2] =
-          getElementAbsoluteCoords(element);
-        acc.push({
-          angle: element.angle,
-          elementX1,
-          elementY1,
-          elementX2,
-          elementY2,
-          selectionColors,
-        });
-      }
-      return acc;
-    }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[] }[]);
-
-    const addSelectionForGroupId = (groupId: GroupId) => {
-      const groupElements = getElementsInGroup(elements, groupId);
-      const [elementX1, elementY1, elementX2, elementY2] =
-        getCommonBounds(groupElements);
-      selections.push({
-        angle: 0,
-        elementX1,
-        elementX2,
-        elementY1,
-        elementY2,
-        selectionColors: [oc.black],
-      });
-    };
-
-    for (const groupId of getSelectedGroupIds(appState)) {
-      // TODO: support multiplayer selected group IDs
-      addSelectionForGroupId(groupId);
-    }
-
-    if (appState.editingGroupId) {
-      addSelectionForGroupId(appState.editingGroupId);
-    }
-
-    selections.forEach((selection) =>
-      renderSelectionBorder(context, renderConfig, selection),
-    );
-
     const locallySelectedElements = getSelectedElements(elements, appState);
+    const locallySelectedIds = locallySelectedElements.map(
+      (element) => element.id,
+    );
+    const isSingleArrowSelected =
+      locallySelectedElements.length === 1 &&
+      isLinearElement(locallySelectedElements[0]);
+    if (isSingleArrowSelected) {
+      renderLinearPointHandles(
+        context,
+        appState,
+        renderConfig,
+        locallySelectedElements[0] as ExcalidrawLinearElement,
+      );
+    } else {
+      const selections = elements.reduce((acc, element) => {
+        const selectionColors = [];
+        // local user
+        if (
+          locallySelectedIds.includes(element.id) &&
+          !isSelectedViaGroup(appState, element)
+        ) {
+          selectionColors.push(oc.black);
+        }
+        // remote users
+        if (renderConfig.remoteSelectedElementIds[element.id]) {
+          selectionColors.push(
+            ...renderConfig.remoteSelectedElementIds[element.id].map(
+              (socketId) => {
+                const { background } = getClientColors(socketId, appState);
+                return background;
+              },
+            ),
+          );
+        }
+        if (selectionColors.length) {
+          const [elementX1, elementY1, elementX2, elementY2] =
+            getElementAbsoluteCoords(element);
+          acc.push({
+            angle: element.angle,
+            elementX1,
+            elementY1,
+            elementX2,
+            elementY2,
+            selectionColors,
+          });
+        }
+        return acc;
+      }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[] }[]);
 
+      const addSelectionForGroupId = (groupId: GroupId) => {
+        const groupElements = getElementsInGroup(elements, groupId);
+        const [elementX1, elementY1, elementX2, elementY2] =
+          getCommonBounds(groupElements);
+        selections.push({
+          angle: 0,
+          elementX1,
+          elementX2,
+          elementY1,
+          elementY2,
+          selectionColors: [oc.black],
+        });
+      };
+
+      for (const groupId of getSelectedGroupIds(appState)) {
+        // TODO: support multiplayer selected group IDs
+        addSelectionForGroupId(groupId);
+      }
+
+      if (appState.editingGroupId) {
+        addSelectionForGroupId(appState.editingGroupId);
+      }
+      selections.forEach((selection) =>
+        renderSelectionBorder(context, renderConfig, selection),
+      );
+    }
     // Paint resize transformHandles
     context.save();
     context.translate(renderConfig.scrollX, renderConfig.scrollY);

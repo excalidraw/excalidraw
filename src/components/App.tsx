@@ -3529,16 +3529,26 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
       } else {
-        if (this.state.editingLinearElement) {
+        if (
+          this.state.editingLinearElement ||
+          this.state.selectedLinearElement
+        ) {
           const ret = LinearElementEditor.handlePointerDown(
             event,
             this.state,
-            (appState) => this.setState(appState),
             this.history,
             pointerDownState.origin,
           );
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
+          }
+          if (ret.linearElementEditor) {
+            if (this.state.editingLinearElement) {
+              this.setState({ editingLinearElement: ret.linearElementEditor });
+            }
+            if (this.state.selectedLinearElement) {
+              this.setState({ selectedLinearElement: ret.linearElementEditor });
+            }
           }
           if (ret.didAddPoint) {
             return true;
@@ -4054,10 +4064,11 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (this.state.editingLinearElement) {
+      if (this.state.editingLinearElement || this.state.selectedLinearElement) {
+        const linearElementEditor =
+          this.state.editingLinearElement || this.state.selectedLinearElement;
         const didDrag = LinearElementEditor.handlePointDragging(
           this.state,
-          (appState) => this.setState(appState),
           pointerCoords.x,
           pointerCoords.y,
           (element, pointsSceneCoords) => {
@@ -4066,11 +4077,33 @@ class App extends React.Component<AppProps, AppState> {
               pointsSceneCoords,
             );
           },
+          linearElementEditor!,
         );
-
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
+          if (
+            this.state.editingLinearElement &&
+            !this.state.editingLinearElement.isDragging
+          ) {
+            this.setState({
+              editingLinearElement: {
+                ...this.state.editingLinearElement,
+                isDragging: true,
+              },
+            });
+          }
+          if (
+            this.state.selectedLinearElement &&
+            !this.state.selectedLinearElement.isDragging
+          ) {
+            this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                isDragging: true,
+              },
+            });
+          }
           return;
         }
       }
@@ -4381,6 +4414,7 @@ class App extends React.Component<AppProps, AppState> {
         isRotating: false,
         resizingElement: null,
         selectionElement: null,
+        selectedLinearElement: null,
         cursorButton: "up",
         // text elements are reset on finalize, and resetting on pointerup
         // may cause issues with double taps
@@ -4414,6 +4448,19 @@ class App extends React.Component<AppProps, AppState> {
               suggestedBindings: [],
             });
           }
+        }
+      }
+      if (this.state.selectedLinearElement) {
+        const linearElementEditor = LinearElementEditor.handlePointerUp(
+          childEvent,
+          this.state.selectedLinearElement,
+          this.state,
+        );
+        if (linearElementEditor !== this.state.selectedLinearElement) {
+          this.setState({
+            selectedLinearElement: linearElementEditor,
+            suggestedBindings: [],
+          });
         }
       }
 
@@ -4598,6 +4645,14 @@ class App extends React.Component<AppProps, AppState> {
       // Code below handles selection when element(s) weren't
       // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
+      if (isLinearElement(hitElement)) {
+        this.setState({
+          selectedLinearElement: new LinearElementEditor(
+            hitElement,
+            this.scene,
+          ),
+        });
+      }
       if (isEraserActive(this.state)) {
         const draggedDistance = distance2d(
           this.lastPointerDown!.clientX,
