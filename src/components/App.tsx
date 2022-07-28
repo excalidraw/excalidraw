@@ -4414,7 +4414,6 @@ class App extends React.Component<AppProps, AppState> {
         isRotating: false,
         resizingElement: null,
         selectionElement: null,
-        selectedLinearElement: null,
         cursorButton: "up",
         // text elements are reset on finalize, and resetting on pointerup
         // may cause issues with double taps
@@ -4594,6 +4593,10 @@ class App extends React.Component<AppProps, AppState> {
                 ...prevState.selectedElementIds,
                 [draggingElement.id]: true,
               },
+              selectedLinearElement: new LinearElementEditor(
+                draggingElement,
+                this.scene,
+              ),
             }));
           } else {
             this.setState((prevState) => ({
@@ -4744,7 +4747,6 @@ class App extends React.Component<AppProps, AppState> {
           } else {
             // add element to selection while
             // keeping prev elements selected
-
             this.setState((_prevState) => ({
               selectedElementIds: {
                 ..._prevState.selectedElementIds,
