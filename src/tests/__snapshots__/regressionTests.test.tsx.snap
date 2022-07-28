@@ -6973,22 +6973,7 @@ Object {
     "id7": false,
   },
   "selectedGroupIds": Object {},
-  "selectedLinearElement": Object {
-    "elementId": "id4",
-    "endBindingElement": "keep",
-    "isDragging": false,
-    "lastUncommittedPoint": null,
-    "pointerDownState": Object {
-      "lastClickedPoint": -1,
-      "prevSelectedPointsIndices": null,
-    },
-    "pointerOffset": Object {
-      "x": 0,
-      "y": 0,
-    },
-    "selectedPointsIndices": null,
-    "startBindingElement": "keep",
-  },
+  "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
