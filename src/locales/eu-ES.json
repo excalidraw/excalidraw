@@ -121,12 +121,12 @@
       "unlockAll": "Desblokeatu guztiak"
     },
     "statusPublished": "Argitaratua",
-    "sidebarLock": ""
+    "sidebarLock": "Mantendu alboko barra irekita"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "Oraindik ez da elementurik gehitu...",
+    "hint_emptyLibrary": "Hautatu oihaleko elementu bat hemen gehitzeko, edo instalatu liburutegi bat beheko biltegi publikotik.",
+    "hint_emptyPrivateLibrary": "Hautatu oihaleko elementu bat hemen gehitzeko."
   },
   "buttons": {
     "clearReset": "Garbitu oihala",
@@ -187,8 +187,7 @@
     "invalidSceneUrl": "Ezin izan da eszena inportatu emandako URLtik. Gaizki eratuta dago edo ez du baliozko Excalidraw JSON daturik.",
     "resetLibrary": "Honek zure liburutegia garbituko du. Ziur zaude?",
     "removeItemsFromsLibrary": "Liburutegitik {{count}} elementu ezabatu?",
-    "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago.",
-    "browserZoom": ""
+    "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago."
   },
   "errors": {
     "unsupportedFileType": "Onartu gabeko fitxategi mota.",
