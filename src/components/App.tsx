@@ -2682,6 +2682,9 @@ class App extends React.Component<AppProps, AppState> {
         this.state.gridSize,
       );
       if (editingLinearElement !== this.state.editingLinearElement) {
+        // Since we are reading from previous state which is not possible with
+        // automatic batching in React 18 hence using flush sync to synchronously
+        // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
         flushSync(() => {
           this.setState({ editingLinearElement });
         });
