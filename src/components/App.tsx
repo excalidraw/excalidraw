@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { flushSync } from "react-dom";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
@@ -2681,7 +2682,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state.gridSize,
       );
       if (editingLinearElement !== this.state.editingLinearElement) {
-        this.setState({ editingLinearElement });
+        // Since we are reading from previous state which is not possible with
+        // automatic batching in React 18 hence using flush sync to synchronously
+        // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
+        flushSync(() => {
+          this.setState({ editingLinearElement });
+        });
       }
       if (editingLinearElement.lastUncommittedPoint != null) {
         this.maybeSuggestBindingAtCursor(scenePointer);
