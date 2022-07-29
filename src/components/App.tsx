@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { flushSync } from "react-dom";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
@@ -2681,7 +2682,9 @@ class App extends React.Component<AppProps, AppState> {
         this.state.gridSize,
       );
       if (editingLinearElement !== this.state.editingLinearElement) {
-        this.setState({ editingLinearElement });
+        flushSync(() => {
+          this.setState({ editingLinearElement });
+        });
       }
       if (editingLinearElement.lastUncommittedPoint != null) {
         this.maybeSuggestBindingAtCursor(scenePointer);
