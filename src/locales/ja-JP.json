@@ -187,8 +187,7 @@
     "invalidSceneUrl": "指定された URL からシーンをインポートできませんでした。不正な形式であるか、有効な Excalidraw JSON データが含まれていません。",
     "resetLibrary": "ライブラリを消去します。本当によろしいですか？",
     "removeItemsFromsLibrary": "{{count}} 個のアイテムをライブラリから削除しますか？",
-    "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。",
-    "browserZoom": ""
+    "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。"
   },
   "errors": {
     "unsupportedFileType": "サポートされていないファイル形式です。",

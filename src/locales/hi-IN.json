@@ -187,8 +187,7 @@
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": "",
-    "browserZoom": "आपके ब्राउज़र का ज़ूम लेवल 100% नहीं हैं इस कारण दृष्य पटल ग़लत दिख सकता हैं"
+    "invalidEncryptionKey": ""
   },
   "errors": {
     "unsupportedFileType": "",
