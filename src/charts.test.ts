@@ -117,5 +117,27 @@ describe("charts", () => {
       expect(labels).toEqual(["01", "02", "03", "04", "05", "06"]);
       expect(values).toEqual([61, -60, 85, -67, 54, 95]);
     });
+
+    it("sorts strictly numerical labels columns in ascending order", () => {
+      const spreadsheet = [
+        ["x", "y"],
+        ["1", "1"],
+        ["9", "2"],
+        ["3", "3"],
+        ["6", "4"],
+      ];
+
+      const result = tryParseCells(spreadsheet);
+
+      expect(result.type).toBe(VALID_SPREADSHEET);
+
+      const { title, labels, values } = (
+        result as { type: typeof VALID_SPREADSHEET; spreadsheet: Spreadsheet }
+      ).spreadsheet;
+
+      expect(title).toEqual("y");
+      expect(labels).toEqual(["1", "3", "6", "9"]);
+      expect(values).toEqual([1, 3, 4, 2]);
+    });
   });
 });

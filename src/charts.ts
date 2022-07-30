@@ -94,6 +94,13 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
     return { type: NOT_SPREADSHEET, reason: "Less than 2 rows" };
   }
 
+  if (isNumericColumn(rows, labelColumnIndex)) {
+    rows.sort((a, b) => {
+      const aParsed = tryParseNumber(a[labelColumnIndex])!;
+      const bParsed = tryParseNumber(b[labelColumnIndex])!;
+      return aParsed - bParsed;
+    });
+  }
   return {
     type: VALID_SPREADSHEET,
     spreadsheet: {
