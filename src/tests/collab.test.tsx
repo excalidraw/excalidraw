@@ -50,6 +50,7 @@ jest.mock("socket.io-client", () => {
     return {
       close: () => {},
       on: () => {},
+      once: () => {},
       off: () => {},
       emit: () => {},
     };
@@ -77,7 +78,7 @@ describe("collaboration", () => {
       ]);
       expect(API.getStateHistory().length).toBe(1);
     });
-    window.collab.openPortal();
+    window.collab.startCollaboration(null);
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
       expect(API.getStateHistory().length).toBe(1);

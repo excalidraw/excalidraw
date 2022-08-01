@@ -120,7 +120,13 @@
       "lockAll": "Alle sperren",
       "unlockAll": "Alle entsperren"
     },
-    "statusPublished": ""
+    "statusPublished": "Veröffentlicht",
+    "sidebarLock": "Seitenleiste offen lassen"
+  },
+  "library": {
+    "noItems": "Noch keine Elemente hinzugefügt...",
+    "hint_emptyLibrary": "Wähle ein Element auf der Zeichenfläche, um es hier hinzuzufügen. Oder installiere eine Bibliothek aus dem öffentlichen Verzeichnis.",
+    "hint_emptyPrivateLibrary": "Wähle ein Element von der Zeichenfläche, um es hier hinzuzufügen."
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -343,7 +349,7 @@
     },
     "noteItems": "Jedes Bibliothekselement muss einen eigenen Namen haben, damit es gefiltert werden kann. Die folgenden Bibliothekselemente werden hinzugefügt:",
     "atleastOneLibItem": "Bitte wähle mindestens ein Bibliothekselement aus, um zu beginnen",
-    "republishWarning": ""
+    "republishWarning": "Hinweis: Einige der ausgewählten Elemente sind bereits als veröffentlicht/eingereicht markiert. Du solltest Elemente nur erneut einreichen, wenn Du eine existierende Bibliothek oder Einreichung aktualisierst."
   },
   "publishSuccessDialog": {
     "title": "Bibliothek übermittelt",

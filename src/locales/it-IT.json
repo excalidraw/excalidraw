@@ -120,7 +120,13 @@
       "lockAll": "Blocca tutto",
       "unlockAll": "Sblocca tutto"
     },
-    "statusPublished": ""
+    "statusPublished": "Pubblicato",
+    "sidebarLock": "Mantieni aperta la barra laterale"
+  },
+  "library": {
+    "noItems": "Nessun elemento ancora aggiunto...",
+    "hint_emptyLibrary": "Selezionare un elemento su tela per aggiungerlo qui, o installare una libreria dal repository pubblico, sotto.",
+    "hint_emptyPrivateLibrary": "Selezionare un elemento su tela per aggiungerlo qui."
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -343,7 +349,7 @@
     },
     "noteItems": "Ogni elemento della libreria deve avere il proprio nome, così che sia filtrabile. Gli elementi della seguente libreria saranno inclusi:",
     "atleastOneLibItem": "Sei pregato di selezionare almeno un elemento della libreria per iniziare",
-    "republishWarning": ""
+    "republishWarning": "Nota: alcuni degli elementi selezionati sono contrassegnati come già pubblicati/presentati. È necessario reinviare gli elementi solo quando si aggiorna una libreria o una presentazione esistente."
   },
   "publishSuccessDialog": {
     "title": "Libreria inviata",

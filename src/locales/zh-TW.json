@@ -120,7 +120,13 @@
       "lockAll": "全部鎖定",
       "unlockAll": "全部解鎖"
     },
-    "statusPublished": "已發布"
+    "statusPublished": "已發布",
+    "sidebarLock": "側欄維持開啟"
+  },
+  "library": {
+    "noItems": "尚未加入任何物件...",
+    "hint_emptyLibrary": "選取畫布上的物件以加入，或從下方的公開 repository 中安裝資料庫",
+    "hint_emptyPrivateLibrary": "選擇畫布上的物件以在此加入"
   },
   "buttons": {
     "clearReset": "重置 canvas",

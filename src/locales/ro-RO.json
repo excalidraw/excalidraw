@@ -120,7 +120,13 @@
       "lockAll": "Blocare toate",
       "unlockAll": "Deblocare toate"
     },
-    "statusPublished": "Publicat"
+    "statusPublished": "Publicat",
+    "sidebarLock": "Păstrează deschisă bara laterală"
+  },
+  "library": {
+    "noItems": "Niciun element adăugat încă...",
+    "hint_emptyLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici sau instalează o bibliotecă din depozitul public, de mai jos.",
+    "hint_emptyPrivateLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici."
   },
   "buttons": {
     "clearReset": "Resetare pânză",

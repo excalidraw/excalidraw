@@ -36,6 +36,7 @@ const crowdinMap = {
   "ru-RU": "en-ru",
   "si-LK": "en-silk",
   "sk-SK": "en-sk",
+  "sl-SI": "en-sl",
   "sv-SE": "en-sv",
   "ta-IN": "en-ta",
   "tr-TR": "en-tr",
@@ -47,6 +48,8 @@ const crowdinMap = {
   "lv-LV": "en-lv",
   "cs-CZ": "en-cs",
   "kk-KZ": "en-kk",
+  "vi-vn": "en-vi",
+  "mr-in": "en-mr",
 };
 
 const flags = {
@@ -86,6 +89,7 @@ const flags = {
   "ru-RU": "🇷🇺",
   "si-LK": "🇱🇰",
   "sk-SK": "🇸🇰",
+  "sl-SI": "🇸🇮",
   "sv-SE": "🇸🇪",
   "ta-IN": "🇮🇳",
   "tr-TR": "🇹🇷",
@@ -93,6 +97,9 @@ const flags = {
   "zh-CN": "🇨🇳",
   "zh-HK": "🇭🇰",
   "zh-TW": "🇹🇼",
+  "eu-ES": "🇪🇦",
+  "vi-VN": "🇻🇳",
+  "mr-IN": "🇮🇳",
 };
 
 const languages = {
@@ -133,6 +140,7 @@ const languages = {
   "ru-RU": "Русский",
   "si-LK": "සිංහල",
   "sk-SK": "Slovenčina",
+  "sl-SI": "Slovenščina",
   "sv-SE": "Svenska",
   "ta-IN": "Tamil",
   "tr-TR": "Türkçe",
@@ -140,6 +148,8 @@ const languages = {
   "zh-CN": "简体中文",
   "zh-HK": "繁體中文 (香港)",
   "zh-TW": "繁體中文",
+  "vi-VN": "Tiếng Việt",
+  "mr-IN": "मराठी",
 };
 
 const percentages = fs.readFileSync(

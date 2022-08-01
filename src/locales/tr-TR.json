@@ -89,8 +89,8 @@
     "align": "Hizala",
     "alignTop": "Yukarı hizala",
     "alignBottom": "Aşağı hizala",
-    "alignLeft": "Sola yasla",
-    "alignRight": "Sağa yasla",
+    "alignLeft": "Sola hizala",
+    "alignRight": "Sağa hizala",
     "centerVertically": "Dikeyde ortala",
     "centerHorizontally": "Yatayda ortala",
     "distributeHorizontally": "Yatay dağıt",
@@ -120,7 +120,13 @@
       "lockAll": "Hepsini kilitle",
       "unlockAll": "Hepsinin kilidini kaldır"
     },
-    "statusPublished": "Yayınlandı"
+    "statusPublished": "Yayınlandı",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "Öğe eklenmedi...",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": "Tuvalden bir eleman seçerek sayfaya ekleyin."
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
