@@ -87,7 +87,6 @@ import {
   getDragOffsetXY,
   getElementWithTransformHandleType,
   getNormalizedDimensions,
-  getPerfectElementSize,
   getResizeArrowDirection,
   getResizeOffsetXY,
   getTransformHandleTypeFromCoords,
@@ -260,6 +259,7 @@ import {
   isPointHittingLinkIcon,
   isLocalLink,
 } from "../element/Hyperlink";
+import { getPerfectLinearSize } from "../element/sizeHelpers";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -4241,10 +4241,11 @@ class App extends React.Component<AppProps, AppState> {
         let dy = gridY - draggingElement.y;
 
         if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
-          ({ width: dx, height: dy } = getPerfectElementSize(
-            this.state.activeTool.type,
-            dx,
-            dy,
+          ({ width: dx, height: dy } = getPerfectLinearSize(
+            draggingElement.x,
+            draggingElement.y,
+            pointerCoords.x,
+            pointerCoords.y,
           ));
         }
 
