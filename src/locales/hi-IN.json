@@ -120,7 +120,13 @@
       "lockAll": "सब ताले के अंदर रखे",
       "unlockAll": "सब ताले के बाहर निकाले"
     },
-    "statusPublished": "प्रकाशित"
+    "statusPublished": "प्रकाशित",
+    "sidebarLock": "साइडबार खुला रखे."
+  },
+  "library": {
+    "noItems": "अभी तक कोई आइटम जोडा नहीं गया.",
+    "hint_emptyLibrary": "यहाँ जोड़ने के लिए पटल से एक वस्तु चुने, अथवा जन कोष से एक संग्रह नीचे स्थापित करें.",
+    "hint_emptyPrivateLibrary": "यहाँ जोड़ने के लिए पटल से एक वस्तु चुने."
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",

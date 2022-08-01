@@ -120,7 +120,13 @@
       "lockAll": "Zakleni vse",
       "unlockAll": "Odkleni vse"
     },
-    "statusPublished": "Objavljeno"
+    "statusPublished": "Objavljeno",
+    "sidebarLock": "Obdrži stransko vrstico odprto"
+  },
+  "library": {
+    "noItems": "Dodan še ni noben element...",
+    "hint_emptyLibrary": "Izberite element na platnu, da ga dodate sem, ali namestite knjižnico iz javnega skladišča spodaj.",
+    "hint_emptyPrivateLibrary": "Izberite element na platnu, da ga dodate sem."
   },
   "buttons": {
     "clearReset": "Ponastavi platno",

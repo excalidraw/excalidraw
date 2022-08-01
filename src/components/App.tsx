@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { flushSync } from "react-dom";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
@@ -166,7 +167,7 @@ import {
   isAndroid,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
-import { renderScene } from "../renderer";
+import { renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
@@ -286,6 +287,10 @@ let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
 
+// remove this hack when we can sync render & resizeObserver (state update)
+// to rAF. See #5439
+let THROTTLE_NEXT_RENDER = true;
+
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
   pointers: new Map(),
@@ -380,7 +385,7 @@ class App extends React.Component<AppProps, AppState> {
         getAppState: () => this.state,
         getFiles: () => this.files,
         refresh: this.refresh,
-        setToastMessage: this.setToastMessage,
+        setToast: this.setToast,
         id: this.id,
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
@@ -469,7 +474,6 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public render() {
-    const { zenModeEnabled, viewModeEnabled } = this.state;
     const selectedElement = getSelectedElements(
       this.scene.getNonDeletedElements(),
       this.state,
@@ -484,7 +488,7 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
-          "excalidraw--view-mode": viewModeEnabled,
+          "excalidraw--view-mode": this.state.viewModeEnabled,
           "excalidraw--mobile": this.device.isMobile,
         })}
         ref={this.excalidrawContainerRef}
@@ -515,17 +519,14 @@ class App extends React.Component<AppProps, AppState> {
                   files: null,
                 })
               }
-              zenModeEnabled={zenModeEnabled}
-              toggleZenMode={this.toggleZenMode}
               langCode={getLanguage().code}
               isCollaborating={this.props.isCollaborating}
               renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
               renderCustomStats={renderCustomStats}
-              viewModeEnabled={viewModeEnabled}
               showExitZenModeBtn={
                 typeof this.props?.zenModeEnabled === "undefined" &&
-                zenModeEnabled
+                this.state.zenModeEnabled
               }
               showThemeBtn={
                 typeof this.props?.theme === "undefined" &&
@@ -549,10 +550,12 @@ class App extends React.Component<AppProps, AppState> {
                 onLinkOpen={this.props.onLinkOpen}
               />
             )}
-            {this.state.toastMessage !== null && (
+            {this.state.toast !== null && (
               <Toast
-                message={this.state.toastMessage}
-                clearToast={this.clearToast}
+                message={this.state.toast.message}
+                onClose={() => this.setToast(null)}
+                duration={this.state.toast.duration}
+                closable={this.state.toast.closable}
               />
             )}
             <main>{this.renderCanvas()}</main>
@@ -766,6 +769,7 @@ class App extends React.Component<AppProps, AppState> {
           ? { ...scene.appState.activeTool, type: "selection" }
           : scene.appState.activeTool,
       isLoading: false,
+      toast: this.state.toast,
     };
     if (initialData?.scrollToContent) {
       scene.appState = {
@@ -859,6 +863,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => {
+        THROTTLE_NEXT_RENDER = false;
         // recompute device dimensions state
         // ---------------------------------------------------------------------
         this.refreshDeviceState(this.excalidrawContainerRef.current!);
@@ -929,6 +934,10 @@ class App extends React.Component<AppProps, AppState> {
     document.removeEventListener(EVENT.COPY, this.onCopy);
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.removeEventListener(EVENT.CUT, this.onCut);
+    this.excalidrawContainerRef.current?.removeEventListener(
+      EVENT.WHEEL,
+      this.onWheel,
+    );
     this.nearestScrollableContainer?.removeEventListener(
       EVENT.SCROLL,
       this.onScroll,
@@ -977,6 +986,12 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     document.addEventListener(EVENT.POINTER_UP, this.removePointer); // #3553
     document.addEventListener(EVENT.COPY, this.onCopy);
+    this.excalidrawContainerRef.current?.addEventListener(
+      EVENT.WHEEL,
+      this.onWheel,
+      { passive: false },
+    );
+
     if (this.props.handleKeyboardGlobally) {
       document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
     }
@@ -1193,7 +1208,8 @@ class App extends React.Component<AppProps, AppState> {
           element.id !== this.state.editingElement.id
         );
       });
-    const { atLeastOneVisibleElement, scrollBars } = renderScene(
+
+    renderScene(
       renderingElements,
       this.state,
       this.state.selectionElement,
@@ -1216,23 +1232,29 @@ class App extends React.Component<AppProps, AppState> {
         isExporting: false,
         renderScrollbars: !this.device.isMobile,
       },
+      ({ atLeastOneVisibleElement, scrollBars }) => {
+        if (scrollBars) {
+          currentScrollBars = scrollBars;
+        }
+        const scrolledOutside =
+          // hide when editing text
+          isTextElement(this.state.editingElement)
+            ? false
+            : !atLeastOneVisibleElement && renderingElements.length > 0;
+        if (this.state.scrolledOutside !== scrolledOutside) {
+          this.setState({ scrolledOutside });
+        }
+
+        this.scheduleImageRefresh();
+      },
+      THROTTLE_NEXT_RENDER && window.EXCALIDRAW_THROTTLE_RENDER === true,
     );
 
-    if (scrollBars) {
-      currentScrollBars = scrollBars;
-    }
-    const scrolledOutside =
-      // hide when editing text
-      isTextElement(this.state.editingElement)
-        ? false
-        : !atLeastOneVisibleElement && renderingElements.length > 0;
-    if (this.state.scrolledOutside !== scrolledOutside) {
-      this.setState({ scrolledOutside });
+    if (!THROTTLE_NEXT_RENDER) {
+      THROTTLE_NEXT_RENDER = true;
     }
 
     this.history.record(this.state, this.scene.getElementsIncludingDeleted());
-
-    this.scheduleImageRefresh();
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -1501,12 +1523,15 @@ class App extends React.Component<AppProps, AppState> {
             this.state.isLibraryOpen && this.device.canDeviceFitSidebar
               ? this.state.isLibraryMenuDocked
               : false,
-          selectedElementIds: newElements.reduce((map, element) => {
-            if (!isBoundToContainer(element)) {
-              map[element.id] = true;
-            }
-            return map;
-          }, {} as any),
+          selectedElementIds: newElements.reduce(
+            (acc: Record<ExcalidrawElement["id"], true>, element) => {
+              if (!isBoundToContainer(element)) {
+                acc[element.id] = true;
+              }
+              return acc;
+            },
+            {},
+          ),
           selectedGroupIds: {},
         },
         this.scene.getNonDeletedElements(),
@@ -1599,10 +1624,6 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  toggleZenMode = () => {
-    this.actionManager.executeAction(actionToggleZenMode);
-  };
-
   scrollToContent = (
     target:
       | ExcalidrawElement
@@ -1617,12 +1638,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  clearToast = () => {
-    this.setState({ toastMessage: null });
-  };
-
-  setToastMessage = (toastMessage: string) => {
-    this.setState({ toastMessage });
+  setToast = (
+    toast: {
+      message: string;
+      closable?: boolean;
+      duration?: number;
+    } | null,
+  ) => {
+    this.setState({ toast });
   };
 
   restoreFileFromShare = async () => {
@@ -1708,6 +1731,7 @@ class App extends React.Component<AppProps, AppState> {
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
       // normalize `event.key` when CapsLock is pressed #2372
+
       if (
         "Proxy" in window &&
         ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
@@ -1729,6 +1753,14 @@ class App extends React.Component<AppProps, AppState> {
               : value;
           },
         });
+      }
+
+      // prevent browser zoom in input fields
+      if (event[KEYS.CTRL_OR_CMD] && isWritableElement(event.target)) {
+        if (event.code === CODES.MINUS || event.code === CODES.EQUAL) {
+          event.preventDefault();
+          return;
+        }
       }
 
       // bail if
@@ -1823,35 +1855,32 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        if (
-          selectedElements.length === 1 &&
-          isLinearElement(selectedElements[0])
-        ) {
-          if (
-            !this.state.editingLinearElement ||
-            this.state.editingLinearElement.elementId !== selectedElements[0].id
-          ) {
-            this.history.resumeRecording();
-            this.setState({
-              editingLinearElement: new LinearElementEditor(
-                selectedElements[0],
-                this.scene,
-              ),
-            });
-          }
-        } else if (
-          selectedElements.length === 1 &&
-          !isLinearElement(selectedElements[0])
-        ) {
-          const selectedElement = selectedElements[0];
+        if (selectedElements.length === 1) {
+          if (isLinearElement(selectedElements[0])) {
+            if (
+              !this.state.editingLinearElement ||
+              this.state.editingLinearElement.elementId !==
+                selectedElements[0].id
+            ) {
+              this.history.resumeRecording();
+              this.setState({
+                editingLinearElement: new LinearElementEditor(
+                  selectedElements[0],
+                  this.scene,
+                ),
+              });
+            }
+          } else {
+            const selectedElement = selectedElements[0];
 
-          this.startTextEditing({
-            sceneX: selectedElement.x + selectedElement.width / 2,
-            sceneY: selectedElement.y + selectedElement.height / 2,
-            shouldBind: true,
-          });
-          event.preventDefault();
-          return;
+            this.startTextEditing({
+              sceneX: selectedElement.x + selectedElement.width / 2,
+              sceneY: selectedElement.y + selectedElement.height / 2,
+              shouldBind: true,
+            });
+            event.preventDefault();
+            return;
+          }
         }
       } else if (
         !event.ctrlKey &&
@@ -1912,6 +1941,13 @@ class App extends React.Component<AppProps, AppState> {
       }
     },
   );
+
+  private onWheel = withBatchedUpdates((event: WheelEvent) => {
+    // prevent browser pinch zoom on DOM elements
+    if (!(event.target instanceof HTMLCanvasElement) && event.ctrlKey) {
+      event.preventDefault();
+    }
+  });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
@@ -2646,7 +2682,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state.gridSize,
       );
       if (editingLinearElement !== this.state.editingLinearElement) {
-        this.setState({ editingLinearElement });
+        // Since we are reading from previous state which is not possible with
+        // automatic batching in React 18 hence using flush sync to synchronously
+        // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
+        flushSync(() => {
+          this.setState({ editingLinearElement });
+        });
       }
       if (editingLinearElement.lastUncommittedPoint != null) {
         this.maybeSuggestBindingAtCursor(scenePointer);
@@ -2713,6 +2754,27 @@ class App extends React.Component<AppProps, AppState> {
           points: points.slice(0, -1),
         });
       } else {
+        const [gridX, gridY] = getGridPoint(
+          scenePointerX,
+          scenePointerY,
+          this.state.gridSize,
+        );
+
+        const [lastCommittedX, lastCommittedY] =
+          multiElement?.lastCommittedPoint ?? [0, 0];
+
+        let dxFromLastCommitted = gridX - rx - lastCommittedX;
+        let dyFromLastCommitted = gridY - ry - lastCommittedY;
+
+        if (shouldRotateWithDiscreteAngle(event)) {
+          ({ width: dxFromLastCommitted, height: dyFromLastCommitted } =
+            getPerfectElementSize(
+              this.state.activeTool.type,
+              dxFromLastCommitted,
+              dyFromLastCommitted,
+            ));
+        }
+
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.canvas, CURSOR_TYPE.POINTER);
         }
@@ -2720,7 +2782,10 @@ class App extends React.Component<AppProps, AppState> {
         mutateElement(multiElement, {
           points: [
             ...points.slice(0, -1),
-            [scenePointerX - rx, scenePointerY - ry],
+            [
+              lastCommittedX + dxFromLastCommitted,
+              lastCommittedY + dyFromLastCommitted,
+            ],
           ],
         });
       }
@@ -4254,10 +4319,13 @@ class App extends React.Component<AppProps, AppState> {
                 ...prevState,
                 selectedElementIds: {
                   ...prevState.selectedElementIds,
-                  ...elementsWithinSelection.reduce((map, element) => {
-                    map[element.id] = true;
-                    return map;
-                  }, {} as any),
+                  ...elementsWithinSelection.reduce(
+                    (acc: Record<ExcalidrawElement["id"], true>, element) => {
+                      acc[element.id] = true;
+                      return acc;
+                    },
+                    {},
+                  ),
                   ...(pointerDownState.hit.element
                     ? {
                         // if using ctrl/cmd, select the hitElement only if we
@@ -5724,7 +5792,6 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
     event.preventDefault();
-
     if (isPanning) {
       return;
     }

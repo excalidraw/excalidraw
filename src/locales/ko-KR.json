@@ -65,13 +65,13 @@
     "cartoonist": "만화가",
     "fileTitle": "파일 이름",
     "colorPicker": "색상 선택기",
-    "canvasColors": "",
+    "canvasColors": "캔버스에서 사용되었음",
     "canvasBackground": "캔버스 배경",
     "drawingCanvas": "캔버스 그리기",
     "layers": "레이어",
     "actions": "동작",
     "language": "언어",
-    "liveCollaboration": "라이브 협력",
+    "liveCollaboration": "실시간 협업",
     "duplicateSelection": "복제",
     "untitled": "제목 없음",
     "name": "이름",
@@ -120,7 +120,13 @@
       "lockAll": "모두 잠금",
       "unlockAll": "모두 잠금 해제"
     },
-    "statusPublished": ""
+    "statusPublished": "게시됨",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -204,7 +210,7 @@
     "text": "텍스트",
     "library": "라이브러리",
     "lock": "선택된 도구 유지하기",
-    "penMode": "",
+    "penMode": "핀치 줌을 하지 않도록 하고 펜을 통해서 자유롭게 그리기",
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개"
   },
@@ -231,7 +237,7 @@
     "placeImage": "클릭해서 이미지를 배치하거나, 클릭하고 드래그해서 사이즈를 조정하기",
     "publishLibrary": "당신만의 라이브러리를 게시하기",
     "bindTextToElement": "Enter 키를 눌러서 텍스트 추가하기",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "CtrlOrCmd 키를 눌러서 깊게 선택하고, 드래그하지 않도록 하기",
     "eraserRevert": "Alt를 눌러서 삭제하도록 지정된 요소를 되돌리기"
   },
   "canvasError": {
@@ -279,8 +285,8 @@
   "helpDialog": {
     "blog": "블로그 읽어보기",
     "click": "클릭",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "깊게 선택",
+    "deepBoxSelect": "영역을 깊게 선택하고, 드래그하지 않도록 하기",
     "curvedArrow": "곡선 화살표",
     "curvedLine": "곡선",
     "documentation": "설명서",
@@ -343,7 +349,7 @@
     },
     "noteItems": "각각의 라이브러리는 분류할 수 있도록 고유한 이름을 가져야 합니다. 다음의 라이브러리 항목이 포함됩니다:",
     "atleastOneLibItem": "최소한 하나의 라이브러리를 선택해주세요",
-    "republishWarning": ""
+    "republishWarning": "참고: 선택된 항목의 일부는 이미 제출/게시되었습니다. 기존의 라이브러리나 제출물을 업데이트하는 경우에만 제출하세요."
   },
   "publishSuccessDialog": {
     "title": "라이브러리 제출됨",

@@ -24,7 +24,10 @@ import {
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
 } from "../../../types";
-import { ExcalidrawElement } from "../../../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 
 declare global {
@@ -75,9 +78,9 @@ const COMMENT_SVG = (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     className="feather feather-message-circle"
   >
     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
@@ -249,20 +252,28 @@ export default function App() {
     excalidrawAPI?.updateScene(sceneData);
   };
 
-  const onLinkOpen = useCallback((element, event) => {
-    const link = element.link;
-    const { nativeEvent } = event.detail;
-    const isNewTab = nativeEvent.ctrlKey || nativeEvent.metaKey;
-    const isNewWindow = nativeEvent.shiftKey;
-    const isInternalLink =
-      link.startsWith("/") || link.includes(window.location.origin);
-    if (isInternalLink && !isNewTab && !isNewWindow) {
-      // signal that we're handling the redirect ourselves
-      event.preventDefault();
-      // do a custom redirect, such as passing to react-router
-      // ...
-    }
-  }, []);
+  const onLinkOpen = useCallback(
+    (
+      element: NonDeletedExcalidrawElement,
+      event: CustomEvent<{
+        nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
+      }>,
+    ) => {
+      const link = element.link!;
+      const { nativeEvent } = event.detail;
+      const isNewTab = nativeEvent.ctrlKey || nativeEvent.metaKey;
+      const isNewWindow = nativeEvent.shiftKey;
+      const isInternalLink =
+        link.startsWith("/") || link.includes(window.location.origin);
+      if (isInternalLink && !isNewTab && !isNewWindow) {
+        // signal that we're handling the redirect ourselves
+        event.preventDefault();
+        // do a custom redirect, such as passing to react-router
+        // ...
+      }
+    },
+    [],
+  );
 
   const onCopy = async (type: string) => {
     await exportToClipboard({

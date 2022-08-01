@@ -120,7 +120,13 @@
       "lockAll": "Lås alle",
       "unlockAll": "Lås opp alle"
     },
-    "statusPublished": "Publisert"
+    "statusPublished": "Publisert",
+    "sidebarLock": "Holde sidemenyen åpen"
+  },
+  "library": {
+    "noItems": "Ingen elementer lagt til ennå...",
+    "hint_emptyLibrary": "Velg et objekt på lerretet for å legge det til her, eller installer et bibliotek fra den offentlige samlingen under.",
+    "hint_emptyPrivateLibrary": "Velg et objekt på lerretet for å legge det til her."
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",

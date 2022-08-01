@@ -120,7 +120,13 @@
       "lockAll": "Kunci semua",
       "unlockAll": "Lepas semua"
     },
-    "statusPublished": ""
+    "statusPublished": "Telah terbit",
+    "sidebarLock": "Biarkan sidebar tetap terbuka"
+  },
+  "library": {
+    "noItems": "Belum ada item yang ditambahkan...",
+    "hint_emptyLibrary": "Pilih item pada kanvas untuk menambahkan nya di sini, atau pasang pustaka dari gudang di bawah ini.",
+    "hint_emptyPrivateLibrary": "Pilih item pada kanvas untuk menambahkan nya di sini."
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -190,7 +196,7 @@
     "svgImageInsertError": "Tidak dapat menyisipkan gambar SVG. Markup SVG sepertinya tidak valid.",
     "invalidSVGString": "SVG tidak valid.",
     "cannotResolveCollabServer": "Tidak dapat terhubung ke server kolab. Muat ulang laman dan coba lagi.",
-    "importLibraryError": ""
+    "importLibraryError": "Tidak dapat memuat pustaka"
   },
   "toolBar": {
     "selection": "Pilihan",
@@ -343,7 +349,7 @@
     },
     "noteItems": "Setiap item pustaka harus memiliki nama, sehingga bisa disortir. Item pustaka di bawah ini akan dimasukan:",
     "atleastOneLibItem": "Pilih setidaknya satu item pustaka untuk mulai",
-    "republishWarning": ""
+    "republishWarning": "Catatan: beberapa item yang dipilih telah ditandai sebagai sudah dipublikasikan/diserahkan. Anda hanya dapat menyerahkan kembali item-item ketika memperbarui pustaka atau pengumpulan."
   },
   "publishSuccessDialog": {
     "title": "Pustaka telah dikirm",

@@ -8,6 +8,7 @@ export const CheckboxItem: React.FC<{
   checked: boolean;
   onChange: (checked: boolean, event: React.MouseEvent) => void;
   className?: string;
+  children?: React.ReactNode;
 }> = ({ children, checked, onChange, className }) => {
   return (
     <div
