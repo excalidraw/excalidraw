@@ -80,5 +80,5 @@ export const shouldMaintainAspectRatio = (event: MouseEvent | KeyboardEvent) =>
   event.shiftKey;
 
 export const shouldRotateWithDiscreteAngle = (
-  event: MouseEvent | KeyboardEvent,
+  event: MouseEvent | KeyboardEvent | React.PointerEvent<HTMLCanvasElement>,
 ) => event.shiftKey;
