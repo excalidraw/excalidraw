@@ -2754,6 +2754,27 @@ class App extends React.Component<AppProps, AppState> {
           points: points.slice(0, -1),
         });
       } else {
+        const [gridX, gridY] = getGridPoint(
+          scenePointerX,
+          scenePointerY,
+          this.state.gridSize,
+        );
+
+        const [lastCommittedX, lastCommittedY] =
+          multiElement?.lastCommittedPoint ?? [0, 0];
+
+        let dxFromLastCommitted = gridX - rx - lastCommittedX;
+        let dyFromLastCommitted = gridY - ry - lastCommittedY;
+
+        if (shouldRotateWithDiscreteAngle(event)) {
+          ({ width: dxFromLastCommitted, height: dyFromLastCommitted } =
+            getPerfectElementSize(
+              this.state.activeTool.type,
+              dxFromLastCommitted,
+              dyFromLastCommitted,
+            ));
+        }
+
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.canvas, CURSOR_TYPE.POINTER);
         }
@@ -2761,7 +2782,10 @@ class App extends React.Component<AppProps, AppState> {
         mutateElement(multiElement, {
           points: [
             ...points.slice(0, -1),
-            [scenePointerX - rx, scenePointerY - ry],
+            [
+              lastCommittedX + dxFromLastCommitted,
+              lastCommittedY + dyFromLastCommitted,
+            ],
           ],
         });
       }
