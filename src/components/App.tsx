@@ -2860,10 +2860,14 @@ class App extends React.Component<AppProps, AppState> {
         setCursor(this.canvas, CURSOR_TYPE.GRAB);
       } else if (isOverScrollBar) {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
-      } else if (this.state.editingLinearElement) {
-        const element = LinearElementEditor.getElement(
-          this.state.editingLinearElement.elementId,
-        );
+      } else if (
+        this.state.editingLinearElement ||
+        this.state.selectedLinearElement
+      ) {
+        const elementId =
+          this.state.editingLinearElement?.elementId ||
+          this.state?.selectedLinearElement?.elementId;
+        const element = LinearElementEditor.getElement(elementId!);
 
         if (
           element &&
@@ -4110,6 +4114,10 @@ class App extends React.Component<AppProps, AppState> {
         (!this.state.editingLinearElement ||
           this.state.editingLinearElement?.elementId !==
             pointerDownState.hit.element?.id ||
+          pointerDownState.hit.hasHitElementInside) &&
+        (!this.state.selectedLinearElement ||
+          this.state.selectedLinearElement?.elementId !==
+            pointerDownState.hit.element?.id ||
           pointerDownState.hit.hasHitElementInside)
       ) {
         const selectedElements = getSelectedElements(
@@ -4138,7 +4146,6 @@ class App extends React.Component<AppProps, AppState> {
 
           // We only drag in one direction if shift is pressed
           const lockDirection = event.shiftKey;
-
           dragSelectedElements(
             pointerDownState,
             selectedElements,
