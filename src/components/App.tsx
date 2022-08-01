@@ -2867,16 +2867,26 @@ class App extends React.Component<AppProps, AppState> {
         const elementId =
           this.state.editingLinearElement?.elementId ||
           this.state?.selectedLinearElement?.elementId;
-        const element = LinearElementEditor.getElement(elementId!);
+        const element = LinearElementEditor.getElement(elementId!)!;
 
-        if (
-          element &&
-          isHittingElementNotConsideringBoundingBox(element, this.state, [
-            scenePointer.x,
-            scenePointer.y,
-          ])
-        ) {
-          setCursor(this.canvas, CURSOR_TYPE.MOVE);
+        if (element) {
+          const clickedPointIndex =
+            LinearElementEditor.getPointIndexUnderCursor(
+              element,
+              this.state.zoom,
+              scenePointerX,
+              scenePointerY,
+            );
+          if (clickedPointIndex >= 0) {
+            setCursor(this.canvas, CURSOR_TYPE.POINTER);
+          } else if (
+            isHittingElementNotConsideringBoundingBox(element, this.state, [
+              scenePointer.x,
+              scenePointer.y,
+            ])
+          ) {
+            setCursor(this.canvas, CURSOR_TYPE.MOVE);
+          }
         } else {
           setCursor(this.canvas, CURSOR_TYPE.AUTO);
         }
