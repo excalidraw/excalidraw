@@ -48,10 +48,13 @@ const allLanguages: Language[] = [
   { code: "ru-RU", label: "Русский" },
   { code: "sk-SK", label: "Slovenčina" },
   { code: "sv-SE", label: "Svenska" },
+  { code: "sl-SI", label: "Slovenščina" },
   { code: "tr-TR", label: "Türkçe" },
   { code: "uk-UA", label: "Українська" },
   { code: "zh-CN", label: "简体中文" },
   { code: "zh-TW", label: "繁體中文" },
+  { code: "vi-VN", label: "Tiếng Việt" },
+  { code: "mr-IN", label: "मराठी" },
 ].concat([defaultLang]);
 
 export const languages: Language[] = allLanguages
@@ -86,7 +89,7 @@ export const setLanguage = async (lang: Language) => {
     currentLangData = {};
   } else {
     currentLangData = await import(
-      /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLang.code}.json`
+      /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
     );
   }
 };

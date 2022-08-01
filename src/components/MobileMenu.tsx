@@ -37,7 +37,6 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  viewModeEnabled: boolean;
   showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
@@ -61,7 +60,6 @@ export const MobileMenu = ({
   canvas,
   isCollaborating,
   renderCustomFooter,
-  viewModeEnabled,
   showThemeBtn,
   onImageAction,
   renderTopRightUI,
@@ -74,7 +72,7 @@ export const MobileMenu = ({
       <>
         <FixedSideContainer side="top" className="App-top-bar">
           <Section heading="shapes">
-            {(heading) => (
+            {(heading: React.ReactNode) => (
               <Stack.Col gap={4} align="center">
                 <Stack.Row gap={1} className="App-toolbar-container">
                   <Island padding={1} className="App-toolbar">
@@ -136,7 +134,7 @@ export const MobileMenu = ({
       !appState.editingElement &&
       getSelectedElements(elements, appState).length === 0;
 
-    if (viewModeEnabled) {
+    if (appState.viewModeEnabled) {
       return (
         <div className="App-toolbar-content">
           {actionManager.renderAction("toggleCanvasMenu")}
@@ -162,7 +160,7 @@ export const MobileMenu = ({
   };
 
   const renderCanvasActions = () => {
-    if (viewModeEnabled) {
+    if (appState.viewModeEnabled) {
       return (
         <>
           {renderJSONExportDialog()}
@@ -196,7 +194,7 @@ export const MobileMenu = ({
   };
   return (
     <>
-      {!viewModeEnabled && renderToolbar()}
+      {!appState.viewModeEnabled && renderToolbar()}
       {renderStats()}
       <div
         className="App-bottom-bar"
@@ -227,7 +225,7 @@ export const MobileMenu = ({
               </div>
             </Section>
           ) : appState.openMenu === "shape" &&
-            !viewModeEnabled &&
+            !appState.viewModeEnabled &&
             showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
               <SelectedShapeActions
@@ -240,18 +238,20 @@ export const MobileMenu = ({
           ) : null}
           <footer className="App-toolbar">
             {renderAppToolbar()}
-            {appState.scrolledOutside && !appState.openMenu && (
-              <button
-                className="scroll-back-to-content"
-                onClick={() => {
-                  setAppState({
-                    ...calculateScrollCenter(elements, appState, canvas),
-                  });
-                }}
-              >
-                {t("buttons.scrollBackToContent")}
-              </button>
-            )}
+            {appState.scrolledOutside &&
+              !appState.openMenu &&
+              !appState.isLibraryOpen && (
+                <button
+                  className="scroll-back-to-content"
+                  onClick={() => {
+                    setAppState({
+                      ...calculateScrollCenter(elements, appState, canvas),
+                    });
+                  }}
+                >
+                  {t("buttons.scrollBackToContent")}
+                </button>
+              )}
           </footer>
         </Island>
       </div>

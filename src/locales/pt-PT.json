@@ -120,7 +120,13 @@
       "lockAll": "",
       "unlockAll": ""
     },
-    "statusPublished": ""
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Limpar a área de desenho e redefinir a cor de fundo",
@@ -310,12 +316,12 @@
     "itemName": "",
     "authorName": "",
     "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
+    "twitterUsername": "Nome de utilizador no Twitter",
+    "libraryName": "Nome da biblioteca",
+    "libraryDesc": "Descrição da biblioteca",
     "website": "",
     "placeholder": {
-      "authorName": "",
+      "authorName": "Introduza o seu nome ou nome de utilizador",
       "libraryName": "",
       "libraryDesc": "",
       "githubHandle": "",
@@ -333,7 +339,7 @@
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "orientações",
       "post": ""
     },
     "noteLicense": {

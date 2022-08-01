@@ -9,7 +9,7 @@
     "copy": "Copia",
     "copyAsPng": "Copia al porta-retalls com a PNG",
     "copyAsSvg": "Copia al porta-retalls com a SVG",
-    "copyText": "",
+    "copyText": "Copia al porta-retalls com a text",
     "bringForward": "Porta endavant",
     "sendToBack": "Envia enrere",
     "bringToFront": "Porta al davant",
@@ -115,12 +115,18 @@
       "label": "Enllaç"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Bloca",
+      "unlock": "Desbloca",
+      "lockAll": "Bloca-ho tot",
+      "unlockAll": "Desbloca-ho tot"
     },
-    "statusPublished": ""
+    "statusPublished": "Publicat",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
@@ -168,7 +174,7 @@
     "couldNotLoadInvalidFile": "No s'ha pogut carregar un fitxer no vàlid",
     "importBackendFailed": "Importació fallida.",
     "cannotExportEmptyCanvas": "No es pot exportar un llenç buit.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "No s'ha pogut copiar al porta-retalls.",
     "decryptFailed": "No s'ha pogut desencriptar.",
     "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut.",
     "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?",
@@ -190,7 +196,7 @@
     "svgImageInsertError": "No ha estat possible inserir la imatge SVG. Les marques SVG semblen invàlides.",
     "invalidSVGString": "SVG no vàlid.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "No s'ha pogut carregar la biblioteca"
   },
   "toolBar": {
     "selection": "Selecció",
@@ -206,7 +212,7 @@
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
     "penMode": "Evita el zoom i accepta solament el dibuix lliure amb bolígraf",
     "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
-    "eraser": ""
+    "eraser": "Esborrador"
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -232,7 +238,7 @@
     "publishLibrary": "Publiqueu la vostra pròpia llibreria",
     "bindTextToElement": "Premeu enter per a afegir-hi text",
     "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
-    "eraserRevert": ""
+    "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar"
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
@@ -292,7 +298,7 @@
     "howto": "Seguiu les nostres guies",
     "or": "o",
     "preventBinding": "Prevenir vinculació de la fletxa",
-    "tools": "",
+    "tools": "Eines",
     "shortcuts": "Dreceres de teclat",
     "textFinish": "Finalitza l'edició (editor de text)",
     "textNewLine": "Afegeix una línia nova (editor de text)",
@@ -343,7 +349,7 @@
     },
     "noteItems": "Cada element de la biblioteca ha de tenir el seu propi nom per tal que sigui filtrable. S'hi inclouran els elements següents:",
     "atleastOneLibItem": "Si us plau, seleccioneu si més no un element de la biblioteca per a començar",
-    "republishWarning": ""
+    "republishWarning": "Nota: alguns dels elements seleccionats s'han marcat com a publicats/enviats. Només hauríeu de reenviar elements quan actualitzeu una biblioteca existent."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",

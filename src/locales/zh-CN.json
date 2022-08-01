@@ -121,7 +121,13 @@
       "lockAll": "全部锁定",
       "unlockAll": "全部解锁"
     },
-    "statusPublished": ""
+    "statusPublished": "已发布",
+    "sidebarLock": "侧边栏常驻"
+  },
+  "library": {
+    "noItems": "尚未添加任何项目……",
+    "hint_emptyLibrary": "选中画布上的项目添加到此处，或从下方的公共素材库中导入。",
+    "hint_emptyPrivateLibrary": "选中画布上的项目添加到此处。"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -344,7 +350,7 @@
     },
     "noteItems": "素材库中每个项目都有各自的名称以供筛选。以下项目将被包含：",
     "atleastOneLibItem": "请选择至少一个素材库以开始",
-    "republishWarning": ""
+    "republishWarning": "注意：部分选中的项目已经发布或提交。请仅在更新已有或已提交的素材库时重复提交项目。"
   },
   "publishSuccessDialog": {
     "title": "素材库已提交",

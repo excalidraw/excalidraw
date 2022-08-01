@@ -120,7 +120,13 @@
       "lockAll": "Fiksēt visu",
       "unlockAll": "Atbrīvot visu"
     },
-    "statusPublished": "Publicēts"
+    "statusPublished": "Publicēts",
+    "sidebarLock": "Paturēt atvērtu sānjoslu"
+  },
+  "library": {
+    "noItems": "Neviena vienība vēl nav pievienota...",
+    "hint_emptyLibrary": "Atlasiet objektu tāfelē, lai to šeit pievienotu, vai pievienojiet publisku bibliotēku zemāk.",
+    "hint_emptyPrivateLibrary": "Atlasiet objektu tāfelē, lai to šeit pievienotu."
   },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
