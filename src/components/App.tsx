@@ -4766,6 +4766,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        !this.state.selectedLinearElement &&
         !this.state.editingLinearElement &&
         !pointerDownState.drag.hasOccurred &&
         !this.state.isResizing &&
