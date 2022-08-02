@@ -6,7 +6,7 @@ import {
   ExcalidrawBindableElement,
 } from "./types";
 import { distance2d, rotate, isPathALoop, getGridPoint } from "../math";
-import { getElementAbsoluteCoords } from ".";
+import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import { getElementPointsCoords } from "./bounds";
 import { Point, AppState } from "../types";
 import { mutateElement } from "./mutateElement";
@@ -20,6 +20,7 @@ import {
 } from "./binding";
 import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
+import { shouldRotateWithDiscreteAngle } from "../keys";
 
 export class LinearElementEditor {
   public elementId: ExcalidrawElement["id"] & {
@@ -132,6 +133,7 @@ export class LinearElementEditor {
 
   /** @returns whether point was dragged */
   static handlePointDragging(
+    event: PointerEvent,
     appState: AppState,
     setState: React.Component<any, AppState>["setState"],
     scenePointerX: number,
@@ -168,41 +170,73 @@ export class LinearElementEditor {
         });
       }
 
-      const newDraggingPointPosition = LinearElementEditor.createPointAt(
-        element,
-        scenePointerX - editingLinearElement.pointerOffset.x,
-        scenePointerY - editingLinearElement.pointerOffset.y,
-        appState.gridSize,
-      );
+      if (
+        shouldRotateWithDiscreteAngle(event) &&
+        selectedPointsIndices.length === 1 &&
+        selectedPointsIndices[0] !== 0 &&
+        element.points.length > 1
+      ) {
+        const selectedIndex = selectedPointsIndices[0];
+        const [gridX, gridY] = getGridPoint(
+          scenePointerX,
+          scenePointerY,
+          appState.gridSize,
+        );
+        const prevPoint = element.points[selectedIndex - 1];
 
-      const deltaX = newDraggingPointPosition[0] - draggingPoint[0];
-      const deltaY = newDraggingPointPosition[1] - draggingPoint[1];
+        const { width, height } = getLockedLinearCursorAlignSize(
+          prevPoint[0] + element.x,
+          prevPoint[1] + element.y,
+          gridX,
+          gridY,
+        );
 
-      LinearElementEditor.movePoints(
-        element,
-        selectedPointsIndices.map((pointIndex) => {
-          const newPointPosition =
-            pointIndex ===
-            editingLinearElement.pointerDownState.lastClickedPoint
-              ? LinearElementEditor.createPointAt(
-                  element,
-                  scenePointerX - editingLinearElement.pointerOffset.x,
-                  scenePointerY - editingLinearElement.pointerOffset.y,
-                  appState.gridSize,
-                )
-              : ([
-                  element.points[pointIndex][0] + deltaX,
-                  element.points[pointIndex][1] + deltaY,
-                ] as const);
-          return {
-            index: pointIndex,
-            point: newPointPosition,
+        LinearElementEditor.movePoints(element, [
+          {
+            index: selectedIndex,
+            point: [width + prevPoint[0], height + prevPoint[1]],
             isDragging:
-              pointIndex ===
+              selectedIndex ===
               editingLinearElement.pointerDownState.lastClickedPoint,
-          };
-        }),
-      );
+          },
+        ]);
+      } else {
+        const newDraggingPointPosition = LinearElementEditor.createPointAt(
+          element,
+          scenePointerX - editingLinearElement.pointerOffset.x,
+          scenePointerY - editingLinearElement.pointerOffset.y,
+          appState.gridSize,
+        );
+
+        const deltaX = newDraggingPointPosition[0] - draggingPoint[0];
+        const deltaY = newDraggingPointPosition[1] - draggingPoint[1];
+
+        LinearElementEditor.movePoints(
+          element,
+          selectedPointsIndices.map((pointIndex) => {
+            const newPointPosition =
+              pointIndex ===
+              editingLinearElement.pointerDownState.lastClickedPoint
+                ? LinearElementEditor.createPointAt(
+                    element,
+                    scenePointerX - editingLinearElement.pointerOffset.x,
+                    scenePointerY - editingLinearElement.pointerOffset.y,
+                    appState.gridSize,
+                  )
+                : ([
+                    element.points[pointIndex][0] + deltaX,
+                    element.points[pointIndex][1] + deltaY,
+                  ] as const);
+            return {
+              index: pointIndex,
+              point: newPointPosition,
+              isDragging:
+                pointIndex ===
+                editingLinearElement.pointerDownState.lastClickedPoint,
+            };
+          }),
+        );
+      }
 
       // suggest bindings for first and last point if selected
       if (isBindingElement(element, false)) {
@@ -485,12 +519,30 @@ export class LinearElementEditor {
       return { ...editingLinearElement, lastUncommittedPoint: null };
     }
 
-    const newPoint = LinearElementEditor.createPointAt(
-      element,
-      scenePointerX - editingLinearElement.pointerOffset.x,
-      scenePointerY - editingLinearElement.pointerOffset.y,
-      gridSize,
-    );
+    let newPoint: Point;
+
+    if (shouldRotateWithDiscreteAngle(event) && points.length >= 2) {
+      const lastExistedPoint = points[points.length - 2];
+      const [gridX, gridY] = getGridPoint(
+        scenePointerX,
+        scenePointerY,
+        gridSize,
+      );
+      const { width, height } = getLockedLinearCursorAlignSize(
+        lastExistedPoint[0] + element.x,
+        lastExistedPoint[1] + element.y,
+        gridX,
+        gridY,
+      );
+      newPoint = [width + lastExistedPoint[0], height + lastExistedPoint[1]];
+    } else {
+      newPoint = LinearElementEditor.createPointAt(
+        element,
+        scenePointerX - editingLinearElement.pointerOffset.x,
+        scenePointerY - editingLinearElement.pointerOffset.y,
+        gridSize,
+      );
+    }
 
     if (lastPoint === lastUncommittedPoint) {
       LinearElementEditor.movePoints(element, [

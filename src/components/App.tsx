@@ -4071,6 +4071,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (this.state.editingLinearElement) {
         const didDrag = LinearElementEditor.handlePointDragging(
+          event,
           this.state,
           (appState) => this.setState(appState),
           pointerCoords.x,
