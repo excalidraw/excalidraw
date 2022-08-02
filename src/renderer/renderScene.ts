@@ -171,12 +171,10 @@ const renderLinearPointHandles = (
           ? "rgba(151, 117, 250, 0.9)"
           : "rgba(255, 255, 255, 0.9)";
       const { POINT_HANDLE_SIZE } = LinearElementEditor;
-      fillCircle(
-        context,
-        point[0],
-        point[1],
-        POINT_HANDLE_SIZE / 2 / renderConfig.zoom.value,
-      );
+      const radius = appState.editingLinearElement
+        ? POINT_HANDLE_SIZE
+        : POINT_HANDLE_SIZE / 2;
+      fillCircle(context, point[0], point[1], radius / renderConfig.zoom.value);
     },
   );
   context.restore();
@@ -188,6 +186,13 @@ const renderLinearElementPointHighlight = (
   renderConfig: RenderConfig,
 ) => {
   const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
+  if (
+    appState.editingLinearElement?.selectedPointsIndices?.includes(
+      hoverPointIndex,
+    )
+  ) {
+    return;
+  }
   const element = LinearElementEditor.getElement(elementId);
   const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     element!,
@@ -195,9 +200,13 @@ const renderLinearElementPointHighlight = (
   );
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
-
-  context.strokeStyle = "rgba(91, 87, 209, 1)";
-  context.fillStyle = "rgba(105, 101, 219, 0.5)";
+  if (appState.editingLinearElement) {
+    context.strokeStyle = "rgb(134, 142, 150)";
+    context.fillStyle = "rgba(206, 212, 218, 0.8)";
+  } else {
+    context.strokeStyle = "rgba(91, 87, 209, 1)";
+    context.fillStyle = "rgba(105, 101, 219, 0.5)";
+  }
   fillCircle(context, x, y, LinearElementEditor.POINT_HANDLE_SIZE);
 
   context.restore();
@@ -324,7 +333,6 @@ export const _renderScene = (
   }
 
   if (
-    !appState.editingLinearElement &&
     appState.selectedLinearElement &&
     appState.selectedLinearElement.hoverPointIndex !== -1
   ) {
