@@ -3544,10 +3544,7 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
       } else {
-        if (
-          this.state.editingLinearElement ||
-          this.state.selectedLinearElement
-        ) {
+        if (this.state.selectedLinearElement) {
           const linearElementEditor =
             this.state.editingLinearElement || this.state.selectedLinearElement;
           const ret = LinearElementEditor.handlePointerDown(
@@ -3555,7 +3552,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
             this.history,
             pointerDownState.origin,
-            linearElementEditor!,
+            linearElementEditor,
           );
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
@@ -4082,7 +4079,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (this.state.editingLinearElement || this.state.selectedLinearElement) {
+      if (this.state.selectedLinearElement) {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
         const didDrag = LinearElementEditor.handlePointDragging(
