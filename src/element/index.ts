@@ -53,6 +53,7 @@ export { textWysiwyg } from "./textWysiwyg";
 export { redrawTextBoundingBox } from "./textElement";
 export {
   getPerfectElementSize,
+  getLockedLinearCursorAlignSize,
   isInvisiblySmallElement,
   resizePerfectLineForNWHandler,
   getNormalizedDimensions,
