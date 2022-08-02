@@ -485,7 +485,7 @@ describe("regression tests", () => {
     }
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     for (const element of h.elements) {
@@ -524,7 +524,7 @@ describe("regression tests", () => {
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.A);
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     expect(API.getSelectedElements().length).toBe(3);
@@ -561,7 +561,7 @@ describe("regression tests", () => {
       mouse.click();
     });
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     expect(h.elements.map((element) => element.id)).toEqual([
@@ -578,7 +578,7 @@ describe("regression tests", () => {
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.A);
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     mouse.doubleClickOn(rectC);
@@ -586,7 +586,7 @@ describe("regression tests", () => {
       mouse.clickOn(rectA);
     });
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     expect(rectC.groupIds.length).toBe(2);
@@ -1000,7 +1000,7 @@ describe("regression tests", () => {
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.A);
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     const selectedGroupIds_prev = h.state.selectedGroupIds;
@@ -1114,7 +1114,7 @@ it(
 
     // Create group with first and third rectangle
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     expect(API.getSelectedElements().length).toBe(2);

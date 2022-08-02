@@ -297,7 +297,7 @@ export const actionToggleTheme = register({
       />
     </div>
   ),
-  keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
+  keyTest: (event) => event.altKey && event.shiftKey && event.key === KEYS.D,
 });
 
 export const actionErase = register({

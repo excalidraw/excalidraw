@@ -3,7 +3,7 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
 } from "../../element/types";
-import { CODES } from "../../keys";
+import { KEYS } from "../../keys";
 import { ToolName } from "../queries/toolQueries";
 import { fireEvent, GlobalTestState } from "../test-utils";
 import { mutateElement } from "../../element/mutateElement";
@@ -314,7 +314,7 @@ export class UI {
   static group(elements: ExcalidrawElement[]) {
     mouse.select(elements);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
   }
 

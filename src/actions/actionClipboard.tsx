@@ -1,4 +1,4 @@
-import { CODES, KEYS } from "../keys";
+import { KEYS } from "../keys";
 import { register } from "./register";
 import {
   copyTextToSystemClipboard,
@@ -36,7 +36,7 @@ export const actionCut = register({
     return actionDeleteSelected.perform(elements, appState);
   },
   contextItemLabel: "labels.cut",
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.X,
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.X,
 });
 
 export const actionCopyAsSvg = register({
@@ -132,7 +132,7 @@ export const actionCopyAsPng = register({
     }
   },
   contextItemLabel: "labels.copyAsPng",
-  keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
+  keyTest: (event) => event.key === KEYS.C && event.altKey && event.shiftKey,
 });
 
 export const copyText = register({

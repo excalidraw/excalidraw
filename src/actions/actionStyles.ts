@@ -3,7 +3,7 @@ import {
   isExcalidrawElement,
   redrawTextBoundingBox,
 } from "../element";
-import { CODES, KEYS } from "../keys";
+import { KEYS } from "../keys";
 import { t } from "../i18n";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
@@ -43,7 +43,7 @@ export const actionCopyStyles = register({
   },
   contextItemLabel: "labels.copyStyles",
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.C,
+    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === KEYS.C,
 });
 
 export const actionPasteStyles = register({
@@ -115,5 +115,5 @@ export const actionPasteStyles = register({
   },
   contextItemLabel: "labels.pasteStyles",
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
+    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === KEYS.V,
 });

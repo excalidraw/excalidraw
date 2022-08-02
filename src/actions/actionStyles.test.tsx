@@ -1,6 +1,6 @@
 import ExcalidrawApp from "../excalidraw-app";
 import { t } from "../i18n";
-import { CODES } from "../keys";
+import { KEYS } from "../keys";
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { fireEvent, render, screen } from "../tests/test-utils";
@@ -46,7 +46,7 @@ describe("actionStyles", () => {
     API.setSelectedElements([h.elements[1]]);
 
     Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
-      Keyboard.codeDown(CODES.C);
+      Keyboard.keyDown(KEYS.C);
     });
     const secondRect = JSON.parse(copiedStyles)[0];
     expect(secondRect.id).toBe(h.elements[1].id);
@@ -55,7 +55,7 @@ describe("actionStyles", () => {
     // Paste styles to first rectangle
     API.setSelectedElements([h.elements[0]]);
     Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
-      Keyboard.codeDown(CODES.V);
+      Keyboard.keyDown(KEYS.V);
     });
 
     const firstRect = API.getSelectedElement();

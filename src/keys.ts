@@ -16,15 +16,6 @@ export const CODES = {
   QUOTE: "Quote",
   ZERO: "Digit0",
   SLASH: "Slash",
-  C: "KeyC",
-  D: "KeyD",
-  G: "KeyG",
-  F: "KeyF",
-  H: "KeyH",
-  V: "KeyV",
-  X: "KeyX",
-  Z: "KeyZ",
-  R: "KeyR",
 } as const;
 
 export const KEYS = {
@@ -48,8 +39,11 @@ export const KEYS = {
 
   A: "a",
   D: "d",
+  C: "c",
   E: "e",
+  F: "f",
   G: "g",
+  H: "h",
   I: "i",
   L: "l",
   O: "o",

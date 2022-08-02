@@ -1,4 +1,4 @@
-import { CODES, KEYS } from "../keys";
+import { KEYS } from "../keys";
 import { register } from "./register";
 
 export const actionToggleViewMode = register({
@@ -19,5 +19,5 @@ export const actionToggleViewMode = register({
   checked: (appState) => appState.viewModeEnabled,
   contextItemLabel: "labels.viewMode",
   keyTest: (event) =>
-    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R,
+    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === KEYS.R,
 });
