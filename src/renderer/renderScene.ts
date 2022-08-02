@@ -204,8 +204,8 @@ const renderLinearElementPointHighlight = (
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
 
-  context.strokeStyle = "rgba(105, 101, 219, 1)";
-  context.fillStyle = "rgba(105, 101, 219, 0.5)";
+  context.strokeStyle = "rgba(105, 101, 219, 0.4)";
+  context.fillStyle = "rgba(105, 101, 219, 0.4)";
 
   fillCircle(context, x, y, LinearElementEditor.POINT_HANDLE_SIZE);
 
