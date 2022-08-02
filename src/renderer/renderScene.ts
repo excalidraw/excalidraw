@@ -207,7 +207,12 @@ const renderLinearElementPointHighlight = (
   context.strokeStyle = "rgba(105, 101, 219, 0.4)";
   context.fillStyle = "rgba(105, 101, 219, 0.4)";
 
-  fillCircle(context, x, y, LinearElementEditor.POINT_HANDLE_SIZE);
+  fillCircle(
+    context,
+    x,
+    y,
+    LinearElementEditor.POINT_HANDLE_SIZE / renderConfig.zoom.value,
+  );
 
   context.restore();
 };
