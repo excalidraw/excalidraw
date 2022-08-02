@@ -2870,14 +2870,24 @@ class App extends React.Component<AppProps, AppState> {
         const element = LinearElementEditor.getElement(elementId!)!;
 
         if (element) {
-          const clickedPointIndex =
-            LinearElementEditor.getPointIndexUnderCursor(
-              element,
-              this.state.zoom,
-              scenePointerX,
-              scenePointerY,
-            );
-          if (clickedPointIndex >= 0) {
+          const hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+            element,
+            this.state.zoom,
+            scenePointerX,
+            scenePointerY,
+          );
+          if (
+            this.state.selectedLinearElement &&
+            this.state.selectedLinearElement.hoverPointIndex !== hoverPointIndex
+          ) {
+            this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                hoverPointIndex,
+              },
+            });
+          }
+          if (hoverPointIndex >= 0) {
             setCursor(this.canvas, CURSOR_TYPE.POINTER);
           } else if (
             isHittingElementNotConsideringBoundingBox(element, this.state, [

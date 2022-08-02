@@ -40,7 +40,7 @@ export class LinearElementEditor {
   public pointerOffset: Readonly<{ x: number; y: number }>;
   public startBindingElement: ExcalidrawBindableElement | null | "keep";
   public endBindingElement: ExcalidrawBindableElement | null | "keep";
-
+  public hoverPointIndex: number;
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
@@ -58,6 +58,7 @@ export class LinearElementEditor {
       prevSelectedPointsIndices: null,
       lastClickedPoint: -1,
     };
+    this.hoverPointIndex = -1;
   }
 
   // ---------------------------------------------------------------------------

@@ -182,6 +182,26 @@ const renderLinearPointHandles = (
   context.restore();
 };
 
+const renderLinearElementPointHighlight = (
+  context: CanvasRenderingContext2D,
+  appState: AppState,
+  renderConfig: RenderConfig,
+) => {
+  const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
+  const element = LinearElementEditor.getElement(elementId);
+  const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    element!,
+    hoverPointIndex,
+  );
+  context.save();
+  context.translate(renderConfig.scrollX, renderConfig.scrollY);
+
+  context.strokeStyle = "rgba(91, 87, 209, 1)";
+  context.fillStyle = "rgba(105, 101, 219, 0.5)";
+  fillCircle(context, x, y, LinearElementEditor.POINT_HANDLE_SIZE);
+
+  context.restore();
+};
 export const _renderScene = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -301,6 +321,14 @@ export const _renderScene = (
       .forEach((suggestedBinding) => {
         renderBindingHighlight(context, renderConfig, suggestedBinding!);
       });
+  }
+
+  if (
+    !appState.editingLinearElement &&
+    appState.selectedLinearElement &&
+    appState.selectedLinearElement.hoverPointIndex !== -1
+  ) {
+    renderLinearElementPointHighlight(context, appState, renderConfig);
   }
 
   // Paint selected elements
