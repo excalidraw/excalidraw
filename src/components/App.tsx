@@ -2997,24 +2997,27 @@ class App extends React.Component<AppProps, AppState> {
     if (!element) {
       return;
     }
-    if (
-      this.state.selectedLinearElement &&
-      isHittingElementNotConsideringBoundingBox(element, this.state, [
-        scenePointerX,
-        scenePointerY,
-      ])
-    ) {
-      const hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-        element,
-        this.state.zoom,
-        scenePointerX,
-        scenePointerY,
-      );
-      if (hoverPointIndex >= 0) {
-        setCursor(this.canvas, CURSOR_TYPE.POINTER);
-      } else {
-        setCursor(this.canvas, CURSOR_TYPE.MOVE);
+    if (this.state.selectedLinearElement) {
+      let hoverPointIndex = -1;
+      if (
+        isHittingElementNotConsideringBoundingBox(element, this.state, [
+          scenePointerX,
+          scenePointerY,
+        ])
+      ) {
+        hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+          element,
+          this.state.zoom,
+          scenePointerX,
+          scenePointerY,
+        );
+        if (hoverPointIndex >= 0) {
+          setCursor(this.canvas, CURSOR_TYPE.POINTER);
+        } else {
+          setCursor(this.canvas, CURSOR_TYPE.MOVE);
+        }
       }
+
       if (
         this.state.selectedLinearElement.hoverPointIndex !== hoverPointIndex
       ) {
