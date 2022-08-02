@@ -358,12 +358,14 @@ export const _renderScene = (
       locallySelectedElements.length === 1 &&
       isLinearElement(locallySelectedElements[0]);
     if (isSingleArrowSelected) {
-      renderLinearPointHandles(
-        context,
-        appState,
-        renderConfig,
-        locallySelectedElements[0] as ExcalidrawLinearElement,
-      );
+      if (appState.selectedLinearElement) {
+        renderLinearPointHandles(
+          context,
+          appState,
+          renderConfig,
+          locallySelectedElements[0] as ExcalidrawLinearElement,
+        );
+      }
     } else {
       const selections = elements.reduce((acc, element) => {
         const selectionColors = [];

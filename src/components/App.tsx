@@ -1134,6 +1134,13 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
+    if (
+      this.state.selectedLinearElement &&
+      !this.state.selectedElementIds[this.state.selectedLinearElement.elementId]
+    ) {
+      this.setState({ selectedLinearElement: null });
+    }
+
     const { multiElement } = prevState;
     if (
       prevState.activeTool !== this.state.activeTool &&

@@ -9146,7 +9146,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `8`;
 
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `52`;
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `54`;
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] appState 1`] = `
 Object {
