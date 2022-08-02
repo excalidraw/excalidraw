@@ -1133,6 +1133,12 @@ class App extends React.Component<AppProps, AppState> {
         this.actionManager.executeAction(actionFinalize);
       });
     }
+    if (
+      this.state.selectedLinearElement &&
+      !this.state.selectedElementIds[this.state.selectedLinearElement.elementId]
+    ) {
+      this.setState({ selectedLinearElement: null });
+    }
     const { multiElement } = prevState;
     if (
       prevState.activeTool !== this.state.activeTool &&
@@ -2860,46 +2866,8 @@ class App extends React.Component<AppProps, AppState> {
         setCursor(this.canvas, CURSOR_TYPE.GRAB);
       } else if (isOverScrollBar) {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
-      } else if (
-        this.state.editingLinearElement ||
-        this.state.selectedLinearElement
-      ) {
-        const elementId =
-          this.state.editingLinearElement?.elementId ||
-          this.state?.selectedLinearElement?.elementId;
-        const element = LinearElementEditor.getElement(elementId!)!;
-
-        if (element) {
-          const hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-            element,
-            this.state.zoom,
-            scenePointerX,
-            scenePointerY,
-          );
-          if (
-            this.state.selectedLinearElement &&
-            this.state.selectedLinearElement.hoverPointIndex !== hoverPointIndex
-          ) {
-            this.setState({
-              selectedLinearElement: {
-                ...this.state.selectedLinearElement,
-                hoverPointIndex,
-              },
-            });
-          }
-          if (hoverPointIndex >= 0) {
-            setCursor(this.canvas, CURSOR_TYPE.POINTER);
-          } else if (
-            isHittingElementNotConsideringBoundingBox(element, this.state, [
-              scenePointer.x,
-              scenePointer.y,
-            ])
-          ) {
-            setCursor(this.canvas, CURSOR_TYPE.MOVE);
-          }
-        } else {
-          setCursor(this.canvas, CURSOR_TYPE.AUTO);
-        }
+      } else if (this.state.selectedLinearElement) {
+        this.handleHoverSelectedLinearElement(scenePointerX, scenePointerY);
       } else if (
         // if using cmd/ctrl, we're not dragging
         !event[KEYS.CTRL_OR_CMD] &&
@@ -3011,6 +2979,46 @@ class App extends React.Component<AppProps, AppState> {
     invalidateContextMenu = true;
   };
 
+  handleHoverSelectedLinearElement(
+    scenePointerX: number,
+    scenePointerY: number,
+  ) {
+    const element = LinearElementEditor.getElement(
+      this.state.selectedLinearElement!.elementId,
+    )!;
+
+    if (
+      this.state.selectedLinearElement &&
+      isHittingElementNotConsideringBoundingBox(element, this.state, [
+        scenePointerX,
+        scenePointerY,
+      ])
+    ) {
+      const hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+        element,
+        this.state.zoom,
+        scenePointerX,
+        scenePointerY,
+      );
+      if (hoverPointIndex >= 0) {
+        setCursor(this.canvas, CURSOR_TYPE.POINTER);
+      } else {
+        setCursor(this.canvas, CURSOR_TYPE.MOVE);
+      }
+      if (
+        this.state.selectedLinearElement.hoverPointIndex !== hoverPointIndex
+      ) {
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            hoverPointIndex,
+          },
+        });
+      }
+    } else {
+      setCursor(this.canvas, CURSOR_TYPE.AUTO);
+    }
+  }
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
