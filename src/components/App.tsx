@@ -3545,11 +3545,14 @@ class App extends React.Component<AppProps, AppState> {
           this.state.editingLinearElement ||
           this.state.selectedLinearElement
         ) {
+          const linearElementEditor =
+            this.state.editingLinearElement || this.state.selectedLinearElement;
           const ret = LinearElementEditor.handlePointerDown(
             event,
             this.state,
             this.history,
             pointerDownState.origin,
+            linearElementEditor!,
           );
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;

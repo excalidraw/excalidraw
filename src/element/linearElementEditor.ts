@@ -320,6 +320,7 @@ export class LinearElementEditor {
     appState: AppState,
     history: History,
     scenePointer: { x: number; y: number },
+    linearElementEditor: LinearElementEditor,
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
@@ -331,18 +332,18 @@ export class LinearElementEditor {
       linearElementEditor: null,
     };
 
-    if (!appState.selectedLinearElement) {
+    if (!linearElementEditor) {
       return ret;
     }
 
-    const { elementId } = appState.selectedLinearElement;
+    const { elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
 
     if (!element) {
       return ret;
     }
     if (event.altKey && appState.editingLinearElement) {
-      if (appState.editingLinearElement.lastUncommittedPoint == null) {
+      if (linearElementEditor.lastUncommittedPoint == null) {
         mutateElement(element, {
           points: [
             ...element.points,
@@ -357,10 +358,9 @@ export class LinearElementEditor {
       }
       history.resumeRecording();
       ret.linearElementEditor = {
-        ...appState.editingLinearElement,
+        ...linearElementEditor,
         pointerDownState: {
-          prevSelectedPointsIndices:
-            appState.editingLinearElement.selectedPointsIndices,
+          prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
           lastClickedPoint: -1,
         },
         selectedPointsIndices: [element.points.length - 1],
@@ -392,8 +392,7 @@ export class LinearElementEditor {
       // from the end points of the `linearElement` - this is to allow disabling
       // binding (which needs to happen at the point the user finishes moving
       // the point).
-      const { startBindingElement, endBindingElement } =
-        appState.selectedLinearElement;
+      const { startBindingElement, endBindingElement } = linearElementEditor;
       if (isBindingEnabled(appState) && isBindingElement(element)) {
         bindOrUnbindLinearElement(
           element,
@@ -419,20 +418,17 @@ export class LinearElementEditor {
     const nextSelectedPointsIndices =
       clickedPointIndex > -1 || event.shiftKey
         ? event.shiftKey ||
-          appState.selectedLinearElement.selectedPointsIndices?.includes(
-            clickedPointIndex,
-          )
+          linearElementEditor.selectedPointsIndices?.includes(clickedPointIndex)
           ? normalizeSelectedPoints([
-              ...(appState.selectedLinearElement.selectedPointsIndices || []),
+              ...(linearElementEditor.selectedPointsIndices || []),
               clickedPointIndex,
             ])
           : [clickedPointIndex]
         : null;
     ret.linearElementEditor = {
-      ...appState.selectedLinearElement,
+      ...linearElementEditor,
       pointerDownState: {
-        prevSelectedPointsIndices:
-          appState.selectedLinearElement.selectedPointsIndices,
+        prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
         lastClickedPoint: clickedPointIndex,
       },
       selectedPointsIndices: nextSelectedPointsIndices,
@@ -451,13 +447,13 @@ export class LinearElementEditor {
     event: React.PointerEvent<HTMLCanvasElement>,
     scenePointerX: number,
     scenePointerY: number,
-    editingLinearElement: LinearElementEditor,
+    linearElementEditor: LinearElementEditor,
     gridSize: number | null,
   ): LinearElementEditor {
-    const { elementId, lastUncommittedPoint } = editingLinearElement;
+    const { elementId, lastUncommittedPoint } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
-      return editingLinearElement;
+      return linearElementEditor;
     }
 
     const { points } = element;
@@ -467,13 +463,13 @@ export class LinearElementEditor {
       if (lastPoint === lastUncommittedPoint) {
         LinearElementEditor.deletePoints(element, [points.length - 1]);
       }
-      return { ...editingLinearElement, lastUncommittedPoint: null };
+      return { ...linearElementEditor, lastUncommittedPoint: null };
     }
 
     const newPoint = LinearElementEditor.createPointAt(
       element,
-      scenePointerX - editingLinearElement.pointerOffset.x,
-      scenePointerY - editingLinearElement.pointerOffset.y,
+      scenePointerX - linearElementEditor.pointerOffset.x,
+      scenePointerY - linearElementEditor.pointerOffset.y,
       gridSize,
     );
 
@@ -489,7 +485,7 @@ export class LinearElementEditor {
     }
 
     return {
-      ...editingLinearElement,
+      ...linearElementEditor,
       lastUncommittedPoint: element.points[element.points.length - 1],
     };
   }
