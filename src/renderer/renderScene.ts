@@ -164,11 +164,11 @@ const renderLinearPointHandles = (
 
   LinearElementEditor.getPointsGlobalCoordinates(element).forEach(
     (point, idx) => {
-      context.strokeStyle = "#6965db";
+      context.strokeStyle = "#5e5ad8";
       context.setLineDash([]);
       context.fillStyle =
         appState.editingLinearElement?.selectedPointsIndices?.includes(idx)
-          ? "rgba(151, 117, 250, 0.9)"
+          ? "rgba(134, 131, 226, 0.9)"
           : "rgba(255, 255, 255, 0.9)";
       const { POINT_HANDLE_SIZE } = LinearElementEditor;
       const radius = appState.editingLinearElement
@@ -194,19 +194,19 @@ const renderLinearElementPointHighlight = (
     return;
   }
   const element = LinearElementEditor.getElement(elementId);
+  if (!element) {
+    return;
+  }
   const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    element!,
+    element,
     hoverPointIndex,
   );
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
-  if (appState.editingLinearElement) {
-    context.strokeStyle = "rgb(134, 142, 150)";
-    context.fillStyle = "rgba(206, 212, 218, 0.8)";
-  } else {
-    context.strokeStyle = "rgba(91, 87, 209, 1)";
-    context.fillStyle = "rgba(105, 101, 219, 0.5)";
-  }
+
+  context.strokeStyle = "rgba(105, 101, 219, 1)";
+  context.fillStyle = "rgba(105, 101, 219, 0.5)";
+
   fillCircle(context, x, y, LinearElementEditor.POINT_HANDLE_SIZE);
 
   context.restore();
