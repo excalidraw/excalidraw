@@ -2862,7 +2862,11 @@ class App extends React.Component<AppProps, AppState> {
       } else if (isOverScrollBar) {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
       } else if (this.state.selectedLinearElement) {
-        this.handleHoverSelectedLinearElement(scenePointerX, scenePointerY);
+        this.handleHoverSelectedLinearElement(
+          this.state.selectedLinearElement,
+          scenePointerX,
+          scenePointerY,
+        );
       } else if (
         // if using cmd/ctrl, we're not dragging
         !event[KEYS.CTRL_OR_CMD] &&
@@ -2975,13 +2979,17 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   handleHoverSelectedLinearElement(
+    linearElementEditor: LinearElementEditor,
     scenePointerX: number,
     scenePointerY: number,
   ) {
     const element = LinearElementEditor.getElement(
-      this.state.selectedLinearElement!.elementId,
-    )!;
+      linearElementEditor.elementId,
+    );
 
+    if (!element) {
+      return;
+    }
     if (
       this.state.selectedLinearElement &&
       isHittingElementNotConsideringBoundingBox(element, this.state, [
@@ -4092,7 +4100,7 @@ class App extends React.Component<AppProps, AppState> {
               pointsSceneCoords,
             );
           },
-          linearElementEditor!,
+          linearElementEditor,
         );
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
