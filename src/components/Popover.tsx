@@ -69,7 +69,6 @@ export const Popover = ({
     if (fitInViewport && popoverRef.current) {
       const element = popoverRef.current;
       const { x, y, width, height } = element.getBoundingClientRect();
-      const { innerWidth: viewportWidth, innerHeight: viewportHeight } = window;
 
       //Position correctly when clicked on rightmost part or the bottom part of viewport
       if (x + width - offsetLeft > viewportWidth) {
