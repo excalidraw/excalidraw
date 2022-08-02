@@ -4693,7 +4693,10 @@ class App extends React.Component<AppProps, AppState> {
       // Code below handles selection when element(s) weren't
       // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
-      if (isLinearElement(hitElement)) {
+      if (
+        this.state.selectedLinearElement?.elementId !== hitElement?.id &&
+        isLinearElement(hitElement)
+      ) {
         this.setState({
           selectedLinearElement: new LinearElementEditor(
             hitElement,
