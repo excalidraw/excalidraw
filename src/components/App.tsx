@@ -4697,12 +4697,18 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement?.elementId !== hitElement?.id &&
         isLinearElement(hitElement)
       ) {
-        this.setState({
-          selectedLinearElement: new LinearElementEditor(
-            hitElement,
-            this.scene,
-          ),
-        });
+        const selectedELements = getSelectedElements(
+          this.scene.getElementsIncludingDeleted(),
+          this.state,
+        );
+        if (selectedELements.length === 1) {
+          this.setState({
+            selectedLinearElement: new LinearElementEditor(
+              hitElement,
+              this.scene,
+            ),
+          });
+        }
       }
       if (isEraserActive(this.state)) {
         const draggedDistance = distance2d(
@@ -5390,6 +5396,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       selectedElementIds: {},
       previousSelectedElementIds: this.state.selectedElementIds,
+      selectedLinearElement: null,
     });
   }
 
@@ -5564,6 +5571,9 @@ class App extends React.Component<AppProps, AppState> {
           {
             ...this.state,
             selectedElementIds: { [element.id]: true },
+            selectedLinearElement: isLinearElement(element)
+              ? new LinearElementEditor(element, this.scene)
+              : null,
           },
           this.scene.getNonDeletedElements(),
         ),

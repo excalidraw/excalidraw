@@ -15,6 +15,7 @@ export const actionSelectAll = register({
       appState: selectGroupsForSelectedElements(
         {
           ...appState,
+          selectedLinearElement: null,
           editingGroupId: null,
           selectedElementIds: elements.reduce(
             (map: Record<ExcalidrawElement["id"], true>, element) => {
