@@ -89,7 +89,11 @@ import {
   getNormalizedDimensions,
   getResizeArrowDirection,
   getResizeOffsetXY,
+<<<<<<< HEAD
   getLockedLinearCursorAlignSize,
+=======
+  getPerfectLinearSize,
+>>>>>>> a28fad12 (feat: apply cursor alignment to multi-point linear elements)
   getTransformHandleTypeFromCoords,
   hitTest,
   isHittingElementBoundingBoxWithoutHittingElement,
@@ -2768,7 +2772,11 @@ class App extends React.Component<AppProps, AppState> {
 
         if (shouldRotateWithDiscreteAngle(event)) {
           ({ width: dxFromLastCommitted, height: dyFromLastCommitted } =
+<<<<<<< HEAD
             getLockedLinearCursorAlignSize(
+=======
+            getPerfectLinearSize(
+>>>>>>> a28fad12 (feat: apply cursor alignment to multi-point linear elements)
               // actual coordinate of the last committed point
               lastCommittedX + rx,
               lastCommittedY + ry,
