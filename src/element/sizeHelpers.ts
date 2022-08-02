@@ -47,7 +47,7 @@ export const getPerfectElementSize = (
   return { width, height };
 };
 
-export const getPerfectLinearSize = (
+export const getLockedLinearCursorAlignSize = (
   originX: number,
   originY: number,
   x: number,

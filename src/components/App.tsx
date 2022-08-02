@@ -89,7 +89,7 @@ import {
   getNormalizedDimensions,
   getResizeArrowDirection,
   getResizeOffsetXY,
-  getPerfectLinearSize,
+  getLockedLinearCursorAlignSize,
   getTransformHandleTypeFromCoords,
   hitTest,
   isHittingElementBoundingBoxWithoutHittingElement,
@@ -2768,7 +2768,7 @@ class App extends React.Component<AppProps, AppState> {
 
         if (shouldRotateWithDiscreteAngle(event)) {
           ({ width: dxFromLastCommitted, height: dyFromLastCommitted } =
-            getPerfectLinearSize(
+            getLockedLinearCursorAlignSize(
               // actual coordinate of the last committed point
               lastCommittedX + rx,
               lastCommittedY + ry,
@@ -4244,7 +4244,7 @@ class App extends React.Component<AppProps, AppState> {
         let dy = gridY - draggingElement.y;
 
         if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
-          ({ width: dx, height: dy } = getPerfectLinearSize(
+          ({ width: dx, height: dy } = getLockedLinearCursorAlignSize(
             draggingElement.x,
             draggingElement.y,
             pointerCoords.x,
