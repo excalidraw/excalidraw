@@ -10979,6 +10979,7 @@ Object {
   "selectedLinearElement": LinearElementEditor {
     "elementId": "id0",
     "endBindingElement": "keep",
+    "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
     "pointerDownState": Object {
@@ -11203,6 +11204,7 @@ Object {
   "selectedLinearElement": LinearElementEditor {
     "elementId": "id0",
     "endBindingElement": "keep",
+    "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
     "pointerDownState": Object {
@@ -11654,6 +11656,7 @@ Object {
   "selectedLinearElement": LinearElementEditor {
     "elementId": "id0",
     "endBindingElement": "keep",
+    "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
     "pointerDownState": Object {
@@ -12057,6 +12060,7 @@ Object {
   "selectedLinearElement": LinearElementEditor {
     "elementId": "id0",
     "endBindingElement": "keep",
+    "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
     "pointerDownState": Object {
