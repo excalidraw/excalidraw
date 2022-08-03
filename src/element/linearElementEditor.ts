@@ -173,7 +173,6 @@ export class LinearElementEditor {
       if (
         shouldRotateWithDiscreteAngle(event) &&
         selectedPointsIndices.length === 1 &&
-        selectedPointsIndices[0] !== 0 &&
         element.points.length > 1
       ) {
         const selectedIndex = selectedPointsIndices[0];
@@ -182,11 +181,12 @@ export class LinearElementEditor {
           scenePointerY,
           appState.gridSize,
         );
-        const prevPoint = element.points[selectedIndex - 1];
+        const referencePoint =
+          element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
 
         const { width, height } = getLockedLinearCursorAlignSize(
-          prevPoint[0] + element.x,
-          prevPoint[1] + element.y,
+          referencePoint[0] + element.x,
+          referencePoint[1] + element.y,
           gridX,
           gridY,
         );
@@ -194,7 +194,7 @@ export class LinearElementEditor {
         LinearElementEditor.movePoints(element, [
           {
             index: selectedIndex,
-            point: [width + prevPoint[0], height + prevPoint[1]],
+            point: [width + referencePoint[0], height + referencePoint[1]],
             isDragging:
               selectedIndex ===
               editingLinearElement.pointerDownState.lastClickedPoint,
@@ -827,9 +827,9 @@ export class LinearElementEditor {
 
     if (selectedOriginPoint) {
       offsetX =
-        selectedOriginPoint.point[0] - points[selectedOriginPoint.index][0];
+        selectedOriginPoint.point[0] + points[selectedOriginPoint.index][0];
       offsetY =
-        selectedOriginPoint.point[1] - points[selectedOriginPoint.index][1];
+        selectedOriginPoint.point[1] + points[selectedOriginPoint.index][1];
     }
 
     const nextPoints = points.map((point, idx) => {
