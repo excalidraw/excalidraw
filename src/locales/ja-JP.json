@@ -121,12 +121,12 @@
       "unlockAll": "すべてのロックを解除"
     },
     "statusPublished": "公開済み",
-    "sidebarLock": ""
+    "sidebarLock": "サイドバーを開いたままにする"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "まだアイテムが追加されていません…",
+    "hint_emptyLibrary": "キャンバス上のアイテムを選択してここに追加するか、以下の公開リポジトリからライブラリをインストールしてください。",
+    "hint_emptyPrivateLibrary": "キャンバス上のアイテムを選択すると、ここに追加されます。"
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
