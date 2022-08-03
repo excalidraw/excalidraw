@@ -5,7 +5,13 @@ import {
   PointBinding,
   ExcalidrawBindableElement,
 } from "./types";
-import { distance2d, rotate, isPathALoop, getGridPoint } from "../math";
+import {
+  distance2d,
+  rotate,
+  isPathALoop,
+  getGridPoint,
+  rotatePoint,
+} from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import { getElementPointsCoords } from "./bounds";
 import { Point, AppState } from "../types";
@@ -169,7 +175,6 @@ export class LinearElementEditor {
           },
         });
       }
-
       if (
         shouldRotateWithDiscreteAngle(event) &&
         selectedPointsIndices.length === 1 &&
@@ -184,12 +189,24 @@ export class LinearElementEditor {
         const referencePoint =
           element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
 
-        const { width, height } = getLockedLinearCursorAlignSize(
-          referencePoint[0] + element.x,
-          referencePoint[1] + element.y,
+        const referencePointCoords =
+          LinearElementEditor.getPointGlobalCoordinates(
+            element,
+            referencePoint,
+          );
+
+        let { width, height } = getLockedLinearCursorAlignSize(
+          referencePointCoords[0],
+          referencePointCoords[1],
           gridX,
           gridY,
         );
+
+        [width, height] = rotatePoint([width, height], [0, 0], -element.angle);
+
+        // rounding to stop the dragged point from jiggling
+        width = Math.round(width);
+        height = Math.round(height);
 
         LinearElementEditor.movePoints(element, [
           {
