@@ -350,7 +350,7 @@ class App extends React.Component<AppProps, AppState> {
       gridModeEnabled = false,
       theme = defaultAppState.theme,
       name = defaultAppState.name,
-      trayModeEnabled = false, //zsviczian
+      initState, //zsviczian
     } = props;
     this.state = {
       ...defaultAppState,
@@ -359,13 +359,13 @@ class App extends React.Component<AppProps, AppState> {
       ...this.getCanvasOffsets(),
       viewModeEnabled,
       zenModeEnabled,
-      trayModeEnabled, //zsviczian
       gridSize: gridModeEnabled ? GRID_SIZE : null,
       name,
       width: window.innerWidth,
       height: window.innerHeight,
       showHyperlinkPopup: false,
       isLibraryMenuDocked: false,
+      ...(initState ?? {}), //zsviczian
     };
 
     this.id = nanoid();
@@ -549,7 +549,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.state.zenModeEnabled
               }
               showThemeBtn={
-                //typeof this.props?.theme === "undefined" && //zsviczian
+                typeof this.props?.theme === "undefined" &&
                 this.props.UIOptions.canvasActions.theme
               }
               libraryReturnUrl={this.props.libraryReturnUrl}
@@ -5876,10 +5876,9 @@ class App extends React.Component<AppProps, AppState> {
         ...options,
         typeof this.props.gridModeEnabled === "undefined" &&
           actionToggleGridMode,
-        //typeof this.props.zenModeEnabled === "undefined" &&  //zsviczian
-        actionToggleZenMode,
-        //typeof this.props.viewModeEnabled === "undefined" &&  //zsviczian
-        actionToggleViewMode,
+        typeof this.props.zenModeEnabled === "undefined" && actionToggleZenMode,
+        typeof this.props.viewModeEnabled === "undefined" &&
+          actionToggleViewMode,
         actionToggleStats,
       ];
 
@@ -5925,10 +5924,10 @@ class App extends React.Component<AppProps, AppState> {
             separator,
             typeof this.props.gridModeEnabled === "undefined" &&
               actionToggleGridMode,
-            //typeof this.props.zenModeEnabled === "undefined" && //zsviczian
-            actionToggleZenMode,
-            //typeof this.props.viewModeEnabled === "undefined" && //zsviczian
-            actionToggleViewMode,
+            typeof this.props.zenModeEnabled === "undefined" &&
+              actionToggleZenMode,
+            typeof this.props.viewModeEnabled === "undefined" &&
+              actionToggleViewMode,
             actionToggleStats,
           ],
           top,

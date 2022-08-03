@@ -26,7 +26,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     viewModeEnabled,
     zenModeEnabled,
     gridModeEnabled,
-    trayModeEnabled, //zsviczian
+    initState, //zsviczian
     libraryReturnUrl,
     theme,
     name,
@@ -98,7 +98,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           viewModeEnabled={viewModeEnabled}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
-          trayModeEnabled={trayModeEnabled} //zsviczian
+          initState={initState} //zsviczian
           libraryReturnUrl={libraryReturnUrl}
           theme={theme}
           name={name}

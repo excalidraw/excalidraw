@@ -297,7 +297,7 @@ export interface ExcalidrawProps {
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   libraryReturnUrl?: string;
-  trayModeEnabled?: boolean; //zsviczian
+  initState?: AppState; //zsviczian
   theme?: Theme;
   name?: string;
   renderCustomStats?: (
