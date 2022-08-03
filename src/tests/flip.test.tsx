@@ -427,6 +427,45 @@ it("flips an unrotated arrow vertically correctly", () => {
   expect(API.getSelectedElements()[0].height).toEqual(originalHeight);
 });
 
+//@TODO fix the tests with rotation
+it.skip("flips a rotated arrow horizontally correctly", () => {
+  const originalAngle = Math.PI / 4;
+  const expectedAngle = (7 * Math.PI) / 4;
+  createAndSelectOneArrow(originalAngle);
+
+  const originalWidth = API.getSelectedElements()[0].width;
+  const originalHeight = API.getSelectedElements()[0].height;
+
+  h.app.actionManager.executeAction(actionFlipHorizontal);
+
+  // Check if width and height did not change
+  expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
+
+  expect(API.getSelectedElements()[0].height).toEqual(originalHeight);
+
+  // Check angle
+  expect(API.getSelectedElements()[0].angle).toBeCloseTo(expectedAngle);
+});
+
+it.skip("flips a rotated arrow vertically correctly", () => {
+  const originalAngle = Math.PI / 4;
+  const expectedAngle = (3 * Math.PI) / 4;
+  createAndSelectOneArrow(originalAngle);
+
+  const originalWidth = API.getSelectedElements()[0].width;
+  const originalHeight = API.getSelectedElements()[0].height;
+
+  h.app.actionManager.executeAction(actionFlipVertical);
+
+  // Check if width and height did not change
+  expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
+
+  expect(API.getSelectedElements()[0].height).toEqual(originalHeight);
+
+  // Check angle
+  expect(API.getSelectedElements()[0].angle).toBeCloseTo(expectedAngle);
+});
+
 // Line element
 
 it("flips an unrotated line horizontally correctly", () => {
@@ -455,6 +494,46 @@ it("flips an unrotated line vertically correctly", () => {
   expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
 
   expect(API.getSelectedElements()[0].height).toEqual(originalHeight);
+});
+
+it.skip("flips a rotated line horizontally correctly", () => {
+  const originalAngle = Math.PI / 4;
+  const expectedAngle = (7 * Math.PI) / 4;
+
+  createAndSelectOneLine(originalAngle);
+
+  const originalWidth = API.getSelectedElements()[0].width;
+  const originalHeight = API.getSelectedElements()[0].height;
+
+  h.app.actionManager.executeAction(actionFlipHorizontal);
+
+  // Check if width and height did not change
+  expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
+
+  expect(API.getSelectedElements()[0].height).toEqual(originalHeight);
+
+  // Check angle
+  expect(API.getSelectedElements()[0].angle).toBeCloseTo(expectedAngle);
+});
+
+it.skip("flips a rotated line vertically correctly", () => {
+  const originalAngle = Math.PI / 4;
+  const expectedAngle = (3 * Math.PI) / 4;
+
+  createAndSelectOneLine(originalAngle);
+
+  const originalWidth = API.getSelectedElements()[0].width;
+  const originalHeight = API.getSelectedElements()[0].height;
+
+  h.app.actionManager.executeAction(actionFlipVertical);
+
+  // Check if width and height did not change
+  expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
+
+  expect(API.getSelectedElements()[0].height).toEqual(originalHeight);
+
+  // Check angle
+  expect(API.getSelectedElements()[0].angle).toBeCloseTo(expectedAngle);
 });
 
 // Draw element

@@ -1,6 +1,7 @@
 import { fireEvent, render } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
+import { getTransformHandles } from "../element/transformHandles";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 
@@ -11,6 +12,40 @@ const mouse = new Pointer("mouse");
 describe("element binding", () => {
   beforeEach(async () => {
     await render(<ExcalidrawApp />);
+  });
+
+  //@TODO fix the test with rotation
+  it.skip("rotation of arrow should rebind both ends", () => {
+    const rectLeft = UI.createElement("rectangle", {
+      x: 0,
+      width: 200,
+      height: 500,
+    });
+    const rectRight = UI.createElement("rectangle", {
+      x: 400,
+      width: 200,
+      height: 500,
+    });
+    const arrow = UI.createElement("arrow", {
+      x: 210,
+      y: 250,
+      width: 180,
+      height: 1,
+    });
+    expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
+    expect(arrow.endBinding?.elementId).toBe(rectRight.id);
+
+    const rotation = getTransformHandles(arrow, h.state.zoom, "mouse")
+      .rotation!;
+    const rotationHandleX = rotation[0] + rotation[2] / 2;
+    const rotationHandleY = rotation[1] + rotation[3] / 2;
+    mouse.down(rotationHandleX, rotationHandleY);
+    mouse.move(300, 400);
+    mouse.up();
+    expect(arrow.angle).toBeGreaterThan(0.7 * Math.PI);
+    expect(arrow.angle).toBeLessThan(1.3 * Math.PI);
+    expect(arrow.startBinding?.elementId).toBe(rectRight.id);
+    expect(arrow.endBinding?.elementId).toBe(rectLeft.id);
   });
 
   // TODO fix & reenable once we rewrite tests to work with concurrency
