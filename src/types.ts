@@ -187,6 +187,7 @@ export type AppState = {
     elementBackground?: string[];
     elementStroke?: string[];
   }; //zsviczian
+  selectedLinearElement: LinearElementEditor | null;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
