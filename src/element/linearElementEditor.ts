@@ -181,28 +181,15 @@ export class LinearElementEditor {
         element.points.length > 1
       ) {
         const selectedIndex = selectedPointsIndices[0];
-        const [gridX, gridY] = getGridPoint(
-          scenePointerX,
-          scenePointerY,
-          appState.gridSize,
-        );
         const referencePoint =
           element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
 
-        const referencePointCoords =
-          LinearElementEditor.getPointGlobalCoordinates(
-            element,
-            referencePoint,
-          );
-
-        let { width, height } = getLockedLinearCursorAlignSize(
-          referencePointCoords[0],
-          referencePointCoords[1],
-          gridX,
-          gridY,
+        let [width, height] = LinearElementEditor._getShiftLockedDelta(
+          element,
+          referencePoint,
+          [scenePointerX, scenePointerY],
+          appState.gridSize,
         );
-
-        [width, height] = rotatePoint([width, height], [0, 0], -element.angle);
 
         // rounding to stop the dragged point from jiggling
         width = Math.round(width);
@@ -539,19 +526,19 @@ export class LinearElementEditor {
     let newPoint: Point;
 
     if (shouldRotateWithDiscreteAngle(event) && points.length >= 2) {
-      const lastExistedPoint = points[points.length - 2];
-      const [gridX, gridY] = getGridPoint(
-        scenePointerX,
-        scenePointerY,
+      const lastCommittedPoint = points[points.length - 2];
+
+      const [width, height] = LinearElementEditor._getShiftLockedDelta(
+        element,
+        lastCommittedPoint,
+        [scenePointerX, scenePointerY],
         gridSize,
       );
-      const { width, height } = getLockedLinearCursorAlignSize(
-        lastExistedPoint[0] + element.x,
-        lastExistedPoint[1] + element.y,
-        gridX,
-        gridY,
-      );
-      newPoint = [width + lastExistedPoint[0], height + lastExistedPoint[1]];
+
+      newPoint = [
+        width + lastCommittedPoint[0],
+        height + lastCommittedPoint[1],
+      ];
     } else {
       newPoint = LinearElementEditor.createPointAt(
         element,
@@ -908,6 +895,33 @@ export class LinearElementEditor {
       x: element.x + rotated[0],
       y: element.y + rotated[1],
     });
+  }
+
+  private static _getShiftLockedDelta(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    referencePoint: Point,
+    scenePointer: Point,
+    gridSize: number | null,
+  ) {
+    const referencePointCoords = LinearElementEditor.getPointGlobalCoordinates(
+      element,
+      referencePoint,
+    );
+
+    const [gridX, gridY] = getGridPoint(
+      scenePointer[0],
+      scenePointer[1],
+      gridSize,
+    );
+
+    const { width, height } = getLockedLinearCursorAlignSize(
+      referencePointCoords[0],
+      referencePointCoords[1],
+      gridX,
+      gridY,
+    );
+
+    return rotatePoint([width, height], [0, 0], -element.angle);
   }
 }
 
