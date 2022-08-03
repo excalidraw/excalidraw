@@ -1138,6 +1138,8 @@ class App extends React.Component<AppProps, AppState> {
       this.state.selectedLinearElement &&
       !this.state.selectedElementIds[this.state.selectedLinearElement.elementId]
     ) {
+      // To make sure `selectedLinearElement` is in sync with `selectedElementIds`, however this shouldn't be needed once
+      // we have a single API to update `selectedElementIds`
       this.setState({ selectedLinearElement: null });
     }
 
@@ -4393,6 +4395,7 @@ class App extends React.Component<AppProps, AppState> {
                   elementsWithinSelection[0].link
                     ? "info"
                     : false,
+                // select linear element only when we haven't box-selected anything else
                 selectedLinearElement:
                   elementsWithinSelection.length === 1 &&
                   isLinearElement(elementsWithinSelection[0])
@@ -4496,7 +4499,7 @@ class App extends React.Component<AppProps, AppState> {
             !pointerDownState.hit.hasHitElementInside)
         ) {
           const selectedELements = getSelectedElements(
-            this.scene.getElementsIncludingDeleted(),
+            this.scene.getNonDeletedElements(),
             this.state,
           );
           // set selectedLinearElement to null if there is more than one element selected since we don't want to show linear element handles
@@ -4708,9 +4711,11 @@ class App extends React.Component<AppProps, AppState> {
         isLinearElement(hitElement)
       ) {
         const selectedELements = getSelectedElements(
-          this.scene.getElementsIncludingDeleted(),
+          this.scene.getNonDeletedElements(),
           this.state,
         );
+        // set selectedLinearElement when no other element selected except
+        // the one we've hit
         if (selectedELements.length === 1) {
           this.setState({
             selectedLinearElement: new LinearElementEditor(
@@ -4826,6 +4831,8 @@ class App extends React.Component<AppProps, AppState> {
                 selectedElementIds: { [hitElement.id]: true },
                 selectedLinearElement:
                   isLinearElement(hitElement) &&
+                  // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
+                  // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
                   this.state.selectedLinearElement?.elementId !== hitElement.id
                     ? new LinearElementEditor(hitElement, this.scene)
                     : this.state.selectedLinearElement,
