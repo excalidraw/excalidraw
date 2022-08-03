@@ -2,11 +2,7 @@ import { KEYS } from "../keys";
 import { register } from "./register";
 import { selectGroupsForSelectedElements } from "../groups";
 import { getNonDeletedElements, isTextElement } from "../element";
-import {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  NonDeleted,
-} from "../element/types";
+import { ExcalidrawElement } from "../element/types";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -17,7 +13,6 @@ export const actionSelectAll = register({
     if (appState.editingLinearElement) {
       return false;
     }
-    let selectedElementsCount = 0;
     const selectedElementIds = elements.reduce(
       (map: Record<ExcalidrawElement["id"], true>, element) => {
         if (
@@ -26,25 +21,22 @@ export const actionSelectAll = register({
           !element.locked
         ) {
           map[element.id] = true;
-          selectedElementsCount++;
         }
         return map;
       },
       {},
     );
-    const isSingleLinearElementSelected =
-      selectedElementsCount === 1 && isLinearElement(elements[0]);
 
     return {
       appState: selectGroupsForSelectedElements(
         {
           ...appState,
-          selectedLinearElement: isSingleLinearElementSelected
-            ? new LinearElementEditor(
-                elements[0] as NonDeleted<ExcalidrawLinearElement>,
-                app.scene,
-              )
-            : null,
+          selectedLinearElement:
+            // single linear element selected
+            Object.keys(selectedElementIds).length === 1 &&
+            isLinearElement(elements[0])
+              ? new LinearElementEditor(elements[0], app.scene)
+              : null,
           editingGroupId: null,
           selectedElementIds,
         },
