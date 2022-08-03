@@ -64,7 +64,7 @@ export const hitTest = (
   const threshold = 10 / appState.zoom.value;
   const point: Point = [x, y];
 
-  if (isElementSelected(appState, element)) {
+  if (isElementSelected(appState, element) && !appState.selectedLinearElement) {
     return isPointHittingElementBoundingBox(element, point, threshold);
   }
 
