@@ -4800,18 +4800,34 @@ class App extends React.Component<AppProps, AppState> {
             } else {
               // remove element from selection while
               // keeping prev elements selected
-              this.setState((prevState) =>
-                selectGroupsForSelectedElements(
+
+              this.setState((prevState) => {
+                const newSelectedElementIds = {
+                  ...prevState.selectedElementIds,
+                  [hitElement!.id]: false,
+                };
+                const newSelectedElements = getSelectedElements(
+                  this.scene.getNonDeletedElements(),
+                  { ...prevState, selectedElementIds: newSelectedElementIds },
+                );
+
+                return selectGroupsForSelectedElements(
                   {
                     ...prevState,
-                    selectedElementIds: {
-                      ...prevState.selectedElementIds,
-                      [hitElement!.id]: false,
-                    },
+                    selectedElementIds: newSelectedElementIds,
+                    // set selectedLinearElement only if thats the only element selected
+                    selectedLinearElement:
+                      newSelectedElements.length === 1 &&
+                      isLinearElement(newSelectedElements[0])
+                        ? new LinearElementEditor(
+                            newSelectedElements[0],
+                            this.scene,
+                          )
+                        : prevState.selectedLinearElement,
                   },
                   this.scene.getNonDeletedElements(),
-                ),
-              );
+                );
+              });
             }
           } else {
             // add element to selection while
