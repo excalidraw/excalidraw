@@ -4397,6 +4397,14 @@ class App extends React.Component<AppProps, AppState> {
                   elementsWithinSelection[0].link
                     ? "info"
                     : false,
+                selectedLinearElement:
+                  elementsWithinSelection.length === 1 &&
+                  isLinearElement(elementsWithinSelection[0])
+                    ? new LinearElementEditor(
+                        elementsWithinSelection[0],
+                        this.scene,
+                      )
+                    : null,
               },
               this.scene.getNonDeletedElements(),
             ),
@@ -4486,9 +4494,10 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (this.state.selectedLinearElement) {
         if (
-          pointerDownState.hit?.element?.id !==
+          !pointerDownState.boxSelection.hasOccurred &&
+          (pointerDownState.hit?.element?.id !==
             this.state.selectedLinearElement.elementId ||
-          !pointerDownState.hit.hasHitElementInside
+            !pointerDownState.hit.hasHitElementInside)
         ) {
           this.setState({
             selectedLinearElement: null,
