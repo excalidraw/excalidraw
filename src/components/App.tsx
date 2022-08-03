@@ -4495,9 +4495,14 @@ class App extends React.Component<AppProps, AppState> {
             this.state.selectedLinearElement.elementId ||
             !pointerDownState.hit.hasHitElementInside)
         ) {
-          this.setState({
-            selectedLinearElement: null,
-          });
+          const selectedELements = getSelectedElements(
+            this.scene.getElementsIncludingDeleted(),
+            this.state,
+          );
+          // set selectedLinearElement to null if there is more than one element selected since we don't want to show linear element handles
+          if (selectedELements.length > 1) {
+            this.setState({ selectedLinearElement: null });
+          }
         } else {
           const linearElementEditor = LinearElementEditor.handlePointerUp(
             childEvent,
