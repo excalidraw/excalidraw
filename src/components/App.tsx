@@ -4823,9 +4823,11 @@ class App extends React.Component<AppProps, AppState> {
               {
                 ...prevState,
                 selectedElementIds: { [hitElement.id]: true },
-                selectedLinearElement: isLinearElement(hitElement)
-                  ? new LinearElementEditor(hitElement, this.scene)
-                  : null,
+                selectedLinearElement:
+                  isLinearElement(hitElement) &&
+                  this.state.selectedLinearElement?.elementId !== hitElement.id
+                    ? new LinearElementEditor(hitElement, this.scene)
+                    : this.state.selectedLinearElement,
               },
               this.scene.getNonDeletedElements(),
             ),
@@ -5408,7 +5410,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       selectedElementIds: {},
       previousSelectedElementIds: this.state.selectedElementIds,
-      selectedLinearElement: null,
     });
   }
 
