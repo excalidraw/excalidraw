@@ -354,10 +354,10 @@ export const _renderScene = (
     const locallySelectedIds = locallySelectedElements.map(
       (element) => element.id,
     );
-    const isSingleArrowSelected =
+    const isSingleLinearElementSelected =
       locallySelectedElements.length === 1 &&
       isLinearElement(locallySelectedElements[0]);
-    if (isSingleArrowSelected) {
+    if (isSingleLinearElementSelected) {
       if (
         appState.selectedLinearElement &&
         !locallySelectedElements[0].locked
