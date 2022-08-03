@@ -3576,11 +3576,10 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.hit.element = ret.hitElement;
           }
           if (ret.linearElementEditor) {
+            this.setState({ selectedLinearElement: ret.linearElementEditor });
+
             if (this.state.editingLinearElement) {
               this.setState({ editingLinearElement: ret.linearElementEditor });
-            }
-            if (this.state.selectedLinearElement) {
-              this.setState({ selectedLinearElement: ret.linearElementEditor });
             }
           }
           if (ret.didAddPoint) {
@@ -4126,10 +4125,7 @@ class App extends React.Component<AppProps, AppState> {
               },
             });
           }
-          if (
-            this.state.selectedLinearElement &&
-            !this.state.selectedLinearElement.isDragging
-          ) {
+          if (!this.state.selectedLinearElement.isDragging) {
             this.setState({
               selectedLinearElement: {
                 ...this.state.selectedLinearElement,
