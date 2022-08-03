@@ -360,16 +360,22 @@ export const _renderScene = (
     const isSingleLinearElementSelected =
       locallySelectedElements.length === 1 &&
       isLinearElement(locallySelectedElements[0]);
-    if (isSingleLinearElementSelected && !locallySelectedElements[0].locked) {
-      if (appState.selectedLinearElement) {
-        renderLinearPointHandles(
-          context,
-          appState,
-          renderConfig,
-          locallySelectedElements[0] as ExcalidrawLinearElement,
-        );
-      }
-    } else {
+    // render selected linear element points
+    if (
+      isSingleLinearElementSelected &&
+      appState.selectedLinearElement?.elementId ===
+        locallySelectedElements[0].id &&
+      !locallySelectedElements[0].locked
+    ) {
+      renderLinearPointHandles(
+        context,
+        appState,
+        renderConfig,
+        locallySelectedElements[0] as ExcalidrawLinearElement,
+      );
+      // render bounding box
+      // (unless dragging a single linear element)
+    } else if (!appState.draggingElement || !isSingleLinearElementSelected) {
       const selections = elements.reduce((acc, element) => {
         const selectionColors = [];
         // local user
