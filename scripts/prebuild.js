@@ -8,6 +8,10 @@ const moveServiceWorkerScript = () => {
   const oldPath = path.resolve(__dirname, "../public/service-worker.js");
   const newPath = path.resolve(__dirname, "../src/service-worker.js");
 
+  if (fs.existsSync(newPath) && !fs.existsSync(oldPath)) {
+    return;
+  }
+
   fs.rename(oldPath, newPath, (error) => {
     if (error) {
       throw error;
