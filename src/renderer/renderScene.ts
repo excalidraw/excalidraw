@@ -122,11 +122,14 @@ const fillCircle = (
   cx: number,
   cy: number,
   radius: number,
+  stroke = true,
 ) => {
   context.beginPath();
   context.arc(cx, cy, radius, 0, Math.PI * 2);
   context.fill();
-  context.stroke();
+  if (stroke) {
+    context.stroke();
+  }
 };
 
 const strokeGrid = (
@@ -204,7 +207,6 @@ const renderLinearElementPointHighlight = (
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
 
-  context.strokeStyle = "rgba(105, 101, 219, 0.4)";
   context.fillStyle = "rgba(105, 101, 219, 0.4)";
 
   fillCircle(
@@ -212,6 +214,7 @@ const renderLinearElementPointHighlight = (
     x,
     y,
     LinearElementEditor.POINT_HANDLE_SIZE / renderConfig.zoom.value,
+    false,
   );
 
   context.restore();
