@@ -358,7 +358,10 @@ export const _renderScene = (
       locallySelectedElements.length === 1 &&
       isLinearElement(locallySelectedElements[0]);
     if (isSingleArrowSelected) {
-      if (appState.selectedLinearElement) {
+      if (
+        appState.selectedLinearElement &&
+        !locallySelectedElements[0].locked
+      ) {
         renderLinearPointHandles(
           context,
           appState,
