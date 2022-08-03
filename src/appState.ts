@@ -93,6 +93,7 @@ export const getDefaultAppState = (): Omit<
     linkOpacity: 1, //zsviczian
     trayModeEnabled: false, //zsviczian
     colorPalette: {}, //zsviczian
+    selectedLinearElement: null,
   };
 };
 
@@ -187,6 +188,7 @@ const APP_STATE_STORAGE_CONF = (<
   linkOpacity: { browser: false, export: false, server: false }, //zsviczian
   trayModeEnabled: { browser: false, export: false, server: false }, //zsviczian
   colorPalette: { browser: false, export: false, server: false }, //zsviczian
+  selectedLinearElement: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <
