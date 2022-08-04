@@ -4332,11 +4332,20 @@ class App extends React.Component<AppProps, AppState> {
           ));
         }
 
+        const cx = dx / 2;
+        const cy = dy / 2;
+
         if (points.length === 1) {
-          mutateElement(draggingElement, { points: [...points, [dx, dy]] });
-        } else if (points.length > 1) {
+          mutateElement(draggingElement, {
+            points: [...points, [cx, cy], [dx, dy]],
+          });
+        } else if (points.length === 2) {
           mutateElement(draggingElement, {
             points: [...points.slice(0, -1), [dx, dy]],
+          });
+        } else if (points.length > 2) {
+          mutateElement(draggingElement, {
+            points: [...points.slice(0, -2), [cx, cy], [dx, dy]],
           });
         }
 
