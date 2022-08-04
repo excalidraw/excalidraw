@@ -4842,7 +4842,8 @@ class App extends React.Component<AppProps, AppState> {
                   ...idsOfSelectedElementsThatAreInGroups,
                 },
               }));
-            } else {
+              // if not gragging a linear element point (outside editor)
+            } else if (!this.state.selectedLinearElement?.isDragging) {
               // remove element from selection while
               // keeping prev elements selected
 
