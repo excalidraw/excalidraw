@@ -183,6 +183,7 @@ export type AppState = {
   /** imageElement waiting to be placed on canvas */
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
+  selectedLinearElement: LinearElementEditor | null;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { flushSync } from "react-dom";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
@@ -87,9 +88,9 @@ import {
   getElementWithTransformHandleType,
   getNonDeletedElements,
   getNormalizedDimensions,
-  getPerfectElementSize,
   getResizeArrowDirection,
   getResizeOffsetXY,
+  getLockedLinearCursorAlignSize,
   getTransformHandleTypeFromCoords,
   hitTest,
   isHittingElementBoundingBoxWithoutHittingElement,
@@ -105,6 +106,7 @@ import {
   updateTextElement,
 } from "../element";
 import {
+  bindOrUnbindLinearElement,
   bindOrUnbindSelectedElements,
   fixBindingsAfterDeletion,
   fixBindingsAfterDuplication,
@@ -958,7 +960,6 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.updateDOMRect(this.initializeScene);
     }
-    this.checkIfBrowserZoomed();
   }
 
   public componentWillUnmount() {
@@ -971,25 +972,8 @@ class App extends React.Component<AppProps, AppState> {
     clearTimeout(touchTimeout);
     touchTimeout = 0;
   }
-  private checkIfBrowserZoomed = () => {
-    if (!this.device.isMobile) {
-      const scrollBarWidth = 10;
-      const widthRatio =
-        (window.outerWidth - scrollBarWidth) / window.innerWidth;
-      const isBrowserZoomed = widthRatio < 0.75 || widthRatio > 1.1;
-      if (isBrowserZoomed) {
-        this.setToast({
-          message: t("alerts.browserZoom"),
-          closable: true,
-          duration: Infinity,
-        });
-      } else {
-        this.setToast(null);
-      }
-    }
-  };
+
   private onResize = withBatchedUpdates(() => {
-    this.checkIfBrowserZoomed();
     this.scene
       .getElementsIncludingDeleted()
       .forEach((element) => invalidateShapeForElement(element));
@@ -1200,6 +1184,16 @@ class App extends React.Component<AppProps, AppState> {
         this.actionManager.executeAction(actionFinalize);
       });
     }
+
+    if (
+      this.state.selectedLinearElement &&
+      !this.state.selectedElementIds[this.state.selectedLinearElement.elementId]
+    ) {
+      // To make sure `selectedLinearElement` is in sync with `selectedElementIds`, however this shouldn't be needed once
+      // we have a single API to update `selectedElementIds`
+      this.setState({ selectedLinearElement: null });
+    }
+
     const { multiElement } = prevState;
     if (
       prevState.activeTool !== this.state.activeTool &&
@@ -2768,7 +2762,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state.gridSize,
       );
       if (editingLinearElement !== this.state.editingLinearElement) {
-        this.setState({ editingLinearElement });
+        // Since we are reading from previous state which is not possible with
+        // automatic batching in React 18 hence using flush sync to synchronously
+        // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
+        flushSync(() => {
+          this.setState({ editingLinearElement });
+        });
       }
       if (editingLinearElement.lastUncommittedPoint != null) {
         this.maybeSuggestBindingAtCursor(scenePointer);
@@ -2835,6 +2834,30 @@ class App extends React.Component<AppProps, AppState> {
           points: points.slice(0, -1),
         });
       } else {
+        const [gridX, gridY] = getGridPoint(
+          scenePointerX,
+          scenePointerY,
+          this.state.gridSize,
+        );
+
+        const [lastCommittedX, lastCommittedY] =
+          multiElement?.lastCommittedPoint ?? [0, 0];
+
+        let dxFromLastCommitted = gridX - rx - lastCommittedX;
+        let dyFromLastCommitted = gridY - ry - lastCommittedY;
+
+        if (shouldRotateWithDiscreteAngle(event)) {
+          ({ width: dxFromLastCommitted, height: dyFromLastCommitted } =
+            getLockedLinearCursorAlignSize(
+              // actual coordinate of the last committed point
+              lastCommittedX + rx,
+              lastCommittedY + ry,
+              // cursor-grid coordinate
+              gridX,
+              gridY,
+            ));
+        }
+
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.canvas, CURSOR_TYPE.POINTER);
         }
@@ -2842,7 +2865,10 @@ class App extends React.Component<AppProps, AppState> {
         mutateElement(multiElement, {
           points: [
             ...points.slice(0, -1),
-            [scenePointerX - rx, scenePointerY - ry],
+            [
+              lastCommittedX + dxFromLastCommitted,
+              lastCommittedY + dyFromLastCommitted,
+            ],
           ],
         });
       }
@@ -2941,22 +2967,12 @@ class App extends React.Component<AppProps, AppState> {
         setCursor(this.canvas, CURSOR_TYPE.GRAB);
       } else if (isOverScrollBar) {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
-      } else if (this.state.editingLinearElement) {
-        const element = LinearElementEditor.getElement(
-          this.state.editingLinearElement.elementId,
+      } else if (this.state.selectedLinearElement) {
+        this.handleHoverSelectedLinearElement(
+          this.state.selectedLinearElement,
+          scenePointerX,
+          scenePointerY,
         );
-
-        if (
-          element &&
-          isHittingElementNotConsideringBoundingBox(element, this.state, [
-            scenePointer.x,
-            scenePointer.y,
-          ])
-        ) {
-          setCursor(this.canvas, CURSOR_TYPE.MOVE);
-        } else {
-          setCursor(this.canvas, CURSOR_TYPE.AUTO);
-        }
       } else if (
         // if using cmd/ctrl, we're not dragging
         !event[KEYS.CTRL_OR_CMD] &&
@@ -3068,6 +3084,53 @@ class App extends React.Component<AppProps, AppState> {
     invalidateContextMenu = true;
   };
 
+  handleHoverSelectedLinearElement(
+    linearElementEditor: LinearElementEditor,
+    scenePointerX: number,
+    scenePointerY: number,
+  ) {
+    const element = LinearElementEditor.getElement(
+      linearElementEditor.elementId,
+    );
+
+    if (!element) {
+      return;
+    }
+    if (this.state.selectedLinearElement) {
+      let hoverPointIndex = -1;
+      if (
+        isHittingElementNotConsideringBoundingBox(element, this.state, [
+          scenePointerX,
+          scenePointerY,
+        ])
+      ) {
+        hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+          element,
+          this.state.zoom,
+          scenePointerX,
+          scenePointerY,
+        );
+        if (hoverPointIndex >= 0) {
+          setCursor(this.canvas, CURSOR_TYPE.POINTER);
+        } else {
+          setCursor(this.canvas, CURSOR_TYPE.MOVE);
+        }
+      }
+
+      if (
+        this.state.selectedLinearElement.hoverPointIndex !== hoverPointIndex
+      ) {
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            hoverPointIndex,
+          },
+        });
+      }
+    } else {
+      setCursor(this.canvas, CURSOR_TYPE.AUTO);
+    }
+  }
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -3598,16 +3661,25 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
       } else {
-        if (this.state.editingLinearElement) {
+        if (this.state.selectedLinearElement) {
+          const linearElementEditor =
+            this.state.editingLinearElement || this.state.selectedLinearElement;
           const ret = LinearElementEditor.handlePointerDown(
             event,
             this.state,
-            (appState) => this.setState(appState),
             this.history,
             pointerDownState.origin,
+            linearElementEditor,
           );
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
+          }
+          if (ret.linearElementEditor) {
+            this.setState({ selectedLinearElement: ret.linearElementEditor });
+
+            if (this.state.editingLinearElement) {
+              this.setState({ editingLinearElement: ret.linearElementEditor });
+            }
           }
           if (ret.didAddPoint) {
             return true;
@@ -4123,10 +4195,11 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (this.state.editingLinearElement) {
+      if (this.state.selectedLinearElement) {
+        const linearElementEditor =
+          this.state.editingLinearElement || this.state.selectedLinearElement;
         const didDrag = LinearElementEditor.handlePointDragging(
           this.state,
-          (appState) => this.setState(appState),
           pointerCoords.x,
           pointerCoords.y,
           (element, pointsSceneCoords) => {
@@ -4135,11 +4208,30 @@ class App extends React.Component<AppProps, AppState> {
               pointsSceneCoords,
             );
           },
+          linearElementEditor,
         );
-
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
+          if (
+            this.state.editingLinearElement &&
+            !this.state.editingLinearElement.isDragging
+          ) {
+            this.setState({
+              editingLinearElement: {
+                ...this.state.editingLinearElement,
+                isDragging: true,
+              },
+            });
+          }
+          if (!this.state.selectedLinearElement.isDragging) {
+            this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                isDragging: true,
+              },
+            });
+          }
           return;
         }
       }
@@ -4157,6 +4249,10 @@ class App extends React.Component<AppProps, AppState> {
         // box-selecting without shift when editing line, not clicking on a line
         (!this.state.editingLinearElement ||
           this.state.editingLinearElement?.elementId !==
+            pointerDownState.hit.element?.id ||
+          pointerDownState.hit.hasHitElementInside) &&
+        (!this.state.selectedLinearElement ||
+          this.state.selectedLinearElement?.elementId !==
             pointerDownState.hit.element?.id ||
           pointerDownState.hit.hasHitElementInside)
       ) {
@@ -4186,7 +4282,6 @@ class App extends React.Component<AppProps, AppState> {
 
           // We only drag in one direction if shift is pressed
           const lockDirection = event.shiftKey;
-
           dragSelectedElements(
             pointerDownState,
             selectedElements,
@@ -4298,10 +4393,11 @@ class App extends React.Component<AppProps, AppState> {
         let dy = gridY - draggingElement.y;
 
         if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
-          ({ width: dx, height: dy } = getPerfectElementSize(
-            this.state.activeTool.type,
-            dx,
-            dy,
+          ({ width: dx, height: dy } = getLockedLinearCursorAlignSize(
+            draggingElement.x,
+            draggingElement.y,
+            pointerCoords.x,
+            pointerCoords.y,
           ));
         }
 
@@ -4397,6 +4493,15 @@ class App extends React.Component<AppProps, AppState> {
                   elementsWithinSelection[0].link
                     ? "info"
                     : false,
+                // select linear element only when we haven't box-selected anything else
+                selectedLinearElement:
+                  elementsWithinSelection.length === 1 &&
+                  isLinearElement(elementsWithinSelection[0])
+                    ? new LinearElementEditor(
+                        elementsWithinSelection[0],
+                        this.scene,
+                      )
+                    : null,
               },
               this.scene.getNonDeletedElements(),
             ),
@@ -4480,6 +4585,46 @@ class App extends React.Component<AppProps, AppState> {
           if (editingLinearElement !== this.state.editingLinearElement) {
             this.setState({
               editingLinearElement,
+              suggestedBindings: [],
+            });
+          }
+        }
+      } else if (this.state.selectedLinearElement) {
+        if (
+          !pointerDownState.boxSelection.hasOccurred &&
+          (pointerDownState.hit?.element?.id !==
+            this.state.selectedLinearElement.elementId ||
+            !pointerDownState.hit.hasHitElementInside)
+        ) {
+          const selectedELements = getSelectedElements(
+            this.scene.getNonDeletedElements(),
+            this.state,
+          );
+          // set selectedLinearElement to null if there is more than one element selected since we don't want to show linear element handles
+          if (selectedELements.length > 1) {
+            this.setState({ selectedLinearElement: null });
+          }
+        } else {
+          const linearElementEditor = LinearElementEditor.handlePointerUp(
+            childEvent,
+            this.state.selectedLinearElement,
+            this.state,
+          );
+
+          const { startBindingElement, endBindingElement } =
+            linearElementEditor;
+          const element = this.scene.getElement(linearElementEditor.elementId);
+          if (isBindingElement(element)) {
+            bindOrUnbindLinearElement(
+              element,
+              startBindingElement,
+              endBindingElement,
+            );
+          }
+
+          if (linearElementEditor !== this.state.selectedLinearElement) {
+            this.setState({
+              selectedLinearElement: linearElementEditor,
               suggestedBindings: [],
             });
           }
@@ -4616,6 +4761,10 @@ class App extends React.Component<AppProps, AppState> {
                 ...prevState.selectedElementIds,
                 [draggingElement.id]: true,
               },
+              selectedLinearElement: new LinearElementEditor(
+                draggingElement,
+                this.scene,
+              ),
             }));
           } else {
             this.setState((prevState) => ({
@@ -4667,6 +4816,25 @@ class App extends React.Component<AppProps, AppState> {
       // Code below handles selection when element(s) weren't
       // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
+      if (
+        this.state.selectedLinearElement?.elementId !== hitElement?.id &&
+        isLinearElement(hitElement)
+      ) {
+        const selectedELements = getSelectedElements(
+          this.scene.getNonDeletedElements(),
+          this.state,
+        );
+        // set selectedLinearElement when no other element selected except
+        // the one we've hit
+        if (selectedELements.length === 1) {
+          this.setState({
+            selectedLinearElement: new LinearElementEditor(
+              hitElement,
+              this.scene,
+            ),
+          });
+        }
+      }
       if (isEraserActive(this.state)) {
         const draggedDistance = distance2d(
           this.lastPointerDown!.clientX,
@@ -4742,23 +4910,38 @@ class App extends React.Component<AppProps, AppState> {
             } else {
               // remove element from selection while
               // keeping prev elements selected
-              this.setState((prevState) =>
-                selectGroupsForSelectedElements(
+
+              this.setState((prevState) => {
+                const newSelectedElementIds = {
+                  ...prevState.selectedElementIds,
+                  [hitElement!.id]: false,
+                };
+                const newSelectedElements = getSelectedElements(
+                  this.scene.getNonDeletedElements(),
+                  { ...prevState, selectedElementIds: newSelectedElementIds },
+                );
+
+                return selectGroupsForSelectedElements(
                   {
                     ...prevState,
-                    selectedElementIds: {
-                      ...prevState.selectedElementIds,
-                      [hitElement!.id]: false,
-                    },
+                    selectedElementIds: newSelectedElementIds,
+                    // set selectedLinearElement only if thats the only element selected
+                    selectedLinearElement:
+                      newSelectedElements.length === 1 &&
+                      isLinearElement(newSelectedElements[0])
+                        ? new LinearElementEditor(
+                            newSelectedElements[0],
+                            this.scene,
+                          )
+                        : prevState.selectedLinearElement,
                   },
                   this.scene.getNonDeletedElements(),
-                ),
-              );
+                );
+              });
             }
           } else {
             // add element to selection while
             // keeping prev elements selected
-
             this.setState((_prevState) => ({
               selectedElementIds: {
                 ..._prevState.selectedElementIds,
@@ -4772,6 +4955,13 @@ class App extends React.Component<AppProps, AppState> {
               {
                 ...prevState,
                 selectedElementIds: { [hitElement.id]: true },
+                selectedLinearElement:
+                  isLinearElement(hitElement) &&
+                  // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
+                  // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
+                  this.state.selectedLinearElement?.elementId !== hitElement.id
+                    ? new LinearElementEditor(hitElement, this.scene)
+                    : this.state.selectedLinearElement,
               },
               this.scene.getNonDeletedElements(),
             ),
@@ -4780,6 +4970,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        !this.state.selectedLinearElement &&
         !this.state.editingLinearElement &&
         !pointerDownState.drag.hasOccurred &&
         !this.state.isResizing &&
@@ -5527,6 +5718,9 @@ class App extends React.Component<AppProps, AppState> {
           {
             ...this.state,
             selectedElementIds: { [element.id]: true },
+            selectedLinearElement: isLinearElement(element)
+              ? new LinearElementEditor(element, this.scene)
+              : null,
           },
           this.scene.getNonDeletedElements(),
         ),

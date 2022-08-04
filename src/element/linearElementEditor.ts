@@ -40,7 +40,7 @@ export class LinearElementEditor {
   public pointerOffset: Readonly<{ x: number; y: number }>;
   public startBindingElement: ExcalidrawBindableElement | null | "keep";
   public endBindingElement: ExcalidrawBindableElement | null | "keep";
-
+  public hoverPointIndex: number;
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
@@ -58,13 +58,14 @@ export class LinearElementEditor {
       prevSelectedPointsIndices: null,
       lastClickedPoint: -1,
     };
+    this.hoverPointIndex = -1;
   }
 
   // ---------------------------------------------------------------------------
   // static methods
   // ---------------------------------------------------------------------------
 
-  static POINT_HANDLE_SIZE = 20;
+  static POINT_HANDLE_SIZE = 10;
 
   /**
    * @param id the `elementId` from the instance of this class (so that we can
@@ -133,21 +134,19 @@ export class LinearElementEditor {
   /** @returns whether point was dragged */
   static handlePointDragging(
     appState: AppState,
-    setState: React.Component<any, AppState>["setState"],
     scenePointerX: number,
     scenePointerY: number,
     maybeSuggestBinding: (
       element: NonDeleted<ExcalidrawLinearElement>,
       pointSceneCoords: { x: number; y: number }[],
     ) => void,
+    linearElementEditor: LinearElementEditor,
   ): boolean {
-    if (!appState.editingLinearElement) {
+    if (!linearElementEditor) {
       return false;
     }
-    const { editingLinearElement } = appState;
-    const { selectedPointsIndices, elementId, isDragging } =
-      editingLinearElement;
 
+    const { selectedPointsIndices, elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
       return false;
@@ -155,23 +154,13 @@ export class LinearElementEditor {
 
     // point that's being dragged (out of all selected points)
     const draggingPoint = element.points[
-      editingLinearElement.pointerDownState.lastClickedPoint
+      linearElementEditor.pointerDownState.lastClickedPoint
     ] as [number, number] | undefined;
-
     if (selectedPointsIndices && draggingPoint) {
-      if (isDragging === false) {
-        setState({
-          editingLinearElement: {
-            ...editingLinearElement,
-            isDragging: true,
-          },
-        });
-      }
-
       const newDraggingPointPosition = LinearElementEditor.createPointAt(
         element,
-        scenePointerX - editingLinearElement.pointerOffset.x,
-        scenePointerY - editingLinearElement.pointerOffset.y,
+        scenePointerX - linearElementEditor.pointerOffset.x,
+        scenePointerY - linearElementEditor.pointerOffset.y,
         appState.gridSize,
       );
 
@@ -182,12 +171,11 @@ export class LinearElementEditor {
         element,
         selectedPointsIndices.map((pointIndex) => {
           const newPointPosition =
-            pointIndex ===
-            editingLinearElement.pointerDownState.lastClickedPoint
+            pointIndex === linearElementEditor.pointerDownState.lastClickedPoint
               ? LinearElementEditor.createPointAt(
                   element,
-                  scenePointerX - editingLinearElement.pointerOffset.x,
-                  scenePointerY - editingLinearElement.pointerOffset.y,
+                  scenePointerX - linearElementEditor.pointerOffset.x,
+                  scenePointerY - linearElementEditor.pointerOffset.y,
                   appState.gridSize,
                 )
               : ([
@@ -199,7 +187,7 @@ export class LinearElementEditor {
             point: newPointPosition,
             isDragging:
               pointIndex ===
-              editingLinearElement.pointerDownState.lastClickedPoint,
+              linearElementEditor.pointerDownState.lastClickedPoint,
           };
         }),
       );
@@ -330,31 +318,32 @@ export class LinearElementEditor {
   static handlePointerDown(
     event: React.PointerEvent<HTMLCanvasElement>,
     appState: AppState,
-    setState: React.Component<any, AppState>["setState"],
     history: History,
     scenePointer: { x: number; y: number },
+    linearElementEditor: LinearElementEditor,
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
+    linearElementEditor: LinearElementEditor | null;
   } {
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
+      linearElementEditor: null,
     };
 
-    if (!appState.editingLinearElement) {
+    if (!linearElementEditor) {
       return ret;
     }
 
-    const { elementId } = appState.editingLinearElement;
+    const { elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
 
     if (!element) {
       return ret;
     }
-
-    if (event.altKey) {
-      if (appState.editingLinearElement.lastUncommittedPoint == null) {
+    if (event.altKey && appState.editingLinearElement) {
+      if (linearElementEditor.lastUncommittedPoint == null) {
         mutateElement(element, {
           points: [
             ...element.points,
@@ -368,22 +357,20 @@ export class LinearElementEditor {
         });
       }
       history.resumeRecording();
-      setState({
-        editingLinearElement: {
-          ...appState.editingLinearElement,
-          pointerDownState: {
-            prevSelectedPointsIndices:
-              appState.editingLinearElement.selectedPointsIndices,
-            lastClickedPoint: -1,
-          },
-          selectedPointsIndices: [element.points.length - 1],
-          lastUncommittedPoint: null,
-          endBindingElement: getHoveredElementForBinding(
-            scenePointer,
-            Scene.getScene(element)!,
-          ),
+      ret.linearElementEditor = {
+        ...linearElementEditor,
+        pointerDownState: {
+          prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
+          lastClickedPoint: -1,
         },
-      });
+        selectedPointsIndices: [element.points.length - 1],
+        lastUncommittedPoint: null,
+        endBindingElement: getHoveredElementForBinding(
+          scenePointer,
+          Scene.getScene(element)!,
+        ),
+      };
+
       ret.didAddPoint = true;
       return ret;
     }
@@ -405,8 +392,7 @@ export class LinearElementEditor {
       // from the end points of the `linearElement` - this is to allow disabling
       // binding (which needs to happen at the point the user finishes moving
       // the point).
-      const { startBindingElement, endBindingElement } =
-        appState.editingLinearElement;
+      const { startBindingElement, endBindingElement } = linearElementEditor;
       if (isBindingEnabled(appState) && isBindingElement(element)) {
         bindOrUnbindLinearElement(
           element,
@@ -432,33 +418,28 @@ export class LinearElementEditor {
     const nextSelectedPointsIndices =
       clickedPointIndex > -1 || event.shiftKey
         ? event.shiftKey ||
-          appState.editingLinearElement.selectedPointsIndices?.includes(
-            clickedPointIndex,
-          )
+          linearElementEditor.selectedPointsIndices?.includes(clickedPointIndex)
           ? normalizeSelectedPoints([
-              ...(appState.editingLinearElement.selectedPointsIndices || []),
+              ...(linearElementEditor.selectedPointsIndices || []),
               clickedPointIndex,
             ])
           : [clickedPointIndex]
         : null;
-
-    setState({
-      editingLinearElement: {
-        ...appState.editingLinearElement,
-        pointerDownState: {
-          prevSelectedPointsIndices:
-            appState.editingLinearElement.selectedPointsIndices,
-          lastClickedPoint: clickedPointIndex,
-        },
-        selectedPointsIndices: nextSelectedPointsIndices,
-        pointerOffset: targetPoint
-          ? {
-              x: scenePointer.x - targetPoint[0],
-              y: scenePointer.y - targetPoint[1],
-            }
-          : { x: 0, y: 0 },
+    ret.linearElementEditor = {
+      ...linearElementEditor,
+      pointerDownState: {
+        prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
+        lastClickedPoint: clickedPointIndex,
       },
-    });
+      selectedPointsIndices: nextSelectedPointsIndices,
+      pointerOffset: targetPoint
+        ? {
+            x: scenePointer.x - targetPoint[0],
+            y: scenePointer.y - targetPoint[1],
+          }
+        : { x: 0, y: 0 },
+    };
+
     return ret;
   }
 
@@ -466,13 +447,13 @@ export class LinearElementEditor {
     event: React.PointerEvent<HTMLCanvasElement>,
     scenePointerX: number,
     scenePointerY: number,
-    editingLinearElement: LinearElementEditor,
+    linearElementEditor: LinearElementEditor,
     gridSize: number | null,
   ): LinearElementEditor {
-    const { elementId, lastUncommittedPoint } = editingLinearElement;
+    const { elementId, lastUncommittedPoint } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
-      return editingLinearElement;
+      return linearElementEditor;
     }
 
     const { points } = element;
@@ -482,13 +463,13 @@ export class LinearElementEditor {
       if (lastPoint === lastUncommittedPoint) {
         LinearElementEditor.deletePoints(element, [points.length - 1]);
       }
-      return { ...editingLinearElement, lastUncommittedPoint: null };
+      return { ...linearElementEditor, lastUncommittedPoint: null };
     }
 
     const newPoint = LinearElementEditor.createPointAt(
       element,
-      scenePointerX - editingLinearElement.pointerOffset.x,
-      scenePointerY - editingLinearElement.pointerOffset.y,
+      scenePointerX - linearElementEditor.pointerOffset.x,
+      scenePointerY - linearElementEditor.pointerOffset.y,
       gridSize,
     );
 
@@ -504,7 +485,7 @@ export class LinearElementEditor {
     }
 
     return {
-      ...editingLinearElement,
+      ...linearElementEditor,
       lastUncommittedPoint: element.points[element.points.length - 1],
     };
   }
@@ -587,7 +568,7 @@ export class LinearElementEditor {
       if (
         distance2d(x, y, point[0], point[1]) * zoom.value <
         // +1px to account for outline stroke
-        this.POINT_HANDLE_SIZE / 2 + 1
+        this.POINT_HANDLE_SIZE + 1
       ) {
         return idx;
       }
