@@ -328,8 +328,6 @@ export class LinearElementEditor {
       }
     }
 
-    editingLinearElement.selectedPointsIndices = null;
-
     return {
       ...editingLinearElement,
       ...bindings,
