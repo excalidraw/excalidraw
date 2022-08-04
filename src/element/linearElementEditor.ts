@@ -154,9 +154,7 @@ export class LinearElementEditor {
       return false;
     }
 
-    const { selectedPointsIndices, elementId, pointerDownState } =
-      linearElementEditor;
-    const { prevSelectedPointsIndices } = pointerDownState;
+    const { selectedPointsIndices, elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
       return false;
@@ -169,14 +167,10 @@ export class LinearElementEditor {
     if (selectedPointsIndices && draggingPoint) {
       if (
         shouldRotateWithDiscreteAngle(event) &&
-        (selectedPointsIndices.length === 1 ||
-          prevSelectedPointsIndices?.length === 1) &&
+        selectedPointsIndices.length === 1 &&
         element.points.length > 1
       ) {
-        const prevSelectedIndex = prevSelectedPointsIndices?.[0];
-        const selectedIndex = selectedPointsIndices.filter(
-          (i) => i !== prevSelectedIndex,
-        )?.[0];
+        const selectedIndex = selectedPointsIndices[0];
         const referencePoint =
           element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
 
@@ -333,6 +327,8 @@ export class LinearElementEditor {
         }
       }
     }
+
+    editingLinearElement.selectedPointsIndices = null;
 
     return {
       ...editingLinearElement,
