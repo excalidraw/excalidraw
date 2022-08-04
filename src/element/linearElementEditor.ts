@@ -29,25 +29,29 @@ import { isBindingElement } from "./typeChecks";
 import { shouldRotateWithDiscreteAngle } from "../keys";
 
 export class LinearElementEditor {
-  public elementId: ExcalidrawElement["id"] & {
+  public readonly elementId: ExcalidrawElement["id"] & {
     _brand: "excalidrawLinearElementId";
   };
   /** indices */
-  public selectedPointsIndices: readonly number[] | null;
+  public readonly selectedPointsIndices: readonly number[] | null;
 
-  public pointerDownState: Readonly<{
+  public readonly pointerDownState: Readonly<{
     prevSelectedPointsIndices: readonly number[] | null;
     /** index */
     lastClickedPoint: number;
   }>;
 
   /** whether you're dragging a point */
-  public isDragging: boolean;
-  public lastUncommittedPoint: Point | null;
-  public pointerOffset: Readonly<{ x: number; y: number }>;
-  public startBindingElement: ExcalidrawBindableElement | null | "keep";
-  public endBindingElement: ExcalidrawBindableElement | null | "keep";
-  public hoverPointIndex: number;
+  public readonly isDragging: boolean;
+  public readonly lastUncommittedPoint: Point | null;
+  public readonly pointerOffset: Readonly<{ x: number; y: number }>;
+  public readonly startBindingElement:
+    | ExcalidrawBindableElement
+    | null
+    | "keep";
+  public readonly endBindingElement: ExcalidrawBindableElement | null | "keep";
+  public readonly hoverPointIndex: number;
+
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
@@ -284,10 +288,12 @@ export class LinearElementEditor {
       return editingLinearElement;
     }
 
-    const bindings: Partial<
-      Pick<
-        InstanceType<typeof LinearElementEditor>,
-        "startBindingElement" | "endBindingElement"
+    const bindings: Mutable<
+      Partial<
+        Pick<
+          InstanceType<typeof LinearElementEditor>,
+          "startBindingElement" | "endBindingElement"
+        >
       >
     > = {};
 
