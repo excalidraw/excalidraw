@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Paste",
     "pasteCharts": "Paste charts",
+    "sortChartLabels": "Sort numerical labels in ascending order",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
     "moveCanvas": "Move canvas",
