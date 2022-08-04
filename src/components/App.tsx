@@ -4130,6 +4130,7 @@ class App extends React.Component<AppProps, AppState> {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
         const didDrag = LinearElementEditor.handlePointDragging(
+          event,
           this.state,
           pointerCoords.x,
           pointerCoords.y,
@@ -4555,7 +4556,10 @@ class App extends React.Component<AppProps, AppState> {
 
           if (linearElementEditor !== this.state.selectedLinearElement) {
             this.setState({
-              selectedLinearElement: linearElementEditor,
+              selectedLinearElement: {
+                ...linearElementEditor,
+                selectedPointsIndices: null,
+              },
               suggestedBindings: [],
             });
           }
@@ -4891,9 +4895,9 @@ class App extends React.Component<AppProps, AppState> {
                   isLinearElement(hitElement) &&
                   // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
                   // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
-                  this.state.selectedLinearElement?.elementId !== hitElement.id
+                  prevState.selectedLinearElement?.elementId !== hitElement.id
                     ? new LinearElementEditor(hitElement, this.scene)
-                    : this.state.selectedLinearElement,
+                    : prevState.selectedLinearElement,
               },
               this.scene.getNonDeletedElements(),
             ),
