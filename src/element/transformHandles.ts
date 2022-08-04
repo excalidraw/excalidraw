@@ -4,6 +4,7 @@ import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
 import { Zoom } from "../types";
 import { isTextElement } from ".";
+import { isLinearElement } from "./typeChecks";
 
 export type TransformHandleDirection =
   | "n"
@@ -59,8 +60,6 @@ const OMIT_SIDES_FOR_LINE_BACKSLASH = {
   s: true,
   n: true,
   w: true,
-  ne: true,
-  sw: true,
 };
 
 const generateTransformHandle = (
@@ -230,11 +229,7 @@ export const getTransformHandles = (
   }
 
   let omitSides: { [T in TransformHandleType]?: boolean } = {};
-  if (
-    element.type === "arrow" ||
-    element.type === "line" ||
-    element.type === "freedraw"
-  ) {
+  if (element.type === "freedraw" || isLinearElement(element)) {
     if (element.points.length === 2) {
       // only check the last point because starting point is always (0,0)
       const [, p1] = element.points;

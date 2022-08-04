@@ -58,6 +58,7 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
+import { isLinearElement } from "../element/typeChecks";
 
 const hasEmojiSupport = supportsEmoji();
 
@@ -121,11 +122,14 @@ const fillCircle = (
   cx: number,
   cy: number,
   radius: number,
+  stroke = true,
 ) => {
   context.beginPath();
   context.arc(cx, cy, radius, 0, Math.PI * 2);
   context.fill();
-  context.stroke();
+  if (stroke) {
+    context.stroke();
+  }
 };
 
 const strokeGrid = (
@@ -163,24 +167,58 @@ const renderLinearPointHandles = (
 
   LinearElementEditor.getPointsGlobalCoordinates(element).forEach(
     (point, idx) => {
-      context.strokeStyle = "red";
+      context.strokeStyle = "#5e5ad8";
       context.setLineDash([]);
       context.fillStyle =
         appState.editingLinearElement?.selectedPointsIndices?.includes(idx)
-          ? "rgba(255, 127, 127, 0.9)"
+          ? "rgba(134, 131, 226, 0.9)"
           : "rgba(255, 255, 255, 0.9)";
       const { POINT_HANDLE_SIZE } = LinearElementEditor;
-      fillCircle(
-        context,
-        point[0],
-        point[1],
-        POINT_HANDLE_SIZE / 2 / renderConfig.zoom.value,
-      );
+      const radius = appState.editingLinearElement
+        ? POINT_HANDLE_SIZE
+        : POINT_HANDLE_SIZE / 2;
+      fillCircle(context, point[0], point[1], radius / renderConfig.zoom.value);
     },
   );
   context.restore();
 };
 
+const renderLinearElementPointHighlight = (
+  context: CanvasRenderingContext2D,
+  appState: AppState,
+  renderConfig: RenderConfig,
+) => {
+  const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
+  if (
+    appState.editingLinearElement?.selectedPointsIndices?.includes(
+      hoverPointIndex,
+    )
+  ) {
+    return;
+  }
+  const element = LinearElementEditor.getElement(elementId);
+  if (!element) {
+    return;
+  }
+  const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    element,
+    hoverPointIndex,
+  );
+  context.save();
+  context.translate(renderConfig.scrollX, renderConfig.scrollY);
+
+  context.fillStyle = "rgba(105, 101, 219, 0.4)";
+
+  fillCircle(
+    context,
+    x,
+    y,
+    LinearElementEditor.POINT_HANDLE_SIZE / renderConfig.zoom.value,
+    false,
+  );
+
+  context.restore();
+};
 export const _renderScene = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -302,76 +340,103 @@ export const _renderScene = (
       });
   }
 
+  if (
+    appState.selectedLinearElement &&
+    appState.selectedLinearElement.hoverPointIndex !== -1
+  ) {
+    renderLinearElementPointHighlight(context, appState, renderConfig);
+  }
+
   // Paint selected elements
   if (
     renderSelection &&
     !appState.multiElement &&
     !appState.editingLinearElement
   ) {
-    const selections = elements.reduce((acc, element) => {
-      const selectionColors = [];
-      // local user
-      if (
-        appState.selectedElementIds[element.id] &&
-        !isSelectedViaGroup(appState, element)
-      ) {
-        selectionColors.push(oc.black);
-      }
-      // remote users
-      if (renderConfig.remoteSelectedElementIds[element.id]) {
-        selectionColors.push(
-          ...renderConfig.remoteSelectedElementIds[element.id].map(
-            (socketId) => {
-              const { background } = getClientColors(socketId, appState);
-              return background;
-            },
-          ),
-        );
-      }
-      if (selectionColors.length) {
-        const [elementX1, elementY1, elementX2, elementY2] =
-          getElementAbsoluteCoords(element);
-        acc.push({
-          angle: element.angle,
-          elementX1,
-          elementY1,
-          elementX2,
-          elementY2,
-          selectionColors,
-        });
-      }
-      return acc;
-    }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[] }[]);
-
-    const addSelectionForGroupId = (groupId: GroupId) => {
-      const groupElements = getElementsInGroup(elements, groupId);
-      const [elementX1, elementY1, elementX2, elementY2] =
-        getCommonBounds(groupElements);
-      selections.push({
-        angle: 0,
-        elementX1,
-        elementX2,
-        elementY1,
-        elementY2,
-        selectionColors: [oc.black],
-      });
-    };
-
-    for (const groupId of getSelectedGroupIds(appState)) {
-      // TODO: support multiplayer selected group IDs
-      addSelectionForGroupId(groupId);
-    }
-
-    if (appState.editingGroupId) {
-      addSelectionForGroupId(appState.editingGroupId);
-    }
-
-    selections.forEach((selection) =>
-      renderSelectionBorder(context, renderConfig, selection),
-    );
-
     const locallySelectedElements = getSelectedElements(elements, appState);
+    const locallySelectedIds = locallySelectedElements.map(
+      (element) => element.id,
+    );
+    const isSingleLinearElementSelected =
+      locallySelectedElements.length === 1 &&
+      isLinearElement(locallySelectedElements[0]);
+    // render selected linear element points
+    if (
+      isSingleLinearElementSelected &&
+      appState.selectedLinearElement?.elementId ===
+        locallySelectedElements[0].id &&
+      !locallySelectedElements[0].locked
+    ) {
+      renderLinearPointHandles(
+        context,
+        appState,
+        renderConfig,
+        locallySelectedElements[0] as ExcalidrawLinearElement,
+      );
+      // render bounding box
+      // (unless dragging a single linear element)
+    } else if (!appState.draggingElement || !isSingleLinearElementSelected) {
+      const selections = elements.reduce((acc, element) => {
+        const selectionColors = [];
+        // local user
+        if (
+          locallySelectedIds.includes(element.id) &&
+          !isSelectedViaGroup(appState, element)
+        ) {
+          selectionColors.push(oc.black);
+        }
+        // remote users
+        if (renderConfig.remoteSelectedElementIds[element.id]) {
+          selectionColors.push(
+            ...renderConfig.remoteSelectedElementIds[element.id].map(
+              (socketId) => {
+                const { background } = getClientColors(socketId, appState);
+                return background;
+              },
+            ),
+          );
+        }
+        if (selectionColors.length) {
+          const [elementX1, elementY1, elementX2, elementY2] =
+            getElementAbsoluteCoords(element);
+          acc.push({
+            angle: element.angle,
+            elementX1,
+            elementY1,
+            elementX2,
+            elementY2,
+            selectionColors,
+          });
+        }
+        return acc;
+      }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[] }[]);
 
+      const addSelectionForGroupId = (groupId: GroupId) => {
+        const groupElements = getElementsInGroup(elements, groupId);
+        const [elementX1, elementY1, elementX2, elementY2] =
+          getCommonBounds(groupElements);
+        selections.push({
+          angle: 0,
+          elementX1,
+          elementX2,
+          elementY1,
+          elementY2,
+          selectionColors: [oc.black],
+        });
+      };
+
+      for (const groupId of getSelectedGroupIds(appState)) {
+        // TODO: support multiplayer selected group IDs
+        addSelectionForGroupId(groupId);
+      }
+
+      if (appState.editingGroupId) {
+        addSelectionForGroupId(appState.editingGroupId);
+      }
+      selections.forEach((selection) =>
+        renderSelectionBorder(context, renderConfig, selection),
+      );
+    }
     // Paint resize transformHandles
     context.save();
     context.translate(renderConfig.scrollX, renderConfig.scrollY);
@@ -382,7 +447,10 @@ export const _renderScene = (
         renderConfig.zoom,
         "mouse", // when we render we don't know which pointer type so use mouse
       );
-      if (!appState.viewModeEnabled) {
+      if (
+        !appState.viewModeEnabled &&
+        !isLinearElement(locallySelectedElements[0])
+      ) {
         renderTransformHandles(
           context,
           renderConfig,
