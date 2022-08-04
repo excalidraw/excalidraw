@@ -145,9 +145,10 @@ describe("Test dragCreate", () => {
       expect(element.type).toEqual("arrow");
       expect(element.x).toEqual(30);
       expect(element.y).toEqual(20);
-      expect(element.points.length).toEqual(2);
+      expect(element.points.length).toEqual(3);
       expect(element.points[0]).toEqual([0, 0]);
-      expect(element.points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
+      expect(element.points[1]).toEqual([15, 25]);
+      expect(element.points[2]).toEqual([30, 50]); // (60 - 30, 70 - 20)
 
       expect(h.elements.length).toMatchSnapshot();
       h.elements.forEach((element) => expect(element).toMatchSnapshot());
@@ -180,9 +181,10 @@ describe("Test dragCreate", () => {
       expect(element.type).toEqual("line");
       expect(element.x).toEqual(30);
       expect(element.y).toEqual(20);
-      expect(element.points.length).toEqual(2);
+      expect(element.points.length).toEqual(3);
       expect(element.points[0]).toEqual([0, 0]);
-      expect(element.points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
+      expect(element.points[1]).toEqual([15, 25]);
+      expect(element.points[2]).toEqual([30, 50]); // (60 - 30, 70 - 20)
 
       h.elements.forEach((element) => expect(element).toMatchSnapshot());
     });
