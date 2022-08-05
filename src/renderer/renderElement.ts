@@ -198,7 +198,7 @@ const drawElementOnCanvas = (
 ) => {
   context.globalAlpha = element.opacity / 100;
   const map = getCustomMethods(element.subtype);
-  if (map) {
+  if (map?.render) {
     map.render(element, context, renderConfig.renderCb);
     context.globalAlpha = 1;
     return;
@@ -866,7 +866,7 @@ export const renderElementToSvg = (
   }
 
   const map = getCustomMethods(element.subtype);
-  if (map) {
+  if (map?.renderSvg) {
     map.renderSvg(svgRoot, root, element, { offsetX, offsetY });
     return;
   }

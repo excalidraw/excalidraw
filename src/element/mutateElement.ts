@@ -18,8 +18,8 @@ const cleanUpdates = <TElement extends Mutable<ExcalidrawElement>>(
   updates: ElementUpdate<TElement>,
 ): ElementUpdate<TElement> => {
   const subtype = maybeGetCustom(element, element.type).subtype;
-  const old = getCustomMethods(subtype)?.clean(updates) as typeof updates;
-  return old ?? updates;
+  const map = getCustomMethods(subtype);
+  return map?.clean ? (map.clean(updates) as typeof updates) : updates;
 };
 
 // This function tracks updates of text elements for the purposes for collaboration.

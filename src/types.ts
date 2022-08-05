@@ -474,7 +474,7 @@ export type ExcalidrawImperativeAPI = {
   addSubtype: (
     subtypeTypes: SubtypeTypes,
     SubtypePrepFn: SubtypePrepFn,
-  ) => { actions: Action[] | null; methods: CustomMethods };
+  ) => { actions: Action[] | null; methods: Partial<CustomMethods> };
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
   addFiles: (data: BinaryFileData[]) => void;

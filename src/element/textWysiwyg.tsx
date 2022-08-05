@@ -64,7 +64,7 @@ const getTransform = (
 
 export const measureTextElement = function (element, next, maxWidth) {
   const map = getCustomMethods(element.subtype);
-  if (map) {
+  if (map?.measureText) {
     return map.measureText(element, next, maxWidth);
   }
 
@@ -76,7 +76,7 @@ export const measureTextElement = function (element, next, maxWidth) {
 
 export const wrapTextElement = function (element, containerWidth, next) {
   const map = getCustomMethods(element.subtype);
-  if (map) {
+  if (map?.wrapText) {
     return map.wrapText(element, containerWidth, next);
   }
 

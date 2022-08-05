@@ -202,7 +202,7 @@ export type CustomMethods = {
   ) => string;
 };
 
-type MethodMap = { subtype: CustomSubtype; methods: CustomMethods };
+type MethodMap = { subtype: CustomSubtype; methods: Partial<CustomMethods> };
 const methodMaps = [] as Array<MethodMap>;
 
 // Use `getCustomMethods` to call subtype-specialized methods, like `render`.
@@ -213,7 +213,7 @@ export const getCustomMethods = (subtype: CustomSubtype | undefined) => {
 
 export const addCustomMethods = (
   subtype: CustomSubtype,
-  methods: CustomMethods,
+  methods: Partial<CustomMethods>,
 ) => {
   if (!methodMaps.find((method) => method.subtype === subtype)) {
     methodMaps.push({ subtype, methods });
@@ -232,7 +232,7 @@ export type SubtypePrepFn = (
   ) => void,
 ) => {
   actions: Action[];
-  methods: CustomMethods;
+  methods: Partial<CustomMethods>;
 };
 
 // This is the main method to set up the subtype.  The optional
@@ -245,7 +245,7 @@ export const prepareSubtype = (
   onSubtypeLoaded?: (
     hasSubtype: (element: ExcalidrawElement) => boolean,
   ) => void,
-): { actions: Action[] | null; methods: CustomMethods } => {
+): { actions: Action[] | null; methods: Partial<CustomMethods> } => {
   const map = getCustomMethods(types.subtype);
   if (map) {
     return { actions: null, methods: map };
@@ -295,7 +295,7 @@ export const ensureSubtypesLoaded = async (
     const subtype = subtypesUsed[i];
     // Should be defined if prepareSubtype() has run
     const map = getCustomMethods(subtype);
-    if (map) {
+    if (map?.ensureLoaded) {
       await map.ensureLoaded();
     }
   }
