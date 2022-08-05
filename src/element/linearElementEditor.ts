@@ -178,16 +178,12 @@ export class LinearElementEditor {
         const referencePoint =
           element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
 
-        let [width, height] = LinearElementEditor._getShiftLockedDelta(
+        const [width, height] = LinearElementEditor._getShiftLockedDelta(
           element,
           referencePoint,
           [scenePointerX, scenePointerY],
           appState.gridSize,
         );
-
-        // rounding to stop the dragged point from jiggling
-        width = Math.round(width);
-        height = Math.round(height);
 
         LinearElementEditor.movePoints(element, [
           {
