@@ -96,6 +96,7 @@ languageDetector.init({
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
+  excalidrawAPI: ExcalidrawImperativeAPI;
 }): Promise<
   { scene: ExcalidrawInitialDataState | null } & (
     | { isExternalScene: true; id: string; key: string }
@@ -180,8 +181,28 @@ const initializeScene = async (opts: {
   }
 
   if (roomLinkData) {
+    const { excalidrawAPI } = opts;
+
+    const scene = await opts.collabAPI.startCollaboration(roomLinkData);
+
     return {
-      scene: await opts.collabAPI.startCollaboration(roomLinkData),
+      // when collaborating, the state may have already been updated at this
+      // point (we may have received updates from other clients), so reconcile
+      // elements and appState with existing state
+      scene: {
+        ...scene,
+        appState: {
+          ...restoreAppState(scene?.appState, excalidrawAPI.getAppState()),
+          // necessary if we're invoking from a hashchange handler which doesn't
+          // go through App.initializeScene() that resets this flag
+          isLoading: false,
+        },
+        elements: reconcileElements(
+          scene?.elements || [],
+          excalidrawAPI.getSceneElementsIncludingDeleted(),
+          excalidrawAPI.getAppState(),
+        ),
+      },
       isExternalScene: true,
       id: roomLinkData.roomId,
       key: roomLinkData.roomKey,
@@ -335,23 +356,9 @@ const ExcalidrawWrapper = () => {
       }
     };
 
-    initializeScene({ collabAPI }).then(async (data) => {
+    initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
-
-      initialStatePromiseRef.current.promise.resolve({
-        ...data.scene,
-        // at this point the state may have already been updated (e.g. when
-        // collaborating, we may have received updates from other clients)
-        appState: restoreAppState(
-          data.scene?.appState,
-          excalidrawAPI.getAppState(),
-        ),
-        elements: reconcileElements(
-          data.scene?.elements || [],
-          excalidrawAPI.getSceneElementsIncludingDeleted(),
-          excalidrawAPI.getAppState(),
-        ),
-      });
+      initialStatePromiseRef.current.promise.resolve(data.scene);
     });
 
     const onHashChange = async (event: HashChangeEvent) => {
@@ -366,7 +373,7 @@ const ExcalidrawWrapper = () => {
         }
         excalidrawAPI.updateScene({ appState: { isLoading: true } });
 
-        initializeScene({ collabAPI }).then((data) => {
+        initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
           loadImages(data);
           if (data.scene) {
             excalidrawAPI.updateScene({
