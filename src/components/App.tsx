@@ -234,6 +234,8 @@ import {
   getCustomSubtypes,
   prepareSubtype,
 } from "../subtypes";
+import { getCrispSubtypeTypes } from "../element/subtypes/crisp/types";
+import { prepareCrispSubtype } from "../element/subtypes/crisp";
 import {
   dataURLToFile,
   generateIdFromFile,
@@ -430,6 +432,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
+    this.addSubtype(getCrispSubtypeTypes(), prepareCrispSubtype);
   }
 
   private addSubtype(subtypeTypes: SubtypeTypes, subtypePrepFn: SubtypePrepFn) {
