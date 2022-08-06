@@ -378,31 +378,6 @@ class App extends React.Component<AppProps, AppState> {
     this.library = new Library(this);
     this.scene = new Scene();
 
-    // Call this method after finishing any async loading for
-    // subtypes of ExcalidrawElement if the newly loaded code
-    // would change the rendering.
-    const refresh = (hasSubtype: (element: ExcalidrawElement) => boolean) => {
-      const elements = this.scene.getElementsIncludingDeleted();
-      let refreshNeeded = false;
-      getNonDeletedElements(elements).forEach((element) => {
-        // If the element is of the subtype that was just
-        // registered, update the element's dimensions, mark the
-        // element for a re-render, and mark the scene for a refresh.
-        if (hasSubtype(element)) {
-          invalidateShapeForElement(element);
-          if (isTextElement(element)) {
-            redrawTextBoundingBox(element, getContainerElement(element));
-          }
-          refreshNeeded = true;
-        }
-      });
-      // If there are any elements of the just-registered subtype,
-      // refresh the scene to re-render each such element.
-      if (refreshNeeded) {
-        this.setState({});
-      }
-    };
-
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -423,16 +398,7 @@ class App extends React.Component<AppProps, AppState> {
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
-        addSubtype: (
-          subtypeTypes: SubtypeTypes,
-          subtypePrepFn: SubtypePrepFn,
-        ) => {
-          const prep = prepareSubtype(subtypeTypes, subtypePrepFn, refresh);
-          if (prep.actions) {
-            this.actionManager.registerAll(prep.actions);
-          }
-          return prep;
-        },
+        addSubtype: this.addSubtype,
         refresh: this.refresh,
         setToast: this.setToast,
         id: this.id,
@@ -464,6 +430,38 @@ class App extends React.Component<AppProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
+  }
+
+  private addSubtype(subtypeTypes: SubtypeTypes, subtypePrepFn: SubtypePrepFn) {
+    // Call this method after finishing any async loading for
+    // subtypes of ExcalidrawElement if the newly loaded code
+    // would change the rendering.
+    const refresh = (hasSubtype: (element: ExcalidrawElement) => boolean) => {
+      const elements = this.scene.getElementsIncludingDeleted();
+      let refreshNeeded = false;
+      getNonDeletedElements(elements).forEach((element) => {
+        // If the element is of the subtype that was just
+        // registered, update the element's dimensions, mark the
+        // element for a re-render, and mark the scene for a refresh.
+        if (hasSubtype(element)) {
+          invalidateShapeForElement(element);
+          if (isTextElement(element)) {
+            redrawTextBoundingBox(element, getContainerElement(element));
+          }
+          refreshNeeded = true;
+        }
+      });
+      // If there are any elements of the just-registered subtype,
+      // refresh the scene to re-render each such element.
+      if (refreshNeeded) {
+        this.setState({});
+      }
+    };
+    const prep = prepareSubtype(subtypeTypes, subtypePrepFn, refresh);
+    if (prep.actions) {
+      this.actionManager.registerAll(prep.actions);
+    }
+    return prep;
   }
 
   private renderCanvas() {
@@ -3945,6 +3943,8 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+      subtype: this.state.activeSubtype,
+      customProps: this.state.customProps,
       locked: false,
     });
 
@@ -4033,6 +4033,8 @@ class App extends React.Component<AppProps, AppState> {
         strokeSharpness: this.state.currentItemLinearStrokeSharpness,
         startArrowhead,
         endArrowhead,
+        subtype: this.state.activeSubtype,
+        customProps: this.state.customProps,
         locked: false,
       });
       this.setState((prevState) => ({
@@ -4082,6 +4084,8 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
+      subtype: this.state.activeSubtype,
+      customProps: this.state.customProps,
       locked: false,
     });
 
