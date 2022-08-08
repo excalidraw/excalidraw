@@ -108,7 +108,7 @@
     "decreaseFontSize": "Redueix la mida de la lletra",
     "increaseFontSize": "Augmenta la mida de la lletra",
     "unbindText": "Desvincular el text",
-    "bindText": "",
+    "bindText": "Ajusta el text al contenidor",
     "link": {
       "edit": "Edita l'enllaç",
       "create": "Crea un enllaç",
@@ -121,7 +121,7 @@
       "unlockAll": "Desbloca-ho tot"
     },
     "statusPublished": "Publicat",
-    "sidebarLock": ""
+    "sidebarLock": "Manté la barra lateral oberta"
   },
   "library": {
     "noItems": "",
