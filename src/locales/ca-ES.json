@@ -124,9 +124,9 @@
     "sidebarLock": "Manté la barra lateral oberta"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "Encara no s'hi han afegit elements...",
+    "hint_emptyLibrary": "Trieu un element o un llenç per a afegir-lo aquí, o instal·leu una biblioteca del repositori públic, més avall.",
+    "hint_emptyPrivateLibrary": "Trieu un element o un llenç per a afegir-lo aquí."
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
@@ -306,7 +306,7 @@
     "view": "Visualització",
     "zoomToFit": "Zoom per veure tots els elements",
     "zoomToSelection": "Zoom per veure la selecció",
-    "toggleElementLock": ""
+    "toggleElementLock": "Blocar/desblocar la selecció"
   },
   "clearCanvasDialog": {
     "title": "Neteja el llenç"
