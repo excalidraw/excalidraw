@@ -263,3 +263,14 @@ export const getGridPoint = (
   }
   return [x, y];
 };
+
+/**
+ * @param x
+ * @param scale used to "speed up" or "slow down" mono decrease amount
+ * @returns monotonically decreasingly scaled version of x
+ */
+export const getMonoDecreasedValue = (x: number, scale = 0.005) => {
+  // take f(x) = 1 - ((1-e^(-x)) / 2)
+  // for x >= 0, f(x) is in the range of [0, 1] monotonically decreasing
+  return (1 - (1 - Math.exp(-x * scale)) / 2) * x;
+};
