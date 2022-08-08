@@ -443,30 +443,32 @@ const generateElementShape = (
           getDiamondPoints(element);
         if (element.strokeSharpness === "round") {
           shape = generator.path(
-            `M ${topX + (rightX - topX) * 0.25} ${
-              topY + (rightY - topY) * 0.25
-            } L ${rightX - (rightX - topX) * 0.25} ${
-              rightY - (rightY - topY) * 0.25
+            `M ${topX + getMonoDecreasedValue(rightX - topX) * 0.25} ${
+              topY + getMonoDecreasedValue(rightY - topY) * 0.25
+            } L ${rightX - getMonoDecreasedValue(rightX - topX) * 0.25} ${
+              rightY - getMonoDecreasedValue(rightY - topY) * 0.25
             }
             C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
-              rightX - (rightX - bottomX) * 0.25
-            } ${rightY + (bottomY - rightY) * 0.25}
-            L ${bottomX + (rightX - bottomX) * 0.25} ${
-              bottomY - (bottomY - rightY) * 0.25
+              rightX - getMonoDecreasedValue(rightX - bottomX) * 0.25
+            } ${rightY + getMonoDecreasedValue(bottomY - rightY) * 0.25}
+            L ${bottomX + getMonoDecreasedValue(rightX - bottomX) * 0.25} ${
+              bottomY - getMonoDecreasedValue(bottomY - rightY) * 0.25
             }
             C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
-              bottomX - (bottomX - leftX) * 0.25
-            } ${bottomY - (bottomY - leftY) * 0.25}
-            L ${leftX + (bottomX - leftX) * 0.25} ${
-              leftY + (bottomY - leftY) * 0.25
+              bottomX - getMonoDecreasedValue(bottomX - leftX) * 0.25
+            } ${bottomY - getMonoDecreasedValue(bottomY - leftY) * 0.25}
+            L ${leftX + getMonoDecreasedValue(bottomX - leftX) * 0.25} ${
+              leftY + getMonoDecreasedValue(bottomY - leftY) * 0.25
             }
             C ${leftX} ${leftY}, ${leftX} ${leftY}, ${
-              leftX + (topX - leftX) * 0.25
-            } ${leftY - (leftY - topY) * 0.25}
-            L ${topX - (topX - leftX) * 0.25} ${topY + (leftY - topY) * 0.25}
+              leftX + getMonoDecreasedValue(topX - leftX) * 0.25
+            } ${leftY - getMonoDecreasedValue(leftY - topY) * 0.25}
+            L ${topX - getMonoDecreasedValue(topX - leftX) * 0.25} ${
+              topY + getMonoDecreasedValue(leftY - topY) * 0.25
+            }
             C ${topX} ${topY}, ${topX} ${topY}, ${
-              topX + (rightX - topX) * 0.25
-            } ${topY + (rightY - topY) * 0.25}`,
+              topX + getMonoDecreasedValue(rightX - topX) * 0.25
+            } ${topY + getMonoDecreasedValue(rightY - topY) * 0.25}`,
             generateRoughOptions(element, true),
           );
         } else {
