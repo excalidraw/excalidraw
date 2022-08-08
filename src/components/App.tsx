@@ -3613,6 +3613,7 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
       } else {
+        let isMidPoint = false;
         if (this.state.selectedLinearElement) {
           const linearElementEditor =
             this.state.editingLinearElement || this.state.selectedLinearElement;
@@ -3633,6 +3634,7 @@ class App extends React.Component<AppProps, AppState> {
               this.setState({ editingLinearElement: ret.linearElementEditor });
             }
           }
+          isMidPoint = ret.isMidPoint;
           if (ret.didAddPoint && !ret.isMidPoint) {
             return true;
           }
@@ -3678,10 +3680,11 @@ class App extends React.Component<AppProps, AppState> {
             this.isASelectedElement(element),
           );
         if (
-          (hitElement === null ||
-            (!someHitElementIsSelected && hitElement === null)) &&
+          (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
-          !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+          !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
+          // checking isMidPoint since "hitTestLinear" returns false when adding midpoint outside editor
+          !isMidPoint
         ) {
           this.clearSelection(hitElement);
         }
