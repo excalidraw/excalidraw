@@ -41,6 +41,7 @@ export class LinearElementEditor {
   public startBindingElement: ExcalidrawBindableElement | null | "keep";
   public endBindingElement: ExcalidrawBindableElement | null | "keep";
   public hoverPointIndex: number;
+  public isHovered: boolean;
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
@@ -59,6 +60,7 @@ export class LinearElementEditor {
       lastClickedPoint: -1,
     };
     this.hoverPointIndex = -1;
+    this.isHovered = false;
   }
 
   // ---------------------------------------------------------------------------
@@ -145,7 +147,6 @@ export class LinearElementEditor {
     if (!linearElementEditor) {
       return false;
     }
-
     const { selectedPointsIndices, elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
@@ -315,6 +316,52 @@ export class LinearElementEditor {
     };
   }
 
+  static isHittingMidPoint = (
+    linearElementEditor: LinearElementEditor,
+    scenePointer: { x: number; y: number },
+    appState: AppState,
+  ) => {
+    const { elementId } = linearElementEditor;
+    const element = LinearElementEditor.getElement(elementId);
+    if (!element) {
+      return;
+    }
+    const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+      element,
+      appState.zoom,
+      scenePointer.x,
+      scenePointer.y,
+    );
+    if (clickedPointIndex >= 0) {
+      return false;
+    }
+    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+    const centerX = (points.at(0)![0] + points.at(-1)![0]) / 2;
+    const centerY = (points.at(0)![1] + points.at(-1)![1]) / 2;
+    const threshold =
+      (LinearElementEditor.POINT_HANDLE_SIZE * 2) / appState.zoom.value;
+    if (
+      Math.abs(scenePointer.x - centerX) <= threshold &&
+      Math.abs(scenePointer.y - centerY) <= threshold
+    ) {
+      return true;
+    }
+    return false;
+  };
+
+  static getMidPoint(linearElementEditor: LinearElementEditor) {
+    const { elementId } = linearElementEditor;
+    const element = LinearElementEditor.getElement(elementId);
+    if (!element) {
+      return;
+    }
+    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+
+    const centerX = (points.at(0)![0] + points.at(-1)![0]) / 2;
+    const centerY = (points.at(0)![1] + points.at(-1)![1]) / 2;
+    return [centerX, centerY];
+  }
+
   static handlePointerDown(
     event: React.PointerEvent<HTMLCanvasElement>,
     appState: AppState,
@@ -325,11 +372,13 @@ export class LinearElementEditor {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
+    isMidPoint: boolean;
   } {
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
       linearElementEditor: null,
+      isMidPoint: false,
     };
 
     if (!linearElementEditor) {
@@ -341,6 +390,45 @@ export class LinearElementEditor {
 
     if (!element) {
       return ret;
+    }
+    const hittingMidPoint = LinearElementEditor.isHittingMidPoint(
+      linearElementEditor,
+      scenePointer,
+      appState,
+    );
+    if (
+      LinearElementEditor.isHittingMidPoint(
+        linearElementEditor,
+        scenePointer,
+        appState,
+      )
+    ) {
+      const midPoint = this.getMidPoint(linearElementEditor);
+      if (midPoint) {
+        mutateElement(element, {
+          points: [
+            element.points[0],
+            LinearElementEditor.createPointAt(
+              element,
+              midPoint[0],
+              midPoint[1],
+              appState.gridSize,
+            ),
+            ...element.points.slice(1),
+          ],
+        });
+      }
+      ret.didAddPoint = true;
+      ret.isMidPoint = true;
+      ret.linearElementEditor = {
+        ...linearElementEditor,
+        selectedPointsIndices: element.points[1],
+        pointerDownState: {
+          prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
+          lastClickedPoint: -1,
+        },
+        lastUncommittedPoint: null,
+      };
     }
     if (event.altKey && appState.editingLinearElement) {
       if (linearElementEditor.lastUncommittedPoint == null) {
@@ -355,6 +443,7 @@ export class LinearElementEditor {
             ),
           ],
         });
+        ret.didAddPoint = true;
       }
       history.resumeRecording();
       ret.linearElementEditor = {
@@ -384,7 +473,7 @@ export class LinearElementEditor {
 
     // if we clicked on a point, set the element as hitElement otherwise
     // it would get deselected if the point is outside the hitbox area
-    if (clickedPointIndex > -1) {
+    if (clickedPointIndex >= 0 || hittingMidPoint) {
       ret.hitElement = element;
     } else {
       // You might be wandering why we are storing the binding elements on

@@ -155,6 +155,25 @@ const strokeGrid = (
   context.restore();
 };
 
+const renderSingleLinearPoint = (
+  context: CanvasRenderingContext2D,
+  appState: AppState,
+  renderConfig: RenderConfig,
+  point: number[],
+  isSelected: boolean,
+) => {
+  context.strokeStyle = "#5e5ad8";
+  context.setLineDash([]);
+  context.fillStyle = isSelected
+    ? "rgba(134, 131, 226, 0.9)"
+    : "rgba(255, 255, 255, 0.9)";
+  const { POINT_HANDLE_SIZE } = LinearElementEditor;
+  const radius = appState.editingLinearElement
+    ? POINT_HANDLE_SIZE
+    : POINT_HANDLE_SIZE / 2;
+  fillCircle(context, point[0], point[1], radius / renderConfig.zoom.value);
+};
+
 const renderLinearPointHandles = (
   context: CanvasRenderingContext2D,
   appState: AppState,
@@ -164,22 +183,38 @@ const renderLinearPointHandles = (
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
   context.lineWidth = 1 / renderConfig.zoom.value;
+  const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+  const centerX = (points.at(0)![0] + points.at(-1)![0]) / 2;
+  const centerY = (points.at(0)![1] + points.at(-1)![1]) / 2;
+  const threshold =
+    (LinearElementEditor.POINT_HANDLE_SIZE * 2) / appState.zoom.value;
+  let lineHasMidPoint = false;
+  points.forEach((point, idx) => {
+    if (
+      Math.abs(point[0] - centerX) <= threshold &&
+      Math.abs(point[1] - centerY) <= threshold
+    ) {
+      lineHasMidPoint = true;
+    }
+    const isSelected =
+      !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
+    renderSingleLinearPoint(context, appState, renderConfig, point, isSelected);
+  });
 
-  LinearElementEditor.getPointsGlobalCoordinates(element).forEach(
-    (point, idx) => {
-      context.strokeStyle = "#5e5ad8";
-      context.setLineDash([]);
-      context.fillStyle =
-        appState.editingLinearElement?.selectedPointsIndices?.includes(idx)
-          ? "rgba(134, 131, 226, 0.9)"
-          : "rgba(255, 255, 255, 0.9)";
-      const { POINT_HANDLE_SIZE } = LinearElementEditor;
-      const radius = appState.editingLinearElement
-        ? POINT_HANDLE_SIZE
-        : POINT_HANDLE_SIZE / 2;
-      fillCircle(context, point[0], point[1], radius / renderConfig.zoom.value);
-    },
-  );
+  if (
+    appState.selectedLinearElement?.isHovered &&
+    points.length < 3 &&
+    !lineHasMidPoint
+  ) {
+    renderSingleLinearPoint(
+      context,
+      appState,
+      renderConfig,
+      [centerX, centerY],
+      false,
+    );
+  }
+
   context.restore();
 };
 
@@ -342,7 +377,7 @@ export const _renderScene = (
 
   if (
     appState.selectedLinearElement &&
-    appState.selectedLinearElement.hoverPointIndex !== -1
+    appState.selectedLinearElement.hoverPointIndex >= 0
   ) {
     renderLinearElementPointHighlight(context, appState, renderConfig);
   }

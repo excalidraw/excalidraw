@@ -3035,17 +3035,38 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerY,
         ])
       ) {
+        if (!this.state.selectedLinearElement.isHovered) {
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              isHovered: true,
+            },
+          });
+        }
         hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
           element,
           this.state.zoom,
           scenePointerX,
           scenePointerY,
         );
-        if (hoverPointIndex >= 0) {
+        const isHoveringMidPoint = LinearElementEditor.isHittingMidPoint(
+          linearElementEditor,
+          { x: scenePointerX, y: scenePointerY },
+          this.state,
+        );
+
+        if (hoverPointIndex >= 0 || isHoveringMidPoint) {
           setCursor(this.canvas, CURSOR_TYPE.POINTER);
         } else {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
         }
+      } else if (this.state.selectedLinearElement.isHovered) {
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            isHovered: false,
+          },
+        });
       }
 
       if (
@@ -3612,7 +3633,7 @@ class App extends React.Component<AppProps, AppState> {
               this.setState({ editingLinearElement: ret.linearElementEditor });
             }
           }
-          if (ret.didAddPoint) {
+          if (ret.didAddPoint && !ret.isMidPoint) {
             return true;
           }
         }
@@ -3657,7 +3678,8 @@ class App extends React.Component<AppProps, AppState> {
             this.isASelectedElement(element),
           );
         if (
-          (hitElement === null || !someHitElementIsSelected) &&
+          (hitElement === null ||
+            (!someHitElementIsSelected && hitElement === null)) &&
           !event.shiftKey &&
           !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
         ) {
@@ -4101,6 +4123,7 @@ class App extends React.Component<AppProps, AppState> {
       // to ensure we don't create a 2-point arrow by mistake when
       // user clicks mouse in a way that it moves a tiny bit (thus
       // triggering pointermove)
+
       if (
         !pointerDownState.drag.hasOccurred &&
         (this.state.activeTool.type === "arrow" ||
@@ -4117,7 +4140,6 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       }
-
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
@@ -4332,20 +4354,13 @@ class App extends React.Component<AppProps, AppState> {
           ));
         }
 
-        const cx = dx / 2;
-        const cy = dy / 2;
-
         if (points.length === 1) {
           mutateElement(draggingElement, {
-            points: [...points, [cx, cy], [dx, dy]],
+            points: [...points, [dx, dy]],
           });
         } else if (points.length === 2) {
           mutateElement(draggingElement, {
             points: [...points.slice(0, -1), [dx, dy]],
-          });
-        } else if (points.length > 2) {
-          mutateElement(draggingElement, {
-            points: [...points.slice(0, -2), [cx, cy], [dx, dy]],
           });
         }
 
