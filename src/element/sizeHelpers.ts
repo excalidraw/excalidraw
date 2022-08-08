@@ -37,9 +37,7 @@ export const getPerfectElementSize = (
     } else if (lockedAngle === Math.PI / 2) {
       width = 0;
     } else {
-      height =
-        Math.round(absWidth * Math.tan(lockedAngle)) * Math.sign(height) ||
-        height;
+      height = absWidth * Math.tan(lockedAngle) * Math.sign(height) || height;
     }
   } else if (elementType !== "selection") {
     height = absWidth * Math.sign(height);
@@ -76,8 +74,8 @@ export const getLockedLinearCursorAlignSize = (
     const c2 = y - a2 * x;
 
     // intersection of the two lines above
-    const intersectX = Math.round((b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1));
-    const intersectY = Math.round((c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1));
+    const intersectX = (b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
+    const intersectY = (c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
 
     // delta
     width = intersectX - originX;

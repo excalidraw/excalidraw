@@ -482,7 +482,10 @@ export const _renderScene = (
         renderConfig.zoom,
         "mouse", // when we render we don't know which pointer type so use mouse
       );
-      if (!appState.viewModeEnabled) {
+      if (
+        !appState.viewModeEnabled &&
+        !isLinearElement(locallySelectedElements[0])
+      ) {
         renderTransformHandles(
           context,
           renderConfig,

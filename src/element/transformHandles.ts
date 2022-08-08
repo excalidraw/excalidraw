@@ -62,18 +62,6 @@ const OMIT_SIDES_FOR_LINE_BACKSLASH = {
   w: true,
 };
 
-const OMIT_SIDES_FOR_LINEAR_ELEMENT = {
-  e: true,
-  s: true,
-  n: true,
-  w: true,
-  nw: true,
-  se: true,
-  ne: true,
-  sw: true,
-  rotation: true,
-};
-
 const generateTransformHandle = (
   x: number,
   y: number,
@@ -241,9 +229,7 @@ export const getTransformHandles = (
   }
 
   let omitSides: { [T in TransformHandleType]?: boolean } = {};
-  if (isLinearElement(element)) {
-    omitSides = OMIT_SIDES_FOR_LINEAR_ELEMENT;
-  } else if (element.type === "freedraw") {
+  if (element.type === "freedraw" || isLinearElement(element)) {
     if (element.points.length === 2) {
       // only check the last point because starting point is always (0,0)
       const [, p1] = element.points;
