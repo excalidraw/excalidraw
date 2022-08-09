@@ -86,6 +86,14 @@ export const isActionEnabled = (
   appState: AppState,
   actionName: ActionName | CustomActionName,
 ) => {
+  // We always enable subtype actions.  Also let through standard actions
+  // which no subtypes might have disabled.
+  if (
+    isSubtype(actionName) ||
+    (!isCustomActionName(actionName) && !isDisabledActionName(actionName))
+  ) {
+    return true;
+  }
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
     appState,
@@ -93,53 +101,50 @@ export const isActionEnabled = (
   const chosen = appState.editingElement
     ? [appState.editingElement, ...selectedElements]
     : selectedElements;
-  let enabled = chosen.some((el) =>
-    customParents.some((parent) => {
+  // Now handle custom actions added by subtypes
+  if (isCustomActionName(actionName)) {
+    // Has any ExcalidrawElement enabled this actionName through having
+    // its subtype?
+    return chosen.some((el) => {
       const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
-      return (
-        ((el.type === parent.parentType && el.subtype === undefined) ||
-          (e.type === parent.parentType && e.subtype === undefined)) &&
-        !isCustomActionName(actionName)
-      );
-    }),
-  );
-  enabled =
-    enabled ||
-    (chosen.length === 0 &&
-      (appState.activeSubtype === undefined ||
-        isActionForSubtype(appState.activeSubtype, actionName)));
-  !enabled &&
-    chosen.forEach((el) => {
-      const subtype = hasBoundTextElement(el)
-        ? getBoundTextElement(el)!.subtype
-        : el.subtype;
-      if (!enabled && isActionForSubtype(subtype, actionName)) {
-        enabled = true;
+      const custom = customActions.find((value) => value.subtype === e.subtype);
+      if (custom) {
+        return custom.actions.includes(actionName);
       }
+      return false;
     });
-  if (isSubtype(actionName)) {
-    enabled = true;
   }
-  return enabled;
-};
-
-const isActionForSubtype = (
-  subtype: CustomSubtype | undefined,
-  action: ActionName | CustomActionName,
-) => {
-  const name = action as DisabledActionName;
-  const customName = action as CustomActionName;
-  if (subtype && isSubtype(subtype)) {
+  // Now handle standard actions disabled by subtypes
+  if (isDisabledActionName(actionName)) {
     return (
-      !disabledActions // Not disabled by subtype
-        .find((value) => value.subtype === subtype)!
-        .actions.includes(name) ||
-      customActions // Added by subtype
-        .find((value) => value.subtype === subtype)!
-        .actions.includes(customName)
+      // Has every ExcalidrawElement not disabled this actionName?
+      chosen.every((el) => {
+        const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
+        const disabled = disabledActions.find(
+          (value) => value.subtype === e.subtype,
+        );
+        if (disabled) {
+          return !disabled.actions.includes(actionName);
+        }
+        return true;
+      }) ||
+      // Or is there an ExcalidrawElement without a subtype which would
+      // disable this action if it had a subtype?
+      chosen.some((el) => {
+        const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
+        return customParents.some(
+          (value) =>
+            value.parentType === e.type &&
+            e.subtype === undefined &&
+            disabledActions
+              .find((val) => val.subtype === value.subtype)!
+              .actions.includes(actionName),
+        );
+      })
     );
   }
-  return !isCustomActionName(action) && !isDisabledActionName(action);
+  // Shouldn't happen
+  return false;
 };
 
 // Custom Shortcuts (for custom actions)
