@@ -380,6 +380,13 @@ class App extends React.Component<AppProps, AppState> {
     this.library = new Library(this);
     this.scene = new Scene();
 
+    this.actionManager = new ActionManager(
+      this.syncActionResult,
+      () => this.state,
+      () => this.scene.getElementsIncludingDeleted(),
+      this,
+    );
+
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -400,6 +407,7 @@ class App extends React.Component<AppProps, AppState> {
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
+        actionManager: this.actionManager,
         addSubtype: this.addSubtype,
         refresh: this.refresh,
         setToast: this.setToast,
@@ -422,12 +430,6 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.history = new History();
-    this.actionManager = new ActionManager(
-      this.syncActionResult,
-      () => this.state,
-      () => this.scene.getElementsIncludingDeleted(),
-      this,
-    );
     this.actionManager.registerAll(actions);
 
     this.actionManager.registerAction(createUndoAction(this.history));
@@ -440,7 +442,7 @@ class App extends React.Component<AppProps, AppState> {
     // subtypes of ExcalidrawElement if the newly loaded code
     // would change the rendering.
     const refresh = (hasSubtype: (element: ExcalidrawElement) => boolean) => {
-      const elements = this.scene.getElementsIncludingDeleted();
+      const elements = this.getSceneElementsIncludingDeleted();
       let refreshNeeded = false;
       getNonDeletedElements(elements).forEach((element) => {
         // If the element is of the subtype that was just
@@ -457,7 +459,7 @@ class App extends React.Component<AppProps, AppState> {
       // If there are any elements of the just-registered subtype,
       // refresh the scene to re-render each such element.
       if (refreshNeeded) {
-        this.setState({});
+        this.refresh();
       }
     };
     const prep = prepareSubtype(subtypeTypes, subtypePrepFn, refresh);
@@ -1261,7 +1263,7 @@ class App extends React.Component<AppProps, AppState> {
         window.clearTimeout(refreshTimer);
       }
       refreshTimer = window.setTimeout(() => {
-        this.setState({});
+        this.refresh();
         window.clearTimeout(refreshTimer);
       }, 50);
     };
