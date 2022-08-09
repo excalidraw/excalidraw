@@ -219,6 +219,23 @@ const renderLinearElementPointHighlight = (
 
   context.restore();
 };
+
+const shouldShowBoundingBox = (elements: NonDeletedExcalidrawElement[]) => {
+  if (elements.length > 1) {
+    return true;
+  }
+  const element = elements[0];
+  if (!isLinearElement(element)) {
+    return true;
+  }
+
+  const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+  if (points.length > 3) {
+    return true;
+  }
+  return false;
+};
+
 export const _renderScene = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -373,9 +390,8 @@ export const _renderScene = (
         renderConfig,
         locallySelectedElements[0] as ExcalidrawLinearElement,
       );
-      // render bounding box
-      // (unless dragging a single linear element)
-    } else if (!appState.draggingElement || !isSingleLinearElementSelected) {
+    }
+    if (shouldShowBoundingBox(locallySelectedElements)) {
       const selections = elements.reduce((acc, element) => {
         const selectionColors = [];
         // local user
@@ -440,6 +456,7 @@ export const _renderScene = (
     // Paint resize transformHandles
     context.save();
     context.translate(renderConfig.scrollX, renderConfig.scrollY);
+
     if (locallySelectedElements.length === 1) {
       context.fillStyle = oc.white;
       const transformHandles = getTransformHandles(
@@ -449,7 +466,7 @@ export const _renderScene = (
       );
       if (
         !appState.viewModeEnabled &&
-        !isLinearElement(locallySelectedElements[0])
+        shouldShowBoundingBox(locallySelectedElements)
       ) {
         renderTransformHandles(
           context,
