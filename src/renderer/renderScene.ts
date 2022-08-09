@@ -363,7 +363,6 @@ export const _renderScene = (
   ) {
     renderLinearElementPointHighlight(context, appState, renderConfig);
   }
-
   // Paint selected elements
   if (
     renderSelection &&
@@ -371,6 +370,8 @@ export const _renderScene = (
     !appState.editingLinearElement
   ) {
     const locallySelectedElements = getSelectedElements(elements, appState);
+    const showBoundingBox = shouldShowBoundingBox(locallySelectedElements);
+
     const locallySelectedIds = locallySelectedElements.map(
       (element) => element.id,
     );
@@ -391,7 +392,7 @@ export const _renderScene = (
         locallySelectedElements[0] as ExcalidrawLinearElement,
       );
     }
-    if (shouldShowBoundingBox(locallySelectedElements)) {
+    if (showBoundingBox) {
       const selections = elements.reduce((acc, element) => {
         const selectionColors = [];
         // local user
@@ -464,10 +465,7 @@ export const _renderScene = (
         renderConfig.zoom,
         "mouse", // when we render we don't know which pointer type so use mouse
       );
-      if (
-        !appState.viewModeEnabled &&
-        shouldShowBoundingBox(locallySelectedElements)
-      ) {
+      if (!appState.viewModeEnabled && showBoundingBox) {
         renderTransformHandles(
           context,
           renderConfig,
