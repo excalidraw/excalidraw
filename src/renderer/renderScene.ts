@@ -230,7 +230,7 @@ const shouldShowBoundingBox = (elements: NonDeletedExcalidrawElement[]) => {
   }
 
   const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-  if (points.length > 3) {
+  if (points.length > 2) {
     return true;
   }
   return false;
