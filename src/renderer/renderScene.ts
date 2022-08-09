@@ -184,27 +184,20 @@ const renderLinearPointHandles = (
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
   context.lineWidth = 1 / renderConfig.zoom.value;
   const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-  const centerX = (points.at(0)![0] + points.at(-1)![0]) / 2;
-  const centerY = (points.at(0)![1] + points.at(-1)![1]) / 2;
-  const threshold =
-    (LinearElementEditor.POINT_HANDLE_SIZE * 2) / appState.zoom.value;
-  let lineHasMidPoint = false;
+  const [centerX, centerY] = LinearElementEditor.getMidPoint(
+    appState.selectedLinearElement!,
+  )!;
+
   points.forEach((point, idx) => {
-    if (
-      Math.abs(point[0] - centerX) <= threshold &&
-      Math.abs(point[1] - centerY) <= threshold
-    ) {
-      lineHasMidPoint = true;
-    }
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
     renderSingleLinearPoint(context, appState, renderConfig, point, isSelected);
   });
 
   if (
+    !appState.editingLinearElement &&
     appState.selectedLinearElement?.isHovered &&
-    points.length < 3 &&
-    !lineHasMidPoint
+    points.length < 3
   ) {
     renderSingleLinearPoint(
       context,

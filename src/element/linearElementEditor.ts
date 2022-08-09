@@ -363,6 +363,9 @@ export class LinearElementEditor {
     scenePointer: { x: number; y: number },
     appState: AppState,
   ) => {
+    if (appState.editingLinearElement) {
+      return false;
+    }
     const { elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
@@ -378,6 +381,9 @@ export class LinearElementEditor {
       return false;
     }
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+    if (points.length >= 3) {
+      return false;
+    }
     const centerX = (points.at(0)![0] + points.at(-1)![0]) / 2;
     const centerY = (points.at(0)![1] + points.at(-1)![1]) / 2;
     const threshold =
