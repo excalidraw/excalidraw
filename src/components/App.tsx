@@ -4197,21 +4197,15 @@ class App extends React.Component<AppProps, AppState> {
         (element) => this.isASelectedElement(element),
       );
 
+      const isSelectingPointsInLineEditor =
+        this.state.editingLinearElement &&
+        event.shiftKey &&
+        this.state.editingLinearElement.elementId ===
+          pointerDownState.hit.element?.id;
       if (
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
-        // this allows for box-selecting points when clicking inside the
-        // line's bounding box
-        (!this.state.editingLinearElement || !event.shiftKey) &&
-        // box-selecting without shift when editing line, not clicking on a line
-        (!this.state.editingLinearElement ||
-          this.state.editingLinearElement?.elementId !==
-            pointerDownState.hit.element?.id ||
-          pointerDownState.hit.hasHitElementInside) &&
-        (!this.state.selectedLinearElement ||
-          this.state.selectedLinearElement?.elementId !==
-            pointerDownState.hit.element?.id ||
-          pointerDownState.hit.hasHitElementInside)
+        !isSelectingPointsInLineEditor
       ) {
         const selectedElements = getSelectedElements(
           this.scene.getNonDeletedElements(),
