@@ -62,6 +62,7 @@ import {
 import { isLinearElement } from "../element/typeChecks";
 
 const hasEmojiSupport = supportsEmoji();
+export const DEFAULT_SPACING = 4;
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -440,7 +441,7 @@ export const _renderScene = (
           context,
           renderConfig,
           selection,
-          isSingleLinearElementSelected ? 8 : 4,
+          isSingleLinearElementSelected ? DEFAULT_SPACING * 2 : DEFAULT_SPACING,
         ),
       );
     }

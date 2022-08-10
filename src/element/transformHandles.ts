@@ -9,6 +9,7 @@ import { rotate } from "../math";
 import { Zoom } from "../types";
 import { isTextElement } from ".";
 import { isLinearElement } from "./typeChecks";
+import { DEFAULT_SPACING } from "../renderer/renderScene";
 
 export type TransformHandleDirection =
   | "n"
@@ -251,7 +252,9 @@ export const getTransformHandles = (
   } else if (isTextElement(element)) {
     omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   }
-  const dashedLineMargin = isLinearElement(element) ? 12 : 4;
+  const dashedLineMargin = isLinearElement(element)
+    ? DEFAULT_SPACING * 3
+    : DEFAULT_SPACING;
   return getTransformHandlesFromCoords(
     getElementAbsoluteCoords(element),
     element.angle,
