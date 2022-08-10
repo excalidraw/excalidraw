@@ -86,6 +86,7 @@ export const getTransformHandlesFromCoords = (
   zoom: Zoom,
   pointerType: PointerType,
   omitSides: { [T in TransformHandleType]?: boolean } = {},
+  margin = 4,
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom.value;
@@ -98,9 +99,7 @@ export const getTransformHandlesFromCoords = (
   const height = y2 - y1;
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
-
-  const dashedLineMargin = 4 / zoom.value;
-
+  const dashedLineMargin = margin / zoom.value;
   const centeringOffset = (size - 8) / (2 * zoom.value);
 
   const transformHandles: TransformHandles = {
@@ -253,13 +252,14 @@ export const getTransformHandles = (
   } else if (isTextElement(element)) {
     omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   }
-
+  const dashedLineMargin = isLinearElement(element) ? 16 : 4;
   return getTransformHandlesFromCoords(
     getElementAbsoluteCoords(element),
     element.angle,
     zoom,
     pointerType,
     omitSides,
+    dashedLineMargin,
   );
 };
 

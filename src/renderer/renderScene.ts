@@ -436,7 +436,12 @@ export const _renderScene = (
         addSelectionForGroupId(appState.editingGroupId);
       }
       selections.forEach((selection) =>
-        renderSelectionBorder(context, renderConfig, selection),
+        renderSelectionBorder(
+          context,
+          renderConfig,
+          selection,
+          isSingleLinearElementSelected,
+        ),
       );
     }
     // Paint resize transformHandles
@@ -714,24 +719,21 @@ const renderTransformHandles = (
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];
     if (transformHandle !== undefined) {
+      const [x, y, width, height] = transformHandle;
+
       context.save();
       context.lineWidth = 1 / renderConfig.zoom.value;
       if (key === "rotation") {
-        fillCircle(
-          context,
-          transformHandle[0] + transformHandle[2] / 2,
-          transformHandle[1] + transformHandle[3] / 2,
-          transformHandle[2] / 2,
-        );
+        fillCircle(context, x + width / 2, y + height / 2, width / 2);
       } else {
         strokeRectWithRotation(
           context,
-          transformHandle[0],
-          transformHandle[1],
-          transformHandle[2],
-          transformHandle[3],
-          transformHandle[0] + transformHandle[2] / 2,
-          transformHandle[1] + transformHandle[3] / 2,
+          x,
+          y,
+          width,
+          height,
+          x + width / 2,
+          y + height / 2,
           angle,
           true, // fill before stroke
         );
@@ -752,13 +754,15 @@ const renderSelectionBorder = (
     elementY2: number;
     selectionColors: string[];
   },
+  isSingleLinearElementSelected: boolean,
 ) => {
   const { angle, elementX1, elementY1, elementX2, elementY2, selectionColors } =
     elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
 
-  const dashedLinePadding = 4 / renderConfig.zoom.value;
+  const dashedLinePadding =
+    (isSingleLinearElementSelected ? 16 : 4) / renderConfig.zoom.value;
   const dashWidth = 8 / renderConfig.zoom.value;
   const spaceWidth = 4 / renderConfig.zoom.value;
 
