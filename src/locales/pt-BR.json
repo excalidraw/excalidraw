@@ -9,7 +9,7 @@
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
-    "copyText": "",
+    "copyText": "Copiar para área de transferência como texto",
     "bringForward": "Trazer para a frente",
     "sendToBack": "Enviar para o fundo",
     "bringToFront": "Trazer para o primeiro plano",
@@ -108,23 +108,23 @@
     "decreaseFontSize": "Diminuir o tamanho da fonte",
     "increaseFontSize": "Aumentar o tamanho da fonte",
     "unbindText": "Desvincular texto",
-    "bindText": "",
+    "bindText": "Vincular texto ao contêiner",
     "link": {
       "edit": "Editar link",
       "create": "Criar link",
       "label": "Link"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Bloquear",
+      "unlock": "Desbloquear",
+      "lockAll": "Bloquear tudo",
+      "unlockAll": "Desbloquear tudo"
     },
-    "statusPublished": "",
-    "sidebarLock": ""
+    "statusPublished": "Publicado",
+    "sidebarLock": "Manter barra lateral aberta"
   },
   "library": {
-    "noItems": "",
+    "noItems": "Nenhum item adicionado ainda...",
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
@@ -298,7 +298,7 @@
     "howto": "Siga nossos guias",
     "or": "ou",
     "preventBinding": "Evitar fixação de seta",
-    "tools": "",
+    "tools": "Ferramentas",
     "shortcuts": "Atalhos de teclado",
     "textFinish": "Encerrar edição (editor de texto)",
     "textNewLine": "Adicionar nova linha (editor de texto)",
