@@ -1,13 +1,7 @@
 // Some imports
 import fallbackMathJaxLangData from "./locales/en.json";
 import { BOUND_TEXT_PADDING, FONT_FAMILY, SVG_NS } from "../../../../constants";
-import {
-  getFontString,
-  getFontFamilyString,
-  getShortcutKey,
-  isRTL,
-  updateActiveTool,
-} from "../../../../utils";
+import { getFontString, getFontFamilyString, isRTL } from "../../../../utils";
 import {
   getApproxLineHeight,
   getBoundTextElement,
@@ -42,13 +36,12 @@ import {
   redrawTextBoundingBox,
 } from "../../../../element";
 import { ButtonSelect } from "../../../../components/ButtonSelect";
-import { ToolButton } from "../../../../components/ToolButton";
-import clsx from "clsx";
 
 // Subtype imports
 import { CustomMethods, SubtypePrepFn } from "../../../../subtypes";
 import { mathSubtypeIcon } from "./icon";
 import { MathProps, mathSubtype } from "./types";
+import { SubtypeButton } from "../../../../components/SubtypeButton";
 
 const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;
 
@@ -1341,53 +1334,7 @@ const createMathActions = () => {
     ),
     trackEvent: false,
   };
-  const actionMath: Action = {
-    name: "math",
-    trackEvent: false,
-    perform: (elements, appState) => {
-      const mathInactive = appState.activeSubtype !== mathSubtype;
-      const activeSubtype = mathInactive ? mathSubtype : undefined;
-      const activeTool = !mathInactive
-        ? appState.activeTool
-        : updateActiveTool(appState, { type: "text" });
-      const selectedElementIds = mathInactive
-        ? {}
-        : appState.selectedElementIds;
-      const selectedGroupIds = mathInactive ? {} : appState.selectedGroupIds;
-
-      return {
-        appState: {
-          ...appState,
-          activeSubtype,
-          selectedElementIds,
-          selectedGroupIds,
-          activeTool,
-        },
-        commitToHistory: true,
-      };
-    },
-    keyTest: (event) => event.code === "KeyM",
-    PanelComponent: ({ elements, appState, updateData, data }) => (
-      <ToolButton
-        type="icon"
-        icon={mathSubtypeIcon.call(this, { theme: appState.theme })}
-        selected={
-          appState.activeSubtype !== undefined &&
-          appState.activeSubtype === mathSubtype
-        }
-        className={clsx({
-          selected:
-            appState.activeSubtype && appState.activeSubtype === mathSubtype,
-        })}
-        title={`${t(`toolBar.${mathSubtype}`)} - ${getShortcutKey("M")}`}
-        aria-label={t(`toolBar.${mathSubtype}`)}
-        onClick={() => {
-          updateData(null);
-        }}
-        size={data?.size || "medium"}
-      ></ToolButton>
-    ),
-  };
+  const actionMath = SubtypeButton(mathSubtype, "text", mathSubtypeIcon, "M");
   mathActions.push(actionChangeUseTex);
   mathActions.push(actionChangeMathOnly);
   mathActions.push(actionMath);
