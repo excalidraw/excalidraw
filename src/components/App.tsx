@@ -3047,7 +3047,15 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
         }
-      } else if (shouldShowBoundingBox([element])) {
+      } else if (
+        shouldShowBoundingBox([element]) &&
+        isHittingElementBoundingBoxWithoutHittingElement(
+          element,
+          this.state,
+          scenePointerX,
+          scenePointerY,
+        )
+      ) {
         setCursor(this.canvas, CURSOR_TYPE.MOVE);
       }
 

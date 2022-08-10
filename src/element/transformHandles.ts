@@ -252,7 +252,7 @@ export const getTransformHandles = (
   } else if (isTextElement(element)) {
     omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   }
-  const dashedLineMargin = isLinearElement(element) ? 16 : 4;
+  const dashedLineMargin = isLinearElement(element) ? 12 : 4;
   return getTransformHandlesFromCoords(
     getElementAbsoluteCoords(element),
     element.angle,
