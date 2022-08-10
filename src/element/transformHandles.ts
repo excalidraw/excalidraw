@@ -9,7 +9,6 @@ import { rotate } from "../math";
 import { Zoom } from "../types";
 import { isTextElement } from ".";
 import { isLinearElement } from "./typeChecks";
-import { LinearElementEditor } from "./linearElementEditor";
 
 export type TransformHandleDirection =
   | "n"
@@ -274,9 +273,5 @@ export const shouldShowBoundingBox = (
     return true;
   }
 
-  const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-  if (points.length > 2) {
-    return true;
-  }
-  return false;
+  return element.points.length > 2;
 };
