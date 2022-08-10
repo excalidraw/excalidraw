@@ -436,7 +436,12 @@ export const _renderScene = (
         addSelectionForGroupId(appState.editingGroupId);
       }
       selections.forEach((selection) =>
-        renderSelectionBorder(context, renderConfig, selection),
+        renderSelectionBorder(
+          context,
+          renderConfig,
+          selection,
+          isSingleLinearElementSelected ? 8 : 4,
+        ),
       );
     }
     // Paint resize transformHandles
@@ -749,13 +754,14 @@ const renderSelectionBorder = (
     elementY2: number;
     selectionColors: string[];
   },
+  padding = 4,
 ) => {
   const { angle, elementX1, elementY1, elementX2, elementY2, selectionColors } =
     elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
 
-  const dashedLinePadding = 4 / renderConfig.zoom.value;
+  const dashedLinePadding = padding / renderConfig.zoom.value;
   const dashWidth = 8 / renderConfig.zoom.value;
   const spaceWidth = 4 / renderConfig.zoom.value;
 
