@@ -44,6 +44,7 @@ import {
   isBindingEnabled,
 } from "../element/binding";
 import {
+  shouldShowBoundingBox,
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
@@ -218,22 +219,6 @@ const renderLinearElementPointHighlight = (
   );
 
   context.restore();
-};
-
-const shouldShowBoundingBox = (elements: NonDeletedExcalidrawElement[]) => {
-  if (elements.length > 1) {
-    return true;
-  }
-  const element = elements[0];
-  if (!isLinearElement(element)) {
-    return true;
-  }
-
-  const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-  if (points.length > 2) {
-    return true;
-  }
-  return false;
 };
 
 export const _renderScene = (

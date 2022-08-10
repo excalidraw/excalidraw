@@ -1,10 +1,15 @@
-import { ExcalidrawElement, PointerType } from "./types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+  PointerType,
+} from "./types";
 
 import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
 import { Zoom } from "../types";
 import { isTextElement } from ".";
 import { isLinearElement } from "./typeChecks";
+import { LinearElementEditor } from "./linearElementEditor";
 
 export type TransformHandleDirection =
   | "n"
@@ -256,4 +261,22 @@ export const getTransformHandles = (
     pointerType,
     omitSides,
   );
+};
+
+export const shouldShowBoundingBox = (
+  elements: NonDeletedExcalidrawElement[],
+) => {
+  if (elements.length > 1) {
+    return true;
+  }
+  const element = elements[0];
+  if (!isLinearElement(element)) {
+    return true;
+  }
+
+  const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+  if (points.length > 2) {
+    return true;
+  }
+  return false;
 };
