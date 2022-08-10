@@ -18,6 +18,7 @@ import { rescalePoints } from "../points";
 
 // x and y position of top left corner, x and y position of bottom right corner
 export type Bounds = readonly [number, number, number, number];
+type MaybeQuadraticSolution = [number | null, number | null] | false;
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
@@ -68,6 +69,89 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
   return shape.sets[0].ops;
 };
 
+// reference: https://eliot-jones.com/2019/12/cubic-bezier-curve-bounding-boxes
+const getBezierValueForT = (
+  t: number,
+  p0: number,
+  p1: number,
+  p2: number,
+  p3: number,
+) => {
+  const oneMinusT = 1 - t;
+  return (
+    Math.pow(oneMinusT, 3) * p0 +
+    3 * Math.pow(oneMinusT, 2) * t * p1 +
+    3 * oneMinusT * Math.pow(t, 2) * p2 +
+    Math.pow(t, 3) * p3
+  );
+};
+
+const solveQuadratic = (
+  p0: number,
+  p1: number,
+  p2: number,
+  p3: number,
+): MaybeQuadraticSolution => {
+  const i = p1 - p0;
+  const j = p2 - p1;
+  const k = p3 - p2;
+
+  const a = 3 * i - 6 * j + 3 * k;
+  const b = 6 * j - 6 * i;
+  const c = 3 * i;
+
+  const sqrtPart = b * b - 4 * a * c;
+  const hasSolution = sqrtPart >= 0;
+
+  if (!hasSolution) {
+    return false;
+  }
+
+  const t1 = (-b + Math.sqrt(sqrtPart)) / (2 * a);
+  const t2 = (-b - Math.sqrt(sqrtPart)) / (2 * a);
+
+  let s1 = null;
+  let s2 = null;
+
+  if (t1 >= 0 && t1 <= 1) {
+    s1 = getBezierValueForT(t1, p0, p1, p2, p3);
+  }
+
+  if (t2 >= 0 && t2 <= 1) {
+    s2 = getBezierValueForT(t2, p0, p1, p2, p3);
+  }
+
+  return [s1, s2];
+};
+
+const getCubicBezierCurveBound = (
+  p0: Point,
+  p1: Point,
+  p2: Point,
+  p3: Point,
+): Bounds => {
+  const solX = solveQuadratic(p0[0], p1[0], p2[0], p3[0]);
+  const solY = solveQuadratic(p0[1], p1[1], p2[1], p3[1]);
+
+  let minX = Math.min(p0[0], p3[0]);
+  let maxX = Math.max(p0[0], p3[0]);
+
+  if (solX) {
+    const xs = solX.filter((x) => x !== null) as number[];
+    minX = Math.min(minX, ...xs);
+    maxX = Math.max(maxX, ...xs);
+  }
+
+  let minY = Math.min(p0[1], p3[1]);
+  let maxY = Math.max(p0[1], p3[1]);
+  if (solY) {
+    const ys = solY.filter((y) => y !== null) as number[];
+    minY = Math.min(minY, ...ys);
+    maxY = Math.max(maxY, ...ys);
+  }
+  return [minX, minY, maxX, maxY];
+};
+
 const getMinMaxXYFromCurvePathOps = (
   ops: Op[],
   transformXY?: (x: number, y: number) => [number, number],
@@ -86,35 +170,29 @@ const getMinMaxXYFromCurvePathOps = (
         // create points from bezier curve
         // bezier curve stores data as a flattened array of three positions
         // [x1, y1, x2, y2, x3, y3]
-        const p1 = [data[0], data[1]] as Point;
-        const p2 = [data[2], data[3]] as Point;
-        const p3 = [data[4], data[5]] as Point;
+        const _p1 = [data[0], data[1]] as Point;
+        const _p2 = [data[0], data[1]] as Point;
+        const _p3 = [data[4], data[5]] as Point;
 
-        const p0 = currentP;
-        currentP = p3;
+        const p1 = transformXY ? transformXY(..._p1) : _p1;
+        const p2 = transformXY ? transformXY(..._p2) : _p2;
+        const p3 = transformXY ? transformXY(..._p3) : _p3;
 
-        const equation = (t: number, idx: number) =>
-          Math.pow(1 - t, 3) * p3[idx] +
-          3 * t * Math.pow(1 - t, 2) * p2[idx] +
-          3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
-          p0[idx] * Math.pow(t, 3);
+        const p0 = transformXY ? transformXY(...currentP) : currentP;
+        currentP = _p3;
 
-        let t = 0;
-        while (t <= 1.0) {
-          let x = equation(t, 0);
-          let y = equation(t, 1);
-          if (transformXY) {
-            [x, y] = transformXY(x, y);
-          }
+        const [minX, minY, maxX, maxY] = getCubicBezierCurveBound(
+          p0,
+          p1,
+          p2,
+          p3,
+        );
 
-          limits.minY = Math.min(limits.minY, y);
-          limits.minX = Math.min(limits.minX, x);
+        limits.minY = Math.min(limits.minY, minY);
+        limits.minX = Math.min(limits.minX, minX);
 
-          limits.maxX = Math.max(limits.maxX, x);
-          limits.maxY = Math.max(limits.maxY, y);
-
-          t += 0.1;
-        }
+        limits.maxX = Math.max(limits.maxX, maxX);
+        limits.maxY = Math.max(limits.maxY, maxY);
       } else if (op === "lineTo") {
         // TODO: Implement this
       } else if (op === "qcurveTo") {
