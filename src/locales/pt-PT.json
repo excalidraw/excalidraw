@@ -347,9 +347,9 @@
       "link": "Licença MIT, ",
       "post": "o que significa, de forma resumida, que qualquer pessoa pode utilizá-la sem restrições."
     },
-    "noteItems": "",
-    "atleastOneLibItem": "",
-    "republishWarning": ""
+    "noteItems": "Cada item da biblioteca deve ter o seu próprio nome para que este seja pesquisável com filtros. Os seguintes itens da biblioteca serão incluídos:",
+    "atleastOneLibItem": "Por favor, seleccione pelo menos um item da biblioteca para começar",
+    "republishWarning": "Nota: alguns dos itens seleccionados estão marcados como já publicados/enviados. Só deve reenviar itens ao actualizar uma biblioteca existente ou submissão."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",
