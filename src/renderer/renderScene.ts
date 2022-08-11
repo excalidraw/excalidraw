@@ -44,6 +44,7 @@ import {
   isBindingEnabled,
 } from "../element/binding";
 import {
+  shouldShowBoundingBox,
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
@@ -61,6 +62,7 @@ import {
 import { isLinearElement } from "../element/typeChecks";
 
 const hasEmojiSupport = supportsEmoji();
+export const DEFAULT_SPACING = 4;
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -247,6 +249,7 @@ const renderLinearElementPointHighlight = (
 
   context.restore();
 };
+
 export const _renderScene = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -374,7 +377,6 @@ export const _renderScene = (
   ) {
     renderLinearElementPointHighlight(context, appState, renderConfig);
   }
-
   // Paint selected elements
   if (
     renderSelection &&
@@ -382,6 +384,8 @@ export const _renderScene = (
     !appState.editingLinearElement
   ) {
     const locallySelectedElements = getSelectedElements(elements, appState);
+    const showBoundingBox = shouldShowBoundingBox(locallySelectedElements);
+
     const locallySelectedIds = locallySelectedElements.map(
       (element) => element.id,
     );
@@ -401,9 +405,8 @@ export const _renderScene = (
         renderConfig,
         locallySelectedElements[0] as ExcalidrawLinearElement,
       );
-      // render bounding box
-      // (unless dragging a single linear element)
-    } else if (!appState.draggingElement || !isSingleLinearElementSelected) {
+    }
+    if (showBoundingBox) {
       const selections = elements.reduce((acc, element) => {
         const selectionColors = [];
         // local user
@@ -462,12 +465,18 @@ export const _renderScene = (
         addSelectionForGroupId(appState.editingGroupId);
       }
       selections.forEach((selection) =>
-        renderSelectionBorder(context, renderConfig, selection),
+        renderSelectionBorder(
+          context,
+          renderConfig,
+          selection,
+          isSingleLinearElementSelected ? DEFAULT_SPACING * 2 : DEFAULT_SPACING,
+        ),
       );
     }
     // Paint resize transformHandles
     context.save();
     context.translate(renderConfig.scrollX, renderConfig.scrollY);
+
     if (locallySelectedElements.length === 1) {
       context.fillStyle = oc.white;
       const transformHandles = getTransformHandles(
@@ -475,10 +484,7 @@ export const _renderScene = (
         renderConfig.zoom,
         "mouse", // when we render we don't know which pointer type so use mouse
       );
-      if (
-        !appState.viewModeEnabled &&
-        !isLinearElement(locallySelectedElements[0])
-      ) {
+      if (!appState.viewModeEnabled && showBoundingBox) {
         renderTransformHandles(
           context,
           renderConfig,
@@ -742,24 +748,21 @@ const renderTransformHandles = (
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];
     if (transformHandle !== undefined) {
+      const [x, y, width, height] = transformHandle;
+
       context.save();
       context.lineWidth = 1 / renderConfig.zoom.value;
       if (key === "rotation") {
-        fillCircle(
-          context,
-          transformHandle[0] + transformHandle[2] / 2,
-          transformHandle[1] + transformHandle[3] / 2,
-          transformHandle[2] / 2,
-        );
+        fillCircle(context, x + width / 2, y + height / 2, width / 2);
       } else {
         strokeRectWithRotation(
           context,
-          transformHandle[0],
-          transformHandle[1],
-          transformHandle[2],
-          transformHandle[3],
-          transformHandle[0] + transformHandle[2] / 2,
-          transformHandle[1] + transformHandle[3] / 2,
+          x,
+          y,
+          width,
+          height,
+          x + width / 2,
+          y + height / 2,
           angle,
           true, // fill before stroke
         );
@@ -780,13 +783,14 @@ const renderSelectionBorder = (
     elementY2: number;
     selectionColors: string[];
   },
+  padding = 4,
 ) => {
   const { angle, elementX1, elementY1, elementX2, elementY2, selectionColors } =
     elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
 
-  const dashedLinePadding = 4 / renderConfig.zoom.value;
+  const dashedLinePadding = padding / renderConfig.zoom.value;
   const dashWidth = 8 / renderConfig.zoom.value;
   const spaceWidth = 4 / renderConfig.zoom.value;
 

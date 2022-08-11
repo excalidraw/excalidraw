@@ -261,6 +261,7 @@ import {
   isPointHittingLinkIcon,
   isLocalLink,
 } from "../element/Hyperlink";
+import { shouldShowBoundingBox } from "../element/transformHandles";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -3067,6 +3068,16 @@ class App extends React.Component<AppProps, AppState> {
             isHovered: false,
           },
         });
+      } else if (
+        shouldShowBoundingBox([element]) &&
+        isHittingElementBoundingBoxWithoutHittingElement(
+          element,
+          this.state,
+          scenePointerX,
+          scenePointerY,
+        )
+      ) {
+        setCursor(this.canvas, CURSOR_TYPE.MOVE);
       }
 
       if (
