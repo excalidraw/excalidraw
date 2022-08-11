@@ -726,7 +726,7 @@ export class LinearElementEditor {
       if (
         distance2d(x, y, point[0], point[1]) * zoom.value <
         // +1px to account for outline stroke
-        this.POINT_HANDLE_SIZE + 1
+        LinearElementEditor.POINT_HANDLE_SIZE + 1
       ) {
         return idx;
       }
