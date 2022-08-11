@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
+
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
@@ -264,6 +265,7 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { ImportedDataState } from "../data/types"; //zsviczian
+import { shouldShowBoundingBox } from "../element/transformHandles";
 
 export let showFourthFont: boolean = false;
 const deviceContextInitialValue = {
@@ -3227,6 +3229,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (this.state.selectedLinearElement) {
       let hoverPointIndex = -1;
+      let midPointHovered = false;
       if (
         isHittingElementNotConsideringBoundingBox(element, this.state, [
           scenePointerX,
@@ -3239,11 +3242,27 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         );
-        if (hoverPointIndex >= 0) {
+        midPointHovered = LinearElementEditor.isHittingMidPoint(
+          linearElementEditor,
+          { x: scenePointerX, y: scenePointerY },
+          this.state,
+        );
+
+        if (hoverPointIndex >= 0 || midPointHovered) {
           setCursor(this.canvas, CURSOR_TYPE.POINTER);
         } else {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
         }
+      } else if (
+        shouldShowBoundingBox([element]) &&
+        isHittingElementBoundingBoxWithoutHittingElement(
+          element,
+          this.state,
+          scenePointerX,
+          scenePointerY,
+        )
+      ) {
+        setCursor(this.canvas, CURSOR_TYPE.MOVE);
       }
 
       if (
@@ -3253,6 +3272,17 @@ class App extends React.Component<AppProps, AppState> {
           selectedLinearElement: {
             ...this.state.selectedLinearElement,
             hoverPointIndex,
+          },
+        });
+      }
+
+      if (
+        this.state.selectedLinearElement.midPointHovered !== midPointHovered
+      ) {
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            midPointHovered,
           },
         });
       }
@@ -3812,7 +3842,7 @@ class App extends React.Component<AppProps, AppState> {
               this.setState({ editingLinearElement: ret.linearElementEditor });
             }
           }
-          if (ret.didAddPoint) {
+          if (ret.didAddPoint && !ret.isMidPoint) {
             return true;
           }
         }
@@ -4301,6 +4331,7 @@ class App extends React.Component<AppProps, AppState> {
       // to ensure we don't create a 2-point arrow by mistake when
       // user clicks mouse in a way that it moves a tiny bit (thus
       // triggering pointermove)
+
       if (
         !pointerDownState.drag.hasOccurred &&
         (this.state.activeTool.type === "arrow" ||
@@ -4317,7 +4348,6 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       }
-
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
@@ -4330,6 +4360,7 @@ class App extends React.Component<AppProps, AppState> {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
         const didDrag = LinearElementEditor.handlePointDragging(
+          event,
           this.state,
           pointerCoords.x,
           pointerCoords.y,
@@ -4371,21 +4402,15 @@ class App extends React.Component<AppProps, AppState> {
         (element) => this.isASelectedElement(element),
       );
 
+      const isSelectingPointsInLineEditor =
+        this.state.editingLinearElement &&
+        event.shiftKey &&
+        this.state.editingLinearElement.elementId ===
+          pointerDownState.hit.element?.id;
       if (
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
-        // this allows for box-selecting points when clicking inside the
-        // line's bounding box
-        (!this.state.editingLinearElement || !event.shiftKey) &&
-        // box-selecting without shift when editing line, not clicking on a line
-        (!this.state.editingLinearElement ||
-          this.state.editingLinearElement?.elementId !==
-            pointerDownState.hit.element?.id ||
-          pointerDownState.hit.hasHitElementInside) &&
-        (!this.state.selectedLinearElement ||
-          this.state.selectedLinearElement?.elementId !==
-            pointerDownState.hit.element?.id ||
-          pointerDownState.hit.hasHitElementInside)
+        !isSelectingPointsInLineEditor
       ) {
         const selectedElements = getSelectedElements(
           this.scene.getNonDeletedElements(),
@@ -4533,8 +4558,10 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (points.length === 1) {
-          mutateElement(draggingElement, { points: [...points, [dx, dy]] });
-        } else if (points.length > 1) {
+          mutateElement(draggingElement, {
+            points: [...points, [dx, dy]],
+          });
+        } else if (points.length === 2) {
           mutateElement(draggingElement, {
             points: [...points.slice(0, -1), [dx, dy]],
           });
@@ -4755,7 +4782,10 @@ class App extends React.Component<AppProps, AppState> {
 
           if (linearElementEditor !== this.state.selectedLinearElement) {
             this.setState({
-              selectedLinearElement: linearElementEditor,
+              selectedLinearElement: {
+                ...linearElementEditor,
+                selectedPointsIndices: null,
+              },
               suggestedBindings: [],
             });
           }
@@ -5038,7 +5068,8 @@ class App extends React.Component<AppProps, AppState> {
                   ...idsOfSelectedElementsThatAreInGroups,
                 },
               }));
-            } else {
+              // if not gragging a linear element point (outside editor)
+            } else if (!this.state.selectedLinearElement?.isDragging) {
               // remove element from selection while
               // keeping prev elements selected
 
@@ -5090,9 +5121,9 @@ class App extends React.Component<AppProps, AppState> {
                   isLinearElement(hitElement) &&
                   // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
                   // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
-                  this.state.selectedLinearElement?.elementId !== hitElement.id
+                  prevState.selectedLinearElement?.elementId !== hitElement.id
                     ? new LinearElementEditor(hitElement, this.scene)
-                    : this.state.selectedLinearElement,
+                    : prevState.selectedLinearElement,
               },
               this.scene.getNonDeletedElements(),
             ),
@@ -6402,4 +6433,5 @@ if (
     },
   });
 }
+
 export default App;
