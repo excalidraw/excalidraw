@@ -386,7 +386,7 @@ export class LinearElementEditor {
       return false;
     }
 
-    const midPoint = this.getMidPoint(linearElementEditor);
+    const midPoint = LinearElementEditor.getMidPoint(linearElementEditor);
     if (midPoint) {
       const threshold =
         LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
@@ -453,7 +453,7 @@ export class LinearElementEditor {
         appState,
       )
     ) {
-      const midPoint = this.getMidPoint(linearElementEditor);
+      const midPoint = LinearElementEditor.getMidPoint(linearElementEditor);
       if (midPoint) {
         mutateElement(element, {
           points: [
@@ -715,7 +715,8 @@ export class LinearElementEditor {
     x: number,
     y: number,
   ) {
-    const pointHandles = this.getPointsGlobalCoordinates(element);
+    const pointHandles =
+      LinearElementEditor.getPointsGlobalCoordinates(element);
     let idx = pointHandles.length;
     // loop from right to left because points on the right are rendered over
     // points on the left, thus should take precedence when clicking, if they
@@ -725,7 +726,7 @@ export class LinearElementEditor {
       if (
         distance2d(x, y, point[0], point[1]) * zoom.value <
         // +1px to account for outline stroke
-        this.POINT_HANDLE_SIZE + 1
+        LinearElementEditor.POINT_HANDLE_SIZE + 1
       ) {
         return idx;
       }
