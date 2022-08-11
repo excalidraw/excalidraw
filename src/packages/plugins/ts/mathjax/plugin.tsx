@@ -65,7 +65,7 @@ class GetMathProps {
   private useTex: boolean = true;
   private mathOnly: boolean = false;
   getUseTex = (appState?: AppState): boolean => {
-    const mathProps = appState?.customProps as MathProps;
+    const mathProps = appState?.customProps?.mathSubtype as MathProps;
     if (mathProps !== undefined) {
       this.useTex = mathProps.useTex !== undefined ? mathProps.useTex : true;
     }
@@ -73,7 +73,7 @@ class GetMathProps {
   };
 
   getMathOnly = (appState?: AppState): boolean => {
-    const mathProps = appState?.customProps as MathProps;
+    const mathProps = appState?.customProps?.mathSubtype as MathProps;
     if (mathProps !== undefined) {
       this.mathOnly =
         mathProps.mathOnly !== undefined ? mathProps.mathOnly : false;
