@@ -10982,6 +10982,7 @@ Object {
     "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
+    "midPointHovered": false,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
       "prevSelectedPointsIndices": null,
@@ -11207,6 +11208,7 @@ Object {
     "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
+    "midPointHovered": false,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
       "prevSelectedPointsIndices": null,
@@ -11659,6 +11661,7 @@ Object {
     "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
+    "midPointHovered": false,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
       "prevSelectedPointsIndices": null,
@@ -12063,6 +12066,7 @@ Object {
     "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
+    "midPointHovered": false,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
       "prevSelectedPointsIndices": null,

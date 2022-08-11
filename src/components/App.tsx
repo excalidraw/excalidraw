@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
+
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
@@ -3030,6 +3031,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (this.state.selectedLinearElement) {
       let hoverPointIndex = -1;
+      let midPointHovered = false;
       if (
         isHittingElementNotConsideringBoundingBox(element, this.state, [
           scenePointerX,
@@ -3042,7 +3044,13 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         );
-        if (hoverPointIndex >= 0) {
+        midPointHovered = LinearElementEditor.isHittingMidPoint(
+          linearElementEditor,
+          { x: scenePointerX, y: scenePointerY },
+          this.state,
+        );
+
+        if (hoverPointIndex >= 0 || midPointHovered) {
           setCursor(this.canvas, CURSOR_TYPE.POINTER);
         } else {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
@@ -3066,6 +3074,17 @@ class App extends React.Component<AppProps, AppState> {
           selectedLinearElement: {
             ...this.state.selectedLinearElement,
             hoverPointIndex,
+          },
+        });
+      }
+
+      if (
+        this.state.selectedLinearElement.midPointHovered !== midPointHovered
+      ) {
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            midPointHovered,
           },
         });
       }
@@ -3623,7 +3642,7 @@ class App extends React.Component<AppProps, AppState> {
               this.setState({ editingLinearElement: ret.linearElementEditor });
             }
           }
-          if (ret.didAddPoint) {
+          if (ret.didAddPoint && !ret.isMidPoint) {
             return true;
           }
         }
@@ -4112,6 +4131,7 @@ class App extends React.Component<AppProps, AppState> {
       // to ensure we don't create a 2-point arrow by mistake when
       // user clicks mouse in a way that it moves a tiny bit (thus
       // triggering pointermove)
+
       if (
         !pointerDownState.drag.hasOccurred &&
         (this.state.activeTool.type === "arrow" ||
@@ -4128,7 +4148,6 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       }
-
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
@@ -4339,8 +4358,10 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (points.length === 1) {
-          mutateElement(draggingElement, { points: [...points, [dx, dy]] });
-        } else if (points.length > 1) {
+          mutateElement(draggingElement, {
+            points: [...points, [dx, dy]],
+          });
+        } else if (points.length === 2) {
           mutateElement(draggingElement, {
             points: [...points.slice(0, -1), [dx, dy]],
           });
@@ -6202,4 +6223,5 @@ if (
     },
   });
 }
+
 export default App;
