@@ -81,6 +81,22 @@ type DisabledActionName = ActionName;
 const isDisabledActionName = (s: any): s is DisabledActionName =>
   disabledActions.some((val) => val.actions.includes(s));
 
+// Is the `actionName` one of the custom actions for `subtype`
+// (if `isAdded` is true) or one of the standard actions disabled
+// by `subtype` (if `isAdded` is false)?
+const isForSubtype = (
+  subtype: ExcalidrawElement["subtype"],
+  actionName: ActionName | CustomActionName,
+  isAdded: boolean,
+) => {
+  const actions = isAdded ? customActions : disabledActions;
+  const map = actions.find((value) => value.subtype === subtype);
+  if (map) {
+    return map.actions.includes(actionName);
+  }
+  return false;
+};
+
 export const isActionEnabled = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -105,29 +121,36 @@ export const isActionEnabled = (
   if (isCustomActionName(actionName)) {
     // Has any ExcalidrawElement enabled this actionName through having
     // its subtype?
-    return chosen.some((el) => {
-      const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
-      const custom = customActions.find((value) => value.subtype === e.subtype);
-      if (custom) {
-        return custom.actions.includes(actionName);
-      }
-      return false;
-    });
+    return (
+      chosen.some((el) => {
+        const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
+        return isForSubtype(e.subtype, actionName, true);
+      }) ||
+      // Or has any active subtype enabled this actionName?
+      appState.activeSubtypes?.some((subtype) => {
+        if (!isValidSubtype(subtype, appState.activeTool.type)) {
+          return false;
+        }
+        return isForSubtype(subtype, actionName, true);
+      })
+    );
   }
   // Now handle standard actions disabled by subtypes
   if (isDisabledActionName(actionName)) {
     return (
       // Has every ExcalidrawElement not disabled this actionName?
-      chosen.every((el) => {
+      (chosen.every((el) => {
         const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
-        const disabled = disabledActions.find(
-          (value) => value.subtype === e.subtype,
-        );
-        if (disabled) {
-          return !disabled.actions.includes(actionName);
-        }
-        return true;
-      }) ||
+        return !isForSubtype(e.subtype, actionName, false);
+      }) &&
+        // And has every active subtype not disabled this actionName?
+        (appState.activeSubtypes === undefined ||
+          appState.activeSubtypes?.every((subtype) => {
+            if (!isValidSubtype(subtype, appState.activeTool.type)) {
+              return true;
+            }
+            return !isForSubtype(subtype, actionName, false);
+          }))) ||
       // Or is there an ExcalidrawElement without a subtype which would
       // disable this action if it had a subtype?
       chosen.some((el) => {
@@ -144,7 +167,24 @@ export const isActionEnabled = (
     );
   }
   // Shouldn't happen
-  return false;
+  return true;
+};
+
+// Are any of the parent types of `subtype` shared by any subtype
+// in the array?
+export const subtypeCollides = (
+  subtype: CustomSubtype,
+  subtypeArray: CustomSubtype[],
+) => {
+  const subtypeParents = customParents
+    .filter((value) => value.subtype === subtype)
+    .map((value) => value.parentType);
+  const subtypeArrayParents = subtypeArray.flatMap((s) =>
+    customParents
+      .filter((value) => value.subtype === s)
+      .map((value) => value.parentType),
+  );
+  return subtypeParents.some((t) => subtypeArrayParents.includes(t));
 };
 
 // Custom Shortcuts (for custom actions)
@@ -223,6 +263,39 @@ export const addCustomMethods = (
   if (!methodMaps.find((method) => method.subtype === subtype)) {
     methodMaps.push({ subtype, methods });
   }
+};
+
+// For a given `ExcalidrawElement` type, return the active subtype
+// and associated customProps (if any) from the AppState.  Assume
+// only one subtype is active for a given `ExcalidrawElement` type
+// at any given time.
+export const selectSubtype = (
+  appState: {
+    activeSubtypes?: AppState["activeSubtypes"];
+    customProps?: AppState["customProps"];
+  },
+  type: ExcalidrawElement["type"],
+): {
+  subtype?: ExcalidrawElement["subtype"];
+  customProps?: ExcalidrawElement["customProps"];
+} => {
+  if (appState.activeSubtypes === undefined) {
+    return {};
+  }
+  const subtype = appState.activeSubtypes.find((subtype) =>
+    isValidSubtype(subtype, type),
+  );
+  if (subtype === undefined) {
+    return {};
+  }
+  if (
+    appState.customProps === undefined ||
+    !(subtype in appState.customProps)
+  ) {
+    return { subtype };
+  }
+  const customProps = appState.customProps?.subtype;
+  return { subtype, customProps };
 };
 
 // Functions to prepare subtypes for use

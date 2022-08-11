@@ -271,11 +271,11 @@ export const restoreAppState = (
         : defaultValue;
   }
 
-  const { activeSubtype, customProps } = appState;
+  const { activeSubtypes, customProps } = appState;
   return {
     ...nextAppState,
-    ...delUndefinedProps({ activeSubtype, customProps }, [
-      "activeSubtype",
+    ...delUndefinedProps({ activeSubtypes, customProps }, [
+      "activeSubtypes",
       "customProps",
     ]),
     cursorButton: localAppState?.cursorButton || "up",

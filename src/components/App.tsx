@@ -233,6 +233,7 @@ import {
   getCustomActions,
   getCustomSubtypes,
   prepareSubtype,
+  selectSubtype,
 } from "../subtypes";
 import { getCrispSubtypeTypes } from "../element/subtypes/crisp/types";
 import { prepareCrispSubtype } from "../element/subtypes/crisp";
@@ -1646,8 +1647,7 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
-      subtype: this.state.activeSubtype,
-      customProps: this.state.customProps,
+      ...selectSubtype(this.state, "text"),
       locked: false,
     });
 
@@ -2467,8 +2467,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? VERTICAL_ALIGN.MIDDLE
             : DEFAULT_VERTICAL_ALIGN,
-          subtype: this.state.activeSubtype,
-          customProps: this.state.customProps,
+          ...selectSubtype(this.state, "text"),
           containerId: container?.id ?? undefined,
           groupIds: container?.groupIds ?? [],
           locked: false,
@@ -3948,8 +3947,7 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemLinearStrokeSharpness,
-      subtype: this.state.activeSubtype,
-      customProps: this.state.customProps,
+      ...selectSubtype(this.state, "image"),
       locked: false,
     });
 
@@ -4038,8 +4036,7 @@ class App extends React.Component<AppProps, AppState> {
         strokeSharpness: this.state.currentItemLinearStrokeSharpness,
         startArrowhead,
         endArrowhead,
-        subtype: this.state.activeSubtype,
-        customProps: this.state.customProps,
+        ...selectSubtype(this.state, elementType),
         locked: false,
       });
       this.setState((prevState) => ({
@@ -4089,8 +4086,7 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
-      subtype: this.state.activeSubtype,
-      customProps: this.state.customProps,
+      ...selectSubtype(this.state, elementType),
       locked: false,
     });
 

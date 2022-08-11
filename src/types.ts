@@ -30,7 +30,12 @@ import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
-import { SubtypeTypes, SubtypePrepFn, CustomMethods } from "./subtypes";
+import {
+  CustomMethods,
+  CustomSubtype,
+  SubtypePrepFn,
+  SubtypeTypes,
+} from "./subtypes";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -94,8 +99,10 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
-  activeSubtype?: ExcalidrawElement["subtype"];
-  customProps?: ExcalidrawElement["customProps"];
+  activeSubtypes?: CustomSubtype[];
+  customProps?: {
+    [subtype: CustomSubtype]: ExcalidrawElement["customProps"];
+  };
   activeTool:
     | {
         type: typeof SHAPES[number]["value"] | "eraser";

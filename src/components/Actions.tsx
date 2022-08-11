@@ -129,7 +129,7 @@ export const SelectedShapeActions = ({
         (element) =>
           hasBoundTextElement(element) || isBoundToContainer(element),
       ) && renderAction("changeVerticalAlign")}
-      {(appState.activeSubtype ||
+      {(appState.activeSubtypes ||
         targetElements.some((element) => element.subtype)) && (
         <>
           {getCustomActions().map((action) => {

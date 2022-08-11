@@ -16,7 +16,7 @@ import { getMimeType } from "../../data/blob";
 import { maybeGetCustom, newFreeDrawElement } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
-import { prepareSubtype } from "../../subtypes";
+import { prepareSubtype, selectSubtype } from "../../subtypes";
 import { prepareCrispSubtype } from "../../element/subtypes/crisp";
 import { getCrispSubtypeTypes } from "../../element/subtypes/crisp/types";
 
@@ -128,8 +128,9 @@ export class API {
 
     const custom = maybeGetCustom(
       {
-        subtype: rest.subtype ?? appState.activeSubtype,
-        customProps: rest.customProps ?? appState.customProps,
+        subtype: rest.subtype ?? selectSubtype(appState, type)?.subtype,
+        customProps:
+          rest.customProps ?? selectSubtype(appState, type)?.customProps,
       },
       type,
     );

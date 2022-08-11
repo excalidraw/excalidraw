@@ -145,7 +145,7 @@ export const parseClipboard = async (
   const spreadsheetResult = parsePotentialSpreadsheet(systemClipboard);
   if (spreadsheetResult) {
     if ("spreadsheet" in spreadsheetResult) {
-      spreadsheetResult.spreadsheet.subtype = appState?.activeSubtype;
+      spreadsheetResult.spreadsheet.activeSubtypes = appState?.activeSubtypes;
       spreadsheetResult.spreadsheet.customProps = appState?.customProps;
     }
     return spreadsheetResult;

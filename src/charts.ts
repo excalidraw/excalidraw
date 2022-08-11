@@ -6,9 +6,10 @@ import {
   VERTICAL_ALIGN,
 } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
-import { maybeGetCustom } from "./element/newElement";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
+import { AppState } from "./types";
+import { selectSubtype } from "./subtypes";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];
 
@@ -21,8 +22,8 @@ export interface Spreadsheet {
   title: string | null;
   labels: string[] | null;
   values: number[];
-  subtype?: NonDeletedExcalidrawElement["subtype"];
-  customProps?: NonDeletedExcalidrawElement["customProps"];
+  activeSubtypes?: AppState["activeSubtypes"];
+  customProps?: AppState["customProps"];
 }
 
 export const NOT_SPREADSHEET = "NOT_SPREADSHEET";
@@ -210,7 +211,7 @@ const chartXLabels = (
         fontSize: 16,
         textAlign: "center",
         verticalAlign: "top",
-        ...maybeGetCustom(spreadsheet, "text"),
+        ...selectSubtype(spreadsheet, "text"),
       });
     }) || []
   );
@@ -231,7 +232,7 @@ const chartYLabels = (
     y: y - BAR_GAP,
     text: "0",
     textAlign: "right",
-    ...maybeGetCustom(spreadsheet, "text"),
+    ...selectSubtype(spreadsheet, "text"),
   });
 
   const maxYLabel = newTextElement({
@@ -242,7 +243,7 @@ const chartYLabels = (
     y: y - BAR_HEIGHT - minYLabel.height / 2,
     text: Math.max(...spreadsheet.values).toLocaleString(),
     textAlign: "right",
-    ...maybeGetCustom(spreadsheet, "text"),
+    ...selectSubtype(spreadsheet, "text"),
   });
 
   return [minYLabel, maxYLabel];
@@ -270,7 +271,7 @@ const chartLines = (
       [0, 0],
       [chartWidth, 0],
     ],
-    ...maybeGetCustom(spreadsheet, "line"),
+    ...selectSubtype(spreadsheet, "line"),
   });
 
   const yLine = newLinearElement({
@@ -287,7 +288,7 @@ const chartLines = (
       [0, 0],
       [0, -chartHeight],
     ],
-    ...maybeGetCustom(spreadsheet, "line"),
+    ...selectSubtype(spreadsheet, "line"),
   });
 
   const maxLine = newLinearElement({
@@ -306,7 +307,7 @@ const chartLines = (
       [0, 0],
       [chartWidth, 0],
     ],
-    ...maybeGetCustom(spreadsheet, "line"),
+    ...selectSubtype(spreadsheet, "line"),
   });
 
   return [xLine, yLine, maxLine];
@@ -334,7 +335,7 @@ const chartBaseElements = (
         strokeSharpness: "sharp",
         strokeStyle: "solid",
         textAlign: "center",
-        ...maybeGetCustom(spreadsheet, "text"),
+        ...selectSubtype(spreadsheet, "text"),
       })
     : null;
 
@@ -351,7 +352,7 @@ const chartBaseElements = (
         strokeColor: colors.elementStroke[0],
         fillStyle: "solid",
         opacity: 6,
-        ...maybeGetCustom(spreadsheet, "rectangle"),
+        ...selectSubtype(spreadsheet, "rectangle"),
       })
     : null;
 
@@ -384,7 +385,7 @@ const chartTypeBar = (
       y: y - barHeight - BAR_GAP,
       width: BAR_WIDTH,
       height: barHeight,
-      ...maybeGetCustom(spreadsheet, "rectangle"),
+      ...selectSubtype(spreadsheet, "rectangle"),
     });
   });
 
@@ -437,7 +438,7 @@ const chartTypeLine = (
     width: maxX - minX,
     strokeWidth: 2,
     points: points as any,
-    ...maybeGetCustom(spreadsheet, "line"),
+    ...selectSubtype(spreadsheet, "line"),
   });
 
   const dots = spreadsheet.values.map((value, index) => {
@@ -454,7 +455,7 @@ const chartTypeLine = (
       y: y + cy - BAR_GAP * 2,
       width: BAR_GAP,
       height: BAR_GAP,
-      ...maybeGetCustom(spreadsheet, "ellipse"),
+      ...selectSubtype(spreadsheet, "ellipse"),
     });
   });
 
@@ -477,7 +478,7 @@ const chartTypeLine = (
         [0, 0],
         [0, cy],
       ],
-      ...maybeGetCustom(spreadsheet, "line"),
+      ...selectSubtype(spreadsheet, "line"),
     });
   });
 
