@@ -192,12 +192,15 @@ const renderLinearPointHandles = (
   renderConfig: RenderConfig,
   element: NonDeleted<ExcalidrawLinearElement>,
 ) => {
+  if (!appState.selectedLinearElement) {
+    return;
+  }
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
   context.lineWidth = 1 / renderConfig.zoom.value;
   const points = LinearElementEditor.getPointsGlobalCoordinates(element);
   const [centerX, centerY] = LinearElementEditor.getMidPoint(
-    appState.selectedLinearElement!,
+    appState.selectedLinearElement,
   )!;
 
   points.forEach((point, idx) => {
