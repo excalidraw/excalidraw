@@ -29,9 +29,14 @@ class Scene {
 
   static mapElementToScene(elementKey: ElementKey, scene: Scene) {
     if (isIdKey(elementKey)) {
+      // for cases where we don't have access to the element object
+      // (e.g. restore serialized appState with id references)
       this.sceneMapById.set(elementKey, scene);
     } else {
       this.sceneMapByElement.set(elementKey, scene);
+      // if mapping element objects, also cache the id string when later
+      // looking up by id alone
+      this.sceneMapById.set(elementKey.id, scene);
     }
   }
 
