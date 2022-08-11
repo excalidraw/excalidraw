@@ -351,7 +351,7 @@ export const prepareSubtype = (
 // Ensure all subtypes are loaded before continuing, eg to
 // render SVG previews of new charts.  Chart-relevant subtypes
 // include math equations in titles or non hand-drawn line styles.
-export const ensureSubtypesLoaded = async (
+export const ensureSubtypesLoadedForElements = async (
   elements: readonly ExcalidrawElement[],
   callback?: () => void,
 ) => {
@@ -368,9 +368,16 @@ export const ensureSubtypesLoaded = async (
       subtypesUsed.push(el.subtype);
     }
   });
+  await ensureSubtypesLoaded(subtypesUsed, callback);
+};
+
+export const ensureSubtypesLoaded = async (
+  subtypes: CustomSubtype[],
+  callback?: () => void,
+) => {
   // Use a for loop so we can do `await map.ensureLoaded()`
-  for (let i = 0; i < subtypesUsed.length; i++) {
-    const subtype = subtypesUsed[i];
+  for (let i = 0; i < subtypes.length; i++) {
+    const subtype = subtypes[i];
     // Should be defined if prepareSubtype() has run
     const map = getCustomMethods(subtype);
     if (map?.ensureLoaded) {

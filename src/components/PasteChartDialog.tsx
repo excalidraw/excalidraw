@@ -29,49 +29,53 @@ const ChartPreviewBtn = (props: {
   );
 
   useLayoutEffect(() => {
-    if (!props.spreadsheet) {
-      return;
-    }
-
-    const elements = renderSpreadsheet(
-      props.chartType,
-      props.spreadsheet,
-      0,
-      0,
-    );
-    (async () => {
-      await ensureSubtypesLoaded(elements, () => {
-        elements.forEach(
-          (el) =>
-            isTextElement(el) &&
-            redrawTextBoundingBox(el, getContainerElement(el)),
-        );
-        setChartElements(elements);
-      });
-    })();
     let svg: SVGSVGElement;
     const previewNode = previewRef.current!;
-
     (async () => {
-      svg = await exportToSvg(
-        elements,
-        {
-          exportBackground: false,
-          viewBackgroundColor: oc.white,
-        },
-        null, // files
-      );
-      previewNode.replaceChildren();
-      previewNode.appendChild(svg);
+      (async () => {
+        let elements: ChartElements;
+        await ensureSubtypesLoaded(
+          props.spreadsheet?.activeSubtypes ?? [],
+          () => {
+            if (!props.spreadsheet) {
+              return;
+            }
 
-      if (props.selected) {
-        (previewNode.parentNode as HTMLDivElement).focus();
-      }
+            elements = renderSpreadsheet(
+              props.chartType,
+              props.spreadsheet,
+              0,
+              0,
+            );
+            elements.forEach(
+              (el) =>
+                isTextElement(el) &&
+                redrawTextBoundingBox(el, getContainerElement(el)),
+            );
+            setChartElements(elements);
+          },
+        ).then(async () => {
+          svg = await exportToSvg(
+            elements,
+            {
+              exportBackground: false,
+              viewBackgroundColor: oc.white,
+            },
+            null, // files
+          );
+          previewNode.replaceChildren();
+          previewNode.appendChild(svg);
+
+          if (props.selected) {
+            (previewNode.parentNode as HTMLDivElement).focus();
+          }
+        });
+      })();
+
+      return () => {
+        previewNode.replaceChildren();
+      };
     })();
-
-    return () => {
-      previewNode.replaceChildren();
-    };
   }, [props.spreadsheet, props.chartType, props.selected]);
 
   return (

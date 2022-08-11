@@ -11,7 +11,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
-import { ensureSubtypesLoaded } from "../subtypes";
+import { ensureSubtypesLoadedForElements } from "../subtypes";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -183,7 +183,7 @@ export const exportToSvg = async (
   }
 
   const rsvg = rough.svg(svgRoot);
-  await ensureSubtypesLoaded(elements, () => {
+  await ensureSubtypesLoadedForElements(elements, () => {
     renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
       offsetX: -minX + exportPadding,
       offsetY: -minY + exportPadding,
