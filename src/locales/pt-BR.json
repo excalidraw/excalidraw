@@ -125,8 +125,8 @@
   },
   "library": {
     "noItems": "Nenhum item adicionado ainda...",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Selecione um item na tela para adicioná-lo aqui, ou instale uma biblioteca do repositório público, abaixo.",
+    "hint_emptyPrivateLibrary": "Selecione um item na tela para adicioná-lo aqui."
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -349,7 +349,7 @@
     },
     "noteItems": "Cada item da biblioteca deve ter seu próprio nome para que seja filtrável. Os seguintes itens da biblioteca serão incluídos:",
     "atleastOneLibItem": "Por favor, selecione pelo menos um item da biblioteca para começar",
-    "republishWarning": ""
+    "republishWarning": "Nota: alguns dos itens selecionados estão marcados como já publicado/enviado. Você só deve reenviar itens ao atualizar uma biblioteca existente ou submissão."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",
