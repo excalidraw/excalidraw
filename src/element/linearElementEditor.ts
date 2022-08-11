@@ -385,15 +385,18 @@ export class LinearElementEditor {
     if (points.length >= 3) {
       return false;
     }
-    const centerX = (points.at(0)![0] + points.at(-1)![0]) / 2;
-    const centerY = (points.at(0)![1] + points.at(-1)![1]) / 2;
-    const threshold =
-      (LinearElementEditor.POINT_HANDLE_SIZE * 2) / appState.zoom.value;
-    if (
-      Math.abs(scenePointer.x - centerX) <= threshold &&
-      Math.abs(scenePointer.y - centerY) <= threshold
-    ) {
-      return true;
+
+    const midPoint = this.getMidPoint(linearElementEditor);
+    if (midPoint) {
+      const threshold =
+        LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
+      const distance = distance2d(
+        midPoint[0],
+        midPoint[1],
+        scenePointer.x,
+        scenePointer.y,
+      );
+      return distance <= threshold;
     }
     return false;
   };
