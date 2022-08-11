@@ -210,19 +210,50 @@ const renderLinearPointHandles = (
   });
 
   if (!appState.editingLinearElement && points.length < 3) {
-    renderSingleLinearPoint(
-      context,
-      appState,
-      renderConfig,
-      [centerX, centerY],
-      false,
-      true,
-    );
+    if (appState.selectedLinearElement.midPointHovered) {
+      const centerPoint = LinearElementEditor.getMidPoint(
+        appState.selectedLinearElement,
+      )!;
+      highlightPoint(centerPoint, context, appState, renderConfig);
+
+      renderSingleLinearPoint(
+        context,
+        appState,
+        renderConfig,
+        [centerX, centerY],
+        false,
+      );
+    } else {
+      renderSingleLinearPoint(
+        context,
+        appState,
+        renderConfig,
+        [centerX, centerY],
+        false,
+        true,
+      );
+    }
   }
 
   context.restore();
 };
 
+const highlightPoint = (
+  point: readonly number[],
+  context: CanvasRenderingContext2D,
+  appState: AppState,
+  renderConfig: RenderConfig,
+) => {
+  context.fillStyle = "rgba(105, 101, 219, 0.4)";
+
+  fillCircle(
+    context,
+    point[0],
+    point[1],
+    LinearElementEditor.POINT_HANDLE_SIZE / renderConfig.zoom.value,
+    false,
+  );
+};
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: AppState,
@@ -240,23 +271,14 @@ const renderLinearElementPointHighlight = (
   if (!element) {
     return;
   }
-  const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+  const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     element,
     hoverPointIndex,
   );
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
 
-  context.fillStyle = "rgba(105, 101, 219, 0.4)";
-
-  fillCircle(
-    context,
-    x,
-    y,
-    LinearElementEditor.POINT_HANDLE_SIZE / renderConfig.zoom.value,
-    false,
-  );
-
+  highlightPoint(point, context, appState, renderConfig);
   context.restore();
 };
 
