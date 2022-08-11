@@ -35,6 +35,7 @@ import { getShapeForElement } from "../renderer/renderElement";
 import { hasBoundTextElement, isImageElement } from "./typeChecks";
 import { isTextElement } from ".";
 import { isTransparent } from "../utils";
+import { shouldShowBoundingBox } from "./transformHandles";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -64,7 +65,10 @@ export const hitTest = (
   const threshold = 10 / appState.zoom.value;
   const point: Point = [x, y];
 
-  if (isElementSelected(appState, element) && !appState.selectedLinearElement) {
+  if (
+    isElementSelected(appState, element) &&
+    shouldShowBoundingBox([element])
+  ) {
     return isPointHittingElementBoundingBox(element, point, threshold);
   }
 
