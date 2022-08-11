@@ -2,7 +2,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 import oc from "open-color";
 
-import { AppState, BinaryFiles, Zoom } from "../types";
+import { AppState, BinaryFiles, Point, Zoom } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -157,34 +157,105 @@ const strokeGrid = (
   context.restore();
 };
 
+const renderSingleLinearPoint = (
+  context: CanvasRenderingContext2D,
+  appState: AppState,
+  renderConfig: RenderConfig,
+  point: Point,
+  isSelected: boolean,
+  isPhantomPoint = false,
+) => {
+  context.strokeStyle = "#5e5ad8";
+  context.setLineDash([]);
+  context.fillStyle = "rgba(255, 255, 255, 0.9)";
+  if (isSelected) {
+    context.fillStyle = "rgba(134, 131, 226, 0.9)";
+  } else if (isPhantomPoint) {
+    context.fillStyle = "rgba(177, 151, 252, 0.7)";
+  }
+  const { POINT_HANDLE_SIZE } = LinearElementEditor;
+  const radius = appState.editingLinearElement
+    ? POINT_HANDLE_SIZE
+    : POINT_HANDLE_SIZE / 2;
+  fillCircle(
+    context,
+    point[0],
+    point[1],
+    radius / renderConfig.zoom.value,
+    !isPhantomPoint,
+  );
+};
+
 const renderLinearPointHandles = (
   context: CanvasRenderingContext2D,
   appState: AppState,
   renderConfig: RenderConfig,
   element: NonDeleted<ExcalidrawLinearElement>,
 ) => {
+  if (!appState.selectedLinearElement) {
+    return;
+  }
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
   context.lineWidth = 1 / renderConfig.zoom.value;
-
-  LinearElementEditor.getPointsGlobalCoordinates(element).forEach(
-    (point, idx) => {
-      context.strokeStyle = "#5e5ad8";
-      context.setLineDash([]);
-      context.fillStyle =
-        appState.editingLinearElement?.selectedPointsIndices?.includes(idx)
-          ? "rgba(134, 131, 226, 0.9)"
-          : "rgba(255, 255, 255, 0.9)";
-      const { POINT_HANDLE_SIZE } = LinearElementEditor;
-      const radius = appState.editingLinearElement
-        ? POINT_HANDLE_SIZE
-        : POINT_HANDLE_SIZE / 2;
-      fillCircle(context, point[0], point[1], radius / renderConfig.zoom.value);
-    },
+  const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+  const centerPoint = LinearElementEditor.getMidPoint(
+    appState.selectedLinearElement,
   );
+  if (!centerPoint) {
+    return;
+  }
+  points.forEach((point, idx) => {
+    const isSelected =
+      !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
+    renderSingleLinearPoint(context, appState, renderConfig, point, isSelected);
+  });
+
+  if (!appState.editingLinearElement && points.length < 3) {
+    if (appState.selectedLinearElement.midPointHovered) {
+      const centerPoint = LinearElementEditor.getMidPoint(
+        appState.selectedLinearElement,
+      )!;
+      highlightPoint(centerPoint, context, appState, renderConfig);
+
+      renderSingleLinearPoint(
+        context,
+        appState,
+        renderConfig,
+        centerPoint,
+        false,
+      );
+    } else {
+      renderSingleLinearPoint(
+        context,
+        appState,
+        renderConfig,
+        centerPoint,
+        false,
+        true,
+      );
+    }
+  }
+
   context.restore();
 };
 
+const highlightPoint = (
+  point: Point,
+  context: CanvasRenderingContext2D,
+  appState: AppState,
+  renderConfig: RenderConfig,
+) => {
+  context.fillStyle = "rgba(105, 101, 219, 0.4)";
+
+  fillCircle(
+    context,
+    point[0],
+    point[1],
+    LinearElementEditor.POINT_HANDLE_SIZE / renderConfig.zoom.value,
+    false,
+  );
+};
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: AppState,
@@ -202,23 +273,14 @@ const renderLinearElementPointHighlight = (
   if (!element) {
     return;
   }
-  const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+  const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     element,
     hoverPointIndex,
   );
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
 
-  context.fillStyle = "rgba(105, 101, 219, 0.4)";
-
-  fillCircle(
-    context,
-    x,
-    y,
-    LinearElementEditor.POINT_HANDLE_SIZE / renderConfig.zoom.value,
-    false,
-  );
-
+  highlightPoint(point, context, appState, renderConfig);
   context.restore();
 };
 
@@ -345,7 +407,7 @@ export const _renderScene = (
 
   if (
     appState.selectedLinearElement &&
-    appState.selectedLinearElement.hoverPointIndex !== -1
+    appState.selectedLinearElement.hoverPointIndex >= 0
   ) {
     renderLinearElementPointHighlight(context, appState, renderConfig);
   }

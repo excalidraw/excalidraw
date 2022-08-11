@@ -11,6 +11,7 @@ import {
   isPathALoop,
   getGridPoint,
   rotatePoint,
+  centerPoint,
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import { getElementPointsCoords } from "./bounds";
@@ -51,6 +52,7 @@ export class LinearElementEditor {
     | "keep";
   public readonly endBindingElement: ExcalidrawBindableElement | null | "keep";
   public readonly hoverPointIndex: number;
+  public readonly midPointHovered: boolean;
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     this.elementId = element.id as string & {
@@ -70,6 +72,7 @@ export class LinearElementEditor {
       lastClickedPoint: -1,
     };
     this.hoverPointIndex = -1;
+    this.midPointHovered = false;
   }
 
   // ---------------------------------------------------------------------------
@@ -157,7 +160,6 @@ export class LinearElementEditor {
     if (!linearElementEditor) {
       return false;
     }
-
     const { selectedPointsIndices, elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
@@ -357,6 +359,59 @@ export class LinearElementEditor {
     };
   }
 
+  static isHittingMidPoint = (
+    linearElementEditor: LinearElementEditor,
+    scenePointer: { x: number; y: number },
+    appState: AppState,
+  ) => {
+    if (appState.editingLinearElement) {
+      return false;
+    }
+    const { elementId } = linearElementEditor;
+    const element = LinearElementEditor.getElement(elementId);
+    if (!element) {
+      return false;
+    }
+    const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+      element,
+      appState.zoom,
+      scenePointer.x,
+      scenePointer.y,
+    );
+    if (clickedPointIndex >= 0) {
+      return false;
+    }
+    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+    if (points.length >= 3) {
+      return false;
+    }
+
+    const midPoint = this.getMidPoint(linearElementEditor);
+    if (midPoint) {
+      const threshold =
+        LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
+      const distance = distance2d(
+        midPoint[0],
+        midPoint[1],
+        scenePointer.x,
+        scenePointer.y,
+      );
+      return distance <= threshold;
+    }
+    return false;
+  };
+
+  static getMidPoint(linearElementEditor: LinearElementEditor) {
+    const { elementId } = linearElementEditor;
+    const element = LinearElementEditor.getElement(elementId);
+    if (!element) {
+      return null;
+    }
+    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+
+    return centerPoint(points[0], points.at(-1)!);
+  }
+
   static handlePointerDown(
     event: React.PointerEvent<HTMLCanvasElement>,
     appState: AppState,
@@ -367,11 +422,13 @@ export class LinearElementEditor {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
+    isMidPoint: boolean;
   } {
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
       linearElementEditor: null,
+      isMidPoint: false,
     };
 
     if (!linearElementEditor) {
@@ -383,6 +440,45 @@ export class LinearElementEditor {
 
     if (!element) {
       return ret;
+    }
+    const hittingMidPoint = LinearElementEditor.isHittingMidPoint(
+      linearElementEditor,
+      scenePointer,
+      appState,
+    );
+    if (
+      LinearElementEditor.isHittingMidPoint(
+        linearElementEditor,
+        scenePointer,
+        appState,
+      )
+    ) {
+      const midPoint = this.getMidPoint(linearElementEditor);
+      if (midPoint) {
+        mutateElement(element, {
+          points: [
+            element.points[0],
+            LinearElementEditor.createPointAt(
+              element,
+              midPoint[0],
+              midPoint[1],
+              appState.gridSize,
+            ),
+            ...element.points.slice(1),
+          ],
+        });
+      }
+      ret.didAddPoint = true;
+      ret.isMidPoint = true;
+      ret.linearElementEditor = {
+        ...linearElementEditor,
+        selectedPointsIndices: element.points[1],
+        pointerDownState: {
+          prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
+          lastClickedPoint: -1,
+        },
+        lastUncommittedPoint: null,
+      };
     }
     if (event.altKey && appState.editingLinearElement) {
       if (linearElementEditor.lastUncommittedPoint == null) {
@@ -397,6 +493,7 @@ export class LinearElementEditor {
             ),
           ],
         });
+        ret.didAddPoint = true;
       }
       history.resumeRecording();
       ret.linearElementEditor = {
@@ -426,7 +523,7 @@ export class LinearElementEditor {
 
     // if we clicked on a point, set the element as hitElement otherwise
     // it would get deselected if the point is outside the hitbox area
-    if (clickedPointIndex > -1) {
+    if (clickedPointIndex >= 0 || hittingMidPoint) {
       ret.hitElement = element;
     } else {
       // You might be wandering why we are storing the binding elements on
@@ -567,14 +664,14 @@ export class LinearElementEditor {
   /** scene coords */
   static getPointsGlobalCoordinates(
     element: NonDeleted<ExcalidrawLinearElement>,
-  ) {
+  ): Point[] {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
     return element.points.map((point) => {
       let { x, y } = element;
       [x, y] = rotate(x + point[0], y + point[1], cx, cy, element.angle);
-      return [x, y];
+      return [x, y] as const;
     });
   }
 
