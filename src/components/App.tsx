@@ -6214,28 +6214,27 @@ if (
     },
   });
 
-  function at(n: any) {
-    // ToInteger() abstract op
-    n = Math.trunc(n) || 0;
-    // Allow negative indexing from the end
-    if (n < 0) {
-      n += this.length;
-    }
-    // OOB access is guaranteed to return undefined
-    if (n < 0 || n >= this.length) {
-      return undefined;
-    }
-    // Otherwise, this is just normal property access
-    return this[n];
-  }
-
-  for (const C of [Array]) {
-    Object.defineProperty(C.prototype, "at", {
-      value: at,
-      writable: true,
-      enumerable: false,
-      configurable: true,
-    });
-  }
+  // Taken from https://github.com/tc39/proposal-relative-indexing-method#polyfill so that it works in tests
+  /* eslint-disable */
+  Object.defineProperty(Array.prototype, "at", {
+    value: function (n: number) {
+      // ToInteger() abstract op
+      n = Math.trunc(n) || 0;
+      // Allow negative indexing from the end
+      if (n < 0) {
+        n += this.length;
+      }
+      // OOB access is guaranteed to return undefined
+      if (n < 0 || n >= this.length) {
+        return undefined;
+      }
+      // Otherwise, this is just normal property access
+      return this[n];
+    },
+    writable: true,
+    enumerable: false,
+    configurable: true,
+  });
 }
+
 export default App;
