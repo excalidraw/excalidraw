@@ -11,6 +11,7 @@ import {
   isPathALoop,
   getGridPoint,
   rotatePoint,
+  centerPoint,
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import { getElementPointsCoords } from "./bounds";
@@ -405,9 +406,7 @@ export class LinearElementEditor {
     }
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
 
-    const centerX = (points.at(0)![0] + points.at(-1)![0]) / 2;
-    const centerY = (points.at(0)![1] + points.at(-1)![1]) / 2;
-    return [centerX, centerY];
+    return centerPoint(points[0], points.at(-1)!);
   }
 
   static handlePointerDown(
@@ -662,14 +661,14 @@ export class LinearElementEditor {
   /** scene coords */
   static getPointsGlobalCoordinates(
     element: NonDeleted<ExcalidrawLinearElement>,
-  ) {
+  ): Point[] {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
     return element.points.map((point) => {
       let { x, y } = element;
       [x, y] = rotate(x + point[0], y + point[1], cx, cy, element.angle);
-      return [x, y];
+      return [x, y] as const;
     });
   }
 

@@ -2,7 +2,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 import oc from "open-color";
 
-import { AppState, BinaryFiles, Zoom } from "../types";
+import { AppState, BinaryFiles, Point, Zoom } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -161,7 +161,7 @@ const renderSingleLinearPoint = (
   context: CanvasRenderingContext2D,
   appState: AppState,
   renderConfig: RenderConfig,
-  point: number[],
+  point: Point,
   isSelected: boolean,
   isPhantomPoint = false,
 ) => {
