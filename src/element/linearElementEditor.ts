@@ -386,7 +386,7 @@ export class LinearElementEditor {
       return false;
     }
 
-    const midPoint = this.getMidPoint(linearElementEditor);
+    const midPoint = LinearElementEditor.getMidPoint(linearElementEditor);
     if (midPoint) {
       const threshold =
         LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
@@ -453,7 +453,7 @@ export class LinearElementEditor {
         appState,
       )
     ) {
-      const midPoint = this.getMidPoint(linearElementEditor);
+      const midPoint = LinearElementEditor.getMidPoint(linearElementEditor);
       if (midPoint) {
         mutateElement(element, {
           points: [
