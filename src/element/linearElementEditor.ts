@@ -51,7 +51,6 @@ export class LinearElementEditor {
     | "keep";
   public readonly endBindingElement: ExcalidrawBindableElement | null | "keep";
   public readonly hoverPointIndex: number;
-  public isHovered: boolean;
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     this.elementId = element.id as string & {
@@ -71,7 +70,6 @@ export class LinearElementEditor {
       lastClickedPoint: -1,
     };
     this.hoverPointIndex = -1;
-    this.isHovered = false;
   }
 
   // ---------------------------------------------------------------------------

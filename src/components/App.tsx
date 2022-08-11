@@ -3036,14 +3036,6 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerY,
         ])
       ) {
-        if (!this.state.selectedLinearElement.isHovered) {
-          this.setState({
-            selectedLinearElement: {
-              ...this.state.selectedLinearElement,
-              isHovered: true,
-            },
-          });
-        }
         hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
           element,
           this.state.zoom,
@@ -3061,13 +3053,6 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
         }
-      } else if (this.state.selectedLinearElement.isHovered) {
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
-            isHovered: false,
-          },
-        });
       } else if (
         shouldShowBoundingBox([element]) &&
         isHittingElementBoundingBoxWithoutHittingElement(

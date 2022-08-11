@@ -163,17 +163,27 @@ const renderSingleLinearPoint = (
   renderConfig: RenderConfig,
   point: number[],
   isSelected: boolean,
+  isPhantomPoint = false,
 ) => {
   context.strokeStyle = "#5e5ad8";
   context.setLineDash([]);
-  context.fillStyle = isSelected
-    ? "rgba(134, 131, 226, 0.9)"
-    : "rgba(255, 255, 255, 0.9)";
+  context.fillStyle = "rgba(255, 255, 255, 0.9)";
+  if (isSelected) {
+    context.fillStyle = "rgba(134, 131, 226, 0.9)";
+  } else if (isPhantomPoint) {
+    context.fillStyle = "rgba(177, 151, 252, 0.7)";
+  }
   const { POINT_HANDLE_SIZE } = LinearElementEditor;
   const radius = appState.editingLinearElement
     ? POINT_HANDLE_SIZE
     : POINT_HANDLE_SIZE / 2;
-  fillCircle(context, point[0], point[1], radius / renderConfig.zoom.value);
+  fillCircle(
+    context,
+    point[0],
+    point[1],
+    radius / renderConfig.zoom.value,
+    !isPhantomPoint,
+  );
 };
 
 const renderLinearPointHandles = (
@@ -196,17 +206,14 @@ const renderLinearPointHandles = (
     renderSingleLinearPoint(context, appState, renderConfig, point, isSelected);
   });
 
-  if (
-    !appState.editingLinearElement &&
-    appState.selectedLinearElement?.isHovered &&
-    points.length < 3
-  ) {
+  if (!appState.editingLinearElement && points.length < 3) {
     renderSingleLinearPoint(
       context,
       appState,
       renderConfig,
       [centerX, centerY],
       false,
+      true,
     );
   }
 
