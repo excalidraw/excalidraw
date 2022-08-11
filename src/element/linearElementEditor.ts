@@ -715,7 +715,8 @@ export class LinearElementEditor {
     x: number,
     y: number,
   ) {
-    const pointHandles = this.getPointsGlobalCoordinates(element);
+    const pointHandles =
+      LinearElementEditor.getPointsGlobalCoordinates(element);
     let idx = pointHandles.length;
     // loop from right to left because points on the right are rendered over
     // points on the left, thus should take precedence when clicking, if they
