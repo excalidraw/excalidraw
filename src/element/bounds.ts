@@ -237,48 +237,40 @@ const getFreeDrawElementAbsoluteCoords = (
   ];
 };
 
+const getLinearElementBound = (
+  element: ExcalidrawLinearElement,
+  transformXY?: (x: number, y: number) => [number, number],
+): [number, number, number, number] => {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  const points = transformXY
+    ? element.points.map((p) => transformXY(p[0], p[1]))
+    : element.points;
+
+  for (const [x, y] of points) {
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+
+  return [minX, minY, maxX, maxY];
+};
+
 const getLinearElementAbsoluteCoords = (
   element: ExcalidrawLinearElement,
 ): [number, number, number, number] => {
-  let coords: [number, number, number, number];
+  const [minX, minY, maxX, maxY] = getLinearElementBound(element);
 
-  if (element.points.length < 2 || !getShapeForElement(element)) {
-    // XXX this is just a poor estimate and not very useful
-    const { minX, minY, maxX, maxY } = element.points.reduce(
-      (limits, [x, y]) => {
-        limits.minY = Math.min(limits.minY, y);
-        limits.minX = Math.min(limits.minX, x);
-
-        limits.maxX = Math.max(limits.maxX, x);
-        limits.maxY = Math.max(limits.maxY, y);
-
-        return limits;
-      },
-      { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
-    );
-    coords = [
-      minX + element.x,
-      minY + element.y,
-      maxX + element.x,
-      maxY + element.y,
-    ];
-  } else {
-    const shape = getShapeForElement(element)!;
-
-    // first element is always the curve
-    const ops = getCurvePathOps(shape[0]);
-
-    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
-
-    coords = [
-      minX + element.x,
-      minY + element.y,
-      maxX + element.x,
-      maxY + element.y,
-    ];
-  }
-
-  return coords;
+  return [
+    minX + element.x,
+    minY + element.y,
+    maxX + element.x,
+    maxY + element.y,
+  ];
 };
 
 export const getArrowheadPoints = (
@@ -404,14 +396,9 @@ const getLinearElementRotatedBounds = (
     return [minX, minY, maxX, maxY];
   }
 
-  const shape = getShapeForElement(element)!;
-
-  // first element is always the curve
-  const ops = getCurvePathOps(shape[0]);
-
   const transformXY = (x: number, y: number) =>
     rotate(element.x + x, element.y + y, cx, cy, element.angle);
-  return getMinMaxXYFromCurvePathOps(ops, transformXY);
+  return getLinearElementBound(element, transformXY);
 };
 
 // We could cache this stuff
@@ -520,20 +507,7 @@ export const getResizedElementAbsoluteCoords = (
     // Free Draw
     bounds = getBoundsFromPoints(points);
   } else {
-    // Line
-    const gen = rough.generator();
-    const curve =
-      element.strokeSharpness === "sharp"
-        ? gen.linearPath(
-            points as [number, number][],
-            generateRoughOptions(element),
-          )
-        : gen.curve(
-            points as [number, number][],
-            generateRoughOptions(element),
-          );
-    const ops = getCurvePathOps(curve);
-    bounds = getMinMaxXYFromCurvePathOps(ops);
+    bounds = getLinearElementBound(element);
   }
 
   const [minX, minY, maxX, maxY] = bounds;
