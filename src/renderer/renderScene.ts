@@ -241,7 +241,7 @@ const renderLinearPointHandles = (
 };
 
 const highlightPoint = (
-  point: readonly number[],
+  point: Point,
   context: CanvasRenderingContext2D,
   appState: AppState,
   renderConfig: RenderConfig,
