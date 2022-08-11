@@ -1,3 +1,4 @@
+import polyfill from "../polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
@@ -83,6 +84,7 @@ import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 
+polyfill();
 window.EXCALIDRAW_THROTTLE_RENDER = true;
 
 const isExcalidrawPlusSignedUser = document.cookie.includes(
