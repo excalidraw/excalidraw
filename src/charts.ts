@@ -197,13 +197,17 @@ const chartXLabels = (
   groupId: string,
   backgroundColor: string,
 ): ChartElements => {
+  const custom = selectSubtype(spreadsheet, "text");
   return (
     spreadsheet.labels?.map((label, index) => {
       return newTextElement({
         groupIds: [groupId],
         backgroundColor,
         ...commonProps,
-        text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
+        text:
+          label.length > 8 && custom.subtype === undefined
+            ? `${label.slice(0, 5)}...`
+            : label,
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
         y: y + BAR_GAP / 2,
         width: BAR_WIDTH,
@@ -211,7 +215,7 @@ const chartXLabels = (
         fontSize: 16,
         textAlign: "center",
         verticalAlign: "top",
-        ...selectSubtype(spreadsheet, "text"),
+        ...custom,
       });
     }) || []
   );
