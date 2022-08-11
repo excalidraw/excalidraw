@@ -3043,7 +3043,7 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         );
-        midPointHovered = !!LinearElementEditor.isHittingMidPoint(
+        midPointHovered = LinearElementEditor.isHittingMidPoint(
           linearElementEditor,
           { x: scenePointerX, y: scenePointerY },
           this.state,
@@ -3621,7 +3621,6 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
       } else {
-        let isMidPoint = false;
         if (this.state.selectedLinearElement) {
           const linearElementEditor =
             this.state.editingLinearElement || this.state.selectedLinearElement;
@@ -3642,7 +3641,6 @@ class App extends React.Component<AppProps, AppState> {
               this.setState({ editingLinearElement: ret.linearElementEditor });
             }
           }
-          isMidPoint = ret.isMidPoint;
           if (ret.didAddPoint && !ret.isMidPoint) {
             return true;
           }
@@ -3690,9 +3688,7 @@ class App extends React.Component<AppProps, AppState> {
         if (
           (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
-          !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
-          // checking isMidPoint since "hitTestLinear" returns false when adding midpoint outside editor
-          !isMidPoint
+          !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
         ) {
           this.clearSelection(hitElement);
         }

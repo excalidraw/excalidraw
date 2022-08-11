@@ -369,7 +369,7 @@ export class LinearElementEditor {
     const { elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
-      return;
+      return false;
     }
     const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
       element,
@@ -401,7 +401,7 @@ export class LinearElementEditor {
     const { elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
-      return;
+      return null;
     }
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
 

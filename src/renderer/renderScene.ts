@@ -199,10 +199,12 @@ const renderLinearPointHandles = (
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
   context.lineWidth = 1 / renderConfig.zoom.value;
   const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-  const [centerX, centerY] = LinearElementEditor.getMidPoint(
+  const centerPoint = LinearElementEditor.getMidPoint(
     appState.selectedLinearElement,
-  )!;
-
+  );
+  if (!centerPoint) {
+    return;
+  }
   points.forEach((point, idx) => {
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
@@ -220,7 +222,7 @@ const renderLinearPointHandles = (
         context,
         appState,
         renderConfig,
-        [centerX, centerY],
+        centerPoint,
         false,
       );
     } else {
@@ -228,7 +230,7 @@ const renderLinearPointHandles = (
         context,
         appState,
         renderConfig,
-        [centerX, centerY],
+        centerPoint,
         false,
         true,
       );
