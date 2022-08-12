@@ -3642,7 +3642,7 @@ class App extends React.Component<AppProps, AppState> {
               this.setState({ editingLinearElement: ret.linearElementEditor });
             }
           }
-          if (ret.didAddPoint && !ret.isMidPointOutsideEditor) {
+          if (ret.didAddPoint && !ret.isMidPoint) {
             return true;
           }
         }
@@ -3666,6 +3666,7 @@ class App extends React.Component<AppProps, AppState> {
           ) {
             return false;
           }
+
           pointerDownState.hit.hasHitElementInside =
             isHittingElementNotConsideringBoundingBox(
               pointerDownState.hit.element,

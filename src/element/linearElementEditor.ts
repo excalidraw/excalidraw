@@ -419,13 +419,13 @@ export class LinearElementEditor {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
-    isMidPointOutsideEditor: boolean;
+    isMidPoint: boolean;
   } {
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
       linearElementEditor: null,
-      isMidPointOutsideEditor: false,
+      isMidPoint: false,
     };
 
     if (!linearElementEditor) {
@@ -466,9 +466,7 @@ export class LinearElementEditor {
         });
       }
       ret.didAddPoint = true;
-      if (!appState.editingLinearElement) {
-        ret.isMidPointOutsideEditor = true;
-      }
+      ret.isMidPoint = true;
       ret.linearElementEditor = {
         ...linearElementEditor,
         selectedPointsIndices: element.points[1],
