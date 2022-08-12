@@ -653,11 +653,11 @@ const resizeMultipleElements = (
   const [cx, cy] = centerPoint([x1, y1], [x2, y2]);
   const direction = transformHandleType;
 
-  const mapDirectionsToAnchors = {
-    ne: [x1, y2] as Point,
-    se: [x1, y1] as Point,
-    sw: [x2, y1] as Point,
-    nw: [x2, y2] as Point,
+  const mapDirectionsToAnchors: Record<typeof direction, Point> = {
+    ne: [x1, y2],
+    se: [x1, y1],
+    sw: [x2, y1],
+    nw: [x2, y2],
   };
 
   // anchor point must be on the opposite side of the dragged selection handle
@@ -696,7 +696,7 @@ const resizeMultipleElements = (
     const textSize: Pick<Update, "fontSize" | "baseline"> = {};
     const boundTextElement = getBoundTextElement(element);
     const optionalPadding = boundTextElement ? BOUND_TEXT_PADDING * 2 : 0;
-    if (boundTextElement || element.type === "text") {
+    if (boundTextElement || isTextElement(element)) {
       const text = measureFontSizeFromWH(
         boundTextElement ?? (element as ExcalidrawTextElement),
         width - optionalPadding,

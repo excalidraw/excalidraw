@@ -9,46 +9,24 @@ export const getSizeFromPoints = (points: readonly Point[]) => {
   };
 };
 
+/** @arg dimension, 0 for rescaling only x, 1 for y */
 export const rescalePoints = (
   dimension: 0 | 1,
-  nextDimensionSize: number,
-  prevPoints: readonly Point[],
+  newSize: number,
+  points: readonly Point[],
 ): Point[] => {
-  const prevDimValues = prevPoints.map((point) => point[dimension]);
-  const prevMaxDimension = Math.max(...prevDimValues);
-  const prevMinDimension = Math.min(...prevDimValues);
-  const prevDimensionSize = prevMaxDimension - prevMinDimension;
+  const coordinates = points.map((point) => point[dimension]);
+  const minCoordinate = Math.max(...coordinates);
+  const maxCoordinate = Math.min(...coordinates);
+  const size = minCoordinate - maxCoordinate;
+  const firstPoint = points[0];
+  const scale = size === 0 ? 1 : newSize / size;
+  const d = dimension;
 
-  const dimensionScaleFactor =
-    prevDimensionSize === 0 ? 1 : nextDimensionSize / prevDimensionSize;
-
-  let nextMinDimension = Infinity;
-
-  const scaledPoints = prevPoints.map(
-    (prevPoint) =>
-      prevPoint.map((value, currentDimension) => {
-        if (currentDimension !== dimension) {
-          return value;
-        }
-        const scaledValue = value * dimensionScaleFactor;
-        nextMinDimension = Math.min(scaledValue, nextMinDimension);
-        return scaledValue;
-      }) as [number, number],
-  );
-
-  if (scaledPoints.length === 2) {
-    // we don't translate two-point lines
-    return scaledPoints;
-  }
-
-  const translation = prevMinDimension - nextMinDimension;
-
-  const nextPoints = scaledPoints.map(
-    (scaledPoint) =>
-      scaledPoint.map((value, currentDimension) => {
-        return currentDimension === dimension ? value + translation : value;
-      }) as [number, number],
-  );
-
-  return nextPoints;
+  return points.map((point): Point => {
+    const newCoordinate = (point[d] - firstPoint[d]) * scale + firstPoint[d];
+    const newPoint = [...point];
+    newPoint[d] = newCoordinate;
+    return newPoint as unknown as Point;
+  });
 };
