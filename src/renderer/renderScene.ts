@@ -238,9 +238,9 @@ const renderLinearPointHandles = (
           radius,
           false,
         );
-        highlightPoint(centerPoint, radius, context, renderConfig);
+        highlightPoint(centerPoint, context, renderConfig);
       } else {
-        highlightPoint(centerPoint, radius, context, renderConfig);
+        highlightPoint(centerPoint, context, renderConfig);
         renderSingleLinearPoint(
           context,
           appState,
@@ -268,7 +268,6 @@ const renderLinearPointHandles = (
 
 const highlightPoint = (
   point: Point,
-  radius: number,
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
 ) => {
@@ -306,12 +305,7 @@ const renderLinearElementPointHighlight = (
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
 
-  highlightPoint(
-    point,
-    LinearElementEditor.POINT_HANDLE_SIZE / 2,
-    context,
-    renderConfig,
-  );
+  highlightPoint(point, context, renderConfig);
   context.restore();
 };
 
