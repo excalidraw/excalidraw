@@ -162,6 +162,7 @@ const renderSingleLinearPoint = (
   appState: AppState,
   renderConfig: RenderConfig,
   point: Point,
+  radius: number,
   isSelected: boolean,
   isPhantomPoint = false,
 ) => {
@@ -173,10 +174,7 @@ const renderSingleLinearPoint = (
   } else if (isPhantomPoint) {
     context.fillStyle = "rgba(177, 151, 252, 0.7)";
   }
-  const { POINT_HANDLE_SIZE } = LinearElementEditor;
-  const radius = appState.editingLinearElement
-    ? POINT_HANDLE_SIZE
-    : POINT_HANDLE_SIZE / 2;
+
   fillCircle(
     context,
     point[0],
@@ -205,32 +203,60 @@ const renderLinearPointHandles = (
   if (!centerPoint) {
     return;
   }
+  const { POINT_HANDLE_SIZE } = LinearElementEditor;
+
   points.forEach((point, idx) => {
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
-    renderSingleLinearPoint(context, appState, renderConfig, point, isSelected);
+    const radius = appState.editingLinearElement
+      ? POINT_HANDLE_SIZE
+      : POINT_HANDLE_SIZE / 2;
+    renderSingleLinearPoint(
+      context,
+      appState,
+      renderConfig,
+      point,
+      radius,
+      isSelected,
+    );
   });
 
-  if (!appState.editingLinearElement && points.length < 3) {
+  if (points.length < 3) {
     if (appState.selectedLinearElement.midPointHovered) {
       const centerPoint = LinearElementEditor.getMidPoint(
         appState.selectedLinearElement,
       )!;
-      highlightPoint(centerPoint, context, appState, renderConfig);
-
-      renderSingleLinearPoint(
-        context,
-        appState,
-        renderConfig,
-        centerPoint,
-        false,
-      );
+      const radius = appState.editingLinearElement
+        ? POINT_HANDLE_SIZE
+        : POINT_HANDLE_SIZE / 2;
+      if (appState.editingLinearElement) {
+        renderSingleLinearPoint(
+          context,
+          appState,
+          renderConfig,
+          centerPoint,
+          radius,
+          false,
+        );
+        highlightPoint(centerPoint, radius, context, renderConfig);
+      } else {
+        highlightPoint(centerPoint, radius, context, renderConfig);
+        renderSingleLinearPoint(
+          context,
+          appState,
+          renderConfig,
+          centerPoint,
+          radius,
+          false,
+        );
+      }
     } else {
       renderSingleLinearPoint(
         context,
         appState,
         renderConfig,
         centerPoint,
+        POINT_HANDLE_SIZE / 2,
         false,
         true,
       );
@@ -242,8 +268,8 @@ const renderLinearPointHandles = (
 
 const highlightPoint = (
   point: Point,
+  radius: number,
   context: CanvasRenderingContext2D,
-  appState: AppState,
   renderConfig: RenderConfig,
 ) => {
   context.fillStyle = "rgba(105, 101, 219, 0.4)";
@@ -280,7 +306,12 @@ const renderLinearElementPointHighlight = (
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
 
-  highlightPoint(point, context, appState, renderConfig);
+  highlightPoint(
+    point,
+    LinearElementEditor.POINT_HANDLE_SIZE / 2,
+    context,
+    renderConfig,
+  );
   context.restore();
 };
 
