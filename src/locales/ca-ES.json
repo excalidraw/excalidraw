@@ -195,7 +195,7 @@
     "fileTooBig": "El fitxer és massa gros. La mida màxima permesa és {{maxSize}}.",
     "svgImageInsertError": "No ha estat possible inserir la imatge SVG. Les marques SVG semblen invàlides.",
     "invalidSVGString": "SVG no vàlid.",
-    "cannotResolveCollabServer": "",
+    "cannotResolveCollabServer": "No ha estat possible connectar amb el servidor collab. Si us plau recarregueu la pàgina i torneu a provar.",
     "importLibraryError": "No s'ha pogut carregar la biblioteca"
   },
   "toolBar": {
@@ -324,7 +324,7 @@
       "authorName": "Nom o usuari",
       "libraryName": "Nom de la vostra biblioteca",
       "libraryDesc": "Descripció de la biblioteca per a ajudar a la gent a entendre'n el funcionament",
-      "githubHandle": "",
+      "githubHandle": "Identificador de GitHub (opcional), per tal que pugueu editar la biblioteca una vegada enviada per a ser revisada",
       "twitterHandle": "Usuari de twitter (opcional), per tal que puguem donar-vos crèdit quan fem la promoció a Twitter",
       "website": "Enllaç al vostre lloc web personal o a qualsevol altre (opcional)"
     },
