@@ -16,9 +16,9 @@ export const rescalePoints = (
   points: readonly Point[],
 ): Point[] => {
   const coordinates = points.map((point) => point[dimension]);
-  const minCoordinate = Math.max(...coordinates);
-  const maxCoordinate = Math.min(...coordinates);
-  const size = minCoordinate - maxCoordinate;
+  const maxCoordinate = Math.max(...coordinates);
+  const minCoordinate = Math.min(...coordinates);
+  const size = maxCoordinate - minCoordinate;
   const scale = size === 0 ? 1 : newSize / size;
 
   return points.map((point): Point => {
