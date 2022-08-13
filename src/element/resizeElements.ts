@@ -724,41 +724,55 @@ const resizeMultipleElements = (
     const x = anchorX + (element.orig.x - anchorX) * scale;
     const y = anchorY + (element.orig.y - anchorY) * scale;
 
-    // update font size if this is a text element or it has text inside
-    const textSize: { fontSize?: number; baseline?: number } = {};
-    const boundTextElement = getBoundTextElement(element.latest);
-    const optionalPadding = boundTextElement ? BOUND_TEXT_PADDING * 2 : 0;
-    if (boundTextElement || isTextElement(element.orig)) {
-      const text = measureFontSizeFromWH(
-        boundTextElement ?? (element.orig as ExcalidrawTextElement),
-        width - optionalPadding,
-        height - optionalPadding,
-      );
-      if (text) {
-        textSize.fontSize = text.size;
-        textSize.baseline = text.baseline;
-      }
-    }
-
     // readjust points for linear & free draw elements
     const rescaledPoints = rescalePointsInElement(element.orig, width, height);
 
-    const update = {
+    const update: {
+      width: number;
+      height: number;
+      x: number;
+      y: number;
+      points?: Point[];
+      fontSize?: number;
+      baseline?: number;
+    } = {
       width,
       height,
       x,
       y,
       ...rescaledPoints,
-      ...textSize,
     };
+
+    let boundTextUpdates: { fontSize: number; baseline: number } | null = null;
+
+    const boundTextElement = getBoundTextElement(element.latest);
+
+    if (boundTextElement || isTextElement(element.orig)) {
+      const optionalPadding = boundTextElement ? BOUND_TEXT_PADDING * 2 : 0;
+      const textMeasurements = measureFontSizeFromWH(
+        boundTextElement ?? (element.orig as ExcalidrawTextElement),
+        width - optionalPadding,
+        height - optionalPadding,
+      );
+      if (textMeasurements) {
+        if (isTextElement(element.orig)) {
+          update.fontSize = textMeasurements.size;
+          update.baseline = textMeasurements.baseline;
+        }
+
+        if (boundTextElement) {
+          boundTextUpdates = {
+            fontSize: textMeasurements.size,
+            baseline: textMeasurements.baseline,
+          };
+        }
+      }
+    }
 
     mutateElement(element.latest, update);
 
-    if (boundTextElement) {
-      mutateElement(boundTextElement, {
-        fontSize: textSize.fontSize,
-        baseline: textSize.baseline,
-      });
+    if (boundTextElement && boundTextUpdates) {
+      mutateElement(boundTextElement, boundTextUpdates);
       handleBindTextResize(element.latest, transformHandleType);
     }
   });
