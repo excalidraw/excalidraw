@@ -647,11 +647,31 @@ const resizeMultipleElements = (
   pointerX: number,
   pointerY: number,
 ) => {
-  const elementsAtResizeStart = selectedElements.map(
-    ({ id }) => pointerDownState.originalElements.get(id)!,
+  // map selected elements to the original elements. While it never should
+  // happen that pointerDownState.originalElements won't contain the selected
+  // elements during resize, this coupling isn't guaranteed, so to ensure
+  // type safety we need to transform only those elements we filter.
+  const targetElements = selectedElements.reduce(
+    (
+      acc: {
+        /** element at resize start */
+        orig: NonDeletedExcalidrawElement;
+        /** latest element */
+        latest: NonDeletedExcalidrawElement;
+      }[],
+      element,
+    ) => {
+      const origElement = pointerDownState.originalElements.get(element.id);
+      if (origElement) {
+        acc.push({ orig: origElement, latest: element });
+      }
+      return acc;
+    },
+    [],
   );
+
   const { minX, minY, maxX, maxY, midX, midY } = getCommonBoundingBox(
-    elementsAtResizeStart,
+    targetElements.map(({ orig }) => orig),
   );
   const direction = transformHandleType;
 
@@ -698,52 +718,48 @@ const resizeMultipleElements = (
     return;
   }
 
-  interface Update {
-    width: number;
-    height: number;
-    x: number;
-    y: number;
-    points?: Point[];
-    fontSize?: number;
-    baseline?: number;
-  }
-
-  const updates = elementsAtResizeStart.map((element) => {
-    const width = element.width * scale;
-    const height = element.height * scale;
-    const x = anchorX + (element.x - anchorX) * scale;
-    const y = anchorY + (element.y - anchorY) * scale;
+  targetElements.forEach((element) => {
+    const width = element.orig.width * scale;
+    const height = element.orig.height * scale;
+    const x = anchorX + (element.orig.x - anchorX) * scale;
+    const y = anchorY + (element.orig.y - anchorY) * scale;
 
     // update font size if this is a text element or it has text inside
-    const textSize: Pick<Update, "fontSize" | "baseline"> = {};
-    const boundTextElement = getBoundTextElement(element);
+    const textSize: { fontSize?: number; baseline?: number } = {};
+    const boundTextElement = getBoundTextElement(element.latest);
     const optionalPadding = boundTextElement ? BOUND_TEXT_PADDING * 2 : 0;
-    if (boundTextElement || isTextElement(element)) {
+    if (boundTextElement || isTextElement(element.orig)) {
       const text = measureFontSizeFromWH(
-        boundTextElement ?? (element as ExcalidrawTextElement),
+        boundTextElement ?? (element.orig as ExcalidrawTextElement),
         width - optionalPadding,
         height - optionalPadding,
       );
-      textSize.fontSize = text?.size;
-      textSize.baseline = text?.baseline;
+      if (text) {
+        textSize.fontSize = text.size;
+        textSize.baseline = text.baseline;
+      }
     }
 
     // readjust points for linear & free draw elements
-    const rescaledPoints = rescalePointsInElement(element, width, height);
+    const rescaledPoints = rescalePointsInElement(element.orig, width, height);
 
-    return { width, height, x, y, ...rescaledPoints, ...textSize } as Update;
-  });
+    const update = {
+      width,
+      height,
+      x,
+      y,
+      ...rescaledPoints,
+      ...textSize,
+    };
 
-  selectedElements.forEach((element, i) => {
-    const update = updates[i];
-    const { fontSize, baseline } = update;
-    const boundTextElement = getBoundTextElement(element);
-
-    mutateElement(element, update);
+    mutateElement(element.latest, update);
 
     if (boundTextElement) {
-      mutateElement(boundTextElement, { fontSize, baseline });
-      handleBindTextResize(element, transformHandleType);
+      mutateElement(boundTextElement, {
+        fontSize: textSize.fontSize,
+        baseline: textSize.baseline,
+      });
+      handleBindTextResize(element.latest, transformHandleType);
     }
   });
 };
