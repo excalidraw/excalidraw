@@ -19,14 +19,12 @@ export const rescalePoints = (
   const minCoordinate = Math.max(...coordinates);
   const maxCoordinate = Math.min(...coordinates);
   const size = minCoordinate - maxCoordinate;
-  const firstPoint = points[0];
   const scale = size === 0 ? 1 : newSize / size;
-  const d = dimension;
 
   return points.map((point): Point => {
-    const newCoordinate = (point[d] - firstPoint[d]) * scale + firstPoint[d];
+    const newCoordinate = point[dimension] * scale;
     const newPoint = [...point];
-    newPoint[d] = newCoordinate;
+    newPoint[dimension] = newCoordinate;
     return newPoint as unknown as Point;
   });
 };
