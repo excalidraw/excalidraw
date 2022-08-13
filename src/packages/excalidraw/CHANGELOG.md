@@ -19,6 +19,14 @@ Please add the latest change on the top under the correct section.
 
 - `setToastMessage` API is now renamed to `setToast` API and the function signature is also updated [#5427](https://github.com/excalidraw/excalidraw/pull/5427). You can also pass `duration` and `closable` attributes along with `message`.
 
+### Excalidraw Library
+
+#### Fixes
+
+- Fix shifting of a multiple linear or free draw elements when resizing [#5560](https://github.com/excalidraw/excalidraw/pull/5560)
+
+- Resize multiple elements from center [#5560](https://github.com/excalidraw/excalidraw/pull/5560)
+
 ## 0.12.0 (2022-07-07)
 
 ### Excalidraw API
