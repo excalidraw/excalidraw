@@ -18,6 +18,7 @@ import {
   getElementAbsoluteCoords,
   getCommonBounds,
   getResizedElementAbsoluteCoords,
+  getCommonBoundingBox,
 } from "./bounds";
 import {
   isFreeDrawElement,
@@ -649,27 +650,28 @@ const resizeMultipleElements = (
   const elementsAtResizeStart = selectedElements.map(
     ({ id }) => pointerDownState.originalElements.get(id)!,
   );
-  const [x1, y1, x2, y2] = getCommonBounds(elementsAtResizeStart);
-  const [cx, cy] = centerPoint([x1, y1], [x2, y2]);
+  const { minX, minY, maxX, maxY, midX, midY } = getCommonBoundingBox(
+    elementsAtResizeStart,
+  );
   const direction = transformHandleType;
 
   const mapDirectionsToAnchors: Record<typeof direction, Point> = {
-    ne: [x1, y2],
-    se: [x1, y1],
-    sw: [x2, y1],
-    nw: [x2, y2],
+    ne: [minX, maxY],
+    se: [minX, minY],
+    sw: [maxX, minY],
+    nw: [maxX, maxY],
   };
 
   // anchor point must be on the opposite side of the dragged selection handle
   // or be the center of the selection if alt is pressed
   const [anchorX, anchorY]: Point = shouldResizeFromCenter
-    ? [cx, cy]
+    ? [midX, midY]
     : mapDirectionsToAnchors[direction];
 
   const scale =
     Math.max(
-      Math.abs(pointerX - anchorX) / (x2 - x1),
-      Math.abs(pointerY - anchorY) / (y2 - y1),
+      Math.abs(pointerX - anchorX) / (maxX - minX),
+      Math.abs(pointerY - anchorY) / (maxY - minY),
     ) * (shouldResizeFromCenter ? 2 : 1);
 
   if (scale === 1) {
@@ -686,7 +688,7 @@ const resizeMultipleElements = (
     baseline?: number;
   }
 
-  const updates = elementsAtResizeStart.map((element, i) => {
+  const updates = elementsAtResizeStart.map((element) => {
     const width = element.width * scale;
     const height = element.height * scale;
     const x = anchorX + (element.x - anchorX) * scale;
