@@ -668,10 +668,30 @@ const resizeMultipleElements = (
     ? [midX, midY]
     : mapDirectionsToAnchors[direction];
 
+  const mapDirectionsToPointerSides: Record<
+    typeof direction,
+    [x: boolean, y: boolean]
+  > = {
+    ne: [pointerX >= anchorX, pointerY <= anchorY],
+    se: [pointerX >= anchorX, pointerY >= anchorY],
+    sw: [pointerX <= anchorX, pointerY >= anchorY],
+    nw: [pointerX <= anchorX, pointerY <= anchorY],
+  };
+
+  // pointer side relative to anchor
+  const [pointerSideX, pointerSideY] = mapDirectionsToPointerSides[
+    direction
+  ].map((condition) => (condition ? 1 : -1));
+
+  // stop resizing if a pointer is on the other side of selection
+  if (pointerSideX < 0 && pointerSideY < 0) {
+    return;
+  }
+
   const scale =
     Math.max(
-      Math.abs(pointerX - anchorX) / (maxX - minX),
-      Math.abs(pointerY - anchorY) / (maxY - minY),
+      (pointerSideX * Math.abs(pointerX - anchorX)) / (maxX - minX),
+      (pointerSideY * Math.abs(pointerY - anchorY)) / (maxY - minY),
     ) * (shouldResizeFromCenter ? 2 : 1);
 
   if (scale === 1) {
