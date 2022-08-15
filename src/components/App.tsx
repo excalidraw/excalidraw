@@ -1240,41 +1240,43 @@ class App extends React.Component<AppProps, AppState> {
       });
 
     renderScene(
-      renderingElements,
-      this.state,
-      window.devicePixelRatio,
-      this.rc!,
-      this.canvas!,
       {
-        scrollX: this.state.scrollX,
-        scrollY: this.state.scrollY,
-        viewBackgroundColor: this.state.viewBackgroundColor,
-        zoom: this.state.zoom,
-        remotePointerViewportCoords: pointerViewportCoords,
-        remotePointerButton: cursorButton,
-        remoteSelectedElementIds,
-        remotePointerUsernames: pointerUsernames,
-        remotePointerUserStates: pointerUserStates,
-        shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
-        theme: this.state.theme,
-        imageCache: this.imageCache,
-        isExporting: false,
-        renderScrollbars: !this.device.isMobile,
-      },
-      ({ atLeastOneVisibleElement, scrollBars }) => {
-        if (scrollBars) {
-          currentScrollBars = scrollBars;
-        }
-        const scrolledOutside =
-          // hide when editing text
-          isTextElement(this.state.editingElement)
-            ? false
-            : !atLeastOneVisibleElement && renderingElements.length > 0;
-        if (this.state.scrolledOutside !== scrolledOutside) {
-          this.setState({ scrolledOutside });
-        }
+        elements: renderingElements,
+        appState: this.state,
+        scale: window.devicePixelRatio,
+        rc: this.rc!,
+        canvas: this.canvas!,
+        renderConfig: {
+          scrollX: this.state.scrollX,
+          scrollY: this.state.scrollY,
+          viewBackgroundColor: this.state.viewBackgroundColor,
+          zoom: this.state.zoom,
+          remotePointerViewportCoords: pointerViewportCoords,
+          remotePointerButton: cursorButton,
+          remoteSelectedElementIds,
+          remotePointerUsernames: pointerUsernames,
+          remotePointerUserStates: pointerUserStates,
+          shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
+          theme: this.state.theme,
+          imageCache: this.imageCache,
+          isExporting: false,
+          renderScrollbars: !this.device.isMobile,
+        },
+        callback: ({ atLeastOneVisibleElement, scrollBars }) => {
+          if (scrollBars) {
+            currentScrollBars = scrollBars;
+          }
+          const scrolledOutside =
+            // hide when editing text
+            isTextElement(this.state.editingElement)
+              ? false
+              : !atLeastOneVisibleElement && renderingElements.length > 0;
+          if (this.state.scrolledOutside !== scrolledOutside) {
+            this.setState({ scrolledOutside });
+          }
 
-        this.scheduleImageRefresh();
+          this.scheduleImageRefresh();
+        },
       },
       THROTTLE_NEXT_RENDER && window.EXCALIDRAW_THROTTLE_RENDER === true,
     );

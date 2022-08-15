@@ -284,478 +284,475 @@ const renderLinearElementPointHighlight = (
   context.restore();
 };
 
-export const _renderScene = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
-  scale: number,
-  rc: RoughCanvas,
-  canvas: HTMLCanvasElement,
-  renderConfig: RenderConfig,
+export const _renderScene = ({
+  elements,
+  appState,
+  scale,
+  rc,
+  canvas,
+  renderConfig,
+}: {
+  elements: readonly NonDeletedExcalidrawElement[];
+  appState: AppState;
+  scale: number;
+  rc: RoughCanvas;
+  canvas: HTMLCanvasElement;
+  renderConfig: RenderConfig;
+}) =>
   // extra options passed to the renderer
-) => {
-  if (canvas === null) {
-    return { atLeastOneVisibleElement: false };
-  }
-  const {
-    renderScrollbars = true,
-    renderSelection = true,
-    renderGrid = true,
-    isExporting,
-  } = renderConfig;
+  {
+    if (canvas === null) {
+      return { atLeastOneVisibleElement: false };
+    }
+    const {
+      renderScrollbars = true,
+      renderSelection = true,
+      renderGrid = true,
+      isExporting,
+    } = renderConfig;
 
-  const context = canvas.getContext("2d")!;
+    const context = canvas.getContext("2d")!;
 
-  context.setTransform(1, 0, 0, 1, 0, 0);
-  context.save();
-  context.scale(scale, scale);
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.save();
+    context.scale(scale, scale);
 
-  // When doing calculations based on canvas width we should used normalized one
-  const normalizedCanvasWidth = canvas.width / scale;
-  const normalizedCanvasHeight = canvas.height / scale;
+    // When doing calculations based on canvas width we should used normalized one
+    const normalizedCanvasWidth = canvas.width / scale;
+    const normalizedCanvasHeight = canvas.height / scale;
 
-  if (isExporting && renderConfig.theme === "dark") {
-    context.filter = THEME_FILTER;
-  }
+    if (isExporting && renderConfig.theme === "dark") {
+      context.filter = THEME_FILTER;
+    }
 
-  // Paint background
-  if (typeof renderConfig.viewBackgroundColor === "string") {
-    const hasTransparence =
-      renderConfig.viewBackgroundColor === "transparent" ||
-      renderConfig.viewBackgroundColor.length === 5 || // #RGBA
-      renderConfig.viewBackgroundColor.length === 9 || // #RRGGBBA
-      /(hsla|rgba)\(/.test(renderConfig.viewBackgroundColor);
-    if (hasTransparence) {
+    // Paint background
+    if (typeof renderConfig.viewBackgroundColor === "string") {
+      const hasTransparence =
+        renderConfig.viewBackgroundColor === "transparent" ||
+        renderConfig.viewBackgroundColor.length === 5 || // #RGBA
+        renderConfig.viewBackgroundColor.length === 9 || // #RRGGBBA
+        /(hsla|rgba)\(/.test(renderConfig.viewBackgroundColor);
+      if (hasTransparence) {
+        context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
+      }
+      context.save();
+      context.fillStyle = renderConfig.viewBackgroundColor;
+      context.fillRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
+      context.restore();
+    } else {
       context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
     }
+
+    // Apply zoom
     context.save();
-    context.fillStyle = renderConfig.viewBackgroundColor;
-    context.fillRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
-    context.restore();
-  } else {
-    context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
-  }
+    context.scale(renderConfig.zoom.value, renderConfig.zoom.value);
 
-  // Apply zoom
-  context.save();
-  context.scale(renderConfig.zoom.value, renderConfig.zoom.value);
-
-  // Grid
-  if (renderGrid && appState.gridSize) {
-    strokeGrid(
-      context,
-      appState.gridSize,
-      -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
-        appState.gridSize +
-        (renderConfig.scrollX % appState.gridSize),
-      -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
-        appState.gridSize +
-        (renderConfig.scrollY % appState.gridSize),
-      normalizedCanvasWidth / renderConfig.zoom.value,
-      normalizedCanvasHeight / renderConfig.zoom.value,
-    );
-  }
-
-  // Paint visible elements
-  const visibleElements = elements.filter((element) =>
-    isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, {
-      zoom: renderConfig.zoom,
-      offsetLeft: appState.offsetLeft,
-      offsetTop: appState.offsetTop,
-      scrollX: renderConfig.scrollX,
-      scrollY: renderConfig.scrollY,
-    }),
-  );
-
-  visibleElements.forEach((element) => {
-    try {
-      renderElement(element, rc, context, renderConfig);
-      if (!isExporting) {
-        renderLinkIcon(element, context, appState);
-      }
-    } catch (error: any) {
-      console.error(error);
-    }
-  });
-
-  if (appState.editingLinearElement) {
-    const element = LinearElementEditor.getElement(
-      appState.editingLinearElement.elementId,
-    );
-    if (element) {
-      renderLinearPointHandles(context, appState, renderConfig, element);
-    }
-  }
-
-  // Paint selection element
-  if (appState.selectionElement) {
-    try {
-      renderElement(appState.selectionElement, rc, context, renderConfig);
-    } catch (error: any) {
-      console.error(error);
-    }
-  }
-
-  if (isBindingEnabled(appState)) {
-    appState.suggestedBindings
-      .filter((binding) => binding != null)
-      .forEach((suggestedBinding) => {
-        renderBindingHighlight(context, renderConfig, suggestedBinding!);
-      });
-  }
-
-  if (
-    appState.selectedLinearElement &&
-    appState.selectedLinearElement.hoverPointIndex >= 0
-  ) {
-    renderLinearElementPointHighlight(context, appState, renderConfig);
-  }
-  // Paint selected elements
-  if (
-    renderSelection &&
-    !appState.multiElement &&
-    !appState.editingLinearElement
-  ) {
-    const locallySelectedElements = getSelectedElements(elements, appState);
-    const showBoundingBox = shouldShowBoundingBox(locallySelectedElements);
-
-    const locallySelectedIds = locallySelectedElements.map(
-      (element) => element.id,
-    );
-    const isSingleLinearElementSelected =
-      locallySelectedElements.length === 1 &&
-      isLinearElement(locallySelectedElements[0]);
-    // render selected linear element points
-    if (
-      isSingleLinearElementSelected &&
-      appState.selectedLinearElement?.elementId ===
-        locallySelectedElements[0].id &&
-      !locallySelectedElements[0].locked
-    ) {
-      renderLinearPointHandles(
+    // Grid
+    if (renderGrid && appState.gridSize) {
+      strokeGrid(
         context,
-        appState,
-        renderConfig,
-        locallySelectedElements[0] as ExcalidrawLinearElement,
-      );
-    }
-    if (showBoundingBox) {
-      const selections = elements.reduce((acc, element) => {
-        const selectionColors = [];
-        // local user
-        if (
-          locallySelectedIds.includes(element.id) &&
-          !isSelectedViaGroup(appState, element)
-        ) {
-          selectionColors.push(oc.black);
-        }
-        // remote users
-        if (renderConfig.remoteSelectedElementIds[element.id]) {
-          selectionColors.push(
-            ...renderConfig.remoteSelectedElementIds[element.id].map(
-              (socketId) => {
-                const { background } = getClientColors(socketId, appState);
-                return background;
-              },
-            ),
-          );
-        }
-        if (selectionColors.length) {
-          const [elementX1, elementY1, elementX2, elementY2] =
-            getElementAbsoluteCoords(element);
-          acc.push({
-            angle: element.angle,
-            elementX1,
-            elementY1,
-            elementX2,
-            elementY2,
-            selectionColors,
-          });
-        }
-        return acc;
-      }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[] }[]);
-
-      const addSelectionForGroupId = (groupId: GroupId) => {
-        const groupElements = getElementsInGroup(elements, groupId);
-        const [elementX1, elementY1, elementX2, elementY2] =
-          getCommonBounds(groupElements);
-        selections.push({
-          angle: 0,
-          elementX1,
-          elementX2,
-          elementY1,
-          elementY2,
-          selectionColors: [oc.black],
-        });
-      };
-
-      for (const groupId of getSelectedGroupIds(appState)) {
-        // TODO: support multiplayer selected group IDs
-        addSelectionForGroupId(groupId);
-      }
-
-      if (appState.editingGroupId) {
-        addSelectionForGroupId(appState.editingGroupId);
-      }
-      selections.forEach((selection) =>
-        renderSelectionBorder(
-          context,
-          renderConfig,
-          selection,
-          isSingleLinearElementSelected ? DEFAULT_SPACING * 2 : DEFAULT_SPACING,
-        ),
-      );
-    }
-    // Paint resize transformHandles
-    context.save();
-    context.translate(renderConfig.scrollX, renderConfig.scrollY);
-
-    if (locallySelectedElements.length === 1) {
-      context.fillStyle = oc.white;
-      const transformHandles = getTransformHandles(
-        locallySelectedElements[0],
-        renderConfig.zoom,
-        "mouse", // when we render we don't know which pointer type so use mouse
-      );
-      if (!appState.viewModeEnabled && showBoundingBox) {
-        renderTransformHandles(
-          context,
-          renderConfig,
-          transformHandles,
-          locallySelectedElements[0].angle,
-        );
-      }
-    } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
-      const dashedLinePadding = 4 / renderConfig.zoom.value;
-      context.fillStyle = oc.white;
-      const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
-      const initialLineDash = context.getLineDash();
-      context.setLineDash([2 / renderConfig.zoom.value]);
-      const lineWidth = context.lineWidth;
-      context.lineWidth = 1 / renderConfig.zoom.value;
-      strokeRectWithRotation(
-        context,
-        x1 - dashedLinePadding,
-        y1 - dashedLinePadding,
-        x2 - x1 + dashedLinePadding * 2,
-        y2 - y1 + dashedLinePadding * 2,
-        (x1 + x2) / 2,
-        (y1 + y2) / 2,
-        0,
-      );
-      context.lineWidth = lineWidth;
-      context.setLineDash(initialLineDash);
-      const transformHandles = getTransformHandlesFromCoords(
-        [x1, y1, x2, y2],
-        0,
-        renderConfig.zoom,
-        "mouse",
-        OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-      );
-      if (locallySelectedElements.some((element) => !element.locked)) {
-        renderTransformHandles(context, renderConfig, transformHandles, 0);
-      }
-    }
-    context.restore();
-  }
-
-  // Reset zoom
-  context.restore();
-
-  // Paint remote pointers
-  for (const clientId in renderConfig.remotePointerViewportCoords) {
-    let { x, y } = renderConfig.remotePointerViewportCoords[clientId];
-
-    x -= appState.offsetLeft;
-    y -= appState.offsetTop;
-
-    const width = 9;
-    const height = 14;
-
-    const isOutOfBounds =
-      x < 0 ||
-      x > normalizedCanvasWidth - width ||
-      y < 0 ||
-      y > normalizedCanvasHeight - height;
-
-    x = Math.max(x, 0);
-    x = Math.min(x, normalizedCanvasWidth - width);
-    y = Math.max(y, 0);
-    y = Math.min(y, normalizedCanvasHeight - height);
-
-    const { background, stroke } = getClientColors(clientId, appState);
-
-    context.save();
-    context.strokeStyle = stroke;
-    context.fillStyle = background;
-
-    const userState = renderConfig.remotePointerUserStates[clientId];
-    if (isOutOfBounds || userState === UserIdleState.AWAY) {
-      context.globalAlpha = 0.48;
-    }
-
-    if (
-      renderConfig.remotePointerButton &&
-      renderConfig.remotePointerButton[clientId] === "down"
-    ) {
-      context.beginPath();
-      context.arc(x, y, 15, 0, 2 * Math.PI, false);
-      context.lineWidth = 3;
-      context.strokeStyle = "#ffffff88";
-      context.stroke();
-      context.closePath();
-
-      context.beginPath();
-      context.arc(x, y, 15, 0, 2 * Math.PI, false);
-      context.lineWidth = 1;
-      context.strokeStyle = stroke;
-      context.stroke();
-      context.closePath();
-    }
-
-    context.beginPath();
-    context.moveTo(x, y);
-    context.lineTo(x + 1, y + 14);
-    context.lineTo(x + 4, y + 9);
-    context.lineTo(x + 9, y + 10);
-    context.lineTo(x, y);
-    context.fill();
-    context.stroke();
-
-    const username = renderConfig.remotePointerUsernames[clientId];
-
-    let idleState = "";
-    if (userState === UserIdleState.AWAY) {
-      idleState = hasEmojiSupport ? "⚫️" : ` (${UserIdleState.AWAY})`;
-    } else if (userState === UserIdleState.IDLE) {
-      idleState = hasEmojiSupport ? "💤" : ` (${UserIdleState.IDLE})`;
-    } else if (userState === UserIdleState.ACTIVE) {
-      idleState = hasEmojiSupport ? "🟢" : "";
-    }
-
-    const usernameAndIdleState = `${
-      username ? `${username} ` : ""
-    }${idleState}`;
-
-    if (!isOutOfBounds && usernameAndIdleState) {
-      const offsetX = x + width;
-      const offsetY = y + height;
-      const paddingHorizontal = 4;
-      const paddingVertical = 4;
-      const measure = context.measureText(usernameAndIdleState);
-      const measureHeight =
-        measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
-
-      // Border
-      context.fillStyle = stroke;
-      context.fillRect(
-        offsetX - 1,
-        offsetY - 1,
-        measure.width + 2 * paddingHorizontal + 2,
-        measureHeight + 2 * paddingVertical + 2,
-      );
-      // Background
-      context.fillStyle = background;
-      context.fillRect(
-        offsetX,
-        offsetY,
-        measure.width + 2 * paddingHorizontal,
-        measureHeight + 2 * paddingVertical,
-      );
-      context.fillStyle = oc.white;
-
-      context.fillText(
-        usernameAndIdleState,
-        offsetX + paddingHorizontal,
-        offsetY + paddingVertical + measure.actualBoundingBoxAscent,
+        appState.gridSize,
+        -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
+          appState.gridSize +
+          (renderConfig.scrollX % appState.gridSize),
+        -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
+          appState.gridSize +
+          (renderConfig.scrollY % appState.gridSize),
+        normalizedCanvasWidth / renderConfig.zoom.value,
+        normalizedCanvasHeight / renderConfig.zoom.value,
       );
     }
 
-    context.restore();
-    context.closePath();
-  }
-
-  // Paint scrollbars
-  let scrollBars;
-  if (renderScrollbars) {
-    scrollBars = getScrollBars(
-      elements,
-      normalizedCanvasWidth,
-      normalizedCanvasHeight,
-      renderConfig,
+    // Paint visible elements
+    const visibleElements = elements.filter((element) =>
+      isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, {
+        zoom: renderConfig.zoom,
+        offsetLeft: appState.offsetLeft,
+        offsetTop: appState.offsetTop,
+        scrollX: renderConfig.scrollX,
+        scrollY: renderConfig.scrollY,
+      }),
     );
 
-    context.save();
-    context.fillStyle = SCROLLBAR_COLOR;
-    context.strokeStyle = "rgba(255,255,255,0.8)";
-    [scrollBars.horizontal, scrollBars.vertical].forEach((scrollBar) => {
-      if (scrollBar) {
-        roundRect(
-          context,
-          scrollBar.x,
-          scrollBar.y,
-          scrollBar.width,
-          scrollBar.height,
-          SCROLLBAR_WIDTH / 2,
-        );
+    visibleElements.forEach((element) => {
+      try {
+        renderElement(element, rc, context, renderConfig);
+        if (!isExporting) {
+          renderLinkIcon(element, context, appState);
+        }
+      } catch (error: any) {
+        console.error(error);
       }
     });
-    context.restore();
-  }
 
-  context.restore();
-  return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
-};
+    if (appState.editingLinearElement) {
+      const element = LinearElementEditor.getElement(
+        appState.editingLinearElement.elementId,
+      );
+      if (element) {
+        renderLinearPointHandles(context, appState, renderConfig, element);
+      }
+    }
+
+    // Paint selection element
+    if (appState.selectionElement) {
+      try {
+        renderElement(appState.selectionElement, rc, context, renderConfig);
+      } catch (error: any) {
+        console.error(error);
+      }
+    }
+
+    if (isBindingEnabled(appState)) {
+      appState.suggestedBindings
+        .filter((binding) => binding != null)
+        .forEach((suggestedBinding) => {
+          renderBindingHighlight(context, renderConfig, suggestedBinding!);
+        });
+    }
+
+    if (
+      appState.selectedLinearElement &&
+      appState.selectedLinearElement.hoverPointIndex >= 0
+    ) {
+      renderLinearElementPointHighlight(context, appState, renderConfig);
+    }
+    // Paint selected elements
+    if (
+      renderSelection &&
+      !appState.multiElement &&
+      !appState.editingLinearElement
+    ) {
+      const locallySelectedElements = getSelectedElements(elements, appState);
+      const showBoundingBox = shouldShowBoundingBox(locallySelectedElements);
+
+      const locallySelectedIds = locallySelectedElements.map(
+        (element) => element.id,
+      );
+      const isSingleLinearElementSelected =
+        locallySelectedElements.length === 1 &&
+        isLinearElement(locallySelectedElements[0]);
+      // render selected linear element points
+      if (
+        isSingleLinearElementSelected &&
+        appState.selectedLinearElement?.elementId ===
+          locallySelectedElements[0].id &&
+        !locallySelectedElements[0].locked
+      ) {
+        renderLinearPointHandles(
+          context,
+          appState,
+          renderConfig,
+          locallySelectedElements[0] as ExcalidrawLinearElement,
+        );
+      }
+      if (showBoundingBox) {
+        const selections = elements.reduce((acc, element) => {
+          const selectionColors = [];
+          // local user
+          if (
+            locallySelectedIds.includes(element.id) &&
+            !isSelectedViaGroup(appState, element)
+          ) {
+            selectionColors.push(oc.black);
+          }
+          // remote users
+          if (renderConfig.remoteSelectedElementIds[element.id]) {
+            selectionColors.push(
+              ...renderConfig.remoteSelectedElementIds[element.id].map(
+                (socketId) => {
+                  const { background } = getClientColors(socketId, appState);
+                  return background;
+                },
+              ),
+            );
+          }
+          if (selectionColors.length) {
+            const [elementX1, elementY1, elementX2, elementY2] =
+              getElementAbsoluteCoords(element);
+            acc.push({
+              angle: element.angle,
+              elementX1,
+              elementY1,
+              elementX2,
+              elementY2,
+              selectionColors,
+            });
+          }
+          return acc;
+        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[] }[]);
+
+        const addSelectionForGroupId = (groupId: GroupId) => {
+          const groupElements = getElementsInGroup(elements, groupId);
+          const [elementX1, elementY1, elementX2, elementY2] =
+            getCommonBounds(groupElements);
+          selections.push({
+            angle: 0,
+            elementX1,
+            elementX2,
+            elementY1,
+            elementY2,
+            selectionColors: [oc.black],
+          });
+        };
+
+        for (const groupId of getSelectedGroupIds(appState)) {
+          // TODO: support multiplayer selected group IDs
+          addSelectionForGroupId(groupId);
+        }
+
+        if (appState.editingGroupId) {
+          addSelectionForGroupId(appState.editingGroupId);
+        }
+        selections.forEach((selection) =>
+          renderSelectionBorder(
+            context,
+            renderConfig,
+            selection,
+            isSingleLinearElementSelected
+              ? DEFAULT_SPACING * 2
+              : DEFAULT_SPACING,
+          ),
+        );
+      }
+      // Paint resize transformHandles
+      context.save();
+      context.translate(renderConfig.scrollX, renderConfig.scrollY);
+
+      if (locallySelectedElements.length === 1) {
+        context.fillStyle = oc.white;
+        const transformHandles = getTransformHandles(
+          locallySelectedElements[0],
+          renderConfig.zoom,
+          "mouse", // when we render we don't know which pointer type so use mouse
+        );
+        if (!appState.viewModeEnabled && showBoundingBox) {
+          renderTransformHandles(
+            context,
+            renderConfig,
+            transformHandles,
+            locallySelectedElements[0].angle,
+          );
+        }
+      } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
+        const dashedLinePadding = 4 / renderConfig.zoom.value;
+        context.fillStyle = oc.white;
+        const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
+        const initialLineDash = context.getLineDash();
+        context.setLineDash([2 / renderConfig.zoom.value]);
+        const lineWidth = context.lineWidth;
+        context.lineWidth = 1 / renderConfig.zoom.value;
+        strokeRectWithRotation(
+          context,
+          x1 - dashedLinePadding,
+          y1 - dashedLinePadding,
+          x2 - x1 + dashedLinePadding * 2,
+          y2 - y1 + dashedLinePadding * 2,
+          (x1 + x2) / 2,
+          (y1 + y2) / 2,
+          0,
+        );
+        context.lineWidth = lineWidth;
+        context.setLineDash(initialLineDash);
+        const transformHandles = getTransformHandlesFromCoords(
+          [x1, y1, x2, y2],
+          0,
+          renderConfig.zoom,
+          "mouse",
+          OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+        );
+        if (locallySelectedElements.some((element) => !element.locked)) {
+          renderTransformHandles(context, renderConfig, transformHandles, 0);
+        }
+      }
+      context.restore();
+    }
+
+    // Reset zoom
+    context.restore();
+
+    // Paint remote pointers
+    for (const clientId in renderConfig.remotePointerViewportCoords) {
+      let { x, y } = renderConfig.remotePointerViewportCoords[clientId];
+
+      x -= appState.offsetLeft;
+      y -= appState.offsetTop;
+
+      const width = 9;
+      const height = 14;
+
+      const isOutOfBounds =
+        x < 0 ||
+        x > normalizedCanvasWidth - width ||
+        y < 0 ||
+        y > normalizedCanvasHeight - height;
+
+      x = Math.max(x, 0);
+      x = Math.min(x, normalizedCanvasWidth - width);
+      y = Math.max(y, 0);
+      y = Math.min(y, normalizedCanvasHeight - height);
+
+      const { background, stroke } = getClientColors(clientId, appState);
+
+      context.save();
+      context.strokeStyle = stroke;
+      context.fillStyle = background;
+
+      const userState = renderConfig.remotePointerUserStates[clientId];
+      if (isOutOfBounds || userState === UserIdleState.AWAY) {
+        context.globalAlpha = 0.48;
+      }
+
+      if (
+        renderConfig.remotePointerButton &&
+        renderConfig.remotePointerButton[clientId] === "down"
+      ) {
+        context.beginPath();
+        context.arc(x, y, 15, 0, 2 * Math.PI, false);
+        context.lineWidth = 3;
+        context.strokeStyle = "#ffffff88";
+        context.stroke();
+        context.closePath();
+
+        context.beginPath();
+        context.arc(x, y, 15, 0, 2 * Math.PI, false);
+        context.lineWidth = 1;
+        context.strokeStyle = stroke;
+        context.stroke();
+        context.closePath();
+      }
+
+      context.beginPath();
+      context.moveTo(x, y);
+      context.lineTo(x + 1, y + 14);
+      context.lineTo(x + 4, y + 9);
+      context.lineTo(x + 9, y + 10);
+      context.lineTo(x, y);
+      context.fill();
+      context.stroke();
+
+      const username = renderConfig.remotePointerUsernames[clientId];
+
+      let idleState = "";
+      if (userState === UserIdleState.AWAY) {
+        idleState = hasEmojiSupport ? "⚫️" : ` (${UserIdleState.AWAY})`;
+      } else if (userState === UserIdleState.IDLE) {
+        idleState = hasEmojiSupport ? "💤" : ` (${UserIdleState.IDLE})`;
+      } else if (userState === UserIdleState.ACTIVE) {
+        idleState = hasEmojiSupport ? "🟢" : "";
+      }
+
+      const usernameAndIdleState = `${
+        username ? `${username} ` : ""
+      }${idleState}`;
+
+      if (!isOutOfBounds && usernameAndIdleState) {
+        const offsetX = x + width;
+        const offsetY = y + height;
+        const paddingHorizontal = 4;
+        const paddingVertical = 4;
+        const measure = context.measureText(usernameAndIdleState);
+        const measureHeight =
+          measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
+
+        // Border
+        context.fillStyle = stroke;
+        context.fillRect(
+          offsetX - 1,
+          offsetY - 1,
+          measure.width + 2 * paddingHorizontal + 2,
+          measureHeight + 2 * paddingVertical + 2,
+        );
+        // Background
+        context.fillStyle = background;
+        context.fillRect(
+          offsetX,
+          offsetY,
+          measure.width + 2 * paddingHorizontal,
+          measureHeight + 2 * paddingVertical,
+        );
+        context.fillStyle = oc.white;
+
+        context.fillText(
+          usernameAndIdleState,
+          offsetX + paddingHorizontal,
+          offsetY + paddingVertical + measure.actualBoundingBoxAscent,
+        );
+      }
+
+      context.restore();
+      context.closePath();
+    }
+
+    // Paint scrollbars
+    let scrollBars;
+    if (renderScrollbars) {
+      scrollBars = getScrollBars(
+        elements,
+        normalizedCanvasWidth,
+        normalizedCanvasHeight,
+        renderConfig,
+      );
+
+      context.save();
+      context.fillStyle = SCROLLBAR_COLOR;
+      context.strokeStyle = "rgba(255,255,255,0.8)";
+      [scrollBars.horizontal, scrollBars.vertical].forEach((scrollBar) => {
+        if (scrollBar) {
+          roundRect(
+            context,
+            scrollBar.x,
+            scrollBar.y,
+            scrollBar.width,
+            scrollBar.height,
+            SCROLLBAR_WIDTH / 2,
+          );
+        }
+      });
+      context.restore();
+    }
+
+    context.restore();
+    return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
+  };
 
 const renderSceneThrottled = throttleRAF(
-  (
-    elements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
-    scale: number,
-    rc: RoughCanvas,
-    canvas: HTMLCanvasElement,
-    renderConfig: RenderConfig,
-    callback?: (data: ReturnType<typeof _renderScene>) => void,
-  ) => {
-    const ret = _renderScene(
-      elements,
-      appState,
-      scale,
-      rc,
-      canvas,
-      renderConfig,
-    );
-    callback?.(ret);
+  (config: {
+    elements: readonly NonDeletedExcalidrawElement[];
+    appState: AppState;
+    scale: number;
+    rc: RoughCanvas;
+    canvas: HTMLCanvasElement;
+    renderConfig: RenderConfig;
+    callback?: (data: ReturnType<typeof _renderScene>) => void;
+  }) => {
+    const ret = _renderScene(config);
+    config.callback?.(ret);
   },
   { trailing: true },
 );
 
 /** renderScene throttled to animation framerate */
 export const renderScene = <T extends boolean = false>(
-  elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
-  scale: number,
-  rc: RoughCanvas,
-  canvas: HTMLCanvasElement,
-  renderConfig: RenderConfig,
-  callback?: (data: ReturnType<typeof _renderScene>) => void,
+  config: {
+    elements: readonly NonDeletedExcalidrawElement[];
+    appState: AppState;
+    scale: number;
+    rc: RoughCanvas;
+    canvas: HTMLCanvasElement;
+    renderConfig: RenderConfig;
+    callback?: (data: ReturnType<typeof _renderScene>) => void;
+  },
   /** Whether to throttle rendering. Defaults to false.
    * When throttling, no value is returned. Use the callback instead. */
   throttle?: T,
 ): T extends true ? void : ReturnType<typeof _renderScene> => {
   if (throttle) {
-    renderSceneThrottled(
-      elements,
-      appState,
-      scale,
-      rc,
-      canvas,
-      renderConfig,
-      callback,
-    );
+    renderSceneThrottled(config);
     return undefined as T extends true ? void : ReturnType<typeof _renderScene>;
   }
-  const ret = _renderScene(elements, appState, scale, rc, canvas, renderConfig);
-  callback?.(ret);
+  const ret = _renderScene(config);
+  config.callback?.(ret);
   return ret as T extends true ? void : ReturnType<typeof _renderScene>;
 };
 
