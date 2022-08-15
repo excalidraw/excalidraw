@@ -1165,7 +1165,23 @@ class App extends React.Component<AppProps, AppState> {
         ),
       );
     }
+    this.renderScene();
+    this.history.record(this.state, this.scene.getElementsIncludingDeleted());
 
+    // Do not notify consumers if we're still loading the scene. Among other
+    // potential issues, this fixes a case where the tab isn't focused during
+    // init, which would trigger onChange with empty elements, which would then
+    // override whatever is in localStorage currently.
+    if (!this.state.isLoading) {
+      this.props.onChange?.(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+        this.files,
+      );
+    }
+  }
+
+  private renderScene = () => {
     const cursorButton: {
       [id: string]: string | undefined;
     } = {};
@@ -1202,6 +1218,7 @@ class App extends React.Component<AppProps, AppState> {
       );
       cursorButton[socketId] = user.button;
     });
+
     const renderingElements = this.scene
       .getNonDeletedElements()
       .filter((element) => {
@@ -1225,7 +1242,6 @@ class App extends React.Component<AppProps, AppState> {
     renderScene(
       renderingElements,
       this.state,
-      this.state.selectionElement,
       window.devicePixelRatio,
       this.rc!,
       this.canvas!,
@@ -1266,21 +1282,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!THROTTLE_NEXT_RENDER) {
       THROTTLE_NEXT_RENDER = true;
     }
-
-    this.history.record(this.state, this.scene.getElementsIncludingDeleted());
-
-    // Do not notify consumers if we're still loading the scene. Among other
-    // potential issues, this fixes a case where the tab isn't focused during
-    // init, which would trigger onChange with empty elements, which would then
-    // override whatever is in localStorage currently.
-    if (!this.state.isLoading) {
-      this.props.onChange?.(
-        this.scene.getElementsIncludingDeleted(),
-        this.state,
-        this.files,
-      );
-    }
-  }
+  };
 
   private onScroll = debounce(() => {
     const { offsetTop, offsetLeft } = this.getCanvasOffsets();

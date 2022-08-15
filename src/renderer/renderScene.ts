@@ -287,7 +287,6 @@ const renderLinearElementPointHighlight = (
 export const _renderScene = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  selectionElement: NonDeletedExcalidrawElement | null,
   scale: number,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
@@ -297,7 +296,6 @@ export const _renderScene = (
   if (canvas === null) {
     return { atLeastOneVisibleElement: false };
   }
-
   const {
     renderScrollbars = true,
     renderSelection = true,
@@ -389,9 +387,9 @@ export const _renderScene = (
   }
 
   // Paint selection element
-  if (selectionElement) {
+  if (appState.selectionElement) {
     try {
-      renderElement(selectionElement, rc, context, renderConfig);
+      renderElement(appState.selectionElement, rc, context, renderConfig);
     } catch (error: any) {
       console.error(error);
     }
@@ -712,7 +710,6 @@ const renderSceneThrottled = throttleRAF(
   (
     elements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
-    selectionElement: NonDeletedExcalidrawElement | null,
     scale: number,
     rc: RoughCanvas,
     canvas: HTMLCanvasElement,
@@ -722,7 +719,6 @@ const renderSceneThrottled = throttleRAF(
     const ret = _renderScene(
       elements,
       appState,
-      selectionElement,
       scale,
       rc,
       canvas,
@@ -737,7 +733,6 @@ const renderSceneThrottled = throttleRAF(
 export const renderScene = <T extends boolean = false>(
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  selectionElement: NonDeletedExcalidrawElement | null,
   scale: number,
   rc: RoughCanvas,
   canvas: HTMLCanvasElement,
@@ -751,7 +746,6 @@ export const renderScene = <T extends boolean = false>(
     renderSceneThrottled(
       elements,
       appState,
-      selectionElement,
       scale,
       rc,
       canvas,
@@ -760,15 +754,7 @@ export const renderScene = <T extends boolean = false>(
     );
     return undefined as T extends true ? void : ReturnType<typeof _renderScene>;
   }
-  const ret = _renderScene(
-    elements,
-    appState,
-    selectionElement,
-    scale,
-    rc,
-    canvas,
-    renderConfig,
-  );
+  const ret = _renderScene(elements, appState, scale, rc, canvas, renderConfig);
   callback?.(ret);
   return ret as T extends true ? void : ReturnType<typeof _renderScene>;
 };

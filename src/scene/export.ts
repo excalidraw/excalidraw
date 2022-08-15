@@ -51,7 +51,7 @@ export const exportToCanvas = async (
     files,
   });
 
-  renderScene(elements, appState, null, scale, rough.canvas(canvas), canvas, {
+  renderScene(elements, appState, scale, rough.canvas(canvas), canvas, {
     viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
     scrollX: -minX + exportPadding,
     scrollY: -minY + exportPadding,
