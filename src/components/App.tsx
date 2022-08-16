@@ -4252,6 +4252,7 @@ class App extends React.Component<AppProps, AppState> {
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
+          pointerDownState.drag.hasOccurred = true;
           if (
             this.state.editingLinearElement &&
             !this.state.editingLinearElement.isDragging
@@ -5009,7 +5010,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        !this.state.selectedLinearElement &&
         !this.state.editingLinearElement &&
         !pointerDownState.drag.hasOccurred &&
         !this.state.isResizing &&

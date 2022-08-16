@@ -264,13 +264,15 @@ const rescalePointsInElement = (
   element: NonDeletedExcalidrawElement,
   width: number,
   height: number,
+  normalizePoints: boolean,
 ) =>
   isLinearElement(element) || isFreeDrawElement(element)
     ? {
         points: rescalePoints(
           0,
           width,
-          rescalePoints(1, height, element.points),
+          rescalePoints(1, height, element.points, normalizePoints),
+          normalizePoints,
         ),
       }
     : {};
@@ -374,6 +376,7 @@ const resizeSingleTextElement = (
       element,
       nextWidth,
       nextHeight,
+      false,
     );
     const deltaX1 = (x1 - nextX1) / 2;
     const deltaY1 = (y1 - nextY1) / 2;
@@ -415,6 +418,7 @@ export const resizeSingleElement = (
     stateAtResizeStart,
     stateAtResizeStart.width,
     stateAtResizeStart.height,
+    true,
   );
   const startTopLeft: Point = [x1, y1];
   const startBottomRight: Point = [x2, y2];
@@ -432,6 +436,7 @@ export const resizeSingleElement = (
     element,
     element.width,
     element.height,
+    true,
   );
 
   const boundsCurrentWidth = esx2 - esx1;
@@ -525,6 +530,7 @@ export const resizeSingleElement = (
       stateAtResizeStart,
       eleNewWidth,
       eleNewHeight,
+      true,
     );
   const newBoundsWidth = newBoundsX2 - newBoundsX1;
   const newBoundsHeight = newBoundsY2 - newBoundsY1;
@@ -595,6 +601,7 @@ export const resizeSingleElement = (
     stateAtResizeStart,
     eleNewWidth,
     eleNewHeight,
+    true,
   );
   // For linear elements (x,y) are the coordinates of the first drawn point not the top-left corner
   // So we need to readjust (x,y) to be where the first point should be
@@ -725,7 +732,12 @@ const resizeMultipleElements = (
     const y = anchorY + (element.orig.y - anchorY) * scale;
 
     // readjust points for linear & free draw elements
-    const rescaledPoints = rescalePointsInElement(element.orig, width, height);
+    const rescaledPoints = rescalePointsInElement(
+      element.orig,
+      width,
+      height,
+      false,
+    );
 
     const update: {
       width: number;

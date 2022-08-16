@@ -239,6 +239,7 @@ const getAdjustedDimensions = (
       element,
       nextWidth,
       nextHeight,
+      false,
     );
     const deltaX1 = (x1 - nextX1) / 2;
     const deltaY1 = (y1 - nextY1) / 2;
