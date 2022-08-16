@@ -4529,9 +4529,8 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.editingLinearElement) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
-          (pointerDownState.hit?.element?.id !==
-            this.state.editingLinearElement.elementId ||
-            !pointerDownState.hit.hasHitElementInside)
+          pointerDownState.hit?.element?.id !==
+            this.state.editingLinearElement.elementId
         ) {
           this.actionManager.executeAction(actionFinalize);
         } else {
@@ -4549,10 +4548,8 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (this.state.selectedLinearElement) {
         if (
-          !pointerDownState.boxSelection.hasOccurred &&
-          (pointerDownState.hit?.element?.id !==
-            this.state.selectedLinearElement.elementId ||
-            !pointerDownState.hit.hasHitElementInside)
+          pointerDownState.hit?.element?.id !==
+          this.state.selectedLinearElement.elementId
         ) {
           const selectedELements = getSelectedElements(
             this.scene.getNonDeletedElements(),
