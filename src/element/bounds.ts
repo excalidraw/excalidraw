@@ -495,6 +495,7 @@ export const getResizedElementAbsoluteCoords = (
   element: ExcalidrawElement,
   nextWidth: number,
   nextHeight: number,
+  normalizePoints: boolean,
 ): [number, number, number, number] => {
   if (!(isLinearElement(element) || isFreeDrawElement(element))) {
     return [
@@ -508,7 +509,8 @@ export const getResizedElementAbsoluteCoords = (
   const points = rescalePoints(
     0,
     nextWidth,
-    rescalePoints(1, nextHeight, element.points),
+    rescalePoints(1, nextHeight, element.points, normalizePoints),
+    normalizePoints,
   );
 
   let bounds: [number, number, number, number];
