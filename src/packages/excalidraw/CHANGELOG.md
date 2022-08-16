@@ -25,9 +25,11 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
-- Render math notation using the MathJax library. Both standard Latex input and simplified AsciiMath input are supported. MathJax support is implemented as a `math` subtype of `ExcalidrawTextElement`.
+- Render math notation using the MathJax library. Both standard Latex input and simplified AsciiMath input are supported.
 
-  Also added plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code. [#5311](https://github.com/excalidraw/excalidraw/pull/5311).
+  Also added plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code.
+
+  Also created an `@excalidraw/plugins` package. This package holds the MathJax plugin to make it completely decoupled from `@excalidraw/excalidraw`. The MathJax plugin is implemented as a `math` subtype of `ExcalidrawTextElement`. [#2993](https://github.com/excalidraw/excalidraw/pull/2993).
 
 - Add [`UIOptions.dockedSidebarBreakpoint`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#dockedSidebarBreakpoint) to customize at which point to break from the docked sidebar [#5274](https://github.com/excalidraw/excalidraw/pull/5274).
 
@@ -392,10 +394,6 @@ React.createElement(ExcalidrawLib.Excalidraw, opts);
 
   - `.excalidraw` files may now contain top-level `files` key in format of `Record<FileId, BinaryFileData>` when exporting any (image) elements.
   - Changes were made to various export utilities exported from the package so that they take `files`, you can refer to the docs for the same.
-
-## Excalidraw API
-
-### Features
 
 - Export [`isLinearElement`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#isLinearElement) and [`getNonDeletedElements`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#getNonDeletedElements) [#4072](https://github.com/excalidraw/excalidraw/pull/4072).
 
