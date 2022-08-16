@@ -84,15 +84,14 @@ export const exportToCanvas = async (
   };
 
   const render = () => {
-    renderScene(
+    renderScene({
       elements,
       appState,
-      null,
       scale,
-      rough.canvas(canvas),
+      rc: rough.canvas(canvas),
       canvas,
       renderConfig,
-    );
+    });
   };
   render();
 
