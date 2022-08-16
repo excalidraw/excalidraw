@@ -632,7 +632,17 @@ const resizeMultipleElements = (
     ? [midX, midY]
     : mapDirectionsToAnchors[direction];
 
-  const mapDirectionsToPointerSides: Record<
+  const scale =
+    Math.max(
+      Math.abs(pointerX - anchorX) / (maxX - minX),
+      Math.abs(pointerY - anchorY) / (maxY - minY),
+    ) * (shouldResizeFromCenter ? 2 : 1);
+
+  if (scale === 0) {
+    return;
+  }
+
+  const mapDirectionsToFlipConditions: Record<
     typeof direction,
     [x: boolean, y: boolean]
   > = {
@@ -642,37 +652,36 @@ const resizeMultipleElements = (
     nw: [pointerX <= anchorX, pointerY <= anchorY],
   };
 
-  // pointer side relative to anchor
-  const [pointerSideX, pointerSideY] = mapDirectionsToPointerSides[
+  // to flip an element:
+  // 1. mirror x,y relative to the anchor over the x/y/both axis (flipFactor)
+  // 2. shift by the width/height/both (flipAdjust) or mirror points in case of
+  //    linear/free draw element (hasPoints)
+  // 3. adjust the angle
+  const [flipFactorX, flipFactorY] = mapDirectionsToFlipConditions[
     direction
   ].map((condition) => (condition ? 1 : -1));
-
-  // stop resizing if a pointer is on the other side of selection
-  if (pointerSideX < 0 && pointerSideY < 0) {
-    return;
-  }
-
-  const scale =
-    Math.max(
-      (pointerSideX * Math.abs(pointerX - anchorX)) / (maxX - minX),
-      (pointerSideY * Math.abs(pointerY - anchorY)) / (maxY - minY),
-    ) * (shouldResizeFromCenter ? 2 : 1);
-
-  if (scale === 0) {
-    return;
-  }
+  const isFlippedByX = flipFactorX < 0;
+  const isFlippedByY = flipFactorY < 0;
 
   targetElements.forEach((element) => {
     const width = element.orig.width * scale;
     const height = element.orig.height * scale;
-    const x = anchorX + (element.orig.x - anchorX) * scale;
-    const y = anchorY + (element.orig.y - anchorY) * scale;
+    const angle = element.orig.angle * flipFactorX * flipFactorY;
+
+    const hasPoints =
+      isLinearElement(element.orig) || isFreeDrawElement(element.orig);
+    const offsetX = element.orig.x - anchorX;
+    const offsetY = element.orig.y - anchorY;
+    const flipAdjustX = isFlippedByX && !hasPoints ? width : 0;
+    const flipAdjustY = isFlippedByY && !hasPoints ? height : 0;
+    const x = anchorX + flipFactorX * (offsetX * scale + flipAdjustX);
+    const y = anchorY + flipFactorY * (offsetY * scale + flipAdjustY);
 
     // readjust points for linear & free draw elements
     const rescaledPoints = rescalePointsInElement(
       element.orig,
-      width,
-      height,
+      width * flipFactorX,
+      height * flipFactorY,
       false,
     );
 
@@ -681,6 +690,7 @@ const resizeMultipleElements = (
       height: number;
       x: number;
       y: number;
+      angle: number;
       points?: Point[];
       fontSize?: number;
       baseline?: number;
@@ -689,10 +699,15 @@ const resizeMultipleElements = (
       height,
       x,
       y,
+      angle,
       ...rescaledPoints,
     };
 
-    let boundTextUpdates: { fontSize: number; baseline: number } | null = null;
+    let boundTextUpdates: {
+      angle: number;
+      fontSize: number;
+      baseline: number;
+    } | null = null;
 
     const boundTextElement = getBoundTextElement(element.latest);
 
@@ -715,6 +730,7 @@ const resizeMultipleElements = (
 
       if (boundTextElement) {
         boundTextUpdates = {
+          angle,
           fontSize: textMeasurements.size,
           baseline: textMeasurements.baseline,
         };
