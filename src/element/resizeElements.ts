@@ -18,6 +18,7 @@ import {
   getElementAbsoluteCoords,
   getCommonBounds,
   getResizedElementAbsoluteCoords,
+  getCommonBoundingBox,
 } from "./bounds";
 import {
   isFreeDrawElement,
@@ -137,8 +138,10 @@ export const transformElements = (
       transformHandleType === "se"
     ) {
       resizeMultipleElements(
+        pointerDownState,
         selectedElements,
         transformHandleType,
+        shouldResizeFromCenter,
         pointerX,
         pointerY,
       );
@@ -637,146 +640,142 @@ export const resizeSingleElement = (
 };
 
 const resizeMultipleElements = (
-  elements: readonly NonDeletedExcalidrawElement[],
+  pointerDownState: PointerDownState,
+  selectedElements: readonly NonDeletedExcalidrawElement[],
   transformHandleType: "nw" | "ne" | "sw" | "se",
+  shouldResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
-  const [x1, y1, x2, y2] = getCommonBounds(elements);
-  let scale: number;
-  let getNextXY: (
-    element: NonDeletedExcalidrawElement,
-    origCoords: readonly [number, number, number, number],
-    finalCoords: readonly [number, number, number, number],
-  ) => { x: number; y: number };
-  switch (transformHandleType) {
-    case "se":
-      scale = Math.max(
-        (pointerX - x1) / (x2 - x1),
-        (pointerY - y1) / (y2 - y1),
-      );
-      getNextXY = (element, [origX1, origY1], [finalX1, finalY1]) => {
-        const x = element.x + (origX1 - x1) * (scale - 1) + origX1 - finalX1;
-        const y = element.y + (origY1 - y1) * (scale - 1) + origY1 - finalY1;
-        return { x, y };
-      };
-      break;
-    case "nw":
-      scale = Math.max(
-        (x2 - pointerX) / (x2 - x1),
-        (y2 - pointerY) / (y2 - y1),
-      );
-      getNextXY = (element, [, , origX2, origY2], [, , finalX2, finalY2]) => {
-        const x = element.x - (x2 - origX2) * (scale - 1) + origX2 - finalX2;
-        const y = element.y - (y2 - origY2) * (scale - 1) + origY2 - finalY2;
-        return { x, y };
-      };
-      break;
-    case "ne":
-      scale = Math.max(
-        (pointerX - x1) / (x2 - x1),
-        (y2 - pointerY) / (y2 - y1),
-      );
-      getNextXY = (element, [origX1, , , origY2], [finalX1, , , finalY2]) => {
-        const x = element.x + (origX1 - x1) * (scale - 1) + origX1 - finalX1;
-        const y = element.y - (y2 - origY2) * (scale - 1) + origY2 - finalY2;
-        return { x, y };
-      };
-      break;
-    case "sw":
-      scale = Math.max(
-        (x2 - pointerX) / (x2 - x1),
-        (pointerY - y1) / (y2 - y1),
-      );
-      getNextXY = (element, [, origY1, origX2], [, finalY1, finalX2]) => {
-        const x = element.x - (x2 - origX2) * (scale - 1) + origX2 - finalX2;
-        const y = element.y + (origY1 - y1) * (scale - 1) + origY1 - finalY1;
-        return { x, y };
-      };
-      break;
+  // map selected elements to the original elements. While it never should
+  // happen that pointerDownState.originalElements won't contain the selected
+  // elements during resize, this coupling isn't guaranteed, so to ensure
+  // type safety we need to transform only those elements we filter.
+  const targetElements = selectedElements.reduce(
+    (
+      acc: {
+        /** element at resize start */
+        orig: NonDeletedExcalidrawElement;
+        /** latest element */
+        latest: NonDeletedExcalidrawElement;
+      }[],
+      element,
+    ) => {
+      const origElement = pointerDownState.originalElements.get(element.id);
+      if (origElement) {
+        acc.push({ orig: origElement, latest: element });
+      }
+      return acc;
+    },
+    [],
+  );
+
+  const { minX, minY, maxX, maxY, midX, midY } = getCommonBoundingBox(
+    targetElements.map(({ orig }) => orig),
+  );
+  const direction = transformHandleType;
+
+  const mapDirectionsToAnchors: Record<typeof direction, Point> = {
+    ne: [minX, maxY],
+    se: [minX, minY],
+    sw: [maxX, minY],
+    nw: [maxX, maxY],
+  };
+
+  // anchor point must be on the opposite side of the dragged selection handle
+  // or be the center of the selection if alt is pressed
+  const [anchorX, anchorY]: Point = shouldResizeFromCenter
+    ? [midX, midY]
+    : mapDirectionsToAnchors[direction];
+
+  const mapDirectionsToPointerSides: Record<
+    typeof direction,
+    [x: boolean, y: boolean]
+  > = {
+    ne: [pointerX >= anchorX, pointerY <= anchorY],
+    se: [pointerX >= anchorX, pointerY >= anchorY],
+    sw: [pointerX <= anchorX, pointerY >= anchorY],
+    nw: [pointerX <= anchorX, pointerY <= anchorY],
+  };
+
+  // pointer side relative to anchor
+  const [pointerSideX, pointerSideY] = mapDirectionsToPointerSides[
+    direction
+  ].map((condition) => (condition ? 1 : -1));
+
+  // stop resizing if a pointer is on the other side of selection
+  if (pointerSideX < 0 && pointerSideY < 0) {
+    return;
   }
-  if (scale > 0) {
-    const updates = elements.reduce(
-      (prev, element) => {
-        if (!prev) {
-          return prev;
+
+  const scale =
+    Math.max(
+      (pointerSideX * Math.abs(pointerX - anchorX)) / (maxX - minX),
+      (pointerSideY * Math.abs(pointerY - anchorY)) / (maxY - minY),
+    ) * (shouldResizeFromCenter ? 2 : 1);
+
+  if (scale === 1) {
+    return;
+  }
+
+  targetElements.forEach((element) => {
+    const width = element.orig.width * scale;
+    const height = element.orig.height * scale;
+    const x = anchorX + (element.orig.x - anchorX) * scale;
+    const y = anchorY + (element.orig.y - anchorY) * scale;
+
+    // readjust points for linear & free draw elements
+    const rescaledPoints = rescalePointsInElement(element.orig, width, height);
+
+    const update: {
+      width: number;
+      height: number;
+      x: number;
+      y: number;
+      points?: Point[];
+      fontSize?: number;
+      baseline?: number;
+    } = {
+      width,
+      height,
+      x,
+      y,
+      ...rescaledPoints,
+    };
+
+    let boundTextUpdates: { fontSize: number; baseline: number } | null = null;
+
+    const boundTextElement = getBoundTextElement(element.latest);
+
+    if (boundTextElement || isTextElement(element.orig)) {
+      const optionalPadding = boundTextElement ? BOUND_TEXT_PADDING * 2 : 0;
+      const textMeasurements = measureFontSizeFromWH(
+        boundTextElement ?? (element.orig as ExcalidrawTextElement),
+        width - optionalPadding,
+        height - optionalPadding,
+      );
+      if (textMeasurements) {
+        if (isTextElement(element.orig)) {
+          update.fontSize = textMeasurements.size;
+          update.baseline = textMeasurements.baseline;
         }
-        const width = element.width * scale;
-        const height = element.height * scale;
-        const boundTextElement = getBoundTextElement(element);
-        let font: { fontSize?: number; baseline?: number } = {};
 
         if (boundTextElement) {
-          const nextFont = measureFontSizeFromWH(
-            boundTextElement,
-            width - BOUND_TEXT_PADDING * 2,
-            height - BOUND_TEXT_PADDING * 2,
-          );
-
-          if (nextFont === null) {
-            return null;
-          }
-          font = {
-            fontSize: nextFont.size,
-            baseline: nextFont.baseline,
+          boundTextUpdates = {
+            fontSize: textMeasurements.size,
+            baseline: textMeasurements.baseline,
           };
         }
-
-        if (isTextElement(element)) {
-          const nextFont = measureFontSizeFromWH(element, width, height);
-          if (nextFont === null) {
-            return null;
-          }
-          font = { fontSize: nextFont.size, baseline: nextFont.baseline };
-        }
-        const origCoords = getElementAbsoluteCoords(element);
-
-        const rescaledPoints = rescalePointsInElement(element, width, height);
-
-        updateBoundElements(element, {
-          newSize: { width, height },
-          simultaneouslyUpdated: elements,
-        });
-
-        const finalCoords = getResizedElementAbsoluteCoords(
-          {
-            ...element,
-            ...rescaledPoints,
-          },
-          width,
-          height,
-        );
-
-        const { x, y } = getNextXY(element, origCoords, finalCoords);
-        return [...prev, { width, height, x, y, ...rescaledPoints, ...font }];
-      },
-      [] as
-        | {
-            width: number;
-            height: number;
-            x: number;
-            y: number;
-            points?: (readonly [number, number])[];
-            fontSize?: number;
-            baseline?: number;
-          }[]
-        | null,
-    );
-    if (updates) {
-      elements.forEach((element, index) => {
-        mutateElement(element, updates[index]);
-        const boundTextElement = getBoundTextElement(element);
-
-        if (boundTextElement) {
-          mutateElement(boundTextElement, {
-            fontSize: updates[index].fontSize,
-            baseline: updates[index].baseline,
-          });
-          handleBindTextResize(element, transformHandleType);
-        }
-      });
+      }
     }
-  }
+
+    mutateElement(element.latest, update);
+
+    if (boundTextElement && boundTextUpdates) {
+      mutateElement(boundTextElement, boundTextUpdates);
+      handleBindTextResize(element.latest, transformHandleType);
+    }
+  });
 };
 
 const rotateMultipleElements = (
