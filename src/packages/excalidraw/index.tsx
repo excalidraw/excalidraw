@@ -1,5 +1,4 @@
 import React, { useEffect, forwardRef } from "react";
-
 import { InitializeApp } from "../../components/InitializeApp";
 import App from "../../components/App";
 
@@ -180,6 +179,7 @@ const forwardedRefComp = forwardRef<
 >((props, ref) => <ExcalidrawBase {...props} excalidrawRef={ref} />);
 
 export const Excalidraw = React.memo(forwardedRefComp, areEqual);
+Excalidraw.displayName = "Excalidraw";
 
 export {
   getSceneVersion,
