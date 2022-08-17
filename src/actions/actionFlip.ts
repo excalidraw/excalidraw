@@ -8,8 +8,8 @@ import { AppState } from "../types";
 import { getTransformHandles } from "../element/transformHandles";
 import { isFreeDrawElement, isLinearElement } from "../element/typeChecks";
 import { updateBoundElements } from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
+import { rescalePoints } from "../points";
 
 const enableActionFlipHorizontal = (
   elements: readonly ExcalidrawElement[],
@@ -129,6 +129,7 @@ const flipElement = (
   mutateElement(element, {
     angle: normalizeAngle(0),
   });
+
   // Flip unrotated by pulling TransformHandle to opposite side
   const transformHandles = getTransformHandles(element, appState.zoom);
   let usingNWHandle = true;
@@ -146,13 +147,11 @@ const flipElement = (
     }
   }
 
-  if (isLinearElement(element)) {
-    for (let index = 1; index < element.points.length; index++) {
-      LinearElementEditor.movePoints(element, [
-        { index, point: [-element.points[index][0], element.points[index][1]] },
-      ]);
-    }
-    LinearElementEditor.normalizePoints(element);
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    const points = rescalePoints(0, -width, element.points, true).map(
+      ([x, y]) => [x - finalOffsetX, y] as const,
+    );
+    mutateElement(element, { points });
   } else {
     // calculate new x-coord for transformation
     newNCoordsX = usingNWHandle ? element.x + 2 * width : element.x - 2 * width;
