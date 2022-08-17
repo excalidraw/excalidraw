@@ -766,18 +766,21 @@ const resizeMultipleElements = (
         width - optionalPadding,
         height - optionalPadding,
       );
-      if (textMeasurements) {
-        if (isTextElement(element.orig)) {
-          update.fontSize = textMeasurements.size;
-          update.baseline = textMeasurements.baseline;
-        }
 
-        if (boundTextElement) {
-          boundTextUpdates = {
-            fontSize: textMeasurements.size,
-            baseline: textMeasurements.baseline,
-          };
-        }
+      if (!textMeasurements) {
+        return;
+      }
+
+      if (isTextElement(element.orig)) {
+        update.fontSize = textMeasurements.size;
+        update.baseline = textMeasurements.baseline;
+      }
+
+      if (boundTextElement) {
+        boundTextUpdates = {
+          fontSize: textMeasurements.size,
+          baseline: textMeasurements.baseline,
+        };
       }
     }
 
