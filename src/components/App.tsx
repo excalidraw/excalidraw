@@ -3060,7 +3060,7 @@ class App extends React.Component<AppProps, AppState> {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
         }
       } else if (
-        shouldShowBoundingBox([element]) &&
+        shouldShowBoundingBox([element], this.state) &&
         isHittingElementBoundingBoxWithoutHittingElement(
           element,
           this.state,

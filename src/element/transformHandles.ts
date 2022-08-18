@@ -6,7 +6,7 @@ import {
 
 import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
-import { Zoom } from "../types";
+import { AppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isLinearElement } from "./typeChecks";
 import { DEFAULT_SPACING } from "../renderer/renderScene";
@@ -267,7 +267,11 @@ export const getTransformHandles = (
 
 export const shouldShowBoundingBox = (
   elements: NonDeletedExcalidrawElement[],
+  appState: AppState,
 ) => {
+  if (appState.editingLinearElement) {
+    return false;
+  }
   if (elements.length > 1) {
     return true;
   }
