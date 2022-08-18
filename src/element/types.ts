@@ -1,4 +1,4 @@
-import { CustomData, CustomSubtype } from "../subtypes";
+import { CustomSubtype } from "../subtypes";
 import { Point } from "../types";
 import { FONT_FAMILY, THEME, VERTICAL_ALIGN } from "../constants";
 
