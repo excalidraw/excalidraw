@@ -36,7 +36,11 @@ import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
-import { useDevice, useExcalidrawData } from "../components/App";
+import {
+  useDevice,
+  useExcalidrawElements,
+  useExcalidrawState,
+} from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import { actionToggleZenMode } from "../actions";
@@ -87,7 +91,8 @@ const LayerUI = ({
   onImageAction,
 }: LayerUIProps) => {
   const device = useDevice();
-  const { appState, elements } = useExcalidrawData();
+  const appState = useExcalidrawState();
+  const elements = useExcalidrawElements();
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {

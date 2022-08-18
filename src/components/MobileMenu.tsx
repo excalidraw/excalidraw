@@ -17,7 +17,7 @@ import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
-import { useExcalidrawData } from "./App";
+import { useExcalidrawElements, useExcalidrawState } from "./App";
 
 type MobileMenuProps = {
   actionManager: ActionManager;
@@ -60,7 +60,8 @@ export const MobileMenu = ({
   renderTopRightUI,
   renderStats,
 }: MobileMenuProps) => {
-  const { appState, elements } = useExcalidrawData();
+  const appState = useExcalidrawState();
+  const elements = useExcalidrawElements();
 
   const renderToolbar = () => {
     return (

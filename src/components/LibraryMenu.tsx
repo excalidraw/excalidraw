@@ -29,7 +29,7 @@ import { trackEvent } from "../analytics";
 import { useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import Spinner from "./Spinner";
-import { useDevice, useExcalidrawData } from "./App";
+import { useDevice, useExcalidrawState } from "./App";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -101,7 +101,7 @@ export const LibraryMenu = ({
   const ref = useRef<HTMLDivElement | null>(null);
 
   const device = useDevice();
-  const { appState } = useExcalidrawData();
+  const appState = useExcalidrawState();
   useOnClickOutside(
     ref,
     useCallback(

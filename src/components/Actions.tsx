@@ -3,7 +3,11 @@ import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { PointerType } from "../element/types";
 import { t } from "../i18n";
-import { useDevice, useExcalidrawData } from "../components/App";
+import {
+  useDevice,
+  useExcalidrawElements,
+  useExcalidrawState,
+} from "../components/App";
 import {
   canChangeSharpness,
   canHaveArrowheads,
@@ -32,7 +36,8 @@ export const SelectedShapeActions = ({
 }: {
   renderAction: ActionManager["renderAction"];
 }) => {
-  const { appState, elements } = useExcalidrawData();
+  const appState = useExcalidrawState();
+  const elements = useExcalidrawElements();
 
   const targetElements = getTargetElements(
     getNonDeletedElements(elements),
