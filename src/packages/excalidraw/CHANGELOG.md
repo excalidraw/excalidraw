@@ -13,7 +13,7 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
-### Excalidraw API  
+### Excalidraw API
 
 #### Features
 
