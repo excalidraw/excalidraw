@@ -67,7 +67,7 @@ export const hitTest = (
 
   if (
     isElementSelected(appState, element) &&
-    shouldShowBoundingBox([element])
+    shouldShowBoundingBox([element], appState)
   ) {
     return isPointHittingElementBoundingBox(element, point, threshold);
   }
