@@ -721,7 +721,7 @@ const resizeMultipleElements = (
       (pointerSideY * Math.abs(pointerY - anchorY)) / (maxY - minY),
     ) * (shouldResizeFromCenter ? 2 : 1);
 
-  if (scale === 1) {
+  if (scale === 0) {
     return;
   }
 
