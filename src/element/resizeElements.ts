@@ -784,6 +784,8 @@ const resizeMultipleElements = (
       }
     }
 
+    updateBoundElements(element.latest, { newSize: { width, height } });
+
     mutateElement(element.latest, update);
 
     if (boundTextElement && boundTextUpdates) {
