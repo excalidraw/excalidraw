@@ -3626,7 +3626,6 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
       } else {
-        let midPointAdded = false;
         if (this.state.selectedLinearElement) {
           const linearElementEditor =
             this.state.editingLinearElement || this.state.selectedLinearElement;
@@ -3637,7 +3636,6 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin,
             linearElementEditor,
           );
-          midPointAdded = ret.isMidPoint;
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
           }
@@ -3672,9 +3670,8 @@ class App extends React.Component<AppProps, AppState> {
           if (hitLinkElement) {
             return false;
           }
-          // isHittingElementNotConsideringBoundingBox returns false when mid point added hence using midPointAdded
+
           pointerDownState.hit.hasHitElementInside =
-            midPointAdded ||
             isHittingElementNotConsideringBoundingBox(
               pointerDownState.hit.element,
               this.state,
