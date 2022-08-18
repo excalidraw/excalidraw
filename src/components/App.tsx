@@ -3670,7 +3670,6 @@ class App extends React.Component<AppProps, AppState> {
           if (hitLinkElement) {
             return false;
           }
-
           pointerDownState.hit.hasHitElementInside =
             isHittingElementNotConsideringBoundingBox(
               pointerDownState.hit.element,
