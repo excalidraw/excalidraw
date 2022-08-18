@@ -3492,7 +3492,6 @@ class App extends React.Component<AppProps, AppState> {
             origin,
             selectedElements,
           ),
-        hasHitElementInside: false,
       },
       drag: {
         hasOccurred: false,
@@ -3670,12 +3669,6 @@ class App extends React.Component<AppProps, AppState> {
           if (hitLinkElement) {
             return false;
           }
-          pointerDownState.hit.hasHitElementInside =
-            isHittingElementNotConsideringBoundingBox(
-              pointerDownState.hit.element,
-              this.state,
-              [pointerDownState.origin.x, pointerDownState.origin.y],
-            );
         }
 
         // For overlapped elements one position may hit
