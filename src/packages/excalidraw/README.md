@@ -476,6 +476,8 @@ Beyond attributes that Excalidraw elements already support, you can store custom
 
 You can use this to add any extra information you need to keep track of.
 
+You can add `customData` to elements when passing them as `initialData`, or using [`updateScene`](#updateScene)/[`updateLibrary`](#updateLibrary) afterwards.
+
 #### `ref`
 
 You can pass a `ref` when you want to access some excalidraw APIs. We expose the below APIs:
