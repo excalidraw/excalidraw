@@ -114,8 +114,11 @@ const restoreElementWithProperties = <
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ?? null,
     locked: element.locked ?? false,
-    customData: element.customData,
   };
+
+  if ("customData" in element) {
+    base.customData = element.customData;
+  }
 
   return {
     ...base,
