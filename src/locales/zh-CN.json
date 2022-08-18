@@ -187,8 +187,7 @@
     "invalidSceneUrl": "无法从提供的 URL 导入场景。它或者格式不正确，或者不包含有效的 Excalidraw JSON 数据。",
     "resetLibrary": "这将会清除你的素材库。你确定要这么做吗？",
     "removeItemsFromsLibrary": "确定要从素材库中删除 {{count}} 个项目吗？",
-    "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。",
-    "browserZoom": "您的浏览器缩放程度没有设置为 100%，这可能会导致画板显示不正确"
+    "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。"
   },
   "errors": {
     "unsupportedFileType": "不支持的文件格式。",

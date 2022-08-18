@@ -66,7 +66,7 @@ export const MobileMenu = ({
     return (
       <FixedSideContainer side="top" className="App-top-bar">
         <Section heading="shapes">
-          {(heading) => (
+          {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
               <Stack.Row gap={1} className="App-toolbar-container">
                 <Island padding={1} className="App-toolbar">
@@ -220,18 +220,20 @@ export const MobileMenu = ({
           ) : null}
           <footer className="App-toolbar">
             {renderAppToolbar()}
-            {appState.scrolledOutside && !appState.openMenu && (
-              <button
-                className="scroll-back-to-content"
-                onClick={() => {
-                  setAppState({
-                    ...calculateScrollCenter(elements, appState, canvas),
-                  });
-                }}
-              >
-                {t("buttons.scrollBackToContent")}
-              </button>
-            )}
+            {appState.scrolledOutside &&
+              !appState.openMenu &&
+              !appState.isLibraryOpen && (
+                <button
+                  className="scroll-back-to-content"
+                  onClick={() => {
+                    setAppState({
+                      ...calculateScrollCenter(elements, appState, canvas),
+                    });
+                  }}
+                >
+                  {t("buttons.scrollBackToContent")}
+                </button>
+              )}
           </footer>
         </Island>
       </div>

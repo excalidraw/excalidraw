@@ -40,32 +40,33 @@
     ]
   },
   "peerDependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react": "^17.0.2 || ^18.2.0",
+    "react-dom": "^17.0.2 || ^18.2.0"
   },
   "devDependencies": {
-    "@babel/core": "7.17.0",
-    "@babel/plugin-transform-arrow-functions": "7.16.7",
-    "@babel/plugin-transform-async-to-generator": "7.16.0",
-    "@babel/plugin-transform-runtime": "7.17.10",
-    "@babel/plugin-transform-typescript": "7.16.1",
+    "@babel/core": "7.18.9",
+    "@babel/plugin-transform-arrow-functions": "7.18.6",
+    "@babel/plugin-transform-async-to-generator": "7.18.6",
+    "@babel/plugin-transform-runtime": "7.18.9",
+    "@babel/plugin-transform-typescript": "7.18.8",
     "@babel/preset-env": "7.18.6",
-    "@babel/preset-react": "7.16.7",
-    "@babel/preset-typescript": "7.16.7",
+    "@babel/preset-react": "7.18.6",
+    "@babel/preset-typescript": "7.18.6",
     "autoprefixer": "10.4.7",
     "babel-loader": "8.2.5",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
     "css-loader": "6.7.1",
-    "mini-css-extract-plugin": "2.6.0",
-    "postcss-loader": "6.2.1",
-    "sass-loader": "12.4.0",
-    "terser-webpack-plugin": "5.3.1",
-    "ts-loader": "9.3.0",
-    "typescript": "4.6.4",
-    "webpack": "5.72.0",
+    "dotenv": "16.0.1",
+    "mini-css-extract-plugin": "2.6.1",
+    "postcss-loader": "7.0.1",
+    "sass-loader": "13.0.2",
+    "terser-webpack-plugin": "5.3.3",
+    "ts-loader": "9.3.1",
+    "typescript": "4.7.4",
+    "webpack": "5.73.0",
     "webpack-bundle-analyzer": "4.5.0",
-    "webpack-cli": "4.9.2",
+    "webpack-cli": "4.10.0",
     "webpack-dev-server": "4.9.3",
     "webpack-merge": "5.8.0"
   },
@@ -78,9 +79,6 @@
     "pack": "yarn build:umd && yarn pack",
     "start": "webpack serve --config webpack.dev-server.config.js",
     "install:deps": "yarn install --frozen-lockfile && yarn --cwd ../../../",
-    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js"
-  },
-  "dependencies": {
-    "dotenv": "10.0.0"
+    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js && yarn gen:types"
   }
 }
