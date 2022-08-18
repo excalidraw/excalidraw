@@ -470,6 +470,12 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 
 You might want to use this when you want to load excalidraw with some initial elements and app state.
 
+#### Storing custom data on Excalidraw elements
+
+Beyond attributes that Excalidraw elements alredy support, you can store custom data on each element in a `customData` object. The type of the attribute is [`Record<string, any>`](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L59) and is optional.
+
+You can use this to add any extra information you need to keep track of.
+
 #### `ref`
 
 You can pass a `ref` when you want to access some excalidraw APIs. We expose the below APIs:
