@@ -18,7 +18,7 @@ const crispSubtypeTypes: SubtypeTypes = {
     { subtype: crispSubtype, parentType: "diamond" },
     { subtype: crispSubtype, parentType: "ellipse" },
   ],
-  customProps: crispProps,
+  customData: crispProps,
   customActions: [
     {
       subtype: crispSubtype,

@@ -100,8 +100,8 @@ export type AppState = {
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
   activeSubtypes?: CustomSubtype[];
-  customProps?: {
-    [subtype: CustomSubtype]: ExcalidrawElement["customProps"];
+  customData?: {
+    [subtype: CustomSubtype]: ExcalidrawElement["customData"];
   };
   activeTool:
     | {

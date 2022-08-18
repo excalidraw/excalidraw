@@ -1,4 +1,4 @@
-import { CustomProps, CustomSubtype } from "../subtypes";
+import { CustomData, CustomSubtype } from "../subtypes";
 import { Point } from "../types";
 import { FONT_FAMILY, THEME, VERTICAL_ALIGN } from "../constants";
 
@@ -58,7 +58,7 @@ type _ExcalidrawElementBase = Readonly<{
   link: string | null;
   locked: boolean;
   subtype?: CustomSubtype;
-  customProps?: CustomProps;
+  customData?: CustomData;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {

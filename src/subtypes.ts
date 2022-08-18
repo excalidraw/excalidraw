@@ -16,7 +16,7 @@ import { getBoundTextElement } from "./element/textElement";
 // Use "let" instead of "const" so we can dynamically add subtypes
 let customSubtypes: readonly CustomSubtype[] = [];
 let customParents: SubtypeTypes["parents"] = [];
-let customProps: SubtypeTypes["customProps"] = [];
+let customData: SubtypeTypes["customData"] = [];
 let customActions: SubtypeTypes["customActions"] = [];
 let disabledActions: SubtypeTypes["disabledActions"] = [];
 let customShortcutNames: SubtypeTypes["customShortcutNames"] = [];
@@ -28,7 +28,7 @@ export type SubtypeTypes = Readonly<{
     subtype: CustomSubtype;
     parentType: ExcalidrawElement["type"];
   }[];
-  customProps: readonly CustomProps[];
+  customData: readonly CustomData[];
   customActions: readonly {
     subtype: CustomSubtype;
     actions: CustomActionName[];
@@ -53,7 +53,7 @@ export const isValidSubtype = (s: any, t: any): s is CustomSubtype =>
 const isSubtype = (s: any): s is CustomSubtype => customSubtypes.includes(s);
 
 // Custom Properties
-export type CustomProps = any;
+export type CustomData = Record<string, any>;
 
 // Custom Actions
 export type CustomActionName = string;
@@ -213,12 +213,12 @@ export type CustomMethods = {
   measureText: (
     element: Pick<
       ExcalidrawTextElement,
-      "subtype" | "customProps" | "fontSize" | "fontFamily" | "text"
+      "subtype" | "customData" | "fontSize" | "fontFamily" | "text"
     >,
     next?: {
       fontSize?: number;
       text?: string;
-      customProps?: CustomProps;
+      customData?: CustomData;
     },
     maxWidth?: number | null,
   ) => { width: number; height: number; baseline: number };
@@ -236,13 +236,13 @@ export type CustomMethods = {
   wrapText: (
     element: Pick<
       ExcalidrawTextElement,
-      "subtype" | "customProps" | "fontSize" | "fontFamily" | "originalText"
+      "subtype" | "customData" | "fontSize" | "fontFamily" | "originalText"
     >,
     containerWidth: number,
     next?: {
       fontSize?: number;
       text?: string;
-      customProps?: CustomProps;
+      customData?: CustomData;
     },
   ) => string;
 };
@@ -266,18 +266,18 @@ export const addCustomMethods = (
 };
 
 // For a given `ExcalidrawElement` type, return the active subtype
-// and associated customProps (if any) from the AppState.  Assume
+// and associated customData (if any) from the AppState.  Assume
 // only one subtype is active for a given `ExcalidrawElement` type
 // at any given time.
 export const selectSubtype = (
   appState: {
     activeSubtypes?: AppState["activeSubtypes"];
-    customProps?: AppState["customProps"];
+    customData?: AppState["customData"];
   },
   type: ExcalidrawElement["type"],
 ): {
   subtype?: ExcalidrawElement["subtype"];
-  customProps?: ExcalidrawElement["customProps"];
+  customData?: ExcalidrawElement["customData"];
 } => {
   if (appState.activeSubtypes === undefined) {
     return {};
@@ -288,14 +288,11 @@ export const selectSubtype = (
   if (subtype === undefined) {
     return {};
   }
-  if (
-    appState.customProps === undefined ||
-    !(subtype in appState.customProps)
-  ) {
+  if (appState.customData === undefined || !(subtype in appState.customData)) {
     return { subtype };
   }
-  const customProps = appState.customProps?.subtype;
-  return { subtype, customProps };
+  const customData = appState.customData?.subtype;
+  return { subtype, customData };
 };
 
 // Functions to prepare subtypes for use
@@ -332,7 +329,7 @@ export const prepareSubtype = (
   // Register the types
   customSubtypes = [...customSubtypes, types.subtype];
   customParents = [...customParents, ...types.parents];
-  customProps = [...customProps, ...types.customProps];
+  customData = [...customData, ...types.customData];
   customActions = [...customActions, ...types.customActions];
   disabledActions = [...disabledActions, ...types.disabledActions];
   customShortcutNames = [...customShortcutNames, ...types.customShortcutNames];

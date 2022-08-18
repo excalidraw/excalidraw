@@ -38,20 +38,20 @@ export const delUndefinedProps = (obj: any, keys: string[]) => {
 export const maybeGetCustom = (
   obj: {
     subtype?: ExcalidrawElement["subtype"];
-    customProps?: ExcalidrawElement["customProps"];
+    customData?: ExcalidrawElement["customData"];
   },
   type: ExcalidrawElement["type"],
 ) => {
-  const { subtype, customProps } = obj;
-  const custom = delUndefinedProps({ subtype, customProps }, [
+  const { subtype, customData } = obj;
+  const custom = delUndefinedProps({ subtype, customData }, [
     "subtype",
-    "customProps",
+    "customData",
   ]);
   if ("subtype" in custom && !isValidSubtype(custom.subtype, type)) {
     delete custom.subtype;
   }
-  if (!("subtype" in custom) && "customProps" in custom) {
-    delete custom.customProps;
+  if (!("subtype" in custom) && "customData" in custom) {
+    delete custom.customData;
   }
   return custom as typeof obj;
 };
@@ -68,7 +68,7 @@ type ElementConstructorOpts = MarkOptional<
   | "versionNonce"
   | "link"
   | "subtype"
-  | "customProps"
+  | "customData"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -94,9 +94,9 @@ const _newElementBase = <T extends ExcalidrawElement>(
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
-  const { subtype, customProps } = rest;
+  const { subtype, customData } = rest;
   const element = {
-    ...maybeGetCustom({ subtype, customProps }, type),
+    ...maybeGetCustom({ subtype, customData }, type),
     id: rest.id || randomId(),
     type,
     x,
@@ -169,7 +169,7 @@ export const newTextElement = (
 ): NonDeleted<ExcalidrawTextElement> => {
   const map = getCustomMethods(opts?.subtype);
   map?.clean && map.clean(opts);
-  const metrics = measureTextElement(opts, { customProps: opts.customProps });
+  const metrics = measureTextElement(opts, { customData: opts.customData });
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {

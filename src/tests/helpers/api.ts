@@ -108,7 +108,7 @@ export class API {
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
     subtype?: ExcalidrawElement["subtype"];
-    customProps?: ExcalidrawElement["customProps"];
+    customData?: ExcalidrawElement["customData"];
     boundElements?: ExcalidrawGenericElement["boundElements"];
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
@@ -129,8 +129,8 @@ export class API {
     const custom = maybeGetCustom(
       {
         subtype: rest.subtype ?? selectSubtype(appState, type)?.subtype,
-        customProps:
-          rest.customProps ?? selectSubtype(appState, type)?.customProps,
+        customData:
+          rest.customData ?? selectSubtype(appState, type)?.customData,
       },
       type,
     );

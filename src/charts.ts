@@ -23,7 +23,7 @@ export interface Spreadsheet {
   labels: string[] | null;
   values: number[];
   activeSubtypes?: AppState["activeSubtypes"];
-  customProps?: AppState["customProps"];
+  customData?: AppState["customData"];
 }
 
 export const NOT_SPREADSHEET = "NOT_SPREADSHEET";

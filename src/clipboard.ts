@@ -146,7 +146,7 @@ export const parseClipboard = async (
   if (spreadsheetResult) {
     if ("spreadsheet" in spreadsheetResult) {
       spreadsheetResult.spreadsheet.activeSubtypes = appState?.activeSubtypes;
-      spreadsheetResult.spreadsheet.customProps = appState?.customProps;
+      spreadsheetResult.spreadsheet.customData = appState?.customData;
     }
     return spreadsheetResult;
   }

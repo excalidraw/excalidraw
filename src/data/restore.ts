@@ -78,7 +78,7 @@ const restoreElementWithProperties = <
   T extends ExcalidrawElement,
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
-  element: MarkOptional<Required<T>, "subtype" | "customProps"> & {
+  element: MarkOptional<Required<T>, "subtype" | "customData"> & {
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
   },
@@ -271,12 +271,12 @@ export const restoreAppState = (
         : defaultValue;
   }
 
-  const { activeSubtypes, customProps } = appState;
+  const { activeSubtypes, customData } = appState;
   return {
     ...nextAppState,
-    ...delUndefinedProps({ activeSubtypes, customProps }, [
+    ...delUndefinedProps({ activeSubtypes, customData }, [
       "activeSubtypes",
-      "customProps",
+      "customData",
     ]),
     cursorButton: localAppState?.cursorButton || "up",
     // reset on fresh restore so as to hide the UI button if penMode not active
