@@ -424,7 +424,10 @@ export const _renderScene = ({
       !appState.editingLinearElement
     ) {
       const locallySelectedElements = getSelectedElements(elements, appState);
-      const showBoundingBox = shouldShowBoundingBox(locallySelectedElements);
+      const showBoundingBox = shouldShowBoundingBox(
+        locallySelectedElements,
+        appState,
+      );
 
       const locallySelectedIds = locallySelectedElements.map(
         (element) => element.id,
