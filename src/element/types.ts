@@ -58,7 +58,7 @@ type _ExcalidrawElementBase = Readonly<{
   link: string | null;
   locked: boolean;
   subtype?: CustomSubtype;
-  customData?: CustomData;
+  customData?: Record<string, any>;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {

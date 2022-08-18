@@ -108,7 +108,7 @@
     "decreaseFontSize": "Redueix la mida de la lletra",
     "increaseFontSize": "Augmenta la mida de la lletra",
     "unbindText": "Desvincular el text",
-    "bindText": "",
+    "bindText": "Ajusta el text al contenidor",
     "link": {
       "edit": "Edita l'enllaç",
       "create": "Crea un enllaç",
@@ -121,12 +121,12 @@
       "unlockAll": "Desbloca-ho tot"
     },
     "statusPublished": "Publicat",
-    "sidebarLock": ""
+    "sidebarLock": "Manté la barra lateral oberta"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "Encara no s'hi han afegit elements...",
+    "hint_emptyLibrary": "Trieu un element o un llenç per a afegir-lo aquí, o instal·leu una biblioteca del repositori públic, més avall.",
+    "hint_emptyPrivateLibrary": "Trieu un element o un llenç per a afegir-lo aquí."
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
@@ -195,7 +195,7 @@
     "fileTooBig": "El fitxer és massa gros. La mida màxima permesa és {{maxSize}}.",
     "svgImageInsertError": "No ha estat possible inserir la imatge SVG. Les marques SVG semblen invàlides.",
     "invalidSVGString": "SVG no vàlid.",
-    "cannotResolveCollabServer": "",
+    "cannotResolveCollabServer": "No ha estat possible connectar amb el servidor collab. Si us plau recarregueu la pàgina i torneu a provar.",
     "importLibraryError": "No s'ha pogut carregar la biblioteca"
   },
   "toolBar": {
@@ -306,7 +306,7 @@
     "view": "Visualització",
     "zoomToFit": "Zoom per veure tots els elements",
     "zoomToSelection": "Zoom per veure la selecció",
-    "toggleElementLock": ""
+    "toggleElementLock": "Blocar/desblocar la selecció"
   },
   "clearCanvasDialog": {
     "title": "Neteja el llenç"
@@ -324,7 +324,7 @@
       "authorName": "Nom o usuari",
       "libraryName": "Nom de la vostra biblioteca",
       "libraryDesc": "Descripció de la biblioteca per a ajudar a la gent a entendre'n el funcionament",
-      "githubHandle": "",
+      "githubHandle": "Identificador de GitHub (opcional), per tal que pugueu editar la biblioteca una vegada enviada per a ser revisada",
       "twitterHandle": "Usuari de twitter (opcional), per tal que puguem donar-vos crèdit quan fem la promoció a Twitter",
       "website": "Enllaç al vostre lloc web personal o a qualsevol altre (opcional)"
     },

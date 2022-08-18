@@ -121,10 +121,10 @@
       "unlockAll": "모두 잠금 해제"
     },
     "statusPublished": "게시됨",
-    "sidebarLock": ""
+    "sidebarLock": "사이드바 유지"
   },
   "library": {
-    "noItems": "",
+    "noItems": "추가된 아이템 없음",
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },

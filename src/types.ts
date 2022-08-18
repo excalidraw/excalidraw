@@ -433,7 +433,6 @@ export type PointerDownState = Readonly<{
     // pointer interaction
     hasBeenDuplicated: boolean;
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
-    hasHitElementInside: boolean;
   };
   withCmdOrCtrl: boolean;
   drag: {

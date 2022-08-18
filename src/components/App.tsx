@@ -3130,7 +3130,7 @@ class App extends React.Component<AppProps, AppState> {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
         }
       } else if (
-        shouldShowBoundingBox([element]) &&
+        shouldShowBoundingBox([element], this.state) &&
         isHittingElementBoundingBoxWithoutHittingElement(
           element,
           this.state,
@@ -3562,7 +3562,6 @@ class App extends React.Component<AppProps, AppState> {
             origin,
             selectedElements,
           ),
-        hasHitElementInside: false,
       },
       drag: {
         hasOccurred: false,
@@ -3730,22 +3729,16 @@ class App extends React.Component<AppProps, AppState> {
 
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
-          if (
-            isPointHittingLinkIcon(
-              pointerDownState.hit.element,
-              this.state,
-              [pointerDownState.origin.x, pointerDownState.origin.y],
-              this.device.isMobile,
-            )
-          ) {
+          const hitLinkElement = this.getElementLinkAtPosition(
+            {
+              x: pointerDownState.origin.x,
+              y: pointerDownState.origin.y,
+            },
+            pointerDownState.hit.element,
+          );
+          if (hitLinkElement) {
             return false;
           }
-          pointerDownState.hit.hasHitElementInside =
-            isHittingElementNotConsideringBoundingBox(
-              pointerDownState.hit.element,
-              this.state,
-              [pointerDownState.origin.x, pointerDownState.origin.y],
-            );
         }
 
         // For overlapped elements one position may hit
@@ -4607,9 +4600,8 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.editingLinearElement) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
-          (pointerDownState.hit?.element?.id !==
-            this.state.editingLinearElement.elementId ||
-            !pointerDownState.hit.hasHitElementInside)
+          pointerDownState.hit?.element?.id !==
+            this.state.editingLinearElement.elementId
         ) {
           this.actionManager.executeAction(actionFinalize);
         } else {
@@ -4627,10 +4619,8 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (this.state.selectedLinearElement) {
         if (
-          !pointerDownState.boxSelection.hasOccurred &&
-          (pointerDownState.hit?.element?.id !==
-            this.state.selectedLinearElement.elementId ||
-            !pointerDownState.hit.hasHitElementInside)
+          pointerDownState.hit?.element?.id !==
+          this.state.selectedLinearElement.elementId
         ) {
           const selectedELements = getSelectedElements(
             this.scene.getNonDeletedElements(),
@@ -5010,7 +5000,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        !this.state.editingLinearElement &&
         !pointerDownState.drag.hasOccurred &&
         !this.state.isResizing &&
         ((hitElement &&
@@ -5023,13 +5012,16 @@ class App extends React.Component<AppProps, AppState> {
           (!hitElement &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
       ) {
-        // Deselect selected elements
-        this.setState({
-          selectedElementIds: {},
-          selectedGroupIds: {},
-          editingGroupId: null,
-        });
-
+        if (this.state.editingLinearElement) {
+          this.setState({ editingLinearElement: null });
+        } else {
+          // Deselect selected elements
+          this.setState({
+            selectedElementIds: {},
+            selectedGroupIds: {},
+            editingGroupId: null,
+          });
+        }
         return;
       }
 

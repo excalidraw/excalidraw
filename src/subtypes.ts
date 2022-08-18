@@ -53,7 +53,7 @@ export const isValidSubtype = (s: any, t: any): s is CustomSubtype =>
 const isSubtype = (s: any): s is CustomSubtype => customSubtypes.includes(s);
 
 // Custom Properties
-export type CustomData = Record<string, any>;
+export type CustomData = ExcalidrawElement["customData"];
 
 // Custom Actions
 export type CustomActionName = string;
