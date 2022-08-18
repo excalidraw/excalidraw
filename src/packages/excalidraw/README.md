@@ -394,7 +394,7 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`zenModeEnabled`](#zenModeEnabled) | boolean |  | This implies if the zen mode is enabled |
 | [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
 | [`libraryReturnUrl`](#libraryReturnUrl) | string |  | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
-| [`theme`](#theme) | [THEME.LIGHT](#THEME-1) &#124; [THEME.LIGHT](#THEME-1) | [THEME.LIGHT](#THEME-1) | The theme of the Excalidraw component |
+| [`theme`](#theme) | [THEME.LIGHT](#THEME-1) &#124; [THEME.DARK](#THEME-1) | [THEME.LIGHT](#THEME-1) | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
 | [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
 | [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L21">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
@@ -469,6 +469,14 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 ```
 
 You might want to use this when you want to load excalidraw with some initial elements and app state.
+
+#### Storing custom data on Excalidraw elements
+
+Beyond attributes that Excalidraw elements already support, you can store custom data on each element in a `customData` object. The type of the attribute is [`Record<string, any>`](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L59) and is optional.
+
+You can use this to add any extra information you need to keep track of.
+
+You can add `customData` to elements when passing them as `initialData`, or using [`updateScene`](#updateScene)/[`updateLibrary`](#updateLibrary) afterwards.
 
 #### `ref`
 

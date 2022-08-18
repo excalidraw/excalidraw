@@ -179,6 +179,7 @@ export type AppState = {
   /** imageElement waiting to be placed on canvas */
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
+  selectedLinearElement: LinearElementEditor | null;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -421,7 +422,6 @@ export type PointerDownState = Readonly<{
     // pointer interaction
     hasBeenDuplicated: boolean;
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
-    hasHitElementInside: boolean;
   };
   withCmdOrCtrl: boolean;
   drag: {

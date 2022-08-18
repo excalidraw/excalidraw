@@ -124,7 +124,7 @@
     "sidebarLock": "Mantener barra lateral abierta"
   },
   "library": {
-    "noItems": "",
+    "noItems": "No hay elementos añadidos todavía...",
     "hint_emptyLibrary": "Seleccione un elemento en el lienzo para añadirlo aquí, o instale una biblioteca del repositorio público, a continuación.",
     "hint_emptyPrivateLibrary": "Seleccione un elemento del lienzo para añadirlo aquí."
   },
@@ -187,8 +187,7 @@
     "invalidSceneUrl": "No se ha podido importar la escena desde la URL proporcionada. Está mal formada, o no contiene datos de Excalidraw JSON válidos.",
     "resetLibrary": "Esto borrará tu biblioteca. ¿Estás seguro?",
     "removeItemsFromsLibrary": "¿Eliminar {{count}} elemento(s) de la biblioteca?",
-    "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada.",
-    "browserZoom": "El nivel de zoom de tu navegador no está configurado al 100%, lo que puede causar que el tablero se muestre de manera incorrecta"
+    "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada."
   },
   "errors": {
     "unsupportedFileType": "Tipo de archivo no admitido.",

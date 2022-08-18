@@ -862,46 +862,42 @@ describe("regression tests", () => {
     expect(API.getSelectedElements().length).toBe(0);
   });
 
-  it(
-    "drags selected elements from point inside common bounding box that doesn't hit any element " +
-      "and keeps elements selected after dragging",
-    () => {
-      UI.clickTool("rectangle");
-      mouse.down();
-      mouse.up(10, 10);
+  it("drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging", () => {
+    UI.clickTool("rectangle");
+    mouse.down();
+    mouse.up(10, 10);
 
-      UI.clickTool("ellipse");
-      mouse.down(100, 100);
-      mouse.up(10, 10);
+    UI.clickTool("ellipse");
+    mouse.down(100, 100);
+    mouse.up(10, 10);
 
-      // Selects first element without deselecting the second element
-      // Second element is already selected because creating it was our last action
-      mouse.reset();
-      Keyboard.withModifierKeys({ shift: true }, () => {
-        mouse.click(5, 5);
-      });
+    // Selects first element without deselecting the second element
+    // Second element is already selected because creating it was our last action
+    mouse.reset();
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.click(5, 5);
+    });
 
-      expect(API.getSelectedElements().length).toBe(2);
+    expect(API.getSelectedElements().length).toBe(2);
 
-      const { x: firstElementPrevX, y: firstElementPrevY } =
-        API.getSelectedElements()[0];
-      const { x: secondElementPrevX, y: secondElementPrevY } =
-        API.getSelectedElements()[1];
+    const { x: firstElementPrevX, y: firstElementPrevY } =
+      API.getSelectedElements()[0];
+    const { x: secondElementPrevX, y: secondElementPrevY } =
+      API.getSelectedElements()[1];
 
-      // drag elements from point on common bounding box that doesn't hit any of the elements
-      mouse.reset();
-      mouse.down(50, 50);
-      mouse.up(25, 25);
+    // drag elements from point on common bounding box that doesn't hit any of the elements
+    mouse.reset();
+    mouse.down(50, 50);
+    mouse.up(25, 25);
 
-      expect(API.getSelectedElements()[0].x).toEqual(firstElementPrevX + 25);
-      expect(API.getSelectedElements()[0].y).toEqual(firstElementPrevY + 25);
+    expect(API.getSelectedElements()[0].x).toEqual(firstElementPrevX + 25);
+    expect(API.getSelectedElements()[0].y).toEqual(firstElementPrevY + 25);
 
-      expect(API.getSelectedElements()[1].x).toEqual(secondElementPrevX + 25);
-      expect(API.getSelectedElements()[1].y).toEqual(secondElementPrevY + 25);
+    expect(API.getSelectedElements()[1].x).toEqual(secondElementPrevX + 25);
+    expect(API.getSelectedElements()[1].y).toEqual(secondElementPrevY + 25);
 
-      expect(API.getSelectedElements().length).toBe(2);
-    },
-  );
+    expect(API.getSelectedElements().length).toBe(2);
+  });
 
   it(
     "given a group of selected elements with an element that is not selected inside the group common bounding box " +
