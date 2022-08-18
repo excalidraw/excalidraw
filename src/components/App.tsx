@@ -3660,14 +3660,14 @@ class App extends React.Component<AppProps, AppState> {
 
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
-          if (
-            isPointHittingLinkIcon(
-              pointerDownState.hit.element,
-              this.state,
-              [pointerDownState.origin.x, pointerDownState.origin.y],
-              this.device.isMobile,
-            )
-          ) {
+          const hitLinkElement = this.getElementLinkAtPosition(
+            {
+              x: pointerDownState.origin.x,
+              y: pointerDownState.origin.y,
+            },
+            pointerDownState.hit.element,
+          );
+          if (hitLinkElement) {
             return false;
           }
           pointerDownState.hit.hasHitElementInside =
