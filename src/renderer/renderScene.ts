@@ -226,7 +226,10 @@ const renderLinearPointHandles = (
       const centerPoint = LinearElementEditor.getMidPoint(
         appState.selectedLinearElement,
       )!;
-
+      // The order of renderingSingleLinearPoint and highLight points is different
+      // inside vs outside editor as hover states are different,
+      // in editor when hovered the original point is not visible as hover state fully covers it whereas outside the
+      // editor original point is visible and hover state is just an outer circle.
       if (appState.editingLinearElement) {
         renderSingleLinearPoint(
           context,
