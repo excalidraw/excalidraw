@@ -472,7 +472,7 @@ You might want to use this when you want to load excalidraw with some initial el
 
 #### Storing custom data on Excalidraw elements
 
-Beyond attributes that Excalidraw elements alredy support, you can store custom data on each element in a `customData` object. The type of the attribute is [`Record<string, any>`](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L59) and is optional.
+Beyond attributes that Excalidraw elements already support, you can store custom data on each element in a `customData` object. The type of the attribute is [`Record<string, any>`](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L59) and is optional.
 
 You can use this to add any extra information you need to keep track of.
 
