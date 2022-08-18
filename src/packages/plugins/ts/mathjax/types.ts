@@ -7,7 +7,7 @@ export type MathProps = typeof mathProps[number];
 export const getMathSubtypeTypes = () => mathSubtypeTypes;
 
 // Define this separately so we can do `export type MathProps`
-const mathProps = [
+const mathProps: readonly Record<string, boolean>[] = [
   { useTex: true, mathOnly: false } as { useTex: boolean; mathOnly: boolean },
 ] as const;
 
@@ -15,7 +15,7 @@ const mathProps = [
 const mathSubtypeTypes: SubtypeTypes = {
   subtype: mathSubtype,
   parents: [{ subtype: mathSubtype, parentType: "text" }],
-  customProps: mathProps,
+  customData: mathProps,
   customActions: [
     {
       subtype: mathSubtype,

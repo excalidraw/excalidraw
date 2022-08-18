@@ -48,7 +48,7 @@ const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;
 type ExcalidrawMathElement = ExcalidrawTextElement &
   Readonly<{
     subtype: typeof mathSubtype;
-    customProps: MathProps;
+    customData: MathProps;
   }>;
 
 const isMathElement = (
@@ -65,7 +65,8 @@ class GetMathProps {
   private useTex: boolean = true;
   private mathOnly: boolean = false;
   getUseTex = (appState?: AppState): boolean => {
-    const mathProps = appState?.customProps?.mathSubtype as MathProps;
+    const mathProps =
+      appState?.customData && appState.customData[`${mathSubtype}`];
     if (mathProps !== undefined) {
       this.useTex = mathProps.useTex !== undefined ? mathProps.useTex : true;
     }
@@ -73,7 +74,8 @@ class GetMathProps {
   };
 
   getMathOnly = (appState?: AppState): boolean => {
-    const mathProps = appState?.customProps?.mathSubtype as MathProps;
+    const mathProps =
+      appState?.customData && appState.customData[`${mathSubtype}`];
     if (mathProps !== undefined) {
       this.mathOnly =
         mathProps.mathOnly !== undefined ? mathProps.mathOnly : false;
@@ -696,14 +698,14 @@ const getSelectedMathElements = (
   return eligibleElements;
 };
 
-// Be sure customProps is defined with proper values for ExcalidrawMathElements
+// Be sure customData is defined with proper values for ExcalidrawMathElements
 const ensureMathElement = (element: Partial<ExcalidrawElement>) => {
   if (!isMathElement(element as Required<ExcalidrawElement>)) {
     return;
   }
-  const mathProps = getMathProps.ensureMathProps(element.customProps!);
-  if (!("customProps" in element)) {
-    (element as any).customProps = mathProps;
+  const mathProps = getMathProps.ensureMathProps(element.customData!);
+  if (!("customData" in element)) {
+    (element as any).customData = mathProps;
   }
 };
 
@@ -713,9 +715,9 @@ const cleanMathElementUpdate = function (updates) {
     if (key !== "fontFamily") {
       (oldUpdates as any)[key] = (updates as any)[key];
     }
-    if (key === "customProps") {
-      const customProps = (updates as any)[key] as MathProps;
-      (updates as any)[key] = getMathProps.ensureMathProps(customProps);
+    if (key === "customData") {
+      const customData = (updates as any)[key] as MathProps;
+      (updates as any)[key] = getMathProps.ensureMathProps(customData);
     } else {
       (updates as any)[key] = (updates as any)[key];
     }
@@ -729,8 +731,8 @@ const measureMathElement = function (element, next, maxWidth) {
   const isMathJaxLoaded = mathJaxLoaded;
   const fontSize = next?.fontSize ?? element.fontSize;
   const text = next?.text ?? element.text;
-  const customProps = next?.customProps ?? element.customProps;
-  const mathProps = getMathProps.ensureMathProps(customProps!);
+  const customData = next?.customData ?? element.customData;
+  const mathProps = getMathProps.ensureMathProps(customData!);
   const noMaxWidth = mathProps.mathOnly;
   const cWidth = noMaxWidth ? undefined : maxWidth;
   const metrics = getImageMetrics(
@@ -754,7 +756,7 @@ const renderMathElement = function (element, context, renderCb) {
   const strokeColor = _element.strokeColor;
   const textAlign = _element.textAlign;
   const opacity = _element.opacity / 100;
-  const mathProps = getMathProps.ensureMathProps(_element.customProps);
+  const mathProps = getMathProps.ensureMathProps(_element.customData);
 
   let _childIsSvg: boolean;
   let _text: string;
@@ -874,7 +876,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   const isMathJaxLoaded = mathJaxLoaded;
 
   const _element = element as NonDeleted<ExcalidrawMathElement>;
-  const mathProps = getMathProps.ensureMathProps(_element.customProps);
+  const mathProps = getMathProps.ensureMathProps(_element.customData);
   const text = _element.text;
   const fontSize = _element.fontSize;
   const strokeColor = _element.strokeColor;
@@ -1018,8 +1020,8 @@ const wrapMathElement = function (element, containerWidth, next) {
   const fontSize =
     next?.fontSize !== undefined ? next.fontSize : element.fontSize;
   const text = next?.text !== undefined ? next.text : element.originalText;
-  const customProps = next?.customProps ?? element.customProps;
-  const mathProps = getMathProps.ensureMathProps(customProps!);
+  const customData = next?.customData ?? element.customData;
+  const mathProps = getMathProps.ensureMathProps(customData!);
 
   const font = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
 
@@ -1171,13 +1173,13 @@ const createMathActions = () => {
   const mathActions: Action[] = [];
   const actionChangeUseTex: Action = {
     name: "changeUseTex",
-    perform: (elements, appState, useTex) => {
+    perform: (elements, appState, useTex: boolean | null) => {
       if (useTex === null) {
         useTex = getFormValue(elements, appState, (element) => {
           const el = hasBoundTextElement(element)
             ? getBoundTextElement(element)
             : element;
-          return isMathElement(el) && el.customProps?.useTex;
+          return isMathElement(el) && el.customData?.useTex;
         });
         if (useTex === null) {
           useTex = getMathProps.getUseTex(appState);
@@ -1191,9 +1193,9 @@ const createMathActions = () => {
             const newElement: ExcalidrawTextElement = newElementWith(
               oldElement,
               {
-                customProps: getMathProps.ensureMathProps({
-                  useTex,
-                  mathOnly: oldElement.customProps?.mathOnly,
+                customData: getMathProps.ensureMathProps({
+                  useTex: useTex as boolean,
+                  mathOnly: oldElement.customData?.mathOnly,
                 }),
               },
             );
@@ -1207,9 +1209,11 @@ const createMathActions = () => {
       );
 
       const mathOnly = getMathProps.getMathOnly(appState);
+      const customData = appState.customData ?? {};
+      customData[`${mathSubtype}`] = { useTex, mathOnly };
       return {
         elements: modElements,
-        appState: { ...appState, customProps: { useTex, mathOnly } },
+        appState: { ...appState, customData },
         commitToHistory: true,
       };
     },
@@ -1241,7 +1245,7 @@ const createMathActions = () => {
                 ? getBoundTextElement(element)
                 : element;
               return isMathElement(el)
-                ? getMathProps.ensureMathProps(el.customProps!).useTex
+                ? getMathProps.ensureMathProps(el.customData!).useTex
                 : null;
             },
             getMathProps.getUseTex(appState),
@@ -1254,13 +1258,13 @@ const createMathActions = () => {
   };
   const actionChangeMathOnly: Action = {
     name: "changeMathOnly",
-    perform: (elements, appState, mathOnly) => {
+    perform: (elements, appState, mathOnly: boolean | null) => {
       if (mathOnly === null) {
         mathOnly = getFormValue(elements, appState, (element) => {
           const el = hasBoundTextElement(element)
             ? getBoundTextElement(element)
             : element;
-          return isMathElement(el) && el.customProps?.mathOnly;
+          return isMathElement(el) && el.customData?.mathOnly;
         });
         if (mathOnly === null) {
           mathOnly = getMathProps.getMathOnly(appState);
@@ -1271,13 +1275,13 @@ const createMathActions = () => {
         appState,
         (oldElement) => {
           if (isMathElement(oldElement)) {
-            const customProps = getMathProps.ensureMathProps({
-              useTex: oldElement.customProps?.useTex,
-              mathOnly,
+            const customData = getMathProps.ensureMathProps({
+              useTex: oldElement.customData?.useTex,
+              mathOnly: mathOnly as boolean,
             });
             const newElement: ExcalidrawTextElement = newElementWith(
               oldElement,
-              { customProps },
+              { customData },
             );
             redrawTextBoundingBox(newElement, getContainerElement(oldElement));
             return newElement;
@@ -1289,9 +1293,11 @@ const createMathActions = () => {
       );
 
       const useTex = getMathProps.getUseTex(appState);
+      const customData = appState.customData ?? {};
+      customData[`${mathSubtype}`] = { useTex, mathOnly };
       return {
         elements: modElements,
-        appState: { ...appState, customProps: { useTex, mathOnly } },
+        appState: { ...appState, customData },
         commitToHistory: true,
       };
     },
@@ -1323,7 +1329,7 @@ const createMathActions = () => {
                 ? getBoundTextElement(element)
                 : element;
               return isMathElement(el)
-                ? getMathProps.ensureMathProps(el.customProps!).mathOnly
+                ? getMathProps.ensureMathProps(el.customData!).mathOnly
                 : null;
             },
             getMathProps.getMathOnly(appState),
