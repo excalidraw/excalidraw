@@ -67,13 +67,14 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 };
 
 const restoreElementWithProperties = <
-  T extends ExcalidrawElement,
-  K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
->(
-  element: Required<T> & {
+  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+    customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
   },
+  K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
+>(
+  element: T,
   extra: Pick<
     T,
     // This extra Pick<T, keyof K> ensure no excess properties are passed.
@@ -113,6 +114,7 @@ const restoreElementWithProperties = <
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ?? null,
     locked: element.locked ?? false,
+    customData: element.customData,
   };
 
   return {
