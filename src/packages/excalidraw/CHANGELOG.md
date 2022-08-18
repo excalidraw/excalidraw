@@ -13,13 +13,15 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
-### Excalidraw API
+### Excalidraw API  
+
+#### Features
 
 - Added support for storing [`customData`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#storing-custom-data-to-excalidraw-elements) on Excalidraw elements [#5592].
 
 #### Breaking Changes
 
-- `setToastMessage` API is now renamed to `setToas○t` API and the function signature is also updated [#5427](https://github.com/excalidraw/excalidraw/pull/5427). You can also pass `duration` and `closable` attributes along with `message`.
+- `setToastMessage` API is now renamed to `setToast` API and the function signature is also updated [#5427](https://github.com/excalidraw/excalidraw/pull/5427). You can also pass `duration` and `closable` attributes along with `message`.
 
 ## 0.12.0 (2022-07-07)
 
