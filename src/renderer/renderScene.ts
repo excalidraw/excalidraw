@@ -204,13 +204,13 @@ const renderLinearPointHandles = (
     return;
   }
   const { POINT_HANDLE_SIZE } = LinearElementEditor;
-
+  const radius = appState.editingLinearElement
+    ? POINT_HANDLE_SIZE
+    : POINT_HANDLE_SIZE / 2;
   points.forEach((point, idx) => {
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
-    const radius = appState.editingLinearElement
-      ? POINT_HANDLE_SIZE
-      : POINT_HANDLE_SIZE / 2;
+
     renderSingleLinearPoint(
       context,
       appState,
@@ -226,9 +226,7 @@ const renderLinearPointHandles = (
       const centerPoint = LinearElementEditor.getMidPoint(
         appState.selectedLinearElement,
       )!;
-      const radius = appState.editingLinearElement
-        ? POINT_HANDLE_SIZE
-        : POINT_HANDLE_SIZE / 2;
+
       if (appState.editingLinearElement) {
         renderSingleLinearPoint(
           context,
