@@ -721,7 +721,7 @@ const resizeMultipleElements = (
       (pointerSideY * Math.abs(pointerY - anchorY)) / (maxY - minY),
     ) * (shouldResizeFromCenter ? 2 : 1);
 
-  if (scale === 0) {
+  if (scale === 1) {
     return;
   }
 
@@ -786,7 +786,7 @@ const resizeMultipleElements = (
 
     updateBoundElements(element.latest, { newSize: { width, height } });
 
-    mutateElement(element.latest, { ...update, width: 0, height: 0 });
+    mutateElement(element.latest, update);
 
     if (boundTextElement && boundTextUpdates) {
       mutateElement(boundTextElement, boundTextUpdates);
