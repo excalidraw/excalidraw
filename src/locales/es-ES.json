@@ -124,7 +124,7 @@
     "sidebarLock": "Mantener barra lateral abierta"
   },
   "library": {
-    "noItems": "",
+    "noItems": "No hay elementos añadidos todavía...",
     "hint_emptyLibrary": "Seleccione un elemento en el lienzo para añadirlo aquí, o instale una biblioteca del repositorio público, a continuación.",
     "hint_emptyPrivateLibrary": "Seleccione un elemento del lienzo para añadirlo aquí."
   },

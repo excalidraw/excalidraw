@@ -3079,7 +3079,7 @@ class App extends React.Component<AppProps, AppState> {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
         }
       } else if (
-        shouldShowBoundingBox([element]) &&
+        shouldShowBoundingBox([element], this.state) &&
         isHittingElementBoundingBoxWithoutHittingElement(
           element,
           this.state,
@@ -3511,7 +3511,6 @@ class App extends React.Component<AppProps, AppState> {
             origin,
             selectedElements,
           ),
-        hasHitElementInside: false,
       },
       drag: {
         hasOccurred: false,
@@ -3689,12 +3688,6 @@ class App extends React.Component<AppProps, AppState> {
           if (hitLinkElement) {
             return false;
           }
-          pointerDownState.hit.hasHitElementInside =
-            isHittingElementNotConsideringBoundingBox(
-              pointerDownState.hit.element,
-              this.state,
-              [pointerDownState.origin.x, pointerDownState.origin.y],
-            );
         }
 
         // For overlapped elements one position may hit
