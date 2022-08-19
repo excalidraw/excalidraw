@@ -25,6 +25,7 @@ import {
   isArrowElement,
   isBoundToContainer,
   isFreeDrawElement,
+  isImageElement,
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
@@ -694,6 +695,7 @@ const resizeMultipleElements = (
       points?: Point[];
       fontSize?: number;
       baseline?: number;
+      scale?: [-1 | 1, -1 | 1];
     } = {
       width,
       height,
@@ -735,6 +737,10 @@ const resizeMultipleElements = (
           baseline: textMeasurements.baseline,
         };
       }
+    }
+
+    if (isImageElement(element.orig)) {
+      update.scale = [flipFactorX, flipFactorY];
     }
 
     updateBoundElements(element.latest, { newSize: { width, height } });
