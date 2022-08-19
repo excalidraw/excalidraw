@@ -364,9 +364,6 @@ export class LinearElementEditor {
     scenePointer: { x: number; y: number },
     appState: AppState,
   ) => {
-    if (appState.editingLinearElement) {
-      return false;
-    }
     const { elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {

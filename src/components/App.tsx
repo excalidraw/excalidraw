@@ -1186,7 +1186,23 @@ class App extends React.Component<AppProps, AppState> {
         ),
       );
     }
+    this.renderScene();
+    this.history.record(this.state, this.scene.getElementsIncludingDeleted());
 
+    // Do not notify consumers if we're still loading the scene. Among other
+    // potential issues, this fixes a case where the tab isn't focused during
+    // init, which would trigger onChange with empty elements, which would then
+    // override whatever is in localStorage currently.
+    if (!this.state.isLoading) {
+      this.props.onChange?.(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+        this.files,
+      );
+    }
+  }
+
+  private renderScene = () => {
     const cursorButton: {
       [id: string]: string | undefined;
     } = {};
@@ -1223,6 +1239,7 @@ class App extends React.Component<AppProps, AppState> {
       );
       cursorButton[socketId] = user.button;
     });
+
     const renderingElements = this.scene
       .getNonDeletedElements()
       .filter((element) => {
@@ -1244,42 +1261,43 @@ class App extends React.Component<AppProps, AppState> {
       });
 
     renderScene(
-      renderingElements,
-      this.state,
-      this.state.selectionElement,
-      window.devicePixelRatio,
-      this.rc!,
-      this.canvas!,
       {
-        scrollX: this.state.scrollX,
-        scrollY: this.state.scrollY,
-        viewBackgroundColor: this.state.viewBackgroundColor,
-        zoom: this.state.zoom,
-        remotePointerViewportCoords: pointerViewportCoords,
-        remotePointerButton: cursorButton,
-        remoteSelectedElementIds,
-        remotePointerUsernames: pointerUsernames,
-        remotePointerUserStates: pointerUserStates,
-        shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
-        theme: this.state.theme,
-        imageCache: this.imageCache,
-        isExporting: false,
-        renderScrollbars: !this.device.isMobile,
-      },
-      ({ atLeastOneVisibleElement, scrollBars }) => {
-        if (scrollBars) {
-          currentScrollBars = scrollBars;
-        }
-        const scrolledOutside =
-          // hide when editing text
-          isTextElement(this.state.editingElement)
-            ? false
-            : !atLeastOneVisibleElement && renderingElements.length > 0;
-        if (this.state.scrolledOutside !== scrolledOutside) {
-          this.setState({ scrolledOutside });
-        }
+        elements: renderingElements,
+        appState: this.state,
+        scale: window.devicePixelRatio,
+        rc: this.rc!,
+        canvas: this.canvas!,
+        renderConfig: {
+          scrollX: this.state.scrollX,
+          scrollY: this.state.scrollY,
+          viewBackgroundColor: this.state.viewBackgroundColor,
+          zoom: this.state.zoom,
+          remotePointerViewportCoords: pointerViewportCoords,
+          remotePointerButton: cursorButton,
+          remoteSelectedElementIds,
+          remotePointerUsernames: pointerUsernames,
+          remotePointerUserStates: pointerUserStates,
+          shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
+          theme: this.state.theme,
+          imageCache: this.imageCache,
+          isExporting: false,
+          renderScrollbars: !this.device.isMobile,
+        },
+        callback: ({ atLeastOneVisibleElement, scrollBars }) => {
+          if (scrollBars) {
+            currentScrollBars = scrollBars;
+          }
+          const scrolledOutside =
+            // hide when editing text
+            isTextElement(this.state.editingElement)
+              ? false
+              : !atLeastOneVisibleElement && renderingElements.length > 0;
+          if (this.state.scrolledOutside !== scrolledOutside) {
+            this.setState({ scrolledOutside });
+          }
 
-        this.scheduleImageRefresh();
+          this.scheduleImageRefresh();
+        },
       },
       THROTTLE_NEXT_RENDER && window.EXCALIDRAW_THROTTLE_RENDER === true,
     );
@@ -1287,21 +1305,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!THROTTLE_NEXT_RENDER) {
       THROTTLE_NEXT_RENDER = true;
     }
-
-    this.history.record(this.state, this.scene.getElementsIncludingDeleted());
-
-    // Do not notify consumers if we're still loading the scene. Among other
-    // potential issues, this fixes a case where the tab isn't focused during
-    // init, which would trigger onChange with empty elements, which would then
-    // override whatever is in localStorage currently.
-    if (!this.state.isLoading) {
-      this.props.onChange?.(
-        this.scene.getElementsIncludingDeleted(),
-        this.state,
-        this.files,
-      );
-    }
-  }
+  };
 
   private onScroll = debounce(() => {
     const { offsetTop, offsetLeft } = this.getCanvasOffsets();
@@ -3254,7 +3258,7 @@ class App extends React.Component<AppProps, AppState> {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
         }
       } else if (
-        shouldShowBoundingBox([element]) &&
+        shouldShowBoundingBox([element], this.state) &&
         isHittingElementBoundingBoxWithoutHittingElement(
           element,
           this.state,
@@ -3688,7 +3692,6 @@ class App extends React.Component<AppProps, AppState> {
             origin,
             selectedElements,
           ),
-        hasHitElementInside: false,
       },
       drag: {
         hasOccurred: false,
@@ -3856,22 +3859,16 @@ class App extends React.Component<AppProps, AppState> {
 
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
-          if (
-            isPointHittingLinkIcon(
-              pointerDownState.hit.element,
-              this.state,
-              [pointerDownState.origin.x, pointerDownState.origin.y],
-              this.device.isMobile,
-            )
-          ) {
+          const hitLinkElement = this.getElementLinkAtPosition(
+            {
+              x: pointerDownState.origin.x,
+              y: pointerDownState.origin.y,
+            },
+            pointerDownState.hit.element,
+          );
+          if (hitLinkElement) {
             return false;
           }
-          pointerDownState.hit.hasHitElementInside =
-            isHittingElementNotConsideringBoundingBox(
-              pointerDownState.hit.element,
-              this.state,
-              [pointerDownState.origin.x, pointerDownState.origin.y],
-            );
         }
 
         // For overlapped elements one position may hit
@@ -4375,6 +4372,7 @@ class App extends React.Component<AppProps, AppState> {
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
+          pointerDownState.drag.hasOccurred = true;
           if (
             this.state.editingLinearElement &&
             !this.state.editingLinearElement.isDragging
@@ -4729,9 +4727,8 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.editingLinearElement) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
-          (pointerDownState.hit?.element?.id !==
-            this.state.editingLinearElement.elementId ||
-            !pointerDownState.hit.hasHitElementInside)
+          pointerDownState.hit?.element?.id !==
+            this.state.editingLinearElement.elementId
         ) {
           this.actionManager.executeAction(actionFinalize);
         } else {
@@ -4749,10 +4746,8 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (this.state.selectedLinearElement) {
         if (
-          !pointerDownState.boxSelection.hasOccurred &&
-          (pointerDownState.hit?.element?.id !==
-            this.state.selectedLinearElement.elementId ||
-            !pointerDownState.hit.hasHitElementInside)
+          pointerDownState.hit?.element?.id !==
+          this.state.selectedLinearElement.elementId
         ) {
           const selectedELements = getSelectedElements(
             this.scene.getNonDeletedElements(),
@@ -5132,8 +5127,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        !this.state.selectedLinearElement &&
-        !this.state.editingLinearElement &&
         !pointerDownState.drag.hasOccurred &&
         !this.state.isResizing &&
         ((hitElement &&
@@ -5146,13 +5139,16 @@ class App extends React.Component<AppProps, AppState> {
           (!hitElement &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
       ) {
-        // Deselect selected elements
-        this.setState({
-          selectedElementIds: {},
-          selectedGroupIds: {},
-          editingGroupId: null,
-        });
-
+        if (this.state.editingLinearElement) {
+          this.setState({ editingLinearElement: null });
+        } else {
+          // Deselect selected elements
+          this.setState({
+            selectedElementIds: {},
+            selectedGroupIds: {},
+            editingGroupId: null,
+          });
+        }
         return;
       }
 
