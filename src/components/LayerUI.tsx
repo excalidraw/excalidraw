@@ -36,20 +36,18 @@ import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
-import {
-  useDevice,
-  useExcalidrawElements,
-  useExcalidrawState,
-} from "../components/App";
+import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import { actionToggleZenMode } from "../actions";
 
 interface LayerUIProps {
   actionManager: ActionManager;
+  appState: AppState;
   files: BinaryFiles;
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
+  elements: readonly NonDeletedExcalidrawElement[];
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   onPenModeToggle: () => void;
@@ -70,8 +68,10 @@ interface LayerUIProps {
 }
 const LayerUI = ({
   actionManager,
+  appState,
   files,
   setAppState,
+  elements,
   canvas,
   onCollabButtonClick,
   onLockToggle,
@@ -91,8 +91,6 @@ const LayerUI = ({
   onImageAction,
 }: LayerUIProps) => {
   const device = useDevice();
-  const appState = useExcalidrawState();
-  const elements = useExcalidrawElements();
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -583,11 +581,24 @@ const LayerUI = ({
 };
 
 const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
+  const getNecessaryObj = (appState: AppState): Partial<AppState> => {
+    const {
+      suggestedBindings,
+      startBoundElement: boundElement,
+      ...ret
+    } = appState;
+    return ret;
+  };
+  const prevAppState = getNecessaryObj(prev.appState);
+  const nextAppState = getNecessaryObj(next.appState);
+
+  const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
   return (
     prev.renderCustomFooter === next.renderCustomFooter &&
     prev.langCode === next.langCode &&
+    prev.elements === next.elements &&
     prev.files === next.files &&
-    prev.showExitZenModeBtn === next.showExitZenModeBtn
+    keys.every((key) => prevAppState[key] === nextAppState[key])
   );
 };
 

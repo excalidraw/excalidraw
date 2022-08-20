@@ -526,9 +526,11 @@ class App extends React.Component<AppProps, AppState> {
               >
                 <LayerUI
                   canvas={this.canvas}
+                  appState={this.state}
                   files={this.files}
                   setAppState={this.setAppState}
                   actionManager={this.actionManager}
+                  elements={this.scene.getNonDeletedElements()}
                   onCollabButtonClick={onCollabButtonClick}
                   onLockToggle={this.toggleLock}
                   onPenModeToggle={this.togglePenMode}
