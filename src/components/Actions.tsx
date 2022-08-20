@@ -31,12 +31,10 @@ export const SelectedShapeActions = ({
   appState,
   elements,
   renderAction,
-  activeTool,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
-  activeTool: AppState["activeTool"]["type"];
 }) => {
   const targetElements = getTargetElements(
     getNonDeletedElements(elements),
@@ -56,13 +54,13 @@ export const SelectedShapeActions = ({
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
-    hasBackground(activeTool) ||
+    hasBackground(appState.activeTool.type) ||
     targetElements.some(
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
   const showChangeBackgroundIcons =
-    hasBackground(activeTool) ||
+    hasBackground(appState.activeTool.type) ||
     targetElements.some((element) => hasBackground(element.type));
 
   const showLinkIcon =
@@ -79,23 +77,23 @@ export const SelectedShapeActions = ({
 
   return (
     <div className="panelColumn">
-      {((hasStrokeColor(activeTool) &&
-        activeTool !== "image" &&
+      {((hasStrokeColor(appState.activeTool.type) &&
+        appState.activeTool.type !== "image" &&
         commonSelectedType !== "image") ||
         targetElements.some((element) => hasStrokeColor(element.type))) &&
         renderAction("changeStrokeColor")}
       {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
       {showFillIcons && renderAction("changeFillStyle")}
 
-      {(hasStrokeWidth(activeTool) ||
+      {(hasStrokeWidth(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}
 
-      {(activeTool === "freedraw" ||
+      {(appState.activeTool.type === "freedraw" ||
         targetElements.some((element) => element.type === "freedraw")) &&
         renderAction("changeStrokeShape")}
 
-      {(hasStrokeStyle(activeTool) ||
+      {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>
           {renderAction("changeStrokeStyle")}
@@ -103,12 +101,12 @@ export const SelectedShapeActions = ({
         </>
       )}
 
-      {(canChangeSharpness(activeTool) ||
+      {(canChangeSharpness(appState.activeTool.type) ||
         targetElements.some((element) => canChangeSharpness(element.type))) && (
         <>{renderAction("changeSharpness")}</>
       )}
 
-      {(hasText(activeTool) ||
+      {(hasText(appState.activeTool.type) ||
         targetElements.some((element) => hasText(element.type))) && (
         <>
           {renderAction("changeFontSize")}
@@ -123,7 +121,7 @@ export const SelectedShapeActions = ({
         (element) =>
           hasBoundTextElement(element) || isBoundToContainer(element),
       ) && renderAction("changeVerticalAlign")}
-      {(canHaveArrowheads(activeTool) ||
+      {(canHaveArrowheads(appState.activeTool.type) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
       )}
