@@ -17,7 +17,7 @@ interface Window {
   EXCALIDRAW_THROTTLE_RENDER: boolean | undefined;
   gtag: Function;
   logTime: (name: string, time?: number) => void;
-  logTimeAverage: (name: string, time: number) => void;
+  logTimeAverage: (name: string, time?: number) => void;
   DEBUG_LOG_TIMES: boolean;
 }
 

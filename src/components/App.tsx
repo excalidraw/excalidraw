@@ -264,51 +264,99 @@ import {
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 
-const TIMES_AGGR: Record<string, { t: number; times: number[] }> = {};
-const TIMES_AVG: Record<string, { times: number[] }> = {};
+let TIMES_AGGR: Record<string, { t: number; times: number[] }> = {};
+let TIMES_AVG: Record<
+  string,
+  { t: number; times: number[]; avg: number | null }
+> = {};
 
 window.DEBUG_LOG_TIMES = true;
 
-setInterval(() => {
+let lastDebugLogCall = 0;
+let DEBUG_LOG_INTERVAL_ID: null | number = null;
+
+const setupInterval = () => {
+  if (DEBUG_LOG_INTERVAL_ID === null) {
+    console.info("%c(starting perf recording)", "color: lime");
+    DEBUG_LOG_INTERVAL_ID = window.setInterval(debugLogger, 1000);
+  }
+  lastDebugLogCall = Date.now();
+};
+
+const lessPrecise = (num: number, precision = 5) =>
+  parseFloat(num.toPrecision(precision));
+
+const getAvgFrameTime = (times: number[]) =>
+  lessPrecise(times.reduce((a, b) => a + b) / times.length);
+
+const getFps = (frametime: number) => lessPrecise(1000 / frametime);
+
+const debugLogger = () => {
+  if (Date.now() - lastDebugLogCall > 600 && DEBUG_LOG_INTERVAL_ID !== null) {
+    window.clearInterval(DEBUG_LOG_INTERVAL_ID);
+    DEBUG_LOG_INTERVAL_ID = null;
+    for (const [name, { avg }] of Object.entries(TIMES_AVG)) {
+      if (avg != null) {
+        console.info(
+          `%c${name} run avg: ${avg}ms (${getFps(avg)} fps)`,
+          "color: blue",
+        );
+      }
+    }
+    console.info("%c(stopping perf recording)", "color: red");
+    TIMES_AGGR = {};
+    TIMES_AVG = {};
+    return;
+  }
   if (window.DEBUG_LOG_TIMES) {
     for (const [name, { t, times }] of Object.entries(TIMES_AGGR)) {
       if (times.length) {
         console.info(
           name,
-          times.reduce((a, b) => a + b),
-          times.sort((a, b) => a - b),
+          lessPrecise(times.reduce((a, b) => a + b) / times.length),
+          times.sort((a, b) => a - b).map((x) => lessPrecise(x)),
         );
         TIMES_AGGR[name] = { t, times: [] };
       }
     }
-    for (const [name, { times }] of Object.entries(TIMES_AVG)) {
+    for (const [name, { t, times, avg }] of Object.entries(TIMES_AVG)) {
       if (times.length) {
-        console.info(
-          name,
-          parseFloat(
-            (times.reduce((a, b) => a + b) / times.length).toPrecision(5),
-          ),
-          times.sort((a, b) => a - b),
-        );
-        TIMES_AVG[name] = { times: [] };
+        const avgFrameTime = getAvgFrameTime(times);
+        console.info(name, `${avgFrameTime}ms (${getFps(avgFrameTime)} fps)`);
+        TIMES_AVG[name] = {
+          t,
+          times: [],
+          avg:
+            avg != null ? getAvgFrameTime([avg, avgFrameTime]) : avgFrameTime,
+        };
       }
     }
   }
-}, 1000);
+};
 
 window.logTime = (name: string, time?: number) => {
+  setupInterval();
+  const now = performance.now();
   const { t, times } = (TIMES_AGGR[name] = TIMES_AGGR[name] || {
     t: 0,
     times: [],
   });
   if (t) {
-    times.push(time != null ? time : Date.now() - t);
+    times.push(time != null ? time : now - t);
   }
-  TIMES_AGGR[name].t = Date.now();
+  TIMES_AGGR[name].t = now;
 };
-window.logTimeAverage = (name: string, time: number) => {
-  const { times } = (TIMES_AVG[name] = TIMES_AVG[name] || { times: [] });
-  times.push(time);
+window.logTimeAverage = (name: string, time?: number) => {
+  setupInterval();
+  const now = performance.now();
+  const { t, times } = (TIMES_AVG[name] = TIMES_AVG[name] || {
+    t: 0,
+    times: [],
+  });
+  if (t) {
+    times.push(time != null ? time : now - t);
+  }
+  TIMES_AVG[name].t = now;
 };
 
 const deviceContextInitialValue = {
@@ -524,6 +572,24 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private __renderUI = true;
+
+  private perfTest = (runs = 180, initial = true) => {
+    if (initial) {
+      console.time("perfTest");
+    } else if (!runs) {
+      console.timeEnd("perfTest");
+    }
+    if (runs) {
+      requestAnimationFrame((id) => {
+        for (const element of this.scene.getNonDeletedElements()) {
+          mutateElement(element, {
+            x: element.x + 1,
+          });
+        }
+        this.perfTest(runs - 1, false);
+      });
+    }
+  };
 
   public render() {
     const selectedElement = getSelectedElements(

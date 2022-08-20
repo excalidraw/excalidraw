@@ -310,8 +310,6 @@ const renderLinearElementPointHighlight = (
   context.restore();
 };
 
-let t = performance.now();
-
 export const _renderScene = ({
   elements,
   appState,
@@ -332,8 +330,7 @@ export const _renderScene = ({
     if (canvas === null) {
       return { atLeastOneVisibleElement: false };
     }
-    window.logTimeAverage("renderScene", performance.now() - t);
-    t = performance.now();
+    window.logTimeAverage("renderScene");
     const {
       renderScrollbars = true,
       renderSelection = true,
