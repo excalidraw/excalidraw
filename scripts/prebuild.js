@@ -18,4 +18,6 @@ const moveServiceWorkerScript = () => {
 
 // -----------------------------------------------------------------------------
 
-moveServiceWorkerScript();
+if (process.env.CI) {
+  moveServiceWorkerScript();
+}

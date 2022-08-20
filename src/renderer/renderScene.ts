@@ -330,6 +330,7 @@ export const _renderScene = ({
     if (canvas === null) {
       return { atLeastOneVisibleElement: false };
     }
+    window.logTimeAverage("renderScene");
     const {
       renderScrollbars = true,
       renderSelection = true,

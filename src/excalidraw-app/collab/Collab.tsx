@@ -169,7 +169,8 @@ class Collab extends PureComponent<Props, CollabState> {
 
     if (
       process.env.NODE_ENV === ENV.TEST ||
-      process.env.NODE_ENV === ENV.DEVELOPMENT
+      process.env.NODE_ENV === ENV.DEVELOPMENT ||
+      process.env.REACT_APP_VERCEL_ENV === "preview"
     ) {
       window.collab = window.collab || ({} as Window["collab"]);
       Object.defineProperties(window, {
