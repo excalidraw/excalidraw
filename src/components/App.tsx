@@ -280,19 +280,20 @@ const ExcalidrawContainerContext = React.createContext<{
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 
-const ExcalidrawElements = React.createContext<
+const ExcalidrawElementsContext = React.createContext<
   readonly NonDeletedExcalidrawElement[]
 >([]);
 
-const ExcalidrawState = React.createContext<AppState>({
+const ExcalidrawStateContext = React.createContext<AppState>({
   ...getDefaultAppState(),
   width: 0,
   height: 0,
   offsetLeft: 0,
   offsetTop: 0,
 });
-export const useExcalidrawElements = () => useContext(ExcalidrawElements);
-export const useExcalidrawState = () => useContext(ExcalidrawState);
+export const useExcalidrawElements = () =>
+  useContext(ExcalidrawElementsContext);
+export const useExcalidrawState = () => useContext(ExcalidrawStateContext);
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
@@ -520,8 +521,8 @@ class App extends React.Component<AppProps, AppState> {
           value={this.excalidrawContainerValue}
         >
           <DeviceContext.Provider value={this.device}>
-            <ExcalidrawState.Provider value={this.state}>
-              <ExcalidrawElements.Provider
+            <ExcalidrawStateContext.Provider value={this.state}>
+              <ExcalidrawElementsContext.Provider
                 value={this.scene.getNonDeletedElements()}
               >
                 <LayerUI
@@ -581,8 +582,8 @@ class App extends React.Component<AppProps, AppState> {
                   />
                 )}
                 <main>{this.renderCanvas()}</main>
-              </ExcalidrawElements.Provider>{" "}
-            </ExcalidrawState.Provider>
+              </ExcalidrawElementsContext.Provider>{" "}
+            </ExcalidrawStateContext.Provider>
           </DeviceContext.Provider>
         </ExcalidrawContainerContext.Provider>
       </div>
