@@ -264,6 +264,53 @@ import {
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 
+const TIMES_AGGR: Record<string, { t: number; times: number[] }> = {};
+const TIMES_AVG: Record<string, { times: number[] }> = {};
+
+window.DEBUG_LOG_TIMES = true;
+
+setInterval(() => {
+  if (window.DEBUG_LOG_TIMES) {
+    for (const [name, { t, times }] of Object.entries(TIMES_AGGR)) {
+      if (times.length) {
+        console.info(
+          name,
+          times.reduce((a, b) => a + b),
+          times.sort((a, b) => a - b),
+        );
+        TIMES_AGGR[name] = { t, times: [] };
+      }
+    }
+    for (const [name, { times }] of Object.entries(TIMES_AVG)) {
+      if (times.length) {
+        console.info(
+          name,
+          parseFloat(
+            (times.reduce((a, b) => a + b) / times.length).toPrecision(5),
+          ),
+          times.sort((a, b) => a - b),
+        );
+        TIMES_AVG[name] = { times: [] };
+      }
+    }
+  }
+}, 1000);
+
+window.logTime = (name: string, time?: number) => {
+  const { t, times } = (TIMES_AGGR[name] = TIMES_AGGR[name] || {
+    t: 0,
+    times: [],
+  });
+  if (t) {
+    times.push(time != null ? time : Date.now() - t);
+  }
+  TIMES_AGGR[name].t = Date.now();
+};
+window.logTimeAverage = (name: string, time: number) => {
+  const { times } = (TIMES_AVG[name] = TIMES_AVG[name] || { times: [] });
+  times.push(time);
+};
+
 const deviceContextInitialValue = {
   isSmScreen: false,
   isMobile: false,
