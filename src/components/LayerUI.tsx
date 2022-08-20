@@ -525,6 +525,8 @@ const LayerUI = ({
     <>
       {dialogs}
       <MobileMenu
+        appState={appState}
+        elements={elements}
         actionManager={actionManager}
         libraryMenu={libraryMenu}
         renderJSONExportDialog={renderJSONExportDialog}
