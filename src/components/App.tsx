@@ -476,6 +476,8 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  private __renderUI = true;
+
   public render() {
     const selectedElement = getSelectedElements(
       this.scene.getNonDeletedElements(),
@@ -505,43 +507,45 @@ class App extends React.Component<AppProps, AppState> {
           value={this.excalidrawContainerValue}
         >
           <DeviceContext.Provider value={this.device}>
-            <LayerUI
-              canvas={this.canvas}
-              appState={this.state}
-              files={this.files}
-              setAppState={this.setAppState}
-              actionManager={this.actionManager}
-              elements={this.scene.getNonDeletedElements()}
-              onCollabButtonClick={onCollabButtonClick}
-              onLockToggle={this.toggleLock}
-              onPenModeToggle={this.togglePenMode}
-              onInsertElements={(elements) =>
-                this.addElementsFromPasteOrLibrary({
-                  elements,
-                  position: "center",
-                  files: null,
-                })
-              }
-              langCode={getLanguage().code}
-              isCollaborating={this.props.isCollaborating}
-              renderTopRightUI={renderTopRightUI}
-              renderCustomFooter={renderFooter}
-              renderCustomStats={renderCustomStats}
-              showExitZenModeBtn={
-                typeof this.props?.zenModeEnabled === "undefined" &&
-                this.state.zenModeEnabled
-              }
-              showThemeBtn={
-                typeof this.props?.theme === "undefined" &&
-                this.props.UIOptions.canvasActions.theme
-              }
-              libraryReturnUrl={this.props.libraryReturnUrl}
-              UIOptions={this.props.UIOptions}
-              focusContainer={this.focusContainer}
-              library={this.library}
-              id={this.id}
-              onImageAction={this.onImageAction}
-            />
+            {this.__renderUI && (
+              <LayerUI
+                canvas={this.canvas}
+                appState={this.state}
+                files={this.files}
+                setAppState={this.setAppState}
+                actionManager={this.actionManager}
+                elements={this.scene.getNonDeletedElements()}
+                onCollabButtonClick={onCollabButtonClick}
+                onLockToggle={this.toggleLock}
+                onPenModeToggle={this.togglePenMode}
+                onInsertElements={(elements) =>
+                  this.addElementsFromPasteOrLibrary({
+                    elements,
+                    position: "center",
+                    files: null,
+                  })
+                }
+                langCode={getLanguage().code}
+                isCollaborating={this.props.isCollaborating}
+                renderTopRightUI={renderTopRightUI}
+                renderCustomFooter={renderFooter}
+                renderCustomStats={renderCustomStats}
+                showExitZenModeBtn={
+                  typeof this.props?.zenModeEnabled === "undefined" &&
+                  this.state.zenModeEnabled
+                }
+                showThemeBtn={
+                  typeof this.props?.theme === "undefined" &&
+                  this.props.UIOptions.canvasActions.theme
+                }
+                libraryReturnUrl={this.props.libraryReturnUrl}
+                UIOptions={this.props.UIOptions}
+                focusContainer={this.focusContainer}
+                library={this.library}
+                id={this.id}
+                onImageAction={this.onImageAction}
+              />
+            )}
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
             {selectedElement.length === 1 && this.state.showHyperlinkPopup && (
@@ -820,7 +824,8 @@ class App extends React.Component<AppProps, AppState> {
 
     if (
       process.env.NODE_ENV === ENV.TEST ||
-      process.env.NODE_ENV === ENV.DEVELOPMENT
+      process.env.NODE_ENV === ENV.DEVELOPMENT ||
+      process.env.REACT_APP_VERCEL_ENV === "preview"
     ) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
@@ -6203,7 +6208,8 @@ declare global {
 
 if (
   process.env.NODE_ENV === ENV.TEST ||
-  process.env.NODE_ENV === ENV.DEVELOPMENT
+  process.env.NODE_ENV === ENV.DEVELOPMENT ||
+  process.env.REACT_APP_VERCEL_ENV === "preview"
 ) {
   window.h = window.h || ({} as Window["h"]);
 

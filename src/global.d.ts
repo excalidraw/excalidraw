@@ -16,6 +16,9 @@ interface Window {
   EXCALIDRAW_EXPORT_SOURCE: string;
   EXCALIDRAW_THROTTLE_RENDER: boolean | undefined;
   gtag: Function;
+  logTime: (name: string, time?: number) => void;
+  logTimeAverage: (name: string, time: number) => void;
+  DEBUG_LOG_TIMES: boolean;
 }
 
 // https://github.com/facebook/create-react-app/blob/ddcb7d5/packages/react-scripts/lib/react-app.d.ts
