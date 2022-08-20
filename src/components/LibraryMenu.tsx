@@ -29,7 +29,7 @@ import { trackEvent } from "../analytics";
 import { useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import Spinner from "./Spinner";
-import { useDevice, useExcalidrawState } from "./App";
+import { useDevice } from "./App";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -86,6 +86,7 @@ export const LibraryMenu = ({
   focusContainer,
   library,
   id,
+  appState,
 }: {
   pendingElements: LibraryItem["elements"];
   onClose: () => void;
@@ -97,11 +98,11 @@ export const LibraryMenu = ({
   focusContainer: () => void;
   library: Library;
   id: string;
+  appState: AppState;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
   const device = useDevice();
-  const appState = useExcalidrawState();
   useOnClickOutside(
     ref,
     useCallback(

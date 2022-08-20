@@ -280,6 +280,7 @@ const LayerUI = ({
       library={library}
       files={files}
       id={id}
+      appState={appState}
     />
   ) : null;
 
