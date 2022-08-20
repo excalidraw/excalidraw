@@ -240,7 +240,11 @@ const LayerUI = ({
           maxHeight: `${appState.height - (appState.fileHandle ? 248 : 200)}px`,
         }}
       >
-        <SelectedShapeActions renderAction={actionManager.renderAction} />
+        <SelectedShapeActions
+          appState={appState}
+          elements={elements}
+          renderAction={actionManager.renderAction}
+        />
       </Island>
     </Section>
   );

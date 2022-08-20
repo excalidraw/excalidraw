@@ -216,7 +216,11 @@ export const MobileMenu = ({
             !appState.viewModeEnabled &&
             showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
-              <SelectedShapeActions renderAction={actionManager.renderAction} />
+              <SelectedShapeActions
+                appState={appState}
+                elements={elements}
+                renderAction={actionManager.renderAction}
+              />
             </Section>
           ) : null}
           <footer className="App-toolbar">

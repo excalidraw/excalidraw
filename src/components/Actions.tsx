@@ -1,13 +1,9 @@
 import React from "react";
 import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
-import { PointerType } from "../element/types";
+import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
-import {
-  useDevice,
-  useExcalidrawElements,
-  useExcalidrawState,
-} from "../components/App";
+import { useDevice } from "../components/App";
 import {
   canChangeSharpness,
   canHaveArrowheads,
@@ -32,13 +28,14 @@ import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
 
 export const SelectedShapeActions = ({
+  appState,
+  elements,
   renderAction,
 }: {
+  appState: AppState;
+  elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
 }) => {
-  const appState = useExcalidrawState();
-  const elements = useExcalidrawElements();
-
   const targetElements = getTargetElements(
     getNonDeletedElements(elements),
     appState,
