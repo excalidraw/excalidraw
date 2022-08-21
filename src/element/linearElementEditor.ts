@@ -686,7 +686,9 @@ export class LinearElementEditor {
 
     const point = element.points[index];
     const { x, y } = element;
-    return rotate(x + point[0], y + point[1], cx, cy, element.angle);
+    return point
+      ? rotate(x + point[0], y + point[1], cx, cy, element.angle)
+      : rotate(x, y, cx, cy, element.angle);
   }
 
   static pointFromAbsoluteCoords(
