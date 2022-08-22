@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState } from "../types";
+import { AppState, ExcalidrawProps } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -18,6 +18,8 @@ import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
+import { Stats } from "./Stats";
+import { actionToggleStats } from "../actions";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -42,7 +44,7 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  renderStats: () => JSX.Element | null;
+  renderCustomStats?: ExcalidrawProps["renderCustomStats"];
 };
 
 export const MobileMenu = ({
@@ -62,7 +64,7 @@ export const MobileMenu = ({
   showThemeBtn,
   onImageAction,
   renderTopRightUI,
-  renderStats,
+  renderCustomStats,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -184,7 +186,17 @@ export const MobileMenu = ({
   return (
     <>
       {!appState.viewModeEnabled && renderToolbar()}
-      {renderStats()}
+      {!appState.openMenu && appState.showStats && (
+        <Stats
+          appState={appState}
+          setAppState={setAppState}
+          elements={elements}
+          onClose={() => {
+            actionManager.executeAction(actionToggleStats);
+          }}
+          renderCustomStats={renderCustomStats}
+        />
+      )}
       <div
         className="App-bottom-bar"
         style={{

@@ -666,10 +666,15 @@ const ExcalidrawWrapper = () => {
     [langCode],
   );
 
-  const renderCustomStats = () => {
+  const renderCustomStats = (
+    elements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+  ) => {
     return (
       <CustomStats
         setToast={(message) => excalidrawAPI!.setToast({ message })}
+        appState={appState}
+        elements={elements}
       />
     );
   };
