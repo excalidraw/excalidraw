@@ -36,7 +36,10 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
-import CommonUIDialogs from "./CommonUIDialogs";
+import { PasteChartDialog } from "./PasteChartDialog";
+import { HelpDialog } from "./HelpDialog";
+import { LoadingMessage } from "./LoadingMessage";
+import { ErrorDialog } from "./ErrorDialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -378,87 +381,105 @@ const LayerUI = ({
     );
   };
 
-  return device.isMobile ? (
+  return (
     <>
-      <CommonUIDialogs
-        appState={appState}
-        setAppState={setAppState}
-        onInsertElements={onInsertElements}
-      />
-      <MobileMenu
-        appState={appState}
-        elements={elements}
-        actionManager={actionManager}
-        libraryMenu={libraryMenu}
-        renderJSONExportDialog={renderJSONExportDialog}
-        renderImageExportDialog={renderImageExportDialog}
-        setAppState={setAppState}
-        onCollabButtonClick={onCollabButtonClick}
-        onLockToggle={() => onLockToggle()}
-        onPenModeToggle={onPenModeToggle}
-        canvas={canvas}
-        isCollaborating={isCollaborating}
-        renderCustomFooter={renderCustomFooter}
-        showThemeBtn={showThemeBtn}
-        onImageAction={onImageAction}
-        renderTopRightUI={renderTopRightUI}
-        renderCustomStats={renderCustomStats}
-      />
-    </>
-  ) : (
-    <>
-      <div
-        className={clsx("layer-ui__wrapper", {
-          "disable-pointerEvents":
-            appState.draggingElement ||
-            appState.resizingElement ||
-            (appState.editingElement &&
-              !isTextElement(appState.editingElement)),
-        })}
-        style={
-          appState.isLibraryOpen &&
-          appState.isLibraryMenuDocked &&
-          device.canDeviceFitSidebar
-            ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
-            : {}
-        }
-      >
-        <CommonUIDialogs
-          appState={appState}
+      {appState.isLoading && <LoadingMessage delay={250} />}
+      {appState.errorMessage && (
+        <ErrorDialog
+          message={appState.errorMessage}
+          onClose={() => setAppState({ errorMessage: null })}
+        />
+      )}
+      {appState.showHelpDialog && (
+        <HelpDialog
+          onClose={() => {
+            setAppState({ showHelpDialog: false });
+          }}
+        />
+      )}
+      {appState.pasteDialog.shown && (
+        <PasteChartDialog
           setAppState={setAppState}
-          onInsertElements={onInsertElements}
-        />
-        {renderFixedSideContainer()}
-        <Footer
           appState={appState}
-          actionManager={actionManager}
-          renderCustomFooter={renderCustomFooter}
-          showExitZenModeBtn={showExitZenModeBtn}
+          onInsertChart={onInsertElements}
+          onClose={() =>
+            setAppState({
+              pasteDialog: { shown: false, data: null },
+            })
+          }
         />
-        {appState.showStats && (
-          <Stats
+      )}
+      {device.isMobile && (
+        <MobileMenu
+          appState={appState}
+          elements={elements}
+          actionManager={actionManager}
+          libraryMenu={libraryMenu}
+          renderJSONExportDialog={renderJSONExportDialog}
+          renderImageExportDialog={renderImageExportDialog}
+          setAppState={setAppState}
+          onCollabButtonClick={onCollabButtonClick}
+          onLockToggle={() => onLockToggle()}
+          onPenModeToggle={onPenModeToggle}
+          canvas={canvas}
+          isCollaborating={isCollaborating}
+          renderCustomFooter={renderCustomFooter}
+          showThemeBtn={showThemeBtn}
+          onImageAction={onImageAction}
+          renderTopRightUI={renderTopRightUI}
+          renderCustomStats={renderCustomStats}
+        />
+      )}
+
+      {!device.isMobile && (
+        <div
+          className={clsx("layer-ui__wrapper", {
+            "disable-pointerEvents":
+              appState.draggingElement ||
+              appState.resizingElement ||
+              (appState.editingElement &&
+                !isTextElement(appState.editingElement)),
+          })}
+          style={
+            appState.isLibraryOpen &&
+            appState.isLibraryMenuDocked &&
+            device.canDeviceFitSidebar
+              ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
+              : {}
+          }
+        >
+          {renderFixedSideContainer()}
+          <Footer
             appState={appState}
-            setAppState={setAppState}
-            elements={elements}
-            onClose={() => {
-              actionManager.executeAction(actionToggleStats);
-            }}
-            renderCustomStats={renderCustomStats}
+            actionManager={actionManager}
+            renderCustomFooter={renderCustomFooter}
+            showExitZenModeBtn={showExitZenModeBtn}
           />
-        )}
-        {appState.scrolledOutside && (
-          <button
-            className="scroll-back-to-content"
-            onClick={() => {
-              setAppState({
-                ...calculateScrollCenter(elements, appState, canvas),
-              });
-            }}
-          >
-            {t("buttons.scrollBackToContent")}
-          </button>
-        )}
-      </div>
+          {appState.showStats && (
+            <Stats
+              appState={appState}
+              setAppState={setAppState}
+              elements={elements}
+              onClose={() => {
+                actionManager.executeAction(actionToggleStats);
+              }}
+              renderCustomStats={renderCustomStats}
+            />
+          )}
+          {appState.scrolledOutside && (
+            <button
+              className="scroll-back-to-content"
+              onClick={() => {
+                setAppState({
+                  ...calculateScrollCenter(elements, appState, canvas),
+                });
+              }}
+            >
+              {t("buttons.scrollBackToContent")}
+            </button>
+          )}
+        </div>
+      )}
       {appState.isLibraryOpen && (
         <div className="layer-ui__sidebar">{libraryMenu}</div>
       )}
