@@ -13,13 +13,17 @@ import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
+import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HintViewer } from "./HintViewer";
 import { Island } from "./Island";
+import { LoadingMessage } from "./LoadingMessage";
 import { LockButton } from "./LockButton";
 import { MobileMenu } from "./MobileMenu";
+import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
+import { HelpDialog } from "./HelpDialog";
 import Stack from "./Stack";
 import { UserList } from "./UserList";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -36,10 +40,6 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
-import { PasteChartDialog } from "./PasteChartDialog";
-import { HelpDialog } from "./HelpDialog";
-import { LoadingMessage } from "./LoadingMessage";
-import { ErrorDialog } from "./ErrorDialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
