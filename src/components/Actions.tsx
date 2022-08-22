@@ -26,6 +26,8 @@ import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
+import clsx from "clsx";
+import { actionToggleZenMode } from "../actions";
 
 export const SelectedShapeActions = ({
   appState,
@@ -268,4 +270,46 @@ export const ZoomActions = ({
       {renderAction("resetZoom")}
     </Stack.Row>
   </Stack.Col>
+);
+
+export const UndoRedoActions = ({
+  renderAction,
+  className,
+}: {
+  renderAction: ActionManager["renderAction"];
+  className?: string;
+}) => (
+  <div className={`undo-redo-buttons ${className}`}>
+    {renderAction("undo", { size: "small" })}
+    {renderAction("redo", { size: "small" })}
+  </div>
+);
+
+export const ExitZenModeAction = ({
+  executeAction,
+  showExitZenModeBtn,
+}: {
+  executeAction: ActionManager["executeAction"];
+  showExitZenModeBtn: boolean;
+}) => (
+  <button
+    className={clsx("disable-zen-mode", {
+      "disable-zen-mode--visible": showExitZenModeBtn,
+    })}
+    onClick={() => executeAction(actionToggleZenMode)}
+  >
+    {t("buttons.exitZenMode")}
+  </button>
+);
+
+export const FinalizeAction = ({
+  renderAction,
+  className,
+}: {
+  renderAction: ActionManager["renderAction"];
+  className?: string;
+}) => (
+  <div className={`finalize-button ${className}`}>
+    {renderAction("finalize", { size: "small" })}
+  </div>
 );
