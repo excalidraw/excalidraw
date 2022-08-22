@@ -10,7 +10,7 @@ import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
 import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
 import { muteFSAbortError } from "../utils";
-import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
+import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
@@ -39,7 +39,7 @@ import { trackEvent } from "../analytics";
 import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
-import { actionToggleZenMode } from "../actions";
+import Footer from "./Footer";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -381,99 +381,6 @@ const LayerUI = ({
     );
   };
 
-  const renderBottomAppMenu = () => {
-    return (
-      <footer
-        role="contentinfo"
-        className="layer-ui__wrapper__footer App-menu App-menu_bottom"
-      >
-        <div
-          className={clsx(
-            "layer-ui__wrapper__footer-left zen-mode-transition",
-            {
-              "layer-ui__wrapper__footer-left--transition-left":
-                appState.zenModeEnabled,
-            },
-          )}
-        >
-          <Stack.Col gap={2}>
-            <Section heading="canvasActions">
-              <Island padding={1}>
-                <ZoomActions
-                  renderAction={actionManager.renderAction}
-                  zoom={appState.zoom}
-                />
-              </Island>
-              {!appState.viewModeEnabled && (
-                <>
-                  <div
-                    className={clsx("undo-redo-buttons zen-mode-transition", {
-                      "layer-ui__wrapper__footer-left--transition-bottom":
-                        appState.zenModeEnabled,
-                    })}
-                  >
-                    {actionManager.renderAction("undo", { size: "small" })}
-                    {actionManager.renderAction("redo", { size: "small" })}
-                  </div>
-
-                  <div
-                    className={clsx("eraser-buttons zen-mode-transition", {
-                      "layer-ui__wrapper__footer-left--transition-left":
-                        appState.zenModeEnabled,
-                    })}
-                  >
-                    {actionManager.renderAction("eraser", { size: "small" })}
-                  </div>
-                </>
-              )}
-              {!appState.viewModeEnabled &&
-                appState.multiElement &&
-                device.isTouchScreen && (
-                  <div
-                    className={clsx("finalize-button zen-mode-transition", {
-                      "layer-ui__wrapper__footer-left--transition-left":
-                        appState.zenModeEnabled,
-                    })}
-                  >
-                    {actionManager.renderAction("finalize", { size: "small" })}
-                  </div>
-                )}
-            </Section>
-          </Stack.Col>
-        </div>
-        <div
-          className={clsx(
-            "layer-ui__wrapper__footer-center zen-mode-transition",
-            {
-              "layer-ui__wrapper__footer-left--transition-bottom":
-                appState.zenModeEnabled,
-            },
-          )}
-        >
-          {renderCustomFooter?.(false, appState)}
-        </div>
-        <div
-          className={clsx(
-            "layer-ui__wrapper__footer-right zen-mode-transition",
-            {
-              "transition-right disable-pointerEvents": appState.zenModeEnabled,
-            },
-          )}
-        >
-          {actionManager.renderAction("toggleShortcuts")}
-        </div>
-        <button
-          className={clsx("disable-zen-mode", {
-            "disable-zen-mode--visible": showExitZenModeBtn,
-          })}
-          onClick={() => actionManager.executeAction(actionToggleZenMode)}
-        >
-          {t("buttons.exitZenMode")}
-        </button>
-      </footer>
-    );
-  };
-
   const dialogs = (
     <>
       {appState.isLoading && <LoadingMessage delay={250} />}
@@ -565,7 +472,12 @@ const LayerUI = ({
       >
         {dialogs}
         {renderFixedSideContainer()}
-        {renderBottomAppMenu()}
+        <Footer
+          appState={appState}
+          actionManager={actionManager}
+          renderCustomFooter={renderCustomFooter}
+          showExitZenModeBtn={showExitZenModeBtn}
+        />
         {renderStats()}
         {appState.scrolledOutside && (
           <button
