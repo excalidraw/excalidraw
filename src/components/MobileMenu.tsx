@@ -224,7 +224,6 @@ export const MobileMenu = ({
                 appState={appState}
                 elements={elements}
                 renderAction={actionManager.renderAction}
-                activeTool={appState.activeTool.type}
               />
             </Section>
           ) : null}

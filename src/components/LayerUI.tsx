@@ -72,8 +72,8 @@ const LayerUI = ({
   appState,
   files,
   setAppState,
-  canvas,
   elements,
+  canvas,
   onCollabButtonClick,
   onLockToggle,
   onPenModeToggle,
@@ -212,8 +212,8 @@ const LayerUI = ({
             )}
           </Stack.Row>
           <BackgroundPickerAndDarkModeToggle
-            actionManager={actionManager}
             appState={appState}
+            actionManager={actionManager}
             setAppState={setAppState}
             showThemeBtn={showThemeBtn}
           />
@@ -246,7 +246,6 @@ const LayerUI = ({
           appState={appState}
           elements={elements}
           renderAction={actionManager.renderAction}
-          activeTool={appState.activeTool.type}
         />
       </Island>
     </Section>
@@ -281,7 +280,6 @@ const LayerUI = ({
       libraryReturnUrl={libraryReturnUrl}
       focusContainer={focusContainer}
       library={library}
-      theme={appState.theme}
       files={files}
       id={id}
       appState={appState}
