@@ -412,23 +412,6 @@ const LayerUI = ({
     </>
   );
 
-  const renderStats = () => {
-    if (!appState.showStats) {
-      return null;
-    }
-    return (
-      <Stats
-        appState={appState}
-        setAppState={setAppState}
-        elements={elements}
-        onClose={() => {
-          actionManager.executeAction(actionToggleStats);
-        }}
-        renderCustomStats={renderCustomStats}
-      />
-    );
-  };
-
   return device.isMobile ? (
     <>
       {dialogs}
@@ -449,7 +432,7 @@ const LayerUI = ({
         showThemeBtn={showThemeBtn}
         onImageAction={onImageAction}
         renderTopRightUI={renderTopRightUI}
-        renderStats={renderStats}
+        renderCustomStats={renderCustomStats}
       />
     </>
   ) : (
@@ -478,7 +461,17 @@ const LayerUI = ({
           renderCustomFooter={renderCustomFooter}
           showExitZenModeBtn={showExitZenModeBtn}
         />
-        {renderStats()}
+        {appState.showStats && (
+          <Stats
+            appState={appState}
+            setAppState={setAppState}
+            elements={elements}
+            onClose={() => {
+              actionManager.executeAction(actionToggleStats);
+            }}
+            renderCustomStats={renderCustomStats}
+          />
+        )}
         {appState.scrolledOutside && (
           <button
             className="scroll-back-to-content"
