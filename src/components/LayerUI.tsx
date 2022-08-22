@@ -13,17 +13,13 @@ import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
-import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HintViewer } from "./HintViewer";
 import { Island } from "./Island";
-import { LoadingMessage } from "./LoadingMessage";
 import { LockButton } from "./LockButton";
 import { MobileMenu } from "./MobileMenu";
-import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
-import { HelpDialog } from "./HelpDialog";
 import Stack from "./Stack";
 import { UserList } from "./UserList";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -40,6 +36,7 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
+import CommonUIDialogs from "./CommonUIDialogs";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -381,40 +378,13 @@ const LayerUI = ({
     );
   };
 
-  const dialogs = (
-    <>
-      {appState.isLoading && <LoadingMessage delay={250} />}
-      {appState.errorMessage && (
-        <ErrorDialog
-          message={appState.errorMessage}
-          onClose={() => setAppState({ errorMessage: null })}
-        />
-      )}
-      {appState.showHelpDialog && (
-        <HelpDialog
-          onClose={() => {
-            setAppState({ showHelpDialog: false });
-          }}
-        />
-      )}
-      {appState.pasteDialog.shown && (
-        <PasteChartDialog
-          setAppState={setAppState}
-          appState={appState}
-          onInsertChart={onInsertElements}
-          onClose={() =>
-            setAppState({
-              pasteDialog: { shown: false, data: null },
-            })
-          }
-        />
-      )}
-    </>
-  );
-
   return device.isMobile ? (
     <>
-      {dialogs}
+      <CommonUIDialogs
+        appState={appState}
+        setAppState={setAppState}
+        onInsertElements={onInsertElements}
+      />
       <MobileMenu
         appState={appState}
         elements={elements}
@@ -453,7 +423,11 @@ const LayerUI = ({
             : {}
         }
       >
-        {dialogs}
+        <CommonUIDialogs
+          appState={appState}
+          setAppState={setAppState}
+          onInsertElements={onInsertElements}
+        />
         {renderFixedSideContainer()}
         <Footer
           appState={appState}
