@@ -17,6 +17,12 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
+- Render math notation using the MathJax library. Both standard Latex input and simplified AsciiMath input are supported.
+
+  Also added plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code.
+
+  Also created an `@excalidraw/plugins` package. This package holds the MathJax plugin to make it completely decoupled from `@excalidraw/excalidraw`. The MathJax plugin is implemented as a `math` subtype of `ExcalidrawTextElement`. [#2993](https://github.com/excalidraw/excalidraw/pull/2993).
+
 - Added support for storing [`customData`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#storing-custom-data-to-excalidraw-elements) on Excalidraw elements [#5592].
 
 #### Breaking Changes
@@ -29,11 +35,7 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
-- Render math notation using the MathJax library. Both standard Latex input and simplified AsciiMath input are supported.
-
-  Also added plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code.
-
-  Also created an `@excalidraw/plugins` package. This package holds the MathJax plugin to make it completely decoupled from `@excalidraw/excalidraw`. The MathJax plugin is implemented as a `math` subtype of `ExcalidrawTextElement`. [#2993](https://github.com/excalidraw/excalidraw/pull/2993).
+- [`loadLibraryFromBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#loadLibraryFromBlob) now takes an additional parameter `defaultStatus` which sets the default status of library item if not present, defaults to `unpublished` [#5067](https://github.com/excalidraw/excalidraw/pull/5067).
 
 - Add [`UIOptions.dockedSidebarBreakpoint`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#dockedSidebarBreakpoint) to customize at which point to break from the docked sidebar [#5274](https://github.com/excalidraw/excalidraw/pull/5274).
 
