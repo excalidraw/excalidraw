@@ -1101,10 +1101,10 @@ import { loadLibraryFromBlob } from "@excalidraw/excalidraw";
 **_Signature_**
 
 <pre>
-loadLibraryFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>)
+loadLibraryFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>, defaultStatus: "published" | "unpublished")
 </pre>
 
-This function loads the library from the blob.
+This function loads the library from the blob. Additonally takes `defaultStatus` param which sets the default status for library item if not present, defaults to `unpublished`.
 
 #### `loadFromBlob`
 
