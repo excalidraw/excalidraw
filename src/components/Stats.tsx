@@ -2,7 +2,6 @@ import React from "react";
 import { getCommonBounds } from "../element/bounds";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { useDevice } from "../components/App";
 import { getTargetElements } from "../scene";
 import { AppState, ExcalidrawProps } from "../types";
 import { close } from "./icons";
@@ -16,13 +15,10 @@ export const Stats = (props: {
   onClose: () => void;
   renderCustomStats: ExcalidrawProps["renderCustomStats"];
 }) => {
-  const device = useDevice();
   const boundingBox = getCommonBounds(props.elements);
   const selectedElements = getTargetElements(props.elements, props.appState);
   const selectedBoundingBox = getCommonBounds(selectedElements);
-  if (device.isMobile && props.appState.openMenu) {
-    return null;
-  }
+
   return (
     <div className="Stats">
       <Island padding={2}>

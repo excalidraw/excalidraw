@@ -10,7 +10,7 @@ import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
 import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
 import { muteFSAbortError } from "../utils";
-import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
+import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
@@ -39,7 +39,7 @@ import { trackEvent } from "../analytics";
 import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
-import { actionToggleZenMode } from "../actions";
+import Footer from "./Footer";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -71,8 +71,8 @@ const LayerUI = ({
   appState,
   files,
   setAppState,
-  canvas,
   elements,
+  canvas,
   onCollabButtonClick,
   onLockToggle,
   onPenModeToggle,
@@ -210,8 +210,8 @@ const LayerUI = ({
             )}
           </Stack.Row>
           <BackgroundPickerAndDarkModeToggle
-            actionManager={actionManager}
             appState={appState}
+            actionManager={actionManager}
             setAppState={setAppState}
             showThemeBtn={showThemeBtn}
           />
@@ -244,7 +244,6 @@ const LayerUI = ({
           appState={appState}
           elements={elements}
           renderAction={actionManager.renderAction}
-          activeTool={appState.activeTool.type}
         />
       </Island>
     </Section>
@@ -279,7 +278,6 @@ const LayerUI = ({
       libraryReturnUrl={libraryReturnUrl}
       focusContainer={focusContainer}
       library={library}
-      theme={appState.theme}
       files={files}
       id={id}
       appState={appState}
@@ -398,99 +396,6 @@ const LayerUI = ({
     );
   };
 
-  const renderBottomAppMenu = () => {
-    return (
-      <footer
-        role="contentinfo"
-        className="layer-ui__wrapper__footer App-menu App-menu_bottom"
-      >
-        <div
-          className={clsx(
-            "layer-ui__wrapper__footer-left zen-mode-transition",
-            {
-              "layer-ui__wrapper__footer-left--transition-left":
-                appState.zenModeEnabled,
-            },
-          )}
-        >
-          <Stack.Col gap={2}>
-            <Section heading="canvasActions">
-              <Island padding={1}>
-                <ZoomActions
-                  renderAction={actionManager.renderAction}
-                  zoom={appState.zoom}
-                />
-              </Island>
-              {!appState.viewModeEnabled && (
-                <>
-                  <div
-                    className={clsx("undo-redo-buttons zen-mode-transition", {
-                      "layer-ui__wrapper__footer-left--transition-bottom":
-                        appState.zenModeEnabled,
-                    })}
-                  >
-                    {actionManager.renderAction("undo", { size: "small" })}
-                    {actionManager.renderAction("redo", { size: "small" })}
-                  </div>
-
-                  <div
-                    className={clsx("eraser-buttons zen-mode-transition", {
-                      "layer-ui__wrapper__footer-left--transition-left":
-                        appState.zenModeEnabled,
-                    })}
-                  >
-                    {actionManager.renderAction("eraser", { size: "small" })}
-                  </div>
-                </>
-              )}
-              {!appState.viewModeEnabled &&
-                appState.multiElement &&
-                device.isTouchScreen && (
-                  <div
-                    className={clsx("finalize-button zen-mode-transition", {
-                      "layer-ui__wrapper__footer-left--transition-left":
-                        appState.zenModeEnabled,
-                    })}
-                  >
-                    {actionManager.renderAction("finalize", { size: "small" })}
-                  </div>
-                )}
-            </Section>
-          </Stack.Col>
-        </div>
-        <div
-          className={clsx(
-            "layer-ui__wrapper__footer-center zen-mode-transition",
-            {
-              "layer-ui__wrapper__footer-left--transition-bottom":
-                appState.zenModeEnabled,
-            },
-          )}
-        >
-          {renderCustomFooter?.(false, appState)}
-        </div>
-        <div
-          className={clsx(
-            "layer-ui__wrapper__footer-right zen-mode-transition",
-            {
-              "transition-right disable-pointerEvents": appState.zenModeEnabled,
-            },
-          )}
-        >
-          {actionManager.renderAction("toggleShortcuts")}
-        </div>
-        <button
-          className={clsx("disable-zen-mode", {
-            "disable-zen-mode--visible": showExitZenModeBtn,
-          })}
-          onClick={() => actionManager.executeAction(actionToggleZenMode)}
-        >
-          {t("buttons.exitZenMode")}
-        </button>
-      </footer>
-    );
-  };
-
   const dialogs = (
     <>
       {appState.isLoading && <LoadingMessage delay={250} />}
@@ -522,23 +427,6 @@ const LayerUI = ({
     </>
   );
 
-  const renderStats = () => {
-    if (!appState.showStats) {
-      return null;
-    }
-    return (
-      <Stats
-        appState={appState}
-        setAppState={setAppState}
-        elements={elements}
-        onClose={() => {
-          actionManager.executeAction(actionToggleStats);
-        }}
-        renderCustomStats={renderCustomStats}
-      />
-    );
-  };
-
   return device.isMobile ||
     (!(appState.viewModeEnabled || appState.zenModeEnabled) &&
       appState.trayModeEnabled) ? ( //zsviczian this is THE line that allows tray mode
@@ -561,7 +449,7 @@ const LayerUI = ({
         showThemeBtn={showThemeBtn}
         onImageAction={onImageAction}
         renderTopRightUI={renderTopRightUI}
-        renderStats={renderStats}
+        renderCustomStats={renderCustomStats}
       />
     </>
   ) : (
@@ -584,8 +472,23 @@ const LayerUI = ({
       >
         {dialogs}
         {renderFixedSideContainer()}
-        {renderBottomAppMenu()}
-        {renderStats()}
+        <Footer
+          appState={appState}
+          actionManager={actionManager}
+          renderCustomFooter={renderCustomFooter}
+          showExitZenModeBtn={showExitZenModeBtn}
+        />
+        {appState.showStats && (
+          <Stats
+            appState={appState}
+            setAppState={setAppState}
+            elements={elements}
+            onClose={() => {
+              actionManager.executeAction(actionToggleStats);
+            }}
+            renderCustomStats={renderCustomStats}
+          />
+        )}
         {appState.scrolledOutside && (
           <button
             className="scroll-back-to-content"

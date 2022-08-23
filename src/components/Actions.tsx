@@ -26,17 +26,17 @@ import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
+import clsx from "clsx";
+import { actionToggleZenMode } from "../actions";
 
 export const SelectedShapeActions = ({
   appState,
   elements,
   renderAction,
-  activeTool,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
-  activeTool: AppState["activeTool"]["type"];
 }) => {
   const targetElements = getTargetElements(
     getNonDeletedElements(elements),
@@ -56,13 +56,13 @@ export const SelectedShapeActions = ({
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
-    hasBackground(activeTool) ||
+    hasBackground(appState.activeTool.type) ||
     targetElements.some(
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
   const showChangeBackgroundIcons =
-    hasBackground(activeTool) ||
+    hasBackground(appState.activeTool.type) ||
     targetElements.some((element) => hasBackground(element.type));
 
   const showLinkIcon =
@@ -79,23 +79,23 @@ export const SelectedShapeActions = ({
 
   return (
     <div className="panelColumn">
-      {((hasStrokeColor(activeTool) &&
-        activeTool !== "image" &&
+      {((hasStrokeColor(appState.activeTool.type) &&
+        appState.activeTool.type !== "image" &&
         commonSelectedType !== "image") ||
         targetElements.some((element) => hasStrokeColor(element.type))) &&
         renderAction("changeStrokeColor")}
       {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
       {showFillIcons && renderAction("changeFillStyle")}
 
-      {(hasStrokeWidth(activeTool) ||
+      {(hasStrokeWidth(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}
 
-      {(activeTool === "freedraw" ||
+      {(appState.activeTool.type === "freedraw" ||
         targetElements.some((element) => element.type === "freedraw")) &&
         renderAction("changeStrokeShape")}
 
-      {(hasStrokeStyle(activeTool) ||
+      {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>
           {renderAction("changeStrokeStyle")}
@@ -103,12 +103,12 @@ export const SelectedShapeActions = ({
         </>
       )}
 
-      {(canChangeSharpness(activeTool) ||
+      {(canChangeSharpness(appState.activeTool.type) ||
         targetElements.some((element) => canChangeSharpness(element.type))) && (
         <>{renderAction("changeSharpness")}</>
       )}
 
-      {(hasText(activeTool) ||
+      {(hasText(appState.activeTool.type) ||
         targetElements.some((element) => hasText(element.type))) && (
         <>
           {renderAction("changeFontSize")}
@@ -123,7 +123,7 @@ export const SelectedShapeActions = ({
         (element) =>
           hasBoundTextElement(element) || isBoundToContainer(element),
       ) && renderAction("changeVerticalAlign")}
-      {(canHaveArrowheads(activeTool) ||
+      {(canHaveArrowheads(appState.activeTool.type) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
       )}
@@ -270,4 +270,46 @@ export const ZoomActions = ({
       {renderAction("resetZoom")}
     </Stack.Row>
   </Stack.Col>
+);
+
+export const UndoRedoActions = ({
+  renderAction,
+  className,
+}: {
+  renderAction: ActionManager["renderAction"];
+  className?: string;
+}) => (
+  <div className={`undo-redo-buttons ${className}`}>
+    {renderAction("undo", { size: "small" })}
+    {renderAction("redo", { size: "small" })}
+  </div>
+);
+
+export const ExitZenModeAction = ({
+  executeAction,
+  showExitZenModeBtn,
+}: {
+  executeAction: ActionManager["executeAction"];
+  showExitZenModeBtn: boolean;
+}) => (
+  <button
+    className={clsx("disable-zen-mode", {
+      "disable-zen-mode--visible": showExitZenModeBtn,
+    })}
+    onClick={() => executeAction(actionToggleZenMode)}
+  >
+    {t("buttons.exitZenMode")}
+  </button>
+);
+
+export const FinalizeAction = ({
+  renderAction,
+  className,
+}: {
+  renderAction: ActionManager["renderAction"];
+  className?: string;
+}) => (
+  <div className={`finalize-button ${className}`}>
+    {renderAction("finalize", { size: "small" })}
+  </div>
 );
