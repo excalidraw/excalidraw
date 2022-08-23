@@ -496,11 +496,11 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
 | scrollToContent | <code> (target?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement</a> &#124; <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement</a>[]) => void </code> | Scroll the nearest element out of the elements supplied to the center. Defaults to the elements on the scene. |
 | refresh | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you should call this API. |
-| [importLibrary](#importlibrary) | `(url: string, token?: string) => void` | Imports library from given URL |
-| [setToast](#setToast) | `({message: string, closable?:boolean, duration?:number} | null) => void` | This API can be used to show the toast with custom message. |
+| [importLibrary](#importlibrary) | <code>(url: string, token?: string) => void</code> | Imports library from given URL |
+| [setToast](#setToast) | <code>({ message: string, closable?:boolean, duration?:number } &#124; null) => void</code> | This API can be used to show the toast with custom message. |
 | [id](#id) | string | Unique ID for the excalidraw component. |
 | [getFiles](#getFiles) | <code>() => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64">files</a> </code> | This API can be used to get the files present in the scene. It may contain files that aren't referenced by any element, so if you're persisting the files to a storage, you should compare them against stored elements. |
-| [setActiveTool](#setActiveTool) | <code>(tool: { type: typeof <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L4">SHAPES</a>[number]["value"] &#124; "eraser" } &#124; { type: "custom"; customType: string }) => void</code> | This API can be used to set the active tool |
+| [setActiveTool](#setActiveTool) | <code>(tool: { type: typeof <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L4">SHAPES</a> &#124; "eraser" } &#124; { type: "custom"; customType: string }) => void</code> | This API can be used to set the active tool |
 | [setCursor](#setCursor) | <code>(cursor: string) => void </code> | This API can be used to set customise the mouse cursor on the canvas |
 | [resetCursor](#resetCursor) | <code>() => void </code> | This API can be used to reset to default mouse cursor on the canvas |
 
@@ -757,7 +757,7 @@ This API can be used to reset to default mouse cursor.
 
 #### `detectScroll`
 
-Indicates whether Excalidraw should listen for `scroll` event on the nearest scrollable container in the DOM tree and recompute the coordinates (e.g. to correctly handle the cursor) when the component's position changes. You can disable this when you either know this doesn't affect your app or you want to take care of it yourself (calling the [`refresh()`](#ref) method).
+Indicates whether Excalidraw should listen for `scroll` event on the nearest scrollable container in the DOM tree and recompute the coordinates (e.g. to correctly handle the cursor) when the component's position changes. You can disable this when you either know this doesn't affect your app or you want to take care of it yourself (calling the [ resh()`](#ref) method).
 
 #### `handleKeyboardGlobally`
 
