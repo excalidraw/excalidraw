@@ -757,7 +757,7 @@ This API can be used to reset to default mouse cursor.
 
 #### `detectScroll`
 
-Indicates whether Excalidraw should listen for `scroll` event on the nearest scrollable container in the DOM tree and recompute the coordinates (e.g. to correctly handle the cursor) when the component's position changes. You can disable this when you either know this doesn't affect your app or you want to take care of it yourself (calling the [ refresh()`](#ref) method).
+Indicates whether Excalidraw should listen for `scroll` event on the nearest scrollable container in the DOM tree and recompute the coordinates (e.g. to correctly handle the cursor) when the component's position changes. You can disable this when you either know this doesn't affect your app or you want to take care of it yourself (calling the [ `refresh()`](#ref) method).
 
 #### `handleKeyboardGlobally`
 
