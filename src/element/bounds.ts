@@ -152,6 +152,11 @@ const getCubicBezierCurveBound = (
   return [minX, minY, maxX, maxY];
 };
 
+// TODO: https://github.com/excalidraw/excalidraw/issues/5617
+const getRandomOffset = () => {
+  return Math.random() / 1000000;
+};
+
 const getMinMaxXYFromCurvePathOps = (
   ops: Op[],
   transformXY?: (x: number, y: number) => [number, number],
@@ -168,9 +173,19 @@ const getMinMaxXYFromCurvePathOps = (
         // move operation does not draw anything; so, it always
         // returns false
       } else if (op === "bcurveTo") {
-        const _p1 = [data[0], data[1]] as Point;
-        const _p2 = [data[2], data[3]] as Point;
-        const _p3 = [data[4], data[5]] as Point;
+        // random offset is needed to fix https://github.com/excalidraw/excalidraw/issues/5585
+        const _p1 = [
+          data[0] + getRandomOffset(),
+          data[1] + getRandomOffset(),
+        ] as Point;
+        const _p2 = [
+          data[2] + getRandomOffset(),
+          data[3] + getRandomOffset(),
+        ] as Point;
+        const _p3 = [
+          data[4] + getRandomOffset(),
+          data[5] + getRandomOffset(),
+        ] as Point;
 
         const p1 = transformXY ? transformXY(..._p1) : _p1;
         const p2 = transformXY ? transformXY(..._p2) : _p2;
