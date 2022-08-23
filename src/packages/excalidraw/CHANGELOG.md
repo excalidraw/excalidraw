@@ -29,7 +29,7 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
-- [`loadLibraryFromBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#loadLibraryFromBlob) now takes an additional parameter `defaultStatus` which sets the default status of library item if not present, defaults to `unpublished`.
+- [`loadLibraryFromBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#loadLibraryFromBlob) now takes an additional parameter `defaultStatus` which sets the default status of library item if not present, defaults to `unpublished` [#5067](https://github.com/excalidraw/excalidraw/pull/5067).
 
 - Add [`UIOptions.dockedSidebarBreakpoint`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#dockedSidebarBreakpoint) to customize at which point to break from the docked sidebar [#5274](https://github.com/excalidraw/excalidraw/pull/5274).
 
