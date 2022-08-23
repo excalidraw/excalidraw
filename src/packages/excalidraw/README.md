@@ -482,8 +482,8 @@ You can add `customData` to elements when passing them as `initialData`, or usin
 
 You can pass a `ref` when you want to access some excalidraw APIs. We expose the below APIs:
 
-| API | signature | Usage |
-| --- | --- | --- | --- |
+| API | Signature | Usage |
+| --- | --- | --- |
 | ready | `boolean` | This is set to true once Excalidraw is rendered |
 | readyPromise | [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317) | This promise will be resolved with the api once excalidraw has rendered. This will be helpful when you want do some action on the host app once this promise resolves. For this to work you will have to pass ref as shown [here](#readyPromise) |
 | [updateScene](#updateScene) | <code>(scene: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>) => void </code> | updates the scene with the sceneData |
