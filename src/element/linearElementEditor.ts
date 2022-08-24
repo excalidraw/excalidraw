@@ -432,6 +432,7 @@ export class LinearElementEditor {
       }
       if (
         appState.editingLinearElement ||
+        element.points.length === 2 ||
         distance >= 2 * LinearElementEditor.POINT_HANDLE_SIZE
       ) {
         visiblePointIndexes.push(index);
