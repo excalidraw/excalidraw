@@ -430,9 +430,10 @@ export class LinearElementEditor {
           previousPoint[1],
         );
       }
+      const isExtremePoint = index === 0 || index === element.points.length - 1;
       if (
         appState.editingLinearElement ||
-        element.points.length === 2 ||
+        isExtremePoint ||
         distance >= 2 * LinearElementEditor.POINT_HANDLE_SIZE
       ) {
         visiblePointIndexes.push(index);
