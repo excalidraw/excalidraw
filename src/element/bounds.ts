@@ -107,11 +107,18 @@ const solveQuadratic = (
     return false;
   }
 
-  const t1 = (-b + Math.sqrt(sqrtPart)) / (2 * a);
-  const t2 = (-b - Math.sqrt(sqrtPart)) / (2 * a);
-
   let s1 = null;
   let s2 = null;
+
+  let t1 = Infinity;
+  let t2 = Infinity;
+
+  if (a === 0) {
+    t1 = t2 = -c / b;
+  } else {
+    t1 = (-b + Math.sqrt(sqrtPart)) / (2 * a);
+    t2 = (-b - Math.sqrt(sqrtPart)) / (2 * a);
+  }
 
   if (t1 >= 0 && t1 <= 1) {
     s1 = getBezierValueForT(t1, p0, p1, p2, p3);

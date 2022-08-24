@@ -272,12 +272,29 @@ const deviceContextInitialValue = {
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 export const useDevice = () => useContext<Device>(DeviceContext);
+
 const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
   id: string | null;
 }>({ container: null, id: null });
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
+
+const ExcalidrawElementsContext = React.createContext<
+  readonly NonDeletedExcalidrawElement[]
+>([]);
+
+const ExcalidrawAppStateContext = React.createContext<AppState>({
+  ...getDefaultAppState(),
+  width: 0,
+  height: 0,
+  offsetLeft: 0,
+  offsetTop: 0,
+});
+export const useExcalidrawElements = () =>
+  useContext(ExcalidrawElementsContext);
+export const useExcalidrawAppState = () =>
+  useContext(ExcalidrawAppStateContext);
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
@@ -505,63 +522,69 @@ class App extends React.Component<AppProps, AppState> {
           value={this.excalidrawContainerValue}
         >
           <DeviceContext.Provider value={this.device}>
-            <LayerUI
-              canvas={this.canvas}
-              appState={this.state}
-              files={this.files}
-              setAppState={this.setAppState}
-              actionManager={this.actionManager}
-              elements={this.scene.getNonDeletedElements()}
-              onCollabButtonClick={onCollabButtonClick}
-              onLockToggle={this.toggleLock}
-              onPenModeToggle={this.togglePenMode}
-              onInsertElements={(elements) =>
-                this.addElementsFromPasteOrLibrary({
-                  elements,
-                  position: "center",
-                  files: null,
-                })
-              }
-              langCode={getLanguage().code}
-              isCollaborating={this.props.isCollaborating}
-              renderTopRightUI={renderTopRightUI}
-              renderCustomFooter={renderFooter}
-              renderCustomStats={renderCustomStats}
-              showExitZenModeBtn={
-                typeof this.props?.zenModeEnabled === "undefined" &&
-                this.state.zenModeEnabled
-              }
-              showThemeBtn={
-                typeof this.props?.theme === "undefined" &&
-                this.props.UIOptions.canvasActions.theme
-              }
-              libraryReturnUrl={this.props.libraryReturnUrl}
-              UIOptions={this.props.UIOptions}
-              focusContainer={this.focusContainer}
-              library={this.library}
-              id={this.id}
-              onImageAction={this.onImageAction}
-            />
-            <div className="excalidraw-textEditorContainer" />
-            <div className="excalidraw-contextMenuContainer" />
-            {selectedElement.length === 1 && this.state.showHyperlinkPopup && (
-              <Hyperlink
-                key={selectedElement[0].id}
-                element={selectedElement[0]}
-                appState={this.state}
-                setAppState={this.setAppState}
-                onLinkOpen={this.props.onLinkOpen}
-              />
-            )}
-            {this.state.toast !== null && (
-              <Toast
-                message={this.state.toast.message}
-                onClose={() => this.setToast(null)}
-                duration={this.state.toast.duration}
-                closable={this.state.toast.closable}
-              />
-            )}
-            <main>{this.renderCanvas()}</main>
+            <ExcalidrawAppStateContext.Provider value={this.state}>
+              <ExcalidrawElementsContext.Provider
+                value={this.scene.getNonDeletedElements()}
+              >
+                <LayerUI
+                  canvas={this.canvas}
+                  appState={this.state}
+                  files={this.files}
+                  setAppState={this.setAppState}
+                  actionManager={this.actionManager}
+                  elements={this.scene.getNonDeletedElements()}
+                  onCollabButtonClick={onCollabButtonClick}
+                  onLockToggle={this.toggleLock}
+                  onPenModeToggle={this.togglePenMode}
+                  onInsertElements={(elements) =>
+                    this.addElementsFromPasteOrLibrary({
+                      elements,
+                      position: "center",
+                      files: null,
+                    })
+                  }
+                  langCode={getLanguage().code}
+                  isCollaborating={this.props.isCollaborating}
+                  renderTopRightUI={renderTopRightUI}
+                  renderCustomFooter={renderFooter}
+                  renderCustomStats={renderCustomStats}
+                  showExitZenModeBtn={
+                    typeof this.props?.zenModeEnabled === "undefined" &&
+                    this.state.zenModeEnabled
+                  }
+                  showThemeBtn={
+                    typeof this.props?.theme === "undefined" &&
+                    this.props.UIOptions.canvasActions.theme
+                  }
+                  libraryReturnUrl={this.props.libraryReturnUrl}
+                  UIOptions={this.props.UIOptions}
+                  focusContainer={this.focusContainer}
+                  library={this.library}
+                  id={this.id}
+                  onImageAction={this.onImageAction}
+                />
+                <div className="excalidraw-textEditorContainer" />
+                <div className="excalidraw-contextMenuContainer" />
+                {selectedElement.length === 1 &&
+                  this.state.showHyperlinkPopup && (
+                    <Hyperlink
+                      key={selectedElement[0].id}
+                      element={selectedElement[0]}
+                      setAppState={this.setAppState}
+                      onLinkOpen={this.props.onLinkOpen}
+                    />
+                  )}
+                {this.state.toast !== null && (
+                  <Toast
+                    message={this.state.toast.message}
+                    onClose={() => this.setToast(null)}
+                    duration={this.state.toast.duration}
+                    closable={this.state.toast.closable}
+                  />
+                )}
+                <main>{this.renderCanvas()}</main>
+              </ExcalidrawElementsContext.Provider>{" "}
+            </ExcalidrawAppStateContext.Provider>
           </DeviceContext.Provider>
         </ExcalidrawContainerContext.Provider>
       </div>
