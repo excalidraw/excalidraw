@@ -159,7 +159,6 @@ const strokeGrid = (
 
 const renderSingleLinearPoint = (
   context: CanvasRenderingContext2D,
-  appState: AppState,
   renderConfig: RenderConfig,
   point: Point,
   radius: number,
@@ -207,18 +206,16 @@ const renderLinearPointHandles = (
   const radius = appState.editingLinearElement
     ? POINT_HANDLE_SIZE
     : POINT_HANDLE_SIZE / 2;
-  points.forEach((point, idx) => {
-    const isSelected =
-      !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
-    renderSingleLinearPoint(
-      context,
-      appState,
-      renderConfig,
-      point,
-      radius,
-      isSelected,
-    );
+  const visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
+    appState.selectedLinearElement,
+    appState,
+  );
+  visiblePointIndexes.forEach((index) => {
+    const isSelected =
+      !!appState.editingLinearElement?.selectedPointsIndices?.includes(index);
+    const point = points[index];
+    renderSingleLinearPoint(context, renderConfig, point, radius, isSelected);
   });
 
   if (points.length < 3) {
@@ -233,7 +230,6 @@ const renderLinearPointHandles = (
       if (appState.editingLinearElement) {
         renderSingleLinearPoint(
           context,
-          appState,
           renderConfig,
           centerPoint,
           radius,
@@ -244,7 +240,7 @@ const renderLinearPointHandles = (
         highlightPoint(centerPoint, context, renderConfig);
         renderSingleLinearPoint(
           context,
-          appState,
+
           renderConfig,
           centerPoint,
           radius,
@@ -254,7 +250,6 @@ const renderLinearPointHandles = (
     } else {
       renderSingleLinearPoint(
         context,
-        appState,
         renderConfig,
         centerPoint,
         POINT_HANDLE_SIZE / 2,
@@ -441,7 +436,17 @@ export const _renderScene = ({
       appState.selectedLinearElement &&
       appState.selectedLinearElement.hoverPointIndex >= 0
     ) {
-      renderLinearElementPointHighlight(context, appState, renderConfig);
+      const visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
+        appState.selectedLinearElement,
+        appState,
+      );
+      if (
+        visiblePointIndexes.includes(
+          appState.selectedLinearElement.hoverPointIndex,
+        )
+      ) {
+        renderLinearElementPointHighlight(context, appState, renderConfig);
+      }
     }
     // Paint selected elements
     if (

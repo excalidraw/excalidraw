@@ -409,6 +409,38 @@ export class LinearElementEditor {
     return centerPoint(points[0], points.at(-1)!);
   }
 
+  static getVisiblePointIndexes(
+    linearElementEditor: LinearElementEditor,
+    appState: AppState,
+  ) {
+    const { elementId } = linearElementEditor;
+    const element = LinearElementEditor.getElement(elementId);
+    if (!element) {
+      return [];
+    }
+    const visiblePointIndexes: number[] = [];
+    let previousPoint: Point | null = null;
+    element.points.forEach((point, index) => {
+      let distance = Infinity;
+      if (previousPoint) {
+        distance = distance2d(
+          point[0],
+          point[1],
+          previousPoint[0],
+          previousPoint[1],
+        );
+      }
+      if (
+        (!appState.editingLinearElement &&
+          distance >= 2 * LinearElementEditor.POINT_HANDLE_SIZE) ||
+        appState.editingLinearElement
+      ) {
+        visiblePointIndexes.push(index);
+        previousPoint = point;
+      }
+    });
+    return visiblePointIndexes;
+  }
   static handlePointerDown(
     event: React.PointerEvent<HTMLCanvasElement>,
     appState: AppState,
