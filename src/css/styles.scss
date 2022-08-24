@@ -488,6 +488,13 @@
     margin-inline-start: 0.6em;
   }
 
+  /*zsvcziain*/
+  .tray-zoom {
+    pointer-events: initial;
+    padding-bottom: 0.25rem;
+    padding-top: 0.25rem;
+  }
+
   .undo-redo-buttons,
   .eraser-buttons {
     display: grid;
@@ -539,6 +546,16 @@
       display: flex;
       justify-content: space-between;
     }
+  }
+
+  /*zsviczian*/
+  textarea.excalidraw-wysiwyg {
+    border: none;
+    outline: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border-radius: 0;
   }
 
   input[type="text"],

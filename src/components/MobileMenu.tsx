@@ -9,7 +9,7 @@ import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
-import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
+import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { Section } from "./Section";
 import CollabButton from "./CollabButton";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
@@ -211,7 +211,7 @@ export const MobileMenu = ({
       <div
         className="App-bottom-bar"
         style={{
-          marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
+          marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN, //* 2, zsviczian
           marginLeft: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
           marginRight: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
         }}
@@ -265,6 +265,17 @@ export const MobileMenu = ({
               )}
           </footer>
         </Island>
+        {appState.trayModeEnabled ? ( //zsviczian display zoom menu in tray mode
+          <Island padding={1} style={{ marginLeft: `4px` }}>
+            <ZoomActions
+              renderAction={actionManager.renderAction}
+              zoom={appState.zoom}
+              trayMode={true}
+            />
+          </Island>
+        ) : (
+          ""
+        )}
       </div>
     </>
   );

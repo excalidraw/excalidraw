@@ -259,11 +259,13 @@ export const ShapesSwitcher = ({
 export const ZoomActions = ({
   renderAction,
   zoom,
+  trayMode = false, //zsviczian
 }: {
   renderAction: ActionManager["renderAction"];
   zoom: Zoom;
+  trayMode?: boolean; //zsviczian note also changes to Stack.Col and Stack.Row
 }) => (
-  <Stack.Col gap={1}>
+  <Stack.Col gap={1} className={clsx({ "tray-zoom": trayMode })}>
     <Stack.Row gap={1} align="center">
       {renderAction("zoomOut")}
       {renderAction("zoomIn")}
