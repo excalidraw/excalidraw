@@ -28,6 +28,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
+import { isValidSubtype } from "../subtypes";
 
 type RestoredAppState = Omit<
   AppState,
@@ -67,7 +68,8 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 };
 
 const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+  T extends Required<Omit<ExcalidrawElement, "subtype" | "customData">> & {
+    subtype?: ExcalidrawElement["subtype"];
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
@@ -116,6 +118,9 @@ const restoreElementWithProperties = <
     locked: element.locked ?? false,
   };
 
+  if ("subtype" in element && isValidSubtype(element.subtype, base.type)) {
+    base.subtype = element.subtype;
+  }
   if ("customData" in element) {
     base.customData = element.customData;
   }
