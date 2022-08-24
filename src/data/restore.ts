@@ -1,13 +1,6 @@
 import {
-  ExcalidrawDiamondElement,
   ExcalidrawElement,
-  ExcalidrawEllipseElement,
-  ExcalidrawFreeDrawElement,
-  ExcalidrawImageElement,
-  ExcalidrawLinearElement,
-  ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
-  ExcalidrawTextElement,
   FontFamilyValues,
 } from "../element/types";
 import {
@@ -35,7 +28,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
-import { delUndefinedProps, maybeGetCustom } from "../element/newElement";
+import { isValidSubtype } from "../subtypes";
 
 type RestoredAppState = Omit<
   AppState,
@@ -93,7 +86,6 @@ const restoreElementWithProperties = <
     Partial<Pick<ExcalidrawElement, "type" | "x" | "y">>,
 ): T => {
   const base: Pick<T, keyof ExcalidrawElement> = {
-    ...maybeGetCustom(element, extra.type || element.type),
     type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
@@ -126,6 +118,9 @@ const restoreElementWithProperties = <
     locked: element.locked ?? false,
   };
 
+  if ("subtype" in element && isValidSubtype(element.subtype, base.type)) {
+    base.subtype = element.subtype;
+  }
   if ("customData" in element) {
     base.customData = element.customData;
   }
@@ -140,7 +135,6 @@ const restoreElementWithProperties = <
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
 ): typeof element | null => {
-  let el;
   switch (element.type) {
     case "text":
       let fontSize = element.fontSize;
@@ -161,21 +155,21 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || element.text,
-      }) as ExcalidrawTextElement;
+      });
     case "freedraw": {
       return restoreElementWithProperties(element, {
         points: element.points,
         lastCommittedPoint: null,
         simulatePressure: element.simulatePressure,
         pressures: element.pressures,
-      }) as ExcalidrawFreeDrawElement;
+      });
     }
     case "image":
       return restoreElementWithProperties(element, {
         status: element.status || "pending",
         fileId: element.fileId,
         scale: element.scale || [1, 1],
-      }) as ExcalidrawImageElement;
+      });
     case "line":
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough
@@ -213,19 +207,16 @@ const restoreElement = (
         points,
         x,
         y,
-      }) as ExcalidrawLinearElement;
+      });
     }
 
     // generic elements
     case "ellipse":
-      el = restoreElementWithProperties(element, {});
-      return el as ExcalidrawEllipseElement;
+      return restoreElementWithProperties(element, {});
     case "rectangle":
-      el = restoreElementWithProperties(element, {});
-      return el as ExcalidrawRectangleElement;
+      return restoreElementWithProperties(element, {});
     case "diamond":
-      el = restoreElementWithProperties(element, {});
-      return el as ExcalidrawDiamondElement;
+      return restoreElementWithProperties(element, {});
 
     // Don't use default case so as to catch a missing an element type case.
     // We also don't want to throw, but instead return void so we filter
@@ -277,13 +268,14 @@ export const restoreAppState = (
         : defaultValue;
   }
 
-  const { activeSubtypes, customData } = appState;
+  if ("activeSubtypes" in appState) {
+    nextAppState.activeSubtypes = appState.activeSubtypes;
+  }
+  if ("customData" in appState) {
+    nextAppState.customData = appState.customData;
+  }
   return {
     ...nextAppState,
-    ...delUndefinedProps({ activeSubtypes, customData }, [
-      "activeSubtypes",
-      "customData",
-    ]),
     cursorButton: localAppState?.cursorButton || "up",
     // reset on fresh restore so as to hide the UI button if penMode not active
     penDetected:

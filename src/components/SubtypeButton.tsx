@@ -41,7 +41,7 @@ export const SubtypeButton = (
         isValidSubtype(subtype, appState.activeTool.type)
           ? appState.activeTool.type
           : parentType;
-      const activeTool = activated
+      const activeTool = !inactive
         ? appState.activeTool
         : updateActiveTool(appState, { type });
       const selectedElementIds = activated ? {} : appState.selectedElementIds;

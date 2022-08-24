@@ -31,7 +31,6 @@ import {
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
-import { delUndefinedProps } from "../element/newElement";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 
@@ -254,17 +253,11 @@ export const ShapesSwitcher = ({
             const nextActiveTool = updateActiveTool(appState, {
               type: value,
             });
-            setAppState(
-              delUndefinedProps(
-                {
-                  activeTool: nextActiveTool,
-                  multiElement: null,
-                  selectedElementIds: {},
-                  customSubtype: undefined,
-                },
-                ["customSubtype"],
-              ),
-            );
+            setAppState({
+              activeTool: nextActiveTool,
+              multiElement: null,
+              selectedElementIds: {},
+            });
             setCursorForShape(canvas, {
               ...appState,
               activeTool: nextActiveTool,

@@ -26,15 +26,6 @@ import { measureTextElement, wrapTextElement } from "./textWysiwyg";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import { getCustomMethods, isValidSubtype } from "../subtypes";
 
-export const delUndefinedProps = (obj: any, keys: string[]) => {
-  keys.forEach((key) => {
-    if (key in obj && obj[key] === undefined) {
-      delete obj[key];
-    }
-  });
-  return obj;
-};
-
 export const maybeGetCustom = (
   obj: {
     subtype?: ExcalidrawElement["subtype"];
@@ -42,11 +33,13 @@ export const maybeGetCustom = (
   },
   type: ExcalidrawElement["type"],
 ) => {
-  const { subtype, customData } = obj;
-  const custom = delUndefinedProps({ subtype, customData }, [
-    "subtype",
-    "customData",
-  ]);
+  const custom: typeof obj = {};
+  if ("subtype" in obj) {
+    custom.subtype = obj.subtype;
+  }
+  if ("customData" in obj) {
+    custom.customData = obj.customData;
+  }
   if ("subtype" in custom && !isValidSubtype(custom.subtype, type)) {
     delete custom.subtype;
   }
