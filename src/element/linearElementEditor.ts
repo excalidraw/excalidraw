@@ -431,9 +431,8 @@ export class LinearElementEditor {
         );
       }
       if (
-        (!appState.editingLinearElement &&
-          distance >= 2 * LinearElementEditor.POINT_HANDLE_SIZE) ||
-        appState.editingLinearElement
+        appState.editingLinearElement ||
+        distance >= 2 * LinearElementEditor.POINT_HANDLE_SIZE
       ) {
         visiblePointIndexes.push(index);
         previousPoint = point;
