@@ -542,7 +542,18 @@ export const getResizedElementAbsoluteCoords = (
     bounds = getBoundsFromPoints(points);
   } else {
     // Line
-    const curve = generateLinearElementShape(element);
+    const gen = rough.generator();
+    const curve =
+      element.strokeSharpness === "sharp"
+        ? gen.linearPath(
+            points as [number, number][],
+            generateRoughOptions(element),
+          )
+        : gen.curve(
+            points as [number, number][],
+            generateRoughOptions(element),
+          );
+
     const ops = getCurvePathOps(curve);
     bounds = getMinMaxXYFromCurvePathOps(ops);
   }
