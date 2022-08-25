@@ -33,6 +33,11 @@
       "name": "Run Tests",
       "command": "yarn test",
       "runAtStart": false
+    },
+    "install-deps": {
+      "name": "Install Dependencies",
+      "command": "yarn install",
+      "restartOn": { "files": ["yarn.lock"] }
     }
   }
 }
