@@ -112,11 +112,11 @@
     "link": {
       "edit": "",
       "create": "",
-      "label": ""
+      "label": "Nuoroda"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
+      "lock": "Užrakinti",
+      "unlock": "Atrakinti",
       "lockAll": "",
       "unlockAll": ""
     },
