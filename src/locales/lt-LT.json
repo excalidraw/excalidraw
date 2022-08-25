@@ -110,8 +110,8 @@
     "unbindText": "",
     "bindText": "",
     "link": {
-      "edit": "",
-      "create": "",
+      "edit": "Redeguoti nuorodą",
+      "create": "Sukurti nuorodą",
       "label": "Nuoroda"
     },
     "elementLock": {
