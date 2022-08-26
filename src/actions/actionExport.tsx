@@ -244,7 +244,7 @@ export const actionLoadScene = register({
     }
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
-  PanelComponent: ({ updateData, appState }) => (
+  PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
       icon={load}
