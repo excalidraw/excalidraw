@@ -506,15 +506,6 @@ export class LinearElementEditor {
       }
       ret.didAddPoint = true;
       ret.isMidPoint = true;
-      ret.linearElementEditor = {
-        ...linearElementEditor,
-        selectedPointsIndices: element.points[1],
-        pointerDownState: {
-          prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
-          lastClickedPoint: -1,
-        },
-        lastUncommittedPoint: null,
-      };
     }
     if (event.altKey && appState.editingLinearElement) {
       if (linearElementEditor.lastUncommittedPoint == null) {
@@ -543,6 +534,10 @@ export class LinearElementEditor {
         endBindingElement: getHoveredElementForBinding(
           scenePointer,
           Scene.getScene(element)!,
+        ),
+        visiblePointIndexes: LinearElementEditor.getVisiblePointIndexes(
+          element,
+          true,
         ),
       };
 
@@ -614,7 +609,16 @@ export class LinearElementEditor {
           }
         : { x: 0, y: 0 },
     };
-
+    if (ret.didAddPoint) {
+      const visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
+        element,
+        !!appState.editingLinearElement,
+      );
+      ret.linearElementEditor = {
+        ...ret.linearElementEditor,
+        visiblePointIndexes,
+      };
+    }
     return ret;
   }
 
