@@ -165,6 +165,9 @@ const renderSingleLinearPoint = (
   isSelected: boolean,
   isPhantomPoint = false,
 ) => {
+  if (!point) {
+    return;
+  }
   context.strokeStyle = "#5e5ad8";
   context.setLineDash([]);
   context.fillStyle = "rgba(255, 255, 255, 0.9)";
@@ -207,10 +210,9 @@ const renderLinearPointHandles = (
     ? POINT_HANDLE_SIZE
     : POINT_HANDLE_SIZE / 2;
 
-  const visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
-    appState.selectedLinearElement,
-    appState,
-  );
+  const visiblePointIndexes =
+    appState.editingLinearElement?.visiblePointIndexes ||
+    appState.selectedLinearElement.visiblePointIndexes;
   visiblePointIndexes.forEach((index) => {
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(index);
@@ -436,10 +438,9 @@ export const _renderScene = ({
       appState.selectedLinearElement &&
       appState.selectedLinearElement.hoverPointIndex >= 0
     ) {
-      const visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
-        appState.selectedLinearElement,
-        appState,
-      );
+      const visiblePointIndexes =
+        appState.editingLinearElement?.visiblePointIndexes ||
+        appState.selectedLinearElement.visiblePointIndexes;
       if (
         visiblePointIndexes.includes(
           appState.selectedLinearElement.hoverPointIndex,

@@ -10993,6 +10993,10 @@ Object {
     },
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
+    "visiblePointIndexes": Array [
+      0,
+      1,
+    ],
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -11219,6 +11223,10 @@ Object {
     },
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
+    "visiblePointIndexes": Array [
+      0,
+      1,
+    ],
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -11672,6 +11680,10 @@ Object {
     },
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
+    "visiblePointIndexes": Array [
+      0,
+      1,
+    ],
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -12077,6 +12089,10 @@ Object {
     },
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
+    "visiblePointIndexes": Array [
+      0,
+      1,
+    ],
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,

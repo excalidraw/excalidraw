@@ -1907,6 +1907,7 @@ class App extends React.Component<AppProps, AppState> {
                 editingLinearElement: new LinearElementEditor(
                   selectedElements[0],
                   this.scene,
+                  true,
                 ),
               });
             }
@@ -2485,6 +2486,7 @@ class App extends React.Component<AppProps, AppState> {
           editingLinearElement: new LinearElementEditor(
             selectedElements[0],
             this.scene,
+            true,
           ),
         });
       }

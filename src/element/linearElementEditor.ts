@@ -53,8 +53,12 @@ export class LinearElementEditor {
   public readonly endBindingElement: ExcalidrawBindableElement | null | "keep";
   public readonly hoverPointIndex: number;
   public readonly midPointHovered: boolean;
-
-  constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
+  public readonly visiblePointIndexes: readonly number[];
+  constructor(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    scene: Scene,
+    editingLinearElement = false,
+  ) {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
     };
@@ -73,6 +77,10 @@ export class LinearElementEditor {
     };
     this.hoverPointIndex = -1;
     this.midPointHovered = false;
+    this.visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
+      element,
+      editingLinearElement,
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -410,11 +418,9 @@ export class LinearElementEditor {
   }
 
   static getVisiblePointIndexes(
-    linearElementEditor: LinearElementEditor,
-    appState: AppState,
+    element: NonDeleted<ExcalidrawLinearElement>,
+    editingLinearElement: boolean,
   ) {
-    const { elementId } = linearElementEditor;
-    const element = LinearElementEditor.getElement(elementId);
     if (!element) {
       return [];
     }
@@ -432,7 +438,7 @@ export class LinearElementEditor {
       }
       const isExtremePoint = index === 0 || index === element.points.length - 1;
       if (
-        appState.editingLinearElement ||
+        editingLinearElement ||
         isExtremePoint ||
         distance >= 2 * LinearElementEditor.POINT_HANDLE_SIZE
       ) {

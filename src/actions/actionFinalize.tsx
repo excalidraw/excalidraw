@@ -33,6 +33,9 @@ export const actionFinalize = register({
             endBindingElement,
           );
         }
+        const selectedLinearElement = appState.selectedLinearElement
+          ? new LinearElementEditor(element, scene)
+          : null;
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
@@ -42,6 +45,7 @@ export const actionFinalize = register({
             ...appState,
             cursorButton: "up",
             editingLinearElement: null,
+            selectedLinearElement,
           },
           commitToHistory: true,
         };
