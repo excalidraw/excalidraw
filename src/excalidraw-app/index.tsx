@@ -43,6 +43,7 @@ import {
 } from "../utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
+  HIDDEN_DISCONNECT_TIMEOUT,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
@@ -452,6 +453,8 @@ const ExcalidrawWrapper = () => {
       LocalData.flushSave();
     };
 
+    let disconnectTimeout: ReturnType<typeof setTimeout>;
+
     const visibilityChange = (event: FocusEvent | Event) => {
       if (event.type === EVENT.BLUR || document.hidden) {
         LocalData.flushSave();
@@ -461,6 +464,31 @@ const ExcalidrawWrapper = () => {
         event.type === EVENT.FOCUS
       ) {
         syncData();
+
+        const disconnect = () => {
+          disconnectTimeout = setTimeout(
+            () => collabAPI.stopCollaboration(false),
+            HIDDEN_DISCONNECT_TIMEOUT,
+          );
+        };
+        const cancelPrevDisconnect = () => clearTimeout(disconnectTimeout);
+
+        if (document.hidden && collabAPI.isCollaborating()) {
+          if (!disconnectTimeout) {
+            disconnect();
+          } else {
+            cancelPrevDisconnect();
+            disconnect();
+          }
+        } else {
+          cancelPrevDisconnect();
+          if (!collabAPI.isCollaborating()) {
+            initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
+              loadImages(data, /* isInitialLoad */ true);
+              initialStatePromiseRef.current.promise.resolve(data.scene);
+            });
+          }
+        }
       }
     };
 
