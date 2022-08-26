@@ -1084,6 +1084,20 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
+      this.state.selectedLinearElement &&
+      prevState.zoom !== this.state.zoom
+    ) {
+      const selectedLinearElement =
+        LinearElementEditor.updateVisiblePointIndexes(
+          this.state.selectedLinearElement,
+          this.state,
+        );
+      this.setState({
+        selectedLinearElement,
+      });
+    }
+
+    if (
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY
     ) {
@@ -1907,6 +1921,7 @@ class App extends React.Component<AppProps, AppState> {
                 editingLinearElement: new LinearElementEditor(
                   selectedElements[0],
                   this.scene,
+                  this.state,
                   true,
                 ),
               });
@@ -2486,6 +2501,7 @@ class App extends React.Component<AppProps, AppState> {
           editingLinearElement: new LinearElementEditor(
             selectedElements[0],
             this.scene,
+            this.state,
             true,
           ),
         });
@@ -4481,6 +4497,7 @@ class App extends React.Component<AppProps, AppState> {
                     ? new LinearElementEditor(
                         elementsWithinSelection[0],
                         this.scene,
+                        this.state,
                       )
                     : null,
               },
@@ -4745,6 +4762,7 @@ class App extends React.Component<AppProps, AppState> {
               selectedLinearElement: new LinearElementEditor(
                 draggingElement,
                 this.scene,
+                this.state,
               ),
             }));
           } else {
@@ -4812,6 +4830,7 @@ class App extends React.Component<AppProps, AppState> {
             selectedLinearElement: new LinearElementEditor(
               hitElement,
               this.scene,
+              this.state,
             ),
           });
         }
@@ -4914,6 +4933,7 @@ class App extends React.Component<AppProps, AppState> {
                         ? new LinearElementEditor(
                             newSelectedElements[0],
                             this.scene,
+                            this.state,
                           )
                         : prevState.selectedLinearElement,
                   },
@@ -4942,7 +4962,11 @@ class App extends React.Component<AppProps, AppState> {
                   // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
                   // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
                   prevState.selectedLinearElement?.elementId !== hitElement.id
-                    ? new LinearElementEditor(hitElement, this.scene)
+                    ? new LinearElementEditor(
+                        hitElement,
+                        this.scene,
+                        this.state,
+                      )
                     : prevState.selectedLinearElement,
               },
               this.scene.getNonDeletedElements(),
@@ -5702,7 +5726,7 @@ class App extends React.Component<AppProps, AppState> {
             ...this.state,
             selectedElementIds: { [element.id]: true },
             selectedLinearElement: isLinearElement(element)
-              ? new LinearElementEditor(element, this.scene)
+              ? new LinearElementEditor(element, this.scene, this.state)
               : null,
           },
           this.scene.getNonDeletedElements(),

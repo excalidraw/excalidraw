@@ -57,6 +57,7 @@ export class LinearElementEditor {
   constructor(
     element: NonDeleted<ExcalidrawLinearElement>,
     scene: Scene,
+    appState: AppState,
     editingLinearElement = false,
   ) {
     this.elementId = element.id as string & {
@@ -79,6 +80,7 @@ export class LinearElementEditor {
     this.midPointHovered = false;
     this.visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
       element,
+      appState,
       editingLinearElement,
     );
   }
@@ -419,6 +421,7 @@ export class LinearElementEditor {
 
   static getVisiblePointIndexes(
     element: NonDeleted<ExcalidrawLinearElement>,
+    appState: AppState,
     editingLinearElement: boolean,
   ) {
     if (!element) {
@@ -429,12 +432,9 @@ export class LinearElementEditor {
     element.points.forEach((point, index) => {
       let distance = Infinity;
       if (previousPoint) {
-        distance = distance2d(
-          point[0],
-          point[1],
-          previousPoint[0],
-          previousPoint[1],
-        );
+        distance =
+          distance2d(point[0], point[1], previousPoint[0], previousPoint[1]) *
+          appState.zoom.value;
       }
       const isExtremePoint = index === 0 || index === element.points.length - 1;
       if (
@@ -447,6 +447,25 @@ export class LinearElementEditor {
       }
     });
     return visiblePointIndexes;
+  }
+
+  static updateVisiblePointIndexes(
+    linearElementEditor: LinearElementEditor,
+    appState: AppState,
+  ) {
+    const { elementId } = linearElementEditor;
+    const element = LinearElementEditor.getElement(elementId);
+    if (!element) {
+      return linearElementEditor;
+    }
+    return {
+      ...linearElementEditor,
+      visiblePointIndexes: LinearElementEditor.getVisiblePointIndexes(
+        element,
+        appState,
+        false,
+      ),
+    };
   }
   static handlePointerDown(
     event: React.PointerEvent<HTMLCanvasElement>,
@@ -537,6 +556,7 @@ export class LinearElementEditor {
         ),
         visiblePointIndexes: LinearElementEditor.getVisiblePointIndexes(
           element,
+          appState,
           true,
         ),
       };
@@ -612,6 +632,7 @@ export class LinearElementEditor {
     if (ret.didAddPoint) {
       const visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
         element,
+        appState,
         !!appState.editingLinearElement,
       );
       ret.linearElementEditor = {
