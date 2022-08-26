@@ -73,12 +73,12 @@
   "scripts": {
     "gen:types": "tsc --project ../../../tsconfig-types.json",
     "build:umd": "rm -rf dist && cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",
-    "build:umd:dev": "cross-env NODE_ENV=development webpack --config webpack.dev.config.js",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
     "pack": "yarn build:umd && yarn pack",
     "start": "webpack serve --config webpack.dev-server.config.js",
-    "install:deps": "yarn --cwd ../ install --frozen-lockfile && yarn install --frozen-lockfile && yarn --cwd ../../../ install --frozen-lockfile",
-    "build:example": "yarn --cwd ../excalidraw build:umd:dev && EXAMPLE=true webpack --config webpack.dev-server.config.js"
+    "install:deps": "yarn install --frozen-lockfile && yarn --cwd ../../../ install --frozen-lockfile",
+    "build:deps": "yarn --cwd ../excalidraw cross-env NODE_ENV=development webpack --config webpack.dev.config.js",
+    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js && yarn gen:types"
   },
   "dependencies": {
     "mathjax-full": "3.2.2"
