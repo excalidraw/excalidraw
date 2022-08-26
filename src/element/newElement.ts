@@ -14,7 +14,7 @@ import {
   ExcalidrawRectangleElement,
 } from "../element/types";
 import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
-import { randomInteger, randomId } from "../random";
+import { randomInteger, randomId, obsidianId } from "../random"; //zsviczian
 import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
@@ -61,7 +61,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
   const element = {
-    id: rest.id || randomId(),
+    id: rest.id || (type === "text" ? obsidianId() : randomId()), //zsviczian
     type,
     x,
     y,
