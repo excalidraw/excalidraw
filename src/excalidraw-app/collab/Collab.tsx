@@ -226,7 +226,7 @@ class Collab extends PureComponent<Props, CollabState> {
       preventUnload(event);
     }
 
-    if (this.isCollaborating || this.portal.roomId) {
+    if (this.isCollaborating() || this.portal.roomId) {
       try {
         localStorage?.setItem(
           STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
