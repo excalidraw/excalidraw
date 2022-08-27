@@ -102,7 +102,7 @@ describe("multi point mode in linear elements", () => {
       key: KEYS.ENTER,
     });
 
-    expect(renderScene).toHaveBeenCalledTimes(14);
+    expect(renderScene).toHaveBeenCalledTimes(13);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;
@@ -145,7 +145,7 @@ describe("multi point mode in linear elements", () => {
       key: KEYS.ENTER,
     });
 
-    expect(renderScene).toHaveBeenCalledTimes(14);
+    expect(renderScene).toHaveBeenCalledTimes(13);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;
