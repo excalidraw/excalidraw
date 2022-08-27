@@ -6167,6 +6167,9 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (width === 0 || height === 0) {
+        if (cb) {
+          cb();
+        }
         return;
       }
 
