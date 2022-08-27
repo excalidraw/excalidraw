@@ -88,6 +88,13 @@ const Footer = ({
       >
         {renderCustomFooter?.(false, appState)}
       </div>
+      <div
+        className={clsx("layer-ui__wrapper__footer-right zen-mode-transition", {
+          "transition-right disable-pointerEvents": appState.zenModeEnabled,
+        })}
+      >
+        {actionManager.renderAction("toggleShortcuts")}
+      </div>
       <ExitZenModeAction
         executeAction={actionManager.executeAction}
         showExitZenModeBtn={showExitZenModeBtn}
