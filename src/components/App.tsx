@@ -6166,6 +6166,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (width === 0 || height === 0) {
+        return;
+      }
+
       this.setState(
         {
           width,
