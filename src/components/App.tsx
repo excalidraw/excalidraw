@@ -6376,8 +6376,11 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      //zsviczian
       if (width === 0 || height === 0) {
-        //zsviczian
+        if (cb) {
+          cb();
+        }
         return;
       }
 
