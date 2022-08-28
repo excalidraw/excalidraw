@@ -22,7 +22,7 @@ import {
   getContainerElement,
   wrapText,
 } from "./textElement";
-import { getCustomMethods, CustomMethods } from "../subtypes";
+import { getSubtypeMethods, SubtypeMethods } from "../subtypes";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -63,7 +63,7 @@ const getTransform = (
 };
 
 export const measureTextElement = function (element, next, maxWidth) {
-  const map = getCustomMethods(element.subtype);
+  const map = getSubtypeMethods(element.subtype);
   if (map?.measureText) {
     return map.measureText(element, next, maxWidth);
   }
@@ -72,10 +72,10 @@ export const measureTextElement = function (element, next, maxWidth) {
   const font = getFontString({ fontSize, fontFamily: element.fontFamily });
   const text = next?.text ?? element.text;
   return measureText(text, font, maxWidth);
-} as CustomMethods["measureText"];
+} as SubtypeMethods["measureText"];
 
 export const wrapTextElement = function (element, containerWidth, next) {
-  const map = getCustomMethods(element.subtype);
+  const map = getSubtypeMethods(element.subtype);
   if (map?.wrapText) {
     return map.wrapText(element, containerWidth, next);
   }
@@ -84,7 +84,7 @@ export const wrapTextElement = function (element, containerWidth, next) {
   const font = getFontString({ fontSize, fontFamily: element.fontFamily });
   const text = next?.text ?? element.originalText;
   return wrapText(text, font, containerWidth);
-} as CustomMethods["wrapText"];
+} as SubtypeMethods["wrapText"];
 
 export const textWysiwyg = ({
   id,

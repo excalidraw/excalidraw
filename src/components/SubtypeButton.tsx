@@ -3,11 +3,11 @@ import { t } from "../i18n";
 import { Action } from "../actions/types";
 import { ToolButton } from "./ToolButton";
 import clsx from "clsx";
-import { CustomSubtype, isValidSubtype, subtypeCollides } from "../subtypes";
+import { SubtypeName, isValidSubtypeName, subtypeCollides } from "../subtypes";
 import { ExcalidrawElement, Theme } from "../element/types";
 
 export const SubtypeButton = (
-  subtype: CustomSubtype,
+  subtype: SubtypeName,
   parentType: ExcalidrawElement["type"],
   icon: ({ theme }: { theme: Theme }) => JSX.Element,
   key?: string,
@@ -20,7 +20,7 @@ export const SubtypeButton = (
     trackEvent: false,
     perform: (elements, appState) => {
       const inactive = !appState.activeSubtypes?.includes(subtype) ?? true;
-      const activeSubtypes: CustomSubtype[] = [];
+      const activeSubtypes: SubtypeName[] = [];
       if (appState.activeSubtypes) {
         activeSubtypes.push(...appState.activeSubtypes);
       }
@@ -38,7 +38,7 @@ export const SubtypeButton = (
       }
       const type =
         appState.activeTool.type !== "custom" &&
-        isValidSubtype(subtype, appState.activeTool.type)
+        isValidSubtypeName(subtype, appState.activeTool.type)
           ? appState.activeTool.type
           : parentType;
       const activeTool = !inactive

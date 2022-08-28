@@ -229,14 +229,14 @@ import LayerUI from "./LayerUI";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
+  Subtype,
   SubtypePrepFn,
-  SubtypeTypes,
-  getCustomActions,
-  getCustomSubtypes,
+  getSubtypeActions,
+  getSubtypeNames,
   prepareSubtype,
   selectSubtype,
 } from "../subtypes";
-import { getCrispSubtypeTypes } from "../element/subtypes/crisp/types";
+import { getCrispSubtype } from "../element/subtypes/crisp/types";
 import { prepareCrispSubtype } from "../element/subtypes/crisp";
 import {
   dataURLToFile,
@@ -454,10 +454,10 @@ class App extends React.Component<AppProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
-    this.addSubtype(getCrispSubtypeTypes(), prepareCrispSubtype);
+    this.addSubtype(getCrispSubtype(), prepareCrispSubtype);
   }
 
-  private addSubtype(subtypeTypes: SubtypeTypes, subtypePrepFn: SubtypePrepFn) {
+  private addSubtype(subtype: Subtype, subtypePrepFn: SubtypePrepFn) {
     // Call this method after finishing any async loading for
     // subtypes of ExcalidrawElement if the newly loaded code
     // would change the rendering.
@@ -482,7 +482,7 @@ class App extends React.Component<AppProps, AppState> {
         this.refresh();
       }
     };
-    const prep = prepareSubtype(subtypeTypes, subtypePrepFn, refresh);
+    const prep = prepareSubtype(subtype, subtypePrepFn, refresh);
     if (prep.actions) {
       this.actionManager.registerAll(prep.actions);
     }
@@ -578,7 +578,7 @@ class App extends React.Component<AppProps, AppState> {
                 value={this.scene.getNonDeletedElements()}
               >
                 <LayerUI
-                  renderShapeToggles={getCustomSubtypes().map((subtype) =>
+                  renderShapeToggles={getSubtypeNames().map((subtype) =>
                     this.actionManager.renderAction(subtype),
                   )}
                   canvas={this.canvas}
@@ -5928,7 +5928,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const maybeUse: boolean[] = [];
-    getCustomActions().forEach((action) => {
+    getSubtypeActions().forEach((action) => {
       if (action.contextItemPredicate) {
         maybeUse.push(
           action.contextItemPredicate!(
@@ -6059,7 +6059,7 @@ class App extends React.Component<AppProps, AppState> {
               options.push(separator);
               firstAdded = false;
             }
-            options.push(getCustomActions()[index]);
+            options.push(getSubtypeActions()[index]);
           }
         }
         ContextMenu.push({

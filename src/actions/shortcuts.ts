@@ -2,9 +2,9 @@ import { t } from "../i18n";
 import { isDarwin } from "../keys";
 import { getShortcutKey } from "../utils";
 import {
-  getCustomShortcutKey,
-  isCustomShortcutName,
-  CustomShortcutName,
+  getSubtypeShortcutKey,
+  isSubtypeShortcutName,
+  SubtypeShortcutName,
 } from "../subtypes";
 import { ActionName } from "./types";
 
@@ -77,10 +77,10 @@ const shortcutMap: Record<ShortcutName, string[]> = {
 };
 
 export const getShortcutFromShortcutName = (
-  name: ShortcutName | CustomShortcutName,
+  name: ShortcutName | SubtypeShortcutName,
 ) => {
-  const shortcuts = isCustomShortcutName(name)
-    ? getCustomShortcutKey(name)
+  const shortcuts = isSubtypeShortcutName(name)
+    ? getSubtypeShortcutKey(name)
     : shortcutMap[name as ShortcutName];
   // if multiple shortcuts available, take the first one
   return shortcuts && shortcuts.length > 0 ? shortcuts[0] : "";

@@ -24,29 +24,29 @@ import { getResizedElementAbsoluteCoords } from "./bounds";
 import { getContainerElement } from "./textElement";
 import { measureTextElement, wrapTextElement } from "./textWysiwyg";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
-import { getCustomMethods, isValidSubtype } from "../subtypes";
+import { getSubtypeMethods, isValidSubtypeName } from "../subtypes";
 
-export const maybeGetCustom = (
+export const maybeGetSubtypeProps = (
   obj: {
     subtype?: ExcalidrawElement["subtype"];
     customData?: ExcalidrawElement["customData"];
   },
   type: ExcalidrawElement["type"],
 ) => {
-  const custom: typeof obj = {};
+  const data: typeof obj = {};
   if ("subtype" in obj) {
-    custom.subtype = obj.subtype;
+    data.subtype = obj.subtype;
   }
   if ("customData" in obj) {
-    custom.customData = obj.customData;
+    data.customData = obj.customData;
   }
-  if ("subtype" in custom && !isValidSubtype(custom.subtype, type)) {
-    delete custom.subtype;
+  if ("subtype" in data && !isValidSubtypeName(data.subtype, type)) {
+    delete data.subtype;
   }
-  if (!("subtype" in custom) && "customData" in custom) {
-    delete custom.customData;
+  if (!("subtype" in data) && "customData" in data) {
+    delete data.customData;
   }
-  return custom as typeof obj;
+  return data as typeof obj;
 };
 
 type ElementConstructorOpts = MarkOptional<
@@ -89,7 +89,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
 ) => {
   const { subtype, customData } = rest;
   const element = {
-    ...maybeGetCustom({ subtype, customData }, type),
+    ...maybeGetSubtypeProps({ subtype, customData }, type),
     id: rest.id || randomId(),
     type,
     x,
@@ -123,7 +123,7 @@ export const newElement = (
     type: ExcalidrawGenericElement["type"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawGenericElement> => {
-  const map = getCustomMethods(opts?.subtype);
+  const map = getSubtypeMethods(opts?.subtype);
   map?.clean && map.clean(opts);
   return _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 };
@@ -160,7 +160,7 @@ export const newTextElement = (
     containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const map = getCustomMethods(opts?.subtype);
+  const map = getSubtypeMethods(opts?.subtype);
   map?.clean && map.clean(opts);
   const metrics = measureTextElement(opts, { customData: opts.customData });
   const offsets = getTextElementPositionOffsets(opts, metrics);
@@ -311,7 +311,7 @@ export const newFreeDrawElement = (
     simulatePressure: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
-  const map = getCustomMethods(opts?.subtype);
+  const map = getSubtypeMethods(opts?.subtype);
   map?.clean && map.clean(opts);
   return {
     ..._newElementBase<ExcalidrawFreeDrawElement>(opts.type, opts),
@@ -330,7 +330,7 @@ export const newLinearElement = (
     points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
-  const map = getCustomMethods(opts?.subtype);
+  const map = getSubtypeMethods(opts?.subtype);
   map?.clean && map.clean(opts);
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
@@ -348,7 +348,7 @@ export const newImageElement = (
     type: ExcalidrawImageElement["type"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
-  const map = getCustomMethods(opts?.subtype);
+  const map = getSubtypeMethods(opts?.subtype);
   map?.clean && map.clean(opts);
   return {
     ..._newElementBase<ExcalidrawImageElement>("image", opts),

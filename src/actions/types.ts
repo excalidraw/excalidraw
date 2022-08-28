@@ -6,7 +6,7 @@ import {
   ExcalidrawProps,
   BinaryFiles,
 } from "../types";
-import { CustomActionName } from "../subtypes";
+import { SubtypeActionName } from "../subtypes";
 
 export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
 
@@ -123,7 +123,7 @@ export type PanelComponentProps = {
 };
 
 export interface Action {
-  name: ActionName | CustomActionName;
+  name: ActionName | SubtypeActionName;
   PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
   keyPriority?: number;

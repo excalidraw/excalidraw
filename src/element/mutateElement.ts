@@ -5,8 +5,8 @@ import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { Point } from "../types";
 import { getUpdatedTimestamp } from "../utils";
-import { maybeGetCustom } from "./newElement";
-import { getCustomMethods } from "../subtypes";
+import { maybeGetSubtypeProps } from "./newElement";
+import { getSubtypeMethods } from "../subtypes";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -17,8 +17,8 @@ const cleanUpdates = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
 ): ElementUpdate<TElement> => {
-  const subtype = maybeGetCustom(element, element.type).subtype;
-  const map = getCustomMethods(subtype);
+  const subtype = maybeGetSubtypeProps(element, element.type).subtype;
+  const map = getSubtypeMethods(subtype);
   return map?.clean ? (map.clean(updates) as typeof updates) : updates;
 };
 

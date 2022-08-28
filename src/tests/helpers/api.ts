@@ -13,12 +13,15 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
-import { maybeGetCustom, newFreeDrawElement } from "../../element/newElement";
+import {
+  maybeGetSubtypeProps,
+  newFreeDrawElement,
+} from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { prepareSubtype, selectSubtype } from "../../subtypes";
 import { prepareCrispSubtype } from "../../element/subtypes/crisp";
-import { getCrispSubtypeTypes } from "../../element/subtypes/crisp/types";
+import { getCrispSubtype } from "../../element/subtypes/crisp/types";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -28,7 +31,7 @@ export class API {
   constructor() {
     if (true) {
       // Call `prepareSubtype()` here for `@excalidraw/excalidraw`-specific subtypes
-      prepareSubtype(getCrispSubtypeTypes(), prepareCrispSubtype);
+      prepareSubtype(getCrispSubtype(), prepareCrispSubtype);
     }
   }
 
@@ -126,7 +129,7 @@ export class API {
 
     const appState = h?.state || getDefaultAppState();
 
-    const custom = maybeGetCustom(
+    const custom = maybeGetSubtypeProps(
       {
         subtype: rest.subtype ?? selectSubtype(appState, type)?.subtype,
         customData:

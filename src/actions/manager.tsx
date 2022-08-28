@@ -10,7 +10,7 @@ import {
 import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { MODES } from "../constants";
-import { isActionEnabled, CustomActionName } from "../subtypes";
+import { isActionEnabled, SubtypeActionName } from "../subtypes";
 import { trackEvent } from "../analytics";
 
 const trackAction = (
@@ -42,7 +42,7 @@ const trackAction = (
 };
 
 export class ActionManager {
-  actions = {} as Record<ActionName | CustomActionName, Action>;
+  actions = {} as Record<ActionName | SubtypeActionName, Action>;
 
   updater: (actionResult: ActionResult | Promise<ActionResult>) => void;
 
@@ -141,7 +141,7 @@ export class ActionManager {
    * @param data additional data sent to the PanelComponent
    */
   renderAction = (
-    name: ActionName | CustomActionName,
+    name: ActionName | SubtypeActionName,
     data?: PanelComponentProps["data"],
   ) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;

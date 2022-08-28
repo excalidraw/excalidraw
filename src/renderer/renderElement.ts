@@ -29,7 +29,7 @@ import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
-import { getCustomMethods } from "../subtypes";
+import { getSubtypeMethods } from "../subtypes";
 import {
   BOUND_TEXT_PADDING,
   MAX_DECIMALS_FOR_SVG_EXPORT,
@@ -197,7 +197,7 @@ const drawElementOnCanvas = (
   renderConfig: RenderConfig,
 ) => {
   context.globalAlpha = element.opacity / 100;
-  const map = getCustomMethods(element.subtype);
+  const map = getSubtypeMethods(element.subtype);
   if (map?.render) {
     map.render(element, context, renderConfig.renderCb);
     context.globalAlpha = 1;
@@ -865,7 +865,7 @@ export const renderElementToSvg = (
     root = anchorTag;
   }
 
-  const map = getCustomMethods(element.subtype);
+  const map = getSubtypeMethods(element.subtype);
   if (map?.renderSvg) {
     map.renderSvg(svgRoot, root, element, { offsetX, offsetY });
     return;
