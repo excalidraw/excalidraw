@@ -38,12 +38,14 @@ import {
 import { ButtonSelect } from "../../../../components/ButtonSelect";
 
 // Subtype imports
-import { CustomMethods, SubtypePrepFn } from "../../../../subtypes";
+import { SubtypeMethods, SubtypePrepFn } from "../../../../subtypes";
 import { mathSubtypeIcon } from "./icon";
-import { MathProps, mathSubtype } from "./types";
+import { getMathSubtype } from "./types";
 import { SubtypeButton } from "../../../../components/SubtypeButton";
 
+const mathSubtype = getMathSubtype().name;
 const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;
+type MathProps = Record<"useTex" | "mathOnly", boolean>;
 
 type ExcalidrawMathElement = ExcalidrawTextElement &
   Readonly<{
@@ -703,7 +705,9 @@ const ensureMathElement = (element: Partial<ExcalidrawElement>) => {
   if (!isMathElement(element as Required<ExcalidrawElement>)) {
     return;
   }
-  const mathProps = getMathProps.ensureMathProps(element.customData!);
+  const mathProps = getMathProps.ensureMathProps(
+    element.customData! as MathProps,
+  );
   if (!("customData" in element)) {
     (element as any).customData = mathProps;
   }
@@ -724,7 +728,7 @@ const cleanMathElementUpdate = function (updates) {
   }
   (updates as any).fontFamily = FONT_FAMILY_MATH;
   return oldUpdates;
-} as CustomMethods["clean"];
+} as SubtypeMethods["clean"];
 
 const measureMathElement = function (element, next, maxWidth) {
   ensureMathElement(element);
@@ -732,7 +736,7 @@ const measureMathElement = function (element, next, maxWidth) {
   const fontSize = next?.fontSize ?? element.fontSize;
   const text = next?.text ?? element.text;
   const customData = next?.customData ?? element.customData;
-  const mathProps = getMathProps.ensureMathProps(customData!);
+  const mathProps = getMathProps.ensureMathProps(customData! as MathProps);
   const noMaxWidth = mathProps.mathOnly;
   const cWidth = noMaxWidth ? undefined : maxWidth;
   const metrics = getImageMetrics(
@@ -745,7 +749,7 @@ const measureMathElement = function (element, next, maxWidth) {
   const { height, baseline } = metrics;
   const width = noMaxWidth ? maxWidth ?? metrics.width : metrics.width;
   return { width, height, baseline };
-} as CustomMethods["measureText"];
+} as SubtypeMethods["measureText"];
 
 const renderMathElement = function (element, context, renderCb) {
   ensureMathElement(element);
@@ -869,7 +873,7 @@ const renderMathElement = function (element, context, renderCb) {
     doRenderChild,
     parentWidth,
   );
-} as CustomMethods["render"];
+} as SubtypeMethods["render"];
 
 const renderSvgMathElement = function (svgRoot, root, element, opt) {
   ensureMathElement(element);
@@ -1012,7 +1016,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   }
   node.appendChild(tempSvg);
   root.appendChild(node);
-} as CustomMethods["renderSvg"];
+} as SubtypeMethods["renderSvg"];
 
 const wrapMathElement = function (element, containerWidth, next) {
   ensureMathElement(element);
@@ -1021,7 +1025,7 @@ const wrapMathElement = function (element, containerWidth, next) {
     next?.fontSize !== undefined ? next.fontSize : element.fontSize;
   const text = next?.text !== undefined ? next.text : element.originalText;
   const customData = next?.customData ?? element.customData;
-  const mathProps = getMathProps.ensureMathProps(customData!);
+  const mathProps = getMathProps.ensureMathProps(customData! as MathProps);
 
   const font = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
 
@@ -1140,14 +1144,14 @@ const wrapMathElement = function (element, containerWidth, next) {
     wrappedLines.splice(0, 1);
   }
   return wrappedLines.join("\n");
-} as CustomMethods["wrapText"];
+} as SubtypeMethods["wrapText"];
 
 const ensureMathJaxLoaded = async function (callback) {
   await loadMathJax();
   if (callback) {
     callback();
   }
-} as CustomMethods["ensureLoaded"];
+} as SubtypeMethods["ensureLoaded"];
 
 const enableActionChangeMathProps = (
   elements: readonly ExcalidrawElement[],
@@ -1348,7 +1352,7 @@ const createMathActions = () => {
 };
 
 export const prepareMathSubtype = function (
-  addCustomAction,
+  addSubtypeAction,
   addLangData,
   onSubtypeLoaded,
 ) {
@@ -1356,7 +1360,7 @@ export const prepareMathSubtype = function (
   // calls loadMathJax().
   mathJaxLoadedCallback = onSubtypeLoaded;
 
-  const methods = {} as CustomMethods;
+  const methods = {} as SubtypeMethods;
   methods.clean = cleanMathElementUpdate;
   methods.ensureLoaded = ensureMathJaxLoaded;
   methods.measureText = measureMathElement;
@@ -1378,7 +1382,7 @@ export const prepareMathSubtype = function (
   registerAuxLangData(fallbackMathJaxLangData, getLangData);
 
   const actions = createMathActions();
-  actions.forEach((action) => addCustomAction(action));
+  actions.forEach((action) => addSubtypeAction(action));
   // Call loadMathJax() here if we want to be sure it's loaded.
 
   return { actions, methods };

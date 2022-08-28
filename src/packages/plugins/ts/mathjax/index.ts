@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { ExcalidrawImperativeAPI } from "../../../../types";
-import { addCustomMethods } from "../../../../subtypes";
-import { getMathSubtypeTypes, mathSubtype } from "./types";
+import { addSubtypeMethods } from "../../../../subtypes";
+import { getMathSubtype } from "./types";
 import { prepareMathSubtype } from "./plugin";
 
 export const MathJaxPlugin = "mathjax";
@@ -11,9 +11,9 @@ export const useMathJaxPlugin = (api: ExcalidrawImperativeAPI | null) => {
   const enabled = mathJaxPluginLoadable;
   useEffect(() => {
     if (enabled && api) {
-      const prep = api.addSubtype(getMathSubtypeTypes(), prepareMathSubtype);
+      const prep = api.addSubtype(getMathSubtype(), prepareMathSubtype);
       if (prep) {
-        addCustomMethods(mathSubtype, prep.methods);
+        addSubtypeMethods(getMathSubtype().name, prep.methods);
       }
     }
   }, [enabled, api]);

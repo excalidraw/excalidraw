@@ -1,30 +1,17 @@
 import { getShortcutKey } from "../../../../utils";
-import { SubtypeTypes } from "../../../../subtypes";
+import { Subtype } from "../../../../subtypes";
 
 // Exports
-export const mathSubtype = "math" as const;
-export type MathProps = typeof mathProps[number];
-export const getMathSubtypeTypes = () => mathSubtypeTypes;
+export const getMathSubtype = () => mathSubtype;
 
-// Define this separately so we can do `export type MathProps`
-const mathProps: readonly Record<string, boolean>[] = [
-  { useTex: true, mathOnly: false } as { useTex: boolean; mathOnly: boolean },
-] as const;
-
-// Use the `getMathSubtypeTypes` so we don't have to export this
-const mathSubtypeTypes: SubtypeTypes = {
-  subtype: mathSubtype,
-  parents: [{ subtype: mathSubtype, parentType: "text" }],
-  customData: mathProps,
-  customActions: [
-    {
-      subtype: mathSubtype,
-      actions: ["changeUseTex", "changeMathOnly", mathSubtype],
-    },
-  ],
-  disabledActions: [{ subtype: mathSubtype, actions: ["changeFontFamily"] }],
-  customShortcutNames: ["changeUseTex", "changeMathOnly"],
-  customShortcutMap: {
+// Use `getMathSubtype` so we don't have to export this
+const mathSubtype: Subtype = {
+  name: "math",
+  parents: ["text"],
+  actionNames: ["changeUseTex", "changeMathOnly"],
+  disabledNames: ["changeFontFamily"],
+  shortcutNames: ["changeUseTex", "changeMathOnly"],
+  shortcutMap: {
     changeUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
     changeMathOnly: [getShortcutKey("CtrlOrCmd+Shift+O")],
   },
