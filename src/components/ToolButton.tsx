@@ -187,3 +187,5 @@ ToolButton.defaultProps = {
   className: "",
   size: "medium",
 };
+
+ToolButton.displayName = "ToolButton";

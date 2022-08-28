@@ -161,6 +161,7 @@ export class ActionManager {
       key = name;
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
+      PanelComponent.displayName = "PanelComponent";
       const elements = this.getElementsIncludingDeleted();
       const appState = this.getAppState();
       const updateData = (formState?: any) => {
