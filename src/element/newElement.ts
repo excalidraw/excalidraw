@@ -399,7 +399,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
       copy.id += "_copy";
     }
   } else {
-    copy.id = randomId();
+    copy.id = copy.type === "text" ? obsidianId() : randomId(); //zsviczian
   }
   copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();
