@@ -28,7 +28,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
-import { isValidSubtype } from "../subtypes";
+import { isValidSubtypeName } from "../subtypes";
 
 type RestoredAppState = Omit<
   AppState,
@@ -118,7 +118,7 @@ const restoreElementWithProperties = <
     locked: element.locked ?? false,
   };
 
-  if ("subtype" in element && isValidSubtype(element.subtype, base.type)) {
+  if ("subtype" in element && isValidSubtypeName(element.subtype, base.type)) {
     base.subtype = element.subtype;
   }
   if ("customData" in element) {

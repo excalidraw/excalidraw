@@ -1,2 +1,2 @@
-export type CustomSubtype = string;
-export const isValidSubtype = (s: any, t: any): s is CustomSubtype => true; // Placeholder before further commits
+export type SubtypeName = string;
+export const isValidSubtypeName = (s: any, t: any): s is SubtypeName => true; // Placeholder before further commits
