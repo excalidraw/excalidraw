@@ -387,7 +387,8 @@
     "fileSaved": "File saved.",
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
-    "selection": "selection"
+    "selection": "selection",
+    "reconnectRoomServer": "Reconnecting to server"
   },
   "colors": {
     "ffffff": "White",

@@ -44,6 +44,7 @@ import {
 import {
   FIREBASE_STORAGE_PREFIXES,
   HIDDEN_DISCONNECT_TIMEOUT,
+  RECONNECT_TOAST_DURATION,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
@@ -84,6 +85,7 @@ import { Provider, useAtom } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
+import { Toast } from "../components/Toast";
 
 polyfill();
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -250,6 +252,8 @@ const PlusAppLinkJSX = (
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
+  const [toast, setToast] = useState<AppState["toast"]>(null);
+  const disconnectRef = useRef(false);
   let currentLangCode = languageDetector.detect() || defaultLang.code;
   if (Array.isArray(currentLangCode)) {
     currentLangCode = currentLangCode[0];
@@ -470,6 +474,7 @@ const ExcalidrawWrapper = () => {
             () => collabAPI.stopCollaboration(false),
             HIDDEN_DISCONNECT_TIMEOUT,
           );
+          disconnectRef.current = true;
         };
         const cancelPrevDisconnect = () => clearTimeout(disconnectTimeout);
 
@@ -479,14 +484,26 @@ const ExcalidrawWrapper = () => {
           } else {
             cancelPrevDisconnect();
             disconnect();
+            setToast(null);
           }
         } else {
           cancelPrevDisconnect();
           if (!collabAPI.isCollaborating()) {
-            initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
-              loadImages(data, /* isInitialLoad */ true);
-              initialStatePromiseRef.current.promise.resolve(data.scene);
-            });
+            if (!toast && disconnectRef.current) {
+              setToast({
+                message: t("toast.reconnectRoomServer"),
+                duration: RECONNECT_TOAST_DURATION,
+                closable: true,
+              });
+            }
+            disconnectRef.current &&
+              initializeScene({ collabAPI, excalidrawAPI }).then(
+                async (data) => {
+                  loadImages(data, /* isInitialLoad */ true);
+                  initialStatePromiseRef.current.promise.resolve(data.scene);
+                },
+              );
+            disconnectRef.current = false;
           }
         }
       }
@@ -509,7 +526,7 @@ const ExcalidrawWrapper = () => {
       );
       clearTimeout(titleTimeout);
     };
-  }, [collabAPI, excalidrawAPI]);
+  }, [collabAPI, excalidrawAPI, toast]);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
@@ -719,7 +736,7 @@ const ExcalidrawWrapper = () => {
   return (
     <div
       style={{ height: "100%" }}
-      className={clsx("excalidraw-app", {
+      className={clsx("excalidraw excalidraw-app", {
         "is-collaborating": isCollaborating,
       })}
     >
@@ -767,6 +784,14 @@ const ExcalidrawWrapper = () => {
         <ErrorDialog
           message={errorMessage}
           onClose={() => setErrorMessage("")}
+        />
+      )}
+      {toast && (
+        <Toast
+          message={toast.message}
+          duration={toast.duration}
+          closable={toast.closable}
+          onClose={() => setToast(null)}
         />
       )}
     </div>
