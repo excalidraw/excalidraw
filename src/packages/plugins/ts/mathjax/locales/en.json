@@ -1,6 +1,6 @@
 {
   "labels": {
-    "changeMathOnly": "Math mode",
+    "changeMathOnly": "Math display",
     "toggleMathOnly": "Toggle math-only mode",
     "mathOnlyTrue": "Math only",
     "mathOnlyFalse": "Mixed text",
