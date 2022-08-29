@@ -1,7 +1,7 @@
+global.__childdir = __dirname;
+global.__noenv = true;
 const webpack = require("webpack");
 const path = require("path");
-const BundleAnalyzerPlugin =
-  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const { merge } = require("webpack-merge");
 const configCommon = require("../common.webpack.prod.config");
 
@@ -18,7 +18,6 @@ const config = {
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
-    ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
   ],
 };
 module.exports = merge(configCommon, config);
