@@ -478,10 +478,10 @@ const LayerUI = ({
               {t("buttons.scrollBackToContent")}
             </button>
           )}
+          {appState.isLibraryOpen && (
+            <div className="layer-ui__sidebar">{libraryMenu}</div>
+          )}
         </div>
-      )}
-      {appState.isLibraryOpen && (
-        <div className="layer-ui__sidebar">{libraryMenu}</div>
       )}
     </>
   );
