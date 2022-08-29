@@ -432,56 +432,58 @@ const LayerUI = ({
       )}
 
       {!device.isMobile && (
-        <div
-          className={clsx("layer-ui__wrapper", {
-            "disable-pointerEvents":
-              appState.draggingElement ||
-              appState.resizingElement ||
-              (appState.editingElement &&
-                !isTextElement(appState.editingElement)),
-          })}
-          style={
-            appState.isLibraryOpen &&
-            appState.isLibraryMenuDocked &&
-            device.canDeviceFitSidebar
-              ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
-              : {}
-          }
-        >
-          {renderFixedSideContainer()}
-          <Footer
-            appState={appState}
-            actionManager={actionManager}
-            renderCustomFooter={renderCustomFooter}
-            showExitZenModeBtn={showExitZenModeBtn}
-          />
-          {appState.showStats && (
-            <Stats
+        <>
+          <div
+            className={clsx("layer-ui__wrapper", {
+              "disable-pointerEvents":
+                appState.draggingElement ||
+                appState.resizingElement ||
+                (appState.editingElement &&
+                  !isTextElement(appState.editingElement)),
+            })}
+            style={
+              appState.isLibraryOpen &&
+              appState.isLibraryMenuDocked &&
+              device.canDeviceFitSidebar
+                ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
+                : {}
+            }
+          >
+            {renderFixedSideContainer()}
+            <Footer
               appState={appState}
-              setAppState={setAppState}
-              elements={elements}
-              onClose={() => {
-                actionManager.executeAction(actionToggleStats);
-              }}
-              renderCustomStats={renderCustomStats}
+              actionManager={actionManager}
+              renderCustomFooter={renderCustomFooter}
+              showExitZenModeBtn={showExitZenModeBtn}
             />
-          )}
-          {appState.scrolledOutside && (
-            <button
-              className="scroll-back-to-content"
-              onClick={() => {
-                setAppState({
-                  ...calculateScrollCenter(elements, appState, canvas),
-                });
-              }}
-            >
-              {t("buttons.scrollBackToContent")}
-            </button>
-          )}
+            {appState.showStats && (
+              <Stats
+                appState={appState}
+                setAppState={setAppState}
+                elements={elements}
+                onClose={() => {
+                  actionManager.executeAction(actionToggleStats);
+                }}
+                renderCustomStats={renderCustomStats}
+              />
+            )}
+            {appState.scrolledOutside && (
+              <button
+                className="scroll-back-to-content"
+                onClick={() => {
+                  setAppState({
+                    ...calculateScrollCenter(elements, appState, canvas),
+                  });
+                }}
+              >
+                {t("buttons.scrollBackToContent")}
+              </button>
+            )}
+          </div>
           {appState.isLibraryOpen && (
             <div className="layer-ui__sidebar">{libraryMenu}</div>
           )}
-        </div>
+        </>
       )}
     </>
   );
