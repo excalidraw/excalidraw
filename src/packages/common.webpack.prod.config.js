@@ -1,5 +1,13 @@
 const path = require("path");
 const autoprefixer = require("autoprefixer");
+const webpack = require("webpack");
+const BundleAnalyzerPlugin = require(path.resolve(
+  path.join(global.__childdir, "node_modules"),
+  "webpack-bundle-analyzer",
+)).BundleAnalyzerPlugin;
+const TerserPlugin = require("terser-webpack-plugin");
+const { parseEnvVariables } =
+  "__noenv" in global ? {} : require(path.resolve(global.__childdir, "./env"));
 
 module.exports = {
   mode: "production",
@@ -67,6 +75,11 @@ module.exports = {
   },
   optimization: {
     minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        test: /\.js($|\?)/i,
+      }),
+    ],
     splitChunks: {
       chunks: "async",
       cacheGroups: {
@@ -77,6 +90,18 @@ module.exports = {
       },
     },
   },
+  plugins: [
+    ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
+    ...("__noenv" in global
+      ? []
+      : [
+          new webpack.DefinePlugin({
+            "process.env": parseEnvVariables(
+              path.resolve(__dirname, "../../.env.production"),
+            ),
+          }),
+        ]),
+  ],
   externals: {
     react: {
       root: "React",

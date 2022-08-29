@@ -1,5 +1,7 @@
 const path = require("path");
 const autoprefixer = require("autoprefixer");
+const webpack = require("webpack");
+const { parseEnvVariables } = require(path.resolve(global.__childdir, "./env"));
 
 module.exports = {
   mode: "development",
@@ -61,6 +63,14 @@ module.exports = {
       },
     },
   },
+  plugins: [
+    new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ }),
+    new webpack.DefinePlugin({
+      "process.env": parseEnvVariables(
+        path.resolve(__dirname, "../../.env.development"),
+      ),
+    }),
+  ],
   externals: {
     react: {
       root: "React",
