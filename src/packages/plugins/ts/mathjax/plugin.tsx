@@ -40,10 +40,10 @@ import { ButtonSelect } from "../../../../components/ButtonSelect";
 // Subtype imports
 import { SubtypeMethods, SubtypePrepFn } from "../../../../subtypes";
 import { mathSubtypeIcon } from "./icon";
-import { getMathSubtype } from "./types";
+import { getMathSubtypeRecord } from "./types";
 import { SubtypeButton } from "../../../../components/SubtypeButton";
 
-const mathSubtype = getMathSubtype().name;
+const mathSubtype = getMathSubtypeRecord().subtype;
 const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;
 type MathProps = Record<"useTex" | "mathOnly", boolean>;
 

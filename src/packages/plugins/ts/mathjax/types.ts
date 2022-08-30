@@ -1,12 +1,12 @@
 import { getShortcutKey } from "../../../../utils";
-import { Subtype } from "../../../../subtypes";
+import { SubtypeRecord } from "../../../../subtypes";
 
 // Exports
-export const getMathSubtype = () => mathSubtype;
+export const getMathSubtypeRecord = () => mathSubtype;
 
 // Use `getMathSubtype` so we don't have to export this
-const mathSubtype: Subtype = {
-  name: "math",
+const mathSubtype: SubtypeRecord = {
+  subtype: "math",
   parents: ["text"],
   actionNames: ["changeUseTex", "changeMathOnly"],
   disabledNames: ["changeFontFamily"],
