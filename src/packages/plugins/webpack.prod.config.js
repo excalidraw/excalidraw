@@ -1,7 +1,7 @@
 global.__childdir = __dirname;
 const path = require("path");
 const { merge } = require("webpack-merge");
-const configCommon = require("../common.webpack.prod.config");
+const commonConfig = require("../common.webpack.prod.config");
 
 const config = {
   entry: {
@@ -14,4 +14,4 @@ const config = {
     assetModuleFilename: "excalidraw-plugins-assets/[name][ext]",
   },
 };
-module.exports = merge(configCommon, config);
+module.exports = merge(commonConfig, config);

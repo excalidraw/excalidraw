@@ -88,7 +88,7 @@ Try out [`@excalidraw/excalidraw`](https://www.npmjs.com/package/@excalidraw/exc
 
 ### Code Sandbox
 
-- Go to https://codesandbox.io/s/github/excalidraw/excalidraw
+- Go to https://codesandbox.io/p/github/excalidraw/excalidraw
   - You may need to sign in with GitHub and reload the page
 - You can start coding instantly, and even send PRs from there!
 
