@@ -1,4 +1,4 @@
-import { SubtypeName } from "../subtypes";
+import { SubtypeRecord } from "../subtypes";
 import { Point } from "../types";
 import { FONT_FAMILY, THEME, VERTICAL_ALIGN } from "../constants";
 
@@ -57,7 +57,7 @@ type _ExcalidrawElementBase = Readonly<{
   updated: number;
   link: string | null;
   locked: boolean;
-  subtype?: SubtypeName;
+  subtype?: SubtypeRecord;
   customData?: Record<string, any>;
 }>;
 
