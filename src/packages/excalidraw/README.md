@@ -929,7 +929,8 @@ This function normalizes library items elements, adding missing values when need
   elements,
   appState
   getDimensions,
-  files
+  files,
+  exportPadding?: number;
 }: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L12">ExportOpts</a>
 </pre>
 
@@ -940,6 +941,7 @@ This function normalizes library items elements, adding missing values when need
 | getDimensions | `(width: number, height: number) => { width: number, height: number, scale?: number }` | undefined | A function which returns the `width`, `height`, and optionally `scale` (defaults `1`), with which canvas is to be exported. |
 | maxWidthOrHeight | `number` | undefined | The maximum width or height of the exported image. If provided, `getDimensions` is ignored. |
 | files | [BinaryFiles](The [`BinaryFiles`](<[BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64)>) | undefined | The files added to the scene. |
+| exportPadding | number | 10 | The padding to be added on canvas |
 
 **How to use**
 
@@ -957,7 +959,8 @@ This function returns the canvas with the exported elements, appState and dimens
 exportToBlob(
   opts: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L14">ExportOpts</a> & {
   mimeType?: string,
-  quality?: number;
+  quality?: number,
+  exportPadding?: number;
 })
 </pre>
 
@@ -966,6 +969,7 @@ exportToBlob(
 | opts |  |  | This param is passed to `exportToCanvas`. You can refer to [`exportToCanvas`](#exportToCanvas) |
 | mimeType | string | "image/png" | Indicates the image format |
 | quality | number | 0.92 | A value between 0 and 1 indicating the [image quality](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#parameters). Applies only to `image/jpeg`/`image/webp` MIME types. |
+| exportPadding | number | 10 | The padding to be added on canvas |
 
 **How to use**
 
