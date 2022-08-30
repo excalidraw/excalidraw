@@ -3058,7 +3058,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (this.state.selectedLinearElement) {
       let hoverPointIndex = -1;
-      let midPointHovered = false;
+      let segmentMidPointHoveredCoords = null;
       if (
         isHittingElementNotConsideringBoundingBox(element, this.state, [
           scenePointerX,
@@ -3071,13 +3071,14 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         );
-        midPointHovered = LinearElementEditor.isHittingMidPoint(
-          linearElementEditor,
-          { x: scenePointerX, y: scenePointerY },
-          this.state,
-        );
+        segmentMidPointHoveredCoords =
+          LinearElementEditor.getSegmentMidpointHitCoords(
+            linearElementEditor,
+            { x: scenePointerX, y: scenePointerY },
+            this.state,
+          );
 
-        if (hoverPointIndex >= 0 || midPointHovered) {
+        if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
           setCursor(this.canvas, CURSOR_TYPE.POINTER);
         } else {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
@@ -3106,12 +3107,13 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        this.state.selectedLinearElement.midPointHovered !== midPointHovered
+        this.state.selectedLinearElement.segmentMidPointHoveredCoords !==
+        segmentMidPointHoveredCoords
       ) {
         this.setState({
           selectedLinearElement: {
             ...this.state.selectedLinearElement,
-            midPointHovered,
+            segmentMidPointHoveredCoords,
           },
         });
       }

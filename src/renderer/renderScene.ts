@@ -60,6 +60,7 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
+import { centerPoint } from "../math";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 4;
@@ -197,12 +198,7 @@ const renderLinearPointHandles = (
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
   context.lineWidth = 1 / renderConfig.zoom.value;
   const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-  const centerPoint = LinearElementEditor.getMidPoint(
-    appState.selectedLinearElement,
-  );
-  if (!centerPoint) {
-    return;
-  }
+
   const { POINT_HANDLE_SIZE } = LinearElementEditor;
   const radius = appState.editingLinearElement
     ? POINT_HANDLE_SIZE
@@ -219,13 +215,20 @@ const renderLinearPointHandles = (
       radius,
       isSelected,
     );
-  });
 
-  if (points.length < 3) {
-    if (appState.selectedLinearElement.midPointHovered) {
-      const centerPoint = LinearElementEditor.getMidPoint(
-        appState.selectedLinearElement,
-      )!;
+    // Rendering segment mid points
+    if (!points[idx + 1]) {
+      return;
+    }
+    const segmentMidPoint = centerPoint(points[idx], points[idx + 1]);
+
+    if (
+      appState?.selectedLinearElement?.segmentMidPointHoveredCoords &&
+      LinearElementEditor.isEqual(
+        segmentMidPoint,
+        appState.selectedLinearElement.segmentMidPointHoveredCoords,
+      )
+    ) {
       // The order of renderingSingleLinearPoint and highLight points is different
       // inside vs outside editor as hover states are different,
       // in editor when hovered the original point is not visible as hover state fully covers it whereas outside the
@@ -235,34 +238,34 @@ const renderLinearPointHandles = (
           context,
           appState,
           renderConfig,
-          centerPoint,
+          segmentMidPoint,
           radius,
           false,
         );
-        highlightPoint(centerPoint, context, renderConfig);
+        highlightPoint(segmentMidPoint, context, renderConfig);
       } else {
-        highlightPoint(centerPoint, context, renderConfig);
+        highlightPoint(segmentMidPoint, context, renderConfig);
         renderSingleLinearPoint(
           context,
           appState,
           renderConfig,
-          centerPoint,
+          segmentMidPoint,
           radius,
           false,
         );
       }
-    } else {
+    } else if (appState.editingLinearElement || points.length === 2) {
       renderSingleLinearPoint(
         context,
         appState,
         renderConfig,
-        centerPoint,
+        segmentMidPoint,
         POINT_HANDLE_SIZE / 2,
         false,
         true,
       );
     }
-  }
+  });
 
   context.restore();
 };
