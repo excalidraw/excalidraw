@@ -44,7 +44,6 @@ import {
 import {
   FIREBASE_STORAGE_PREFIXES,
   HIDDEN_DISCONNECT_TIMEOUT,
-  RECONNECT_TOAST_DURATION,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
@@ -186,9 +185,8 @@ const initializeScene = async (opts: {
   }
 
   if (roomLinkData) {
-    const { excalidrawAPI } = opts;
-
-    const scene = await opts.collabAPI.startCollaboration(roomLinkData);
+    const { excalidrawAPI, collabAPI } = opts;
+    const scene = await collabAPI.startCollaboration(roomLinkData);
 
     return {
       // when collaborating, the state may have already been updated at this
@@ -459,7 +457,7 @@ const ExcalidrawWrapper = () => {
 
     let disconnectTimeout: ReturnType<typeof setTimeout>;
 
-    const visibilityChange = (event: FocusEvent | Event) => {
+    const visibilityChange = async (event: FocusEvent | Event) => {
       if (event.type === EVENT.BLUR || document.hidden) {
         LocalData.flushSave();
       }
@@ -492,17 +490,26 @@ const ExcalidrawWrapper = () => {
             if (!toast && disconnectRef.current) {
               setToast({
                 message: t("toast.reconnectRoomServer"),
-                duration: RECONNECT_TOAST_DURATION,
+                duration: Infinity,
                 closable: true,
               });
             }
             disconnectRef.current &&
-              initializeScene({ collabAPI, excalidrawAPI }).then(
+              (await initializeScene({ collabAPI, excalidrawAPI }).then(
                 async (data) => {
                   loadImages(data, /* isInitialLoad */ true);
                   initialStatePromiseRef.current.promise.resolve(data.scene);
+                  if (data.scene) {
+                    excalidrawAPI.updateScene({
+                      ...data.scene,
+                      ...restore(data.scene, null, null),
+                      commitToHistory: true,
+                    });
+                    excalidrawAPI.scrollToContent();
+                  }
                 },
-              );
+              ));
+            setToast(null);
             disconnectRef.current = false;
           }
         }
@@ -526,7 +533,8 @@ const ExcalidrawWrapper = () => {
       );
       clearTimeout(titleTimeout);
     };
-  }, [collabAPI, excalidrawAPI, toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collabAPI, excalidrawAPI]);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
@@ -736,7 +744,7 @@ const ExcalidrawWrapper = () => {
   return (
     <div
       style={{ height: "100%" }}
-      className={clsx("excalidraw excalidraw-app", {
+      className={clsx("excalidraw-app excalidraw", {
         "is-collaborating": isCollaborating,
       })}
     >
