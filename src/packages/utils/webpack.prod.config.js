@@ -3,7 +3,7 @@ global.__noenv = true;
 const webpack = require("webpack");
 const path = require("path");
 const { merge } = require("webpack-merge");
-const configCommon = require("../common.webpack.prod.config");
+const commonConfig = require("../common.webpack.prod.config");
 
 const config = {
   entry: { "excalidraw-utils.min": "./index.js" },
@@ -20,4 +20,4 @@ const config = {
     }),
   ],
 };
-module.exports = merge(configCommon, config);
+module.exports = merge(commonConfig, config);
