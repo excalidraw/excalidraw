@@ -24,7 +24,7 @@ import { getResizedElementAbsoluteCoords } from "./bounds";
 import { getContainerElement } from "./textElement";
 import { measureTextElement, wrapTextElement } from "./textWysiwyg";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
-import { getSubtypeMethods, isValidSubtypeName } from "../subtypes";
+import { getSubtypeMethods, isValidSubtype } from "../subtypes";
 
 export const maybeGetSubtypeProps = (
   obj: {
@@ -40,7 +40,7 @@ export const maybeGetSubtypeProps = (
   if ("customData" in obj) {
     data.customData = obj.customData;
   }
-  if ("subtype" in data && !isValidSubtypeName(data.subtype, type)) {
+  if ("subtype" in data && !isValidSubtype(data.subtype, type)) {
     delete data.subtype;
   }
   if (!("subtype" in data) && "customData" in data) {

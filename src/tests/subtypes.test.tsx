@@ -1,9 +1,9 @@
 import fallbackLangData from "./helpers/locales/en.json";
 import {
-  Subtype,
+  SubtypeRecord,
   SubtypeMethods,
   SubtypePrepFn,
-  isValidSubtypeName,
+  isValidSubtype,
   prepareSubtype,
   subtypeCollides,
 } from "../subtypes";
@@ -40,8 +40,8 @@ const testSubtypeIcon = ({ theme }: { theme: Theme }) =>
     { width: 40, height: 20, mirror: true },
   );
 
-const test1: Subtype = {
-  name: "test",
+const test1: SubtypeRecord = {
+  subtype: "test",
   parents: ["line", "arrow", "rectangle", "diamond", "ellipse"],
   actionNames: [],
   disabledNames: ["changeSloppiness"],
@@ -51,8 +51,8 @@ const test1: Subtype = {
 
 const test1NonParent = "text" as const;
 
-const test2: Subtype = {
-  name: "test2",
+const test2: SubtypeRecord = {
+  subtype: "test2",
   parents: ["text"],
   actionNames: [],
   disabledNames: [],
@@ -60,8 +60,8 @@ const test2: Subtype = {
   shortcutMap: {},
 };
 
-const test3: Subtype = {
-  name: "test3",
+const test3: SubtypeRecord = {
+  subtype: "test3",
   parents: ["text", "line"],
   actionNames: [],
   disabledNames: [],
@@ -138,48 +138,50 @@ prepareSubtype(test3, prepareTest3Subtype);
 describe("subtypes", () => {
   it("should correctly validate", async () => {
     test1.parents.forEach((p) => {
-      expect(isValidSubtypeName(test1.name, p)).toBe(true);
-      expect(isValidSubtypeName(undefined, p)).toBe(false);
+      expect(isValidSubtype(test1.subtype, p)).toBe(true);
+      expect(isValidSubtype(undefined, p)).toBe(false);
     });
-    expect(isValidSubtypeName(test1.name, test1NonParent)).toBe(false);
-    expect(isValidSubtypeName(test1.name, undefined)).toBe(false);
-    expect(isValidSubtypeName(undefined, undefined)).toBe(false);
+    expect(isValidSubtype(test1.subtype, test1NonParent)).toBe(false);
+    expect(isValidSubtype(test1.subtype, undefined)).toBe(false);
+    expect(isValidSubtype(undefined, undefined)).toBe(false);
   });
   it("should collide with themselves", async () => {
-    expect(subtypeCollides(test1.name, [test1.name])).toBe(true);
-    expect(subtypeCollides(test1.name, [test1.name, test2.name])).toBe(true);
+    expect(subtypeCollides(test1.subtype, [test1.subtype])).toBe(true);
+    expect(subtypeCollides(test1.subtype, [test1.subtype, test2.subtype])).toBe(
+      true,
+    );
   });
   it("should not collide without type overlap", async () => {
-    expect(subtypeCollides(test1.name, [test2.name])).toBe(false);
+    expect(subtypeCollides(test1.subtype, [test2.subtype])).toBe(false);
   });
   it("should collide with type overlap", async () => {
-    expect(subtypeCollides(test1.name, [test3.name])).toBe(true);
+    expect(subtypeCollides(test1.subtype, [test3.subtype])).toBe(true);
   });
   it("should apply to ExcalidrawElements", async () => {
     await render(<ExcalidrawApp />, {
       localStorageData: {
         elements: [
-          API.createElement({ type: "line", id: "A", subtype: test1.name }),
-          API.createElement({ type: "arrow", id: "B", subtype: test1.name }),
+          API.createElement({ type: "line", id: "A", subtype: test1.subtype }),
+          API.createElement({ type: "arrow", id: "B", subtype: test1.subtype }),
           API.createElement({
             type: "rectangle",
             id: "C",
-            subtype: test1.name,
+            subtype: test1.subtype,
           }),
           API.createElement({
             type: "diamond",
             id: "D",
-            subtype: test1.name,
+            subtype: test1.subtype,
           }),
           API.createElement({
             type: "ellipse",
             id: "E",
-            subtype: test1.name,
+            subtype: test1.subtype,
           }),
         ],
       },
     });
-    h.elements.forEach((el) => expect(el.subtype).toBe(test1.name));
+    h.elements.forEach((el) => expect(el.subtype).toBe(test1.subtype));
   });
   it("should enforce prop value restrictions", async () => {
     await render(<ExcalidrawApp />, {
@@ -188,7 +190,7 @@ describe("subtypes", () => {
           API.createElement({
             type: "line",
             id: "A",
-            subtype: test1.name,
+            subtype: test1.subtype,
             roughness: 1,
           }),
           API.createElement({ type: "line", id: "B", roughness: 1 }),
@@ -196,7 +198,7 @@ describe("subtypes", () => {
       },
     });
     h.elements.forEach((el) => {
-      if (el.subtype === test1.name) {
+      if (el.subtype === test1.subtype) {
         expect(el.roughness).toBe(0);
       } else {
         expect(el.roughness).toBe(1);

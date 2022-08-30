@@ -3,7 +3,7 @@ import { registerAuxLangData } from "../../../i18n";
 import { SubtypeMethods, SubtypePrepFn } from "../../../subtypes";
 import { SubtypeButton } from "../../../components/SubtypeButton";
 import { crispSubtypeIcon } from "./icon";
-import { getCrispSubtype } from "./types";
+import { getCrispSubtypeRecord } from "./types";
 
 const cleanCrispElementUpdate = function (updates) {
   const oldUpdates = {};
@@ -37,7 +37,7 @@ export const prepareCrispSubtype = function (
   addLangData(fallbackLangData, getLangData);
   registerAuxLangData(fallbackLangData, getLangData);
 
-  const crispSubtype = getCrispSubtype().name;
+  const crispSubtype = getCrispSubtypeRecord().subtype;
   const crispAction = SubtypeButton(crispSubtype, "line", crispSubtypeIcon);
 
   const actions = [crispAction];

@@ -229,14 +229,14 @@ import LayerUI from "./LayerUI";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
-  Subtype,
+  SubtypeRecord,
   SubtypePrepFn,
   getSubtypeActions,
   getSubtypeNames,
   prepareSubtype,
   selectSubtype,
 } from "../subtypes";
-import { getCrispSubtype } from "../element/subtypes/crisp/types";
+import { getCrispSubtypeRecord } from "../element/subtypes/crisp/types";
 import { prepareCrispSubtype } from "../element/subtypes/crisp";
 import {
   dataURLToFile,
@@ -454,10 +454,10 @@ class App extends React.Component<AppProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
-    this.addSubtype(getCrispSubtype(), prepareCrispSubtype);
+    this.addSubtype(getCrispSubtypeRecord(), prepareCrispSubtype);
   }
 
-  private addSubtype(subtype: Subtype, subtypePrepFn: SubtypePrepFn) {
+  private addSubtype(record: SubtypeRecord, subtypePrepFn: SubtypePrepFn) {
     // Call this method after finishing any async loading for
     // subtypes of ExcalidrawElement if the newly loaded code
     // would change the rendering.
@@ -482,7 +482,7 @@ class App extends React.Component<AppProps, AppState> {
         this.refresh();
       }
     };
-    const prep = prepareSubtype(subtype, subtypePrepFn, refresh);
+    const prep = prepareSubtype(record, subtypePrepFn, refresh);
     if (prep.actions) {
       this.actionManager.registerAll(prep.actions);
     }

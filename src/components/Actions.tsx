@@ -23,7 +23,7 @@ import {
 } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
-import { getSubtypeActions, getSubtypeNames, SubtypeName } from "../subtypes";
+import { getSubtypeActions, getSubtypeNames, Subtype } from "../subtypes";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
@@ -128,7 +128,7 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => element.subtype)) && (
         <>
           {getSubtypeActions().map((action) => {
-            if (!getSubtypeNames().includes(action.name as SubtypeName)) {
+            if (!getSubtypeNames().includes(action.name as Subtype)) {
               return renderAction(action.name);
             }
             return null;

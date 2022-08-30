@@ -14,24 +14,24 @@ import { hasBoundTextElement } from "./element/typeChecks";
 import { getBoundTextElement } from "./element/textElement";
 
 // Use "let" instead of "const" so we can dynamically add subtypes
-let subtypeNames: readonly SubtypeName[] = [];
+let subtypeNames: readonly Subtype[] = [];
 let parentTypeMap: readonly {
-  subtype: SubtypeName;
+  subtype: Subtype;
   parentType: ExcalidrawElement["type"];
 }[] = [];
 let subtypeActionMap: readonly {
-  subtype: SubtypeName;
+  subtype: Subtype;
   actions: readonly SubtypeActionName[];
 }[] = [];
 let disabledActionMap: readonly {
-  subtype: SubtypeName;
+  subtype: Subtype;
   actions: readonly DisabledActionName[];
 }[] = [];
-let subtypeShortcutNames: Subtype["shortcutNames"] = [];
-let subtypeShortcutMap: Subtype["shortcutMap"] = {};
+let subtypeShortcutNames: SubtypeRecord["shortcutNames"] = [];
+let subtypeShortcutMap: SubtypeRecord["shortcutMap"] = {};
 
-export type Subtype = Readonly<{
-  name: SubtypeName;
+export type SubtypeRecord = Readonly<{
+  subtype: Subtype;
   parents: readonly ExcalidrawElement["type"][];
   actionNames: readonly SubtypeActionName[];
   disabledNames: readonly DisabledActionName[];
@@ -40,15 +40,15 @@ export type Subtype = Readonly<{
 }>;
 
 // Subtype Names
-export type SubtypeName = string;
-export const getSubtypeNames = (): readonly SubtypeName[] => {
+export type Subtype = string;
+export const getSubtypeNames = (): readonly Subtype[] => {
   return subtypeNames;
 };
-export const isValidSubtypeName = (s: any, t: any): s is SubtypeName =>
+export const isValidSubtype = (s: any, t: any): s is Subtype =>
   parentTypeMap.find(
     (val) => val.subtype === (s as string) && val.parentType === (t as string),
   ) !== undefined;
-const isSubtypeName = (s: any): s is SubtypeName => subtypeNames.includes(s);
+const isSubtypeName = (s: any): s is Subtype => subtypeNames.includes(s);
 
 // Subtype Actions
 export type SubtypeActionName = string;
@@ -123,7 +123,7 @@ export const isActionEnabled = (
       }) ||
       // Or has any active subtype enabled this actionName?
       appState.activeSubtypes?.some((subtype) => {
-        if (!isValidSubtypeName(subtype, appState.activeTool.type)) {
+        if (!isValidSubtype(subtype, appState.activeTool.type)) {
           return false;
         }
         return isForSubtype(subtype, actionName, true);
@@ -141,7 +141,7 @@ export const isActionEnabled = (
         // And has every active subtype not disabled this actionName?
         (appState.activeSubtypes === undefined ||
           appState.activeSubtypes?.every((subtype) => {
-            if (!isValidSubtypeName(subtype, appState.activeTool.type)) {
+            if (!isValidSubtype(subtype, appState.activeTool.type)) {
               return true;
             }
             return !isForSubtype(subtype, actionName, false);
@@ -167,10 +167,7 @@ export const isActionEnabled = (
 
 // Are any of the parent types of `subtype` shared by any subtype
 // in the array?
-export const subtypeCollides = (
-  subtype: SubtypeName,
-  subtypeArray: SubtypeName[],
-) => {
+export const subtypeCollides = (subtype: Subtype, subtypeArray: Subtype[]) => {
   const subtypeParents = parentTypeMap
     .filter((value) => value.subtype === subtype)
     .map((value) => value.parentType);
@@ -242,17 +239,17 @@ export type SubtypeMethods = {
   ) => string;
 };
 
-type MethodMap = { subtype: SubtypeName; methods: Partial<SubtypeMethods> };
+type MethodMap = { subtype: Subtype; methods: Partial<SubtypeMethods> };
 const methodMaps = [] as Array<MethodMap>;
 
 // Use `getSUbtypeMethods` to call subtype-specialized methods, like `render`.
-export const getSubtypeMethods = (subtype: SubtypeName | undefined) => {
+export const getSubtypeMethods = (subtype: Subtype | undefined) => {
   const map = methodMaps.find((method) => method.subtype === subtype);
   return map?.methods;
 };
 
 export const addSubtypeMethods = (
-  subtype: SubtypeName,
+  subtype: Subtype,
   methods: Partial<SubtypeMethods>,
 ) => {
   if (!methodMaps.find((method) => method.subtype === subtype)) {
@@ -278,7 +275,7 @@ export const selectSubtype = (
     return {};
   }
   const subtype = appState.activeSubtypes.find((subtype) =>
-    isValidSubtypeName(subtype, type),
+    isValidSubtype(subtype, type),
   );
   if (subtype === undefined) {
     return {};
@@ -310,43 +307,43 @@ export type SubtypePrepFn = (
 // `ExcalidrawElement`s after the subtype has finished async loading.
 // See the MathJax plugin in `@excalidraw/plugins` for example.
 export const prepareSubtype = (
-  subtype: Subtype,
+  record: SubtypeRecord,
   subtypePrepFn: SubtypePrepFn,
   onSubtypeLoaded?: (
     hasSubtype: (element: ExcalidrawElement) => boolean,
   ) => void,
 ): { actions: Action[] | null; methods: Partial<SubtypeMethods> } => {
-  const map = getSubtypeMethods(subtype.name);
+  const map = getSubtypeMethods(record.subtype);
   if (map) {
     return { actions: null, methods: map };
   }
 
   // Check for undefined/null subtypes and parentTypes
   if (
-    subtype.name === undefined ||
-    subtype.name === "" ||
-    subtype.parents === undefined ||
-    subtype.parents.length === 0
+    record.subtype === undefined ||
+    record.subtype === "" ||
+    record.parents === undefined ||
+    record.parents.length === 0
   ) {
     return { actions: null, methods: {} };
   }
 
   // Register the types
-  const name = subtype.name;
-  subtypeNames = [...subtypeNames, name];
-  subtype.parents.forEach((parentType) => {
-    parentTypeMap = [...parentTypeMap, { subtype: name, parentType }];
+  const subtype = record.subtype;
+  subtypeNames = [...subtypeNames, subtype];
+  record.parents.forEach((parentType) => {
+    parentTypeMap = [...parentTypeMap, { subtype, parentType }];
   });
   subtypeActionMap = [
     ...subtypeActionMap,
-    { subtype: name, actions: subtype.actionNames },
+    { subtype, actions: record.actionNames },
   ];
   disabledActionMap = [
     ...disabledActionMap,
-    { subtype: name, actions: subtype.disabledNames },
+    { subtype, actions: record.disabledNames },
   ];
-  subtypeShortcutNames = [...subtypeShortcutNames, ...subtype.shortcutNames];
-  subtypeShortcutMap = { ...subtypeShortcutMap, ...subtype.shortcutMap };
+  subtypeShortcutNames = [...subtypeShortcutNames, ...record.shortcutNames];
+  subtypeShortcutMap = { ...subtypeShortcutMap, ...record.shortcutMap };
 
   // Prepare the subtype
   const { actions, methods } = subtypePrepFn(
@@ -356,7 +353,7 @@ export const prepareSubtype = (
   );
 
   // Register the subtype's methods
-  addSubtypeMethods(subtype.name, methods);
+  addSubtypeMethods(record.subtype, methods);
   return { actions, methods };
 };
 
@@ -370,11 +367,11 @@ export const ensureSubtypesLoadedForElements = async (
   // Only ensure the loading of subtypes which are actually needed.
   // We don't want to be held up by eg downloading the MathJax SVG fonts
   // if we don't actually need them yet.
-  const subtypesUsed = [] as SubtypeName[];
+  const subtypesUsed = [] as Subtype[];
   elements.forEach((el) => {
     if (
       "subtype" in el &&
-      isValidSubtypeName(el.subtype, el.type) &&
+      isValidSubtype(el.subtype, el.type) &&
       !subtypesUsed.includes(el.subtype)
     ) {
       subtypesUsed.push(el.subtype);
@@ -384,7 +381,7 @@ export const ensureSubtypesLoadedForElements = async (
 };
 
 export const ensureSubtypesLoaded = async (
-  subtypes: SubtypeName[],
+  subtypes: Subtype[],
   callback?: () => void,
 ) => {
   // Use a for loop so we can do `await map.ensureLoaded()`

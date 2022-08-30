@@ -32,9 +32,9 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import {
   SubtypeMethods,
-  SubtypeName,
-  SubtypePrepFn,
   Subtype,
+  SubtypePrepFn,
+  SubtypeRecord,
 } from "./subtypes";
 
 export type Point = Readonly<RoughPoint>;
@@ -99,9 +99,9 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
-  activeSubtypes?: SubtypeName[];
+  activeSubtypes?: Subtype[];
   customData?: {
-    [subtype: SubtypeName]: ExcalidrawElement["customData"];
+    [subtype: Subtype]: ExcalidrawElement["customData"];
   };
   activeTool:
     | {
@@ -479,7 +479,7 @@ export type ExcalidrawImperativeAPI = {
   getFiles: () => InstanceType<typeof App>["files"];
   actionManager: InstanceType<typeof App>["actionManager"];
   addSubtype: (
-    subtype: Subtype,
+    record: SubtypeRecord,
     subtypePrepFn: SubtypePrepFn,
   ) => { actions: Action[] | null; methods: Partial<SubtypeMethods> };
   refresh: InstanceType<typeof App>["refresh"];
