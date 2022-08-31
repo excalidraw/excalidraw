@@ -419,7 +419,7 @@ export class LinearElementEditor {
     endPointIndex: number,
   ) {
     let segmentMidPoint = centerPoint(startPoint, endPoint);
-    if (element.strokeSharpness === "round") {
+    if (element.points.length > 2 && element.strokeSharpness === "round") {
       const controlPoints = getControlPointsForBezierCurve(
         element,
         element.points[endPointIndex],
