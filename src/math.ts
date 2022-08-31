@@ -277,21 +277,29 @@ export const getControlPointsForBezierCurve = (
   const ops = getCurvePathOps(shape[0]);
   let currentP: Point = [0, 0];
   let index = 0;
+  let minDistance = Infinity;
+  let controlPoints = null;
   while (index < ops.length) {
     const { op, data } = ops[index];
+    if (op === "move") {
+      currentP = data as unknown as Point;
+    }
     if (op === "bcurveTo") {
       const p0 = currentP;
       const p1 = [data[0], data[1]] as Point;
       const p2 = [data[2], data[3]] as Point;
       const p3 = [data[4], data[5]] as Point;
-      if (p3[0] === endPoint[0] && p3[1] === endPoint[1]) {
-        return [p0, p1, p2, p3];
+      const distance = distance2d(p3[0], p3[1], endPoint[0], endPoint[1]);
+      if (distance < minDistance) {
+        minDistance = distance;
+        controlPoints = [p0, p1, p2, p3];
       }
       currentP = p3;
     }
     index++;
   }
-  return null;
+
+  return controlPoints;
 };
 
 export const getBezierXY = (
