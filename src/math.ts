@@ -1,6 +1,8 @@
 import { NormalizedZoomValue, Point, Zoom } from "./types";
 import { LINE_CONFIRM_THRESHOLD } from "./constants";
-import { ExcalidrawLinearElement } from "./element/types";
+import { ExcalidrawLinearElement, NonDeleted } from "./element/types";
+import { getShapeForElement } from "./renderer/renderElement";
+import { getCurvePathOps } from "./element/bounds";
 
 export const rotate = (
   x1: number,
@@ -262,4 +264,49 @@ export const getGridPoint = (
     ];
   }
   return [x, y];
+};
+
+export const getControlPointsForBezierCurve = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+  endPoint: Point,
+) => {
+  const shape = getShapeForElement(element as ExcalidrawLinearElement);
+  if (!shape) {
+    return null;
+  }
+  const ops = getCurvePathOps(shape[0]);
+  let currentP: Point = [0, 0];
+  let index = 0;
+  while (index < ops.length) {
+    const { op, data } = ops[index];
+    if (op === "bcurveTo") {
+      const p0 = currentP;
+      const p1 = [data[0], data[1]] as Point;
+      const p2 = [data[2], data[3]] as Point;
+      const p3 = [data[4], data[5]] as Point;
+      if (p3[0] === endPoint[0] && p3[1] === endPoint[1]) {
+        return [p0, p1, p2, p3];
+      }
+      currentP = p3;
+    }
+    index++;
+  }
+  return null;
+};
+
+export const getBezierXY = (
+  p0: Point,
+  p1: Point,
+  p2: Point,
+  p3: Point,
+  t: number,
+) => {
+  const equation = (t: number, idx: number) =>
+    Math.pow(1 - t, 3) * p3[idx] +
+    3 * t * Math.pow(1 - t, 2) * p2[idx] +
+    3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
+    p0[idx] * Math.pow(t, 3);
+  const tx = equation(0.5, 0);
+  const ty = equation(0.5, 1);
+  return [tx, ty];
 };

@@ -12,6 +12,8 @@ import {
   getGridPoint,
   rotatePoint,
   centerPoint,
+  getControlPointsForBezierCurve,
+  getBezierXY,
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import { getElementPointsCoords } from "./bounds";
@@ -383,44 +385,61 @@ export class LinearElementEditor {
       return null;
     }
 
-    return LinearElementEditor.getSegmentMidPoint(
-      linearElementEditor,
-      scenePointer,
-      appState,
-    );
-  };
-
-  static getSegmentMidPoint(
-    linearElementEditor: LinearElementEditor,
-    scenePointer: { x: number; y: number },
-    appState: AppState,
-  ) {
-    const { elementId } = linearElementEditor;
-    const element = LinearElementEditor.getElement(elementId);
-    if (!element) {
-      return null;
-    }
     const threshold =
       LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
-    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-
     let index = 0;
 
     while (index < points.length - 1) {
-      const segmentMidPoint = centerPoint(points[index], points[index + 1]);
-
-      const distance = distance2d(
-        segmentMidPoint[0],
-        segmentMidPoint[1],
-        scenePointer.x,
-        scenePointer.y,
+      const segmentMidPoint = LinearElementEditor.getSegmentMidPoint(
+        element,
+        points[index],
+        points[index + 1],
+        index + 1,
       );
-      if (distance <= threshold) {
-        return segmentMidPoint;
+      if (segmentMidPoint) {
+        const distance = distance2d(
+          segmentMidPoint[0],
+          segmentMidPoint[1],
+          scenePointer.x,
+          scenePointer.y,
+        );
+        if (distance <= threshold) {
+          return segmentMidPoint;
+        }
       }
       index++;
     }
     return null;
+  };
+
+  static getSegmentMidPoint(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    startPoint: Point,
+    endPoint: Point,
+    endPointIndex: number,
+  ) {
+    let segmentMidPoint = centerPoint(startPoint, endPoint);
+    if (element.strokeSharpness === "round") {
+      const controlPoints = getControlPointsForBezierCurve(
+        element,
+        element.points[endPointIndex],
+      );
+      if (controlPoints) {
+        const [tx, ty] = getBezierXY(
+          controlPoints[0],
+          controlPoints[1],
+          controlPoints[2],
+          controlPoints[3],
+          0.5,
+        );
+        segmentMidPoint = LinearElementEditor.getPointGlobalCoordinates(
+          element,
+          [tx, ty],
+        );
+      }
+    }
+
+    return segmentMidPoint;
   }
 
   static getSegmentMidPointIndex(
@@ -430,7 +449,12 @@ export class LinearElementEditor {
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
     let index = 0;
     while (index < points.length - 1) {
-      const segmentMidPoint = centerPoint(points[index], points[index + 1]);
+      const segmentMidPoint = LinearElementEditor.getSegmentMidPoint(
+        element,
+        points[index],
+        points[index + 1],
+        index + 1,
+      );
       if (this.isEqual(midPoint, segmentMidPoint)) {
         return index + 1;
       }
@@ -468,43 +492,31 @@ export class LinearElementEditor {
     if (!element) {
       return ret;
     }
-    const hittingMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
+    const segmentMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
       linearElementEditor,
       scenePointer,
       appState,
     );
-    if (
-      LinearElementEditor.getSegmentMidpointHitCoords(
-        linearElementEditor,
-        scenePointer,
-        appState,
-      )
-    ) {
-      const midPoint = LinearElementEditor.getSegmentMidPoint(
-        linearElementEditor,
-        scenePointer,
-        appState,
+    if (segmentMidPoint) {
+      const index = LinearElementEditor.getSegmentMidPointIndex(
+        element,
+        segmentMidPoint,
       );
-      if (midPoint) {
-        const index = LinearElementEditor.getSegmentMidPointIndex(
-          element,
-          midPoint,
-        );
-        const newMidPoint = LinearElementEditor.createPointAt(
-          element,
-          midPoint[0],
-          midPoint[1],
-          appState.gridSize,
-        );
-        const points = [
-          ...element.points.slice(0, index),
-          newMidPoint,
-          ...element.points.slice(index),
-        ];
-        mutateElement(element, {
-          points,
-        });
-      }
+      const newMidPoint = LinearElementEditor.createPointAt(
+        element,
+        segmentMidPoint[0],
+        segmentMidPoint[1],
+        appState.gridSize,
+      );
+      const points = [
+        ...element.points.slice(0, index),
+        newMidPoint,
+        ...element.points.slice(index),
+      ];
+      mutateElement(element, {
+        points,
+      });
+
       ret.didAddPoint = true;
       ret.isMidPoint = true;
       ret.linearElementEditor = {
@@ -560,7 +572,7 @@ export class LinearElementEditor {
 
     // if we clicked on a point, set the element as hitElement otherwise
     // it would get deselected if the point is outside the hitbox area
-    if (clickedPointIndex >= 0 || hittingMidPoint) {
+    if (clickedPointIndex >= 0 || segmentMidPoint) {
       ret.hitElement = element;
     } else {
       // You might be wandering why we are storing the binding elements on

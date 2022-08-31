@@ -60,7 +60,11 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
-import { centerPoint } from "../math";
+import {
+  centerPoint,
+  getBezierXY,
+  getControlPointsForBezierCurve,
+} from "../math";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 4;
@@ -220,7 +224,26 @@ const renderLinearPointHandles = (
     if (!points[idx + 1]) {
       return;
     }
-    const segmentMidPoint = centerPoint(points[idx], points[idx + 1]);
+    let segmentMidPoint = centerPoint(points[idx], points[idx + 1]);
+    if (element.strokeSharpness === "round") {
+      const controlPoints = getControlPointsForBezierCurve(
+        element,
+        element.points[idx + 1],
+      );
+      if (controlPoints) {
+        const [tx, ty] = getBezierXY(
+          controlPoints[0],
+          controlPoints[1],
+          controlPoints[2],
+          controlPoints[3],
+          0.5,
+        );
+        segmentMidPoint = LinearElementEditor.getPointGlobalCoordinates(
+          element,
+          [tx, ty],
+        );
+      }
+    }
 
     if (
       appState?.selectedLinearElement?.segmentMidPointHoveredCoords &&
