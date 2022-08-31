@@ -631,7 +631,13 @@ export class LinearElementEditor {
     return ret;
   }
 
-  static isEqual(point1: Point, point2: Point) {
+  static isEqual(point1: Point | null, point2: Point | null) {
+    if (!point1 && !point2) {
+      return true;
+    }
+    if (!point1 || !point2) {
+      return false;
+    }
     return point1[0] === point2[0] && point1[1] === point2[1];
   }
   static handlePointerMove(

@@ -3107,8 +3107,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        this.state.selectedLinearElement.segmentMidPointHoveredCoords !==
-        segmentMidPointHoveredCoords
+        !LinearElementEditor.isEqual(
+          this.state.selectedLinearElement.segmentMidPointHoveredCoords,
+          segmentMidPointHoveredCoords,
+        )
       ) {
         this.setState({
           selectedLinearElement: {
