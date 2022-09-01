@@ -437,11 +437,12 @@ export class LinearElementEditor {
           appState.zoom.value;
       }
       const isExtremePoint = index === 0 || index === element.points.length - 1;
-      if (
-        editingLinearElement ||
-        isExtremePoint ||
-        distance >= 2 * LinearElementEditor.POINT_HANDLE_SIZE
-      ) {
+      const threshold = 2 * LinearElementEditor.POINT_HANDLE_SIZE;
+      if (editingLinearElement || isExtremePoint || distance >= threshold) {
+        // hide n-1 point if distance is less than threshold
+        if (isExtremePoint && distance < threshold) {
+          visiblePointIndexes.pop();
+        }
         visiblePointIndexes.push(index);
         previousPoint = point;
       }
