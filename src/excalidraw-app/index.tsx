@@ -5,7 +5,7 @@ import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { usePlugins } from "@excalidraw/plugins";
+import { useExtensions } from "@excalidraw/extensions";
 import {
   APP_NAME,
   COOKIES,
@@ -277,7 +277,7 @@ const ExcalidrawWrapper = () => {
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
 
-  usePlugins(excalidrawAPI);
+  useExtensions(excalidrawAPI);
 
   const [collabAPI] = useAtom(collabAPIAtom);
   const [, setCollabDialogShown] = useAtom(collabDialogShownAtom);

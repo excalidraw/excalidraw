@@ -305,7 +305,7 @@ export type SubtypePrepFn = (
 // This is the main method to set up the subtype.  The optional
 // `onSubtypeLoaded` callback may be used to re-render subtyped
 // `ExcalidrawElement`s after the subtype has finished async loading.
-// See the MathJax plugin in `@excalidraw/plugins` for example.
+// See the MathJax extension in `@excalidraw/extensions` for example.
 export const prepareSubtype = (
   record: SubtypeRecord,
   subtypePrepFn: SubtypePrepFn,

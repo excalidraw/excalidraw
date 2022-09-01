@@ -1,5 +1,5 @@
 {
-  "name": "@excalidraw/plugins",
+  "name": "@excalidraw/extensions",
   "version": "0.12.0",
   "main": "index.ts",
   "files": [
@@ -8,7 +8,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "description": "Excalidraw plugins",
+  "description": "Excalidraw extensions",
   "repository": "https://github.com/excalidraw/excalidraw",
   "license": "MIT",
   "keywords": [
@@ -69,7 +69,7 @@
     "webpack-merge": "5.8.0"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/plugins",
+  "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/extensions",
   "scripts": {
     "gen:types": "tsc --project ../../../tsconfig-types.json",
     "build:umd": "rm -rf dist && cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",

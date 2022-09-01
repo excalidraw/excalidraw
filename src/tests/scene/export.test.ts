@@ -8,7 +8,7 @@ import {
 
 describe("exportToSvg", () => {
   window.EXCALIDRAW_ASSET_PATH = "/";
-  window.EXCALIDRAW_PLUGINS_ASSET_PATH = "/";
+  window.EXCALIDRAW_EXTENSIONS_ASSET_PATH = "/";
   const ELEMENT_HEIGHT = 100;
   const ELEMENT_WIDTH = 100;
   const ELEMENTS = [

@@ -1200,7 +1200,7 @@
   resolved "https://registry.npmjs.org/@excalidraw/eslint-config/-/eslint-config-1.0.0.tgz"
   integrity sha512-5SQFsQXO4vzny7OFSJr/DDPr1Mzeh6w0uwmZ0Fk2qjBcS5nhPtnx5KOTRPmpc6Hf5Ao57WK/MKI4lhCzw66V/A==
 
-"@excalidraw/plugins@link:src/packages/plugins":
+"@excalidraw/extensions@link:src/packages/extensions":
   version "0.0.0"
   uid ""
 

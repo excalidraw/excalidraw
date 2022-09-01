@@ -6,13 +6,13 @@ const commonConfig = require("../common.webpack.dev.config");
 const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
 const config = {
   entry: {
-    "excalidraw-plugins.development": "./index.ts",
+    "excalidraw-extensions.development": "./index.ts",
   },
   output: {
     path: path.resolve(__dirname, outputDir),
-    library: "ExcalidrawPluginsLib",
-    chunkFilename: "excalidraw-plugins-assets-dev/[name]-[contenthash].js",
-    assetModuleFilename: "excalidraw-plugins-assets-dev/[name][ext]",
+    library: "ExcalidrawExtensionsLib",
+    chunkFilename: "excalidraw-extensions-assets-dev/[name]-[contenthash].js",
+    assetModuleFilename: "excalidraw-extensions-assets-dev/[name][ext]",
   },
 };
 module.exports = merge(commonConfig, config);

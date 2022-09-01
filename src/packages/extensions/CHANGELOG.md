@@ -13,7 +13,7 @@ Please add the latest change at the top under the correct section.
 
 ## Unreleased
 
-### Excalidraw Plugins
+### Excalidraw Extensions
 
 #### Features
 
@@ -21,4 +21,4 @@ Please add the latest change at the top under the correct section.
 
   Also added plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code. [#5311](https://github.com/excalidraw/excalidraw/pull/5311).
 
-- Provided a stub example plugin (`./empty/index.ts`).
+- Provided a stub example extension (`./empty/index.ts`).

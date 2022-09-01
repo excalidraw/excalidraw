@@ -5,17 +5,17 @@ import App from "../../excalidraw/example/App";
 
 declare global {
   interface Window {
-    ExcalidrawPluginsLib: any;
+    ExcalidrawExtensionsLib: any;
   }
 }
-const { usePlugins } = window.ExcalidrawPluginsLib;
+const { useExtensions } = window.ExcalidrawExtensionsLib;
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(
   <React.StrictMode>
     <App
-      appTitle={"Excalidraw Plugins Example"}
-      useCustom={usePlugins}
+      appTitle={"Excalidraw Extensions Example"}
+      useCustom={useExtensions}
       customArgs={["mathjax"]}
     />
   </React.StrictMode>,
