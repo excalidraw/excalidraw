@@ -10994,7 +10994,6 @@ Object {
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
     "visiblePointIndexes": Array [
-      0,
       1,
     ],
   },
@@ -11224,7 +11223,6 @@ Object {
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
     "visiblePointIndexes": Array [
-      0,
       1,
     ],
   },
@@ -11681,7 +11679,6 @@ Object {
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
     "visiblePointIndexes": Array [
-      0,
       1,
     ],
   },
@@ -12090,7 +12087,6 @@ Object {
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
     "visiblePointIndexes": Array [
-      0,
       1,
     ],
   },
