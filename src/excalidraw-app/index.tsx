@@ -537,7 +537,6 @@ const ExcalidrawWrapper = () => {
       );
       clearTimeout(titleTimeout);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collabAPI, excalidrawAPI]);
 
   useEffect(() => {
