@@ -482,7 +482,6 @@ const ExcalidrawWrapper = () => {
           } else {
             cancelPrevDisconnect();
             disconnect();
-            excalidrawAPI.setToast(null);
           }
         } else {
           cancelPrevDisconnect();
