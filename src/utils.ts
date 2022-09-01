@@ -72,6 +72,12 @@ export const isWritableElement = (
   (target instanceof HTMLInputElement &&
     (target.type === "text" || target.type === "number"));
 
+const FONT_FAMILY_MAP = {
+  [FONT_FAMILY.Virgil]: "Virgil, Yozai",
+  [FONT_FAMILY.Helvetica]: "Helvetica",
+  [FONT_FAMILY.Cascadia]: "Cascadia, Yozai",
+};
+
 export const getFontFamilyString = ({
   fontFamily,
 }: {
@@ -79,7 +85,10 @@ export const getFontFamilyString = ({
 }) => {
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
-      return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
+      if (FONT_FAMILY_MAP[id] === undefined) {
+        return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
+      }
+      return `${FONT_FAMILY_MAP[id]}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
     }
   }
   return WINDOWS_EMOJI_FALLBACK_FONT;

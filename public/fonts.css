@@ -5,6 +5,12 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Yozai";
+  src: url("Yozai-Regular.ttf");
+  font-display: swap;
+}
+
 /* https://github.com/microsoft/cascadia-code */
 @font-face {
   font-family: "Cascadia";

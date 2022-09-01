@@ -145,6 +145,10 @@ export const exportToSvg = async (
         src: url("${assetPath}Virgil.woff2");
       }
       @font-face {
+        font-family: "Yozai";
+        src: url("${assetPath}Yozai-Regular.ttf");
+      }
+      @font-face {
         font-family: "Cascadia";
         src: url("${assetPath}Cascadia.woff2");
       }
