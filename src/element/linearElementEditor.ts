@@ -791,19 +791,20 @@ export class LinearElementEditor {
 
     const pointHandles =
       LinearElementEditor.getPointsGlobalCoordinates(element);
-    let idx = linearElementEditor.visiblePointIndexes.length;
+    let counter = linearElementEditor.visiblePointIndexes.length;
 
     // loop from right to left because points on the right are rendered over
     // points on the left, thus should take precedence when clicking, if they
     // overlap
-    while (--idx > 0) {
-      const point = pointHandles[linearElementEditor.visiblePointIndexes[idx]];
+    while (--counter >= 0) {
+      const index = linearElementEditor.visiblePointIndexes[counter];
+      const point = pointHandles[index];
       if (
         distance2d(x, y, point[0], point[1]) * zoom.value <
         // +1px to account for outline stroke
         LinearElementEditor.POINT_HANDLE_SIZE + 1
       ) {
-        return idx;
+        return index;
       }
     }
     return -1;
