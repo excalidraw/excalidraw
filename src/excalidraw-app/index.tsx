@@ -44,6 +44,7 @@ import {
 import {
   FIREBASE_STORAGE_PREFIXES,
   HIDDEN_DISCONNECT_TIMEOUT,
+  RECONNECT_TOAST_DURATION,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
@@ -84,7 +85,6 @@ import { Provider, useAtom } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
-import { Toast } from "../components/Toast";
 
 polyfill();
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -250,8 +250,8 @@ const PlusAppLinkJSX = (
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [toast, setToast] = useState<AppState["toast"]>(null);
   const disconnectRef = useRef(false);
+  const toastRef = useRef<AppState["toast"]>(null);
   let currentLangCode = languageDetector.detect() || defaultLang.code;
   if (Array.isArray(currentLangCode)) {
     currentLangCode = currentLangCode[0];
@@ -482,17 +482,17 @@ const ExcalidrawWrapper = () => {
           } else {
             cancelPrevDisconnect();
             disconnect();
-            setToast(null);
+            excalidrawAPI.setToast(null);
           }
         } else {
           cancelPrevDisconnect();
           if (!collabAPI.isCollaborating()) {
-            if (!toast && disconnectRef.current) {
-              setToast({
+            if (!toastRef.current && disconnectRef.current) {
+              toastRef.current = {
                 message: t("toast.reconnectRoomServer"),
-                duration: Infinity,
+                duration: RECONNECT_TOAST_DURATION,
                 closable: true,
-              });
+              };
             }
             disconnectRef.current &&
               (await initializeScene({ collabAPI, excalidrawAPI }).then(
@@ -504,12 +504,16 @@ const ExcalidrawWrapper = () => {
                       ...data.scene,
                       ...restore(data.scene, null, null),
                       commitToHistory: true,
+                      appState: {
+                        ...excalidrawAPI.getAppState(),
+                        toast: toastRef.current,
+                      },
                     });
                     excalidrawAPI.scrollToContent();
                   }
                 },
               ));
-            setToast(null);
+            toastRef.current = null;
             disconnectRef.current = false;
           }
         }
@@ -744,7 +748,7 @@ const ExcalidrawWrapper = () => {
   return (
     <div
       style={{ height: "100%" }}
-      className={clsx("excalidraw-app excalidraw", {
+      className={clsx("excalidraw-app", {
         "is-collaborating": isCollaborating,
       })}
     >
@@ -792,14 +796,6 @@ const ExcalidrawWrapper = () => {
         <ErrorDialog
           message={errorMessage}
           onClose={() => setErrorMessage("")}
-        />
-      )}
-      {toast && (
-        <Toast
-          message={toast.message}
-          duration={toast.duration}
-          closable={toast.closable}
-          onClose={() => setToast(null)}
         />
       )}
     </div>
