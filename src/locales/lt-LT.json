@@ -110,13 +110,13 @@
     "unbindText": "",
     "bindText": "",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Redeguoti nuorodą",
+      "create": "Sukurti nuorodą",
+      "label": "Nuoroda"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
+      "lock": "Užrakinti",
+      "unlock": "Atrakinti",
       "lockAll": "",
       "unlockAll": ""
     },
