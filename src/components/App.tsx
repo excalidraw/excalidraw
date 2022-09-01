@@ -3084,7 +3084,7 @@ class App extends React.Component<AppProps, AppState> {
         ])
       ) {
         hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-          element,
+          this.state.selectedLinearElement,
           this.state.zoom,
           scenePointerX,
           scenePointerY,

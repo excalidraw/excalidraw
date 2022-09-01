@@ -380,7 +380,7 @@ export class LinearElementEditor {
       return false;
     }
     const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-      element,
+      appState.selectedLinearElement,
       appState.zoom,
       scenePointer.x,
       scenePointer.y,
@@ -566,7 +566,7 @@ export class LinearElementEditor {
     }
 
     const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-      element,
+      appState.selectedLinearElement,
       appState.zoom,
       scenePointer.x,
       scenePointer.y,
@@ -773,19 +773,30 @@ export class LinearElementEditor {
   }
 
   static getPointIndexUnderCursor(
-    element: NonDeleted<ExcalidrawLinearElement>,
+    linearElementEditor: LinearElementEditor | null,
     zoom: AppState["zoom"],
     x: number,
     y: number,
   ) {
+    if (!linearElementEditor) {
+      return -1;
+    }
+    const element = LinearElementEditor.getElement(
+      linearElementEditor.elementId,
+    );
+    if (!element) {
+      return -1;
+    }
+
     const pointHandles =
       LinearElementEditor.getPointsGlobalCoordinates(element);
-    let idx = pointHandles.length;
+    let idx = linearElementEditor.visiblePointIndexes.length;
+
     // loop from right to left because points on the right are rendered over
     // points on the left, thus should take precedence when clicking, if they
     // overlap
-    while (--idx > -1) {
-      const point = pointHandles[idx];
+    while (--idx > 0) {
+      const point = pointHandles[linearElementEditor.visiblePointIndexes[idx]];
       if (
         distance2d(x, y, point[0], point[1]) * zoom.value <
         // +1px to account for outline stroke
