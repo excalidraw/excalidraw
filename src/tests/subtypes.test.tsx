@@ -45,7 +45,6 @@ const test1: SubtypeRecord = {
   parents: ["line", "arrow", "rectangle", "diamond", "ellipse"],
   actionNames: [],
   disabledNames: ["changeSloppiness"],
-  shortcutNames: [],
   shortcutMap: {},
 };
 
@@ -56,7 +55,6 @@ const test2: SubtypeRecord = {
   parents: ["text"],
   actionNames: [],
   disabledNames: [],
-  shortcutNames: [],
   shortcutMap: {},
 };
 
@@ -65,7 +63,6 @@ const test3: SubtypeRecord = {
   parents: ["text", "line"],
   actionNames: [],
   disabledNames: [],
-  shortcutNames: [],
   shortcutMap: {},
 };
 

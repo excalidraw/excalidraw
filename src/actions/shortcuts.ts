@@ -1,11 +1,6 @@
 import { t } from "../i18n";
 import { isDarwin } from "../keys";
 import { getShortcutKey } from "../utils";
-import {
-  getSubtypeShortcutKey,
-  isSubtypeShortcutName,
-  SubtypeShortcutName,
-} from "../subtypes";
 import { ActionName } from "./types";
 
 export type ShortcutName = SubtypeOf<
@@ -76,12 +71,23 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   toggleLock: [getShortcutKey("CtrlOrCmd+Shift+L")],
 };
 
-export const getShortcutFromShortcutName = (
-  name: ShortcutName | SubtypeShortcutName,
+export type CustomShortcutName = string;
+
+let customShortcutMap: Record<CustomShortcutName, string[]> = {};
+
+export const registerCustomShortcuts = (
+  shortcuts: Record<CustomShortcutName, string[]>,
 ) => {
-  const shortcuts = isSubtypeShortcutName(name)
-    ? getSubtypeShortcutKey(name)
-    : shortcutMap[name as ShortcutName];
+  customShortcutMap = { ...customShortcutMap, ...shortcuts };
+};
+
+export const getShortcutFromShortcutName = (
+  name: ShortcutName | CustomShortcutName,
+) => {
+  const shortcuts =
+    name in customShortcutMap
+      ? customShortcutMap[name as CustomShortcutName]
+      : shortcutMap[name as ShortcutName];
   // if multiple shortcuts available, take the first one
   return shortcuts && shortcuts.length > 0 ? shortcuts[0] : "";
 };

@@ -9,6 +9,5 @@ const crispSubtype: SubtypeRecord = {
   parents: ["line", "arrow", "rectangle", "diamond", "ellipse"],
   actionNames: [],
   disabledNames: ["changeSloppiness"],
-  shortcutNames: [],
   shortcutMap: {},
 };

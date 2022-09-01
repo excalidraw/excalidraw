@@ -9,6 +9,10 @@ import { AppState } from "./types";
 import { registerAuxLangData } from "./i18n";
 
 import { Action, ActionName } from "./actions/types";
+import {
+  CustomShortcutName,
+  registerCustomShortcuts,
+} from "./actions/shortcuts";
 import { register } from "./actions/register";
 import { hasBoundTextElement } from "./element/typeChecks";
 import { getBoundTextElement } from "./element/textElement";
@@ -27,16 +31,13 @@ let disabledActionMap: readonly {
   subtype: Subtype;
   actions: readonly DisabledActionName[];
 }[] = [];
-let subtypeShortcutNames: SubtypeRecord["shortcutNames"] = [];
-let subtypeShortcutMap: SubtypeRecord["shortcutMap"] = {};
 
 export type SubtypeRecord = Readonly<{
   subtype: Subtype;
   parents: readonly ExcalidrawElement["type"][];
   actionNames: readonly SubtypeActionName[];
   disabledNames: readonly DisabledActionName[];
-  shortcutNames: readonly SubtypeShortcutName[];
-  shortcutMap: Record<SubtypeShortcutName, string[]>;
+  shortcutMap: Record<CustomShortcutName, string[]>;
 }>;
 
 // Subtype Names
@@ -177,20 +178,6 @@ export const subtypeCollides = (subtype: Subtype, subtypeArray: Subtype[]) => {
       .map((value) => value.parentType),
   );
   return subtypeParents.some((t) => subtypeArrayParents.includes(t));
-};
-
-// Subtype Shortcuts (for subtype-specific actions)
-export type SubtypeShortcutName = string;
-export const isSubtypeShortcutName = (s: any): s is SubtypeShortcutName =>
-  subtypeShortcutNames.includes(s);
-
-// Return the shortcut by SubtypeShortcutName
-export const getSubtypeShortcutKey = (name: SubtypeShortcutName) => {
-  let shortcuts: string[] = [];
-  if (isSubtypeShortcutName(name)) {
-    shortcuts = subtypeShortcutMap[name];
-  }
-  return shortcuts;
 };
 
 // Subtype Methods
@@ -342,8 +329,7 @@ export const prepareSubtype = (
     ...disabledActionMap,
     { subtype, actions: record.disabledNames },
   ];
-  subtypeShortcutNames = [...subtypeShortcutNames, ...record.shortcutNames];
-  subtypeShortcutMap = { ...subtypeShortcutMap, ...record.shortcutMap };
+  registerCustomShortcuts(record.shortcutMap);
 
   // Prepare the subtype
   const { actions, methods } = subtypePrepFn(

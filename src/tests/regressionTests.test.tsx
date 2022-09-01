@@ -4,7 +4,7 @@ import { CODES, KEYS } from "../keys";
 import ExcalidrawApp from "../excalidraw-app";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
-import { setDateTimeForTests } from "../utils";
+import { getShortcutKey, setDateTimeForTests } from "../utils";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
@@ -17,6 +17,11 @@ import {
 import { defaultLang } from "../i18n";
 import { FONT_FAMILY } from "../constants";
 import { t } from "../i18n";
+import {
+  CustomShortcutName,
+  getShortcutFromShortcutName,
+  registerCustomShortcuts,
+} from "../actions/shortcuts";
 
 const { h } = window;
 
@@ -1053,6 +1058,14 @@ describe("regression tests", () => {
     mouse.reset();
     mouse.click();
     expect(screen.queryByText(/fill/i)).not.toBeNull();
+  });
+
+  it("should retrieve custom shortcuts", () => {
+    const shortcuts: Record<CustomShortcutName, string[]> = {
+      test: [getShortcutKey("CtrlOrCmd+1"), getShortcutKey("CtrlOrCmd+2")],
+    };
+    registerCustomShortcuts(shortcuts);
+    expect(getShortcutFromShortcutName("test")).toBe("Ctrl+1");
   });
 });
 

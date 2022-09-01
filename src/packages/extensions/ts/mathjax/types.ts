@@ -10,7 +10,6 @@ const mathSubtype: SubtypeRecord = {
   parents: ["text"],
   actionNames: ["changeUseTex", "changeMathOnly"],
   disabledNames: ["changeFontFamily"],
-  shortcutNames: ["changeUseTex", "changeMathOnly"],
   shortcutMap: {
     changeUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
     changeMathOnly: [getShortcutKey("CtrlOrCmd+Shift+O")],
