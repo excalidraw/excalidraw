@@ -3,6 +3,7 @@ import { LINE_CONFIRM_THRESHOLD } from "./constants";
 import { ExcalidrawLinearElement, NonDeleted } from "./element/types";
 import { getShapeForElement } from "./renderer/renderElement";
 import { getCurvePathOps } from "./element/bounds";
+import { LinearElementEditor } from "./element/linearElementEditor";
 
 export const rotate = (
   x1: number,
@@ -275,20 +276,20 @@ export const getControlPointsForBezierCurve = (
     return null;
   }
   const ops = getCurvePathOps(shape[0]);
-  let currentP: Point = [0, 0];
+  let currentP: Mutable<Point> = [0, 0];
   let index = 0;
   let minDistance = Infinity;
-  let controlPoints = null;
+  let controlPoints: Mutable<Point>[] | null = null;
   while (index < ops.length) {
     const { op, data } = ops[index];
     if (op === "move") {
-      currentP = data as unknown as Point;
+      currentP = data as unknown as Mutable<Point>;
     }
     if (op === "bcurveTo") {
       const p0 = currentP;
-      const p1 = [data[0], data[1]] as Point;
-      const p2 = [data[2], data[3]] as Point;
-      const p3 = [data[4], data[5]] as Point;
+      const p1 = [data[0], data[1]] as Mutable<Point>;
+      const p2 = [data[2], data[3]] as Mutable<Point>;
+      const p3 = [data[4], data[5]] as Mutable<Point>;
       const distance = distance2d(p3[0], p3[1], endPoint[0], endPoint[1]);
       if (distance < minDistance) {
         minDistance = distance;
@@ -314,7 +315,36 @@ export const getBezierXY = (
     3 * t * Math.pow(1 - t, 2) * p2[idx] +
     3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
     p0[idx] * Math.pow(t, 3);
-  const tx = equation(0.5, 0);
-  const ty = equation(0.5, 1);
+  const tx = equation(t, 0);
+  const ty = equation(t, 1);
   return [tx, ty];
+};
+
+export const getPointsInBezierCurve = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+  endPoint: Point,
+) => {
+  const controlPoints: Mutable<Point>[] = getControlPointsForBezierCurve(
+    element,
+    endPoint,
+  )!;
+  const pointsOnCurve: Mutable<Point>[] = [];
+  let t = 1;
+  while (t > 0) {
+    const point = getBezierXY(
+      controlPoints[0],
+      controlPoints[1],
+      controlPoints[2],
+      controlPoints[3],
+      t,
+    );
+    pointsOnCurve.push([point[0], point[1]]);
+    t -= 0.1;
+  }
+  if (pointsOnCurve.length) {
+    if (!LinearElementEditor.isEqual(pointsOnCurve.at(-1)!, endPoint)) {
+      pointsOnCurve.push([endPoint[0], endPoint[1]]);
+    }
+  }
+  return pointsOnCurve;
 };

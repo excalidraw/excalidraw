@@ -14,6 +14,7 @@ import {
   centerPoint,
   getControlPointsForBezierCurve,
   getBezierXY,
+  getPointsInBezierCurve,
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import { getElementPointsCoords } from "./bounds";
@@ -392,8 +393,9 @@ export class LinearElementEditor {
     while (index < points.length - 1) {
       if (
         LinearElementEditor.isSegmentTooShort(
-          points[index],
-          points[index + 1],
+          element,
+          element.points[index],
+          element.points[index + 1],
           appState.zoom,
         )
       ) {
@@ -422,15 +424,34 @@ export class LinearElementEditor {
   };
 
   static isSegmentTooShort(
+    element: NonDeleted<ExcalidrawLinearElement>,
     startPoint: Point,
     endPoint: Point,
     zoom: AppState["zoom"],
   ) {
-    const distance =
-      distance2d(startPoint[0], startPoint[1], endPoint[0], endPoint[1]) *
-      zoom.value;
-
-    return distance < LinearElementEditor.POINT_HANDLE_SIZE * 4;
+    let distance = 0;
+    if (element.strokeSharpness === "sharp") {
+      distance = distance2d(
+        startPoint[0],
+        startPoint[1],
+        endPoint[0],
+        endPoint[1],
+      );
+    } else {
+      const points = getPointsInBezierCurve(element, endPoint);
+      let index = 0;
+      while (index < points.length - 1) {
+        const segmentDistance = distance2d(
+          points[index][0],
+          points[index][1],
+          points[index + 1][0],
+          points[index + 1][1],
+        );
+        distance += segmentDistance;
+        index++;
+      }
+    }
+    return distance * zoom.value < LinearElementEditor.POINT_HANDLE_SIZE * 4;
   }
 
   static getSegmentMidPoint(
@@ -659,7 +680,9 @@ export class LinearElementEditor {
     if (!point1 || !point2) {
       return false;
     }
-    return point1[0] === point2[0] && point1[1] === point2[1];
+    return (
+      Math.round(distance2d(point1[0], point1[1], point2[0], point2[1])) === 0
+    );
   }
   static handlePointerMove(
     event: React.PointerEvent<HTMLCanvasElement>,
