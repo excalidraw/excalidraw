@@ -1,4 +1,4 @@
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 import {
   copyTextToSystemClipboard,
@@ -132,7 +132,7 @@ export const actionCopyAsPng = register({
     }
   },
   contextItemLabel: "labels.copyAsPng",
-  keyTest: (event) => event.key === KEYS.C && event.altKey && event.shiftKey,
+  keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
 });
 
 export const copyText = register({
