@@ -53,7 +53,9 @@
     "roughjs": "4.5.2",
     "sass": "1.51.0",
     "socket.io-client": "2.3.1",
-    "typescript": "4.5.5"
+    "typescript": "4.5.5",
+    "pica": "^7.1.1",
+    "lodash": "^4.17.21" 
   },
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.0",
