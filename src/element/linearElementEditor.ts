@@ -390,27 +390,48 @@ export class LinearElementEditor {
     let index = 0;
 
     while (index < points.length - 1) {
+      if (
+        LinearElementEditor.isSegmentTooShort(
+          points[index],
+          points[index + 1],
+          appState.zoom,
+        )
+      ) {
+        index++;
+        continue;
+      }
       const segmentMidPoint = LinearElementEditor.getSegmentMidPoint(
         element,
         points[index],
         points[index + 1],
         index + 1,
       );
-      if (segmentMidPoint) {
-        const distance = distance2d(
-          segmentMidPoint[0],
-          segmentMidPoint[1],
-          scenePointer.x,
-          scenePointer.y,
-        );
-        if (distance <= threshold) {
-          return segmentMidPoint;
-        }
+      const distance = distance2d(
+        segmentMidPoint[0],
+        segmentMidPoint[1],
+        scenePointer.x,
+        scenePointer.y,
+      );
+      if (distance <= threshold) {
+        return segmentMidPoint;
       }
+
       index++;
     }
     return null;
   };
+
+  static isSegmentTooShort(
+    startPoint: Point,
+    endPoint: Point,
+    zoom: AppState["zoom"],
+  ) {
+    const distance =
+      distance2d(startPoint[0], startPoint[1], endPoint[0], endPoint[1]) *
+      zoom.value;
+
+    return distance < LinearElementEditor.POINT_HANDLE_SIZE * 4;
+  }
 
   static getSegmentMidPoint(
     element: NonDeleted<ExcalidrawLinearElement>,
