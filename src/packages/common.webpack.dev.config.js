@@ -48,7 +48,7 @@ module.exports = {
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        type: "asset/resource",
+        type: "asset/inline", //zsviczian
       },
     ],
   },
@@ -64,7 +64,6 @@ module.exports = {
     },
   },
   plugins: [
-    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }), //zsviczian
     new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ }),
     new webpack.DefinePlugin({
       "process.env": parseEnvVariables(

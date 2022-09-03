@@ -455,12 +455,14 @@
 
   .help-icon {
     display: flex;
+    width: 2.5rem; //zsviczian
     cursor: pointer;
     fill: $oc-gray-6;
     padding: 0;
-    margin: 0;
+    margin: 0px 3px; //zsviczian
     background: none;
     color: var(--icon-fill-color);
+    box-shadow: none; //zsviczian
 
     svg {
       width: 1.5rem;

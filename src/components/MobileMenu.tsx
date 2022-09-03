@@ -132,7 +132,6 @@ export const MobileMenu = ({
   const renderAppToolbar = () => {
     // Render eraser conditionally in mobile
     const showEraser =
-      !appState.viewModeEnabled &&
       !appState.editingElement &&
       getSelectedElements(elements, appState).length === 0;
 
@@ -151,12 +150,14 @@ export const MobileMenu = ({
 
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
-        {showEraser && actionManager.renderAction("eraser")}
-
-        {actionManager.renderAction(
-          appState.multiElement ? "finalize" : "duplicateSelection",
-        )}
-        {actionManager.renderAction("deleteSelectedElements")}
+        {showEraser
+          ? actionManager.renderAction("eraser")
+          : actionManager.renderAction(
+              appState.multiElement ? "finalize" : "duplicateSelection",
+            )}
+        {showEraser
+          ? actionManager.renderAction("toggleShortcuts") //zsviczian
+          : actionManager.renderAction("deleteSelectedElements")}
       </div>
     );
   };

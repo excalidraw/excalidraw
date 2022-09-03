@@ -201,6 +201,9 @@ const LayerUI = ({
             {renderJSONExportDialog()}
             {renderImageExportDialog()}
             <Separator />
+            {
+              actionManager.renderAction("toggleShortcuts") //zsviczian
+            }
             {onCollabButtonClick && (
               <CollabButton
                 isCollaborating={isCollaborating}

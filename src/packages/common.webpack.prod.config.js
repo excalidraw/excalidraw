@@ -69,7 +69,7 @@ module.exports = {
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        type: "asset/resource",
+        type: "asset/inline", //zsviczian
       },
     ],
   },
@@ -92,7 +92,6 @@ module.exports = {
   },
   plugins: [
     ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
-    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
     ...("__noenv" in global
       ? []
       : [
