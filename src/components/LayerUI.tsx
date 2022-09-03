@@ -396,7 +396,12 @@ const LayerUI = ({
     );
   };
 
-  const dialogs = (
+  const isTrayModeOrMobile =
+    device.isMobile ||
+    (!(appState.viewModeEnabled || appState.zenModeEnabled) &&
+      appState.trayModeEnabled); //zsviczian
+
+  return (
     <>
       {appState.isLoading && <LoadingMessage delay={250} />}
       {appState.errorMessage && (
@@ -424,86 +429,81 @@ const LayerUI = ({
           }
         />
       )}
-    </>
-  );
-
-  return device.isMobile ||
-    (!(appState.viewModeEnabled || appState.zenModeEnabled) &&
-      appState.trayModeEnabled) ? ( //zsviczian this is THE line that allows tray mode
-    <>
-      {dialogs}
-      <MobileMenu
-        appState={appState}
-        elements={elements}
-        actionManager={actionManager}
-        libraryMenu={libraryMenu}
-        renderJSONExportDialog={renderJSONExportDialog}
-        renderImageExportDialog={renderImageExportDialog}
-        setAppState={setAppState}
-        onCollabButtonClick={onCollabButtonClick}
-        onLockToggle={() => onLockToggle()}
-        onPenModeToggle={onPenModeToggle}
-        canvas={canvas}
-        isCollaborating={isCollaborating}
-        renderCustomFooter={renderCustomFooter}
-        showThemeBtn={showThemeBtn}
-        onImageAction={onImageAction}
-        renderTopRightUI={renderTopRightUI}
-        renderCustomStats={renderCustomStats}
-      />
-    </>
-  ) : (
-    <>
-      <div
-        className={clsx("layer-ui__wrapper", {
-          "disable-pointerEvents":
-            appState.draggingElement ||
-            appState.resizingElement ||
-            (appState.editingElement &&
-              !isTextElement(appState.editingElement)),
-        })}
-        style={
-          appState.isLibraryOpen &&
-          appState.isLibraryMenuDocked &&
-          device.canDeviceFitSidebar
-            ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
-            : {}
-        }
-      >
-        {dialogs}
-        {renderFixedSideContainer()}
-        <Footer
+      {isTrayModeOrMobile && ( //zsviczian changed from !device.isMobile
+        <MobileMenu
           appState={appState}
+          elements={elements}
           actionManager={actionManager}
+          libraryMenu={libraryMenu}
+          renderJSONExportDialog={renderJSONExportDialog}
+          renderImageExportDialog={renderImageExportDialog}
+          setAppState={setAppState}
+          onCollabButtonClick={onCollabButtonClick}
+          onLockToggle={() => onLockToggle()}
+          onPenModeToggle={onPenModeToggle}
+          canvas={canvas}
+          isCollaborating={isCollaborating}
           renderCustomFooter={renderCustomFooter}
-          showExitZenModeBtn={showExitZenModeBtn}
+          showThemeBtn={showThemeBtn}
+          onImageAction={onImageAction}
+          renderTopRightUI={renderTopRightUI}
+          renderCustomStats={renderCustomStats}
         />
-        {appState.showStats && (
-          <Stats
-            appState={appState}
-            setAppState={setAppState}
-            elements={elements}
-            onClose={() => {
-              actionManager.executeAction(actionToggleStats);
-            }}
-            renderCustomStats={renderCustomStats}
-          />
-        )}
-        {appState.scrolledOutside && (
-          <button
-            className="scroll-back-to-content"
-            onClick={() => {
-              setAppState({
-                ...calculateScrollCenter(elements, appState, canvas),
-              });
-            }}
+      )}
+
+      {!isTrayModeOrMobile && ( //zsviczian changed from !device.isMobile
+        <>
+          <div
+            className={clsx("layer-ui__wrapper", {
+              "disable-pointerEvents":
+                appState.draggingElement ||
+                appState.resizingElement ||
+                (appState.editingElement &&
+                  !isTextElement(appState.editingElement)),
+            })}
+            style={
+              appState.isLibraryOpen &&
+              appState.isLibraryMenuDocked &&
+              device.canDeviceFitSidebar
+                ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
+                : {}
+            }
           >
-            {t("buttons.scrollBackToContent")}
-          </button>
-        )}
-      </div>
-      {appState.isLibraryOpen && (
-        <div className="layer-ui__sidebar">{libraryMenu}</div>
+            {renderFixedSideContainer()}
+            <Footer
+              appState={appState}
+              actionManager={actionManager}
+              renderCustomFooter={renderCustomFooter}
+              showExitZenModeBtn={showExitZenModeBtn}
+            />
+            {appState.showStats && (
+              <Stats
+                appState={appState}
+                setAppState={setAppState}
+                elements={elements}
+                onClose={() => {
+                  actionManager.executeAction(actionToggleStats);
+                }}
+                renderCustomStats={renderCustomStats}
+              />
+            )}
+            {appState.scrolledOutside && (
+              <button
+                className="scroll-back-to-content"
+                onClick={() => {
+                  setAppState({
+                    ...calculateScrollCenter(elements, appState, canvas),
+                  });
+                }}
+              >
+                {t("buttons.scrollBackToContent")}
+              </button>
+            )}
+          </div>
+          {appState.isLibraryOpen && (
+            <div className="layer-ui__sidebar">{libraryMenu}</div>
+          )}
+        </>
       )}
     </>
   );

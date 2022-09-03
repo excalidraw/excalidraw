@@ -194,7 +194,13 @@ const initializeScene = async (opts: {
       scene: {
         ...scene,
         appState: {
-          ...restoreAppState(scene?.appState, excalidrawAPI.getAppState()),
+          ...restoreAppState(
+            {
+              ...scene?.appState,
+              theme: localDataState?.appState?.theme || scene?.appState?.theme,
+            },
+            excalidrawAPI.getAppState(),
+          ),
           // necessary if we're invoking from a hashchange handler which doesn't
           // go through App.initializeScene() that resets this flag
           isLoading: false,
