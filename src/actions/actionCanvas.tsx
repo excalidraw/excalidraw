@@ -74,6 +74,7 @@ export const actionClearCanvas = register({
           appState.activeTool.type === "image"
             ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
+        colorPalette: appState.colorPalette, //zsviczian
       },
       commitToHistory: true,
     };
