@@ -755,6 +755,9 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
+    if (this.props.defaultTheme) {
+      this.setState({ theme: this.props.defaultTheme });
+    }
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });
     }
