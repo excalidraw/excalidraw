@@ -353,6 +353,8 @@ const ColorInput = React.forwardRef(
   },
 );
 
+ColorInput.displayName = "ColorInput";
+
 export const ColorPicker = ({
   type,
   color,

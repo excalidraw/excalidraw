@@ -1,7 +1,7 @@
 {
   "ar-SA": 91,
   "bg-BG": 58,
-  "bn-BD": 0,
+  "bn-BD": 13,
   "ca-ES": 99,
   "cs-CZ": 27,
   "da-DK": 34,
@@ -23,7 +23,7 @@
   "kab-KAB": 95,
   "kk-KZ": 22,
   "ko-KR": 99,
-  "lt-LT": 22,
+  "lt-LT": 24,
   "lv-LV": 100,
   "mr-IN": 100,
   "my-MM": 44,
@@ -44,7 +44,7 @@
   "ta-IN": 98,
   "tr-TR": 99,
   "uk-UA": 100,
-  "vi-VN": 13,
+  "vi-VN": 16,
   "zh-CN": 100,
   "zh-HK": 27,
   "zh-TW": 100

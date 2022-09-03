@@ -35,9 +35,9 @@ export const exportToCanvas = ({
   files,
   maxWidthOrHeight,
   getDimensions,
-  exportPadding, //zsviczian
+  exportPadding,
 }: ExportOpts & {
-  exportPadding?: number; //zsviczian
+  exportPadding?: number;
 }) => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
@@ -49,7 +49,7 @@ export const exportToCanvas = ({
     getNonDeletedElements(restoredElements),
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
-    { exportBackground, exportPadding, viewBackgroundColor }, //zsviczian
+    { exportBackground, exportPadding, viewBackgroundColor },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
 
@@ -90,7 +90,7 @@ export const exportToBlob = async (
   opts: ExportOpts & {
     mimeType?: string;
     quality?: number;
-    exportPadding?: number; //zsviczian
+    exportPadding?: number;
   },
 ): Promise<Blob> => {
   let { mimeType = MIME_TYPES.png, quality } = opts;
