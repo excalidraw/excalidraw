@@ -38,6 +38,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onLinkOpen,
     onPointerDown,
     onScrollChange,
+    onMenuToggle: onSidebarToggle,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -104,6 +105,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
+          onMenuToggle={onSidebarToggle}
+          children={props.children}
         />
       </Provider>
     </InitializeApp>
@@ -225,3 +228,5 @@ export {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
 } from "../../utils";
+
+export { Sidebar } from "../../components/Sidebar";

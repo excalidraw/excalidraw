@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import { t } from "../i18n";
-import { AppState } from "../types";
+import { AppState, ExcalidrawProps } from "../types";
 import { capitalizeString } from "../utils";
 import { trackEvent } from "../analytics";
 import { useDevice } from "./App";
@@ -19,7 +19,8 @@ export const LibraryButton: React.FC<{
   appState: AppState;
   setAppState: React.Component<any, AppState>["setState"];
   isMobile?: boolean;
-}> = ({ appState, setAppState, isMobile }) => {
+  onMenuToggle: ExcalidrawProps["onMenuToggle"];
+}> = ({ appState, setAppState, isMobile, onMenuToggle }) => {
   const device = useDevice();
   return (
     <label
@@ -42,6 +43,7 @@ export const LibraryButton: React.FC<{
             ?.classList.remove("animate");
           const nextState = event.target.checked;
           setAppState({ isLibraryOpen: nextState });
+          onMenuToggle?.("library", nextState);
           // track only openings
           if (nextState) {
             trackEvent(

@@ -17,7 +17,6 @@ import {
   ExcalidrawProps,
 } from "../types";
 import { Dialog } from "./Dialog";
-import { Island } from "./Island";
 import PublishLibrary from "./PublishLibrary";
 import { ToolButton } from "./ToolButton";
 
@@ -69,9 +68,9 @@ const LibraryMenuWrapper = forwardRef<
   { children: React.ReactNode }
 >(({ children }, ref) => {
   return (
-    <Island padding={1} ref={ref} className="layer-ui__library">
+    <div ref={ref} className="layer-ui__library">
       {children}
-    </Island>
+    </div>
   );
 });
 

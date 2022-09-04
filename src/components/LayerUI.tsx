@@ -40,6 +40,9 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
+import { hostSidebarCountersAtom, Sidebar } from "./Sidebar";
+import { jotaiScope } from "../jotai";
+import { useAtom } from "jotai";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -52,6 +55,7 @@ interface LayerUIProps {
   onLockToggle: () => void;
   onPenModeToggle: () => void;
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
+  onMenuToggle: ExcalidrawProps["onMenuToggle"];
   showExitZenModeBtn: boolean;
   showThemeBtn: boolean;
   langCode: Language["code"];
@@ -77,6 +81,7 @@ const LayerUI = ({
   onLockToggle,
   onPenModeToggle,
   onInsertElements,
+  onMenuToggle,
   showExitZenModeBtn,
   showThemeBtn,
   isCollaborating,
@@ -356,6 +361,7 @@ const LayerUI = ({
                     <LibraryButton
                       appState={appState}
                       setAppState={setAppState}
+                      onMenuToggle={onMenuToggle}
                     />
                   </Stack.Row>
                 </Stack.Col>
@@ -380,6 +386,8 @@ const LayerUI = ({
       </FixedSideContainer>
     );
   };
+
+  const [hostSidebarCounters] = useAtom(hostSidebarCountersAtom, jotaiScope);
 
   return (
     <>
@@ -421,6 +429,7 @@ const LayerUI = ({
           onCollabButtonClick={onCollabButtonClick}
           onLockToggle={() => onLockToggle()}
           onPenModeToggle={onPenModeToggle}
+          onMenuToggle={onMenuToggle}
           canvas={canvas}
           isCollaborating={isCollaborating}
           renderCustomFooter={renderCustomFooter}
@@ -442,8 +451,8 @@ const LayerUI = ({
                   !isTextElement(appState.editingElement)),
             })}
             style={
-              appState.isLibraryOpen &&
-              appState.isLibraryMenuDocked &&
+              ((appState.isLibraryOpen && appState.isLibraryMenuDocked) ||
+                hostSidebarCounters.docked) &&
               device.canDeviceFitSidebar
                 ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
                 : {}
@@ -481,7 +490,27 @@ const LayerUI = ({
             )}
           </div>
           {appState.isLibraryOpen && (
-            <div className="layer-ui__sidebar">{libraryMenu}</div>
+            <Sidebar
+              __isInternal
+              onClose={() => {
+                const isLibraryOpen = false;
+                setAppState({ isLibraryOpen });
+                onMenuToggle?.("library", isLibraryOpen);
+              }}
+              onDock={(docked) => {
+                setAppState({
+                  isLibraryMenuDocked: docked,
+                });
+                trackEvent(
+                  "library",
+                  `toggleLibraryDock (${docked ? "dock" : "undock"})`,
+                  `sidebar (${device.isMobile ? "mobile" : "desktop"})`,
+                );
+              }}
+              docked={appState.isLibraryMenuDocked}
+            >
+              {libraryMenu}
+            </Sidebar>
           )}
         </>
       )}
@@ -502,8 +531,12 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   const nextAppState = getNecessaryObj(next.appState);
 
   const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
+
   return (
     prev.renderCustomFooter === next.renderCustomFooter &&
+    prev.renderTopRightUI === next.renderTopRightUI &&
+    prev.renderCustomStats === next.renderCustomStats &&
+    prev.onMenuToggle === next.onMenuToggle &&
     prev.langCode === next.langCode &&
     prev.elements === next.elements &&
     prev.files === next.files &&
