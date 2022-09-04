@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
-import Sidebar from "./sidebar/Sidebar";
+import ExampleSidebar from "./sidebar/ExampleSidebar";
 
 import "./App.scss";
 import initialData from "./initialData";
@@ -510,7 +510,7 @@ export default function App() {
   return (
     <div className="App" ref={appRef}>
       <h1> Excalidraw Example</h1>
-      <Sidebar>
+      <ExampleSidebar>
         <div className="button-wrapper">
           <button onClick={loadSceneOrLibrary}>Load Scene or Library</button>
           <button className="update-scene" onClick={updateScene}>
@@ -756,7 +756,7 @@ export default function App() {
             <img src={canvasUrl} alt="" />
           </div>
         </div>
-      </Sidebar>
+      </ExampleSidebar>
     </div>
   );
 }
