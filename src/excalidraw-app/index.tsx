@@ -83,6 +83,7 @@ import { Provider, useAtom } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
+import { Sidebar } from "../components/Sidebar";
 
 polyfill();
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -694,6 +695,10 @@ const ExcalidrawWrapper = () => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
   };
 
+  const [renderSidebar, setRenderSidebar] = useState(false);
+  const [renderSidebarHeader, setRenderSidebarHeader] = useState(true);
+  const [sidebarDocked, setSidebarDocked] = useState(false);
+
   return (
     <div
       style={{ height: "100%" }}
@@ -701,6 +706,26 @@ const ExcalidrawWrapper = () => {
         "is-collaborating": isCollaborating,
       })}
     >
+      <div
+        style={{
+          position: "fixed",
+          left: "50%",
+          bottom: "20px",
+          display: "flex",
+          zIndex: 9999999999999999,
+          padding: "5px 10px",
+          transform: "translateX(-50%)",
+          background: "rgba(255, 255, 255, 0.8)",
+          gap: "1rem",
+        }}
+      >
+        <button onClick={() => setRenderSidebar((s) => !s)}>
+          Toggle Sidebar
+        </button>
+        <button onClick={() => setRenderSidebarHeader((s) => !s)}>
+          Toggle Sidebar Header
+        </button>
+      </div>
       <Excalidraw
         ref={excalidrawRefCallback}
         onChange={onChange}
@@ -739,7 +764,21 @@ const ExcalidrawWrapper = () => {
         handleKeyboardGlobally={true}
         onLibraryChange={onLibraryChange}
         autoFocus={true}
-      />
+        onMenuToggle={(toggled) => setRenderSidebar(!toggled)}
+      >
+        {renderSidebar && (
+          <Sidebar
+            docked={sidebarDocked}
+            onDock={(docked) => setSidebarDocked(docked)}
+            onClose={() => setRenderSidebar(false)}
+          >
+            {renderSidebarHeader && (
+              <Sidebar.Header>Custom header!</Sidebar.Header>
+            )}
+            Custom sidebar!
+          </Sidebar>
+        )}
+      </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
         <ErrorDialog
