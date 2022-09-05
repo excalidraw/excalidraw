@@ -1,5 +1,5 @@
 @import "open-color/open-color";
-@import "../css/variables.module";
+@import "../../css/variables.module";
 
 .excalidraw {
   .layer-ui__sidebar {
@@ -62,5 +62,25 @@
     display: flex;
     align-items: center;
     margin-left: auto;
+  }
+
+  .layer-ui__sidebar-dock-button {
+    @include toolbarButtonColorStates;
+    margin-right: 0.2rem;
+
+    .ToolIcon_type_floating .ToolIcon__icon {
+      width: calc(var(--space-factor) * 7);
+      height: calc(var(--space-factor) * 7);
+      svg {
+        // mirror
+        transform: scale(-1, 1);
+      }
+    }
+
+    .ToolIcon_type_checkbox {
+      &:not(.ToolIcon_toggle_opaque):checked + .ToolIcon__icon {
+        background-color: var(--color-primary);
+      }
+    }
   }
 }

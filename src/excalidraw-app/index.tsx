@@ -83,7 +83,7 @@ import { Provider, useAtom } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
-import { Sidebar } from "../components/Sidebar";
+import { Sidebar } from "../components/Sidebar/Sidebar";
 
 polyfill();
 window.EXCALIDRAW_THROTTLE_RENDER = true;

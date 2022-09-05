@@ -40,7 +40,7 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
-import { hostSidebarCountersAtom, Sidebar } from "./Sidebar";
+import { hostSidebarCountersAtom, Sidebar } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 

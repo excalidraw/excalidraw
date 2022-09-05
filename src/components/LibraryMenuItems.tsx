@@ -24,7 +24,7 @@ import "./LibraryMenuItems.scss";
 import { MIME_TYPES, VERSIONS } from "../constants";
 import Spinner from "./Spinner";
 import { fileOpen } from "../data/filesystem";
-import { Sidebar } from "./Sidebar";
+import { Sidebar } from "./Sidebar/Sidebar";
 
 const LibraryMenuItems = ({
   isLoading,

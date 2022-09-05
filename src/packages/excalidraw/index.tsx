@@ -229,4 +229,4 @@ export {
   viewportCoordsToSceneCoords,
 } from "../../utils";
 
-export { Sidebar } from "../../components/Sidebar";
+export { Sidebar } from "../../components/Sidebar/Sidebar";
