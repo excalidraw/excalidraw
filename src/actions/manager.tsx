@@ -204,7 +204,6 @@ export class ActionManager {
   ) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
-    let key: string;
     if (
       this.actions[name] &&
       "PanelComponent" in this.actions[name] &&
@@ -216,7 +215,6 @@ export class ActionManager {
             name,
           ))
     ) {
-      key = name;
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
       PanelComponent.displayName = "PanelComponent";
@@ -237,7 +235,7 @@ export class ActionManager {
 
       return (
         <PanelComponent
-          key={key}
+          key={name}
           elements={this.getElementsIncludingDeleted()}
           appState={this.getAppState()}
           updateData={updateData}
