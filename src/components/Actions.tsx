@@ -87,6 +87,17 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => hasStrokeColor(element.type))) &&
         renderAction("changeStrokeColor")}
       {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
+      {(appState.activeSubtypes ||
+        targetElements.some((element) => element.subtype)) && (
+        <>
+          {getCustomActions().map((action) => {
+            if (!getSubtypeNames().includes(action.name as Subtype)) {
+              return renderAction(action.name);
+            }
+            return null;
+          })}
+        </>
+      )}
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||
@@ -125,17 +136,6 @@ export const SelectedShapeActions = ({
         (element) =>
           hasBoundTextElement(element) || isBoundToContainer(element),
       ) && renderAction("changeVerticalAlign")}
-      {(appState.activeSubtypes ||
-        targetElements.some((element) => element.subtype)) && (
-        <>
-          {getCustomActions().map((action) => {
-            if (!getSubtypeNames().includes(action.name as Subtype)) {
-              return renderAction(action.name);
-            }
-            return null;
-          })}
-        </>
-      )}
       {(canHaveArrowheads(appState.activeTool.type) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
