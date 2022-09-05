@@ -8,12 +8,13 @@ import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
 import { registerAuxLangData } from "./i18n";
 
-import { Action, ActionName } from "./actions/types";
+import { Action, ActionName, DisableFn, EnableFn } from "./actions/types";
 import {
   CustomShortcutName,
   registerCustomShortcuts,
 } from "./actions/shortcuts";
 import { register } from "./actions/register";
+import { registerDisableFn, registerEnableFn } from "./actions/guards";
 import { hasBoundTextElement } from "./element/typeChecks";
 import { getBoundTextElement } from "./element/textElement";
 
@@ -52,22 +53,14 @@ export const isValidSubtype = (s: any, t: any): s is Subtype =>
 const isSubtypeName = (s: any): s is Subtype => subtypeNames.includes(s);
 
 // Subtype Actions
-export type SubtypeActionName = string;
+type SubtypeActionName = string;
 
 const isSubtypeActionName = (s: any): s is SubtypeActionName =>
   subtypeActionMap.some((val) => val.actions.includes(s));
 
-const subtypeActions: Action[] = [];
-export const getSubtypeActions = (): readonly Action[] => {
-  return subtypeActions;
-};
-
 const addSubtypeAction = (action: Action) => {
   if (isSubtypeActionName(action.name) || isSubtypeName(action.name)) {
-    if (subtypeActions.every((value) => value.name !== action.name)) {
-      subtypeActions.push(action);
-      register(action);
-    }
+    register(action);
   }
 };
 
@@ -93,11 +86,11 @@ const isForSubtype = (
   return false;
 };
 
-export const isActionEnabled = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  actionName: ActionName | SubtypeActionName,
-) => {
+const isActionDisabled: DisableFn = function (elements, appState, actionName) {
+  return !isActionEnabled(elements, appState, actionName);
+};
+
+const isActionEnabled: EnableFn = function (elements, appState, actionName) {
   // We always enable subtype actions.  Also let through standard actions
   // which no subtypes might have disabled.
   if (
@@ -123,12 +116,13 @@ export const isActionEnabled = (
         return isForSubtype(e.subtype, actionName, true);
       }) ||
       // Or has any active subtype enabled this actionName?
-      appState.activeSubtypes?.some((subtype) => {
-        if (!isValidSubtype(subtype, appState.activeTool.type)) {
-          return false;
-        }
-        return isForSubtype(subtype, actionName, true);
-      })
+      (appState.activeSubtypes !== undefined &&
+        appState.activeSubtypes?.some((subtype) => {
+          if (!isValidSubtype(subtype, appState.activeTool.type)) {
+            return false;
+          }
+          return isForSubtype(subtype, actionName, true);
+        }))
     );
   }
   // Now handle standard actions disabled by subtypes
@@ -338,6 +332,13 @@ export const prepareSubtype = (
     onSubtypeLoaded,
   );
 
+  record.disabledNames.forEach((name) => {
+    registerDisableFn(name, isActionDisabled);
+  });
+  record.actionNames.forEach((name) => {
+    registerEnableFn(name, isActionEnabled);
+  });
+  registerEnableFn(record.subtype, isActionEnabled);
   // Register the subtype's methods
   addSubtypeMethods(record.subtype, methods);
   return { actions, methods };

@@ -37,7 +37,7 @@ import {
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
-import { actions } from "../actions/register";
+import { getActions, getCustomActions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
@@ -231,7 +231,6 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
   SubtypeRecord,
   SubtypePrepFn,
-  getSubtypeActions,
   getSubtypeNames,
   prepareSubtype,
   selectSubtype,
@@ -450,11 +449,12 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.history = new History();
-    this.actionManager.registerAll(actions);
+    this.actionManager.registerAll(getActions());
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
     this.addSubtype(getCrispSubtypeRecord(), prepareCrispSubtype);
+    this.actionManager.registerActionGuards();
   }
 
   private addSubtype(record: SubtypeRecord, subtypePrepFn: SubtypePrepFn) {
@@ -486,6 +486,7 @@ class App extends React.Component<AppProps, AppState> {
     if (prep.actions) {
       this.actionManager.registerAll(prep.actions);
     }
+    this.actionManager.registerActionGuards();
     return prep;
   }
 
@@ -5927,17 +5928,6 @@ class App extends React.Component<AppProps, AppState> {
       this.actionManager.getAppState(),
     );
 
-    const maybeUse: boolean[] = [];
-    getSubtypeActions().forEach((action) => {
-      if (action.contextItemPredicate) {
-        maybeUse.push(
-          action.contextItemPredicate!(
-            this.actionManager.getElementsIncludingDeleted(),
-            this.actionManager.getAppState(),
-          ),
-        );
-      }
-    });
     const mayBeAllowUnbinding = actionUnbindText.contextItemPredicate(
       this.actionManager.getElementsIncludingDeleted(),
       this.actionManager.getAppState(),
@@ -5958,6 +5948,24 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const options: ContextMenuOption[] = [];
+    const allElements = this.actionManager.getElementsIncludingDeleted();
+    const appState = this.actionManager.getAppState();
+    let addedCustom = false;
+    getCustomActions().forEach((action) => {
+      if (action.contextItemPredicate) {
+        if (
+          action.contextItemPredicate!(allElements, appState) &&
+          this.actionManager.isActionEnabled(allElements, appState, action.name)
+        ) {
+          addedCustom = true;
+          options.push(action);
+        }
+      }
+    });
+    if (addedCustom) {
+      options.push(separator);
+    }
+
     if (probablySupportsClipboardBlob && elements.length > 0) {
       options.push(actionCopyAsPng);
     }
@@ -6052,16 +6060,6 @@ class App extends React.Component<AppProps, AppState> {
           elements,
         });
       } else {
-        let firstAdded = true;
-        for (let index = 0; index < maybeUse.length; index++) {
-          if (maybeUse[index]) {
-            if (firstAdded) {
-              options.push(separator);
-              firstAdded = false;
-            }
-            options.push(getSubtypeActions()[index]);
-          }
-        }
         ContextMenu.push({
           options: [
             this.device.isMobile && actionCut,

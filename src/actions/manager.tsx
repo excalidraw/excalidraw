@@ -6,11 +6,14 @@ import {
   ActionResult,
   PanelComponentProps,
   ActionSource,
+  DisableFn,
+  EnableFn,
+  isActionName,
 } from "./types";
+import { getActionDisablers, getActionEnablers } from "./guards";
 import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { MODES } from "../constants";
-import { isActionEnabled, SubtypeActionName } from "../subtypes";
 import { trackEvent } from "../analytics";
 
 const trackAction = (
@@ -42,7 +45,10 @@ const trackAction = (
 };
 
 export class ActionManager {
-  actions = {} as Record<ActionName | SubtypeActionName, Action>;
+  actions = {} as Record<ActionName | Action["name"], Action>;
+
+  disablers = {} as Record<ActionName, DisableFn[]>;
+  enablers = {} as Record<Action["name"], EnableFn[]>;
 
   updater: (actionResult: ActionResult | Promise<ActionResult>) => void;
 
@@ -70,6 +76,58 @@ export class ActionManager {
     this.app = app;
   }
 
+  public registerActionGuards() {
+    const disablers = getActionDisablers();
+    for (const d in disablers) {
+      const dName = d as ActionName;
+      disablers[dName].forEach((disabler) =>
+        this.registerDisableFn(dName, disabler),
+      );
+    }
+    const enablers = getActionEnablers();
+    for (const e in enablers) {
+      const eName = e as Action["name"];
+      enablers[e].forEach((enabler) => this.registerEnableFn(eName, enabler));
+    }
+  }
+
+  private registerDisableFn(name: ActionName, disabler: DisableFn) {
+    if (!(name in this.disablers)) {
+      this.disablers[name] = [] as DisableFn[];
+    }
+    if (!this.disablers[name].includes(disabler)) {
+      this.disablers[name].push(disabler);
+    }
+  }
+
+  private registerEnableFn(name: Action["name"], enabler: EnableFn) {
+    if (!(name in this.enablers)) {
+      this.enablers[name] = [] as EnableFn[];
+    }
+    if (!this.enablers[name].includes(enabler)) {
+      this.enablers[name].push(enabler);
+    }
+  }
+
+  public isActionEnabled(
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    actionName: Action["name"],
+  ): boolean {
+    if (isActionName(actionName)) {
+      return !(
+        actionName in this.disablers &&
+        this.disablers[actionName].some((fn) =>
+          fn(elements, appState, actionName),
+        )
+      );
+    }
+    return (
+      actionName in this.enablers &&
+      this.enablers[actionName].some((fn) => fn(elements, appState, actionName))
+    );
+  }
+
   registerAction(action: Action) {
     this.actions[action.name] = action;
   }
@@ -86,7 +144,7 @@ export class ActionManager {
         (action) =>
           (action.name in canvasActions
             ? canvasActions[action.name as keyof typeof canvasActions]
-            : isActionEnabled(
+            : this.isActionEnabled(
                 this.getElementsIncludingDeleted(),
                 this.getAppState(),
                 action.name,
@@ -141,7 +199,7 @@ export class ActionManager {
    * @param data additional data sent to the PanelComponent
    */
   renderAction = (
-    name: ActionName | SubtypeActionName,
+    name: ActionName | Action["name"],
     data?: PanelComponentProps["data"],
   ) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
@@ -152,7 +210,7 @@ export class ActionManager {
       "PanelComponent" in this.actions[name] &&
       (name in canvasActions
         ? canvasActions[name as keyof typeof canvasActions]
-        : isActionEnabled(
+        : this.isActionEnabled(
             this.getElementsIncludingDeleted(),
             this.getAppState(),
             name,
