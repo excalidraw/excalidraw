@@ -1170,6 +1170,13 @@ const enableActionChangeMathProps = (
     }
   });
 
+  if (
+    appState.activeTool.type === "text" &&
+    appState.activeSubtypes &&
+    appState.activeSubtypes.includes(mathSubtype)
+  ) {
+    enabled = true;
+  }
   return enabled;
 };
 
