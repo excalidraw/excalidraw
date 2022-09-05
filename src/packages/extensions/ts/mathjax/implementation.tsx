@@ -1258,6 +1258,8 @@ const createMathActions = () => {
         />
       </fieldset>
     ),
+    panelComponentPredicate: (elements, appState) =>
+      enableActionChangeMathProps(elements, appState),
     trackEvent: false,
   };
   const actionChangeMathOnly: Action = {
@@ -1342,6 +1344,8 @@ const createMathActions = () => {
         />
       </fieldset>
     ),
+    panelComponentPredicate: (elements, appState) =>
+      enableActionChangeMathProps(elements, appState),
     trackEvent: false,
   };
   const actionMath = SubtypeButton(mathSubtype, "text", mathSubtypeIcon, "M");
