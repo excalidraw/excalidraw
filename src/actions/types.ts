@@ -146,6 +146,10 @@ export type PanelComponentProps = {
 export interface Action {
   name: string;
   PanelComponent?: React.FC<PanelComponentProps>;
+  panelComponentPredicate?: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => boolean;
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (
