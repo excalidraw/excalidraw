@@ -37,7 +37,7 @@ import {
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
-import { actions } from "../actions/register";
+import { getActions, getCustomActions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
@@ -432,10 +432,12 @@ class App extends React.Component<AppProps, AppState> {
       () => this.scene.getElementsIncludingDeleted(),
       this,
     );
-    this.actionManager.registerAll(actions);
+    this.actionManager.registerAll(getActions());
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
+
+    this.actionManager.registerActionGuards();
   }
 
   private renderCanvas() {
@@ -5874,6 +5876,24 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const options: ContextMenuOption[] = [];
+    const allElements = this.actionManager.getElementsIncludingDeleted();
+    const appState = this.actionManager.getAppState();
+    let addedCustom = false;
+    getCustomActions().forEach((action) => {
+      if (action.contextItemPredicate) {
+        if (
+          action.contextItemPredicate!(allElements, appState) &&
+          this.actionManager.isActionEnabled(allElements, appState, action.name)
+        ) {
+          addedCustom = true;
+          options.push(action);
+        }
+      }
+    });
+    if (addedCustom) {
+      options.push(separator);
+    }
+
     if (probablySupportsClipboardBlob && elements.length > 0) {
       options.push(actionCopyAsPng);
     }
