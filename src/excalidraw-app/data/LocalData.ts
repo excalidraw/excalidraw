@@ -98,7 +98,7 @@ export class LocalData {
   /** Saves the AppState, only if saving is paused. */
   static saveAppState = (appState: AppState) => {
     // we need to make the `isSavePaused` check synchronously (undebounced)
-    if (this.isSavePaused()) {
+    if (LocalData.isSavePaused()) {
       this._save([], appState, {}, () => {}, true);
     }
   };
