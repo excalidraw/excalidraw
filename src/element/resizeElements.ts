@@ -1,4 +1,4 @@
-import { BOUND_TEXT_PADDING, SHIFT_LOCKING_ANGLE } from "../constants";
+import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
 import {
