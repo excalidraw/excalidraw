@@ -709,8 +709,8 @@ const resizeMultipleElements = (
         if (boundTextElement) {
           const nextFont = measureFontSizeFromWH(
             boundTextElement,
-            width - BOUND_TEXT_PADDING * 2,
-            height - BOUND_TEXT_PADDING * 2,
+            boundTextElement.width + (width - element.width),
+            boundTextElement.height + (height - element.height),
           );
 
           if (nextFont === null) {
