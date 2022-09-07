@@ -317,7 +317,7 @@ export interface ExcalidrawProps {
    * @param type NOTE: more menu types coming later
    */
   onMenuToggle?: (type: "library", isOpen: boolean) => void;
-  children?: React.ReactNode;
+  renderSidebar?: () => JSX.Element | null;
 }
 
 export type SceneData = {

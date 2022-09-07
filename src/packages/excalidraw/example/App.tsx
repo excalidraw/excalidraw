@@ -119,8 +119,8 @@ export default function App() {
   );
   const [comment, setComment] = useState<Comment | null>(null);
 
-  const [renderSidebar, setRenderSidebar] = useState(false);
-  const [sidebarDocked, setSidebarDocked] = useState(false);
+  const [shouldRenderSidebar, setShouldRenderSidebar] = useState(false);
+  const [isSidebarDocked, setIsSidebarDocked] = useState(false);
 
   const initialStatePromiseRef = useRef<{
     promise: ResolvablePromise<ExcalidrawInitialDataState | null>;
@@ -513,6 +513,22 @@ export default function App() {
     );
   };
 
+  const renderSidebar = () => {
+    if (!shouldRenderSidebar) {
+      return null;
+    }
+    return (
+      <Sidebar
+        docked={isSidebarDocked}
+        onDock={(docked) => setIsSidebarDocked(docked)}
+        onClose={() => setShouldRenderSidebar(false)}
+      >
+        <Sidebar.Header>Custom header!</Sidebar.Header>
+        Custom sidebar!
+      </Sidebar>
+    );
+  };
+
   return (
     <div className="App" ref={appRef}>
       <h1> Excalidraw Example</h1>
@@ -663,8 +679,8 @@ export default function App() {
               gap: "1rem",
             }}
           >
-            <button onClick={() => setRenderSidebar((s) => !s)}>
-              Toggle Sidebar
+            <button onClick={() => setShouldRenderSidebar((s) => !s)}>
+              Toggle Custom Sidebar
             </button>
           </div>
           <Excalidraw
@@ -692,19 +708,9 @@ export default function App() {
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
-            onMenuToggle={() => setRenderSidebar(false)}
-          >
-            {renderSidebar && (
-              <Sidebar
-                docked={sidebarDocked}
-                onDock={(docked) => setSidebarDocked(docked)}
-                onClose={() => setRenderSidebar(false)}
-              >
-                <Sidebar.Header>Custom header!</Sidebar.Header>
-                Custom sidebar!
-              </Sidebar>
-            )}
-          </Excalidraw>
+            onMenuToggle={() => setShouldRenderSidebar(false)}
+            renderSidebar={renderSidebar}
+          />
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}
         </div>

@@ -63,6 +63,7 @@ interface LayerUIProps {
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomFooter?: ExcalidrawProps["renderFooter"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
+  renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   UIOptions: AppProps["UIOptions"];
   focusContainer: () => void;
@@ -88,6 +89,7 @@ const LayerUI = ({
   renderTopRightUI,
   renderCustomFooter,
   renderCustomStats,
+  renderCustomSidebar,
   libraryReturnUrl,
   UIOptions,
   focusContainer,
@@ -437,6 +439,7 @@ const LayerUI = ({
           onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
+          renderCustomSidebar={renderCustomSidebar}
         />
       )}
 
@@ -489,6 +492,7 @@ const LayerUI = ({
               </button>
             )}
           </div>
+          {renderCustomSidebar?.()}
           {appState.isLibraryOpen && (
             <Sidebar
               __isInternal

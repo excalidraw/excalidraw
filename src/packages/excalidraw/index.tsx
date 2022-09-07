@@ -21,6 +21,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerUpdate,
     renderTopRightUI,
     renderFooter,
+    renderSidebar,
     langCode = defaultLang.code,
     viewModeEnabled,
     zenModeEnabled,
@@ -106,7 +107,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
           onMenuToggle={onMenuToggle}
-          children={props.children}
+          renderSidebar={renderSidebar}
         />
       </Provider>
     </InitializeApp>

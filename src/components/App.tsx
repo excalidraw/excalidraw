@@ -526,7 +526,6 @@ class App extends React.Component<AppProps, AppState> {
               <ExcalidrawElementsContext.Provider
                 value={this.scene.getNonDeletedElements()}
               >
-                {this.props.children}
                 <LayerUI
                   canvas={this.canvas}
                   appState={this.state}
@@ -550,6 +549,7 @@ class App extends React.Component<AppProps, AppState> {
                   renderTopRightUI={renderTopRightUI}
                   renderCustomFooter={renderFooter}
                   renderCustomStats={renderCustomStats}
+                  renderCustomSidebar={this.props.renderSidebar}
                   showExitZenModeBtn={
                     typeof this.props?.zenModeEnabled === "undefined" &&
                     this.state.zenModeEnabled
