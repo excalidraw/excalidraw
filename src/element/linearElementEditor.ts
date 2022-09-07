@@ -430,15 +430,13 @@ export class LinearElementEditor {
     endPoint: Point,
     zoom: AppState["zoom"],
   ) {
-    let distance = 0;
-    if (element.strokeSharpness === "sharp") {
-      distance = distance2d(
-        startPoint[0],
-        startPoint[1],
-        endPoint[0],
-        endPoint[1],
-      );
-    } else {
+    let distance = distance2d(
+      startPoint[0],
+      startPoint[1],
+      endPoint[0],
+      endPoint[1],
+    );
+    if (element.points.length > 2 && element.strokeSharpness === "round") {
       distance = getBezierCurveLength(element, endPoint);
     }
     return distance * zoom.value < LinearElementEditor.POINT_HANDLE_SIZE * 4;

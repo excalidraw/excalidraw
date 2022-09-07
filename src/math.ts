@@ -275,11 +275,13 @@ export const getControlPointsForBezierCurve = (
   if (!shape) {
     return null;
   }
+
   const ops = getCurvePathOps(shape[0]);
   let currentP: Mutable<Point> = [0, 0];
   let index = 0;
   let minDistance = Infinity;
   let controlPoints: Mutable<Point>[] | null = null;
+
   while (index < ops.length) {
     const { op, data } = ops[index];
     if (op === "move") {
@@ -359,7 +361,6 @@ export const getBezierCurveArcLengths = (
   const points = getPointsInBezierCurve(element, endPoint);
   let index = 0;
   let distance = 0;
-
   while (index < points.length - 1) {
     const segmentDistance = distance2d(
       points[index][0],
