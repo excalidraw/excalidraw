@@ -14,7 +14,7 @@ import {
 } from "../app_constants";
 import { UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
-import { throttle } from "lodash";
+import throttle from "lodash.throttle";
 import { newElementWith } from "../../element/mutateElement";
 import { BroadcastedExcalidrawElement } from "./reconciliation";
 import { encryptData } from "../../data/encryption";
