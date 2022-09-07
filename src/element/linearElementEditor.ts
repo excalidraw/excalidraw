@@ -14,7 +14,8 @@ import {
   centerPoint,
   getControlPointsForBezierCurve,
   getBezierXY,
-  getPointsInBezierCurve,
+  getBezierCurveLength,
+  mapUToBezierT,
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import { getElementPointsCoords } from "./bounds";
@@ -438,18 +439,7 @@ export class LinearElementEditor {
         endPoint[1],
       );
     } else {
-      const points = getPointsInBezierCurve(element, endPoint);
-      let index = 0;
-      while (index < points.length - 1) {
-        const segmentDistance = distance2d(
-          points[index][0],
-          points[index][1],
-          points[index + 1][0],
-          points[index + 1][1],
-        );
-        distance += segmentDistance;
-        index++;
-      }
+      distance = getBezierCurveLength(element, endPoint);
     }
     return distance * zoom.value < LinearElementEditor.POINT_HANDLE_SIZE * 4;
   }
@@ -467,12 +457,14 @@ export class LinearElementEditor {
         element.points[endPointIndex],
       );
       if (controlPoints) {
+        const t = mapUToBezierT(element, element.points[endPointIndex], 0.5);
+
         const [tx, ty] = getBezierXY(
           controlPoints[0],
           controlPoints[1],
           controlPoints[2],
           controlPoints[3],
-          0.5,
+          t,
         );
         segmentMidPoint = LinearElementEditor.getPointGlobalCoordinates(
           element,

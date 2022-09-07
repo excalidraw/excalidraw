@@ -330,6 +330,7 @@ export const getPointsInBezierCurve = (
   )!;
   const pointsOnCurve: Mutable<Point>[] = [];
   let t = 1;
+  // Take 20 points on curve for better accuracy
   while (t > 0) {
     const point = getBezierXY(
       controlPoints[0],
@@ -339,7 +340,7 @@ export const getPointsInBezierCurve = (
       t,
     );
     pointsOnCurve.push([point[0], point[1]]);
-    t -= 0.1;
+    t -= 0.05;
   }
   if (pointsOnCurve.length) {
     if (!LinearElementEditor.isEqual(pointsOnCurve.at(-1)!, endPoint)) {
@@ -347,4 +348,75 @@ export const getPointsInBezierCurve = (
     }
   }
   return pointsOnCurve;
+};
+
+export const getBezierCurveArcLengths = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+  endPoint: Point,
+) => {
+  const arcLengths: number[] = [];
+  arcLengths[0] = 0;
+  const points = getPointsInBezierCurve(element, endPoint);
+  let index = 0;
+  let distance = 0;
+
+  while (index < points.length - 1) {
+    const segmentDistance = distance2d(
+      points[index][0],
+      points[index][1],
+      points[index + 1][0],
+      points[index + 1][1],
+    );
+    distance += segmentDistance;
+    arcLengths.push(distance);
+    index++;
+  }
+
+  return arcLengths;
+};
+
+export const getBezierCurveLength = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+  endPoint: Point,
+) => {
+  const arcLengths = getBezierCurveArcLengths(element, endPoint);
+  return arcLengths.at(-1) as number;
+};
+
+// This maps u to actual t on the curve so that when t = 0.5, its actually the point at 50% of the length
+export const mapUToBezierT = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+  endPoint: Point,
+  u: number,
+) => {
+  const arcLengths = getBezierCurveArcLengths(element, endPoint);
+  const pointsCount = arcLengths.length - 1;
+  const curveLength = arcLengths.at(-1) as number;
+  const targetLength = u * curveLength;
+  let low = 0;
+  let high = pointsCount;
+  let index = 0;
+  // Doing a binary search to find the largest length that is less than the target length
+  while (low < high) {
+    index = Math.floor(low + (high - low) / 2);
+    if (arcLengths[index] < targetLength) {
+      low = index + 1;
+    } else {
+      high = index;
+    }
+  }
+  if (arcLengths[index] > targetLength) {
+    index--;
+  }
+  if (arcLengths[index] === targetLength) {
+    return index / pointsCount;
+  }
+
+  return (
+    1 -
+    (index +
+      (targetLength - arcLengths[index]) /
+        (arcLengths[index + 1] - arcLengths[index])) /
+      pointsCount
+  );
 };
