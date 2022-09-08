@@ -2399,7 +2399,6 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
     }
-
     const element = existingTextElement
       ? existingTextElement
       : newTextElement({

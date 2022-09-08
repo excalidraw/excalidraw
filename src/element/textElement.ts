@@ -16,16 +16,20 @@ export const redrawTextBoundingBox = (
   element: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
 ) => {
-  const maxWidth = container
-    ? container.width - BOUND_TEXT_PADDING * 2
+  let containerDims;
+  if (container) {
+    containerDims = getContainerDims(container);
+  }
+  const maxWidth = containerDims
+    ? containerDims.width - BOUND_TEXT_PADDING * 2
     : undefined;
   let text = element.text;
 
-  if (container) {
+  if (containerDims) {
     text = wrapText(
       element.originalText,
       getFontString(element),
-      container.width,
+      containerDims.width,
     );
   }
   const metrics = measureText(
@@ -37,18 +41,24 @@ export const redrawTextBoundingBox = (
   let coordX = element.x;
   // Resize container and vertically center align the text
   if (container) {
-    let nextHeight = container.height;
-    coordX = container.x + BOUND_TEXT_PADDING;
+    const containerDims = getContainerDims(container);
+    const containerCoords = getBoundTextContainerCoords(container);
+    let nextHeight = containerDims.height;
+    coordX = containerCoords.x + BOUND_TEXT_PADDING;
     if (element.verticalAlign === VERTICAL_ALIGN.TOP) {
-      coordY = container.y + BOUND_TEXT_PADDING;
+      coordY = containerCoords.y + BOUND_TEXT_PADDING;
     } else if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
       coordY =
-        container.y + container.height - metrics.height - BOUND_TEXT_PADDING;
+        containerCoords.y +
+        containerDims.height -
+        metrics.height -
+        BOUND_TEXT_PADDING;
     } else {
-      coordY = container.y + container.height / 2 - metrics.height / 2;
-      if (metrics.height > container.height - BOUND_TEXT_PADDING * 2) {
+      coordY =
+        containerCoords.y + containerDims.height / 2 - metrics.height / 2;
+      if (metrics.height > containerDims.height - BOUND_TEXT_PADDING * 2) {
         nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
-        coordY = container.y + nextHeight / 2 - metrics.height / 2;
+        coordY = containerCoords.y + nextHeight / 2 - metrics.height / 2;
       }
     }
     mutateElement(container, { height: nextHeight });
@@ -121,7 +131,7 @@ export const handleBindTextResize = (
           text = wrapText(
             textElement.originalText,
             getFontString(textElement),
-            element.width,
+            getContainerDims(element).width,
           );
         }
 
@@ -473,4 +483,29 @@ export const getContainerElement = (
     return Scene.getScene(element)?.getElement(element.containerId) || null;
   }
   return null;
+};
+
+export const getContainerDims = (element: ExcalidrawElement) => {
+  if (element.type === "ellipse") {
+    return {
+      width: Math.round((element.width / 2) * Math.sqrt(2)),
+      height: Math.round((element.height / 2) * Math.sqrt(2)),
+    };
+  }
+  return { width: element.width, height: element.height };
+};
+
+export const getBoundTextContainerCoords = (container: ExcalidrawElement) => {
+  if (container.type === "ellipse") {
+    const offsetX = (container.width / 2) * (1 - Math.sqrt(2) / 2);
+    const offsetY = (container.height / 2) * (1 - Math.sqrt(2) / 2);
+    return {
+      x: container.x + offsetX,
+      y: container.y + offsetY,
+    };
+  }
+  return {
+    x: container.x,
+    y: container.y,
+  };
 };

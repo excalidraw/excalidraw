@@ -21,7 +21,12 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
-import { getContainerElement, measureText, wrapText } from "./textElement";
+import {
+  getContainerElement,
+  getContainerDims,
+  measureText,
+  wrapText,
+} from "./textElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
@@ -164,7 +169,9 @@ const getAdjustedDimensions = (
   let maxWidth = null;
   const container = getContainerElement(element);
   if (container) {
-    maxWidth = container.width - BOUND_TEXT_PADDING * 2;
+    const containerDims = getContainerDims(container);
+
+    maxWidth = containerDims.width - BOUND_TEXT_PADDING * 2;
   }
   const {
     width: nextWidth,
@@ -224,16 +231,21 @@ const getAdjustedDimensions = (
   // make sure container dimensions are set properly when
   // text editor overflows beyond viewport dimensions
   if (container) {
-    let height = container.height;
-    let width = container.width;
+    const containerDims = getContainerDims(container);
+    let { width, height } = containerDims;
     if (nextHeight > height - BOUND_TEXT_PADDING * 2) {
       height = nextHeight + BOUND_TEXT_PADDING * 2;
     }
     if (nextWidth > width - BOUND_TEXT_PADDING * 2) {
       width = nextWidth + BOUND_TEXT_PADDING * 2;
     }
-    if (height !== container.height || width !== container.width) {
-      mutateElement(container, { height, width });
+    if (height !== containerDims.height || width !== containerDims.height) {
+      const diffHeight = height - containerDims.height;
+      const diffWidth = width - containerDims.width;
+      mutateElement(container, {
+        height: container.height + diffHeight,
+        width: container.width + diffWidth,
+      });
     }
   }
   return {
@@ -259,7 +271,11 @@ export const updateTextElement = (
 ): ExcalidrawTextElement => {
   const container = getContainerElement(element);
   if (container) {
-    text = wrapText(text, getFontString(element), container.width);
+    text = wrapText(
+      text,
+      getFontString(element),
+      getContainerDims(container).width,
+    );
   }
   const dimensions = getAdjustedDimensions(element, text);
   return newElementWith(element, {

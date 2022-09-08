@@ -19,7 +19,9 @@ import {
   getApproxLineHeight,
   getBoundTextElementId,
   getContainerElement,
+  getContainerDims,
   wrapText,
+  getBoundTextContainerCoords,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -126,26 +128,28 @@ export const textWysiwyg = ({
           updatedElement,
           editable,
         );
+        const containerDims = getContainerDims(container);
         // using editor.style.height to get the accurate height of text editor
         const editorHeight = Number(editable.style.height.slice(0, -2));
         if (editorHeight > 0) {
           height = editorHeight;
         }
         if (propertiesUpdated) {
-          originalContainerHeight = container.height;
+          originalContainerHeight = containerDims.height;
 
           // update height of the editor after properties updated
           height = updatedElement.height;
         }
         if (!originalContainerHeight) {
-          originalContainerHeight = container.height;
+          originalContainerHeight = containerDims.height;
         }
-        maxWidth = container.width - BOUND_TEXT_PADDING * 2;
-        maxHeight = container.height - BOUND_TEXT_PADDING * 2;
+        maxWidth = containerDims.width - BOUND_TEXT_PADDING * 2;
+        maxHeight = containerDims.height - BOUND_TEXT_PADDING * 2;
         width = maxWidth;
+        const boundTextCoords = getBoundTextContainerCoords(container);
         // The coordinates of text box set a distance of
         // 5px to preserve padding
-        coordX = container.x + BOUND_TEXT_PADDING;
+        coordX = boundTextCoords.x + BOUND_TEXT_PADDING;
         // autogrow container height if text exceeds
         if (height > maxHeight) {
           const diff = Math.min(height - maxHeight, approxLineHeight);
@@ -154,7 +158,7 @@ export const textWysiwyg = ({
         } else if (
           // autoshrink container height until original container height
           // is reached when text is removed
-          container.height > originalContainerHeight &&
+          containerDims.height > originalContainerHeight &&
           height < maxHeight
         ) {
           const diff = Math.min(maxHeight - height, approxLineHeight);
@@ -165,11 +169,14 @@ export const textWysiwyg = ({
         else {
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
-            coordY = container.y + container.height / 2 - height / 2;
+            coordY = boundTextCoords.y + containerDims.height / 2 - height / 2;
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
             coordY =
-              container.y + container.height - height - BOUND_TEXT_PADDING;
+              boundTextCoords.y +
+              containerDims.height -
+              height -
+              BOUND_TEXT_PADDING;
           }
         }
       }
@@ -303,7 +310,7 @@ export const textWysiwyg = ({
           const actualLineCount = wrapText(
             editable.value,
             font,
-            container!.width,
+            getContainerDims(container!).width,
           ).split("\n").length;
           // This is browser behaviour when setting height to "auto"
           // It sets the height needed for 2 lines even if actual
