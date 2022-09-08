@@ -15,7 +15,7 @@ import {
   getControlPointsForBezierCurve,
   getBezierXY,
   getBezierCurveLength,
-  mapUToBezierT,
+  mapIntervalToBezierT,
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import { getElementPointsCoords } from "./bounds";
@@ -455,7 +455,11 @@ export class LinearElementEditor {
         element.points[endPointIndex],
       );
       if (controlPoints) {
-        const t = mapUToBezierT(element, element.points[endPointIndex], 0.5);
+        const t = mapIntervalToBezierT(
+          element,
+          element.points[endPointIndex],
+          0.5,
+        );
 
         const [tx, ty] = getBezierXY(
           controlPoints[0],

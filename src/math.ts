@@ -330,6 +330,9 @@ export const getPointsInBezierCurve = (
     element,
     endPoint,
   )!;
+  if (!controlPoints) {
+    return [];
+  }
   const pointsOnCurve: Mutable<Point>[] = [];
   let t = 1;
   // Take 20 points on curve for better accuracy
@@ -384,16 +387,16 @@ export const getBezierCurveLength = (
   return arcLengths.at(-1) as number;
 };
 
-// This maps u to actual t on the curve so that when t = 0.5, its actually the point at 50% of the length
-export const mapUToBezierT = (
+// This maps interval to actual interval t on the curve so that when t = 0.5, its actually the point at 50% of the length
+export const mapIntervalToBezierT = (
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: Point,
-  u: number,
+  interval: number, // The interval between 0 to 1 for which you want to find the point on the curve,
 ) => {
   const arcLengths = getBezierCurveArcLengths(element, endPoint);
   const pointsCount = arcLengths.length - 1;
   const curveLength = arcLengths.at(-1) as number;
-  const targetLength = u * curveLength;
+  const targetLength = interval * curveLength;
   let low = 0;
   let high = pointsCount;
   let index = 0;
