@@ -253,7 +253,7 @@ const shiftElementsToEnd = (
 ) => {
   const indicesToMove = getIndicesToMove(elements, appState);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
-  const displacedElements: ExcalidrawElement[] = [];
+  let displacedElements: ExcalidrawElement[] = [];
 
   let leadingIndex: number;
   let trailingIndex: number;
@@ -298,6 +298,7 @@ const shiftElementsToEnd = (
   const targetElements = Object.values(targetElementsMap).map((element) => {
     return bumpVersion(element);
   });
+  displacedElements = displacedElements.map((element) => bumpVersion(element));
 
   const leadingElements = elements.slice(0, leadingIndex);
   const trailingElements = elements.slice(trailingIndex + 1);
