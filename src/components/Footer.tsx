@@ -96,7 +96,7 @@ const Footer = ({
         {actionManager.renderAction("toggleShortcuts")}
       </div>
       <ExitZenModeAction
-        executeAction={actionManager.executeAction}
+        actionManager={actionManager}
         showExitZenModeBtn={showExitZenModeBtn}
       />
     </footer>
