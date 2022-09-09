@@ -24,6 +24,10 @@ Please add the latest change on the top under the correct section.
 
 - `setToastMessage` API is now renamed to `setToast` API and the function signature is also updated [#5427](https://github.com/excalidraw/excalidraw/pull/5427). You can also pass `duration` and `closable` attributes along with `message`.
 
+#### Fixes
+
+- Fix zIndex operations like `bring to front` breaking when saving in a collaboration room [#5681](https://github.com/excalidraw/excalidraw/pull/5681).
+
 ## 0.12.0 (2022-07-07)
 
 ### Excalidraw API
