@@ -26,21 +26,21 @@ Please add the latest change on the top under the correct section.
 
 ## 0.12.0 (2022-07-07)
 
-Check out the [Release notes](Checkout the [release notes](https://github.com/excalidraw/excalidraw/releases/tag/v0.12.0) )
+Check out the [release notes](https://github.com/excalidraw/excalidraw/releases/tag/v0.12.0) )
 
 **_This section lists the updates made to the excalidraw library and will not affect the integration._**
 
 ## 0.11.0 (2022-02-17)
 
-Check out the [Release notes](Checkout the [release notes](https://github.com/excalidraw/excalidraw/releases/tag/v0.11.0)
+Check out the [release notes](https://github.com/excalidraw/excalidraw/releases/tag/v0.11.0)
 
 ## 0.10.0 (2021-10-13)
 
-Check out the [Release notes](Checkout the [release notes](https://github.com/excalidraw/excalidraw/releases/tag/v0.10.0)
+Check out the [release notes](https://github.com/excalidraw/excalidraw/releases/tag/v0.10.0)
 
 ## 0.9.0 (2021-07-10)
 
-Check out the [Release notes](Checkout the [release notes](https://github.com/excalidraw/excalidraw/releases/tag/v0.9.0)
+Check out the [release notes](https://github.com/excalidraw/excalidraw/releases/tag/v0.9.0)
 
 ## 0.8.0 (2021-05-15)
 
