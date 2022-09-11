@@ -356,7 +356,7 @@ export const getFileHandle = async (
 };
 
 /**
- * attemps to detect if a buffer is a valid image by checking its leading bytes
+ * attempts to detect if a buffer is a valid image by checking its leading bytes
  */
 const getActualMimeTypeFromImage = (buffer: ArrayBuffer) => {
   let mimeType: ValueOf<Pick<typeof MIME_TYPES, "png" | "jpg" | "gif">> | null =
@@ -396,7 +396,7 @@ export const createFile = (
   });
 };
 
-/** attemps to detect correct mimeType if none is set, or if an image
+/** attempts to detect correct mimeType if none is set, or if an image
  * has an incorrect extension.
  * Note: doesn't handle missing .excalidraw/.excalidrawlib extension  */
 export const normalizeFile = async (file: File) => {
