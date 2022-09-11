@@ -356,7 +356,7 @@ export const getFileHandle = async (
 };
 
 /**
- * attempt to detect if a buffer is a valid image by checking its leading bytes
+ * attempts to detect if a buffer is a valid image by checking its leading bytes
  */
 const getActualMimeTypeFromImage = (buffer: ArrayBuffer) => {
   let mimeType: ValueOf<Pick<typeof MIME_TYPES, "png" | "jpg" | "gif">> | null =
