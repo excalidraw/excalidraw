@@ -396,7 +396,7 @@ export const createFile = (
   });
 };
 
-/** attempt to detect correct mimeType if none is set, or if an image
+/** attempts to detect correct mimeType if none is set, or if an image
  * has an incorrect extension.
  * Note: doesn't handle missing .excalidraw/.excalidrawlib extension  */
 export const normalizeFile = async (file: File) => {
