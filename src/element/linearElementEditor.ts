@@ -417,6 +417,9 @@ export class LinearElementEditor {
     editorMidPointsCache = midpoints;
   };
 
+  static clearEditorMidPointsCache = () => {
+    editorMidPointsCache = [];
+  };
   static getSegmentMidpointHitCoords = (
     linearElementEditor: LinearElementEditor,
     scenePointer: { x: number; y: number },
