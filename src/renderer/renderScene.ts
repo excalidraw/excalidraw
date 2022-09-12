@@ -214,29 +214,16 @@ const renderLinearPointHandles = (
       radius,
       isSelected,
     );
+  });
 
-    // Rendering segment mid points
-    if (!points[idx + 1]) {
-      return;
-    }
-    if (
-      LinearElementEditor.isSegmentTooShort(
-        element,
-        element.points[idx],
-        element.points[idx + 1],
-        appState.zoom,
-      )
-    ) {
-      return;
-    }
+  //Rendering segment mid points
+  const midPoints = LinearElementEditor.getEditorMidPoints(element, appState);
 
-    const segmentMidPoint = LinearElementEditor.getSegmentMidPoint(
-      element,
-      points[idx],
-      points[idx + 1],
-      idx + 1,
-    );
+  if (!midPoints || !midPoints?.length) {
+    return;
+  }
 
+  midPoints.forEach((segmentMidPoint) => {
     if (
       appState?.selectedLinearElement?.segmentMidPointHoveredCoords &&
       LinearElementEditor.isEqual(

@@ -1907,6 +1907,7 @@ class App extends React.Component<AppProps, AppState> {
                 editingLinearElement: new LinearElementEditor(
                   selectedElements[0],
                   this.scene,
+                  this.state,
                 ),
               });
             }
@@ -2485,6 +2486,7 @@ class App extends React.Component<AppProps, AppState> {
           editingLinearElement: new LinearElementEditor(
             selectedElements[0],
             this.scene,
+            this.state,
           ),
         });
       }
@@ -2718,15 +2720,19 @@ class App extends React.Component<AppProps, AppState> {
         event,
         scenePointerX,
         scenePointerY,
-        this.state.editingLinearElement,
-        this.state.gridSize,
+        this.state,
       );
+      if (!editingLinearElement) {
+        return;
+      }
       if (editingLinearElement !== this.state.editingLinearElement) {
         // Since we are reading from previous state which is not possible with
         // automatic batching in React 18 hence using flush sync to synchronously
         // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
         flushSync(() => {
-          this.setState({ editingLinearElement });
+          this.setState({
+            editingLinearElement,
+          });
         });
       }
       if (editingLinearElement.lastUncommittedPoint != null) {
@@ -4483,6 +4489,7 @@ class App extends React.Component<AppProps, AppState> {
                     ? new LinearElementEditor(
                         elementsWithinSelection[0],
                         this.scene,
+                        this.state,
                       )
                     : null,
               },
@@ -4747,6 +4754,7 @@ class App extends React.Component<AppProps, AppState> {
               selectedLinearElement: new LinearElementEditor(
                 draggingElement,
                 this.scene,
+                this.state,
               ),
             }));
           } else {
@@ -4814,6 +4822,7 @@ class App extends React.Component<AppProps, AppState> {
             selectedLinearElement: new LinearElementEditor(
               hitElement,
               this.scene,
+              this.state,
             ),
           });
         }
@@ -4916,6 +4925,7 @@ class App extends React.Component<AppProps, AppState> {
                         ? new LinearElementEditor(
                             newSelectedElements[0],
                             this.scene,
+                            this.state,
                           )
                         : prevState.selectedLinearElement,
                   },
@@ -4944,7 +4954,11 @@ class App extends React.Component<AppProps, AppState> {
                   // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
                   // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
                   prevState.selectedLinearElement?.elementId !== hitElement.id
-                    ? new LinearElementEditor(hitElement, this.scene)
+                    ? new LinearElementEditor(
+                        hitElement,
+                        this.scene,
+                        this.state,
+                      )
                     : prevState.selectedLinearElement,
               },
               this.scene.getNonDeletedElements(),
@@ -5704,7 +5718,7 @@ class App extends React.Component<AppProps, AppState> {
             ...this.state,
             selectedElementIds: { [element.id]: true },
             selectedLinearElement: isLinearElement(element)
-              ? new LinearElementEditor(element, this.scene)
+              ? new LinearElementEditor(element, this.scene, this.state)
               : null,
           },
           this.scene.getNonDeletedElements(),
