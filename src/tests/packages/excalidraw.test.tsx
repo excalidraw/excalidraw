@@ -88,20 +88,53 @@ describe("<Excalidraw/>", () => {
   });
 
   describe("Test theme prop", () => {
-    it('should show the dark mode toggle when the theme prop is "undefined"', async () => {
+    it("should show the dark mode toggle by default", async () => {
       const { container } = await render(<Excalidraw />);
       expect(h.state.theme).toBe(THEME.LIGHT);
-
       const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
-
       expect(darkModeToggle).toBeTruthy();
     });
 
-    it('should not show the dark mode toggle when the theme prop is not "undefined"', async () => {
-      const { container } = await render(<Excalidraw theme="dark" />);
-      expect(h.state.theme).toBe(THEME.DARK);
+    it("should always show dark mode toggle when `UIOptions.canvasActions.theme` is true", async () => {
+      const { container } = await render(
+        <Excalidraw UIOptions={{ canvasActions: { theme: true } }} />,
+      );
+      expect(h.state.theme).toBe(THEME.LIGHT);
+      const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
+      expect(darkModeToggle).toBeTruthy();
+    });
 
-      expect(queryByTestId(container, "toggle-dark-mode")).toBe(null);
+    describe("should never show dark mode toggle when `UIOptions.canvasActions.theme` is false", () => {
+      it("should not show when theme is not defined", async () => {
+        const { container } = await render(
+          <Excalidraw UIOptions={{ canvasActions: { theme: false } }} />,
+        );
+        expect(h.state.theme).toBe(THEME.LIGHT);
+        const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
+        expect(darkModeToggle).toBeFalsy();
+      });
+
+      it("should not show when theme is defined", async () => {
+        const { container } = await render(
+          <Excalidraw
+            UIOptions={{ canvasActions: { theme: false } }}
+            theme={THEME.DARK}
+          />,
+        );
+        expect(h.state.theme).toBe(THEME.DARK);
+        const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
+        expect(darkModeToggle).toBeFalsy();
+      });
+    });
+
+    it("should render dark theme when specified by `theme` prop", async () => {
+      await render(
+        <Excalidraw
+          theme={THEME.DARK}
+          UIOptions={{ canvasActions: { theme: false } }}
+        />,
+      );
+      expect(h.state.theme).toBe(THEME.DARK);
     });
   });
 
