@@ -34,8 +34,8 @@ import { isBindingElement } from "./typeChecks";
 import { shouldRotateWithDiscreteAngle } from "../keys";
 
 // To track whether editor is updated
-let isUpdated = false;
-let editorMidPointsCache: Point[] = [];
+let previousElementVersion: number | null = null;
+let editorMidPointsCache: Point[] | null = [];
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
     _brand: "excalidrawLinearElementId";
@@ -342,7 +342,6 @@ export class LinearElementEditor {
         }
       }
     }
-    isUpdated = false;
 
     return {
       ...editingLinearElement,
@@ -374,13 +373,14 @@ export class LinearElementEditor {
   static getEditorMidPoints = (
     element: NonDeleted<ExcalidrawLinearElement>,
     appState: AppState,
-  ) => {
-    if (editorMidPointsCache.length && !isUpdated) {
+  ): Point[] => {
+    if (previousElementVersion === element.version && editorMidPointsCache) {
       return editorMidPointsCache;
     }
+    previousElementVersion = element.version;
 
     LinearElementEditor.updateEditorMidPointsCache(element, appState);
-    return editorMidPointsCache;
+    return editorMidPointsCache!;
   };
   static updateEditorMidPointsCache = (
     element: NonDeleted<ExcalidrawLinearElement>,
@@ -418,7 +418,7 @@ export class LinearElementEditor {
   };
 
   static clearEditorMidPointsCache = () => {
-    editorMidPointsCache = [];
+    editorMidPointsCache = null;
   };
   static getSegmentMidpointHitCoords = (
     linearElementEditor: LinearElementEditor,
@@ -461,7 +461,7 @@ export class LinearElementEditor {
       }
     }
     let index = 0;
-    const midPoints = editorMidPointsCache;
+    const midPoints = LinearElementEditor.getEditorMidPoints(element, appState);
     while (index < midPoints.length) {
       const distance = distance2d(
         midPoints[index][0],
@@ -535,9 +535,16 @@ export class LinearElementEditor {
 
   static getSegmentMidPointIndex(
     linearElementEditor: LinearElementEditor,
+    appState: AppState,
     midPoint: Point,
   ) {
-    const midPoints = editorMidPointsCache;
+    const element = LinearElementEditor.getElement(
+      linearElementEditor.elementId,
+    );
+    if (!element) {
+      return -1;
+    }
+    const midPoints = LinearElementEditor.getEditorMidPoints(element, appState);
     let index = 0;
     while (index < midPoints.length - 1) {
       if (this.isEqual(midPoint, midPoints[index])) {
@@ -560,7 +567,6 @@ export class LinearElementEditor {
     linearElementEditor: LinearElementEditor | null;
     isMidPoint: boolean;
   } {
-    isUpdated = true;
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
@@ -586,6 +592,7 @@ export class LinearElementEditor {
     if (segmentMidPoint) {
       const index = LinearElementEditor.getSegmentMidPointIndex(
         linearElementEditor,
+        appState,
         segmentMidPoint,
       );
       const newMidPoint = LinearElementEditor.createPointAt(
