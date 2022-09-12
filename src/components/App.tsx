@@ -553,8 +553,8 @@ class App extends React.Component<AppProps, AppState> {
                     this.state.zenModeEnabled
                   }
                   showThemeBtn={
-                    typeof this.props?.theme === "undefined" &&
-                    this.props.UIOptions.canvasActions.theme
+                    this.props.UIOptions.canvasActions.theme ??
+                    !(typeof this.props?.theme === "undefined")
                   }
                   libraryReturnUrl={this.props.libraryReturnUrl}
                   UIOptions={this.props.UIOptions}
@@ -659,7 +659,10 @@ class App extends React.Component<AppProps, AppState> {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
         }
 
-        if (typeof this.props.theme !== "undefined") {
+        if (
+          typeof this.props.theme !== "undefined" &&
+          !this.props.UIOptions.canvasActions.theme
+        ) {
           theme = this.props.theme;
         }
 
@@ -755,8 +758,8 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    if (this.props.defaultTheme) {
-      this.setState({ theme: this.props.defaultTheme });
+    if (this.props.theme) {
+      this.setState({ theme: this.props.theme });
     }
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });

@@ -313,7 +313,6 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
-  defaultTheme?: Theme;
 }
 
 export type SceneData = {

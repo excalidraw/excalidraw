@@ -38,7 +38,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onLinkOpen,
     onPointerDown,
     onScrollChange,
-    defaultTheme,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -76,7 +75,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   }, []);
 
   return (
-    <InitializeApp langCode={langCode} theme={theme || defaultTheme}>
+    <InitializeApp langCode={langCode} theme={theme}>
       <Provider unstable_createStore={() => jotaiStore} scope={jotaiScope}>
         <App
           onChange={onChange}
@@ -105,7 +104,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
-          defaultTheme={defaultTheme}
         />
       </Provider>
     </InitializeApp>
