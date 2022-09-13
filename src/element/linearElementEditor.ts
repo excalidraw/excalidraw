@@ -387,9 +387,6 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     appState: AppState,
   ) => {
-    // the midpoints are set to empty array when points are being dragged
-    // due to shapeCache being empty hence unable to compute the points
-    // on the curve so recalculating midpoints when empty array
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
 
     let index = 0;

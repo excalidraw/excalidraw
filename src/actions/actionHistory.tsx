@@ -26,6 +26,7 @@ const writeData = (
     if (data === null) {
       return { commitToHistory };
     }
+
     const prevElementMap = arrayToMap(prevElements);
     const nextElements = data.elements;
     const nextElementMap = arrayToMap(nextElements);
