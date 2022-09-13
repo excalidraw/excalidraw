@@ -222,7 +222,7 @@ const renderLinearPointHandles = (
     appState,
   ).filter((midPoint) => midPoint !== null) as Point[];
 
-  if (!midPoints || !midPoints?.length) {
+  if (appState.editingLinearElement && !midPoints.length) {
     return;
   }
 
