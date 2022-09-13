@@ -34,9 +34,12 @@ import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
 import { shouldRotateWithDiscreteAngle } from "../keys";
 
-// To track whether editor is updated
-let previousElementVersion: number | null = null;
-let editorMidPointsCache: (Point | null)[] = [];
+const editorMidPointsCache: {
+  version: number | null;
+  points: (Point | null)[];
+  zoom: number | null;
+} = { version: null, points: [], zoom: null };
+
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
     _brand: "excalidrawLinearElementId";
@@ -373,18 +376,19 @@ export class LinearElementEditor {
   static getEditorMidPoints = (
     element: NonDeleted<ExcalidrawLinearElement>,
     appState: AppState,
-  ): typeof editorMidPointsCache => {
+  ): typeof editorMidPointsCache["points"] => {
     // Since its not needed outside editor unless 2 pointer lines
     if (!appState.editingLinearElement && element.points.length > 2) {
       return [];
     }
-    if (previousElementVersion === element.version && editorMidPointsCache) {
-      return editorMidPointsCache;
+    if (
+      editorMidPointsCache.version === element.version &&
+      editorMidPointsCache.zoom === appState.zoom.value
+    ) {
+      return editorMidPointsCache.points;
     }
-    previousElementVersion = element.version;
-
     LinearElementEditor.updateEditorMidPointsCache(element, appState);
-    return editorMidPointsCache!;
+    return editorMidPointsCache.points!;
   };
 
   static updateEditorMidPointsCache = (
@@ -417,7 +421,9 @@ export class LinearElementEditor {
       midpoints.push(segmentMidPoint);
       index++;
     }
-    editorMidPointsCache = midpoints;
+    editorMidPointsCache.points = midpoints;
+    editorMidPointsCache.version = element.version;
+    editorMidPointsCache.zoom = appState.zoom.value;
   };
 
   static getSegmentMidpointHitCoords = (
@@ -461,7 +467,7 @@ export class LinearElementEditor {
       }
     }
     let index = 0;
-    const midPoints: typeof editorMidPointsCache =
+    const midPoints: typeof editorMidPointsCache["points"] =
       LinearElementEditor.getEditorMidPoints(element, appState);
     while (index < midPoints.length) {
       if (midPoints[index] !== null) {
