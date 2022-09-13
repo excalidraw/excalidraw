@@ -217,7 +217,10 @@ const renderLinearPointHandles = (
   });
 
   //Rendering segment mid points
-  const midPoints = LinearElementEditor.getEditorMidPoints(element, appState);
+  const midPoints = LinearElementEditor.getEditorMidPoints(
+    element,
+    appState,
+  ).filter((midPoint) => midPoint !== null) as Point[];
 
   if (!midPoints || !midPoints?.length) {
     return;

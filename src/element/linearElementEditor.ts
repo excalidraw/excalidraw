@@ -35,7 +35,7 @@ import { shouldRotateWithDiscreteAngle } from "../keys";
 
 // To track whether editor is updated
 let previousElementVersion: number | null = null;
-let editorMidPointsCache: Point[] | null = [];
+let editorMidPointsCache: (Point | null)[] = [];
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
     _brand: "excalidrawLinearElementId";
@@ -373,7 +373,7 @@ export class LinearElementEditor {
   static getEditorMidPoints = (
     element: NonDeleted<ExcalidrawLinearElement>,
     appState: AppState,
-  ): Point[] => {
+  ): typeof editorMidPointsCache => {
     if (previousElementVersion === element.version && editorMidPointsCache) {
       return editorMidPointsCache;
     }
@@ -382,6 +382,7 @@ export class LinearElementEditor {
     LinearElementEditor.updateEditorMidPointsCache(element, appState);
     return editorMidPointsCache!;
   };
+
   static updateEditorMidPointsCache = (
     element: NonDeleted<ExcalidrawLinearElement>,
     appState: AppState,
@@ -392,7 +393,7 @@ export class LinearElementEditor {
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
 
     let index = 0;
-    const midpoints: Point[] = [];
+    const midpoints: (Point | null)[] = [];
     while (index < points.length - 1) {
       if (
         LinearElementEditor.isSegmentTooShort(
@@ -402,6 +403,7 @@ export class LinearElementEditor {
           appState.zoom,
         )
       ) {
+        midpoints.push(null);
         index++;
         continue;
       }
@@ -417,9 +419,6 @@ export class LinearElementEditor {
     editorMidPointsCache = midpoints;
   };
 
-  static clearEditorMidPointsCache = () => {
-    editorMidPointsCache = null;
-  };
   static getSegmentMidpointHitCoords = (
     linearElementEditor: LinearElementEditor,
     scenePointer: { x: number; y: number },
@@ -461,16 +460,19 @@ export class LinearElementEditor {
       }
     }
     let index = 0;
-    const midPoints = LinearElementEditor.getEditorMidPoints(element, appState);
+    const midPoints: typeof editorMidPointsCache =
+      LinearElementEditor.getEditorMidPoints(element, appState);
     while (index < midPoints.length) {
-      const distance = distance2d(
-        midPoints[index][0],
-        midPoints[index][1],
-        scenePointer.x,
-        scenePointer.y,
-      );
-      if (distance <= threshold) {
-        return midPoints[index];
+      if (midPoints[index] !== null) {
+        const distance = distance2d(
+          midPoints[index]![0],
+          midPoints[index]![1],
+          scenePointer.x,
+          scenePointer.y,
+        );
+        if (distance <= threshold) {
+          return midPoints[index];
+        }
       }
 
       index++;

@@ -9,7 +9,6 @@ import { isWindows, KEYS } from "../keys";
 import { newElementWith } from "../element/mutateElement";
 import { fixBindingsAfterDeletion } from "../element/binding";
 import { arrayToMap } from "../utils";
-import { LinearElementEditor } from "../element/linearElementEditor";
 
 const writeData = (
   prevElements: readonly ExcalidrawElement[],
@@ -27,7 +26,6 @@ const writeData = (
     if (data === null) {
       return { commitToHistory };
     }
-    LinearElementEditor.clearEditorMidPointsCache();
     const prevElementMap = arrayToMap(prevElements);
     const nextElements = data.elements;
     const nextElementMap = arrayToMap(nextElements);
