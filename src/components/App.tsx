@@ -2722,10 +2722,11 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this.state,
       );
-      if (!editingLinearElement) {
-        return;
-      }
-      if (editingLinearElement !== this.state.editingLinearElement) {
+
+      if (
+        editingLinearElement &&
+        editingLinearElement !== this.state.editingLinearElement
+      ) {
         // Since we are reading from previous state which is not possible with
         // automatic batching in React 18 hence using flush sync to synchronously
         // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
@@ -2735,7 +2736,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
       }
-      if (editingLinearElement.lastUncommittedPoint != null) {
+      if (editingLinearElement?.lastUncommittedPoint != null) {
         this.maybeSuggestBindingAtCursor(scenePointer);
       } else {
         this.setState({ suggestedBindings: [] });
