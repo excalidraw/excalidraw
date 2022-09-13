@@ -264,17 +264,26 @@ export const getGridPoint = (
   return [x, y];
 };
 
-const SCALE_STEP_SIZE = 0.00008;
-const SCALE_MAX = 0.0008;
+const SCALE_STEP_SIZE = 0.0005;
+const CUTOFF_SIZE = 500;
 
 // This is to provide a better default radius size for squares and diamonds.
 export const getDefaultCornerRadius = (x: number) => {
-  // f(x) = 1 - (1 - e^(-x)) is a monotonically decreasing function
+  // g(x) = 1 - (1 - e^(-x)) is a monotonically decreasing function
   // in the range of [0,1].
+  const f = (x: number, scale: number) => {
+    return (1 - (1 - Math.exp(-x * scale))) * x * 0.25;
+  };
+
   // We further define a scale, that increases as x increases.
   // Together, they provide smaller default radius size as x gets larger.
+  const s = (x: number) => {
+    return (Math.log2(x + 1) + 1) * SCALE_STEP_SIZE;
+  };
 
-  let scale = (Math.log2(x + 1) + 1) * SCALE_STEP_SIZE;
-  scale = scale > SCALE_MAX ? SCALE_MAX : scale;
-  return (1 - (1 - Math.exp(-x * scale))) * x * 0.25;
+  if (x >= CUTOFF_SIZE) {
+    return f(CUTOFF_SIZE, s(CUTOFF_SIZE));
+  }
+
+  return f(x, s(x));
 };
