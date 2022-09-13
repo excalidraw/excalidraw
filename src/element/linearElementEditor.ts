@@ -730,9 +730,7 @@ export class LinearElementEditor {
     if (!point1 || !point2) {
       return false;
     }
-    return (
-      Math.round(distance2d(point1[0], point1[1], point2[0], point2[1])) === 0
-    );
+    return point1[0] === point2[0] && point1[1] === point2[1];
   }
   static handlePointerMove(
     event: React.PointerEvent<HTMLCanvasElement>,
