@@ -264,15 +264,17 @@ export const getGridPoint = (
   return [x, y];
 };
 
-/**
- * @param x
- * @param scale used to "speed up" or "slow down" mono decrease amount
- * @returns monotonically decreasingly scaled version of x
- */
-export const getMonoDecreasedValue = (x: number, scale = 0.0035) => {
-  // Take f(x) = e^(-x), a monotonically decreasing function.
-  // For x >= 0, f(x) is in the range of [0.5, 1], which provides a
-  // gradual scale down as x increases.
-  // As f(x) is really meant for x >= 0, for x < 0, we return it as is
-  return x < 0 ? x : (1 - (1 - Math.exp(-x * scale)) / 2) * x;
+const SCALE_STEP_SIZE = 0.00008;
+const SCALE_MAX = 0.0008;
+
+// This is to provide a better default radius size for squares and diamonds.
+export const getDefaultCornerRadius = (x: number) => {
+  // f(x) = 1 - (1 - e^(-x)) is a monotonically decreasing function
+  // in the range of [0,1].
+  // We further define a scale, that increases as x increases.
+  // Together, they provide smaller default radius size as x gets larger.
+
+  let scale = (Math.log2(x + 1) + 1) * SCALE_STEP_SIZE;
+  scale = scale > SCALE_MAX ? SCALE_MAX : scale;
+  return (1 - (1 - Math.exp(-x * scale))) * x * 0.25;
 };

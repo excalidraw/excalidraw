@@ -25,7 +25,7 @@ import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
-import { getMonoDecreasedValue, isPathALoop } from "../math";
+import { getDefaultCornerRadius, isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
@@ -417,7 +417,7 @@ const generateElementShape = (
         if (element.strokeSharpness === "round") {
           const w = element.width;
           const h = element.height;
-          const r = getMonoDecreasedValue(Math.min(w, h)) * 0.25;
+          const r = getDefaultCornerRadius(Math.min(w, h));
           shape = generator.path(
             `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
               h - r
@@ -443,32 +443,32 @@ const generateElementShape = (
           getDiamondPoints(element);
         if (element.strokeSharpness === "round") {
           shape = generator.path(
-            `M ${topX + getMonoDecreasedValue(rightX - topX) * 0.25} ${
-              topY + getMonoDecreasedValue(rightY - topY) * 0.25
-            } L ${rightX - getMonoDecreasedValue(rightX - topX) * 0.25} ${
-              rightY - getMonoDecreasedValue(rightY - topY) * 0.25
+            `M ${topX + getDefaultCornerRadius(rightX - topX)} ${
+              topY + getDefaultCornerRadius(rightY - topY)
+            } L ${rightX - getDefaultCornerRadius(rightX - topX)} ${
+              rightY - getDefaultCornerRadius(rightY - topY)
             }
             C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
-              rightX - getMonoDecreasedValue(rightX - bottomX) * 0.25
-            } ${rightY + getMonoDecreasedValue(bottomY - rightY) * 0.25}
-            L ${bottomX + getMonoDecreasedValue(rightX - bottomX) * 0.25} ${
-              bottomY - getMonoDecreasedValue(bottomY - rightY) * 0.25
+              rightX - getDefaultCornerRadius(rightX - bottomX)
+            } ${rightY + getDefaultCornerRadius(bottomY - rightY)}
+            L ${bottomX + getDefaultCornerRadius(rightX - bottomX)} ${
+              bottomY - getDefaultCornerRadius(bottomY - rightY)
             }
             C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
-              bottomX - getMonoDecreasedValue(bottomX - leftX) * 0.25
-            } ${bottomY - getMonoDecreasedValue(bottomY - leftY) * 0.25}
-            L ${leftX + getMonoDecreasedValue(bottomX - leftX) * 0.25} ${
-              leftY + getMonoDecreasedValue(bottomY - leftY) * 0.25
+              bottomX - getDefaultCornerRadius(bottomX - leftX)
+            } ${bottomY - getDefaultCornerRadius(bottomY - leftY)}
+            L ${leftX + getDefaultCornerRadius(bottomX - leftX)} ${
+              leftY + getDefaultCornerRadius(bottomY - leftY)
             }
             C ${leftX} ${leftY}, ${leftX} ${leftY}, ${
-              leftX + getMonoDecreasedValue(topX - leftX) * 0.25
-            } ${leftY - getMonoDecreasedValue(leftY - topY) * 0.25}
-            L ${topX - getMonoDecreasedValue(topX - leftX) * 0.25} ${
-              topY + getMonoDecreasedValue(leftY - topY) * 0.25
+              leftX + getDefaultCornerRadius(topX - leftX)
+            } ${leftY - getDefaultCornerRadius(leftY - topY)}
+            L ${topX - getDefaultCornerRadius(topX - leftX)} ${
+              topY + getDefaultCornerRadius(leftY - topY)
             }
             C ${topX} ${topY}, ${topX} ${topY}, ${
-              topX + getMonoDecreasedValue(rightX - topX) * 0.25
-            } ${topY + getMonoDecreasedValue(rightY - topY) * 0.25}`,
+              topX + getDefaultCornerRadius(rightX - topX)
+            } ${topY + getDefaultCornerRadius(rightY - topY)}`,
             generateRoughOptions(element, true),
           );
         } else {
