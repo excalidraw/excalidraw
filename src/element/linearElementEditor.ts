@@ -547,7 +547,7 @@ export class LinearElementEditor {
     const midPoints = LinearElementEditor.getEditorMidPoints(element, appState);
     let index = 0;
     while (index < midPoints.length - 1) {
-      if (LinearElementEditor.isEqual(midPoint, midPoints[index])) {
+      if (LinearElementEditor.arePointsEqual(midPoint, midPoints[index])) {
         return index + 1;
       }
       index++;
@@ -724,7 +724,7 @@ export class LinearElementEditor {
     return ret;
   }
 
-  static isEqual(point1: Point | null, point2: Point | null) {
+  static arePointsEqual(point1: Point | null, point2: Point | null) {
     if (!point1 && !point2) {
       return true;
     }

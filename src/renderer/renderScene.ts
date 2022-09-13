@@ -229,7 +229,7 @@ const renderLinearPointHandles = (
   midPoints.forEach((segmentMidPoint) => {
     if (
       appState?.selectedLinearElement?.segmentMidPointHoveredCoords &&
-      LinearElementEditor.isEqual(
+      LinearElementEditor.arePointsEqual(
         segmentMidPoint,
         appState.selectedLinearElement.segmentMidPointHoveredCoords,
       )

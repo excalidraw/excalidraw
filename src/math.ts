@@ -347,7 +347,7 @@ export const getPointsInBezierCurve = (
     t -= 0.05;
   }
   if (pointsOnCurve.length) {
-    if (arePointsEqual(pointsOnCurve[1], endPoint)) {
+    if (arePointsEqual(pointsOnCurve.at(-1)!, endPoint)) {
       pointsOnCurve.push([endPoint[0], endPoint[1]]);
     }
   }
