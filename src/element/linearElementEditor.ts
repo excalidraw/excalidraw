@@ -85,7 +85,6 @@ export class LinearElementEditor {
     };
     this.hoverPointIndex = -1;
     this.segmentMidPointHoveredCoords = null;
-    LinearElementEditor.updateEditorMidPointsCache(element, appState);
   }
 
   // ---------------------------------------------------------------------------
@@ -799,7 +798,6 @@ export class LinearElementEditor {
     } else {
       LinearElementEditor.addPoints(element, appState, [{ point: newPoint }]);
     }
-    LinearElementEditor.updateEditorMidPointsCache(element, appState);
     return {
       ...appState.editingLinearElement,
       lastUncommittedPoint: element.points[element.points.length - 1],
@@ -1043,7 +1041,6 @@ export class LinearElementEditor {
     }, []);
 
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
-    LinearElementEditor.updateEditorMidPointsCache(element, appState);
   }
 
   static addPoints(
