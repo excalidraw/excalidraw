@@ -374,6 +374,10 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     appState: AppState,
   ): typeof editorMidPointsCache => {
+    // Since its not needed outside editor unless 2 pointer lines
+    if (!appState.editingLinearElement && element.points.length > 2) {
+      return [];
+    }
     if (previousElementVersion === element.version && editorMidPointsCache) {
       return editorMidPointsCache;
     }
