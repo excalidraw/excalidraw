@@ -637,7 +637,7 @@ If supplied, this URL will be used when user tries to install a library from [li
 
 #### `theme`
 
-This prop controls Excalidraw's theme. When supplied, the value takes precedence over `intialData.appState.theme`, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app. You can use [`THEME`](#THEME-1) to specify the theme.
+This prop controls Excalidraw's theme. When supplied, the value takes precedence over `intialData.appState.theme`, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app unless specified by `UIOptions.canvasActions.theme` in which case, this prop will control Excalidraw's default theme with ability to allow theme switching handed over to `UIOptions.canvasActions.theme`.You can use [`THEME`](#THEME-1) to specify the theme.
 
 #### `name`
 
@@ -660,7 +660,7 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | `export` | false &#124; [exportOpts](#exportOpts) | <pre>{ saveFileToDisk: true }</pre> | This prop allows to customize the UI inside the export dialog. By default it shows the "saveFileToDisk". If this prop is `false` the export button will not be rendered. For more details visit [`exportOpts`](#exportOpts). |
 | `loadScene` | boolean | true | Implies whether to show `Load button` |
 | `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
-| `theme` | boolean | true | Implies whether to show `Theme toggle` |
+| `theme` | boolean &#124; null | null | Implies whether to show `Theme toggle`. When defined as `boolean`, takes precedence over `props.theme` to show `Theme toggle` |
 | `saveAsImage` | boolean | true | Implies whether to show `Save as image button` |
 
 ##### `dockedSidebarBreakpoint`
