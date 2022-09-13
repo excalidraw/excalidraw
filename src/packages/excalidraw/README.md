@@ -637,7 +637,9 @@ If supplied, this URL will be used when user tries to install a library from [li
 
 #### `theme`
 
-This prop controls Excalidraw's theme. When supplied, the value takes precedence over `intialData.appState.theme`, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app unless specified by `UIOptions.canvasActions.theme` in which case, this prop will control Excalidraw's default theme with ability to allow theme switching handed over to `UIOptions.canvasActions.theme`.You can use [`THEME`](#THEME-1) to specify the theme.
+This prop controls Excalidraw's theme. When supplied, the value takes precedence over `intialData.appState.theme`, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app unless `UIOptions.canvasActions.theme` is set to `true`, in which case the `theme` prop will control Excalidraw's default theme with ability to allow theme switching (you must take care of updating the `theme` prop when you detect a change to `appState.theme` from the [onChange](#onChange) callback).
+
+You can use [`THEME`](#THEME-1) to specify the theme.
 
 #### `name`
 

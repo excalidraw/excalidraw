@@ -17,12 +17,9 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
+- Support [theme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#theme) to be semi-controlled [#5660](https://github.com/excalidraw/excalidraw/pull/5660).
 - Added support for storing [`customData`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#storing-custom-data-to-excalidraw-elements) on Excalidraw elements [#5592].
 - Added `exportPadding?: number;` to [exportToCanvas](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exporttocanvas) and [exportToBlob](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exporttoblob). The default value of the padding is 10.
-
-#### Fixes
-
-- Fixed light theme splash on load [#5660](https://github.com/excalidraw/excalidraw/pull/5660)
 
 #### Breaking Changes
 
