@@ -16,6 +16,7 @@ import {
   getBezierXY,
   getBezierCurveLength,
   mapIntervalToBezierT,
+  arePointsEqual,
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import { getElementPointsCoords } from "./bounds";
@@ -546,7 +547,7 @@ export class LinearElementEditor {
     const midPoints = LinearElementEditor.getEditorMidPoints(element, appState);
     let index = 0;
     while (index < midPoints.length - 1) {
-      if (this.isEqual(midPoint, midPoints[index])) {
+      if (LinearElementEditor.isEqual(midPoint, midPoints[index])) {
         return index + 1;
       }
       index++;
@@ -730,8 +731,9 @@ export class LinearElementEditor {
     if (!point1 || !point2) {
       return false;
     }
-    return point1[0] === point2[0] && point1[1] === point2[1];
+    return arePointsEqual(point1, point2);
   }
+
   static handlePointerMove(
     event: React.PointerEvent<HTMLCanvasElement>,
     scenePointerX: number,

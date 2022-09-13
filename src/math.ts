@@ -3,7 +3,6 @@ import { LINE_CONFIRM_THRESHOLD } from "./constants";
 import { ExcalidrawLinearElement, NonDeleted } from "./element/types";
 import { getShapeForElement } from "./renderer/renderElement";
 import { getCurvePathOps } from "./element/bounds";
-import { LinearElementEditor } from "./element/linearElementEditor";
 
 export const rotate = (
   x1: number,
@@ -348,7 +347,7 @@ export const getPointsInBezierCurve = (
     t -= 0.05;
   }
   if (pointsOnCurve.length) {
-    if (!LinearElementEditor.isEqual(pointsOnCurve.at(-1)!, endPoint)) {
+    if (arePointsEqual(pointsOnCurve[1], endPoint)) {
       pointsOnCurve.push([endPoint[0], endPoint[1]]);
     }
   }
@@ -423,4 +422,8 @@ export const mapIntervalToBezierT = (
         (arcLengths[index + 1] - arcLengths[index])) /
       pointsCount
   );
+};
+
+export const arePointsEqual = (p1: Point, p2: Point) => {
+  return p1[0] === p2[0] && p1[1] === p2[1];
 };
