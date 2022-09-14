@@ -222,10 +222,6 @@ const renderLinearPointHandles = (
     appState,
   ).filter((midPoint) => midPoint !== null) as Point[];
 
-  if (appState.editingLinearElement && !midPoints.length) {
-    return;
-  }
-
   midPoints.forEach((segmentMidPoint) => {
     if (
       appState?.selectedLinearElement?.segmentMidPointHoveredCoords &&
