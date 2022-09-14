@@ -197,12 +197,7 @@ const renderLinearPointHandles = (
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
   context.lineWidth = 1 / renderConfig.zoom.value;
   const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-  const centerPoint = LinearElementEditor.getMidPoint(
-    appState.selectedLinearElement,
-  );
-  if (!centerPoint) {
-    return;
-  }
+
   const { POINT_HANDLE_SIZE } = LinearElementEditor;
   const radius = appState.editingLinearElement
     ? POINT_HANDLE_SIZE
@@ -221,11 +216,20 @@ const renderLinearPointHandles = (
     );
   });
 
-  if (points.length < 3) {
-    if (appState.selectedLinearElement.midPointHovered) {
-      const centerPoint = LinearElementEditor.getMidPoint(
-        appState.selectedLinearElement,
-      )!;
+  //Rendering segment mid points
+  const midPoints = LinearElementEditor.getEditorMidPoints(
+    element,
+    appState,
+  ).filter((midPoint) => midPoint !== null) as Point[];
+
+  midPoints.forEach((segmentMidPoint) => {
+    if (
+      appState?.selectedLinearElement?.segmentMidPointHoveredCoords &&
+      LinearElementEditor.arePointsEqual(
+        segmentMidPoint,
+        appState.selectedLinearElement.segmentMidPointHoveredCoords,
+      )
+    ) {
       // The order of renderingSingleLinearPoint and highLight points is different
       // inside vs outside editor as hover states are different,
       // in editor when hovered the original point is not visible as hover state fully covers it whereas outside the
@@ -235,34 +239,34 @@ const renderLinearPointHandles = (
           context,
           appState,
           renderConfig,
-          centerPoint,
+          segmentMidPoint,
           radius,
           false,
         );
-        highlightPoint(centerPoint, context, renderConfig);
+        highlightPoint(segmentMidPoint, context, renderConfig);
       } else {
-        highlightPoint(centerPoint, context, renderConfig);
+        highlightPoint(segmentMidPoint, context, renderConfig);
         renderSingleLinearPoint(
           context,
           appState,
           renderConfig,
-          centerPoint,
+          segmentMidPoint,
           radius,
           false,
         );
       }
-    } else {
+    } else if (appState.editingLinearElement || points.length === 2) {
       renderSingleLinearPoint(
         context,
         appState,
         renderConfig,
-        centerPoint,
+        segmentMidPoint,
         POINT_HANDLE_SIZE / 2,
         false,
         true,
       );
     }
-  }
+  });
 
   context.restore();
 };
@@ -403,6 +407,20 @@ export const _renderScene = ({
     visibleElements.forEach((element) => {
       try {
         renderElement(element, rc, context, renderConfig);
+        // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
+        // ShapeCache returns empty hence making sure that we get the
+        // correct element from visible elements
+        if (appState.editingLinearElement?.elementId === element.id) {
+          if (element) {
+            renderLinearPointHandles(
+              context,
+              appState,
+              renderConfig,
+              element as NonDeleted<ExcalidrawLinearElement>,
+            );
+          }
+        }
+
         if (!isExporting) {
           renderLinkIcon(element, context, appState);
         }
@@ -410,15 +428,6 @@ export const _renderScene = ({
         console.error(error);
       }
     });
-
-    if (appState.editingLinearElement) {
-      const element = LinearElementEditor.getElement(
-        appState.editingLinearElement.elementId,
-      );
-      if (element) {
-        renderLinearPointHandles(context, appState, renderConfig, element);
-      }
-    }
 
     // Paint selection element
     if (appState.selectionElement) {
