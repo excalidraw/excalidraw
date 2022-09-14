@@ -65,11 +65,7 @@ export class LinearElementEditor {
   public readonly hoverPointIndex: number;
   public readonly segmentMidPointHoveredCoords: Point | null;
 
-  constructor(
-    element: NonDeleted<ExcalidrawLinearElement>,
-    scene: Scene,
-    appState: AppState,
-  ) {
+  constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
     };
@@ -763,9 +759,7 @@ export class LinearElementEditor {
 
     if (!event.altKey) {
       if (lastPoint === lastUncommittedPoint) {
-        LinearElementEditor.deletePoints(element, appState, [
-          points.length - 1,
-        ]);
+        LinearElementEditor.deletePoints(element, [points.length - 1]);
       }
       return {
         ...appState.editingLinearElement,
@@ -1021,7 +1015,6 @@ export class LinearElementEditor {
 
   static deletePoints(
     element: NonDeleted<ExcalidrawLinearElement>,
-    appState: AppState,
     pointIndices: readonly number[],
   ) {
     let offsetX = 0;

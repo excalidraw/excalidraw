@@ -184,7 +184,7 @@ export const actionFinalize = register({
         // To select the linear element when user has finished mutipoint editing
         selectedLinearElement:
           multiPointElement && isLinearElement(multiPointElement)
-            ? new LinearElementEditor(multiPointElement, scene, appState)
+            ? new LinearElementEditor(multiPointElement, scene)
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },
