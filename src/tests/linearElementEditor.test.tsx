@@ -17,9 +17,9 @@ const renderScene = jest.spyOn(Renderer, "renderScene");
 const { h } = window;
 
 describe(" Test Linear Elements", () => {
-  let getByToolName;
-  let container;
-  let canvas;
+  let getByToolName: (...args: string[]) => HTMLElement;
+  let container: HTMLElement;
+  let canvas: HTMLCanvasElement;
 
   beforeEach(async () => {
     // Unmount ReactDOM from root
