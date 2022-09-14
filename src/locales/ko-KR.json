@@ -125,8 +125,8 @@
   },
   "library": {
     "noItems": "추가된 아이템 없음",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "캔버스 위에서 아이템을 선택하여 여기에 추가를 하거나, 아래의 공용 저장소에서 라이브러리를 설치하세요.",
+    "hint_emptyPrivateLibrary": "캔버스 위에서 아이템을 선택하여 여기 추가하세요."
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
