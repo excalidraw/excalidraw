@@ -790,6 +790,9 @@ export const renderElement = (
         context.save();
         context.translate(cx, cy);
         context.rotate(element.angle);
+        if (element.type === "image") {
+          context.scale(element.scale[0], element.scale[1]);
+        }
         context.translate(-shiftX, -shiftY);
 
         if (shouldResetImageFilter(element, renderConfig)) {
