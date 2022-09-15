@@ -226,16 +226,14 @@ class Collab extends PureComponent<Props, CollabState> {
       preventUnload(event);
     }
 
-    if (this.isCollaborating || this.portal.roomId) {
-      try {
-        localStorage?.setItem(
-          STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-          JSON.stringify({
-            timestamp: Date.now(),
-            room: this.portal.roomId,
-          }),
-        );
-      } catch {}
+    if (this.isCollaborating() || this.portal.roomId) {
+      localStorage?.setItem(
+        STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+        JSON.stringify({
+          timestamp: Date.now(),
+          room: this.portal.roomId,
+        }),
+      );
     }
   });
 
