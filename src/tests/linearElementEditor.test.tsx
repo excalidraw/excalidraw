@@ -4,10 +4,9 @@ import ExcalidrawApp from "../excalidraw-app";
 import { centerPoint } from "../math";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
-import { Keyboard } from "./helpers/ui";
-import { screen } from "./test-utils";
-
-import { render, fireEvent } from "./test-utils";
+import { Keyboard, Pointer } from "./helpers/ui";
+import { screen, render, fireEvent } from "./test-utils";
+import { API } from "../tests/helpers/api";
 import { Point } from "../types";
 import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -17,7 +16,6 @@ const renderScene = jest.spyOn(Renderer, "renderScene");
 const { h } = window;
 
 describe(" Test Linear Elements", () => {
-  let getByToolName: (...args: string[]) => HTMLElement;
   let container: HTMLElement;
   let canvas: HTMLCanvasElement;
 
@@ -28,7 +26,6 @@ describe(" Test Linear Elements", () => {
     renderScene.mockClear();
     reseed(7);
     const comp = await render(<ExcalidrawApp />);
-    getByToolName = comp.getByToolName;
     container = comp.container;
     canvas = container.querySelector("canvas")!;
     canvas.width = 1000;
@@ -39,43 +36,60 @@ describe(" Test Linear Elements", () => {
   const p2: Point = [60, 20];
   const midpoint = centerPoint(p1, p2);
   const delta = 50;
+  const mouse = new Pointer("mouse");
 
   const createTwoPointerLinearElement = (
     type: ExcalidrawLinearElement["type"],
-    edge: "Sharp" | "Round" = "Sharp",
-    roughness: "Architect" | "Cartoonist" | "Artist" = "Architect",
+    strokeSharpness: ExcalidrawLinearElement["strokeSharpness"] = "sharp",
+    roughness: ExcalidrawLinearElement["roughness"] = 0,
   ) => {
-    const tool = getByToolName(type);
-    fireEvent.click(tool);
-    fireEvent.click(screen.getByTitle(edge));
-    fireEvent.click(screen.getByTitle(roughness));
-    fireEvent.pointerDown(canvas, { clientX: p1[0], clientY: p1[1] });
-    fireEvent.pointerMove(canvas, { clientX: p2[0], clientY: p2[1] });
-    fireEvent.pointerUp(canvas, { clientX: p2[0], clientY: p2[1] });
+    h.elements = [
+      API.createElement({
+        x: p1[0],
+        y: p1[1],
+        width: p2[0] - p1[0],
+        height: 0,
+        type,
+        roughness,
+        points: [
+          [0, 0],
+          [p2[0] - p1[0], p2[1] - p1[1]],
+        ],
+        strokeSharpness,
+      }),
+    ];
+
+    mouse.clickAt(p1[0], p1[1]);
   };
 
   const createThreePointerLinearElement = (
     type: ExcalidrawLinearElement["type"],
-    edge: "Sharp" | "Round" = "Sharp",
-    roughness: "Architect" | "Cartoonist" | "Artist" = "Architect",
+    strokeSharpness: ExcalidrawLinearElement["strokeSharpness"] = "sharp",
+    roughness: ExcalidrawLinearElement["roughness"] = 0,
   ) => {
-    createTwoPointerLinearElement(type, edge, roughness);
-    // Extending line via midpoint
-    fireEvent.pointerDown(canvas, {
-      clientX: midpoint[0],
-      clientY: midpoint[1],
-    });
-    fireEvent.pointerMove(canvas, {
-      clientX: midpoint[0] + delta,
-      clientY: midpoint[1] + delta,
-    });
-    fireEvent.pointerUp(canvas, {
-      clientX: midpoint[0] + delta,
-      clientY: midpoint[1] + delta,
-    });
+    //dragging line from midpoint
+    const p3 = [midpoint[0] + delta - p1[0], midpoint[1] + delta - p1[1]];
+    h.elements = [
+      API.createElement({
+        x: p1[0],
+        y: p1[1],
+        width: p3[0] - p1[0],
+        height: 0,
+        type,
+        roughness,
+        points: [
+          [0, 0],
+          [p3[0], p3[1]],
+          [p2[0] - p1[0], p2[1] - p1[1]],
+        ],
+        strokeSharpness,
+      }),
+    ];
+    mouse.clickAt(p1[0], p1[1]);
   };
 
   const enterLineEditingMode = (line: ExcalidrawLinearElement) => {
+    mouse.clickAt(p1[0], p1[1]);
     Keyboard.keyPress(KEYS.ENTER);
     expect(h.state.editingLinearElement?.elementId).toEqual(line.id);
   };
@@ -111,12 +125,12 @@ describe(" Test Linear Elements", () => {
     createTwoPointerLinearElement("line");
     const line = h.elements[0] as ExcalidrawLinearElement;
 
-    expect(renderScene).toHaveBeenCalledTimes(9);
+    expect(renderScene).toHaveBeenCalledTimes(6);
     expect((h.elements[0] as ExcalidrawLinearElement).points.length).toEqual(2);
 
     // drag line from midpoint
     drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
-    expect(renderScene).toHaveBeenCalledTimes(12);
+    expect(renderScene).toHaveBeenCalledTimes(9);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
       Array [
@@ -139,11 +153,14 @@ describe(" Test Linear Elements", () => {
   describe("Inside editor", () => {
     it("should allow dragging line from midpoint in 2 pointer lines", async () => {
       createTwoPointerLinearElement("line");
+
       const line = h.elements[0] as ExcalidrawLinearElement;
       enterLineEditingMode(line);
 
       // drag line from midpoint
       drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
+      expect(renderScene).toHaveBeenCalledTimes(13);
+
       expect(line.points.length).toEqual(3);
       expect(line.points).toMatchInlineSnapshot(`
         Array [
@@ -178,6 +195,8 @@ describe(" Test Linear Elements", () => {
 
       // update sharpness
       fireEvent.click(screen.getByTitle("Round"));
+
+      expect(renderScene).toHaveBeenCalledTimes(11);
       const midPointsWithRoundEdge = LinearElementEditor.getEditorMidPoints(
         h.elements[0] as ExcalidrawLinearElement,
         h.state,
@@ -200,7 +219,7 @@ describe(" Test Linear Elements", () => {
     });
 
     it("should update all the midpoints when element position changed", async () => {
-      createThreePointerLinearElement("line", "Round");
+      createThreePointerLinearElement("line", "round");
 
       const line = h.elements[0] as ExcalidrawLinearElement;
       expect(line.points.length).toEqual(3);
@@ -219,6 +238,7 @@ describe(" Test Linear Elements", () => {
       // Move the element
       drag(startPoint, endPoint);
 
+      expect(renderScene).toHaveBeenCalledTimes(14);
       expect([line.x, line.y]).toEqual([
         points[0][0] + deltaX,
         points[0][1] + deltaY,
@@ -274,6 +294,8 @@ describe(" Test Linear Elements", () => {
           lastSegmentMidpoint[0] + delta,
           lastSegmentMidpoint[1] + delta,
         ]);
+
+        expect(renderScene).toHaveBeenCalledTimes(18);
         expect(line.points.length).toEqual(5);
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
@@ -323,6 +345,8 @@ describe(" Test Linear Elements", () => {
           clientY: hitCoords[0] - delta,
         });
 
+        expect(renderScene).toHaveBeenCalledTimes(14);
+
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
           points[0][0] - delta,
@@ -355,6 +379,7 @@ describe(" Test Linear Elements", () => {
         // delete 3rd point
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
+        expect(renderScene).toHaveBeenCalledTimes(19);
 
         const newMidPoints = LinearElementEditor.getEditorMidPoints(
           line,
@@ -379,7 +404,7 @@ describe(" Test Linear Elements", () => {
       let line: ExcalidrawLinearElement;
 
       beforeEach(() => {
-        createThreePointerLinearElement("line", "Round");
+        createThreePointerLinearElement("line", "round");
         line = h.elements[0] as ExcalidrawLinearElement;
         expect(line.points.length).toEqual(3);
 
@@ -399,6 +424,8 @@ describe(" Test Linear Elements", () => {
           lastSegmentMidpoint[0] + delta,
           lastSegmentMidpoint[1] + delta,
         ]);
+        expect(renderScene).toHaveBeenCalledTimes(18);
+
         expect(line.points.length).toEqual(5);
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
