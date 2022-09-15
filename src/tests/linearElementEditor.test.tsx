@@ -329,21 +329,10 @@ describe(" Test Linear Elements", () => {
         const points = LinearElementEditor.getPointsGlobalCoordinates(line);
         const midPoints = LinearElementEditor.getEditorMidPoints(line, h.state);
 
-        const hitCoords = [points[0][0], points[0][1]];
+        const hitCoords: Point = [points[0][0], points[0][1]];
 
-        // Drag first point
-        fireEvent.pointerDown(canvas, {
-          clientX: hitCoords[0],
-          clientY: hitCoords[1],
-        });
-        fireEvent.pointerMove(canvas, {
-          clientX: hitCoords[0] - delta,
-          clientY: hitCoords[1] - delta,
-        });
-        fireEvent.pointerUp(canvas, {
-          clientX: hitCoords[0] - delta,
-          clientY: hitCoords[0] - delta,
-        });
+        // Drag from first point
+        drag(hitCoords, [hitCoords[0] - delta, hitCoords[1] - delta]);
 
         expect(renderScene).toHaveBeenCalledTimes(14);
 
@@ -359,6 +348,32 @@ describe(" Test Linear Elements", () => {
         );
 
         expect(midPoints[0]).not.toEqual(newMidPoints[0]);
+        expect(midPoints[1]).toEqual(newMidPoints[1]);
+      });
+
+      it("should hide midpoints in the segment when points moved close", async () => {
+        const points = LinearElementEditor.getPointsGlobalCoordinates(line);
+        const midPoints = LinearElementEditor.getEditorMidPoints(line, h.state);
+
+        const hitCoords: Point = [points[0][0], points[0][1]];
+
+        // Drag from first point
+        drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
+
+        expect(renderScene).toHaveBeenCalledTimes(14);
+
+        const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
+        expect([newPoints[0][0], newPoints[0][1]]).toEqual([
+          points[0][0] + delta,
+          points[0][1] + delta,
+        ]);
+
+        const newMidPoints = LinearElementEditor.getEditorMidPoints(
+          line,
+          h.state,
+        );
+        // This midpoint is hidden since the points are too close
+        expect(newMidPoints[0]).toBeNull();
         expect(midPoints[1]).toEqual(newMidPoints[1]);
       });
 
@@ -459,21 +474,10 @@ describe(" Test Linear Elements", () => {
         const points = LinearElementEditor.getPointsGlobalCoordinates(line);
         const midPoints = LinearElementEditor.getEditorMidPoints(line, h.state);
 
-        const hitCoords = [points[0][0], points[0][1]];
+        const hitCoords: Point = [points[0][0], points[0][1]];
 
-        // Drag first point
-        fireEvent.pointerDown(canvas, {
-          clientX: hitCoords[0],
-          clientY: hitCoords[1],
-        });
-        fireEvent.pointerMove(canvas, {
-          clientX: hitCoords[0] - delta,
-          clientY: hitCoords[1] - delta,
-        });
-        fireEvent.pointerUp(canvas, {
-          clientX: hitCoords[0] - delta,
-          clientY: hitCoords[0] - delta,
-        });
+        // Drag from first point
+        drag(hitCoords, [hitCoords[0] - delta, hitCoords[1] - delta]);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -502,6 +506,32 @@ describe(" Test Linear Elements", () => {
         `);
       });
 
+      it("should hide midpoints in the segment when points moved close", async () => {
+        const points = LinearElementEditor.getPointsGlobalCoordinates(line);
+        const midPoints = LinearElementEditor.getEditorMidPoints(line, h.state);
+
+        const hitCoords: Point = [points[0][0], points[0][1]];
+
+        // Drag from first point
+        drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
+
+        expect(renderScene).toHaveBeenCalledTimes(14);
+
+        const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
+        expect([newPoints[0][0], newPoints[0][1]]).toEqual([
+          points[0][0] + delta,
+          points[0][1] + delta,
+        ]);
+
+        const newMidPoints = LinearElementEditor.getEditorMidPoints(
+          line,
+          h.state,
+        );
+        // This mid point is hidden due to point being too close
+        expect(newMidPoints[0]).toBeNull();
+        expect(newMidPoints[1]).not.toEqual(midPoints[1]);
+      });
+
       it("should update all the midpoints when a point is deleted", async () => {
         drag(lastSegmentMidpoint, [
           lastSegmentMidpoint[0] + delta,
@@ -521,7 +551,6 @@ describe(" Test Linear Elements", () => {
           h.state,
         );
         expect(newMidPoints.length).toEqual(2);
-
         expect(midPoints[0]).not.toEqual(newMidPoints[0]);
         expect(midPoints[1]).not.toEqual(newMidPoints[1]);
         expect(newMidPoints).toMatchInlineSnapshot(`
