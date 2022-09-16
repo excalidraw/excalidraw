@@ -553,9 +553,9 @@ class App extends React.Component<AppProps, AppState> {
                     this.state.zenModeEnabled
                   }
                   showThemeBtn={
-                    this.props.UIOptions.canvasActions.theme !== false &&
+                    this.props.UIOptions.canvasActions.toggleTheme !== false &&
                     (typeof this.props?.theme === "undefined" ||
-                      this.props.UIOptions.canvasActions.theme === true)
+                      this.props.UIOptions.canvasActions.toggleTheme === true)
                   }
                   libraryReturnUrl={this.props.libraryReturnUrl}
                   UIOptions={this.props.UIOptions}

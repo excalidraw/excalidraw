@@ -350,7 +350,7 @@ type CanvasActions = {
   export?: false | ExportOpts;
   loadScene?: boolean;
   saveToActiveFile?: boolean;
-  theme?: boolean | null;
+  toggleTheme?: boolean | null;
   saveAsImage?: boolean;
 };
 
