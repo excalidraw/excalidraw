@@ -953,6 +953,8 @@ export const renderElementToSvg = (
       break;
     }
     case "image": {
+      const width = Math.round(element.width);
+      const height = Math.round(element.height);
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
@@ -981,17 +983,26 @@ export const renderElementToSvg = (
           use.setAttribute("filter", IMAGE_INVERT_FILTER);
         }
 
-        use.setAttribute("width", `${Math.round(element.width)}`);
-        use.setAttribute("height", `${Math.round(element.height)}`);
+        use.setAttribute("width", `${width}`);
+        use.setAttribute("height", `${height}`);
 
+        // We first apply scale on use, then apply translation and rotation on g
+        // which wraps use
         use.setAttribute(
+          "transform",
+          element.scale[0] === -1 ? `scale(-1, 1) translate(-${width}) ` : "",
+        );
+
+        const g = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+        g.appendChild(use);
+        g.setAttribute(
           "transform",
           `translate(${offsetX || 0} ${
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
 
-        root.appendChild(use);
+        root.appendChild(g);
       }
       break;
     }
