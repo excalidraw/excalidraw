@@ -88,20 +88,41 @@ describe("<Excalidraw/>", () => {
   });
 
   describe("Test theme prop", () => {
-    it('should show the dark mode toggle when the theme prop is "undefined"', async () => {
+    it("should show the theme toggle by default", async () => {
       const { container } = await render(<Excalidraw />);
       expect(h.state.theme).toBe(THEME.LIGHT);
-
       const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
-
       expect(darkModeToggle).toBeTruthy();
     });
 
-    it('should not show the dark mode toggle when the theme prop is not "undefined"', async () => {
+    it("should not show theme toggle when the theme prop is defined", async () => {
       const { container } = await render(<Excalidraw theme="dark" />);
       expect(h.state.theme).toBe(THEME.DARK);
-
       expect(queryByTestId(container, "toggle-dark-mode")).toBe(null);
+    });
+
+    it("should show theme mode toggle when `UIOptions.canvasActions.toggleTheme` is true", async () => {
+      const { container } = await render(
+        <Excalidraw
+          theme={THEME.DARK}
+          UIOptions={{ canvasActions: { toggleTheme: true } }}
+        />,
+      );
+      expect(h.state.theme).toBe(THEME.DARK);
+      const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
+      expect(darkModeToggle).toBeTruthy();
+    });
+
+    it("should not show theme toggle when `UIOptions.canvasActions.toggleTheme` is false", async () => {
+      const { container } = await render(
+        <Excalidraw
+          UIOptions={{ canvasActions: { toggleTheme: false } }}
+          theme={THEME.DARK}
+        />,
+      );
+      expect(h.state.theme).toBe(THEME.DARK);
+      const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
+      expect(darkModeToggle).toBeFalsy();
     });
   });
 
@@ -214,7 +235,7 @@ describe("<Excalidraw/>", () => {
 
       it("should hide the theme toggle when theme is false", async () => {
         const { container } = await render(
-          <Excalidraw UIOptions={{ canvasActions: { theme: false } }} />,
+          <Excalidraw UIOptions={{ canvasActions: { toggleTheme: false } }} />,
         );
 
         expect(queryByTestId(container, "toggle-dark-mode")).toBeNull();

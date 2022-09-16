@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 
 import { LoadingMessage } from "./LoadingMessage";
 import { defaultLang, Language, languages, setLanguage } from "../i18n";
+import { Theme } from "../element/types";
 
 interface Props {
   langCode: Language["code"];
   children: React.ReactElement;
+  theme?: Theme;
 }
 
 export const InitializeApp = (props: Props) => {
@@ -21,5 +23,5 @@ export const InitializeApp = (props: Props) => {
     updateLang();
   }, [props.langCode]);
 
-  return loading ? <LoadingMessage /> : props.children;
+  return loading ? <LoadingMessage theme={props.theme} /> : props.children;
 };
