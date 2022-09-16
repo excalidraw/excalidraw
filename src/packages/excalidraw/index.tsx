@@ -63,6 +63,13 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       DEFAULT_UI_OPTIONS.canvasActions.export.saveFileToDisk;
   }
 
+  if (
+    UIOptions.canvasActions.toggleTheme === null &&
+    typeof theme === "undefined"
+  ) {
+    UIOptions.canvasActions.toggleTheme = true;
+  }
+
   useEffect(() => {
     // Block pinch-zooming on iOS outside of the content area
     const handleTouchMove = (event: TouchEvent) => {
@@ -82,7 +89,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   }, []);
 
   return (
-    <InitializeApp langCode={langCode}>
+    <InitializeApp langCode={langCode} theme={theme}>
       <Provider unstable_createStore={() => jotaiStore} scope={jotaiScope}>
         <App
           onChange={onChange}
