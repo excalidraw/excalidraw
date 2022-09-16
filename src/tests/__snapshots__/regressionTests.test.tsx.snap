@@ -10982,7 +10982,6 @@ Object {
     "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
-    "midPointHovered": false,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
       "prevSelectedPointsIndices": null,
@@ -10991,6 +10990,7 @@ Object {
       "x": 0,
       "y": 0,
     },
+    "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
     "visiblePointIndexes": Array [
@@ -11211,7 +11211,6 @@ Object {
     "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
-    "midPointHovered": false,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
       "prevSelectedPointsIndices": null,
@@ -11220,6 +11219,7 @@ Object {
       "x": 0,
       "y": 0,
     },
+    "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
     "visiblePointIndexes": Array [
@@ -11667,7 +11667,6 @@ Object {
     "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
-    "midPointHovered": false,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
       "prevSelectedPointsIndices": null,
@@ -11676,6 +11675,7 @@ Object {
       "x": 0,
       "y": 0,
     },
+    "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
     "visiblePointIndexes": Array [
@@ -12075,7 +12075,6 @@ Object {
     "hoverPointIndex": -1,
     "isDragging": false,
     "lastUncommittedPoint": null,
-    "midPointHovered": false,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
       "prevSelectedPointsIndices": null,
@@ -12084,6 +12083,7 @@ Object {
       "x": 0,
       "y": 0,
     },
+    "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
     "visiblePointIndexes": Array [

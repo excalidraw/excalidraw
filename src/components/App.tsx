@@ -2736,18 +2736,23 @@ class App extends React.Component<AppProps, AppState> {
         event,
         scenePointerX,
         scenePointerY,
-        this.state.editingLinearElement,
-        this.state.gridSize,
+        this.state,
       );
-      if (editingLinearElement !== this.state.editingLinearElement) {
+
+      if (
+        editingLinearElement &&
+        editingLinearElement !== this.state.editingLinearElement
+      ) {
         // Since we are reading from previous state which is not possible with
         // automatic batching in React 18 hence using flush sync to synchronously
         // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
         flushSync(() => {
-          this.setState({ editingLinearElement });
+          this.setState({
+            editingLinearElement,
+          });
         });
       }
-      if (editingLinearElement.lastUncommittedPoint != null) {
+      if (editingLinearElement?.lastUncommittedPoint != null) {
         this.maybeSuggestBindingAtCursor(scenePointer);
       } else {
         this.setState({ suggestedBindings: [] });
@@ -3076,7 +3081,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (this.state.selectedLinearElement) {
       let hoverPointIndex = -1;
-      let midPointHovered = false;
+      let segmentMidPointHoveredCoords = null;
       if (
         isHittingElementNotConsideringBoundingBox(element, this.state, [
           scenePointerX,
@@ -3089,13 +3094,14 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         );
-        midPointHovered = LinearElementEditor.isHittingMidPoint(
-          linearElementEditor,
-          { x: scenePointerX, y: scenePointerY },
-          this.state,
-        );
+        segmentMidPointHoveredCoords =
+          LinearElementEditor.getSegmentMidpointHitCoords(
+            linearElementEditor,
+            { x: scenePointerX, y: scenePointerY },
+            this.state,
+          );
 
-        if (hoverPointIndex >= 0 || midPointHovered) {
+        if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
           setCursor(this.canvas, CURSOR_TYPE.POINTER);
         } else {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
@@ -3124,12 +3130,15 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        this.state.selectedLinearElement.midPointHovered !== midPointHovered
+        !LinearElementEditor.arePointsEqual(
+          this.state.selectedLinearElement.segmentMidPointHoveredCoords,
+          segmentMidPointHoveredCoords,
+        )
       ) {
         this.setState({
           selectedLinearElement: {
             ...this.state.selectedLinearElement,
-            midPointHovered,
+            segmentMidPointHoveredCoords,
           },
         });
       }
