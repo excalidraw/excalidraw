@@ -1,5 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+  <script>
+    try {
+      // to minimize white flash on load when user has dark mode enabled
+      const theme = window.localStorage.getItem("excalidraw-theme");
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+      }
+    } catch {}
+  </script>
   <head>
     <meta charset="utf-8" />
     <title>Excalidraw | Hand-drawn look & feel • Collaborative • Secure</title>
@@ -51,7 +60,6 @@
       name="twitter:description"
       content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
-
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -70,6 +78,13 @@
         window.location.href = "https://app.excalidraw.com";
       }
     </script>
+    
+    <style>
+      html.dark {
+        background-color: #121212;
+        color: #fff;
+      }
+    </style>
 
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
@@ -98,7 +113,7 @@
     />
 
     <link rel="stylesheet" href="fonts.css" type="text/css" />
-    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD === "true") { %>
+    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD==="true" ) { %>
     <script>
       {
         const _WebSocket = window.WebSocket;
@@ -155,7 +170,7 @@
         width: 1px;
         overflow: hidden;
         clip: rect(1px, 1px, 1px, 1px);
-        white-space: nowrap; /* added line */
+        white-space: nowrap;
         user-select: none;
       }
 
