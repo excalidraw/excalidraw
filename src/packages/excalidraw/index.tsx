@@ -62,6 +62,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   ) {
     UIOptions.canvasActions.toggleTheme = true;
   }
+
   useEffect(() => {
     // Block pinch-zooming on iOS outside of the content area
     const handleTouchMove = (event: TouchEvent) => {
