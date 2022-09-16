@@ -39,7 +39,6 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
@@ -62,7 +61,6 @@ export const MobileMenu = ({
   canvas,
   isCollaborating,
   renderCustomFooter,
-  showThemeBtn,
   onImageAction,
   renderTopRightUI,
   renderCustomStats,
@@ -184,14 +182,7 @@ export const MobileMenu = ({
             onClick={onCollabButtonClick}
           />
         )}
-        {
-          <BackgroundPickerAndDarkModeToggle
-            actionManager={actionManager}
-            appState={appState}
-            setAppState={setAppState}
-            showThemeBtn={showThemeBtn}
-          />
-        }
+        {<BackgroundPickerAndDarkModeToggle actionManager={actionManager} />}
       </>
     );
   };
