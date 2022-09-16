@@ -344,13 +344,17 @@ export type ExportOpts = {
   ) => JSX.Element;
 };
 
+// NOTE at the moment, if action name coressponds to canvasAction prop, its
+// truthiness value will determine whether the action is rendered or not
+// (see manager renderAction). We also override canvasAction values in
+// excalidraw package index.tsx.
 type CanvasActions = {
   changeViewBackgroundColor?: boolean;
   clearCanvas?: boolean;
   export?: false | ExportOpts;
   loadScene?: boolean;
   saveToActiveFile?: boolean;
-  theme?: boolean;
+  toggleTheme?: boolean | null;
   saveAsImage?: boolean;
 };
 

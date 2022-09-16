@@ -552,10 +552,6 @@ class App extends React.Component<AppProps, AppState> {
                     typeof this.props?.zenModeEnabled === "undefined" &&
                     this.state.zenModeEnabled
                   }
-                  showThemeBtn={
-                    typeof this.props?.theme === "undefined" &&
-                    this.props.UIOptions.canvasActions.theme
-                  }
                   libraryReturnUrl={this.props.libraryReturnUrl}
                   UIOptions={this.props.UIOptions}
                   focusContainer={this.focusContainer}
@@ -645,7 +641,8 @@ class App extends React.Component<AppProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
-        let theme = actionResult?.appState?.theme || THEME.LIGHT;
+        const theme =
+          actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
         let name = actionResult?.appState?.name ?? this.state.name;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -657,10 +654,6 @@ class App extends React.Component<AppProps, AppState> {
 
         if (typeof this.props.gridModeEnabled !== "undefined") {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
-        }
-
-        if (typeof this.props.theme !== "undefined") {
-          theme = this.props.theme;
         }
 
         if (typeof this.props.name !== "undefined") {
@@ -755,6 +748,9 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
+    if (this.props.theme) {
+      this.setState({ theme: this.props.theme });
+    }
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });
     }
@@ -784,6 +780,7 @@ class App extends React.Component<AppProps, AppState> {
     const scene = restore(initialData, null, null);
     scene.appState = {
       ...scene.appState,
+      theme: this.props.theme || scene.appState.theme,
       // we're falling back to current (pre-init) state when deciding
       // whether to open the library, to handle a case where we
       // update the state outside of initialData (e.g. when loading the app
