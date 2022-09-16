@@ -205,9 +205,10 @@ const renderLinearPointHandles = (
     ? POINT_HANDLE_SIZE
     : POINT_HANDLE_SIZE / 2;
 
-  const visiblePointIndexes =
-    appState.editingLinearElement?.visiblePointIndexes ||
-    appState.selectedLinearElement.visiblePointIndexes;
+  const visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
+    element,
+    appState,
+  );
   visiblePointIndexes.forEach((index) => {
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(index);
@@ -447,15 +448,21 @@ export const _renderScene = ({
       appState.selectedLinearElement &&
       appState.selectedLinearElement.hoverPointIndex >= 0
     ) {
-      const visiblePointIndexes =
-        appState.editingLinearElement?.visiblePointIndexes ||
-        appState.selectedLinearElement.visiblePointIndexes;
-      if (
-        visiblePointIndexes.includes(
-          appState.selectedLinearElement.hoverPointIndex,
-        )
-      ) {
-        renderLinearElementPointHighlight(context, appState, renderConfig);
+      const element = LinearElementEditor.getElement(
+        appState.selectedLinearElement.elementId,
+      );
+      if (element) {
+        const visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
+          element,
+          appState,
+        );
+        if (
+          visiblePointIndexes.includes(
+            appState.selectedLinearElement.hoverPointIndex,
+          )
+        ) {
+          renderLinearElementPointHighlight(context, appState, renderConfig);
+        }
       }
     }
     // Paint selected elements

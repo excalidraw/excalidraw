@@ -1084,20 +1084,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      this.state.selectedLinearElement &&
-      prevState.zoom !== this.state.zoom
-    ) {
-      const selectedLinearElement =
-        LinearElementEditor.updateVisiblePointIndexes(
-          this.state.selectedLinearElement,
-          this.state,
-        );
-      this.setState({
-        selectedLinearElement,
-      });
-    }
-
-    if (
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY
     ) {
