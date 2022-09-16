@@ -524,7 +524,8 @@ const ExcalidrawWrapper = () => {
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_THEME, theme);
-    // currently only used for body styling during init, but may change
+    // currently only used for body styling during init (see public/index.html),
+    // but may change in the future
     document.documentElement.classList.toggle("dark", theme === THEME.DARK);
   }, [theme]);
 
