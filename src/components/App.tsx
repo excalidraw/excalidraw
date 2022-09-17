@@ -1153,7 +1153,11 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       // defer so that the commitToHistory flag isn't reset via current update
       setTimeout(() => {
-        this.actionManager.executeAction(actionFinalize);
+        // execute only if the condition still holds when the deferred callback
+        // executes (it can be scheduled multiple times depending on how
+        // many times the component renders)
+        this.state.editingLinearElement &&
+          this.actionManager.executeAction(actionFinalize);
       });
     }
 
