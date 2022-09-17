@@ -971,6 +971,11 @@ class App extends React.Component<AppProps, AppState> {
       this.updateCurrentCursorPosition,
       false,
     );
+    document.removeEventListener(
+      EVENT.DRAG_OVER,
+      this.updateCurrentCursorPosition,
+      false,
+    );
     document.removeEventListener(EVENT.KEYUP, this.onKeyUp);
     window.removeEventListener(EVENT.RESIZE, this.onResize, false);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
@@ -1021,6 +1026,10 @@ class App extends React.Component<AppProps, AppState> {
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
     document.addEventListener(
       EVENT.MOUSE_MOVE,
+      this.updateCurrentCursorPosition,
+    );
+    document.addEventListener(
+      EVENT.DRAG_OVER,
       this.updateCurrentCursorPosition,
     );
     // rerender text elements on font load to fix #637 && #1553
@@ -5553,6 +5562,12 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    const textContent = event.dataTransfer.getData(MIME_TYPES.text);
+    if (textContent) {
+      this.addTextFromPaste(textContent);
+      return;
+    }
+
     // must be retrieved first, in the same frame
     const { file, fileHandle } = await getFileFromEvent(event);
 
