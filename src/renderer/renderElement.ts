@@ -986,12 +986,20 @@ export const renderElementToSvg = (
         use.setAttribute("width", `${width}`);
         use.setAttribute("height", `${height}`);
 
-        // We first apply scale on use, then apply translation and rotation on g
-        // which wraps use
-        use.setAttribute(
-          "transform",
-          element.scale[0] === -1 ? `scale(-1, 1) translate(-${width}) ` : "",
-        );
+        // We first apply `scale` transforms (horizontal/vertical mirroring)
+        // on the <use> element, then apply translation and rotation
+        // on the <g> element which wraps the <use>.
+        // Doing this separately is a quick hack to to work around compositing
+        // the transformations correctly (the transform-origin was not being
+        // applied correctly).
+        if (element.scale[0] !== 1 || element.scale[1] !== 1) {
+          const translateX = element.scale[0] !== 1 ? -width : 0;
+          const translateY = element.scale[1] !== 1 ? -height : 0;
+          use.setAttribute(
+            "transform",
+            `scale(${element.scale[0]}, ${element.scale[1]}) translate(${translateX} ${translateY})`,
+          );
+        }
 
         const g = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
         g.appendChild(use);
