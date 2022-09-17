@@ -308,6 +308,9 @@ export const newLinearElement = (
 export const newImageElement = (
   opts: {
     type: ExcalidrawImageElement["type"];
+    status?: ExcalidrawImageElement["status"];
+    fileId?: ExcalidrawImageElement["fileId"];
+    scale?: ExcalidrawImageElement["scale"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
   return {
@@ -315,9 +318,9 @@ export const newImageElement = (
     // in the future we'll support changing stroke color for some SVG elements,
     // and `transparent` will likely mean "use original colors of the image"
     strokeColor: "transparent",
-    status: "pending",
-    fileId: null,
-    scale: [1, 1],
+    status: opts.status ?? "pending",
+    fileId: opts.fileId ?? null,
+    scale: opts.scale ?? [1, 1],
   };
 };
 
