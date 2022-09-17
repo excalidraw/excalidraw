@@ -170,6 +170,8 @@ describe("export", () => {
     // expect 4 <use> elements (one for each excalidraw image element)
     expect(svgText.match(/<use/g)?.length).toBe(4);
 
+    // in case of regressions, save the SVG to a file and visually compare to:
+    // src/tests/fixtures/svg-image-exporting-reference.svg
     expect(svgText).toMatchSnapshot(`svg export output`);
   });
 });
