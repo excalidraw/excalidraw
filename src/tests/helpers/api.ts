@@ -4,6 +4,8 @@ import {
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
+  FileId,
 } from "../../element/types";
 import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN } from "../../constants";
@@ -13,7 +15,7 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
-import { newFreeDrawElement } from "../../element/newElement";
+import { newFreeDrawElement, newImageElement } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 
@@ -77,6 +79,7 @@ export class API {
     y?: number;
     height?: number;
     width?: number;
+    angle?: number;
     id?: string;
     isDeleted?: boolean;
     groupIds?: string[];
@@ -103,12 +106,17 @@ export class API {
       : never;
     points?: T extends "arrow" | "line" ? readonly Point[] : never;
     locked?: boolean;
+    fileId?: T extends "image" ? string : never;
+    scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
+    status?: T extends "image" ? ExcalidrawImageElement["status"] : never;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
     ? ExcalidrawFreeDrawElement
     : T extends "text"
     ? ExcalidrawTextElement
+    : T extends "image"
+    ? ExcalidrawImageElement
     : ExcalidrawGenericElement => {
     let element: Mutable<ExcalidrawElement> = null!;
 
@@ -117,6 +125,7 @@ export class API {
     const base = {
       x,
       y,
+      angle: rest.angle ?? 0,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:
         rest.backgroundColor ?? appState.currentItemBackgroundColor,
@@ -167,10 +176,21 @@ export class API {
           ...base,
           width,
           height,
-          type: type as "arrow" | "line",
+          type,
           startArrowhead: null,
           endArrowhead: null,
           points: rest.points ?? [],
+        });
+        break;
+      case "image":
+        element = newImageElement({
+          ...base,
+          width,
+          height,
+          type,
+          fileId: (rest.fileId as string as FileId) ?? null,
+          status: rest.status || "saved",
+          scale: rest.scale || [1, 1],
         });
         break;
     }
