@@ -5,7 +5,12 @@ import {
 } from "../element/types";
 
 import { getElementAbsoluteCoords } from "../element";
-import { isTextBindableContainer } from "../element/typeChecks";
+import {
+  isLinearElement,
+  isTextBindableContainer,
+} from "../element/typeChecks";
+import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
+import { AppState } from "../types";
 
 export const hasBackground = (type: string) =>
   type === "rectangle" ||
@@ -76,6 +81,7 @@ export const getElementsAtPosition = (
 
 export const getTextBindableContainerAtPosition = (
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
   x: number,
   y: number,
 ): ExcalidrawTextContainer | null => {
@@ -86,7 +92,16 @@ export const getTextBindableContainerAtPosition = (
       continue;
     }
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
-    if (x1 < x && x < x2 && y1 < y && y < y2) {
+    if (
+      isLinearElement(elements[index]) &&
+      isHittingElementNotConsideringBoundingBox(elements[index], appState, [
+        x,
+        y,
+      ])
+    ) {
+      hitElement = elements[index];
+      break;
+    } else if (x1 < x && x < x2 && y1 < y && y < y2) {
       hitElement = elements[index];
       break;
     }

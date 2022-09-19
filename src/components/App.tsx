@@ -1898,31 +1898,44 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (selectedElements.length === 1) {
-          if (isLinearElement(selectedElements[0])) {
-            if (
-              !this.state.editingLinearElement ||
-              this.state.editingLinearElement.elementId !==
-                selectedElements[0].id
-            ) {
-              this.history.resumeRecording();
-              this.setState({
-                editingLinearElement: new LinearElementEditor(
-                  selectedElements[0],
-                  this.scene,
-                ),
-              });
-            }
-          } else {
-            const selectedElement = selectedElements[0];
+          // if (
+          //   !this.state.editingLinearElement ||
+          //   this.state.editingLinearElement.elementId !==
+          //     selectedElements[0].id
+          // ) {
+          //   this.history.resumeRecording();
+          //   this.setState({
+          //     editingLinearElement: new LinearElementEditor(
+          //       selectedElements[0],
+          //       this.scene,
+          //     ),
+          //   });
+          // }
+          const selectedElement = selectedElements[0];
+          let sceneX = selectedElement.x + selectedElement.width / 2;
+          let sceneY = selectedElement.y + selectedElement.height / 2;
+          if (isLinearElement(selectedElement)) {
+            const points =
+              LinearElementEditor.getPointsGlobalCoordinates(selectedElement);
 
-            this.startTextEditing({
-              sceneX: selectedElement.x + selectedElement.width / 2,
-              sceneY: selectedElement.y + selectedElement.height / 2,
-              shouldBind: true,
-            });
-            event.preventDefault();
-            return;
+            const midPoint = LinearElementEditor.getSegmentMidPoint(
+              selectedElement,
+              points[0],
+              points.at(-1)!,
+              points.length - 1,
+            );
+
+            sceneX = midPoint[0];
+            sceneY = midPoint[1];
           }
+          console.log("sceneX, sceneY", sceneX, sceneY);
+          this.startTextEditing({
+            sceneX,
+            sceneY,
+            shouldBind: true,
+          });
+          event.preventDefault();
+          return;
         }
       } else if (
         !event.ctrlKey &&
@@ -2367,13 +2380,15 @@ class App extends React.Component<AppProps, AppState> {
       !existingTextElement &&
       (shouldBind || parentCenterPosition)
     ) {
+      const elements = this.scene
+        .getNonDeletedElements()
+        .filter(
+          (ele) =>
+            isTextBindableContainer(ele, false) && !getBoundTextElement(ele),
+        );
       container = getTextBindableContainerAtPosition(
-        this.scene
-          .getNonDeletedElements()
-          .filter(
-            (ele) =>
-              isTextBindableContainer(ele, false) && !getBoundTextElement(ele),
-          ),
+        elements,
+        this.state,
         sceneX,
         sceneY,
       );
@@ -2433,6 +2448,7 @@ class App extends React.Component<AppProps, AppState> {
           groupIds: container?.groupIds ?? [],
           locked: false,
         });
+    console.log(element.width, container?.width);
 
     this.setState({ editingElement: element });
 
@@ -6100,6 +6116,7 @@ class App extends React.Component<AppProps, AppState> {
       this.scene
         .getElementsIncludingDeleted()
         .filter((element) => !isTextElement(element)),
+      this.state,
       x,
       y,
     );

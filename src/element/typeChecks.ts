@@ -110,7 +110,8 @@ export const isTextBindableContainer = (
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
-      element.type === "image")
+      element.type === "image" ||
+      (isLinearElement(element) && element.points.length === 2))
   );
 };
 

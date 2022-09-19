@@ -141,7 +141,8 @@ export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawLinearElement;
 
 export type ExcalidrawTextElementWithContainer = {
   containerId: ExcalidrawTextContainer["id"];
