@@ -18,6 +18,7 @@ import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
+  getContainerDims,
   getContainerElement,
   wrapText,
 } from "./textElement";
@@ -83,17 +84,17 @@ export const textWysiwyg = ({
   app: App;
 }) => {
   const textPropertiesUpdated = (
-    updatedElement: ExcalidrawTextElement,
+    updatedTextElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
   ) => {
     const currentFont = editable.style.fontFamily.replace(/"/g, "");
     if (
-      getFontFamilyString({ fontFamily: updatedElement.fontFamily }) !==
+      getFontFamilyString({ fontFamily: updatedTextElement.fontFamily }) !==
       currentFont
     ) {
       return true;
     }
-    if (`${updatedElement.fontSize}px` !== editable.style.fontSize) {
+    if (`${updatedTextElement.fontSize}px` !== editable.style.fontSize) {
       return true;
     }
     return false;
@@ -102,46 +103,49 @@ export const textWysiwyg = ({
 
   const updateWysiwygStyle = () => {
     const appState = app.state;
-    const updatedElement =
+    const updatedTextElement =
       Scene.getScene(element)?.getElement<ExcalidrawTextElement>(id);
-    if (!updatedElement) {
+    if (!updatedTextElement) {
       return;
     }
-    const { textAlign, verticalAlign } = updatedElement;
+    const { textAlign, verticalAlign } = updatedTextElement;
 
-    const approxLineHeight = getApproxLineHeight(getFontString(updatedElement));
-    if (updatedElement && isTextElement(updatedElement)) {
-      let coordX = updatedElement.x;
-      let coordY = updatedElement.y;
-      const container = getContainerElement(updatedElement);
-      let maxWidth = updatedElement.width;
+    const approxLineHeight = getApproxLineHeight(
+      getFontString(updatedTextElement),
+    );
+    if (updatedTextElement && isTextElement(updatedTextElement)) {
+      let coordX = updatedTextElement.x;
+      let coordY = updatedTextElement.y;
+      const container = getContainerElement(updatedTextElement);
+      let maxWidth = updatedTextElement.width;
 
-      let maxHeight = updatedElement.height;
-      let width = updatedElement.width;
+      let maxHeight = updatedTextElement.height;
+      let width = updatedTextElement.width;
       // Set to element height by default since that's
       // what is going to be used for unbounded text
-      let height = updatedElement.height;
-      if (container && updatedElement.containerId) {
+      let height = updatedTextElement.height;
+      if (container && updatedTextElement.containerId) {
         const propertiesUpdated = textPropertiesUpdated(
-          updatedElement,
+          updatedTextElement,
           editable,
         );
+        const containerDims = getContainerDims(container);
         // using editor.style.height to get the accurate height of text editor
         const editorHeight = Number(editable.style.height.slice(0, -2));
         if (editorHeight > 0) {
           height = editorHeight;
         }
         if (propertiesUpdated) {
-          originalContainerHeight = container.height;
+          originalContainerHeight = containerDims.height;
 
           // update height of the editor after properties updated
-          height = updatedElement.height;
+          height = updatedTextElement.height;
         }
         if (!originalContainerHeight) {
-          originalContainerHeight = container.height;
+          originalContainerHeight = containerDims.height;
         }
-        maxWidth = container.width - BOUND_TEXT_PADDING * 2;
-        maxHeight = container.height - BOUND_TEXT_PADDING * 2;
+        maxWidth = containerDims.width - BOUND_TEXT_PADDING * 2;
+        maxHeight = containerDims.height - BOUND_TEXT_PADDING * 2;
         width = maxWidth;
         // The coordinates of text box set a distance of
         // 5px to preserve padding
@@ -149,27 +153,27 @@ export const textWysiwyg = ({
         // autogrow container height if text exceeds
         if (height > maxHeight) {
           const diff = Math.min(height - maxHeight, approxLineHeight);
-          mutateElement(container, { height: container.height + diff });
+          mutateElement(container, { height: containerDims.height + diff });
           return;
         } else if (
           // autoshrink container height until original container height
           // is reached when text is removed
-          container.height > originalContainerHeight &&
+          containerDims.height > originalContainerHeight &&
           height < maxHeight
         ) {
           const diff = Math.min(maxHeight - height, approxLineHeight);
-          mutateElement(container, { height: container.height - diff });
+          mutateElement(container, { height: containerDims.height - diff });
         }
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
         else {
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
-            coordY = container.y + container.height / 2 - height / 2;
+            coordY = container.y + containerDims.height / 2 - height / 2;
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
             coordY =
-              container.y + container.height - height - BOUND_TEXT_PADDING;
+              container.y + containerDims.height - height - BOUND_TEXT_PADDING;
           }
         }
       }
@@ -177,7 +181,7 @@ export const textWysiwyg = ({
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
       const initialLength = editable.value.length;
-      editable.value = updatedElement.originalText;
+      editable.value = updatedTextElement.originalText;
 
       // restore cursor position after value updated so it doesn't
       // go to the end of text when container auto expanded
@@ -192,10 +196,10 @@ export const textWysiwyg = ({
         editable.selectionEnd = editable.value.length - diff;
       }
 
-      const lines = updatedElement.originalText.split("\n");
-      const lineHeight = updatedElement.containerId
+      const lines = updatedTextElement.originalText.split("\n");
+      const lineHeight = updatedTextElement.containerId
         ? approxLineHeight
-        : updatedElement.height / lines.length;
+        : updatedTextElement.height / lines.length;
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
       }
@@ -203,9 +207,9 @@ export const textWysiwyg = ({
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
-      const angle = container ? container.angle : updatedElement.angle;
+      const angle = container ? container.angle : updatedTextElement.angle;
       Object.assign(editable.style, {
-        font: getFontString(updatedElement),
+        font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
         width: `${width}px`,
@@ -222,8 +226,8 @@ export const textWysiwyg = ({
         ),
         textAlign,
         verticalAlign,
-        color: updatedElement.strokeColor,
-        opacity: updatedElement.opacity / 100,
+        color: updatedTextElement.strokeColor,
+        opacity: updatedTextElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxWidth: `${maxWidth}px`,
         maxHeight: `${editorMaxHeight}px`,
@@ -231,9 +235,9 @@ export const textWysiwyg = ({
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
       if (isTestEnv()) {
-        editable.style.fontFamily = getFontFamilyString(updatedElement);
+        editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
-      mutateElement(updatedElement, { x: coordX, y: coordY });
+      mutateElement(updatedTextElement, { x: coordX, y: coordY });
     }
   };
 
@@ -276,10 +280,10 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.oninput = () => {
-      const updatedElement = Scene.getScene(element)?.getElement(
+      const updatedTextElement = Scene.getScene(element)?.getElement(
         id,
       ) as ExcalidrawTextElement;
-      const font = getFontString(updatedElement);
+      const font = getFontString(updatedTextElement);
       // using scrollHeight here since we need to calculate
       // number of lines so cannot use editable.style.height
       // as that gets updated below
