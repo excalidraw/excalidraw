@@ -15,6 +15,8 @@ export const defaultLang = { code: "en", label: "English" };
 const allLanguages: Language[] = [
   { code: "ar-SA", label: "العربية", rtl: true },
   { code: "bg-BG", label: "Български" },
+  { code: "bn-IN", label: "বাংলা (ভারত)" },
+  { code: "bn-BD", label: "বাংলা (বাংলাদেশ)" },
   { code: "ca-ES", label: "Català" },
   { code: "cs-CZ", label: "Česky" },
   { code: "de-DE", label: "Deutsch" },
