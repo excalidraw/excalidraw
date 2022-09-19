@@ -21,7 +21,12 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
-import { getContainerElement, measureText, wrapText } from "./textElement";
+import {
+  getContainerDims,
+  getContainerElement,
+  measureText,
+  wrapText,
+} from "./textElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
@@ -164,7 +169,8 @@ const getAdjustedDimensions = (
   let maxWidth = null;
   const container = getContainerElement(element);
   if (container) {
-    maxWidth = container.width - BOUND_TEXT_PADDING * 2;
+    const containerDims = getContainerDims(container);
+    maxWidth = containerDims.width - BOUND_TEXT_PADDING * 2;
   }
   const {
     width: nextWidth,
@@ -224,15 +230,16 @@ const getAdjustedDimensions = (
   // make sure container dimensions are set properly when
   // text editor overflows beyond viewport dimensions
   if (container) {
-    let height = container.height;
-    let width = container.width;
+    const containerDims = getContainerDims(container);
+    let height = containerDims.height;
+    let width = containerDims.width;
     if (nextHeight > height - BOUND_TEXT_PADDING * 2) {
       height = nextHeight + BOUND_TEXT_PADDING * 2;
     }
     if (nextWidth > width - BOUND_TEXT_PADDING * 2) {
       width = nextWidth + BOUND_TEXT_PADDING * 2;
     }
-    if (height !== container.height || width !== container.width) {
+    if (height !== containerDims.height || width !== containerDims.width) {
       mutateElement(container, { height, width });
     }
   }
@@ -259,7 +266,8 @@ export const updateTextElement = (
 ): ExcalidrawTextElement => {
   const container = getContainerElement(element);
   if (container) {
-    text = wrapText(text, getFontString(element), container.width);
+    const containerDims = getContainerDims(container);
+    text = wrapText(text, getFontString(element), containerDims.width);
   }
   const dimensions = getAdjustedDimensions(element, text);
   return newElementWith(element, {
