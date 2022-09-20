@@ -268,6 +268,12 @@ export const selectSubtype = (
   return { subtype, customData };
 };
 
+// Callback to re-render subtyped `ExcalidrawElement`s after completing
+// async loading of the subtype.
+export type SubtypeLoadedCb = (
+  hasSubtype: (element: ExcalidrawElement) => boolean,
+) => void;
+
 // Functions to prepare subtypes for use
 export type SubtypePrepFn = (
   addSubtypeAction: (action: Action) => void,
@@ -275,9 +281,7 @@ export type SubtypePrepFn = (
     fallbackLangData: Object,
     setLanguageAux: (langCode: string) => Promise<Object | undefined>,
   ) => void,
-  onSubtypeLoaded?: (
-    hasSubtype: (element: ExcalidrawElement) => boolean,
-  ) => void,
+  onSubtypeLoaded?: SubtypeLoadedCb,
 ) => {
   actions: Action[];
   methods: Partial<SubtypeMethods>;
@@ -290,9 +294,7 @@ export type SubtypePrepFn = (
 export const prepareSubtype = (
   record: SubtypeRecord,
   subtypePrepFn: SubtypePrepFn,
-  onSubtypeLoaded?: (
-    hasSubtype: (element: ExcalidrawElement) => boolean,
-  ) => void,
+  onSubtypeLoaded?: SubtypeLoadedCb,
 ): { actions: Action[] | null; methods: Partial<SubtypeMethods> } => {
   const map = getSubtypeMethods(record.subtype);
   if (map) {

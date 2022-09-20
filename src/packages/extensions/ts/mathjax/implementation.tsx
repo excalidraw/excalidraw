@@ -38,7 +38,11 @@ import {
 import { ButtonSelect } from "../../../../components/ButtonSelect";
 
 // Subtype imports
-import { SubtypeMethods, SubtypePrepFn } from "../../../../subtypes";
+import {
+  SubtypeLoadedCb,
+  SubtypeMethods,
+  SubtypePrepFn,
+} from "../../../../subtypes";
 import { mathSubtypeIcon } from "./icon";
 import { getMathSubtypeRecord } from "./types";
 import { SubtypeButton } from "../../../../components/SubtypeButton";
@@ -118,9 +122,7 @@ const mathJax = {} as {
 let stopLoadingMathJax = false;
 let mathJaxLoaded = false;
 let mathJaxLoading = false;
-let mathJaxLoadedCallback:
-  | ((hasSubtype: (element: ExcalidrawElement) => boolean) => void)
-  | undefined;
+let mathJaxLoadedCallback: SubtypeLoadedCb | undefined;
 
 let errorSvg: string;
 
