@@ -54,7 +54,6 @@ type MathProps = Record<"useTex" | "mathOnly", boolean>;
 type ExcalidrawMathElement = ExcalidrawTextElement &
   Readonly<{
     subtype: typeof mathSubtype;
-    customData: MathProps;
   }>;
 
 const isMathElement = (
@@ -89,7 +88,7 @@ class GetMathProps {
     return this.mathOnly;
   };
 
-  ensureMathProps = (props: MathProps): MathProps => {
+  ensureMathProps = (props: ExcalidrawElement["customData"]): MathProps => {
     const mathProps: MathProps = {
       useTex:
         props !== undefined && props.useTex !== undefined
@@ -707,12 +706,12 @@ const ensureMathElement = (element: Partial<ExcalidrawElement>) => {
   if (!isMathElement(element as Required<ExcalidrawElement>)) {
     return;
   }
-  const mathProps = getMathProps.ensureMathProps(
-    element.customData! as MathProps,
-  );
-  if (!("customData" in element)) {
-    (element as any).customData = mathProps;
-  }
+  const mathProps = getMathProps.ensureMathProps(element.customData);
+  (element as any).customData = {
+    ...element.customData,
+    useTex: mathProps.useTex,
+    mathOnly: mathProps.mathOnly,
+  } as ExcalidrawElement["customData"];
 };
 
 const cleanMathElementUpdate = function (updates) {
@@ -722,8 +721,12 @@ const cleanMathElementUpdate = function (updates) {
       (oldUpdates as any)[key] = (updates as any)[key];
     }
     if (key === "customData") {
-      const customData = (updates as any)[key] as MathProps;
-      (updates as any)[key] = getMathProps.ensureMathProps(customData);
+      const mathProps = getMathProps.ensureMathProps((updates as any)[key]);
+      (updates as any)[key] = {
+        ...(updates as any)[key],
+        useTex: mathProps.useTex,
+        mathOnly: mathProps.mathOnly,
+      };
     } else {
       (updates as any)[key] = (updates as any)[key];
     }
@@ -738,7 +741,7 @@ const measureMathElement = function (element, next, maxWidth) {
   const fontSize = next?.fontSize ?? element.fontSize;
   const text = next?.text ?? element.text;
   const customData = next?.customData ?? element.customData;
-  const mathProps = getMathProps.ensureMathProps(customData! as MathProps);
+  const mathProps = getMathProps.ensureMathProps(customData);
   const noMaxWidth = mathProps.mathOnly;
   const cWidth = noMaxWidth ? undefined : maxWidth;
   const metrics = getImageMetrics(
@@ -1027,7 +1030,7 @@ const wrapMathElement = function (element, containerWidth, next) {
     next?.fontSize !== undefined ? next.fontSize : element.fontSize;
   const text = next?.text !== undefined ? next.text : element.originalText;
   const customData = next?.customData ?? element.customData;
-  const mathProps = getMathProps.ensureMathProps(customData! as MathProps);
+  const mathProps = getMathProps.ensureMathProps(customData);
 
   const font = getFontString({ fontSize, fontFamily: FONT_FAMILY_MATH });
 
@@ -1258,7 +1261,7 @@ const createMathActions = () => {
                 ? getBoundTextElement(element)
                 : element;
               return isMathElement(el)
-                ? getMathProps.ensureMathProps(el.customData!).useTex
+                ? getMathProps.ensureMathProps(el.customData).useTex
                 : null;
             },
             getMathProps.getUseTex(appState),
@@ -1344,7 +1347,7 @@ const createMathActions = () => {
                 ? getBoundTextElement(element)
                 : element;
               return isMathElement(el)
-                ? getMathProps.ensureMathProps(el.customData!).mathOnly
+                ? getMathProps.ensureMathProps(el.customData).mathOnly
                 : null;
             },
             getMathProps.getMathOnly(appState),
