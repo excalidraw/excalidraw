@@ -39,7 +39,6 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
@@ -63,7 +62,6 @@ export const MobileMenu = ({
   isCollaborating,
   renderShapeToggles,
   renderCustomFooter,
-  showThemeBtn,
   onImageAction,
   renderTopRightUI,
   renderCustomStats,
@@ -124,7 +122,6 @@ export const MobileMenu = ({
   const renderAppToolbar = () => {
     // Render eraser conditionally in mobile
     const showEraser =
-      !appState.viewModeEnabled &&
       !appState.editingElement &&
       getSelectedElements(elements, appState).length === 0;
 
@@ -143,11 +140,11 @@ export const MobileMenu = ({
 
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
-        {showEraser && actionManager.renderAction("eraser")}
-
-        {actionManager.renderAction(
-          appState.multiElement ? "finalize" : "duplicateSelection",
-        )}
+        {showEraser
+          ? actionManager.renderAction("eraser")
+          : actionManager.renderAction(
+              appState.multiElement ? "finalize" : "duplicateSelection",
+            )}
         {actionManager.renderAction("deleteSelectedElements")}
       </div>
     );
@@ -175,14 +172,7 @@ export const MobileMenu = ({
             onClick={onCollabButtonClick}
           />
         )}
-        {
-          <BackgroundPickerAndDarkModeToggle
-            actionManager={actionManager}
-            appState={appState}
-            setAppState={setAppState}
-            showThemeBtn={showThemeBtn}
-          />
-        }
+        {<BackgroundPickerAndDarkModeToggle actionManager={actionManager} />}
       </>
     );
   };

@@ -264,6 +264,7 @@ import {
   getBoundTextElement,
   getContainerElement,
   redrawTextBoundingBox,
+  getContainerDims,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
@@ -607,10 +608,6 @@ class App extends React.Component<AppProps, AppState> {
                     typeof this.props?.zenModeEnabled === "undefined" &&
                     this.state.zenModeEnabled
                   }
-                  showThemeBtn={
-                    typeof this.props?.theme === "undefined" &&
-                    this.props.UIOptions.canvasActions.theme
-                  }
                   libraryReturnUrl={this.props.libraryReturnUrl}
                   UIOptions={this.props.UIOptions}
                   focusContainer={this.focusContainer}
@@ -700,7 +697,8 @@ class App extends React.Component<AppProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
-        let theme = actionResult?.appState?.theme || THEME.LIGHT;
+        const theme =
+          actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
         let name = actionResult?.appState?.name ?? this.state.name;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -712,10 +710,6 @@ class App extends React.Component<AppProps, AppState> {
 
         if (typeof this.props.gridModeEnabled !== "undefined") {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
-        }
-
-        if (typeof this.props.theme !== "undefined") {
-          theme = this.props.theme;
         }
 
         if (typeof this.props.name !== "undefined") {
@@ -810,6 +804,9 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
+    if (this.props.theme) {
+      this.setState({ theme: this.props.theme });
+    }
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });
     }
@@ -839,6 +836,7 @@ class App extends React.Component<AppProps, AppState> {
     const scene = restore(initialData, null, null);
     scene.appState = {
       ...scene.appState,
+      theme: this.props.theme || scene.appState.theme,
       // we're falling back to current (pre-init) state when deciding
       // whether to open the library, to handle a case where we
       // update the state outside of initialData (e.g. when loading the app
@@ -1211,7 +1209,11 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       // defer so that the commitToHistory flag isn't reset via current update
       setTimeout(() => {
-        this.actionManager.executeAction(actionFinalize);
+        // execute only if the condition still holds when the deferred callback
+        // executes (it can be scheduled multiple times depending on how
+        // many times the component renders)
+        this.state.editingLinearElement &&
+          this.actionManager.executeAction(actionFinalize);
       });
     }
 
@@ -2454,8 +2456,9 @@ class App extends React.Component<AppProps, AppState> {
       };
       const minWidth = getApproxMinLineWidth(getFontString(fontString));
       const minHeight = getApproxMinLineHeight(getFontString(fontString));
-      const newHeight = Math.max(container.height, minHeight);
-      const newWidth = Math.max(container.width, minWidth);
+      const containerDims = getContainerDims(container);
+      const newHeight = Math.max(containerDims.height, minHeight);
+      const newWidth = Math.max(containerDims.width, minWidth);
       mutateElement(container, { height: newHeight, width: newWidth });
       sceneX = container.x + newWidth / 2;
       sceneY = container.y + newHeight / 2;
@@ -2789,18 +2792,23 @@ class App extends React.Component<AppProps, AppState> {
         event,
         scenePointerX,
         scenePointerY,
-        this.state.editingLinearElement,
-        this.state.gridSize,
+        this.state,
       );
-      if (editingLinearElement !== this.state.editingLinearElement) {
+
+      if (
+        editingLinearElement &&
+        editingLinearElement !== this.state.editingLinearElement
+      ) {
         // Since we are reading from previous state which is not possible with
         // automatic batching in React 18 hence using flush sync to synchronously
         // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
         flushSync(() => {
-          this.setState({ editingLinearElement });
+          this.setState({
+            editingLinearElement,
+          });
         });
       }
-      if (editingLinearElement.lastUncommittedPoint != null) {
+      if (editingLinearElement?.lastUncommittedPoint != null) {
         this.maybeSuggestBindingAtCursor(scenePointer);
       } else {
         this.setState({ suggestedBindings: [] });
@@ -3129,7 +3137,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (this.state.selectedLinearElement) {
       let hoverPointIndex = -1;
-      let midPointHovered = false;
+      let segmentMidPointHoveredCoords = null;
       if (
         isHittingElementNotConsideringBoundingBox(element, this.state, [
           scenePointerX,
@@ -3142,13 +3150,14 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         );
-        midPointHovered = LinearElementEditor.isHittingMidPoint(
-          linearElementEditor,
-          { x: scenePointerX, y: scenePointerY },
-          this.state,
-        );
+        segmentMidPointHoveredCoords =
+          LinearElementEditor.getSegmentMidpointHitCoords(
+            linearElementEditor,
+            { x: scenePointerX, y: scenePointerY },
+            this.state,
+          );
 
-        if (hoverPointIndex >= 0 || midPointHovered) {
+        if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
           setCursor(this.canvas, CURSOR_TYPE.POINTER);
         } else {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
@@ -3177,12 +3186,15 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        this.state.selectedLinearElement.midPointHovered !== midPointHovered
+        !LinearElementEditor.arePointsEqual(
+          this.state.selectedLinearElement.segmentMidPointHoveredCoords,
+          segmentMidPointHoveredCoords,
+        )
       ) {
         this.setState({
           selectedLinearElement: {
             ...this.state.selectedLinearElement,
-            midPointHovered,
+            segmentMidPointHoveredCoords,
           },
         });
       }

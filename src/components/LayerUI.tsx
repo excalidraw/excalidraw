@@ -53,7 +53,6 @@ interface LayerUIProps {
   onPenModeToggle: () => void;
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   showExitZenModeBtn: boolean;
-  showThemeBtn: boolean;
   langCode: Language["code"];
   isCollaborating: boolean;
   renderShapeToggles?: (JSX.Element | null)[];
@@ -79,7 +78,6 @@ const LayerUI = ({
   onPenModeToggle,
   onInsertElements,
   showExitZenModeBtn,
-  showThemeBtn,
   isCollaborating,
   renderShapeToggles,
   renderTopRightUI,
@@ -211,12 +209,7 @@ const LayerUI = ({
               />
             )}
           </Stack.Row>
-          <BackgroundPickerAndDarkModeToggle
-            appState={appState}
-            actionManager={actionManager}
-            setAppState={setAppState}
-            showThemeBtn={showThemeBtn}
-          />
+          <BackgroundPickerAndDarkModeToggle actionManager={actionManager} />
           {appState.fileHandle && (
             <>{actionManager.renderAction("saveToActiveFile")}</>
           )}
@@ -428,7 +421,6 @@ const LayerUI = ({
           isCollaborating={isCollaborating}
           renderShapeToggles={renderShapeToggles}
           renderCustomFooter={renderCustomFooter}
-          showThemeBtn={showThemeBtn}
           onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}

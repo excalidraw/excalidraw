@@ -290,7 +290,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
       files: excalidrawAPI?.getFiles(),
       type,
     });
-    window.alert(`Copied to clipboard as ${type} sucessfully`);
+    window.alert(`Copied to clipboard as ${type} successfully`);
   };
 
   const [pointerData, setPointerData] = useState<{
