@@ -37,7 +37,10 @@ import {
   VERTICAL_ALIGN,
 } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
-import { getApproxLineHeight } from "../element/textElement";
+import {
+  getApproxLineHeight,
+  getContainerElement,
+} from "../element/textElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -804,6 +807,18 @@ export const renderElement = (
         // not exporting → optimized rendering (cache & render from element
         // canvases)
       } else {
+        if (isTextElement(element)) {
+          const container = getContainerElement(element);
+          if (isLinearElement(container)) {
+            context.save();
+            context.translate(
+              element.x + renderConfig.scrollX,
+              element.y + renderConfig.scrollY,
+            );
+            context.clearRect(0, 0, element.width, element.height);
+            context.restore();
+          }
+        }
         const elementWithCanvas = generateElementWithCanvas(
           element,
           renderConfig,

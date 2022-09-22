@@ -1928,7 +1928,6 @@ class App extends React.Component<AppProps, AppState> {
             sceneX = midPoint[0];
             sceneY = midPoint[1];
           }
-          console.log("sceneX, sceneY", sceneX, sceneY);
           this.startTextEditing({
             sceneX,
             sceneY,
@@ -2394,7 +2393,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    if (!existingTextElement && container) {
+    if (!existingTextElement && container && !isLinearElement(container)) {
       const fontString = {
         fontSize: this.state.currentItemFontSize,
         fontFamily: this.state.currentItemFontFamily,
@@ -2417,7 +2416,6 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
     }
-
     const element = existingTextElement
       ? existingTextElement
       : newTextElement({
@@ -2448,7 +2446,6 @@ class App extends React.Component<AppProps, AppState> {
           groupIds: container?.groupIds ?? [],
           locked: false,
         });
-    console.log(element.width, container?.width);
 
     this.setState({ editingElement: element });
 

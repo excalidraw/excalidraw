@@ -6,7 +6,11 @@ import {
   isTestEnv,
 } from "../utils";
 import Scene from "../scene/Scene";
-import { isBoundToContainer, isTextElement } from "./typeChecks";
+import {
+  isBoundToContainer,
+  isLinearElement,
+  isTextElement,
+} from "./typeChecks";
 import { CLASSES, BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
@@ -28,7 +32,7 @@ import {
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
-import { getMaxContainerWidth } from "./newElement";
+import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 
 const normalizeText = (text: string) => {
   return (
@@ -145,8 +149,9 @@ export const textWysiwyg = ({
         if (!originalContainerHeight) {
           originalContainerHeight = containerDims.height;
         }
-        maxWidth = containerDims.width - BOUND_TEXT_PADDING * 2;
-        maxHeight = containerDims.height - BOUND_TEXT_PADDING * 2;
+        maxWidth = getMaxContainerWidth(container);
+        maxHeight = getMaxContainerHeight(container);
+
         // autogrow container height if text exceeds
         if (height > maxHeight) {
           const diff = Math.min(height - maxHeight, approxLineHeight);
@@ -166,7 +171,13 @@ export const textWysiwyg = ({
         else {
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
-            coordY = container.y + containerDims.height / 2 - height / 2;
+            const lines = updatedTextElement.text.split("\n");
+            if (!isLinearElement(container)) {
+              coordY = container.y + containerDims.height / 2 - height / 2;
+            } else if (lines.length > 1) {
+              coordY =
+                container.y - ((lines.length - 1) * approxLineHeight) / 2;
+            }
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
             coordY =
