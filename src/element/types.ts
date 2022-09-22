@@ -1,5 +1,5 @@
 import { Point } from "../types";
-import { FONT_FAMILY, THEME, VERTICAL_ALIGN } from "../constants";
+import { FONT_FAMILY, TEXT_ALIGN, THEME, VERTICAL_ALIGN } from "../constants";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid";
@@ -11,7 +11,7 @@ export type GroupId = string;
 export type PointerType = "mouse" | "pen" | "touch";
 export type StrokeSharpness = "round" | "sharp";
 export type StrokeStyle = "solid" | "dashed" | "dotted";
-export type TextAlign = "left" | "center" | "right";
+export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
 
 type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
 export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];

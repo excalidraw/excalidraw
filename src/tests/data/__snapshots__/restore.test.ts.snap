@@ -296,7 +296,7 @@ Object {
   "versionNonce": 0,
   "verticalAlign": "middle",
   "width": 100,
-  "x": 0,
+  "x": -0.5,
   "y": 0,
 }
 `;

@@ -252,8 +252,16 @@ const getAdjustedDimensions = (
   };
 };
 
+export const getMaxContainerWidth = (container: ExcalidrawElement) => {
+  return getContainerDims(container).width - BOUND_TEXT_PADDING * 2;
+};
+
+export const getMaxContainerHeight = (container: ExcalidrawElement) => {
+  return getContainerDims(container).height - BOUND_TEXT_PADDING * 2;
+};
+
 export const updateTextElement = (
-  element: ExcalidrawTextElement,
+  textElement: ExcalidrawTextElement,
   {
     text,
     isDeleted,
@@ -264,16 +272,19 @@ export const updateTextElement = (
     originalText: string;
   },
 ): ExcalidrawTextElement => {
-  const container = getContainerElement(element);
+  const container = getContainerElement(textElement);
   if (container) {
-    const containerDims = getContainerDims(container);
-    text = wrapText(text, getFontString(element), containerDims.width);
+    text = wrapText(
+      originalText,
+      getFontString(textElement),
+      getMaxContainerWidth(container),
+    );
   }
-  const dimensions = getAdjustedDimensions(element, text);
-  return newElementWith(element, {
+  const dimensions = getAdjustedDimensions(textElement, text);
+  return newElementWith(textElement, {
     text,
     originalText,
-    isDeleted: isDeleted ?? element.isDeleted,
+    isDeleted: isDeleted ?? textElement.isDeleted,
     ...dimensions,
   });
 };
