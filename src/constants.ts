@@ -201,6 +201,12 @@ export const VERTICAL_ALIGN = {
   BOTTOM: "bottom",
 };
 
+export const TEXT_ALIGN = {
+  LEFT: "left",
+  CENTER: "center",
+  RIGHT: "right",
+};
+
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 
 export const COOKIES = {
