@@ -15,6 +15,7 @@ export const alignElements = (
   const groups: ExcalidrawElement[][] = getMaximumGroups(selectedElements);
 
   const selectionBoundingBox = getCommonBoundingBox(selectedElements);
+
   return groups.flatMap((group) => {
     const translation = calculateTranslation(
       group,
