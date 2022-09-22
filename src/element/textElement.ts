@@ -7,11 +7,11 @@ import {
   NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
-import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
-import { getMaxContainerWidth } from "./newElement";
+import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
@@ -39,7 +39,6 @@ export const redrawTextBoundingBox = (
   if (container) {
     const containerDims = getContainerDims(container);
     let nextHeight = containerDims.height;
-    coordX = container.x + container.width / 2 - metrics.width / 2;
     if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
       coordY = container.y + BOUND_TEXT_PADDING;
     } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
@@ -50,11 +49,21 @@ export const redrawTextBoundingBox = (
         BOUND_TEXT_PADDING;
     } else {
       coordY = container.y + containerDims.height / 2 - metrics.height / 2;
-      if (metrics.height > containerDims.height - BOUND_TEXT_PADDING * 2) {
+      if (metrics.height > getMaxContainerHeight(container)) {
         nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
         coordY = container.y + nextHeight / 2 - metrics.height / 2;
       }
     }
+
+    if (textElement.textAlign === TEXT_ALIGN.LEFT) {
+      coordX = container.x + BOUND_TEXT_PADDING;
+    } else if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
+      coordX =
+        container.x + containerDims.width - metrics.width - BOUND_TEXT_PADDING;
+    } else {
+      coordX = container.x + container.width / 2 - metrics.width / 2;
+    }
+
     mutateElement(container, { height: nextHeight });
   }
 

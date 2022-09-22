@@ -263,7 +263,7 @@ export const textWysiwyg = ({
     border: 0,
     outline: 0,
     resize: "none",
-    background: "transparent",
+    background: "white",
     overflow: "hidden",
     // must be specified because in dark mode canvas creates a stacking context
     zIndex: "var(--zIndex-wysiwyg)",
