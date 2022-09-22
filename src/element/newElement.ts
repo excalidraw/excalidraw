@@ -275,7 +275,7 @@ export const updateTextElement = (
   const container = getContainerElement(textElement);
   if (container) {
     text = wrapText(
-      text,
+      originalText,
       getFontString(textElement),
       getMaxContainerWidth(container),
     );
