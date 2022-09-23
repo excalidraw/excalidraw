@@ -33,13 +33,17 @@ import {
 import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
 import { shouldRotateWithDiscreteAngle } from "../keys";
+import { getBoundTextElement } from "./textElement";
+import { isPointHittingElementBoundingBox } from "./collision";
 
 const editorMidPointsCache: {
   version: number | null;
   points: (Point | null)[];
   zoom: number | null;
 } = { version: null, points: [], zoom: null };
-
+let isPointHittingBoundTextElement = false;
+let boundTextOnLeftSegment = false;
+let boundTextOnRightSegment = false;
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
     _brand: "excalidrawLinearElementId";
@@ -243,6 +247,41 @@ export class LinearElementEditor {
           }),
         );
       }
+      const textElement = getBoundTextElement(element);
+
+      if (textElement) {
+        const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+        const selectedIndex = selectedPointsIndices[0];
+
+        if (isPointHittingBoundTextElement) {
+          mutateElement(textElement, {
+            x: points[selectedIndex][0] - textElement.width / 2,
+            y: points[selectedIndex][1] - textElement.height / 2,
+          });
+        } else if (boundTextOnLeftSegment) {
+          const midPointForLeftSegment = this.getSegmentMidPoint(
+            element,
+            points[selectedIndex],
+            points[selectedIndex - 1]!,
+            selectedIndex,
+          );
+          mutateElement(textElement, {
+            x: midPointForLeftSegment[0] - textElement.width / 2,
+            y: midPointForLeftSegment[1] - textElement.height / 2,
+          });
+        } else if (boundTextOnRightSegment) {
+          const midPointForRightSegment = this.getSegmentMidPoint(
+            element,
+            points[selectedIndex],
+            points[selectedIndex + 1]!,
+            selectedIndex + 1,
+          );
+          mutateElement(textElement, {
+            x: midPointForRightSegment[0] - textElement.width / 2,
+            y: midPointForRightSegment[1] - textElement.height / 2,
+          });
+        }
+      }
 
       // suggest bindings for first and last point if selected
       if (isBindingElement(element, false)) {
@@ -292,6 +331,9 @@ export class LinearElementEditor {
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
     const element = LinearElementEditor.getElement(elementId);
+    isPointHittingBoundTextElement = false;
+    boundTextOnLeftSegment = false;
+    boundTextOnRightSegment = false;
     if (!element) {
       return editingLinearElement;
     }
@@ -594,6 +636,9 @@ export class LinearElementEditor {
       scenePointer,
       appState,
     );
+    const textElement = getBoundTextElement(element);
+    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+
     if (segmentMidPoint) {
       const index = LinearElementEditor.getSegmentMidPointIndex(
         linearElementEditor,
@@ -606,15 +651,25 @@ export class LinearElementEditor {
         segmentMidPoint[1],
         appState.gridSize,
       );
-      const points = [
+      const updatedPoints = [
         ...element.points.slice(0, index),
         newMidPoint,
         ...element.points.slice(index),
       ];
       mutateElement(element, {
-        points,
+        points: updatedPoints,
       });
-
+      if (textElement) {
+        if (
+          isPointHittingElementBoundingBox(
+            textElement,
+            [scenePointer.x, scenePointer.y],
+            10,
+          )
+        ) {
+          isPointHittingBoundTextElement = true;
+        }
+      }
       ret.didAddPoint = true;
       ret.isMidPoint = true;
       ret.linearElementEditor = {
@@ -626,6 +681,52 @@ export class LinearElementEditor {
         },
         lastUncommittedPoint: null,
       };
+    } else if (textElement && !isPointHittingBoundTextElement) {
+      const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+        element,
+        appState.zoom,
+        scenePointer.x,
+        scenePointer.y,
+      );
+      if (clickedPointIndex > 0) {
+        const midPointForLeftSegment = this.getSegmentMidPoint(
+          element,
+          points[clickedPointIndex],
+          points[clickedPointIndex - 1]!,
+          clickedPointIndex,
+        );
+
+        if (
+          isPointHittingElementBoundingBox(
+            textElement,
+            midPointForLeftSegment,
+            10,
+          )
+        ) {
+          boundTextOnLeftSegment = true;
+        }
+      }
+      if (
+        !boundTextOnLeftSegment &&
+        clickedPointIndex >= 0 &&
+        clickedPointIndex < points.length - 1
+      ) {
+        const midPointForRightSegment = this.getSegmentMidPoint(
+          element,
+          points[clickedPointIndex],
+          points[clickedPointIndex + 1]!,
+          clickedPointIndex + 1,
+        );
+        if (
+          isPointHittingElementBoundingBox(
+            textElement,
+            midPointForRightSegment,
+            10,
+          )
+        ) {
+          boundTextOnRightSegment = true;
+        }
+      }
     }
     if (event.altKey && appState.editingLinearElement) {
       if (linearElementEditor.lastUncommittedPoint == null) {
@@ -667,7 +768,6 @@ export class LinearElementEditor {
       scenePointer.x,
       scenePointer.y,
     );
-
     // if we clicked on a point, set the element as hitElement otherwise
     // it would get deselected if the point is outside the hitbox area
     if (clickedPointIndex >= 0 || segmentMidPoint) {

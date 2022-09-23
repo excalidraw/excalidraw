@@ -264,6 +264,9 @@ export const textWysiwyg = ({
     whiteSpace = "pre-wrap";
     wordBreak = "break-word";
   }
+  const background = isLinearElement(getContainerElement(element))
+    ? "#fff"
+    : "transparent";
   Object.assign(editable.style, {
     position: "absolute",
     display: "inline-block",
@@ -274,7 +277,7 @@ export const textWysiwyg = ({
     border: 0,
     outline: 0,
     resize: "none",
-    background: "transparent",
+    background,
     overflow: "hidden",
     // must be specified because in dark mode canvas creates a stacking context
     zIndex: "var(--zIndex-wysiwyg)",
