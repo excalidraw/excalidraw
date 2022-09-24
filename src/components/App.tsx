@@ -253,6 +253,7 @@ import {
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
+  getContainerDims,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import { resizeSingleElement } from "../element/resizeElements";
@@ -1174,7 +1175,10 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       // defer so that the commitToHistory flag isn't reset via current update
       setTimeout(() => {
-        this.state.editingLinearElement && //zsviczian
+        // execute only if the condition still holds when the deferred callback
+        // executes (it can be scheduled multiple times depending on how
+        // many times the component renders)
+        this.state.editingLinearElement &&
           this.actionManager.executeAction(actionFinalize);
       });
     }
@@ -2576,8 +2580,9 @@ class App extends React.Component<AppProps, AppState> {
       };
       const minWidth = getApproxMinLineWidth(getFontString(fontString));
       const minHeight = getApproxMinLineHeight(getFontString(fontString));
-      const newHeight = Math.max(container.height, minHeight);
-      const newWidth = Math.max(container.width, minWidth);
+      const containerDims = getContainerDims(container);
+      const newHeight = Math.max(containerDims.height, minHeight);
+      const newWidth = Math.max(containerDims.width, minWidth);
       mutateElement(container, { height: newHeight, width: newWidth });
       sceneX = container.x + newWidth / 2;
       sceneY = container.y + newHeight / 2;
