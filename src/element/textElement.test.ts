@@ -1,3 +1,4 @@
+import { BOUND_TEXT_PADDING } from "../constants";
 import { wrapText } from "./textElement";
 import { FontString } from "./types";
 
@@ -45,7 +46,7 @@ up`,
       },
     ].forEach((data) => {
       it(`should ${data.desc}`, () => {
-        const res = wrapText(text, font, data.width);
+        const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
         expect(res).toEqual(data.res);
       });
     });
@@ -93,7 +94,7 @@ whats up`,
       },
     ].forEach((data) => {
       it(`should respect new lines and ${data.desc}`, () => {
-        const res = wrapText(text, font, data.width);
+        const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
         expect(res).toEqual(data.res);
       });
     });
@@ -132,7 +133,7 @@ break it now`,
       },
     ].forEach((data) => {
       it(`should ${data.desc}`, () => {
-        const res = wrapText(text, font, data.width);
+        const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
         expect(res).toEqual(data.res);
       });
     });
