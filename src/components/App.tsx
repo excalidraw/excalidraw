@@ -34,6 +34,8 @@ import {
   actionUngroup,
   actionLink,
   actionToggleLock,
+  actionEnterLineEditor,
+  actionExitLineEditor,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -5876,6 +5878,16 @@ class App extends React.Component<AppProps, AppState> {
       this.actionManager.getAppState(),
     );
 
+    const mayBeAllowLineEditing = actionEnterLineEditor.contextItemPredicate(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const mayBeExitLineEditing = actionExitLineEditor.contextItemPredicate(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
     const separator = "separator";
 
     const elements = this.scene.getNonDeletedElements();
@@ -6005,6 +6017,8 @@ class App extends React.Component<AppProps, AppState> {
             maybeGroupAction && actionGroup,
             mayBeAllowUnbinding && actionUnbindText,
             mayBeAllowBinding && actionBindText,
+            mayBeAllowLineEditing && actionEnterLineEditor,
+            mayBeExitLineEditing && actionExitLineEditor,
             maybeUngroupAction && actionUngroup,
             (maybeGroupAction || maybeUngroupAction) && separator,
             actionAddToLibrary,
