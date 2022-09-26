@@ -34,8 +34,7 @@ import {
   actionUngroup,
   actionLink,
   actionToggleLock,
-  actionEnterLineEditor,
-  actionExitLineEditor,
+  actionToggleLineEditor,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -5878,15 +5877,11 @@ class App extends React.Component<AppProps, AppState> {
       this.actionManager.getAppState(),
     );
 
-    const mayBeAllowLineEditing = actionEnterLineEditor.contextItemPredicate(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
-
-    const mayBeExitLineEditing = actionExitLineEditor.contextItemPredicate(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
+    const mayBeAllowToggleLineEditing =
+      actionToggleLineEditor.contextItemPredicate(
+        this.actionManager.getElementsIncludingDeleted(),
+        this.actionManager.getAppState(),
+      );
 
     const separator = "separator";
 
@@ -6017,8 +6012,7 @@ class App extends React.Component<AppProps, AppState> {
             maybeGroupAction && actionGroup,
             mayBeAllowUnbinding && actionUnbindText,
             mayBeAllowBinding && actionBindText,
-            mayBeAllowLineEditing && actionEnterLineEditor,
-            mayBeExitLineEditing && actionExitLineEditor,
+            mayBeAllowToggleLineEditing && actionToggleLineEditor,
             maybeUngroupAction && actionUngroup,
             (maybeGroupAction || maybeUngroupAction) && separator,
             actionAddToLibrary,

@@ -5,18 +5,14 @@ import { ExcalidrawLinearElement } from "../element/types";
 import { getSelectedElements } from "../scene";
 import { register } from "./register";
 
-export const actionEnterLineEditor = register({
-  name: "enterLineEditor",
+export const actionToggleLineEditor = register({
+  name: "toggleLineEditor",
   trackEvent: {
     category: "element",
   },
   contextItemPredicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
-    if (
-      selectedElements.length === 1 &&
-      isLinearElement(selectedElements[0]) &&
-      appState.editingLinearElement?.elementId !== selectedElements[0].id
-    ) {
+    if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       return true;
     }
     return false;
@@ -27,45 +23,27 @@ export const actionEnterLineEditor = register({
       appState,
       true,
     )[0] as ExcalidrawLinearElement;
-    return {
-      appState: {
-        ...appState,
-        editingLinearElement: new LinearElementEditor(
-          selectedElement,
-          app.scene,
-        ),
-      },
-      commitToHistory: false,
-    };
-  },
-  contextItemLabel: "labels.lineEditor.edit",
-});
 
-export const actionExitLineEditor = register({
-  name: "exitLineEditor",
-  trackEvent: {
-    category: "element",
-  },
-  contextItemPredicate: (elements, appState) => {
-    const selectedElements = getSelectedElements(elements, appState);
-    if (
-      appState.editingLinearElement &&
-      selectedElements.length === 1 &&
-      isLinearElement(selectedElements[0]) &&
-      appState.editingLinearElement.elementId === selectedElements[0].id
-    ) {
-      return true;
-    }
-    return false;
-  },
-  perform(elements, appState, _, app) {
+    const editingLinearElement =
+      appState.editingLinearElement?.elementId === selectedElement.id
+        ? null
+        : new LinearElementEditor(selectedElement, app.scene);
     return {
       appState: {
         ...appState,
-        editingLinearElement: null,
+        editingLinearElement,
       },
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.lineEditor.exit",
+  contextItemLabel: (elements, appState) => {
+    const selectedElement = getSelectedElements(
+      getNonDeletedElements(elements),
+      appState,
+      true,
+    )[0] as ExcalidrawLinearElement;
+    return appState.editingLinearElement?.elementId === selectedElement.id
+      ? "labels.lineEditor.exit"
+      : "labels.lineEditor.edit";
+  },
 });
