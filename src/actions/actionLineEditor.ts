@@ -8,8 +8,7 @@ import { register } from "./register";
 export const actionEnterLineEditor = register({
   name: "enterLineEditor",
   trackEvent: {
-    category: "canvas",
-    predicate: (appState) => !appState.zenModeEnabled,
+    category: "element",
   },
   contextItemPredicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
@@ -45,8 +44,7 @@ export const actionEnterLineEditor = register({
 export const actionExitLineEditor = register({
   name: "exitLineEditor",
   trackEvent: {
-    category: "canvas",
-    predicate: (appState) => !appState.zenModeEnabled,
+    category: "element",
   },
   contextItemPredicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
