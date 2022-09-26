@@ -1732,7 +1732,7 @@ class App extends React.Component<AppProps, AppState> {
         );
         resizeSingleElement(
           new Map().set(el.id, el),
-          true,
+          false,
           el,
           "se",
           true,
