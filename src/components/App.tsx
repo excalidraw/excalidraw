@@ -1914,15 +1914,20 @@ class App extends React.Component<AppProps, AppState> {
           const selectedElement = selectedElements[0];
           let sceneX = selectedElement.x + selectedElement.width / 2;
           let sceneY = selectedElement.y + selectedElement.height / 2;
-          if (isLinearElement(selectedElement)) {
+          const boundTextElement = getBoundTextElement(selectedElement);
+
+          if (boundTextElement) {
+            sceneX = boundTextElement.x + boundTextElement.width / 2;
+            sceneY = boundTextElement.y + boundTextElement.height / 2;
+          } else if (isLinearElement(selectedElement)) {
             const points =
               LinearElementEditor.getPointsGlobalCoordinates(selectedElement);
 
             const midPoint = LinearElementEditor.getSegmentMidPoint(
               selectedElement,
               points[0],
-              points.at(-1)!,
-              points.length - 1,
+              points[1],
+              1,
             );
 
             sceneX = midPoint[0];
@@ -2344,13 +2349,7 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     let parentCenterPosition =
       insertAtParentCenter &&
-      this.getTextWysiwygSnappedToCenterPosition(
-        sceneX,
-        sceneY,
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
-      );
+      this.getTextWysiwygSnappedToCenterPosition(sceneX, sceneY, this.state);
 
     let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
     let container: ExcalidrawTextContainer | null = null;
@@ -2411,8 +2410,6 @@ class App extends React.Component<AppProps, AppState> {
           sceneX,
           sceneY,
           this.state,
-          this.canvas,
-          window.devicePixelRatio,
         );
       }
     }
@@ -6106,8 +6103,6 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
     appState: AppState,
-    canvas: HTMLCanvasElement | null,
-    scale: number,
   ) {
     const elementClickedInside = getTextBindableContainerAtPosition(
       this.scene
@@ -6118,10 +6113,24 @@ class App extends React.Component<AppProps, AppState> {
       y,
     );
     if (elementClickedInside) {
-      const elementCenterX =
+      let elementCenterX =
         elementClickedInside.x + elementClickedInside.width / 2;
-      const elementCenterY =
+      let elementCenterY =
         elementClickedInside.y + elementClickedInside.height / 2;
+      if (isLinearElement(elementClickedInside)) {
+        const points =
+          LinearElementEditor.getPointsGlobalCoordinates(elementClickedInside);
+        const midPoint = LinearElementEditor.getSegmentMidPoint(
+          elementClickedInside,
+          points[0],
+          points[1],
+          1,
+        );
+        if (midPoint) {
+          elementCenterX = midPoint[0];
+          elementCenterY = midPoint[1];
+        }
+      }
       const distanceToCenter = Math.hypot(
         x - elementCenterX,
         y - elementCenterY,
