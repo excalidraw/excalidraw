@@ -493,9 +493,7 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
 
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
 
       expect(h.elements.length).toBe(2);
 
@@ -696,9 +694,8 @@ describe("textWysiwyg", () => {
       // Edit and text by removing second line and it should
       // still vertically align correctly
       mouse.select(rectangle);
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
+
       editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
@@ -735,9 +732,7 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
 
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
 
       expect(h.elements.length).toBe(2);
 
@@ -776,9 +771,7 @@ describe("textWysiwyg", () => {
     it("shouldn't bind to container if container has bound text", async () => {
       expect(h.elements.length).toBe(1);
 
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
 
       expect(h.elements.length).toBe(2);
 
@@ -817,9 +810,7 @@ describe("textWysiwyg", () => {
     });
 
     it("should respect text alignment when resizing", async () => {
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
 
       let editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
@@ -838,9 +829,8 @@ describe("textWysiwyg", () => {
       `);
 
       mouse.select(rectangle);
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
+
       editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
@@ -863,9 +853,7 @@ describe("textWysiwyg", () => {
       `);
 
       mouse.select(rectangle);
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
       editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
