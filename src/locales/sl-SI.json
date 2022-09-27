@@ -114,6 +114,10 @@
       "create": "Ustvari povezavo",
       "label": "Povezava"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Zakleni",
       "unlock": "Odkleni",
