@@ -174,7 +174,12 @@ export const handleBindTextResize = (
       } else {
         updatedY = element.y + element.height / 2 - nextHeight / 2;
       }
-      const updatedX = element.x + element.width / 2 - nextWidth / 2;
+      const updatedX =
+        textElement.textAlign === TEXT_ALIGN.LEFT
+          ? element.x + BOUND_TEXT_PADDING
+          : textElement.textAlign === TEXT_ALIGN.RIGHT
+          ? element.x + element.width - nextWidth - BOUND_TEXT_PADDING
+          : element.x + element.width / 2 - nextWidth / 2;
       mutateElement(textElement, {
         text,
         width: nextWidth,

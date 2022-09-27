@@ -14,6 +14,7 @@ import {
 import * as textElementUtils from "./textElement";
 import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
+import { resize } from "../tests/utils";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -492,9 +493,7 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
 
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
 
       expect(h.elements.length).toBe(2);
 
@@ -695,9 +694,8 @@ describe("textWysiwyg", () => {
       // Edit and text by removing second line and it should
       // still vertically align correctly
       mouse.select(rectangle);
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
+
       editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
@@ -734,9 +732,7 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
 
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
 
       expect(h.elements.length).toBe(2);
 
@@ -771,12 +767,11 @@ describe("textWysiwyg", () => {
         null,
       );
     });
+
     it("shouldn't bind to container if container has bound text", async () => {
       expect(h.elements.length).toBe(1);
 
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
 
       expect(h.elements.length).toBe(2);
 
@@ -812,6 +807,74 @@ describe("textWysiwyg", () => {
         { id: h.elements[1].id, type: "text" },
       ]);
       expect(text.containerId).toBe(null);
+    });
+
+    it("should respect text alignment when resizing", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+
+      let editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello" } });
+      editor.blur();
+
+      // should center align horizontally and vertically by default
+      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
+      expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+        Array [
+          109.5,
+          17,
+        ]
+      `);
+
+      mouse.select(rectangle);
+      Keyboard.keyPress(KEYS.ENTER);
+
+      editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      editor.select();
+
+      fireEvent.click(screen.getByTitle("Left"));
+      fireEvent.click(screen.getByTitle("Align bottom"));
+      await new Promise((r) => setTimeout(r, 0));
+
+      editor.blur();
+
+      // should left align horizontally and bottom vertically after resize
+      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
+      expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+        Array [
+          15,
+          90,
+        ]
+      `);
+
+      mouse.select(rectangle);
+      Keyboard.keyPress(KEYS.ENTER);
+      editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      editor.select();
+
+      fireEvent.click(screen.getByTitle("Right"));
+      fireEvent.click(screen.getByTitle("Align top"));
+
+      await new Promise((r) => setTimeout(r, 0));
+
+      editor.blur();
+
+      // should right align horizontally and top vertically after resize
+      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
+      expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+        Array [
+          424,
+          -539,
+        ]
+      `);
     });
   });
 });
