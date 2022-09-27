@@ -114,6 +114,10 @@
       "create": "Buat tautan",
       "label": "Tautan"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Kunci",
       "unlock": "Lepas",
