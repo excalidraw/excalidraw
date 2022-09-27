@@ -92,6 +92,7 @@ export const getTextBindableContainerAtPosition = (
       continue;
     }
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
+
     if (
       isLinearElement(elements[index]) &&
       isHittingElementNotConsideringBoundingBox(elements[index], appState, [

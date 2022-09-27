@@ -6122,12 +6122,17 @@ class App extends React.Component<AppProps, AppState> {
       if (isLinearElement(elementClickedInside)) {
         const points =
           LinearElementEditor.getPointsGlobalCoordinates(elementClickedInside);
-        const midPoint = LinearElementEditor.getSegmentMidPoint(
-          elementClickedInside,
-          points[0],
-          points[1],
-          1,
-        );
+        let midPoint: Point;
+        if (points.length === 3) {
+          midPoint = points[1];
+        } else {
+          midPoint = LinearElementEditor.getSegmentMidPoint(
+            elementClickedInside,
+            points[0],
+            points[1],
+            1,
+          );
+        }
         if (midPoint) {
           elementCenterX = midPoint[0];
           elementCenterY = midPoint[1];
