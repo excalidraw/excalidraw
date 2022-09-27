@@ -638,7 +638,17 @@ export class LinearElementEditor {
     );
     const textElement = getBoundTextElement(element);
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-
+    if (textElement) {
+      if (
+        isPointHittingElementBoundingBox(
+          textElement,
+          [scenePointer.x, scenePointer.y],
+          10,
+        )
+      ) {
+        isPointHittingBoundTextElement = true;
+      }
+    }
     if (segmentMidPoint) {
       const index = LinearElementEditor.getSegmentMidPointIndex(
         linearElementEditor,
@@ -659,17 +669,7 @@ export class LinearElementEditor {
       mutateElement(element, {
         points: updatedPoints,
       });
-      if (textElement) {
-        if (
-          isPointHittingElementBoundingBox(
-            textElement,
-            [scenePointer.x, scenePointer.y],
-            10,
-          )
-        ) {
-          isPointHittingBoundTextElement = true;
-        }
-      }
+
       ret.didAddPoint = true;
       ret.isMidPoint = true;
       ret.linearElementEditor = {
