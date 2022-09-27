@@ -114,6 +114,10 @@
       "create": "Создать ссылку",
       "label": "Ссылка"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Блокировать",
       "unlock": "Разблокировать",
