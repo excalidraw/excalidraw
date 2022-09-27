@@ -114,6 +114,10 @@
       "create": "Crear un ligam",
       "label": "Ligam"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Verrolhar",
       "unlock": "Desverrolhar",
