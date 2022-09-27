@@ -115,8 +115,8 @@
       "label": "連結"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "編輯線條",
+      "exit": "結束線條編輯"
     },
     "elementLock": {
       "lock": "鎖定",
