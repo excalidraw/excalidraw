@@ -34,7 +34,7 @@ import {
   actionUngroup,
   actionLink,
   actionToggleLock,
-  actionToggleLineEditor,
+  actionToggleLinearEditor,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -5878,7 +5878,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const mayBeAllowToggleLineEditing =
-      actionToggleLineEditor.contextItemPredicate(
+      actionToggleLinearEditor.contextItemPredicate(
         this.actionManager.getElementsIncludingDeleted(),
         this.actionManager.getAppState(),
       );
@@ -6012,7 +6012,6 @@ class App extends React.Component<AppProps, AppState> {
             maybeGroupAction && actionGroup,
             mayBeAllowUnbinding && actionUnbindText,
             mayBeAllowBinding && actionBindText,
-            mayBeAllowToggleLineEditing && actionToggleLineEditor,
             maybeUngroupAction && actionUngroup,
             (maybeGroupAction || maybeUngroupAction) && separator,
             actionAddToLibrary,
@@ -6025,6 +6024,7 @@ class App extends React.Component<AppProps, AppState> {
             maybeFlipHorizontal && actionFlipHorizontal,
             maybeFlipVertical && actionFlipVertical,
             (maybeFlipHorizontal || maybeFlipVertical) && separator,
+            mayBeAllowToggleLineEditing && actionToggleLinearEditor,
             actionLink.contextItemPredicate(elements, this.state) && actionLink,
             actionDuplicateSelection,
             actionToggleLock,

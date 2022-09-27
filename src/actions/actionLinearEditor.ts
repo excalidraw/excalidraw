@@ -5,8 +5,8 @@ import { ExcalidrawLinearElement } from "../element/types";
 import { getSelectedElements } from "../scene";
 import { register } from "./register";
 
-export const actionToggleLineEditor = register({
-  name: "toggleLineEditor",
+export const actionToggleLinearEditor = register({
+  name: "toggleLinearEditor",
   trackEvent: {
     category: "element",
   },

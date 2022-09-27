@@ -85,4 +85,4 @@ export { actionToggleStats } from "./actionToggleStats";
 export { actionUnbindText, actionBindText } from "./actionBoundText";
 export { actionLink } from "../element/Hyperlink";
 export { actionToggleLock } from "./actionToggleLock";
-export { actionToggleLineEditor } from "./actionLineEditor";
+export { actionToggleLinearEditor } from "./actionLinearEditor";

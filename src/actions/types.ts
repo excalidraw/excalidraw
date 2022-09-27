@@ -112,7 +112,7 @@ export type ActionName =
   | "eraser"
   | "bindText"
   | "toggleLock"
-  | "toggleLineEditor";
+  | "toggleLinearEditor";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
