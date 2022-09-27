@@ -22,7 +22,7 @@
   "ja-JP": 99,
   "kab-KAB": 95,
   "kk-KZ": 22,
-  "ko-KR": 99,
+  "ko-KR": 100,
   "lt-LT": 23,
   "lv-LV": 99,
   "mr-IN": 99,
@@ -39,7 +39,7 @@
   "ru-RU": 99,
   "si-LK": 8,
   "sk-SK": 99,
-  "sl-SI": 99,
+  "sl-SI": 100,
   "sv-SE": 99,
   "ta-IN": 97,
   "tr-TR": 98,
@@ -47,5 +47,5 @@
   "vi-VN": 16,
   "zh-CN": 99,
   "zh-HK": 27,
-  "zh-TW": 99
+  "zh-TW": 100
 }
