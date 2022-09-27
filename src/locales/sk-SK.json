@@ -114,6 +114,10 @@
       "create": "Vytvoriť odkaz",
       "label": "Odkaz"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Zamknúť",
       "unlock": "Odomknúť",
