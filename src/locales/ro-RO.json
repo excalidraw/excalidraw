@@ -115,8 +115,8 @@
       "label": "URL"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Editare linie",
+      "exit": "Părăsire editor de linii"
     },
     "elementLock": {
       "lock": "Blocare",
