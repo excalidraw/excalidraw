@@ -115,8 +115,8 @@
       "label": "Povezava"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Uredi črto",
+      "exit": "Zapri urejanje črte"
     },
     "elementLock": {
       "lock": "Zakleni",
