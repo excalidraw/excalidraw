@@ -114,6 +114,11 @@
       "create": "Create link",
       "label": "Link"
     },
+    "lineEditor": {
+      "edit": "Edit line",
+      "exit": "Exit line editor"
+    },
+
     "elementLock": {
       "lock": "Lock",
       "unlock": "Unlock",
