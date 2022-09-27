@@ -114,6 +114,10 @@
       "create": "दुवा तयार करा",
       "label": "दुवा"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "कुलूपात ठेवा",
       "unlock": "कुलूपातून बाहेर",
