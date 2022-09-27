@@ -33,6 +33,7 @@ import {
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
+import { LinearElementEditor } from "./linearElementEditor";
 
 const normalizeText = (text: string) => {
   return (
@@ -175,8 +176,15 @@ export const textWysiwyg = ({
             if (!isLinearElement(container)) {
               coordY = container.y + containerDims.height / 2 - height / 2;
             } else if (lines.length > 1) {
-              coordY =
-                container.y - ((lines.length - 1) * approxLineHeight) / 2;
+              if (container.points.length === 2) {
+                coordY =
+                  container.y - ((lines.length - 1) * approxLineHeight) / 2;
+              } else {
+                const points =
+                  LinearElementEditor.getPointsGlobalCoordinates(container);
+                coordY =
+                  points[1][1] - ((lines.length - 1) * approxLineHeight) / 2;
+              }
             }
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {

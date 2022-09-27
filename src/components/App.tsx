@@ -200,6 +200,7 @@ import {
   PointerDownState,
   SceneData,
   Device,
+  Point,
 } from "../types";
 import {
   debounce,
@@ -1898,19 +1899,6 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (selectedElements.length === 1) {
-          // if (
-          //   !this.state.editingLinearElement ||
-          //   this.state.editingLinearElement.elementId !==
-          //     selectedElements[0].id
-          // ) {
-          //   this.history.resumeRecording();
-          //   this.setState({
-          //     editingLinearElement: new LinearElementEditor(
-          //       selectedElements[0],
-          //       this.scene,
-          //     ),
-          //   });
-          // }
           const selectedElement = selectedElements[0];
           let sceneX = selectedElement.x + selectedElement.width / 2;
           let sceneY = selectedElement.y + selectedElement.height / 2;
@@ -1922,14 +1910,20 @@ class App extends React.Component<AppProps, AppState> {
           } else if (isLinearElement(selectedElement)) {
             const points =
               LinearElementEditor.getPointsGlobalCoordinates(selectedElement);
-
-            const midPoint = LinearElementEditor.getSegmentMidPoint(
-              selectedElement,
-              points[0],
-              points[1],
-              1,
-            );
-
+            if (points.length > 3) {
+              return;
+            }
+            let midPoint: Point;
+            if (points.length === 3) {
+              midPoint = points[1];
+            } else {
+              midPoint = LinearElementEditor.getSegmentMidPoint(
+                selectedElement,
+                points[0],
+                points[1],
+                1,
+              );
+            }
             sceneX = midPoint[0];
             sceneY = midPoint[1];
           }
