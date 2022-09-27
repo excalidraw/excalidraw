@@ -114,6 +114,10 @@
       "create": "링크 만들기",
       "label": "링크"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "잠금",
       "unlock": "잠금 해제",
