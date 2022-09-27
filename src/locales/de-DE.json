@@ -115,8 +115,8 @@
       "label": "Link"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Linie bearbeiten",
+      "exit": "Linieneditor verlassen"
     },
     "elementLock": {
       "lock": "Sperren",
