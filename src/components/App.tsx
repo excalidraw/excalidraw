@@ -1898,43 +1898,60 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           this.state,
         );
-
         if (selectedElements.length === 1) {
-          const selectedElement = selectedElements[0];
-          let sceneX = selectedElement.x + selectedElement.width / 2;
-          let sceneY = selectedElement.y + selectedElement.height / 2;
-          const boundTextElement = getBoundTextElement(selectedElement);
+          if (event[KEYS.CTRL_OR_CMD]) {
+            if (isLinearElement(selectedElements[0])) {
+              if (
+                !this.state.editingLinearElement ||
+                this.state.editingLinearElement.elementId !==
+                  selectedElements[0].id
+              ) {
+                this.history.resumeRecording();
+                this.setState({
+                  editingLinearElement: new LinearElementEditor(
+                    selectedElements[0],
+                    this.scene,
+                  ),
+                });
+              }
+            }
+          } else {
+            const selectedElement = selectedElements[0];
+            let sceneX = selectedElement.x + selectedElement.width / 2;
+            let sceneY = selectedElement.y + selectedElement.height / 2;
+            const boundTextElement = getBoundTextElement(selectedElement);
 
-          if (boundTextElement) {
-            sceneX = boundTextElement.x + boundTextElement.width / 2;
-            sceneY = boundTextElement.y + boundTextElement.height / 2;
-          } else if (isLinearElement(selectedElement)) {
-            const points =
-              LinearElementEditor.getPointsGlobalCoordinates(selectedElement);
-            if (points.length > 3) {
-              return;
+            if (boundTextElement) {
+              sceneX = boundTextElement.x + boundTextElement.width / 2;
+              sceneY = boundTextElement.y + boundTextElement.height / 2;
+            } else if (isLinearElement(selectedElement)) {
+              const points =
+                LinearElementEditor.getPointsGlobalCoordinates(selectedElement);
+              if (points.length > 3) {
+                return;
+              }
+              let midPoint: Point;
+              if (points.length === 3) {
+                midPoint = points[1];
+              } else {
+                midPoint = LinearElementEditor.getSegmentMidPoint(
+                  selectedElement,
+                  points[0],
+                  points[1],
+                  1,
+                );
+              }
+              sceneX = midPoint[0];
+              sceneY = midPoint[1];
             }
-            let midPoint: Point;
-            if (points.length === 3) {
-              midPoint = points[1];
-            } else {
-              midPoint = LinearElementEditor.getSegmentMidPoint(
-                selectedElement,
-                points[0],
-                points[1],
-                1,
-              );
-            }
-            sceneX = midPoint[0];
-            sceneY = midPoint[1];
+            this.startTextEditing({
+              sceneX,
+              sceneY,
+              shouldBind: true,
+            });
+            event.preventDefault();
+            return;
           }
-          this.startTextEditing({
-            sceneX,
-            sceneY,
-            shouldBind: true,
-          });
-          event.preventDefault();
-          return;
         }
       } else if (
         !event.ctrlKey &&

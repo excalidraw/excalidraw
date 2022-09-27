@@ -91,7 +91,9 @@ describe(" Test Linear Elements", () => {
 
   const enterLineEditingMode = (line: ExcalidrawLinearElement) => {
     mouse.clickAt(p1[0], p1[1]);
-    Keyboard.keyPress(KEYS.ENTER);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ENTER);
+    });
     expect(h.state.editingLinearElement?.elementId).toEqual(line.id);
   };
 
@@ -431,7 +433,7 @@ describe(" Test Linear Elements", () => {
         // delete 3rd point
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
-        expect(renderScene).toHaveBeenCalledTimes(19);
+        expect(renderScene).toHaveBeenCalledTimes(20);
 
         const newMidPoints = LinearElementEditor.getEditorMidPoints(
           line,

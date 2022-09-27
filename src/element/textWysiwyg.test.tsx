@@ -515,13 +515,9 @@ describe("textWysiwyg", () => {
 
     it("shouldn't bind to non-text-bindable containers", async () => {
       const line = API.createElement({
-        type: "line",
+        type: "freedraw",
         width: 100,
         height: 0,
-        points: [
-          [0, 0],
-          [100, 0],
-        ],
       });
       h.elements = [line];
 
