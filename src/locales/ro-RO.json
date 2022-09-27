@@ -114,6 +114,10 @@
       "create": "Creare URL",
       "label": "URL"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Blocare",
       "unlock": "Deblocare",
