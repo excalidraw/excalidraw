@@ -115,8 +115,8 @@
       "label": "Saite"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Rediģēt līniju",
+      "exit": "Aizvērt līnijas redaktoru"
     },
     "elementLock": {
       "lock": "Fiksēt",
