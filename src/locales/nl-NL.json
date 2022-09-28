@@ -115,8 +115,8 @@
       "label": ""
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Bewerk regel",
+      "exit": "Verlaat regel-editor"
     },
     "elementLock": {
       "lock": "",
