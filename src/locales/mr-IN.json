@@ -115,8 +115,8 @@
       "label": "दुवा"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "रेघ संपादन",
+      "exit": "रेघ संपादकाबाहेर"
     },
     "elementLock": {
       "lock": "कुलूपात ठेवा",
