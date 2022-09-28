@@ -115,8 +115,8 @@
       "label": "Odkaz"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Upraviť čiaru",
+      "exit": "Ukončiť editovanie čiary"
     },
     "elementLock": {
       "lock": "Zamknúť",
