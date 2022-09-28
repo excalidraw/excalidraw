@@ -151,3 +151,18 @@ export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
     },
   );
 };
+
+export const contentsContainAppElements = (
+  contents: any,
+): contents is { elements: ExcalidrawElement[]; files?: BinaryFiles } => {
+  if (
+    [
+      EXPORT_DATA_TYPES.excalidraw,
+      EXPORT_DATA_TYPES.excalidrawClipboard,
+    ].includes(contents?.type) &&
+    Array.isArray(contents.elements)
+  ) {
+    return true;
+  }
+  return false;
+};

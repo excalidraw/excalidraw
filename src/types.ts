@@ -23,12 +23,12 @@ import type App from "./components/App";
 import type { ResolvablePromise, throttleRAF } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
-import { ClipboardData } from "./clipboard";
 import { isOverScrollBars } from "./scene";
 import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
+import { ParsedData } from "./textContent";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -274,7 +274,7 @@ export interface ExcalidrawProps {
     pointersMap: Gesture["pointers"];
   }) => void;
   onPaste?: (
-    data: ClipboardData,
+    data: ParsedData,
     event: ClipboardEvent | null,
   ) => Promise<boolean> | boolean;
   renderTopRightUI?: (

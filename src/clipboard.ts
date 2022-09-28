@@ -1,13 +1,11 @@
-import {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "./element/types";
+import { NonDeletedExcalidrawElement } from "./element/types";
 import { AppState, BinaryFiles } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
-import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "./constants";
 import { isInitializedImageElement } from "./element/typeChecks";
 import { isPromiseLike } from "./utils";
+import { contentsContainAppElements } from "./data/json";
+import { ParsedData, parsePotentialSpreadsheet } from "./textContent";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
@@ -15,13 +13,7 @@ type ElementsClipboard = {
   files: BinaryFiles | undefined;
 };
 
-export interface ClipboardData {
-  spreadsheet?: Spreadsheet;
-  elements?: readonly ExcalidrawElement[];
-  files?: BinaryFiles;
-  text?: string;
-  errorMessage?: string;
-}
+export type ClipboardData = ParsedData;
 
 let CLIPBOARD = "";
 let PREFER_APP_CLIPBOARD = false;
@@ -37,21 +29,6 @@ export const probablySupportsClipboardBlob =
   "write" in navigator.clipboard &&
   "ClipboardItem" in window &&
   "toBlob" in HTMLCanvasElement.prototype;
-
-const clipboardContainsElements = (
-  contents: any,
-): contents is { elements: ExcalidrawElement[]; files?: BinaryFiles } => {
-  if (
-    [
-      EXPORT_DATA_TYPES.excalidraw,
-      EXPORT_DATA_TYPES.excalidrawClipboard,
-    ].includes(contents?.type) &&
-    Array.isArray(contents.elements)
-  ) {
-    return true;
-  }
-  return false;
-};
 
 export const copyToClipboard = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -93,16 +70,6 @@ const getAppClipboard = (): Partial<ElementsClipboard> => {
     console.error(error);
     return {};
   }
-};
-
-const parsePotentialSpreadsheet = (
-  text: string,
-): { spreadsheet: Spreadsheet } | { errorMessage: string } | null => {
-  const result = tryParseSpreadsheet(text);
-  if (result.type === VALID_SPREADSHEET) {
-    return { spreadsheet: result.spreadsheet };
-  }
-  return null;
 };
 
 /**
@@ -150,7 +117,7 @@ export const parseClipboard = async (
 
   try {
     const systemClipboardData = JSON.parse(systemClipboard);
-    if (clipboardContainsElements(systemClipboardData)) {
+    if (contentsContainAppElements(systemClipboardData)) {
       return {
         elements: systemClipboardData.elements,
         files: systemClipboardData.files,
