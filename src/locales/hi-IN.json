@@ -115,8 +115,8 @@
       "label": ""
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "रेखा संपादित करे",
+      "exit": "रेखा संपादक के बाहर"
     },
     "elementLock": {
       "lock": "ताले में रखें",
