@@ -38,36 +38,46 @@ export const redrawTextBoundingBox = (
   let coordX = textElement.x;
   // Resize container and vertically center align the text
   if (container) {
-    const containerDims = getContainerDims(container);
-    let nextHeight = containerDims.height;
-    if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-      coordY = container.y + BOUND_TEXT_PADDING;
-    } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-      coordY =
-        container.y +
-        containerDims.height -
-        metrics.height -
-        BOUND_TEXT_PADDING;
-    } else {
-      coordY = container.y + containerDims.height / 2 - metrics.height / 2;
-      if (metrics.height > getMaxContainerHeight(container)) {
-        nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
-        coordY = container.y + nextHeight / 2 - metrics.height / 2;
+    if (!isLinearElement(container)) {
+      const containerDims = getContainerDims(container);
+      let nextHeight = containerDims.height;
+      if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
+        coordY = container.y + BOUND_TEXT_PADDING;
+      } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+        coordY =
+          container.y +
+          containerDims.height -
+          metrics.height -
+          BOUND_TEXT_PADDING;
+      } else {
+        coordY = container.y + containerDims.height / 2 - metrics.height / 2;
+        if (metrics.height > getMaxContainerHeight(container)) {
+          nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
+          coordY = container.y + nextHeight / 2 - metrics.height / 2;
+        }
       }
-    }
+      if (textElement.textAlign === TEXT_ALIGN.LEFT) {
+        coordX = container.x + BOUND_TEXT_PADDING;
+      } else if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
+        coordX =
+          container.x +
+          containerDims.width -
+          metrics.width -
+          BOUND_TEXT_PADDING;
+      } else {
+        coordX = container.x + container.width / 2 - metrics.width / 2;
+      }
 
-    if (textElement.textAlign === TEXT_ALIGN.LEFT) {
-      coordX = container.x + BOUND_TEXT_PADDING;
-    } else if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
-      coordX =
-        container.x + containerDims.width - metrics.width - BOUND_TEXT_PADDING;
+      mutateElement(container, { height: nextHeight });
     } else {
-      coordX = container.x + container.width / 2 - metrics.width / 2;
+      const centerX = textElement.x + textElement.width / 2;
+      const centerY = textElement.y + textElement.height / 2;
+      const diffWidth = metrics.width - textElement.width;
+      const diffHeight = metrics.height - textElement.height;
+      coordY = centerY - (textElement.height + diffHeight) / 2;
+      coordX = centerX - (textElement.width + diffWidth) / 2;
     }
-
-    mutateElement(container, { height: nextHeight });
   }
-
   mutateElement(textElement, {
     width: metrics.width,
     height: metrics.height,
