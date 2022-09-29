@@ -115,8 +115,8 @@
       "label": "Tautan"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Edit tautan",
+      "exit": "Keluar editor garis"
     },
     "elementLock": {
       "lock": "Kunci",
