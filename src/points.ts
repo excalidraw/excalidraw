@@ -51,6 +51,18 @@ export const rescalePoints = (
         return currentDimension === dimension ? value + translation : value;
       }) as [number, number],
   );
-
   return nextPoints;
+};
+
+export const getScaleFactorForResize = (
+  dimension: 0 | 1,
+  newSize: number,
+  points: readonly Point[],
+) => {
+  const coordinates = points.map((point) => point[dimension]);
+  const maxCoordinate = Math.max(...coordinates);
+  const minCoordinate = Math.min(...coordinates);
+  const size = maxCoordinate - minCoordinate;
+  const scale = size === 0 ? 1 : newSize / size;
+  return scale;
 };

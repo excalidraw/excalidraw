@@ -1,5 +1,5 @@
 import { BOUND_TEXT_PADDING, SHIFT_LOCKING_ANGLE } from "../constants";
-import { rescalePoints } from "../points";
+import { getScaleFactorForResize, rescalePoints } from "../points";
 
 import {
   rotate,
@@ -44,6 +44,7 @@ import {
   handleBindTextResize,
   measureText,
 } from "./textElement";
+import { LinearElementEditor } from "./linearElementEditor";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -596,25 +597,41 @@ export const resizeSingleElement = (
   const rotatedNewCenter = rotatePoint(newCenter, startCenter, angle);
   newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
 
+  let originalBoundTextElement = null;
+  if (boundTextElement) {
+    originalBoundTextElement = originalElements.get(boundTextElement.id);
+  }
   // Readjust points for linear elements
-  const rescaledPoints = rescalePointsInElement(
-    stateAtResizeStart,
-    eleNewWidth,
-    eleNewHeight,
-    true,
-  );
+  let rescaledElementPointsY;
+  let rescaledPoints;
+
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    rescaledElementPointsY = rescalePoints(
+      1,
+      eleNewHeight,
+      (stateAtResizeStart as ExcalidrawLinearElement).points,
+      true,
+    );
+
+    rescaledPoints = rescalePoints(
+      0,
+      eleNewWidth,
+      rescaledElementPointsY,
+      true,
+    );
+  }
+
   // For linear elements (x,y) are the coordinates of the first drawn point not the top-left corner
   // So we need to readjust (x,y) to be where the first point should be
   const newOrigin = [...newTopLeft];
   newOrigin[0] += stateAtResizeStart.x - newBoundsX1;
   newOrigin[1] += stateAtResizeStart.y - newBoundsY1;
-
   const resizedElement = {
     width: Math.abs(eleNewWidth),
     height: Math.abs(eleNewHeight),
     x: newOrigin[0],
     y: newOrigin[1],
-    ...rescaledPoints,
+    points: rescaledPoints,
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {
@@ -638,7 +655,34 @@ export const resizeSingleElement = (
     updateBoundElements(element, {
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
+
     mutateElement(element, resizedElement);
+    if (
+      rescaledElementPointsY &&
+      isLinearElement(stateAtResizeStart) &&
+      boundTextElement
+    ) {
+      const boundElementCenterPoint: Point =
+        LinearElementEditor.pointFromAbsoluteCoords(stateAtResizeStart, [
+          originalBoundTextElement!.x! + originalBoundTextElement!.width! / 2,
+          originalBoundTextElement!.y! + originalBoundTextElement!.height! / 2,
+        ]);
+
+      const scaleFactor = getScaleFactorForResize(
+        0,
+        eleNewWidth,
+        rescaledElementPointsY,
+      );
+      const coords = LinearElementEditor.getPointGlobalCoordinates(
+        element as ExcalidrawLinearElement,
+        [boundElementCenterPoint[0] * scaleFactor, boundElementCenterPoint[1]],
+      );
+
+      mutateElement(boundTextElement, {
+        x: coords[0] - originalBoundTextElement!.width! / 2,
+        y: coords[1] - originalBoundTextElement!.height! / 2,
+      });
+    }
     if (boundTextElement && boundTextFont) {
       mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
     }

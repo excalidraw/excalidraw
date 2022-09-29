@@ -12,6 +12,7 @@ import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
+import { isLinearElement } from "./typeChecks";
 
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
@@ -118,14 +119,19 @@ export const handleBindTextResize = (
   transformHandleType: MaybeTransformHandleType,
 ) => {
   const boundTextElementId = getBoundTextElementId(element);
-  if (boundTextElementId) {
-    const textElement = Scene.getScene(element)!.getElement(
-      boundTextElementId,
-    ) as ExcalidrawTextElement;
-    if (textElement && textElement.text) {
-      if (!element) {
-        return;
-      }
+  if (!boundTextElementId) {
+    return;
+  }
+  const textElement = Scene.getScene(element)!.getElement(
+    boundTextElementId,
+  ) as ExcalidrawTextElement;
+  if (textElement && textElement.text) {
+    if (!element) {
+      return;
+    }
+
+    if (isLinearElement(element)) {
+    } else {
       let text = textElement.text;
       let nextHeight = textElement.height;
       let nextWidth = textElement.width;
