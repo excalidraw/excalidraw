@@ -75,6 +75,7 @@ export const transformElements = (
         pointerX,
         pointerY,
         shouldRotateWithDiscreteAngle,
+        pointerDownState.originalElements,
       );
       updateBoundElements(element);
     } else if (
@@ -157,8 +158,8 @@ const rotateSingleElement = (
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
+  originalElements: Map<string, NonDeleted<ExcalidrawElement>>,
 ) => {
-  const elementBeforeRotation = { ...element };
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
@@ -177,22 +178,24 @@ const rotateSingleElement = (
     ) as ExcalidrawTextElement;
 
     if (isLinearElement(element)) {
-      const boundTextCenterPointBeforeRotate =
+      const originalBoundTextElement = originalElements.get(textElement.id)!;
+      const originalContainer = originalElements.get(element.id)!;
+      const originalBoundTextCenterPoint =
         LinearElementEditor.pointFromAbsoluteCoords(
-          elementBeforeRotation as ExcalidrawLinearElement,
+          originalContainer as ExcalidrawLinearElement,
           [
-            textElement.x + textElement.width / 2,
-            textElement.y + textElement.height / 2,
+            originalBoundTextElement.x + originalBoundTextElement.width / 2,
+            originalBoundTextElement.y + originalBoundTextElement.height / 2,
           ],
         );
       const newBoundTextCenterPoint =
         LinearElementEditor.getPointGlobalCoordinates(
           element,
-          boundTextCenterPointBeforeRotate,
+          originalBoundTextCenterPoint,
         );
       mutateElement(textElement, {
-        x: newBoundTextCenterPoint[0] - textElement.width! / 2,
-        y: newBoundTextCenterPoint[1] - textElement.height! / 2,
+        x: newBoundTextCenterPoint[0] - textElement.width / 2,
+        y: newBoundTextCenterPoint[1] - textElement.height / 2,
       });
     } else {
       mutateElement(textElement, { angle });
