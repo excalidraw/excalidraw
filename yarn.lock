@@ -9022,10 +9022,10 @@ pepjs@0.5.3:
   resolved "https://registry.npmjs.org/pepjs/-/pepjs-0.5.3.tgz"
   integrity sha512-5yHVB9OHqKd9fr/OIsn8ss0NgThQ9buaqrEuwr9Or5YjPp6h+WTDKWZI+xZLaBGZCtODTnFtlSHNmhFsq67THg==
 
-perfect-freehand@1.0.16:
-  version "1.0.16"
-  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-1.0.16.tgz#38575ef946ff513b9c94057c763cac003b504020"
-  integrity sha512-D4+avUeR8CHSl2vaPbPYX/dNpSMRYO3VOFp7qSSc+LRkSgzQbLATVnXosy7VxtsSHEh1C5t8K8sfmo0zCVnfWQ==
+perfect-freehand@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-1.2.0.tgz#706a0f854544f6175772440c51d3b0563eb3988a"
+  integrity sha512-h/0ikF1M3phW7CwpZ5MMvKnfpHficWoOEyr//KVNTxV4F6deRK1eYMtHyBKEAKFK0aXIEUK9oBvlF6PNXMDsAw==
 
 performance-now@^2.1.0:
   version "2.1.0"
