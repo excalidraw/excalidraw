@@ -46,6 +46,10 @@
     top: -11px;
   }
 
+  .color-picker-content--multi {
+    padding: 0.25rem;
+  }
+
   .color-picker-content--default {
     padding: 0.5rem;
     display: grid;
@@ -68,6 +72,10 @@
       color: $oc-gray-6;
       font-size: 12px;
       padding: 0 0.25rem;
+    }
+
+    &-button svg {
+      color: var(--icon-fill-color);
     }
 
     &-colors {

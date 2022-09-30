@@ -1,4 +1,5 @@
 import React from "react";
+import { HexColorPicker } from "react-colorful";
 import { Popover } from "./Popover";
 import { isTransparent } from "../utils";
 
@@ -12,6 +13,43 @@ import { AppState } from "../types";
 
 const MAX_CUSTOM_COLORS = 5;
 const MAX_DEFAULT_COLORS = 15;
+const PALETTE_ICON = (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M10.5566 8.62411L14.1753 10.8096L8.69444 19.8846C8.37003 20.4218 7.76997 20.7295 7.14444 20.6796V20.6796C6.36571 20.6174 5.73623 20.0197 5.63385 19.2452L5.50014 18.2336C5.41328 17.5765 5.55264 16.9094 5.8953 16.3421L10.5566 8.62411Z"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <rect
+      x="9.84003"
+      y="5.72208"
+      width="8.45496"
+      height="2.11374"
+      rx="1.05687"
+      transform="rotate(31.1299 9.84003 5.72208)"
+      fill="currentColor"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M13.2886 4.10089C13.8921 3.10161 15.1914 2.78078 16.1907 3.3843V3.3843C17.19 3.98781 17.5108 5.28713 16.9073 6.28641L14.7217 9.90512L11.103 7.7196L13.2886 4.10089Z"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+);
 
 export const getCustomColors = (
   elements: readonly ExcalidrawElement[],
@@ -108,7 +146,8 @@ const Picker = ({
   const activeItem = React.useRef<HTMLButtonElement>();
   const gallery = React.useRef<HTMLDivElement>();
   const colorInput = React.useRef<HTMLInputElement>();
-
+  const [showMultiColorPicker, setShowMultiColorPicker] =
+    React.useState<Boolean>(false);
   const [customColors] = React.useState(() => {
     if (type === "canvasBackground") {
       return [];
@@ -263,10 +302,27 @@ const Picker = ({
         // to allow focusing by clicking but not by tabbing
         tabIndex={-1}
       >
-        <div className="color-picker-content--default">
-          {renderColors(colors)}
+        {!showMultiColorPicker && (
+          <div className="color-picker-content--default">
+            {renderColors(colors)}
+          </div>
+        )}
+        {showMultiColorPicker && (
+          <div className="color-picker-content--multi">
+            <HexColorPicker color={color || undefined} onChange={onChange} />
+          </div>
+        )}
+        <div className="color-picker-content--canvas">
+          <button
+            className="color-picker-content--canvas-button"
+            onClick={() => {
+              setShowMultiColorPicker(!showMultiColorPicker);
+            }}
+          >
+            {PALETTE_ICON}
+          </button>
         </div>
-        {!!customColors.length && (
+        {!!customColors.length && !showMultiColorPicker && (
           <div className="color-picker-content--canvas">
             <span className="color-picker-content--canvas-title">
               {t("labels.canvasColors")}
