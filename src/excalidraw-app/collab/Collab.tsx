@@ -352,6 +352,7 @@ class Collab extends PureComponent<Props, CollabState> {
 
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
+    newRoomLinkData?: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
     if (this.portal.socket) {
       return null;
@@ -363,7 +364,11 @@ class Collab extends PureComponent<Props, CollabState> {
     if (existingRoomLinkData) {
       ({ roomId, roomKey } = existingRoomLinkData);
     } else {
-      ({ roomId, roomKey } = await generateCollaborationLinkData());
+      if (newRoomLinkData) {
+        ({ roomId, roomKey } = newRoomLinkData);
+      } else {
+        ({ roomId, roomKey } = await generateCollaborationLinkData());
+      }
       window.history.pushState(
         {},
         APP_NAME,

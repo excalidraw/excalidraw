@@ -151,7 +151,10 @@ export const getCollaborationLinkData = (link: string) => {
   return match ? { roomId: match[1], roomKey: match[2] } : null;
 };
 
-export const generateCollaborationLinkData = async () => {
+export const generateCollaborationLinkData = async (): Promise<{
+  roomId: string;
+  roomKey: string;
+}> => {
   const roomId = await generateRoomId();
   const roomKey = await generateEncryptionKey();
 

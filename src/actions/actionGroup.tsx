@@ -21,6 +21,9 @@ import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 
+import { checkCollaborationStarted, startCollaboration } from "./actionTboard";
+import { generateCollaborationLinkData } from "../excalidraw-app/data";
+
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
     const groupIds = elements[0].groupIds;
@@ -117,6 +120,25 @@ export const actionGroup = register({
       ...elementsInGroup,
       ...elementsAfterGroup,
     ];
+
+    /**
+     * Если не запущена сессия, то создадим ее.
+     * Параметром передаем groupId выбранной группы.
+     * @task https://trello.com/c/oWcovp3k
+     */
+
+    const isCollaborating = checkCollaborationStarted();
+
+    if (!isCollaborating) {
+      generateCollaborationLinkData().then(({ roomId, roomKey }) => {
+        startCollaboration({
+          roomId,
+          roomKey: `${roomKey}&groupId=${newGroupId}`,
+        });
+      });
+    }
+
+    /** */
 
     return {
       appState: selectGroup(
