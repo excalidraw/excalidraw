@@ -47,6 +47,7 @@
     "png-chunks-encode": "1.0.0",
     "png-chunks-extract": "1.0.0",
     "points-on-curve": "0.2.0",
+    "pre-commit": "1.2.2",
     "pwacompat": "2.0.17",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -117,5 +118,8 @@
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
     "release": "node scripts/release.js"
-  }
+  },
+  "pre-commit": [
+    "fix"
+  ]
 }
