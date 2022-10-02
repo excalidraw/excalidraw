@@ -29,7 +29,7 @@ export const getDefaultAppState = (): Omit<
     currentItemFontSize: DEFAULT_FONT_SIZE,
     currentItemLinearStrokeSharpness: "round",
     currentItemOpacity: 100,
-    currentItemRoughness: 1,
+    currentItemRoughness: 0,
     currentItemStartArrowhead: null,
     currentItemStrokeColor: oc.black,
     currentItemStrokeSharpness: "sharp",
