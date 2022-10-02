@@ -373,6 +373,8 @@
     "angle": "Angle",
     "element": "Element",
     "elements": "Elements",
+    "gridsHeight": "Grids (H)",
+    "gridsWidth": "Grids (W)",
     "height": "Height",
     "scene": "Scene",
     "selected": "Selected",
