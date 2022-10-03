@@ -114,6 +114,10 @@
       "create": "Snulfu-d aseɣwen",
       "label": "Aseɣwen"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Sekkeṛ",
       "unlock": "Serreḥ",
