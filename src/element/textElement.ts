@@ -7,35 +7,38 @@ import {
   NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
-import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
 import { measureTextElement, wrapTextElement } from "./textWysiwyg";
+import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 
 export const redrawTextBoundingBox = (
-  element: ExcalidrawTextElement,
+  textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
 ) => {
   let maxWidth = undefined;
-  let text = element.text;
+  let text = textElement.text;
 
   if (container) {
-    const containerDims = getContainerDims(container);
-    maxWidth = containerDims.width - BOUND_TEXT_PADDING * 2;
-    text = wrapTextElement(element, containerDims.width);
+    maxWidth = getMaxContainerWidth(container);
+    text = wrapTextElement(textElement, getMaxContainerWidth(container));
   }
-  const metrics = measureTextElement(element, { text }, maxWidth);
-  let coordY = element.y;
-  let coordX = element.x;
+  const metrics = measureTextElement(
+    textElement,
+    { text: textElement.originalText },
+    maxWidth,
+  );
+  let coordY = textElement.y;
+  let coordX = textElement.x;
   // Resize container and vertically center align the text
   if (container) {
     const containerDims = getContainerDims(container);
     let nextHeight = containerDims.height;
-    coordX = container.x + BOUND_TEXT_PADDING;
-    if (element.verticalAlign === VERTICAL_ALIGN.TOP) {
+    if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
       coordY = container.y + BOUND_TEXT_PADDING;
-    } else if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+    } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
       coordY =
         container.y +
         containerDims.height -
@@ -43,14 +46,25 @@ export const redrawTextBoundingBox = (
         BOUND_TEXT_PADDING;
     } else {
       coordY = container.y + containerDims.height / 2 - metrics.height / 2;
-      if (metrics.height > containerDims.height - BOUND_TEXT_PADDING * 2) {
+      if (metrics.height > getMaxContainerHeight(container)) {
         nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
         coordY = container.y + nextHeight / 2 - metrics.height / 2;
       }
     }
+
+    if (textElement.textAlign === TEXT_ALIGN.LEFT) {
+      coordX = container.x + BOUND_TEXT_PADDING;
+    } else if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
+      coordX =
+        container.x + containerDims.width - metrics.width - BOUND_TEXT_PADDING;
+    } else {
+      coordX = container.x + container.width / 2 - metrics.width / 2;
+    }
+
     mutateElement(container, { height: nextHeight });
   }
-  mutateElement(element, {
+
+  mutateElement(textElement, {
     width: metrics.width,
     height: metrics.height,
     baseline: metrics.baseline,
@@ -111,18 +125,21 @@ export const handleBindTextResize = (
       }
       let text = textElement.text;
       let nextHeight = textElement.height;
+      let nextWidth = textElement.width;
       let containerHeight = element.height;
       let nextBaseLine = textElement.baseline;
       if (transformHandleType !== "n" && transformHandleType !== "s") {
         if (text) {
-          text = wrapTextElement(textElement, element.width);
+          text = wrapTextElement(textElement, getMaxContainerWidth(element));
         }
 
-        const dimensions = measureTextElement(textElement, {
-          text,
-          fontSize: textElement.fontSize,
-        });
+        const dimensions = measureTextElement(
+          textElement,
+          { text },
+          element.width,
+        );
         nextHeight = dimensions.height;
+        nextWidth = dimensions.width;
         nextBaseLine = dimensions.baseline;
       }
       // increase height in case text element height exceeds
@@ -150,13 +167,17 @@ export const handleBindTextResize = (
       } else {
         updatedY = element.y + element.height / 2 - nextHeight / 2;
       }
-
+      const updatedX =
+        textElement.textAlign === TEXT_ALIGN.LEFT
+          ? element.x + BOUND_TEXT_PADDING
+          : textElement.textAlign === TEXT_ALIGN.RIGHT
+          ? element.x + element.width - nextWidth - BOUND_TEXT_PADDING
+          : element.x + element.width / 2 - nextWidth / 2;
       mutateElement(textElement, {
         text,
-        // preserve padding and set width correctly
-        width: element.width - BOUND_TEXT_PADDING * 2,
+        width: nextWidth,
         height: nextHeight,
-        x: element.x + BOUND_TEXT_PADDING,
+        x: updatedX,
         y: updatedY,
         baseline: nextBaseLine,
       });
@@ -183,7 +204,6 @@ export const measureText = (
   container.style.minHeight = "1em";
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
-    container.style.width = `${String(maxWidth)}px`;
     container.style.maxWidth = `${String(maxWidth)}px`;
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
@@ -201,7 +221,8 @@ export const measureText = (
   container.appendChild(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
-  const width = container.offsetWidth;
+  // Since span adds 1px extra width to the container
+  const width = container.offsetWidth + 1;
 
   const height = container.offsetHeight;
   document.body.removeChild(container);
@@ -239,13 +260,7 @@ export const getTextWidth = (text: string, font: FontString) => {
   return metrics.width;
 };
 
-export const wrapText = (
-  text: string,
-  font: FontString,
-  containerWidth: number,
-) => {
-  const maxWidth = containerWidth - BOUND_TEXT_PADDING * 2;
-
+export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   const spaceWidth = getTextWidth(" ", font);

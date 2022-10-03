@@ -429,7 +429,7 @@ const getCacheKey = (
   text: string,
   fontSize: number,
   strokeColor: String,
-  textAlign: CanvasTextAlign,
+  textAlign: string,
   opacity: Number,
   mathProps: MathProps,
 ) => {
@@ -608,7 +608,7 @@ const getMetrics = (
 const renderMath = (
   text: string,
   fontSize: number,
-  textAlign: CanvasTextAlign,
+  textAlign: string,
   mathProps: MathProps,
   isMathJaxLoaded: boolean,
   doSetupChild: (

@@ -30,6 +30,7 @@ import {
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
+import { getMaxContainerWidth } from "./newElement";
 
 const normalizeText = (text: string) => {
   return (
@@ -141,7 +142,7 @@ export const textWysiwyg = ({
       getFontString(updatedTextElement),
     );
     if (updatedTextElement && isTextElement(updatedTextElement)) {
-      let coordX = updatedTextElement.x;
+      const coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
       let wCoordY = coordY;
       let rCoordY = coordY;
@@ -157,7 +158,7 @@ export const textWysiwyg = ({
 
       let maxWidth = wMetrics.width;
       let maxHeight = wMetrics.height;
-      let width = wMetrics.width;
+      const width = wMetrics.width;
       // Set to element height by default since that's
       // what is going to be used for unbounded text
       let height = rMetrics.height;
@@ -184,10 +185,6 @@ export const textWysiwyg = ({
         }
         maxWidth = containerDims.width - BOUND_TEXT_PADDING * 2;
         maxHeight = containerDims.height - BOUND_TEXT_PADDING * 2;
-        width = maxWidth;
-        // The coordinates of text box set a distance of
-        // 5px to preserve padding
-        coordX = container.x + BOUND_TEXT_PADDING;
         // autogrow container height if text exceeds
         if (height > maxHeight) {
           const diff = Math.min(height - maxHeight, approxLineHeight);
@@ -275,7 +272,7 @@ export const textWysiwyg = ({
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
-        width: `${width}px`,
+        width: `${Math.min(width, maxWidth)}px`,
         height: `${height}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
@@ -295,7 +292,6 @@ export const textWysiwyg = ({
         color: updatedTextElement.strokeColor,
         opacity: updatedTextElement.opacity / 100,
         filter: "var(--theme-filter)",
-        maxWidth: `${maxWidth}px`,
         maxHeight: `${editorMaxHeight}px`,
       });
       // For some reason updating font attribute doesn't set font family
@@ -367,13 +363,14 @@ export const textWysiwyg = ({
       // doubles the height as soon as user starts typing
       if (isBoundToContainer(element) && lines > 1) {
         let height = "auto";
-
+        editable.style.height = "0px";
+        let heightSet = false;
         if (lines === 2) {
           const container = getContainerElement(element);
           const actualLineCount = wrapText(
             editable.value,
             font,
-            container!.width,
+            getMaxContainerWidth(container!),
           ).split("\n").length;
           // This is browser behaviour when setting height to "auto"
           // It sets the height needed for 2 lines even if actual
@@ -382,10 +379,13 @@ export const textWysiwyg = ({
           // so single line aligns vertically when deleting
           if (actualLineCount === 1) {
             height = `${editable.scrollHeight / 2}px`;
+            editable.style.height = height;
+            heightSet = true;
           }
         }
-        editable.style.height = height;
-        editable.style.height = `${editable.scrollHeight}px`;
+        if (!heightSet) {
+          editable.style.height = `${editable.scrollHeight}px`;
+        }
       }
       onChange(normalizeText(editable.value));
     };
