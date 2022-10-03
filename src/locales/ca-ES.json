@@ -114,6 +114,10 @@
       "create": "Crea un enllaç",
       "label": "Enllaç"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Bloca",
       "unlock": "Desbloca",

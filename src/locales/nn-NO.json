@@ -114,6 +114,10 @@
       "create": "Lag lenke",
       "label": "Lenke"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
