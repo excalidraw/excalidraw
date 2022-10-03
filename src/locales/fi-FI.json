@@ -114,6 +114,10 @@
       "create": "Luo linkki",
       "label": "Linkki"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",

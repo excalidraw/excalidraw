@@ -114,6 +114,10 @@
       "create": "링크 만들기",
       "label": "링크"
     },
+    "lineEditor": {
+      "edit": "선 수정하기",
+      "exit": "선 편집기 종료"
+    },
     "elementLock": {
       "lock": "잠금",
       "unlock": "잠금 해제",
@@ -125,8 +129,8 @@
   },
   "library": {
     "noItems": "추가된 아이템 없음",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "캔버스 위에서 아이템을 선택하여 여기에 추가를 하거나, 아래의 공용 저장소에서 라이브러리를 설치하세요.",
+    "hint_emptyPrivateLibrary": "캔버스 위에서 아이템을 선택하여 여기 추가하세요."
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -323,9 +327,9 @@
     "placeholder": {
       "authorName": "이름 또는 사용자명",
       "libraryName": "당신의 라이브러리 이름",
-      "libraryDesc": "사람들이 쓰임새를 파악할 수 있도록 라이브러리에 대해 설명",
+      "libraryDesc": "사람들에게 라이브러리의 용도를 알기 쉽게 설명해주세요",
       "githubHandle": "GitHub 사용자명 (선택), 제출한 뒤에도 심사를 위해서 라이브러리를 수정할 때 사용됩니다",
-      "twitterHandle": "Twitter 사용자명 (선택), Twitter를 통한 홍보에서 누가 제작했는지를 알리기 위해 사용됩니다",
+      "twitterHandle": "Twitter 사용자명 (선택), Twitter를 통해서 홍보할 때 제작자를 밝히기 위해 사용됩니다",
       "website": "개인 웹사이트나 다른 어딘가의 링크 (선택)"
     },
     "errors": {

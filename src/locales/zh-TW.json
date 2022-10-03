@@ -114,6 +114,10 @@
       "create": "建立連結",
       "label": "連結"
     },
+    "lineEditor": {
+      "edit": "編輯線條",
+      "exit": "結束線條編輯"
+    },
     "elementLock": {
       "lock": "鎖定",
       "unlock": "解鎖",

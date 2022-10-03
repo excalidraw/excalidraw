@@ -114,6 +114,10 @@
       "create": "Ajouter un lien",
       "label": "Lien"
     },
+    "lineEditor": {
+      "edit": "Modifier la ligne",
+      "exit": "Quitter l'éditeur de ligne"
+    },
     "elementLock": {
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",

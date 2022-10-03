@@ -71,7 +71,7 @@
     "layers": "परतें",
     "actions": "कार्रवाई",
     "language": "भाषा",
-    "liveCollaboration": "",
+    "liveCollaboration": "जीवंत सहयोग",
     "duplicateSelection": "डुप्लिकेट",
     "untitled": "अशीर्षित",
     "name": "नाम",
@@ -101,7 +101,7 @@
     "toggleExportColorScheme": "",
     "share": "शेयर करें",
     "showStroke": "",
-    "showBackground": "",
+    "showBackground": "पृष्ठभूमि रंग वरक़ दिखाये",
     "toggleTheme": "",
     "personalLib": "",
     "excalidrawLib": "",
@@ -113,6 +113,10 @@
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "lineEditor": {
+      "edit": "रेखा संपादित करे",
+      "exit": "रेखा संपादक के बाहर"
     },
     "elementLock": {
       "lock": "ताले में रखें",
@@ -161,11 +165,11 @@
     "zenMode": "ज़ेन मोड",
     "exitZenMode": "जेन मोड से बाहर निकलें",
     "cancel": "",
-    "clear": "",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "clear": "साफ़ करे",
+    "remove": "हटाएं",
+    "publishLibrary": "प्रकाशित करें",
+    "submit": "प्रस्तुत करे",
+    "confirm": "पुष्टि करें"
   },
   "alerts": {
     "clearReset": "इससे पूरा कैनवास साफ हो जाएगा। क्या आपको यकीन है?",
@@ -174,39 +178,39 @@
     "couldNotLoadInvalidFile": "अमान्य फ़ाइल लोड नहीं की जा सकी",
     "importBackendFailed": "बैकएंड से आयात करना विफल रहा।",
     "cannotExportEmptyCanvas": "खाली कैनवास निर्यात नहीं कर सकता।",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "क्लिपबोर्ड पर कॉपी नहीं किया जा सका",
     "decryptFailed": "डेटा को डिक्रिप्ट नहीं किया जा सका।",
     "uploadedSecurly": "अपलोड को एंड-टू-एंड एन्क्रिप्शन के साथ सुरक्षित किया गया है, जिसका मतलब है कि एक्सक्लूसिव सर्वर और थर्ड पार्टी कंटेंट नहीं पढ़ सकते हैं।",
     "loadSceneOverridePrompt": "लोड हो रहा है बाहरी ड्राइंग आपके मौजूदा सामग्री को बदल देगा। क्या आप जारी रखना चाहते हैं?",
-    "collabStopOverridePrompt": "",
-    "errorAddingToLibrary": "",
-    "errorRemovingFromLibrary": "",
+    "collabStopOverridePrompt": "चालू सत्र समाप्ति से आपका संग्रहित पूर्व स्थानीय अधिलेखन नष्ट होकर पुनः अधिलेखित होगा, क्या आपको यक़ीन हैं? ( यदी आपको पूर्व स्थापित अधिलेखन सुरक्षित चाहिये तो बस ब्राउज़र टैब बंद करे)",
+    "errorAddingToLibrary": "संग्रह में जोडा न जा सका",
+    "errorRemovingFromLibrary": "संग्रह से हटाया नहीं जा सका",
     "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "ऐसा लगता है कि इस छवि में कोई दृश्य डेटा नहीं है। क्या आपने निर्यात के दौरान दृश्य एम्बेडिंग अनुमतित की है?",
     "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है",
-    "invalidSceneUrl": "",
-    "resetLibrary": "",
-    "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidSceneUrl": "दिये गये युआरेल से दृश्य आयात नहीं किया जा सका. यह या तो अनुरचित है, या इसमें उचित Excalidraw JSON डेटा नहीं है।",
+    "resetLibrary": "यह पूरा संग्रह रिक्त करेगा. क्या आपको यक़ीन हैं?",
+    "removeItemsFromsLibrary": "{{count}} वस्तु(यें) संग्रह से हटायें?",
+    "invalidEncryptionKey": "कूटलेखन कुंजी 22 अक्षरों की होनी चाहिये, इसलिये जीवंत सहयोग अक्षम हैं"
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
-    "invalidSVGString": "",
+    "unsupportedFileType": "असमर्थित फाइल प्रकार",
+    "imageInsertError": "छवि सम्मिलित नहीं की जा सकी. पुनः प्रयत्न करे...",
+    "fileTooBig": "फ़ाइल ज़रूरत से ज़्यादा बड़ी हैं. अधिकतम अनुमनित परिमाण {{maxSize}} हैं",
+    "svgImageInsertError": "एसवीजी छवि सम्मिलित नहीं कर सके, एसवीजी रचना अनुचित हैं",
+    "invalidSVGString": "अनुचित SVG",
     "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे.",
     "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका"
   },
   "toolBar": {
     "selection": "चयन",
-    "image": "",
+    "image": "छवि सम्मिलित करें",
     "rectangle": "आयात",
     "diamond": "तिर्यग्वर्ग",
     "ellipse": "दीर्घवृत्त",
     "arrow": "तीर",
     "line": "रेखा",
-    "freedraw": "",
+    "freedraw": "चित्रांतित करे",
     "text": "पाठ",
     "library": "लाइब्रेरी",
     "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें",
@@ -330,16 +334,16 @@
     },
     "errors": {
       "required": "",
-      "website": ""
+      "website": "मान्य URL प्रविष्ट करें"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "संग्रह सम्मिलित करने हेतु प्रस्तुत करें ",
+      "link": "सार्वजनिक संग्रहालय",
+      "post": "अन्य वक्तियों को उनके चित्रकारी में उपयोग के लिये"
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
+      "pre": "संग्रह को पहले स्वीकृति आवश्यक कृपया यह पढ़ें ",
+      "link": "दिशा-निर्देश",
       "post": ""
     },
     "noteLicense": {

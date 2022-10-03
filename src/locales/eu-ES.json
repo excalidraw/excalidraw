@@ -114,6 +114,10 @@
       "create": "Sortu esteka",
       "label": "Esteka"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Blokeatu",
       "unlock": "Desblokeatu",

@@ -114,6 +114,10 @@
       "create": "新建链接",
       "label": "链接"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "锁定",
       "unlock": "解除锁定",

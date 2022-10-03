@@ -114,6 +114,10 @@
       "create": "Bağlantı oluştur",
       "label": "Bağlantı"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Kilitle",
       "unlock": "Kilidi Kaldır",

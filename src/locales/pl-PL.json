@@ -9,7 +9,7 @@
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "copyAsSvg": "Skopiuj do schowka jako plik SVG",
-    "copyText": "",
+    "copyText": "Skopiuj do schowka jako tekst",
     "bringForward": "Przenieś wyżej",
     "sendToBack": "Przenieś na spód",
     "bringToFront": "Przenieś na wierzch",
@@ -114,6 +114,10 @@
       "create": "",
       "label": ""
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
@@ -212,7 +216,7 @@
     "lock": "Zablokuj wybrane narzędzie",
     "penMode": "",
     "link": "",
-    "eraser": ""
+    "eraser": "Gumka"
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -298,7 +302,7 @@
     "howto": "Skorzystaj z instrukcji",
     "or": "lub",
     "preventBinding": "Zapobiegaj wiązaniu strzałek",
-    "tools": "",
+    "tools": "Narzędzia",
     "shortcuts": "Skróty klawiszowe",
     "textFinish": "Zakończ edycję (edytor tekstu)",
     "textNewLine": "Dodaj nowy wiersz (edytor tekstu)",
@@ -313,7 +317,7 @@
   },
   "publishDialog": {
     "title": "Opublikuj bibliotekę",
-    "itemName": "",
+    "itemName": "Nazwa elementu",
     "authorName": "Nazwa autora",
     "githubUsername": "Nazwa użytkownika na GitHubie",
     "twitterUsername": "Nazwa użytkownika Twitter",

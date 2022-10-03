@@ -114,6 +114,10 @@
       "create": "Opprett lenke",
       "label": "Lenke"
     },
+    "lineEditor": {
+      "edit": "Rediger linje",
+      "exit": "Avslutt linjeredigering"
+    },
     "elementLock": {
       "lock": "Lås",
       "unlock": "Lås opp",

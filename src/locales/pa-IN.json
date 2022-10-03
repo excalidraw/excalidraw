@@ -114,6 +114,10 @@
       "create": "ਕੜੀ ਬਣਾਓ",
       "label": "ਕੜੀ"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",

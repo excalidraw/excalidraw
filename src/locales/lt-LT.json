@@ -114,6 +114,10 @@
       "create": "Sukurti nuorodą",
       "label": "Nuoroda"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Užrakinti",
       "unlock": "Atrakinti",
