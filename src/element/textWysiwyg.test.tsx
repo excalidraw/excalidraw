@@ -823,8 +823,8 @@ describe("textWysiwyg", () => {
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
-          109.5,
-          17,
+          10,
+          4.5,
         ]
       `);
 
@@ -848,7 +848,7 @@ describe("textWysiwyg", () => {
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
           15,
-          90,
+          65,
         ]
       `);
 
@@ -871,7 +871,7 @@ describe("textWysiwyg", () => {
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
-          424,
+          5,
           -539,
         ]
       `);
