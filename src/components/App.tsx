@@ -254,6 +254,7 @@ import {
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
+  getContainerCenter,
   getContainerDims,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
@@ -6136,37 +6137,25 @@ class App extends React.Component<AppProps, AppState> {
         elementClickedInside.x + elementClickedInside.width / 2;
       let elementCenterY =
         elementClickedInside.y + elementClickedInside.height / 2;
-      if (isLinearElement(elementClickedInside)) {
-        const points =
-          LinearElementEditor.getPointsGlobalCoordinates(elementClickedInside);
-        let midPoint: Point;
-        if (points.length === 3) {
-          midPoint = points[1];
-        } else {
-          midPoint = LinearElementEditor.getSegmentMidPoint(
-            elementClickedInside,
-            points[0],
-            points[1],
-            1,
-          );
+      if (elementClickedInside) {
+        const elementCenter = getContainerCenter(elementClickedInside);
+        if (elementCenter) {
+          elementCenterX = elementCenter.x;
+          elementCenterY = elementCenter.y;
         }
-        if (midPoint) {
-          elementCenterX = midPoint[0];
-          elementCenterY = midPoint[1];
-        }
-      }
-      const distanceToCenter = Math.hypot(
-        x - elementCenterX,
-        y - elementCenterY,
-      );
-      const isSnappedToCenter =
-        distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD;
-      if (isSnappedToCenter) {
-        const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
-          { sceneX: elementCenterX, sceneY: elementCenterY },
-          appState,
+        const distanceToCenter = Math.hypot(
+          x - elementCenterX,
+          y - elementCenterY,
         );
-        return { viewportX, viewportY, elementCenterX, elementCenterY };
+        const isSnappedToCenter =
+          distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD;
+        if (isSnappedToCenter) {
+          const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
+            { sceneX: elementCenterX, sceneY: elementCenterY },
+            appState,
+          );
+          return { viewportX, viewportY, elementCenterX, elementCenterY };
+        }
       }
     }
   }

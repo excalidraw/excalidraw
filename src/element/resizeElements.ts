@@ -196,7 +196,6 @@ const rotateSingleElement = (
       mutateElement(textElement, {
         x: newBoundTextCenterPoint[0] - textElement.width / 2,
         y: newBoundTextCenterPoint[1] - textElement.height / 2,
-        angle,
       });
     } else {
       mutateElement(textElement, { angle });

@@ -13,6 +13,8 @@ import Scene from "../scene/Scene";
 import { isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import { isLinearElement } from "./typeChecks";
+import { LinearElementEditor } from "./linearElementEditor";
+import { Point } from "../types";
 
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
@@ -506,5 +508,34 @@ export const getContainerElement = (
 };
 
 export const getContainerDims = (element: ExcalidrawElement) => {
+  if (isLinearElement(element)) {
+    const width = Math.max(element.width, element.height);
+    const height = Math.min(element.width, element.height);
+    return { width, height };
+  }
   return { width: element.width, height: element.height };
+};
+
+export const getContainerCenter = (element: ExcalidrawElement) => {
+  if (isLinearElement(element)) {
+    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+    let midPoint: Point;
+    if (points.length === 3) {
+      midPoint = points[1];
+    } else {
+      midPoint = LinearElementEditor.getSegmentMidPoint(
+        element,
+        points[0],
+        points[1],
+        1,
+      );
+    }
+    if (midPoint) {
+      return { x: midPoint[0], y: midPoint[1] };
+    }
+  }
+  return {
+    x: element.x + element.width / 2,
+    y: element.y + element.height / 2,
+  };
 };
