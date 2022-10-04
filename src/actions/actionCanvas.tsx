@@ -1,5 +1,5 @@
 import { ColorPicker } from "../components/ColorPicker";
-import { eraser, zoomIn, zoomOut } from "../components/icons";
+import { eraser } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { THEME, ZOOM_STEP } from "../constants";
@@ -103,13 +103,28 @@ export const actionZoomIn = register({
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
-      icon={zoomIn}
+      className="zoom-in-button zoom-button"
+      icon={
+        // TODO barnabasmolnar/editor-redesign
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      }
       title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
       onClick={() => {
         updateData(null);
       }}
-      size="small"
     />
   ),
   keyTest: (event) =>
@@ -139,13 +154,27 @@ export const actionZoomOut = register({
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
-      icon={zoomOut}
+      className="zoom-out-button zoom-button"
+      icon={
+        // TODO barnabasmolnar/editor-redesign
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      }
       title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
       onClick={() => {
         updateData(null);
       }}
-      size="small"
     />
   ),
   keyTest: (event) =>
@@ -176,13 +205,12 @@ export const actionResetZoom = register({
     <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
       <ToolButton
         type="button"
-        className="reset-zoom-button"
+        className="reset-zoom-button zoom-button"
         title={t("buttons.resetZoom")}
         aria-label={t("buttons.resetZoom")}
         onClick={() => {
           updateData(null);
         }}
-        size="small"
       >
         {(appState.zoom.value * 100).toFixed(0)}%
       </ToolButton>

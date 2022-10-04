@@ -28,6 +28,7 @@ import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
+import "./Actions.scss";
 
 export const SelectedShapeActions = ({
   appState,
@@ -264,11 +265,11 @@ export const ZoomActions = ({
   renderAction: ActionManager["renderAction"];
   zoom: Zoom;
 }) => (
-  <Stack.Col gap={1}>
-    <Stack.Row gap={1} align="center">
+  <Stack.Col gap={1} className="zoom-actions">
+    <Stack.Row align="center">
       {renderAction("zoomOut")}
-      {renderAction("zoomIn")}
       {renderAction("resetZoom")}
+      {renderAction("zoomIn")}
     </Stack.Row>
   </Stack.Col>
 );
@@ -281,8 +282,8 @@ export const UndoRedoActions = ({
   className?: string;
 }) => (
   <div className={`undo-redo-buttons ${className}`}>
-    {renderAction("undo", { size: "small" })}
-    {renderAction("redo", { size: "small" })}
+    <div className="undo-button-container">{renderAction("undo")}</div>
+    <div className="redo-button-container">{renderAction("redo")}</div>
   </div>
 );
 

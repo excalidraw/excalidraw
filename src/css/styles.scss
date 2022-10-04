@@ -342,20 +342,14 @@
 
   .App-menu_bottom {
     position: absolute;
-    bottom: 0;
+    bottom: 1rem;
     grid-template-columns: min-content auto min-content;
     grid-gap: 15px;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
-
-    :root[dir="ltr"] & {
-      left: 0.25rem;
-    }
-
-    :root[dir="rtl"] & {
-      right: 0.25rem;
-    }
+    box-sizing: border-box;
+    padding: 0 1rem;
 
     &--transition-left {
       section {
@@ -469,9 +463,6 @@
   }
 
   .reset-zoom-button {
-    padding: 0.2em;
-    background: transparent;
-    color: var(--text-primary-color);
     font-family: var(--ui-font);
   }
 
@@ -488,7 +479,6 @@
   .eraser-buttons {
     display: grid;
     grid-auto-flow: column;
-    gap: 0.4em;
     margin-top: auto;
     margin-bottom: auto;
     margin-inline-start: 0.6em;

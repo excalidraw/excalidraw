@@ -36,9 +36,10 @@
     0px 0px 3.12708px rgba(0, 0, 0, 0.0798),
     0px 0px 0.931014px rgba(0, 0, 0, 0.1702);
   --toolIcon-hover: var(--color-gray-10);
+  --default-border-color: var(--color-gray-30);
 
   --space-factor: 0.25rem;
-  --text-primary-color: #{$oc-gray-8};
+  --text-primary-color: var(--color-gray-80);
 
   --color-primary: #6965db;
   --color-primary-darker: #5b57d1;
@@ -89,8 +90,9 @@
     --popup-text-color: #{$oc-gray-4};
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$oc-blue-4};
-    --text-primary-color: #{$oc-gray-4};
+    --text-primary-color: var(--color-gray-40);
     --toolIcon-hover: var(--color-gray-80);
+    --default-border-color: var(--color-gray-80);
 
     --color-primary: #5650f0;
     --color-primary-darker: #b2aeff;

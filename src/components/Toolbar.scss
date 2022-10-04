@@ -14,16 +14,8 @@
       width: 1px;
       height: 1.5rem;
       align-self: center;
-      background-color: var(--color-gray-30);
+      background-color: var(--default-border-color);
       margin: 0 0.5rem;
-    }
-  }
-
-  &.theme--dark {
-    .App-toolbar {
-      &__divider {
-        background-color: var(--color-gray-80);
-      }
     }
   }
 }
