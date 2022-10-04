@@ -137,6 +137,16 @@ export class ActionManager {
    */
   renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
+
+    // console.log("wtf...");
+    // console.log(
+    //   this.actions[name] &&
+    //     "PanelComponent" in this.actions[name] &&
+    //     (name in canvasActions
+    //       ? canvasActions[name as keyof typeof canvasActions]
+    //       : true),
+    // );
+
     if (
       this.actions[name] &&
       "PanelComponent" in this.actions[name] &&

@@ -307,19 +307,6 @@ const LayerUI = ({
                       "zen-mode": appState.zenModeEnabled,
                     })}
                   >
-                    <PenModeButton
-                      zenModeEnabled={appState.zenModeEnabled}
-                      checked={appState.penMode}
-                      onChange={onPenModeToggle}
-                      title={t("toolBar.penMode")}
-                      penDetected={appState.penDetected}
-                    />
-                    <LockButton
-                      zenModeEnabled={appState.zenModeEnabled}
-                      checked={appState.activeTool.locked}
-                      onChange={() => onLockToggle()}
-                      title={t("toolBar.lock")}
-                    />
                     <Island
                       padding={1}
                       className={clsx("App-toolbar", {
@@ -333,6 +320,22 @@ const LayerUI = ({
                       />
                       {heading}
                       <Stack.Row gap={1}>
+                        <PenModeButton
+                          zenModeEnabled={appState.zenModeEnabled}
+                          checked={appState.penMode}
+                          onChange={onPenModeToggle}
+                          title={t("toolBar.penMode")}
+                          penDetected={appState.penDetected}
+                          // TODO barnabasmolnar/editor-redesign
+                          // penDetected={true}
+                        />
+                        <LockButton
+                          zenModeEnabled={appState.zenModeEnabled}
+                          checked={appState.activeTool.locked}
+                          onChange={() => onLockToggle()}
+                          title={t("toolBar.lock")}
+                        />
+                        <div className="App-toolbar__divider"></div>
                         <ShapesSwitcher
                           appState={appState}
                           canvas={canvas}
@@ -344,6 +347,9 @@ const LayerUI = ({
                             });
                           }}
                         />
+                        {/* {actionManager.renderAction("eraser", {
+                          // size: "small",
+                        })} */}
                       </Stack.Row>
                     </Island>
                     <LibraryButton

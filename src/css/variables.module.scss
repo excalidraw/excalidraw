@@ -7,24 +7,45 @@
 }
 
 @mixin toolbarButtonColorStates {
+  &.fillable {
+    .ToolIcon_type_radio,
+    .ToolIcon_type_checkbox {
+      &:checked + .ToolIcon__icon {
+        --icon-fill-color: var(--color-primary-darker);
+
+        svg {
+          fill: var(--icon-fill-color);
+        }
+      }
+    }
+  }
+
   .ToolIcon_type_radio,
   .ToolIcon_type_checkbox {
-    & + .ToolIcon__icon:active {
-      background: var(--color-primary-light);
-    }
     &:checked + .ToolIcon__icon {
-      background: var(--color-primary);
-      --icon-fill-color: #{$oc-white};
-      --keybinding-color: #{$oc-white};
-    }
-    &:checked + .ToolIcon__icon:active {
-      background: var(--color-primary-darker);
+      background: var(--color-primary-light);
+      --keybinding-color: var(--color-gray-60);
+
+      svg {
+        color: var(--color-primary-darker);
+      }
     }
   }
 
   .ToolIcon__keybinding {
     bottom: 4px;
     right: 4px;
+  }
+
+  .ToolIcon__icon {
+    &:hover {
+      background: var(--toolIcon-hover);
+    }
+
+    &:active {
+      background: var(--toolIcon-hover);
+      border: 1px solid var(--color-primary-darkest);
+    }
   }
 }
 

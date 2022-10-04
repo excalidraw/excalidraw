@@ -53,7 +53,7 @@ export const PenModeButton = (props: PenModeIconProps) => {
     return (
       <label
         className={clsx(
-          "ToolIcon ToolIcon__penMode ToolIcon_type_floating",
+          "ToolIcon ToolIcon__penMode",
           `ToolIcon_size_${DEFAULT_SIZE}`,
           {
             "is-mobile": props.isMobile,
@@ -67,7 +67,7 @@ export const PenModeButton = (props: PenModeIconProps) => {
   return (
     <label
       className={clsx(
-        "ToolIcon ToolIcon__penMode ToolIcon_type_floating",
+        "ToolIcon ToolIcon__penMode",
         `ToolIcon_size_${DEFAULT_SIZE}`,
         {
           "is-mobile": props.isMobile,

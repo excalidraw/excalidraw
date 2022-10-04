@@ -289,8 +289,6 @@
   .App-toolbar {
     width: 100%;
 
-    box-sizing: border-box;
-
     .eraser {
       &.ToolIcon:hover {
         --icon-fill-color: #fff;
@@ -390,7 +388,6 @@
 
   .App-menu__left {
     overflow-y: auto;
-    box-shadow: var(--shadow-island);
   }
 
   .dropdown-select {

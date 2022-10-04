@@ -16,8 +16,8 @@ $wide-viewport-width: 1000px;
     width: 100%;
     margin-top: 6px;
     text-align: center;
-    color: $oc-gray-6;
-    font-size: 0.8rem;
+    color: var(--color-gray-40);
+    font-size: 0.625rem;
 
     @include isMobile {
       position: static;
