@@ -67,7 +67,7 @@ export const redrawTextBoundingBox = (
           metrics.width -
           BOUND_TEXT_PADDING;
       } else {
-        coordX = container.x + container.width / 2 - metrics.width / 2;
+        coordX = container.x + containerDims.width / 2 - metrics.width / 2;
       }
 
       mutateElement(container, { height: nextHeight });
@@ -127,86 +127,85 @@ export const bindTextToShapeAfterDuplication = (
 };
 
 export const handleBindTextResize = (
-  element: NonDeletedExcalidrawElement,
+  container: NonDeletedExcalidrawElement,
   transformHandleType: MaybeTransformHandleType,
 ) => {
-  const boundTextElementId = getBoundTextElementId(element);
+  const boundTextElementId = getBoundTextElementId(container);
   if (!boundTextElementId) {
     return;
   }
-  const textElement = Scene.getScene(element)!.getElement(
+  const textElement = Scene.getScene(container)!.getElement(
     boundTextElementId,
   ) as ExcalidrawTextElement;
   if (textElement && textElement.text) {
-    if (!element) {
+    if (!container || isLinearElement(container)) {
       return;
     }
 
-    if (isLinearElement(element)) {
-    } else {
-      let text = textElement.text;
-      let nextHeight = textElement.height;
-      let nextWidth = textElement.width;
-      let containerHeight = element.height;
-      let nextBaseLine = textElement.baseline;
-      if (transformHandleType !== "n" && transformHandleType !== "s") {
-        if (text) {
-          text = wrapText(
-            textElement.originalText,
-            getFontString(textElement),
-            getMaxContainerWidth(element),
-          );
-        }
-
-        const dimensions = measureText(
-          text,
+    let text = textElement.text;
+    let nextHeight = textElement.height;
+    let nextWidth = textElement.width;
+    const containerDims = getContainerDims(container);
+    let containerHeight = containerDims.height;
+    let nextBaseLine = textElement.baseline;
+    if (transformHandleType !== "n" && transformHandleType !== "s") {
+      if (text) {
+        text = wrapText(
+          textElement.originalText,
           getFontString(textElement),
-          element.width,
+          getMaxContainerWidth(container),
         );
-        nextHeight = dimensions.height;
-        nextWidth = dimensions.width;
-        nextBaseLine = dimensions.baseline;
-      }
-      // increase height in case text element height exceeds
-      if (nextHeight > element.height - BOUND_TEXT_PADDING * 2) {
-        containerHeight = nextHeight + BOUND_TEXT_PADDING * 2;
-        const diff = containerHeight - element.height;
-        // fix the y coord when resizing from ne/nw/n
-        const updatedY =
-          transformHandleType === "ne" ||
-          transformHandleType === "nw" ||
-          transformHandleType === "n"
-            ? element.y - diff
-            : element.y;
-        mutateElement(element, {
-          height: containerHeight,
-          y: updatedY,
-        });
       }
 
-      let updatedY;
-      if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-        updatedY = element.y + BOUND_TEXT_PADDING;
-      } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-        updatedY = element.y + element.height - nextHeight - BOUND_TEXT_PADDING;
-      } else {
-        updatedY = element.y + element.height / 2 - nextHeight / 2;
-      }
-      const updatedX =
-        textElement.textAlign === TEXT_ALIGN.LEFT
-          ? element.x + BOUND_TEXT_PADDING
-          : textElement.textAlign === TEXT_ALIGN.RIGHT
-          ? element.x + element.width - nextWidth - BOUND_TEXT_PADDING
-          : element.x + element.width / 2 - nextWidth / 2;
-      mutateElement(textElement, {
+      const dimensions = measureText(
         text,
-        width: nextWidth,
-        height: nextHeight,
-        x: updatedX,
+        getFontString(textElement),
+        container.width,
+      );
+      nextHeight = dimensions.height;
+      nextWidth = dimensions.width;
+      nextBaseLine = dimensions.baseline;
+    }
+    // increase height in case text element height exceeds
+    if (nextHeight > containerDims.height - BOUND_TEXT_PADDING * 2) {
+      containerHeight = nextHeight + BOUND_TEXT_PADDING * 2;
+      const diff = containerHeight - containerDims.height;
+      // fix the y coord when resizing from ne/nw/n
+      const updatedY =
+        transformHandleType === "ne" ||
+        transformHandleType === "nw" ||
+        transformHandleType === "n"
+          ? container.y - diff
+          : container.y;
+      mutateElement(container, {
+        height: containerHeight,
         y: updatedY,
-        baseline: nextBaseLine,
       });
     }
+    let updatedY;
+    if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
+      updatedY = container.y + BOUND_TEXT_PADDING;
+    } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+      updatedY =
+        container.y + containerDims.height - nextHeight - BOUND_TEXT_PADDING;
+    } else {
+      updatedY = container.y + containerDims.height / 2 - nextHeight / 2;
+    }
+    const updatedX =
+      textElement.textAlign === TEXT_ALIGN.LEFT
+        ? container.x + BOUND_TEXT_PADDING
+        : textElement.textAlign === TEXT_ALIGN.RIGHT
+        ? container.x + containerDims.width - nextWidth - BOUND_TEXT_PADDING
+        : container.x + containerDims.width / 2 - nextWidth / 2;
+
+    mutateElement(textElement, {
+      text,
+      width: nextWidth,
+      height: nextHeight,
+      x: updatedX,
+      y: updatedY,
+      baseline: nextBaseLine,
+    });
   }
 };
 

@@ -256,7 +256,7 @@ const getAdjustedDimensions = (
 export const getMaxContainerWidth = (container: ExcalidrawElement) => {
   const width = getContainerDims(container).width;
   if (isLinearElement(container)) {
-    return width / 2 + width / 4;
+    return 300;
   }
   return width - BOUND_TEXT_PADDING * 2;
 };
