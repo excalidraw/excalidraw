@@ -36,6 +36,7 @@ import { hasBoundTextElement, isImageElement } from "./typeChecks";
 import { isTextElement } from ".";
 import { isTransparent } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
+import { getBoundTextElement } from "./textElement";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -72,6 +73,13 @@ export const hitTest = (
     return isPointHittingElementBoundingBox(element, point, threshold);
   }
 
+  const boundTextElement = getBoundTextElement(element);
+  if (boundTextElement) {
+    const isHittingBoundTextElement = hitTest(boundTextElement, appState, x, y);
+    if (isHittingBoundTextElement) {
+      return true;
+    }
+  }
   return isHittingElementNotConsideringBoundingBox(element, appState, point);
 };
 

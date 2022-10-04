@@ -2966,15 +2966,18 @@ class App extends React.Component<AppProps, AppState> {
         );
       } else if (
         // if using cmd/ctrl, we're not dragging
-        !event[KEYS.CTRL_OR_CMD] &&
-        (hitElement ||
-          this.isHittingCommonBoundingBoxOfSelectedElements(
-            scenePointer,
-            selectedElements,
-          )) &&
-        !hitElement?.locked
+        !event[KEYS.CTRL_OR_CMD]
       ) {
-        setCursor(this.canvas, CURSOR_TYPE.MOVE);
+        if (
+          (hitElement ||
+            this.isHittingCommonBoundingBoxOfSelectedElements(
+              scenePointer,
+              selectedElements,
+            )) &&
+          !hitElement?.locked
+        ) {
+          setCursor(this.canvas, CURSOR_TYPE.MOVE);
+        }
       } else {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
       }
@@ -3084,6 +3087,8 @@ class App extends React.Component<AppProps, AppState> {
       linearElementEditor.elementId,
     );
 
+    const boundTextElement = getBoundTextElement(element);
+
     if (!element) {
       return;
     }
@@ -3122,6 +3127,11 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         )
+      ) {
+        setCursor(this.canvas, CURSOR_TYPE.MOVE);
+      } else if (
+        boundTextElement &&
+        hitTest(boundTextElement, this.state, scenePointerX, scenePointerY)
       ) {
         setCursor(this.canvas, CURSOR_TYPE.MOVE);
       }
