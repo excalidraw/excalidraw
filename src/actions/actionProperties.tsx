@@ -949,7 +949,7 @@ export const actionChangeArrowhead = register({
     return (
       <fieldset>
         <legend>{t("labels.arrowheads")}</legend>
-        <div className="iconSelectList">
+        <div className="iconSelectList buttonList">
           <IconPicker
             label="arrowhead_start"
             options={[

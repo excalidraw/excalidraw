@@ -85,27 +85,22 @@
   .panelColumn {
     display: flex;
     flex-direction: column;
+    row-gap: 0.75rem;
 
     h3,
     legend,
     .control-label {
-      margin-top: 0.333rem;
-      margin-bottom: 0.333rem;
+      margin: 0;
+      margin-bottom: 0.25rem;
       font-size: 0.75rem;
       color: var(--text-primary-color);
-      font-weight: bold;
+      font-weight: normal;
       display: block;
     }
 
     .control-label input {
       display: block;
       width: 100%;
-    }
-
-    h3:first-child,
-    legend:first-child,
-    .control-label:first-child {
-      margin-top: 0;
     }
 
     legend {
@@ -119,11 +114,12 @@
 
     .buttonList {
       flex-wrap: wrap;
+      display: flex;
+      column-gap: 0.5rem;
+      row-gap: 0.5rem;
 
       label {
-        margin-right: 0.25rem;
         font-size: 0.75rem;
-        display: inline-block;
       }
 
       input[type="radio"],
@@ -136,38 +132,10 @@
       .iconRow {
         margin-top: 8px;
       }
-
-      .ToolIcon {
-        margin: 0;
-        margin-inline-end: 8px;
-
-        &:focus {
-          outline: transparent;
-          box-shadow: 0 0 0 2px var(--focus-highlight-color);
-        }
-
-        &:hover {
-          background-color: var(--button-gray-2);
-        }
-
-        &:active {
-          background-color: var(--button-gray-3);
-        }
-
-        &:disabled {
-          cursor: not-allowed;
-        }
-      }
-
-      .ToolIcon__icon {
-        width: 28px;
-        height: 28px;
-      }
     }
 
     fieldset {
       margin: 0;
-      margin-top: 0.333rem;
       padding: 0;
       border: none;
     }
@@ -185,64 +153,48 @@
     box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
 
-  button,
-  .buttonList label {
-    user-select: none;
-    background-color: var(--button-gray-1);
-    border: 0;
-    border-radius: var(--border-radius-md);
-    margin: 0.125rem 0;
-    padding: 0.25rem;
-    white-space: nowrap;
-
-    cursor: pointer;
-
-    &:focus-visible {
-      outline: transparent;
-      box-shadow: 0 0 0 2px var(--focus-highlight-color);
+  .buttonList {
+    .ToolIcon__icon {
+      all: unset !important;
+      display: flex !important;
     }
 
-    &:hover {
-      background-color: var(--button-gray-2);
+    button {
+      background-color: transparent;
     }
 
-    &:active {
-      background-color: var(--button-gray-3);
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-    }
-  }
-
-  .active,
-  .buttonList label.active {
-    background-color: var(--color-primary);
-
-    --icon-fill-color: #{$oc-white};
-
-    &:hover {
-      background-color: var(--color-primary-darker);
-    }
-
-    &:active {
-      background-color: var(--color-primary-darkest);
-    }
-  }
-
-  .buttonList.buttonListIcon {
-    label {
-      display: inline-flex;
+    label,
+    button,
+    .zIndexButton {
+      display: flex;
       justify-content: center;
       align-items: center;
-      svg {
-        width: 35px;
-        height: 14px;
-        padding: 2px;
-        opacity: 0.6;
+      padding: 0.625rem;
+      width: 2.25rem;
+      height: 2.25rem;
+      box-sizing: border-box;
+      border-width: 1px;
+      border-style: solid;
+      border-color: var(--default-border-color);
+      border-radius: var(--border-radius-lg);
+      cursor: pointer;
+
+      &:active {
+        background-color: var(--button-hover);
+        border: 1px solid var(--color-primary-darkest);
       }
-      &.active svg {
-        opacity: 1;
+
+      &.active {
+        background-color: var(--color-primary-light);
+        border-color: var(--color-primary-light);
+
+        &:hover {
+          background-color: var(--color-primary-light);
+        }
+      }
+
+      &:hover {
+        background-color: var(--button-hover);
       }
     }
   }
@@ -382,6 +334,10 @@
 
   .App-menu__left {
     overflow-y: auto;
+    padding: 0.75rem;
+    width: 100%;
+    max-width: 192px;
+    box-sizing: border-box;
   }
 
   .dropdown-select {
@@ -416,20 +372,6 @@
 
     &:active {
       background-color: var(--button-gray-2);
-    }
-  }
-
-  .zIndexButton {
-    margin: 0;
-    margin-inline-end: 8px;
-    padding: 5px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    svg {
-      width: 18px;
-      height: 18px;
     }
   }
 

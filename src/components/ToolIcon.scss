@@ -109,7 +109,8 @@
     }
 
     &--hide {
-      visibility: hidden;
+      // visibility: hidden;
+      display: none !important;
     }
   }
 

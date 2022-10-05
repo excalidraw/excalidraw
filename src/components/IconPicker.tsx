@@ -150,7 +150,7 @@ export function IconPicker<T>({
   const isRTL = getLanguage().rtl;
 
   return (
-    <label className={"picker-container"}>
+    <div>
       <button
         name={group}
         className={isActive ? "active" : ""}
@@ -184,6 +184,6 @@ export function IconPicker<T>({
           </>
         ) : null}
       </React.Suspense>
-    </label>
+    </div>
   );
 }

@@ -39,11 +39,11 @@
 
   .ToolIcon__icon {
     &:hover {
-      background: var(--toolIcon-hover);
+      background: var(--button-hover);
     }
 
     &:active {
-      background: var(--toolIcon-hover);
+      background: var(--button-hover);
       border: 1px solid var(--color-primary-darkest);
     }
   }
