@@ -49,6 +49,41 @@
   }
 }
 
+@mixin outlineButtonStyles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.625rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--default-border-color);
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  background-color: transparent;
+  color: var(--text-primary-color);
+
+  &:hover {
+    background-color: var(--button-hover);
+  }
+
+  &:active {
+    background-color: var(--button-hover);
+    border-color: var(--color-primary-darkest);
+  }
+
+  &.active {
+    background-color: var(--color-primary-light);
+    border-color: var(--color-primary-light);
+
+    &:hover {
+      background-color: var(--color-primary-light);
+    }
+  }
+}
+
 $theme-filter: "invert(93%) hue-rotate(180deg)";
 $right-sidebar-width: "302px";
 
