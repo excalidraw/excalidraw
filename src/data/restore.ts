@@ -71,6 +71,7 @@ const restoreElementWithProperties = <
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
+    parent?: string;
   },
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
@@ -121,6 +122,7 @@ const restoreElementWithProperties = <
   }
 
   return {
+    parent: element.parent,
     ...base,
     ...getNormalizedDimensions(base),
     ...extra,
