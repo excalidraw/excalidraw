@@ -506,8 +506,8 @@ export const _renderScene = ({
             );
           }
           if (selectionColors.length) {
-            const [elementX1, elementY1, elementX2, elementY2] =
-              getElementAbsoluteCoords(element);
+            const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
+              getElementAbsoluteCoords(element, true);
             acc.push({
               angle: element.angle,
               elementX1,
@@ -515,10 +515,12 @@ export const _renderScene = ({
               elementX2,
               elementY2,
               selectionColors,
+              cx,
+              cy,
             });
           }
           return acc;
-        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[] }[]);
+        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; cx: number; cy: number }[]);
 
         const addSelectionForGroupId = (groupId: GroupId) => {
           const groupElements = getElementsInGroup(elements, groupId);
@@ -531,6 +533,8 @@ export const _renderScene = ({
             elementY1,
             elementY2,
             selectionColors: [oc.black],
+            cx: elementX1 + (elementX2 - elementX1) / 2,
+            cy: elementY1 + (elementY2 - elementY1) / 2,
           });
         };
 
@@ -593,7 +597,7 @@ export const _renderScene = ({
         context.lineWidth = lineWidth;
         context.setLineDash(initialLineDash);
         const transformHandles = getTransformHandlesFromCoords(
-          [x1, y1, x2, y2],
+          [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
           0,
           renderConfig.zoom,
           "mouse",
@@ -837,11 +841,21 @@ const renderSelectionBorder = (
     elementX2: number;
     elementY2: number;
     selectionColors: string[];
+    cx: number;
+    cy: number;
   },
   padding = 4,
 ) => {
-  const { angle, elementX1, elementY1, elementX2, elementY2, selectionColors } =
-    elementProperties;
+  const {
+    angle,
+    elementX1,
+    elementY1,
+    elementX2,
+    elementY2,
+    selectionColors,
+    cx,
+    cy,
+  } = elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
 
@@ -867,8 +881,8 @@ const renderSelectionBorder = (
       elementY1 - dashedLinePadding,
       elementWidth + dashedLinePadding * 2,
       elementHeight + dashedLinePadding * 2,
-      elementX1 + elementWidth / 2,
-      elementY1 + elementHeight / 2,
+      cx,
+      cy,
       angle,
     );
   }

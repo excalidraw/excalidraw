@@ -5,7 +5,7 @@ import {
   ExcalidrawFreeDrawElement,
   NonDeleted,
 } from "./types";
-import { distance2d, rotate } from "../math";
+import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
@@ -15,6 +15,7 @@ import {
 } from "../renderer/renderElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { rescalePoints } from "../points";
+import { getBoundTextElement } from "./textElement";
 
 // x and y position of top left corner, x and y position of bottom right corner
 export type Bounds = readonly [number, number, number, number];
@@ -24,17 +25,20 @@ type MaybeQuadraticSolution = [number | null, number | null] | false;
 // This set of functions retrieves the absolute position of the 4 points.
 export const getElementAbsoluteCoords = (
   element: ExcalidrawElement,
-): Bounds => {
+  includeBoundText: boolean = false,
+): [number, number, number, number, number, number] => {
   if (isFreeDrawElement(element)) {
     return getFreeDrawElementAbsoluteCoords(element);
   } else if (isLinearElement(element)) {
-    return getLinearElementAbsoluteCoords(element);
+    return getLinearElementAbsoluteCoords(element, includeBoundText);
   }
   return [
     element.x,
     element.y,
     element.x + element.width,
     element.y + element.height,
+    element.x + element.width / 2,
+    element.y + element.height / 2,
   ];
 };
 
@@ -230,22 +234,24 @@ const getBoundsFromPoints = (
 
 const getFreeDrawElementAbsoluteCoords = (
   element: ExcalidrawFreeDrawElement,
-): [number, number, number, number] => {
+): [number, number, number, number, number, number] => {
   const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
-
-  return [
-    minX + element.x,
-    minY + element.y,
-    maxX + element.x,
-    maxY + element.y,
-  ];
+  const x1 = minX + element.x;
+  const y1 = minY + element.y;
+  const x2 = maxX + element.x;
+  const y2 = maxY + element.y;
+  return [x1, y1, x2, y1, (x1 + x2) / 2, (y1 + y2) / 2];
 };
 
 const getLinearElementAbsoluteCoords = (
   element: ExcalidrawLinearElement,
-): [number, number, number, number] => {
-  let coords: [number, number, number, number];
-
+  includeBoundText: boolean = false,
+): [number, number, number, number, number, number] => {
+  let coords: [number, number, number, number, number, number];
+  let x1;
+  let y1;
+  let x2;
+  let y2;
   if (element.points.length < 2 || !getShapeForElement(element)) {
     // XXX this is just a poor estimate and not very useful
     const { minX, minY, maxX, maxY } = element.points.reduce(
@@ -260,12 +266,10 @@ const getLinearElementAbsoluteCoords = (
       },
       { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
     );
-    coords = [
-      minX + element.x,
-      minY + element.y,
-      maxX + element.x,
-      maxY + element.y,
-    ];
+    x1 = minX + element.x;
+    y1 = minY + element.y;
+    x2 = maxX + element.x;
+    y2 = maxY + element.y;
   } else {
     const shape = getShapeForElement(element)!;
 
@@ -273,14 +277,86 @@ const getLinearElementAbsoluteCoords = (
     const ops = getCurvePathOps(shape[0]);
 
     const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
-
-    coords = [
-      minX + element.x,
-      minY + element.y,
-      maxX + element.x,
-      maxY + element.y,
-    ];
+    x1 = minX + element.x;
+    y1 = minY + element.y;
+    x2 = maxX + element.x;
+    y2 = maxY + element.y;
   }
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  coords = [x1, y1, x2, y2, cx, cy];
+
+  if (!includeBoundText) {
+    return coords;
+  }
+  const boundTextElement = getBoundTextElement(element);
+  if (boundTextElement) {
+    const boundTextX1 = boundTextElement.x;
+    const boundTextY1 = boundTextElement.y;
+    const boundTextX2 = boundTextX1 + boundTextElement.width;
+    const boundTextY2 = boundTextY1 + boundTextElement.height;
+
+    const TopLeftRotatedPoint = rotatePoint([x1, y1], [cx, cy], element.angle);
+    const TopRightRotatedPoint = rotatePoint([x2, y1], [cx, cy], element.angle);
+
+    if (element.points.length === 2) {
+      return coords;
+    }
+    if (
+      TopLeftRotatedPoint[0] < TopRightRotatedPoint[0] &&
+      TopLeftRotatedPoint[1] >= TopRightRotatedPoint[1] &&
+      boundTextY1 < TopLeftRotatedPoint[1]
+    ) {
+      const reverseRotate = rotatePoint(
+        [boundTextX1, boundTextY1],
+
+        [cx, cy],
+
+        -element.angle,
+      );
+
+      y1 = reverseRotate[1];
+    } else if (
+      TopLeftRotatedPoint[1] > TopRightRotatedPoint[1] &&
+      boundTextY2 > TopRightRotatedPoint[1]
+    ) {
+      const reverseRotate = rotatePoint(
+        [boundTextX1, boundTextY2],
+
+        [cx, cy],
+
+        -element.angle,
+      );
+      y1 = reverseRotate[1];
+    } else if (
+      TopLeftRotatedPoint[0] > TopRightRotatedPoint[0] &&
+      boundTextY2 > TopLeftRotatedPoint[1]
+    ) {
+      const reverseRotate = rotatePoint(
+        [boundTextX2, boundTextY2],
+
+        [cx, cy],
+
+        -element.angle,
+      );
+      y1 = reverseRotate[1];
+    } else if (
+      TopLeftRotatedPoint[1] < TopRightRotatedPoint[1] &&
+      boundTextX2 > TopLeftRotatedPoint[0] &&
+      boundTextY1 < TopRightRotatedPoint[1]
+    ) {
+      const reverseRotate = rotatePoint(
+        [boundTextX2, boundTextY1],
+
+        [cx, cy],
+
+        -element.angle,
+      );
+
+      y1 = reverseRotate[1];
+    }
+  }
+  coords = [x1, y1, x2, y2, cx, cy];
 
   return coords;
 };

@@ -442,8 +442,9 @@ const pointRelativeToElement = (
   pointTuple: Point,
 ): [GA.Point, GA.Point, number, number] => {
   const point = GAPoint.from(pointTuple);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const elementCoords = getElementAbsoluteCoords(element);
-  const center = coordsCenter(elementCoords);
+  const center = coordsCenter([x1, y1, x2, y2]);
   // GA has angle orientation opposite to `rotate`
   const rotate = GATransform.rotation(center, element.angle);
   const pointRotated = GATransform.apply(rotate, point);
@@ -474,8 +475,8 @@ export const pointInAbsoluteCoords = (
 const relativizationToElementCenter = (
   element: ExcalidrawElement,
 ): GA.Transform => {
-  const elementCoords = getElementAbsoluteCoords(element);
-  const center = coordsCenter(elementCoords);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const center = coordsCenter([x1, y1, x2, y2]);
   // GA has angle orientation opposite to `rotate`
   const rotate = GATransform.rotation(center, element.angle);
   const translate = GA.reverse(
@@ -532,8 +533,8 @@ export const determineFocusPoint = (
   adjecentPoint: Point,
 ): Point => {
   if (focus === 0) {
-    const elementCoords = getElementAbsoluteCoords(element);
-    const center = coordsCenter(elementCoords);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const center = coordsCenter([x1, y1, x2, y2]);
     return GAPoint.toTuple(center);
   }
   const relateToCenter = relativizationToElementCenter(element);
