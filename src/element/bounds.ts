@@ -337,22 +337,70 @@ const getLinearElementAbsoluteCoords = (
       topLeftRotatedPoint[1] >= topRightRotatedPoint[1]
     ) {
       if (boundTextY1 < topLeftRotatedPoint[1]) {
-        y1 = counterRotateBoundTextTopLeft[1];
+        y1 = Math.min(y1, counterRotateBoundTextTopLeft[1]);
       }
-    } else if (topLeftRotatedPoint[1] > topRightRotatedPoint[1]) {
+
       if (boundTextY2 > topRightRotatedPoint[1]) {
-        y1 = counterRotateBoundTextBottomLeft[1];
+        x1 = Math.min(x1, counterRotateBoundTextBottomLeft[0]);
+        x2 = Math.max(
+          x2,
+          Math.max(
+            counterRotateBoundTextTopRight[0],
+            counterRotateBoundTextBottomRight[0],
+          ),
+        );
+        y2 = Math.max(y2, counterRotateBoundTextBottomRight[1]);
       }
-    } else if (topLeftRotatedPoint[0] > topRightRotatedPoint[0]) {
+    } else if (
+      topLeftRotatedPoint[0] >= topRightRotatedPoint[0] &&
+      topLeftRotatedPoint[1] > topRightRotatedPoint[1]
+    ) {
+      if (boundTextY2 > topRightRotatedPoint[1]) {
+        y1 = Math.min(y1, counterRotateBoundTextBottomLeft[1]);
+      }
+      if (boundTextY2 > topLeftRotatedPoint[1]) {
+        x1 = Math.min(x1, counterRotateBoundTextBottomRight[0]);
+      }
+      if (boundTextY1 < topRightRotatedPoint[1]) {
+        x2 = Math.max(
+          x2,
+          Math.max(
+            counterRotateBoundTextTopLeft[0],
+            counterRotateBoundTextTopRight[0],
+          ),
+        );
+      }
+      if (boundTextY2 > topRightRotatedPoint[1]) {
+        y2 = Math.max(y2, counterRotateBoundTextTopRight[1]);
+      }
+    } else if (topLeftRotatedPoint[0] >= topRightRotatedPoint[0]) {
       if (boundTextY2 > topLeftRotatedPoint[1]) {
         y1 = counterRotateBoundTextBottomRight[1];
       }
-    } else if (topLeftRotatedPoint[1] < topRightRotatedPoint[1]) {
+      if (boundTextY1 < topRightRotatedPoint[1]) {
+        x1 = Math.min(x1, counterRotateBoundTextTopRight[0]);
+        x2 = Math.max(x2, counterRotateBoundTextTopLeft[0]);
+        y2 = Math.max(y2, counterRotateBoundTextTopLeft[1]);
+      }
+    } else if (topLeftRotatedPoint[1] <= topRightRotatedPoint[1]) {
       if (
         boundTextX2 > topLeftRotatedPoint[0] &&
         boundTextY1 < topRightRotatedPoint[1]
       ) {
         y1 = counterRotateBoundTextTopRight[1];
+      }
+      if (boundTextY1 < topLeftRotatedPoint[1]) {
+        x1 = Math.min(
+          x1,
+          Math.min(
+            counterRotateBoundTextTopRight[0],
+            counterRotateBoundTextTopLeft[0],
+          ),
+        );
+      }
+
+      if (boundTextY2 > topRightRotatedPoint[1]) {
+        x2 = Math.max(x2, counterRotateBoundTextBottomRight[0]);
       }
     }
   }
