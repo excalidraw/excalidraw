@@ -54,8 +54,8 @@
   justify-content: center;
   align-items: center;
   padding: 0.625rem;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: var(--default-button-size);
+  height: var(--default-button-size);
   box-sizing: border-box;
   border-width: 1px;
   border-style: solid;

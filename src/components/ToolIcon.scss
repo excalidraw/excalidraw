@@ -35,8 +35,8 @@
 
   .ToolIcon__icon {
     box-sizing: border-box;
-    width: 2.25rem;
-    height: 2.25rem;
+    width: var(--default-button-size);
+    height: var(--default-button-size);
     color: var(--icon-fill-color);
 
     display: flex;

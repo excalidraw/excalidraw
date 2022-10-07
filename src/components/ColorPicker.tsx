@@ -369,13 +369,15 @@ export const ColorPicker = ({
   return (
     <div>
       <div className="color-picker-control-container">
-        <button
-          className="color-picker-label-swatch"
-          aria-label={label}
-          style={color ? { "--swatch-color": color } : undefined}
-          onClick={() => setActive(!isActive)}
-          ref={pickerButton}
-        />
+        <div className="color-picker-label-swatch-container">
+          <button
+            className="color-picker-label-swatch"
+            aria-label={label}
+            style={color ? { "--swatch-color": color } : undefined}
+            onClick={() => setActive(!isActive)}
+            ref={pickerButton}
+          />
+        </div>
         <ColorInput
           color={color}
           label={label}
