@@ -538,3 +538,11 @@ export const getContainerCenter = (element: ExcalidrawElement) => {
     y: element.y + element.height / 2,
   };
 };
+
+export const getTextElementAngle = (textElement: ExcalidrawTextElement) => {
+  const container = getContainerElement(textElement);
+  if (!container || isLinearElement(container)) {
+    return textElement.angle;
+  }
+  return container.angle;
+};

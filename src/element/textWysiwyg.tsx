@@ -25,6 +25,7 @@ import {
   getContainerCenter,
   getContainerDims,
   getContainerElement,
+  getTextElementAngle,
   wrapText,
 } from "./textElement";
 import {
@@ -219,7 +220,6 @@ export const textWysiwyg = ({
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
-      const angle = container ? container.angle : updatedTextElement.angle;
       Object.assign(editable.style, {
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -231,7 +231,7 @@ export const textWysiwyg = ({
         transform: getTransform(
           width,
           height,
-          angle,
+          getTextElementAngle(updatedTextElement),
           appState,
           maxWidth,
           editorMaxHeight,
