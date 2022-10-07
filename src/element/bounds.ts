@@ -296,64 +296,64 @@ const getLinearElementAbsoluteCoords = (
     const boundTextX2 = boundTextX1 + boundTextElement.width;
     const boundTextY2 = boundTextY1 + boundTextElement.height;
 
-    const TopLeftRotatedPoint = rotatePoint([x1, y1], [cx, cy], element.angle);
-    const TopRightRotatedPoint = rotatePoint([x2, y1], [cx, cy], element.angle);
+    const topLeftRotatedPoint = rotatePoint([x1, y1], [cx, cy], element.angle);
+    const topRightRotatedPoint = rotatePoint([x2, y1], [cx, cy], element.angle);
 
     if (element.points.length === 2) {
       return coords;
     }
+
+    const counterRotateBoundTextTopLeft = rotatePoint(
+      [boundTextX1, boundTextY1],
+
+      [cx, cy],
+
+      -element.angle,
+    );
+    const counterRotateBoundTextTopRight = rotatePoint(
+      [boundTextX2, boundTextY1],
+
+      [cx, cy],
+
+      -element.angle,
+    );
+    const counterRotateBoundTextBottomLeft = rotatePoint(
+      [boundTextX1, boundTextY2],
+
+      [cx, cy],
+
+      -element.angle,
+    );
+    const counterRotateBoundTextBottomRight = rotatePoint(
+      [boundTextX2, boundTextY2],
+
+      [cx, cy],
+
+      -element.angle,
+    );
+
     if (
-      TopLeftRotatedPoint[0] < TopRightRotatedPoint[0] &&
-      TopLeftRotatedPoint[1] >= TopRightRotatedPoint[1] &&
-      boundTextY1 < TopLeftRotatedPoint[1]
+      topLeftRotatedPoint[0] < topRightRotatedPoint[0] &&
+      topLeftRotatedPoint[1] >= topRightRotatedPoint[1]
     ) {
-      const reverseRotate = rotatePoint(
-        [boundTextX1, boundTextY1],
-
-        [cx, cy],
-
-        -element.angle,
-      );
-
-      y1 = reverseRotate[1];
-    } else if (
-      TopLeftRotatedPoint[1] > TopRightRotatedPoint[1] &&
-      boundTextY2 > TopRightRotatedPoint[1]
-    ) {
-      const reverseRotate = rotatePoint(
-        [boundTextX1, boundTextY2],
-
-        [cx, cy],
-
-        -element.angle,
-      );
-      y1 = reverseRotate[1];
-    } else if (
-      TopLeftRotatedPoint[0] > TopRightRotatedPoint[0] &&
-      boundTextY2 > TopLeftRotatedPoint[1]
-    ) {
-      const reverseRotate = rotatePoint(
-        [boundTextX2, boundTextY2],
-
-        [cx, cy],
-
-        -element.angle,
-      );
-      y1 = reverseRotate[1];
-    } else if (
-      TopLeftRotatedPoint[1] < TopRightRotatedPoint[1] &&
-      boundTextX2 > TopLeftRotatedPoint[0] &&
-      boundTextY1 < TopRightRotatedPoint[1]
-    ) {
-      const reverseRotate = rotatePoint(
-        [boundTextX2, boundTextY1],
-
-        [cx, cy],
-
-        -element.angle,
-      );
-
-      y1 = reverseRotate[1];
+      if (boundTextY1 < topLeftRotatedPoint[1]) {
+        y1 = counterRotateBoundTextTopLeft[1];
+      }
+    } else if (topLeftRotatedPoint[1] > topRightRotatedPoint[1]) {
+      if (boundTextY2 > topRightRotatedPoint[1]) {
+        y1 = counterRotateBoundTextBottomLeft[1];
+      }
+    } else if (topLeftRotatedPoint[0] > topRightRotatedPoint[0]) {
+      if (boundTextY2 > topLeftRotatedPoint[1]) {
+        y1 = counterRotateBoundTextBottomRight[1];
+      }
+    } else if (topLeftRotatedPoint[1] < topRightRotatedPoint[1]) {
+      if (
+        boundTextX2 > topLeftRotatedPoint[0] &&
+        boundTextY1 < topRightRotatedPoint[1]
+      ) {
+        y1 = counterRotateBoundTextTopRight[1];
+      }
     }
   }
   coords = [x1, y1, x2, y2, cx, cy];
