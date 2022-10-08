@@ -116,6 +116,9 @@ const mathJax = {} as {
   adaptor: any;
   amHtml: any;
   texHtml: any;
+  visitor: any;
+  mmlSvg: any;
+  mmlSre: any;
 };
 
 let stopLoadingMathJax = false;
@@ -124,6 +127,7 @@ let mathJaxLoading = false;
 let mathJaxLoadedCallback: SubtypeLoadedCb | undefined;
 
 let errorSvg: string;
+let errorAria: string;
 
 const loadMathJax = async () => {
   const shouldLoad =
@@ -131,7 +135,10 @@ const loadMathJax = async () => {
     !mathJaxLoading &&
     (mathJax.adaptor === undefined ||
       mathJax.amHtml === undefined ||
-      mathJax.texHtml === undefined);
+      mathJax.texHtml === undefined ||
+      mathJax.visitor === undefined ||
+      mathJax.mmlSvg === undefined ||
+      mathJax.mmlSre === undefined);
   if (!shouldLoad && !mathJaxLoaded) {
     stopLoadingMathJax = true;
   }
@@ -149,6 +156,13 @@ const loadMathJax = async () => {
     const HTMLDocument = (
       await import("mathjax-full/js/handlers/html/HTMLDocument.js")
     ).HTMLDocument;
+
+    // Components for MathJax accessibility
+    const MathML = (await import("mathjax-full/js/input/mathml")).MathML;
+    const SerializedMmlVisitor = (
+      await import("mathjax-full/js/core/MmlTree/SerializedMmlVisitor")
+    ).SerializedMmlVisitor;
+    const Sre = (await import("mathjax-full/js/a11y/sre")).Sre;
 
     // Import some TeX packages
     await import("mathjax-full/js/input/tex/ams/AmsConfiguration");
@@ -191,34 +205,50 @@ const loadMathJax = async () => {
       return;
     }
 
-    // Set up shared output components
-    const svg = new SVG<E | T, T, D>({ fontCache: "local" });
+    // Set up input components
     const asciimath = new AsciiMath<E | T, T, D>({});
     const tex = new TeX<E | T, T, D>({ packages: texPackages });
+
+    // Set up shared output components
+    const mml = new MathML<E | T, T, D>();
+    const svg = new SVG<E | T, T, D>({ fontCache: "local" });
 
     // AsciiMath input
     mathJax.adaptor = liteAdaptor();
     mathJax.amHtml = new HTMLDocument<E | T, T, D>("", mathJax.adaptor, {
       InputJax: asciimath,
-      OutputJax: svg,
     });
 
     // LaTeX input
     mathJax.texHtml = new HTMLDocument<E | T, T, D>("", mathJax.adaptor, {
       InputJax: tex,
+    });
+
+    // Capture the MathML for accessibility purposes
+    mathJax.mmlSvg = new HTMLDocument<E | T, T, D>("", mathJax.adaptor, {
+      InputJax: mml,
       OutputJax: svg,
     });
 
-    // Error indicator
-    errorSvg = mathJax.adaptor.outerHTML(
-      mathJax.texHtml.convert("ERR", { display: false }),
-    );
+    // Configure MathJax for accessibility
+    mathJax.visitor = new SerializedMmlVisitor();
+    Sre.setupEngine({ speech: "shallow" }).then(() => {
+      // FIXME: Load our local mathmaps in a decoupled manner
+      mathJax.mmlSre = Sre;
 
-    // Finalize loading MathJax
-    mathJaxLoaded = true;
-    if (mathJaxLoadedCallback !== undefined) {
-      mathJaxLoadedCallback(isMathElement);
-    }
+      // Error indicator
+      const errorMML = mathJax.visitor.visitTree(
+        mathJax.texHtml.convert("ERR", { display: false }),
+      );
+      errorSvg = mathJax.adaptor.outerHTML(mathJax.mmlSvg.convert(errorMML));
+      errorAria = mathJax.mmlSre.toSpeech(errorMML);
+
+      // Finalize loading MathJax
+      mathJaxLoaded = true;
+      if (mathJaxLoadedCallback !== undefined) {
+        mathJaxLoadedCallback(isMathElement);
+      }
+    });
   }
 };
 
@@ -309,8 +339,12 @@ const consumeMathNewlines = (
 };
 
 // Cache the SVGs from MathJax
-const mathJaxSvgCacheAM = {} as { [key: string]: string };
-const mathJaxSvgCacheTex = {} as { [key: string]: string };
+const mathJaxSvgCacheAM = {} as {
+  [key: string]: { svg: string; aria: string };
+};
+const mathJaxSvgCacheTex = {} as {
+  [key: string]: { svg: string; aria: string };
+};
 // Cache the results of getMetrics()
 const metricsCache = {} as {
   [key: string]: {
@@ -352,7 +386,7 @@ const math2Svg = (
   text: string,
   mathProps: MathProps,
   isMathJaxLoaded: boolean,
-) => {
+): { svg: string; aria: string } => {
   const useTex = mathProps.useTex;
   if (
     isMathJaxLoaded &&
@@ -363,26 +397,35 @@ const math2Svg = (
   loadMathJax();
   try {
     const userOptions = { display: mathProps.mathOnly };
-    const htmlString = isMathJaxLoaded
-      ? mathJax.adaptor.outerHTML(
+    // Intermediate MathML
+    const mmlString = isMathJaxLoaded
+      ? mathJax.visitor.visitTree(
           useTex
             ? mathJax.texHtml.convert(text, userOptions)
             : mathJax.amHtml.convert(text, userOptions),
         )
       : text;
+    // For rendering
+    const htmlString = isMathJaxLoaded
+      ? mathJax.adaptor.outerHTML(mathJax.mmlSvg.convert(mmlString))
+      : text;
+    // For accessibility
+    const ariaString = isMathJaxLoaded
+      ? mathJax.mmlSre.toSpeech(mmlString)
+      : mmlString;
     if (isMathJaxLoaded) {
       if (useTex) {
-        mathJaxSvgCacheTex[text] = htmlString;
+        mathJaxSvgCacheTex[text] = { svg: htmlString, aria: ariaString };
       } else {
-        mathJaxSvgCacheAM[text] = htmlString;
+        mathJaxSvgCacheAM[text] = { svg: htmlString, aria: ariaString };
       }
     }
-    return htmlString;
+    return { svg: htmlString, aria: ariaString };
   } catch {
     if (isMathJaxLoaded) {
-      return errorSvg;
+      return { svg: errorSvg, aria: errorAria };
     }
-    return text;
+    return { svg: text, aria: text };
   }
 };
 
@@ -395,11 +438,15 @@ const markupText = (
     getMathNewline(mathProps),
   );
   const markup = [] as Array<string>[];
+  const aria = [] as Array<string>[];
   for (let index = 0; index < lines.length; index++) {
     markup.push([]);
+    aria.push([]);
     if (!isMathJaxLoaded) {
       // Run lines[index] through math2Svg so loadMathJax() gets called
-      markup[index].push(math2Svg(lines[index], mathProps, isMathJaxLoaded));
+      const math = math2Svg(lines[index], mathProps, isMathJaxLoaded);
+      markup[index].push(math.svg);
+      aria[index].push(math.aria);
       continue;
     }
     // Don't split by the delimiter in math-only mode
@@ -412,17 +459,20 @@ const markupText = (
       // in order to ensure math2Svg() actually gets called, and thus
       // loadMathJax().
       if (i % 2 === 1 || mathProps.mathOnly) {
-        const svgString = math2Svg(lineArray[i], mathProps, isMathJaxLoaded);
-        markup[index].push(svgString);
+        const math = math2Svg(lineArray[i], mathProps, isMathJaxLoaded);
+        markup[index].push(math.svg);
+        aria[index].push(math.aria);
       } else {
         markup[index].push(lineArray[i]);
+        aria[index].push(lineArray[i]);
       }
     }
     if (lineArray.length === 0) {
       markup[index].push("");
+      aria[index].push("");
     }
   }
-  return markup;
+  return { markup, aria };
 };
 
 const getCacheKey = (
@@ -621,11 +671,11 @@ const renderMath = (
   ) => void,
   doRenderChild: (x: number, y: number, width: number, height: number) => void,
   parentWidth?: number,
-) => {
+): string => {
   const mathLines = consumeMathNewlines(text, mathProps, isMathJaxLoaded).split(
     getMathNewline(mathProps),
   );
-  const markup = markupText(text, mathProps, isMathJaxLoaded);
+  const { markup, aria } = markupText(text, mathProps, isMathJaxLoaded);
   const metrics = getMetrics(markup, fontSize, mathProps, isMathJaxLoaded);
   const width = parentWidth ?? metrics.imageMetrics.width;
 
@@ -667,6 +717,13 @@ const renderMath = (
     }
     y += lineMetrics.height;
   }
+  let ariaText = "";
+  for (let i = 0; i < aria.length; i++) {
+    for (let j = 0; j < aria[i].length; j++) {
+      ariaText = `${ariaText}${aria[i][j]}`;
+    }
+  }
+  return ariaText;
 };
 
 const getImageMetrics = (
@@ -676,7 +733,7 @@ const getImageMetrics = (
   isMathJaxLoaded: boolean,
   maxWidth?: number | null,
 ) => {
-  const markup = markupText(text, mathProps, isMathJaxLoaded);
+  const markup = markupText(text, mathProps, isMathJaxLoaded).markup;
   return getMetrics(markup, fontSize, mathProps, isMathJaxLoaded, maxWidth)
     .imageMetrics;
 };
@@ -868,7 +925,7 @@ const renderMathElement = function (element, context, renderCb) {
   const parentWidth = container
     ? container.width - BOUND_TEXT_PADDING * 2
     : undefined;
-  renderMath(
+  element.customData!.ariaLabel = renderMath(
     text,
     fontSize,
     textAlign,
@@ -1001,7 +1058,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
     childNode.setAttribute("y", `${y}`);
     groupNode.appendChild(childNode);
   };
-  renderMath(
+  element.customData!.ariaLabel = renderMath(
     text,
     fontSize,
     textAlign,
@@ -1041,7 +1098,7 @@ const wrapMathElement = function (element, containerWidth, next) {
 
   const maxWidth = containerWidth - BOUND_TEXT_PADDING * 2;
 
-  const markup = markupText(text, mathProps, isMathJaxLoaded);
+  const markup = markupText(text, mathProps, isMathJaxLoaded).markup;
   const metrics = getMetrics(markup, fontSize, mathProps, isMathJaxLoaded);
 
   const lines = consumeMathNewlines(text, mathProps, isMathJaxLoaded).split(
