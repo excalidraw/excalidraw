@@ -212,3 +212,7 @@ export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 export const COOKIES = {
   AUTH_STATE_COOKIE: "excplus-auth",
 } as const;
+
+/** key containt id of precedeing elemnt id we use in reconciliation during
+ * collaboration */
+export const PRECEDING_ELEMENT_KEY = "__precedingElement__";
