@@ -114,6 +114,10 @@
       "create": "Izveidot saiti",
       "label": "Saite"
     },
+    "lineEditor": {
+      "edit": "Rediģēt līniju",
+      "exit": "Aizvērt līnijas redaktoru"
+    },
     "elementLock": {
       "lock": "Fiksēt",
       "unlock": "Atbrīvot",

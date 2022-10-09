@@ -114,6 +114,10 @@
       "create": "Buat tautan",
       "label": "Tautan"
     },
+    "lineEditor": {
+      "edit": "Edit tautan",
+      "exit": "Keluar editor garis"
+    },
     "elementLock": {
       "lock": "Kunci",
       "unlock": "Lepas",
