@@ -91,6 +91,13 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
 ): boolean => {
   const threshold = 10 / appState.zoom.value;
 
+  // So that bound text element hit is considered within bounding box of container even if its outside actual bounding box of element
+  // eg for linear elements text can be outside the element bounding box
+  const boundTextElement = getBoundTextElement(element);
+  if (boundTextElement && hitTest(boundTextElement, appState, x, y)) {
+    return false;
+  }
+
   return (
     !isHittingElementNotConsideringBoundingBox(element, appState, [x, y]) &&
     isPointHittingElementBoundingBox(element, [x, y], threshold)
@@ -103,7 +110,6 @@ export const isHittingElementNotConsideringBoundingBox = (
   point: Point,
 ): boolean => {
   const threshold = 10 / appState.zoom.value;
-
   const check = isTextElement(element)
     ? isStrictlyInside
     : isElementDraggableFromInside(element)
@@ -390,6 +396,7 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
   if (!getShapeForElement(element)) {
     return false;
   }
+
   const [point, pointAbs, hwidth, hheight] = pointRelativeToElement(
     args.element,
     args.point,
