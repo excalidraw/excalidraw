@@ -99,6 +99,9 @@ export const MIME_TYPES = {
   "excalidraw.png": "image/png",
   jpg: "image/jpeg",
   gif: "image/gif",
+  webp: "image/webp",
+  bmp: "image/bmp",
+  ico: "image/x-icon",
   binary: "application/octet-stream",
 } as const;
 
@@ -180,6 +183,9 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
   MIME_TYPES.jpg,
   MIME_TYPES.svg,
   MIME_TYPES.gif,
+  MIME_TYPES.webp,
+  MIME_TYPES.bmp,
+  MIME_TYPES.ico,
 ] as const;
 
 export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
