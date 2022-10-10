@@ -6,10 +6,11 @@ import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { normalizeAngle, resizeSingleElement } from "../element/resizeElements";
 import { AppState } from "../types";
 import { getTransformHandles } from "../element/transformHandles";
-import { isFreeDrawElement, isLinearElement } from "../element/typeChecks";
+import { isLinearElement } from "../element/typeChecks";
 import { updateBoundElements } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
+import { getResizedElementAbsoluteCoords } from "../element/bounds";
 
 const enableActionFlipHorizontal = (
   elements: readonly ExcalidrawElement[],
@@ -119,7 +120,7 @@ const flipElement = (
   const originalAngle = normalizeAngle(element.angle);
 
   let finalOffsetX = 0;
-  if (isLinearElement(element) || isFreeDrawElement(element)) {
+  if (isLinearElement(element)) {
     finalOffsetX =
       element.points.reduce((max, point) => Math.max(max, point[0]), 0) * 2 -
       element.width;
@@ -132,7 +133,6 @@ const flipElement = (
   // Flip unrotated by pulling TransformHandle to opposite side
   const transformHandles = getTransformHandles(element, appState.zoom);
   let usingNWHandle = true;
-  let newNCoordsX = 0;
   let nHandle = transformHandles.nw;
   if (!nHandle) {
     // Use ne handle instead
@@ -154,22 +154,22 @@ const flipElement = (
     }
     LinearElementEditor.normalizePoints(element);
   } else {
-    // calculate new x-coord for transformation
-    newNCoordsX = usingNWHandle ? element.x + 2 * width : element.x - 2 * width;
+    const [axTopLeft, ayTopLeft] = getResizedElementAbsoluteCoords(
+      element,
+      width,
+      height,
+      true,
+    );
+
     resizeSingleElement(
       new Map().set(element.id, element),
-      true,
+      false,
       element,
       usingNWHandle ? "nw" : "ne",
       false,
-      newNCoordsX,
-      nHandle[1],
+      usingNWHandle ? axTopLeft + width * 2 : ayTopLeft - width * 2,
+      ayTopLeft,
     );
-    // fix the size to account for handle sizes
-    mutateElement(element, {
-      width,
-      height,
-    });
   }
 
   // Rotate by (360 degrees - original angle)
