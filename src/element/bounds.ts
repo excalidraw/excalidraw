@@ -4,6 +4,7 @@ import {
   Arrowhead,
   ExcalidrawFreeDrawElement,
   NonDeleted,
+  ExcalidrawTextElementWithContainer,
 } from "./types";
 import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
@@ -291,102 +292,113 @@ const getLinearElementAbsoluteCoords = (
   }
   const boundTextElement = getBoundTextElement(element);
   if (boundTextElement) {
-    const boundTextX1 = boundTextElement.x;
-    const boundTextY1 = boundTextElement.y;
-    const boundTextX2 = boundTextX1 + boundTextElement.width;
-    const boundTextY2 = boundTextY1 + boundTextElement.height;
-
-    const topLeftRotatedPoint = rotatePoint([x1, y1], [cx, cy], element.angle);
-    const topRightRotatedPoint = rotatePoint([x2, y1], [cx, cy], element.angle);
-
-    if (element.points.length === 2) {
-      return coords;
-    }
-
-    const counterRotateBoundTextTopLeft = rotatePoint(
-      [boundTextX1, boundTextY1],
-
-      [cx, cy],
-
-      -element.angle,
+    coords = getMinMaxXYWithBoundText(
+      element,
+      [x1, y1, x2, y2],
+      boundTextElement,
     );
-    const counterRotateBoundTextTopRight = rotatePoint(
-      [boundTextX2, boundTextY1],
-
-      [cx, cy],
-
-      -element.angle,
-    );
-    const counterRotateBoundTextBottomLeft = rotatePoint(
-      [boundTextX1, boundTextY2],
-
-      [cx, cy],
-
-      -element.angle,
-    );
-    const counterRotateBoundTextBottomRight = rotatePoint(
-      [boundTextX2, boundTextY2],
-
-      [cx, cy],
-
-      -element.angle,
-    );
-
-    if (
-      topLeftRotatedPoint[0] < topRightRotatedPoint[0] &&
-      topLeftRotatedPoint[1] >= topRightRotatedPoint[1]
-    ) {
-      x1 = Math.min(x1, counterRotateBoundTextBottomLeft[0]);
-      x2 = Math.max(
-        x2,
-        Math.max(
-          counterRotateBoundTextTopRight[0],
-          counterRotateBoundTextBottomRight[0],
-        ),
-      );
-      y1 = Math.min(y1, counterRotateBoundTextTopLeft[1]);
-
-      y2 = Math.max(y2, counterRotateBoundTextBottomRight[1]);
-    } else if (
-      topLeftRotatedPoint[0] >= topRightRotatedPoint[0] &&
-      topLeftRotatedPoint[1] > topRightRotatedPoint[1]
-    ) {
-      x1 = Math.min(x1, counterRotateBoundTextBottomRight[0]);
-      x2 = Math.max(
-        x2,
-        Math.max(
-          counterRotateBoundTextTopLeft[0],
-          counterRotateBoundTextTopRight[0],
-        ),
-      );
-      y1 = Math.min(y1, counterRotateBoundTextBottomLeft[1]);
-
-      y2 = Math.max(y2, counterRotateBoundTextTopRight[1]);
-    } else if (topLeftRotatedPoint[0] >= topRightRotatedPoint[0]) {
-      x1 = Math.min(x1, counterRotateBoundTextTopRight[0]);
-      x2 = Math.max(x2, counterRotateBoundTextBottomLeft[0]);
-      y1 = Math.min(y1, counterRotateBoundTextBottomRight[1]);
-
-      y2 = Math.max(y2, counterRotateBoundTextTopLeft[1]);
-    } else if (topLeftRotatedPoint[1] <= topRightRotatedPoint[1]) {
-      x1 = Math.min(
-        x1,
-        Math.min(
-          counterRotateBoundTextTopRight[0],
-          counterRotateBoundTextTopLeft[0],
-        ),
-      );
-
-      x2 = Math.max(x2, counterRotateBoundTextBottomRight[0]);
-      y1 = Math.min(y1, counterRotateBoundTextTopRight[1]);
-      y2 = Math.max(y2, counterRotateBoundTextBottomLeft[1]);
-    }
   }
-  coords = [x1, y1, x2, y2, cx, cy];
 
   return coords;
 };
 
+export const getMinMaxXYWithBoundText = (
+  element: ExcalidrawElement,
+  elementBounds: [number, number, number, number],
+  boundTextElement: ExcalidrawTextElementWithContainer,
+): [number, number, number, number, number, number] => {
+  let [x1, y1, x2, y2] = elementBounds;
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const boundTextX1 = boundTextElement.x;
+  const boundTextY1 = boundTextElement.y;
+  const boundTextX2 = boundTextX1 + boundTextElement.width;
+  const boundTextY2 = boundTextY1 + boundTextElement.height;
+
+  const topLeftRotatedPoint = rotatePoint([x1, y1], [cx, cy], element.angle);
+  const topRightRotatedPoint = rotatePoint([x2, y1], [cx, cy], element.angle);
+
+  const counterRotateBoundTextTopLeft = rotatePoint(
+    [boundTextX1, boundTextY1],
+
+    [cx, cy],
+
+    -element.angle,
+  );
+  const counterRotateBoundTextTopRight = rotatePoint(
+    [boundTextX2, boundTextY1],
+
+    [cx, cy],
+
+    -element.angle,
+  );
+  const counterRotateBoundTextBottomLeft = rotatePoint(
+    [boundTextX1, boundTextY2],
+
+    [cx, cy],
+
+    -element.angle,
+  );
+  const counterRotateBoundTextBottomRight = rotatePoint(
+    [boundTextX2, boundTextY2],
+
+    [cx, cy],
+
+    -element.angle,
+  );
+
+  if (
+    topLeftRotatedPoint[0] < topRightRotatedPoint[0] &&
+    topLeftRotatedPoint[1] >= topRightRotatedPoint[1]
+  ) {
+    x1 = Math.min(x1, counterRotateBoundTextBottomLeft[0]);
+    x2 = Math.max(
+      x2,
+      Math.max(
+        counterRotateBoundTextTopRight[0],
+        counterRotateBoundTextBottomRight[0],
+      ),
+    );
+    y1 = Math.min(y1, counterRotateBoundTextTopLeft[1]);
+
+    y2 = Math.max(y2, counterRotateBoundTextBottomRight[1]);
+  } else if (
+    topLeftRotatedPoint[0] >= topRightRotatedPoint[0] &&
+    topLeftRotatedPoint[1] > topRightRotatedPoint[1]
+  ) {
+    x1 = Math.min(x1, counterRotateBoundTextBottomRight[0]);
+    x2 = Math.max(
+      x2,
+      Math.max(
+        counterRotateBoundTextTopLeft[0],
+        counterRotateBoundTextTopRight[0],
+      ),
+    );
+    y1 = Math.min(y1, counterRotateBoundTextBottomLeft[1]);
+
+    y2 = Math.max(y2, counterRotateBoundTextTopRight[1]);
+  } else if (topLeftRotatedPoint[0] >= topRightRotatedPoint[0]) {
+    x1 = Math.min(x1, counterRotateBoundTextTopRight[0]);
+    x2 = Math.max(x2, counterRotateBoundTextBottomLeft[0]);
+    y1 = Math.min(y1, counterRotateBoundTextBottomRight[1]);
+
+    y2 = Math.max(y2, counterRotateBoundTextTopLeft[1]);
+  } else if (topLeftRotatedPoint[1] <= topRightRotatedPoint[1]) {
+    x1 = Math.min(
+      x1,
+      Math.min(
+        counterRotateBoundTextTopRight[0],
+        counterRotateBoundTextTopLeft[0],
+      ),
+    );
+
+    x2 = Math.max(x2, counterRotateBoundTextBottomRight[0]);
+    y1 = Math.min(y1, counterRotateBoundTextTopRight[1]);
+    y2 = Math.max(y2, counterRotateBoundTextBottomLeft[1]);
+  }
+
+  return [x1, y1, x2, y2, cx, cy];
+};
 export const getArrowheadPoints = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],
@@ -507,7 +519,23 @@ const getLinearElementRotatedBounds = (
       },
       { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
     );
-    return [minX, minY, maxX, maxY];
+
+    let coords: [number, number, number, number] = [minX, minY, maxX, minY];
+    const boundTextElement = getBoundTextElement(element);
+    if (boundTextElement) {
+      const coordsWithBoundText = getMinMaxXYWithBoundText(
+        element,
+        [minX, minY, maxX, maxY],
+        boundTextElement,
+      );
+      coords = [
+        coordsWithBoundText[0],
+        coordsWithBoundText[1],
+        coordsWithBoundText[2],
+        coordsWithBoundText[3],
+      ];
+    }
+    return coords;
   }
 
   const shape = getShapeForElement(element)!;
@@ -517,7 +545,28 @@ const getLinearElementRotatedBounds = (
 
   const transformXY = (x: number, y: number) =>
     rotate(element.x + x, element.y + y, cx, cy, element.angle);
-  return getMinMaxXYFromCurvePathOps(ops, transformXY);
+  const res = getMinMaxXYFromCurvePathOps(ops, transformXY);
+  let coords: [number, number, number, number] = [
+    res[0],
+    res[1],
+    res[2],
+    res[3],
+  ];
+  const boundTextElement = getBoundTextElement(element);
+  if (boundTextElement) {
+    const coordsWithBoundText = getMinMaxXYWithBoundText(
+      element,
+      coords,
+      boundTextElement,
+    );
+    coords = [
+      coordsWithBoundText[0],
+      coordsWithBoundText[1],
+      coordsWithBoundText[2],
+      coordsWithBoundText[3],
+    ];
+  }
+  return coords;
 };
 
 // We could cache this stuff
@@ -526,9 +575,7 @@ export const getElementBounds = (
 ): [number, number, number, number] => {
   let bounds: [number, number, number, number];
 
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
   if (isFreeDrawElement(element)) {
     const [minX, minY, maxX, maxY] = getBoundsFromPoints(
       element.points.map(([x, y]) =>
