@@ -13,6 +13,7 @@ import {
   NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawElement,
+  ExcalidrawTextElementWithContainer,
 } from "./types";
 import {
   getElementAbsoluteCoords,
@@ -175,28 +176,10 @@ const rotateSingleElement = (
   if (boundTextElementId) {
     const textElement = Scene.getScene(element)!.getElement(
       boundTextElementId,
-    ) as ExcalidrawTextElement;
+    ) as ExcalidrawTextElementWithContainer;
 
     if (isLinearElement(element)) {
-      const originalBoundTextElement = originalElements.get(textElement.id)!;
-      const originalContainer = originalElements.get(element.id)!;
-      const originalBoundTextCenterPoint =
-        LinearElementEditor.pointFromAbsoluteCoords(
-          originalContainer as ExcalidrawLinearElement,
-          [
-            originalBoundTextElement.x + originalBoundTextElement.width / 2,
-            originalBoundTextElement.y + originalBoundTextElement.height / 2,
-          ],
-        );
-      const newBoundTextCenterPoint =
-        LinearElementEditor.getPointGlobalCoordinates(
-          element,
-          originalBoundTextCenterPoint,
-        );
-      mutateElement(textElement, {
-        x: newBoundTextCenterPoint[0] - textElement.width / 2,
-        y: newBoundTextCenterPoint[1] - textElement.height / 2,
-      });
+      rotateLinearElementBoundText(originalElements, element, textElement);
     } else {
       mutateElement(textElement, { angle });
     }
@@ -877,7 +860,7 @@ const rotateMultipleElements = (
     centerAngle += SHIFT_LOCKING_ANGLE / 2;
     centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
-  elements.forEach((element, index) => {
+  elements.forEach((element) => {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
@@ -897,17 +880,50 @@ const rotateMultipleElements = (
     });
     const boundTextElementId = getBoundTextElementId(element);
     if (boundTextElementId) {
-      const textElement =
-        Scene.getScene(element)!.getElement(boundTextElementId)!;
-      mutateElement(textElement, {
-        x: textElement.x + (rotatedCX - cx),
-        y: textElement.y + (rotatedCY - cy),
-        angle: normalizeAngle(centerAngle + origAngle),
-      });
+      const textElement = Scene.getScene(element)!.getElement(
+        boundTextElementId,
+      ) as ExcalidrawTextElementWithContainer;
+      if (isLinearElement(element)) {
+        rotateLinearElementBoundText(
+          pointerDownState.originalElements,
+          element,
+          textElement,
+        );
+      } else {
+        mutateElement(textElement, {
+          x: textElement.x + (rotatedCX - cx),
+          y: textElement.y + (rotatedCY - cy),
+          angle: normalizeAngle(centerAngle + origAngle),
+        });
+      }
     }
   });
 };
 
+const rotateLinearElementBoundText = (
+  originalElements: Map<string, NonDeleted<ExcalidrawElement>>,
+  container: NonDeleted<ExcalidrawLinearElement>,
+  textElement: ExcalidrawTextElementWithContainer,
+) => {
+  const originalBoundTextElement = originalElements.get(textElement.id)!;
+  const originalContainer = originalElements.get(container.id)!;
+  const originalBoundTextCenterPoint =
+    LinearElementEditor.pointFromAbsoluteCoords(
+      originalContainer as ExcalidrawLinearElement,
+      [
+        originalBoundTextElement.x + originalBoundTextElement.width / 2,
+        originalBoundTextElement.y + originalBoundTextElement.height / 2,
+      ],
+    );
+  const newBoundTextCenterPoint = LinearElementEditor.getPointGlobalCoordinates(
+    container,
+    originalBoundTextCenterPoint,
+  );
+  mutateElement(textElement, {
+    x: newBoundTextCenterPoint[0] - textElement.width / 2,
+    y: newBoundTextCenterPoint[1] - textElement.height / 2,
+  });
+};
 export const getResizeOffsetXY = (
   transformHandleType: MaybeTransformHandleType,
   selectedElements: NonDeletedExcalidrawElement[],
