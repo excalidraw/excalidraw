@@ -365,7 +365,7 @@ export const useHandleLibrary = ({
       return;
     }
 
-    const importLibraryFromURL = ({
+    const importLibraryFromURL = async ({
       libraryUrl,
       idToken,
     }: {
@@ -382,17 +382,31 @@ export const useHandleLibrary = ({
         window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
       }
 
-      excalidrawAPI.updateLibrary({
-        libraryItems: new Promise<Blob>(async (resolve, reject) => {
-          try {
-            const request = await fetch(decodeURIComponent(libraryUrl));
-            const blob = await request.blob();
-            resolve(blob);
-          } catch (error: any) {
-            reject(error);
-          }
-        }),
-        prompt: idToken !== excalidrawAPI.id,
+      const libraryPromise = new Promise<Blob>(async (resolve, reject) => {
+        try {
+          const request = await fetch(decodeURIComponent(libraryUrl));
+          const blob = await request.blob();
+          resolve(blob);
+        } catch (error: any) {
+          reject(error);
+        }
+      });
+
+      const shouldPrompt = idToken !== excalidrawAPI.id;
+
+      // wait for the tab to be focused before continuing in case we'll prompt
+      // for confirmation
+      await (shouldPrompt && document.hidden
+        ? new Promise<void>((resolve) => {
+            window.addEventListener("focus", () => resolve(), {
+              once: true,
+            });
+          })
+        : null);
+
+      await excalidrawAPI.updateLibrary({
+        libraryItems: libraryPromise,
+        prompt: shouldPrompt,
         merge: true,
         defaultStatus: "published",
         openLibraryMenu: true,
