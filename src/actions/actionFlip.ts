@@ -141,12 +141,12 @@ const flipElement = (
     element,
     width,
     height,
-    true,
+    false,
   );
 
   resizeSingleElement(
     new Map().set(element.id, element),
-    false,
+    true,
     element,
     usingNWHandle ? "nw" : "ne",
     false,
