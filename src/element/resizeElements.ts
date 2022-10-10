@@ -608,10 +608,6 @@ export const resizeSingleElement = (
   const rotatedNewCenter = rotatePoint(newCenter, startCenter, angle);
   newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
 
-  let originalBoundTextElement = null;
-  if (boundTextElement) {
-    originalBoundTextElement = originalElements.get(boundTextElement.id);
-  }
   // Readjust points for linear elements
   let rescaledElementPointsY;
   let rescaledPoints;
@@ -668,31 +664,14 @@ export const resizeSingleElement = (
     });
 
     mutateElement(element, resizedElement);
-    if (
-      rescaledElementPointsY &&
-      isLinearElement(stateAtResizeStart) &&
-      boundTextElement
-    ) {
-      const boundElementCenterPoint: Point =
-        LinearElementEditor.pointFromAbsoluteCoords(stateAtResizeStart, [
-          originalBoundTextElement!.x! + originalBoundTextElement!.width! / 2,
-          originalBoundTextElement!.y! + originalBoundTextElement!.height! / 2,
-        ]);
-
-      const scaleFactor = getScaleFactorForResize(
-        0,
-        eleNewWidth,
-        rescaledElementPointsY,
-      );
-      const coords = LinearElementEditor.getPointGlobalCoordinates(
+    if (isLinearElement(stateAtResizeStart) && boundTextElement) {
+      resizeLinearElementBoundText(
+        originalElements,
         element as ExcalidrawLinearElement,
-        [boundElementCenterPoint[0] * scaleFactor, boundElementCenterPoint[1]],
+        boundTextElement,
+        eleNewWidth,
+        eleNewHeight,
       );
-
-      mutateElement(boundTextElement, {
-        x: coords[0] - originalBoundTextElement!.width! / 2,
-        y: coords[1] - originalBoundTextElement!.height! / 2,
-      });
     }
     if (boundTextElement && boundTextFont) {
       mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
@@ -840,7 +819,19 @@ const resizeMultipleElements = (
 
     if (boundTextElement && boundTextUpdates) {
       mutateElement(boundTextElement, boundTextUpdates);
-      handleBindTextResize(element.latest, transformHandleType);
+
+      if (isLinearElement(element.latest)) {
+        resizeLinearElementBoundText(
+          pointerDownState.originalElements,
+          element.latest as ExcalidrawLinearElement,
+          boundTextElement,
+          width,
+          height,
+          true,
+        );
+      } else {
+        handleBindTextResize(element.latest, transformHandleType);
+      }
     }
   });
 };
@@ -924,6 +915,51 @@ const rotateLinearElementBoundText = (
     y: newBoundTextCenterPoint[1] - textElement.height / 2,
   });
 };
+
+const resizeLinearElementBoundText = (
+  originalElements: PointerDownState["originalElements"],
+  container: NonDeleted<ExcalidrawLinearElement>,
+  textElement: ExcalidrawTextElementWithContainer,
+  containerNewWidth: number,
+  containerNewHeight: number,
+  multipleElementsSelected: boolean = false,
+) => {
+  const originalBoundTextElement = originalElements.get(textElement.id)!;
+  const originalContainer = originalElements.get(
+    container.id,
+  ) as ExcalidrawLinearElement;
+
+  const boundElementCenterPoint: Point =
+    LinearElementEditor.pointFromAbsoluteCoords(originalContainer, [
+      originalBoundTextElement!.x! + originalBoundTextElement!.width! / 2,
+      originalBoundTextElement!.y! + originalBoundTextElement!.height! / 2,
+    ]);
+  const rescaledElementPointsY = rescalePoints(
+    1,
+    containerNewHeight,
+    (originalContainer as ExcalidrawLinearElement).points,
+    false,
+  );
+  const scaleFactor = getScaleFactorForResize(
+    0,
+    containerNewWidth,
+    rescaledElementPointsY,
+  );
+  const scaledX = boundElementCenterPoint[0] * scaleFactor;
+  const scaledY = multipleElementsSelected
+    ? boundElementCenterPoint[1] * scaleFactor
+    : boundElementCenterPoint[1];
+  const coords = LinearElementEditor.getPointGlobalCoordinates(
+    container as ExcalidrawLinearElement,
+    [scaledX, scaledY],
+  );
+
+  mutateElement(textElement, {
+    x: coords[0] - originalBoundTextElement!.width! / 2,
+    y: coords[1] - originalBoundTextElement!.height! / 2,
+  });
+};
+
 export const getResizeOffsetXY = (
   transformHandleType: MaybeTransformHandleType,
   selectedElements: NonDeletedExcalidrawElement[],
