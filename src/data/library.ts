@@ -372,16 +372,6 @@ export const useHandleLibrary = ({
       libraryUrl: string;
       idToken: string | null;
     }) => {
-      if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
-        const hash = new URLSearchParams(window.location.hash.slice(1));
-        hash.delete(URL_HASH_KEYS.addLibrary);
-        window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
-      } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
-        const query = new URLSearchParams(window.location.search);
-        query.delete(URL_QUERY_KEYS.addLibrary);
-        window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
-      }
-
       const libraryPromise = new Promise<Blob>(async (resolve, reject) => {
         try {
           const request = await fetch(decodeURIComponent(libraryUrl));
@@ -404,13 +394,27 @@ export const useHandleLibrary = ({
           })
         : null);
 
-      await excalidrawAPI.updateLibrary({
-        libraryItems: libraryPromise,
-        prompt: shouldPrompt,
-        merge: true,
-        defaultStatus: "published",
-        openLibraryMenu: true,
-      });
+      try {
+        await excalidrawAPI.updateLibrary({
+          libraryItems: libraryPromise,
+          prompt: shouldPrompt,
+          merge: true,
+          defaultStatus: "published",
+          openLibraryMenu: true,
+        });
+      } catch (error) {
+        throw error;
+      } finally {
+        if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
+          const hash = new URLSearchParams(window.location.hash.slice(1));
+          hash.delete(URL_HASH_KEYS.addLibrary);
+          window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
+        } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
+          const query = new URLSearchParams(window.location.search);
+          query.delete(URL_QUERY_KEYS.addLibrary);
+          window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
+        }
+      }
     };
     const onHashChange = (event: HashChangeEvent) => {
       event.preventDefault();
