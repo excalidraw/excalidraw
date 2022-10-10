@@ -6,9 +6,7 @@ import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { normalizeAngle, resizeSingleElement } from "../element/resizeElements";
 import { AppState } from "../types";
 import { getTransformHandles } from "../element/transformHandles";
-import { isLinearElement } from "../element/typeChecks";
 import { updateBoundElements } from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
 import { getResizedElementAbsoluteCoords } from "../element/bounds";
 
@@ -119,13 +117,6 @@ const flipElement = (
   const height = element.height;
   const originalAngle = normalizeAngle(element.angle);
 
-  let finalOffsetX = 0;
-  if (isLinearElement(element)) {
-    finalOffsetX =
-      element.points.reduce((max, point) => Math.max(max, point[0]), 0) * 2 -
-      element.width;
-  }
-
   // Rotate back to zero, if necessary
   mutateElement(element, {
     angle: normalizeAngle(0),
@@ -146,31 +137,22 @@ const flipElement = (
     }
   }
 
-  if (isLinearElement(element)) {
-    for (let index = 1; index < element.points.length; index++) {
-      LinearElementEditor.movePoints(element, [
-        { index, point: [-element.points[index][0], element.points[index][1]] },
-      ]);
-    }
-    LinearElementEditor.normalizePoints(element);
-  } else {
-    const [axTopLeft, ayTopLeft] = getResizedElementAbsoluteCoords(
-      element,
-      width,
-      height,
-      true,
-    );
+  const [axTopLeft, ayTopLeft] = getResizedElementAbsoluteCoords(
+    element,
+    width,
+    height,
+    true,
+  );
 
-    resizeSingleElement(
-      new Map().set(element.id, element),
-      false,
-      element,
-      usingNWHandle ? "nw" : "ne",
-      false,
-      usingNWHandle ? axTopLeft + width * 2 : ayTopLeft - width * 2,
-      ayTopLeft,
-    );
-  }
+  resizeSingleElement(
+    new Map().set(element.id, element),
+    false,
+    element,
+    usingNWHandle ? "nw" : "ne",
+    false,
+    usingNWHandle ? axTopLeft + width * 2 : ayTopLeft - width * 2,
+    ayTopLeft,
+  );
 
   // Rotate by (360 degrees - original angle)
   let angle = normalizeAngle(2 * Math.PI - originalAngle);
@@ -184,7 +166,7 @@ const flipElement = (
 
   // Move back to original spot to appear "flipped in place"
   mutateElement(element, {
-    x: originalX + finalOffsetX,
+    x: originalX,
     y: originalY,
   });
 
