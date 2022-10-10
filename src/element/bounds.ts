@@ -520,7 +520,7 @@ const getLinearElementRotatedBounds = (
       { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
     );
 
-    let coords: [number, number, number, number] = [minX, minY, maxX, minY];
+    let coords: [number, number, number, number] = [minX, minY, maxX, maxY];
     const boundTextElement = getBoundTextElement(element);
     if (boundTextElement) {
       const coordsWithBoundText = getMinMaxXYWithBoundText(
