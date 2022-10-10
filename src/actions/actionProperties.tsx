@@ -2,34 +2,15 @@ import { AppState } from "../../src/types";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
+// TODO barnabasmolnar/editor-redesign
 import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
   ArrowheadDotIcon,
   ArrowheadTriangleIcon,
   ArrowheadNoneIcon,
-  EdgeRoundIcon,
-  EdgeSharpIcon,
-  FillCrossHatchIcon,
-  FillHachureIcon,
-  FillSolidIcon,
-  FontFamilyCodeIcon,
-  FontFamilyHandDrawnIcon,
-  FontFamilyNormalIcon,
-  FontSizeExtraLargeIcon,
-  FontSizeLargeIcon,
-  FontSizeMediumIcon,
-  FontSizeSmallIcon,
-  SloppinessArchitectIcon,
-  SloppinessArtistIcon,
-  SloppinessCartoonistIcon,
   StrokeStyleDashedIcon,
   StrokeStyleDottedIcon,
-  StrokeStyleSolidIcon,
-  StrokeWidthIcon,
-  TextAlignCenterIcon,
-  TextAlignLeftIcon,
-  TextAlignRightIcon,
   TextAlignTopIcon,
   TextAlignBottomIcon,
   TextAlignMiddleIcon,
@@ -307,17 +288,98 @@ export const actionChangeFillStyle = register({
           {
             value: "hachure",
             text: t("labels.hachure"),
-            icon: <FillHachureIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <g
+                  clipPath="url(#a)"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M-.977 13.73 13.73-.977M4.8 19.508 19.508 4.8M-3.806 10.902 10.902-3.806M1.6 17.108 16.308 2.4" />
+                </g>
+                <rect
+                  x=".5"
+                  y=".5"
+                  width={15}
+                  height={15}
+                  rx="2.5"
+                  stroke="currentColor"
+                />
+                <defs>
+                  <clipPath id="a">
+                    <rect width={16} height={16} rx={3} fill="#fff" />
+                  </clipPath>
+                </defs>
+              </svg>
+            ),
           },
           {
             value: "cross-hatch",
             text: t("labels.crossHatch"),
-            icon: <FillCrossHatchIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <g
+                  clipPath="url(#a)"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M-.977 13.73 13.73-.977M4.8 19.508 19.508 4.8M-3.806 10.902 10.902-3.806M1.6 17.108 16.308 2.4M13.73 16.68-.977 1.971M19.508 10.902 4.8-3.806M10.902 19.508-3.806 4.8M17.108 14.102 2.4-.606" />
+                </g>
+                <rect
+                  x=".5"
+                  y=".5"
+                  width={15}
+                  height={15}
+                  rx="2.5"
+                  stroke="currentColor"
+                />
+                <defs>
+                  <clipPath id="a">
+                    <rect width={16} height={16} rx={3} fill="#fff" />
+                  </clipPath>
+                </defs>
+              </svg>
+            ),
           },
           {
             value: "solid",
             text: t("labels.solid"),
-            icon: <FillSolidIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x=".5"
+                  y=".5"
+                  width={15}
+                  height={15}
+                  rx="2.5"
+                  fill="currentColor"
+                />
+                <rect
+                  x=".5"
+                  y=".5"
+                  width={15}
+                  height={15}
+                  rx="2.5"
+                  stroke="currentColor"
+                />
+              </svg>
+            ),
           },
         ]}
         group="fill"
@@ -358,17 +420,59 @@ export const actionChangeStrokeWidth = register({
           {
             value: 1,
             text: t("labels.thin"),
-            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={2} />,
+            icon: (
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 8h14"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
           },
           {
             value: 2,
             text: t("labels.bold"),
-            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={6} />,
+            icon: (
+              <svg
+                viewBox="0 0 18 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 8h14"
+                  stroke="currentColor"
+                  strokeWidth="3.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
           },
           {
             value: 4,
             text: t("labels.extraBold"),
-            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={10} />,
+            icon: (
+              <svg
+                viewBox="0 0 20 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 8h14"
+                  stroke="currentColor"
+                  strokeWidth="4.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
           },
         ]}
         value={getFormValue(
@@ -407,17 +511,56 @@ export const actionChangeSloppiness = register({
           {
             value: 0,
             text: t("labels.architect"),
-            icon: <SloppinessArchitectIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 20 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 10.723C2.986 9.66 8.081 6.772 11.282 5.497c3.2-1.274.121 3.386 1.583 3.726C14.327 9.563 19 7.046 19 7.046"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            ),
           },
           {
             value: 1,
             text: t("labels.artist"),
-            icon: <SloppinessArtistIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 20 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 11.426c1.986-1.062 7.081-3.95 10.282-5.225 3.2-1.275.121 3.386 1.583 3.725C14.327 10.266 19 7.75 19 7.75M2.837 10.426C6.393 8.522 10.194 3.681 11.8 4.43c1.605.747-1.384 4.93-.16 6.714C12.866 12.926 19 9.426 19 9.426"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            ),
           },
           {
             value: 2,
             text: t("labels.cartoonist"),
-            icon: <SloppinessCartoonistIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 20 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 10.823C3.084 9.77 11.352 4.408 13.505 4.501c2.153.094-.503 6.166.413 6.884.916.718 4.235-2.147 5.082-2.576M1.514 8.246C2.912 7.623 8.08 4.309 9.9 4.509c1.822.198 1.2 4.592 2.545 4.93 1.345.338 4.606-2.419 5.526-2.903"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            ),
           },
         ]}
         value={getFormValue(
@@ -455,16 +598,32 @@ export const actionChangeStrokeStyle = register({
           {
             value: "solid",
             text: t("labels.strokeStyle_solid"),
-            icon: <StrokeStyleSolidIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 20 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 8h18"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
           },
           {
             value: "dashed",
             text: t("labels.strokeStyle_dashed"),
+            // TODO barnabasmolnar/editor-redesign
             icon: <StrokeStyleDashedIcon theme={appState.theme} />,
           },
           {
             value: "dotted",
             text: t("labels.strokeStyle_dotted"),
+            // TODO barnabasmolnar/editor-redesign
             icon: <StrokeStyleDottedIcon theme={appState.theme} />,
           },
         ]}
@@ -535,25 +694,81 @@ export const actionChangeFontSize = register({
           {
             value: 16,
             text: t("labels.small"),
-            icon: <FontSizeSmallIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11 5.5c0-.663-.253-1.299-.703-1.768A2.353 2.353 0 0 0 8.6 3H7.4c-.637 0-1.247.263-1.697.732A2.554 2.554 0 0 0 5 5.5c0 .663.253 1.299.703 1.768.45.469 1.06.732 1.697.732h1.2c.637 0 1.247.263 1.697.732.45.47.703 1.105.703 1.768s-.253 1.299-.703 1.768c-.45.469-1.06.732-1.697.732H7.4a2.352 2.352 0 0 1-1.697-.732A2.554 2.554 0 0 1 5 10.5"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
             testId: "fontSize-small",
           },
           {
             value: 20,
             text: t("labels.medium"),
-            icon: <FontSizeMediumIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 13V3l4 8.75L12 3v10"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
             testId: "fontSize-medium",
           },
           {
             value: 28,
             text: t("labels.large"),
-            icon: <FontSizeLargeIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5 3v10h6"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
             testId: "fontSize-large",
           },
           {
             value: 36,
             text: t("labels.veryLarge"),
-            icon: <FontSizeExtraLargeIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m1 3 6 10M7 3 1 13M9 3v10h6"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
             testId: "fontSize-veryLarge",
           },
         ]}
@@ -658,17 +873,58 @@ export const actionChangeFontFamily = register({
       {
         value: FONT_FAMILY.Virgil,
         text: t("labels.handDrawn"),
-        icon: <FontFamilyHandDrawnIcon theme={appState.theme} />,
+        icon: (
+          <svg
+            viewBox="0 0 24 24"
+            strokeWidth="1.2"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+            <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+          </svg>
+        ),
       },
       {
         value: FONT_FAMILY.Helvetica,
         text: t("labels.normal"),
-        icon: <FontFamilyNormalIcon theme={appState.theme} />,
+        icon: (
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4.667 13.333v-8a2.667 2.667 0 0 1 2.666-2.666h1.334a2.667 2.667 0 0 1 2.666 2.666v8M4.667 8.667h6.666"
+              stroke="currentColor"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ),
       },
       {
         value: FONT_FAMILY.Cascadia,
         text: t("labels.code"),
-        icon: <FontFamilyCodeIcon theme={appState.theme} />,
+        icon: (
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4.667 5.333 2 8l2.667 2.667M11.333 5.333 14 8l-2.667 2.667M9.333 2.667 6.667 13.333"
+              stroke="currentColor"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ),
       },
     ];
 
@@ -739,17 +995,96 @@ export const actionChangeTextAlign = register({
             {
               value: "left",
               text: t("labels.left"),
-              icon: <TextAlignLeftIcon theme={appState.theme} />,
+              icon: (
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    clipPath="url(#a)"
+                    stroke="currentColor"
+                    strokeWidth="1.25"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M2.667 4h10.666M2.667 8h6.666M2.667 12H12" />
+                  </g>
+                  <defs>
+                    <clipPath id="a">
+                      <path fill="#fff" d="M0 0h16v16H0z" />
+                    </clipPath>
+                  </defs>
+                </svg>
+              ),
             },
             {
               value: "center",
               text: t("labels.center"),
-              icon: <TextAlignCenterIcon theme={appState.theme} />,
+              icon: (
+                <svg
+                  width={16}
+                  height={16}
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g clipPath="url(#clip0_218_11808)">
+                    <path
+                      d="M2.66663 4H13.3333"
+                      stroke="currentColor"
+                      strokeWidth="1.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M5.33337 8H10.6667"
+                      stroke="currentColor"
+                      strokeWidth="1.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M4 12H12"
+                      stroke="currentColor"
+                      strokeWidth="1.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_218_11808">
+                      <rect width={16} height={16} fill="white" />
+                    </clipPath>
+                  </defs>
+                </svg>
+              ),
             },
             {
               value: "right",
               text: t("labels.right"),
-              icon: <TextAlignRightIcon theme={appState.theme} />,
+              icon: (
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    clipPath="url(#a)"
+                    stroke="currentColor"
+                    strokeWidth="1.25"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M2.667 4h10.666M6.667 8h6.666M4 12h9.333" />
+                  </g>
+                  <defs>
+                    <clipPath id="a">
+                      <path fill="#fff" d="M0 0h16v16H0z" />
+                    </clipPath>
+                  </defs>
+                </svg>
+              ),
             },
           ]}
           value={getFormValue(
@@ -882,12 +1217,40 @@ export const actionChangeSharpness = register({
           {
             value: "sharp",
             text: t("labels.sharp"),
-            icon: <EdgeSharpIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.264 2.664h-5.6V8.264M10.667 2.667v.006M13.333 2.667v.006M13.333 5.333v.007M13.333 8v.007M2.667 10.667v.006M13.333 10.667v.006M2.667 13.333v.007M5.333 13.333v.007M8 13.333v.007M10.667 13.333v.007M13.333 13.333v.007"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
           },
           {
             value: "round",
             text: t("labels.round"),
-            icon: <EdgeRoundIcon theme={appState.theme} />,
+            icon: (
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2.667 8V5.333a2.667 2.667 0 0 1 2.666-2.666H8M10.667 2.667v.006M13.333 2.667v.006M13.333 5.333v.007M13.333 8v.007M2.667 10.667v.006M13.333 10.667v.006M2.667 13.333v.007M5.333 13.333v.007M8 13.333v.007M10.667 13.333v.007M13.333 13.333v.007"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
           },
         ]}
         value={getFormValue(

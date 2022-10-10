@@ -5,7 +5,7 @@ export const SHAPES = [
     icon: (
       <svg
         viewBox="0 0 24 24"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
         stroke="currentColor"
         fill="none"
         strokeLinecap="round"
@@ -28,7 +28,7 @@ export const SHAPES = [
     icon: (
       <svg
         viewBox="0 0 24 24"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
         stroke="currentColor"
         fill="none"
         strokeLinecap="round"
@@ -46,7 +46,7 @@ export const SHAPES = [
     icon: (
       <svg
         viewBox="0 0 24 24"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
         stroke="currentColor"
         fill="none"
         strokeLinecap="round"
@@ -64,7 +64,7 @@ export const SHAPES = [
     icon: (
       <svg
         viewBox="0 0 24 24"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
         stroke="currentColor"
         fill="none"
         strokeLinecap="round"
@@ -82,7 +82,7 @@ export const SHAPES = [
     icon: (
       <svg
         viewBox="0 0 24 24"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
         stroke="currentColor"
         fill="none"
         strokeLinecap="round"
@@ -103,7 +103,7 @@ export const SHAPES = [
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
         stroke="currentColor"
         fill="none"
         strokeLinecap="round"
@@ -121,7 +121,7 @@ export const SHAPES = [
     icon: (
       <svg
         viewBox="0 0 24 24"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
         stroke="currentColor"
         fill="none"
         strokeLinecap="round"
@@ -140,7 +140,7 @@ export const SHAPES = [
     icon: (
       <svg
         viewBox="0 0 24 24"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
         stroke="currentColor"
         fill="none"
         strokeLinecap="round"
@@ -162,7 +162,7 @@ export const SHAPES = [
     icon: (
       <svg
         viewBox="0 0 24 24"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
         stroke="currentColor"
         fill="none"
         strokeLinecap="round"
@@ -184,7 +184,7 @@ export const SHAPES = [
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
         stroke="currentColor"
         fill="none"
         strokeLinecap="round"

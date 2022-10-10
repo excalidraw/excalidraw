@@ -81,6 +81,10 @@
     &:hover {
       background-color: var(--color-primary-light);
     }
+
+    svg {
+      color: var(--color-primary-darker);
+    }
   }
 }
 
