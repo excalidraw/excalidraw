@@ -411,16 +411,13 @@ export const _renderScene = ({
         // ShapeCache returns empty hence making sure that we get the
         // correct element from visible elements
         if (appState.editingLinearElement?.elementId === element.id) {
-          if (element) {
-            renderLinearPointHandles(
-              context,
-              appState,
-              renderConfig,
-              element as NonDeleted<ExcalidrawLinearElement>,
-            );
-          }
+          renderLinearPointHandles(
+            context,
+            appState,
+            renderConfig,
+            element as NonDeleted<ExcalidrawLinearElement>,
+          );
         }
-
         if (!isExporting) {
           renderLinkIcon(element, context, appState);
         }

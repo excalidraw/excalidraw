@@ -247,41 +247,11 @@ export class LinearElementEditor {
           }),
         );
       }
-      const textElement = getBoundTextElement(element);
 
-      if (textElement) {
-        const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-        const selectedIndex = selectedPointsIndices[0];
-
-        if (isPointHittingBoundTextElement) {
-          mutateElement(textElement, {
-            x: points[selectedIndex][0] - textElement.width / 2,
-            y: points[selectedIndex][1] - textElement.height / 2,
-          });
-        } else if (boundTextOnLeftSegment) {
-          const midPointForLeftSegment = this.getSegmentMidPoint(
-            element,
-            points[selectedIndex],
-            points[selectedIndex - 1]!,
-            selectedIndex,
-          );
-          mutateElement(textElement, {
-            x: midPointForLeftSegment[0] - textElement.width / 2,
-            y: midPointForLeftSegment[1] - textElement.height / 2,
-          });
-        } else if (boundTextOnRightSegment) {
-          const midPointForRightSegment = this.getSegmentMidPoint(
-            element,
-            points[selectedIndex],
-            points[selectedIndex + 1]!,
-            selectedIndex + 1,
-          );
-          mutateElement(textElement, {
-            x: midPointForRightSegment[0] - textElement.width / 2,
-            y: midPointForRightSegment[1] - textElement.height / 2,
-          });
-        }
-      }
+      LinearElementEditor.updateBoundTextPosition(
+        element,
+        selectedPointsIndices[0],
+      );
 
       // suggest bindings for first and last point if selected
       if (isBindingElement(element, false)) {
@@ -1155,7 +1125,6 @@ export class LinearElementEditor {
     const offsetY = 0;
 
     const nextPoints = [...element.points, ...targetPoints.map((x) => x.point)];
-
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
   }
 
@@ -1235,14 +1204,65 @@ export class LinearElementEditor {
     const dX = prevCenterX - nextCenterX;
     const dY = prevCenterY - nextCenterY;
     const rotated = rotate(offsetX, offsetY, dX, dY, element.angle);
-
     mutateElement(element, {
       ...otherUpdates,
       points: nextPoints,
       x: element.x + rotated[0],
       y: element.y + rotated[1],
     });
+    LinearElementEditor.updateBoundTextPosition(element);
   }
+
+  static updateBoundTextPosition = (
+    element: ExcalidrawLinearElement,
+    index?: number,
+  ) => {
+    const boundTextElement = getBoundTextElement(element);
+    if (!boundTextElement) {
+      return;
+    }
+    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+
+    if (index) {
+      if (isPointHittingBoundTextElement) {
+        mutateElement(boundTextElement, {
+          x: points[index][0] - boundTextElement.width / 2,
+          y: points[index][1] - boundTextElement.height / 2,
+        });
+      } else if (boundTextOnLeftSegment) {
+        const midPointForLeftSegment = this.getSegmentMidPoint(
+          element,
+          points[index],
+          points[index - 1]!,
+          index,
+        );
+        mutateElement(boundTextElement, {
+          x: midPointForLeftSegment[0] - boundTextElement.width / 2,
+          y: midPointForLeftSegment[1] - boundTextElement.height / 2,
+        });
+      } else if (boundTextOnRightSegment) {
+        const midPointForRightSegment = this.getSegmentMidPoint(
+          element,
+          points[index],
+          points[index + 1]!,
+          index + 1,
+        );
+        mutateElement(boundTextElement, {
+          x: midPointForRightSegment[0] - boundTextElement.width / 2,
+          y: midPointForRightSegment[1] - boundTextElement.height / 2,
+        });
+      }
+    } else if (element.points.length % 2 === 1) {
+      const index = Math.floor(element.points.length / 2);
+      const midPoint = LinearElementEditor.getPointGlobalCoordinates(
+        element,
+        element.points[index],
+      );
+      const x = midPoint[0] - boundTextElement.width / 2;
+      const y = midPoint[1] - boundTextElement.height / 2;
+      mutateElement(boundTextElement, { x, y });
+    }
+  };
 
   private static _getShiftLockedDelta(
     element: NonDeleted<ExcalidrawLinearElement>,
