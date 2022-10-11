@@ -665,7 +665,11 @@ export const resizeSingleElement = (
 
     mutateElement(element, resizedElement);
     if (isLinearElement(element) && boundTextElement) {
-      LinearElementEditor.updateBoundTextPosition(element, "update");
+      LinearElementEditor.updateBoundTextPosition(
+        element,
+        boundTextElement,
+        "update",
+      );
     }
     if (boundTextElement && boundTextFont) {
       mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
@@ -815,7 +819,11 @@ const resizeMultipleElements = (
       mutateElement(boundTextElement, boundTextUpdates);
 
       if (isLinearElement(element.latest)) {
-        LinearElementEditor.updateBoundTextPosition(element.latest, "update");
+        LinearElementEditor.updateBoundTextPosition(
+          element.latest,
+          boundTextElement,
+          "update",
+        );
       } else {
         handleBindTextResize(element.latest, transformHandleType);
       }

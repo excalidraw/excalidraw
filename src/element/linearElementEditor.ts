@@ -4,6 +4,7 @@ import {
   ExcalidrawElement,
   PointBinding,
   ExcalidrawBindableElement,
+  ExcalidrawTextElementWithContainer,
 } from "./types";
 import {
   distance2d,
@@ -250,6 +251,7 @@ export class LinearElementEditor {
 
       LinearElementEditor.updateBoundTextPosition(
         element,
+        getBoundTextElement(element),
         "update",
         selectedPointsIndices,
       );
@@ -830,7 +832,9 @@ export class LinearElementEditor {
 
     if (!event.altKey) {
       if (lastPoint === lastUncommittedPoint) {
-        LinearElementEditor.deletePoints(element, [points.length - 1]);
+        LinearElementEditor.deletePoints(element, appState, [
+          points.length - 1,
+        ]);
       }
       return {
         ...appState.editingLinearElement,
@@ -1086,6 +1090,7 @@ export class LinearElementEditor {
 
   static deletePoints(
     element: NonDeleted<ExcalidrawLinearElement>,
+    appState: AppState,
     pointIndices: readonly number[],
   ) {
     let offsetX = 0;
@@ -1115,12 +1120,18 @@ export class LinearElementEditor {
     }, []);
     LinearElementEditor.updateBoundTextPosition(
       element,
+      getBoundTextElement(element),
       "delete",
       pointIndices,
     );
 
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
-    LinearElementEditor.updateBoundTextPosition(element, "update");
+    LinearElementEditor.updateEditorMidPointsCache(element, appState);
+    LinearElementEditor.updateBoundTextPosition(
+      element,
+      getBoundTextElement(element),
+      "update",
+    );
   }
 
   static addPoints(
@@ -1133,7 +1144,11 @@ export class LinearElementEditor {
 
     const nextPoints = [...element.points, ...targetPoints.map((x) => x.point)];
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
-    LinearElementEditor.updateBoundTextPosition(element, "update");
+    LinearElementEditor.updateBoundTextPosition(
+      element,
+      getBoundTextElement(element),
+      "update",
+    );
   }
 
   static movePoints(
@@ -1186,7 +1201,11 @@ export class LinearElementEditor {
       offsetY,
       otherUpdates,
     );
-    LinearElementEditor.updateBoundTextPosition(element, "update");
+    LinearElementEditor.updateBoundTextPosition(
+      element,
+      getBoundTextElement(element),
+      "update",
+    );
   }
 
   private static _updatePoints(
@@ -1223,10 +1242,10 @@ export class LinearElementEditor {
 
   static updateBoundTextPosition = (
     element: ExcalidrawLinearElement,
+    boundTextElement: ExcalidrawTextElementWithContainer | null,
     type: "update" | "delete",
     indexes?: readonly number[],
   ) => {
-    const boundTextElement = getBoundTextElement(element);
     if (!boundTextElement) {
       return;
     }
@@ -1294,7 +1313,7 @@ export class LinearElementEditor {
       const y = midPoint[1] - boundTextElement.height / 2;
       mutateElement(boundTextElement, { x, y });
     } else {
-      const index = Math.floor((element.points.length - 1) / 2);
+      const index = element.points.length / 2 - 1;
       let midSegmentMidpoint = editorMidPointsCache.points[index];
       if (element.points.length === 2) {
         midSegmentMidpoint = centerPoint(points[0], points[1]);
