@@ -250,6 +250,7 @@ export class LinearElementEditor {
 
       LinearElementEditor.updateBoundTextPosition(
         element,
+        "update",
         selectedPointsIndices[0],
       );
 
@@ -1114,6 +1115,7 @@ export class LinearElementEditor {
     }, []);
 
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
+    LinearElementEditor.updateBoundTextPosition(element, "delete");
   }
 
   static addPoints(
@@ -1126,6 +1128,7 @@ export class LinearElementEditor {
 
     const nextPoints = [...element.points, ...targetPoints.map((x) => x.point)];
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
+    LinearElementEditor.updateBoundTextPosition(element, "update");
   }
 
   static movePoints(
@@ -1178,6 +1181,7 @@ export class LinearElementEditor {
       offsetY,
       otherUpdates,
     );
+    LinearElementEditor.updateBoundTextPosition(element, "update");
   }
 
   private static _updatePoints(
@@ -1210,11 +1214,11 @@ export class LinearElementEditor {
       x: element.x + rotated[0],
       y: element.y + rotated[1],
     });
-    LinearElementEditor.updateBoundTextPosition(element);
   }
 
   static updateBoundTextPosition = (
     element: ExcalidrawLinearElement,
+    type: "update" | "delete",
     index?: number,
   ) => {
     const boundTextElement = getBoundTextElement(element);
@@ -1222,7 +1226,22 @@ export class LinearElementEditor {
       return;
     }
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+    const boundTextCenterPoint = [
+      boundTextElement.x + boundTextElement.width / 2,
+      boundTextElement.y + boundTextElement.height / 2,
+    ];
 
+    if (type === "delete") {
+      const boundTextPointIndex = points.findIndex(
+        (point) =>
+          point[0] === boundTextCenterPoint[0] &&
+          point[1] === boundTextCenterPoint[1],
+      );
+      if (boundTextPointIndex === -1) {
+        mutateElement(boundTextElement, { isDeleted: true });
+      }
+      return;
+    }
     if (index) {
       if (isPointHittingBoundTextElement) {
         mutateElement(boundTextElement, {
