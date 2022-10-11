@@ -167,59 +167,57 @@ const LayerUI = ({
     );
   };
 
-  const CanvasActions = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    return (
-      <>
-        <button
-          className={clsx("menu-button", "zen-mode-transition", {
-            "transition-left": appState.zenModeEnabled,
-          })}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {HamburgerMenuIcon}
-        </button>
+  const renderCanvasActions = () => (
+    <>
+      <button
+        className={clsx("menu-button", "zen-mode-transition", {
+          "transition-left": appState.zenModeEnabled,
+        })}
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        type="button"
+      >
+        {HamburgerMenuIcon}
+      </button>
 
-        {isMenuOpen && (
-          <Section heading="canvasActions">
-            {/* the zIndex ensures this menu has higher stacking order,
+      {isMenuOpen && (
+        <Section heading="canvasActions">
+          {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}
-            <Island padding={2} style={{ zIndex: 1, maxWidth: "192px" }}>
-              {actionManager.renderAction("loadScene")}
-              {/* // TODO barnabasmolnar/editor-redesign  */}
-              {/* {appState.fileHandle && (
+          <Island padding={2} style={{ zIndex: 1, maxWidth: "192px" }}>
+            {actionManager.renderAction("loadScene")}
+            {/* // TODO barnabasmolnar/editor-redesign  */}
+            {/* {appState.fileHandle && (
                 <>{actionManager.renderAction("saveToActiveFile")}</>
               )} */}
-              {renderJSONExportDialog()}
-              {renderImageExportDialog()}
-              {onCollabButtonClick && (
-                <CollabButton
-                  isCollaborating={isCollaborating}
-                  collaboratorCount={appState.collaborators.size}
-                  onClick={onCollabButtonClick}
-                />
-              )}
-              {actionManager.renderAction("clearCanvas")}
-              <Separator />
+            {renderJSONExportDialog()}
+            {renderImageExportDialog()}
+            {onCollabButtonClick && (
+              <CollabButton
+                isCollaborating={isCollaborating}
+                collaboratorCount={appState.collaborators.size}
+                onClick={onCollabButtonClick}
+              />
+            )}
+            {actionManager.renderAction("clearCanvas")}
 
-              <div style={{ marginBottom: ".5rem" }}>
-                <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
-                  {t("labels.canvasBackground")}
-                </div>
-                {/* // TODO barnabasmolnar/editor-redesign  */}
-                {/* clicking on the colour picker closes the menu... */}
-                {actionManager.renderAction("changeViewBackgroundColor")}
+            <Separator />
+
+            <div style={{ marginBottom: ".5rem" }}>
+              <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
+                {t("labels.canvasBackground")}
               </div>
+              {actionManager.renderAction("changeViewBackgroundColor")}
+            </div>
 
-              {actionManager.renderAction("toggleTheme")}
-              {/* <BackgroundPickerAndDarkModeToggle actionManager={actionManager} /> */}
-            </Island>
-          </Section>
-        )}
-      </>
-    );
-  };
+            {actionManager.renderAction("toggleTheme")}
+            {/* <BackgroundPickerAndDarkModeToggle actionManager={actionManager} /> */}
+          </Island>
+        </Section>
+      )}
+    </>
+  );
 
   // const renderCanvasActions = () => (
   //   <Section
@@ -333,10 +331,7 @@ const LayerUI = ({
               "disable-pointerEvents": appState.zenModeEnabled,
             })}
           >
-            {/* {appState.viewModeEnabled
-              ? renderViewModeCanvasActions()
-              : renderCanvasActions()} */}
-            <CanvasActions />
+            {renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
           {!appState.viewModeEnabled && (

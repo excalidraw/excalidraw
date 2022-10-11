@@ -15,6 +15,7 @@ const MenuItem = ({ icon, onClick, label, dataTestId }: MenuProps) => {
       onClick={onClick}
       data-testid={dataTestId}
       title={label}
+      type="button"
     >
       <div className="menu-item__icon">{icon}</div>
       <div className="menu-item__text">{label}</div>
