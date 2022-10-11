@@ -407,17 +407,6 @@ export const _renderScene = ({
     visibleElements.forEach((element) => {
       try {
         renderElement(element, rc, context, renderConfig);
-        // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
-        // ShapeCache returns empty hence making sure that we get the
-        // correct element from visible elements
-        if (appState.editingLinearElement?.elementId === element.id) {
-          renderLinearPointHandles(
-            context,
-            appState,
-            renderConfig,
-            element as NonDeleted<ExcalidrawLinearElement>,
-          );
-        }
         if (!isExporting) {
           renderLinkIcon(element, context, appState);
         }
@@ -442,6 +431,22 @@ export const _renderScene = ({
           renderBindingHighlight(context, renderConfig, suggestedBinding!);
         });
     }
+    const locallySelectedElements = getSelectedElements(elements, appState);
+
+    // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
+    // ShapeCache returns empty hence making sure that we get the
+    // correct element from visible elements
+    if (
+      locallySelectedElements.length === 1 &&
+      appState.editingLinearElement?.elementId === locallySelectedElements[0].id
+    ) {
+      renderLinearPointHandles(
+        context,
+        appState,
+        renderConfig,
+        locallySelectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
+      );
+    }
 
     if (
       appState.selectedLinearElement &&
@@ -455,7 +460,6 @@ export const _renderScene = ({
       !appState.multiElement &&
       !appState.editingLinearElement
     ) {
-      const locallySelectedElements = getSelectedElements(elements, appState);
       const showBoundingBox = shouldShowBoundingBox(
         locallySelectedElements,
         appState,
