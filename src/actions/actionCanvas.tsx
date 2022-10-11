@@ -1,5 +1,5 @@
 import { ColorPicker } from "../components/ColorPicker";
-import { eraser } from "../components/icons";
+import { eraser, ZoomInIcon, ZoomOutIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { THEME, ZOOM_STEP } from "../constants";
@@ -104,22 +104,7 @@ export const actionZoomIn = register({
     <ToolButton
       type="button"
       className="zoom-in-button zoom-button"
-      icon={
-        // TODO barnabasmolnar/editor-redesign
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          strokeWidth="1.2"
-          stroke="currentColor"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      }
+      icon={ZoomInIcon}
       title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
       onClick={() => {
@@ -155,21 +140,7 @@ export const actionZoomOut = register({
     <ToolButton
       type="button"
       className="zoom-out-button zoom-button"
-      icon={
-        // TODO barnabasmolnar/editor-redesign
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          strokeWidth="1.2"
-          stroke="currentColor"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      }
+      icon={ZoomOutIcon}
       title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
       onClick={() => {

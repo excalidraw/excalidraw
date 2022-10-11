@@ -36,6 +36,7 @@ export const createIcon = (
     height = width,
     mirror,
     style,
+    ...rest
   } = typeof opts === "number" ? ({ width: opts } as Opts) : opts;
   return (
     <svg
@@ -45,11 +46,168 @@ export const createIcon = (
       viewBox={`0 0 ${width} ${height}`}
       className={clsx({ "rtl-mirror": mirror })}
       style={style}
+      {...rest}
     >
       {typeof d === "string" ? <path fill="currentColor" d={d} /> : d}
     </svg>
   );
 };
+
+const newIconProps: Opts = {
+  width: 24,
+  height: 24,
+  strokeWidth: 1.2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  fill: "none",
+  stroke: "currentColor",
+};
+
+export const SelectionIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="3" y1="12" x2="6" y2="12" />
+    <line x1="12" y1="3" x2="12" y2="6" />
+    <line x1="7.8" y1="7.8" x2="5.6" y2="5.6" />
+    <line x1="16.2" y1="7.8" x2="18.4" y2="5.6" />
+    <line x1="7.8" y1="16.2" x2="5.6" y2="18.4" />
+    <path d="M12 12l9 3l-4 2l-2 4l-3 -9" />
+  </>,
+  newIconProps,
+);
+
+export const RectangleIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <rect x="4" y="4" width="16" height="16" rx="2" />,
+  </>,
+  newIconProps,
+);
+
+export const DiamondIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M10.5 20.4l-6.9 -6.9c-.781 -.781 -.781 -2.219 0 -3l6.9 -6.9c.781 -.781 2.219 -.781 3 0l6.9 6.9c.781 .781 .781 2.219 0 3l-6.9 6.9c-.781 .781 -2.219 .781 -3 0z" />
+  </>,
+  newIconProps,
+);
+
+export const EllipseIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <circle cx="12" cy="12" r="9" />
+  </>,
+  newIconProps,
+);
+
+export const ArrowIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <line x1="15" y1="16" x2="19" y2="12" />
+    <line x1="15" y1="8" x2="19" y2="12" />
+  </>,
+  newIconProps,
+);
+
+export const LineIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </>,
+  newIconProps,
+);
+
+export const FreedrawIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+    <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+  </>,
+  newIconProps,
+);
+
+export const TextIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="4" y1="20" x2="7" y2="20" />
+    <line x1="14" y1="20" x2="21" y2="20" />
+    <line x1="6.9" y1="15" x2="13.8" y2="15" />
+    <line x1="10.2" y1="6.3" x2="16" y2="20" />
+    <polyline points="5 20 11 4 13 4 20 20" />
+  </>,
+  newIconProps,
+);
+
+export const ImageIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="15" y1="8" x2="15.01" y2="8" />
+    <rect x="4" y="4" width="16" height="16" rx="3" />
+    <path d="M4 15l4 -4a3 5 0 0 1 3 0l5 5" />
+    <path d="M14 14l1 -1a3 5 0 0 1 3 0l2 2" />
+  </>,
+  newIconProps,
+);
+
+export const EraserIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M19 19h-11l-4 -4a1 1 0 0 1 0 -1.41l10 -10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41l-9 9" />
+    <line x1="18" y1="12.3" x2="11.7" y2="6" />
+  </>,
+  newIconProps,
+);
+
+export const ZoomInIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </>,
+  newIconProps,
+);
+
+export const ZoomOutIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </>,
+  newIconProps,
+);
+
+export const TrashIcon = createIcon(
+  <>
+    <path
+      d="M2.667 4.667h10.666M6.667 7.333v4M9.333 7.333v4M3.333 4.667l.667 8A1.333 1.333 0 0 0 5.333 14h5.334A1.333 1.333 0 0 0 12 12.667l.667-8M6 4.667v-2A.667.667 0 0 1 6.667 2h2.666a.667.667 0 0 1 .667.667v2"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </>,
+  { width: 16, height: 16, fill: "none" },
+);
+
+export const DuplicateIcon = createIcon(
+  <>
+    <path
+      d="M12 5.333H6.667c-.737 0-1.334.597-1.334 1.334V12c0 .736.597 1.333 1.334 1.333H12c.736 0 1.333-.597 1.333-1.333V6.667c0-.737-.597-1.334-1.333-1.334Z"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M10.667 5.333V4a1.333 1.333 0 0 0-1.334-1.333H4A1.333 1.333 0 0 0 2.667 4v5.333A1.333 1.333 0 0 0 4 10.667h1.333"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </>,
+  { width: 16, height: 16, fill: "none" },
+);
 
 export const checkIcon = createIcon(
   <polyline fill="none" stroke="currentColor" points="20 6 9 17 4 12" />,
@@ -543,48 +701,75 @@ export const UngroupIcon = React.memo(({ theme }: { theme: Theme }) =>
   ),
 );
 
-export const FillHachureIcon = React.memo(({ theme }: { theme: Theme }) =>
+export const FillHachureIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M-.977 13.73 13.73-.977M4.8 19.508 19.508 4.8M-3.806 10.902 10.902-3.806M1.6 17.108 16.308 2.4" />
+    </g>
+    <rect x=".5" y=".5" width={15} height={15} rx="2.5" stroke="currentColor" />
+    <defs>
+      <clipPath id="a">
+        <rect width={16} height={16} rx={3} fill="#fff" />
+      </clipPath>
+    </defs>
+  </>,
+  { width: 16, height: 16, fill: "none" },
+);
+
+export const FillCrossHatchIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M-.977 13.73 13.73-.977M4.8 19.508 19.508 4.8M-3.806 10.902 10.902-3.806M1.6 17.108 16.308 2.4M13.73 16.68-.977 1.971M19.508 10.902 4.8-3.806M10.902 19.508-3.806 4.8M17.108 14.102 2.4-.606" />
+    </g>
+    <rect x=".5" y=".5" width={15} height={15} rx="2.5" stroke="currentColor" />
+    <defs>
+      <clipPath id="a">
+        <rect width={16} height={16} rx={3} fill="#fff" />
+      </clipPath>
+    </defs>
+  </>,
+  { width: 16, height: 16, fill: "none" },
+);
+
+export const FillSolidIcon = createIcon(
+  <>
+    <rect x=".5" y=".5" width={15} height={15} rx="2.5" fill="currentColor" />
+    <rect x=".5" y=".5" width={15} height={15} rx="2.5" stroke="currentColor" />
+  </>,
+  { width: 16, height: 16, fill: "none" },
+);
+
+export const StrokeWidthIcon = ({
+  strokeWidth,
+  width,
+  height,
+}: {
+  strokeWidth: number;
+  width: number;
+  height: number;
+}) =>
   createIcon(
     <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z"
-      fill={iconFillColor(theme)}
+      d="M2 8h14"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />,
-    { width: 40, height: 20 },
-  ),
-);
-
-export const FillCrossHatchIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <g fill={iconFillColor(theme)} fillRule="evenodd" clipRule="evenodd">
-      <path d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z" />
-      <path d="M14.0001 18L3.00006 4.00002L4.5727 2.76438L15.5727 16.7644L14.0001 18ZM25.0001 18L14.0001 4.00002L15.5727 2.76438L26.5727 16.7644L25.0001 18ZM36.0001 18L25.0001 4.00002L26.5727 2.76438L37.5727 16.7644L36.0001 18Z" />
-    </g>,
-    { width: 40, height: 20 },
-  ),
-);
-
-export const FillSolidIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(<path d="M2 2H38V18H2V2Z" fill={iconFillColor(theme)} />, {
-    width: 40,
-    height: 20,
-  }),
-);
-
-export const StrokeWidthIcon = React.memo(
-  ({ theme, strokeWidth }: { theme: Theme; strokeWidth: number }) =>
-    createIcon(
-      <path
-        d="M6 10H32"
-        stroke={iconFillColor(theme)}
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        fill="none"
-      />,
-      { width: 40, height: 20 },
-    ),
-);
+    { width, height },
+  );
 
 export const StrokeStyleSolidIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
@@ -630,45 +815,34 @@ export const StrokeStyleDottedIcon = React.memo(({ theme }: { theme: Theme }) =>
   ),
 );
 
-export const SloppinessArchitectIcon = React.memo(
-  ({ theme }: { theme: Theme }) =>
-    createIcon(
-      <path
-        d="M3.00098 16.1691C6.28774 13.9744 19.6399 2.8905 22.7215 3.00082C25.8041 3.11113 19.1158 15.5488 21.4962 16.8309C23.8757 18.1131 34.4155 11.7148 37.0001 10.6919"
-        stroke={iconFillColor(theme)}
-        strokeWidth={2}
-        strokeLinecap="round"
-        fill="none"
-      />,
-      { width: 40, height: 20, mirror: true },
-    ),
+export const SloppinessArchitectIcon = createIcon(
+  <path
+    d="M1 10.723C2.986 9.66 8.081 6.772 11.282 5.497c3.2-1.274.121 3.386 1.583 3.726C14.327 9.563 19 7.046 19 7.046"
+    stroke="currentColor"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+  />,
+  { width: 20, height: 16, mirror: true, fill: "none" },
 );
 
-export const SloppinessArtistIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <path
-      d="M3 17C6.68158 14.8752 16.1296 9.09849 22.0648 6.54922C28 3.99995 22.2896 13.3209 25 14C27.7104 14.6791 36.3757 9.6471 36.3757 9.6471M6.40706 15C13 11.1918 20.0468 1.51045 23.0234 3.0052C26 4.49995 20.457 12.8659 22.7285 16.4329C25 20 36.3757 13 36.3757 13"
-      stroke={iconFillColor(theme)}
-      strokeWidth={2}
-      strokeLinecap="round"
-      fill="none"
-    />,
-    { width: 40, height: 20, mirror: true },
-  ),
+export const SloppinessArtistIcon = createIcon(
+  <path
+    d="M1 11.426c1.986-1.062 7.081-3.95 10.282-5.225 3.2-1.275.121 3.386 1.583 3.725C14.327 10.266 19 7.75 19 7.75M2.837 10.426C6.393 8.522 10.194 3.681 11.8 4.43c1.605.747-1.384 4.93-.16 6.714C12.866 12.926 19 9.426 19 9.426"
+    stroke="currentColor"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+  />,
+  { width: 20, height: 16, mirror: true, fill: "none" },
 );
 
-export const SloppinessCartoonistIcon = React.memo(
-  ({ theme }: { theme: Theme }) =>
-    createIcon(
-      <path
-        d="M3 15.6468C6.93692 13.5378 22.5544 2.81528 26.6206 3.00242C30.6877 3.18956 25.6708 15.3346 27.4009 16.7705C29.1309 18.2055 35.4001 12.4762 37 11.6177M3.97143 10.4917C6.61158 9.24563 16.3706 2.61886 19.8104 3.01724C23.2522 3.41472 22.0773 12.2013 24.6181 12.8783C27.1598 13.5536 33.3179 8.04068 35.0571 7.07244"
-        stroke={iconFillColor(theme)}
-        strokeWidth={2}
-        strokeLinecap="round"
-        fill="none"
-      />,
-      { width: 40, height: 20, mirror: true },
-    ),
+export const SloppinessCartoonistIcon = createIcon(
+  <path
+    d="M1 10.823C3.084 9.77 11.352 4.408 13.505 4.501c2.153.094-.503 6.166.413 6.884.916.718 4.235-2.147 5.082-2.576M1.514 8.246C2.912 7.623 8.08 4.309 9.9 4.509c1.822.198 1.2 4.592 2.545 4.93 1.345.338 4.606-2.419 5.526-2.903"
+    stroke="currentColor"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+  />,
+  { width: 20, height: 16, mirror: true, fill: "none" },
 );
 
 export const EdgeSharpIcon = React.memo(({ theme }: { theme: Theme }) =>

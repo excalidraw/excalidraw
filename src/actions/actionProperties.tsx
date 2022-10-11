@@ -14,6 +14,13 @@ import {
   TextAlignTopIcon,
   TextAlignBottomIcon,
   TextAlignMiddleIcon,
+  FillHachureIcon,
+  FillCrossHatchIcon,
+  FillSolidIcon,
+  StrokeWidthIcon,
+  SloppinessArchitectIcon,
+  SloppinessArtistIcon,
+  SloppinessCartoonistIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -288,98 +295,17 @@ export const actionChangeFillStyle = register({
           {
             value: "hachure",
             text: t("labels.hachure"),
-            icon: (
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g
-                  clipPath="url(#a)"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M-.977 13.73 13.73-.977M4.8 19.508 19.508 4.8M-3.806 10.902 10.902-3.806M1.6 17.108 16.308 2.4" />
-                </g>
-                <rect
-                  x=".5"
-                  y=".5"
-                  width={15}
-                  height={15}
-                  rx="2.5"
-                  stroke="currentColor"
-                />
-                <defs>
-                  <clipPath id="a">
-                    <rect width={16} height={16} rx={3} fill="#fff" />
-                  </clipPath>
-                </defs>
-              </svg>
-            ),
+            icon: FillHachureIcon,
           },
           {
             value: "cross-hatch",
             text: t("labels.crossHatch"),
-            icon: (
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g
-                  clipPath="url(#a)"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M-.977 13.73 13.73-.977M4.8 19.508 19.508 4.8M-3.806 10.902 10.902-3.806M1.6 17.108 16.308 2.4M13.73 16.68-.977 1.971M19.508 10.902 4.8-3.806M10.902 19.508-3.806 4.8M17.108 14.102 2.4-.606" />
-                </g>
-                <rect
-                  x=".5"
-                  y=".5"
-                  width={15}
-                  height={15}
-                  rx="2.5"
-                  stroke="currentColor"
-                />
-                <defs>
-                  <clipPath id="a">
-                    <rect width={16} height={16} rx={3} fill="#fff" />
-                  </clipPath>
-                </defs>
-              </svg>
-            ),
+            icon: FillCrossHatchIcon,
           },
           {
             value: "solid",
             text: t("labels.solid"),
-            icon: (
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  x=".5"
-                  y=".5"
-                  width={15}
-                  height={15}
-                  rx="2.5"
-                  fill="currentColor"
-                />
-                <rect
-                  x=".5"
-                  y=".5"
-                  width={15}
-                  height={15}
-                  rx="2.5"
-                  stroke="currentColor"
-                />
-              </svg>
-            ),
+            icon: FillSolidIcon,
           },
         ]}
         group="fill"
@@ -420,59 +346,17 @@ export const actionChangeStrokeWidth = register({
           {
             value: 1,
             text: t("labels.thin"),
-            icon: (
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M1 8h14"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: <StrokeWidthIcon strokeWidth={1.2} width={16} height={16} />,
           },
           {
             value: 2,
             text: t("labels.bold"),
-            icon: (
-              <svg
-                viewBox="0 0 18 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M2 8h14"
-                  stroke="currentColor"
-                  strokeWidth="3.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: <StrokeWidthIcon strokeWidth={3.2} width={18} height={16} />,
           },
           {
             value: 4,
             text: t("labels.extraBold"),
-            icon: (
-              <svg
-                viewBox="0 0 20 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3 8h14"
-                  stroke="currentColor"
-                  strokeWidth="4.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: <StrokeWidthIcon strokeWidth={4.8} width={20} height={16} />,
           },
         ]}
         value={getFormValue(
@@ -511,56 +395,17 @@ export const actionChangeSloppiness = register({
           {
             value: 0,
             text: t("labels.architect"),
-            icon: (
-              <svg
-                viewBox="0 0 20 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M1 10.723C2.986 9.66 8.081 6.772 11.282 5.497c3.2-1.274.121 3.386 1.583 3.726C14.327 9.563 19 7.046 19 7.046"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            ),
+            icon: SloppinessArchitectIcon,
           },
           {
             value: 1,
             text: t("labels.artist"),
-            icon: (
-              <svg
-                viewBox="0 0 20 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M1 11.426c1.986-1.062 7.081-3.95 10.282-5.225 3.2-1.275.121 3.386 1.583 3.725C14.327 10.266 19 7.75 19 7.75M2.837 10.426C6.393 8.522 10.194 3.681 11.8 4.43c1.605.747-1.384 4.93-.16 6.714C12.866 12.926 19 9.426 19 9.426"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            ),
+            icon: SloppinessArtistIcon,
           },
           {
             value: 2,
             text: t("labels.cartoonist"),
-            icon: (
-              <svg
-                viewBox="0 0 20 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M1 10.823C3.084 9.77 11.352 4.408 13.505 4.501c2.153.094-.503 6.166.413 6.884.916.718 4.235-2.147 5.082-2.576M1.514 8.246C2.912 7.623 8.08 4.309 9.9 4.509c1.822.198 1.2 4.592 2.545 4.93 1.345.338 4.606-2.419 5.526-2.903"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            ),
+            icon: SloppinessCartoonistIcon,
           },
         ]}
         value={getFormValue(
