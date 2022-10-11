@@ -1120,6 +1120,7 @@ export class LinearElementEditor {
     );
 
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
+    LinearElementEditor.updateBoundTextPosition(element, "update");
   }
 
   static addPoints(
@@ -1230,9 +1231,11 @@ export class LinearElementEditor {
       return;
     }
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-
+    if (points.length < 2) {
+      mutateElement(boundTextElement, { isDeleted: true });
+    }
     if (type === "delete") {
-      if (!indexes) {
+      if (!indexes || points.length % 2 === 0) {
         return;
       }
       const boundTextCenterPoint = [
@@ -1245,7 +1248,7 @@ export class LinearElementEditor {
           boundTextCenterPoint[1],
         ]),
       );
-      if (boundTextPointDeleted !== -1) {
+      if (typeof boundTextPointDeleted !== "undefined") {
         mutateElement(boundTextElement, { isDeleted: true });
       }
       return;
@@ -1292,7 +1295,10 @@ export class LinearElementEditor {
       mutateElement(boundTextElement, { x, y });
     } else {
       const index = Math.floor((element.points.length - 1) / 2);
-      const midSegmentMidpoint = editorMidPointsCache.points[index];
+      let midSegmentMidpoint = editorMidPointsCache.points[index];
+      if (element.points.length === 2) {
+        midSegmentMidpoint = centerPoint(points[0], points[1]);
+      }
       if (!midSegmentMidpoint) {
         return;
       }
