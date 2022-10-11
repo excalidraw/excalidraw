@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { ActionManager } from "../actions/manager";
 import { CLASSES, LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { exportCanvas } from "../data";
@@ -11,7 +11,6 @@ import { ExportType } from "../scene/types";
 import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
-import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
@@ -40,6 +39,7 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
+import { HamburgerMenuIcon } from "./icons";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -156,65 +156,105 @@ const LayerUI = ({
   };
 
   const Separator = () => {
-    return <div style={{ width: ".625em" }} />;
-  };
-
-  const renderViewModeCanvasActions = () => {
     return (
-      <Section
-        heading="canvasActions"
-        className={clsx("zen-mode-transition", {
-          "transition-left": appState.zenModeEnabled,
-        })}
-      >
-        {/* the zIndex ensures this menu has higher stacking order,
-         see https://github.com/excalidraw/excalidraw/pull/1445 */}
-        <Island padding={2} style={{ zIndex: 1 }}>
-          <Stack.Col gap={4}>
-            <Stack.Row gap={1} justifyContent="space-between">
-              {renderJSONExportDialog()}
-              {renderImageExportDialog()}
-            </Stack.Row>
-          </Stack.Col>
-        </Island>
-      </Section>
+      <div
+        style={{
+          height: "1px",
+          backgroundColor: "var(--default-border-color)",
+          margin: ".5rem 0",
+        }}
+      />
     );
   };
 
-  const renderCanvasActions = () => (
-    <Section
-      heading="canvasActions"
-      className={clsx("zen-mode-transition", {
-        "transition-left": appState.zenModeEnabled,
-      })}
-    >
-      {/* the zIndex ensures this menu has higher stacking order,
+  const CanvasActions = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    return (
+      <>
+        <button
+          className={clsx("menu-button", "zen-mode-transition", {
+            "transition-left": appState.zenModeEnabled,
+          })}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          {HamburgerMenuIcon}
+        </button>
+
+        {isMenuOpen && (
+          <Section heading="canvasActions">
+            {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}
-      <Island padding={2} style={{ zIndex: 1 }}>
-        <Stack.Col gap={4}>
-          <Stack.Row gap={1} justifyContent="space-between">
-            {actionManager.renderAction("clearCanvas")}
-            <Separator />
-            {actionManager.renderAction("loadScene")}
-            {renderJSONExportDialog()}
-            {renderImageExportDialog()}
-            <Separator />
-            {onCollabButtonClick && (
-              <CollabButton
-                isCollaborating={isCollaborating}
-                collaboratorCount={appState.collaborators.size}
-                onClick={onCollabButtonClick}
-              />
-            )}
-          </Stack.Row>
-          <BackgroundPickerAndDarkModeToggle actionManager={actionManager} />
-          {appState.fileHandle && (
-            <>{actionManager.renderAction("saveToActiveFile")}</>
-          )}
-        </Stack.Col>
-      </Island>
-    </Section>
-  );
+            <Island padding={2} style={{ zIndex: 1, maxWidth: "192px" }}>
+              {actionManager.renderAction("loadScene")}
+              {/* // TODO barnabasmolnar/editor-redesign  */}
+              {/* {appState.fileHandle && (
+                <>{actionManager.renderAction("saveToActiveFile")}</>
+              )} */}
+              {renderJSONExportDialog()}
+              {renderImageExportDialog()}
+              {onCollabButtonClick && (
+                <CollabButton
+                  isCollaborating={isCollaborating}
+                  collaboratorCount={appState.collaborators.size}
+                  onClick={onCollabButtonClick}
+                />
+              )}
+              {actionManager.renderAction("clearCanvas")}
+              <Separator />
+
+              <div style={{ marginBottom: ".5rem" }}>
+                <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
+                  {t("labels.canvasBackground")}
+                </div>
+                {/* // TODO barnabasmolnar/editor-redesign  */}
+                {/* clicking on the colour picker closes the menu... */}
+                {actionManager.renderAction("changeViewBackgroundColor")}
+              </div>
+
+              {actionManager.renderAction("toggleTheme")}
+              {/* <BackgroundPickerAndDarkModeToggle actionManager={actionManager} /> */}
+            </Island>
+          </Section>
+        )}
+      </>
+    );
+  };
+
+  // const renderCanvasActions = () => (
+  //   <Section
+  //     heading="canvasActions"
+  //     className={clsx("zen-mode-transition", {
+  //       "transition-left": appState.zenModeEnabled,
+  //     })}
+  //   >
+  //     {/* the zIndex ensures this menu has higher stacking order,
+  //        see https://github.com/excalidraw/excalidraw/pull/1445 */}
+  //     <Island padding={2} style={{ zIndex: 1 }}>
+  //       <Stack.Col gap={4}>
+  //         <Stack.Row gap={1} justifyContent="space-between">
+  //           {actionManager.renderAction("clearCanvas")}
+  //           <Separator />
+  //           {actionManager.renderAction("loadScene")}
+  //           {renderJSONExportDialog()}
+  //           {renderImageExportDialog()}
+  //           <Separator />
+  //           {onCollabButtonClick && (
+  //             <CollabButton
+  //               isCollaborating={isCollaborating}
+  //               collaboratorCount={appState.collaborators.size}
+  //               onClick={onCollabButtonClick}
+  //             />
+  //           )}
+  //         </Stack.Row>
+  //         <BackgroundPickerAndDarkModeToggle actionManager={actionManager} />
+  //         {appState.fileHandle && (
+  //           <>{actionManager.renderAction("saveToActiveFile")}</>
+  //         )}
+  //       </Stack.Col>
+  //     </Island>
+  //   </Section>
+  // );
 
   const renderSelectedShapeActions = () => (
     <Section
@@ -287,14 +327,16 @@ const LayerUI = ({
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
           <Stack.Col
+            style={{ width: "192px" }}
             gap={4}
             className={clsx({
               "disable-pointerEvents": appState.zenModeEnabled,
             })}
           >
-            {appState.viewModeEnabled
+            {/* {appState.viewModeEnabled
               ? renderViewModeCanvasActions()
-              : renderCanvasActions()}
+              : renderCanvasActions()} */}
+            <CanvasActions />
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
           {!appState.viewModeEnabled && (

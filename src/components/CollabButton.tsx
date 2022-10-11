@@ -1,10 +1,8 @@
-import clsx from "clsx";
-import { ToolButton } from "./ToolButton";
 import { t } from "../i18n";
-import { useDevice } from "../components/App";
 import { users } from "./icons";
 
 import "./CollabButton.scss";
+import MenuItem from "./MenuItem";
 
 const CollabButton = ({
   isCollaborating,
@@ -17,21 +15,17 @@ const CollabButton = ({
 }) => {
   return (
     <>
-      <ToolButton
-        className={clsx("CollabButton", {
-          "is-collaborating": isCollaborating,
-        })}
-        onClick={onClick}
+      <MenuItem
+        label={t("labels.liveCollaboration")}
+        dataTestId="collab-button"
         icon={users}
-        type="button"
-        title={t("labels.liveCollaboration")}
-        aria-label={t("labels.liveCollaboration")}
-        showAriaLabel={useDevice().isMobile}
-      >
-        {isCollaborating && (
-          <div className="CollabButton-collaborators">{collaboratorCount}</div>
-        )}
-      </ToolButton>
+        onClick={onClick}
+      />
+      {/* // TODO barnabasmolnar/editor-redesign  */}
+      {/* do we want to show the collaborator count here? */}
+      {/* {isCollaborating && (
+        <div className="CollabButton-collaborators">{collaboratorCount}</div>
+      )} */}
     </>
   );
 };

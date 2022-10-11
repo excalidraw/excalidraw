@@ -19,6 +19,7 @@ import { ActiveFile } from "../components/ActiveFile";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
+import MenuItem from "../components/MenuItem";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -245,14 +246,20 @@ export const actionLoadScene = register({
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
   PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="button"
+    // <ToolButton
+    //   type="button"
+    //   icon={load}
+    //   title={t("buttons.load")}
+    //   aria-label={t("buttons.load")}
+    //   showAriaLabel={useDevice().isMobile}
+    //   onClick={updateData}
+    //   data-testid="load-button"
+    // />
+    <MenuItem
+      label={t("buttons.load")}
       icon={load}
-      title={t("buttons.load")}
-      aria-label={t("buttons.load")}
-      showAriaLabel={useDevice().isMobile}
       onClick={updateData}
-      data-testid="load-button"
+      dataTestId="load-button"
     />
   ),
 });

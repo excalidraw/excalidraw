@@ -1,0 +1,46 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .menu-button {
+    @include outlineButtonStyles;
+  }
+
+  .menu-item {
+    display: flex;
+    background-color: transparent;
+    border: 0;
+    align-items: center;
+    padding: 0.625rem;
+    column-gap: 0.625rem;
+    font-size: 0.875rem;
+    color: var(--color-gray-100);
+    cursor: pointer;
+    border-radius: var(--border-radius-md);
+    width: 100%;
+
+    &__icon {
+      line-height: 0;
+    }
+
+    &__text {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    &:hover {
+      background-color: var(--button-hover);
+    }
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  &.theme--dark {
+    .menu-item {
+      color: var(--color-gray-40);
+    }
+  }
+}

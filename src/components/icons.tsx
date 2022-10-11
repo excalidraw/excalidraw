@@ -209,6 +209,49 @@ export const DuplicateIcon = createIcon(
   { width: 16, height: 16, fill: "none" },
 );
 
+export const MoonIcon = createIcon(
+  <path
+    d="M8 2h.262a5 5 0 0 0 5.28 8.297A5.999 5.999 0 1 1 8 1.995V2Z"
+    stroke="currentColor"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  { width: 16, height: 16, fill: "none" },
+);
+
+export const SunIcon = createIcon(
+  <path
+    d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM8 3.333V2M11.333 4.667l.934-.934M12.667 8H14M11.333 11.333l.934.934M8 12.667V14M4.667 11.333l-.934.934M4 8H2.667M4.667 4.667l-.934-.934"
+    stroke="currentColor"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  { width: 16, height: 16, fill: "none" },
+);
+
+export const HamburgerMenuIcon = createIcon(
+  <path
+    d="M2.667 4h10.666M2.667 8h10.666M2.667 12h10.666"
+    stroke="currentColor"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  { width: 16, height: 16, fill: "none" },
+);
+
+export const ExportIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+    <path d="M11.5 21h-4.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v5m-5 6h7m-3 -3l3 3l-3 3" />
+    ,
+  </>,
+  newIconProps,
+);
+
 export const checkIcon = createIcon(
   <polyline fill="none" stroke="currentColor" points="20 6 9 17 4 12" />,
   {
@@ -233,8 +276,13 @@ export const saveAs = createIcon(
 );
 
 export const load = createIcon(
-  "M572.694 292.093L500.27 416.248A63.997 63.997 0 0 1 444.989 448H45.025c-18.523 0-30.064-20.093-20.731-36.093l72.424-124.155A64 64 0 0 1 152 256h399.964c18.523 0 30.064 20.093 20.73 36.093zM152 224h328v-48c0-26.51-21.49-48-48-48H272l-64-64H48C21.49 64 0 85.49 0 112v278.046l69.077-118.418C86.214 242.25 117.989 224 152 224z",
-  { width: 576, height: 512, mirror: true },
+  <path
+    d="M3.333 2.667H6l2 2h4.667A1.333 1.333 0 0 1 14 6v5.333a1.334 1.334 0 0 1-1.333 1.334H3.333A1.334 1.334 0 0 1 2 11.333V4a1.333 1.333 0 0 1 1.333-1.333"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  { width: 16, height: 16, fill: "none" },
 );
 
 export const clipboard = createIcon(
@@ -599,9 +647,20 @@ export const CenterHorizontallyIcon = React.memo(
     ),
 );
 
+// export const users = createIcon(
+//   "M192 256c61.9 0 112-50.1 112-112S253.9 32 192 32 80 82.1 80 144s50.1 112 112 112zm76.8 32h-8.3c-20.8 10-43.9 16-68.5 16s-47.6-6-68.5-16h-8.3C51.6 288 0 339.6 0 403.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-28.8c0-63.6-51.6-115.2-115.2-115.2zM480 256c53 0 96-43 96-96s-43-96-96-96-96 43-96 96 43 96 96 96zm48 32h-3.8c-13.9 4.8-28.6 8-44.2 8s-30.3-3.2-44.2-8H432c-20.4 0-39.2 5.9-55.7 15.4 24.4 26.3 39.7 61.2 39.7 99.8v38.4c0 2.2-.5 4.3-.6 6.4H592c26.5 0 48-21.5 48-48 0-61.9-50.1-112-112-112z",
+//   { width: 640, height: 512, mirror: true },
+// );
+
 export const users = createIcon(
-  "M192 256c61.9 0 112-50.1 112-112S253.9 32 192 32 80 82.1 80 144s50.1 112 112 112zm76.8 32h-8.3c-20.8 10-43.9 16-68.5 16s-47.6-6-68.5-16h-8.3C51.6 288 0 339.6 0 403.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-28.8c0-63.6-51.6-115.2-115.2-115.2zM480 256c53 0 96-43 96-96s-43-96-96-96-96 43-96 96 43 96 96 96zm48 32h-3.8c-13.9 4.8-28.6 8-44.2 8s-30.3-3.2-44.2-8H432c-20.4 0-39.2 5.9-55.7 15.4 24.4 26.3 39.7 61.2 39.7 99.8v38.4c0 2.2-.5 4.3-.6 6.4H592c26.5 0 48-21.5 48-48 0-61.9-50.1-112-112-112z",
-  { width: 640, height: 512, mirror: true },
+  <path
+    d="M6 7.333A2.667 2.667 0 1 0 6 2a2.667 2.667 0 0 0 0 5.333ZM2 14v-1.333A2.667 2.667 0 0 1 4.667 10h2.666A2.667 2.667 0 0 1 10 12.667V14M10.667 2.087a2.666 2.666 0 0 1 0 5.166M14 14v-1.333a2.667 2.667 0 0 0-2-2.567"
+    stroke="currentColor"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  { width: 16, height: 16, mirror: true, fill: "none" },
 );
 
 // not mirrored because it's inspired by a playback control, which is always RTL

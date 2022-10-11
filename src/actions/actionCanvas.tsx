@@ -1,7 +1,13 @@
 import { ColorPicker } from "../components/ColorPicker";
-import { eraser, ZoomInIcon, ZoomOutIcon } from "../components/icons";
+import {
+  eraser,
+  MoonIcon,
+  SunIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { DarkModeToggle } from "../components/DarkModeToggle";
+// import { DarkModeToggle } from "../components/DarkModeToggle";
 import { THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
@@ -18,6 +24,7 @@ import { newElementWith } from "../element/mutateElement";
 import { getDefaultAppState, isEraserActive } from "../appState";
 import ClearCanvas from "../components/ClearCanvas";
 import clsx from "clsx";
+import MenuItem from "../components/MenuItem";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -287,14 +294,27 @@ export const actionToggleTheme = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <div style={{ marginInlineStart: "0.25rem" }}>
-      <DarkModeToggle
-        value={appState.theme}
-        onChange={(theme) => {
-          updateData(theme);
-        }}
-      />
-    </div>
+    <MenuItem
+      label={
+        appState.theme === "dark"
+          ? t("buttons.lightMode")
+          : t("buttons.darkMode")
+      }
+      onClick={() => {
+        updateData(appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT);
+      }}
+      icon={appState.theme === "dark" ? SunIcon : MoonIcon}
+      dataTestId="toggle-dark-mode"
+    />
+    // <div style={{ marginInlineStart: "0.25rem" }}>
+    //   sup
+    //   <DarkModeToggle
+    //     value={appState.theme}
+    //     onChange={(theme) => {
+    //       updateData(theme);
+    //     }}
+    //   />
+    // </div>
   ),
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
 });

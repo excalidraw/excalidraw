@@ -5,20 +5,19 @@ import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
-import { useDevice } from "./App";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../scene/export";
 import { AppState, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
-import { clipboard, exportImage } from "./icons";
+import { clipboard, ExportIcon } from "./icons";
 import Stack from "./Stack";
-import { ToolButton } from "./ToolButton";
 import "./ExportDialog.scss";
 import OpenColor from "open-color";
 import { CheckboxItem } from "./CheckboxItem";
 import { DEFAULT_EXPORT_PADDING } from "../constants";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { ActionManager } from "../actions/manager";
+import MenuItem from "./MenuItem";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -245,16 +244,15 @@ export const ImageExportDialog = ({
 
   return (
     <>
-      <ToolButton
+      {/* // TODO barnabasmolnar/editor-redesign  */}
+      {/* probably use a different icon here... */}
+      <MenuItem
+        label={t("buttons.exportImage")}
+        icon={ExportIcon}
+        dataTestId="image-export-button"
         onClick={() => {
           setModalIsShown(true);
         }}
-        data-testid="image-export-button"
-        icon={exportImage}
-        type="button"
-        aria-label={t("buttons.exportImage")}
-        showAriaLabel={useDevice().isMobile}
-        title={t("buttons.exportImage")}
       />
       {modalIsShown && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.exportImage")}>
