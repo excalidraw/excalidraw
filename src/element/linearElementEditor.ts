@@ -251,7 +251,7 @@ export class LinearElementEditor {
       LinearElementEditor.updateBoundTextPosition(
         element,
         "update",
-        selectedPointsIndices[0],
+        selectedPointsIndices,
       );
 
       // suggest bindings for first and last point if selected
@@ -1113,9 +1113,13 @@ export class LinearElementEditor {
       }
       return acc;
     }, []);
+    LinearElementEditor.updateBoundTextPosition(
+      element,
+      "delete",
+      pointIndices,
+    );
 
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
-    LinearElementEditor.updateBoundTextPosition(element, "delete");
   }
 
   static addPoints(
@@ -1219,30 +1223,36 @@ export class LinearElementEditor {
   static updateBoundTextPosition = (
     element: ExcalidrawLinearElement,
     type: "update" | "delete",
-    index?: number,
+    indexes?: readonly number[],
   ) => {
     const boundTextElement = getBoundTextElement(element);
     if (!boundTextElement) {
       return;
     }
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-    const boundTextCenterPoint = [
-      boundTextElement.x + boundTextElement.width / 2,
-      boundTextElement.y + boundTextElement.height / 2,
-    ];
 
     if (type === "delete") {
-      const boundTextPointIndex = points.findIndex(
-        (point) =>
-          point[0] === boundTextCenterPoint[0] &&
-          point[1] === boundTextCenterPoint[1],
+      if (!indexes) {
+        return;
+      }
+      const boundTextCenterPoint = [
+        boundTextElement.x + boundTextElement.width / 2,
+        boundTextElement.y + boundTextElement.height / 2,
+      ];
+      const boundTextPointDeleted = indexes.find((index) =>
+        LinearElementEditor.arePointsEqual(points[index], [
+          boundTextCenterPoint[0],
+          boundTextCenterPoint[1],
+        ]),
       );
-      if (boundTextPointIndex === -1) {
+      if (boundTextPointDeleted !== -1) {
         mutateElement(boundTextElement, { isDeleted: true });
       }
       return;
     }
-    if (index) {
+
+    if (indexes?.length) {
+      const index = indexes[0];
       if (isPointHittingBoundTextElement) {
         mutateElement(boundTextElement, {
           x: points[index][0] - boundTextElement.width / 2,
@@ -1279,6 +1289,15 @@ export class LinearElementEditor {
       );
       const x = midPoint[0] - boundTextElement.width / 2;
       const y = midPoint[1] - boundTextElement.height / 2;
+      mutateElement(boundTextElement, { x, y });
+    } else {
+      const index = Math.floor((element.points.length - 1) / 2);
+      const midSegmentMidpoint = editorMidPointsCache.points[index];
+      if (!midSegmentMidpoint) {
+        return;
+      }
+      const x = midSegmentMidpoint[0] - boundTextElement.width / 2;
+      const y = midSegmentMidpoint[1] - boundTextElement.height / 2;
       mutateElement(boundTextElement, { x, y });
     }
   };
