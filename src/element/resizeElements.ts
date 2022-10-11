@@ -1,5 +1,5 @@
 import { BOUND_TEXT_PADDING, SHIFT_LOCKING_ANGLE } from "../constants";
-import { getScaleFactorForResize, rescalePoints } from "../points";
+import { rescalePoints } from "../points";
 
 import {
   rotate,
@@ -664,14 +664,8 @@ export const resizeSingleElement = (
     });
 
     mutateElement(element, resizedElement);
-    if (isLinearElement(stateAtResizeStart) && boundTextElement) {
-      resizeLinearElementBoundText(
-        originalElements,
-        element as ExcalidrawLinearElement,
-        boundTextElement,
-        eleNewWidth,
-        eleNewHeight,
-      );
+    if (isLinearElement(element) && boundTextElement) {
+      LinearElementEditor.updateBoundTextPosition(element, "update");
     }
     if (boundTextElement && boundTextFont) {
       mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
@@ -821,14 +815,7 @@ const resizeMultipleElements = (
       mutateElement(boundTextElement, boundTextUpdates);
 
       if (isLinearElement(element.latest)) {
-        resizeLinearElementBoundText(
-          pointerDownState.originalElements,
-          element.latest as ExcalidrawLinearElement,
-          boundTextElement,
-          width,
-          height,
-          true,
-        );
+        LinearElementEditor.updateBoundTextPosition(element.latest, "update");
       } else {
         handleBindTextResize(element.latest, transformHandleType);
       }
@@ -913,50 +900,6 @@ const rotateLinearElementBoundText = (
   mutateElement(textElement, {
     x: newBoundTextCenterPoint[0] - textElement.width / 2,
     y: newBoundTextCenterPoint[1] - textElement.height / 2,
-  });
-};
-
-const resizeLinearElementBoundText = (
-  originalElements: PointerDownState["originalElements"],
-  container: NonDeleted<ExcalidrawLinearElement>,
-  textElement: ExcalidrawTextElementWithContainer,
-  containerNewWidth: number,
-  containerNewHeight: number,
-  multipleElementsSelected: boolean = false,
-) => {
-  const originalBoundTextElement = originalElements.get(textElement.id)!;
-  const originalContainer = originalElements.get(
-    container.id,
-  ) as ExcalidrawLinearElement;
-
-  const boundElementCenterPoint: Point =
-    LinearElementEditor.pointFromAbsoluteCoords(originalContainer, [
-      originalBoundTextElement!.x! + originalBoundTextElement!.width! / 2,
-      originalBoundTextElement!.y! + originalBoundTextElement!.height! / 2,
-    ]);
-  const rescaledElementPointsY = rescalePoints(
-    1,
-    containerNewHeight,
-    (originalContainer as ExcalidrawLinearElement).points,
-    false,
-  );
-  const scaleFactor = getScaleFactorForResize(
-    0,
-    containerNewWidth,
-    rescaledElementPointsY,
-  );
-  const scaledX = boundElementCenterPoint[0] * scaleFactor;
-  const scaledY = multipleElementsSelected
-    ? boundElementCenterPoint[1] * scaleFactor
-    : boundElementCenterPoint[1];
-  const coords = LinearElementEditor.getPointGlobalCoordinates(
-    container as ExcalidrawLinearElement,
-    [scaledX, scaledY],
-  );
-
-  mutateElement(textElement, {
-    x: coords[0] - originalBoundTextElement!.width! / 2,
-    y: coords[1] - originalBoundTextElement!.height! / 2,
   });
 };
 

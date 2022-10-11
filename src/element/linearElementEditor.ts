@@ -1300,7 +1300,12 @@ export class LinearElementEditor {
         midSegmentMidpoint = centerPoint(points[0], points[1]);
       }
       if (!midSegmentMidpoint) {
-        return;
+        midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
+          element,
+          points[index],
+          points[index + 1],
+          index + 1,
+        );
       }
       const x = midSegmentMidpoint[0] - boundTextElement.width / 2;
       const y = midSegmentMidpoint[1] - boundTextElement.height / 2;
