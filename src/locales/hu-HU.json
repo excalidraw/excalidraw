@@ -114,6 +114,10 @@
       "create": "Hivatkozás létrehozása",
       "label": "Hivatkozás"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",

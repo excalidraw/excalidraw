@@ -114,17 +114,21 @@
       "create": "Crear un ligam",
       "label": "Ligam"
     },
+    "lineEditor": {
+      "edit": "Modificar la linha",
+      "exit": "Sortir de l’editor de linha"
+    },
     "elementLock": {
       "lock": "Verrolhar",
       "unlock": "Desverrolhar",
       "lockAll": "Tot verrolhar",
       "unlockAll": "Tot desverrolhar"
     },
-    "statusPublished": "",
-    "sidebarLock": ""
+    "statusPublished": "Publicat",
+    "sidebarLock": "Gardar la barra laterala dobèrta"
   },
   "library": {
-    "noItems": "",
+    "noItems": "Cap d’element pas encara apondut...",
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },

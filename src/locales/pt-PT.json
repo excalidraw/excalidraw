@@ -114,6 +114,10 @@
       "create": "Criar ligação",
       "label": "Ligação"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Bloquear",
       "unlock": "Desbloquear",
