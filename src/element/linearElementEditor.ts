@@ -1126,7 +1126,6 @@ export class LinearElementEditor {
     );
 
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
-    LinearElementEditor.updateEditorMidPointsCache(element, appState);
     LinearElementEditor.updateBoundTextPosition(
       element,
       getBoundTextElement(element),
