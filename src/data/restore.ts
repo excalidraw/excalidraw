@@ -21,6 +21,7 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
+  PRECEDING_ELEMENT_KEY,
   FONT_FAMILY,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
@@ -73,6 +74,8 @@ const restoreElementWithProperties = <
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
+    /** metadata that may be present in elements during collaboration */
+    [PRECEDING_ELEMENT_KEY]?: string;
   },
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
@@ -85,7 +88,9 @@ const restoreElementWithProperties = <
   > &
     Partial<Pick<ExcalidrawElement, "type" | "x" | "y">>,
 ): T => {
-  const base: Pick<T, keyof ExcalidrawElement> = {
+  const base: Pick<T, keyof ExcalidrawElement> & {
+    [PRECEDING_ELEMENT_KEY]?: string;
+  } = {
     type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
@@ -123,6 +128,10 @@ const restoreElementWithProperties = <
   }
   if ("customData" in element) {
     base.customData = element.customData;
+  }
+
+  if (PRECEDING_ELEMENT_KEY in element) {
+    base[PRECEDING_ELEMENT_KEY] = element[PRECEDING_ELEMENT_KEY];
   }
 
   return {
