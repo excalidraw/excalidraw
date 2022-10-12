@@ -157,6 +157,11 @@ export interface Action {
     appState: AppState,
     elements: readonly ExcalidrawElement[],
   ) => boolean;
+  shapeConfigPredicate?: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    data?: Record<string, any>,
+  ) => boolean;
   contextItemLabel?:
     | string
     | ((

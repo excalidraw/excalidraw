@@ -582,7 +582,9 @@ class App extends React.Component<AppProps, AppState> {
               >
                 <LayerUI
                   renderShapeToggles={getSubtypeNames().map((subtype) =>
-                    this.actionManager.renderAction(subtype),
+                    this.actionManager.renderAction(subtype, {
+                      onContextMenu: this.handleShapeContextMenu,
+                    }),
                   )}
                   canvas={this.canvas}
                   appState={this.state}
@@ -5751,6 +5753,20 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private handleShapeContextMenu = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    source: string,
+  ) => {
+    event.preventDefault();
+
+    const container = this.excalidrawContainerRef.current!;
+    const { top: offsetTop, left: offsetLeft } =
+      container.getBoundingClientRect();
+    const left = event.clientX - offsetLeft;
+    const top = event.clientY - offsetTop;
+    this._openContextMenu({ left, top }, "shape", source);
+  };
+
   private handleCanvasContextMenu = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -5915,7 +5931,8 @@ class App extends React.Component<AppProps, AppState> {
       left: number;
       top: number;
     },
-    type: "canvas" | "element",
+    type: "canvas" | "element" | "shape",
+    source?: string,
   ) => {
     if (this.state.showHyperlinkPopup) {
       this.setState({ showHyperlinkPopup: false });
@@ -5971,7 +5988,7 @@ class App extends React.Component<AppProps, AppState> {
     const appState = this.actionManager.getAppState();
     let addedCustom = false;
     getCustomActions().forEach((action) => {
-      if (action.contextItemPredicate) {
+      if (action.contextItemPredicate && type !== "shape") {
         if (
           action.contextItemPredicate!(allElements, appState) &&
           this.actionManager.isActionEnabled(allElements, appState, action.name)
@@ -5979,8 +5996,27 @@ class App extends React.Component<AppProps, AppState> {
           addedCustom = true;
           options.push(action);
         }
+      } else if (action.shapeConfigPredicate && type === "shape") {
+        if (
+          action.shapeConfigPredicate!(allElements, appState, { source }) &&
+          this.actionManager.isActionEnabled(allElements, appState, action.name)
+        ) {
+          options.push(action);
+        }
       }
     });
+    if (type === "shape") {
+      ContextMenu.push({
+        options,
+        top,
+        left,
+        actionManager: this.actionManager,
+        appState: this.state,
+        container: this.excalidrawContainerRef.current!,
+        elements,
+      });
+      return;
+    }
     if (addedCustom) {
       options.push(separator);
     }

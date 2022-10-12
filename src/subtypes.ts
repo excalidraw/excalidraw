@@ -32,6 +32,10 @@ let disabledActionMap: readonly {
   subtype: Subtype;
   actions: readonly DisabledActionName[];
 }[] = [];
+let alwaysEnabledMap: readonly {
+  subtype: Subtype;
+  actions: readonly SubtypeActionName[];
+}[] = [];
 
 export type SubtypeRecord = Readonly<{
   subtype: Subtype;
@@ -39,6 +43,7 @@ export type SubtypeRecord = Readonly<{
   actionNames: readonly SubtypeActionName[];
   disabledNames: readonly DisabledActionName[];
   shortcutMap: Record<CustomShortcutName, string[]>;
+  alwaysEnabledNames?: readonly SubtypeActionName[];
 }>;
 
 // Subtype Names
@@ -122,7 +127,10 @@ const isActionEnabled: EnableFn = function (elements, appState, actionName) {
             return false;
           }
           return isForSubtype(subtype, actionName, true);
-        }))
+        })) ||
+      alwaysEnabledMap.some((value) => {
+        return value.actions.includes(actionName);
+      })
     );
   }
   // Now handle standard actions disabled by subtypes
@@ -325,6 +333,12 @@ export const prepareSubtype = (
     ...disabledActionMap,
     { subtype, actions: record.disabledNames },
   ];
+  if (record.alwaysEnabledNames) {
+    alwaysEnabledMap = [
+      ...alwaysEnabledMap,
+      { subtype, actions: record.alwaysEnabledNames },
+    ];
+  }
   registerCustomShortcuts(record.shortcutMap);
 
   // Prepare the subtype
