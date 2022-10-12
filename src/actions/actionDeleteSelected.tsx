@@ -78,11 +78,11 @@ export const actionDeleteSelected = register({
         // case: deleting last remaining point
         element.points.length < 2
       ) {
-        const nextElements = elements.filter((el) => el.id !== element.id);
-        const nextAppState = handleGroupEditingState(appState, nextElements);
+        const result = deleteSelectedElements(elements, appState);
+        const nextAppState = handleGroupEditingState(appState, elements);
 
         return {
-          elements: nextElements,
+          elements: result.elements,
           appState: {
             ...nextAppState,
             editingLinearElement: null,

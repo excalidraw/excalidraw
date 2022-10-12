@@ -33,11 +33,13 @@ export const actionFinalize = register({
             endBindingElement,
           );
         }
+        if (isInvisiblySmallElement(element)) {
+          mutateElement(element, {
+            isDeleted: true,
+          });
+        }
         return {
-          elements:
-            element.points.length < 2 || isInvisiblySmallElement(element)
-              ? elements.filter((el) => el.id !== element.id)
-              : undefined,
+          elements,
           appState: {
             ...appState,
             cursorButton: "up",
