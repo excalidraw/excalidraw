@@ -1,6 +1,11 @@
 @import "../css/variables.module";
 
 .excalidraw {
+  .menu-container {
+    width: 240px;
+    background-color: #fff !important;
+  }
+
   .menu-button {
     @include outlineButtonStyles;
   }
@@ -41,6 +46,10 @@
   &.theme--dark {
     .menu-item {
       color: var(--color-gray-40);
+    }
+
+    .menu-container {
+      background-color: var(--color-gray-90) !important;
     }
   }
 }

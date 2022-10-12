@@ -170,7 +170,7 @@ const LayerUI = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const renderCanvasActions = () => (
-    <>
+    <div style={{ position: "relative" }}>
       <button
         className={clsx("menu-button", "zen-mode-transition", {
           "transition-left": appState.zenModeEnabled,
@@ -182,41 +182,47 @@ const LayerUI = ({
       </button>
 
       {isMenuOpen && (
-        <Section heading="canvasActions">
-          {/* the zIndex ensures this menu has higher stacking order,
+        <div style={{ position: "absolute", top: "100%", marginTop: ".25rem" }}>
+          <Section heading="canvasActions">
+            {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}
-          <Island padding={2} style={{ zIndex: 1, maxWidth: "192px" }}>
-            {actionManager.renderAction("loadScene")}
-            {/* // TODO barnabasmolnar/editor-redesign  */}
-            {/* {appState.fileHandle && (
+            <Island
+              className="menu-container"
+              padding={2}
+              style={{ zIndex: 1 }}
+            >
+              {actionManager.renderAction("loadScene")}
+              {/* // TODO barnabasmolnar/editor-redesign  */}
+              {/* {appState.fileHandle && (
                 <>{actionManager.renderAction("saveToActiveFile")}</>
               )} */}
-            {renderJSONExportDialog()}
-            {renderImageExportDialog()}
-            {onCollabButtonClick && (
-              <CollabButton
-                isCollaborating={isCollaborating}
-                collaboratorCount={appState.collaborators.size}
-                onClick={onCollabButtonClick}
-              />
-            )}
-            {actionManager.renderAction("clearCanvas")}
+              {renderJSONExportDialog()}
+              {renderImageExportDialog()}
+              {onCollabButtonClick && (
+                <CollabButton
+                  isCollaborating={isCollaborating}
+                  collaboratorCount={appState.collaborators.size}
+                  onClick={onCollabButtonClick}
+                />
+              )}
+              {actionManager.renderAction("clearCanvas")}
 
-            <Separator />
+              <Separator />
 
-            <div style={{ marginBottom: ".5rem" }}>
-              <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
-                {t("labels.canvasBackground")}
+              <div style={{ marginBottom: ".5rem" }}>
+                <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
+                  {t("labels.canvasBackground")}
+                </div>
+                {actionManager.renderAction("changeViewBackgroundColor")}
               </div>
-              {actionManager.renderAction("changeViewBackgroundColor")}
-            </div>
 
-            {actionManager.renderAction("toggleTheme")}
-            {/* <BackgroundPickerAndDarkModeToggle actionManager={actionManager} /> */}
-          </Island>
-        </Section>
+              {actionManager.renderAction("toggleTheme")}
+              {/* <BackgroundPickerAndDarkModeToggle actionManager={actionManager} /> */}
+            </Island>
+          </Section>
+        </div>
       )}
-    </>
+    </div>
   );
 
   // const renderCanvasActions = () => (
@@ -257,7 +263,7 @@ const LayerUI = ({
   const renderSelectedShapeActions = () => (
     <Section
       heading="selectedShapeActions"
-      className={clsx("zen-mode-transition", {
+      className={clsx("selected-shape-actions zen-mode-transition", {
         "transition-left": appState.zenModeEnabled,
       })}
     >

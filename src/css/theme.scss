@@ -53,6 +53,7 @@
   --color-gray-40: #b8b8b8;
   --color-gray-60: #7a7a7a;
   --color-gray-80: #3d3d3d;
+  --color-gray-90: #1e1e1e;
   --color-gray-100: #121212;
 
   --border-radius-md: 0.375rem;
@@ -96,6 +97,10 @@
     --text-primary-color: var(--color-gray-40);
     --button-hover: var(--color-gray-80);
     --default-border-color: var(--color-gray-80);
+    --shadow-island: 0px 13px 33px rgba(0, 0, 0, 0.07),
+      0px 4.13px 9.94853px rgba(0, 0, 0, 0.0456112),
+      0px 1.13px 4.13211px rgba(0, 0, 0, 0.035),
+      0px 0.769896px 1.4945px rgba(0, 0, 0, 0.0243888);
 
     --color-primary: #5650f0;
     --color-primary-darker: #b2aeff;
