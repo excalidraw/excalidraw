@@ -60,6 +60,7 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
+import { getBoundTextElement } from "../element/textElement";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 4;
@@ -432,7 +433,19 @@ export const _renderScene = ({
         });
     }
     const locallySelectedElements = getSelectedElements(elements, appState);
-
+    locallySelectedElements.forEach((element) => {
+      if (isLinearElement(element)) {
+        const boundText = getBoundTextElement(element);
+        LinearElementEditor.getEditorMidPoints(element, appState);
+        if (boundText) {
+          LinearElementEditor.updateBoundTextPosition(
+            element,
+            boundText,
+            "update",
+          );
+        }
+      }
+    });
     // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
     // ShapeCache returns empty hence making sure that we get the
     // correct element from visible elements

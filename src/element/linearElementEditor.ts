@@ -249,13 +249,6 @@ export class LinearElementEditor {
         );
       }
 
-      LinearElementEditor.updateBoundTextPosition(
-        element,
-        getBoundTextElement(element),
-        "update",
-        selectedPointsIndices,
-      );
-
       // suggest bindings for first and last point if selected
       if (isBindingElement(element, false)) {
         const coords: { x: number; y: number }[] = [];
@@ -388,8 +381,14 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     appState: AppState,
   ): typeof editorMidPointsCache["points"] => {
-    // Since its not needed outside editor unless 2 pointer lines
-    if (!appState.editingLinearElement && element.points.length > 2) {
+    const boundText = getBoundTextElement(element);
+
+    // Since its not needed outside editor unless 2 pointer lines or bound text
+    if (
+      !appState.editingLinearElement &&
+      element.points.length > 2 &&
+      !boundText
+    ) {
       return [];
     }
     if (
@@ -1126,11 +1125,6 @@ export class LinearElementEditor {
     );
 
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
-    LinearElementEditor.updateBoundTextPosition(
-      element,
-      getBoundTextElement(element),
-      "update",
-    );
   }
 
   static addPoints(
@@ -1143,11 +1137,6 @@ export class LinearElementEditor {
 
     const nextPoints = [...element.points, ...targetPoints.map((x) => x.point)];
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
-    LinearElementEditor.updateBoundTextPosition(
-      element,
-      getBoundTextElement(element),
-      "update",
-    );
   }
 
   static movePoints(
@@ -1199,11 +1188,6 @@ export class LinearElementEditor {
       offsetX,
       offsetY,
       otherUpdates,
-    );
-    LinearElementEditor.updateBoundTextPosition(
-      element,
-      getBoundTextElement(element),
-      "update",
     );
   }
 
