@@ -1,13 +1,13 @@
 {
   "labels": {
     "changeMathOnly": "Math display",
-    "toggleMathOnly": "Toggle math-only mode",
     "mathOnlyTrue": "Math only",
     "mathOnlyFalse": "Mixed text",
-    "changeUseTex": "Math input",
-    "toggleUseTex": "Toggle simplified input",
-    "useTexTrue": "Standard",
-    "useTexFalse": "Simplified"
+    "resetUseTex": "Reset math input type",
+    "useTexTrueActive": "✔ Standard input",
+    "useTexTrueInactive": "Standard input",
+    "useTexFalseActive": "✔ Simplified input",
+    "useTexFalseInactive": "Simplified input"
   },
   "toolBar": {
     "math": "Math"

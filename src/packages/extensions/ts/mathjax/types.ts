@@ -8,10 +8,10 @@ export const getMathSubtypeRecord = () => mathSubtype;
 const mathSubtype: SubtypeRecord = {
   subtype: "math",
   parents: ["text"],
-  actionNames: ["changeUseTex", "changeMathOnly"],
+  actionNames: ["useTexTrue", "useTexFalse", "resetUseTex", "changeMathOnly"],
   disabledNames: ["changeFontFamily"],
   shortcutMap: {
-    changeUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
-    changeMathOnly: [getShortcutKey("CtrlOrCmd+Shift+O")],
+    resetUseTex: [getShortcutKey("Shift+R")],
   },
+  alwaysEnabledNames: ["useTexTrue", "useTexFalse"],
 };

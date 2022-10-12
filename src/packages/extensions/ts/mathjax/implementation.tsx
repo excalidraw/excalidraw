@@ -1244,25 +1244,59 @@ const enableActionChangeMathProps = (
 
 const createMathActions = () => {
   const mathActions: Action[] = [];
-  const actionChangeUseTex: Action = {
-    name: "changeUseTex",
+  const actionUseTexTrue: Action = {
+    name: "useTexTrue",
     perform: (elements, appState, useTex: boolean | null) => {
-      if (useTex === null) {
-        useTex = getFormValue(elements, appState, (element) => {
-          const el = hasBoundTextElement(element)
-            ? getBoundTextElement(element)
-            : element;
-          return isMathElement(el) && el.customData?.useTex;
-        });
-        if (useTex === null) {
-          useTex = getMathProps.getUseTex(appState);
-        }
-      }
+      const mathOnly = getMathProps.getMathOnly(appState);
+      const customData = appState.customData ?? {};
+      customData[`${mathSubtype}`] = { useTex: true, mathOnly };
+      return {
+        elements,
+        appState: { ...appState, customData },
+        commitToHistory: true,
+      };
+    },
+    contextItemLabel: (elements, appState) =>
+      getMathProps.getUseTex(appState)
+        ? "labels.useTexTrueActive"
+        : "labels.useTexTrueInactive",
+    shapeConfigPredicate: (elements, appState, data) =>
+      data?.source === mathSubtype,
+    trackEvent: false,
+  };
+  const actionUseTexFalse: Action = {
+    name: "useTexTrue",
+    perform: (elements, appState, useTex: boolean | null) => {
+      const mathOnly = getMathProps.getMathOnly(appState);
+      const customData = appState.customData ?? {};
+      customData[`${mathSubtype}`] = { useTex: false, mathOnly };
+      return {
+        elements,
+        appState: { ...appState, customData },
+        commitToHistory: true,
+      };
+    },
+    contextItemLabel: (elements, appState) =>
+      !getMathProps.getUseTex(appState)
+        ? "labels.useTexFalseActive"
+        : "labels.useTexFalseInactive",
+    shapeConfigPredicate: (elements, appState, data) =>
+      data?.source === mathSubtype,
+    trackEvent: false,
+  };
+  const actionResetUseTex: Action = {
+    name: "resetUseTex",
+    perform: (elements, appState) => {
+      const useTex = getMathProps.getUseTex(appState);
       const modElements = changeProperty(
         elements,
         appState,
         (oldElement) => {
-          if (isMathElement(oldElement)) {
+          if (
+            isMathElement(oldElement) &&
+            (oldElement.customData === undefined ||
+              oldElement.customData.useTex !== useTex)
+          ) {
             const newElement: ExcalidrawTextElement = newElementWith(
               oldElement,
               {
@@ -1281,54 +1315,21 @@ const createMathActions = () => {
         true,
       );
 
-      const mathOnly = getMathProps.getMathOnly(appState);
-      const customData = appState.customData ?? {};
-      customData[`${mathSubtype}`] = { useTex, mathOnly };
       return {
         elements: modElements,
-        appState: { ...appState, customData },
         commitToHistory: true,
       };
     },
-    keyTest: (event) =>
-      event.ctrlKey && event.shiftKey && event.code === "KeyM",
-    contextItemLabel: "labels.toggleUseTex",
-    contextItemPredicate: (elements, appState) =>
-      enableActionChangeMathProps(elements, appState),
-    PanelComponent: ({ elements, appState, updateData }) => (
-      <fieldset>
-        <legend>{t("labels.changeUseTex")}</legend>
-        <ButtonSelect
-          group="useTex"
-          options={[
-            {
-              value: true,
-              text: t("labels.useTexTrue"),
-            },
-            {
-              value: false,
-              text: t("labels.useTexFalse"),
-            },
-          ]}
-          value={getFormValue(
-            elements,
-            appState,
-            (element) => {
-              const el = hasBoundTextElement(element)
-                ? getBoundTextElement(element)
-                : element;
-              return isMathElement(el)
-                ? getMathProps.ensureMathProps(el.customData).useTex
-                : null;
-            },
-            getMathProps.getUseTex(appState),
-          )}
-          onChange={(value) => updateData(value)}
-        />
-      </fieldset>
-    ),
-    panelComponentPredicate: (elements, appState) =>
-      enableActionChangeMathProps(elements, appState),
+    keyTest: (event) => event.shiftKey && event.code === "KeyR",
+    contextItemLabel: "labels.resetUseTex",
+    contextItemPredicate: (elements, appState) => {
+      const useTex = getMathProps.getUseTex(appState);
+      const mathElements = getSelectedMathElements(elements, appState);
+      return mathElements.some((el) => {
+        const e = isMathElement(el) ? el : getBoundTextElement(el)!;
+        return e.customData === undefined || e.customData.useTex !== useTex;
+      });
+    },
     trackEvent: false,
   };
   const actionChangeMathOnly: Action = {
@@ -1376,11 +1377,6 @@ const createMathActions = () => {
         commitToHistory: true,
       };
     },
-    keyTest: (event) =>
-      event.ctrlKey && event.shiftKey && event.code === "KeyO",
-    contextItemLabel: "labels.toggleMathOnly",
-    contextItemPredicate: (elements, appState) =>
-      enableActionChangeMathProps(elements, appState),
     PanelComponent: ({ elements, appState, updateData }) => (
       <fieldset>
         <legend>{t("labels.changeMathOnly")}</legend>
@@ -1418,7 +1414,9 @@ const createMathActions = () => {
     trackEvent: false,
   };
   const actionMath = SubtypeButton(mathSubtype, "text", mathSubtypeIcon, "M");
-  mathActions.push(actionChangeUseTex);
+  mathActions.push(actionUseTexTrue);
+  mathActions.push(actionUseTexFalse);
+  mathActions.push(actionResetUseTex);
   mathActions.push(actionChangeMathOnly);
   mathActions.push(actionMath);
   return mathActions;
