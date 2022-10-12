@@ -252,6 +252,37 @@ export const ExportIcon = createIcon(
   newIconProps,
 );
 
+export const HelpIcon = createIcon(
+  <>
+    <path
+      d="M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12ZM8 11.333v.009"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 9a1 1 0 0 1 .667-1 1.733 1.733 0 1 0-2-2.667"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </>,
+  { width: 16, height: 16, fill: "none" },
+);
+
+export const LinkIcon = createIcon(
+  <path
+    d="M7.334 4.667H4A1.333 1.333 0 0 0 2.667 6v6A1.333 1.333 0 0 0 4 13.333h6A1.333 1.333 0 0 0 11.334 12V8.667M6.667 9.333l6.667-6.666M10 2.667h3.333V6"
+    stroke="currentColor"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  { width: 16, height: 16, fill: "none" },
+);
+
 export const checkIcon = createIcon(
   <polyline fill="none" stroke="currentColor" points="20 6 9 17 4 12" />,
   {

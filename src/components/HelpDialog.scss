@@ -50,8 +50,11 @@
     }
 
     &__link-icon {
-      width: 1rem;
-      height: 1rem;
+      line-height: 0;
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
     }
 
     &__islands-container {

@@ -39,7 +39,7 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
-import { HamburgerMenuIcon } from "./icons";
+import { HamburgerMenuIcon, LinkIcon } from "./icons";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -193,6 +193,7 @@ const LayerUI = ({
             >
               {actionManager.renderAction("loadScene")}
               {/* // TODO barnabasmolnar/editor-redesign  */}
+              {/* where should this go? */}
               {/* {appState.fileHandle && (
                 <>{actionManager.renderAction("saveToActiveFile")}</>
               )} */}
@@ -205,17 +206,45 @@ const LayerUI = ({
                   onClick={onCollabButtonClick}
                 />
               )}
+              {actionManager.renderAction("toggleShortcuts", undefined, true)}
               {actionManager.renderAction("clearCanvas")}
-
               <Separator />
-
+              <a
+                href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=banner&utm_campaign=launch"
+                target="_blank"
+                rel="noreferrer"
+                className="menu-item"
+              >
+                {/* // TODO barnabasmolnar/editor-redesign  */}
+                {/* will the LinkIcon do or should it only be a placeholder? */}
+                <div className="menu-item__icon">{LinkIcon}</div>
+                <div className="menu-item__text">Excalidraw+</div>
+              </a>
+              <a
+                className="menu-item"
+                href="https://github.com/excalidraw/excalidraw"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="menu-item__icon">{LinkIcon}</div>
+                <div className="menu-item__text">GitHub</div>
+              </a>
+              <a
+                className="menu-item"
+                target="_blank"
+                href="https://discord.gg/UexuTaE"
+                rel="noopener noreferrer"
+              >
+                <div className="menu-item__icon">{LinkIcon}</div>
+                <div className="menu-item__text">Discord</div>
+              </a>
+              <Separator />
               <div style={{ marginBottom: ".5rem" }}>
                 <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
                   {t("labels.canvasBackground")}
                 </div>
                 {actionManager.renderAction("changeViewBackgroundColor")}
               </div>
-
               {actionManager.renderAction("toggleTheme")}
               {/* <BackgroundPickerAndDarkModeToggle actionManager={actionManager} /> */}
             </Island>
@@ -224,41 +253,6 @@ const LayerUI = ({
       )}
     </div>
   );
-
-  // const renderCanvasActions = () => (
-  //   <Section
-  //     heading="canvasActions"
-  //     className={clsx("zen-mode-transition", {
-  //       "transition-left": appState.zenModeEnabled,
-  //     })}
-  //   >
-  //     {/* the zIndex ensures this menu has higher stacking order,
-  //        see https://github.com/excalidraw/excalidraw/pull/1445 */}
-  //     <Island padding={2} style={{ zIndex: 1 }}>
-  //       <Stack.Col gap={4}>
-  //         <Stack.Row gap={1} justifyContent="space-between">
-  //           {actionManager.renderAction("clearCanvas")}
-  //           <Separator />
-  //           {actionManager.renderAction("loadScene")}
-  //           {renderJSONExportDialog()}
-  //           {renderImageExportDialog()}
-  //           <Separator />
-  //           {onCollabButtonClick && (
-  //             <CollabButton
-  //               isCollaborating={isCollaborating}
-  //               collaboratorCount={appState.collaborators.size}
-  //               onClick={onCollabButtonClick}
-  //             />
-  //           )}
-  //         </Stack.Row>
-  //         <BackgroundPickerAndDarkModeToggle actionManager={actionManager} />
-  //         {appState.fileHandle && (
-  //           <>{actionManager.renderAction("saveToActiveFile")}</>
-  //         )}
-  //       </Stack.Col>
-  //     </Island>
-  //   </Section>
-  // );
 
   const renderSelectedShapeActions = () => (
     <Section

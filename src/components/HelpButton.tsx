@@ -1,11 +1,11 @@
-type HelpIconProps = {
+type HelpButtonProps = {
   title?: string;
   name?: string;
   id?: string;
   onClick?(): void;
 };
 
-export const HelpIcon = (props: HelpIconProps) => (
+export const HelpButton = (props: HelpButtonProps) => (
   <button
     className="help-icon"
     onClick={props.onClick}

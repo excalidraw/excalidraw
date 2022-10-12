@@ -22,6 +22,8 @@
     cursor: pointer;
     border-radius: var(--border-radius-md);
     width: 100%;
+    box-sizing: border-box;
+    font-weight: normal;
 
     &__icon {
       line-height: 0;
@@ -35,6 +37,7 @@
 
     &:hover {
       background-color: var(--button-hover);
+      text-decoration: none;
     }
 
     svg {
