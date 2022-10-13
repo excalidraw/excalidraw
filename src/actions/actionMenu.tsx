@@ -1,4 +1,4 @@
-import { HelpIcon, menu, palette } from "../components/icons";
+import { HamburgerMenuIcon, HelpIcon, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
@@ -21,7 +21,7 @@ export const actionToggleCanvasMenu = register({
   PanelComponent: ({ appState, updateData }) => (
     <ToolButton
       type="button"
-      icon={menu}
+      icon={HamburgerMenuIcon}
       aria-label={t("buttons.menu")}
       onClick={updateData}
       selected={appState.openMenu === "canvas"}
