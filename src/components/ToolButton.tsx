@@ -6,6 +6,7 @@ import { useExcalidrawContainer } from "./App";
 import { AbortError } from "../errors";
 import Spinner from "./Spinner";
 import { PointerType } from "../element/types";
+import { Tooltip } from "./Tooltip";
 
 export type ToolButtonSize = "small" | "medium";
 
@@ -100,85 +101,99 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
       | "button"
       | "submit";
     return (
-      <button
-        className={clsx(
-          "ToolIcon_type_button",
-          sizeCn,
-          props.className,
-          props.visible && !props.hidden
-            ? "ToolIcon_type_button--show"
-            : "ToolIcon_type_button--hide",
-          {
-            ToolIcon: !props.hidden,
-            "ToolIcon--selected": props.selected,
-            "ToolIcon--plain": props.type === "icon",
-          },
-        )}
-        data-testid={props["data-testid"]}
-        hidden={props.hidden}
-        title={props.title}
-        aria-label={props["aria-label"]}
-        type={type}
-        onClick={onClick}
-        ref={innerRef}
-        disabled={isLoading || props.isLoading}
+      <Tooltip
+        label={props["aria-label"]}
+        keyshortcuts={props["aria-keyshortcuts"]}
+        long={false}
       >
-        {(props.icon || props.label) && (
-          <div className="ToolIcon__icon" aria-hidden="true">
-            {props.icon || props.label}
-            {props.keyBindingLabel && (
-              <span className="ToolIcon__keybinding">
-                {props.keyBindingLabel}
-              </span>
-            )}
-            {props.isLoading && <Spinner />}
-          </div>
-        )}
-        {props.showAriaLabel && (
-          <div className="ToolIcon__label">
-            {props["aria-label"]} {isLoading && <Spinner />}
-          </div>
-        )}
-        {props.children}
-      </button>
+        <button
+          className={clsx(
+            "ToolIcon_type_button",
+            sizeCn,
+            props.className,
+            props.visible && !props.hidden
+              ? "ToolIcon_type_button--show"
+              : "ToolIcon_type_button--hide",
+            {
+              ToolIcon: !props.hidden,
+              "ToolIcon--selected": props.selected,
+              "ToolIcon--plain": props.type === "icon",
+            },
+          )}
+          data-testid={props["data-testid"]}
+          hidden={props.hidden}
+          title={props.title}
+          aria-label={props["aria-label"]}
+          type={type}
+          onClick={onClick}
+          ref={innerRef}
+          disabled={isLoading || props.isLoading}
+        >
+          {(props.icon || props.label) && (
+            <div className="ToolIcon__icon" aria-hidden="true">
+              {props.icon || props.label}
+              {props.keyBindingLabel && (
+                <span className="ToolIcon__keybinding">
+                  {props.keyBindingLabel}
+                </span>
+              )}
+              {props.isLoading && <Spinner />}
+            </div>
+          )}
+          {props.showAriaLabel && (
+            <div className="ToolIcon__label">
+              {props["aria-label"]} {isLoading && <Spinner />}
+            </div>
+          )}
+          {props.children}
+        </button>
+      </Tooltip>
     );
   }
 
   return (
-    <label
-      className={clsx("ToolIcon", props.className)}
-      title={props.title}
-      onPointerDown={(event) => {
-        lastPointerTypeRef.current = event.pointerType || null;
-        props.onPointerDown?.({ pointerType: event.pointerType || null });
-      }}
-      onPointerUp={() => {
-        requestAnimationFrame(() => {
-          lastPointerTypeRef.current = null;
-        });
-      }}
+    <Tooltip
+      label={props["aria-label"]}
+      keyshortcuts={props["aria-keyshortcuts"]}
+      long={false}
     >
-      <input
-        className={`ToolIcon_type_radio ${sizeCn}`}
-        type="radio"
-        name={props.name}
-        aria-label={props["aria-label"]}
-        aria-keyshortcuts={props["aria-keyshortcuts"]}
-        data-testid={props["data-testid"]}
-        id={`${excalId}-${props.id}`}
-        onChange={() => {
-          props.onChange?.({ pointerType: lastPointerTypeRef.current });
+      <label
+        className={clsx("ToolIcon", props.className)}
+        title={props.title}
+        onPointerDown={(event) => {
+          lastPointerTypeRef.current = event.pointerType || null;
+          props.onPointerDown?.({ pointerType: event.pointerType || null });
         }}
-        checked={props.checked}
-        ref={innerRef}
-      />
-      <div className="ToolIcon__icon">
-        {props.icon}
-        {props.keyBindingLabel && (
-          <span className="ToolIcon__keybinding">{props.keyBindingLabel}</span>
-        )}
-      </div>
-    </label>
+        onPointerUp={() => {
+          requestAnimationFrame(() => {
+            lastPointerTypeRef.current = null;
+          });
+        }}
+      >
+        <input
+          className={`ToolIcon_type_radio ${sizeCn}`}
+          type="radio"
+          name={props.name}
+          aria-label={props["aria-label"]}
+          aria-keyshortcuts={props["aria-keyshortcuts"]}
+          data-testid={props["data-testid"]}
+          id={`${excalId}-${props.id}`}
+          onChange={() => {
+            props.onChange?.({ pointerType: lastPointerTypeRef.current });
+          }}
+          checked={props.checked}
+          ref={innerRef}
+        />
+        <div className="ToolIcon__icon">
+          {props.icon}
+          {props.keyBindingLabel && (
+            <span className="ToolIcon__keybinding">
+              {props.keyBindingLabel}
+            </span>
+          )}
+        </div>
+      </label>
+    </Tooltip>
   );
 });
 
