@@ -16,6 +16,7 @@ import Stack from "../../components/Stack";
 import { AppState } from "../../types";
 import { trackEvent } from "../../analytics";
 import { getFrame } from "../../utils";
+import DialogActionButton from "../../components/DialogActionButton";
 
 const getShareIcon = () => {
   const navigator = window.navigator as any;
@@ -90,18 +91,15 @@ const RoomDialog = ({
             <p>{t("roomDialog.desc_intro")}</p>
             <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
             <div className="RoomDialog-sessionStartButtonContainer">
-              <button
-                className="RoomDialog__action-button"
-                type="button"
-                aria-label={t("roomDialog.button_startSession")}
+              <DialogActionButton
+                label={t("roomDialog.button_startSession")}
                 onClick={() => {
                   trackEvent("share", "room creation", `ui (${getFrame()})`);
                   onRoomCreate();
                 }}
               >
                 {start}
-                {t("roomDialog.button_startSession")}
-              </button>
+              </DialogActionButton>
             </div>
           </>
         )}
@@ -160,18 +158,16 @@ const RoomDialog = ({
             </p>
             <p>{t("roomDialog.desc_exitSession")}</p>
             <div className="RoomDialog-sessionStartButtonContainer">
-              <button
-                className="RoomDialog__action-button RoomDialog__action-button--danger"
-                type="button"
-                aria-label={t("roomDialog.button_stopSession")}
+              <DialogActionButton
+                isDangerous
+                label={t("roomDialog.button_stopSession")}
                 onClick={() => {
                   trackEvent("share", "room closed");
                   onRoomDestroy();
                 }}
               >
                 {stop}
-                {t("roomDialog.button_stopSession")}
-              </button>
+              </DialogActionButton>
             </div>
           </>
         )}

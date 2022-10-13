@@ -5,37 +5,6 @@
     border: 1px solid var(--default-border-color) !important;
   }
 
-  .RoomDialog__action-button {
-    display: flex;
-    column-gap: 0.5rem;
-    align-items: center;
-    padding: 0.5rem 1.5rem;
-    border: 1px solid var(--default-border-color);
-    background-color: transparent;
-    height: 3rem;
-    border-radius: var(--border-radius-lg);
-    letter-spacing: 0.4px;
-    color: inherit;
-
-    svg {
-      display: block;
-      width: 1rem;
-      height: 1rem;
-    }
-
-    &--danger {
-      background-color: var(--color-danger);
-      border-color: var(--color-danger);
-      color: #fff;
-    }
-  }
-
-  &.theme--dark {
-    .RoomDialog__action-button--danger {
-      color: var(--color-gray-100);
-    }
-  }
-
   .RoomDialog-linkContainer {
     display: flex;
     margin: 1.5em 0;

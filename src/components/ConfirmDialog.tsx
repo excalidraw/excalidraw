@@ -1,8 +1,8 @@
 import { t } from "../i18n";
 import { Dialog, DialogProps } from "./Dialog";
-import { ToolButton } from "./ToolButton";
 
 import "./ConfirmDialog.scss";
+import DialogActionButton from "./DialogActionButton";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;
@@ -29,21 +29,11 @@ const ConfirmDialog = (props: Props) => {
     >
       {children}
       <div className="confirm-dialog-buttons">
-        <ToolButton
-          type="button"
-          title={cancelText}
-          aria-label={cancelText}
-          label={cancelText}
-          onClick={onCancel}
-          className="confirm-dialog--cancel"
-        />
-        <ToolButton
-          type="button"
-          title={confirmText}
-          aria-label={confirmText}
+        <DialogActionButton label={cancelText} onClick={onCancel} />
+        <DialogActionButton
           label={confirmText}
           onClick={onConfirm}
-          className="confirm-dialog--confirm"
+          isDangerous
         />
       </div>
     </Dialog>
