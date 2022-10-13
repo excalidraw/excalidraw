@@ -13,7 +13,7 @@ import {
 import { arrayToMap, chunk, muteFSAbortError } from "../utils";
 import { useDevice } from "./App";
 import ConfirmDialog from "./ConfirmDialog";
-import { close, exportToFileIcon, load, publishIcon, trash } from "./icons";
+import { CloseIcon, exportToFileIcon, load, publishIcon, trash } from "./icons";
 import { LibraryUnit } from "./LibraryUnit";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
@@ -411,7 +411,7 @@ const LibraryMenuItems = ({
                 }
                 aria-label={t("buttons.close")}
               >
-                {close}
+                {CloseIcon}
               </button>
             </div>
           )}

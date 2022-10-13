@@ -83,6 +83,7 @@
     border: none;
     margin: 0;
     font-size: inherit;
+    background-color: initial;
 
     &:focus-visible {
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
@@ -96,9 +97,9 @@
       }
     }
 
-    &:hover {
-      background-color: var(--button-gray-2);
-    }
+    // &:hover {
+    //   background-color: var(--button-gray-2);
+    // }
 
     &:active {
       background-color: var(--button-gray-3);

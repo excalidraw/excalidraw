@@ -19,6 +19,10 @@
   height: 100%;
   width: 100%;
 
+  button {
+    cursor: pointer;
+  }
+
   &:focus {
     outline: none;
   }

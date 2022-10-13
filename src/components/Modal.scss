@@ -30,7 +30,7 @@
     right: 0;
     bottom: 0;
     z-index: 1;
-    background-color: transparentize($oc-black, 0.3);
+    background-color: rgba(#121212, 0.2);
   }
 
   .Modal__content {
@@ -50,7 +50,7 @@
     background: var(--island-bg-color);
 
     border: 1px solid var(--dialog-border-color);
-    box-shadow: 0 2px 10px transparentize($oc-black, 0.75);
+    box-shadow: var(--modal-shadow);
     border-radius: 6px;
     box-sizing: border-box;
 
@@ -89,8 +89,8 @@
     cursor: pointer;
 
     svg {
-      width: 1.125rem;
-      height: 1.125rem;
+      width: 1.5rem;
+      height: 1.5rem;
     }
   }
 

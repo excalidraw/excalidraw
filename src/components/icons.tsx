@@ -348,6 +348,17 @@ export const LinkIcon = createIcon(
   newIconProps,
 );
 
+export const CloseIcon222 = createIcon(
+  <path
+    d="m12 4-8 8M4 4l8 8"
+    stroke="#3D3D3D"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  newIconProps,
+);
+
 export const checkIcon = createIcon(
   <polyline fill="none" stroke="currentColor" points="20 6 9 17 4 12" />,
   {
@@ -768,9 +779,15 @@ export const stop = createIcon(
   "M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm96 328c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V176c0-8.8 7.2-16 16-16h160c8.8 0 16 7.2 16 16v160z",
 );
 
-export const close = createIcon(
-  "M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z",
-  { width: 352, height: 512 },
+export const CloseIcon = createIcon(
+  <path
+    d="m12 4-8 8M4 4l8 8"
+    stroke="currentColor"
+    strokeWidth="1.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  newIconProps,
 );
 
 export const back = createIcon(

@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { t } from "../i18n";
 import { exportToSvg } from "../packages/utils";
 import { AppState, LibraryItem } from "../types";
-import { close } from "./icons";
+import { CloseIcon } from "./icons";
 
 import "./SingleLibraryItem.scss";
 import { ToolButton } from "./ToolButton";
@@ -54,7 +54,7 @@ const SingleLibraryItem = ({
       <ToolButton
         aria-label={t("buttons.remove")}
         type="button"
-        icon={close}
+        icon={CloseIcon}
         className="single-library-item--remove"
         onClick={onRemove.bind(null, libItem.id)}
         title={t("buttons.remove")}

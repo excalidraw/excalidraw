@@ -7,22 +7,11 @@
   }
 
   .Dialog__title {
-    display: grid;
-    align-items: center;
-    margin-top: 0;
-    grid-template-columns: 1fr calc(var(--space-factor) * 7);
-    grid-gap: var(--metric);
-    padding: calc(var(--space-factor) * 2);
-    text-align: center;
-    font-variant: small-caps;
-    font-size: 1.2em;
-  }
-
-  .Dialog__titleContent {
-    flex: 1;
-  }
-
-  .Dialog__content {
-    padding: 0 16px 16px;
+    margin: 0;
+    text-align: left;
+    font-size: 1.25rem;
+    border-bottom: 1px solid var(--dialog-border-color);
+    padding: 0 0 0.75rem;
+    margin-bottom: 1.5rem;
   }
 }

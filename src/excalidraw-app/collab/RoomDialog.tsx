@@ -90,18 +90,18 @@ const RoomDialog = ({
             <p>{t("roomDialog.desc_intro")}</p>
             <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
             <div className="RoomDialog-sessionStartButtonContainer">
-              <ToolButton
-                className="RoomDialog-startSession"
+              <button
+                className="RoomDialog__action-button"
                 type="button"
-                icon={start}
-                title={t("roomDialog.button_startSession")}
                 aria-label={t("roomDialog.button_startSession")}
-                showAriaLabel={true}
                 onClick={() => {
                   trackEvent("share", "room creation", `ui (${getFrame()})`);
                   onRoomCreate();
                 }}
-              />
+              >
+                {start}
+                {t("roomDialog.button_startSession")}
+              </button>
             </div>
           </>
         )}
@@ -113,6 +113,7 @@ const RoomDialog = ({
               <Stack.Row gap={2}>
                 {"share" in navigator ? (
                   <ToolButton
+                    className="RoomDialog__button"
                     type="button"
                     icon={getShareIcon()}
                     title={t("labels.share")}
@@ -121,6 +122,7 @@ const RoomDialog = ({
                   />
                 ) : null}
                 <ToolButton
+                  className="RoomDialog__button"
                   type="button"
                   icon={clipboard}
                   title={t("labels.copy")}
@@ -158,18 +160,18 @@ const RoomDialog = ({
             </p>
             <p>{t("roomDialog.desc_exitSession")}</p>
             <div className="RoomDialog-sessionStartButtonContainer">
-              <ToolButton
-                className="RoomDialog-stopSession"
+              <button
+                className="RoomDialog__action-button RoomDialog__action-button--danger"
                 type="button"
-                icon={stop}
-                title={t("roomDialog.button_stopSession")}
                 aria-label={t("roomDialog.button_stopSession")}
-                showAriaLabel={true}
                 onClick={() => {
                   trackEvent("share", "room closed");
                   onRoomDestroy();
                 }}
-              />
+              >
+                {stop}
+                {t("roomDialog.button_stopSession")}
+              </button>
             </div>
           </>
         )}

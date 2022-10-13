@@ -5,7 +5,7 @@ import { t } from "../i18n";
 import { useExcalidrawContainer, useDevice } from "../components/App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
-import { back, close } from "./icons";
+import { back, CloseIcon } from "./icons";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
 import { AppState } from "../types";
@@ -88,7 +88,7 @@ export const Dialog = (props: DialogProps) => {
             title={t("buttons.close")}
             aria-label={t("buttons.close")}
           >
-            {useDevice().isMobile ? back : close}
+            {useDevice().isMobile ? back : CloseIcon}
           </button>
         </h2>
         <div className="Dialog__content">{props.children}</div>
