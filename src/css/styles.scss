@@ -231,14 +231,20 @@
   }
 
   .buttonList.buttonListIcon {
+    .excalidraw-tooltip-wrapper {
+      // For Neembboard
+      display: inline-flex; // For Neembboard
+    } // For Neembboard
     label {
       display: inline-flex;
       justify-content: center;
       align-items: center;
+      padding: 4px 6.5px; // For Neembboard
+
       svg {
-        width: 35px;
-        height: 14px;
-        padding: 2px;
+        width: 35px; // For Neembboard
+        height: 24px; // For Neembboard
+        padding: 0 2px; // For Neembboard
         opacity: 0.6;
       }
       &.active svg {
@@ -323,7 +329,7 @@
   }
 
   .App-menu_top {
-    grid-template-columns: auto max-content auto;
+    grid-template-columns: 1fr max-content 1fr; // For Neembboard
     grid-gap: 4px;
     align-items: flex-start;
     cursor: default;
