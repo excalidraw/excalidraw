@@ -28,7 +28,6 @@ import {
 } from "../../../types";
 import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
-import { Sidebar } from "../../../components/Sidebar/Sidebar";
 
 declare global {
   interface Window {
@@ -68,6 +67,7 @@ const {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   restoreElements,
+  Sidebar,
 } = window.ExcalidrawLib;
 
 const COMMENT_SVG = (
