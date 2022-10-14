@@ -16,10 +16,7 @@ export const ButtonIconSelect = <T extends Object>({
   <div className="buttonList buttonListIcon">
     {options.map((option) => (
       <Tooltip label={option.text} key={option.text}>
-        <label
-          className={clsx({ active: value === option.value })}
-          title={option.text}
-        >
+        <label className={clsx({ active: value === option.value })}>
           <input
             type="radio"
             name={group}

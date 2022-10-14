@@ -107,7 +107,6 @@ function Picker<T>({
               (event.currentTarget as HTMLButtonElement).focus();
               onChange(option.value);
             }}
-            title={`${option.text} — ${option.keyBinding.toUpperCase()}`}
             aria-label={option.text || "none"}
             aria-keyshortcuts={option.keyBinding}
             key={option.text}
