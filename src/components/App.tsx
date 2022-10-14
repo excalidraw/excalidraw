@@ -545,7 +545,6 @@ class App extends React.Component<AppProps, AppState> {
                       files: null,
                     })
                   }
-                  onMenuToggle={this.props.onMenuToggle}
                   langCode={getLanguage().code}
                   isCollaborating={this.props.isCollaborating}
                   renderTopRightUI={renderTopRightUI}

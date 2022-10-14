@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import { t } from "../i18n";
-import { AppState, ExcalidrawProps } from "../types";
+import { AppState } from "../types";
 import { capitalizeString } from "../utils";
 import { trackEvent } from "../analytics";
 import { useDevice } from "./App";
@@ -19,8 +19,7 @@ export const LibraryButton: React.FC<{
   appState: AppState;
   setAppState: React.Component<any, AppState>["setState"];
   isMobile?: boolean;
-  onMenuToggle: ExcalidrawProps["onMenuToggle"];
-}> = ({ appState, setAppState, isMobile, onMenuToggle }) => {
+}> = ({ appState, setAppState, isMobile }) => {
   const device = useDevice();
   return (
     <label

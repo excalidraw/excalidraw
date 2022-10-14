@@ -55,7 +55,6 @@ interface LayerUIProps {
   onLockToggle: () => void;
   onPenModeToggle: () => void;
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
-  onMenuToggle: ExcalidrawProps["onMenuToggle"];
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
   isCollaborating: boolean;
@@ -81,7 +80,6 @@ const LayerUI = ({
   onLockToggle,
   onPenModeToggle,
   onInsertElements,
-  onMenuToggle,
   showExitZenModeBtn,
   isCollaborating,
   renderTopRightUI,
@@ -356,7 +354,6 @@ const LayerUI = ({
                     <LibraryButton
                       appState={appState}
                       setAppState={setAppState}
-                      onMenuToggle={onMenuToggle}
                     />
                   </Stack.Row>
                 </Stack.Col>
@@ -424,7 +421,6 @@ const LayerUI = ({
           onCollabButtonClick={onCollabButtonClick}
           onLockToggle={() => onLockToggle()}
           onPenModeToggle={onPenModeToggle}
-          onMenuToggle={onMenuToggle}
           canvas={canvas}
           isCollaborating={isCollaborating}
           renderCustomFooter={renderCustomFooter}
@@ -531,7 +527,6 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
     prev.renderTopRightUI === next.renderTopRightUI &&
     prev.renderCustomStats === next.renderCustomStats &&
     prev.renderCustomSidebar === next.renderCustomSidebar &&
-    prev.onMenuToggle === next.onMenuToggle &&
     prev.langCode === next.langCode &&
     prev.elements === next.elements &&
     prev.files === next.files &&
