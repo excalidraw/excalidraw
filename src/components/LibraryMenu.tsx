@@ -106,7 +106,8 @@ export const LibraryMenu = ({
     ref,
     useCallback(
       (event) => {
-        // If click on the library icon, do nothing.
+        // If click on the library icon, do nothing so that LibraryButton
+        // can toggle library menu
         if ((event.target as Element).closest(".ToolIcon__library")) {
           return;
         }

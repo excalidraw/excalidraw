@@ -57,7 +57,6 @@ interface LayerUIProps {
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   onMenuToggle: ExcalidrawProps["onMenuToggle"];
   showExitZenModeBtn: boolean;
-  showThemeBtn: boolean;
   langCode: Language["code"];
   isCollaborating: boolean;
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
@@ -84,7 +83,6 @@ const LayerUI = ({
   onInsertElements,
   onMenuToggle,
   showExitZenModeBtn,
-  showThemeBtn,
   isCollaborating,
   renderTopRightUI,
   renderCustomFooter,
@@ -216,12 +214,7 @@ const LayerUI = ({
               />
             )}
           </Stack.Row>
-          <BackgroundPickerAndDarkModeToggle
-            appState={appState}
-            actionManager={actionManager}
-            setAppState={setAppState}
-            showThemeBtn={showThemeBtn}
-          />
+          <BackgroundPickerAndDarkModeToggle actionManager={actionManager} />
           {appState.fileHandle && (
             <>{actionManager.renderAction("saveToActiveFile")}</>
           )}
@@ -435,7 +428,6 @@ const LayerUI = ({
           canvas={canvas}
           isCollaborating={isCollaborating}
           renderCustomFooter={renderCustomFooter}
-          showThemeBtn={showThemeBtn}
           onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}

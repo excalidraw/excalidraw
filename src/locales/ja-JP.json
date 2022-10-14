@@ -114,6 +114,10 @@
       "create": "リンクを作成",
       "label": "リンク"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "ロック",
       "unlock": "ロック解除",

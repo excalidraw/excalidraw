@@ -52,6 +52,25 @@
       content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
 
+    <!------------------------------------------------------------------------->
+    <!--   to minimize white flash on load when user has dark mode enabled   -->
+    <script>
+      try {
+        //
+        const theme = window.localStorage.getItem("excalidraw-theme");
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+        }
+      } catch {}
+    </script>
+    <style>
+      html.dark {
+        background-color: #121212;
+        color: #fff;
+      }
+    </style>
+    <!------------------------------------------------------------------------->
+
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -98,7 +117,7 @@
     />
 
     <link rel="stylesheet" href="fonts.css" type="text/css" />
-    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD === "true") { %>
+    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD==="true" ) { %>
     <script>
       {
         const _WebSocket = window.WebSocket;
@@ -155,7 +174,7 @@
         width: 1px;
         overflow: hidden;
         clip: rect(1px, 1px, 1px, 1px);
-        white-space: nowrap; /* added line */
+        white-space: nowrap;
         user-select: none;
       }
 

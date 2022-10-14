@@ -114,6 +114,10 @@
       "create": "إنشاء رابط",
       "label": "رابط"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
