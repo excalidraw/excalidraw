@@ -196,8 +196,15 @@
     border: 0;
     border-radius: var(--border-radius-md);
     margin: 0.125rem 0;
-    padding: 0.25rem;
+    padding: 4px 6.5px; // For Neembboard
     white-space: nowrap;
+
+    svg {
+      // For Neembboard
+      width: 35px !important;
+      height: 24px !important;
+      padding: 0 2px !important;
+    }
 
     cursor: pointer;
 
@@ -243,12 +250,8 @@
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      padding: 4px 6.5px; // For Neembboard
 
       svg {
-        width: 35px; // For Neembboard
-        height: 24px; // For Neembboard
-        padding: 0 2px; // For Neembboard
         opacity: 0.6;
       }
       &.active svg {
