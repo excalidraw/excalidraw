@@ -60,37 +60,36 @@ export const updateTooltipPosition = (
   });
 };
 
-const showTooltip = debounce((tooltip: HTMLDivElement) => {
-  tooltip.classList.add("excalidraw-tooltip--visible");
-}, 800);
-
 const closeTooltip = () => {
-  showTooltip.cancel();
+  updateTooltip.cancel();
   getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
 };
 
-const updateTooltip = (
-  item: HTMLDivElement,
-  tooltip: HTMLDivElement,
-  label: string,
-  long: boolean,
-  keyshortcuts?: string,
-) => {
-  showTooltip(tooltip);
-  tooltip.style.minWidth = long ? "50ch" : "10ch";
-  tooltip.style.maxWidth = long ? "50ch" : "15ch";
+const updateTooltip = debounce(
+  (
+    item: HTMLDivElement,
+    tooltip: HTMLDivElement,
+    label: string,
+    long: boolean,
+    keyshortcuts?: string,
+  ) => {
+    tooltip.classList.add("excalidraw-tooltip--visible");
+    tooltip.style.minWidth = long ? "50ch" : "10ch";
+    tooltip.style.maxWidth = long ? "50ch" : "15ch";
 
-  tooltip.textContent = label;
-  if (keyshortcuts) {
-    const shortcut = document.createElement("span");
-    shortcut.className = "excalidraw-tooltip__keyshortcut";
-    shortcut.textContent = keyshortcuts;
-    tooltip.insertAdjacentElement("afterbegin", shortcut);
-  }
+    tooltip.textContent = label;
+    if (keyshortcuts) {
+      const shortcut = document.createElement("span");
+      shortcut.className = "excalidraw-tooltip__keyshortcut";
+      shortcut.textContent = keyshortcuts;
+      tooltip.insertAdjacentElement("afterbegin", shortcut);
+    }
 
-  const itemRect = item.getBoundingClientRect();
-  updateTooltipPosition(tooltip, itemRect);
-};
+    const itemRect = item.getBoundingClientRect();
+    updateTooltipPosition(tooltip, itemRect);
+  },
+  800,
+);
 
 type TooltipProps = {
   children: React.ReactNode;
