@@ -640,8 +640,8 @@ The `<Sidebar>` component takes these props (all are optional except `children`)
 | name | type | description |
 | --- | --- | --- |
 | className | string |
-| children | `React.ReactNode` | Content you want to render inside the sidebar. 
-| onClose | `() => void`  | Invoked when the user clicks the close button. If not supplied, sidebar won't be closable. |
+| children | `React.ReactNode` | Content you want to render inside the sidebar. |
+| onClose | `() => void` | Invoked when the user clicks the close button. If not supplied, sidebar won't be closable. |
 | onDock | `(isDocked: boolean) => void` | Invoked when the user toggles the dock button. If not supplied, sidebar won't be dockable by the user. You are responsible to act on this callback and set `props.docked` as applicable. See below. |
 | docked | boolean | Indicates whether the sidebar is docked. By default, the sidebar is undocked. See [here](#dockedSidebarBreakpoint) for more info. |
 
@@ -654,7 +654,7 @@ The `<Sidebar.Header>` component takes these props children (all are optional):
 | name | type | description |
 | --- | --- | --- |
 | className | string |
-| children | `React.ReactNode` | Content you want to render inside the sidebar header, sibling of the header buttons (if present).
+| children | `React.ReactNode` | Content you want to render inside the sidebar header, sibling of the header buttons (if present). |
 
 For example code, see the example [`App.tsx`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/example/App.tsx#L527) file.
 
