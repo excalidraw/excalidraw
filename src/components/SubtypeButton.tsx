@@ -77,15 +77,20 @@ export const SubtypeButton = (
         onClick={() => {
           updateData(null);
         }}
-        onContextMenu={(event: React.MouseEvent) => {
-          if (
-            appState.activeSubtypes !== undefined &&
-            !appState.activeSubtypes.includes(subtype)
-          ) {
-            updateData(null);
-          }
-          data?.onContextMenu(event, subtype);
-        }}
+        onContextMenu={
+          data && "onContextMenu" in data
+            ? (event: React.MouseEvent) => {
+                if (
+                  appState.activeSubtypes === undefined ||
+                  (appState.activeSubtypes !== undefined &&
+                    !appState.activeSubtypes.includes(subtype))
+                ) {
+                  updateData(null);
+                }
+                data.onContextMenu(event, subtype);
+              }
+            : undefined
+        }
         size={data?.size || "medium"}
       ></ToolButton>
     ),

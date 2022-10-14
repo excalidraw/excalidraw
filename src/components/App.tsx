@@ -233,6 +233,7 @@ import {
   SubtypeRecord,
   SubtypePrepFn,
   getSubtypeNames,
+  hasAlwaysEnabledActions,
   prepareSubtype,
   selectSubtype,
 } from "../subtypes";
@@ -582,9 +583,12 @@ class App extends React.Component<AppProps, AppState> {
               >
                 <LayerUI
                   renderShapeToggles={getSubtypeNames().map((subtype) =>
-                    this.actionManager.renderAction(subtype, {
-                      onContextMenu: this.handleShapeContextMenu,
-                    }),
+                    this.actionManager.renderAction(
+                      subtype,
+                      hasAlwaysEnabledActions(subtype)
+                        ? { onContextMenu: this.handleShapeContextMenu }
+                        : {},
+                    ),
                   )}
                   canvas={this.canvas}
                   appState={this.state}

@@ -58,6 +58,15 @@ export const isValidSubtype = (s: any, t: any): s is Subtype =>
 const isSubtypeName = (s: any): s is Subtype => subtypeNames.includes(s);
 
 // Subtype Actions
+
+// Used for context menus in the shape chooser
+export const hasAlwaysEnabledActions = (s: any): boolean => {
+  if (!isSubtypeName(s)) {
+    return false;
+  }
+  return alwaysEnabledMap.some((value) => value.subtype === s);
+};
+
 type SubtypeActionName = string;
 
 const isSubtypeActionName = (s: any): s is SubtypeActionName =>
