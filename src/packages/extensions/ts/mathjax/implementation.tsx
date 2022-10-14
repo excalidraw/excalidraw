@@ -205,16 +205,19 @@ const loadMathJax = async () => {
       return;
     }
 
+    // Set up shared components
+    mathJax.adaptor = liteAdaptor();
+    mathJax.visitor = new SerializedMmlVisitor();
+
     // Set up input components
     const asciimath = new AsciiMath<E | T, T, D>({});
     const tex = new TeX<E | T, T, D>({ packages: texPackages });
 
-    // Set up shared output components
+    // Set up output components
     const mml = new MathML<E | T, T, D>();
     const svg = new SVG<E | T, T, D>({ fontCache: "local" });
 
     // AsciiMath input
-    mathJax.adaptor = liteAdaptor();
     mathJax.amHtml = new HTMLDocument<E | T, T, D>("", mathJax.adaptor, {
       InputJax: asciimath,
     });
@@ -230,10 +233,23 @@ const loadMathJax = async () => {
       OutputJax: svg,
     });
 
+    // Set up a custom loader to use our local mathmaps
+    const custom = (locale: string) => {
+      return new Promise<string>((resolve, reject) => {
+        try {
+          const mathmap = JSON.stringify(
+            require(`mathjax-full/es5/sre/mathmaps/${locale}.json`),
+          );
+          resolve(mathmap);
+        } catch (e) {
+          reject("");
+        }
+      });
+    };
+    global.SREfeature = { custom };
+
     // Configure MathJax for accessibility
-    mathJax.visitor = new SerializedMmlVisitor();
-    Sre.setupEngine({ speech: "shallow" }).then(() => {
-      // FIXME: Load our local mathmaps in a decoupled manner
+    Sre.setupEngine({ speech: "shallow", custom: true }).then(() => {
       mathJax.mmlSre = Sre;
 
       // Error indicator
