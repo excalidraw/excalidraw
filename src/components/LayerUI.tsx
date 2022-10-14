@@ -376,6 +376,14 @@ const LayerUI = ({
               collaborators={appState.collaborators}
               actionManager={actionManager}
             />
+            {onCollabButtonClick && (
+              <CollabButton
+                isInHamburgerMenu={false}
+                isCollaborating={isCollaborating}
+                collaboratorCount={appState.collaborators.size}
+                onClick={onCollabButtonClick}
+              />
+            )}
             {renderTopRightUI?.(device.isMobile, appState)}
           </div>
         </div>

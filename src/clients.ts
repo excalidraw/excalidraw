@@ -20,18 +20,10 @@ export const getClientColors = (clientId: string, appState: AppState) => {
   };
 };
 
-export const getClientInitials = (username?: string | null) => {
-  if (!username) {
+export const getClientInitials = (userName?: string) => {
+  if (!userName) {
     return "?";
   }
-  const names = username.trim().split(" ");
 
-  if (names.length < 2) {
-    return names[0].substring(0, 2).toUpperCase();
-  }
-
-  const firstName = names[0];
-  const lastName = names[names.length - 1];
-
-  return (firstName[0] + lastName[0]).toUpperCase();
+  return userName[0].toUpperCase();
 };

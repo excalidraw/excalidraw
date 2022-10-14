@@ -67,8 +67,10 @@
     height: 100%;
     pointer-events: none;
     z-index: var(--zIndex-layerUI);
+
     &__top-right {
       display: flex;
+      gap: 0.75rem;
     }
 
     &__footer {

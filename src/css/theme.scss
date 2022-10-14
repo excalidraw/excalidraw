@@ -44,6 +44,7 @@
     0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
     0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
     0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
+  --avatar-border-color: var(--color-gray-20);
 
   --space-factor: 0.25rem;
   --text-primary-color: var(--color-gray-80);
@@ -59,6 +60,7 @@
   --color-gray-40: #b8b8b8;
   --color-gray-60: #7a7a7a;
   --color-gray-80: #3d3d3d;
+  --color-gray-85: #242424;
   --color-gray-90: #1e1e1e;
   --color-gray-100: #121212;
 
@@ -115,8 +117,9 @@
       0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
       0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
       0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
+    --avatar-border-color: var(--color-gray-85);
 
-    --color-primary: #5650f0;
+    --color-primary: #a8a5ff;
     --color-primary-darker: #b2aeff;
     --color-primary-darkest: #beb9ff;
     --color-primary-light: #4f4d6f;
