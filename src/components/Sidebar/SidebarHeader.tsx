@@ -49,36 +49,45 @@ const _SidebarHeader: React.FC<{
   const device = useDevice();
   const props = useContext(SidebarPropsContext);
 
+  const renderDockButton = !!(device.canDeviceFitSidebar && props.onDock);
+  const renderCloseButton = !!props.onClose;
+
   return (
     <div className={clsx("layer-ui__sidebar__header", className)}>
       {children}
-      <div className="layer-ui__sidebar__header__buttons">
-        {device.canDeviceFitSidebar && props.onDock && (
-          <SidebarDockButton
-            checked={!!props.docked}
-            onChange={() => {
-              if (props.onDock) {
-                document
-                  .querySelector(".layer-ui__wrapper")
-                  ?.classList.add("animate");
+      {renderDockButton ||
+        (renderCloseButton && (
+          <div className="layer-ui__sidebar__header__buttons">
+            {renderDockButton && (
+              <SidebarDockButton
+                checked={!!props.docked}
+                onChange={() => {
+                  if (props.onDock) {
+                    document
+                      .querySelector(".layer-ui__wrapper")
+                      ?.classList.add("animate");
 
-                props.onDock(!props.docked);
-              }
-            }}
-          />
-        )}
-        {props.onClose && (
-          <div className="ToolIcon__icon__close" data-testid="sidebar-close">
-            <button
-              className="Modal__close"
-              onClick={props.onClose}
-              aria-label={t("buttons.close")}
-            >
-              {close}
-            </button>
+                    props.onDock(!props.docked);
+                  }
+                }}
+              />
+            )}
+            {renderCloseButton && (
+              <div
+                className="ToolIcon__icon__close"
+                data-testid="sidebar-close"
+              >
+                <button
+                  className="Modal__close"
+                  onClick={props.onClose}
+                  aria-label={t("buttons.close")}
+                >
+                  {close}
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        ))}
     </div>
   );
 };
