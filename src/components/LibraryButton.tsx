@@ -43,7 +43,6 @@ export const LibraryButton: React.FC<{
             ?.classList.remove("animate");
           const nextState = event.target.checked;
           setAppState({ isLibraryOpen: nextState });
-          onMenuToggle?.("library", nextState);
           // track only openings
           if (nextState) {
             trackEvent(

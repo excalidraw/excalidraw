@@ -1091,6 +1091,10 @@ class App extends React.Component<AppProps, AppState> {
       this.props?.onScrollChange?.(this.state.scrollX, this.state.scrollY);
     }
 
+    if (this.state.isLibraryOpen !== prevState.isLibraryOpen) {
+      this.props.onMenuToggle?.("library", this.state.isLibraryOpen);
+    }
+
     if (
       Object.keys(this.state.selectedElementIds).length &&
       isEraserActive(this.state)
@@ -1560,20 +1564,14 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
 
-    const nextIsLibraryOpen =
-      this.state.isLibraryOpen && this.device.canDeviceFitSidebar
-        ? this.state.isLibraryMenuDocked
-        : false;
-
-    if (this.state.isLibraryOpen !== nextIsLibraryOpen) {
-      this.props.onMenuToggle?.("library", nextIsLibraryOpen);
-    }
-
     this.setState(
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          isLibraryOpen: nextIsLibraryOpen,
+          isLibraryOpen:
+            this.state.isLibraryOpen && this.device.canDeviceFitSidebar
+              ? this.state.isLibraryMenuDocked
+              : false,
           selectedElementIds: newElements.reduce(
             (acc: Record<ExcalidrawElement["id"], true>, element) => {
               if (!isBoundToContainer(element)) {
@@ -1847,7 +1845,6 @@ class App extends React.Component<AppProps, AppState> {
       if (event.code === CODES.ZERO) {
         const nextState = !this.state.isLibraryOpen;
         this.setState({ isLibraryOpen: nextState });
-        this.props.onMenuToggle?.("library", nextState);
         // track only openings
         if (nextState) {
           trackEvent(

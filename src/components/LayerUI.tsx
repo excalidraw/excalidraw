@@ -489,9 +489,7 @@ const LayerUI = ({
             <Sidebar
               __isInternal
               onClose={() => {
-                const isLibraryOpen = false;
-                setAppState({ isLibraryOpen });
-                onMenuToggle?.("library", isLibraryOpen);
+                setAppState({ isLibraryOpen: false });
               }}
               onDock={(docked) => {
                 setAppState({

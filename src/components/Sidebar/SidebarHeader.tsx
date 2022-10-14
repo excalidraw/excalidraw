@@ -68,7 +68,7 @@ const _SidebarHeader: React.FC<{
           />
         )}
         {props.onClose && (
-          <div className="ToolIcon__icon__close">
+          <div className="ToolIcon__icon__close" data-testid="sidebar-close">
             <button
               className="Modal__close"
               onClick={props.onClose}
