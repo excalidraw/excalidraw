@@ -385,8 +385,8 @@ No, Excalidraw package doesn't come with collaboration built in, since the imple
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | [`onChange`](#onChange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
-| [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState<a> } </pre> | null | The initial data with which app loads. |
-| [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) &#124; [`useRef`](https://reactjs.org/docs/hooks-reference.html#useref) &#124; [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) &#124; <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
+| [`initialData`](#initialData) | <code>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState<a> } </code> | null | The initial data with which app loads. |
+| [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) &#124; [`useRef`](https://reactjs.org/docs/hooks-reference.html#useref) &#124; [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) &#124; <code>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</code> |  | Ref to be passed to Excalidraw |
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
@@ -401,17 +401,17 @@ No, Excalidraw package doesn't come with collaboration built in, since the imple
 | [`libraryReturnUrl`](#libraryReturnUrl) | string |  | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | [THEME.LIGHT](#THEME-1) &#124; [THEME.DARK](#THEME-1) | [THEME.LIGHT](#THEME-1) | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
-| [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
-| [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L21">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
+| [`UIOptions`](#UIOptions) | <code>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</code> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
+| [`onPaste`](#onPaste) | <code>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L21">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</code> |  | Callback to be triggered if passed when the something is pasted in to the scene |
 | [`detectScroll`](#detectScroll) | boolean | true | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handleKeyboardGlobally) | boolean | false | Indicates whether to bind the keyboard events to document. |
-| [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
+| [`onLibraryChange`](#onLibraryChange) | <code>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </code> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
-| [`onLinkOpen`](#onLinkOpen) | <pre>(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">NonDeletedExcalidrawElement</a>, event: CustomEvent) </pre> |  | This prop if passed will be triggered when link of an element is clicked. |
-| [`onPointerDown`](#onPointerDown) | <pre>(activeTool: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L93"> AppState["activeTool"]</a>, pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L365">PointerDownState</a>) => void</pre> |  | This prop if passed gets triggered on pointer down evenets |
-| [`onScrollChange`](#onScrollChange) | <pre>(scrollX: number, scrollY: number)</pre> |  | This prop if passed gets triggered when scrolling the canvas. |
-| [`onMenuToggle`](#onMenuToggle) | <pre>(type: "library", isOpen: boolean)</pre> |  | Invoked when specific menus are being toggled on/off. Currently applies only to library menu |
+| [`onLinkOpen`](#onLinkOpen) | <code>(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">NonDeletedExcalidrawElement</a>, event: CustomEvent) </code> |  | This prop if passed will be triggered when link of an element is clicked. |
+| [`onPointerDown`](#onPointerDown) | <code>(activeTool: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L93"> AppState["activeTool"]</a>, pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L365">PointerDownState</a>) => void</code> |  | This prop if passed gets triggered on pointer down evenets |
+| [`onScrollChange`](#onScrollChange) | <code>(scrollX: number, scrollY: number)</code> |  | This prop if passed gets triggered when scrolling the canvas. |
+| [`onMenuToggle`](#onMenuToggle) | <code>(type: "library", isOpen: boolean)</code> |  | Invoked when specific menus are being toggled on/off. Currently applies only to library menu |
 
 ### Dimensions of Excalidraw
 
@@ -640,9 +640,9 @@ The `<Sidebar>` component takes these props (all are optional except `children`)
 | name | type | description |
 | --- | --- | --- |
 | className | string |
-| children | `React.ReactNode` | Content you want to render inside the sidebar. |
-| onClose | `() => void` | Invoked when the user clicks the close button. If not supplied, sidebar won't be closable. |
-| onDock | `(isDocked: boolean) => void` | Invoked when the user toggles the dock button. If not supplied, sidebar won't be dockable by the user. You are responsible to act on this callback and set `props.docked` as applicable. See below. |
+| children | <pre>React.ReactNode</pre> | Content you want to render inside the sidebar. |
+| onClose | <pre>() => void</pre> | Invoked when the user clicks the close button. If not supplied, sidebar won't be closable. |
+| onDock | <pre>(isDocked: boolean) => void</pre> | Invoked when the user toggles the dock button. If not supplied, sidebar won't be dockable by the user. You are responsible to act on this callback and set <pre>props.docked</pre> as applicable. See below. |
 | docked | boolean | Indicates whether the sidebar is docked. By default, the sidebar is undocked. See [here](#dockedSidebarBreakpoint) for more info. |
 
 The sidebar will always include a header with close/dock buttons. If neither action is enabled, the header will be collapsed.
@@ -654,7 +654,7 @@ The `<Sidebar.Header>` component takes these props children (all are optional):
 | name | type | description |
 | --- | --- | --- |
 | className | string |
-| children | `React.ReactNode` | Content you want to render inside the sidebar header, sibling of the header buttons (if present). |
+| children | <pre>React.ReactNode</pre> | Content you want to render inside the sidebar header, sibling of the header buttons (if present). |
 
 For example code, see the example [`App.tsx`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/example/App.tsx#L527) file.
 
