@@ -626,8 +626,8 @@ export const ArrowheadArrowIcon = React.memo(
     createIcon(
       <path
         transform={flip ? "translate(32, -2) scale(-1, 1)" : "translate(8, -2)"}
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M19.6485 11.244C19.8619 11.4274 19.9971 11.6993 19.9971 12.0028C19.9971 12.2756 19.8878 12.523 19.7106 12.7034L19.6983 12.7159L15.7082 16.706C15.3177 17.0965 14.6845 17.0965 14.294 16.706C13.9035 16.3155 13.9035 15.6823 14.294 15.2918L16.583 13.0028L4.99707 13.0028C4.44478 13.0028 3.99707 12.5551 3.99707 12.0028C3.99707 11.4505 4.44478 11.0028 4.99707 11.0028L16.5788 11.0028L14.2841 8.70808C13.8936 8.31756 13.8936 7.68439 14.2841 7.29387C14.6746 6.90335 15.3078 6.90335 15.6983 7.29387L19.6485 11.244Z"
       />,
       { width: 40, height: 20 },
@@ -639,8 +639,8 @@ export const ArrowheadDotIcon = React.memo(
     createIcon(
       <path
         transform={flip ? "translate(24, 0) scale(-1, 1)" : ""}
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M15 15C16.6569 15 18 13.6569 18 12C18 10.3431 16.6569 9 15 9C13.6938 9 12.5825 9.83481 12.1707 11H7C6.44772 11 6 11.4477 6 12C6 12.5523 6.44771 13 7 13H12.1707C12.5825 14.1652 13.6938 15 15 15Z"
       />,
       { width: 24, height: 24 },
@@ -652,8 +652,8 @@ export const ArrowheadBarIcon = React.memo(
     createIcon(
       <path
         transform={flip ? "translate(24, 0) scale(-1, 1)" : ""}
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M17 8C16.4477 8 16 8.44771 16 9V11H7C6.44772 11 6 11.4477 6 12C6 12.5523 6.44771 13 7 13H16V15C16 15.5523 16.4477 16 17 16C17.5523 16 18 15.5523 18 15V12V9C18 8.44771 17.5523 8 17 8Z"
       />,
       { width: 24, height: 24 },
@@ -665,8 +665,8 @@ export const ArrowheadTriangleIcon = React.memo(
     createIcon(
       <path
         transform={flip ? "translate(24, 0) scale(-1, 1)" : ""}
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M17.6475 11.245C17.8609 11.4284 17.9961 11.7003 17.9961 12.0038C17.9961 12.2768 17.8866 12.5244 17.7092 12.7048L17.6973 12.7169L14.7068 15.7074C14.3163 16.0979 13.6831 16.0979 13.2926 15.7074C13.0982 15.513 13.0006 15.2585 12.9997 15.0038L12.9961 15.0038L12.9961 14.0038L12.9961 13.0038L6.99609 13.0038C6.44381 13.0038 5.99609 12.556 5.99609 12.0038C5.99609 11.4515 6.44381 11.0038 6.99609 11.0038L12.9961 11.0038L12.9961 10.0038L12.9961 9.12513C12.959 8.82929 13.054 8.52005 13.2812 8.29289C13.6717 7.90237 14.3049 7.90237 14.6954 8.29289L17.6475 11.245Z"
       />,
       { width: 24, height: 24 },
