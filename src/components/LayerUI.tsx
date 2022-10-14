@@ -530,6 +530,7 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
     prev.renderCustomFooter === next.renderCustomFooter &&
     prev.renderTopRightUI === next.renderTopRightUI &&
     prev.renderCustomStats === next.renderCustomStats &&
+    prev.renderCustomSidebar === next.renderCustomSidebar &&
     prev.onMenuToggle === next.onMenuToggle &&
     prev.langCode === next.langCode &&
     prev.elements === next.elements &&
