@@ -18,7 +18,7 @@ export const SidebarDockButton = (props: {
   onChange?(): void;
 }) => {
   return (
-    <div className="layer-ui__sidebar-dock-button">
+    <div className="layer-ui__sidebar-dock-button" data-testid="sidebar-dock">
       <Tooltip label={t("labels.sidebarLock")}>
         <label
           className={clsx(
@@ -53,7 +53,10 @@ const _SidebarHeader: React.FC<{
   const renderCloseButton = !!props.onClose;
 
   return (
-    <div className={clsx("layer-ui__sidebar__header", className)}>
+    <div
+      className={clsx("layer-ui__sidebar__header", className)}
+      data-testid="sidebar-header"
+    >
       {children}
       {renderDockButton ||
         (renderCloseButton && (

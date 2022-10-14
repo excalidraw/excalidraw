@@ -635,7 +635,7 @@ Optional function that can render custom sidebar. This sidebar is the same that 
 
 The Excalidraw package is exporting the `<Sidebar>` container component that your render function should return. It accepts `children` which can be any content you like to render inside.
 
-The `<Sidebar>` component takes these props (all are optional):
+The `<Sidebar>` component takes these props (all are optional except `children`):
 
 | name | type | description |
 | --- | --- | --- |
