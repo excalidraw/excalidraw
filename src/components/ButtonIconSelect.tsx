@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { Tooltip } from "./Tooltip";
 
 // TODO: It might be "clever" to add option.icon to the existing component <ButtonSelect />
 export const ButtonIconSelect = <T extends Object>({
@@ -14,20 +15,21 @@ export const ButtonIconSelect = <T extends Object>({
 }) => (
   <div className="buttonList buttonListIcon">
     {options.map((option) => (
-      <label
-        key={option.text}
-        className={clsx({ active: value === option.value })}
-        title={option.text}
-      >
-        <input
-          type="radio"
-          name={group}
-          onChange={() => onChange(option.value)}
-          checked={value === option.value}
-          data-testid={option.testId}
-        />
-        {option.icon}
-      </label>
+      <Tooltip label={option.text} key={option.text}>
+        <label
+          className={clsx({ active: value === option.value })}
+          title={option.text}
+        >
+          <input
+            type="radio"
+            name={group}
+            onChange={() => onChange(option.value)}
+            checked={value === option.value}
+            data-testid={option.testId}
+          />
+          {option.icon}
+        </label>
+      </Tooltip>
     ))}
   </div>
 );

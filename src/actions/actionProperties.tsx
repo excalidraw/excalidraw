@@ -363,12 +363,12 @@ export const actionChangeStrokeWidth = register({
           {
             value: 2,
             text: t("labels.bold"),
-            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={6} />,
+            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={4} />,
           },
           {
             value: 4,
             text: t("labels.extraBold"),
-            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={10} />,
+            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={6} />,
           },
         ]}
         value={getFormValue(
@@ -656,11 +656,6 @@ export const actionChangeFontFamily = register({
       icon: JSX.Element;
     }[] = [
       {
-        value: FONT_FAMILY.Virgil,
-        text: t("labels.handDrawn"),
-        icon: <FontFamilyHandDrawnIcon theme={appState.theme} />,
-      },
-      {
         value: FONT_FAMILY.Helvetica,
         text: t("labels.normal"),
         icon: <FontFamilyNormalIcon theme={appState.theme} />,
@@ -669,6 +664,11 @@ export const actionChangeFontFamily = register({
         value: FONT_FAMILY.Cascadia,
         text: t("labels.code"),
         icon: <FontFamilyCodeIcon theme={appState.theme} />,
+      },
+      {
+        value: FONT_FAMILY.Virgil,
+        text: t("labels.handDrawn"),
+        icon: <FontFamilyHandDrawnIcon theme={appState.theme} />,
       },
     ];
 

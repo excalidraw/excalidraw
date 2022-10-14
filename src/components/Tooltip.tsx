@@ -64,12 +64,19 @@ const updateTooltip = (
   tooltip: HTMLDivElement,
   label: string,
   long: boolean,
+  keyshortcuts?: string,
 ) => {
   tooltip.classList.add("excalidraw-tooltip--visible");
   tooltip.style.minWidth = long ? "50ch" : "10ch";
   tooltip.style.maxWidth = long ? "50ch" : "15ch";
 
   tooltip.textContent = label;
+  if (keyshortcuts) {
+    const shortcut = document.createElement("span");
+    shortcut.className = "excalidraw-tooltip__keyshortcut";
+    shortcut.textContent = keyshortcuts;
+    tooltip.insertAdjacentElement("afterbegin", shortcut);
+  }
 
   const itemRect = item.getBoundingClientRect();
   updateTooltipPosition(tooltip, itemRect);
@@ -80,6 +87,7 @@ type TooltipProps = {
   label: string;
   long?: boolean;
   style?: React.CSSProperties;
+  keyshortcuts?: string;
 };
 
 export const Tooltip = ({
@@ -87,6 +95,7 @@ export const Tooltip = ({
   label,
   long = false,
   style,
+  keyshortcuts,
 }: TooltipProps) => {
   useEffect(() => {
     return () =>
@@ -101,6 +110,7 @@ export const Tooltip = ({
           getTooltipDiv(),
           label,
           long,
+          keyshortcuts,
         )
       }
       onPointerLeave={() =>

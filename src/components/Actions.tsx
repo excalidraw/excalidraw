@@ -3,9 +3,9 @@ import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
-import { useDevice } from "../components/App";
+// import { useDevice } from "../components/App";
 import {
-  canChangeSharpness,
+  // canChangeSharpness,
   canHaveArrowheads,
   getTargetElements,
   hasBackground,
@@ -17,7 +17,7 @@ import { SHAPES } from "../shapes";
 import { AppState, Zoom } from "../types";
 import {
   capitalizeString,
-  isTransparent,
+  // isTransparent,
   updateActiveTool,
   setCursorForShape,
 } from "../utils";
@@ -51,22 +51,22 @@ export const SelectedShapeActions = ({
   ) {
     isSingleElementBoundContainer = true;
   }
-  const isEditing = Boolean(appState.editingElement);
-  const device = useDevice();
+  // const isEditing = Boolean(appState.editingElement);
+  // const device = useDevice();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
-  const showFillIcons =
-    hasBackground(appState.activeTool.type) ||
-    targetElements.some(
-      (element) =>
-        hasBackground(element.type) && !isTransparent(element.backgroundColor),
-    );
+  // const showFillIcons =
+  //   hasBackground(appState.activeTool.type) ||
+  //   targetElements.some(
+  //     (element) =>
+  //       hasBackground(element.type) && !isTransparent(element.backgroundColor),
+  //   );
   const showChangeBackgroundIcons =
     hasBackground(appState.activeTool.type) ||
     targetElements.some((element) => hasBackground(element.type));
 
-  const showLinkIcon =
-    targetElements.length === 1 || isSingleElementBoundContainer;
+  // const showLinkIcon =
+  //   targetElements.length === 1 || isSingleElementBoundContainer;
 
   let commonSelectedType: string | null = targetElements[0]?.type || null;
 
@@ -85,7 +85,7 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => hasStrokeColor(element.type))) &&
         renderAction("changeStrokeColor")}
       {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
-      {showFillIcons && renderAction("changeFillStyle")}
+      {/* {showFillIcons && renderAction("changeFillStyle")} */}
 
       {(hasStrokeWidth(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
@@ -99,14 +99,14 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>
           {renderAction("changeStrokeStyle")}
-          {renderAction("changeSloppiness")}
+          {/* {renderAction("changeSloppiness")} */}
         </>
       )}
 
-      {(canChangeSharpness(appState.activeTool.type) ||
+      {/* {(canChangeSharpness(appState.activeTool.type) ||
         targetElements.some((element) => canChangeSharpness(element.type))) && (
         <>{renderAction("changeSharpness")}</>
-      )}
+      )} */}
 
       {(hasText(appState.activeTool.type) ||
         targetElements.some((element) => hasText(element.type))) && (
@@ -128,9 +128,9 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeArrowhead")}</>
       )}
 
-      {renderAction("changeOpacity")}
+      {/* {renderAction("changeOpacity")} */}
 
-      <fieldset>
+      {/* <fieldset>
         <legend>{t("labels.layers")}</legend>
         <div className="buttonList">
           {renderAction("sendToBack")}
@@ -138,7 +138,7 @@ export const SelectedShapeActions = ({
           {renderAction("bringToFront")}
           {renderAction("bringForward")}
         </div>
-      </fieldset>
+      </fieldset> */}
 
       {targetElements.length > 1 && !isSingleElementBoundContainer && (
         <fieldset>
@@ -161,19 +161,15 @@ export const SelectedShapeActions = ({
                 {renderAction("alignRight")}
               </>
             )}
-            {targetElements.length > 2 &&
-              renderAction("distributeHorizontally")}
             <div className="iconRow">
               {renderAction("alignTop")}
               {renderAction("alignVerticallyCentered")}
               {renderAction("alignBottom")}
-              {targetElements.length > 2 &&
-                renderAction("distributeVertically")}
             </div>
           </div>
         </fieldset>
       )}
-      {!isEditing && targetElements.length > 0 && (
+      {/* {!isEditing && targetElements.length > 0 && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
@@ -184,7 +180,7 @@ export const SelectedShapeActions = ({
             {showLinkIcon && renderAction("hyperlink")}
           </div>
         </fieldset>
-      )}
+      )} */}
     </div>
   );
 };
