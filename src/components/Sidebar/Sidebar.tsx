@@ -11,6 +11,7 @@ import {
 import { SidebarHeaderComponents } from "./SidebarHeader";
 
 import "./Sidebar.scss";
+import clsx from "clsx";
 
 /** using a counter instead of boolean to handle race conditions where
  * the host app may render (mount/unmount) multiple different sidebar */
@@ -21,6 +22,7 @@ export const Sidebar = ({
   onClose,
   onDock,
   docked,
+  className,
   __isInternal,
 }: SidebarProps<{
   // NOTE sidebars we use internally inside the editor must have this flag set.
@@ -59,7 +61,7 @@ export const Sidebar = ({
   }
 
   return (
-    <Island padding={2} className="layer-ui__sidebar">
+    <Island padding={2} className={clsx("layer-ui__sidebar", className)}>
       <SidebarPropsContext.Provider value={propsRef.current}>
         <SidebarHeaderComponents.Context>
           <SidebarHeaderComponents.Component __isFallback />
