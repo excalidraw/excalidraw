@@ -365,38 +365,56 @@ export const useHandleLibrary = ({
       return;
     }
 
-    const importLibraryFromURL = ({
+    const importLibraryFromURL = async ({
       libraryUrl,
       idToken,
     }: {
       libraryUrl: string;
       idToken: string | null;
     }) => {
-      if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
-        const hash = new URLSearchParams(window.location.hash.slice(1));
-        hash.delete(URL_HASH_KEYS.addLibrary);
-        window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
-      } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
-        const query = new URLSearchParams(window.location.search);
-        query.delete(URL_QUERY_KEYS.addLibrary);
-        window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
-      }
-
-      excalidrawAPI.updateLibrary({
-        libraryItems: new Promise<Blob>(async (resolve, reject) => {
-          try {
-            const request = await fetch(decodeURIComponent(libraryUrl));
-            const blob = await request.blob();
-            resolve(blob);
-          } catch (error: any) {
-            reject(error);
-          }
-        }),
-        prompt: idToken !== excalidrawAPI.id,
-        merge: true,
-        defaultStatus: "published",
-        openLibraryMenu: true,
+      const libraryPromise = new Promise<Blob>(async (resolve, reject) => {
+        try {
+          const request = await fetch(decodeURIComponent(libraryUrl));
+          const blob = await request.blob();
+          resolve(blob);
+        } catch (error: any) {
+          reject(error);
+        }
       });
+
+      const shouldPrompt = idToken !== excalidrawAPI.id;
+
+      // wait for the tab to be focused before continuing in case we'll prompt
+      // for confirmation
+      await (shouldPrompt && document.hidden
+        ? new Promise<void>((resolve) => {
+            window.addEventListener("focus", () => resolve(), {
+              once: true,
+            });
+          })
+        : null);
+
+      try {
+        await excalidrawAPI.updateLibrary({
+          libraryItems: libraryPromise,
+          prompt: shouldPrompt,
+          merge: true,
+          defaultStatus: "published",
+          openLibraryMenu: true,
+        });
+      } catch (error) {
+        throw error;
+      } finally {
+        if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
+          const hash = new URLSearchParams(window.location.hash.slice(1));
+          hash.delete(URL_HASH_KEYS.addLibrary);
+          window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
+        } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
+          const query = new URLSearchParams(window.location.search);
+          query.delete(URL_QUERY_KEYS.addLibrary);
+          window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
+        }
+      }
     };
     const onHashChange = (event: HashChangeEvent) => {
       event.preventDefault();
