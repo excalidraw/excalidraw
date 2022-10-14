@@ -122,7 +122,6 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
           )}
           data-testid={props["data-testid"]}
           hidden={props.hidden}
-          title={props.title}
           aria-label={props["aria-label"]}
           type={type}
           onClick={onClick}
@@ -159,7 +158,6 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
     >
       <label
         className={clsx("ToolIcon", props.className)}
-        title={props.title}
         onPointerDown={(event) => {
           lastPointerTypeRef.current = event.pointerType || null;
           props.onPointerDown?.({ pointerType: event.pointerType || null });

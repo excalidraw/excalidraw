@@ -1,6 +1,7 @@
 import "./Tooltip.scss";
 
 import React, { useEffect } from "react";
+import { debounce } from "../utils";
 
 export const getTooltipDiv = () => {
   const existingDiv = document.querySelector<HTMLDivElement>(
@@ -59,6 +60,15 @@ export const updateTooltipPosition = (
   });
 };
 
+const showTooltip = debounce((tooltip: HTMLDivElement) => {
+  tooltip.classList.add("excalidraw-tooltip--visible");
+}, 800);
+
+const closeTooltip = () => {
+  showTooltip.cancel();
+  getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+};
+
 const updateTooltip = (
   item: HTMLDivElement,
   tooltip: HTMLDivElement,
@@ -66,7 +76,7 @@ const updateTooltip = (
   long: boolean,
   keyshortcuts?: string,
 ) => {
-  tooltip.classList.add("excalidraw-tooltip--visible");
+  showTooltip(tooltip);
   tooltip.style.minWidth = long ? "50ch" : "10ch";
   tooltip.style.maxWidth = long ? "50ch" : "15ch";
 
@@ -98,8 +108,7 @@ export const Tooltip = ({
   keyshortcuts,
 }: TooltipProps) => {
   useEffect(() => {
-    return () =>
-      getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+    return () => closeTooltip();
   }, []);
   return (
     <div
@@ -113,9 +122,7 @@ export const Tooltip = ({
           keyshortcuts,
         )
       }
-      onPointerLeave={() =>
-        getTooltipDiv().classList.remove("excalidraw-tooltip--visible")
-      }
+      onPointerLeave={() => closeTooltip()}
       style={style}
     >
       {children}
