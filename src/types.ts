@@ -317,6 +317,9 @@ export interface ExcalidrawProps {
    * @param type NOTE: more menu types coming later
    */
   onMenuToggle?: (type: "library", isOpen: boolean) => void;
+  /**
+   * Render function that renders custom <Sidebar /> component.
+   */
   renderSidebar?: () => JSX.Element | null;
 }
 

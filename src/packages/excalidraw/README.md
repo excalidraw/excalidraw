@@ -376,6 +376,10 @@ Most notably, you can customize the primary colors, by overriding these variable
 
 For a complete list of variables, check [theme.scss](https://github.com/excalidraw/excalidraw/blob/master/src/css/theme.scss), though most of them will not make sense to override.
 
+### Does this package support collaboration ?
+
+No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
+
 ### Props
 
 | Name | Type | Default | Description |
@@ -390,6 +394,7 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`renderTopRightUI`](#renderTopRightUI) | Function |  | Function that renders custom UI in top right corner |
 | [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
 | [`renderCustomStats`](#renderCustomStats) | Function |  | Function that can be used to render custom stats on the stats dialog. |
+| [`renderSIdebar`](#renderSIdebar) | Function |  | Render function that renders custom sidebar. |
 | [`viewModeEnabled`](#viewModeEnabled) | boolean |  | This implies if the app is in view mode. |
 | [`zenModeEnabled`](#zenModeEnabled) | boolean |  | This implies if the zen mode is enabled |
 | [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
@@ -405,7 +410,8 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
 | [`onLinkOpen`](#onLinkOpen) | <pre>(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">NonDeletedExcalidrawElement</a>, event: CustomEvent) </pre> |  | This prop if passed will be triggered when link of an element is clicked. |
 | [`onPointerDown`](#onPointerDown) | <pre>(activeTool: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L93"> AppState["activeTool"]</a>, pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L365">PointerDownState</a>) => void</pre> |  | This prop if passed gets triggered on pointer down evenets |
-| [`onScrollChange`](#onScrollChange) | (scrollX: number, scrollY: number) |  | This prop if passed gets triggered when scrolling the canvas. |
+| [`onScrollChange`](#onScrollChange) | <pre>(scrollX: number, scrollY: number)</pre> |  | This prop if passed gets triggered when scrolling the canvas. |
+| [`onMenuToggle`](#onMenuToggle) | <pre>(type: "library", isOpen: boolean)</pre> |  | Invoked when specific menus are being toggled on/off. Currently applies only to library menu |
 
 ### Dimensions of Excalidraw
 
@@ -618,6 +624,39 @@ A function returning JSX to render custom UI footer. For example, you can use th
 #### `renderCustomStats`
 
 A function that can be used to render custom stats (returns JSX) in the nerd stats dialog. For example you can use this prop to render the size of the elements in the storage.
+
+#### `renderSidebar`
+
+<pre>
+() => JSX | null
+</pre>
+
+Optional function that can render custom sidebar. This sidebar is the same that the library menu sidebar is using, and can be used for any purposes your app needs. The render function is meant to return a `<Sidebar>` instance when your sidebar is open, or `null` when the sidebar is closed. When your sidebar is rendered, it takes precedence over the editor's native sidebar(s), and you are responsible to stop rendering your own sidebar when you detect (using `props.onMenuToggle`) that the editor is attempting to open its own sidebar.
+
+The Excalidraw package is exporting the `<Sidebar>` container component that your render function should return. It accepts `children` which can be any content you like to render inside.
+
+The `<Sidebar>` component takes these props (all are optional):
+
+| name | type | description |
+| --- | --- | --- |
+| className | string |
+| children | `React.ReactNode` | Content you want to render inside the sidebar. 
+| onClose | `() => void`  | Invoked when the user clicks the close button. If not supplied, sidebar won't be closable. |
+| onDock | `(isDocked: boolean) => void` | Invoked when the user toggles the dock button. If not supplied, sidebar won't be dockable by the user. You are responsible to act on this callback and set `props.docked` as applicable. See below. |
+| docked | boolean | Indicates whether the sidebar is docked. By default, the sidebar is undocked. See [here](#dockedSidebarBreakpoint) for more info. |
+
+The sidebar will always include a header with close/dock buttons. If neither action is enabled, the header will be collapsed.
+
+You can also add custom content to the header, by rendering `<Sidebar.Header>` as a child of the `<Sidebar>` component. Note that the custom header will still include the default buttons, when applicable.
+
+The `<Sidebar.Header>` component takes these props children (all are optional):
+
+| name | type | description |
+| --- | --- | --- |
+| className | string |
+| children | `React.ReactNode` | Content you want to render inside the sidebar header, sibling of the header buttons (if present).
+
+For example code, see the example [`App.tsx`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/example/App.tsx#L527) file.
 
 #### `viewModeEnabled`
 
@@ -842,9 +881,11 @@ This prop if passed will be triggered when canvas is scrolled and has the below 
 (scrollX: number, scrollY: number) => void
 ```
 
-### Does it support collaboration ?
+#### `onMenuToggle`
 
-No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
+If supplied, the callback will be invoked when a specific menu is opened or closed. Currently only applies to the library menu.
+
+For example, the callback is invoked when the user opens the library menu using the UI toggle button, the keyboard, or when you open/close the menu programmatically using the `updateScene()` API.
 
 ### Restore utilities
 
