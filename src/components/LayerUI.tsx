@@ -41,6 +41,7 @@ import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
 import { HamburgerMenuIcon } from "./icons";
 import { MenuLinks, Separator } from "./MenuUtils";
+import { useOutsideClickHook } from "../hooks/useOutsideClick";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -157,10 +158,12 @@ const LayerUI = ({
   };
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useOutsideClickHook(() => setIsMenuOpen(false));
 
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
       <button
+        data-prevent-outside-click
         className={clsx("menu-button", "zen-mode-transition", {
           "transition-left": appState.zenModeEnabled,
         })}
@@ -171,7 +174,10 @@ const LayerUI = ({
       </button>
 
       {isMenuOpen && (
-        <div style={{ position: "absolute", top: "100%", marginTop: ".25rem" }}>
+        <div
+          ref={menuRef}
+          style={{ position: "absolute", top: "100%", marginTop: ".25rem" }}
+        >
           <Section heading="canvasActions">
             {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}

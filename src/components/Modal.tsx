@@ -45,6 +45,7 @@ export const Modal: React.FC<{
         onClick={closeOnClickOutside ? props.onCloseRequest : undefined}
       ></div>
       <div
+        data-prevent-outside-click
         className="Modal__content"
         style={{ "--max-width": `${props.maxWidth}px` }}
         tabIndex={0}
