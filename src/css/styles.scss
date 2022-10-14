@@ -196,7 +196,7 @@
     border: 0;
     border-radius: var(--border-radius-md);
     margin: 0.125rem 0;
-    padding: 0.25rem;
+    padding: 4px 6.5px; // For Neembboard
     white-space: nowrap;
 
     cursor: pointer;
@@ -243,7 +243,6 @@
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      padding: 4px 6.5px; // For Neembboard
 
       svg {
         width: 35px; // For Neembboard

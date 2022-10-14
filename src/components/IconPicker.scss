@@ -43,9 +43,10 @@
     }
 
     svg {
+      width: 35px; // For Neembboard
+      height: 24px; // For Neembboard
+      padding: 0 2px; // For Neembboard
       margin: 0;
-      width: 36px;
-      height: 18px;
       opacity: 0.6;
       pointer-events: none;
     }
