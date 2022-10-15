@@ -118,7 +118,6 @@ export default function App() {
   );
   const [comment, setComment] = useState<Comment | null>(null);
 
-  const [shouldRenderSidebar, setShouldRenderSidebar] = useState(false);
   const [isSidebarDocked, setIsSidebarDocked] = useState(false);
 
   const initialStatePromiseRef = useRef<{
@@ -525,14 +524,10 @@ export default function App() {
   };
 
   const renderSidebar = () => {
-    if (!shouldRenderSidebar) {
-      return null;
-    }
     return (
       <Sidebar
         docked={isSidebarDocked}
         onDock={(docked) => setIsSidebarDocked(docked)}
-        onClose={() => setShouldRenderSidebar(false)}
       >
         <Sidebar.Header>Custom header!</Sidebar.Header>
         Custom sidebar!
@@ -690,7 +685,7 @@ export default function App() {
               gap: "1rem",
             }}
           >
-            <button onClick={() => setShouldRenderSidebar((s) => !s)}>
+            <button onClick={() => excalidrawAPI?.toggleMenu("customSidebar")}>
               Toggle Custom Sidebar
             </button>
           </div>
@@ -719,7 +714,6 @@ export default function App() {
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
-            onMenuToggle={() => setShouldRenderSidebar(false)}
             renderSidebar={renderSidebar}
           />
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
