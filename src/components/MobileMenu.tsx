@@ -111,7 +111,7 @@ export const MobileMenu = ({
                   penDetected={appState.penDetected}
                 />
               </Stack.Row>
-              <Island padding={2}>{libraryMenu}</Island>
+              {libraryMenu && <Island padding={2}>{libraryMenu}</Island>}
             </Stack.Col>
           )}
         </Section>
