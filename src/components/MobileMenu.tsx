@@ -177,7 +177,7 @@ export const MobileMenu = ({
   };
   return (
     <>
-      {renderCustomSidebar?.()}
+      {appState.openSidebar === "customSidebar" && renderCustomSidebar?.()}
       {!appState.viewModeEnabled && renderToolbar()}
       {!appState.openMenu && appState.showStats && (
         <Stats
@@ -233,7 +233,7 @@ export const MobileMenu = ({
             {renderAppToolbar()}
             {appState.scrolledOutside &&
               !appState.openMenu &&
-              !appState.isLibraryOpen && (
+              appState.openSidebar !== "library" && (
                 <button
                   className="scroll-back-to-content"
                   onClick={() => {

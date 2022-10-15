@@ -13,6 +13,7 @@ describe("Sidebar", () => {
   it("should render custom sidebar", async () => {
     const { container } = await render(
       <Excalidraw
+        initialData={{ appState: { openSidebar: "customSidebar" } }}
         renderSidebar={() => (
           <Sidebar>
             <div id="test-sidebar-content">42</div>
@@ -28,6 +29,7 @@ describe("Sidebar", () => {
   it("should render custom sidebar header", async () => {
     const { container } = await render(
       <Excalidraw
+        initialData={{ appState: { openSidebar: "customSidebar" } }}
         renderSidebar={() => (
           <Sidebar>
             <Sidebar.Header>
@@ -48,7 +50,7 @@ describe("Sidebar", () => {
   it("should render only one sidebar and prefer the custom one", async () => {
     const { container } = await render(
       <Excalidraw
-        initialData={{ appState: { isLibraryOpen: true } }}
+        initialData={{ appState: { openSidebar: "customSidebar" } }}
         renderSidebar={() => (
           <Sidebar>
             <div id="test-sidebar-content">42</div>
@@ -68,24 +70,14 @@ describe("Sidebar", () => {
     });
   });
 
-  it("should render custom sidebar with close button when onClose passed", async () => {
+  it("should always render custom sidebar with close button & close on click", async () => {
     const CustomExcalidraw = () => {
-      const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
-
       return (
         <Excalidraw
-          renderSidebar={() => {
-            return isSidebarOpen ? (
-              <Sidebar
-                className="test-sidebar"
-                onClose={() => {
-                  setIsSidebarOpen(false);
-                }}
-              >
-                hello
-              </Sidebar>
-            ) : null;
-          }}
+          initialData={{ appState: { openSidebar: "customSidebar" } }}
+          renderSidebar={() => (
+            <Sidebar className="test-sidebar">hello</Sidebar>
+          )}
         />
       );
     };
@@ -109,6 +101,7 @@ describe("Sidebar", () => {
 
       return (
         <Excalidraw
+          initialData={{ appState: { openSidebar: "customSidebar" } }}
           renderSidebar={() => (
             <Sidebar
               className="test-sidebar"
@@ -127,7 +120,7 @@ describe("Sidebar", () => {
     // should show dock button when the sidebar fits to be docked
     // -------------------------------------------------------------------------
 
-    withExcalidrawDimensions({ width: 1920, height: 1080 }, () => {
+    await withExcalidrawDimensions({ width: 1920, height: 1080 }, () => {
       const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
       expect(sidebar).not.toBe(null);
       const closeButton = queryByTestId(sidebar!, "sidebar-dock");
@@ -137,7 +130,7 @@ describe("Sidebar", () => {
     // should not show dock button when the sidebar does not fit to be docked
     // -------------------------------------------------------------------------
 
-    withExcalidrawDimensions({ width: 400, height: 1080 }, () => {
+    await withExcalidrawDimensions({ width: 400, height: 1080 }, () => {
       const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
       expect(sidebar).not.toBe(null);
       const closeButton = queryByTestId(sidebar!, "sidebar-dock");

@@ -23,7 +23,7 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
-  if (appState.isLibraryOpen) {
+  if (appState.openSidebar === "library") {
     return null;
   }
 

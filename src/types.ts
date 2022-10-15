@@ -140,6 +140,7 @@ export type AppState = {
     | "backgroundColorPicker"
     | "strokeColorPicker"
     | null;
+  openSidebar: "library" | "customSidebar" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
@@ -161,7 +162,6 @@ export type AppState = {
   offsetTop: number;
   offsetLeft: number;
 
-  isLibraryOpen: boolean;
   isLibraryMenuDocked: boolean;
   fileHandle: FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
@@ -316,7 +316,7 @@ export interface ExcalidrawProps {
   /**
    * @param type NOTE: more menu types coming later
    */
-  onMenuToggle?: (type: "library", isOpen: boolean) => void;
+  onMenuToggle?: (type: "library" | "customSidebar", isOpen: boolean) => void;
   /**
    * Render function that renders custom <Sidebar /> component.
    */

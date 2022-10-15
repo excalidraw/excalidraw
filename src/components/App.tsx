@@ -797,8 +797,7 @@ class App extends React.Component<AppProps, AppState> {
       // whether to open the library, to handle a case where we
       // update the state outside of initialData (e.g. when loading the app
       // with a library install link, which should auto-open the library)
-      isLibraryOpen:
-        initialData?.appState?.isLibraryOpen || this.state.isLibraryOpen,
+      openSidebar: scene.appState?.openSidebar || this.state.openSidebar,
       activeTool:
         scene.appState.activeTool.type === "image"
           ? { ...scene.appState.activeTool, type: "selection" }
@@ -1099,8 +1098,14 @@ class App extends React.Component<AppProps, AppState> {
       this.props?.onScrollChange?.(this.state.scrollX, this.state.scrollY);
     }
 
-    if (this.state.isLibraryOpen !== prevState.isLibraryOpen) {
-      this.props.onMenuToggle?.("library", this.state.isLibraryOpen);
+    if (this.state.openSidebar !== prevState.openSidebar) {
+      if (this.state.openSidebar && prevState.openSidebar) {
+        this.props.onMenuToggle?.(prevState.openSidebar, false);
+      }
+      this.props.onMenuToggle?.(
+        this.state.openSidebar || prevState.openSidebar!,
+        !!this.state.openSidebar,
+      );
     }
 
     if (
@@ -1576,10 +1581,17 @@ class App extends React.Component<AppProps, AppState> {
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          isLibraryOpen:
-            this.state.isLibraryOpen && this.device.canDeviceFitSidebar
-              ? this.state.isLibraryMenuDocked
-              : false,
+          // keep sidebar (presumably the library) open if it's docked and
+          // can fit.
+          //
+          // Note, we should close the sidebar only if we're dropping items
+          // from library, not when pasting from clipboard. Alas.
+          openSidebar:
+            this.state.openSidebar &&
+            this.device.canDeviceFitSidebar &&
+            this.state.isLibraryMenuDocked
+              ? this.state.openSidebar
+              : null,
           selectedElementIds: newElements.reduce(
             (acc: Record<ExcalidrawElement["id"], true>, element) => {
               if (!isBoundToContainer(element)) {
@@ -1851,8 +1863,9 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.code === CODES.ZERO) {
-        const nextState = !this.state.isLibraryOpen;
-        this.setState({ isLibraryOpen: nextState });
+        const nextState =
+          this.state.openSidebar === "library" ? null : "library";
+        this.setState({ openSidebar: nextState });
         // track only openings
         if (nextState) {
           trackEvent(

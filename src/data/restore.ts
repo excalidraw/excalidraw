@@ -299,9 +299,12 @@ export const restoreAppState = (
         : appState.zoom || defaultAppState.zoom,
     // when sidebar docked and user left it open in last session,
     // keep it open. If not docked, keep it closed irrespective of last state.
-    isLibraryOpen: nextAppState.isLibraryMenuDocked
-      ? nextAppState.isLibraryOpen
-      : false,
+    openSidebar:
+      nextAppState.openSidebar === "library"
+        ? nextAppState.isLibraryMenuDocked
+          ? "library"
+          : null
+        : nextAppState.openSidebar,
   };
 };
 

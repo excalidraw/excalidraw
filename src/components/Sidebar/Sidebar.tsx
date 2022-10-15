@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { Island } from ".././Island";
 import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../../jotai";
@@ -12,6 +12,7 @@ import { SidebarHeaderComponents } from "./SidebarHeader";
 
 import "./Sidebar.scss";
 import clsx from "clsx";
+import { useExcalidrawSetAppState } from "../App";
 
 /** using a counter instead of boolean to handle race conditions where
  * the host app may render (mount/unmount) multiple different sidebar */
@@ -36,6 +37,8 @@ export const Sidebar = ({
     jotaiScope,
   );
 
+  const setAppState = useExcalidrawSetAppState();
+
   useLayoutEffect(() => {
     if (!__isInternal) {
       setHostSidebarCounters((s) => ({
@@ -51,10 +54,21 @@ export const Sidebar = ({
     }
   }, [__isInternal, setHostSidebarCounters, docked]);
 
-  const propsRef = useRef<SidebarPropsContextValue>({});
-  propsRef.current.onClose = onClose;
-  propsRef.current.onDock = onDock;
-  propsRef.current.docked = docked;
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    return () => {
+      onCloseRef.current?.();
+    };
+  }, []);
+
+  const headerPropsRef = useRef<SidebarPropsContextValue>({});
+  headerPropsRef.current.onClose = () => {
+    setAppState({ openSidebar: null });
+  };
+  headerPropsRef.current.onDock = onDock;
+  headerPropsRef.current.docked = docked;
 
   if (hostSidebarCounters.rendered > 0 && __isInternal) {
     return null;
@@ -62,7 +76,7 @@ export const Sidebar = ({
 
   return (
     <Island padding={2} className={clsx("layer-ui__sidebar", className)}>
-      <SidebarPropsContext.Provider value={propsRef.current}>
+      <SidebarPropsContext.Provider value={headerPropsRef.current}>
         <SidebarHeaderComponents.Context>
           <SidebarHeaderComponents.Component __isFallback />
           {children}

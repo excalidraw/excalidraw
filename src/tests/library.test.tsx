@@ -128,10 +128,10 @@ describe("library menu", () => {
     // duplicate calls shouldn't emit an event
     // ------------------------------------------
 
-    window.h.app.updateScene({ appState: { isLibraryOpen: true } });
-    window.h.app.updateScene({ appState: { isLibraryOpen: true } });
-    window.h.app.updateScene({ appState: { isLibraryOpen: false } });
-    window.h.app.updateScene({ appState: { isLibraryOpen: false } });
+    window.h.app.updateScene({ appState: { openSidebar: "library" } });
+    window.h.app.updateScene({ appState: { openSidebar: "library" } });
+    window.h.app.updateScene({ appState: { openSidebar: null } });
+    window.h.app.updateScene({ appState: { openSidebar: null } });
 
     await waitFor(() => {
       expect(onMenuToggle).toHaveBeenCalledTimes(2);
