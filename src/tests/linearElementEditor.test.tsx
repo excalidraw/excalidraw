@@ -187,6 +187,17 @@ describe(" Test Linear Elements", () => {
     expect(h.state.editingLinearElement?.elementId).toBeUndefined();
   });
 
+  it("should delete the line when we exit line editor and there is only one point left", async () => {
+    createTwoPointerLinearElement("line");
+    const line = h.elements[0] as ExcalidrawLinearElement;
+    enterLineEditingMode(line);
+    const points = LinearElementEditor.getPointsGlobalCoordinates(line);
+    deletePoint(points[1]);
+    //click at previously removed point position to exit editing mode
+    mouse.clickAt(points[1][0], points[1][1]);
+    expect(line.isDeleted).toEqual(true);
+  });
+
   describe("Inside editor", () => {
     it("should allow dragging line from midpoint in 2 pointer lines", async () => {
       createTwoPointerLinearElement("line");
