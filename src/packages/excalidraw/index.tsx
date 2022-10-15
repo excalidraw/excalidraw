@@ -39,7 +39,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onLinkOpen,
     onPointerDown,
     onScrollChange,
-    onMenuToggle,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -113,7 +112,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
-          onMenuToggle={onMenuToggle}
           renderSidebar={renderSidebar}
         />
       </Provider>

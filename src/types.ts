@@ -314,10 +314,6 @@ export interface ExcalidrawProps {
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   /**
-   * @param type NOTE: more menu types coming later
-   */
-  onMenuToggle?: (type: "library" | "customSidebar", isOpen: boolean) => void;
-  /**
    * Render function that renders custom <Sidebar /> component.
    */
   renderSidebar?: () => JSX.Element | null;

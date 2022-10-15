@@ -1,16 +1,14 @@
-import { fireEvent, queryByTestId, render, waitFor } from "./test-utils";
+import { fireEvent, render, waitFor } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { MIME_TYPES } from "../constants";
 import { LibraryItem, LibraryItems } from "../types";
-import { Keyboard, UI } from "./helpers/ui";
+import { UI } from "./helpers/ui";
 import { serializeLibraryAsJSON } from "../data/json";
 import { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { ExcalidrawGenericElement } from "../element/types";
 import { getCommonBoundingBox } from "../element/bounds";
 import { parseLibraryJSON } from "../data/blob";
-import { Excalidraw } from "../packages/excalidraw/index";
-import { CODES } from "../keys";
 
 const { h } = window;
 
@@ -115,70 +113,6 @@ describe("library menu", () => {
     });
 
     expect(true).toBe(true);
-  });
-
-  it("should call onMenuToggle when toggling library", async () => {
-    const onMenuToggle = jest.fn();
-    const { container } = await render(
-      <Excalidraw handleKeyboardGlobally onMenuToggle={onMenuToggle} />,
-    );
-
-    // opening/closing via API
-    //
-    // duplicate calls shouldn't emit an event
-    // ------------------------------------------
-
-    window.h.app.updateScene({ appState: { openSidebar: "library" } });
-    window.h.app.updateScene({ appState: { openSidebar: "library" } });
-    window.h.app.updateScene({ appState: { openSidebar: null } });
-    window.h.app.updateScene({ appState: { openSidebar: null } });
-
-    await waitFor(() => {
-      expect(onMenuToggle).toHaveBeenCalledTimes(2);
-      expect(onMenuToggle).toHaveBeenNthCalledWith(1, "library", true);
-      expect(onMenuToggle).toHaveBeenNthCalledWith(2, "library", false);
-    });
-
-    // opening via keyboard shortcut
-    // ---------------------------------
-
-    Keyboard.codeDown(CODES.ZERO);
-
-    await waitFor(() => {
-      expect(onMenuToggle).toHaveBeenCalled();
-      expect(onMenuToggle).toHaveBeenCalledWith("library", true);
-    });
-
-    // closing via keyboard shortcut
-    // ---------------------------------
-
-    Keyboard.codeDown(CODES.ZERO);
-
-    await waitFor(() => {
-      expect(onMenuToggle).toHaveBeenCalled();
-      expect(onMenuToggle).toHaveBeenCalledWith("library", false);
-    });
-
-    // opening via UI button
-    // ---------------------------------
-
-    fireEvent.click(container.querySelector(".ToolIcon__library")!);
-
-    await waitFor(() => {
-      expect(onMenuToggle).toHaveBeenCalled();
-      expect(onMenuToggle).toHaveBeenCalledWith("library", true);
-    });
-
-    // closing via UI close button
-    // ---------------------------------
-
-    const closeButton = queryByTestId(container, "sidebar-close");
-    fireEvent.click(closeButton!.querySelector("button")!);
-
-    await waitFor(() => {
-      expect(onMenuToggle).toHaveBeenCalled();
-      expect(onMenuToggle).toHaveBeenCalledWith("library", false);
-    });
   });
 });
 

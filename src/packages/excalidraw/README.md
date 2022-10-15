@@ -411,7 +411,6 @@ No, Excalidraw package doesn't come with collaboration built in, since the imple
 | [`onLinkOpen`](#onLinkOpen) | <code>(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">NonDeletedExcalidrawElement</a>, event: CustomEvent) </code> |  | This prop if passed will be triggered when link of an element is clicked. |
 | [`onPointerDown`](#onPointerDown) | <code>(activeTool: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L93"> AppState["activeTool"]</a>, pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L365">PointerDownState</a>) => void</code> |  | This prop if passed gets triggered on pointer down evenets |
 | [`onScrollChange`](#onScrollChange) | <code>(scrollX: number, scrollY: number)</code> |  | This prop if passed gets triggered when scrolling the canvas. |
-| [`onMenuToggle`](#onMenuToggle) | <code>(type: "library", isOpen: boolean)</code> |  | Invoked when specific menus are being toggled on/off. Currently applies only to library menu |
 
 ### Dimensions of Excalidraw
 
@@ -631,7 +630,7 @@ A function that can be used to render custom stats (returns JSX) in the nerd sta
 () => JSX | null
 </pre>
 
-Optional function that can render custom sidebar. This sidebar is the same that the library menu sidebar is using, and can be used for any purposes your app needs. The render function is meant to return a `<Sidebar>` instance when your sidebar is open, or `null` when the sidebar is closed. When your sidebar is rendered, it takes precedence over the editor's native sidebar(s), and you are responsible to stop rendering your own sidebar when you detect (using `props.onMenuToggle`) that the editor is attempting to open its own sidebar.
+Optional function that can render custom sidebar. This sidebar is the same that the library menu sidebar is using, and can be used for any purposes your app needs. The render function should return a `<Sidebar>` instance.
 
 The Excalidraw package is exporting the `<Sidebar>` container component that your render function should return. It accepts `children` which can be any content you like to render inside.
 
@@ -880,12 +879,6 @@ This prop if passed will be triggered when canvas is scrolled and has the below 
 ```ts
 (scrollX: number, scrollY: number) => void
 ```
-
-#### `onMenuToggle`
-
-If supplied, the callback will be invoked when a specific menu is opened or closed. Currently only applies to the library menu.
-
-For example, the callback is invoked when the user opens the library menu using the UI toggle button, the keyboard, or when you open/close the menu programmatically using the `updateScene()` API.
 
 ### Restore utilities
 

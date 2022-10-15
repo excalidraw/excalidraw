@@ -1098,16 +1098,6 @@ class App extends React.Component<AppProps, AppState> {
       this.props?.onScrollChange?.(this.state.scrollX, this.state.scrollY);
     }
 
-    if (this.state.openSidebar !== prevState.openSidebar) {
-      if (this.state.openSidebar && prevState.openSidebar) {
-        this.props.onMenuToggle?.(prevState.openSidebar, false);
-      }
-      this.props.onMenuToggle?.(
-        this.state.openSidebar || prevState.openSidebar!,
-        !!this.state.openSidebar,
-      );
-    }
-
     if (
       Object.keys(this.state.selectedElementIds).length &&
       isEraserActive(this.state)
