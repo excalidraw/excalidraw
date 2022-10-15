@@ -58,39 +58,35 @@ const _SidebarHeader: React.FC<{
       data-testid="sidebar-header"
     >
       {children}
-      {renderDockButton ||
-        (renderCloseButton && (
-          <div className="layer-ui__sidebar__header__buttons">
-            {renderDockButton && (
-              <SidebarDockButton
-                checked={!!props.docked}
-                onChange={() => {
-                  if (props.onDock) {
-                    document
-                      .querySelector(".layer-ui__wrapper")
-                      ?.classList.add("animate");
+      {(renderDockButton || renderCloseButton) && (
+        <div className="layer-ui__sidebar__header__buttons">
+          {renderDockButton && (
+            <SidebarDockButton
+              checked={!!props.docked}
+              onChange={() => {
+                if (props.onDock) {
+                  document
+                    .querySelector(".layer-ui__wrapper")
+                    ?.classList.add("animate");
 
-                    props.onDock(!props.docked);
-                  }
-                }}
-              />
-            )}
-            {renderCloseButton && (
-              <div
-                className="ToolIcon__icon__close"
-                data-testid="sidebar-close"
+                  props.onDock(!props.docked);
+                }
+              }}
+            />
+          )}
+          {renderCloseButton && (
+            <div className="ToolIcon__icon__close" data-testid="sidebar-close">
+              <button
+                className="Modal__close"
+                onClick={props.onClose}
+                aria-label={t("buttons.close")}
               >
-                <button
-                  className="Modal__close"
-                  onClick={props.onClose}
-                  aria-label={t("buttons.close")}
-                >
-                  {close}
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+                {close}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
