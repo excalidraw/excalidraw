@@ -17,12 +17,17 @@ export interface ExportedDataState {
   files: BinaryFiles | undefined;
 }
 
+export type LegacyAppState = {
+  /** @deprecated #5663 TODO remove 22-12-14 */
+  isLibraryOpen: boolean;
+};
+
 export interface ImportedDataState {
   type?: string;
   version?: number;
   source?: string;
   elements?: readonly ExcalidrawElement[] | null;
-  appState?: Readonly<Partial<AppState>> | null;
+  appState?: Readonly<Partial<AppState & LegacyAppState>> | null;
   scrollToContent?: boolean;
   libraryItems?: LibraryItems_anyVersion;
   files?: BinaryFiles;

@@ -251,6 +251,20 @@ export const restoreElements = (
   }, [] as ExcalidrawElement[]);
 };
 
+const LegacyAppStateMigrations: Partial<{
+  [K in keyof AppState]: (
+    ImportedDataState: Exclude<ImportedDataState["appState"], null | undefined>,
+  ) => AppState[K];
+}> = {
+  openSidebar: (appState) => {
+    // console.log("HERE", appState.isLibraryOpen);
+    if ("isLibraryOpen" in appState) {
+      return appState.isLibraryOpen ? "library" : null;
+    }
+    return appState.openSidebar ?? null;
+  },
+};
+
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null | undefined,
@@ -262,7 +276,13 @@ export const restoreAppState = (
     keyof typeof defaultAppState,
     any,
   ][]) {
-    const suppliedValue = appState[key];
+    // if AppState contains a legacy key, prefer that one and migrate its
+    // value to the new one
+    const suppliedValue =
+      key in LegacyAppStateMigrations
+        ? LegacyAppStateMigrations[key]?.(appState)
+        : appState[key];
+
     const localValue = localAppState ? localAppState[key] : undefined;
     (nextAppState as any)[key] =
       suppliedValue !== undefined
