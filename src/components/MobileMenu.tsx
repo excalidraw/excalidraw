@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState, ExcalidrawProps } from "../types";
+import { AppState, Device, ExcalidrawProps } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -45,6 +45,7 @@ type MobileMenuProps = {
   ) => JSX.Element | null;
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
+  device: Device;
 };
 
 export const MobileMenu = ({
@@ -65,6 +66,7 @@ export const MobileMenu = ({
   renderTopRightUI,
   renderCustomStats,
   renderCustomSidebar,
+  device,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -113,7 +115,12 @@ export const MobileMenu = ({
             </Stack.Col>
           )}
         </Section>
-        <HintViewer appState={appState} elements={elements} isMobile={true} />
+        <HintViewer
+          appState={appState}
+          elements={elements}
+          isMobile={true}
+          device={device}
+        />
       </FixedSideContainer>
     );
   };

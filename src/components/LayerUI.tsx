@@ -336,6 +336,7 @@ const LayerUI = ({
                         appState={appState}
                         elements={elements}
                         isMobile={device.isMobile}
+                        device={device}
                       />
                       {heading}
                       <Stack.Row gap={1}>
@@ -429,6 +430,7 @@ const LayerUI = ({
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
           renderCustomSidebar={renderCustomSidebar}
+          device={device}
         />
       )}
 
