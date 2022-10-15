@@ -419,6 +419,7 @@ class App extends React.Component<AppProps, AppState> {
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
+        toggleMenu: this.toggleMenu,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1778,6 +1779,39 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({});
   };
 
+  /**
+   * @returns whether the menu was toggled on or off
+   */
+  public toggleMenu = (
+    type: "library" | "customSidebar",
+    force?: boolean,
+  ): boolean => {
+    if (type === "customSidebar" && !this.props.renderSidebar) {
+      console.warn(
+        `attempting to toggle "customSidebar", but no "props.renderSidebar" is defined`,
+      );
+      return false;
+    }
+
+    if (type === "library" || type === "customSidebar") {
+      const nextValue =
+        force !== undefined
+          ? force
+            ? type
+            : null
+          : this.state.openSidebar === type
+          ? null
+          : type;
+      this.setState(() => ({
+        openSidebar: nextValue,
+      }));
+
+      return !!nextValue;
+    }
+
+    return false;
+  };
+
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
       cursorX = event.clientX;
@@ -1853,9 +1887,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.code === CODES.ZERO) {
-        const nextState =
-          this.state.openSidebar === "library" ? null : "library";
-        this.setState({ openSidebar: nextState });
+        const nextState = this.toggleMenu("library");
         // track only openings
         if (nextState) {
           trackEvent(

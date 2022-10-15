@@ -137,4 +137,73 @@ describe("Sidebar", () => {
       expect(closeButton).toBe(null);
     });
   });
+
+  it("should toggle sidebar using props.toggleMenu()", async () => {
+    const { container } = await render(
+      <Excalidraw
+        renderSidebar={() => (
+          <Sidebar>
+            <div id="test-sidebar-content">42</div>
+          </Sidebar>
+        )}
+      />,
+    );
+
+    // sidebar isn't rendered initially
+    // -------------------------------------------------------------------------
+    await waitFor(() => {
+      const node = container.querySelector("#test-sidebar-content");
+      expect(node).toBe(null);
+    });
+
+    // toggle sidebar on
+    // -------------------------------------------------------------------------
+    expect(window.h.app.toggleMenu("customSidebar")).toBe(true);
+
+    await waitFor(() => {
+      const node = container.querySelector("#test-sidebar-content");
+      expect(node).not.toBe(null);
+    });
+
+    // toggle sidebar off
+    // -------------------------------------------------------------------------
+    expect(window.h.app.toggleMenu("customSidebar")).toBe(false);
+
+    await waitFor(() => {
+      const node = container.querySelector("#test-sidebar-content");
+      expect(node).toBe(null);
+    });
+
+    // force-toggle sidebar off (=> still hidden)
+    // -------------------------------------------------------------------------
+    expect(window.h.app.toggleMenu("customSidebar", false)).toBe(false);
+
+    await waitFor(() => {
+      const node = container.querySelector("#test-sidebar-content");
+      expect(node).toBe(null);
+    });
+
+    // force-toggle sidebar on
+    // -------------------------------------------------------------------------
+    expect(window.h.app.toggleMenu("customSidebar", true)).toBe(true);
+    expect(window.h.app.toggleMenu("customSidebar", true)).toBe(true);
+
+    await waitFor(() => {
+      const node = container.querySelector("#test-sidebar-content");
+      expect(node).not.toBe(null);
+    });
+
+    // toggle library (= hide custom sidebar)
+    // -------------------------------------------------------------------------
+    expect(window.h.app.toggleMenu("library")).toBe(true);
+
+    await waitFor(() => {
+      const node = container.querySelector("#test-sidebar-content");
+      expect(node).toBe(null);
+
+      // make sure only one sidebar is rendered
+      const sidebars = container.querySelectorAll(".layer-ui__sidebar");
+      expect(sidebars.length).toBe(1);
+    });
+  });
 });
