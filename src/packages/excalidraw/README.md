@@ -508,6 +508,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | [setActiveTool](#setActiveTool) | <code>(tool: { type: typeof <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L4">SHAPES</a> [number]["value"]&#124; "eraser" } &#124; { type: "custom"; customType: string }) => void</code> | This API can be used to set the active tool |
 | [setCursor](#setCursor) | <code>(cursor: string) => void </code> | This API can be used to set customise the mouse cursor on the canvas |
 | [resetCursor](#resetCursor) | <code>() => void </code> | This API can be used to reset to default mouse cursor on the canvas |
+| [toggleMenu](#toggleMenu) | <code>(type: string, force?: boolean) => boolean</code> | Toggles specific menus on/off |
 
 #### `readyPromise`
 
@@ -630,9 +631,7 @@ A function that can be used to render custom stats (returns JSX) in the nerd sta
 () => JSX | null
 </pre>
 
-Optional function that can render custom sidebar. This sidebar is the same that the library menu sidebar is using, and can be used for any purposes your app needs. The render function should return a `<Sidebar>` instance.
-
-The Excalidraw package is exporting the `<Sidebar>` container component that your render function should return. It accepts `children` which can be any content you like to render inside.
+Optional function that can render custom sidebar. This sidebar is the same that the library menu sidebar is using, and can be used for any purposes your app needs. The render function should return a `<Sidebar>` instance — a component that is exported from the Excalidraw package. It accepts `children` which can be any content you like to render inside.
 
 The `<Sidebar>` component takes these props (all are optional except `children`):
 
@@ -640,22 +639,23 @@ The `<Sidebar>` component takes these props (all are optional except `children`)
 | --- | --- | --- |
 | className | string |
 | children | <pre>React.ReactNode</pre> | Content you want to render inside the sidebar. |
-| onClose | <pre>() => void</pre> | Invoked when the user clicks the close button. If not supplied, sidebar won't be closable. |
-| onDock | <pre>(isDocked: boolean) => void</pre> | Invoked when the user toggles the dock button. If not supplied, sidebar won't be dockable by the user. You are responsible to act on this callback and set <pre>props.docked</pre> as applicable. See below. |
-| docked | boolean | Indicates whether the sidebar is docked. By default, the sidebar is undocked. See [here](#dockedSidebarBreakpoint) for more info. |
+| onClose | <pre>() => void</pre> | Invoked when the component is closed (by user, or the editor). No need to act on this event, as the editor manages the sidebar open state on its own. |
+| onDock | <pre>(isDocked: boolean) => void</pre> | Invoked when the user toggles the dock button. |
+| docked | boolean | Indicates whether the sidebar is docked. By default, the sidebar is undocked. If passed, the docking becomes controlled, and you are responsible for updating the `docked` state by listening on `onDock` callback. See [here](#dockedSidebarBreakpoint) for more info docking. |
+| dockable | boolean | Indicates whether the sidebar can be docked by user (=the dock button is shown). If `false`, you can still dock programmatically by passing `docked=true` |
 
-The sidebar will always include a header with close/dock buttons. If neither action is enabled, the header will be collapsed.
+The sidebar will always include a header with close/dock buttons (when applicable).
 
-You can also add custom content to the header, by rendering `<Sidebar.Header>` as a child of the `<Sidebar>` component. Note that the custom header will still include the default buttons, when applicable.
+You can also add custom content to the header, by rendering `<Sidebar.Header>` as a child of the `<Sidebar>` component. Note that the custom header will still include the default buttons.
 
 The `<Sidebar.Header>` component takes these props children (all are optional):
 
 | name | type | description |
 | --- | --- | --- |
 | className | string |
-| children | <pre>React.ReactNode</pre> | Content you want to render inside the sidebar header, sibling of the header buttons (if present). |
+| children | <pre>React.ReactNode</pre> | Content you want to render inside the sidebar header, sibling of the header buttons. |
 
-For example code, see the example [`App.tsx`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/example/App.tsx#L527) file.
+For example code, see the example [`App.tsx`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/example/App.tsx#L524) file.
 
 #### `viewModeEnabled`
 
@@ -790,6 +790,16 @@ This API can be used to customise the mouse cursor on the canvas and has the bel
 <pre>
 (cursor: string) => void
 </pre>
+
+#### `toggleMenu`
+
+<pre>
+(type: "library" | "customSidebar", force?: boolean) => boolean
+</pre>
+
+This API can be used to toggle a specific menu (currently only the sidebars), and returns whether the menu was toggled on or off. If the `force` flag passed, it will force the menu to be toggled either on/off based on the boolean passed.
+
+This API is especially useful when you render a custom sidebar using [`renderSidebar`](#renderSidebar) prop, and you want to toggle it from your app based on a user action.
 
 #### `resetCursor`
 
