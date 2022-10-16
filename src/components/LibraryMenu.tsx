@@ -111,11 +111,11 @@ export const LibraryMenu = ({
         if ((event.target as Element).closest(".ToolIcon__library")) {
           return;
         }
-        if (!appState.isLibraryMenuDocked || !device.canDeviceFitSidebar) {
+        if (!appState.isSidebarDocked || !device.canDeviceFitSidebar) {
           onClose();
         }
       },
-      [onClose, appState.isLibraryMenuDocked, device.canDeviceFitSidebar],
+      [onClose, appState.isSidebarDocked, device.canDeviceFitSidebar],
     ),
   );
 
@@ -123,7 +123,7 @@ export const LibraryMenu = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
         event.key === KEYS.ESCAPE &&
-        (!appState.isLibraryMenuDocked || !device.canDeviceFitSidebar)
+        (!appState.isSidebarDocked || !device.canDeviceFitSidebar)
       ) {
         onClose();
       }
@@ -132,7 +132,7 @@ export const LibraryMenu = ({
     return () => {
       document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
     };
-  }, [onClose, appState.isLibraryMenuDocked, device.canDeviceFitSidebar]);
+  }, [onClose, appState.isSidebarDocked, device.canDeviceFitSidebar]);
 
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
   const [showPublishLibraryDialog, setShowPublishLibraryDialog] =

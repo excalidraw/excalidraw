@@ -9,12 +9,13 @@ export type SidebarProps<P = {}> = {
   /** if not supplied, sidebar won't be dockable */
   onDock?: (docked: boolean) => void;
   docked?: boolean;
+  dockable?: boolean;
   className?: string;
 } & P;
 
 export type SidebarPropsContextValue = Pick<
   SidebarProps,
-  "onClose" | "onDock" | "docked"
+  "onClose" | "onDock" | "docked" | "dockable"
 >;
 
 export const SidebarPropsContext =

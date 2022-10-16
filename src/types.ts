@@ -141,6 +141,8 @@ export type AppState = {
     | "strokeColorPicker"
     | null;
   openSidebar: "library" | "customSidebar" | null;
+  isSidebarDocked: boolean;
+
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
@@ -162,7 +164,6 @@ export type AppState = {
   offsetTop: number;
   offsetLeft: number;
 
-  isLibraryMenuDocked: boolean;
   fileHandle: FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;

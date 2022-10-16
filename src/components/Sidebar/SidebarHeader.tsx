@@ -49,7 +49,7 @@ const _SidebarHeader: React.FC<{
   const device = useDevice();
   const props = useContext(SidebarPropsContext);
 
-  const renderDockButton = !!(device.canDeviceFitSidebar && props.onDock);
+  const renderDockButton = !!(device.canDeviceFitSidebar && props.dockable);
   const renderCloseButton = !!props.onClose;
 
   return (
@@ -64,13 +64,11 @@ const _SidebarHeader: React.FC<{
             <SidebarDockButton
               checked={!!props.docked}
               onChange={() => {
-                if (props.onDock) {
-                  document
-                    .querySelector(".layer-ui__wrapper")
-                    ?.classList.add("animate");
+                document
+                  .querySelector(".layer-ui__wrapper")
+                  ?.classList.add("animate");
 
-                  props.onDock(!props.docked);
-                }
+                props.onDock?.(!props.docked);
               }}
             />
           )}

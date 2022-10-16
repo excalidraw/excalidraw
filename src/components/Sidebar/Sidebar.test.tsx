@@ -1,6 +1,7 @@
 import React from "react";
 import { Excalidraw, Sidebar } from "../../packages/excalidraw/index";
 import {
+  act,
   fireEvent,
   queryAllByTestId,
   queryByTestId,
@@ -71,12 +72,15 @@ describe("Sidebar", () => {
   });
 
   it("should always render custom sidebar with close button & close on click", async () => {
+    const onClose = jest.fn();
     const CustomExcalidraw = () => {
       return (
         <Excalidraw
           initialData={{ appState: { openSidebar: "customSidebar" } }}
           renderSidebar={() => (
-            <Sidebar className="test-sidebar">hello</Sidebar>
+            <Sidebar className="test-sidebar" onClose={onClose}>
+              hello
+            </Sidebar>
           )}
         />
       );
@@ -92,24 +96,17 @@ describe("Sidebar", () => {
     fireEvent.click(closeButton!.querySelector("button")!);
     await waitFor(() => {
       expect(container.querySelector<HTMLElement>(".test-sidebar")).toBe(null);
+      expect(onClose).toHaveBeenCalled();
     });
   });
 
-  it("should render custom sidebar with dock button when onDock passed", async () => {
+  it("should render custom sidebar with dock (irrespective of onDock prop)", async () => {
     const CustomExcalidraw = () => {
-      const [isDocked, setIsDocked] = React.useState(true);
-
       return (
         <Excalidraw
           initialData={{ appState: { openSidebar: "customSidebar" } }}
           renderSidebar={() => (
-            <Sidebar
-              className="test-sidebar"
-              docked={isDocked}
-              onDock={() => setIsDocked(false)}
-            >
-              hello
-            </Sidebar>
+            <Sidebar className="test-sidebar">hello</Sidebar>
           )}
         />
       );
@@ -135,6 +132,155 @@ describe("Sidebar", () => {
       expect(sidebar).not.toBe(null);
       const closeButton = queryByTestId(sidebar!, "sidebar-dock");
       expect(closeButton).toBe(null);
+    });
+  });
+
+  it("should support controlled docking", async () => {
+    let _setDockable: (dockable: boolean) => void = null!;
+
+    const CustomExcalidraw = () => {
+      const [dockable, setDockable] = React.useState(false);
+      _setDockable = setDockable;
+      return (
+        <Excalidraw
+          initialData={{ appState: { openSidebar: "customSidebar" } }}
+          renderSidebar={() => (
+            <Sidebar
+              className="test-sidebar"
+              docked={false}
+              dockable={dockable}
+            >
+              hello
+            </Sidebar>
+          )}
+        />
+      );
+    };
+
+    const { container } = await render(<CustomExcalidraw />);
+
+    await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
+      // should not show dock button when `dockable` is `false`
+      // -------------------------------------------------------------------------
+
+      act(() => {
+        _setDockable(false);
+      });
+
+      await waitFor(() => {
+        const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
+        expect(sidebar).not.toBe(null);
+        const closeButton = queryByTestId(sidebar!, "sidebar-dock");
+        expect(closeButton).toBe(null);
+      });
+
+      // should show dock button when `dockable` is `true`, even if `docked`
+      // prop is set
+      // -------------------------------------------------------------------------
+
+      act(() => {
+        _setDockable(true);
+      });
+
+      await waitFor(() => {
+        const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
+        expect(sidebar).not.toBe(null);
+        const closeButton = queryByTestId(sidebar!, "sidebar-dock");
+        expect(closeButton).not.toBe(null);
+      });
+    });
+  });
+
+  it("should support controlled docking", async () => {
+    let _setDocked: (docked?: boolean) => void = null!;
+
+    const CustomExcalidraw = () => {
+      const [docked, setDocked] = React.useState<boolean | undefined>();
+      _setDocked = setDocked;
+      return (
+        <Excalidraw
+          initialData={{ appState: { openSidebar: "customSidebar" } }}
+          renderSidebar={() => (
+            <Sidebar className="test-sidebar" docked={docked}>
+              hello
+            </Sidebar>
+          )}
+        />
+      );
+    };
+
+    const { container } = await render(<CustomExcalidraw />);
+
+    const { h } = window;
+
+    await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
+      const dockButton = await waitFor(() => {
+        const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
+        expect(sidebar).not.toBe(null);
+        const dockBotton = queryByTestId(sidebar!, "sidebar-dock");
+        expect(dockBotton).not.toBe(null);
+        return dockBotton!;
+      });
+
+      const dockButtonInput = dockButton.querySelector("input")!;
+
+      // should not show dock button when `dockable` is `false`
+      // -------------------------------------------------------------------------
+
+      expect(h.state.isSidebarDocked).toBe(false);
+
+      fireEvent.click(dockButtonInput);
+      await waitFor(() => {
+        expect(h.state.isSidebarDocked).toBe(true);
+        expect(dockButtonInput).toBeChecked();
+      });
+
+      fireEvent.click(dockButtonInput);
+      await waitFor(() => {
+        expect(h.state.isSidebarDocked).toBe(false);
+        expect(dockButtonInput).not.toBeChecked();
+      });
+
+      // shouldn't update `appState.isSidebarDocked` when the sidebar
+      // is controlled (`docked` prop is set), as host apps should handle
+      // the state themselves
+      // -------------------------------------------------------------------------
+
+      act(() => {
+        _setDocked(true);
+      });
+
+      await waitFor(() => {
+        expect(dockButtonInput).toBeChecked();
+        expect(h.state.isSidebarDocked).toBe(false);
+        expect(dockButtonInput).toBeChecked();
+      });
+
+      fireEvent.click(dockButtonInput);
+      await waitFor(() => {
+        expect(h.state.isSidebarDocked).toBe(false);
+        expect(dockButtonInput).toBeChecked();
+      });
+
+      // the `appState.isSidebarDocked` should remain untouched when
+      // `props.docked` is set to `false`, and user toggles
+      // -------------------------------------------------------------------------
+
+      act(() => {
+        _setDocked(false);
+        h.setState({ isSidebarDocked: true });
+      });
+
+      await waitFor(() => {
+        expect(h.state.isSidebarDocked).toBe(true);
+        expect(dockButtonInput).not.toBeChecked();
+      });
+
+      fireEvent.click(dockButtonInput);
+      await waitFor(() => {
+        expect(dockButtonInput).not.toBeChecked();
+        expect(h.state.isSidebarDocked).toBe(true);
+      });
     });
   });
 

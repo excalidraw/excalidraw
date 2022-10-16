@@ -446,7 +446,7 @@ const LayerUI = ({
             })}
             style={
               ((appState.openSidebar === "library" &&
-                appState.isLibraryMenuDocked) ||
+                appState.isSidebarDocked) ||
                 hostSidebarCounters.docked) &&
               device.canDeviceFitSidebar
                 ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
@@ -494,16 +494,12 @@ const LayerUI = ({
               // is colled correctly
               key="library"
               onDock={(docked) => {
-                setAppState({
-                  isLibraryMenuDocked: docked,
-                });
                 trackEvent(
                   "library",
                   `toggleLibraryDock (${docked ? "dock" : "undock"})`,
                   `sidebar (${device.isMobile ? "mobile" : "desktop"})`,
                 );
               }}
-              docked={appState.isLibraryMenuDocked}
             >
               {libraryMenu}
             </Sidebar>

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Island } from ".././Island";
 import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../../jotai";
@@ -13,6 +13,7 @@ import { SidebarHeaderComponents } from "./SidebarHeader";
 import "./Sidebar.scss";
 import clsx from "clsx";
 import { useExcalidrawSetAppState } from "../App";
+import { updateObject } from "../../utils";
 
 /** using a counter instead of boolean to handle race conditions where
  * the host app may render (mount/unmount) multiple different sidebar */
@@ -23,6 +24,7 @@ export const Sidebar = ({
   onClose,
   onDock,
   docked,
+  dockable = true,
   className,
   __isInternal,
 }: SidebarProps<{
@@ -39,20 +41,38 @@ export const Sidebar = ({
 
   const setAppState = useExcalidrawSetAppState();
 
+  const [isDockedFallback, setIsDockedFallback] = useState(docked ?? false);
+
+  useLayoutEffect(() => {
+    if (docked === undefined) {
+      // ugly hack to get initial state out of AppState without susbcribing
+      // to it as a whole (once we have granular subscriptions, we'll move
+      // to that)
+      //
+      // NOTE this means that is updated `state.isSidebarDocked` changes outside
+      // of this compoent, it won't be reflected here. Currently doesn't happen.
+      setAppState((state) => {
+        setIsDockedFallback(state.isSidebarDocked);
+        // bail from update
+        return null;
+      });
+    }
+  }, [setAppState, docked]);
+
   useLayoutEffect(() => {
     if (!__isInternal) {
       setHostSidebarCounters((s) => ({
         rendered: s.rendered + 1,
-        docked: docked ? s.docked + 1 : s.docked,
+        docked: isDockedFallback ? s.docked + 1 : s.docked,
       }));
       return () => {
         setHostSidebarCounters((s) => ({
           rendered: s.rendered - 1,
-          docked: docked ? s.docked - 1 : s.docked,
+          docked: isDockedFallback ? s.docked - 1 : s.docked,
         }));
       };
     }
-  }, [__isInternal, setHostSidebarCounters, docked]);
+  }, [__isInternal, setHostSidebarCounters, isDockedFallback]);
 
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -67,8 +87,20 @@ export const Sidebar = ({
   headerPropsRef.current.onClose = () => {
     setAppState({ openSidebar: null });
   };
-  headerPropsRef.current.onDock = onDock;
-  headerPropsRef.current.docked = docked;
+  headerPropsRef.current.onDock = (isDocked) => {
+    if (docked === undefined) {
+      setAppState({ isSidebarDocked: isDocked });
+      setIsDockedFallback(isDocked);
+    }
+    onDock?.(isDocked);
+  };
+  // renew the ref object if the following props change since we want to
+  // rerender. We can't pass down as component props manually because
+  // the <Sidebar.Header/> can be rendered upsream.
+  headerPropsRef.current = updateObject(headerPropsRef.current, {
+    docked: docked ?? isDockedFallback,
+    dockable,
+  });
 
   if (hostSidebarCounters.rendered > 0 && __isInternal) {
     return null;

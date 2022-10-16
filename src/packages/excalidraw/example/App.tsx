@@ -118,8 +118,6 @@ export default function App() {
   );
   const [comment, setComment] = useState<Comment | null>(null);
 
-  const [isSidebarDocked, setIsSidebarDocked] = useState(false);
-
   const initialStatePromiseRef = useRef<{
     promise: ResolvablePromise<ExcalidrawInitialDataState | null>;
   }>({ promise: null! });
@@ -525,10 +523,7 @@ export default function App() {
 
   const renderSidebar = () => {
     return (
-      <Sidebar
-        docked={isSidebarDocked}
-        onDock={(docked) => setIsSidebarDocked(docked)}
-      >
+      <Sidebar>
         <Sidebar.Header>Custom header!</Sidebar.Header>
         Custom sidebar!
       </Sidebar>
