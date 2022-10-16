@@ -8,7 +8,12 @@ import { AppState } from "../types";
 import { getTransformHandles } from "../element/transformHandles";
 import { updateBoundElements } from "../element/binding";
 import { arrayToMap } from "../utils";
-import { getResizedElementAbsoluteCoords } from "../element/bounds";
+import {
+  getElementAbsoluteCoords,
+  getElementPointsCoords,
+} from "../element/bounds";
+import { isLinearElement } from "../element/typeChecks";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 const enableActionFlipHorizontal = (
   elements: readonly ExcalidrawElement[],
@@ -137,22 +142,52 @@ const flipElement = (
     }
   }
 
-  const [axTopLeft, ayTopLeft] = getResizedElementAbsoluteCoords(
-    element,
-    width,
-    height,
-    false,
-  );
+  let finalOffsetX = 0;
+  if (isLinearElement(element) && element.points.length < 3) {
+    finalOffsetX =
+      element.points.reduce((max, point) => Math.max(max, point[0]), 0) * 2 -
+      element.width;
+  }
 
-  resizeSingleElement(
-    new Map().set(element.id, element),
-    true,
-    element,
-    usingNWHandle ? "nw" : "ne",
-    false,
-    usingNWHandle ? axTopLeft + width * 2 : ayTopLeft - width * 2,
-    ayTopLeft,
-  );
+  let initialPointsCoords;
+  if (isLinearElement(element)) {
+    initialPointsCoords = getElementPointsCoords(
+      element,
+      element.points,
+      element.strokeSharpness,
+    );
+  }
+  const initialElementAbsoluteCoords = getElementAbsoluteCoords(element);
+
+  if (isLinearElement(element) && element.points.length < 3) {
+    for (let index = 1; index < element.points.length; index++) {
+      LinearElementEditor.movePoints(element, [
+        {
+          index,
+          point: [-element.points[index][0], element.points[index][1]],
+        },
+      ]);
+    }
+    LinearElementEditor.normalizePoints(element);
+  } else {
+    const elWidth = initialPointsCoords
+      ? initialPointsCoords[2] - initialPointsCoords[0]
+      : initialElementAbsoluteCoords[2] - initialElementAbsoluteCoords[0];
+
+    const startPoint = initialPointsCoords
+      ? [initialPointsCoords[0], initialPointsCoords[1]]
+      : [initialElementAbsoluteCoords[0], initialElementAbsoluteCoords[1]];
+
+    resizeSingleElement(
+      new Map().set(element.id, element),
+      false,
+      element,
+      usingNWHandle ? "nw" : "ne",
+      true,
+      usingNWHandle ? startPoint[0] + elWidth : startPoint[0] - elWidth,
+      startPoint[1],
+    );
+  }
 
   // Rotate by (360 degrees - original angle)
   let angle = normalizeAngle(2 * Math.PI - originalAngle);
@@ -166,11 +201,36 @@ const flipElement = (
 
   // Move back to original spot to appear "flipped in place"
   mutateElement(element, {
-    x: originalX,
+    x: originalX + finalOffsetX,
     y: originalY,
+    width,
+    height,
   });
 
   updateBoundElements(element);
+
+  if (initialPointsCoords && isLinearElement(element)) {
+    // Adjusting origin because when a beizer curve path exceeds min/max points it offsets the origin.
+    // There's still room for improvement since when the line roughness is > 1
+    // we still have a small offset of the origin when fliipping the element.
+    const finalPointsCoords = getElementPointsCoords(
+      element,
+      element.points,
+      element.strokeSharpness,
+    );
+
+    const topLeftCoordsDiff = initialPointsCoords[0] - finalPointsCoords[0];
+    const topRightCoordDiff = initialPointsCoords[2] - finalPointsCoords[2];
+
+    const coordsDiff = topLeftCoordsDiff + topRightCoordDiff;
+
+    mutateElement(element, {
+      x: element.x + coordsDiff * 0.5,
+      y: element.y,
+      width,
+      height,
+    });
+  }
 };
 
 const rotateElement = (element: ExcalidrawElement, rotationAngle: number) => {
