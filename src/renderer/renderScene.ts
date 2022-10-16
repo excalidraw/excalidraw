@@ -143,7 +143,7 @@ const strokeGrid = (
   height: number,
 ) => {
   context.save();
-  context.strokeStyle = "rgba(0,0,0,0.1)";
+  context.strokeStyle = "rgba(128,128,128,0.1)"; //zsviczian
   context.beginPath();
   for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
     context.moveTo(x, offsetY - gridSize);
@@ -902,7 +902,7 @@ const renderBindingHighlightForBindableElement = (
 
   // So that we don't overlap the element itself
   const strokeOffset = 4;
-  context.strokeStyle = "rgba(0,0,0,.05)";
+  context.strokeStyle = "rgba(128,128,128,.1)"; //zsviczian
   context.lineWidth = threshold - strokeOffset;
   const padding = strokeOffset / 2 + threshold / 2;
 
@@ -960,7 +960,7 @@ const renderBindingHighlightForSuggestedPointBinding = (
   );
 
   context.strokeStyle = "rgba(0,0,0,0)";
-  context.fillStyle = "rgba(0,0,0,.05)";
+  context.fillStyle = "rgba(128,128,128,.1)"; //zsviczian "rgba(0,0,0,.05)";
 
   const pointIndices =
     startOrEnd === "both" ? [0, -1] : startOrEnd === "start" ? [0] : [-1];

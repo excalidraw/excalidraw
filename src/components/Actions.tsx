@@ -237,11 +237,13 @@ export const ShapesSwitcher = ({
             const nextActiveTool = updateActiveTool(appState, {
               type: value,
             });
-            setAppState({
-              activeTool: nextActiveTool,
-              multiElement: null,
-              selectedElementIds: {},
-            });
+            setTimeout(() =>
+              setAppState({
+                activeTool: nextActiveTool,
+                multiElement: null,
+                selectedElementIds: {},
+              }),
+            ); //zsviczian added setTimeout wrapper because tools wouldn't select on first click
             setCursorForShape(canvas, {
               ...appState,
               activeTool: nextActiveTool,
