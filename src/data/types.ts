@@ -17,9 +17,18 @@ export interface ExportedDataState {
   files: BinaryFiles | undefined;
 }
 
+/**
+ * Map of legacy AppState keys, with values of:
+ *  [<legacy type>, <new AppState proeprty>]
+ *
+ * This is a helper type used in downstream abstractions.
+ * Don't consume on its own.
+ */
 export type LegacyAppState = {
-  /** @deprecated #5663 TODO remove 22-12-14 */
-  isLibraryOpen: boolean;
+  /** @deprecated #5663 TODO remove 22-12-15 */
+  isLibraryOpen: [boolean, "openSidebar"];
+  /** @deprecated #5663 TODO remove 22-12-15 */
+  isLibraryMenuDocked: [boolean, "isSidebarDocked"];
 };
 
 export interface ImportedDataState {
@@ -27,7 +36,13 @@ export interface ImportedDataState {
   version?: number;
   source?: string;
   elements?: readonly ExcalidrawElement[] | null;
-  appState?: Readonly<Partial<AppState & LegacyAppState>> | null;
+  appState?: Readonly<
+    Partial<
+      AppState & {
+        [T in keyof LegacyAppState]: LegacyAppState[T][0];
+      }
+    >
+  > | null;
   scrollToContent?: boolean;
   libraryItems?: LibraryItems_anyVersion;
   files?: BinaryFiles;
