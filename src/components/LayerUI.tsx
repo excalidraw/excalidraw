@@ -40,6 +40,9 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
+import { hostSidebarCountersAtom, Sidebar } from "./Sidebar/Sidebar";
+import { jotaiScope } from "../jotai";
+import { useAtom } from "jotai";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -58,6 +61,7 @@ interface LayerUIProps {
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomFooter?: ExcalidrawProps["renderFooter"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
+  renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   UIOptions: AppProps["UIOptions"];
   focusContainer: () => void;
@@ -81,6 +85,7 @@ const LayerUI = ({
   renderTopRightUI,
   renderCustomFooter,
   renderCustomStats,
+  renderCustomSidebar,
   libraryReturnUrl,
   UIOptions,
   focusContainer,
@@ -252,7 +257,7 @@ const LayerUI = ({
     if (isDialogOpen) {
       return;
     }
-    setAppState({ isLibraryOpen: false });
+    setAppState({ openSidebar: null });
   }, [setAppState]);
 
   const deselectItems = useCallback(() => {
@@ -262,23 +267,24 @@ const LayerUI = ({
     });
   }, [setAppState]);
 
-  const libraryMenu = appState.isLibraryOpen ? (
-    <LibraryMenu
-      pendingElements={getSelectedElements(elements, appState, true)}
-      onClose={closeLibrary}
-      onInsertLibraryItems={(libraryItems) => {
-        onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
-      }}
-      onAddToLibrary={deselectItems}
-      setAppState={setAppState}
-      libraryReturnUrl={libraryReturnUrl}
-      focusContainer={focusContainer}
-      library={library}
-      files={files}
-      id={id}
-      appState={appState}
-    />
-  ) : null;
+  const libraryMenu =
+    appState.openSidebar === "library" ? (
+      <LibraryMenu
+        pendingElements={getSelectedElements(elements, appState, true)}
+        onClose={closeLibrary}
+        onInsertLibraryItems={(libraryItems) => {
+          onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
+        }}
+        onAddToLibrary={deselectItems}
+        setAppState={setAppState}
+        libraryReturnUrl={libraryReturnUrl}
+        focusContainer={focusContainer}
+        library={library}
+        files={files}
+        id={id}
+        appState={appState}
+      />
+    ) : null;
 
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
@@ -339,6 +345,7 @@ const LayerUI = ({
                           ) &&
                             appState.trayModeEnabled)
                         } //zsviczian
+                        device={device}
                       />
                       {heading}
                       <Stack.Row gap={1}>
@@ -396,6 +403,7 @@ const LayerUI = ({
     device.isMobile ||
     (!(appState.viewModeEnabled || appState.zenModeEnabled) &&
       appState.trayModeEnabled); //zsviczian
+  const [hostSidebarCounters] = useAtom(hostSidebarCountersAtom, jotaiScope);
 
   return (
     <>
@@ -443,6 +451,8 @@ const LayerUI = ({
           onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
+          renderCustomSidebar={renderCustomSidebar}
+          device={device}
         />
       )}
 
@@ -457,8 +467,9 @@ const LayerUI = ({
                   !isTextElement(appState.editingElement)),
             })}
             style={
-              appState.isLibraryOpen &&
-              appState.isLibraryMenuDocked &&
+              ((appState.openSidebar === "library" &&
+                appState.isSidebarDocked) ||
+                hostSidebarCounters.docked) &&
               device.canDeviceFitSidebar
                 ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
                 : {}
@@ -495,9 +506,26 @@ const LayerUI = ({
               </button>
             )}
           </div>
-          {appState.isLibraryOpen && (
-            <div className="layer-ui__sidebar">{libraryMenu}</div>
-          )}
+          {appState.openSidebar === "customSidebar" ? (
+            renderCustomSidebar?.()
+          ) : appState.openSidebar === "library" ? (
+            <Sidebar
+              __isInternal
+              // necessary to remount when switching between internal
+              // and custom (host app) sidebar, so that the `props.onClose`
+              // is colled correctly
+              key="library"
+              onDock={(docked) => {
+                trackEvent(
+                  "library",
+                  `toggleLibraryDock (${docked ? "dock" : "undock"})`,
+                  `sidebar (${device.isMobile ? "mobile" : "desktop"})`,
+                );
+              }}
+            >
+              {libraryMenu}
+            </Sidebar>
+          ) : null}
         </>
       )}
     </>
@@ -517,8 +545,12 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   const nextAppState = getNecessaryObj(next.appState);
 
   const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
+
   return (
     prev.renderCustomFooter === next.renderCustomFooter &&
+    prev.renderTopRightUI === next.renderTopRightUI &&
+    prev.renderCustomStats === next.renderCustomStats &&
+    prev.renderCustomSidebar === next.renderCustomSidebar &&
     prev.langCode === next.langCode &&
     prev.elements === next.elements &&
     prev.files === next.files &&
