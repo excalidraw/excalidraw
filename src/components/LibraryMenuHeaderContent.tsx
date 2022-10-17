@@ -131,6 +131,40 @@ export const LibraryMenuHeaderContent: React.FC<{
     [setShowPublishLibraryDialog, setPublishLibSuccess, selectedItems, library],
   );
 
+  const onLibraryImport = async () => {
+    try {
+      await library.updateLibrary({
+        libraryItems: fileOpen({
+          description: "Excalidraw library files",
+          // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
+          // gets resolved. Else, iOS users cannot open `.excalidraw` files.
+          /*
+            extensions: [".json", ".excalidrawlib"],
+            */
+        }),
+        merge: true,
+        openLibraryMenu: true,
+      });
+    } catch (error: any) {
+      if (error?.name === "AbortError") {
+        console.warn(error);
+        return;
+      }
+      setAppState({ errorMessage: t("errors.importLibraryError") });
+    }
+  };
+
+  const onLibraryExport = async () => {
+    const libraryItems = itemsSelected
+      ? items
+      : await library.getLatestLibrary();
+    saveLibraryAsJSON(libraryItems)
+      .catch(muteFSAbortError)
+      .catch((error) => {
+        setAppState({ errorMessage: error.message });
+      });
+  };
+
   return (
     <div className="library-actions">
       {showRemoveLibAlert && renderRemoveLibAlert()}
@@ -162,28 +196,7 @@ export const LibraryMenuHeaderContent: React.FC<{
           title={t("buttons.load")}
           aria-label={t("buttons.load")}
           icon={load}
-          onClick={async () => {
-            try {
-              await library.updateLibrary({
-                libraryItems: fileOpen({
-                  description: "Excalidraw library files",
-                  // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
-                  // gets resolved. Else, iOS users cannot open `.excalidraw` files.
-                  /*
-                    extensions: [".json", ".excalidrawlib"],
-                    */
-                }),
-                merge: true,
-                openLibraryMenu: true,
-              });
-            } catch (error: any) {
-              if (error?.name === "AbortError") {
-                console.warn(error);
-                return;
-              }
-              setAppState({ errorMessage: t("errors.importLibraryError") });
-            }
-          }}
+          onClick={onLibraryImport}
           className="library-actions--load"
         />
       )}
@@ -195,16 +208,7 @@ export const LibraryMenuHeaderContent: React.FC<{
             title={t("buttons.export")}
             aria-label={t("buttons.export")}
             icon={exportToFileIcon}
-            onClick={async () => {
-              const libraryItems = itemsSelected
-                ? items
-                : await library.getLatestLibrary();
-              saveLibraryAsJSON(libraryItems)
-                .catch(muteFSAbortError)
-                .catch((error) => {
-                  setAppState({ errorMessage: error.message });
-                });
-            }}
+            onClick={onLibraryExport}
             className="library-actions--export"
           >
             {selectedItems.length > 0 && (
@@ -240,7 +244,6 @@ export const LibraryMenuHeaderContent: React.FC<{
             className="library-actions--publish"
             onClick={() => setShowPublishLibraryDialog(true)}
           >
-            {/* {!device.isMobile && <label>{t("buttons.publishLibrary")}</label>} */}
             <label>{t("buttons.publishLibrary")}</label>
             {selectedItems.length > 0 && (
               <span className="library-actions-counter">
