@@ -115,8 +115,8 @@
       "label": "链接"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "编辑线条",
+      "exit": "退出线条编辑"
     },
     "elementLock": {
       "lock": "锁定",
