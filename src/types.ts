@@ -79,6 +79,7 @@ export type LastActiveToolBeforeEraser =
     }
   | null;
 export type AppState = {
+  showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: string | null;
   draggingElement: NonDeletedExcalidrawElement | null;

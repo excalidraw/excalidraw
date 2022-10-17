@@ -42,6 +42,7 @@ import Footer from "./Footer";
 import { HamburgerMenuIcon } from "./icons";
 import { MenuLinks, Separator } from "./MenuUtils";
 import { useOutsideClickHook } from "../hooks/useOutsideClick";
+import WelcomeScreen from "./WelcomeScreen";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -66,6 +67,7 @@ interface LayerUIProps {
   library: Library;
   id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
+  renderWelcomeScreen: boolean;
 }
 const LayerUI = ({
   actionManager,
@@ -89,6 +91,7 @@ const LayerUI = ({
   library,
   id,
   onImageAction,
+  renderWelcomeScreen,
 }: LayerUIProps) => {
   const device = useDevice();
 
@@ -393,6 +396,7 @@ const LayerUI = ({
 
   return (
     <>
+      {renderWelcomeScreen && <WelcomeScreen />}
       {appState.isLoading && <LoadingMessage delay={250} />}
       {appState.errorMessage && (
         <ErrorDialog

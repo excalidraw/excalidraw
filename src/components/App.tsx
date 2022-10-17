@@ -560,6 +560,11 @@ class App extends React.Component<AppProps, AppState> {
                   library={this.library}
                   id={this.id}
                   onImageAction={this.onImageAction}
+                  renderWelcomeScreen={
+                    this.state.showWelcomeScreen &&
+                    this.state.activeTool.type === "selection" &&
+                    !this.scene.getElementsIncludingDeleted().length
+                  }
                 />
                 <div className="excalidraw-textEditorContainer" />
                 <div className="excalidraw-contextMenuContainer" />
@@ -1074,6 +1079,13 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    if (
+      !this.state.showWelcomeScreen &&
+      !this.scene.getElementsIncludingDeleted().length
+    ) {
+      this.setState({ showWelcomeScreen: true });
+    }
+
     if (
       this.excalidrawContainerRef.current &&
       prevProps.UIOptions.dockedSidebarBreakpoint !==
