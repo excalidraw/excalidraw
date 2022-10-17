@@ -9,7 +9,7 @@ import {
   LibraryItem,
   NormalizedZoomValue,
 } from "../types";
-import { ImportedDataState } from "./types";
+import { ImportedDataState, LegacyAppState } from "./types";
 import {
   getNonDeletedElements,
   getNormalizedDimensions,
@@ -251,6 +251,43 @@ export const restoreElements = (
   }, [] as ExcalidrawElement[]);
 };
 
+const coalesceAppStateValue = <
+  T extends keyof ReturnType<typeof getDefaultAppState>,
+>(
+  key: T,
+  appState: Exclude<ImportedDataState["appState"], null | undefined>,
+  defaultAppState: ReturnType<typeof getDefaultAppState>,
+) => {
+  const value = appState[key];
+  // NOTE the value! assertion is needed in TS 4.5.5 (fixed in newer versions)
+  return value !== undefined ? value! : defaultAppState[key];
+};
+
+const LegacyAppStateMigrations: {
+  [K in keyof LegacyAppState]: (
+    ImportedDataState: Exclude<ImportedDataState["appState"], null | undefined>,
+    defaultAppState: ReturnType<typeof getDefaultAppState>,
+  ) => [LegacyAppState[K][1], AppState[LegacyAppState[K][1]]];
+} = {
+  isLibraryOpen: (appState, defaultAppState) => {
+    return [
+      "openSidebar",
+      "isLibraryOpen" in appState
+        ? appState.isLibraryOpen
+          ? "library"
+          : null
+        : coalesceAppStateValue("openSidebar", appState, defaultAppState),
+    ];
+  },
+  isLibraryMenuDocked: (appState, defaultAppState) => {
+    return [
+      "isSidebarDocked",
+      appState.isLibraryMenuDocked ??
+        coalesceAppStateValue("isSidebarDocked", appState, defaultAppState),
+    ];
+  },
+};
+
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null | undefined,
@@ -258,11 +295,30 @@ export const restoreAppState = (
   appState = appState || {};
   const defaultAppState = getDefaultAppState();
   const nextAppState = {} as typeof defaultAppState;
+
+  // first, migrate all legacy AppState properties to new ones. We do it
+  // in one go before migrate the rest of the properties in case the new ones
+  // depend on checking any other key (i.e. they are coupled)
+  for (const legacyKey of Object.keys(
+    LegacyAppStateMigrations,
+  ) as (keyof typeof LegacyAppStateMigrations)[]) {
+    if (legacyKey in appState) {
+      const [nextKey, nextValue] = LegacyAppStateMigrations[legacyKey](
+        appState,
+        defaultAppState,
+      );
+      (nextAppState as any)[nextKey] = nextValue;
+    }
+  }
+
   for (const [key, defaultValue] of Object.entries(defaultAppState) as [
     keyof typeof defaultAppState,
     any,
   ][]) {
+    // if AppState contains a legacy key, prefer that one and migrate its
+    // value to the new one
     const suppliedValue = appState[key];
+
     const localValue = localAppState ? localAppState[key] : undefined;
     (nextAppState as any)[key] =
       suppliedValue !== undefined
@@ -299,9 +355,12 @@ export const restoreAppState = (
         : appState.zoom || defaultAppState.zoom,
     // when sidebar docked and user left it open in last session,
     // keep it open. If not docked, keep it closed irrespective of last state.
-    isLibraryOpen: nextAppState.isLibraryMenuDocked
-      ? nextAppState.isLibraryOpen
-      : false,
+    openSidebar:
+      nextAppState.openSidebar === "library"
+        ? nextAppState.isSidebarDocked
+          ? "library"
+          : null
+        : nextAppState.openSidebar,
   };
 };
 

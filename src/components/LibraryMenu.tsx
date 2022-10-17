@@ -17,7 +17,6 @@ import {
   ExcalidrawProps,
 } from "../types";
 import { Dialog } from "./Dialog";
-import { Island } from "./Island";
 import PublishLibrary from "./PublishLibrary";
 import { ToolButton } from "./ToolButton";
 
@@ -69,9 +68,9 @@ const LibraryMenuWrapper = forwardRef<
   { children: React.ReactNode }
 >(({ children }, ref) => {
   return (
-    <Island padding={1} ref={ref} className="layer-ui__library">
+    <div ref={ref} className="layer-ui__library">
       {children}
-    </Island>
+    </div>
   );
 });
 
@@ -112,11 +111,11 @@ export const LibraryMenu = ({
         if ((event.target as Element).closest(".ToolIcon__library")) {
           return;
         }
-        if (!appState.isLibraryMenuDocked || !device.canDeviceFitSidebar) {
+        if (!appState.isSidebarDocked || !device.canDeviceFitSidebar) {
           onClose();
         }
       },
-      [onClose, appState.isLibraryMenuDocked, device.canDeviceFitSidebar],
+      [onClose, appState.isSidebarDocked, device.canDeviceFitSidebar],
     ),
   );
 
@@ -124,7 +123,7 @@ export const LibraryMenu = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
         event.key === KEYS.ESCAPE &&
-        (!appState.isLibraryMenuDocked || !device.canDeviceFitSidebar)
+        (!appState.isSidebarDocked || !device.canDeviceFitSidebar)
       ) {
         onClose();
       }
@@ -133,7 +132,7 @@ export const LibraryMenu = ({
     return () => {
       document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
     };
-  }, [onClose, appState.isLibraryMenuDocked, device.canDeviceFitSidebar]);
+  }, [onClose, appState.isSidebarDocked, device.canDeviceFitSidebar]);
 
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
   const [showPublishLibraryDialog, setShowPublishLibraryDialog] =
