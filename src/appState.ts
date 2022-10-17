@@ -1,4 +1,3 @@
-import oc from "open-color";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -31,7 +30,7 @@ export const getDefaultAppState = (): Omit<
     currentItemOpacity: 100,
     currentItemRoughness: 0,
     currentItemStartArrowhead: null,
-    currentItemStrokeColor: oc.black,
+    currentItemStrokeColor: "#1F2123",
     currentItemStrokeSharpness: "round",
     currentItemStrokeStyle: "solid",
     currentItemStrokeWidth: 1,
