@@ -8,6 +8,13 @@
 
   .menu-button {
     @include outlineButtonStyles;
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
+
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
   }
 
   .menu-item {

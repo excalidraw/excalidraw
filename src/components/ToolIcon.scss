@@ -51,8 +51,8 @@
 
     svg {
       position: relative;
-      width: 1rem;
-      height: 1rem;
+      width: var(--default-icon-size);
+      height: var(--default-icon-size);
       color: var(--icon-fill-color);
     }
   }
@@ -157,6 +157,18 @@
 
     :root[dir="rtl"] & {
       right: 2px;
+    }
+  }
+
+  .App-toolbar-container {
+    .ToolIcon__icon {
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+
+      svg {
+        width: var(--lg-icon-size);
+        height: var(--lg-icon-size);
+      }
     }
   }
 }

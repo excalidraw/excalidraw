@@ -362,10 +362,12 @@
 
   .help-icon {
     @include outlineButtonStyles;
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
 
     svg {
-      width: 1rem;
-      height: 1rem;
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
     }
   }
 

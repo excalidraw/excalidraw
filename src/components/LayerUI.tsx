@@ -292,7 +292,7 @@ const LayerUI = ({
         <div className="App-menu App-menu_top">
           <Stack.Col
             style={{ width: "192px" }}
-            gap={4}
+            gap={6}
             className={clsx({
               "disable-pointerEvents": appState.zenModeEnabled,
             })}

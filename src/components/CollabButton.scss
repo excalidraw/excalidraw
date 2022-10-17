@@ -3,6 +3,13 @@
 .excalidraw {
   .collab-button {
     @include outlineButtonStyles;
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
+
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
     background-color: var(--color-primary);
     border-color: var(--color-primary);
     color: white;
