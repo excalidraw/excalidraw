@@ -149,6 +149,8 @@ export const handleBindTextResize = (
     let nextHeight = textElement.height;
     let nextWidth = textElement.width;
     const containerDims = getContainerDims(container);
+    const maxWidth = getMaxContainerWidth(container);
+    const maxHeight = getMaxContainerHeight(container);
     let containerHeight = containerDims.height;
     let nextBaseLine = textElement.baseline;
     if (transformHandleType !== "n" && transformHandleType !== "s") {
@@ -156,20 +158,20 @@ export const handleBindTextResize = (
         text = wrapText(
           textElement.originalText,
           getFontString(textElement),
-          getMaxContainerWidth(container),
+          maxWidth,
         );
       }
       const dimensions = measureText(
         text,
         getFontString(textElement),
-        containerDims.width,
+        maxWidth,
       );
       nextHeight = dimensions.height;
       nextWidth = dimensions.width;
       nextBaseLine = dimensions.baseline;
     }
     // increase height in case text element height exceeds
-    if (nextHeight > containerDims.height - BOUND_TEXT_PADDING * 2) {
+    if (nextHeight > maxHeight) {
       containerHeight = nextHeight + BOUND_TEXT_PADDING * 2;
       const diff = containerHeight - containerDims.height;
       // fix the y coord when resizing from ne/nw/n

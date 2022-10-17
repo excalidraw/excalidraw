@@ -28,6 +28,7 @@ import {
   wrapText,
 } from "./textElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+import { isLinearElement } from "./typeChecks";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -254,6 +255,9 @@ const getAdjustedDimensions = (
 
 export const getMaxContainerWidth = (container: ExcalidrawElement) => {
   const width = getContainerDims(container).width;
+  if (isLinearElement(container)) {
+    return width - BOUND_TEXT_PADDING * 15;
+  }
   return width - BOUND_TEXT_PADDING * 2;
 };
 

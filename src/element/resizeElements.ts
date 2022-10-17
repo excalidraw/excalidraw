@@ -664,13 +664,6 @@ export const resizeSingleElement = (
     });
 
     mutateElement(element, resizedElement);
-    if (isLinearElement(element) && boundTextElement) {
-      LinearElementEditor.updateBoundTextPosition(
-        element,
-        boundTextElement,
-        "update",
-      );
-    }
     if (boundTextElement && boundTextFont) {
       mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
     }

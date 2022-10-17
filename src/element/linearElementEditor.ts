@@ -34,7 +34,7 @@ import {
 import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
 import { shouldRotateWithDiscreteAngle } from "../keys";
-import { getBoundTextElement } from "./textElement";
+import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { isPointHittingElementBoundingBox } from "./collision";
 
 const editorMidPointsCache: {
@@ -247,6 +247,11 @@ export class LinearElementEditor {
             };
           }),
         );
+
+        const boundTextElement = getBoundTextElement(element);
+        if (boundTextElement) {
+          handleBindTextResize(element, false);
+        }
       }
 
       // suggest bindings for first and last point if selected
