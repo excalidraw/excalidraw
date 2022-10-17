@@ -56,7 +56,7 @@ export const Sidebar = Object.assign(
 
       useLayoutEffect(() => {
         if (docked === undefined) {
-          // ugly hack to get initial state out of AppState without susbcribing
+          // ugly hack to get initial state out of AppState without subscribing
           // to it as a whole (once we have granular subscriptions, we'll move
           // to that)
           //

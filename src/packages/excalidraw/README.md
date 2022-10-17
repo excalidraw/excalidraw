@@ -643,7 +643,6 @@ The `<Sidebar>` component takes these props (all are optional except `children`)
 | onDock | <pre>(isDocked: boolean) => void</pre> | Invoked when the user toggles the dock button. |
 | docked | boolean | Indicates whether the sidebar is docked. By default, the sidebar is undocked. If passed, the docking becomes controlled, and you are responsible for updating the `docked` state by listening on `onDock` callback. See [here](#dockedSidebarBreakpoint) for more info docking. |
 | dockable | boolean | Indicates whether the sidebar can be docked by user (=the dock button is shown). If `false`, you can still dock programmatically by passing `docked=true` |
-| ref | <pre>React.Ref&lt;HTMLDivElement&gt;</pre> | forward ref |
 
 The sidebar will always include a header with close/dock buttons (when applicable).
 
