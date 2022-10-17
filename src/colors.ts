@@ -15,8 +15,44 @@ const shades = (index: number) => [
   oc.orange[index],
 ];
 
+const elementStrokeColors = [
+  "#1F2123",
+  "#3A3C40",
+  "#55575D",
+  "#70737A",
+  "#8C8F96",
+  "#00B3F5",
+  "#0678CB",
+  "#8155E3",
+  "#FAD000",
+  "#F59127",
+  "#00BAA5",
+  "#8CCA08",
+  "#009E52",
+  "#E60E5E",
+  "#D21C09",
+];
+
+const elementBackgroundColors = [
+  "transparent",
+  "#FFFFFF",
+  "#F4F4F5",
+  "#E8E9EA",
+  "#C1C3C7",
+  "#ADE9FF",
+  "#ADD8FF",
+  "#C7ADFF",
+  "#FFF2AD",
+  "#FFD7AD",
+  "#ADFFF6",
+  "#E4FFAD",
+  "#ADFFBD",
+  "#FFADD9",
+  "#FFB5AD",
+];
+
 export default {
   canvasBackground: [oc.white, oc.gray[0], oc.gray[1], ...shades(0)],
-  elementBackground: ["transparent", oc.gray[4], oc.gray[6], ...shades(6)],
-  elementStroke: [oc.black, oc.gray[8], oc.gray[7], ...shades(9)],
+  elementBackground: [...elementBackgroundColors],
+  elementStroke: [...elementStrokeColors],
 };

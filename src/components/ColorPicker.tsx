@@ -201,13 +201,13 @@ const Picker = ({
 
   const renderColors = (colors: Array<string>, custom: boolean = false) => {
     return colors.map((_color, i) => {
-      const _colorWithoutHash = _color.replace("#", "");
+      // const _colorWithoutHash = _color.replace("#", "");
       const keyBinding = custom
         ? keyBindings[i + MAX_DEFAULT_COLORS]
         : keyBindings[i];
-      const label = custom
-        ? _colorWithoutHash
-        : t(`colors.${_colorWithoutHash}`);
+      // const label = custom
+      //   ? _colorWithoutHash
+      //   : t(`colors.${_colorWithoutHash}`);
       return (
         <button
           className="color-picker-swatch"
@@ -215,9 +215,9 @@ const Picker = ({
             (event.currentTarget as HTMLButtonElement).focus();
             onChange(_color);
           }}
-          title={`${label}${
-            !isTransparent(_color) ? ` (${_color})` : ""
-          } — ${keyBinding.toUpperCase()}`}
+          // title={`${label}${
+          //   !isTransparent(_color) ? ` (${_color})` : ""
+          // } — ${keyBinding.toUpperCase()}`}
           aria-label={label}
           aria-keyshortcuts={keyBindings[i]}
           style={{ color: _color }}
