@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState, ExcalidrawProps } from "../types";
+import { AppState, Device, ExcalidrawProps } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -44,6 +44,8 @@ type MobileMenuProps = {
     appState: AppState,
   ) => JSX.Element | null;
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
+  renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
+  device: Device;
 };
 
 export const MobileMenu = ({
@@ -63,6 +65,8 @@ export const MobileMenu = ({
   onImageAction,
   renderTopRightUI,
   renderCustomStats,
+  renderCustomSidebar,
+  device,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -107,11 +111,16 @@ export const MobileMenu = ({
                   penDetected={appState.penDetected}
                 />
               </Stack.Row>
-              {libraryMenu}
+              {libraryMenu && <Island padding={2}>{libraryMenu}</Island>}
             </Stack.Col>
           )}
         </Section>
-        <HintViewer appState={appState} elements={elements} isMobile={true} />
+        <HintViewer
+          appState={appState}
+          elements={elements}
+          isMobile={true}
+          device={device}
+        />
       </FixedSideContainer>
     );
   };
@@ -175,6 +184,7 @@ export const MobileMenu = ({
   };
   return (
     <>
+      {appState.openSidebar === "customSidebar" && renderCustomSidebar?.()}
       {!appState.viewModeEnabled && renderToolbar()}
       {!appState.openMenu && appState.showStats && (
         <Stats
@@ -230,7 +240,7 @@ export const MobileMenu = ({
             {renderAppToolbar()}
             {appState.scrolledOutside &&
               !appState.openMenu &&
-              !appState.isLibraryOpen && (
+              appState.openSidebar !== "library" && (
                 <button
                   className="scroll-back-to-content"
                   onClick={() => {

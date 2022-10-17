@@ -1,0 +1,89 @@
+@import "open-color/open-color";
+@import "../../css/variables.module";
+
+.excalidraw {
+  .layer-ui__sidebar {
+    position: absolute;
+    top: var(--sat);
+    bottom: var(--sab);
+    right: var(--sar);
+    z-index: 5;
+
+    box-shadow: var(--shadow-island);
+    overflow: hidden;
+    border-radius: var(--border-radius-lg);
+    margin: var(--space-factor);
+    width: calc(#{$right-sidebar-width} - var(--space-factor) * 2);
+
+    padding: 0.5rem;
+    box-sizing: border-box;
+
+    .Island {
+      box-shadow: none;
+    }
+
+    .ToolIcon__icon {
+      border-radius: var(--border-radius-md);
+    }
+
+    .ToolIcon__icon__close {
+      .Modal__close {
+        width: calc(var(--space-factor) * 7);
+        height: calc(var(--space-factor) * 7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--color-text);
+      }
+    }
+
+    .Island {
+      --padding: 0;
+      background-color: var(--island-bg-color);
+      border-radius: var(--border-radius-lg);
+      padding: calc(var(--padding) * var(--space-factor));
+      position: relative;
+      transition: box-shadow 0.5s ease-in-out;
+    }
+  }
+
+  .layer-ui__sidebar__header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 2px 0 15px 0;
+    &:empty {
+      margin: 0;
+    }
+    button {
+      // 2px from the left to account for focus border of left-most button
+      margin: 0 2px;
+    }
+  }
+
+  .layer-ui__sidebar__header__buttons {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  .layer-ui__sidebar-dock-button {
+    @include toolbarButtonColorStates;
+    margin-right: 0.2rem;
+
+    .ToolIcon_type_floating .ToolIcon__icon {
+      width: calc(var(--space-factor) * 7);
+      height: calc(var(--space-factor) * 7);
+      svg {
+        // mirror
+        transform: scale(-1, 1);
+      }
+    }
+
+    .ToolIcon_type_checkbox {
+      &:not(.ToolIcon_toggle_opaque):checked + .ToolIcon__icon {
+        background-color: var(--color-primary);
+      }
+    }
+  }
+}

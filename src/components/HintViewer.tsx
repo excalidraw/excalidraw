@@ -3,7 +3,7 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { getSelectedElements } from "../scene";
 
 import "./HintViewer.scss";
-import { AppState } from "../types";
+import { AppState, Device } from "../types";
 import {
   isImageElement,
   isLinearElement,
@@ -17,13 +17,19 @@ interface HintViewerProps {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
   isMobile: boolean;
+  device: Device;
 }
 
-const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
+const getHints = ({
+  appState,
+  elements,
+  isMobile,
+  device,
+}: HintViewerProps) => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
-  if (appState.isLibraryOpen) {
+  if (appState.openSidebar === "library" && !device.canDeviceFitSidebar) {
     return null;
   }
 
@@ -111,11 +117,13 @@ export const HintViewer = ({
   appState,
   elements,
   isMobile,
+  device,
 }: HintViewerProps) => {
   let hint = getHints({
     appState,
     elements,
     isMobile,
+    device,
   });
   if (!hint) {
     return null;

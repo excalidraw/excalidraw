@@ -376,13 +376,17 @@ Most notably, you can customize the primary colors, by overriding these variable
 
 For a complete list of variables, check [theme.scss](https://github.com/excalidraw/excalidraw/blob/master/src/css/theme.scss), though most of them will not make sense to override.
 
+### Does this package support collaboration ?
+
+No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
+
 ### Props
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | [`onChange`](#onChange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
-| [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState<a> } </pre> | null | The initial data with which app loads. |
-| [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) &#124; [`useRef`](https://reactjs.org/docs/hooks-reference.html#useref) &#124; [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) &#124; <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
+| [`initialData`](#initialData) | <code>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState<a> } </code> | null | The initial data with which app loads. |
+| [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) &#124; [`useRef`](https://reactjs.org/docs/hooks-reference.html#useref) &#124; [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) &#124; <code>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</code> |  | Ref to be passed to Excalidraw |
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
@@ -390,22 +394,23 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 | [`renderTopRightUI`](#renderTopRightUI) | Function |  | Function that renders custom UI in top right corner |
 | [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
 | [`renderCustomStats`](#renderCustomStats) | Function |  | Function that can be used to render custom stats on the stats dialog. |
+| [`renderSIdebar`](#renderSIdebar) | Function |  | Render function that renders custom sidebar. |
 | [`viewModeEnabled`](#viewModeEnabled) | boolean |  | This implies if the app is in view mode. |
 | [`zenModeEnabled`](#zenModeEnabled) | boolean |  | This implies if the zen mode is enabled |
 | [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
 | [`libraryReturnUrl`](#libraryReturnUrl) | string |  | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | [THEME.LIGHT](#THEME-1) &#124; [THEME.DARK](#THEME-1) | [THEME.LIGHT](#THEME-1) | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
-| [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
-| [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L21">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
+| [`UIOptions`](#UIOptions) | <code>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</code> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
+| [`onPaste`](#onPaste) | <code>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L21">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</code> |  | Callback to be triggered if passed when the something is pasted in to the scene |
 | [`detectScroll`](#detectScroll) | boolean | true | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handleKeyboardGlobally) | boolean | false | Indicates whether to bind the keyboard events to document. |
-| [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
+| [`onLibraryChange`](#onLibraryChange) | <code>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </code> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
-| [`onLinkOpen`](#onLinkOpen) | <pre>(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">NonDeletedExcalidrawElement</a>, event: CustomEvent) </pre> |  | This prop if passed will be triggered when link of an element is clicked. |
-| [`onPointerDown`](#onPointerDown) | <pre>(activeTool: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L93"> AppState["activeTool"]</a>, pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L365">PointerDownState</a>) => void</pre> |  | This prop if passed gets triggered on pointer down evenets |
-| [`onScrollChange`](#onScrollChange) | (scrollX: number, scrollY: number) |  | This prop if passed gets triggered when scrolling the canvas. |
+| [`onLinkOpen`](#onLinkOpen) | <code>(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">NonDeletedExcalidrawElement</a>, event: CustomEvent) </code> |  | This prop if passed will be triggered when link of an element is clicked. |
+| [`onPointerDown`](#onPointerDown) | <code>(activeTool: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L93"> AppState["activeTool"]</a>, pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L365">PointerDownState</a>) => void</code> |  | This prop if passed gets triggered on pointer down evenets |
+| [`onScrollChange`](#onScrollChange) | <code>(scrollX: number, scrollY: number)</code> |  | This prop if passed gets triggered when scrolling the canvas. |
 
 ### Dimensions of Excalidraw
 
@@ -503,6 +508,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | [setActiveTool](#setActiveTool) | <code>(tool: { type: typeof <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L4">SHAPES</a> [number]["value"]&#124; "eraser" } &#124; { type: "custom"; customType: string }) => void</code> | This API can be used to set the active tool |
 | [setCursor](#setCursor) | <code>(cursor: string) => void </code> | This API can be used to set customise the mouse cursor on the canvas |
 | [resetCursor](#resetCursor) | <code>() => void </code> | This API can be used to reset to default mouse cursor on the canvas |
+| [toggleMenu](#toggleMenu) | <code>(type: string, force?: boolean) => boolean</code> | Toggles specific menus on/off |
 
 #### `readyPromise`
 
@@ -618,6 +624,38 @@ A function returning JSX to render custom UI footer. For example, you can use th
 #### `renderCustomStats`
 
 A function that can be used to render custom stats (returns JSX) in the nerd stats dialog. For example you can use this prop to render the size of the elements in the storage.
+
+#### `renderSidebar`
+
+<pre>
+() => JSX | null
+</pre>
+
+Optional function that can render custom sidebar. This sidebar is the same that the library menu sidebar is using, and can be used for any purposes your app needs. The render function should return a `<Sidebar>` instance — a component that is exported from the Excalidraw package. It accepts `children` which can be any content you like to render inside.
+
+The `<Sidebar>` component takes these props (all are optional except `children`):
+
+| name | type | description |
+| --- | --- | --- |
+| className | string |
+| children | <pre>React.ReactNode</pre> | Content you want to render inside the sidebar. |
+| onClose | <pre>() => void</pre> | Invoked when the component is closed (by user, or the editor). No need to act on this event, as the editor manages the sidebar open state on its own. |
+| onDock | <pre>(isDocked: boolean) => void</pre> | Invoked when the user toggles the dock button. |
+| docked | boolean | Indicates whether the sidebar is docked. By default, the sidebar is undocked. If passed, the docking becomes controlled, and you are responsible for updating the `docked` state by listening on `onDock` callback. See [here](#dockedSidebarBreakpoint) for more info docking. |
+| dockable | boolean | Indicates whether the sidebar can be docked by user (=the dock button is shown). If `false`, you can still dock programmatically by passing `docked=true` |
+
+The sidebar will always include a header with close/dock buttons (when applicable).
+
+You can also add custom content to the header, by rendering `<Sidebar.Header>` as a child of the `<Sidebar>` component. Note that the custom header will still include the default buttons.
+
+The `<Sidebar.Header>` component takes these props children (all are optional):
+
+| name | type | description |
+| --- | --- | --- |
+| className | string |
+| children | <pre>React.ReactNode</pre> | Content you want to render inside the sidebar header, sibling of the header buttons. |
+
+For example code, see the example [`App.tsx`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/example/App.tsx#L524) file.
 
 #### `viewModeEnabled`
 
@@ -753,6 +791,16 @@ This API can be used to customise the mouse cursor on the canvas and has the bel
 (cursor: string) => void
 </pre>
 
+#### `toggleMenu`
+
+<pre>
+(type: "library" | "customSidebar", force?: boolean) => boolean
+</pre>
+
+This API can be used to toggle a specific menu (currently only the sidebars), and returns whether the menu was toggled on or off. If the `force` flag passed, it will force the menu to be toggled either on/off based on the boolean passed.
+
+This API is especially useful when you render a custom sidebar using [`renderSidebar`](#renderSidebar) prop, and you want to toggle it from your app based on a user action.
+
 #### `resetCursor`
 
 This API can be used to reset to default mouse cursor.
@@ -841,10 +889,6 @@ This prop if passed will be triggered when canvas is scrolled and has the below 
 ```ts
 (scrollX: number, scrollY: number) => void
 ```
-
-### Does it support collaboration ?
-
-No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
 
 ### Restore utilities
 

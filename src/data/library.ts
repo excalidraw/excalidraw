@@ -148,7 +148,7 @@ class Library {
     defaultStatus?: "unpublished" | "published";
   }): Promise<LibraryItems> => {
     if (openLibraryMenu) {
-      this.app.setState({ isLibraryOpen: true });
+      this.app.setState({ openSidebar: "library" });
     }
 
     return this.setLibrary(() => {

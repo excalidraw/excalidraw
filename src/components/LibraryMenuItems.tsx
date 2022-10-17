@@ -13,7 +13,7 @@ import {
 import { arrayToMap, chunk, muteFSAbortError } from "../utils";
 import { useDevice } from "./App";
 import ConfirmDialog from "./ConfirmDialog";
-import { close, exportToFileIcon, load, publishIcon, trash } from "./icons";
+import { exportToFileIcon, load, publishIcon, trash } from "./icons";
 import { LibraryUnit } from "./LibraryUnit";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
@@ -23,9 +23,7 @@ import "./LibraryMenuItems.scss";
 import { MIME_TYPES, VERSIONS } from "../constants";
 import Spinner from "./Spinner";
 import { fileOpen } from "../data/filesystem";
-
-import { SidebarLockButton } from "./SidebarLockButton";
-import { trackEvent } from "../analytics";
+import { Sidebar } from "./Sidebar/Sidebar";
 
 const LibraryMenuItems = ({
   isLoading,
@@ -372,54 +370,6 @@ const LibraryMenuItems = ({
     (item) => item.status === "published",
   );
 
-  const renderLibraryHeader = () => {
-    return (
-      <>
-        <div className="layer-ui__library-header" key="library-header">
-          {renderLibraryActions()}
-          {device.canDeviceFitSidebar && (
-            <>
-              <div className="layer-ui__sidebar-lock-button">
-                <SidebarLockButton
-                  checked={appState.isLibraryMenuDocked}
-                  onChange={() => {
-                    document
-                      .querySelector(".layer-ui__wrapper")
-                      ?.classList.add("animate");
-                    const nextState = !appState.isLibraryMenuDocked;
-                    setAppState({
-                      isLibraryMenuDocked: nextState,
-                    });
-                    trackEvent(
-                      "library",
-                      `toggleLibraryDock (${nextState ? "dock" : "undock"})`,
-                      `sidebar (${device.isMobile ? "mobile" : "desktop"})`,
-                    );
-                  }}
-                />
-              </div>
-            </>
-          )}
-          {!device.isMobile && (
-            <div className="ToolIcon__icon__close">
-              <button
-                className="Modal__close"
-                onClick={() =>
-                  setAppState({
-                    isLibraryOpen: false,
-                  })
-                }
-                aria-label={t("buttons.close")}
-              >
-                {close}
-              </button>
-            </div>
-          )}
-        </div>
-      </>
-    );
-  };
-
   const renderLibraryMenuItems = () => {
     return (
       <Stack.Col
@@ -548,7 +498,11 @@ const LibraryMenuItems = ({
       }
     >
       {showRemoveLibAlert && renderRemoveLibAlert()}
-      {renderLibraryHeader()}
+      {/* NOTE using SidebarHeader here isn't semantic since this may render
+          outside of a sidebar, but for now it doesn't matter */}
+      <Sidebar.Header className="layer-ui__library-header">
+        {renderLibraryActions()}
+      </Sidebar.Header>
       {renderLibraryMenuItems()}
       {!device.isMobile && renderLibraryFooter()}
     </div>

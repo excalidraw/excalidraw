@@ -293,10 +293,17 @@ const ExcalidrawAppStateContext = React.createContext<AppState>({
   offsetLeft: 0,
   offsetTop: 0,
 });
+
+const ExcalidrawSetAppStateContent = React.createContext<
+  React.Component<any, AppState>["setState"]
+>(() => {});
+
 export const useExcalidrawElements = () =>
   useContext(ExcalidrawElementsContext);
 export const useExcalidrawAppState = () =>
   useContext(ExcalidrawAppStateContext);
+export const useExcalidrawSetAppState = () =>
+  useContext(ExcalidrawSetAppStateContent);
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
@@ -380,7 +387,7 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
       showHyperlinkPopup: false,
-      isLibraryMenuDocked: false,
+      isSidebarDocked: false,
     };
 
     this.id = nanoid();
@@ -412,6 +419,7 @@ class App extends React.Component<AppProps, AppState> {
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
+        toggleMenu: this.toggleMenu,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -524,65 +532,68 @@ class App extends React.Component<AppProps, AppState> {
           value={this.excalidrawContainerValue}
         >
           <DeviceContext.Provider value={this.device}>
-            <ExcalidrawAppStateContext.Provider value={this.state}>
-              <ExcalidrawElementsContext.Provider
-                value={this.scene.getNonDeletedElements()}
-              >
-                <LayerUI
-                  canvas={this.canvas}
-                  appState={this.state}
-                  files={this.files}
-                  setAppState={this.setAppState}
-                  actionManager={this.actionManager}
-                  elements={this.scene.getNonDeletedElements()}
-                  onCollabButtonClick={onCollabButtonClick}
-                  onLockToggle={this.toggleLock}
-                  onPenModeToggle={this.togglePenMode}
-                  onInsertElements={(elements) =>
-                    this.addElementsFromPasteOrLibrary({
-                      elements,
-                      position: "center",
-                      files: null,
-                    })
-                  }
-                  langCode={getLanguage().code}
-                  isCollaborating={this.props.isCollaborating}
-                  renderTopRightUI={renderTopRightUI}
-                  renderCustomFooter={renderFooter}
-                  renderCustomStats={renderCustomStats}
-                  showExitZenModeBtn={
-                    typeof this.props?.zenModeEnabled === "undefined" &&
-                    this.state.zenModeEnabled
-                  }
-                  libraryReturnUrl={this.props.libraryReturnUrl}
-                  UIOptions={this.props.UIOptions}
-                  focusContainer={this.focusContainer}
-                  library={this.library}
-                  id={this.id}
-                  onImageAction={this.onImageAction}
-                />
-                <div className="excalidraw-textEditorContainer" />
-                <div className="excalidraw-contextMenuContainer" />
-                {selectedElement.length === 1 &&
-                  this.state.showHyperlinkPopup && (
-                    <Hyperlink
-                      key={selectedElement[0].id}
-                      element={selectedElement[0]}
-                      setAppState={this.setAppState}
-                      onLinkOpen={this.props.onLinkOpen}
+            <ExcalidrawSetAppStateContent.Provider value={this.setAppState}>
+              <ExcalidrawAppStateContext.Provider value={this.state}>
+                <ExcalidrawElementsContext.Provider
+                  value={this.scene.getNonDeletedElements()}
+                >
+                  <LayerUI
+                    canvas={this.canvas}
+                    appState={this.state}
+                    files={this.files}
+                    setAppState={this.setAppState}
+                    actionManager={this.actionManager}
+                    elements={this.scene.getNonDeletedElements()}
+                    onCollabButtonClick={onCollabButtonClick}
+                    onLockToggle={this.toggleLock}
+                    onPenModeToggle={this.togglePenMode}
+                    onInsertElements={(elements) =>
+                      this.addElementsFromPasteOrLibrary({
+                        elements,
+                        position: "center",
+                        files: null,
+                      })
+                    }
+                    langCode={getLanguage().code}
+                    isCollaborating={this.props.isCollaborating}
+                    renderTopRightUI={renderTopRightUI}
+                    renderCustomFooter={renderFooter}
+                    renderCustomStats={renderCustomStats}
+                    renderCustomSidebar={this.props.renderSidebar}
+                    showExitZenModeBtn={
+                      typeof this.props?.zenModeEnabled === "undefined" &&
+                      this.state.zenModeEnabled
+                    }
+                    libraryReturnUrl={this.props.libraryReturnUrl}
+                    UIOptions={this.props.UIOptions}
+                    focusContainer={this.focusContainer}
+                    library={this.library}
+                    id={this.id}
+                    onImageAction={this.onImageAction}
+                  />
+                  <div className="excalidraw-textEditorContainer" />
+                  <div className="excalidraw-contextMenuContainer" />
+                  {selectedElement.length === 1 &&
+                    this.state.showHyperlinkPopup && (
+                      <Hyperlink
+                        key={selectedElement[0].id}
+                        element={selectedElement[0]}
+                        setAppState={this.setAppState}
+                        onLinkOpen={this.props.onLinkOpen}
+                      />
+                    )}
+                  {this.state.toast !== null && (
+                    <Toast
+                      message={this.state.toast.message}
+                      onClose={() => this.setToast(null)}
+                      duration={this.state.toast.duration}
+                      closable={this.state.toast.closable}
                     />
                   )}
-                {this.state.toast !== null && (
-                  <Toast
-                    message={this.state.toast.message}
-                    onClose={() => this.setToast(null)}
-                    duration={this.state.toast.duration}
-                    closable={this.state.toast.closable}
-                  />
-                )}
-                <main>{this.renderCanvas()}</main>
-              </ExcalidrawElementsContext.Provider>{" "}
-            </ExcalidrawAppStateContext.Provider>
+                  <main>{this.renderCanvas()}</main>
+                </ExcalidrawElementsContext.Provider>{" "}
+              </ExcalidrawAppStateContext.Provider>
+            </ExcalidrawSetAppStateContent.Provider>
           </DeviceContext.Provider>
         </ExcalidrawContainerContext.Provider>
       </div>
@@ -787,8 +798,7 @@ class App extends React.Component<AppProps, AppState> {
       // whether to open the library, to handle a case where we
       // update the state outside of initialData (e.g. when loading the app
       // with a library install link, which should auto-open the library)
-      isLibraryOpen:
-        initialData?.appState?.isLibraryOpen || this.state.isLibraryOpen,
+      openSidebar: scene.appState?.openSidebar || this.state.openSidebar,
       activeTool:
         scene.appState.activeTool.type === "image"
           ? { ...scene.appState.activeTool, type: "selection" }
@@ -1562,10 +1572,17 @@ class App extends React.Component<AppProps, AppState> {
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          isLibraryOpen:
-            this.state.isLibraryOpen && this.device.canDeviceFitSidebar
-              ? this.state.isLibraryMenuDocked
-              : false,
+          // keep sidebar (presumably the library) open if it's docked and
+          // can fit.
+          //
+          // Note, we should close the sidebar only if we're dropping items
+          // from library, not when pasting from clipboard. Alas.
+          openSidebar:
+            this.state.openSidebar &&
+            this.device.canDeviceFitSidebar &&
+            this.state.isSidebarDocked
+              ? this.state.openSidebar
+              : null,
           selectedElementIds: newElements.reduce(
             (acc: Record<ExcalidrawElement["id"], true>, element) => {
               if (!isBoundToContainer(element)) {
@@ -1623,8 +1640,8 @@ class App extends React.Component<AppProps, AppState> {
 
   // Collaboration
 
-  setAppState = (obj: any) => {
-    this.setState(obj);
+  setAppState: React.Component<any, AppState>["setState"] = (state) => {
+    this.setState(state);
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
@@ -1762,6 +1779,35 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({});
   };
 
+  /**
+   * @returns whether the menu was toggled on or off
+   */
+  public toggleMenu = (
+    type: "library" | "customSidebar",
+    force?: boolean,
+  ): boolean => {
+    if (type === "customSidebar" && !this.props.renderSidebar) {
+      console.warn(
+        `attempting to toggle "customSidebar", but no "props.renderSidebar" is defined`,
+      );
+      return false;
+    }
+
+    if (type === "library" || type === "customSidebar") {
+      let nextValue;
+      if (force === undefined) {
+        nextValue = this.state.openSidebar === type ? null : type;
+      } else {
+        nextValue = force ? type : null;
+      }
+      this.setState({ openSidebar: nextValue });
+
+      return !!nextValue;
+    }
+
+    return false;
+  };
+
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
       cursorX = event.clientX;
@@ -1837,8 +1883,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.code === CODES.ZERO) {
-        const nextState = !this.state.isLibraryOpen;
-        this.setState({ isLibraryOpen: nextState });
+        const nextState = this.toggleMenu("library");
         // track only openings
         if (nextState) {
           trackEvent(
