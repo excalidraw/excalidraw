@@ -141,6 +141,9 @@ export type AppState = {
     | "backgroundColorPicker"
     | "strokeColorPicker"
     | null;
+  openSidebar: "library" | "customSidebar" | null;
+  isSidebarDocked: boolean;
+
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
@@ -162,8 +165,6 @@ export type AppState = {
   offsetTop: number;
   offsetLeft: number;
 
-  isLibraryOpen: boolean;
-  isLibraryMenuDocked: boolean;
   fileHandle: FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
@@ -338,6 +339,10 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
+  /**
+   * Render function that renders custom <Sidebar /> component.
+   */
+  renderSidebar?: () => JSX.Element | null;
 }
 
 export type SceneData = {
@@ -393,6 +398,7 @@ export type AppProps = Merge<
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;
+    children?: React.ReactNode;
   }
 >;
 
@@ -514,6 +520,7 @@ export type ExcalidrawImperativeAPI = {
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
+  toggleMenu: InstanceType<typeof App>["toggleMenu"];
 };
 
 export type Device = Readonly<{

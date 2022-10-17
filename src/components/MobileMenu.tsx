@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState, ExcalidrawProps } from "../types";
+import { AppState, Device, ExcalidrawProps } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -18,9 +18,9 @@ import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
-import { useDevice } from "./App"; //zsviczian
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
+import { Sidebar } from "./Sidebar/Sidebar";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -45,6 +45,8 @@ type MobileMenuProps = {
     appState: AppState,
   ) => JSX.Element | null;
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
+  renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
+  device: Device;
 };
 
 export const MobileMenu = ({
@@ -64,8 +66,9 @@ export const MobileMenu = ({
   onImageAction,
   renderTopRightUI,
   renderCustomStats,
+  renderCustomSidebar,
+  device,
 }: MobileMenuProps) => {
-  const device = useDevice(); //zsviczian
   const renderToolbar = () => {
     return (
       //zsviczian (added <> for library docking)
@@ -111,17 +114,24 @@ export const MobileMenu = ({
                     penDetected={appState.penDetected}
                   />
                 </Stack.Row>
-                {
-                  device.isMobile && libraryMenu //zsviczian
-                }
+                {device.isMobile && libraryMenu && (
+                  <Island padding={2}>{libraryMenu}</Island>
+                )}
               </Stack.Col>
             )}
           </Section>
-          <HintViewer appState={appState} elements={elements} isMobile={true} />
+          <HintViewer
+            appState={appState}
+            elements={elements}
+            isMobile={true}
+            device={device}
+          />
         </FixedSideContainer>
-        {!device.isMobile && //zsviczian
-          appState.isLibraryOpen && (
-            <div className="layer-ui__sidebar">{libraryMenu}</div>
+        {!device.isMobile && //zsviczian - taken from LayerUI
+          appState.openSidebar === "library" && (
+            <Sidebar __isInternal key="library">
+              {libraryMenu}
+            </Sidebar>
           )}
       </>
     );
@@ -188,6 +198,7 @@ export const MobileMenu = ({
   };
   return (
     <>
+      {appState.openSidebar === "customSidebar" && renderCustomSidebar?.()}
       {!appState.viewModeEnabled && renderToolbar()}
       {!appState.openMenu && appState.showStats && (
         <Stats
@@ -243,7 +254,7 @@ export const MobileMenu = ({
             {renderAppToolbar()}
             {appState.scrolledOutside &&
               !appState.openMenu &&
-              !appState.isLibraryOpen && (
+              appState.openSidebar !== "library" && (
                 <button
                   className="scroll-back-to-content"
                   onClick={() => {
