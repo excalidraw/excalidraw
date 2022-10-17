@@ -111,7 +111,7 @@ export const isTextBindableContainer = (
       element.type === "diamond" ||
       element.type === "ellipse" ||
       element.type === "image" ||
-      (isLinearElement(element) && element.points.length <= 3))
+      isLinearElement(element))
   );
 };
 
