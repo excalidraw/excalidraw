@@ -30,7 +30,7 @@ import {
 import { Sidebar } from "./Sidebar/Sidebar";
 import { getSelectedElements } from "../scene";
 import { NonDeletedExcalidrawElement } from "../element/types";
-import { LibraryMenuHeaderContent } from "./LibraryMenuHeaderContent";
+import { LibraryMenuHeader } from "./LibraryMenuHeaderContent";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -275,7 +275,7 @@ export const LibraryMenu: React.FC<{
       ref={ref}
     >
       <Sidebar.Header className="layer-ui__library-header">
-        <LibraryMenuHeaderContent
+        <LibraryMenuHeader
           appState={appState}
           setAppState={setAppState}
           selectedItems={selectedItems}

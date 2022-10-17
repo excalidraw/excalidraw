@@ -19,7 +19,7 @@ const getSelectedItems = (
   selectedItems: LibraryItem["id"][],
 ) => libraryItems.filter((item) => selectedItems.includes(item.id));
 
-export const LibraryMenuHeaderContent: React.FC<{
+export const LibraryMenuHeader: React.FC<{
   setAppState: React.Component<any, AppState>["setState"];
   selectedItems: LibraryItem["id"][];
   library: Library;
