@@ -1,0 +1,113 @@
+.excalidraw {
+  .virgil {
+    font-family: "Virgil";
+  }
+
+  .WelcomeScreen-logo {
+    display: flex;
+    align-items: center;
+    column-gap: 0.75rem;
+    font-size: 2.25rem;
+
+    svg {
+      width: 1.625rem;
+    }
+  }
+
+  .WelcomeScreen-decor {
+    color: var(--color-gray-40);
+
+    &--data {
+      font-size: 1.125rem;
+      text-align: center;
+    }
+
+    &--help-pointer {
+      svg {
+        width: 102px;
+        height: 83px;
+      }
+    }
+
+    &--menu-pointer {
+      position: absolute;
+      width: 320px;
+      font-size: 1rem;
+
+      top: 100%;
+      margin-top: 0.25rem;
+
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+
+      svg {
+        width: 41px;
+        height: 94px;
+      }
+    }
+  }
+
+  .WelcomeScreen-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .WelcomeScreen-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .WelcomeScreen-item {
+    color: var(--color-gray-50);
+    font-size: 0.875rem;
+
+    min-width: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: none;
+    border: none;
+
+    padding: 0.75rem;
+
+    border-radius: var(--border-radius-md);
+
+    &__label {
+      display: flex;
+      align-items: center;
+      column-gap: 0.5rem;
+
+      svg {
+        width: var(--default-icon-size);
+        height: var(--default-icon-size);
+      }
+    }
+
+    &__shortcut {
+      color: var(--color-gray-40);
+      font-size: 0.75rem;
+    }
+
+    &:hover {
+      background: var(--color-gray-10);
+
+      .WelcomeScreen-item__shortcut {
+        color: var(--color-gray-50);
+      }
+
+      .WelcomeScreen-item__label {
+        color: var(--color-gray-100);
+      }
+    }
+  }
+}

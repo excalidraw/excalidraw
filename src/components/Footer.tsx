@@ -8,6 +8,7 @@ import {
   ZoomActions,
 } from "./Actions";
 import { useDevice } from "./App";
+// import { WelcomeScreenHelpArrow } from "./icons";
 import { Section } from "./Section";
 import Stack from "./Stack";
 
@@ -16,11 +17,13 @@ const Footer = ({
   actionManager,
   renderCustomFooter,
   showExitZenModeBtn,
+  renderWelcomeScreen,
 }: {
   appState: AppState;
   actionManager: ActionManager;
   renderCustomFooter?: ExcalidrawProps["renderFooter"];
   showExitZenModeBtn: boolean;
+  renderWelcomeScreen: boolean;
 }) => {
   const device = useDevice();
   const showFinalize =
@@ -80,7 +83,18 @@ const Footer = ({
           "transition-right disable-pointerEvents": appState.zenModeEnabled,
         })}
       >
-        {actionManager.renderAction("toggleShortcuts")}
+        <div style={{ position: "relative" }}>
+          {/* // TODO barnabasmolnar/editor-redesign */}
+          {/* don't forget to add proper text + possibly i18n */}
+          {/* // TODO something not quite right with the arrow here... */}
+          {/* {renderWelcomeScreen && (
+            <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--help-pointer">
+              {WelcomeScreenHelpArrow}
+              <div>Placeholder text for menu hints</div>
+            </div>
+          )} */}
+          {actionManager.renderAction("toggleShortcuts")}
+        </div>
       </div>
       <ExitZenModeAction
         actionManager={actionManager}

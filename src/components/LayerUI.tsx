@@ -39,7 +39,7 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
-import { HamburgerMenuIcon } from "./icons";
+import { HamburgerMenuIcon, WelcomeScreenMenuArrow } from "./icons";
 import { MenuLinks, Separator } from "./MenuUtils";
 import { useOutsideClickHook } from "../hooks/useOutsideClick";
 import WelcomeScreen from "./WelcomeScreen";
@@ -165,6 +165,14 @@ const LayerUI = ({
 
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
+      {renderWelcomeScreen && (
+        <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--menu-pointer">
+          {WelcomeScreenMenuArrow}
+          {/* // TODO barnabasmolnar/editor-redesign */}
+          {/* don't forget to add proper text + possibly i18n */}
+          <div>Placeholder text for menu hints</div>
+        </div>
+      )}
       <button
         data-prevent-outside-click
         className={clsx("menu-button", "zen-mode-transition", {
@@ -396,7 +404,7 @@ const LayerUI = ({
 
   return (
     <>
-      {renderWelcomeScreen && <WelcomeScreen />}
+      {renderWelcomeScreen && <WelcomeScreen actionManager={actionManager} />}
       {appState.isLoading && <LoadingMessage delay={250} />}
       {appState.errorMessage && (
         <ErrorDialog
@@ -464,6 +472,7 @@ const LayerUI = ({
           >
             {renderFixedSideContainer()}
             <Footer
+              renderWelcomeScreen={renderWelcomeScreen}
               appState={appState}
               actionManager={actionManager}
               renderCustomFooter={renderCustomFooter}
