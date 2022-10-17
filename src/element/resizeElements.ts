@@ -818,15 +818,7 @@ const resizeMultipleElements = (
     if (boundTextElement && boundTextUpdates) {
       mutateElement(boundTextElement, boundTextUpdates);
 
-      if (isLinearElement(element.latest)) {
-        LinearElementEditor.updateBoundTextPosition(
-          element.latest,
-          boundTextElement,
-          "update",
-        );
-      } else {
-        handleBindTextResize(element.latest, transformHandleType);
-      }
+      handleBindTextResize(element.latest, transformHandleType);
     }
   });
 };

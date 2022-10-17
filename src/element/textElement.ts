@@ -14,7 +14,7 @@ import { isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import { isLinearElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
-import { Point } from "../types";
+import { AppState } from "../types";
 
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
@@ -134,14 +134,17 @@ export const handleBindTextResize = (
   if (!boundTextElementId) {
     return;
   }
-  const textElement = Scene.getScene(container)!.getElement(
+  let textElement = Scene.getScene(container)!.getElement(
     boundTextElementId,
   ) as ExcalidrawTextElement;
   if (textElement && textElement.text) {
-    if (!container || isLinearElement(container)) {
+    if (!container) {
       return;
     }
 
+    textElement = Scene.getScene(container)!.getElement(
+      boundTextElementId,
+    ) as ExcalidrawTextElement;
     let text = textElement.text;
     let nextHeight = textElement.height;
     let nextWidth = textElement.width;
@@ -156,11 +159,10 @@ export const handleBindTextResize = (
           getMaxContainerWidth(container),
         );
       }
-
       const dimensions = measureText(
         text,
         getFontString(textElement),
-        container.width,
+        containerDims.width,
       );
       nextHeight = dimensions.height;
       nextWidth = dimensions.width;
@@ -182,33 +184,58 @@ export const handleBindTextResize = (
         y: updatedY,
       });
     }
-    let updatedY;
-    if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-      updatedY = container.y + BOUND_TEXT_PADDING;
-    } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-      updatedY =
-        container.y + containerDims.height - nextHeight - BOUND_TEXT_PADDING;
-    } else {
-      updatedY = container.y + containerDims.height / 2 - nextHeight / 2;
-    }
-    const updatedX =
-      textElement.textAlign === TEXT_ALIGN.LEFT
-        ? container.x + BOUND_TEXT_PADDING
-        : textElement.textAlign === TEXT_ALIGN.RIGHT
-        ? container.x + containerDims.width - nextWidth - BOUND_TEXT_PADDING
-        : container.x + containerDims.width / 2 - nextWidth / 2;
 
     mutateElement(textElement, {
       text,
       width: nextWidth,
       height: nextHeight,
-      x: updatedX,
-      y: updatedY,
+
       baseline: nextBaseLine,
     });
+    updateBoundTextPosition(
+      container,
+      textElement as ExcalidrawTextElementWithContainer,
+    );
   }
 };
 
+const updateBoundTextPosition = (
+  container: ExcalidrawElement,
+  boundTextElement: ExcalidrawTextElementWithContainer,
+) => {
+  if (isLinearElement(container)) {
+    LinearElementEditor.updateBoundTextPosition(
+      container,
+      boundTextElement,
+      "update",
+    );
+    return;
+  }
+  const containerDims = getContainerDims(container);
+  let y;
+  if (boundTextElement.verticalAlign === VERTICAL_ALIGN.TOP) {
+    y = container.y + BOUND_TEXT_PADDING;
+  } else if (boundTextElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+    y =
+      container.y +
+      containerDims.height -
+      boundTextElement.height -
+      BOUND_TEXT_PADDING;
+  } else {
+    y = container.y + containerDims.height / 2 - boundTextElement.height / 2;
+  }
+  const x =
+    boundTextElement.textAlign === TEXT_ALIGN.LEFT
+      ? container.x + BOUND_TEXT_PADDING
+      : boundTextElement.textAlign === TEXT_ALIGN.RIGHT
+      ? container.x +
+        containerDims.width -
+        boundTextElement.width -
+        BOUND_TEXT_PADDING
+      : container.x + containerDims.width / 2 - boundTextElement.width / 2;
+
+  mutateElement(boundTextElement, { x, y });
+};
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
 export const measureText = (
   text: string,
@@ -515,28 +542,39 @@ export const getContainerDims = (element: ExcalidrawElement) => {
   return { width: element.width, height: element.height };
 };
 
-export const getContainerCenter = (element: ExcalidrawElement) => {
-  if (isLinearElement(element)) {
-    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-    let midPoint: Point;
-    if (points.length === 3) {
-      midPoint = points[1];
-    } else {
-      midPoint = LinearElementEditor.getSegmentMidPoint(
-        element,
-        points[0],
-        points[1],
-        1,
-      );
-    }
-    if (midPoint) {
-      return { x: midPoint[0], y: midPoint[1] };
-    }
+export const getContainerCenter = (
+  container: ExcalidrawElement,
+  appState: AppState,
+) => {
+  if (!isLinearElement(container)) {
+    return {
+      x: container.x + container.width / 2,
+      y: container.y + container.height / 2,
+    };
   }
-  return {
-    x: element.x + element.width / 2,
-    y: element.y + element.height / 2,
-  };
+  const points = LinearElementEditor.getPointsGlobalCoordinates(container);
+  if (points.length % 2 === 1) {
+    const index = Math.floor(container.points.length / 2);
+    const midPoint = LinearElementEditor.getPointGlobalCoordinates(
+      container,
+      container.points[index],
+    );
+    return { x: midPoint[0], y: midPoint[1] };
+  }
+  const index = container.points.length / 2 - 1;
+  let midSegmentMidpoint = LinearElementEditor.getEditorMidPoints(
+    container,
+    appState,
+  )[index];
+  if (!midSegmentMidpoint) {
+    midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
+      container,
+      points[index],
+      points[index + 1],
+      index + 1,
+    );
+  }
+  return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
 };
 
 export const getTextElementAngle = (textElement: ExcalidrawTextElement) => {

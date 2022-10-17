@@ -177,7 +177,7 @@ export const textWysiwyg = ({
             if (!isLinearElement(container)) {
               coordY = container.y + containerDims.height / 2 - height / 2;
             } else if (lines.length > 1) {
-              const elementCenter = getContainerCenter(container);
+              const elementCenter = getContainerCenter(container, appState);
               if (elementCenter) {
                 coordY =
                   elementCenter.y - ((lines.length - 1) * approxLineHeight) / 2;

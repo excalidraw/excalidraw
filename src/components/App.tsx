@@ -201,7 +201,6 @@ import {
   PointerDownState,
   SceneData,
   Device,
-  Point,
 } from "../types";
 import {
   debounce,
@@ -1918,32 +1917,14 @@ class App extends React.Component<AppProps, AppState> {
             }
           } else {
             const selectedElement = selectedElements[0];
-            let sceneX = selectedElement.x + selectedElement.width / 2;
-            let sceneY = selectedElement.y + selectedElement.height / 2;
+            const midPoint = getContainerCenter(selectedElement, this.state);
+            let sceneX = midPoint.x;
+            let sceneY = midPoint.y;
             const boundTextElement = getBoundTextElement(selectedElement);
 
             if (boundTextElement) {
               sceneX = boundTextElement.x + boundTextElement.width / 2;
               sceneY = boundTextElement.y + boundTextElement.height / 2;
-            } else if (isLinearElement(selectedElement)) {
-              const points =
-                LinearElementEditor.getPointsGlobalCoordinates(selectedElement);
-              if (points.length > 3) {
-                return;
-              }
-              let midPoint: Point;
-              if (points.length === 3) {
-                midPoint = points[1];
-              } else {
-                midPoint = LinearElementEditor.getSegmentMidPoint(
-                  selectedElement,
-                  points[0],
-                  points[1],
-                  1,
-                );
-              }
-              sceneX = midPoint[0];
-              sceneY = midPoint[1];
             }
             this.startTextEditing({
               sceneX,
@@ -6148,7 +6129,10 @@ class App extends React.Component<AppProps, AppState> {
       let elementCenterY =
         elementClickedInside.y + elementClickedInside.height / 2;
       if (elementClickedInside) {
-        const elementCenter = getContainerCenter(elementClickedInside);
+        const elementCenter = getContainerCenter(
+          elementClickedInside,
+          appState,
+        );
         if (elementCenter) {
           elementCenterX = elementCenter.x;
           elementCenterY = elementCenter.y;
