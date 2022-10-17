@@ -1795,15 +1795,12 @@ class App extends React.Component<AppProps, AppState> {
 
     if (type === "library" || type === "customSidebar") {
       let nextValue;
-      this.setState((state) => {
-        if (force === undefined) {
-          nextValue = state.openSidebar === type ? null : type;
-        } else {
-          nextValue = force ? type : null;
-        }
-
-        return { openSidebar: nextValue };
-      });
+      if (force === undefined) {
+        nextValue = this.state.openSidebar === type ? null : type;
+      } else {
+        nextValue = force ? type : null;
+      }
+      this.setState({ openSidebar: nextValue });
 
       return !!nextValue;
     }
