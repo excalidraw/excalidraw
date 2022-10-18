@@ -21,6 +21,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerUpdate,
     renderTopRightUI,
     renderFooter,
+    renderSidebar,
     langCode = defaultLang.code,
     viewModeEnabled,
     zenModeEnabled,
@@ -111,6 +112,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
+          renderSidebar={renderSidebar}
         />
       </Provider>
     </InitializeApp>
@@ -232,3 +234,5 @@ export {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
 } from "../../utils";
+
+export { Sidebar } from "../../components/Sidebar/Sidebar";
