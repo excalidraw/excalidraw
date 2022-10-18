@@ -3,7 +3,7 @@ import oc from "open-color";
 import { useEffect, useRef, useState } from "react";
 import { useDevice } from "../components/App";
 import { exportToSvg } from "../scene/export";
-import { BinaryFiles, LibraryItem } from "../types";
+import { LibraryItem } from "../types";
 import "./LibraryUnit.scss";
 import { CheckboxItem } from "./CheckboxItem";
 
@@ -23,7 +23,6 @@ const PLUS_ICON = (
 export const LibraryUnit = ({
   id,
   elements,
-  files,
   isPending,
   onClick,
   selected,
@@ -32,7 +31,6 @@ export const LibraryUnit = ({
 }: {
   id: LibraryItem["id"] | /** for pending item */ null;
   elements?: LibraryItem["elements"];
-  files: BinaryFiles;
   isPending?: boolean;
   onClick: () => void;
   selected: boolean;
@@ -56,7 +54,7 @@ export const LibraryUnit = ({
           exportBackground: false,
           viewBackgroundColor: oc.white,
         },
-        files,
+        null,
       );
       node.innerHTML = svg.outerHTML;
     })();
@@ -64,7 +62,7 @@ export const LibraryUnit = ({
     return () => {
       node.innerHTML = "";
     };
-  }, [elements, files]);
+  }, [elements]);
 
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useDevice().isMobile;

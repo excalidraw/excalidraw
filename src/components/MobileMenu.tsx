@@ -20,7 +20,6 @@ import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
-import { Sidebar } from "./Sidebar/Sidebar";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -29,7 +28,6 @@ type MobileMenuProps = {
   renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  libraryMenu: JSX.Element | null;
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   onPenModeToggle: () => void;
@@ -45,14 +43,13 @@ type MobileMenuProps = {
     appState: AppState,
   ) => JSX.Element | null;
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
-  renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
+  renderSidebars: () => JSX.Element | null;
   device: Device;
 };
 
 export const MobileMenu = ({
   appState,
   elements,
-  libraryMenu,
   actionManager,
   renderJSONExportDialog,
   renderImageExportDialog,
@@ -66,74 +63,62 @@ export const MobileMenu = ({
   onImageAction,
   renderTopRightUI,
   renderCustomStats,
-  renderCustomSidebar,
+  renderSidebars,
   device,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
-      //zsviczian (added <> for library docking)
-      <>
-        <FixedSideContainer side="top" className="App-top-bar">
-          <Section heading="shapes">
-            {(heading: React.ReactNode) => (
-              <Stack.Col gap={4} align="center">
-                <Stack.Row gap={1} className="App-toolbar-container">
-                  <Island padding={1} className="App-toolbar">
-                    {heading}
-                    <Stack.Row gap={1}>
-                      <ShapesSwitcher
-                        appState={appState}
-                        canvas={canvas}
-                        activeTool={appState.activeTool}
-                        setAppState={setAppState}
-                        onImageAction={({ pointerType }) => {
-                          onImageAction({
-                            insertOnCanvasDirectly: pointerType !== "mouse",
-                          });
-                        }}
-                      />
-                    </Stack.Row>
-                  </Island>
-                  {renderTopRightUI && renderTopRightUI(true, appState)}
-                  <LockButton
-                    checked={appState.activeTool.locked}
-                    onChange={onLockToggle}
-                    title={t("toolBar.lock")}
-                    isMobile
-                  />
-                  <LibraryButton
-                    appState={appState}
-                    setAppState={setAppState}
-                    isMobile
-                  />
-                  <PenModeButton
-                    checked={appState.penMode}
-                    onChange={onPenModeToggle}
-                    title={t("toolBar.penMode")}
-                    isMobile
-                    penDetected={appState.penDetected}
-                  />
-                </Stack.Row>
-                {device.isMobile && libraryMenu && (
-                  <Island padding={2}>{libraryMenu}</Island>
-                )}
-              </Stack.Col>
-            )}
-          </Section>
-          <HintViewer
-            appState={appState}
-            elements={elements}
-            isMobile={true}
-            device={device}
-          />
-        </FixedSideContainer>
-        {!device.isMobile && //zsviczian - taken from LayerUI
-          appState.openSidebar === "library" && (
-            <Sidebar __isInternal key="library">
-              {libraryMenu}
-            </Sidebar>
+      <FixedSideContainer side="top" className="App-top-bar">
+        <Section heading="shapes">
+          {(heading: React.ReactNode) => (
+            <Stack.Col gap={4} align="center">
+              <Stack.Row gap={1} className="App-toolbar-container">
+                <Island padding={1} className="App-toolbar">
+                  {heading}
+                  <Stack.Row gap={1}>
+                    <ShapesSwitcher
+                      appState={appState}
+                      canvas={canvas}
+                      activeTool={appState.activeTool}
+                      setAppState={setAppState}
+                      onImageAction={({ pointerType }) => {
+                        onImageAction({
+                          insertOnCanvasDirectly: pointerType !== "mouse",
+                        });
+                      }}
+                    />
+                  </Stack.Row>
+                </Island>
+                {renderTopRightUI && renderTopRightUI(true, appState)}
+                <LockButton
+                  checked={appState.activeTool.locked}
+                  onChange={onLockToggle}
+                  title={t("toolBar.lock")}
+                  isMobile
+                />
+                <LibraryButton
+                  appState={appState}
+                  setAppState={setAppState}
+                  isMobile
+                />
+                <PenModeButton
+                  checked={appState.penMode}
+                  onChange={onPenModeToggle}
+                  title={t("toolBar.penMode")}
+                  isMobile
+                  penDetected={appState.penDetected}
+                />
+              </Stack.Row>
+            </Stack.Col>
           )}
-      </>
+        </Section>
+        <HintViewer
+          appState={appState}
+          elements={elements}
+          isMobile={true}
+          device={device}
+        />
+      </FixedSideContainer>
     );
   };
 
@@ -198,7 +183,7 @@ export const MobileMenu = ({
   };
   return (
     <>
-      {appState.openSidebar === "customSidebar" && renderCustomSidebar?.()}
+      {renderSidebars()}
       {!appState.viewModeEnabled && renderToolbar()}
       {!appState.openMenu && appState.showStats && (
         <Stats
