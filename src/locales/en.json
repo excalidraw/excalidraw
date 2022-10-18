@@ -440,5 +440,11 @@
     "5c940d": "Lime 9",
     "e67700": "Yellow 9",
     "d9480f": "Orange 9"
+  },
+  "welcomeScreen": {
+    "data": "All your data is saved locally in your browser.",
+    "menuHints": "Export, preferences, languages, ...",
+    "toolbarHints": "Pick a tool & Start drawing!",
+    "helpHints": "Shortcuts & help"
   }
 }

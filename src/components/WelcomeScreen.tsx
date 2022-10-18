@@ -41,10 +41,8 @@ const WelcomeScreen = ({ actionManager }: { actionManager: ActionManager }) => {
       <div className="WelcomeScreen-logo virgil WelcomeScreen-decor">
         {ExcalLogo} Excalidraw
       </div>
-      {/* // TODO barnabasmolnar/editor-redesign */}
-      {/* might need i18n later on */}
       <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--data">
-        All your data is saved locally in your browser.
+        {t("welcomeScreen.data")}
       </div>
       <div className="WelcomeScreen-items">
         <WelcomeScreenItem

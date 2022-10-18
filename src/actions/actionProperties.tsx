@@ -3,6 +3,8 @@ import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
 // TODO barnabasmolnar/editor-redesign
+// TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
+// ArrowHead icons
 import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,

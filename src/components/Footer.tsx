@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { ActionManager } from "../actions/manager";
+import { t } from "../i18n";
 import { AppState, ExcalidrawProps } from "../types";
 import {
   ExitZenModeAction,
@@ -84,11 +85,9 @@ const Footer = ({
         })}
       >
         <div style={{ position: "relative" }}>
-          {/* // TODO barnabasmolnar/editor-redesign */}
-          {/* don't forget to add proper text + possibly i18n */}
           {renderWelcomeScreen && (
             <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--help-pointer">
-              <div>Placeholder text for help hints</div>
+              <div>{t("welcomeScreen.helpHints")}</div>
               {WelcomeScreenHelpArrow}
             </div>
           )}

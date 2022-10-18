@@ -177,9 +177,7 @@ const LayerUI = ({
       {renderWelcomeScreen && (
         <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--menu-pointer">
           {WelcomeScreenMenuArrow}
-          {/* // TODO barnabasmolnar/editor-redesign */}
-          {/* don't forget to add proper text + possibly i18n */}
-          <div>Placeholder text for menu hints</div>
+          <div>{t("welcomeScreen.menuHints")}</div>
         </div>
       )}
       <button
@@ -289,12 +287,10 @@ const LayerUI = ({
             <Section heading="shapes">
               {(heading: React.ReactNode) => (
                 <div style={{ position: "relative" }}>
-                  {/* // TODO barnabasmolnar/editor-redesign */}
-                  {/* don't forget to add proper text + possibly i18n */}
                   {renderWelcomeScreen && (
                     <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--top-toolbar-pointer">
                       <div className="WelcomeScreen-decor--top-toolbar-pointer__label">
-                        Placeholder text for top toolbar hints
+                        {t("welcomeScreen.toolbarHints")}
                       </div>
                       {WelcomeScreenTopToolbarArrow}
                     </div>
