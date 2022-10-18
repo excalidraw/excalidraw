@@ -23,9 +23,35 @@
     }
 
     &--help-pointer {
+      position: absolute;
+      right: 100%;
+      bottom: 0;
+
       svg {
-        width: 102px;
-        height: 83px;
+        margin-top: 0.5rem;
+        width: 85px;
+        height: 71px;
+      }
+    }
+
+    &--top-toolbar-pointer {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 2.5rem;
+      display: flex;
+      align-items: baseline;
+
+      &__label {
+        width: 120px;
+        position: relative;
+        top: -0.5rem;
+      }
+
+      svg {
+        width: 38px;
+        height: 78px;
       }
     }
 
@@ -107,6 +133,32 @@
 
       .WelcomeScreen-item__label {
         color: var(--color-gray-100);
+      }
+    }
+  }
+
+  &.theme--dark {
+    .WelcomeScreen-decor {
+      color: var(--color-gray-80);
+    }
+
+    .WelcomeScreen-item {
+      color: var(--color-gray-80);
+
+      &__shortcut {
+        color: var(--color-gray-80);
+      }
+
+      &:hover {
+        background: var(--color-gray-85);
+
+        .WelcomeScreen-item__shortcut {
+          color: var(--color-gray-50);
+        }
+
+        .WelcomeScreen-item__label {
+          color: var(--color-gray-10);
+        }
       }
     }
   }

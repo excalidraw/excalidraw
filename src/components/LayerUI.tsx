@@ -39,7 +39,11 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
-import { HamburgerMenuIcon, WelcomeScreenMenuArrow } from "./icons";
+import {
+  HamburgerMenuIcon,
+  WelcomeScreenMenuArrow,
+  WelcomeScreenTopToolbarArrow,
+} from "./icons";
 import { MenuLinks, Separator } from "./MenuUtils";
 import { useOutsideClickHook } from "../hooks/useOutsideClick";
 import WelcomeScreen from "./WelcomeScreen";
@@ -314,64 +318,76 @@ const LayerUI = ({
           {!appState.viewModeEnabled && (
             <Section heading="shapes">
               {(heading: React.ReactNode) => (
-                <Stack.Col gap={4} align="start">
-                  <Stack.Row
-                    gap={1}
-                    className={clsx("App-toolbar-container", {
-                      "zen-mode": appState.zenModeEnabled,
-                    })}
-                  >
-                    <Island
-                      padding={1}
-                      className={clsx("App-toolbar", {
+                <div style={{ position: "relative" }}>
+                  {/* // TODO barnabasmolnar/editor-redesign */}
+                  {/* don't forget to add proper text + possibly i18n */}
+                  {renderWelcomeScreen && (
+                    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--top-toolbar-pointer">
+                      <div className="WelcomeScreen-decor--top-toolbar-pointer__label">
+                        Placeholder text for top toolbar hints
+                      </div>
+                      {WelcomeScreenTopToolbarArrow}
+                    </div>
+                  )}
+                  <Stack.Col gap={4} align="start">
+                    <Stack.Row
+                      gap={1}
+                      className={clsx("App-toolbar-container", {
                         "zen-mode": appState.zenModeEnabled,
                       })}
                     >
-                      <HintViewer
-                        appState={appState}
-                        elements={elements}
-                        isMobile={device.isMobile}
-                      />
-                      {heading}
-                      <Stack.Row gap={1}>
-                        <PenModeButton
-                          zenModeEnabled={appState.zenModeEnabled}
-                          checked={appState.penMode}
-                          onChange={onPenModeToggle}
-                          title={t("toolBar.penMode")}
-                          penDetected={appState.penDetected}
-                          // TODO barnabasmolnar/editor-redesign
-                          // penDetected={true}
-                        />
-                        <LockButton
-                          zenModeEnabled={appState.zenModeEnabled}
-                          checked={appState.activeTool.locked}
-                          onChange={() => onLockToggle()}
-                          title={t("toolBar.lock")}
-                        />
-                        <div className="App-toolbar__divider"></div>
-                        <ShapesSwitcher
+                      <Island
+                        padding={1}
+                        className={clsx("App-toolbar", {
+                          "zen-mode": appState.zenModeEnabled,
+                        })}
+                      >
+                        <HintViewer
                           appState={appState}
-                          canvas={canvas}
-                          activeTool={appState.activeTool}
-                          setAppState={setAppState}
-                          onImageAction={({ pointerType }) => {
-                            onImageAction({
-                              insertOnCanvasDirectly: pointerType !== "mouse",
-                            });
-                          }}
+                          elements={elements}
+                          isMobile={device.isMobile}
                         />
-                        {/* {actionManager.renderAction("eraser", {
+                        {heading}
+                        <Stack.Row gap={1}>
+                          <PenModeButton
+                            zenModeEnabled={appState.zenModeEnabled}
+                            checked={appState.penMode}
+                            onChange={onPenModeToggle}
+                            title={t("toolBar.penMode")}
+                            penDetected={appState.penDetected}
+                            // TODO barnabasmolnar/editor-redesign
+                            // penDetected={true}
+                          />
+                          <LockButton
+                            zenModeEnabled={appState.zenModeEnabled}
+                            checked={appState.activeTool.locked}
+                            onChange={() => onLockToggle()}
+                            title={t("toolBar.lock")}
+                          />
+                          <div className="App-toolbar__divider"></div>
+                          <ShapesSwitcher
+                            appState={appState}
+                            canvas={canvas}
+                            activeTool={appState.activeTool}
+                            setAppState={setAppState}
+                            onImageAction={({ pointerType }) => {
+                              onImageAction({
+                                insertOnCanvasDirectly: pointerType !== "mouse",
+                              });
+                            }}
+                          />
+                          {/* {actionManager.renderAction("eraser", {
                           // size: "small",
                         })} */}
-                      </Stack.Row>
-                    </Island>
-                    <LibraryButton
-                      appState={appState}
-                      setAppState={setAppState}
-                    />
-                  </Stack.Row>
-                </Stack.Col>
+                        </Stack.Row>
+                      </Island>
+                      <LibraryButton
+                        appState={appState}
+                        setAppState={setAppState}
+                      />
+                    </Stack.Row>
+                  </Stack.Col>
+                </div>
               )}
             </Section>
           )}

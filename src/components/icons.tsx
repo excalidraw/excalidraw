@@ -85,37 +85,50 @@ export const WelcomeScreenMenuArrow = createIcon(
 
 export const WelcomeScreenHelpArrow = createIcon(
   <>
-    <g clipPath="url(#a)">
-      <path
-        d="M29.026 7.232c-5.268 13.125-5.548 33.555 3.285 42.311 8.823 8.75 33.31 12.304 42.422 13.523"
-        stroke="#B8B8B8"
-        strokeWidth={2}
-        strokeLinecap="round"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="m83.181 65.247-13.058-10-2.948 13.62 16.006-3.62Z"
-        fill="#B8B8B8"
-      />
-      <path
-        d="M83.181 65.247c-3.163-2.429-6.337-4.856-13.058-10m13.058 10c-5.145-3.936-10.292-7.882-13.058-10m0 0c-.78 3.603-1.563 7.196-2.948 13.62m2.948-13.62c-1.126 5.168-2.24 10.346-2.948 13.62m0 0c5.168-1.166 10.334-2.343 16.006-3.62m-16.006 3.62c5.51-1.248 11.01-2.495 16.006-3.62"
-        stroke="#B8B8B8"
-        strokeWidth={2}
-        strokeLinecap="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path
-          fill="#fff"
-          transform="scale(1 -1) rotate(60 112.157 29.246)"
-          d="M0 0h41v94H0z"
-        />
-      </clipPath>
-    </defs>
+    <path
+      d="M18.026 1.232c-5.268 13.125-5.548 33.555 3.285 42.311 8.823 8.75 33.31 12.304 42.422 13.523"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+    />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="m72.181 59.247-13.058-10-2.948 13.62 16.006-3.62Z"
+      fill="currentColor"
+    />
+    <path
+      d="M72.181 59.247c-3.163-2.429-6.337-4.856-13.058-10m13.058 10c-5.145-3.936-10.292-7.882-13.058-10m0 0c-.78 3.603-1.563 7.196-2.948 13.62m2.948-13.62c-1.126 5.168-2.24 10.346-2.948 13.62m0 0c5.168-1.166 10.334-2.343 16.006-3.62m-16.006 3.62c5.51-1.248 11.01-2.495 16.006-3.62"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+    />
   </>,
-  { width: 102, height: 83, fill: "none" },
+  { width: 85, height: 71, fill: "none" },
+);
+
+export const WelcomeScreenTopToolbarArrow = createIcon(
+  <>
+    <path
+      d="M1 77c14-2 31.833-11.973 35-24 3.167-12.016-6-35-9.5-43.5"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+    />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="m24.165 1.093-2.132 16.309 13.27-4.258-11.138-12.05Z"
+      fill="currentColor"
+    />
+    <path
+      d="M24.165 1.093c-.522 3.953-1.037 7.916-2.132 16.309m2.131-16.309c-.835 6.424-1.68 12.854-2.13 16.308m0 0c3.51-1.125 7.013-2.243 13.27-4.257m-13.27 4.257c5.038-1.608 10.08-3.232 13.27-4.257m0 0c-3.595-3.892-7.197-7.777-11.14-12.05m11.14 12.05c-3.837-4.148-7.667-8.287-11.14-12.05"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+    />
+  </>,
+  { width: 38, height: 78, fill: "none" },
 );
 
 export const ExcalLogo = createIcon(

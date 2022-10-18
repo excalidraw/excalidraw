@@ -8,7 +8,7 @@ import {
   ZoomActions,
 } from "./Actions";
 import { useDevice } from "./App";
-// import { WelcomeScreenHelpArrow } from "./icons";
+import { WelcomeScreenHelpArrow } from "./icons";
 import { Section } from "./Section";
 import Stack from "./Stack";
 
@@ -86,13 +86,13 @@ const Footer = ({
         <div style={{ position: "relative" }}>
           {/* // TODO barnabasmolnar/editor-redesign */}
           {/* don't forget to add proper text + possibly i18n */}
-          {/* // TODO something not quite right with the arrow here... */}
-          {/* {renderWelcomeScreen && (
+          {renderWelcomeScreen && (
             <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--help-pointer">
+              <div>Placeholder text for help hints</div>
               {WelcomeScreenHelpArrow}
-              <div>Placeholder text for menu hints</div>
             </div>
-          )} */}
+          )}
+
           {actionManager.renderAction("toggleShortcuts")}
         </div>
       </div>
