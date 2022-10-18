@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { t } from "../../i18n";
 import { useDevice } from "../App";
 import { SidebarPropsContext } from "./common";
-import { close } from "../icons";
+import { CloseIcon } from "../icons";
 import { withUpstreamOverride } from "../hoc/withUpstreamOverride";
 import { Tooltip } from "../Tooltip";
 
@@ -79,7 +79,7 @@ const _SidebarHeader: React.FC<{
                 onClick={props.onClose}
                 aria-label={t("buttons.close")}
               >
-                {close}
+                {CloseIcon}
               </button>
             </div>
           )}
