@@ -28,7 +28,6 @@ type MobileMenuProps = {
   renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  libraryMenu: JSX.Element | null;
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   onPenModeToggle: () => void;
@@ -44,14 +43,13 @@ type MobileMenuProps = {
     appState: AppState,
   ) => JSX.Element | null;
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
-  renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
+  renderSidebars: () => JSX.Element | null;
   device: Device;
 };
 
 export const MobileMenu = ({
   appState,
   elements,
-  libraryMenu,
   actionManager,
   renderJSONExportDialog,
   renderImageExportDialog,
@@ -65,7 +63,7 @@ export const MobileMenu = ({
   onImageAction,
   renderTopRightUI,
   renderCustomStats,
-  renderCustomSidebar,
+  renderSidebars,
   device,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
@@ -111,7 +109,6 @@ export const MobileMenu = ({
                   penDetected={appState.penDetected}
                 />
               </Stack.Row>
-              {libraryMenu && <Island padding={2}>{libraryMenu}</Island>}
             </Stack.Col>
           )}
         </Section>
@@ -184,7 +181,7 @@ export const MobileMenu = ({
   };
   return (
     <>
-      {appState.openSidebar === "customSidebar" && renderCustomSidebar?.()}
+      {renderSidebars()}
       {!appState.viewModeEnabled && renderToolbar()}
       {!appState.openMenu && appState.showStats && (
         <Stats

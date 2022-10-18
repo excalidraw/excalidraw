@@ -1,223 +1,35 @@
-import React, { useCallback, useState } from "react";
-import { saveLibraryAsJSON, serializeLibraryAsJSON } from "../data/json";
-import Library from "../data/library";
+import React, { useState } from "react";
+import { serializeLibraryAsJSON } from "../data/json";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
-import {
-  AppState,
-  BinaryFiles,
-  ExcalidrawProps,
-  LibraryItem,
-  LibraryItems,
-} from "../types";
-import { arrayToMap, chunk, muteFSAbortError } from "../utils";
-import { useDevice } from "./App";
-import ConfirmDialog from "./ConfirmDialog";
-import { exportToFileIcon, load, publishIcon, trash } from "./icons";
+import { LibraryItem, LibraryItems } from "../types";
+import { arrayToMap, chunk } from "../utils";
 import { LibraryUnit } from "./LibraryUnit";
 import Stack from "./Stack";
-import { ToolButton } from "./ToolButton";
-import { Tooltip } from "./Tooltip";
 
 import "./LibraryMenuItems.scss";
-import { MIME_TYPES, VERSIONS } from "../constants";
+import { MIME_TYPES } from "../constants";
 import Spinner from "./Spinner";
-import { fileOpen } from "../data/filesystem";
-import { Sidebar } from "./Sidebar/Sidebar";
+
+const CELLS_PER_ROW = 4;
 
 const LibraryMenuItems = ({
   isLoading,
   libraryItems,
-  onRemoveFromLibrary,
   onAddToLibrary,
   onInsertLibraryItems,
   pendingElements,
-  theme,
-  setAppState,
-  appState,
-  libraryReturnUrl,
-  library,
-  files,
-  id,
   selectedItems,
   onSelectItems,
-  onPublish,
-  resetLibrary,
 }: {
   isLoading: boolean;
   libraryItems: LibraryItems;
   pendingElements: LibraryItem["elements"];
-  onRemoveFromLibrary: () => void;
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: (elements: LibraryItem["elements"]) => void;
-  theme: AppState["theme"];
-  files: BinaryFiles;
-  setAppState: React.Component<any, AppState>["setState"];
-  appState: AppState;
-  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
-  library: Library;
-  id: string;
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
-  onPublish: () => void;
-  resetLibrary: () => void;
 }) => {
-  const renderRemoveLibAlert = useCallback(() => {
-    const content = selectedItems.length
-      ? t("alerts.removeItemsFromsLibrary", { count: selectedItems.length })
-      : t("alerts.resetLibrary");
-    const title = selectedItems.length
-      ? t("confirmDialog.removeItemsFromLib")
-      : t("confirmDialog.resetLibrary");
-    return (
-      <ConfirmDialog
-        onConfirm={() => {
-          if (selectedItems.length) {
-            onRemoveFromLibrary();
-          } else {
-            resetLibrary();
-          }
-          setShowRemoveLibAlert(false);
-        }}
-        onCancel={() => {
-          setShowRemoveLibAlert(false);
-        }}
-        title={title}
-      >
-        <p>{content}</p>
-      </ConfirmDialog>
-    );
-  }, [selectedItems, onRemoveFromLibrary, resetLibrary]);
-
-  const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
-  const device = useDevice();
-  const renderLibraryActions = () => {
-    const itemsSelected = !!selectedItems.length;
-    const items = itemsSelected
-      ? libraryItems.filter((item) => selectedItems.includes(item.id))
-      : libraryItems;
-    const resetLabel = itemsSelected
-      ? t("buttons.remove")
-      : t("buttons.resetLibrary");
-    return (
-      <div className="library-actions">
-        {!itemsSelected && (
-          <ToolButton
-            key="import"
-            type="button"
-            title={t("buttons.load")}
-            aria-label={t("buttons.load")}
-            icon={load}
-            onClick={async () => {
-              try {
-                await library.updateLibrary({
-                  libraryItems: fileOpen({
-                    description: "Excalidraw library files",
-                    // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
-                    // gets resolved. Else, iOS users cannot open `.excalidraw` files.
-                    /*
-                    extensions: [".json", ".excalidrawlib"],
-                    */
-                  }),
-                  merge: true,
-                  openLibraryMenu: true,
-                });
-              } catch (error: any) {
-                if (error?.name === "AbortError") {
-                  console.warn(error);
-                  return;
-                }
-                setAppState({ errorMessage: t("errors.importLibraryError") });
-              }
-            }}
-            className="library-actions--load"
-          />
-        )}
-        {!!items.length && (
-          <>
-            <ToolButton
-              key="export"
-              type="button"
-              title={t("buttons.export")}
-              aria-label={t("buttons.export")}
-              icon={exportToFileIcon}
-              onClick={async () => {
-                const libraryItems = itemsSelected
-                  ? items
-                  : await library.getLatestLibrary();
-                saveLibraryAsJSON(libraryItems)
-                  .catch(muteFSAbortError)
-                  .catch((error) => {
-                    setAppState({ errorMessage: error.message });
-                  });
-              }}
-              className="library-actions--export"
-            >
-              {selectedItems.length > 0 && (
-                <span className="library-actions-counter">
-                  {selectedItems.length}
-                </span>
-              )}
-            </ToolButton>
-            <ToolButton
-              key="reset"
-              type="button"
-              title={resetLabel}
-              aria-label={resetLabel}
-              icon={trash}
-              onClick={() => setShowRemoveLibAlert(true)}
-              className="library-actions--remove"
-            >
-              {selectedItems.length > 0 && (
-                <span className="library-actions-counter">
-                  {selectedItems.length}
-                </span>
-              )}
-            </ToolButton>
-          </>
-        )}
-        {itemsSelected && (
-          <Tooltip label={t("hints.publishLibrary")}>
-            <ToolButton
-              type="button"
-              aria-label={t("buttons.publishLibrary")}
-              label={t("buttons.publishLibrary")}
-              icon={publishIcon}
-              className="library-actions--publish"
-              onClick={onPublish}
-            >
-              {!device.isMobile && <label>{t("buttons.publishLibrary")}</label>}
-              {selectedItems.length > 0 && (
-                <span className="library-actions-counter">
-                  {selectedItems.length}
-                </span>
-              )}
-            </ToolButton>
-          </Tooltip>
-        )}
-        {device.isMobile && (
-          <div className="library-menu-browse-button--mobile">
-            <a
-              href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-                window.name || "_blank"
-              }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
-                VERSIONS.excalidrawLibrary
-              }`}
-              target="_excalidraw_libraries"
-            >
-              {t("labels.libraries")}
-            </a>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const CELLS_PER_ROW = device.isMobile && !device.isSmScreen ? 6 : 4;
-
-  const referrer =
-    libraryReturnUrl || window.location.origin + window.location.pathname;
-
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
   >(null);
@@ -294,7 +106,6 @@ const LibraryMenuItems = ({
       <Stack.Col key={params.key}>
         <LibraryUnit
           elements={params.item?.elements}
-          files={files}
           isPending={!params.item?.id && !!params.item?.elements}
           onClick={params.onClick || (() => {})}
           id={params.item?.id || null}
@@ -370,8 +181,21 @@ const LibraryMenuItems = ({
     (item) => item.status === "published",
   );
 
-  const renderLibraryMenuItems = () => {
-    return (
+  return (
+    <div
+      className="library-menu-items-container"
+      style={
+        publishedItems.length || unpublishedItems.length
+          ? {
+              flex: "1 1 0",
+              overflowY: "auto",
+            }
+          : {
+              marginBottom: "2rem",
+              flex: 0,
+            }
+      }
+    >
       <Stack.Col
         className="library-menu-items-container__items"
         align="start"
@@ -443,8 +267,8 @@ const LibraryMenuItems = ({
 
         <>
           {(publishedItems.length > 0 ||
-            (!device.isMobile &&
-              (pendingElements.length > 0 || unpublishedItems.length > 0))) && (
+            pendingElements.length > 0 ||
+            unpublishedItems.length > 0) && (
             <div className="separator">{t("labels.excalidrawLib")}</div>
           )}
           {publishedItems.length > 0 ? (
@@ -466,45 +290,6 @@ const LibraryMenuItems = ({
           ) : null}
         </>
       </Stack.Col>
-    );
-  };
-
-  const renderLibraryFooter = () => {
-    return (
-      <a
-        className="library-menu-browse-button"
-        href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-          window.name || "_blank"
-        }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
-          VERSIONS.excalidrawLibrary
-        }`}
-        target="_excalidraw_libraries"
-      >
-        {t("labels.libraries")}
-      </a>
-    );
-  };
-
-  return (
-    <div
-      className="library-menu-items-container"
-      style={
-        device.isMobile
-          ? {
-              minHeight: "200px",
-              maxHeight: "70vh",
-            }
-          : undefined
-      }
-    >
-      {showRemoveLibAlert && renderRemoveLibAlert()}
-      {/* NOTE using SidebarHeader here isn't semantic since this may render
-          outside of a sidebar, but for now it doesn't matter */}
-      <Sidebar.Header className="layer-ui__library-header">
-        {renderLibraryActions()}
-      </Sidebar.Header>
-      {renderLibraryMenuItems()}
-      {!device.isMobile && renderLibraryFooter()}
     </div>
   );
 };
