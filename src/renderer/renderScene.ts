@@ -410,7 +410,11 @@ export const _renderScene = ({
 
     visibleElements.forEach((element, index) => {
       try {
-        const enclosingElement = getEnclosingElement(elements, element, index);
+        const enclosingElement = getEnclosingElement(
+          visibleElements,
+          element,
+          index,
+        );
         renderElement(
           element,
           rc,
