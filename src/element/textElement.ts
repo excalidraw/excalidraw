@@ -1,4 +1,4 @@
-import { getFontString, arrayToMap, isTestEnv } from "../utils";
+import { getFontString, arrayToMap, isTestEnv, isTransparent } from "../utils";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -10,7 +10,7 @@ import { mutateElement } from "./mutateElement";
 import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
-import { isTextElement } from ".";
+import { getElementAbsoluteCoords, isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import { isLinearElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -585,4 +585,38 @@ export const getTextElementAngle = (textElement: ExcalidrawTextElement) => {
     return textElement.angle;
   }
   return container.angle;
+};
+
+export const getEnclosingElement = (
+  elements: readonly ExcalidrawElement[],
+  element: ExcalidrawElement,
+  index: number,
+) => {
+  let enclosingElement = null;
+  if (isTextElement(element)) {
+    const container = getContainerElement(element);
+    if (isLinearElement(container)) {
+      const containerCoords = getElementAbsoluteCoords(container);
+      let startingIndex = index - 2;
+      while (startingIndex >= 0) {
+        const currentElement = elements[startingIndex];
+        const elementCoords = getElementAbsoluteCoords(currentElement);
+
+        if (isTransparent(currentElement.backgroundColor)) {
+          startingIndex--;
+        } else if (
+          containerCoords[0] > elementCoords[0] &&
+          containerCoords[1] > elementCoords[1] &&
+          containerCoords[2] < elementCoords[2] &&
+          containerCoords[3] < elementCoords[3]
+        ) {
+          enclosingElement = elements[startingIndex];
+          break;
+        } else {
+          break;
+        }
+      }
+    }
+  }
+  return enclosingElement;
 };

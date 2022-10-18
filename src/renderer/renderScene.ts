@@ -60,7 +60,10 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
-import { getBoundTextElement } from "../element/textElement";
+import {
+  getBoundTextElement,
+  getEnclosingElement,
+} from "../element/textElement";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 4;
@@ -405,9 +408,17 @@ export const _renderScene = ({
       }),
     );
 
-    visibleElements.forEach((element) => {
+    visibleElements.forEach((element, index) => {
       try {
-        renderElement(element, rc, context, renderConfig);
+        const enclosingElement = getEnclosingElement(elements, element, index);
+        renderElement(
+          element,
+          rc,
+          context,
+          renderConfig,
+          appState,
+          enclosingElement,
+        );
         if (!isExporting) {
           renderLinkIcon(element, context, appState);
         }
@@ -419,7 +430,14 @@ export const _renderScene = ({
     // Paint selection element
     if (appState.selectionElement) {
       try {
-        renderElement(appState.selectionElement, rc, context, renderConfig);
+        renderElement(
+          appState.selectionElement,
+          rc,
+          context,
+          renderConfig,
+          appState,
+          null,
+        );
       } catch (error: any) {
         console.error(error);
       }
@@ -1112,8 +1130,9 @@ export const renderSceneToSvg = (
     return;
   }
   // render elements
-  elements.forEach((element) => {
+  elements.forEach((element, index) => {
     if (!element.isDeleted) {
+      const enclosingElement = getEnclosingElement(elements, element, index);
       try {
         renderElementToSvg(
           element,
@@ -1123,6 +1142,7 @@ export const renderSceneToSvg = (
           element.x + offsetX,
           element.y + offsetY,
           exportWithDarkMode,
+          enclosingElement,
         );
       } catch (error: any) {
         console.error(error);

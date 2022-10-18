@@ -738,6 +738,8 @@ export const renderElement = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
+  appState: AppState,
+  enclosingElement: ExcalidrawElement | null,
 ) => {
   const generator = rc.generator;
   switch (element.type) {
@@ -786,6 +788,18 @@ export const renderElement = (
     case "text": {
       generateElementShape(element, generator);
       if (renderConfig.isExporting) {
+        if (isTextElement(element)) {
+          const container = getContainerElement(element);
+          if (isLinearElement(container)) {
+            clearLinearElementBoundTextRect(
+              element,
+              context,
+              renderConfig,
+              appState,
+              enclosingElement,
+            );
+          }
+        }
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + renderConfig.scrollX;
         const cy = (y1 + y2) / 2 + renderConfig.scrollY;
@@ -811,13 +825,13 @@ export const renderElement = (
         if (isTextElement(element)) {
           const container = getContainerElement(element);
           if (isLinearElement(container)) {
-            context.save();
-            context.translate(
-              element.x + renderConfig.scrollX,
-              element.y + renderConfig.scrollY,
+            clearLinearElementBoundTextRect(
+              element,
+              context,
+              renderConfig,
+              appState,
+              enclosingElement,
             );
-            context.clearRect(0, 0, element.width, element.height);
-            context.restore();
           }
         }
         const elementWithCanvas = generateElementWithCanvas(
@@ -835,6 +849,27 @@ export const renderElement = (
   }
 };
 
+const clearLinearElementBoundTextRect = (
+  element: ExcalidrawElement,
+  context: CanvasRenderingContext2D,
+  renderConfig: RenderConfig,
+  appState: AppState,
+  enclosingElement: ExcalidrawElement | null,
+) => {
+  context.save();
+  context.translate(
+    element.x + renderConfig.scrollX,
+    element.y + renderConfig.scrollY,
+  );
+  if (enclosingElement) {
+    context.fillStyle = enclosingElement.backgroundColor;
+  } else {
+    context.fillStyle = appState.viewBackgroundColor;
+  }
+  context.fillRect(0, 0, element.width, element.height);
+
+  context.restore();
+};
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,
   drawable: Drawable,
@@ -859,6 +894,7 @@ export const renderElementToSvg = (
   offsetX?: number,
   offsetY?: number,
   exportWithDarkMode?: boolean,
+  enclosingElement?: ExcalidrawElement | null,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x2 - x1) / 2 - (element.x - x1);
@@ -898,6 +934,7 @@ export const renderElementToSvg = (
         node.setAttribute("fill-opacity", `${opacity}`);
       }
       node.setAttribute("stroke-linecap", "round");
+      node.setAttribute("id", element.id);
       node.setAttribute(
         "transform",
         `translate(${offsetX || 0} ${
@@ -1059,7 +1096,12 @@ export const renderElementToSvg = (
             clipRect.setAttribute("x", `${offsetX}`);
             clipRect.setAttribute("y", `${offsetY}`);
             clipPath.appendChild(clipRect);
-            usePath.setAttribute("href", `#clip-path-bound-text`);
+            if (enclosingElement) {
+              usePath.setAttribute("href", `#${enclosingElement.id}`);
+            } else {
+              usePath.setAttribute("href", `#clip-path-bound-text`);
+            }
+
             usePath.setAttribute("clip-path", `url(#clip-${element.id})`);
             root.append(clipPath);
             root.append(usePath);
