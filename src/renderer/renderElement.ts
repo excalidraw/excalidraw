@@ -12,6 +12,7 @@ import {
   isLinearElement,
   isFreeDrawElement,
   isInitializedImageElement,
+  isBoundToContainer,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -1037,6 +1038,34 @@ export const renderElementToSvg = (
           node.setAttribute("stroke-opacity", `${opacity}`);
           node.setAttribute("fill-opacity", `${opacity}`);
         }
+        const clipPath = svgRoot.ownerDocument!.createElementNS(
+          SVG_NS,
+          "clipPath",
+        );
+        const usePath = svgRoot.ownerDocument!.createElementNS(SVG_NS, "use");
+        if (isBoundToContainer(element)) {
+          const container = getContainerElement(element);
+          if (isLinearElement(container)) {
+            clipPath.setAttribute("id", `clip-${element.id}`);
+            root
+              .querySelector("rect")
+              ?.setAttribute("id", `clip-path-bound-text`);
+            const clipRect = svgRoot.ownerDocument!.createElementNS(
+              SVG_NS,
+              "rect",
+            );
+            clipRect.setAttribute("width", `${element.width}`);
+            clipRect.setAttribute("height", `${element.height}`);
+            clipRect.setAttribute("x", `${offsetX}`);
+            clipRect.setAttribute("y", `${offsetY}`);
+            clipPath.appendChild(clipRect);
+            usePath.setAttribute("href", `#clip-path-bound-text`);
+            usePath.setAttribute("clip-path", `url(#clip-${element.id})`);
+            root.append(clipPath);
+            root.append(usePath);
+          }
+        }
+
         node.setAttribute(
           "transform",
           `translate(${offsetX || 0} ${
