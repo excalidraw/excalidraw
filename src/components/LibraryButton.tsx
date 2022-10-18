@@ -40,10 +40,10 @@ export const LibraryButton: React.FC<{
           document
             .querySelector(".layer-ui__wrapper")
             ?.classList.remove("animate");
-          const nextState = event.target.checked;
-          setAppState({ isLibraryOpen: nextState });
+          const isOpen = event.target.checked;
+          setAppState({ openSidebar: isOpen ? "library" : null });
           // track only openings
-          if (nextState) {
+          if (isOpen) {
             trackEvent(
               "library",
               "toggleLibrary (open)",
@@ -51,7 +51,7 @@ export const LibraryButton: React.FC<{
             );
           }
         }}
-        checked={appState.isLibraryOpen}
+        checked={appState.openSidebar === "library"}
         aria-label={capitalizeString(t("toolBar.library"))}
         aria-keyshortcuts="0"
       />
