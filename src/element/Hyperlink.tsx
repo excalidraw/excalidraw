@@ -10,7 +10,7 @@ import { NonDeletedExcalidrawElement } from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import { editIcon, trash } from "../components/icons";
+import { FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
 import { t } from "../i18n";
 import {
   useCallback,
@@ -197,7 +197,7 @@ export const Hyperlink = ({
             label={t("buttons.edit")}
             onClick={onEdit}
             className="excalidraw-hyperlinkContainer--edit"
-            icon={editIcon}
+            icon={FreedrawIcon}
           />
         )}
 
@@ -209,7 +209,7 @@ export const Hyperlink = ({
             label={t("buttons.remove")}
             onClick={handleRemove}
             className="excalidraw-hyperlinkContainer--remove"
-            icon={trash}
+            icon={TrashIcon}
           />
         )}
       </div>
@@ -277,28 +277,7 @@ export const actionLink = register({
     return (
       <ToolButton
         type="button"
-        icon={
-          <svg
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M6.667 9.333a2.333 2.333 0 0 0 3.333 0l2.667-2.666a2.357 2.357 0 1 0-3.334-3.334L9 3.667"
-              stroke="currentColor"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M9.333 6.667a2.333 2.333 0 0 0-3.333 0L3.333 9.333a2.357 2.357 0 1 0 3.334 3.334L7 12.333"
-              stroke="currentColor"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        }
+        icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
         title={`${t("labels.link.label")} - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}

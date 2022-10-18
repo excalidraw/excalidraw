@@ -1,4 +1,4 @@
-import { LinkIcon } from "./icons";
+import { ExternalLinkIcon } from "./icons";
 
 export const MenuLinks = () => (
   <>
@@ -10,7 +10,7 @@ export const MenuLinks = () => (
     >
       {/* // TODO barnabasmolnar/editor-redesign  */}
       {/* will the LinkIcon do or should it only be a placeholder? */}
-      <div className="menu-item__icon">{LinkIcon}</div>
+      <div className="menu-item__icon">{ExternalLinkIcon}</div>
       <div className="menu-item__text">Excalidraw+</div>
     </a>
     <a
@@ -19,7 +19,7 @@ export const MenuLinks = () => (
       target="_blank"
       rel="noopener noreferrer"
     >
-      <div className="menu-item__icon">{LinkIcon}</div>
+      <div className="menu-item__icon">{ExternalLinkIcon}</div>
       <div className="menu-item__text">GitHub</div>
     </a>
     <a
@@ -28,7 +28,7 @@ export const MenuLinks = () => (
       href="https://discord.gg/UexuTaE"
       rel="noopener noreferrer"
     >
-      <div className="menu-item__icon">{LinkIcon}</div>
+      <div className="menu-item__icon">{ExternalLinkIcon}</div>
       <div className="menu-item__text">Discord</div>
     </a>
   </>

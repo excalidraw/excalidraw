@@ -4,7 +4,7 @@ import { t } from "../i18n";
 
 import { AppState, ExportOpts, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
-import { ExportIcon, exportToFileIcon, link } from "./icons";
+import { ExportIcon, exportToFileIcon, LinkIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
 import { actionSaveFileToDisk } from "../actions/actionExport";
 import { Card } from "./Card";
@@ -64,7 +64,7 @@ const JSONExportModal = ({
         )}
         {onExportToBackend && (
           <Card color="pink">
-            <div className="Card-icon">{link}</div>
+            <div className="Card-icon">{LinkIcon}</div>
             <h2>{t("exportDialog.link_title")}</h2>
             <div className="Card-details">{t("exportDialog.link_details")}</div>
             <ToolButton

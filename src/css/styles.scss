@@ -171,6 +171,13 @@
     button,
     .zIndexButton {
       @include outlineButtonStyles;
+
+      padding: 0;
+
+      svg {
+        width: var(--lg-icon-size);
+        height: var(--lg-icon-size);
+      }
     }
   }
 

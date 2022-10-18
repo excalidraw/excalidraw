@@ -3,7 +3,7 @@ import { saveLibraryAsJSON } from "../data/json";
 import Library, { libraryItemsAtom } from "../data/library";
 import { t } from "../i18n";
 import { AppState, LibraryItem, LibraryItems } from "../types";
-import { exportToFileIcon, load, publishIcon, trash } from "./icons";
+import { ExportIcon, LoadIcon, publishIcon, TrashIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import { fileOpen } from "../data/filesystem";
@@ -195,7 +195,7 @@ export const LibraryMenuHeader: React.FC<{
           type="button"
           title={t("buttons.load")}
           aria-label={t("buttons.load")}
-          icon={load}
+          icon={LoadIcon}
           onClick={onLibraryImport}
           className="library-actions--load"
         />
@@ -207,7 +207,7 @@ export const LibraryMenuHeader: React.FC<{
             type="button"
             title={t("buttons.export")}
             aria-label={t("buttons.export")}
-            icon={exportToFileIcon}
+            icon={ExportIcon}
             onClick={onLibraryExport}
             className="library-actions--export"
           >
@@ -222,7 +222,7 @@ export const LibraryMenuHeader: React.FC<{
             type="button"
             title={resetLabel}
             aria-label={resetLabel}
-            icon={trash}
+            icon={TrashIcon}
             onClick={() => setShowRemoveLibAlert(true)}
             className="library-actions--remove"
           >

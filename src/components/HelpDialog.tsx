@@ -4,7 +4,7 @@ import { isDarwin, isWindows } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
-import { LinkIcon } from "./icons";
+import { ExternalLinkIcon } from "./icons";
 
 const Header = () => (
   <div className="HelpDialog__header">
@@ -15,7 +15,7 @@ const Header = () => (
       rel="noopener noreferrer"
     >
       {t("helpDialog.documentation")}
-      <div className="HelpDialog__link-icon">{LinkIcon}</div>
+      <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
     </a>
     <a
       className="HelpDialog__btn"
@@ -24,7 +24,7 @@ const Header = () => (
       rel="noopener noreferrer"
     >
       {t("helpDialog.blog")}
-      <div className="HelpDialog__link-icon">{LinkIcon}</div>
+      <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
     </a>
     <a
       className="HelpDialog__btn"
@@ -33,7 +33,7 @@ const Header = () => (
       rel="noopener noreferrer"
     >
       {t("helpDialog.github")}
-      <div className="HelpDialog__link-icon">{LinkIcon}</div>
+      <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
     </a>
   </div>
 );

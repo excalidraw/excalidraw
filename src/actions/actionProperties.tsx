@@ -17,10 +17,24 @@ import {
   FillHachureIcon,
   FillCrossHatchIcon,
   FillSolidIcon,
-  StrokeWidthIcon,
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
+  StrokeWidthBaseIcon,
+  StrokeWidthBoldIcon,
+  StrokeWidthExtraBoldIcon,
+  FontSizeSmallIcon,
+  FontSizeMediumIcon,
+  FontSizeLargeIcon,
+  FontSizeExtraLargeIcon,
+  EdgeSharpIcon,
+  EdgeRoundIcon,
+  FreedrawIcon,
+  FontFamilyNormalIcon,
+  FontFamilyCodeIcon,
+  TextAlignLeftIcon,
+  TextAlignCenterIcon,
+  TextAlignRightIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -346,17 +360,17 @@ export const actionChangeStrokeWidth = register({
           {
             value: 1,
             text: t("labels.thin"),
-            icon: <StrokeWidthIcon strokeWidth={1.2} width={16} height={16} />,
+            icon: StrokeWidthBaseIcon,
           },
           {
             value: 2,
             text: t("labels.bold"),
-            icon: <StrokeWidthIcon strokeWidth={3.2} width={18} height={16} />,
+            icon: StrokeWidthBoldIcon,
           },
           {
             value: 4,
             text: t("labels.extraBold"),
-            icon: <StrokeWidthIcon strokeWidth={4.8} width={20} height={16} />,
+            icon: StrokeWidthExtraBoldIcon,
           },
         ]}
         value={getFormValue(
@@ -443,33 +457,17 @@ export const actionChangeStrokeStyle = register({
           {
             value: "solid",
             text: t("labels.strokeStyle_solid"),
-            icon: (
-              <svg
-                viewBox="0 0 20 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M1 8h18"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: StrokeWidthBaseIcon,
           },
           {
             value: "dashed",
             text: t("labels.strokeStyle_dashed"),
-            // TODO barnabasmolnar/editor-redesign
-            icon: <StrokeStyleDashedIcon theme={appState.theme} />,
+            icon: StrokeStyleDashedIcon,
           },
           {
             value: "dotted",
             text: t("labels.strokeStyle_dotted"),
-            // TODO barnabasmolnar/editor-redesign
-            icon: <StrokeStyleDottedIcon theme={appState.theme} />,
+            icon: StrokeStyleDottedIcon,
           },
         ]}
         value={getFormValue(
@@ -539,81 +537,25 @@ export const actionChangeFontSize = register({
           {
             value: 16,
             text: t("labels.small"),
-            icon: (
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M11 5.5c0-.663-.253-1.299-.703-1.768A2.353 2.353 0 0 0 8.6 3H7.4c-.637 0-1.247.263-1.697.732A2.554 2.554 0 0 0 5 5.5c0 .663.253 1.299.703 1.768.45.469 1.06.732 1.697.732h1.2c.637 0 1.247.263 1.697.732.45.47.703 1.105.703 1.768s-.253 1.299-.703 1.768c-.45.469-1.06.732-1.697.732H7.4a2.352 2.352 0 0 1-1.697-.732A2.554 2.554 0 0 1 5 10.5"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: FontSizeSmallIcon,
             testId: "fontSize-small",
           },
           {
             value: 20,
             text: t("labels.medium"),
-            icon: (
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4 13V3l4 8.75L12 3v10"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: FontSizeMediumIcon,
             testId: "fontSize-medium",
           },
           {
             value: 28,
             text: t("labels.large"),
-            icon: (
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 3v10h6"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: FontSizeLargeIcon,
             testId: "fontSize-large",
           },
           {
             value: 36,
             text: t("labels.veryLarge"),
-            icon: (
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="m1 3 6 10M7 3 1 13M9 3v10h6"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: FontSizeExtraLargeIcon,
             testId: "fontSize-veryLarge",
           },
         ]}
@@ -718,58 +660,17 @@ export const actionChangeFontFamily = register({
       {
         value: FONT_FAMILY.Virgil,
         text: t("labels.handDrawn"),
-        icon: (
-          <svg
-            viewBox="0 0 24 24"
-            strokeWidth="1.2"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
-            <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
-          </svg>
-        ),
+        icon: FreedrawIcon,
       },
       {
         value: FONT_FAMILY.Helvetica,
         text: t("labels.normal"),
-        icon: (
-          <svg
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M4.667 13.333v-8a2.667 2.667 0 0 1 2.666-2.666h1.334a2.667 2.667 0 0 1 2.666 2.666v8M4.667 8.667h6.666"
-              stroke="currentColor"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        ),
+        icon: FontFamilyNormalIcon,
       },
       {
         value: FONT_FAMILY.Cascadia,
         text: t("labels.code"),
-        icon: (
-          <svg
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M4.667 5.333 2 8l2.667 2.667M11.333 5.333 14 8l-2.667 2.667M9.333 2.667 6.667 13.333"
-              stroke="currentColor"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        ),
+        icon: FontFamilyCodeIcon,
       },
     ];
 
@@ -840,96 +741,17 @@ export const actionChangeTextAlign = register({
             {
               value: "left",
               text: t("labels.left"),
-              icon: (
-                <svg
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <g
-                    clipPath="url(#a)"
-                    stroke="currentColor"
-                    strokeWidth="1.25"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M2.667 4h10.666M2.667 8h6.666M2.667 12H12" />
-                  </g>
-                  <defs>
-                    <clipPath id="a">
-                      <path fill="#fff" d="M0 0h16v16H0z" />
-                    </clipPath>
-                  </defs>
-                </svg>
-              ),
+              icon: TextAlignLeftIcon,
             },
             {
               value: "center",
               text: t("labels.center"),
-              icon: (
-                <svg
-                  width={16}
-                  height={16}
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <g clipPath="url(#clip0_218_11808)">
-                    <path
-                      d="M2.66663 4H13.3333"
-                      stroke="currentColor"
-                      strokeWidth="1.25"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M5.33337 8H10.6667"
-                      stroke="currentColor"
-                      strokeWidth="1.25"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M4 12H12"
-                      stroke="currentColor"
-                      strokeWidth="1.25"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_218_11808">
-                      <rect width={16} height={16} fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-              ),
+              icon: TextAlignCenterIcon,
             },
             {
               value: "right",
               text: t("labels.right"),
-              icon: (
-                <svg
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <g
-                    clipPath="url(#a)"
-                    stroke="currentColor"
-                    strokeWidth="1.25"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M2.667 4h10.666M6.667 8h6.666M4 12h9.333" />
-                  </g>
-                  <defs>
-                    <clipPath id="a">
-                      <path fill="#fff" d="M0 0h16v16H0z" />
-                    </clipPath>
-                  </defs>
-                </svg>
-              ),
+              icon: TextAlignRightIcon,
             },
           ]}
           value={getFormValue(
@@ -1062,40 +884,12 @@ export const actionChangeSharpness = register({
           {
             value: "sharp",
             text: t("labels.sharp"),
-            icon: (
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8.264 2.664h-5.6V8.264M10.667 2.667v.006M13.333 2.667v.006M13.333 5.333v.007M13.333 8v.007M2.667 10.667v.006M13.333 10.667v.006M2.667 13.333v.007M5.333 13.333v.007M8 13.333v.007M10.667 13.333v.007M13.333 13.333v.007"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: EdgeSharpIcon,
           },
           {
             value: "round",
             text: t("labels.round"),
-            icon: (
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M2.667 8V5.333a2.667 2.667 0 0 1 2.666-2.666H8M10.667 2.667v.006M13.333 2.667v.006M13.333 5.333v.007M13.333 8v.007M2.667 10.667v.006M13.333 10.667v.006M2.667 13.333v.007M5.333 13.333v.007M8 13.333v.007M10.667 13.333v.007M13.333 13.333v.007"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ),
+            icon: EdgeRoundIcon,
           },
         ]}
         value={getFormValue(

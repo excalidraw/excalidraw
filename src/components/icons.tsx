@@ -13,9 +13,6 @@ import clsx from "clsx";
 import { Theme } from "../element/types";
 import { THEME } from "../constants";
 
-const activeElementColor = (theme: Theme) =>
-  theme === THEME.LIGHT ? oc.orange[4] : oc.orange[9];
-
 const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";
 
 const handlerColor = (theme: Theme) =>
@@ -54,10 +51,75 @@ export const createIcon = (
 };
 
 const newIconProps: Opts = {
-  width: 16,
-  height: 16,
+  width: 20,
+  height: 20,
   fill: "none",
 };
+
+// TODO barnabasmolnar/editor-redesign
+// something not quite right with this icon
+export const UnlockedIcon = createIcon(
+  <>
+    <g clipPath="url(#a)">
+      <path
+        d="M13.542 8.542H6.458a2.5 2.5 0 0 0-2.5 2.5v3.75a2.5 2.5 0 0 0 2.5 2.5h7.084a2.5 2.5 0 0 0 2.5-2.5v-3.75a2.5 2.5 0 0 0-2.5-2.5Z"
+        stroke="currentColor"
+        strokeWidth="1.25"
+      />
+      <path
+        d="M10 13.958a1.042 1.042 0 1 0 0-2.083 1.042 1.042 0 0 0 0 2.083Z"
+        stroke="currentColor"
+        strokeWidth="1.25"
+      />
+      <mask
+        id="b"
+        style={{ maskType: "alpha" }}
+        maskUnits="userSpaceOnUse"
+        x={6}
+        y={1}
+        width={9}
+        height={9}
+      >
+        <path
+          d="M6.399 9.561V5.175c0-.93.401-1.823 1.116-2.48a3.981 3.981 0 0 1 2.693-1.028c1.01 0 1.98.37 2.694 1.027.715.658 1.116 1.55 1.116 2.481"
+          fill="#fff"
+        />
+      </mask>
+      <g mask="url(#b)">
+        <path
+          d="M5.149 9.561v1.25h2.5v-1.25h-2.5Zm5.06-7.894V.417v1.25Zm2.559 3.508v1.25h2.5v-1.25h-2.5ZM7.648 8.51V5.175h-2.5V8.51h2.5Zm0-3.334c0-.564.243-1.128.713-1.561L6.668 1.775c-.959.883-1.52 2.104-1.52 3.4h2.5Zm.713-1.561a2.732 2.732 0 0 1 1.847-.697v-2.5c-1.31 0-2.585.478-3.54 1.358L8.36 3.614Zm1.847-.697c.71 0 1.374.26 1.847.697l1.694-1.839a5.231 5.231 0 0 0-3.54-1.358v2.5Zm1.847.697c.47.433.713.997.713 1.561h2.5c0-1.296-.56-2.517-1.52-3.4l-1.693 1.839Z"
+          fill="currentColor"
+        />
+      </g>
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
+export const LockedIcon = createIcon(
+  <>
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+      <path d="M13.542 8.542H6.458a2.5 2.5 0 0 0-2.5 2.5v3.75a2.5 2.5 0 0 0 2.5 2.5h7.084a2.5 2.5 0 0 0 2.5-2.5v-3.75a2.5 2.5 0 0 0-2.5-2.5Z" />
+      <path d="M10 13.958a1.042 1.042 0 1 0 0-2.083 1.042 1.042 0 0 0 0 2.083Z" />
+      <path
+        d="M6.667 8.333V5.417C6.667 3.806 8.159 2.5 10 2.5c1.841 0 3.333 1.306 3.333 2.917v2.916"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
 
 export const WelcomeScreenMenuArrow = createIcon(
   <>
@@ -147,191 +209,275 @@ export const ExcalLogo = createIcon(
       </clipPath>
     </defs>
   </>,
-
   { width: 26, height: 62, fill: "none" },
 );
 
 export const InviteToCollabIcon = createIcon(
   <>
-    <path
-      d="M6 7.333A2.667 2.667 0 1 0 6 2a2.667 2.667 0 0 0 0 5.333ZM2 14v-1.333A2.667 2.667 0 0 1 4.667 10h2.666A2.667 2.667 0 0 1 10 12.667V14M10.667 7.333h4m-2-2v4"
+    <g
+      clipPath="url(#a)"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
+    >
+      <path d="M5 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM15 7.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM15 17.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM7.25 8.917l5.5-2.834M7.25 11.083l5.5 2.834" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const ImportSceneIcon = createIcon(
   <>
-    <path
-      d="M2.667 11.177v1.411c0 .375.14.734.39.998.25.265.59.414.943.414h8c.354 0 .693-.149.943-.414.25-.264.39-.623.39-.998v-1.411M4.667 5.53 8 2l3.333 3.53M8 2v8.47"
+    <g
+      clipPath="url(#a)"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
+    >
+      <path d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 7.5 10 3.333 14.167 7.5M10 3.333v10" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const SelectionIcon = createIcon(
   <>
-    <path
-      d="M2 8h2M8 2v2M5.2 5.2 3.733 3.733M10.8 5.2l1.467-1.467M5.2 10.8l-1.467 1.467M8 8l6 2-2.667 1.333L10 14 8 8Z"
+    <g
+      clipPath="url(#a)"
       stroke="currentColor"
-      strokeWidth="1.2"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
+    >
+      <path d="M2.5 10H5M10 2.5V5M6.5 6.5 4.667 4.667M13.5 6.5l1.833-1.833M6.5 13.5l-1.833 1.833" />
+      <path
+        clipRule="evenodd"
+        d="m10 10 7.5 2.5-3.333 1.667L12.5 17.5 10 10Z"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const RectangleIcon = createIcon(
   <>
-    <path
-      d="M12 2.667H4c-.736 0-1.333.597-1.333 1.333v8c0 .736.597 1.333 1.333 1.333h8c.736 0 1.333-.597 1.333-1.333V4c0-.736-.597-1.333-1.333-1.333Z"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <g clipPath="url(#a)">
+      <path
+        d="M4.91 2.625h10.18a2.284 2.284 0 0 1 2.285 2.284v10.182a2.284 2.284 0 0 1-2.284 2.284H4.909a2.284 2.284 0 0 1-2.284-2.284V4.909a2.284 2.284 0 0 1 2.284-2.284Z"
+        stroke="currentColor"
+        strokeWidth="1.25"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const DiamondIcon = createIcon(
   <>
-    <path
-      d="M7 13.6 2.4 9c-.52-.52-.52-1.48 0-2L7 2.4c.52-.52 1.48-.52 2 0L13.6 7c.52.52.52 1.48 0 2L9 13.6c-.52.52-1.48.52-2 0v0Z"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <g clipPath="url(#a)">
+      <path
+        clipRule="evenodd"
+        d="M8.75 17 3 11.25c-.65-.65-.65-1.85 0-2.5L8.75 3c.65-.65 1.85-.65 2.5 0L17 8.75c.65.65.65 1.85 0 2.5L11.25 17c-.65.65-1.85.65-2.5 0Z"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const EllipseIcon = createIcon(
   <>
-    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clipPath="url(#a)">
       <path
-        d="M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12Z"
+        d="M10 16.875a6.875 6.875 0 1 0 0-13.75 6.875 6.875 0 0 0 0 13.75Z"
         stroke="currentColor"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeWidth="1.25"
       />
-    </svg>
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const ArrowIcon = createIcon(
   <>
-    <path
-      d="M3.333 8h9.334M10 10.667 12.667 8M10 5.333 12.667 8"
+    <g
+      clipPath="url(#a)"
       stroke="currentColor"
-      strokeWidth="1.2"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
+    >
+      <path d="M4.167 10h11.666M12.5 13.333 15.833 10M12.5 6.667 15.833 10" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const LineIcon = createIcon(
   <>
-    <path
-      d="M3.333 8h9.334"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <g clipPath="url(#a)">
+      <path
+        d="M4.167 10h11.666"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const FreedrawIcon = createIcon(
   <>
-    <path
-      d="M2.667 13.333h2.666l7-7a1.886 1.886 0 0 0-2.666-2.666l-7 7v2.666ZM9 4.333 11.667 7"
+    <g
+      clipPath="url(#a)"
       stroke="currentColor"
-      strokeWidth="1.2"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
+    >
+      <path
+        clipRule="evenodd"
+        d="m7.643 15.69 7.774-7.773a2.357 2.357 0 1 0-3.334-3.334L4.31 12.357a3.333 3.333 0 0 0-.977 2.357v1.953h1.953c.884 0 1.732-.352 2.357-.977Z"
+      />
+      <path d="m11.25 5.417 3.333 3.333" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const TextIcon = createIcon(
   <>
-    <path
-      d="M2.667 13.333h2M9.333 13.333H14M4.6 10h4.6M6.8 4.2l3.867 9.133M3.333 13.333l4-10.666h1.334l4.666 10.666"
+    <g
+      clipPath="url(#a)"
       stroke="currentColor"
-      strokeWidth="1.2"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
+    >
+      <path d="M3.333 16.667h2.5M11.667 16.667H17.5M5.75 12.5h5.75M8.5 5.25l4.833 11.417M4.167 16.667l5-13.334h1.666l5.834 13.334" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const ImageIcon = createIcon(
   <>
-    <path
-      d="M10 5.333h.007M11.333 2.667H4.667a2 2 0 0 0-2 2v6.666a2 2 0 0 0 2 2h6.666a2 2 0 0 0 2-2V4.667a2 2 0 0 0-2-2Z"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="m2.667 10 2.666-2.667c.304-.292.65-.446 1-.446.351 0 .696.154 1 .446l3.334 3.334"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M9.333 9.333 10 8.667c.304-.293.649-.447 1-.447s.696.154 1 .447L13.333 10"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+      <path d="M12.5 6.667h.01" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4.91 2.625h10.18a2.284 2.284 0 0 1 2.285 2.284v10.182a2.284 2.284 0 0 1-2.284 2.284H4.909a2.284 2.284 0 0 1-2.284-2.284V4.909a2.284 2.284 0 0 1 2.284-2.284Z" />
+      <path
+        d="m3.333 12.5 3.334-3.333c.773-.745 1.726-.745 2.5 0l4.166 4.166"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m11.667 11.667.833-.834c.774-.744 1.726-.744 2.5 0l1.667 1.667"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const EraserIcon = createIcon(
   <>
-    <path
-      d="M12.667 12.667H5.333L2.667 10a.667.667 0 0 1 0-.94l6.666-6.667a.667.667 0 0 1 .94 0l3.334 3.334a.667.667 0 0 1 0 .94l-6 6M12 8.2 7.8 4"
+    <g
+      clipPath="url(#a)"
       stroke="currentColor"
-      strokeWidth="1.2"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
+    >
+      <path d="M15.833 15.833H6.667L3.333 12.5a.833.833 0 0 1 0-1.175l7.5-7.5c.758-.753 2.074-.764 2.842 0l2.5 2.5c.733.738.721 2.116 0 2.842l-6.667 6.666M15 10.25 9.75 5" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const ZoomInIcon = createIcon(
   <>
-    <path
-      d="M8 3.333v9.334M3.333 8h9.334"
+    <g
+      clipPath="url(#a)"
       stroke="currentColor"
-      strokeWidth="1.2"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
+    >
+      <path d="M10 4.167v11.666M4.167 10h11.666" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
@@ -339,9 +485,9 @@ export const ZoomInIcon = createIcon(
 export const ZoomOutIcon = createIcon(
   <>
     <path
-      d="M3.333 8h9.334"
+      d="M5 10h10"
       stroke="currentColor"
-      strokeWidth="1.2"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
@@ -351,129 +497,161 @@ export const ZoomOutIcon = createIcon(
 
 export const TrashIcon = createIcon(
   <>
-    <path
-      d="M2.667 4.667h10.666M6.667 7.333v4M9.333 7.333v4M3.333 4.667l.667 8A1.333 1.333 0 0 0 5.333 14h5.334A1.333 1.333 0 0 0 12 12.667l.667-8M6 4.667v-2A.667.667 0 0 1 6.667 2h2.666a.667.667 0 0 1 .667.667v2"
+    <g
+      clipPath="url(#a)"
       stroke="currentColor"
-      strokeWidth="1.2"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
+    >
+      <path d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const DuplicateIcon = createIcon(
   <>
-    <path
-      d="M12 5.333H6.667c-.737 0-1.334.597-1.334 1.334V12c0 .736.597 1.333 1.334 1.333H12c.736 0 1.333-.597 1.333-1.333V6.667c0-.737-.597-1.334-1.333-1.334Z"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M10.667 5.333V4a1.333 1.333 0 0 0-1.334-1.333H4A1.333 1.333 0 0 0 2.667 4v5.333A1.333 1.333 0 0 0 4 10.667h1.333"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+      <path d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z" />
+      <path
+        clipRule="evenodd"
+        d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const MoonIcon = createIcon(
-  <path
-    d="M8 2h.262a5 5 0 0 0 5.28 8.297A5.999 5.999 0 1 1 8 1.995V2Z"
-    stroke="currentColor"
-    strokeWidth="1.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />,
+  <>
+    <g clipPath="url(#a)">
+      <path
+        clipRule="evenodd"
+        d="M10 2.5h.328a6.25 6.25 0 0 0 6.6 10.372A7.5 7.5 0 1 1 10 2.493V2.5Z"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
   newIconProps,
 );
 
 export const SunIcon = createIcon(
-  <path
-    d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM8 3.333V2M11.333 4.667l.934-.934M12.667 8H14M11.333 11.333l.934.934M8 12.667V14M4.667 11.333l-.934.934M4 8H2.667M4.667 4.667l-.934-.934"
-    stroke="currentColor"
-    strokeWidth="1.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />,
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM10 4.167V2.5M14.167 5.833l1.166-1.166M15.833 10H17.5M14.167 14.167l1.166 1.166M10 15.833V17.5M5.833 14.167l-1.166 1.166M5 10H3.333M5.833 5.833 4.667 4.667" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
   newIconProps,
 );
 
 export const HamburgerMenuIcon = createIcon(
-  <path
-    d="M2.667 4h10.666M2.667 8h10.666M2.667 12h10.666"
-    stroke="currentColor"
-    strokeWidth="1.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />,
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3.333 5h13.334M3.333 10h13.334M3.333 15h13.334" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
   newIconProps,
 );
 
 export const ExportIcon = createIcon(
   <>
-    <path
-      d="M9.333 5.333V4A1.333 1.333 0 0 0 8 2.667H3.333A1.333 1.333 0 0 0 2 4v8a1.333 1.333 0 0 0 1.333 1.333H8A1.333 1.333 0 0 0 9.333 12v-1.333"
+    <g
+      clipPath="url(#a)"
       stroke="currentColor"
-      strokeWidth="1.2"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
-    <path
-      d="M4.667 8H14l-2-2m0 4 2-2"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    >
+      <path d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 9.167 10 13.333l4.167-4.166M10 3.333v10" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
 export const HelpIcon = createIcon(
   <>
-    <path
-      d="M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12ZM8 11.333v.009"
+    <g
+      clipPath="url(#a)"
       stroke="currentColor"
-      strokeWidth="1.2"
+      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
-    <path
-      d="M8 9a1 1 0 0 1 .667-1 1.733 1.733 0 1 0-2-2.667"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    >
+      <path d="M10 17.5a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15ZM10 14.167v.01" />
+      <path d="M10 11.25a1.25 1.25 0 0 1 .833-1.25 2.167 2.167 0 1 0-2.5-3.333" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
-export const LinkIcon = createIcon(
-  <path
-    d="M7.334 4.667H4A1.333 1.333 0 0 0 2.667 6v6A1.333 1.333 0 0 0 4 13.333h6A1.333 1.333 0 0 0 11.334 12V8.667M6.667 9.333l6.667-6.666M10 2.667h3.333V6"
-    stroke="currentColor"
-    strokeWidth="1.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />,
-  newIconProps,
-);
-
-export const CloseIcon222 = createIcon(
-  <path
-    d="m12 4-8 8M4 4l8 8"
-    stroke="#3D3D3D"
-    strokeWidth="1.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />,
+export const ExternalLinkIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9.167 5.833H5.833c-1.254 0-2.5 1.282-2.5 2.5v5.834c0 1.283 1.252 2.5 2.5 2.5h5.834c1.251 0 2.5-1.25 2.5-2.5v-3.334M8.333 11.667l8.334-8.334M12.5 3.333h4.167V7.5" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
   newIconProps,
 );
 
@@ -485,9 +663,25 @@ export const checkIcon = createIcon(
   },
 );
 
-export const link = createIcon(
-  "M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z",
-  { mirror: true },
+export const LinkIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M8.333 11.667a2.917 2.917 0 0 0 4.167 0l3.333-3.334a2.946 2.946 0 1 0-4.166-4.166l-.417.416" />
+      <path d="M11.667 8.333a2.917 2.917 0 0 0-4.167 0l-3.333 3.334a2.946 2.946 0 0 0 4.166 4.166l.417-.416" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
 export const save = createIcon(
@@ -500,25 +694,27 @@ export const saveAs = createIcon(
   { width: 448, height: 512 },
 );
 
-export const load = createIcon(
-  <path
-    d="M3.333 2.667H6l2 2h4.667A1.333 1.333 0 0 1 14 6v5.333a1.334 1.334 0 0 1-1.333 1.334H3.333A1.334 1.334 0 0 1 2 11.333V4a1.333 1.333 0 0 1 1.333-1.333"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />,
+export const LoadIcon = createIcon(
+  <>
+    <g clipPath="url(#a)">
+      <path
+        d="m9.257 6.351.183.183H15.819c.34 0 .727.182 1.051.506.323.323.505.708.505 1.05v5.819c0 .316-.183.7-.52 1.035-.337.338-.723.522-1.037.522H4.182c-.352 0-.74-.181-1.058-.5-.318-.318-.499-.705-.499-1.057V5.182c0-.351.181-.736.5-1.054.32-.321.71-.503 1.057-.503H6.53l2.726 2.726Z"
+        stroke="currentColor"
+        strokeWidth="1.25"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
   newIconProps,
 );
 
 export const clipboard = createIcon(
   "M384 112v352c0 26.51-21.49 48-48 48H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h80c0-35.29 28.71-64 64-64s64 28.71 64 64h80c26.51 0 48 21.49 48 48zM192 40c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24m96 114v-20a6 6 0 0 0-6-6H102a6 6 0 0 0-6 6v20a6 6 0 0 0 6 6h180a6 6 0 0 0 6-6z",
   { width: 384, height: 512 },
-);
-
-export const trash = createIcon(
-  "M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z",
-
-  { width: 448, height: 512 },
 );
 
 export const palette = createIcon(
@@ -561,14 +757,44 @@ export const menu = createIcon(
   "M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z",
 );
 
-export const undo = createIcon(
-  "M255.545 8c-66.269.119-126.438 26.233-170.86 68.685L48.971 40.971C33.851 25.851 8 36.559 8 57.941V192c0 13.255 10.745 24 24 24h134.059c21.382 0 32.09-25.851 16.971-40.971l-41.75-41.75c30.864-28.899 70.801-44.907 113.23-45.273 92.398-.798 170.283 73.977 169.484 169.442C423.236 348.009 349.816 424 256 424c-41.127 0-79.997-14.678-110.63-41.556-4.743-4.161-11.906-3.908-16.368.553L89.34 422.659c-4.872 4.872-4.631 12.815.482 17.433C133.798 479.813 192.074 504 256 504c136.966 0 247.999-111.033 248-247.998C504.001 119.193 392.354 7.755 255.545 8z",
-  { mirror: true },
+export const UndoIcon = createIcon(
+  <>
+    <g clipPath="url(#a)">
+      <path
+        d="M7.5 10.833 4.167 7.5 7.5 4.167M4.167 7.5h9.166a3.333 3.333 0 0 1 0 6.667H12.5"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  { ...newIconProps, mirror: true },
 );
 
-export const redo = createIcon(
-  "M256.455 8c66.269.119 126.437 26.233 170.859 68.685l35.715-35.715C478.149 25.851 504 36.559 504 57.941V192c0 13.255-10.745 24-24 24H345.941c-21.382 0-32.09-25.851-16.971-40.971l41.75-41.75c-30.864-28.899-70.801-44.907-113.23-45.273-92.398-.798-170.283 73.977-169.484 169.442C88.764 348.009 162.184 424 256 424c41.127 0 79.997-14.678 110.629-41.556 4.743-4.161 11.906-3.908 16.368.553l39.662 39.662c4.872 4.872 4.631 12.815-.482 17.433C378.202 479.813 319.926 504 256 504 119.034 504 8.001 392.967 8 256.002 7.999 119.193 119.646 7.755 256.455 8z",
-  { mirror: true },
+export const RedoIcon = createIcon(
+  <>
+    <g clipPath="url(#a)">
+      <path
+        d="M12.5 10.833 15.833 7.5 12.5 4.167M15.833 7.5H6.667a3.333 3.333 0 1 0 0 6.667H7.5"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  { ...newIconProps, mirror: true },
 );
 
 export const questionCircle = createIcon(
@@ -620,84 +846,118 @@ export const resetZoom = createIcon(
   { width: 1024 },
 );
 
-export const BringForwardIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <>
+export const BringForwardIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path
-        d="M22 9.556C22 8.696 21.303 8 20.444 8H16v8H8v4.444C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
-        fill={iconFillColor(theme)}
-        stroke={iconFillColor(theme)}
-        strokeWidth="2"
+        d="M13.889 4.167H8.333c-.767 0-1.389.622-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.767-.622-1.39-1.39-1.39Z"
+        fill="currentColor"
       />
-      <path
-        d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-        fill={activeElementColor(theme)}
-        stroke={activeElementColor(theme)}
-        strokeWidth="2"
-      />
-    </>,
-    { width: 24, mirror: true },
-  ),
+      <path d="M12.5 12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const SendBackwardIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <>
+export const SendBackwardIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path
-        d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-        fill={activeElementColor(theme)}
-        stroke={activeElementColor(theme)}
-        strokeWidth="2"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M6.944 12.5H12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
+        fill="currentColor"
       />
-      <path
-        d="M22 9.556C22 8.696 21.303 8 20.444 8H9.556C8.696 8 8 8.697 8 9.556v10.888C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
-        fill={iconFillColor(theme)}
-        stroke={iconFillColor(theme)}
-        strokeWidth="2"
-      />
-    </>,
-    { width: 24, mirror: true },
-  ),
+      <path d="M13.889 4.167H8.333c-.767 0-1.389.621-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.768-.622-1.39-1.39-1.39Z" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const BringToFrontIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <>
+export const BringToFrontIcon = createIcon(
+  <>
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
       <path
-        d="M13 21a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1h-3v5h-5v3zM11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h3V6h5V3z"
-        fill={iconFillColor(theme)}
-        stroke={iconFillColor(theme)}
-        strokeWidth="2"
+        d="M8.775 6.458h2.45a2.316 2.316 0 0 1 2.317 2.316v2.452a2.316 2.316 0 0 1-2.316 2.316H8.774a2.316 2.316 0 0 1-2.317-2.316V8.774a2.316 2.316 0 0 1 2.317-2.316Z"
+        fill="currentColor"
       />
-      <path
-        d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-        fill={activeElementColor(theme)}
-        stroke={activeElementColor(theme)}
-        strokeWidth="2"
-      />
-    </>,
-    { width: 24, mirror: true },
-  ),
+      <path d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316ZM12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const SendToBackIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <>
+export const SendToBackIcon = createIcon(
+  <>
+    <g clipPath="url(#a)">
       <path
-        d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-        fill={activeElementColor(theme)}
-        stroke={activeElementColor(theme)}
-        strokeWidth="2"
+        d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+        stroke="currentColor"
+        strokeWidth="1.25"
       />
       <path
-        d="M11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h8V3zM22 14a1 1 0 00-1-1h-7a1 1 0 00-1 1v7a1 1 0 001 1h8v-8z"
-        fill={iconFillColor(theme)}
-        stroke={iconFillColor(theme)}
-        strokeWidth="2"
+        d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+        stroke="currentColor"
+        strokeWidth="1.25"
       />
-    </>,
-    { width: 24, mirror: true },
-  ),
+      <mask id="b" fill="#fff">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+        />
+      </mask>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+        fill="currentColor"
+      />
+      <path
+        d="M9.167 5.833h1.25v-1.25h-1.25v1.25Zm5 5h1.25v-1.25h-1.25v1.25Zm-3.334 3.334h-1.25v1.25h1.25v-1.25Zm-5-5h-1.25v1.25h1.25v-1.25Zm2.084-3.334v2.06h2.5v-2.06h-2.5Zm0 2.06a4.191 4.191 0 0 0 4.19 4.19v-2.5a1.691 1.691 0 0 1-1.69-1.69h-2.5Zm4.19 4.19h2.06v-2.5h-2.06v2.5Zm.81-1.25v.393h2.5v-.393h-2.5Zm0 .393c0 .933-.758 1.69-1.691 1.69v2.5a4.191 4.191 0 0 0 4.19-4.19h-2.5Zm-1.691 1.69h-.393v2.5h.393v-2.5Zm.857 1.25v-2.058h-2.5v2.059h2.5Zm0-2.058a4.191 4.191 0 0 0-4.19-4.191v2.5c.933 0 1.69.757 1.69 1.69h2.5Zm-4.19-4.191h-2.06v2.5h2.06v-2.5Zm-.81 1.25v-.393h-2.5v.393h2.5Zm0-.393c0-.934.758-1.69 1.692-1.69v-2.5a4.191 4.191 0 0 0-4.192 4.19h2.5Zm1.692-1.69h.392v-2.5h-.392v2.5Z"
+        fill="currentColor"
+        mask="url(#b)"
+      />
+      <path
+        d="M12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
+        stroke="currentColor"
+        strokeWidth="1.25"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
 //
@@ -706,176 +966,156 @@ export const SendToBackIcon = React.memo(({ theme }: { theme: Theme }) =>
 // first one the user sees. Horizontal align icons should not be flipped since
 // that would make them lie about their function.
 //
-export const AlignTopIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <>
+export const AlignTopIcon = createIcon(
+  <>
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
       <path
-        d="M 2,5 H 22"
-        fill={iconFillColor(theme)}
-        stroke={iconFillColor(theme)}
-        strokeWidth="2"
+        d="M3.333 3.333h13.334"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <path
-        d="M 6,7 C 5.446,7 5,7.446 5,8 v 9.999992 c 0,0.554 0.446,1 1,1 h 3.0000001 c 0.554,0 0.9999999,-0.446 0.9999999,-1 V 8 C 10,7.446 9.5540001,7 9.0000001,7 Z m 9,0 c -0.554,0 -1,0.446 -1,1 v 5.999992 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 V 8 C 19,7.446 18.554,7 18,7 Z"
-        fill={activeElementColor(theme)}
-        stroke={activeElementColor(theme)}
-        strokeWidth="2"
-      />
-    </>,
-    { width: 24, mirror: true },
-  ),
+      <path d="M13.542 6.458h-.417c-.92 0-1.667.747-1.667 1.667v7.083c0 .92.746 1.667 1.667 1.667h.417c.92 0 1.666-.746 1.666-1.667V8.125c0-.92-.746-1.667-1.666-1.667ZM6.875 6.458h-.417c-.92 0-1.666.747-1.666 1.667v3.75c0 .92.746 1.667 1.666 1.667h.417c.92 0 1.667-.746 1.667-1.667v-3.75c0-.92-.747-1.667-1.667-1.667Z" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const AlignBottomIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <>
+export const AlignBottomIcon = createIcon(
+  <>
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
       <path
-        d="M 2,19 H 22"
-        fill={iconFillColor(theme)}
-        stroke={iconFillColor(theme)}
-        strokeWidth="2"
+        d="M3.333 16.667h13.334"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <path
-        d="m 6,16.999992 c -0.554,0 -1,-0.446 -1,-1 V 6 C 5,5.446 5.446,5 6,5 H 9.0000001 C 9.5540001,5 10,5.446 10,6 v 9.999992 c 0,0.554 -0.4459999,1 -0.9999999,1 z m 9,0 c -0.554,0 -1,-0.446 -1,-1 V 10 c 0,-0.554 0.446,-1 1,-1 h 3 c 0.554,0 1,0.446 1,1 v 5.999992 c 0,0.554 -0.446,1 -1,1 z"
-        fill={activeElementColor(theme)}
-        stroke={activeElementColor(theme)}
-        strokeWidth="2"
-      />
-    </>,
-    { width: 24, mirror: true },
-  ),
+      <path d="M6.875 3.125h-.417c-.92 0-1.666.746-1.666 1.667v7.083c0 .92.746 1.667 1.666 1.667h.417c.92 0 1.667-.746 1.667-1.667V4.792c0-.92-.747-1.667-1.667-1.667ZM13.542 5.817h-.417c-.92 0-1.667.747-1.667 1.667v4.391c0 .92.746 1.667 1.667 1.667h.417c.92 0 1.666-.746 1.666-1.667V7.484c0-.92-.746-1.667-1.666-1.667Z" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const AlignLeftIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <>
+export const AlignLeftIcon = createIcon(
+  <>
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
       <path
-        d="M 5,2 V 22"
-        fill={iconFillColor(theme)}
-        stroke={iconFillColor(theme)}
-        strokeWidth="2"
+        d="M3.333 3.333v13.334"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <path
-        d="m 7.000004,5.999996 c 0,-0.554 0.446,-1 1,-1 h 9.999992 c 0.554,0 1,0.446 1,1 v 3.0000001 c 0,0.554 -0.446,0.9999999 -1,0.9999999 H 8.000004 c -0.554,0 -1,-0.4459999 -1,-0.9999999 z m 0,9 c 0,-0.554 0.446,-1 1,-1 h 5.999992 c 0.554,0 1,0.446 1,1 v 3 c 0,0.554 -0.446,1 -1,1 H 8.000004 c -0.554,0 -1,-0.446 -1,-1 z"
-        fill={activeElementColor(theme)}
-        stroke={activeElementColor(theme)}
-        strokeWidth="2"
-      />
-    </>,
-    { width: 24 },
-  ),
+      <path d="M15.208 4.792H8.125c-.92 0-1.667.746-1.667 1.666v.417c0 .92.747 1.667 1.667 1.667h7.083c.92 0 1.667-.747 1.667-1.667v-.417c0-.92-.746-1.666-1.667-1.666ZM12.516 11.458H8.125c-.92 0-1.667.746-1.667 1.667v.417c0 .92.747 1.666 1.667 1.666h4.391c.92 0 1.667-.746 1.667-1.666v-.417c0-.92-.746-1.667-1.667-1.667Z" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const AlignRightIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <>
+export const AlignRightIcon = createIcon(
+  <>
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
       <path
-        d="M 19,2 V 22"
-        fill={iconFillColor(theme)}
-        stroke={iconFillColor(theme)}
-        strokeWidth="2"
+        d="M16.667 3.333v13.334"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <path
-        d="m 16.999996,5.999996 c 0,-0.554 -0.446,-1 -1,-1 H 6.000004 c -0.554,0 -1,0.446 -1,1 v 3.0000001 c 0,0.554 0.446,0.9999999 1,0.9999999 h 9.999992 c 0.554,0 1,-0.4459999 1,-0.9999999 z m 0,9 c 0,-0.554 -0.446,-1 -1,-1 h -5.999992 c -0.554,0 -1,0.446 -1,1 v 3 c 0,0.554 0.446,1 1,1 h 5.999992 c 0.554,0 1,-0.446 1,-1 z"
-        fill={activeElementColor(theme)}
-        stroke={activeElementColor(theme)}
-        strokeWidth="2"
-      />
-    </>,
-    { width: 24 },
-  ),
+      <path d="M11.875 4.792H4.792c-.92 0-1.667.746-1.667 1.666v.417c0 .92.746 1.667 1.667 1.667h7.083c.92 0 1.667-.747 1.667-1.667v-.417c0-.92-.746-1.666-1.667-1.666ZM11.683 11.458H7.292c-.92 0-1.667.746-1.667 1.667v.417c0 .92.746 1.666 1.667 1.666h4.39c.921 0 1.667-.746 1.667-1.666v-.417c0-.92-.746-1.667-1.666-1.667Z" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const DistributeHorizontallyIcon = React.memo(
-  ({ theme }: { theme: Theme }) =>
-    createIcon(
-      <>
-        <path
-          d="M19 5V19M5 5V19"
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M15 9C15.554 9 16 9.446 16 10V14C16 14.554 15.554 15 15 15H9C8.446 15 8 14.554 8 14V10C8 9.446 8.446 9 9 9H15Z"
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-      </>,
-      { width: 24 },
-    ),
-);
-
-export const DistributeVerticallyIcon = React.memo(
-  ({ theme }: { theme: Theme }) =>
-    createIcon(
-      <>
-        <path
-          d="M5 5L19 5M5 19H19"
-          fill={iconFillColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M15 9C15.554 9 16 9.446 16 10V14C16 14.554 15.554 15 15 15H9C8.446 15 8 14.554 8 14V10C8 9.446 8.446 9 9 9H15Z"
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-      </>,
-      { width: 24 },
-    ),
-);
-
-export const CenterVerticallyIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <>
+export const DistributeHorizontallyIcon = createIcon(
+  <>
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
       <path
-        d="m 5.000004,16.999996 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 v -10 c 0,-0.554 -0.446,-1 -1,-1 h -3 c -0.554,0 -1,0.446 -1,1 z m 9,-2 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 v -6 c 0,-0.554 -0.446,-1 -1,-1 h -3 c -0.554,0 -1,0.446 -1,1 z"
-        fill={activeElementColor(theme)}
-        stroke={activeElementColor(theme)}
-        strokeWidth="2"
-      />
-      <path
-        d="M 2,12 H 22"
-        fill={iconFillColor(theme)}
-        stroke={iconFillColor(theme)}
-        strokeWidth="2"
-        strokeDasharray="1, 2.8"
+        d="M16.667 3.333v13.334M3.333 3.333v13.334"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
-    </>,
-    { width: 24, mirror: true },
-  ),
+      <path d="M14.375 10.208v-.416c0-.92-.746-1.667-1.667-1.667H7.292c-.92 0-1.667.746-1.667 1.667v.416c0 .92.746 1.667 1.667 1.667h5.416c.92 0 1.667-.746 1.667-1.667Z" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const CenterHorizontallyIcon = React.memo(
-  ({ theme }: { theme: Theme }) =>
-    createIcon(
-      <>
-        <path
-          d="M 7 5 C 6.446 5 6 5.446 6 6 L 6 9 C 6 9.554 6.446 10 7 10 L 17 10 C 17.554 10 18 9.554 18 9 L 18 6 C 18 5.446 17.554 5 17 5 L 7 5 z M 9 14 C 8.446 14 8 14.446 8 15 L 8 18 C 8 18.554 8.446 19 9 19 L 15 19 C 15.554 19 16 18.554 16 18 L 16 15 C 16 14.446 15.554 14 15 14 L 9 14 z "
-          fill={activeElementColor(theme)}
-          stroke={activeElementColor(theme)}
-          strokeWidth="2"
-        />
-        <path
-          d="M 12,2 V 22"
-          fill={iconFillColor(theme)}
-          stroke={iconFillColor(theme)}
-          strokeWidth="2"
-          strokeDasharray="1, 2.8"
-          strokeLinecap="round"
-        />
-      </>,
-      { width: 24 },
-    ),
+export const DistributeVerticallyIcon = createIcon(
+  <>
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+      <path
+        d="M3.333 3.333h13.334M3.333 16.667h13.334"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M10.208 5.625h-.416c-.92 0-1.667.746-1.667 1.667v5.416c0 .92.746 1.667 1.667 1.667h.416c.92 0 1.667-.746 1.667-1.667V7.292c0-.92-.746-1.667-1.667-1.667Z" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
+export const CenterVerticallyIcon = createIcon(
+  <>
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+      <path
+        d="M10 18.333v-2.916"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M10 11.667V8.333" strokeLinejoin="round" />
+      <path d="M10 4.583V1.667" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4.792 13.125v.417c0 .92.746 1.666 1.666 1.666h7.084c.92 0 1.666-.746 1.666-1.666v-.417c0-.92-.746-1.667-1.666-1.667H6.458c-.92 0-1.666.746-1.666 1.667ZM6.458 6.458v.417c0 .92.747 1.667 1.667 1.667h3.75c.92 0 1.667-.747 1.667-1.667v-.417c0-.92-.746-1.666-1.667-1.666h-3.75c-.92 0-1.667.746-1.667 1.666Z" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
+export const CenterHorizontallyIcon = createIcon(
+  <>
+    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+      <path d="M1.667 10h2.916" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8.333 10h3.334" strokeLinejoin="round" />
+      <path d="M15.417 10h2.916" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6.875 4.792h-.417c-.92 0-1.666.746-1.666 1.666v7.084c0 .92.746 1.666 1.666 1.666h.417c.92 0 1.667-.746 1.667-1.666V6.458c0-.92-.747-1.666-1.667-1.666ZM13.542 6.458h-.417c-.92 0-1.667.747-1.667 1.667v3.75c0 .92.746 1.667 1.667 1.667h.417c.92 0 1.666-.746 1.666-1.667v-3.75c0-.92-.746-1.667-1.666-1.667Z" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
 // export const users = createIcon(
@@ -904,13 +1144,22 @@ export const stop = createIcon(
 );
 
 export const CloseIcon = createIcon(
-  <path
-    d="m12 4-8 8M4 4l8 8"
-    stroke="currentColor"
-    strokeWidth="1.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />,
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M15 5 5 15M5 5l10 10" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
   newIconProps,
 );
 
@@ -935,6 +1184,8 @@ export const file = createIcon(
   { width: 384, height: 512 },
 );
 
+// TODO barnabasmolnar/editor-redesign
+// couldn't find a new icon for this
 export const GroupIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <>
@@ -997,42 +1248,79 @@ export const UngroupIcon = React.memo(({ theme }: { theme: Theme }) =>
   ),
 );
 
+// TODO barnabasmolnar/editor-redesign
+// something not quite right with this icon
 export const FillHachureIcon = createIcon(
   <>
-    <g
-      clipPath="url(#a)"
+    <path
+      d="M5.879 2.625h8.242a3.254 3.254 0 0 1 3.254 3.254v8.242a3.254 3.254 0 0 1-3.254 3.254H5.88a3.254 3.254 0 0 1-3.254-3.254V5.88a3.254 3.254 0 0 1 3.254-3.254Z"
       stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      strokeWidth="1.25"
+    />
+    <mask
+      id="a"
+      style={{ maskType: "alpha" }}
+      maskUnits="userSpaceOnUse"
+      x={2}
+      y={2}
+      width={16}
+      height={16}
     >
-      <path d="M-.977 13.73 13.73-.977M4.8 19.508 19.508 4.8M-3.806 10.902 10.902-3.806M1.6 17.108 16.308 2.4" />
+      <path
+        d="M5.879 2.625h8.242a3.254 3.254 0 0 1 3.254 3.254v8.242a3.254 3.254 0 0 1-3.254 3.254H5.88a3.254 3.254 0 0 1-3.254-3.254V5.88a3.254 3.254 0 0 1 3.254-3.254Z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.25"
+      />
+    </mask>
+    <g mask="url(#a)">
+      <path
+        d="M2.258 15.156 15.156 2.258M7.324 20.222 20.222 7.325m-20.444 5.35L12.675-.222m-8.157 18.34L17.416 5.22"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </g>
-    <rect x=".5" y=".5" width={15} height={15} rx="2.5" stroke="currentColor" />
-    <defs>
-      <clipPath id="a">
-        <rect width={16} height={16} rx={3} fill="#fff" />
-      </clipPath>
-    </defs>
   </>,
   newIconProps,
 );
 
 export const FillCrossHatchIcon = createIcon(
   <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M-.977 13.73 13.73-.977M4.8 19.508 19.508 4.8M-3.806 10.902 10.902-3.806M1.6 17.108 16.308 2.4M13.73 16.68-.977 1.971M19.508 10.902 4.8-3.806M10.902 19.508-3.806 4.8M17.108 14.102 2.4-.606" />
+    <g clipPath="url(#a)">
+      <path
+        d="M5.879 2.625h8.242a3.254 3.254 0 0 1 3.254 3.254v8.242a3.254 3.254 0 0 1-3.254 3.254H5.88a3.254 3.254 0 0 1-3.254-3.254V5.88a3.254 3.254 0 0 1 3.254-3.254Z"
+        stroke="currentColor"
+        strokeWidth="1.25"
+      />
+      <mask
+        id="b"
+        style={{ maskType: "alpha" }}
+        maskUnits="userSpaceOnUse"
+        x={-1}
+        y={-1}
+        width={22}
+        height={22}
+      >
+        <path
+          d="M2.426 15.044 15.044 2.426M7.383 20 20 7.383M0 12.617 12.617 0m-7.98 17.941L17.256 5.324m-2.211 12.25L2.426 4.956M20 12.617 7.383 0m5.234 20L0 7.383m17.941 7.98L5.324 2.745"
+          stroke="currentColor"
+          strokeWidth="1.25"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </mask>
+      <g mask="url(#b)">
+        <path
+          d="M14.121 2H5.88A3.879 3.879 0 0 0 2 5.879v8.242A3.879 3.879 0 0 0 5.879 18h8.242A3.879 3.879 0 0 0 18 14.121V5.88A3.879 3.879 0 0 0 14.121 2Z"
+          fill="currentColor"
+        />
+      </g>
     </g>
-    <rect x=".5" y=".5" width={15} height={15} rx="2.5" stroke="currentColor" />
     <defs>
       <clipPath id="a">
-        <rect width={16} height={16} rx={3} fill="#fff" />
+        <path fill="#fff" d="M0 0h20v20H0z" />
       </clipPath>
     </defs>
   </>,
@@ -1041,31 +1329,63 @@ export const FillCrossHatchIcon = createIcon(
 
 export const FillSolidIcon = createIcon(
   <>
-    <rect x=".5" y=".5" width={15} height={15} rx="2.5" fill="currentColor" />
-    <rect x=".5" y=".5" width={15} height={15} rx="2.5" stroke="currentColor" />
+    <g clipPath="url(#a)">
+      <path
+        d="M4.91 2.625h10.18a2.284 2.284 0 0 1 2.285 2.284v10.182a2.284 2.284 0 0 1-2.284 2.284H4.909a2.284 2.284 0 0 1-2.284-2.284V4.909a2.284 2.284 0 0 1 2.284-2.284Z"
+        stroke="currentColor"
+        strokeWidth="1.25"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  { ...newIconProps, fill: "currentColor" },
+);
+
+export const StrokeWidthBaseIcon = createIcon(
+  <>
+    <g clipPath="url(#a)">
+      <path
+        d="M4.167 10h11.666"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
   </>,
   newIconProps,
 );
 
-export const StrokeWidthIcon = ({
-  strokeWidth,
-  width,
-  height,
-}: {
-  strokeWidth: number;
-  width: number;
-  height: number;
-}) =>
-  createIcon(
-    <path
-      d="M2 8h14"
-      stroke="currentColor"
-      strokeWidth={strokeWidth}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />,
-    { width, height },
-  );
+export const StrokeWidthBoldIcon = createIcon(
+  <path
+    d="M5 10h10"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  newIconProps,
+);
+
+export const StrokeWidthExtraBoldIcon = createIcon(
+  <path
+    d="M5 10h10"
+    stroke="currentColor"
+    strokeWidth="3.75"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  newIconProps,
+);
 
 export const StrokeStyleSolidIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
@@ -1083,88 +1403,120 @@ export const StrokeStyleSolidIcon = React.memo(({ theme }: { theme: Theme }) =>
   ),
 );
 
-export const StrokeStyleDashedIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <path
-      d="M6 10H34"
-      stroke={iconFillColor(theme)}
-      strokeWidth={2.5}
-      strokeDasharray={"10, 8"}
-      fill="none"
+export const StrokeStyleDashedIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
       strokeLinecap="round"
-    />,
-    { width: 40, height: 20 },
-  ),
+      strokeLinejoin="round"
+    >
+      <path d="M4.167 10h1.666M14.167 10h1.666M9.167 10h1.666" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const StrokeStyleDottedIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <path
-      d="M6 10H36"
-      stroke={iconFillColor(theme)}
-      strokeWidth={2.5}
-      strokeDasharray={"2, 4.5"}
-      fill="none"
+export const StrokeStyleDottedIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
       strokeLinecap="round"
-    />,
-    { width: 40, height: 20 },
-  ),
+      strokeLinejoin="round"
+    >
+      <path d="M3.333 10v.008M6.667 10v.008M10 10v.008M13.333 10v.008M16.667 10v.008" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
 export const SloppinessArchitectIcon = createIcon(
-  <path
-    d="M1 10.723C2.986 9.66 8.081 6.772 11.282 5.497c3.2-1.274.121 3.386 1.583 3.726C14.327 9.563 19 7.046 19 7.046"
-    stroke="currentColor"
-    strokeWidth="1.2"
-    strokeLinecap="round"
-  />,
-  { width: 20, height: 16, mirror: true, fill: "none" },
+  <>
+    <path
+      d="M2.5 12.038c1.655-.885 5.9-3.292 8.568-4.354 2.668-1.063.101 2.821 1.32 3.104 1.218.283 5.112-1.814 5.112-1.814"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+    />
+  </>,
+  newIconProps,
 );
 
 export const SloppinessArtistIcon = createIcon(
-  <path
-    d="M1 11.426c1.986-1.062 7.081-3.95 10.282-5.225 3.2-1.275.121 3.386 1.583 3.725C14.327 10.266 19 7.75 19 7.75M2.837 10.426C6.393 8.522 10.194 3.681 11.8 4.43c1.605.747-1.384 4.93-.16 6.714C12.866 12.926 19 9.426 19 9.426"
-    stroke="currentColor"
-    strokeWidth="1.2"
-    strokeLinecap="round"
-  />,
-  { width: 20, height: 16, mirror: true, fill: "none" },
+  <>
+    <path
+      d="M2.5 12.563c1.655-.886 5.9-3.293 8.568-4.355 2.668-1.062.101 2.822 1.32 3.105 1.218.283 5.112-1.814 5.112-1.814m-13.469 2.23c2.963-1.586 6.13-5.62 7.468-4.998 1.338.623-1.153 4.11-.132 5.595 1.02 1.487 6.133-1.43 6.133-1.43"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+    />
+  </>,
+  newIconProps,
 );
 
 export const SloppinessCartoonistIcon = createIcon(
-  <path
-    d="M1 10.823C3.084 9.77 11.352 4.408 13.505 4.501c2.153.094-.503 6.166.413 6.884.916.718 4.235-2.147 5.082-2.576M1.514 8.246C2.912 7.623 8.08 4.309 9.9 4.509c1.822.198 1.2 4.592 2.545 4.93 1.345.338 4.606-2.419 5.526-2.903"
-    stroke="currentColor"
-    strokeWidth="1.2"
-    strokeLinecap="round"
-  />,
-  { width: 20, height: 16, mirror: true, fill: "none" },
+  <>
+    <path
+      d="M2.5 11.936c1.737-.879 8.627-5.346 10.42-5.268 1.795.078-.418 5.138.345 5.736.763.598 3.53-1.789 4.235-2.147M2.929 9.788c1.164-.519 5.47-3.28 6.987-3.114 1.519.165 1 3.827 2.121 4.109 1.122.281 3.839-2.016 4.606-2.42"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+    />
+  </>,
+  newIconProps,
 );
 
-export const EdgeSharpIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <path
-      d="M10 17L10 5L35 5"
-      stroke={iconFillColor(theme)}
-      strokeWidth={2}
+export const EdgeSharpIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
       strokeLinecap="round"
-      fill="none"
-    />,
-    { width: 40, height: 20, mirror: true },
-  ),
+      strokeLinejoin="round"
+    >
+      <path d="M3.333 10V6.667l.002-3.33c1.617-.003 2.728-.004 3.332-.004H10M13.333 3.333v.01M16.667 3.333v.01M16.667 6.667v.01M16.667 10v.01M3.333 13.333v.01M16.667 13.333v.01M3.333 16.667v.01M6.667 16.667v.01M10 16.667v.01M13.333 16.667v.01M16.667 16.667v.01" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const EdgeRoundIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <path
-      d="M10 17V15C10 8 13 5 21 5L33.5 5"
-      stroke={iconFillColor(theme)}
-      strokeWidth={2}
+export const EdgeRoundIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
       strokeLinecap="round"
-      fill="none"
-    />,
-    { width: 40, height: 20, mirror: true },
-  ),
+      strokeLinejoin="round"
+    >
+      <path d="M3.333 10V6.667a3.333 3.333 0 0 1 3.334-3.334H10M13.333 3.333v.01M16.667 3.333v.01M16.667 6.667v.01M16.667 10v.01M3.333 13.333v.01M16.667 13.333v.01M3.333 16.667v.01M6.667 16.667v.01M10 16.667v.01M13.333 16.667v.01M16.667 16.667v.01" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
 export const ArrowheadNoneIcon = React.memo(({ theme }: { theme: Theme }) =>
@@ -1243,116 +1595,177 @@ export const ArrowheadTriangleIcon = React.memo(
     ),
 );
 
-export const FontSizeSmallIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <path
-      fill={iconFillColor(theme)}
-      d="M 0 69.092 L 0 55.03 A 124.24 124.24 0 0 0 4.706 57.02 Q 6.826 57.863 8.708 58.5 A 53.466 53.466 0 0 0 12.231 59.571 Q 17.236 60.889 21.387 60.889 A 20.909 20.909 0 0 0 24.265 60.704 Q 25.719 60.502 26.903 60.077 A 8.649 8.649 0 0 0 29.028 58.985 Q 31.689 57.08 31.689 53.321 Q 31.689 51.221 30.518 49.585 A 10.126 10.126 0 0 0 29.282 48.177 Q 28.352 47.287 27.075 46.436 A 23.719 23.719 0 0 0 25.752 45.627 Q 23.774 44.492 20.176 42.735 A 254.44 254.44 0 0 0 17.822 41.602 Q 11.503 38.631 8.236 35.888 A 19.742 19.742 0 0 1 8.008 35.694 A 22.18 22.18 0 0 1 2.783 29.102 Q 0.83 25.342 0.83 20.313 A 22.471 22.471 0 0 1 1.733 13.778 A 17.283 17.283 0 0 1 7.251 5.42 A 21.486 21.486 0 0 1 15.177 1.272 Q 18.361 0.338 22.166 0.09 A 43.573 43.573 0 0 1 25 0 A 42.399 42.399 0 0 1 34.349 1.01 A 39.075 39.075 0 0 1 35.62 1.319 A 67.407 67.407 0 0 1 42.108 3.382 A 83.357 83.357 0 0 1 46.191 5.03 L 41.309 16.797 Q 35.596 14.453 31.86 13.526 A 30.762 30.762 0 0 0 25.417 12.612 A 28.337 28.337 0 0 0 24.512 12.598 A 14.846 14.846 0 0 0 22.022 12.793 Q 19.498 13.224 17.92 14.6 Q 15.625 16.602 15.625 19.824 Q 15.625 21.826 16.553 23.316 Q 17.48 24.805 19.507 26.197 A 18.343 18.343 0 0 0 20.659 26.912 Q 22.596 28.035 26.516 29.953 A 299.99 299.99 0 0 0 29.102 31.201 Q 37.91 35.412 41.841 39.642 A 16.553 16.553 0 0 1 42.822 40.796 A 17.675 17.675 0 0 1 46.301 49.233 A 23.517 23.517 0 0 1 46.533 52.588 A 21.581 21.581 0 0 1 45.471 59.515 A 17.733 17.733 0 0 1 39.575 67.823 Q 33.745 72.486 24.094 73.243 A 49.683 49.683 0 0 1 20.215 73.389 A 51.712 51.712 0 0 1 9.448 72.315 A 40.672 40.672 0 0 1 0 69.092 Z"
-    />,
-    { width: 47, height: 77 },
-  ),
-);
-
-export const FontSizeMediumIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <path
-      fill={iconFillColor(theme)}
-      d="M 44.092 71.387 L 30.225 71.387 L 13.037 15.381 L 12.598 15.381 A 1505.093 1505.093 0 0 1 12.959 22.313 Q 13.426 31.715 13.508 36.4 A 102.991 102.991 0 0 1 13.525 38.184 L 13.525 71.387 L 0 71.387 L 0 0 L 20.605 0 L 37.5 54.59 L 37.793 54.59 L 55.713 0 L 76.318 0 L 76.318 71.387 L 62.207 71.387 L 62.207 37.598 Q 62.207 35.205 62.28 32.08 A 160.703 160.703 0 0 1 62.326 30.544 Q 62.452 26.754 62.866 17.168 A 5390.536 5390.536 0 0 1 62.939 15.479 L 62.5 15.479 L 44.092 71.387 Z"
-    />,
-    { width: 77, height: 75 },
-  ),
-);
-
-export const FontSizeLargeIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <path
-      fill={iconFillColor(theme)}
-      d="M 44.092 71.387 L 0 71.387 L 0 0 L 15.137 0 L 15.137 58.887 L 44.092 58.887 L 44.092 71.387 Z"
-    />,
-    { width: 45, height: 75 },
-  ),
-);
-
-export const FontSizeExtraLargeIcon = React.memo(
-  ({ theme }: { theme: Theme }) =>
-    createIcon(
+export const FontSizeSmallIcon = createIcon(
+  <>
+    <g clipPath="url(#a)">
       <path
-        fill={iconFillColor(theme)}
-        d="M 42.578 35.4 L 66.699 71.387 L 49.414 71.387 L 32.813 44.385 L 16.211 71.387 L 0 71.387 L 23.682 34.57 L 1.514 0 L 18.213 0 L 33.594 25.684 L 48.682 0 L 64.99 0 L 42.578 35.4 Z M 119.775 71.387 L 75.684 71.387 L 75.684 0 L 90.82 0 L 90.82 58.887 L 119.775 58.887 L 119.775 71.387 Z"
-      />,
-      { width: 120, height: 75 },
-    ),
-);
-
-export const FontFamilyHandDrawnIcon = React.memo(
-  ({ theme }: { theme: Theme }) =>
-    createIcon(
-      <path
-        fill={iconFillColor(theme)}
-        d="M290.74 93.24l128.02 128.02-277.99 277.99-114.14 12.6C11.35 513.54-1.56 500.62.14 485.34l12.7-114.22 277.9-277.88zm207.2-19.06l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.76 18.75-49.16 0-67.91z"
-      />,
-      { width: 448, height: 512 },
-    ),
-);
-
-export const FontFamilyNormalIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <>
-      <path
-        fill={iconFillColor(theme)}
-        d="M 63.818 71.68 L 54.492 71.68 L 45.898 49.561 L 17.578 49.561 L 9.082 71.68 L 0 71.68 L 27.881 0 L 35.986 0 L 63.818 71.68 Z M 20.605 41.602 L 43.213 41.602 L 35.205 19.971 L 31.787 9.277 Q 30.322 15.137 28.711 19.971 L 20.605 41.602 Z"
+        d="M14.167 6.667a3.333 3.333 0 0 0-3.334-3.334H9.167a3.333 3.333 0 0 0 0 6.667h1.666a3.333 3.333 0 0 1 0 6.667H9.167a3.333 3.333 0 0 1-3.334-3.334"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <path
-        fill={iconFillColor(theme)}
-        d="M 68.994 71.68 L 52.686 71.68 L 47.51 54.688 L 21.484 54.688 L 16.309 71.68 L 0 71.68 L 25.195 0 L 43.701 0 L 68.994 71.68 Z M 25.293 41.992 L 43.896 41.992 A 27590.463 27590.463 0 0 1 42.2 36.532 Q 36.965 19.676 35.937 16.273 A 120.932 120.932 0 0 1 35.815 15.869 A 131.65 131.65 0 0 1 35.396 14.435 Q 34.951 12.879 34.675 11.741 A 34.866 34.866 0 0 1 34.521 11.084 A 141.762 141.762 0 0 1 33.706 14.075 Q 31.482 21.957 25.293 41.992 Z"
-      />
-    </>,
-    { width: 70, height: 78 },
-  ),
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const FontFamilyCodeIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <>
+export const FontSizeMediumIcon = createIcon(
+  <>
+    <g clipPath="url(#a)">
       <path
-        fill={iconFillColor(theme)}
-        d="M278.9 511.5l-61-17.7c-6.4-1.8-10-8.5-8.2-14.9L346.2 8.7c1.8-6.4 8.5-10 14.9-8.2l61 17.7c6.4 1.8 10 8.5 8.2 14.9L293.8 503.3c-1.9 6.4-8.5 10.1-14.9 8.2zm-114-112.2l43.5-46.4c4.6-4.9 4.3-12.7-.8-17.2L117 256l90.6-79.7c5.1-4.5 5.5-12.3.8-17.2l-43.5-46.4c-4.5-4.8-12.1-5.1-17-.5L3.8 247.2c-5.1 4.7-5.1 12.8 0 17.5l144.1 135.1c4.9 4.6 12.5 4.4 17-.5zm327.2.6l144.1-135.1c5.1-4.7 5.1-12.8 0-17.5L492.1 112.1c-4.8-4.5-12.4-4.3-17 .5L431.6 159c-4.6 4.9-4.3 12.7.8 17.2L523 256l-90.6 79.7c-5.1 4.5-5.5 12.3-.8 17.2l43.5 46.4c4.5 4.9 12.1 5.1 17 .6z"
+        d="M5 16.667V3.333L10 15l5-11.667v13.334"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-    </>,
-    { width: 640, height: 512 },
-  ),
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
-export const TextAlignLeftIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
+export const FontSizeLargeIcon = createIcon(
+  <>
+    <g clipPath="url(#a)">
+      <path
+        d="M5.833 3.333v13.334h8.334"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
+export const FontSizeExtraLargeIcon = createIcon(
+  <>
     <path
-      d="M12.83 352h262.34A12.82 12.82 0 00288 339.17v-38.34A12.82 12.82 0 00275.17 288H12.83A12.82 12.82 0 000 300.83v38.34A12.82 12.82 0 0012.83 352zm0-256h262.34A12.82 12.82 0 00288 83.17V44.83A12.82 12.82 0 00275.17 32H12.83A12.82 12.82 0 000 44.83v38.34A12.82 12.82 0 0012.83 96zM432 160H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm0 256H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16z"
-      fill={iconFillColor(theme)}
+      d="m1.667 3.333 6.666 13.334M8.333 3.333 1.667 16.667M11.667 3.333v13.334h6.666"
+      stroke="currentColor"
+      strokeWidth="1.25"
       strokeLinecap="round"
-    />,
-    { width: 448, height: 512 },
-  ),
+      strokeLinejoin="round"
+    />
+  </>,
+  newIconProps,
 );
 
-export const TextAlignCenterIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <path
-      d="M432 160H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm0 256H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zM108.1 96h231.81A12.09 12.09 0 00352 83.9V44.09A12.09 12.09 0 00339.91 32H108.1A12.09 12.09 0 0096 44.09V83.9A12.1 12.1 0 00108.1 96zm231.81 256A12.09 12.09 0 00352 339.9v-39.81A12.09 12.09 0 00339.91 288H108.1A12.09 12.09 0 0096 300.09v39.81a12.1 12.1 0 0012.1 12.1z"
-      fill={iconFillColor(theme)}
-    />,
-    { width: 448, height: 512 },
-  ),
-);
-
-export const TextAlignRightIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <path
-      d="M16 224h416a16 16 0 0016-16v-32a16 16 0 00-16-16H16a16 16 0 00-16 16v32a16 16 0 0016 16zm416 192H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm3.17-384H172.83A12.82 12.82 0 00160 44.83v38.34A12.82 12.82 0 00172.83 96h262.34A12.82 12.82 0 00448 83.17V44.83A12.82 12.82 0 00435.17 32zm0 256H172.83A12.82 12.82 0 00160 300.83v38.34A12.82 12.82 0 00172.83 352h262.34A12.82 12.82 0 00448 339.17v-38.34A12.82 12.82 0 00435.17 288z"
-      fill={iconFillColor(theme)}
+export const FontFamilyNormalIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
       strokeLinecap="round"
-    />,
-    { width: 448, height: 512 },
-  ),
+      strokeLinejoin="round"
+    >
+      <path d="M5.833 16.667v-10a3.333 3.333 0 0 1 3.334-3.334h1.666a3.333 3.333 0 0 1 3.334 3.334v10M5.833 10.833h8.334" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
+export const FontFamilyCodeIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5.833 6.667 2.5 10l3.333 3.333M14.167 6.667 17.5 10l-3.333 3.333M11.667 3.333 8.333 16.667" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
+export const TextAlignLeftIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3.333 5h13.334M3.333 10h8.334M3.333 15H15" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
+export const TextAlignCenterIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3.333 5h13.334M6.667 10h6.666M5 15h10" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
+export const TextAlignRightIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3.333 5h13.334M8.333 10h8.334M5 15h11.667" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
 );
 
 export const TextAlignTopIcon = React.memo(({ theme }: { theme: Theme }) =>
@@ -1394,14 +1807,6 @@ export const publishIcon = createIcon(
     d="M537.6 226.6c4.1-10.7 6.4-22.4 6.4-34.6 0-53-43-96-96-96-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32c-88.4 0-160 71.6-160 160 0 2.7.1 5.4.2 8.1C40.2 219.8 0 273.2 0 336c0 79.5 64.5 144 144 144h368c70.7 0 128-57.3 128-128 0-61.9-44-113.6-102.4-125.4zM393.4 288H328v112c0 8.8-7.2 16-16 16h-48c-8.8 0-16-7.2-16-16V288h-65.4c-14.3 0-21.4-17.2-11.3-27.3l105.4-105.4c6.2-6.2 16.4-6.2 22.6 0l105.4 105.4c10.1 10.1 2.9 27.3-11.3 27.3z"
     fill="currentColor"
   />,
-  { width: 640, height: 512 },
-);
-
-export const editIcon = createIcon(
-  <path
-    fill="currentColor"
-    d="M402.3 344.9l32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zm156.6-201.8L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8zM460.1 174L402 115.9 216.2 301.8l-7.3 65.3 65.3-7.3L460.1 174zm64.8-79.7l-43.2-43.2c-4.1-4.1-10.8-4.1-14.8 0L436 82l58.1 58.1 30.9-30.9c4-4.2 4-10.8-.1-14.9z"
-  ></path>,
   { width: 640, height: 512 },
 );
 
