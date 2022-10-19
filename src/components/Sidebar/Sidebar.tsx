@@ -118,11 +118,7 @@ export const Sidebar = Object.assign(
       }
 
       return (
-        <Island
-          padding={2}
-          className={clsx("layer-ui__sidebar", className)}
-          ref={ref}
-        >
+        <Island className={clsx("layer-ui__sidebar", className)} ref={ref}>
           <SidebarPropsContext.Provider value={headerPropsRef.current}>
             <SidebarHeaderComponents.Context>
               <SidebarHeaderComponents.Component __isFallback />

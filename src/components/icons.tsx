@@ -56,6 +56,46 @@ const newIconProps: Opts = {
   fill: "none",
 };
 
+export const DotsIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M10 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM10 16.667A.833.833 0 1 0 10 15a.833.833 0 0 0 0 1.667ZM10 5a.833.833 0 1 0 0-1.667A.833.833 0 0 0 10 5Z" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
+export const PinIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M7.5 3.333v5l-1.667 3.334v1.666h8.334v-1.666L12.5 8.333v-5M10 13.333V17.5M6.667 3.333h6.666" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
 export const UnlockedIcon = createIcon(
   <>
     <g clipPath="url(#a)">

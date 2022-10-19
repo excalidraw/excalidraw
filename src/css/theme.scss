@@ -48,6 +48,17 @@
     0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
     0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
   --avatar-border-color: var(--color-gray-20);
+  --sidebar-shadow: 0px 100px 80px rgba(0, 0, 0, 0.07),
+    0px 41.7776px 33.4221px rgba(0, 0, 0, 0.0503198),
+    0px 22.3363px 17.869px rgba(0, 0, 0, 0.0417275),
+    0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
+    0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
+    0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
+  --sidebar-border-color: var(--color-gray-20);
+  --sidebar-bg-color: #fff;
+  --library-dropdown-shadow: 0px 15px 6px rgba(0, 0, 0, 0.01),
+    0px 8px 5px rgba(0, 0, 0, 0.05), 0px 4px 4px rgba(0, 0, 0, 0.09),
+    0px 1px 2px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
 
   --space-factor: 0.25rem;
   --text-primary-color: var(--color-gray-80);
@@ -120,6 +131,8 @@
       0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
       0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
     --avatar-border-color: var(--color-gray-85);
+    --sidebar-border-color: var(--color-gray-85);
+    --sidebar-bg-color: #191919;
 
     --color-primary: #a8a5ff;
     --color-primary-darker: #b2aeff;
