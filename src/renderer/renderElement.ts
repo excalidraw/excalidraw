@@ -934,7 +934,6 @@ export const renderElementToSvg = (
         node.setAttribute("fill-opacity", `${opacity}`);
       }
       node.setAttribute("stroke-linecap", "round");
-      node.setAttribute("id", element.id);
       node.setAttribute(
         "transform",
         `translate(${offsetX || 0} ${
