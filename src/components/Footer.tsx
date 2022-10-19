@@ -69,6 +69,7 @@ const Footer = ({
         </Stack.Col>
       </div>
       <div
+        style={{ position: "fixed", bottom: "4.5rem", right: "1rem" }}
         className={clsx(
           "layer-ui__wrapper__footer-center zen-mode-transition",
           {

@@ -56,8 +56,6 @@ const newIconProps: Opts = {
   fill: "none",
 };
 
-// TODO barnabasmolnar/editor-redesign
-// something not quite right with this icon
 export const UnlockedIcon = createIcon(
   <>
     <g clipPath="url(#a)">
@@ -72,7 +70,7 @@ export const UnlockedIcon = createIcon(
         strokeWidth="1.25"
       />
       <mask
-        id="b"
+        id="UnlockedIcon"
         style={{ maskType: "alpha" }}
         maskUnits="userSpaceOnUse"
         x={6}
@@ -85,7 +83,7 @@ export const UnlockedIcon = createIcon(
           fill="#fff"
         />
       </mask>
-      <g mask="url(#b)">
+      <g mask="url(#UnlockedIcon)">
         <path
           d="M5.149 9.561v1.25h2.5v-1.25h-2.5Zm5.06-7.894V.417v1.25Zm2.559 3.508v1.25h2.5v-1.25h-2.5ZM7.648 8.51V5.175h-2.5V8.51h2.5Zm0-3.334c0-.564.243-1.128.713-1.561L6.668 1.775c-.959.883-1.52 2.104-1.52 3.4h2.5Zm.713-1.561a2.732 2.732 0 0 1 1.847-.697v-2.5c-1.31 0-2.585.478-3.54 1.358L8.36 3.614Zm1.847-.697c.71 0 1.374.26 1.847.697l1.694-1.839a5.231 5.231 0 0 0-3.54-1.358v2.5Zm1.847.697c.47.433.713.997.713 1.561h2.5c0-1.296-.56-2.517-1.52-3.4l-1.693 1.839Z"
           fill="currentColor"
@@ -927,7 +925,7 @@ export const SendToBackIcon = createIcon(
         stroke="currentColor"
         strokeWidth="1.25"
       />
-      <mask id="b" fill="#fff">
+      <mask id="SendToBackIcon" fill="#fff">
         <path
           fillRule="evenodd"
           clipRule="evenodd"
@@ -943,7 +941,7 @@ export const SendToBackIcon = createIcon(
       <path
         d="M9.167 5.833h1.25v-1.25h-1.25v1.25Zm5 5h1.25v-1.25h-1.25v1.25Zm-3.334 3.334h-1.25v1.25h1.25v-1.25Zm-5-5h-1.25v1.25h1.25v-1.25Zm2.084-3.334v2.06h2.5v-2.06h-2.5Zm0 2.06a4.191 4.191 0 0 0 4.19 4.19v-2.5a1.691 1.691 0 0 1-1.69-1.69h-2.5Zm4.19 4.19h2.06v-2.5h-2.06v2.5Zm.81-1.25v.393h2.5v-.393h-2.5Zm0 .393c0 .933-.758 1.69-1.691 1.69v2.5a4.191 4.191 0 0 0 4.19-4.19h-2.5Zm-1.691 1.69h-.393v2.5h.393v-2.5Zm.857 1.25v-2.058h-2.5v2.059h2.5Zm0-2.058a4.191 4.191 0 0 0-4.19-4.191v2.5c.933 0 1.69.757 1.69 1.69h2.5Zm-4.19-4.191h-2.06v2.5h2.06v-2.5Zm-.81 1.25v-.393h-2.5v.393h2.5Zm0-.393c0-.934.758-1.69 1.692-1.69v-2.5a4.191 4.191 0 0 0-4.192 4.19h2.5Zm1.692-1.69h.392v-2.5h-.392v2.5Z"
         fill="currentColor"
-        mask="url(#b)"
+        mask="url(#SendToBackIcon)"
       />
       <path
         d="M12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
@@ -1248,8 +1246,6 @@ export const UngroupIcon = React.memo(({ theme }: { theme: Theme }) =>
   ),
 );
 
-// TODO barnabasmolnar/editor-redesign
-// something not quite right with this icon
 export const FillHachureIcon = createIcon(
   <>
     <path
@@ -1258,7 +1254,7 @@ export const FillHachureIcon = createIcon(
       strokeWidth="1.25"
     />
     <mask
-      id="a"
+      id="FillHachureIcon"
       style={{ maskType: "alpha" }}
       maskUnits="userSpaceOnUse"
       x={2}
@@ -1273,7 +1269,7 @@ export const FillHachureIcon = createIcon(
         strokeWidth="1.25"
       />
     </mask>
-    <g mask="url(#a)">
+    <g mask="url(#FillHachureIcon)">
       <path
         d="M2.258 15.156 15.156 2.258M7.324 20.222 20.222 7.325m-20.444 5.35L12.675-.222m-8.157 18.34L17.416 5.22"
         stroke="currentColor"
@@ -1295,7 +1291,7 @@ export const FillCrossHatchIcon = createIcon(
         strokeWidth="1.25"
       />
       <mask
-        id="b"
+        id="FillCrossHatchIcon"
         style={{ maskType: "alpha" }}
         maskUnits="userSpaceOnUse"
         x={-1}
@@ -1311,7 +1307,7 @@ export const FillCrossHatchIcon = createIcon(
           strokeLinejoin="round"
         />
       </mask>
-      <g mask="url(#b)">
+      <g mask="url(#FillCrossHatchIcon)">
         <path
           d="M14.121 2H5.88A3.879 3.879 0 0 0 2 5.879v8.242A3.879 3.879 0 0 0 5.879 18h8.242A3.879 3.879 0 0 0 18 14.121V5.88A3.879 3.879 0 0 0 14.121 2Z"
           fill="currentColor"

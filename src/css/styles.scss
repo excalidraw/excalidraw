@@ -277,8 +277,8 @@
   .App-menu_bottom {
     position: absolute;
     bottom: 1rem;
-    grid-template-columns: min-content auto min-content;
-    grid-gap: 15px;
+    display: flex;
+    justify-content: space-between;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
@@ -354,6 +354,10 @@
 
     &:active {
       background-color: var(--button-gray-2);
+    }
+
+    &__language {
+      height: 2rem;
     }
   }
 

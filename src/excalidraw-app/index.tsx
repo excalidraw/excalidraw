@@ -1,6 +1,6 @@
 import polyfill from "../polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
@@ -21,11 +21,7 @@ import {
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import {
-  Excalidraw,
-  defaultLang,
-  languages,
-} from "../packages/excalidraw/index";
+import { Excalidraw, defaultLang } from "../packages/excalidraw/index";
 import {
   AppState,
   LibraryItems,
@@ -67,8 +63,6 @@ import {
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { restore, restoreAppState, RestoredDataState } from "../data/restore";
-import { Tooltip } from "../components/Tooltip";
-import { shield } from "../components/icons";
 
 import "./index.scss";
 import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
@@ -80,10 +74,11 @@ import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
-import { Provider, useAtom } from "jotai";
+import { atom, Provider, useAtom } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
+import EncryptedIcon from "../components/EncryptedIcon";
 
 polyfill();
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -225,13 +220,16 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
+const currentLangCode = languageDetector.detect() || defaultLang.code;
+
+export const langCodeAtom = atom(
+  Array.isArray(currentLangCode) ? currentLangCode[0] : currentLangCode,
+);
+
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  let currentLangCode = languageDetector.detect() || defaultLang.code;
-  if (Array.isArray(currentLangCode)) {
-    currentLangCode = currentLangCode[0];
-  }
-  const [langCode, setLangCode] = useState(currentLangCode);
+  const [langCode, setLangCode] = useAtom(langCodeAtom);
+
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -459,7 +457,7 @@ const ExcalidrawWrapper = () => {
       );
       clearTimeout(titleTimeout);
     };
-  }, [collabAPI, excalidrawAPI]);
+  }, [collabAPI, excalidrawAPI, setLangCode]);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
@@ -573,54 +571,27 @@ const ExcalidrawWrapper = () => {
     }
   };
 
-  const renderFooter = useCallback(
-    (isMobile: boolean) => {
-      const renderEncryptedIcon = () => (
-        <a
-          className="encrypted-icon tooltip"
-          href="https://blog.excalidraw.com/end-to-end-encryption/"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={t("encrypted.link")}
-        >
-          <Tooltip label={t("encrypted.tooltip")} long={true}>
-            {shield}
-          </Tooltip>
-        </a>
-      );
-
-      const renderLanguageList = () => (
-        <LanguageList
-          onChange={(langCode) => setLangCode(langCode)}
-          languages={languages}
-          currentLangCode={langCode}
-        />
-      );
-      if (isMobile) {
-        const isTinyDevice = window.innerWidth < 362;
-        return (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: isTinyDevice ? "column" : "row",
-            }}
-          >
-            <fieldset>
-              <legend>{t("labels.language")}</legend>
-              {renderLanguageList()}
-            </fieldset>
-          </div>
-        );
-      }
+  const renderFooter = (isMobile: boolean) => {
+    const renderLanguageList = () => <LanguageList />;
+    if (isMobile) {
+      const isTinyDevice = window.innerWidth < 362;
       return (
-        <>
-          {renderEncryptedIcon()}
-          {renderLanguageList()}
-        </>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: isTinyDevice ? "column" : "row",
+          }}
+        >
+          <fieldset>
+            <legend>{t("labels.language")}</legend>
+            {renderLanguageList()}
+          </fieldset>
+        </div>
       );
-    },
-    [langCode],
-  );
+    }
+
+    return <EncryptedIcon />;
+  };
 
   const renderCustomStats = (
     elements: readonly NonDeletedExcalidrawElement[],

@@ -50,6 +50,7 @@ import WelcomeScreen from "./WelcomeScreen";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
+import { LanguageList } from "../excalidraw-app/components/LanguageList";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -230,7 +231,10 @@ const LayerUI = ({
                 </div>
                 {actionManager.renderAction("changeViewBackgroundColor")}
               </div>
-              {actionManager.renderAction("toggleTheme")}
+              <div style={{ marginBottom: ".5rem" }}>
+                {actionManager.renderAction("toggleTheme")}
+              </div>
+              <LanguageList style={{ width: "100%" }} />
             </Island>
           </Section>
         </div>
