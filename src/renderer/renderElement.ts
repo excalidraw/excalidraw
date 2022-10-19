@@ -12,7 +12,6 @@ import {
   isLinearElement,
   isFreeDrawElement,
   isInitializedImageElement,
-  isBoundToContainer,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -40,8 +39,10 @@ import {
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
   getApproxLineHeight,
+  getBoundTextElement,
   getContainerElement,
 } from "../element/textElement";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -894,7 +895,6 @@ export const renderElementToSvg = (
   offsetX?: number,
   offsetY?: number,
   exportWithDarkMode?: boolean,
-  enclosingElement?: ExcalidrawElement | null,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x2 - x1) / 2 - (element.x - x1);
@@ -946,8 +946,53 @@ export const renderElementToSvg = (
     }
     case "line":
     case "arrow": {
+      const boundText = getBoundTextElement(element);
+      const maskPath = svgRoot.ownerDocument!.createElementNS(SVG_NS, "mask");
+      if (boundText) {
+        maskPath.setAttribute("id", `mask-${element.id}`);
+        const maskRectVisible = svgRoot.ownerDocument!.createElementNS(
+          SVG_NS,
+          "rect",
+        );
+        offsetX = offsetX || 0;
+        offsetY = offsetY || 0;
+        maskRectVisible.setAttribute("x", "0");
+        maskRectVisible.setAttribute("y", "0");
+        maskRectVisible.setAttribute("fill", "#fff");
+        maskRectVisible.setAttribute(
+          "width",
+          `${element.width + 100 + offsetX}`,
+        );
+        maskRectVisible.setAttribute(
+          "height",
+          `${element.height + 100 + offsetY}`,
+        );
+
+        maskPath.appendChild(maskRectVisible);
+        const maskRectInvisible = svgRoot.ownerDocument!.createElementNS(
+          SVG_NS,
+          "rect",
+        );
+        const absoluteCoords = LinearElementEditor.pointFromAbsoluteCoords(
+          element,
+          [boundText.x, boundText.y],
+        );
+        const x = absoluteCoords[0] + offsetX;
+        const y = absoluteCoords[1] + offsetY;
+
+        maskRectInvisible.setAttribute("x", x.toString());
+        maskRectInvisible.setAttribute("y", y.toString());
+        maskRectInvisible.setAttribute("fill", "#000");
+        maskRectInvisible.setAttribute("width", `${boundText.width}`);
+        maskRectInvisible.setAttribute("height", `${boundText.height}`);
+        maskRectInvisible.setAttribute("opacity", "1");
+        maskPath.appendChild(maskRectInvisible);
+      }
       generateElementShape(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+      if (boundText) {
+        group.setAttribute("mask", `url(#mask-${element.id})`);
+      }
       const opacity = element.opacity / 100;
       group.setAttribute("stroke-linecap", "round");
 
@@ -977,6 +1022,7 @@ export const renderElementToSvg = (
         group.appendChild(node);
       });
       root.appendChild(group);
+      root.append(maskPath);
       break;
     }
     case "freedraw": {
@@ -1074,38 +1120,6 @@ export const renderElementToSvg = (
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);
           node.setAttribute("fill-opacity", `${opacity}`);
-        }
-        const clipPath = svgRoot.ownerDocument!.createElementNS(
-          SVG_NS,
-          "clipPath",
-        );
-        const usePath = svgRoot.ownerDocument!.createElementNS(SVG_NS, "use");
-        if (isBoundToContainer(element)) {
-          const container = getContainerElement(element);
-          if (isLinearElement(container)) {
-            clipPath.setAttribute("id", `clip-${element.id}`);
-            root
-              .querySelector("rect")
-              ?.setAttribute("id", `clip-path-bound-text`);
-            const clipRect = svgRoot.ownerDocument!.createElementNS(
-              SVG_NS,
-              "rect",
-            );
-            clipRect.setAttribute("width", `${element.width}`);
-            clipRect.setAttribute("height", `${element.height}`);
-            clipRect.setAttribute("x", `${offsetX}`);
-            clipRect.setAttribute("y", `${offsetY}`);
-            clipPath.appendChild(clipRect);
-            if (enclosingElement) {
-              usePath.setAttribute("href", `#${enclosingElement.id}`);
-            } else {
-              usePath.setAttribute("href", `#clip-path-bound-text`);
-            }
-
-            usePath.setAttribute("clip-path", `url(#clip-${element.id})`);
-            root.append(clipPath);
-            root.append(usePath);
-          }
         }
 
         node.setAttribute(

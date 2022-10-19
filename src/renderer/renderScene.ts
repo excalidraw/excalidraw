@@ -1136,7 +1136,6 @@ export const renderSceneToSvg = (
   // render elements
   elements.forEach((element, index) => {
     if (!element.isDeleted) {
-      const enclosingElement = getEnclosingElement(elements, element, index);
       try {
         renderElementToSvg(
           element,
@@ -1146,7 +1145,6 @@ export const renderSceneToSvg = (
           element.x + offsetX,
           element.y + offsetY,
           exportWithDarkMode,
-          enclosingElement,
         );
       } catch (error: any) {
         console.error(error);
