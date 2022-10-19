@@ -16,7 +16,7 @@ import { LibraryItems, LibraryItem, AppState, ExcalidrawProps } from "../types";
 
 import "./LibraryMenu.scss";
 import LibraryMenuItems from "./LibraryMenuItems";
-import { EVENT, VERSIONS } from "../constants";
+import { EVENT } from "../constants";
 import { KEYS } from "../keys";
 import { trackEvent } from "../analytics";
 import { useAtom } from "jotai";
@@ -31,6 +31,7 @@ import { Sidebar } from "./Sidebar/Sidebar";
 import { getSelectedElements } from "../scene";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { LibraryMenuHeader } from "./LibraryMenuHeaderContent";
+import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -94,9 +95,6 @@ export const LibraryMenuContent = ({
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) => {
-  const referrer =
-    libraryReturnUrl || window.location.origin + window.location.pathname;
-
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
 
   const addToLibrary = useCallback(
@@ -138,6 +136,9 @@ export const LibraryMenuContent = ({
     );
   }
 
+  const showBtn =
+    libraryItemsData.libraryItems.length > 0 || pendingElements.length > 0;
+
   return (
     <LibraryMenuWrapper>
       <LibraryMenuItems
@@ -150,18 +151,17 @@ export const LibraryMenuContent = ({
         pendingElements={pendingElements}
         selectedItems={selectedItems}
         onSelectItems={onSelectItems}
+        id={id}
+        libraryReturnUrl={libraryReturnUrl}
+        theme={appState.theme}
       />
-      <a
-        className="library-menu-browse-button"
-        href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-          window.name || "_blank"
-        }&referrer=${referrer}&useHash=true&token=${id}&theme=${
-          appState.theme
-        }&version=${VERSIONS.excalidrawLibrary}`}
-        target="_excalidraw_libraries"
-      >
-        {t("labels.libraries")}
-      </a>
+      {showBtn && (
+        <LibraryMenuBrowseButton
+          id={id}
+          libraryReturnUrl={libraryReturnUrl}
+          theme={appState.theme}
+        />
+      )}
     </LibraryMenuWrapper>
   );
 };

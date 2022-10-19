@@ -1,16 +1,53 @@
 @import "open-color/open-color";
 
 .excalidraw {
+  .library-menu-items__no-items {
+    text-align: center;
+    color: var(--color-gray-70);
+    line-height: 1.5;
+
+    &__label {
+      color: var(--color-primary);
+      font-weight: bold;
+      font-size: 1.125rem;
+      margin-bottom: 0.75rem;
+    }
+
+    &__hint {
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  &.theme--dark {
+    .library-menu-items__no-items {
+      color: var(--color-gray-40);
+    }
+  }
+
   .library-menu-items-container {
     display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    overflow-y: auto;
     flex-direction: column;
     height: 100%;
+    justify-content: center;
+    margin: 0.5rem 0;
 
     &__items {
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
       margin-bottom: 1rem;
+    }
+
+    &__header {
+      color: var(--color-primary);
+      font-size: 1.125rem;
+      font-weight: bold;
+      margin-bottom: 0.75rem;
     }
 
     .separator {
