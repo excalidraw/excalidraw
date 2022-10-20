@@ -391,6 +391,7 @@
 
   .help-icon {
     @include outlineButtonStyles;
+    background-color: var(--island-bg-color);
     width: var(--lg-button-size);
     height: var(--lg-button-size);
 

@@ -25,7 +25,19 @@
   }
 
   .color-picker-control-container + .popover {
-    position: fixed;
+    position: static;
+  }
+
+  .color-picker-popover-container {
+    margin-top: -0.25rem;
+
+    :root[dir="ltr"] & {
+      margin-left: 0.5rem;
+    }
+
+    :root[dir="rtl"] & {
+      margin-left: -3rem;
+    }
   }
 
   .color-picker-triangle {
@@ -35,20 +47,29 @@
     border-width: 0 9px 10px;
     border-color: transparent transparent var(--popup-bg-color);
     position: absolute;
-    top: -10px;
+    top: 10px;
 
     :root[dir="ltr"] & {
-      left: 12px;
+      transform: rotate(270deg);
+      left: -14px;
     }
 
     :root[dir="rtl"] & {
-      right: 12px;
+      transform: rotate(90deg);
+      right: -14px;
     }
   }
 
   .color-picker-triangle-shadow {
     border-color: transparent transparent transparentize($oc-black, 0.9);
-    top: -11px;
+
+    :root[dir="ltr"] & {
+      left: -14px;
+    }
+
+    :root[dir="rtl"] & {
+      right: -16px;
+    }
   }
 
   .color-picker-content--default {

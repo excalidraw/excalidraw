@@ -4,10 +4,13 @@
   .menu-container {
     width: 240px;
     background-color: #fff !important;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
   }
 
   .menu-button {
     @include outlineButtonStyles;
+    background-color: var(--island-bg-color);
     width: var(--lg-button-size);
     height: var(--lg-button-size);
 
