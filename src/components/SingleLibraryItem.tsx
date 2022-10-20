@@ -62,7 +62,7 @@ const SingleLibraryItem = ({
       <div
         style={{
           display: "flex",
-          margin: "0.8rem 0.3rem",
+          margin: "0.8rem 0",
           width: "100%",
           fontSize: "14px",
           fontWeight: 500,

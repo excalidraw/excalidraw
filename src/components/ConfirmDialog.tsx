@@ -33,7 +33,7 @@ const ConfirmDialog = (props: Props) => {
         <DialogActionButton
           label={confirmText}
           onClick={onConfirm}
-          isDangerous
+          actionType="danger"
         />
       </div>
     </Dialog>

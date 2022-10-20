@@ -1,5 +1,6 @@
 .excalidraw {
   .Dialog__action-button {
+    position: relative;
     display: flex;
     column-gap: 0.5rem;
     align-items: center;
@@ -22,10 +23,20 @@
       border-color: var(--color-danger);
       color: #fff;
     }
+
+    &--primary {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
   }
 
   &.theme--dark {
     .Dialog__action-button--danger {
+      color: var(--color-gray-100);
+    }
+
+    .Dialog__action-button--primary {
       color: var(--color-gray-100);
     }
   }

@@ -1,13 +1,13 @@
 import clsx from "clsx";
 import { ReactNode } from "react";
 import "./DialogActionButton.scss";
+import Spinner from "./Spinner";
 
 interface DialogActionButtonProps {
   label: string;
-  onClick: () => void;
-  className?: string;
   children?: ReactNode;
-  isDangerous?: boolean;
+  actionType?: "primary" | "danger";
+  isLoading?: boolean;
 }
 
 const DialogActionButton = ({
@@ -15,21 +15,30 @@ const DialogActionButton = ({
   onClick,
   className,
   children,
-  isDangerous,
-}: DialogActionButtonProps) => {
+  actionType,
+  type = "button",
+  isLoading,
+  ...rest
+}: DialogActionButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+  const cs = actionType ? `Dialog__action-button--${actionType}` : "";
+
   return (
     <button
-      className={clsx(
-        "Dialog__action-button",
-        { "Dialog__action-button--danger": isDangerous },
-        className,
-      )}
-      type="button"
+      className={clsx("Dialog__action-button", cs, className)}
+      type={type}
       aria-label={label}
       onClick={onClick}
+      {...rest}
     >
-      {children && <div>{children}</div>}
-      <div>{label}</div>
+      {children && (
+        <div style={isLoading ? { visibility: "hidden" } : {}}>{children}</div>
+      )}
+      <div style={isLoading ? { visibility: "hidden" } : {}}>{label}</div>
+      {isLoading && (
+        <div style={{ position: "absolute", inset: 0 }}>
+          <Spinner />
+        </div>
+      )}
     </button>
   );
 };

@@ -159,7 +159,7 @@ const RoomDialog = ({
             <p>{t("roomDialog.desc_exitSession")}</p>
             <div className="RoomDialog-sessionStartButtonContainer">
               <DialogActionButton
-                isDangerous
+                actionType="danger"
                 label={t("roomDialog.button_stopSession")}
                 onClick={() => {
                   trackEvent("share", "room closed");
