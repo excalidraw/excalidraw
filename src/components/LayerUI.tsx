@@ -352,10 +352,6 @@ const LayerUI = ({
                         })} */}
                         </Stack.Row>
                       </Island>
-                      <LibraryButton
-                        appState={appState}
-                        setAppState={setAppState}
-                      />
                     </Stack.Row>
                   </Stack.Col>
                 </div>
@@ -383,6 +379,7 @@ const LayerUI = ({
               />
             )}
             {renderTopRightUI?.(device.isMobile, appState)}
+            <LibraryButton appState={appState} setAppState={setAppState} />
           </div>
         </div>
       </FixedSideContainer>

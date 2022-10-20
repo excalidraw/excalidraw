@@ -56,6 +56,26 @@ const newIconProps: Opts = {
   fill: "none",
 };
 
+export const LibraryIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M2.5 15.833a7.5 7.5 0 0 1 7.5 0 7.5 7.5 0 0 1 7.5 0M2.5 5A7.5 7.5 0 0 1 10 5a7.5 7.5 0 0 1 7.5 0M2.5 5v10.833M10 5v10.833M17.5 5v10.833" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
 export const PlusIcon = createIcon(
   <>
     <g
