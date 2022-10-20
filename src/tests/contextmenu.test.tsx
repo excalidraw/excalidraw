@@ -14,7 +14,7 @@ import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { CODES } from "../keys";
+import { KEYS } from "../keys";
 import { ShortcutName } from "../actions/shortcuts";
 import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
@@ -240,7 +240,7 @@ describe("contextMenu element", () => {
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     fireEvent.contextMenu(GlobalTestState.canvas, {
@@ -537,7 +537,7 @@ describe("contextMenu element", () => {
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     fireEvent.contextMenu(GlobalTestState.canvas, {
