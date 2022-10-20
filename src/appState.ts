@@ -57,8 +57,7 @@ export const getDefaultAppState = (): Omit<
     fileHandle: null,
     gridSize: null,
     isBindingEnabled: true,
-    isLibraryOpen: false,
-    isLibraryMenuDocked: false,
+    isSidebarDocked: false,
     isLoading: false,
     isResizing: false,
     isRotating: false,
@@ -67,6 +66,7 @@ export const getDefaultAppState = (): Omit<
     name: `${t("labels.untitled")}-${getDateTime()}`,
     openMenu: null,
     openPopup: null,
+    openSidebar: null,
     pasteDialog: { shown: false, data: null },
     previousSelectedElementIds: {},
     resizingElement: null,
@@ -90,6 +90,7 @@ export const getDefaultAppState = (): Omit<
     viewModeEnabled: false,
     pendingImageElementId: null,
     showHyperlinkPopup: false,
+    selectedLinearElement: null,
   };
 };
 
@@ -147,8 +148,7 @@ const APP_STATE_STORAGE_CONF = (<
   gridSize: { browser: true, export: true, server: true },
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: false, export: false, server: false },
-  isLibraryOpen: { browser: true, export: false, server: false },
-  isLibraryMenuDocked: { browser: true, export: false, server: false },
+  isSidebarDocked: { browser: true, export: false, server: false },
   isLoading: { browser: false, export: false, server: false },
   isResizing: { browser: false, export: false, server: false },
   isRotating: { browser: false, export: false, server: false },
@@ -159,6 +159,7 @@ const APP_STATE_STORAGE_CONF = (<
   offsetTop: { browser: false, export: false, server: false },
   openMenu: { browser: true, export: false, server: false },
   openPopup: { browser: false, export: false, server: false },
+  openSidebar: { browser: true, export: false, server: false },
   pasteDialog: { browser: false, export: false, server: false },
   previousSelectedElementIds: { browser: true, export: false, server: false },
   resizingElement: { browser: false, export: false, server: false },
@@ -181,6 +182,7 @@ const APP_STATE_STORAGE_CONF = (<
   viewModeEnabled: { browser: false, export: false, server: false },
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
+  selectedLinearElement: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

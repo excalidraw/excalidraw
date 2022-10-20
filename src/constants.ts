@@ -99,6 +99,9 @@ export const MIME_TYPES = {
   "excalidraw.png": "image/png",
   jpg: "image/jpeg",
   gif: "image/gif",
+  webp: "image/webp",
+  bmp: "image/bmp",
+  ico: "image/x-icon",
   binary: "application/octet-stream",
 } as const;
 
@@ -149,7 +152,7 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     export: { saveFileToDisk: true },
     loadScene: true,
     saveToActiveFile: true,
-    theme: true,
+    toggleTheme: null,
     saveAsImage: true,
   },
 };
@@ -180,6 +183,9 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
   MIME_TYPES.jpg,
   MIME_TYPES.svg,
   MIME_TYPES.gif,
+  MIME_TYPES.webp,
+  MIME_TYPES.bmp,
+  MIME_TYPES.ico,
 ] as const;
 
 export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
@@ -201,8 +207,18 @@ export const VERTICAL_ALIGN = {
   BOTTOM: "bottom",
 };
 
+export const TEXT_ALIGN = {
+  LEFT: "left",
+  CENTER: "center",
+  RIGHT: "right",
+};
+
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 
 export const COOKIES = {
   AUTH_STATE_COOKIE: "excplus-auth",
 } as const;
+
+/** key containt id of precedeing elemnt id we use in reconciliation during
+ * collaboration */
+export const PRECEDING_ELEMENT_KEY = "__precedingElement__";

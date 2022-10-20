@@ -114,6 +114,10 @@
       "create": "தொடுப்பைப் படை",
       "label": "தொடுப்பு"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "பூட்டு",
       "unlock": "பூட்டவிழ்",

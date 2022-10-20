@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { PRECEDING_ELEMENT_KEY } from "../constants";
 import { ExcalidrawElement } from "../element/types";
 import {
   BroadcastedExcalidrawElement,
@@ -13,7 +14,7 @@ type ElementLike = {
   id: string;
   version: number;
   versionNonce: number;
-  parent?: string | null;
+  [PRECEDING_ELEMENT_KEY]?: string | null;
 };
 
 type Cache = Record<string, ExcalidrawElement | undefined>;
@@ -42,7 +43,7 @@ const createElement = (opts: { uid: string } | ElementLike) => {
     id,
     version,
     versionNonce: versionNonce || randomInteger(),
-    parent: parent || null,
+    [PRECEDING_ELEMENT_KEY]: parent || null,
   };
 };
 
@@ -51,16 +52,20 @@ const idsToElements = (
   cache: Cache = {},
 ): readonly ExcalidrawElement[] => {
   return ids.reduce((acc, _uid, idx) => {
-    const { uid, id, version, parent, versionNonce } = createElement(
-      typeof _uid === "string" ? { uid: _uid } : _uid,
-    );
+    const {
+      uid,
+      id,
+      version,
+      [PRECEDING_ELEMENT_KEY]: parent,
+      versionNonce,
+    } = createElement(typeof _uid === "string" ? { uid: _uid } : _uid);
     const cached = cache[uid];
     const elem = {
       id,
       version: version ?? 0,
       versionNonce,
       ...cached,
-      parent,
+      [PRECEDING_ELEMENT_KEY]: parent,
     } as BroadcastedExcalidrawElement;
     // @ts-ignore
     cache[uid] = elem;
@@ -71,7 +76,7 @@ const idsToElements = (
 
 const addParents = (elements: BroadcastedExcalidrawElement[]) => {
   return elements.map((el, idx, els) => {
-    el.parent = els[idx - 1]?.id || "^";
+    el[PRECEDING_ELEMENT_KEY] = els[idx - 1]?.id || "^";
     return el;
   });
 };
@@ -79,7 +84,7 @@ const addParents = (elements: BroadcastedExcalidrawElement[]) => {
 const cleanElements = (elements: ReconciledElements) => {
   return elements.map((el) => {
     // @ts-ignore
-    delete el.parent;
+    delete el[PRECEDING_ELEMENT_KEY];
     // @ts-ignore
     delete el.next;
     // @ts-ignore
@@ -385,13 +390,13 @@ describe("elements reconciliation", () => {
         id: "A",
         version: 1,
         versionNonce: 1,
-        parent: null,
+        [PRECEDING_ELEMENT_KEY]: null,
       },
       {
         id: "B",
         version: 1,
         versionNonce: 1,
-        parent: null,
+        [PRECEDING_ELEMENT_KEY]: null,
       },
     ];
 
@@ -404,13 +409,13 @@ describe("elements reconciliation", () => {
       id: "A",
       version: 1,
       versionNonce: 1,
-      parent: null,
+      [PRECEDING_ELEMENT_KEY]: null,
     };
     const el2 = {
       id: "B",
       version: 1,
       versionNonce: 1,
-      parent: null,
+      [PRECEDING_ELEMENT_KEY]: null,
     };
     testIdentical([el1, el2], [el2, el1], ["A", "B"]);
   });

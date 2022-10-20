@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState } from "../types";
+import { AppState, Device, ExcalidrawProps } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -18,6 +18,8 @@ import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
+import { Stats } from "./Stats";
+import { actionToggleStats } from "../actions";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -26,7 +28,6 @@ type MobileMenuProps = {
   renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  libraryMenu: JSX.Element | null;
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   onPenModeToggle: () => void;
@@ -36,19 +37,19 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  renderStats: () => JSX.Element | null;
+  renderCustomStats?: ExcalidrawProps["renderCustomStats"];
+  renderSidebars: () => JSX.Element | null;
+  device: Device;
 };
 
 export const MobileMenu = ({
   appState,
   elements,
-  libraryMenu,
   actionManager,
   renderJSONExportDialog,
   renderImageExportDialog,
@@ -59,10 +60,11 @@ export const MobileMenu = ({
   canvas,
   isCollaborating,
   renderCustomFooter,
-  showThemeBtn,
   onImageAction,
   renderTopRightUI,
-  renderStats,
+  renderCustomStats,
+  renderSidebars,
+  device,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -107,11 +109,15 @@ export const MobileMenu = ({
                   penDetected={appState.penDetected}
                 />
               </Stack.Row>
-              {libraryMenu}
             </Stack.Col>
           )}
         </Section>
-        <HintViewer appState={appState} elements={elements} isMobile={true} />
+        <HintViewer
+          appState={appState}
+          elements={elements}
+          isMobile={true}
+          device={device}
+        />
       </FixedSideContainer>
     );
   };
@@ -119,7 +125,6 @@ export const MobileMenu = ({
   const renderAppToolbar = () => {
     // Render eraser conditionally in mobile
     const showEraser =
-      !appState.viewModeEnabled &&
       !appState.editingElement &&
       getSelectedElements(elements, appState).length === 0;
 
@@ -138,11 +143,11 @@ export const MobileMenu = ({
 
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
-        {showEraser && actionManager.renderAction("eraser")}
-
-        {actionManager.renderAction(
-          appState.multiElement ? "finalize" : "duplicateSelection",
-        )}
+        {showEraser
+          ? actionManager.renderAction("eraser")
+          : actionManager.renderAction(
+              appState.multiElement ? "finalize" : "duplicateSelection",
+            )}
         {actionManager.renderAction("deleteSelectedElements")}
       </div>
     );
@@ -170,21 +175,25 @@ export const MobileMenu = ({
             onClick={onCollabButtonClick}
           />
         )}
-        {
-          <BackgroundPickerAndDarkModeToggle
-            actionManager={actionManager}
-            appState={appState}
-            setAppState={setAppState}
-            showThemeBtn={showThemeBtn}
-          />
-        }
+        {<BackgroundPickerAndDarkModeToggle actionManager={actionManager} />}
       </>
     );
   };
   return (
     <>
+      {renderSidebars()}
       {!appState.viewModeEnabled && renderToolbar()}
-      {renderStats()}
+      {!appState.openMenu && appState.showStats && (
+        <Stats
+          appState={appState}
+          setAppState={setAppState}
+          elements={elements}
+          onClose={() => {
+            actionManager.executeAction(actionToggleStats);
+          }}
+          renderCustomStats={renderCustomStats}
+        />
+      )}
       <div
         className="App-bottom-bar"
         style={{
@@ -221,7 +230,6 @@ export const MobileMenu = ({
                 appState={appState}
                 elements={elements}
                 renderAction={actionManager.renderAction}
-                activeTool={appState.activeTool.type}
               />
             </Section>
           ) : null}
@@ -229,7 +237,7 @@ export const MobileMenu = ({
             {renderAppToolbar()}
             {appState.scrolledOutside &&
               !appState.openMenu &&
-              !appState.isLibraryOpen && (
+              appState.openSidebar !== "library" && (
                 <button
                   className="scroll-back-to-content"
                   onClick={() => {

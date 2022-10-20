@@ -105,7 +105,7 @@ export const dragNewElement = (
       true */
   widthAspectRatio?: number | null,
 ) => {
-  if (shouldMaintainAspectRatio) {
+  if (shouldMaintainAspectRatio && draggingElement.type !== "selection") {
     if (widthAspectRatio) {
       height = width / widthAspectRatio;
     } else {

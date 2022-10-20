@@ -140,6 +140,9 @@ export type AppState = {
     | "backgroundColorPicker"
     | "strokeColorPicker"
     | null;
+  openSidebar: "library" | "customSidebar" | null;
+  isSidebarDocked: boolean;
+
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
@@ -161,8 +164,6 @@ export type AppState = {
   offsetTop: number;
   offsetLeft: number;
 
-  isLibraryOpen: boolean;
-  isLibraryMenuDocked: boolean;
   fileHandle: FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
@@ -179,6 +180,7 @@ export type AppState = {
   /** imageElement waiting to be placed on canvas */
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
+  selectedLinearElement: LinearElementEditor | null;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -312,6 +314,10 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
+  /**
+   * Render function that renders custom <Sidebar /> component.
+   */
+  renderSidebar?: () => JSX.Element | null;
 }
 
 export type SceneData = {
@@ -343,13 +349,17 @@ export type ExportOpts = {
   ) => JSX.Element;
 };
 
+// NOTE at the moment, if action name coressponds to canvasAction prop, its
+// truthiness value will determine whether the action is rendered or not
+// (see manager renderAction). We also override canvasAction values in
+// excalidraw package index.tsx.
 type CanvasActions = {
   changeViewBackgroundColor?: boolean;
   clearCanvas?: boolean;
   export?: false | ExportOpts;
   loadScene?: boolean;
   saveToActiveFile?: boolean;
-  theme?: boolean;
+  toggleTheme?: boolean | null;
   saveAsImage?: boolean;
 };
 
@@ -363,6 +373,7 @@ export type AppProps = Merge<
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;
+    children?: React.ReactNode;
   }
 >;
 
@@ -421,7 +432,6 @@ export type PointerDownState = Readonly<{
     // pointer interaction
     hasBeenDuplicated: boolean;
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
-    hasHitElementInside: boolean;
   };
   withCmdOrCtrl: boolean;
   drag: {
@@ -475,6 +485,7 @@ export type ExcalidrawImperativeAPI = {
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
+  toggleMenu: InstanceType<typeof App>["toggleMenu"];
 };
 
 export type Device = Readonly<{
