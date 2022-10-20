@@ -76,6 +76,13 @@ export const MobileMenu = ({
                 <Island padding={1} className="App-toolbar">
                   {heading}
                   <Stack.Row gap={1}>
+                    <LockButton
+                      checked={appState.activeTool.locked}
+                      onChange={onLockToggle}
+                      title={t("toolBar.lock")}
+                      isMobile
+                    />
+                    <div className="App-toolbar__divider"></div>
                     <ShapesSwitcher
                       appState={appState}
                       canvas={canvas}
@@ -90,12 +97,6 @@ export const MobileMenu = ({
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
-                <LockButton
-                  checked={appState.activeTool.locked}
-                  onChange={onLockToggle}
-                  title={t("toolBar.lock")}
-                  isMobile
-                />
                 <LibraryButton
                   appState={appState}
                   setAppState={setAppState}

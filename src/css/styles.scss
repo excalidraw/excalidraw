@@ -360,15 +360,26 @@
     }
   }
 
+  .disable-zen-mode {
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-gray-20);
+    border: 1px solid var(--color-gray-30);
+    padding: 10px 20px;
+
+    &:hover {
+      background-color: var(--color-gray-30);
+    }
+  }
+
   .scroll-back-to-content {
     border-radius: var(--border-radius-lg);
     background-color: var(--color-gray-20);
     border: 1px solid var(--color-gray-30);
+    padding: 10px 20px;
     position: absolute;
     left: 50%;
     bottom: 30px;
     transform: translateX(-50%);
-    padding: 10px 20px;
     pointer-events: all;
 
     &:hover {
@@ -377,7 +388,8 @@
   }
 
   &.theme--dark {
-    .scroll-back-to-content {
+    .scroll-back-to-content,
+    .disable-zen-mode {
       background-color: var(--color-gray-85);
       border: 1px solid var(--color-gray-80);
       color: var(--color-gray-10);
@@ -498,6 +510,7 @@
   // (doesn't work in Firefox)
   ::-webkit-scrollbar {
     width: 5px;
+    height: 5px;
   }
   ::-webkit-scrollbar-thumb {
     background: var(--button-gray-2);
