@@ -365,10 +365,7 @@ export const ColorPicker = ({
   appState: AppState;
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
-
-  const coords = document
-    .querySelector(".color-picker-label-swatch")
-    ?.getBoundingClientRect();
+  const coords = pickerButton.current?.getBoundingClientRect();
 
   return (
     <div>
