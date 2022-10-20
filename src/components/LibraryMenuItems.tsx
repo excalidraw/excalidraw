@@ -11,6 +11,7 @@ import "./LibraryMenuItems.scss";
 import { MIME_TYPES } from "../constants";
 import Spinner from "./Spinner";
 import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
+import clsx from "clsx";
 
 const CELLS_PER_ROW = 4;
 
@@ -174,7 +175,11 @@ const LibraryMenuItems = ({
         );
       }
       return (
-        <Stack.Row align="center" gap={1} key={index}>
+        <Stack.Row
+          align="center"
+          key={index}
+          className="library-menu-items-container__row"
+        >
           {rowItems}
         </Stack.Row>
       );
@@ -241,7 +246,11 @@ const LibraryMenuItems = ({
           </div>
           {!pendingElements.length && !unpublishedItems.length ? (
             <div className="library-menu-items__no-items">
-              <div className="library-menu-items__no-items__label">
+              <div
+                className={clsx({
+                  "library-menu-items__no-items__label": showBtn,
+                })}
+              >
                 {t("library.noItems")}
               </div>
               <div className="library-menu-items__no-items__hint">
@@ -265,7 +274,7 @@ const LibraryMenuItems = ({
           {(publishedItems.length > 0 ||
             pendingElements.length > 0 ||
             unpublishedItems.length > 0) && (
-            <div className="library-menu-items-container__header">
+            <div className="library-menu-items-container__header library-menu-items-container__header--excal">
               {t("labels.excalidrawLib")}
             </div>
           )}

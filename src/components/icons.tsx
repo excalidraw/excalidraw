@@ -56,6 +56,26 @@ const newIconProps: Opts = {
   fill: "none",
 };
 
+export const PlusIcon = createIcon(
+  <>
+    <g
+      clipPath="url(#a)"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M10 4.167v11.666M4.167 10h11.666" />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h20v20H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  newIconProps,
+);
+
 export const DotsIcon = createIcon(
   <>
     <g
