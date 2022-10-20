@@ -40,7 +40,6 @@ import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
   getApproxLineHeight,
   getBoundTextElement,
-  getContainerElement,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -85,6 +84,7 @@ export interface ExcalidrawElementWithCanvas {
   canvasZoom: Zoom["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
+  hasBoundTextElement: boolean;
 }
 
 const generateElementCanvas = (
@@ -153,6 +153,7 @@ const generateElementCanvas = (
     canvasZoom: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
+    hasBoundTextElement: !!getBoundTextElement(element),
   };
 };
 
@@ -214,9 +215,34 @@ const drawElementOnCanvas = (
     case "line": {
       context.lineJoin = "round";
       context.lineCap = "round";
+      const boundText = getBoundTextElement(element);
+      if (!renderConfig.isExporting && boundText) {
+        const absoluteCoords = LinearElementEditor.pointFromAbsoluteCoords(
+          element,
+          [boundText.x, boundText.y],
+        );
+        // Draw a rectangle of bound text dimensions so that the linear container can be drawn on non overlapping area due to the below
+        // globalCompositeOperation operation
+        context.fillRect(
+          absoluteCoords[0],
+          absoluteCoords[1],
+          boundText.width,
+          boundText.height,
+        );
+        context.globalCompositeOperation = "source-out";
+      }
 
       getShapeForElement(element)!.forEach((shape) => {
         rc.draw(shape);
+
+        // set the globalCompositeOperation back to its default after drawing
+        // the first shape of linear element so that only first shape is drawn
+        // in non overapped area of the the above bound text rectangle and rest
+        // of the shapes of linear element are drawn on top of prev canvas as usual
+
+        if (context.globalCompositeOperation === "source-out") {
+          context.globalCompositeOperation = "source-over";
+        }
       });
       break;
     }
@@ -661,11 +687,12 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.canvasZoom !== zoom.value &&
     !renderConfig?.shouldCacheIgnoreZoom;
-
+  const hasBoundText = !!getBoundTextElement(element);
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
-    prevElementWithCanvas.theme !== renderConfig.theme
+    prevElementWithCanvas.theme !== renderConfig.theme ||
+    prevElementWithCanvas.hasBoundTextElement !== hasBoundText
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
@@ -789,18 +816,6 @@ export const renderElement = (
     case "text": {
       generateElementShape(element, generator);
       if (renderConfig.isExporting) {
-        if (isTextElement(element)) {
-          const container = getContainerElement(element);
-          if (isLinearElement(container)) {
-            clearLinearElementBoundTextRect(
-              element,
-              context,
-              renderConfig,
-              appState,
-              enclosingElement,
-            );
-          }
-        }
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + renderConfig.scrollX;
         const cy = (y1 + y2) / 2 + renderConfig.scrollY;
@@ -817,24 +832,50 @@ export const renderElement = (
         if (shouldResetImageFilter(element, renderConfig)) {
           context.filter = "none";
         }
+        const boundText = getBoundTextElement(element);
 
-        drawElementOnCanvas(element, rc, context, renderConfig);
+        if (isLinearElement(element) && boundText) {
+          const tempCanvas = document.createElement("canvas");
+
+          const tempCtx = tempCanvas.getContext("2d")!;
+          tempCanvas.width = distance(x1, x2) * appState.exportScale;
+          tempCanvas.height = distance(y1, y2) * appState.exportScale;
+
+          const boundTextCanvasOffsetX =
+            boundText.x > x1 ? distance(boundText.x, x1) : 0;
+          const boundTextCanvasOffsetY =
+            boundText.y > y1 ? distance(boundText.y, y1) : 0;
+          tempCtx.translate(boundTextCanvasOffsetX, boundTextCanvasOffsetY);
+
+          // Draw a rectangle of bound text dimensions so that the linear
+          // container can be drawn on non overlapping area due to the below
+          // globalCompositeOperation operation
+
+          tempCtx.fillRect(0, 0, boundText.width, boundText.height);
+          tempCtx.translate(-boundTextCanvasOffsetX, -boundTextCanvasOffsetY);
+
+          tempCtx.globalCompositeOperation = "source-out";
+
+          const canvasOffsetX = element.x > x1 ? distance(element.x, x1) : 0;
+          const canvasOffsetY = element.y > y1 ? distance(element.y, y1) : 0;
+          tempCtx.translate(canvasOffsetX, canvasOffsetY);
+          const tempRc = rough.canvas(tempCanvas);
+          drawElementOnCanvas(element, tempRc, tempCtx, renderConfig);
+
+          context.translate(shiftX, shiftY);
+          context.drawImage(
+            tempCanvas,
+            -element.width / 2,
+            -element.height / 2,
+          );
+        } else {
+          drawElementOnCanvas(element, rc, context, renderConfig);
+        }
+
         context.restore();
         // not exporting → optimized rendering (cache & render from element
         // canvases)
       } else {
-        if (isTextElement(element)) {
-          const container = getContainerElement(element);
-          if (isLinearElement(container)) {
-            clearLinearElementBoundTextRect(
-              element,
-              context,
-              renderConfig,
-              appState,
-              enclosingElement,
-            );
-          }
-        }
         const elementWithCanvas = generateElementWithCanvas(
           element,
           renderConfig,
@@ -850,27 +891,6 @@ export const renderElement = (
   }
 };
 
-const clearLinearElementBoundTextRect = (
-  element: ExcalidrawElement,
-  context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
-  appState: AppState,
-  enclosingElement: ExcalidrawElement | null,
-) => {
-  context.save();
-  context.translate(
-    element.x + renderConfig.scrollX,
-    element.y + renderConfig.scrollY,
-  );
-  if (enclosingElement) {
-    context.fillStyle = enclosingElement.backgroundColor;
-  } else {
-    context.fillStyle = appState.viewBackgroundColor;
-  }
-  context.fillRect(0, 0, element.width, element.height);
-
-  context.restore();
-};
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,
   drawable: Drawable,
