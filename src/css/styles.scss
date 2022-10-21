@@ -522,6 +522,24 @@
   ::-webkit-scrollbar-thumb:active {
     background: var(--button-gray-2);
   }
+
+  .penmode-button {
+    display: flex;
+    align-items: baseline;
+
+    &__pen {
+      svg {
+        transform: rotate(-45deg);
+      }
+    }
+
+    &__lock {
+      svg {
+        width: 0.75rem !important;
+        height: 0.75rem !important;
+      }
+    }
+  }
 }
 
 .ErrorSplash.excalidraw {

@@ -326,8 +326,6 @@ const LayerUI = ({
                             onChange={onPenModeToggle}
                             title={t("toolBar.penMode")}
                             penDetected={appState.penDetected}
-                            // TODO barnabasmolnar/editor-redesign
-                            // penDetected={true}
                           />
                           <LockButton
                             zenModeEnabled={appState.zenModeEnabled}
