@@ -13,7 +13,7 @@ import {
   FontFamilyValues,
   ExcalidrawRectangleElement,
 } from "../element/types";
-import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
+import { getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -21,13 +21,33 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
-import {
-  getContainerDims,
-  getContainerElement,
-  measureText,
-  wrapText,
-} from "./textElement";
+import { getContainerDims, getContainerElement } from "./textElement";
+import { measureTextElement, wrapTextElement } from "./textWysiwyg";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+import { getSubtypeMethods, isValidSubtype } from "../subtypes";
+
+export const maybeGetSubtypeProps = (
+  obj: {
+    subtype?: ExcalidrawElement["subtype"];
+    customData?: ExcalidrawElement["customData"];
+  },
+  type: ExcalidrawElement["type"],
+) => {
+  const data: typeof obj = {};
+  if ("subtype" in obj) {
+    data.subtype = obj.subtype;
+  }
+  if ("customData" in obj) {
+    data.customData = obj.customData;
+  }
+  if ("subtype" in data && !isValidSubtype(data.subtype, type)) {
+    delete data.subtype;
+  }
+  if (!("subtype" in data) && "customData" in data) {
+    delete data.customData;
+  }
+  return data as typeof obj;
+};
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -40,6 +60,8 @@ type ElementConstructorOpts = MarkOptional<
   | "version"
   | "versionNonce"
   | "link"
+  | "subtype"
+  | "customData"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -65,7 +87,9 @@ const _newElementBase = <T extends ExcalidrawElement>(
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
+  const { subtype, customData } = rest;
   const element = {
+    ...maybeGetSubtypeProps({ subtype, customData }, type),
     id: rest.id || randomId(),
     type,
     x,
@@ -98,8 +122,11 @@ export const newElement = (
   opts: {
     type: ExcalidrawGenericElement["type"];
   } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawGenericElement> =>
-  _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
+): NonDeleted<ExcalidrawGenericElement> => {
+  const map = getSubtypeMethods(opts?.subtype);
+  map?.clean && map.clean(opts);
+  return _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
+};
 
 /** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (
@@ -133,7 +160,9 @@ export const newTextElement = (
     containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const metrics = measureText(opts.text, getFontString(opts));
+  const map = getSubtypeMethods(opts?.subtype);
+  map?.clean && map.clean(opts);
+  const metrics = measureTextElement(opts, { customData: opts.customData });
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
@@ -176,7 +205,7 @@ const getAdjustedDimensions = (
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureText(nextText, getFontString(element), maxWidth);
+  } = measureTextElement(element, { text: nextText }, maxWidth);
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
@@ -185,9 +214,9 @@ const getAdjustedDimensions = (
     verticalAlign === VERTICAL_ALIGN.MIDDLE &&
     !element.containerId
   ) {
-    const prevMetrics = measureText(
-      element.text,
-      getFontString(element),
+    const prevMetrics = measureTextElement(
+      element,
+      { fontSize: element.fontSize },
       maxWidth,
     );
     const offsets = getTextElementPositionOffsets(element, {
@@ -274,11 +303,9 @@ export const updateTextElement = (
 ): ExcalidrawTextElement => {
   const container = getContainerElement(textElement);
   if (container) {
-    text = wrapText(
-      originalText,
-      getFontString(textElement),
-      getMaxContainerWidth(container),
-    );
+    text = wrapTextElement(textElement, getMaxContainerWidth(container), {
+      text: originalText,
+    });
   }
   const dimensions = getAdjustedDimensions(textElement, text);
   return newElementWith(textElement, {
@@ -296,6 +323,8 @@ export const newFreeDrawElement = (
     simulatePressure: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
+  const map = getSubtypeMethods(opts?.subtype);
+  map?.clean && map.clean(opts);
   return {
     ..._newElementBase<ExcalidrawFreeDrawElement>(opts.type, opts),
     points: opts.points || [],
@@ -313,6 +342,8 @@ export const newLinearElement = (
     points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
+  const map = getSubtypeMethods(opts?.subtype);
+  map?.clean && map.clean(opts);
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: opts.points || [],
@@ -332,6 +363,8 @@ export const newImageElement = (
     scale?: ExcalidrawImageElement["scale"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
+  const map = getSubtypeMethods(opts?.subtype);
+  map?.clean && map.clean(opts);
   return {
     ..._newElementBase<ExcalidrawImageElement>("image", opts),
     // in the future we'll support changing stroke color for some SVG elements,

@@ -1,3 +1,4 @@
+import { Subtype } from "../subtypes";
 import { Point } from "../types";
 import { FONT_FAMILY, TEXT_ALIGN, THEME, VERTICAL_ALIGN } from "../constants";
 
@@ -56,6 +57,7 @@ type _ExcalidrawElementBase = Readonly<{
   updated: number;
   link: string | null;
   locked: boolean;
+  subtype?: Subtype;
   customData?: Record<string, any>;
 }>;
 

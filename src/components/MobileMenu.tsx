@@ -33,6 +33,7 @@ type MobileMenuProps = {
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
+  renderShapeToggles?: (JSX.Element | null)[];
   renderCustomFooter?: (
     isMobile: boolean,
     appState: AppState,
@@ -59,6 +60,7 @@ export const MobileMenu = ({
   onPenModeToggle,
   canvas,
   isCollaborating,
+  renderShapeToggles,
   renderCustomFooter,
   onImageAction,
   renderTopRightUI,
@@ -87,6 +89,7 @@ export const MobileMenu = ({
                         });
                       }}
                     />
+                    {renderShapeToggles}
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}

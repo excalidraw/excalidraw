@@ -38,7 +38,7 @@ import {
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
-import { actions } from "../actions/register";
+import { getActions, getCustomActions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
@@ -88,6 +88,7 @@ import {
   getCursorForResizingElement,
   getDragOffsetXY,
   getElementWithTransformHandleType,
+  getNonDeletedElements,
   getNormalizedDimensions,
   getResizeArrowDirection,
   getResizeOffsetXY,
@@ -229,6 +230,14 @@ import LayerUI from "./LayerUI";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
+  SubtypeRecord,
+  SubtypePrepFn,
+  getSubtypeNames,
+  hasAlwaysEnabledActions,
+  prepareSubtype,
+  selectSubtype,
+} from "../subtypes";
+import {
   dataURLToFile,
   generateIdFromFile,
   getDataURL,
@@ -253,6 +262,8 @@ import {
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
+  getContainerElement,
+  redrawTextBoundingBox,
   getContainerDims,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
@@ -305,6 +316,7 @@ export const useExcalidrawAppState = () =>
 export const useExcalidrawSetAppState = () =>
   useContext(ExcalidrawSetAppStateContent);
 
+let refreshTimer = 0;
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let cursorX = 0;
@@ -393,6 +405,15 @@ class App extends React.Component<AppProps, AppState> {
     this.id = nanoid();
 
     this.library = new Library(this);
+    this.scene = new Scene();
+
+    this.actionManager = new ActionManager(
+      this.syncActionResult,
+      () => this.state,
+      () => this.scene.getElementsIncludingDeleted(),
+      this,
+    );
+
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -413,6 +434,8 @@ class App extends React.Component<AppProps, AppState> {
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
+        actionManager: this.actionManager,
+        addSubtype: this.addSubtype,
         refresh: this.refresh,
         setToast: this.setToast,
         id: this.id,
@@ -434,18 +457,45 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    this.scene = new Scene();
     this.history = new History();
-    this.actionManager = new ActionManager(
-      this.syncActionResult,
-      () => this.state,
-      () => this.scene.getElementsIncludingDeleted(),
-      this,
-    );
-    this.actionManager.registerAll(actions);
+    this.actionManager.registerAll(getActions());
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
+    this.actionManager.registerActionGuards();
+  }
+
+  private addSubtype(record: SubtypeRecord, subtypePrepFn: SubtypePrepFn) {
+    // Call this method after finishing any async loading for
+    // subtypes of ExcalidrawElement if the newly loaded code
+    // would change the rendering.
+    const refresh = (hasSubtype: (element: ExcalidrawElement) => boolean) => {
+      const elements = this.getSceneElementsIncludingDeleted();
+      let refreshNeeded = false;
+      getNonDeletedElements(elements).forEach((element) => {
+        // If the element is of the subtype that was just
+        // registered, update the element's dimensions, mark the
+        // element for a re-render, and mark the scene for a refresh.
+        if (hasSubtype(element)) {
+          invalidateShapeForElement(element);
+          if (isTextElement(element)) {
+            redrawTextBoundingBox(element, getContainerElement(element));
+          }
+          refreshNeeded = true;
+        }
+      });
+      // If there are any elements of the just-registered subtype,
+      // refresh the scene to re-render each such element.
+      if (refreshNeeded) {
+        this.refresh();
+      }
+    };
+    const prep = prepareSubtype(record, subtypePrepFn, refresh);
+    if (prep.actions) {
+      this.actionManager.registerAll(prep.actions);
+    }
+    this.actionManager.registerActionGuards();
+    return prep;
   }
 
   private renderCanvas() {
@@ -538,6 +588,14 @@ class App extends React.Component<AppProps, AppState> {
                   value={this.scene.getNonDeletedElements()}
                 >
                   <LayerUI
+                    renderShapeToggles={getSubtypeNames().map((subtype) =>
+                      this.actionManager.renderAction(
+                        subtype,
+                        hasAlwaysEnabledActions(subtype)
+                          ? { onContextMenu: this.handleShapeContextMenu }
+                          : {},
+                      ),
+                    )}
                     canvas={this.canvas}
                     appState={this.state}
                     files={this.files}
@@ -1254,7 +1312,20 @@ class App extends React.Component<AppProps, AppState> {
       );
       cursorButton[socketId] = user.button;
     });
-
+    const refresh = () => {
+      // If a scene refresh is cued, restart the countdown.
+      // This way we are not calling this.setState({}) once per
+      // ExcalidrawElement. The countdown improves performance
+      // when there are large numbers of ExcalidrawElements
+      // executing this refresh() callback.
+      if (refreshTimer !== 0) {
+        window.clearTimeout(refreshTimer);
+      }
+      refreshTimer = window.setTimeout(() => {
+        this.refresh();
+        window.clearTimeout(refreshTimer);
+      }, 50);
+    };
     const renderingElements = this.scene
       .getNonDeletedElements()
       .filter((element) => {
@@ -1297,6 +1368,7 @@ class App extends React.Component<AppProps, AppState> {
           imageCache: this.imageCache,
           isExporting: false,
           renderScrollbars: !this.device.isMobile,
+          renderCb: refresh,
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
           if (scrollBars) {
@@ -1447,7 +1519,7 @@ class App extends React.Component<AppProps, AppState> {
       // (something something security)
       let file = event?.clipboardData?.files[0];
 
-      const data = await parseClipboard(event);
+      const data = await parseClipboard(event, this.state);
 
       if (!file && data.text) {
         const string = data.text.trim();
@@ -1627,6 +1699,7 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
+      ...selectSubtype(this.state, "text"),
       locked: false,
     });
 
@@ -2475,6 +2548,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? VERTICAL_ALIGN.MIDDLE
             : DEFAULT_VERTICAL_ALIGN,
+          ...selectSubtype(this.state, "text"),
           containerId: container?.id ?? undefined,
           groupIds: container?.groupIds ?? [],
           locked: false,
@@ -3984,6 +4058,7 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+      ...selectSubtype(this.state, "image"),
       locked: false,
     });
 
@@ -4072,6 +4147,7 @@ class App extends React.Component<AppProps, AppState> {
         strokeSharpness: this.state.currentItemLinearStrokeSharpness,
         startArrowhead,
         endArrowhead,
+        ...selectSubtype(this.state, elementType),
         locked: false,
       });
       this.setState((prevState) => ({
@@ -4121,6 +4197,7 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
+      ...selectSubtype(this.state, elementType),
       locked: false,
     });
 
@@ -5722,6 +5799,20 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private handleShapeContextMenu = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    source: string,
+  ) => {
+    event.preventDefault();
+
+    const container = this.excalidrawContainerRef.current!;
+    const { top: offsetTop, left: offsetLeft } =
+      container.getBoundingClientRect();
+    const left = event.clientX - offsetLeft;
+    const top = event.clientY - offsetTop;
+    this._openContextMenu({ left, top }, "shape", source);
+  };
+
   private handleCanvasContextMenu = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -5886,7 +5977,8 @@ class App extends React.Component<AppProps, AppState> {
       left: number;
       top: number;
     },
-    type: "canvas" | "element",
+    type: "canvas" | "element" | "shape",
+    source?: string,
   ) => {
     if (this.state.showHyperlinkPopup) {
       this.setState({ showHyperlinkPopup: false });
@@ -5938,6 +6030,43 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const options: ContextMenuOption[] = [];
+    const allElements = this.actionManager.getElementsIncludingDeleted();
+    const appState = this.actionManager.getAppState();
+    let addedCustom = false;
+    getCustomActions().forEach((action) => {
+      if (action.contextItemPredicate && type !== "shape") {
+        if (
+          action.contextItemPredicate!(allElements, appState) &&
+          this.actionManager.isActionEnabled(allElements, appState, action.name)
+        ) {
+          addedCustom = true;
+          options.push(action);
+        }
+      } else if (action.shapeConfigPredicate && type === "shape") {
+        if (
+          action.shapeConfigPredicate!(allElements, appState, { source }) &&
+          this.actionManager.isActionEnabled(allElements, appState, action.name)
+        ) {
+          options.push(action);
+        }
+      }
+    });
+    if (type === "shape") {
+      ContextMenu.push({
+        options,
+        top,
+        left,
+        actionManager: this.actionManager,
+        appState: this.state,
+        container: this.excalidrawContainerRef.current!,
+        elements,
+      });
+      return;
+    }
+    if (addedCustom) {
+      options.push(separator);
+    }
+
     if (probablySupportsClipboardBlob && elements.length > 0) {
       options.push(actionCopyAsPng);
     }

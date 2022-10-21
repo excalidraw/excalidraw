@@ -28,6 +28,7 @@ import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
+import { getCustomActions } from "../actions/register";
 
 export const SelectedShapeActions = ({
   appState,
@@ -85,6 +86,15 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => hasStrokeColor(element.type))) &&
         renderAction("changeStrokeColor")}
       {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
+      {getCustomActions().map((action) => {
+        if (
+          action.panelComponentPredicate &&
+          action.panelComponentPredicate(targetElements, appState)
+        ) {
+          return renderAction(action.name);
+        }
+        return null;
+      })}
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||

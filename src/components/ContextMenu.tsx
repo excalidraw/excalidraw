@@ -6,6 +6,7 @@ import { t } from "../i18n";
 import "./ContextMenu.scss";
 import {
   getShortcutFromShortcutName,
+  CustomShortcutName,
   ShortcutName,
 } from "../actions/shortcuts";
 import { Action } from "../actions/types";
@@ -77,7 +78,9 @@ const ContextMenu = ({
                 <div className="context-menu-option__label">{label}</div>
                 <kbd className="context-menu-option__shortcut">
                   {actionName
-                    ? getShortcutFromShortcutName(actionName as ShortcutName)
+                    ? getShortcutFromShortcutName(
+                        actionName as ShortcutName | CustomShortcutName,
+                      )
                     : ""}
                 </kbd>
               </button>

@@ -15,15 +15,26 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
-import { newFreeDrawElement, newImageElement } from "../../element/newElement";
+import {
+  maybeGetSubtypeProps,
+  newFreeDrawElement,
+  newImageElement,
+} from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
+import { selectSubtype } from "../../subtypes";
 
 const readFile = util.promisify(fs.readFile);
 
 const { h } = window;
 
 export class API {
+  constructor() {
+    if (true) {
+      // Call `prepareSubtype()` here for `@excalidraw/excalidraw`-specific subtypes
+    }
+  }
+
   static setSelectedElements = (elements: ExcalidrawElement[]) => {
     h.setState({
       selectedElementIds: elements.reduce((acc, element) => {
@@ -100,6 +111,8 @@ export class API {
     verticalAlign?: T extends "text"
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
+    subtype?: ExcalidrawElement["subtype"];
+    customData?: ExcalidrawElement["customData"];
     boundElements?: ExcalidrawGenericElement["boundElements"];
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
@@ -122,7 +135,16 @@ export class API {
 
     const appState = h?.state || getDefaultAppState();
 
+    const custom = maybeGetSubtypeProps(
+      {
+        subtype: rest.subtype ?? selectSubtype(appState, type)?.subtype,
+        customData:
+          rest.customData ?? selectSubtype(appState, type)?.customData,
+      },
+      type,
+    );
     const base = {
+      ...custom,
       x,
       y,
       angle: rest.angle ?? 0,
