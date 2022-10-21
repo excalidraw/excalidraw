@@ -278,7 +278,7 @@ const LayerUI = ({
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
           <Stack.Col
-            style={{ width: "192px" }}
+            // style={{ width: "192px" }}
             gap={6}
             className={clsx({
               "disable-pointerEvents": appState.zenModeEnabled,
@@ -288,7 +288,7 @@ const LayerUI = ({
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
           {!appState.viewModeEnabled && (
-            <Section heading="shapes">
+            <Section heading="shapes" className="shapes-section">
               {(heading: React.ReactNode) => (
                 <div style={{ position: "relative" }}>
                   {renderWelcomeScreen && (
@@ -334,6 +334,7 @@ const LayerUI = ({
                             title={t("toolBar.lock")}
                           />
                           <div className="App-toolbar__divider"></div>
+
                           <ShapesSwitcher
                             appState={appState}
                             canvas={canvas}

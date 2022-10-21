@@ -395,6 +395,7 @@ export const ColorPicker = ({
               position: "fixed",
               top: coords?.top,
               left: coords?.right,
+              zIndex: 1,
             }}
           >
             <Popover

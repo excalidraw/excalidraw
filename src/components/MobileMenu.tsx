@@ -73,10 +73,10 @@ export const MobileMenu = ({
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
               <Stack.Row gap={1} className="App-toolbar-container">
-                <Island padding={1} className="App-toolbar">
+                <Island padding={1} className="App-toolbar App-toolbar--mobile">
                   {heading}
                   <Stack.Row gap={1}>
-                    <PenModeButton
+                    {/* <PenModeButton
                       checked={appState.penMode}
                       onChange={onPenModeToggle}
                       title={t("toolBar.penMode")}
@@ -89,7 +89,7 @@ export const MobileMenu = ({
                       title={t("toolBar.lock")}
                       isMobile
                     />
-                    <div className="App-toolbar__divider"></div>
+                    <div className="App-toolbar__divider"></div> */}
                     <ShapesSwitcher
                       appState={appState}
                       canvas={canvas}
@@ -104,11 +104,27 @@ export const MobileMenu = ({
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
-                <LibraryButton
-                  appState={appState}
-                  setAppState={setAppState}
-                  isMobile
-                />
+                <div className="mobile-misc-tools-container">
+                  <PenModeButton
+                    checked={appState.penMode}
+                    onChange={onPenModeToggle}
+                    title={t("toolBar.penMode")}
+                    isMobile
+                    penDetected={appState.penDetected}
+                    // penDetected={true}
+                  />
+                  <LockButton
+                    checked={appState.activeTool.locked}
+                    onChange={onLockToggle}
+                    title={t("toolBar.lock")}
+                    isMobile
+                  />
+                  <LibraryButton
+                    appState={appState}
+                    setAppState={setAppState}
+                    isMobile
+                  />
+                </div>
               </Stack.Row>
             </Stack.Col>
           )}

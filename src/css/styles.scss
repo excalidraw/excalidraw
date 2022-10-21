@@ -254,8 +254,14 @@
     color: var(--icon-fill-color);
   }
 
+  .shapes-section {
+    display: flex;
+    justify-content: center;
+  }
+
   .App-menu_top {
     grid-template-columns: auto max-content auto;
+    // grid-template-columns: minmax(auto, 192px) 1fr auto;
     grid-gap: 4px;
     align-items: flex-start;
     cursor: default;
@@ -319,6 +325,7 @@
     padding: 0.75rem;
     width: 192px;
     box-sizing: border-box;
+    position: absolute;
   }
 
   .dropdown-select {
@@ -538,6 +545,37 @@
         width: 0.75rem !important;
         height: 0.75rem !important;
       }
+    }
+  }
+
+  .mobile-misc-tools-container {
+    position: fixed;
+    top: 5rem;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--sidebar-border-color);
+    border-top-left-radius: var(--border-radius-lg);
+    border-bottom-left-radius: var(--border-radius-lg);
+    border-right: 0;
+
+    background-color: var(--island-bg-color);
+
+    .ToolIcon__icon {
+      border-radius: 0;
+    }
+
+    .library-button {
+      border: 0;
+    }
+  }
+
+  .App-toolbar--mobile {
+    overflow-x: auto;
+    max-width: 100vw;
+
+    .ToolIcon__keybinding {
+      display: none;
     }
   }
 }

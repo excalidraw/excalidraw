@@ -42,7 +42,9 @@ export const LibraryButton: React.FC<{
       />
       <div className="library-button">
         <div>{LibraryIcon}</div>
-        {showLabel && <div>{t("toolBar.library")}</div>}
+        {showLabel && (
+          <div className="library-button__label">{t("toolBar.library")}</div>
+        )}
       </div>
     </label>
   );
