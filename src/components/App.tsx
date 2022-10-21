@@ -1923,8 +1923,18 @@ class App extends React.Component<AppProps, AppState> {
             const boundTextElement = getBoundTextElement(selectedElement);
 
             if (boundTextElement) {
-              sceneX = boundTextElement.x + boundTextElement.width / 2;
-              sceneY = boundTextElement.y + boundTextElement.height / 2;
+              if (isLinearElement(selectedElement)) {
+                const boundTextCoords =
+                  LinearElementEditor.getBoundTextPosition(
+                    selectedElement,
+                    boundTextElement,
+                  );
+                sceneX = boundTextCoords.x + boundTextElement.width / 2;
+                sceneY = boundTextCoords.y + boundTextElement.height / 2;
+              } else {
+                sceneX = boundTextElement.x + boundTextElement.width / 2;
+                sceneY = boundTextElement.y + boundTextElement.height / 2;
+              }
             }
             this.startTextEditing({
               sceneX,

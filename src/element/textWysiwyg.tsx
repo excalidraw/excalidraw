@@ -16,13 +16,13 @@ import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
 } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
-  getContainerCenter,
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
@@ -35,6 +35,7 @@ import {
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
+import { LinearElementEditor } from "./linearElementEditor";
 
 const normalizeText = (text: string) => {
   return (
@@ -121,7 +122,7 @@ export const textWysiwyg = ({
       getFontString(updatedTextElement),
     );
     if (updatedTextElement && isTextElement(updatedTextElement)) {
-      const coordX = updatedTextElement.x;
+      let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
       const container = getContainerElement(updatedTextElement);
       let maxWidth = updatedTextElement.width;
@@ -132,6 +133,14 @@ export const textWysiwyg = ({
       // what is going to be used for unbounded text
       let height = updatedTextElement.height;
       if (container && updatedTextElement.containerId) {
+        if (isLinearElement(container)) {
+          const boundTextCoords = LinearElementEditor.getBoundTextPosition(
+            container,
+            updatedTextElement as ExcalidrawTextElementWithContainer,
+          );
+          coordX = boundTextCoords.x;
+          coordY = boundTextCoords.y;
+        }
         const propertiesUpdated = textPropertiesUpdated(
           updatedTextElement,
           editable,
@@ -173,15 +182,8 @@ export const textWysiwyg = ({
         else {
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
-            const lines = updatedTextElement.text.split("\n");
             if (!isLinearElement(container)) {
               coordY = container.y + containerDims.height / 2 - height / 2;
-            } else if (lines.length > 1) {
-              const elementCenter = getContainerCenter(container, appState);
-              if (elementCenter) {
-                coordY =
-                  elementCenter.y - ((lines.length - 1) * approxLineHeight) / 2;
-              }
             }
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
