@@ -194,10 +194,12 @@ export const handleBindTextResize = (
 
       baseline: nextBaseLine,
     });
-    updateBoundTextPosition(
-      container,
-      textElement as ExcalidrawTextElementWithContainer,
-    );
+    if (!isLinearElement(container)) {
+      updateBoundTextPosition(
+        container,
+        textElement as ExcalidrawTextElementWithContainer,
+      );
+    }
   }
 };
 
@@ -205,14 +207,6 @@ const updateBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
-  if (isLinearElement(container)) {
-    LinearElementEditor.updateBoundTextPosition(
-      container,
-      boundTextElement,
-      "update",
-    );
-    return;
-  }
   const containerDims = getContainerDims(container);
   let y;
   if (boundTextElement.verticalAlign === VERTICAL_ALIGN.TOP) {

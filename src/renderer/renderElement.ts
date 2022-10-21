@@ -6,6 +6,7 @@ import {
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
+  ExcalidrawTextElementWithContainer,
 } from "../element/types";
 import {
   isTextElement,
@@ -40,6 +41,7 @@ import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
   getApproxLineHeight,
   getBoundTextElement,
+  getContainerElement,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -217,9 +219,13 @@ const drawElementOnCanvas = (
       context.lineCap = "round";
       const boundText = getBoundTextElement(element);
       if (!renderConfig.isExporting && boundText) {
+        const boundTextCoords = LinearElementEditor.getBoundTextPosition(
+          element,
+          boundText,
+        );
         const absoluteCoords = LinearElementEditor.pointFromAbsoluteCoords(
           element,
-          [boundText.x, boundText.y],
+          [boundTextCoords.x, boundTextCoords.y],
         );
         // Draw a rectangle of bound text dimensions so that the linear container can be drawn on non overlapping area due to the below
         // globalCompositeOperation operation
@@ -724,6 +730,21 @@ const drawElementFromCanvas = (
     y1 = Math.floor(y1);
     y2 = Math.ceil(y2);
   }
+  if (isTextElement(element)) {
+    const container = getContainerElement(element);
+    if (container && isLinearElement(container)) {
+      const coords = LinearElementEditor.getBoundTextPosition(
+        container,
+        element as ExcalidrawTextElementWithContainer,
+      );
+      if (coords && coords.x && coords.y) {
+        x1 = coords.x;
+        x2 = x1 + element.width;
+        y1 = coords.y;
+        y2 = x2 + element.height;
+      }
+    }
+  }
 
   const cx = ((x1 + x2) / 2 + renderConfig.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + renderConfig.scrollY) * window.devicePixelRatio;
@@ -840,11 +861,19 @@ export const renderElement = (
           const tempCtx = tempCanvas.getContext("2d")!;
           tempCanvas.width = distance(x1, x2) * appState.exportScale;
           tempCanvas.height = distance(y1, y2) * appState.exportScale;
+          const boundTextCoords = LinearElementEditor.getBoundTextPosition(
+            element,
+            boundText,
+          );
+
+          const boundTextX = boundTextCoords.x;
+
+          const boundTextY = boundTextCoords.y;
 
           const boundTextCanvasOffsetX =
-            boundText.x > x1 ? distance(boundText.x, x1) : 0;
+            boundTextX > x1 ? distance(boundTextX, x1) : 0;
           const boundTextCanvasOffsetY =
-            boundText.y > y1 ? distance(boundText.y, y1) : 0;
+            boundTextY > y1 ? distance(boundTextY, y1) : 0;
           tempCtx.translate(boundTextCanvasOffsetX, boundTextCanvasOffsetY);
 
           // Draw a rectangle of bound text dimensions so that the linear
@@ -992,9 +1021,13 @@ export const renderElementToSvg = (
           SVG_NS,
           "rect",
         );
+        const boundTextCoords = LinearElementEditor.getBoundTextPosition(
+          element,
+          boundText,
+        );
         const absoluteCoords = LinearElementEditor.pointFromAbsoluteCoords(
           element,
-          [boundText.x, boundText.y],
+          [boundTextCoords.x, boundTextCoords.y],
         );
         const x = absoluteCoords[0] + offsetX;
         const y = absoluteCoords[1] + offsetY;

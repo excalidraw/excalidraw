@@ -17,6 +17,7 @@ import {
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { rescalePoints } from "../points";
 import { getBoundTextElement } from "./textElement";
+import { LinearElementEditor } from "./linearElementEditor";
 
 // x and y position of top left corner, x and y position of bottom right corner
 export type Bounds = readonly [number, number, number, number];
@@ -303,15 +304,15 @@ const getLinearElementAbsoluteCoords = (
 };
 
 export const getMinMaxXYWithBoundText = (
-  element: ExcalidrawElement,
+  element: ExcalidrawLinearElement,
   elementBounds: [number, number, number, number],
   boundTextElement: ExcalidrawTextElementWithContainer,
 ): [number, number, number, number, number, number] => {
   let [x1, y1, x2, y2] = elementBounds;
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
-  const boundTextX1 = boundTextElement.x;
-  const boundTextY1 = boundTextElement.y;
+  const { x: boundTextX1, y: boundTextY1 } =
+    LinearElementEditor.getBoundTextPosition(element, boundTextElement);
   const boundTextX2 = boundTextX1 + boundTextElement.width;
   const boundTextY2 = boundTextY1 + boundTextElement.height;
 
