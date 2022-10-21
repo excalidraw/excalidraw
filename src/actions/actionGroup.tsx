@@ -189,7 +189,9 @@ export const actionUngroup = register({
     };
   },
   keyTest: (event) =>
-    event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G,
+    event.shiftKey &&
+    event[KEYS.CTRL_OR_CMD] &&
+    event.key === KEYS.G.toUpperCase(),
   contextItemLabel: "labels.ungroup",
   contextItemPredicate: (elements, appState) =>
     getSelectedGroupIds(appState).length > 0,
