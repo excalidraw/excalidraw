@@ -122,10 +122,10 @@ export const exportToSvg = async (
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
-  let assetPath = "https://excalidraw.com/";
+  const assetPath = "https://excalidraw.com/";
 
   // Asset path needs to be determined only when using package
-  if (process.env.IS_EXCALIDRAW_NPM_PACKAGE) {
+  /*if (process.env.IS_EXCALIDRAW_NPM_PACKAGE) { //zsviczian
     assetPath =
       window.EXCALIDRAW_ASSET_PATH ||
       `https://unpkg.com/${process.env.PKG_NAME}@${process.env.PKG_VERSION}`;
@@ -134,7 +134,7 @@ export const exportToSvg = async (
       assetPath = assetPath.replace("/", `${window.location.origin}/`);
     }
     assetPath = `${assetPath}/dist/excalidraw-assets/`;
-  }
+  }*/
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
