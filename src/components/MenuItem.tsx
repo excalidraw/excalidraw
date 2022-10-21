@@ -5,9 +5,16 @@ interface MenuProps {
   onClick: () => void;
   label: string;
   dataTestId: string;
+  shortcut?: string;
 }
 
-const MenuItem = ({ icon, onClick, label, dataTestId }: MenuProps) => {
+const MenuItem = ({
+  icon,
+  onClick,
+  label,
+  dataTestId,
+  shortcut,
+}: MenuProps) => {
   return (
     <button
       className="menu-item"
@@ -19,6 +26,7 @@ const MenuItem = ({ icon, onClick, label, dataTestId }: MenuProps) => {
     >
       <div className="menu-item__icon">{icon}</div>
       <div className="menu-item__text">{label}</div>
+      {shortcut && <div className="menu-item__shortcut">{shortcut}</div>}
     </button>
   );
 };

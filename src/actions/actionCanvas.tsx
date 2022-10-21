@@ -25,6 +25,7 @@ import { getDefaultAppState, isEraserActive } from "../appState";
 import ClearCanvas from "../components/ClearCanvas";
 import clsx from "clsx";
 import MenuItem from "../components/MenuItem";
+import { getShortcutFromShortcutName } from "./shortcuts";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -305,16 +306,8 @@ export const actionToggleTheme = register({
       }}
       icon={appState.theme === "dark" ? SunIcon : MoonIcon}
       dataTestId="toggle-dark-mode"
+      shortcut={getShortcutFromShortcutName("toggleTheme")}
     />
-    // <div style={{ marginInlineStart: "0.25rem" }}>
-    //   sup
-    //   <DarkModeToggle
-    //     value={appState.theme}
-    //     onChange={(theme) => {
-    //       updateData(theme);
-    //     }}
-    //   />
-    // </div>
   ),
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
 });

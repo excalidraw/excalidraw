@@ -45,6 +45,11 @@
       white-space: nowrap;
     }
 
+    &__shortcut {
+      margin-left: auto;
+      opacity: 0.5;
+    }
+
     &:hover {
       background-color: var(--button-hover);
       text-decoration: none;

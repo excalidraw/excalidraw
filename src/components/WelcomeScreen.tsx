@@ -1,6 +1,7 @@
 import { useAtom } from "jotai";
 import { actionLoadScene, actionShortcuts } from "../actions";
 import { ActionManager } from "../actions/manager";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { collabDialogShownAtom } from "../excalidraw-app/collab/Collab";
 import { t } from "../i18n";
 import {
@@ -51,7 +52,7 @@ const WelcomeScreen = ({ actionManager }: { actionManager: ActionManager }) => {
           // in use elsewhere or new ones?
           label={t("buttons.load")}
           onClick={() => actionManager.executeAction(actionLoadScene)}
-          shortcut="TODO"
+          shortcut={getShortcutFromShortcutName("loadScene")}
           icon={ImportSceneIcon}
         />
         <WelcomeScreenItem

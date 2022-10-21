@@ -5,6 +5,8 @@ import { ActionName } from "./types";
 
 export type ShortcutName = SubtypeOf<
   ActionName,
+  | "toggleTheme"
+  | "loadScene"
   | "cut"
   | "copy"
   | "paste"
@@ -33,6 +35,8 @@ export type ShortcutName = SubtypeOf<
 >;
 
 const shortcutMap: Record<ShortcutName, string[]> = {
+  toggleTheme: [getShortcutKey("Shit+Alt+D")],
+  loadScene: [getShortcutKey("CtrlOrCmd+O")],
   cut: [getShortcutKey("CtrlOrCmd+X")],
   copy: [getShortcutKey("CtrlOrCmd+C")],
   paste: [getShortcutKey("CtrlOrCmd+V")],

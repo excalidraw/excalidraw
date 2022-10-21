@@ -93,6 +93,7 @@ export const actionShortcuts = register({
         dataTestId="help-menu-item"
         icon={HelpIcon}
         onClick={updateData}
+        shortcut="?"
       />
     ) : (
       <HelpButton title={t("helpDialog.title")} onClick={updateData} />

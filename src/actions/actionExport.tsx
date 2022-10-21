@@ -20,6 +20,7 @@ import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
 import MenuItem from "../components/MenuItem";
+import { getShortcutFromShortcutName } from "./shortcuts";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -251,6 +252,7 @@ export const actionLoadScene = register({
       icon={LoadIcon}
       onClick={updateData}
       dataTestId="load-button"
+      shortcut={getShortcutFromShortcutName("loadScene")}
     />
   ),
 });
