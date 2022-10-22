@@ -144,13 +144,15 @@ export const actionSaveToActiveFile = register({
         appState: {
           ...appState,
           fileHandle,
-          toastMessage: fileHandleExists
-            ? fileHandle?.name
-              ? t("toast.fileSavedToFilename").replace(
-                  "{filename}",
-                  `"${fileHandle.name}"`,
-                )
-              : t("toast.fileSaved")
+          toast: fileHandleExists
+            ? {
+                message: fileHandle?.name
+                  ? t("toast.fileSavedToFilename").replace(
+                      "{filename}",
+                      `"${fileHandle.name}"`,
+                    )
+                  : t("toast.fileSaved"),
+              }
             : null,
         },
       };
@@ -242,7 +244,7 @@ export const actionLoadScene = register({
     }
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
-  PanelComponent: ({ updateData, appState }) => (
+  PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
       icon={load}

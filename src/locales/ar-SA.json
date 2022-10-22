@@ -114,6 +114,10 @@
       "create": "إنشاء رابط",
       "label": "رابط"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
@@ -187,8 +191,7 @@
     "invalidSceneUrl": "تعذر استيراد المشهد من عنوان URL المتوفر. إما أنها مشوهة، أو لا تحتوي على بيانات Excalidraw JSON صالحة.",
     "resetLibrary": "هذا سوف يمسح مكتبتك. هل أنت متأكد؟",
     "removeItemsFromsLibrary": "حذف {{count}} عنصر (عناصر) من المكتبة؟",
-    "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل.",
-    "browserZoom": ""
+    "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل."
   },
   "errors": {
     "unsupportedFileType": "نوع الملف غير مدعوم.",

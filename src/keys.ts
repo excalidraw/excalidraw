@@ -18,11 +18,8 @@ export const CODES = {
   SLASH: "Slash",
   C: "KeyC",
   D: "KeyD",
-  G: "KeyG",
-  F: "KeyF",
   H: "KeyH",
   V: "KeyV",
-  X: "KeyX",
   Z: "KeyZ",
   R: "KeyR",
 } as const;
@@ -47,9 +44,12 @@ export const KEYS = {
   COMMA: ",",
 
   A: "a",
+  C: "c",
   D: "d",
   E: "e",
+  F: "f",
   G: "g",
+  H: "h",
   I: "i",
   L: "l",
   O: "o",
@@ -80,5 +80,5 @@ export const shouldMaintainAspectRatio = (event: MouseEvent | KeyboardEvent) =>
   event.shiftKey;
 
 export const shouldRotateWithDiscreteAngle = (
-  event: MouseEvent | KeyboardEvent,
+  event: MouseEvent | KeyboardEvent | React.PointerEvent<HTMLCanvasElement>,
 ) => event.shiftKey;

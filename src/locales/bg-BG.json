@@ -114,6 +114,10 @@
       "create": "",
       "label": ""
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
@@ -187,8 +191,7 @@
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": "",
-    "browserZoom": ""
+    "invalidEncryptionKey": ""
   },
   "errors": {
     "unsupportedFileType": "Този файлов формат не се поддържа.",

@@ -1,3 +1,4 @@
+import polyfill from "../polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
@@ -8,6 +9,7 @@ import {
   APP_NAME,
   COOKIES,
   EVENT,
+  THEME,
   TITLE_TIMEOUT,
   VERSION_TIMEOUT,
 } from "../constants";
@@ -16,6 +18,7 @@ import {
   ExcalidrawElement,
   FileId,
   NonDeletedExcalidrawElement,
+  Theme,
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
@@ -83,6 +86,9 @@ import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 
+polyfill();
+window.EXCALIDRAW_THROTTLE_RENDER = true;
+
 const isExcalidrawPlusSignedUser = document.cookie.includes(
   COOKIES.AUTH_STATE_COOKIE,
 );
@@ -94,6 +100,7 @@ languageDetector.init({
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
+  excalidrawAPI: ExcalidrawImperativeAPI;
 }): Promise<
   { scene: ExcalidrawInitialDataState | null } & (
     | { isExternalScene: true; id: string; key: string }
@@ -178,8 +185,34 @@ const initializeScene = async (opts: {
   }
 
   if (roomLinkData) {
+    const { excalidrawAPI } = opts;
+
+    const scene = await opts.collabAPI.startCollaboration(roomLinkData);
+
     return {
-      scene: await opts.collabAPI.startCollaboration(roomLinkData),
+      // when collaborating, the state may have already been updated at this
+      // point (we may have received updates from other clients), so reconcile
+      // elements and appState with existing state
+      scene: {
+        ...scene,
+        appState: {
+          ...restoreAppState(
+            {
+              ...scene?.appState,
+              theme: localDataState?.appState?.theme || scene?.appState?.theme,
+            },
+            excalidrawAPI.getAppState(),
+          ),
+          // necessary if we're invoking from a hashchange handler which doesn't
+          // go through App.initializeScene() that resets this flag
+          isLoading: false,
+        },
+        elements: reconcileElements(
+          scene?.elements || [],
+          excalidrawAPI.getSceneElementsIncludingDeleted(),
+          excalidrawAPI.getAppState(),
+        ),
+      },
       isExternalScene: true,
       id: roomLinkData.roomId,
       key: roomLinkData.roomKey,
@@ -333,23 +366,9 @@ const ExcalidrawWrapper = () => {
       }
     };
 
-    initializeScene({ collabAPI }).then(async (data) => {
+    initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
-
-      initialStatePromiseRef.current.promise.resolve({
-        ...data.scene,
-        // at this point the state may have already been updated (e.g. when
-        // collaborating, we may have received updates from other clients)
-        appState: restoreAppState(
-          data.scene?.appState,
-          excalidrawAPI.getAppState(),
-        ),
-        elements: reconcileElements(
-          data.scene?.elements || [],
-          excalidrawAPI.getSceneElementsIncludingDeleted(),
-          excalidrawAPI.getAppState(),
-        ),
-      });
+      initialStatePromiseRef.current.promise.resolve(data.scene);
     });
 
     const onHashChange = async (event: HashChangeEvent) => {
@@ -364,7 +383,7 @@ const ExcalidrawWrapper = () => {
         }
         excalidrawAPI.updateScene({ appState: { isLoading: true } });
 
-        initializeScene({ collabAPI }).then((data) => {
+        initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
           loadImages(data);
           if (data.scene) {
             excalidrawAPI.updateScene({
@@ -495,6 +514,21 @@ const ExcalidrawWrapper = () => {
     languageDetector.cacheUserLanguage(langCode);
   }, [langCode]);
 
+  const [theme, setTheme] = useState<Theme>(
+    () =>
+      localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_THEME) ||
+      // FIXME migration from old LS scheme. Can be removed later. #5660
+      importFromLocalStorage().appState?.theme ||
+      THEME.LIGHT,
+  );
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_THEME, theme);
+    // currently only used for body styling during init (see public/index.html),
+    // but may change in the future
+    document.documentElement.classList.toggle("dark", theme === THEME.DARK);
+  }, [theme]);
+
   const onChange = (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -503,6 +537,8 @@ const ExcalidrawWrapper = () => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
     }
+
+    setTheme(appState.theme);
 
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
@@ -655,10 +691,15 @@ const ExcalidrawWrapper = () => {
     [langCode],
   );
 
-  const renderCustomStats = () => {
+  const renderCustomStats = (
+    elements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+  ) => {
     return (
       <CustomStats
-        setToastMessage={(message) => excalidrawAPI!.setToastMessage(message)}
+        setToast={(message) => excalidrawAPI!.setToast({ message })}
+        appState={appState}
+        elements={elements}
       />
     );
   };
@@ -688,6 +729,7 @@ const ExcalidrawWrapper = () => {
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{
           canvasActions: {
+            toggleTheme: true,
             export: {
               onExportToBackend,
               renderCustomUI: (elements, appState, files) => {
@@ -717,6 +759,7 @@ const ExcalidrawWrapper = () => {
         handleKeyboardGlobally={true}
         onLibraryChange={onLibraryChange}
         autoFocus={true}
+        theme={theme}
       />
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (

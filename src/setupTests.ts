@@ -1,8 +1,9 @@
 import "@testing-library/jest-dom";
 import "jest-canvas-mock";
-
 import dotenv from "dotenv";
+import polyfill from "./polyfill";
 
+polyfill();
 // jest doesn't know of .env.development so we need to init it ourselves
 dotenv.config({
   path: require("path").resolve(__dirname, "../.env.development"),

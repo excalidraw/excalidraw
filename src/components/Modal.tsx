@@ -8,7 +8,7 @@ import { useExcalidrawContainer, useDevice } from "./App";
 import { AppState } from "../types";
 import { THEME } from "../constants";
 
-export const Modal = (props: {
+export const Modal: React.FC<{
   className?: string;
   children: React.ReactNode;
   maxWidth?: number;
@@ -16,7 +16,7 @@ export const Modal = (props: {
   labelledBy: string;
   theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
-}) => {
+}> = (props) => {
   const { theme = THEME.LIGHT, closeOnClickOutside = true } = props;
   const modalRoot = useBodyRoot(theme);
 

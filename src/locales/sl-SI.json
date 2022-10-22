@@ -114,6 +114,10 @@
       "create": "Ustvari povezavo",
       "label": "Povezava"
     },
+    "lineEditor": {
+      "edit": "Uredi črto",
+      "exit": "Zapri urejanje črte"
+    },
     "elementLock": {
       "lock": "Zakleni",
       "unlock": "Odkleni",
@@ -187,8 +191,7 @@
     "invalidSceneUrl": "S priloženega URL-ja ni bilo mogoče uvoziti scene. Je napačno oblikovana ali pa ne vsebuje veljavnih podatkov Excalidraw JSON.",
     "resetLibrary": "To bo počistilo vašo knjižnico. Ali ste prepričani?",
     "removeItemsFromsLibrary": "Izbriši elemente ({{count}}) iz knjižnice?",
-    "invalidEncryptionKey": "Ključ za šifriranje mora vsebovati 22 znakov. Sodelovanje v živo je onemogočeno.",
-    "browserZoom": "Stopnja povečave vašega brskalnika ni nastavljena na 100 %, kar lahko povzroči nepravilen prikaz table"
+    "invalidEncryptionKey": "Ključ za šifriranje mora vsebovati 22 znakov. Sodelovanje v živo je onemogočeno."
   },
   "errors": {
     "unsupportedFileType": "Nepodprt tip datoteke.",

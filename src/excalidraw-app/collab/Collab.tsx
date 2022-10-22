@@ -25,7 +25,6 @@ import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
   LOAD_IMAGES_TIMEOUT,
   WS_SCENE_EVENT_TYPES,
-  STORAGE_KEYS,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
 import {
@@ -224,18 +223,6 @@ class Collab extends PureComponent<Props, CollabState> {
       this.saveCollabRoomToFirebase(syncableElements);
 
       preventUnload(event);
-    }
-
-    if (this.isCollaborating || this.portal.roomId) {
-      try {
-        localStorage?.setItem(
-          STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-          JSON.stringify({
-            timestamp: Date.now(),
-            room: this.portal.roomId,
-          }),
-        );
-      } catch {}
     }
   });
 

@@ -36,7 +36,7 @@ export const actionCut = register({
     return actionDeleteSelected.perform(elements, appState);
   },
   contextItemLabel: "labels.cut",
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.X,
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.X,
 });
 
 export const actionCopyAsSvg = register({
@@ -107,14 +107,16 @@ export const actionCopyAsPng = register({
       return {
         appState: {
           ...appState,
-          toastMessage: t("toast.copyToClipboardAsPng", {
-            exportSelection: selectedElements.length
-              ? t("toast.selection")
-              : t("toast.canvas"),
-            exportColorScheme: appState.exportWithDarkMode
-              ? t("buttons.darkMode")
-              : t("buttons.lightMode"),
-          }),
+          toast: {
+            message: t("toast.copyToClipboardAsPng", {
+              exportSelection: selectedElements.length
+                ? t("toast.selection")
+                : t("toast.canvas"),
+              exportColorScheme: appState.exportWithDarkMode
+                ? t("buttons.darkMode")
+                : t("buttons.lightMode"),
+            }),
+          },
         },
         commitToHistory: false,
       };

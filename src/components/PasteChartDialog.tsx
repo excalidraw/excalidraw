@@ -46,7 +46,7 @@ const ChartPreviewBtn = (props: {
         },
         null, // files
       );
-
+      previewNode.replaceChildren();
       previewNode.appendChild(svg);
 
       if (props.selected) {
@@ -55,7 +55,7 @@ const ChartPreviewBtn = (props: {
     })();
 
     return () => {
-      previewNode.removeChild(svg);
+      previewNode.replaceChildren();
     };
   }, [props.spreadsheet, props.chartType, props.selected]);
 

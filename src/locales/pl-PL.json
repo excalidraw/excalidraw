@@ -9,7 +9,7 @@
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "copyAsSvg": "Skopiuj do schowka jako plik SVG",
-    "copyText": "",
+    "copyText": "Skopiuj do schowka jako tekst",
     "bringForward": "Przenieś wyżej",
     "sendToBack": "Przenieś na spód",
     "bringToFront": "Przenieś na wierzch",
@@ -114,6 +114,10 @@
       "create": "",
       "label": ""
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
@@ -187,8 +191,7 @@
     "invalidSceneUrl": "Nie udało się zaimportować sceny z podanego adresu URL. Jest ona wadliwa lub nie zawiera poprawnych danych Excalidraw w formacie JSON.",
     "resetLibrary": "To wyczyści twoją bibliotekę. Jesteś pewien?",
     "removeItemsFromsLibrary": "Usunąć {{count}} element(ów) z biblioteki?",
-    "invalidEncryptionKey": "Klucz szyfrowania musi składać się z 22 znaków. Współpraca na żywo jest wyłączona.",
-    "browserZoom": ""
+    "invalidEncryptionKey": "Klucz szyfrowania musi składać się z 22 znaków. Współpraca na żywo jest wyłączona."
   },
   "errors": {
     "unsupportedFileType": "Nieobsługiwany typ pliku.",
@@ -213,7 +216,7 @@
     "lock": "Zablokuj wybrane narzędzie",
     "penMode": "",
     "link": "",
-    "eraser": ""
+    "eraser": "Gumka"
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -299,7 +302,7 @@
     "howto": "Skorzystaj z instrukcji",
     "or": "lub",
     "preventBinding": "Zapobiegaj wiązaniu strzałek",
-    "tools": "",
+    "tools": "Narzędzia",
     "shortcuts": "Skróty klawiszowe",
     "textFinish": "Zakończ edycję (edytor tekstu)",
     "textNewLine": "Dodaj nowy wiersz (edytor tekstu)",
@@ -314,7 +317,7 @@
   },
   "publishDialog": {
     "title": "Opublikuj bibliotekę",
-    "itemName": "",
+    "itemName": "Nazwa elementu",
     "authorName": "Nazwa autora",
     "githubUsername": "Nazwa użytkownika na GitHubie",
     "twitterUsername": "Nazwa użytkownika Twitter",

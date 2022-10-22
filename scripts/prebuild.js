@@ -1,11 +1,12 @@
 const fs = require("fs");
+const path = require("path");
 
 // for development purposes we want to have the service-worker.js file
 // accessible from the public folder. On build though, we need to compile it
 // and CRA expects that file to be in src/ folder.
 const moveServiceWorkerScript = () => {
-  const oldPath = "./public/service-worker.js";
-  const newPath = "./src/service-worker.js";
+  const oldPath = path.resolve(__dirname, "../public/service-worker.js");
+  const newPath = path.resolve(__dirname, "../src/service-worker.js");
 
   fs.rename(oldPath, newPath, (error) => {
     if (error) {

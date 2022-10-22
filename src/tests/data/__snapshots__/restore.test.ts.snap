@@ -295,8 +295,8 @@ Object {
   "version": 1,
   "versionNonce": 0,
   "verticalAlign": "middle",
-  "width": 0,
-  "x": 0,
+  "width": 1,
+  "x": -0.5,
   "y": 0,
 }
 `;
@@ -332,7 +332,7 @@ Object {
   "version": 1,
   "versionNonce": 0,
   "verticalAlign": "top",
-  "width": 0,
+  "width": 1,
   "x": 0,
   "y": 0,
 }

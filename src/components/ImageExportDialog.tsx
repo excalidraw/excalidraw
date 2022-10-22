@@ -58,6 +58,7 @@ const ExportButton: React.FC<{
   onClick: () => void;
   title: string;
   shade?: number;
+  children?: React.ReactNode;
 }> = ({ children, title, onClick, color, shade = 6 }) => {
   return (
     <button
@@ -170,7 +171,9 @@ const ImageExportModal = ({
         <Stack.Row gap={2}>
           {actionManager.renderAction("changeExportScale")}
         </Stack.Row>
-        <p style={{ marginLeft: "1em", userSelect: "none" }}>Scale</p>
+        <p style={{ marginLeft: "1em", userSelect: "none" }}>
+          {t("buttons.scale")}
+        </p>
       </div>
       <div
         style={{

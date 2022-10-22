@@ -114,6 +114,10 @@
       "create": "Vytvoriť odkaz",
       "label": "Odkaz"
     },
+    "lineEditor": {
+      "edit": "Upraviť čiaru",
+      "exit": "Ukončiť editovanie čiary"
+    },
     "elementLock": {
       "lock": "Zamknúť",
       "unlock": "Odomknúť",
@@ -187,8 +191,7 @@
     "invalidSceneUrl": "Nepodarilo sa načítať scénu z poskytnutej URL. Je nevalidná alebo neobsahuje žiadne validné Excalidraw JSON dáta.",
     "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?",
     "removeItemsFromsLibrary": "Odstrániť {{count}} položiek z knižnice?",
-    "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá.",
-    "browserZoom": ""
+    "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá."
   },
   "errors": {
     "unsupportedFileType": "Nepodporovaný typ súboru.",

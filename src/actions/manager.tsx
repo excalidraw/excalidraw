@@ -137,7 +137,6 @@ export class ActionManager {
    */
   renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
-
     if (
       this.actions[name] &&
       "PanelComponent" in this.actions[name] &&
@@ -147,6 +146,7 @@ export class ActionManager {
     ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
+      PanelComponent.displayName = "PanelComponent";
       const elements = this.getElementsIncludingDeleted();
       const appState = this.getAppState();
       const updateData = (formState?: any) => {
