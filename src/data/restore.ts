@@ -385,10 +385,9 @@ export const restore = (
    */
   localAppState: Partial<AppState> | null | undefined,
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  refreshDimensions = true,
 ): RestoredDataState => {
   return {
-    elements: restoreElements(data?.elements, localElements, refreshDimensions),
+    elements: restoreElements(data?.elements, localElements, true),
     appState: restoreAppState(data?.appState, localAppState || null),
     files: data?.files || {},
   };
