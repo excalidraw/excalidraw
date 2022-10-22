@@ -404,6 +404,8 @@ export const _renderScene = ({
       }),
     );
 
+    let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
+      undefined;
     visibleElements.forEach((element) => {
       try {
         renderElement(element, rc, context, renderConfig);
@@ -412,15 +414,10 @@ export const _renderScene = ({
         // correct element from visible elements
         if (appState.editingLinearElement?.elementId === element.id) {
           if (element) {
-            renderLinearPointHandles(
-              context,
-              appState,
-              renderConfig,
-              element as NonDeleted<ExcalidrawLinearElement>,
-            );
+            editingLinearElement =
+              element as NonDeleted<ExcalidrawLinearElement>;
           }
         }
-
         if (!isExporting) {
           renderLinkIcon(element, context, appState);
         }
@@ -428,6 +425,15 @@ export const _renderScene = ({
         console.error(error);
       }
     });
+
+    if (editingLinearElement) {
+      renderLinearPointHandles(
+        context,
+        appState,
+        renderConfig,
+        editingLinearElement,
+      );
+    }
 
     // Paint selection element
     if (appState.selectionElement) {
