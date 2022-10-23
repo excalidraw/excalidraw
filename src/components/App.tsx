@@ -250,6 +250,7 @@ import throttle from "lodash.throttle";
 import { fileOpen, FileSystemHandle } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
+  createSingleLineTextElementsFromTextElement,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
@@ -265,6 +266,7 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
+import { createPasteTextAction } from "../actions/actionClipboard";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -446,6 +448,11 @@ class App extends React.Component<AppProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
+    this.actionManager.registerAction(
+      createPasteTextAction({
+        addTextFromPaste: this.addTextFromPaste.bind(this),
+      }),
+    );
   }
 
   private renderCanvas() {
@@ -1605,7 +1612,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setActiveTool({ type: "selection" });
   };
 
-  private addTextFromPaste(text: any) {
+  private addTextFromPaste(text: any, splitText: boolean = true) {
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX: cursorX, clientY: cursorY },
       this.state,
@@ -1629,12 +1636,28 @@ class App extends React.Component<AppProps, AppState> {
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
     });
-
+    let newElements: ExcalidrawTextElement[];
+    if (splitText) {
+      // We split the text after we create the not splitted text element
+      // to preserve the proportions (width, height, and beginning of each line)
+      // so that copy with text split and copy without text split look equal
+      newElements = createSingleLineTextElementsFromTextElement(element);
+    } else {
+      newElements = [element];
+    }
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
-      element,
+      ...newElements,
     ]);
-    this.setState({ selectedElementIds: { [element.id]: true } });
+    const selectedElementIds: { [id: string]: boolean } = {};
+    newElements.forEach((e) => (selectedElementIds[e.id] = true));
+    this.setState({ selectedElementIds });
+    if (splitText && newElements.length > 1) {
+      this.setToast({
+        message: t("toast.copyAsSingleElement"),
+        duration: 3000,
+      });
+    }
     this.history.resumeRecording();
   }
 

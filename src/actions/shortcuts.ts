@@ -19,6 +19,7 @@ export type ShortcutName = SubtypeOf<
   | "bringToFront"
   | "copyAsPng"
   | "copyAsSvg"
+  | "pasteText"
   | "group"
   | "ungroup"
   | "gridMode"
@@ -36,6 +37,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   cut: [getShortcutKey("CtrlOrCmd+X")],
   copy: [getShortcutKey("CtrlOrCmd+C")],
   paste: [getShortcutKey("CtrlOrCmd+V")],
+  pasteText: [getShortcutKey("CtrlOrCmd+Shift+V")],
   copyStyles: [getShortcutKey("CtrlOrCmd+Alt+C")],
   pasteStyles: [getShortcutKey("CtrlOrCmd+Alt+V")],
   selectAll: [getShortcutKey("CtrlOrCmd+A")],

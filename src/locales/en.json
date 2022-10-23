@@ -392,7 +392,8 @@
     "fileSaved": "File saved.",
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
-    "selection": "selection"
+    "selection": "selection",
+    "copyAsSingleElement": "To copy the text as a single element use Ctrl/Cmd+Shift+V"
   },
   "colors": {
     "ffffff": "White",
