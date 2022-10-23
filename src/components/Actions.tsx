@@ -221,7 +221,7 @@ export const ShapesSwitcher = ({
           keyBindingLabel={`${index + 1}`}
           aria-label={capitalizeString(label)}
           aria-keyshortcuts={shortcut}
-          data-testid={value}
+          data-testid={`toolbar-${value}`}
           onPointerDown={({ pointerType }) => {
             if (!appState.penDetected && pointerType === "pen") {
               setAppState({
