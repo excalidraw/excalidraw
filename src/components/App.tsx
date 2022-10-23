@@ -43,6 +43,7 @@ import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
 import {
+  getSystemClipboard,
   parseClipboard,
   probablySupportsClipboardBlob,
   probablySupportsClipboardWriteText,
@@ -223,6 +224,7 @@ import {
   updateObject,
   setEraserCursor,
   updateActiveTool,
+  getShortcutKey,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -266,7 +268,6 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
-import { createPasteTextAction } from "../actions/actionClipboard";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -321,6 +322,9 @@ let invalidateContextMenu = false;
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
 let THROTTLE_NEXT_RENDER = true;
+
+let IS_PLAINTEXT_PASTE = false;
+let IS_PLAINTEXT_PASTE_TIMER = 0;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -448,11 +452,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
-    this.actionManager.registerAction(
-      createPasteTextAction({
-        addTextFromPaste: this.addTextFromPaste.bind(this),
-      }),
-    );
   }
 
   private renderCanvas() {
@@ -1440,12 +1439,16 @@ class App extends React.Component<AppProps, AppState> {
 
       const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
       if (
-        // if no ClipboardEvent supplied, assume we're pasting via contextMenu
-        // thus these checks don't make sense
         event &&
         (!(elementUnderCursor instanceof HTMLCanvasElement) ||
           isWritableElement(target))
       ) {
+        return;
+      }
+
+      if (IS_PLAINTEXT_PASTE) {
+        const text = await getSystemClipboard(event);
+        this.addTextFromPaste(text, false);
         return;
       }
 
@@ -1612,7 +1615,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setActiveTool({ type: "selection" });
   };
 
-  private addTextFromPaste(text: any, splitText: boolean = true) {
+  private addTextFromPaste(text: any, splitText = true) {
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX: cursorX, clientY: cursorY },
       this.state,
@@ -1654,8 +1657,10 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ selectedElementIds });
     if (splitText && newElements.length > 1) {
       this.setToast({
-        message: t("toast.copyAsSingleElement"),
-        duration: 3000,
+        message: t("toast.pasteAsSingleElement", {
+          shortcut: getShortcutKey("CtrlOrCmd+Shift+V"),
+        }),
+        duration: 5000,
       });
     }
     this.history.resumeRecording();
@@ -1865,6 +1870,18 @@ class App extends React.Component<AppProps, AppState> {
               : value;
           },
         });
+      }
+
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        event.key.toLowerCase() === KEYS.V &&
+        event.shiftKey
+      ) {
+        IS_PLAINTEXT_PASTE = true;
+        clearTimeout(IS_PLAINTEXT_PASTE_TIMER);
+        IS_PLAINTEXT_PASTE_TIMER = window.setTimeout(() => {
+          IS_PLAINTEXT_PASTE = false;
+        }, 1);
       }
 
       // prevent browser zoom in input fields

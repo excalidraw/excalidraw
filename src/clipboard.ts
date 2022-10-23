@@ -109,12 +109,12 @@ const parsePotentialSpreadsheet = (
  * Retrieves content from system clipboard (either from ClipboardEvent or
  *  via async clipboard API if supported)
  */
-const getSystemClipboard = async (
+export const getSystemClipboard = async (
   event: ClipboardEvent | null,
 ): Promise<string> => {
   try {
     const text = event
-      ? event.clipboardData?.getData("text/plain").trim()
+      ? event.clipboardData?.getData("text/plain")
       : probablySupportsClipboardReadText &&
         (await navigator.clipboard.readText());
 
@@ -130,7 +130,7 @@ const getSystemClipboard = async (
 export const parseClipboard = async (
   event: ClipboardEvent | null,
 ): Promise<ClipboardData> => {
-  const systemClipboard = await getSystemClipboard(event);
+  const systemClipboard = (await getSystemClipboard(event)).trim();
 
   // if system clipboard empty, couldn't be resolved, or contains previously
   // copied excalidraw scene as SVG, fall back to previously copied excalidraw

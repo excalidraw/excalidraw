@@ -3,7 +3,6 @@ import { register } from "./register";
 import {
   copyTextToSystemClipboard,
   copyToClipboard,
-  parseClipboard,
   probablySupportsClipboardWriteText,
 } from "../clipboard";
 import { actionDeleteSelected } from "./actionDeleteSelected";
@@ -11,7 +10,6 @@ import { getSelectedElements } from "../scene/selection";
 import { exportCanvas } from "../data/index";
 import { getNonDeletedElements, isTextElement } from "../element";
 import { t } from "../i18n";
-import { Action } from "./types";
 
 export const actionCopy = register({
   name: "copy",
@@ -28,32 +26,6 @@ export const actionCopy = register({
   contextItemLabel: "labels.copy",
   // don't supply a shortcut since we handle this conditionally via onCopy event
   keyTest: undefined,
-});
-
-type PasteTextFnArgs = {
-  addTextFromPaste: (text: string, split?: boolean) => void;
-};
-
-type PasteTextActionCreator = ({ addTextFromPaste }: PasteTextFnArgs) => Action;
-
-export const createPasteTextAction: PasteTextActionCreator = ({
-  addTextFromPaste,
-}) => ({
-  name: "pasteText",
-  trackEvent: { category: "element" },
-  perform: async () => {
-    const data = await parseClipboard(null);
-    if (data.text) {
-      addTextFromPaste(data.text, false);
-    }
-    return {
-      commitToHistory: false,
-    };
-  },
-  keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] &&
-    event.key.toLowerCase() === KEYS.V &&
-    event.shiftKey,
 });
 
 export const actionCut = register({

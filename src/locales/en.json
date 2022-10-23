@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Paste",
+    "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
@@ -393,7 +394,7 @@
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
     "selection": "selection",
-    "copyAsSingleElement": "To copy the text as a single element use Ctrl/Cmd+Shift+V"
+    "pasteAsSingleElement": "To paste the text as a single element use {{shortcut}},\nor paste into an existing text editor"
   },
   "colors": {
     "ffffff": "White",
