@@ -36,7 +36,7 @@ export const actionCut = register({
     return actionDeleteSelected.perform(elements, appState);
   },
   contextItemLabel: "labels.cut",
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.X,
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.X,
 });
 
 export const actionCopyAsSvg = register({
