@@ -960,35 +960,31 @@ export const actionChangeArrowhead = register({
               {
                 value: null,
                 text: t("labels.arrowhead_none"),
-                icon: <ArrowheadNoneIcon theme={appState.theme} />,
+                icon: ArrowheadNoneIcon,
                 keyBinding: "q",
               },
               {
                 value: "arrow",
                 text: t("labels.arrowhead_arrow"),
-                icon: (
-                  <ArrowheadArrowIcon theme={appState.theme} flip={!isRTL} />
-                ),
+                icon: <ArrowheadArrowIcon flip={!isRTL} />,
                 keyBinding: "w",
               },
               {
                 value: "bar",
                 text: t("labels.arrowhead_bar"),
-                icon: <ArrowheadBarIcon theme={appState.theme} flip={!isRTL} />,
+                icon: <ArrowheadBarIcon flip={!isRTL} />,
                 keyBinding: "e",
               },
               {
                 value: "dot",
                 text: t("labels.arrowhead_dot"),
-                icon: <ArrowheadDotIcon theme={appState.theme} flip={!isRTL} />,
+                icon: <ArrowheadDotIcon flip={!isRTL} />,
                 keyBinding: "r",
               },
               {
                 value: "triangle",
                 text: t("labels.arrowhead_triangle"),
-                icon: (
-                  <ArrowheadTriangleIcon theme={appState.theme} flip={!isRTL} />
-                ),
+                icon: <ArrowheadTriangleIcon flip={!isRTL} />,
                 keyBinding: "t",
               },
             ]}
@@ -1011,34 +1007,30 @@ export const actionChangeArrowhead = register({
                 value: null,
                 text: t("labels.arrowhead_none"),
                 keyBinding: "q",
-                icon: <ArrowheadNoneIcon theme={appState.theme} />,
+                icon: ArrowheadNoneIcon,
               },
               {
                 value: "arrow",
                 text: t("labels.arrowhead_arrow"),
                 keyBinding: "w",
-                icon: (
-                  <ArrowheadArrowIcon theme={appState.theme} flip={isRTL} />
-                ),
+                icon: <ArrowheadArrowIcon flip={isRTL} />,
               },
               {
                 value: "bar",
                 text: t("labels.arrowhead_bar"),
                 keyBinding: "e",
-                icon: <ArrowheadBarIcon theme={appState.theme} flip={isRTL} />,
+                icon: <ArrowheadBarIcon flip={isRTL} />,
               },
               {
                 value: "dot",
                 text: t("labels.arrowhead_dot"),
                 keyBinding: "r",
-                icon: <ArrowheadDotIcon theme={appState.theme} flip={isRTL} />,
+                icon: <ArrowheadDotIcon flip={isRTL} />,
               },
               {
                 value: "triangle",
                 text: t("labels.arrowhead_triangle"),
-                icon: (
-                  <ArrowheadTriangleIcon theme={appState.theme} flip={isRTL} />
-                ),
+                icon: <ArrowheadTriangleIcon flip={isRTL} />,
                 keyBinding: "t",
               },
             ]}

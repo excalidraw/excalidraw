@@ -1640,27 +1640,20 @@ export const EdgeRoundIcon = createIcon(
   newIconProps,
 );
 
-export const ArrowheadNoneIcon = React.memo(({ theme }: { theme: Theme }) =>
-  createIcon(
-    <path
-      d="M6 10H34"
-      stroke={iconFillColor(theme)}
-      strokeWidth={2}
-      fill="none"
-    />,
-    {
-      width: 40,
-      height: 20,
-    },
-  ),
+export const ArrowheadNoneIcon = createIcon(
+  <path d="M6 10H34" stroke="currentColor" strokeWidth={2} fill="none" />,
+  {
+    width: 40,
+    height: 20,
+  },
 );
 
 export const ArrowheadArrowIcon = React.memo(
-  ({ theme, flip = false }: { theme: Theme; flip?: boolean }) =>
+  ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
-        stroke={iconFillColor(theme)}
+        stroke="currentColor"
         strokeWidth={2}
         fill="none"
       >
@@ -1672,11 +1665,11 @@ export const ArrowheadArrowIcon = React.memo(
 );
 
 export const ArrowheadDotIcon = React.memo(
-  ({ theme, flip = false }: { theme: Theme; flip?: boolean }) =>
+  ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
-        stroke={iconFillColor(theme)}
-        fill={iconFillColor(theme)}
+        stroke="currentColor"
+        fill="currentColor"
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
       >
         <path d="M32 10L6 10" strokeWidth={2} />
@@ -1687,12 +1680,12 @@ export const ArrowheadDotIcon = React.memo(
 );
 
 export const ArrowheadBarIcon = React.memo(
-  ({ theme, flip = false }: { theme: Theme; flip?: boolean }) =>
+  ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}>
         <path
           d="M34 10H5.99996M34 10L34 5M34 10L34 15"
-          stroke={iconFillColor(theme)}
+          stroke="currentColor"
           strokeWidth={2}
           fill="none"
         />
@@ -1702,11 +1695,11 @@ export const ArrowheadBarIcon = React.memo(
 );
 
 export const ArrowheadTriangleIcon = React.memo(
-  ({ theme, flip = false }: { theme: Theme; flip?: boolean }) =>
+  ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
-        stroke={iconFillColor(theme)}
-        fill={iconFillColor(theme)}
+        stroke="currentColor"
+        fill="currentColor"
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
       >
         <path d="M32 10L6 10" strokeWidth={2} />
