@@ -25,7 +25,7 @@
     background-color: transparent;
     border: 0;
     align-items: center;
-    padding: 0.625rem;
+    padding: 0.5rem 0.625rem;
     column-gap: 0.625rem;
     font-size: 0.875rem;
     color: var(--color-gray-100);
@@ -35,6 +35,10 @@
     box-sizing: border-box;
     font-weight: normal;
 
+    @media screen and (min-width: 1921px) {
+      padding: 0.625rem;
+    }
+
     &__icon {
       line-height: 0;
     }
@@ -43,6 +47,7 @@
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
+      line-height: 1;
     }
 
     &__shortcut {
