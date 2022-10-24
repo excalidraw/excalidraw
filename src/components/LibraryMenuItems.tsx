@@ -231,16 +231,12 @@ const LibraryMenuItems = ({
             {isLoading && (
               <div
                 style={{
-                  marginLeft: "auto",
-                  marginRight: "1rem",
-                  display: "flex",
-                  alignItems: "center",
-                  fontWeight: "normal",
+                  position: "absolute",
+                  top: "1rem",
+                  right: "1rem",
                 }}
               >
-                <div style={{ transform: "translateY(2px)" }}>
-                  <Spinner />
-                </div>
+                <Spinner />
               </div>
             )}
           </div>

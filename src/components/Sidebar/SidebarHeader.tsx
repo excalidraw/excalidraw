@@ -56,6 +56,7 @@ const _SidebarHeader: React.FC<{
       className={clsx("layer-ui__sidebar__header", className)}
       data-testid="sidebar-header"
     >
+      {children}
       {(renderDockButton || renderCloseButton) && (
         <div className="layer-ui__sidebar__header__buttons">
           {renderDockButton && (
@@ -82,7 +83,6 @@ const _SidebarHeader: React.FC<{
           )}
         </div>
       )}
-      {children}
     </div>
   );
 };

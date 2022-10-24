@@ -34,6 +34,8 @@
     margin: 0;
     border-bottom: 1px solid var(--sidebar-border-color);
 
+    position: relative;
+
     &__row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);

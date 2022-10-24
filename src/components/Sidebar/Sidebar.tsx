@@ -118,7 +118,14 @@ export const Sidebar = Object.assign(
       }
 
       return (
-        <Island className={clsx("layer-ui__sidebar", className)} ref={ref}>
+        <Island
+          className={clsx(
+            "layer-ui__sidebar",
+            { "layer-ui__sidebar--docked": isDockedFallback },
+            className,
+          )}
+          ref={ref}
+        >
           <SidebarPropsContext.Provider value={headerPropsRef.current}>
             <SidebarHeaderComponents.Context>
               <SidebarHeaderComponents.Component __isFallback />

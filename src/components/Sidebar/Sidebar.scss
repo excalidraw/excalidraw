@@ -7,7 +7,7 @@
       z-index: 1;
       position: absolute;
       top: 100%;
-      right: 0;
+      left: 0;
       margin-top: 0.25rem;
       width: 180px;
       box-shadow: var(--library-dropdown-shadow);
@@ -69,6 +69,11 @@
     background-color: var(--sidebar-bg-color);
 
     box-shadow: var(--sidebar-shadow);
+
+    &--docked {
+      box-shadow: none;
+    }
+
     overflow: hidden;
     border-radius: 0;
     width: calc(#{$right-sidebar-width} - var(--space-factor) * 2);

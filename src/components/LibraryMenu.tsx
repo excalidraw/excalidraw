@@ -129,8 +129,10 @@ export const LibraryMenuContent = ({
     return (
       <LibraryMenuWrapper>
         <div className="layer-ui__library-message">
-          <Spinner size="2em" />
-          <span>{t("labels.libraryLoadingMessage")}</span>
+          <div>
+            <Spinner size="2em" />
+            <span>{t("labels.libraryLoadingMessage")}</span>
+          </div>
         </div>
       </LibraryMenuWrapper>
     );
