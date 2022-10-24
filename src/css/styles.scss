@@ -261,7 +261,6 @@
 
   .App-menu_top {
     grid-template-columns: auto max-content auto;
-    // grid-template-columns: minmax(auto, 192px) 1fr auto;
     grid-gap: 4px;
     align-items: flex-start;
     cursor: default;
@@ -323,7 +322,7 @@
   .App-menu__left {
     overflow-y: auto;
     padding: 0.75rem;
-    width: 192px;
+    width: 202px;
     box-sizing: border-box;
     position: absolute;
   }
