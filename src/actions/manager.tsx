@@ -3,6 +3,7 @@ import {
   Action,
   UpdaterFn,
   ActionName,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ActionResult,
   PanelComponentProps,
   ActionSource,
@@ -122,7 +123,7 @@ export class ActionManager {
     return true;
   }
 
-  executeAction(action: Action, source: ActionSource = "api") {
+  executeAction = (action: Action, source: ActionSource = "api") => {
     const elements = this.getElementsIncludingDeleted();
     const appState = this.getAppState();
     const value = null;
@@ -130,7 +131,7 @@ export class ActionManager {
     trackAction(action, source, appState, elements, this.app, value);
 
     this.updater(action.perform(elements, appState, value, this.app));
-  }
+  };
 
   /**
    * @param data additional data sent to the PanelComponent
