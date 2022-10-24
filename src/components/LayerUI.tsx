@@ -395,9 +395,7 @@ const LayerUI = ({
               />
             )}
             {renderTopRightUI?.(device.isMobile, appState)}
-            {!appState.isSidebarDocked && (
-              <LibraryButton appState={appState} setAppState={setAppState} />
-            )}
+            <LibraryButton appState={appState} setAppState={setAppState} />
           </div>
         </div>
       </FixedSideContainer>

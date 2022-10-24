@@ -15,6 +15,12 @@ export const LibraryButton: React.FC<{
   const device = useDevice();
   const showLabel = !isMobile;
 
+  // TODO barnabasmolnar/redesign
+  // not great, toolbar jumps in a jarring manner
+  if (appState.isSidebarDocked && appState.openSidebar === "library") {
+    return null;
+  }
+
   return (
     <label title={`${capitalizeString(t("toolBar.library"))} — 0`}>
       <input
