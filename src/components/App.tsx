@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
@@ -187,6 +188,7 @@ import { RenderConfig, ScrollBars } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey, SHAPES } from "../shapes";
 import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   AppClassProperties,
   AppProps,
   AppState,
@@ -196,6 +198,7 @@ import {
   BinaryFiles,
   Gesture,
   GestureEvent,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   LibraryItems,
   PointerDownState,
   SceneData,
@@ -411,6 +414,7 @@ class App extends React.Component<AppProps, AppState> {
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
+        getActionManager: () => this.actionManager,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);

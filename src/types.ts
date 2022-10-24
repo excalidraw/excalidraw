@@ -479,6 +479,7 @@ export type ExcalidrawImperativeAPI = {
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
+  getActionManager: () => InstanceType<typeof App>["actionManager"];
 };
 
 export type Device = Readonly<{
