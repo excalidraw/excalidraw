@@ -11,11 +11,7 @@ import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
-import {
-  getMaxContainerHeight,
-  getMaxContainerWidth,
-  newTextElement,
-} from "./newElement";
+import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
@@ -495,42 +491,4 @@ export const getContainerElement = (
 
 export const getContainerDims = (element: ExcalidrawElement) => {
   return { width: element.width, height: element.height };
-};
-
-export const createSingleLineTextElementsFromTextElement = (
-  element: ExcalidrawTextElement,
-): ExcalidrawTextElement[] => {
-  const newLines: string[] = element.text.split("\n");
-  if (newLines.length === 0) {
-    return [element];
-  }
-  const newTextElements: ExcalidrawTextElement[] = [];
-  const lineHeight: number = element.height / newLines.length;
-  for (let i = 0; i < newLines.length; i++) {
-    newLines[i] = newLines[i].trim();
-    if (newLines[i].length === 0) {
-      continue;
-    }
-    const newElement = newTextElement({
-      text: newLines[i],
-      x: element.x,
-      y: element.y + lineHeight * i,
-      height: element.fontSize,
-      strokeColor: element.strokeColor,
-      backgroundColor: element.backgroundColor,
-      fillStyle: element.fillStyle,
-      strokeWidth: element.strokeWidth,
-      strokeStyle: element.strokeStyle,
-      roughness: element.roughness,
-      opacity: element.opacity,
-      strokeSharpness: element.strokeSharpness,
-      fontSize: element.fontSize,
-      fontFamily: element.fontFamily,
-      textAlign: element.textAlign,
-      verticalAlign: element.verticalAlign,
-      locked: element.locked,
-    });
-    newTextElements.push(newElement);
-  }
-  return newTextElements.length > 1 ? newTextElements : [element];
 };

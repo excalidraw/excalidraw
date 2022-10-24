@@ -115,7 +115,9 @@ export const getSystemClipboard = async (
   try {
     const text = event
       ? event.clipboardData?.getData("text/plain")
-      : probablySupportsClipboardReadText &&
+      : // clipboard checking at runtime to allow for testing injection of the clipbard
+        "clipboard" in navigator &&
+        "readText" in navigator.clipboard &&
         (await navigator.clipboard.readText());
 
     return text || "";

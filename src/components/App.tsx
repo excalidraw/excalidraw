@@ -252,7 +252,6 @@ import throttle from "lodash.throttle";
 import { fileOpen, FileSystemHandle } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
-  createSingleLineTextElementsFromTextElement,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
@@ -1447,7 +1446,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (IS_PLAINTEXT_PASTE) {
-        const text = await getSystemClipboard(event);
+        const text = (await getSystemClipboard(event)).trim();
         this.addTextFromPaste(text, false);
         return;
       }
@@ -1615,13 +1614,13 @@ class App extends React.Component<AppProps, AppState> {
     this.setActiveTool({ type: "selection" });
   };
 
-  private addTextFromPaste(text: any, splitText = true) {
+  private addTextFromPaste(text: string, splitText = true) {
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX: cursorX, clientY: cursorY },
       this.state,
     );
 
-    const element = newTextElement({
+    const newElementProps = {
       x,
       y,
       strokeColor: this.state.currentItemStrokeColor,
@@ -1638,16 +1637,43 @@ class App extends React.Component<AppProps, AppState> {
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
-    });
-    let newElements: ExcalidrawTextElement[];
+    };
+    const newElements: ExcalidrawTextElement[] = [];
     if (splitText) {
-      // We split the text after we create the not splitted text element
-      // to preserve the proportions (width, height, and beginning of each line)
-      // so that copy with text split and copy without text split look equal
-      newElements = createSingleLineTextElementsFromTextElement(element);
+      let currentY = y;
+      const splittedText = text.split("\n");
+      for (const line of splittedText) {
+        if (line.trim().length === 0) {
+          continue;
+        }
+        const element = newTextElement({
+          ...newElementProps,
+          x,
+          y: currentY,
+          text: line.trim(),
+        });
+        newElements.push(element);
+        currentY +=
+          element.height +
+          (element.height - element.baseline) / this.state.zoom.value;
+      }
     } else {
-      newElements = [element];
+      if (text.length === 0) {
+        return;
+      }
+      const element = newTextElement({
+        ...newElementProps,
+        x,
+        y,
+        text,
+      });
+      newElements.push(element);
     }
+
+    if (newElements.length === 0) {
+      return;
+    }
+
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
@@ -1881,7 +1907,7 @@ class App extends React.Component<AppProps, AppState> {
         clearTimeout(IS_PLAINTEXT_PASTE_TIMER);
         IS_PLAINTEXT_PASTE_TIMER = window.setTimeout(() => {
           IS_PLAINTEXT_PASTE = false;
-        }, 1);
+        }, 100);
       }
 
       // prevent browser zoom in input fields
