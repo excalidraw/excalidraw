@@ -1638,6 +1638,7 @@ class App extends React.Component<AppProps, AppState> {
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
     };
+    const DELTA_GAP = 12;
     const newElements: ExcalidrawTextElement[] = [];
     if (splitText) {
       let currentY = y;
@@ -1653,9 +1654,7 @@ class App extends React.Component<AppProps, AppState> {
           text: line.trim(),
         });
         newElements.push(element);
-        currentY +=
-          element.height +
-          (element.height - element.baseline) / this.state.zoom.value;
+        currentY += element.height + DELTA_GAP / this.state.zoom.value;
       }
     } else {
       if (text.length === 0) {
