@@ -87,9 +87,9 @@ export const SelectedShapeActions = ({
           targetElements.some((element) => hasStrokeColor(element.type))) &&
           renderAction("changeStrokeColor")}
       </div>
-      <div>
-        {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
-      </div>
+      {showChangeBackgroundIcons && (
+        <div>{renderAction("changeBackgroundColor")}</div>
+      )}
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||
