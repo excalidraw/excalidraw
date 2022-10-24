@@ -363,12 +363,12 @@
 
     &__language {
       height: 2rem;
-      background-color: transparent;
+      background-color: var(--island-bg-color);
       border-color: var(--default-border-color) !important;
       cursor: pointer;
 
       &:hover {
-        background-color: inherit;
+        background-color: var(--island-bg-color);
       }
     }
   }
