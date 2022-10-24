@@ -51,6 +51,7 @@ import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import { LanguageList } from "../excalidraw-app/components/LanguageList";
+import WelcomeScreenDecor from "./WelcomeScreenDecor";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -175,12 +176,15 @@ const LayerUI = ({
 
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
-      {renderWelcomeScreen && (
+      <WelcomeScreenDecor
+        shouldRender={renderWelcomeScreen && !appState.isLoading}
+      >
         <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--menu-pointer">
           {WelcomeScreenMenuArrow}
           <div>{t("welcomeScreen.menuHints")}</div>
         </div>
-      )}
+      </WelcomeScreenDecor>
+
       <button
         data-prevent-outside-click
         className={clsx("menu-button", "zen-mode-transition", {
@@ -276,6 +280,9 @@ const LayerUI = ({
 
     return (
       <FixedSideContainer side="top">
+        {renderWelcomeScreen && !appState.isLoading && (
+          <WelcomeScreen actionManager={actionManager} />
+        )}
         <div className="App-menu App-menu_top">
           <Stack.Col
             // style={{ width: "192px" }}
@@ -291,14 +298,17 @@ const LayerUI = ({
             <Section heading="shapes" className="shapes-section">
               {(heading: React.ReactNode) => (
                 <div style={{ position: "relative" }}>
-                  {renderWelcomeScreen && (
+                  <WelcomeScreenDecor
+                    shouldRender={renderWelcomeScreen && !appState.isLoading}
+                  >
                     <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--top-toolbar-pointer">
                       <div className="WelcomeScreen-decor--top-toolbar-pointer__label">
                         {t("welcomeScreen.toolbarHints")}
                       </div>
                       {WelcomeScreenTopToolbarArrow}
                     </div>
-                  )}
+                  </WelcomeScreenDecor>
+
                   <Stack.Col gap={4} align="start">
                     <Stack.Row
                       gap={1}
@@ -378,7 +388,9 @@ const LayerUI = ({
               />
             )}
             {renderTopRightUI?.(device.isMobile, appState)}
-            <LibraryButton appState={appState} setAppState={setAppState} />
+            {!appState.isSidebarDocked && (
+              <LibraryButton appState={appState} setAppState={setAppState} />
+            )}
           </div>
         </div>
       </FixedSideContainer>
@@ -404,7 +416,6 @@ const LayerUI = ({
 
   return (
     <>
-      {renderWelcomeScreen && <WelcomeScreen actionManager={actionManager} />}
       {appState.isLoading && <LoadingMessage delay={250} />}
       {appState.errorMessage && (
         <ErrorDialog

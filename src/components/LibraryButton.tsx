@@ -13,7 +13,7 @@ export const LibraryButton: React.FC<{
   isMobile?: boolean;
 }> = ({ appState, setAppState, isMobile }) => {
   const device = useDevice();
-  const showLabel = appState.openSidebar !== "library" && !isMobile;
+  const showLabel = !isMobile;
 
   return (
     <label title={`${capitalizeString(t("toolBar.library"))} — 0`}>

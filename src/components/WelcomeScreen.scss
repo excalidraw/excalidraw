@@ -15,6 +15,8 @@
   }
 
   .WelcomeScreen-decor {
+    pointer-events: none;
+
     color: var(--color-gray-40);
 
     &--data {
@@ -80,8 +82,12 @@
     gap: 2rem;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    pointer-events: none;
+    left: 1rem;
+    top: 1rem;
+    right: 1rem;
+    bottom: 1rem;
   }
 
   .WelcomeScreen-items {
@@ -93,6 +99,8 @@
   }
 
   .WelcomeScreen-item {
+    pointer-events: all;
+
     color: var(--color-gray-50);
     font-size: 0.875rem;
 

@@ -12,6 +12,7 @@ import { useDevice } from "./App";
 import { WelcomeScreenHelpArrow } from "./icons";
 import { Section } from "./Section";
 import Stack from "./Stack";
+import WelcomeScreenDecor from "./WelcomeScreenDecor";
 
 const Footer = ({
   appState,
@@ -86,12 +87,14 @@ const Footer = ({
         })}
       >
         <div style={{ position: "relative" }}>
-          {renderWelcomeScreen && (
+          <WelcomeScreenDecor
+            shouldRender={renderWelcomeScreen && !appState.isLoading}
+          >
             <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--help-pointer">
               <div>{t("welcomeScreen.helpHints")}</div>
               {WelcomeScreenHelpArrow}
             </div>
-          )}
+          </WelcomeScreenDecor>
 
           {actionManager.renderAction("toggleShortcuts")}
         </div>
