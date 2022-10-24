@@ -229,16 +229,24 @@ const LayerUI = ({
               <Separator />
               <MenuLinks />
               <Separator />
-              <div style={{ marginBottom: ".5rem" }}>
-                <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
-                  {t("labels.canvasBackground")}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  rowGap: ".5rem",
+                }}
+              >
+                <div>{actionManager.renderAction("toggleTheme")}</div>
+                <div>
+                  <LanguageList style={{ width: "100%" }} />
                 </div>
-                {actionManager.renderAction("changeViewBackgroundColor")}
+                <div>
+                  <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
+                    {t("labels.canvasBackground")}
+                  </div>
+                  {actionManager.renderAction("changeViewBackgroundColor")}
+                </div>
               </div>
-              <div style={{ marginBottom: ".5rem" }}>
-                {actionManager.renderAction("toggleTheme")}
-              </div>
-              <LanguageList style={{ width: "100%" }} />
             </Island>
           </Section>
         </div>

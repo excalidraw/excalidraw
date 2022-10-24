@@ -363,6 +363,13 @@
 
     &__language {
       height: 2rem;
+      background-color: transparent;
+      border-color: var(--default-border-color) !important;
+      cursor: pointer;
+
+      &:hover {
+        background-color: inherit;
+      }
     }
   }
 
