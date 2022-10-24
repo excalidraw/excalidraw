@@ -25,14 +25,17 @@
     }
 
     &--help-pointer {
+      display: flex;
       position: absolute;
-      right: 100%;
-      bottom: 0;
+      right: 0;
+      bottom: 100%;
 
       svg {
         margin-top: 0.5rem;
         width: 85px;
         height: 71px;
+
+        transform: scale(-1, 1) rotate(80deg);
       }
     }
 
