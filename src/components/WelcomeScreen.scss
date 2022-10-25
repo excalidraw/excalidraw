@@ -150,14 +150,14 @@
 
   &.theme--dark {
     .WelcomeScreen-decor {
-      color: var(--color-gray-80);
+      color: var(--color-gray-70);
     }
 
     .WelcomeScreen-item {
-      color: var(--color-gray-80);
+      color: var(--color-gray-70);
 
       &__shortcut {
-        color: var(--color-gray-80);
+        color: var(--color-gray-70);
       }
 
       &:hover {
