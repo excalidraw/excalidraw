@@ -515,3 +515,36 @@ it("flips an unrotated image vertically correctly", async () => {
 
   await checkVerticalFlip();
 });
+
+it("flips an rotated image horizontally correctly", async () => {
+  const originalAngle = Math.PI / 4;
+  const expectedAngle = (7 * Math.PI) / 4;
+  //paste image
+  await createImage();
+  await waitFor(() => {
+    expect(API.getSelectedElements().length).toBeGreaterThan(0);
+    expect(API.getSelectedElements()[0].type).toEqual("image");
+    expect(h.app.files.fileId).toBeDefined();
+  });
+  mutateElement(h.elements[0], {
+    angle: originalAngle,
+  });
+  await checkRotatedHorizontalFlip(expectedAngle);
+});
+
+it("flips an rotated image vertically correctly", async () => {
+  const originalAngle = Math.PI / 4;
+  const expectedAngle = (3 * Math.PI) / 4;
+  //paste image
+  await createImage();
+  await waitFor(() => {
+    expect(API.getSelectedElements().length).toBeGreaterThan(0);
+    expect(API.getSelectedElements()[0].type).toEqual("image");
+    expect(h.app.files.fileId).toBeDefined();
+  });
+  mutateElement(h.elements[0], {
+    angle: originalAngle,
+  });
+
+  await checkRotatedVerticalFlip(expectedAngle);
+});
