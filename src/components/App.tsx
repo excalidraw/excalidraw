@@ -317,6 +317,7 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+let plainTextPasteToastShown = false;
 
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
@@ -1680,13 +1681,18 @@ class App extends React.Component<AppProps, AppState> {
     const selectedElementIds: { [id: string]: boolean } = {};
     newElements.forEach((e) => (selectedElementIds[e.id] = true));
     this.setState({ selectedElementIds });
-    if (splitText && newElements.length > 1) {
+    if (
+      splitText &&
+      newElements.length > 1 &&
+      plainTextPasteToastShown === false
+    ) {
       this.setToast({
         message: t("toast.pasteAsSingleElement", {
           shortcut: getShortcutKey("CtrlOrCmd+Shift+V"),
         }),
         duration: 5000,
       });
+      plainTextPasteToastShown = true;
     }
     this.history.resumeRecording();
   }
