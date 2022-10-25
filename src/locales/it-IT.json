@@ -116,7 +116,7 @@
     },
     "lineEditor": {
       "edit": "Modifica linea",
-      "exit": ""
+      "exit": "Esci dall'editor di linea"
     },
     "elementLock": {
       "lock": "Blocca",
@@ -129,8 +129,8 @@
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
-    "hint_emptyLibrary": "Selezionare un elemento su tela per aggiungerlo qui, o installare una libreria dal repository pubblico, sotto.",
-    "hint_emptyPrivateLibrary": "Selezionare un elemento su tela per aggiungerlo qui."
+    "hint_emptyLibrary": "Seleziona un elemento sulla tela per aggiungerlo qui, o installa una libreria dal repository pubblico qui sotto.",
+    "hint_emptyPrivateLibrary": "Seleziona un elemento sulla tela per aggiungerlo qui."
   },
   "buttons": {
     "clearReset": "Svuota la tela",
