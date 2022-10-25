@@ -86,7 +86,7 @@ export interface ExcalidrawElementWithCanvas {
   canvasZoom: Zoom["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
-  hasBoundTextElement: boolean;
+  boundTextElementVersion: number | null;
 }
 
 const generateElementCanvas = (
@@ -155,7 +155,7 @@ const generateElementCanvas = (
     canvasZoom: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
-    hasBoundTextElement: !!getBoundTextElement(element),
+    boundTextElementVersion: getBoundTextElement(element)?.version || null,
   };
 };
 
@@ -693,12 +693,12 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.canvasZoom !== zoom.value &&
     !renderConfig?.shouldCacheIgnoreZoom;
-  const hasBoundText = !!getBoundTextElement(element);
+  const boundTextElementVersion = getBoundTextElement(element)?.version;
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== renderConfig.theme ||
-    prevElementWithCanvas.hasBoundTextElement !== hasBoundText
+    prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
