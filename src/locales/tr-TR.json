@@ -115,8 +115,8 @@
       "label": "Bağlantı"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Çizgiyi düzenle",
+      "exit": "Çizgi düzenlemeden çık"
     },
     "elementLock": {
       "lock": "Kilitle",
@@ -125,11 +125,11 @@
       "unlockAll": "Hepsinin kilidini kaldır"
     },
     "statusPublished": "Yayınlandı",
-    "sidebarLock": ""
+    "sidebarLock": "Kenar çubuğu açık kalsın"
   },
   "library": {
     "noItems": "Öğe eklenmedi...",
-    "hint_emptyLibrary": "",
+    "hint_emptyLibrary": "Öğelerden birini eklemek için öğeyi seçiniz veya aşağıdaki genel kütüphaneden öğeleri ekleyin.",
     "hint_emptyPrivateLibrary": "Tuvalden bir eleman seçerek sayfaya ekleyin."
   },
   "buttons": {
