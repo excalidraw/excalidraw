@@ -29,6 +29,7 @@ import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import "./Actions.scss";
+import { Tooltip } from "./Tooltip";
 
 export const SelectedShapeActions = ({
   appState,
@@ -295,8 +296,12 @@ export const UndoRedoActions = ({
   className?: string;
 }) => (
   <div className={`undo-redo-buttons ${className}`}>
-    <div className="undo-button-container">{renderAction("undo")}</div>
-    <div className="redo-button-container">{renderAction("redo")}</div>
+    <div className="undo-button-container">
+      <Tooltip label={t("buttons.undo")}>{renderAction("undo")}</Tooltip>
+    </div>
+    <div className="redo-button-container">
+      <Tooltip label={t("buttons.redo")}> {renderAction("redo")}</Tooltip>
+    </div>
   </div>
 );
 
