@@ -573,7 +573,14 @@ export const getElementPointsCoords = (
   sharpness: ExcalidrawElement["strokeSharpness"],
 ): [number, number, number, number] => {
   // This might be computationally heavey
-  const curve = generateLinearElementShape(element);
+  const gen = rough.generator();
+  const curve =
+    sharpness === "sharp"
+      ? gen.linearPath(
+          points as [number, number][],
+          generateRoughOptions(element),
+        )
+      : gen.curve(points as [number, number][], generateRoughOptions(element));
   const ops = getCurvePathOps(curve);
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
   return [
