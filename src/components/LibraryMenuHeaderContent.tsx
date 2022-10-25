@@ -186,6 +186,10 @@ export const LibraryMenuHeader: React.FC<{
         {DotsIcon}
       </button>
 
+      {selectedItems.length > 0 && (
+        <div className="library-actions-counter">{selectedItems.length}</div>
+      )}
+
       {isDropdownOpen && (
         <div
           className="Sidebar__dropdown-content menu-container"
