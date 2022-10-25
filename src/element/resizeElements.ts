@@ -1,4 +1,4 @@
-import { BOUND_TEXT_PADDING, SHIFT_LOCKING_ANGLE } from "../constants";
+import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
 import {
@@ -42,6 +42,7 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
+  getBoundTextElementPadding,
   handleBindTextResize,
   measureText,
 } from "./textElement";
@@ -517,10 +518,12 @@ export const resizeSingleElement = (
       };
     }
     if (shouldMaintainAspectRatio) {
+      const boundTextElementPadding =
+        getBoundTextElementPadding(boundTextElement);
       const nextFont = measureFontSizeFromWH(
         boundTextElement,
-        eleNewWidth - BOUND_TEXT_PADDING * 2,
-        eleNewHeight - BOUND_TEXT_PADDING * 2,
+        eleNewWidth - boundTextElementPadding * 2,
+        eleNewHeight - boundTextElementPadding * 2,
       );
       if (nextFont === null) {
         return;
@@ -785,7 +788,7 @@ const resizeMultipleElements = (
     const boundTextElement = getBoundTextElement(element.latest);
 
     if (boundTextElement || isTextElement(element.orig)) {
-      const optionalPadding = boundTextElement ? BOUND_TEXT_PADDING * 2 : 0;
+      const optionalPadding = getBoundTextElementPadding(boundTextElement) * 2;
       const textMeasurements = measureFontSizeFromWH(
         boundTextElement ?? (element.orig as ExcalidrawTextElement),
         width - optionalPadding,

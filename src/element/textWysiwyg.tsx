@@ -11,7 +11,7 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+import { CLASSES, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -23,6 +23,7 @@ import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
+  getBoundTextElementPadding,
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
@@ -188,7 +189,10 @@ export const textWysiwyg = ({
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
             coordY =
-              container.y + containerDims.height - height - BOUND_TEXT_PADDING;
+              container.y +
+              containerDims.height -
+              height -
+              getBoundTextElementPadding(updatedTextElement);
           }
         }
       }

@@ -22,6 +22,7 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
+  getBoundTextElementPadding,
   getContainerDims,
   getContainerElement,
   measureText,
@@ -170,8 +171,7 @@ const getAdjustedDimensions = (
   let maxWidth = null;
   const container = getContainerElement(element);
   if (container) {
-    const containerDims = getContainerDims(container);
-    maxWidth = containerDims.width - BOUND_TEXT_PADDING * 2;
+    maxWidth = getMaxContainerWidth(container);
   }
   const {
     width: nextWidth,
@@ -231,14 +231,16 @@ const getAdjustedDimensions = (
   // make sure container dimensions are set properly when
   // text editor overflows beyond viewport dimensions
   if (container) {
+    const boundTextElementPadding = getBoundTextElementPadding(element);
+
     const containerDims = getContainerDims(container);
     let height = containerDims.height;
     let width = containerDims.width;
-    if (nextHeight > height - BOUND_TEXT_PADDING * 2) {
-      height = nextHeight + BOUND_TEXT_PADDING * 2;
+    if (nextHeight > height - boundTextElementPadding * 2) {
+      height = nextHeight + boundTextElementPadding * 2;
     }
-    if (nextWidth > width - BOUND_TEXT_PADDING * 2) {
-      width = nextWidth + BOUND_TEXT_PADDING * 2;
+    if (nextWidth > width - boundTextElementPadding * 2) {
+      width = nextWidth + boundTextElementPadding * 2;
     }
     if (height !== containerDims.height || width !== containerDims.width) {
       mutateElement(container, { height, width });
@@ -256,13 +258,16 @@ const getAdjustedDimensions = (
 export const getMaxContainerWidth = (container: ExcalidrawElement) => {
   const width = getContainerDims(container).width;
   if (isLinearElement(container)) {
-    return width - BOUND_TEXT_PADDING * 15;
+    return width - BOUND_TEXT_PADDING * 8 * 2;
   }
   return width - BOUND_TEXT_PADDING * 2;
 };
 
 export const getMaxContainerHeight = (container: ExcalidrawElement) => {
   const height = getContainerDims(container).height;
+  if (isLinearElement(container)) {
+    return height - BOUND_TEXT_PADDING * 8 * 2;
+  }
   return height - BOUND_TEXT_PADDING * 2;
 };
 

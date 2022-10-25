@@ -31,7 +31,6 @@ import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
-  BOUND_TEXT_PADDING,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
@@ -41,6 +40,7 @@ import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
   getApproxLineHeight,
   getBoundTextElement,
+  getBoundTextElementPadding,
   getContainerElement,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -309,7 +309,7 @@ const drawElementOnCanvas = (
           : element.height / lines.length;
         let verticalOffset = element.height - element.baseline;
         if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-          verticalOffset = BOUND_TEXT_PADDING;
+          verticalOffset = getBoundTextElementPadding(element);
         }
 
         const horizontalOffset =
