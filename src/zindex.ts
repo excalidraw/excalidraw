@@ -168,24 +168,12 @@ const getTargetIndex = (
   return candidateIndex;
 };
 
-const getTargetElementsMap = (
-  elements: readonly ExcalidrawElement[],
-  indices: number[],
-) => {
-  return indices.reduce((acc, index) => {
-    const element = elements[index];
-    acc[element.id] = element;
-    return acc;
-  }, {} as Record<string, ExcalidrawElement>);
-};
-
 const shiftElements = (
   appState: AppState,
   elements: readonly ExcalidrawElement[],
   direction: "left" | "right",
 ) => {
   const indicesToMove = getIndicesToMove(elements, appState);
-  const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
   let groupedIndices = toContiguousGroups(indicesToMove);
 
   if (direction === "right") {
@@ -212,8 +200,8 @@ const shiftElements = (
       direction === "left"
         ? elements.slice(0, targetIndex)
         : elements.slice(0, leadingIndex);
-    const targetElements = elements.slice(leadingIndex, trailingIndex + 1);
-    const displacedElements =
+    let targetElements = elements.slice(leadingIndex, trailingIndex + 1);
+    let displacedElements =
       direction === "left"
         ? elements.slice(targetIndex, leadingIndex)
         : elements.slice(trailingIndex + 1, targetIndex + 1);
@@ -221,6 +209,11 @@ const shiftElements = (
       direction === "left"
         ? elements.slice(trailingIndex + 1)
         : elements.slice(targetIndex + 1);
+
+    targetElements = targetElements.map((element) => bumpVersion(element));
+    displacedElements = displacedElements.map((element) =>
+      bumpVersion(element),
+    );
 
     elements =
       direction === "left"
@@ -238,12 +231,7 @@ const shiftElements = (
           ];
   });
 
-  return elements.map((element) => {
-    if (targetElementsMap[element.id]) {
-      return bumpVersion(element);
-    }
-    return element;
-  });
+  return elements;
 };
 
 const shiftElementsToEnd = (
@@ -252,8 +240,7 @@ const shiftElementsToEnd = (
   direction: "left" | "right",
 ) => {
   const indicesToMove = getIndicesToMove(elements, appState);
-  const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
-  const displacedElements: ExcalidrawElement[] = [];
+  let displacedElements: ExcalidrawElement[] = [];
 
   let leadingIndex: number;
   let trailingIndex: number;
@@ -295,9 +282,10 @@ const shiftElementsToEnd = (
     }
   }
 
-  const targetElements = Object.values(targetElementsMap).map((element) => {
-    return bumpVersion(element);
+  const targetElements = indicesToMove.map((index) => {
+    return bumpVersion(elements[index]);
   });
+  displacedElements = displacedElements.map((element) => bumpVersion(element));
 
   const leadingElements = elements.slice(0, leadingIndex);
   const trailingElements = elements.slice(trailingIndex + 1);
