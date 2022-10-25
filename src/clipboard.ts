@@ -115,7 +115,8 @@ const getSystemClipboard = async (
   try {
     const text = event
       ? event.clipboardData?.getData("text/plain").trim()
-      : probablySupportsClipboardReadText &&
+      : "clipboard" in navigator &&
+        "readText" in navigator.clipboard &&
         (await navigator.clipboard.readText());
 
     return text || "";
