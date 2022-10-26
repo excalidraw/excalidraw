@@ -190,4 +190,31 @@
       }
     }
   }
+
+  // Can tweak these values but for an initial effort, it looks OK to me
+  @media (max-width: 1024px) {
+    .WelcomeScreen-decor {
+      &--help-pointer,
+      &--top-toolbar-pointer,
+      &--menu-pointer {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-height: 600px) {
+    .WelcomeScreen-container {
+      display: none;
+    }
+  }
+
+  @media (max-height: 800px) {
+    .WelcomeScreen-decor {
+      &--help-pointer,
+      &--top-toolbar-pointer,
+      &--menu-pointer {
+        display: none;
+      }
+    }
+  }
 }

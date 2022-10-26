@@ -20,6 +20,7 @@ import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import { MenuLinks, Separator } from "./MenuUtils";
+import WelcomeScreen from "./WelcomeScreen";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -45,6 +46,7 @@ type MobileMenuProps = {
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderSidebars: () => JSX.Element | null;
   device: Device;
+  renderWelcomeScreen?: boolean;
 };
 
 export const MobileMenu = ({
@@ -65,10 +67,14 @@ export const MobileMenu = ({
   renderCustomStats,
   renderSidebars,
   device,
+  renderWelcomeScreen,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
+        {renderWelcomeScreen && !appState.isLoading && (
+          <WelcomeScreen actionManager={actionManager} />
+        )}
         <Section heading="shapes">
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">

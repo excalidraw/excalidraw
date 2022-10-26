@@ -449,6 +449,7 @@ const LayerUI = ({
       )}
       {device.isMobile && (
         <MobileMenu
+          renderWelcomeScreen={renderWelcomeScreen}
           appState={appState}
           elements={elements}
           actionManager={actionManager}
