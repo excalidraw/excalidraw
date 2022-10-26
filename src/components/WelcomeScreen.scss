@@ -30,12 +30,21 @@
       right: 0;
       bottom: 100%;
 
+      :root[dir="rtl"] & {
+        left: 0;
+        right: auto;
+      }
+
       svg {
         margin-top: 0.5rem;
         width: 85px;
         height: 71px;
 
-        transform: scale(-1, 1) rotate(80deg);
+        transform: scaleX(-1) rotate(80deg);
+
+        :root[dir="rtl"] & {
+          transform: scaleX(-1) rotate(180deg);
+        }
       }
     }
 
@@ -57,6 +66,10 @@
       svg {
         width: 38px;
         height: 78px;
+
+        :root[dir="rtl"] & {
+          transform: scaleX(-1);
+        }
       }
     }
 
@@ -75,6 +88,10 @@
       svg {
         width: 41px;
         height: 94px;
+
+        :root[dir="rtl"] & {
+          transform: scaleX(-1);
+        }
       }
     }
   }

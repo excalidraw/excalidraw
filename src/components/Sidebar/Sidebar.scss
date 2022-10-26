@@ -8,6 +8,12 @@
       position: absolute;
       top: 100%;
       left: 0;
+
+      :root[dir="rtl"] & {
+        right: 0;
+        left: auto;
+      }
+
       margin-top: 0.25rem;
       width: 180px;
       box-shadow: var(--library-dropdown-shadow);
@@ -66,6 +72,11 @@
     z-index: 5;
     margin: 0;
 
+    :root[dir="rtl"] & {
+      left: 0;
+      right: auto;
+    }
+
     background-color: var(--sidebar-bg-color);
 
     box-shadow: var(--sidebar-shadow);
@@ -77,7 +88,13 @@
     overflow: hidden;
     border-radius: 0;
     width: calc(#{$right-sidebar-width} - var(--space-factor) * 2);
+
     border-left: 1px solid var(--sidebar-border-color);
+
+    :root[dir="rtl"] & {
+      border-right: 1px solid var(--sidebar-border-color);
+      border-left: 0;
+    }
 
     padding: 0;
     box-sizing: border-box;

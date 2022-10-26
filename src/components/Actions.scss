@@ -36,6 +36,10 @@
   border-top-left-radius: var(--border-radius-lg) !important;
   border-bottom-left-radius: var(--border-radius-lg) !important;
 
+  :root[dir="rtl"] & {
+    transform: scaleX(-1);
+  }
+
   .ToolIcon__icon {
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
@@ -45,6 +49,10 @@
 .zoom-in-button {
   border-top-right-radius: var(--border-radius-lg) !important;
   border-bottom-right-radius: var(--border-radius-lg) !important;
+
+  :root[dir="rtl"] & {
+    transform: scaleX(-1);
+  }
 
   .ToolIcon__icon {
     border-top-left-radius: 0 !important;
@@ -58,6 +66,10 @@
     border-bottom-left-radius: var(--border-radius-lg) !important;
     border-right: 0 !important;
 
+    :root[dir="rtl"] & {
+      transform: scaleX(-1);
+    }
+
     .ToolIcon__icon {
       border-top-right-radius: 0 !important;
       border-bottom-right-radius: 0 !important;
@@ -67,6 +79,10 @@
   .redo-button-container button {
     border-top-right-radius: var(--border-radius-lg) !important;
     border-bottom-right-radius: var(--border-radius-lg) !important;
+
+    :root[dir="rtl"] & {
+      transform: scaleX(-1);
+    }
 
     .ToolIcon__icon {
       border-top-left-radius: 0 !important;

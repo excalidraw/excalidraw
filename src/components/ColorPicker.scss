@@ -158,6 +158,8 @@
 
     :root[dir="rtl"] & {
       border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) 0;
+      border-right: 1px solid var(--default-border-color);
+      border-left: 0;
     }
 
     color: var(--input-label-color);
@@ -196,6 +198,8 @@
 
     :root[dir="rtl"] & {
       border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
+      border-left: 1px solid var(--default-border-color);
+      border-right: 0;
     }
 
     padding: 0.5rem;

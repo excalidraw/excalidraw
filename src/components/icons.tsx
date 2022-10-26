@@ -893,7 +893,7 @@ export const UndoIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  { ...newIconProps, mirror: true },
+  { ...newIconProps },
 );
 
 export const RedoIcon = createIcon(
@@ -913,7 +913,7 @@ export const RedoIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  { ...newIconProps, mirror: true },
+  { ...newIconProps },
 );
 
 export const questionCircle = createIcon(
