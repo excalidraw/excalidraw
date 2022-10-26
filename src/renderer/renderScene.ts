@@ -811,6 +811,12 @@ const renderTransformHandles = (
       }
       if (key === "rotation") {
         fillCircle(context, x + width / 2, y + height / 2, width / 2);
+        // prefer round corners if roundRect API is available
+      } else if (context.roundRect) {
+        context.beginPath();
+        context.roundRect(x, y, width, height, 2);
+        context.fill();
+        context.stroke();
       } else {
         strokeRectWithRotation(
           context,
