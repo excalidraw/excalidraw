@@ -7,6 +7,7 @@ export const MenuLinks = () => (
       target="_blank"
       rel="noreferrer"
       className="menu-item"
+      style={{ color: "var(--color-promo)" }}
     >
       <div className="menu-item__icon">{ExternalLinkIcon}</div>
       <div className="menu-item__text">Excalidraw+</div>
