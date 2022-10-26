@@ -337,7 +337,7 @@ export const SelectionIcon = createIcon(
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      />
+    />
   </>,
   { fill: "none", width: 24, height: 24, strokeWidth: 1.5 },
 );
