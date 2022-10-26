@@ -1,5 +1,6 @@
 // TODO barnabasmolnar/editor-redesign
 // this icon is not great
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { save } from "../components/icons";
 import { t } from "../i18n";
 
@@ -13,7 +14,8 @@ type ActiveFileProps = {
 
 export const ActiveFile = ({ fileName, onSave }: ActiveFileProps) => (
   <MenuItem
-    label={`${t("buttons.save")}: ${fileName}`}
+    label={`${t("buttons.save")}`}
+    shortcut={getShortcutFromShortcutName("saveScene")}
     dataTestId="save-button"
     onClick={onSave}
     icon={save}

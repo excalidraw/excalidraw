@@ -212,9 +212,8 @@ const LayerUI = ({
               {actionManager.renderAction("loadScene")}
               {/* // TODO barnabasmolnar/editor-redesign  */}
               {/* is this fine here? */}
-              {appState.fileHandle && (
-                <>{actionManager.renderAction("saveToActiveFile")}</>
-              )}
+              {appState.fileHandle &&
+                actionManager.renderAction("saveToActiveFile")}
               {renderJSONExportDialog()}
               {renderImageExportDialog()}
               {onCollabButtonClick && (
