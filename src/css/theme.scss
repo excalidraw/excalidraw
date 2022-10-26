@@ -40,6 +40,9 @@
   --default-button-size: 2.25rem;
   --default-icon-size: 1rem;
 
+  --scrollbar-thumb: var(--button-gray-2);
+  --scrollbar-thumb-hover: var(--button-gray-3);
+
   --lg-button-size: var(--default-button-size);
   --lg-icon-size: var(--default-icon-size);
 
@@ -104,6 +107,7 @@
     --theme-filter: #{$theme-filter};
     --button-destructive-bg-color: #5a0000;
     --button-destructive-color: #{$oc-red-3};
+
     --button-gray-1: #363636;
     --button-gray-2: #272727;
     --button-gray-3: #222;
@@ -143,6 +147,9 @@
     --avatar-border-color: var(--color-gray-85);
     --sidebar-border-color: var(--color-gray-85);
     --sidebar-bg-color: #191919;
+
+    --scrollbar-thumb: #{$oc-gray-8};
+    --scrollbar-thumb-hover: #{$oc-gray-7};
 
     // will be inverted to a lighter color.
     --color-selection: #3530c4;

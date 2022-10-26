@@ -522,18 +522,18 @@
   // use custom, minimalistic scrollbar
   // (doesn't work in Firefox)
   ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 3px;
   }
+
   ::-webkit-scrollbar-thumb {
-    background: var(--button-gray-2);
+    background: var(--scrollbar-thumb);
     border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--button-gray-3);
+    background: var(--scrollbar-thumb-hover);
   }
   ::-webkit-scrollbar-thumb:active {
-    background: var(--button-gray-2);
+    background: var(--scrollbar-thumb);
   }
 
   .penmode-button {
