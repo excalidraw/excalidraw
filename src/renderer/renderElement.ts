@@ -842,8 +842,19 @@ export const renderElement = (
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + renderConfig.scrollX;
         const cy = (y1 + y2) / 2 + renderConfig.scrollY;
-        const shiftX = (x2 - x1) / 2 - (element.x - x1);
-        const shiftY = (y2 - y1) / 2 - (element.y - y1);
+        let shiftX = (x2 - x1) / 2 - (element.x - x1);
+        let shiftY = (y2 - y1) / 2 - (element.y - y1);
+        if (isTextElement(element)) {
+          const container = getContainerElement(element);
+          if (isLinearElement(container)) {
+            const boundTextCoords = LinearElementEditor.getBoundTextPosition(
+              container,
+              element as ExcalidrawTextElementWithContainer,
+            );
+            shiftX = (x2 - x1) / 2 - (boundTextCoords.x - x1);
+            shiftY = (y2 - y1) / 2 - (boundTextCoords.y - y1);
+          }
+        }
         context.save();
         context.translate(cx, cy);
         context.rotate(element.angle);
@@ -855,35 +866,25 @@ export const renderElement = (
         if (shouldResetImageFilter(element, renderConfig)) {
           context.filter = "none";
         }
-        const boundText = getBoundTextElement(element);
+        const boundTextElement = getBoundTextElement(element);
 
-        if (isLinearElement(element) && boundText) {
+        if (isLinearElement(element) && boundTextElement) {
+          context.translate(shiftX, shiftY);
           const tempCanvas = document.createElement("canvas");
 
           const tempCtx = tempCanvas.getContext("2d")!;
           tempCanvas.width = distance(x1, x2) * appState.exportScale;
           tempCanvas.height = distance(y1, y2) * appState.exportScale;
-          const boundTextCoords = LinearElementEditor.getBoundTextPosition(
-            element,
-            boundText,
-          );
-
-          const boundTextX = boundTextCoords.x;
-
-          const boundTextY = boundTextCoords.y;
-
-          const boundTextCanvasOffsetX =
-            boundTextX > x1 ? distance(boundTextX, x1) : 0;
-          const boundTextCanvasOffsetY =
-            boundTextY > y1 ? distance(boundTextY, y1) : 0;
-          tempCtx.translate(boundTextCanvasOffsetX, boundTextCanvasOffsetY);
 
           // Draw a rectangle of bound text dimensions so that the linear
           // container can be drawn on non overlapping area due to the below
           // globalCompositeOperation operation
-
-          tempCtx.fillRect(0, 0, boundText.width, boundText.height);
-          tempCtx.translate(-boundTextCanvasOffsetX, -boundTextCanvasOffsetY);
+          tempCtx.fillRect(
+            0,
+            0,
+            boundTextElement.width,
+            boundTextElement.height,
+          );
 
           tempCtx.globalCompositeOperation = "source-out";
 
@@ -893,7 +894,6 @@ export const renderElement = (
           const tempRc = rough.canvas(tempCanvas);
           drawElementOnCanvas(element, tempRc, tempCtx, renderConfig);
 
-          context.translate(shiftX, shiftY);
           context.drawImage(
             tempCanvas,
             -element.width / 2,

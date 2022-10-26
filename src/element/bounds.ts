@@ -14,9 +14,13 @@ import {
   getShapeForElement,
   generateRoughOptions,
 } from "../renderer/renderElement";
-import { isFreeDrawElement, isLinearElement } from "./typeChecks";
+import {
+  isFreeDrawElement,
+  isLinearElement,
+  isTextElement,
+} from "./typeChecks";
 import { rescalePoints } from "../points";
-import { getBoundTextElement } from "./textElement";
+import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 
 // x and y position of top left corner, x and y position of bottom right corner
@@ -33,6 +37,22 @@ export const getElementAbsoluteCoords = (
     return getFreeDrawElementAbsoluteCoords(element);
   } else if (isLinearElement(element)) {
     return getLinearElementAbsoluteCoords(element, includeBoundText);
+  } else if (isTextElement(element)) {
+    const container = getContainerElement(element);
+    if (isLinearElement(container)) {
+      const coords = LinearElementEditor.getBoundTextPosition(
+        container,
+        element as ExcalidrawTextElementWithContainer,
+      );
+      return [
+        coords.x,
+        coords.y,
+        coords.x + element.width,
+        coords.y + element.height,
+        coords.x + element.width / 2,
+        coords.y + element.height / 2,
+      ];
+    }
   }
   return [
     element.x,
