@@ -265,10 +265,9 @@ const LayerUI = ({
         className={CLASSES.SHAPE_ACTIONS_MENU}
         padding={2}
         style={{
-          // we want to make sure this doesn't overflow so subtracting 200
-          // which is approximately height of zoom footer and top left menu items with some buffer
-          // if active file name is displayed, subtracting 248 to account for its height
-          maxHeight: `${appState.height - (appState.fileHandle ? 248 : 200)}px`,
+          // we want to make sure this doesn't overflow so subtracting the
+          // approximate height of hamburgerMenu + footer
+          maxHeight: `${appState.height - 166}px`,
         }}
       >
         <SelectedShapeActions
