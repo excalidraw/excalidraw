@@ -507,6 +507,7 @@ export const _renderScene = ({
               ),
             );
           }
+
           if (selectionColors.length) {
             const [elementX1, elementY1, elementX2, elementY2] =
               getElementAbsoluteCoords(element);
@@ -517,10 +518,11 @@ export const _renderScene = ({
               elementX2,
               elementY2,
               selectionColors,
+              dashed: !!renderConfig.remoteSelectedElementIds[element.id],
             });
           }
           return acc;
-        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[] }[]);
+        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean }[]);
 
         const addSelectionForGroupId = (groupId: GroupId) => {
           const groupElements = getElementsInGroup(elements, groupId);
@@ -533,7 +535,6 @@ export const _renderScene = ({
             elementY1,
             elementY2,
             selectionColors: [oc.black],
-            // selectionColors: [oc.violet[5]],
           });
         };
 
@@ -837,11 +838,19 @@ const renderSelectionBorder = (
     elementX2: number;
     elementY2: number;
     selectionColors: string[];
+    dashed?: boolean;
   },
   padding = 8,
 ) => {
-  const { angle, elementX1, elementY1, elementX2, elementY2, selectionColors } =
-    elementProperties;
+  const {
+    angle,
+    elementX1,
+    elementY1,
+    elementX2,
+    elementY2,
+    selectionColors,
+    dashed,
+  } = elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
 
@@ -856,6 +865,12 @@ const renderSelectionBorder = (
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {
     context.strokeStyle = selectionColors[index];
+    if (dashed) {
+      context.setLineDash([
+        lineWidth,
+        spaceWidth + (lineWidth + spaceWidth) * (count - 1),
+      ]);
+    }
     context.lineDashOffset = (lineWidth + spaceWidth) * index;
     strokeRectWithRotation(
       context,
