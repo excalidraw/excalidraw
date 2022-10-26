@@ -46,7 +46,6 @@ import {
   handleBindTextResize,
   measureText,
 } from "./textElement";
-import { LinearElementEditor } from "./linearElementEditor";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -179,9 +178,7 @@ const rotateSingleElement = (
       boundTextElementId,
     ) as ExcalidrawTextElementWithContainer;
 
-    if (isLinearElement(element)) {
-      rotateLinearElementBoundText(originalElements, element, textElement);
-    } else {
+    if (!isLinearElement(element)) {
       mutateElement(textElement, { angle });
     }
   }
@@ -857,13 +854,7 @@ const rotateMultipleElements = (
       const textElement = Scene.getScene(element)!.getElement(
         boundTextElementId,
       ) as ExcalidrawTextElementWithContainer;
-      if (isLinearElement(element)) {
-        rotateLinearElementBoundText(
-          pointerDownState.originalElements,
-          element,
-          textElement,
-        );
-      } else {
+      if (!isLinearElement(element)) {
         mutateElement(textElement, {
           x: textElement.x + (rotatedCX - cx),
           y: textElement.y + (rotatedCY - cy),
@@ -871,31 +862,6 @@ const rotateMultipleElements = (
         });
       }
     }
-  });
-};
-
-const rotateLinearElementBoundText = (
-  originalElements: Map<string, NonDeleted<ExcalidrawElement>>,
-  container: NonDeleted<ExcalidrawLinearElement>,
-  textElement: ExcalidrawTextElementWithContainer,
-) => {
-  const originalBoundTextElement = originalElements.get(textElement.id)!;
-  const originalContainer = originalElements.get(container.id)!;
-  const originalBoundTextCenterPoint =
-    LinearElementEditor.pointFromAbsoluteCoords(
-      originalContainer as ExcalidrawLinearElement,
-      [
-        originalBoundTextElement.x + originalBoundTextElement.width / 2,
-        originalBoundTextElement.y + originalBoundTextElement.height / 2,
-      ],
-    );
-  const newBoundTextCenterPoint = LinearElementEditor.getPointGlobalCoordinates(
-    container,
-    originalBoundTextCenterPoint,
-  );
-  mutateElement(textElement, {
-    x: newBoundTextCenterPoint[0] - textElement.width / 2,
-    y: newBoundTextCenterPoint[1] - textElement.height / 2,
   });
 };
 

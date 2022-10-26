@@ -217,23 +217,25 @@ const drawElementOnCanvas = (
     case "line": {
       context.lineJoin = "round";
       context.lineCap = "round";
-      const boundText = getBoundTextElement(element);
-      if (!renderConfig.isExporting && boundText) {
-        const boundTextCoords = LinearElementEditor.getBoundTextPosition(
-          element,
-          boundText,
-        );
+      const boundTextElement = getBoundTextElement(element);
+      if (!renderConfig.isExporting && boundTextElement) {
+        const { x: boundTextX1, y: boundTextY1 } =
+          LinearElementEditor.getBoundTextPosition(element, boundTextElement);
+
         const absoluteCoords = LinearElementEditor.pointFromAbsoluteCoords(
           element,
-          [boundTextCoords.x, boundTextCoords.y],
+          [
+            boundTextX1 + boundTextElement.width / 2,
+            boundTextY1 + boundTextElement.height / 2,
+          ],
         );
         // Draw a rectangle of bound text dimensions so that the linear container can be drawn on non overlapping area due to the below
         // globalCompositeOperation operation
         context.fillRect(
-          absoluteCoords[0],
-          absoluteCoords[1],
-          boundText.width,
-          boundText.height,
+          absoluteCoords[0] - boundTextElement.width / 2,
+          absoluteCoords[1] - boundTextElement.height / 2,
+          boundTextElement.width,
+          boundTextElement.height,
         );
         context.globalCompositeOperation = "source-out";
       }
