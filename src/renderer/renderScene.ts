@@ -571,13 +571,14 @@ export const _renderScene = ({
           );
         }
       } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
-        const dashedLinePadding = 4 / renderConfig.zoom.value;
+        const dashedLinePadding = 8 / renderConfig.zoom.value;
         context.fillStyle = oc.white;
         const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
         const initialLineDash = context.getLineDash();
         context.setLineDash([2 / renderConfig.zoom.value]);
         const lineWidth = context.lineWidth;
         context.lineWidth = 1 / renderConfig.zoom.value;
+        context.strokeStyle = selectionColour;
         strokeRectWithRotation(
           context,
           x1 - dashedLinePadding,
