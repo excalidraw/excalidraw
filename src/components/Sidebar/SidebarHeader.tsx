@@ -63,10 +63,6 @@ const _SidebarHeader: React.FC<{
             <SidebarDockButton
               checked={!!props.docked}
               onChange={() => {
-                document
-                  .querySelector(".layer-ui__wrapper")
-                  ?.classList.add("animate");
-
                 props.onDock?.(!props.docked);
               }}
             />
