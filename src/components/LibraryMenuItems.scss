@@ -1,6 +1,9 @@
 @import "open-color/open-color";
 
 .excalidraw {
+  --container-padding-y: 1.5rem;
+  --container-padding-x: 0.75rem;
+
   .library-menu-items__no-items {
     text-align: center;
     color: var(--color-gray-70);
@@ -44,7 +47,7 @@
 
     &__items {
       row-gap: 0.5rem;
-      padding: 1.5rem 0.75rem;
+      padding: var(--container-padding-y) var(--container-padding-x);
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;

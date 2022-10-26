@@ -232,8 +232,9 @@ const LibraryMenuItems = ({
               <div
                 style={{
                   position: "absolute",
-                  top: "1rem",
-                  right: "1rem",
+                  top: "var(--container-padding-y)",
+                  right: "var(--container-padding-x)",
+                  transform: "translateY(50%)",
                 }}
               >
                 <Spinner />
