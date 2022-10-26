@@ -332,26 +332,14 @@ export const ImportSceneIcon = createIcon(
 
 export const SelectionIcon = createIcon(
   <>
-    <g
-      clipPath="url(#a)"
+    <path
+      d="M3.567 3.567 10.07 19.97l2.51-7.39 7.39-2.51L3.567 3.567ZM13 13l6 6"
       stroke="currentColor"
-      strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
-    >
-      <path d="M2.5 10H5M10 2.5V5M6.5 6.5 4.667 4.667M13.5 6.5l1.833-1.833M6.5 13.5l-1.833 1.833" />
-      <path
-        clipRule="evenodd"
-        d="m10 10 7.5 2.5-3.333 1.667L12.5 17.5 10 10Z"
       />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
   </>,
-  newIconProps,
+  { fill: "none", width: 24, height: 24, strokeWidth: 1.5 },
 );
 
 export const RectangleIcon = createIcon(
