@@ -39,13 +39,13 @@ export const Modal: React.FC<{
       aria-modal="true"
       onKeyDown={handleKeydown}
       aria-labelledby={props.labelledBy}
+      data-prevent-outside-click
     >
       <div
         className="Modal__background"
         onClick={closeOnClickOutside ? props.onCloseRequest : undefined}
       ></div>
       <div
-        data-prevent-outside-click
         className="Modal__content"
         style={{ "--max-width": `${props.maxWidth}px` }}
         tabIndex={0}
