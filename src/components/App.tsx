@@ -1287,6 +1287,10 @@ class App extends React.Component<AppProps, AppState> {
         );
       });
 
+    const selectionColour = getComputedStyle(
+      document.querySelector(".excalidraw")!,
+    ).getPropertyValue("--color-primary");
+
     renderScene(
       {
         elements: renderingElements,
@@ -1295,6 +1299,7 @@ class App extends React.Component<AppProps, AppState> {
         rc: this.rc!,
         canvas: this.canvas!,
         renderConfig: {
+          selectionColour,
           scrollX: this.state.scrollX,
           scrollY: this.state.scrollY,
           viewBackgroundColor: this.state.viewBackgroundColor,

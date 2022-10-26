@@ -341,6 +341,8 @@ export const _renderScene = ({
       isExporting,
     } = renderConfig;
 
+    const selectionColour = renderConfig.selectionColour || oc.black;
+
     const context = canvas.getContext("2d")!;
 
     context.setTransform(1, 0, 0, 1, 0, 0);
@@ -492,7 +494,7 @@ export const _renderScene = ({
             locallySelectedIds.includes(element.id) &&
             !isSelectedViaGroup(appState, element)
           ) {
-            selectionColors.push(oc.black);
+            selectionColors.push(selectionColour);
           }
           // remote users
           if (renderConfig.remoteSelectedElementIds[element.id]) {
@@ -531,6 +533,7 @@ export const _renderScene = ({
             elementY1,
             elementY2,
             selectionColors: [oc.black],
+            // selectionColors: [oc.violet[5]],
           });
         };
 
@@ -542,15 +545,9 @@ export const _renderScene = ({
         if (appState.editingGroupId) {
           addSelectionForGroupId(appState.editingGroupId);
         }
+
         selections.forEach((selection) =>
-          renderSelectionBorder(
-            context,
-            renderConfig,
-            selection,
-            isSingleLinearElementSelected
-              ? DEFAULT_SPACING * 2
-              : DEFAULT_SPACING,
-          ),
+          renderSelectionBorder(context, renderConfig, selection),
         );
       }
       // Paint resize transformHandles
@@ -807,6 +804,9 @@ const renderTransformHandles = (
 
       context.save();
       context.lineWidth = 1 / renderConfig.zoom.value;
+      if (renderConfig.selectionColour) {
+        context.strokeStyle = renderConfig.selectionColour;
+      }
       if (key === "rotation") {
         fillCircle(context, x + width / 2, y + height / 2, width / 2);
       } else {
@@ -838,15 +838,15 @@ const renderSelectionBorder = (
     elementY2: number;
     selectionColors: string[];
   },
-  padding = 4,
+  padding = 8,
 ) => {
   const { angle, elementX1, elementY1, elementX2, elementY2, selectionColors } =
     elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
 
-  const dashedLinePadding = padding / renderConfig.zoom.value;
-  const dashWidth = 8 / renderConfig.zoom.value;
+  const linePadding = padding / renderConfig.zoom.value;
+  const lineWidth = 8 / renderConfig.zoom.value;
   const spaceWidth = 4 / renderConfig.zoom.value;
 
   context.save();
@@ -856,17 +856,13 @@ const renderSelectionBorder = (
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {
     context.strokeStyle = selectionColors[index];
-    context.setLineDash([
-      dashWidth,
-      spaceWidth + (dashWidth + spaceWidth) * (count - 1),
-    ]);
-    context.lineDashOffset = (dashWidth + spaceWidth) * index;
+    context.lineDashOffset = (lineWidth + spaceWidth) * index;
     strokeRectWithRotation(
       context,
-      elementX1 - dashedLinePadding,
-      elementY1 - dashedLinePadding,
-      elementWidth + dashedLinePadding * 2,
-      elementHeight + dashedLinePadding * 2,
+      elementX1 - linePadding,
+      elementY1 - linePadding,
+      elementWidth + linePadding * 2,
+      elementHeight + linePadding * 2,
       elementX1 + elementWidth / 2,
       elementY1 + elementHeight / 2,
       angle,
