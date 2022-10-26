@@ -5,10 +5,10 @@ import {
   ExitZenModeAction,
   FinalizeAction,
   UndoRedoActions,
-  ZoomActions,
+  // ZoomActions,
 } from "./Actions";
 import { useDevice } from "./App";
-import { Island } from "./Island";
+// import { Island } from "./Island";
 import { Section } from "./Section";
 import Stack from "./Stack";
 
@@ -39,12 +39,12 @@ const Footer = ({
       >
         <Stack.Col gap={2}>
           <Section heading="canvasActions">
-            <Island padding={1}>
+            {/* <Island padding={1}>
               <ZoomActions
                 renderAction={actionManager.renderAction}
                 zoom={appState.zoom}
               />
-            </Island>
+            </Island> */}
             {!appState.viewModeEnabled && (
               <>
                 <UndoRedoActions
