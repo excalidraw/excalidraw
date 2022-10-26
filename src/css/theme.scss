@@ -70,6 +70,8 @@
   --space-factor: 0.25rem;
   --text-primary-color: var(--color-gray-80);
 
+  --color-selection: #6965db;
+
   --color-primary: #6965db;
   --color-primary-darker: #5b57d1;
   --color-primary-darkest: #4a47b1;
@@ -141,6 +143,9 @@
     --avatar-border-color: var(--color-gray-85);
     --sidebar-border-color: var(--color-gray-85);
     --sidebar-bg-color: #191919;
+
+    // will be inverted to a lighter color.
+    --color-selection: #3530c4;
 
     --color-primary: #a8a5ff;
     --color-primary-darker: #b2aeff;

@@ -341,7 +341,7 @@ export const _renderScene = ({
       isExporting,
     } = renderConfig;
 
-    const selectionColour = renderConfig.selectionColour || oc.black;
+    const selectionColor = renderConfig.selectionColor || oc.black;
 
     const context = canvas.getContext("2d")!;
 
@@ -494,7 +494,7 @@ export const _renderScene = ({
             locallySelectedIds.includes(element.id) &&
             !isSelectedViaGroup(appState, element)
           ) {
-            selectionColors.push(selectionColour);
+            selectionColors.push(selectionColor);
           }
           // remote users
           if (renderConfig.remoteSelectedElementIds[element.id]) {
@@ -578,7 +578,7 @@ export const _renderScene = ({
         context.setLineDash([2 / renderConfig.zoom.value]);
         const lineWidth = context.lineWidth;
         context.lineWidth = 1 / renderConfig.zoom.value;
-        context.strokeStyle = selectionColour;
+        context.strokeStyle = selectionColor;
         strokeRectWithRotation(
           context,
           x1 - dashedLinePadding,
@@ -806,8 +806,8 @@ const renderTransformHandles = (
 
       context.save();
       context.lineWidth = 1 / renderConfig.zoom.value;
-      if (renderConfig.selectionColour) {
-        context.strokeStyle = renderConfig.selectionColour;
+      if (renderConfig.selectionColor) {
+        context.strokeStyle = renderConfig.selectionColor;
       }
       if (key === "rotation") {
         fillCircle(context, x + width / 2, y + height / 2, width / 2);
