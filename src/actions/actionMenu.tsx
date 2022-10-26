@@ -4,7 +4,7 @@ import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
 import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
-import { CODES, KEYS } from "../keys";
+import { KEYS } from "../keys";
 import { HelpButton } from "../components/HelpButton";
 import MenuItem from "../components/MenuItem";
 
@@ -68,7 +68,7 @@ export const actionFullScreen = register({
       commitToHistory: false,
     };
   },
-  keyTest: (event) => event.code === CODES.F && !event[KEYS.CTRL_OR_CMD],
+  keyTest: (event) => event.key === KEYS.F && !event[KEYS.CTRL_OR_CMD],
 });
 
 export const actionShortcuts = register({
