@@ -175,8 +175,8 @@
       padding: 0;
 
       svg {
-        width: 1.25rem;
-        height: 1.25rem;
+        width: var(--default-icon-size);
+        height: var(--default-icon-size);
       }
     }
   }
