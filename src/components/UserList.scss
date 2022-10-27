@@ -12,6 +12,16 @@
     &:empty {
       display: none;
     }
+
+    // can fit max 5 avatars in a column
+    max-height: 140px;
+
+    // can fit max 10 avatars in a row when there's enough space
+    max-width: 290px;
+
+    // Tweak in 30px increments to fit more/fewer avatars in a row/column ^^
+
+    overflow: hidden;
   }
 
   .UserList > * {

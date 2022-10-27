@@ -23,6 +23,23 @@
     &:active {
       background-color: var(--color-primary-darker);
     }
+
+    // same colours as before
+    // but blends together too much with bg imo
+    &.active {
+      background-color: var(--button-special-active-bg-color);
+      border-color: var(--button-special-active-bg-color);
+
+      svg {
+        color: var(--icon-green-fill-color);
+      }
+
+      &:hover,
+      &:active {
+        background-color: var(--button-special-active-bg-color);
+        border-color: var(--button-special-active-bg-color);
+      }
+    }
   }
 
   &.theme--dark {

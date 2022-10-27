@@ -3,6 +3,7 @@ import { share, users } from "./icons";
 
 import "./CollabButton.scss";
 import MenuItem from "./MenuItem";
+import clsx from "clsx";
 
 const CollabButton = ({
   isCollaborating,
@@ -25,15 +26,20 @@ const CollabButton = ({
           onClick={onClick}
         />
       ) : (
-        <button className="collab-button" type="button" onClick={onClick}>
+        <button
+          className={clsx("collab-button", { active: isCollaborating })}
+          type="button"
+          onClick={onClick}
+          style={{ position: "relative" }}
+        >
           {share}
+          {collaboratorCount > 0 && (
+            <div className="CollabButton-collaborators">
+              {collaboratorCount}
+            </div>
+          )}
         </button>
       )}
-      {/* // TODO barnabasmolnar/editor-redesign  */}
-      {/* do we want to show the collaborator count here? */}
-      {/* {isCollaborating && (
-        <div className="CollabButton-collaborators">{collaboratorCount}</div>
-      )} */}
     </>
   );
 };

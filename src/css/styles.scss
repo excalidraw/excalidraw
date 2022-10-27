@@ -260,11 +260,16 @@
   }
 
   .App-menu_top {
-    grid-template-columns: auto max-content auto;
-    grid-gap: 4px;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-gap: 2rem;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
+
+    @media (min-width: 1536px) {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-gap: 3rem;
+    }
   }
 
   .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_top > * {
