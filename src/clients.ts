@@ -20,7 +20,7 @@ export const getClientColors = (clientId: string, appState: AppState) => {
   };
 };
 
-export const getClientInitials = (userName?: string) => {
+export const getClientInitials = (userName?: string | null) => {
   if (!userName) {
     return "?";
   }
