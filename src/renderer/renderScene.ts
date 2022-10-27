@@ -814,7 +814,7 @@ const renderTransformHandles = (
         // prefer round corners if roundRect API is available
       } else if (context.roundRect) {
         context.beginPath();
-        context.roundRect(x, y, width, height, 2);
+        context.roundRect(x, y, width, height, 2 / renderConfig.zoom.value);
         context.fill();
         context.stroke();
       } else {
