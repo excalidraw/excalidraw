@@ -19,7 +19,7 @@ const WelcomeScreenItem = ({
   icon,
 }: {
   label: string;
-  shortcut: string;
+  shortcut: string | null;
   onClick: () => void;
   icon: JSX.Element;
 }) => {
@@ -29,7 +29,9 @@ const WelcomeScreenItem = ({
         {icon}
         {label}
       </div>
-      <div className="WelcomeScreen-item__shortcut">{shortcut}</div>
+      {shortcut && (
+        <div className="WelcomeScreen-item__shortcut">{shortcut}</div>
+      )}
     </button>
   );
 };
@@ -57,7 +59,7 @@ const WelcomeScreen = ({ actionManager }: { actionManager: ActionManager }) => {
         />
         <WelcomeScreenItem
           label={t("labels.liveCollaboration")}
-          shortcut="TODO"
+          shortcut={null}
           onClick={() => setCollabDialogShown(true)}
           icon={InviteToCollabIcon}
         />
