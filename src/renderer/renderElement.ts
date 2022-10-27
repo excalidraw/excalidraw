@@ -790,7 +790,6 @@ export const renderElement = (
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
   appState: AppState,
-  enclosingElement: ExcalidrawElement | null,
 ) => {
   const generator = rc.generator;
   switch (element.type) {

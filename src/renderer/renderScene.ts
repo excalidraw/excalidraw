@@ -60,7 +60,6 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
-import { getEnclosingElement } from "../element/textElement";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 4;
@@ -407,19 +406,7 @@ export const _renderScene = ({
 
     visibleElements.forEach((element, index) => {
       try {
-        const enclosingElement = getEnclosingElement(
-          visibleElements,
-          element,
-          index,
-        );
-        renderElement(
-          element,
-          rc,
-          context,
-          renderConfig,
-          appState,
-          enclosingElement,
-        );
+        renderElement(element, rc, context, renderConfig, appState);
         if (!isExporting) {
           renderLinkIcon(element, context, appState);
         }
@@ -437,7 +424,6 @@ export const _renderScene = ({
           context,
           renderConfig,
           appState,
-          null,
         );
       } catch (error: any) {
         console.error(error);

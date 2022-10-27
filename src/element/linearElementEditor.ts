@@ -836,9 +836,7 @@ export class LinearElementEditor {
 
     if (!event.altKey) {
       if (lastPoint === lastUncommittedPoint) {
-        LinearElementEditor.deletePoints(element, appState, [
-          points.length - 1,
-        ]);
+        LinearElementEditor.deletePoints(element, [points.length - 1]);
       }
       return {
         ...appState.editingLinearElement,
@@ -1094,7 +1092,6 @@ export class LinearElementEditor {
 
   static deletePoints(
     element: NonDeleted<ExcalidrawLinearElement>,
-    appState: AppState,
     pointIndices: readonly number[],
   ) {
     let offsetX = 0;
