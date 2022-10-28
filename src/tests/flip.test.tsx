@@ -3,7 +3,7 @@ import { GlobalTestState, render, waitFor } from "./test-utils";
 import { UI, Pointer } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
-import { getElementBounds } from "../element/bounds";
+import { getElementAbsoluteCoords } from "../element";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -31,15 +31,16 @@ jest.mock("../data/blob", () => {
 beforeEach(async () => {
   // Unmount ReactDOM from root
   ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+
   mouse.reset();
   localStorage.clear();
+  sessionStorage.clear();
   jest.clearAllMocks();
-
-  await render(<ExcalidrawApp />);
 
   Object.assign(document, {
     elementFromPoint: () => GlobalTestState.canvas,
   });
+  await render(<ExcalidrawApp />);
   h.setState({
     zoom: {
       value: 1 as NormalizedZoomValue,
@@ -180,9 +181,10 @@ const checkElementsBoundingBox = async (
   element2: ExcalidrawElement,
   toleranceInPx: number = 0,
 ) => {
-  const [x1, y1, x2, y2] = getElementBounds(element1);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element1);
 
-  const [x12, y12, x22, y22] = getElementBounds(element2);
+  const [x12, y12, x22, y22] = getElementAbsoluteCoords(element2);
+
   debugger;
   await waitFor(() => {
     // Check if width and height did not change
@@ -272,7 +274,7 @@ const checkVerticalFlip = async (toleranceInPx: number = 0.00001) => {
 };
 
 const TWO_POINTS_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS = 5;
-const MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS = 15;
+const MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS = 20;
 
 // Rectangle element
 describe("rectangle", () => {
@@ -378,7 +380,7 @@ describe("arrow", () => {
   it("flips an unrotated arrow horizontally with line inside min/max points bounds", async () => {
     const arrow = createLinearElementWithCurveInsideMinMaxPoints("arrow");
     h.app.scene.replaceAllElements([arrow]);
-    h.app.state.selectedElementIds[arrow.id] = true;
+    h.app.setState({ selectedElementIds: { [arrow.id]: true } });
     await checkHorizontalFlip(
       MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
     );
@@ -387,16 +389,98 @@ describe("arrow", () => {
   it("flips an unrotated arrow vertically with line inside min/max points bounds", async () => {
     const arrow = createLinearElementWithCurveInsideMinMaxPoints("arrow");
     h.app.scene.replaceAllElements([arrow]);
-    h.app.state.selectedElementIds[arrow.id] = true;
+    h.app.setState({ selectedElementIds: { [arrow.id]: true } });
+
     await checkVerticalFlip(50);
+  });
+
+  it("flips a rotated arrow horizontally with line inside min/max points bounds", async () => {
+    const originalAngle = Math.PI / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
+    const line = createLinearElementWithCurveInsideMinMaxPoints("arrow");
+    h.app.scene.replaceAllElements([line]);
+    h.app.state.selectedElementIds[line.id] = true;
+    mutateElement(line, {
+      angle: originalAngle,
+    });
+
+    await checkRotatedHorizontalFlip(
+      expectedAngle,
+      MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
+    );
+  });
+
+  it("flips a rotated arrow vertically with line inside min/max points bounds", async () => {
+    const originalAngle = Math.PI / 4;
+    const expectedAngle = (3 * Math.PI) / 4;
+    const line = createLinearElementWithCurveInsideMinMaxPoints("arrow");
+    h.app.scene.replaceAllElements([line]);
+    h.app.state.selectedElementIds[line.id] = true;
+    mutateElement(line, {
+      angle: originalAngle,
+    });
+
+    await checkRotatedVerticalFlip(
+      expectedAngle,
+      MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
+    );
   });
 
   //TODO: elements with curve outside minMax points have a wrong bounding box!!!
   it.skip("flips an unrotated arrow horizontally with line outside min/max points bounds", async () => {
     const arrow = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
     h.app.scene.replaceAllElements([arrow]);
-    h.app.state.selectedElementIds[arrow.id] = true;
-    await checkHorizontalFlip(50);
+    h.app.setState({ selectedElementIds: { [arrow.id]: true } });
+
+    await checkHorizontalFlip(
+      MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
+    );
+  });
+
+  //TODO: elements with curve outside minMax points have a wrong bounding box!!!
+  it.skip("flips a rotated arrow horizontally with line outside min/max points bounds", async () => {
+    const originalAngle = Math.PI / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
+    const line = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
+    mutateElement(line, { angle: originalAngle });
+    h.app.scene.replaceAllElements([line]);
+    h.app.setState({ selectedElementIds: { [line.id]: true } });
+
+    await checkRotatedVerticalFlip(
+      expectedAngle,
+      MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
+    );
+  });
+
+  //TODO: elements with curve outside minMax points have a wrong bounding box!!!
+  it.skip("flips an unrotated arrow vertically with line outside min/max points bounds", async () => {
+    const arrow = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
+    h.app.scene.replaceAllElements([arrow]);
+    h.app.setState({ selectedElementIds: { [arrow.id]: true } });
+
+    await checkVerticalFlip(MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS);
+  });
+
+  //TODO: elements with curve outside minMax points have a wrong bounding box!!!
+  it.skip("flips a rotated arrow vertically with line outside min/max points bounds", async () => {
+    const originalAngle = Math.PI / 4;
+    const expectedAngle = (3 * Math.PI) / 4;
+    const line = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
+    mutateElement(line, { angle: originalAngle });
+    h.app.scene.replaceAllElements([line]);
+    h.app.setState({ selectedElementIds: { [line.id]: true } });
+
+    await checkRotatedVerticalFlip(
+      expectedAngle,
+      MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
+    );
+  });
+
+  it("flips an unrotated arrow horizontally correctly", async () => {
+    createAndSelectOneArrow();
+    await checkHorizontalFlip(
+      TWO_POINTS_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
+    );
   });
 
   it("flips an unrotated arrow vertically correctly", async () => {
@@ -419,18 +503,20 @@ describe("arrow", () => {
 // Line element
 describe("line", () => {
   it("flips an unrotated line horizontally with line inside min/max points bounds", async () => {
-    const arrow = createLinearElementWithCurveInsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([arrow]);
-    h.app.state.selectedElementIds[arrow.id] = true;
+    const line = createLinearElementWithCurveInsideMinMaxPoints("line");
+    h.app.scene.replaceAllElements([line]);
+    h.app.setState({ selectedElementIds: { [line.id]: true } });
+
     await checkHorizontalFlip(
       MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
     );
   });
 
   it("flips an unrotated line vertically with line inside min/max points bounds", async () => {
-    const arrow = createLinearElementWithCurveInsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([arrow]);
-    h.app.state.selectedElementIds[arrow.id] = true;
+    const line = createLinearElementWithCurveInsideMinMaxPoints("line");
+    h.app.scene.replaceAllElements([line]);
+    h.app.setState({ selectedElementIds: { [line.id]: true } });
+
     await checkVerticalFlip(MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS);
   });
 
@@ -442,10 +528,52 @@ describe("line", () => {
   });
   //TODO: elements with curve outside minMax points have a wrong bounding box
   it.skip("flips an unrotated line horizontally with line outside min/max points bounds", async () => {
-    const arrow = createLinearElementsWithCurveOutsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([arrow]);
-    h.app.state.selectedElementIds[arrow.id] = true;
-    await checkHorizontalFlip(10);
+    const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
+    h.app.scene.replaceAllElements([line]);
+    h.app.setState({ selectedElementIds: { [line.id]: true } });
+
+    await checkHorizontalFlip(
+      MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
+    );
+  });
+
+  //TODO: elements with curve outside minMax points have a wrong bounding box
+  it.skip("flips an unrotated line vertically with line outside min/max points bounds", async () => {
+    const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
+    h.app.scene.replaceAllElements([line]);
+    h.app.setState({ selectedElementIds: { [line.id]: true } });
+
+    await checkVerticalFlip(MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS);
+  });
+
+  //TODO: elements with curve outside minMax points have a wrong bounding box
+  it.skip("flips a rotated line horizontally with line outside min/max points bounds", async () => {
+    const originalAngle = Math.PI / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
+    const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
+    mutateElement(line, { angle: originalAngle });
+    h.app.scene.replaceAllElements([line]);
+    h.app.setState({ selectedElementIds: { [line.id]: true } });
+
+    await checkRotatedHorizontalFlip(
+      expectedAngle,
+      MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
+    );
+  });
+
+  //TODO: elements with curve outside minMax points have a wrong bounding box
+  it.skip("flips a rotated line vertically with line outside min/max points bounds", async () => {
+    const originalAngle = Math.PI / 4;
+    const expectedAngle = (3 * Math.PI) / 4;
+    const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
+    mutateElement(line, { angle: originalAngle });
+    h.app.scene.replaceAllElements([line]);
+    h.app.setState({ selectedElementIds: { [line.id]: true } });
+
+    await checkRotatedVerticalFlip(
+      expectedAngle,
+      MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
+    );
   });
 
   it("flips an unrotated line vertically correctly", async () => {
@@ -453,22 +581,46 @@ describe("line", () => {
     await checkVerticalFlip(TWO_POINTS_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS);
   });
 
-  it.skip("flips a rotated line horizontally with line inside min/max points bounds", async () => {
+  it("flips a rotated line horizontally with line inside min/max points bounds", async () => {
     const originalAngle = Math.PI / 4;
     const expectedAngle = (7 * Math.PI) / 4;
-    const arrow = createLinearElementWithCurveInsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([arrow]);
-    h.app.state.selectedElementIds[arrow.id] = true;
-    mutateElement(arrow, {
+    const line = createLinearElementWithCurveInsideMinMaxPoints("line");
+    h.app.scene.replaceAllElements([line]);
+    h.app.state.selectedElementIds[line.id] = true;
+    mutateElement(line, {
       angle: originalAngle,
     });
-    await waitFor(() => {
-      expect(API.getSelectedElement().angle).toEqual(originalAngle);
-    });
+
     await checkRotatedHorizontalFlip(
       expectedAngle,
       MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
     );
+  });
+
+  it("flips a rotated line vertically with line inside min/max points bounds", async () => {
+    const originalAngle = Math.PI / 4;
+    const expectedAngle = (3 * Math.PI) / 4;
+    const line = createLinearElementWithCurveInsideMinMaxPoints("line");
+    h.app.scene.replaceAllElements([line]);
+    h.app.state.selectedElementIds[line.id] = true;
+    mutateElement(line, {
+      angle: originalAngle,
+    });
+
+    await checkRotatedVerticalFlip(
+      expectedAngle,
+      MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
+    );
+  });
+
+  it("flips a two points line horizontally correctly", async () => {
+    createAndSelectOneLine();
+    await checkTwoPointsLineHorizontalFlip();
+  });
+
+  it("flips a two points line vertically correctly", async () => {
+    createAndSelectOneLine();
+    await checkTwoPointsLineVerticalFlip();
   });
 });
 
