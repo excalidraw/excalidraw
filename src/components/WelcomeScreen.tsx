@@ -2,6 +2,7 @@ import { useAtom } from "jotai";
 import { actionLoadScene, actionShortcuts } from "../actions";
 import { ActionManager } from "../actions/manager";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { COOKIES } from "../constants";
 import { collabDialogShownAtom } from "../excalidraw-app/collab/Collab";
 import { t } from "../i18n";
 import {
@@ -9,20 +10,43 @@ import {
   HelpIcon,
   ImportSceneIcon,
   InviteToCollabIcon,
+  PlusPromoIcon,
 } from "./icons";
 import "./WelcomeScreen.scss";
+
+const isExcalidrawPlusSignedUser = document.cookie.includes(
+  COOKIES.AUTH_STATE_COOKIE,
+);
 
 const WelcomeScreenItem = ({
   label,
   shortcut,
   onClick,
   icon,
+  isPromoLink,
 }: {
   label: string;
   shortcut: string | null;
-  onClick: () => void;
+  onClick?: () => void;
   icon: JSX.Element;
+  isPromoLink?: boolean;
 }) => {
+  if (isPromoLink) {
+    return (
+      <a
+        className="WelcomeScreen-item WelcomeScreen-item--promo"
+        href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=banner&utm_campaign=launch"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <div className="WelcomeScreen-item__label">
+          {icon}
+          {label}
+        </div>
+      </a>
+    );
+  }
+
   return (
     <button className="WelcomeScreen-item" type="button" onClick={onClick}>
       <div className="WelcomeScreen-item__label">
@@ -69,6 +93,14 @@ const WelcomeScreen = ({ actionManager }: { actionManager: ActionManager }) => {
           shortcut="?"
           icon={HelpIcon}
         />
+        {!isExcalidrawPlusSignedUser && (
+          <WelcomeScreenItem
+            isPromoLink
+            label="Try Excalidraw Plus!"
+            shortcut={null}
+            icon={PlusPromoIcon}
+          />
+        )}
       </div>
     </div>
   );

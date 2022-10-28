@@ -120,6 +120,8 @@
   }
 
   .WelcomeScreen-item {
+    box-sizing: border-box;
+
     pointer-events: all;
 
     color: var(--color-gray-50);
@@ -154,6 +156,8 @@
     }
 
     &:hover {
+      text-decoration: none;
+
       background: var(--color-gray-10);
 
       .WelcomeScreen-item__shortcut {
@@ -162,6 +166,16 @@
 
       .WelcomeScreen-item__label {
         color: var(--color-gray-100);
+      }
+    }
+
+    &--promo {
+      color: var(--color-promo) !important;
+
+      &:hover {
+        .WelcomeScreen-item__label {
+          color: var(--color-promo) !important;
+        }
       }
     }
   }
