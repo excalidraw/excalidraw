@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import "./Menu.scss";
 
 interface MenuProps {
@@ -6,6 +7,7 @@ interface MenuProps {
   label: string;
   dataTestId: string;
   shortcut?: string;
+  isCollaborating?: boolean;
 }
 
 const MenuItem = ({
@@ -14,10 +16,11 @@ const MenuItem = ({
   label,
   dataTestId,
   shortcut,
+  isCollaborating,
 }: MenuProps) => {
   return (
     <button
-      className="menu-item"
+      className={clsx("menu-item", { "active-collab": isCollaborating })}
       aria-label={label}
       onClick={onClick}
       data-testid={dataTestId}

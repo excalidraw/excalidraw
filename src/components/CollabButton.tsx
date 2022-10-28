@@ -24,6 +24,7 @@ const CollabButton = ({
           dataTestId="collab-button"
           icon={users}
           onClick={onClick}
+          isCollaborating={isCollaborating}
         />
       ) : (
         <button
