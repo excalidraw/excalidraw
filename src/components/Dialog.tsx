@@ -10,6 +10,8 @@ import { Island } from "./Island";
 import { Modal } from "./Modal";
 import { AppState } from "../types";
 import { queryFocusableElements } from "../utils";
+import { isMenuOpenAtom, isDropdownOpenAtom } from "./App";
+import { useSetAtom } from "jotai";
 
 export interface DialogProps {
   children: React.ReactNode;
@@ -65,7 +67,12 @@ export const Dialog = (props: DialogProps) => {
     return () => islandNode.removeEventListener("keydown", handleKeyDown);
   }, [islandNode, props.autofocus]);
 
+  const setIsMenuOpen = useSetAtom(isMenuOpenAtom);
+  const setIsDropdownOpen = useSetAtom(isDropdownOpenAtom);
+
   const onClose = () => {
+    setIsMenuOpen(false);
+    setIsDropdownOpen(false);
     (lastActiveElement as HTMLElement).focus();
     props.onCloseRequest();
   };

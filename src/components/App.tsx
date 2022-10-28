@@ -265,6 +265,10 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
+import { atom } from "jotai";
+
+export const isMenuOpenAtom = atom(false);
+export const isDropdownOpenAtom = atom(false);
 
 const deviceContextInitialValue = {
   isSmScreen: false,

@@ -20,6 +20,7 @@ import PublishLibrary from "./PublishLibrary";
 import { Dialog } from "./Dialog";
 import { useOutsideClickHook } from "../hooks/useOutsideClick";
 import MenuItem from "./MenuItem";
+import { isDropdownOpenAtom } from "./App";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,
@@ -172,7 +173,7 @@ export const LibraryMenuHeader: React.FC<{
       });
   };
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useAtom(isDropdownOpenAtom);
   const dropdownRef = useOutsideClickHook(() => setIsDropdownOpen(false));
 
   return (
