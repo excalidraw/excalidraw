@@ -14,6 +14,7 @@ import {
   getNonDeletedElements,
   getNormalizedDimensions,
   isInvisiblySmallElement,
+  refreshTextDimensions,
 } from "../element";
 import {
   isFreeDrawElement,
@@ -142,6 +143,7 @@ const restoreElementWithProperties = <
 
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+  refreshDimensions = true,
 ): typeof element | null => {
   switch (element.type) {
     case "text":
@@ -154,7 +156,7 @@ const restoreElement = (
         fontSize = parseInt(fontPx, 10);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
-      return restoreElementWithProperties(element, {
+      element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
         text: element.text ?? "",
@@ -164,6 +166,11 @@ const restoreElement = (
         containerId: element.containerId ?? null,
         originalText: element.originalText || element.text,
       });
+
+      if (refreshDimensions) {
+        element = { ...element, ...refreshTextDimensions(element) };
+      }
+      return element;
     case "freedraw": {
       return restoreElementWithProperties(element, {
         points: element.points,
@@ -236,6 +243,7 @@ export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
+  refreshDimensions = true,
 ): ExcalidrawElement[] => {
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
   return (elements || []).reduce((elements, element) => {
@@ -249,7 +257,10 @@ export const restoreElements = (
       ) {
         return elements;
       }
-      let migratedElement: ExcalidrawElement | null = restoreElement(element);
+      let migratedElement: ExcalidrawElement | null = restoreElement(
+        element,
+        refreshDimensions,
+      );
       if (migratedElement) {
         const localElement = localElementsMap?.get(element.id);
         if (localElement && localElement.version > migratedElement.version) {
@@ -387,7 +398,7 @@ export const restore = (
   localElements: readonly ExcalidrawElement[] | null | undefined,
 ): RestoredDataState => {
   return {
-    elements: restoreElements(data?.elements, localElements),
+    elements: restoreElements(data?.elements, localElements, true),
     appState: restoreAppState(data?.appState, localAppState || null),
     files: data?.files || {},
   };
