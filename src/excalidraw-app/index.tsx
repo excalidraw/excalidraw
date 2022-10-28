@@ -7,6 +7,7 @@ import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import {
   APP_NAME,
+  COOKIES,
   EVENT,
   THEME,
   TITLE_TIMEOUT,
@@ -82,6 +83,10 @@ import EncryptedIcon from "../components/EncryptedIcon";
 
 polyfill();
 window.EXCALIDRAW_THROTTLE_RENDER = true;
+
+const isExcalidrawPlusSignedUser = document.cookie.includes(
+  COOKIES.AUTH_STATE_COOKIE,
+);
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -590,7 +595,21 @@ const ExcalidrawWrapper = () => {
       );
     }
 
-    return <EncryptedIcon />;
+    return (
+      <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
+        {isExcalidrawPlusSignedUser && (
+          <a
+            href={`${process.env.REACT_APP_PLUS_APP}/#excalidraw-redirect`}
+            target="_blank"
+            rel="noreferrer"
+            className="plus-button"
+          >
+            Go to Excalidraw+
+          </a>
+        )}
+        <EncryptedIcon />
+      </div>
+    );
   };
 
   const renderCustomStats = (
