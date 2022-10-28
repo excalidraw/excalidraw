@@ -3748,7 +3748,11 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // remove selections on escape press
-      if (event.key === "Escape") {
+      if (event.key === KEYS.ESCAPE) {
+        // Don't deselect text right after editing it
+        if (isWritableElement(event.target)) {
+          return;
+        }
         this.setState({
           selectedElementIds: {},
           selectedGroupIds: {},
