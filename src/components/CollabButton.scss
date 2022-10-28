@@ -27,17 +27,17 @@
     // same colours as before
     // but blends together too much with bg imo
     &.active {
-      background-color: var(--button-special-active-bg-color);
-      border-color: var(--button-special-active-bg-color);
+      background-color: #0fb884;
+      border-color: #0fb884;
 
       svg {
-        color: var(--icon-green-fill-color);
+        color: #fff;
       }
 
       &:hover,
       &:active {
-        background-color: var(--button-special-active-bg-color);
-        border-color: var(--button-special-active-bg-color);
+        background-color: #0fb884;
+        border-color: #0fb884;
       }
     }
   }
@@ -71,9 +71,9 @@
     bottom: -5px;
     padding: 3px;
     border-radius: 50%;
-    background-color: $oc-green-6;
-    color: $oc-white;
-    font-size: 0.6em;
+    background-color: $oc-green-2;
+    color: $oc-green-9;
+    font-size: 0.6rem;
     font-family: "Cascadia";
   }
 }
