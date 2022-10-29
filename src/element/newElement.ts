@@ -254,6 +254,23 @@ const getAdjustedDimensions = (
   };
 };
 
+export const refreshTextDimensions = (
+  textElement: ExcalidrawTextElement,
+  text = textElement.text,
+) => {
+  const container = getContainerElement(textElement);
+  if (container) {
+    // text = wrapText(text, getFontString(textElement), container.width);
+    text = wrapText(
+      text,
+      getFontString(textElement),
+      getMaxContainerWidth(container),
+    );
+  }
+  const dimensions = getAdjustedDimensions(textElement, text);
+  return { text, ...dimensions };
+};
+
 export const getMaxContainerWidth = (container: ExcalidrawElement) => {
   return getContainerDims(container).width - BOUND_TEXT_PADDING * 2;
 };
@@ -278,22 +295,12 @@ export const updateTextElement = (
     link?: string;
   },
 ): ExcalidrawTextElement => {
-  const container = getContainerElement(textElement);
-  if (container) {
-    text = wrapText(
-      originalText,
-      getFontString(textElement),
-      getMaxContainerWidth(container),
-    );
-  }
-  const dimensions = getAdjustedDimensions(textElement, text);
   return newElementWith(textElement, {
-    text,
-    rawText: rawText ?? originalText, //should this be rather originalText??
+    rawText: rawText ?? originalText, //zsviczian should this be rather originalText??
     originalText, //zsviczian
     isDeleted: isDeleted ?? textElement.isDeleted,
     ...(link ? { link } : {}), //zsviczian
-    ...dimensions,
+    ...refreshTextDimensions(textElement, originalText),
   });
 };
 
