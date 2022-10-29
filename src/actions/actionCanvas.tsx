@@ -198,7 +198,7 @@ export const actionResetZoom = register({
 const zoomValueToFitBoundsOnViewport = (
   bounds: [number, number, number, number],
   viewportDimensions: { width: number; height: number },
-  maxZoom: number = 1,
+  maxZoom: number = 1, //zsviczian
 ) => {
   const [x1, y1, x2, y2] = bounds;
   const commonBoundsWidth = x2 - x1;
@@ -209,8 +209,8 @@ const zoomValueToFitBoundsOnViewport = (
   const zoomAdjustedToSteps =
     Math.floor(smallestZoomValue / ZOOM_STEP) * ZOOM_STEP;
   const clampedZoomValueToFitElements = Math.min(
-    Math.max(zoomAdjustedToSteps, ZOOM_STEP),
-    maxZoom,
+    Math.max(zoomAdjustedToSteps, 0.1), //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/850
+    maxZoom, //zsviczian
   );
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
