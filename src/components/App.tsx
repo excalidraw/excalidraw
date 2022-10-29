@@ -252,6 +252,7 @@ import throttle from "lodash.throttle";
 import { fileOpen, FileSystemHandle } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
+  getApproxLineHeight,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
@@ -1639,13 +1640,22 @@ class App extends React.Component<AppProps, AppState> {
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
     };
-    const DELTA_GAP = 12;
+    const DELTA_GAP = 10;
     const newElements: ExcalidrawTextElement[] = [];
     if (splitText) {
       let currentY = y;
       const splittedText = text.split("\n");
       for (const line of splittedText) {
+        const lineHeight =
+          getApproxLineHeight(
+            getFontString({
+              fontSize: newElementProps.fontSize,
+              fontFamily: newElementProps.fontFamily,
+            }),
+          ) +
+          DELTA_GAP / this.state.zoom.value;
         if (line.trim().length === 0) {
+          currentY += lineHeight;
           continue;
         }
         const element = newTextElement({
@@ -1655,7 +1665,7 @@ class App extends React.Component<AppProps, AppState> {
           text: line.trim(),
         });
         newElements.push(element);
-        currentY += element.height + DELTA_GAP / this.state.zoom.value;
+        currentY += lineHeight;
       }
     } else {
       if (text.length === 0) {
