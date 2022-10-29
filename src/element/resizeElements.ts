@@ -721,7 +721,7 @@ const resizeMultipleElements = (
       (pointerSideY * Math.abs(pointerY - anchorY)) / (maxY - minY),
     ) * (shouldResizeFromCenter ? 2 : 1);
 
-  if (scale === 1) {
+  if (scale === 0) {
     return;
   }
 
@@ -766,20 +766,25 @@ const resizeMultipleElements = (
         width - optionalPadding,
         height - optionalPadding,
       );
-      if (textMeasurements) {
-        if (isTextElement(element.orig)) {
-          update.fontSize = textMeasurements.size;
-          update.baseline = textMeasurements.baseline;
-        }
 
-        if (boundTextElement) {
-          boundTextUpdates = {
-            fontSize: textMeasurements.size,
-            baseline: textMeasurements.baseline,
-          };
-        }
+      if (!textMeasurements) {
+        return;
+      }
+
+      if (isTextElement(element.orig)) {
+        update.fontSize = textMeasurements.size;
+        update.baseline = textMeasurements.baseline;
+      }
+
+      if (boundTextElement) {
+        boundTextUpdates = {
+          fontSize: textMeasurements.size,
+          baseline: textMeasurements.baseline,
+        };
       }
     }
+
+    updateBoundElements(element.latest, { newSize: { width, height } });
 
     mutateElement(element.latest, update);
 
