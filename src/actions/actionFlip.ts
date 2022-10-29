@@ -183,8 +183,8 @@ const flipElement = (
       false,
       element,
       usingNWHandle ? "nw" : "ne",
-      false,
-      usingNWHandle ? startPoint[0] + elWidth * 2 : startPoint[0] - elWidth * 2,
+      true,
+      usingNWHandle ? startPoint[0] + elWidth : startPoint[0] - elWidth,
       startPoint[1],
     );
   }
