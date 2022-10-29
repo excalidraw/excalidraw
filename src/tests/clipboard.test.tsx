@@ -3,6 +3,10 @@ import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import ExcalidrawApp from "../excalidraw-app";
 import { KEYS } from "../keys";
+import { getApproxLineHeight } from "../element/textElement";
+import { getFontString } from "../utils";
+import { getElementBounds } from "../element";
+import { NormalizedZoomValue } from "../types";
 
 const { h } = window;
 
@@ -59,6 +63,7 @@ beforeEach(async () => {
   mouse.reset();
 
   await render(<ExcalidrawApp />);
+  h.app.setAppState({ zoom: { value: 1 as NormalizedZoomValue } });
   setClipboardText("");
   Object.assign(document, {
     elementFromPoint: () => GlobalTestState.canvas,
@@ -91,6 +96,52 @@ describe("paste text as single lines", () => {
     await waitFor(async () => {
       await sleep(50); // elements lenght will always be zero if we don't wait, since paste is async
       expect(h.elements.length).toEqual(0);
+    });
+  });
+
+  it("should space items correctly", async () => {
+    const text = "hkhkjhki\njgkjhffjh\njgkjhffjh";
+    const lineHeight =
+      getApproxLineHeight(
+        getFontString({
+          fontSize: h.app.state.currentItemFontSize,
+          fontFamily: h.app.state.currentItemFontFamily,
+        }),
+      ) +
+      10 / h.app.state.zoom.value;
+    mouse.moveTo(100, 100);
+    setClipboardText(text);
+    pasteWithCtrlCmdV();
+    await waitFor(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [fx, firstElY] = getElementBounds(h.elements[0]);
+      for (let i = 1; i < h.elements.length; i++) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [fx, elY] = getElementBounds(h.elements[i]);
+        expect(elY).toEqual(firstElY + lineHeight * i);
+      }
+    });
+  });
+
+  it("should leave a space for blank new lines", async () => {
+    const text = "hkhkjhki\n\njgkjhffjh";
+    const lineHeight =
+      getApproxLineHeight(
+        getFontString({
+          fontSize: h.app.state.currentItemFontSize,
+          fontFamily: h.app.state.currentItemFontFamily,
+        }),
+      ) +
+      10 / h.app.state.zoom.value;
+    mouse.moveTo(100, 100);
+    setClipboardText(text);
+    pasteWithCtrlCmdV();
+    await waitFor(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [fx, firstElY] = getElementBounds(h.elements[0]);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [lx, lastElY] = getElementBounds(h.elements[1]);
+      expect(lastElY).toEqual(firstElY + lineHeight * 2);
     });
   });
 });
