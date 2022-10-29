@@ -35,6 +35,8 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Pasting text onto the canvas with `Ctr/Cmd+V` now splits the text line by line and creates an element for every line. To copy the text as a single element one should paste with `Ctrl/Cmd+Shift+V` [#5786](https://github.com/excalidraw/excalidraw/pull/5786).
+
 - Render library into `Sidebar` on mobile [#5774](https://github.com/excalidraw/excalidraw/pull/5774)
 
 - Additional drag and drop image format support (webp, bmp, ico) [#5749](https://github.com/excalidraw/excalidraw/pull/5749)
