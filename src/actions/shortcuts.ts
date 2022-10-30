@@ -34,12 +34,14 @@ export type ShortcutName =
       | "hyperlink"
       | "toggleLock"
     >
-  | "saveScene";
+  | "saveScene"
+  | "imageExport";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   toggleTheme: [getShortcutKey("Shit+Alt+D")],
   saveScene: [getShortcutKey("CtrlOrCmd+S")],
   loadScene: [getShortcutKey("CtrlOrCmd+O")],
+  imageExport: [getShortcutKey("CtrlOrCmd+Shift+E")],
   cut: [getShortcutKey("CtrlOrCmd+X")],
   copy: [getShortcutKey("CtrlOrCmd+C")],
   paste: [getShortcutKey("CtrlOrCmd+V")],

@@ -21,6 +21,8 @@ import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import { MenuLinks, Separator } from "./MenuUtils";
 import WelcomeScreen from "./WelcomeScreen";
+import MenuItem from "./MenuItem";
+import { ExportIcon } from "./icons";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -173,6 +175,12 @@ export const MobileMenu = ({
       return (
         <>
           {renderJSONExportDialog()}
+          <MenuItem
+            label={t("buttons.exportImage")}
+            icon={ExportIcon}
+            dataTestId="image-export-button"
+            onClick={() => setAppState({ openDialog: "imageExport" })}
+          />
           {renderImageExportDialog()}
         </>
       );
@@ -182,6 +190,12 @@ export const MobileMenu = ({
         {actionManager.renderAction("loadScene")}
         {renderJSONExportDialog()}
         {renderImageExportDialog()}
+        <MenuItem
+          label={t("buttons.exportImage")}
+          icon={ExportIcon}
+          dataTestId="image-export-button"
+          onClick={() => setAppState({ openDialog: "imageExport" })}
+        />
         {onCollabButtonClick && (
           <CollabButton
             isCollaborating={isCollaborating}

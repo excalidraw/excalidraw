@@ -9,7 +9,7 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../scene/export";
 import { AppState, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
-import { clipboard, ExportIcon } from "./icons";
+import { clipboard } from "./icons";
 import Stack from "./Stack";
 import "./ExportDialog.scss";
 import OpenColor from "open-color";
@@ -17,7 +17,6 @@ import { CheckboxItem } from "./CheckboxItem";
 import { DEFAULT_EXPORT_PADDING } from "../constants";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { ActionManager } from "../actions/manager";
-import MenuItem from "./MenuItem";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -220,6 +219,7 @@ const ImageExportModal = ({
 export const ImageExportDialog = ({
   elements,
   appState,
+  setAppState,
   files,
   exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
@@ -228,6 +228,7 @@ export const ImageExportDialog = ({
   onExportToClipboard,
 }: {
   appState: AppState;
+  setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles;
   exportPadding?: number;
@@ -236,25 +237,13 @@ export const ImageExportDialog = ({
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
 }) => {
-  const [modalIsShown, setModalIsShown] = useState(false);
-
   const handleClose = React.useCallback(() => {
-    setModalIsShown(false);
-  }, []);
+    setAppState({ openDialog: null });
+  }, [setAppState]);
 
   return (
     <>
-      {/* // TODO barnabasmolnar/editor-redesign  */}
-      {/* probably use a different icon here... */}
-      <MenuItem
-        label={t("buttons.exportImage")}
-        icon={ExportIcon}
-        dataTestId="image-export-button"
-        onClick={() => {
-          setModalIsShown(true);
-        }}
-      />
-      {modalIsShown && (
+      {appState.openDialog === "imageExport" && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.exportImage")}>
           <ImageExportModal
             elements={elements}

@@ -1887,8 +1887,16 @@ class App extends React.Component<AppProps, AppState> {
 
       if (event.key === KEYS.QUESTION_MARK) {
         this.setState({
-          showHelpDialog: true,
+          openDialog: "help",
         });
+        return;
+      } else if (
+        event.key.toLowerCase() === KEYS.E &&
+        event.shiftKey &&
+        event[KEYS.CTRL_OR_CMD]
+      ) {
+        this.setState({ openDialog: "imageExport" });
+        return;
       }
 
       if (this.actionManager.handleKeyDown(event)) {

@@ -40,6 +40,7 @@ import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
 import {
+  ExportIcon,
   HamburgerMenuIcon,
   WelcomeScreenMenuArrow,
   WelcomeScreenTopToolbarArrow,
@@ -52,6 +53,8 @@ import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import { LanguageList } from "../excalidraw-app/components/LanguageList";
 import WelcomeScreenDecor from "./WelcomeScreenDecor";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import MenuItem from "./MenuItem";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -162,6 +165,7 @@ const LayerUI = ({
       <ImageExportDialog
         elements={elements}
         appState={appState}
+        setAppState={setAppState}
         files={files}
         actionManager={actionManager}
         onExportToPng={createExporter("png")}
@@ -215,7 +219,13 @@ const LayerUI = ({
               {appState.fileHandle &&
                 actionManager.renderAction("saveToActiveFile")}
               {renderJSONExportDialog()}
-              {renderImageExportDialog()}
+              <MenuItem
+                label={t("buttons.exportImage")}
+                icon={ExportIcon}
+                dataTestId="image-export-button"
+                onClick={() => setAppState({ openDialog: "imageExport" })}
+                shortcut={getShortcutFromShortcutName("imageExport")}
+              />
               {onCollabButtonClick && (
                 <CollabButton
                   isCollaborating={isCollaborating}
@@ -426,13 +436,14 @@ const LayerUI = ({
           onClose={() => setAppState({ errorMessage: null })}
         />
       )}
-      {appState.showHelpDialog && (
+      {appState.openDialog === "help" && (
         <HelpDialog
           onClose={() => {
-            setAppState({ showHelpDialog: false });
+            setAppState({ openDialog: null });
           }}
         />
       )}
+      {renderImageExportDialog()}
       {appState.pasteDialog.shown && (
         <PasteChartDialog
           setAppState={setAppState}
