@@ -154,19 +154,30 @@
       color: var(--color-gray-40);
       font-size: 0.75rem;
     }
+  }
 
-    &:hover {
-      text-decoration: none;
+  &:not(:active) .WelcomeScreen-item:hover {
+    text-decoration: none;
+    background: var(--color-gray-10);
 
-      background: var(--color-gray-10);
+    .WelcomeScreen-item__shortcut {
+      color: var(--color-gray-50);
+    }
 
-      .WelcomeScreen-item__shortcut {
-        color: var(--color-gray-50);
-      }
+    .WelcomeScreen-item__label {
+      color: var(--color-gray-100);
+    }
+  }
 
-      .WelcomeScreen-item__label {
-        color: var(--color-gray-100);
-      }
+  .WelcomeScreen-item:active {
+    background: var(--color-gray-20);
+
+    .WelcomeScreen-item__shortcut {
+      color: var(--color-gray-50);
+    }
+
+    .WelcomeScreen-item__label {
+      color: var(--color-gray-100);
     }
 
     &--promo {
@@ -191,17 +202,17 @@
       &__shortcut {
         color: var(--color-gray-60);
       }
+    }
 
-      &:hover {
-        background: var(--color-gray-85);
+    &:not(:active) .WelcomeScreen-item:hover {
+      background: var(--color-gray-85);
 
-        .WelcomeScreen-item__shortcut {
-          color: var(--color-gray-50);
-        }
+      .WelcomeScreen-item__shortcut {
+        color: var(--color-gray-50);
+      }
 
-        .WelcomeScreen-item__label {
-          color: var(--color-gray-10);
-        }
+      .WelcomeScreen-item__label {
+        color: var(--color-gray-10);
       }
     }
   }
