@@ -50,174 +50,134 @@ export const createIcon = (
   );
 };
 
-const newIconProps: Opts = {
+const tablerIconProps: Opts = {
+  width: 24,
+  height: 24,
+  fill: "none",
+  strokeWidth: 2,
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
+
+const modifiedTablerIconProps: Opts = {
   width: 20,
   height: 20,
   fill: "none",
-};
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
 
+// -----------------------------------------------------------------------------
+
+// tabler-icons: present
 export const PlusPromoIcon = createIcon(
-  <>
+  <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <rect x={3} y={8} width={18} height={4} rx={1} />
     <line x1={12} y1={8} x2={12} y2={21} />
     <path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" />
     <path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5" />
-  </>,
-  {
-    width: 24,
-    height: 24,
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.25,
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-  },
+  </g>,
+  tablerIconProps,
 );
 
+// tabler-icons: book
 export const LibraryIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M2.5 15.833a7.5 7.5 0 0 1 7.5 0 7.5 7.5 0 0 1 7.5 0M2.5 5A7.5 7.5 0 0 1 10 5a7.5 7.5 0 0 1 7.5 0M2.5 5v10.833M10 5v10.833M17.5 5v10.833" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+    <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+    <line x1="3" y1="6" x2="3" y2="19" />
+    <line x1="12" y1="6" x2="12" y2="19" />
+    <line x1="21" y1="6" x2="21" y2="19" />
+  </g>,
+  tablerIconProps,
 );
 
+// tabler-icons: plus
 export const PlusIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M10 4.167v11.666M4.167 10h11.666" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <svg strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>,
+  tablerIconProps,
 );
 
+// tabler-icons: dots-vertical
 export const DotsIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M10 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM10 16.667A.833.833 0 1 0 10 15a.833.833 0 0 0 0 1.667ZM10 5a.833.833 0 1 0 0-1.667A.833.833 0 0 0 10 5Z" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="1"></circle>
+    <circle cx="12" cy="19" r="1"></circle>
+    <circle cx="12" cy="5" r="1"></circle>
+  </g>,
+  tablerIconProps,
 );
 
+// tabler-icons: pinned
 export const PinIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
+  <svg strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M9 4v6l-2 4v2h10v-2l-2 -4v-6"></path>
+    <line x1="12" y1="16" x2="12" y2="21"></line>
+    <line x1="8" y1="4" x2="16" y2="4"></line>
+  </svg>,
+  tablerIconProps,
+);
+
+// tabler-icons: lock-open (via Figma)
+export const UnlockedIcon = createIcon(
+  <g>
+    <path
+      d="M13.542 8.542H6.458a2.5 2.5 0 0 0-2.5 2.5v3.75a2.5 2.5 0 0 0 2.5 2.5h7.084a2.5 2.5 0 0 0 2.5-2.5v-3.75a2.5 2.5 0 0 0-2.5-2.5Z"
       stroke="currentColor"
       strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+    />
+    <path
+      d="M10 13.958a1.042 1.042 0 1 0 0-2.083 1.042 1.042 0 0 0 0 2.083Z"
+      stroke="currentColor"
+      strokeWidth="1.25"
+    />
+    <mask
+      id="UnlockedIcon"
+      style={{ maskType: "alpha" }}
+      maskUnits="userSpaceOnUse"
+      x={6}
+      y={1}
+      width={9}
+      height={9}
     >
-      <path d="M7.5 3.333v5l-1.667 3.334v1.666h8.334v-1.666L12.5 8.333v-5M10 13.333V17.5M6.667 3.333h6.666" />
+      <path
+        stroke="none"
+        d="M6.399 9.561V5.175c0-.93.401-1.823 1.116-2.48a3.981 3.981 0 0 1 2.693-1.028c1.01 0 1.98.37 2.694 1.027.715.658 1.116 1.55 1.116 2.481"
+        fill="#fff"
+      />
+    </mask>
+    <g mask="url(#UnlockedIcon)">
+      <path
+        stroke="none"
+        d="M5.149 9.561v1.25h2.5v-1.25h-2.5Zm5.06-7.894V.417v1.25Zm2.559 3.508v1.25h2.5v-1.25h-2.5ZM7.648 8.51V5.175h-2.5V8.51h2.5Zm0-3.334c0-.564.243-1.128.713-1.561L6.668 1.775c-.959.883-1.52 2.104-1.52 3.4h2.5Zm.713-1.561a2.732 2.732 0 0 1 1.847-.697v-2.5c-1.31 0-2.585.478-3.54 1.358L8.36 3.614Zm1.847-.697c.71 0 1.374.26 1.847.697l1.694-1.839a5.231 5.231 0 0 0-3.54-1.358v2.5Zm1.847.697c.47.433.713.997.713 1.561h2.5c0-1.296-.56-2.517-1.52-3.4l-1.693 1.839Z"
+        fill="currentColor"
+      />
     </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  </g>,
+  modifiedTablerIconProps,
 );
 
-export const UnlockedIcon = createIcon(
-  <>
-    <g clipPath="url(#a)">
-      <path
-        d="M13.542 8.542H6.458a2.5 2.5 0 0 0-2.5 2.5v3.75a2.5 2.5 0 0 0 2.5 2.5h7.084a2.5 2.5 0 0 0 2.5-2.5v-3.75a2.5 2.5 0 0 0-2.5-2.5Z"
-        stroke="currentColor"
-        strokeWidth="1.25"
-      />
-      <path
-        d="M10 13.958a1.042 1.042 0 1 0 0-2.083 1.042 1.042 0 0 0 0 2.083Z"
-        stroke="currentColor"
-        strokeWidth="1.25"
-      />
-      <mask
-        id="UnlockedIcon"
-        style={{ maskType: "alpha" }}
-        maskUnits="userSpaceOnUse"
-        x={6}
-        y={1}
-        width={9}
-        height={9}
-      >
-        <path
-          d="M6.399 9.561V5.175c0-.93.401-1.823 1.116-2.48a3.981 3.981 0 0 1 2.693-1.028c1.01 0 1.98.37 2.694 1.027.715.658 1.116 1.55 1.116 2.481"
-          fill="#fff"
-        />
-      </mask>
-      <g mask="url(#UnlockedIcon)">
-        <path
-          d="M5.149 9.561v1.25h2.5v-1.25h-2.5Zm5.06-7.894V.417v1.25Zm2.559 3.508v1.25h2.5v-1.25h-2.5ZM7.648 8.51V5.175h-2.5V8.51h2.5Zm0-3.334c0-.564.243-1.128.713-1.561L6.668 1.775c-.959.883-1.52 2.104-1.52 3.4h2.5Zm.713-1.561a2.732 2.732 0 0 1 1.847-.697v-2.5c-1.31 0-2.585.478-3.54 1.358L8.36 3.614Zm1.847-.697c.71 0 1.374.26 1.847.697l1.694-1.839a5.231 5.231 0 0 0-3.54-1.358v2.5Zm1.847.697c.47.433.713.997.713 1.561h2.5c0-1.296-.56-2.517-1.52-3.4l-1.693 1.839Z"
-          fill="currentColor"
-        />
-      </g>
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
-);
-
+// tabler-icons: lock (via Figma)
 export const LockedIcon = createIcon(
-  <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
-      <path d="M13.542 8.542H6.458a2.5 2.5 0 0 0-2.5 2.5v3.75a2.5 2.5 0 0 0 2.5 2.5h7.084a2.5 2.5 0 0 0 2.5-2.5v-3.75a2.5 2.5 0 0 0-2.5-2.5Z" />
-      <path d="M10 13.958a1.042 1.042 0 1 0 0-2.083 1.042 1.042 0 0 0 0 2.083Z" />
-      <path
-        d="M6.667 8.333V5.417C6.667 3.806 8.159 2.5 10 2.5c1.841 0 3.333 1.306 3.333 2.917v2.916"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.25">
+    <path d="M13.542 8.542H6.458a2.5 2.5 0 0 0-2.5 2.5v3.75a2.5 2.5 0 0 0 2.5 2.5h7.084a2.5 2.5 0 0 0 2.5-2.5v-3.75a2.5 2.5 0 0 0-2.5-2.5Z" />
+    <path d="M10 13.958a1.042 1.042 0 1 0 0-2.083 1.042 1.042 0 0 0 0 2.083Z" />
+    <path d="M6.667 8.333V5.417C6.667 3.806 8.159 2.5 10 2.5c1.841 0 3.333 1.306 3.333 2.917v2.916" />
+  </g>,
+  modifiedTablerIconProps,
 );
 
+// custom
 export const WelcomeScreenMenuArrow = createIcon(
   <>
     <path
@@ -242,6 +202,7 @@ export const WelcomeScreenMenuArrow = createIcon(
   { width: 41, height: 94, fill: "none" },
 );
 
+// custom
 export const WelcomeScreenHelpArrow = createIcon(
   <>
     <path
@@ -266,6 +227,7 @@ export const WelcomeScreenHelpArrow = createIcon(
   { width: 85, height: 71, fill: "none" },
 );
 
+// custom
 export const WelcomeScreenTopToolbarArrow = createIcon(
   <>
     <path
@@ -290,6 +252,7 @@ export const WelcomeScreenTopToolbarArrow = createIcon(
   { width: 38, height: 78, fill: "none" },
 );
 
+// custom
 export const ExcalLogo = createIcon(
   <g fill="currentColor">
     <path d="M24.296 12.214c0 .112-.134.224-.291.224-.135 0-.516.629-.808 1.392-.897 2.335-9.867 20.096-9.89 19.534 0-.292-.134-.494-.359-.494-.313 0-.358.18-.224 1.055.135 1.01.045 1.236-3.14 7.432-1.793 3.525-3.722 7.208-4.282 8.196-.584 1.032-1.032 2.155-1.077 2.626-.067.809.022.92 1.973 2.605 1.122.988 2.557 2.223 3.185 2.784 2.826 2.582 4.149 3.615 4.508 3.547.538-.09 8.858-8.823 8.88-9.317 0-.225-.403-3.638-.897-7.59-.852-6.735-1.66-14.616-1.57-15.38.068-.47-.269-2.85-.516-3.884-.201-.808-.112-1.145 1.503-4.827.942-2.178 2.176-4.85 2.714-5.928.515-1.077.964-2.02.964-2.088 0-.067-.157-.112-.336-.112-.18 0-.337.09-.337.225Zm-5.158 16.772c.247 1.572.74 5.344 1.099 8.375.695 5.568 1.503 11.742 1.727 13.314.135.786.045.943-1.413 2.56-2.534 2.851-5.225 5.658-6.145 6.376l-.852.674-4.373-4.086c-4.037-3.728-4.373-4.11-4.127-4.558a5154.2 5154.2 0 0 1 2.535-4.626 727.864 727.864 0 0 0 3.678-6.78c.784-1.46 1.502-2.717 1.637-2.785.156-.09.201 2.178.156 7.006-.09 7.207-.067 7.23.651 7.072.09 0 .157-3.637.157-8.06V35.43l2.355-4.715c1.3-2.605 2.377-4.693 2.422-4.67.045.022.27 1.347.493 2.94ZM9.562 1.818C7.903 3.143 5.346 5.388 3.328 7.32L1.735 8.823l.292 1.976c.157 1.078.449 3.188.628 4.67.202 1.482.404 2.874.47 3.077.09.269 0 .404-.246.404-.426 0-.449-.113.718 3.592.286.952.577 1.903.875 2.851.044.158.224.225.425.158.202-.09.314-.27.247-.427-.067-.18.045-.36.224-.427.247-.09.225-.269-.157-.92-.605-1.01-2.152-9.633-2.242-12.416-.067-1.976-.067-1.999.762-3.121.808-1.1 2.67-2.762 5.54-4.873.807-.605 1.614-1.28 1.839-1.504.336-.404.493-.292 3.319 2.717 1.637 1.729 3.453 3.502 4.037 3.952l1.076.808-.83 1.75c-.448.944-2.265 4.581-4.059 8.04-3.745 7.274-2.983 6.578-7.333 6.645l-2.826.023-.942 1.077c-.987 1.146-1.121 1.572-.65 2.29.18.248.313.652.313.898 0 .405.157.472 1.055.517.56.023 1.076.09 1.144.157.067.068.156 1.46.224 3.098l.09 2.965-1.503 3.232C1.735 45.422.749 47.891.749 48.7c0 .427.09.786.18.786.224 0 .224-.022 9.35-19.085a4398.495 4398.495 0 0 1 8.927-18.546c.672-1.369 1.278-2.626 1.323-2.806.045-.202-1.503-1.751-3.97-3.93-2.22-1.975-4.171-3.772-4.35-3.974-.516-.628-1.279-.426-2.647.674ZM8.441 31.231c-.18.472-.65 1.46-1.031 2.2-.629 1.258-.696 1.303-.853.786-.09-.314-.157-1.235-.18-2.066-.022-1.639-.067-1.616 1.817-1.728L8.8 30.4l-.358.831Zm1.884-3.592c-1.032 1.998-1.077 2.02-3.903 2.155-2.489.135-2.533.112-2.533-.36 0-.269-.09-.628-.203-.808-.134-.202-.044-.56.27-1.055l.493-.763H6.69c1.234-.023 2.647-.113 3.14-.202.494-.09.92-.135.965-.113.045.023-.18.54-.471 1.146Zm-.09-20.477c-.404.292-.516.584-.516 1.325 0 .875.067 1.01.673 1.257.605.247.763.224 1.458-.247.92-.629.941-.786.269-1.796-.583-.876-1.166-1.033-1.884-.54Z" />
@@ -302,476 +265,212 @@ export const ExcalLogo = createIcon(
   { width: 26, height: 62, fill: "none" },
 );
 
-export const InviteToCollabIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM15 7.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM15 17.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM7.25 8.917l5.5-2.834M7.25 11.083l5.5 2.834" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
-);
-
-export const ImportSceneIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 7.5 10 3.333 14.167 7.5M10 3.333v10" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
-);
-
+// custom
 export const SelectionIcon = createIcon(
-  <>
-    <path
-      d="M3.567 3.567 10.07 19.97l2.51-7.39 7.39-2.51L3.567 3.567ZM13 13l6 6"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </>,
-  { fill: "none", width: 24, height: 24, strokeWidth: 1.5 },
+  <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 6l4.153 11.793a0.365 .365 0 0 0 .331 .207a0.366 .366 0 0 0 .332 -.207l2.184 -4.793l4.787 -1.994a0.355 .355 0 0 0 .213 -.323a0.355 .355 0 0 0 -.213 -.323l-11.787 -4.36z" />
+    <path d="M13.5 13.5l4.5 4.5" />
+  </g>,
+  { fill: "none", width: 22, height: 22, strokeWidth: 1.25 },
 );
 
+// tabler-icons: square
 export const RectangleIcon = createIcon(
-  <>
-    <g clipPath="url(#a)">
-      <path
-        d="M4.91 2.625h10.18a2.284 2.284 0 0 1 2.285 2.284v10.182a2.284 2.284 0 0 1-2.284 2.284H4.909a2.284 2.284 0 0 1-2.284-2.284V4.909a2.284 2.284 0 0 1 2.284-2.284Z"
-        stroke="currentColor"
-        strokeWidth="1.25"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+  </g>,
+  tablerIconProps,
 );
 
+// tabler-icons: square-rotated
 export const DiamondIcon = createIcon(
-  <>
-    <g clipPath="url(#a)">
-      <path
-        clipRule="evenodd"
-        d="M8.75 17 3 11.25c-.65-.65-.65-1.85 0-2.5L8.75 3c.65-.65 1.85-.65 2.5 0L17 8.75c.65.65.65 1.85 0 2.5L11.25 17c-.65.65-1.85.65-2.5 0Z"
-        stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M10.5 20.4l-6.9 -6.9c-.781 -.781 -.781 -2.219 0 -3l6.9 -6.9c.781 -.781 2.219 -.781 3 0l6.9 6.9c.781 .781 .781 2.219 0 3l-6.9 6.9c-.781 .781 -2.219 .781 -3 0z" />
+  </g>,
+
+  tablerIconProps,
 );
 
+// tabler-icons: circle
 export const EllipseIcon = createIcon(
-  <>
-    <g clipPath="url(#a)">
-      <path
-        d="M10 16.875a6.875 6.875 0 1 0 0-13.75 6.875 6.875 0 0 0 0 13.75Z"
-        stroke="currentColor"
-        strokeWidth="1.25"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <circle cx="12" cy="12" r="9"></circle>
+  </g>,
+
+  tablerIconProps,
 );
 
+// tabler-icons: arrow-narrow-right
 export const ArrowIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4.167 10h11.666M12.5 13.333 15.833 10M12.5 6.667 15.833 10" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <line x1="15" y1="16" x2="19" y2="12" />
+    <line x1="15" y1="8" x2="19" y2="12" />
+  </g>,
+  tablerIconProps,
 );
 
+// custom?
 export const LineIcon = createIcon(
-  <>
-    <g clipPath="url(#a)">
-      <path
-        d="M4.167 10h11.666"
-        stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <path d="M4.167 10h11.666" strokeWidth="1.5" />,
+  modifiedTablerIconProps,
 );
 
+// modified tabler-icons: pencil
 export const FreedrawIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path
-        clipRule="evenodd"
-        d="m7.643 15.69 7.774-7.773a2.357 2.357 0 1 0-3.334-3.334L4.31 12.357a3.333 3.333 0 0 0-.977 2.357v1.953h1.953c.884 0 1.732-.352 2.357-.977Z"
-      />
-      <path d="m11.25 5.417 3.333 3.333" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.25">
+    <path
+      clipRule="evenodd"
+      d="m7.643 15.69 7.774-7.773a2.357 2.357 0 1 0-3.334-3.334L4.31 12.357a3.333 3.333 0 0 0-.977 2.357v1.953h1.953c.884 0 1.732-.352 2.357-.977Z"
+    />
+    <path d="m11.25 5.417 3.333 3.333" />
+  </g>,
+
+  modifiedTablerIconProps,
 );
 
+// tabler-icons: typography
 export const TextIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.333 16.667h2.5M11.667 16.667H17.5M5.75 12.5h5.75M8.5 5.25l4.833 11.417M4.167 16.667l5-13.334h1.666l5.834 13.334" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="4" y1="20" x2="7" y2="20" />
+    <line x1="14" y1="20" x2="21" y2="20" />
+    <line x1="6.9" y1="15" x2="13.8" y2="15" />
+    <line x1="10.2" y1="6.3" x2="16" y2="20" />
+    <polyline points="5 20 11 4 13 4 20 20"></polyline>
+  </g>,
+  tablerIconProps,
 );
 
+// modified tabler-icons: photo
 export const ImageIcon = createIcon(
-  <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
-      <path d="M12.5 6.667h.01" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M4.91 2.625h10.18a2.284 2.284 0 0 1 2.285 2.284v10.182a2.284 2.284 0 0 1-2.284 2.284H4.909a2.284 2.284 0 0 1-2.284-2.284V4.909a2.284 2.284 0 0 1 2.284-2.284Z" />
-      <path
-        d="m3.333 12.5 3.334-3.333c.773-.745 1.726-.745 2.5 0l4.166 4.166"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="m11.667 11.667.833-.834c.774-.744 1.726-.744 2.5 0l1.667 1.667"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.25">
+    <path d="M12.5 6.667h.01" />
+    <path d="M4.91 2.625h10.18a2.284 2.284 0 0 1 2.285 2.284v10.182a2.284 2.284 0 0 1-2.284 2.284H4.909a2.284 2.284 0 0 1-2.284-2.284V4.909a2.284 2.284 0 0 1 2.284-2.284Z" />
+    <path d="m3.333 12.5 3.334-3.333c.773-.745 1.726-.745 2.5 0l4.166 4.166" />
+    <path d="m11.667 11.667.833-.834c.774-.744 1.726-.744 2.5 0l1.667 1.667" />
+  </g>,
+  modifiedTablerIconProps,
 );
 
+// tabler-icons: eraser
 export const EraserIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M15.833 15.833H6.667L3.333 12.5a.833.833 0 0 1 0-1.175l7.5-7.5c.758-.753 2.074-.764 2.842 0l2.5 2.5c.733.738.721 2.116 0 2.842l-6.667 6.666M15 10.25 9.75 5" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M19 20h-10.5l-4.21 -4.3a1 1 0 0 1 0 -1.41l10 -10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41l-9.2 9.3" />
+    <path d="M18 13.3l-6.3 -6.3" />
+  </g>,
+  tablerIconProps,
 );
 
 export const ZoomInIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M10 4.167v11.666M4.167 10h11.666" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <path strokeWidth="1.25" d="M10 4.167v11.666M4.167 10h11.666" />,
+  modifiedTablerIconProps,
 );
 
 export const ZoomOutIcon = createIcon(
-  <>
-    <path
-      d="M5 10h10"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </>,
-  newIconProps,
+  <path d="M5 10h10" strokeWidth="1.25" />,
+  modifiedTablerIconProps,
 );
 
 export const TrashIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <path
+    strokeWidth="1.25"
+    d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5"
+  />,
+  modifiedTablerIconProps,
 );
 
 export const DuplicateIcon = createIcon(
-  <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
-      <path d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z" />
-      <path
-        clipRule="evenodd"
-        d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.25">
+    <path d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z" />
+    <path
+      clipRule="evenodd"
+      d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+    />
+  </g>,
+  modifiedTablerIconProps,
 );
 
 export const MoonIcon = createIcon(
-  <>
-    <g clipPath="url(#a)">
-      <path
-        clipRule="evenodd"
-        d="M10 2.5h.328a6.25 6.25 0 0 0 6.6 10.372A7.5 7.5 0 1 1 10 2.493V2.5Z"
-        stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <path
+    clipRule="evenodd"
+    d="M10 2.5h.328a6.25 6.25 0 0 0 6.6 10.372A7.5 7.5 0 1 1 10 2.493V2.5Z"
+    stroke="currentColor"
+  />,
+  modifiedTablerIconProps,
 );
 
 export const SunIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM10 4.167V2.5M14.167 5.833l1.166-1.166M15.833 10H17.5M14.167 14.167l1.166 1.166M10 15.833V17.5M5.833 14.167l-1.166 1.166M5 10H3.333M5.833 5.833 4.667 4.667" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g
+    stroke="currentColor"
+    strokeWidth="1.25"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM10 4.167V2.5M14.167 5.833l1.166-1.166M15.833 10H17.5M14.167 14.167l1.166 1.166M10 15.833V17.5M5.833 14.167l-1.166 1.166M5 10H3.333M5.833 5.833 4.667 4.667" />
+  </g>,
+  modifiedTablerIconProps,
 );
 
 export const HamburgerMenuIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.333 5h13.334M3.333 10h13.334M3.333 15h13.334" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  // <svg strokeWidth="1.5">
+  //   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+  //   <line x1="4" y1="6" x2="20" y2="6"></line>
+  //   <line x1="4" y1="12" x2="20" y2="12"></line>
+  //   <line x1="4" y1="18" x2="20" y2="18"></line>
+  // </svg>,
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <line x1="4" y1="8" x2="20" y2="8"></line>
+    <line x1="4" y1="16" x2="20" y2="16"></line>
+  </g>,
+  tablerIconProps,
 );
 
 export const ExportIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 9.167 10 13.333l4.167-4.166M10 3.333v10" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <path
+    strokeWidth="1.25"
+    d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 9.167 10 13.333l4.167-4.166M10 3.333v10"
+  />,
+  modifiedTablerIconProps,
 );
 
 export const HelpIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M10 17.5a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15ZM10 14.167v.01" />
-      <path d="M10 11.25a1.25 1.25 0 0 1 .833-1.25 2.167 2.167 0 1 0-2.5-3.333" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.25">
+    <path d="M10 17.5a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15ZM10 14.167v.01" />
+    <path d="M10 11.25a1.25 1.25 0 0 1 .833-1.25 2.167 2.167 0 1 0-2.5-3.333" />
+  </g>,
+  modifiedTablerIconProps,
 );
 
 export const ExternalLinkIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M9.167 5.833H5.833c-1.254 0-2.5 1.282-2.5 2.5v5.834c0 1.283 1.252 2.5 2.5 2.5h5.834c1.251 0 2.5-1.25 2.5-2.5v-3.334M8.333 11.667l8.334-8.334M12.5 3.333h4.167V7.5" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <path
+    strokeWidth="1.25"
+    d="M9.167 5.833H5.833c-1.254 0-2.5 1.282-2.5 2.5v5.834c0 1.283 1.252 2.5 2.5 2.5h5.834c1.251 0 2.5-1.25 2.5-2.5v-3.334M8.333 11.667l8.334-8.334M12.5 3.333h4.167V7.5"
+  />,
+  modifiedTablerIconProps,
 );
 
 export const GithubIcon = createIcon(
-  <>
-    <g clipPath="url(#a)">
-      <path
-        d="M7.5 15.833c-3.583 1.167-3.583-2.083-5-2.5m10 4.167v-2.917c0-.833.083-1.166-.417-1.666 2.334-.25 4.584-1.167 4.584-5a3.833 3.833 0 0 0-1.084-2.667 3.5 3.5 0 0 0-.083-2.667s-.917-.25-2.917 1.084a10.25 10.25 0 0 0-5.166 0C5.417 2.333 4.5 2.583 4.5 2.583a3.5 3.5 0 0 0-.083 2.667 3.833 3.833 0 0 0-1.084 2.667c0 3.833 2.25 4.75 4.584 5-.5.5-.5 1-.417 1.666V17.5"
-        stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <path
+    d="M7.5 15.833c-3.583 1.167-3.583-2.083-5-2.5m10 4.167v-2.917c0-.833.083-1.166-.417-1.666 2.334-.25 4.584-1.167 4.584-5a3.833 3.833 0 0 0-1.084-2.667 3.5 3.5 0 0 0-.083-2.667s-.917-.25-2.917 1.084a10.25 10.25 0 0 0-5.166 0C5.417 2.333 4.5 2.583 4.5 2.583a3.5 3.5 0 0 0-.083 2.667 3.833 3.833 0 0 0-1.084 2.667c0 3.833 2.25 4.75 4.584 5-.5.5-.5 1-.417 1.666V17.5"
+    strokeWidth="1.25"
+  />,
+  modifiedTablerIconProps,
 );
 
 export const DiscordIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M7.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM12.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM6.25 6.25c2.917-.833 4.583-.833 7.5 0M5.833 13.75c2.917.833 5.417.833 8.334 0" />
-      <path d="M12.917 14.167c0 .833 1.25 2.5 1.666 2.5 1.25 0 2.361-1.39 2.917-2.5.556-1.39.417-4.861-1.25-9.584-1.214-.846-2.5-1.116-3.75-1.25l-.833 2.084M7.083 14.167c0 .833-1.13 2.5-1.526 2.5-1.191 0-2.249-1.39-2.778-2.5-.529-1.39-.397-4.861 1.19-9.584 1.157-.846 2.318-1.116 3.531-1.25l.833 2.084" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.25">
+    <path d="M7.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM12.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM6.25 6.25c2.917-.833 4.583-.833 7.5 0M5.833 13.75c2.917.833 5.417.833 8.334 0" />
+    <path d="M12.917 14.167c0 .833 1.25 2.5 1.666 2.5 1.25 0 2.361-1.39 2.917-2.5.556-1.39.417-4.861-1.25-9.584-1.214-.846-2.5-1.116-3.75-1.25l-.833 2.084M7.083 14.167c0 .833-1.13 2.5-1.526 2.5-1.191 0-2.249-1.39-2.778-2.5-.529-1.39-.397-4.861 1.19-9.584 1.157-.846 2.318-1.116 3.531-1.25l.833 2.084" />
+  </g>,
+  modifiedTablerIconProps,
 );
 
 export const checkIcon = createIcon(
@@ -783,24 +482,11 @@ export const checkIcon = createIcon(
 );
 
 export const LinkIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M8.333 11.667a2.917 2.917 0 0 0 4.167 0l3.333-3.334a2.946 2.946 0 1 0-4.166-4.166l-.417.416" />
-      <path d="M11.667 8.333a2.917 2.917 0 0 0-4.167 0l-3.333 3.334a2.946 2.946 0 0 0 4.166 4.166l.417-.416" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="1.25">
+    <path d="M8.333 11.667a2.917 2.917 0 0 0 4.167 0l3.333-3.334a2.946 2.946 0 1 0-4.166-4.166l-.417.416" />
+    <path d="M11.667 8.333a2.917 2.917 0 0 0-4.167 0l-3.333 3.334a2.946 2.946 0 0 0 4.166 4.166l.417-.416" />
+  </g>,
+  modifiedTablerIconProps,
 );
 
 export const save = createIcon(
@@ -813,22 +499,13 @@ export const saveAs = createIcon(
   { width: 448, height: 512 },
 );
 
+// tabler-icon: folder
 export const LoadIcon = createIcon(
-  <>
-    <g clipPath="url(#a)">
-      <path
-        d="m9.257 6.351.183.183H15.819c.34 0 .727.182 1.051.506.323.323.505.708.505 1.05v5.819c0 .316-.183.7-.52 1.035-.337.338-.723.522-1.037.522H4.182c-.352 0-.74-.181-1.058-.5-.318-.318-.499-.705-.499-1.057V5.182c0-.351.181-.736.5-1.054.32-.321.71-.503 1.057-.503H6.53l2.726 2.726Z"
-        stroke="currentColor"
-        strokeWidth="1.25"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <path
+    d="m9.257 6.351.183.183H15.819c.34 0 .727.182 1.051.506.323.323.505.708.505 1.05v5.819c0 .316-.183.7-.52 1.035-.337.338-.723.522-1.037.522H4.182c-.352 0-.74-.181-1.058-.5-.318-.318-.499-.705-.499-1.057V5.182c0-.351.181-.736.5-1.054.32-.321.71-.503 1.057-.503H6.53l2.726 2.726Z"
+    strokeWidth="1.25"
+  />,
+  modifiedTablerIconProps,
 );
 
 export const clipboard = createIcon(
@@ -877,43 +554,19 @@ export const menu = createIcon(
 );
 
 export const UndoIcon = createIcon(
-  <>
-    <g clipPath="url(#a)">
-      <path
-        d="M7.5 10.833 4.167 7.5 7.5 4.167M4.167 7.5h9.166a3.333 3.333 0 0 1 0 6.667H12.5"
-        stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  { ...newIconProps },
+  <path
+    d="M7.5 10.833 4.167 7.5 7.5 4.167M4.167 7.5h9.166a3.333 3.333 0 0 1 0 6.667H12.5"
+    strokeWidth="1.25"
+  />,
+  modifiedTablerIconProps,
 );
 
 export const RedoIcon = createIcon(
-  <>
-    <g clipPath="url(#a)">
-      <path
-        d="M12.5 10.833 15.833 7.5 12.5 4.167M15.833 7.5H6.667a3.333 3.333 0 1 0 0 6.667H7.5"
-        stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  { ...newIconProps },
+  <path
+    d="M12.5 10.833 15.833 7.5 12.5 4.167M15.833 7.5H6.667a3.333 3.333 0 1 0 0 6.667H7.5"
+    strokeWidth="1.25"
+  />,
+  modifiedTablerIconProps,
 );
 
 export const questionCircle = createIcon(
@@ -924,12 +577,9 @@ export const questionCircle = createIcon(
 export const share = createIcon(
   <path
     d="M5 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM15 7.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM15 17.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM7.25 8.917l5.5-2.834M7.25 11.083l5.5 2.834"
-    stroke="currentColor"
     strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
   />,
-  { width: 20, height: 20, fill: "none" },
+  modifiedTablerIconProps,
 );
 
 export const shareIOS = createIcon(
@@ -940,7 +590,6 @@ export const shareIOS = createIcon(
 export const shareWindows = createIcon(
   <>
     <path
-      stroke="currentColor"
       fill="currentColor"
       d="M40 5.6v6.1l-4.1.7c-8.9 1.4-16.5 6.9-20.6 15C13 32 10.9 43 12.4 43c.4 0 2.4-1.3 4.4-3 5-3.9 12.1-7 18.2-7.7l5-.6v12.8l11.2-11.3L62.5 22 51.2 10.8 40-.5v6.1zm10.2 22.6L44 34.5v-6.8l-6.9.6c-3.9.3-9.8 1.7-13.2 3.1-3.5 1.4-6.5 2.4-6.7 2.2-.9-1 3-7.5 6.4-10.8C28 18.6 34.4 16 40.1 16c3.7 0 3.9-.1 3.9-3.2V9.5l6.2 6.3 6.3 6.2-6.3 6.2z"
     />
@@ -986,7 +635,7 @@ export const BringForwardIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const SendBackwardIcon = createIcon(
@@ -1012,7 +661,7 @@ export const SendBackwardIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const BringToFrontIcon = createIcon(
@@ -1030,7 +679,7 @@ export const BringToFrontIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const SendToBackIcon = createIcon(
@@ -1076,7 +725,7 @@ export const SendToBackIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 //
@@ -1101,7 +750,7 @@ export const AlignTopIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const AlignBottomIcon = createIcon(
@@ -1120,7 +769,7 @@ export const AlignBottomIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const AlignLeftIcon = createIcon(
@@ -1139,7 +788,7 @@ export const AlignLeftIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const AlignRightIcon = createIcon(
@@ -1158,7 +807,7 @@ export const AlignRightIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const DistributeHorizontallyIcon = createIcon(
@@ -1177,7 +826,7 @@ export const DistributeHorizontallyIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const DistributeVerticallyIcon = createIcon(
@@ -1196,7 +845,7 @@ export const DistributeVerticallyIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const CenterVerticallyIcon = createIcon(
@@ -1217,7 +866,7 @@ export const CenterVerticallyIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const CenterHorizontallyIcon = createIcon(
@@ -1234,7 +883,7 @@ export const CenterHorizontallyIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const users = createIcon(
@@ -1254,7 +903,7 @@ export const users = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 // not mirrored because it's inspired by a playback control, which is always RTL
@@ -1283,7 +932,7 @@ export const CloseIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const back = createIcon(
@@ -1404,7 +1053,7 @@ export const FillHachureIcon = createIcon(
       />
     </g>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const FillCrossHatchIcon = createIcon(
@@ -1445,7 +1094,7 @@ export const FillCrossHatchIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const FillSolidIcon = createIcon(
@@ -1463,27 +1112,20 @@ export const FillSolidIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  { ...newIconProps, fill: "currentColor" },
+  { ...modifiedTablerIconProps, fill: "currentColor" },
 );
 
 export const StrokeWidthBaseIcon = createIcon(
   <>
-    <g clipPath="url(#a)">
-      <path
-        d="M4.167 10h11.666"
-        stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
+    <path
+      d="M4.167 10h11.666"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const StrokeWidthBoldIcon = createIcon(
@@ -1494,7 +1136,7 @@ export const StrokeWidthBoldIcon = createIcon(
     strokeLinecap="round"
     strokeLinejoin="round"
   />,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const StrokeWidthExtraBoldIcon = createIcon(
@@ -1505,7 +1147,7 @@ export const StrokeWidthExtraBoldIcon = createIcon(
     strokeLinecap="round"
     strokeLinejoin="round"
   />,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const StrokeStyleSolidIcon = React.memo(({ theme }: { theme: Theme }) =>
@@ -1525,119 +1167,93 @@ export const StrokeStyleSolidIcon = React.memo(({ theme }: { theme: Theme }) =>
 );
 
 export const StrokeStyleDashedIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4.167 10h1.666M14.167 10h1.666M9.167 10h1.666" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="2">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M5 12h2" />
+    <path d="M17 12h2" />
+    <path d="M11 12h2" />
+  </g>,
+  tablerIconProps,
 );
 
+// tabler-icons: line-dotted
 export const StrokeStyleDottedIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.333 10v.008M6.667 10v.008M10 10v.008M13.333 10v.008M16.667 10v.008" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g strokeWidth="2">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 12v.01" />
+    <path d="M8 12v.01" />
+    <path d="M12 12v.01" />
+    <path d="M16 12v.01" />
+    <path d="M20 12v.01" />
+  </g>,
+  tablerIconProps,
 );
 
 export const SloppinessArchitectIcon = createIcon(
-  <>
-    <path
-      d="M2.5 12.038c1.655-.885 5.9-3.292 8.568-4.354 2.668-1.063.101 2.821 1.32 3.104 1.218.283 5.112-1.814 5.112-1.814"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-    />
-  </>,
-  newIconProps,
+  <path
+    d="M2.5 12.038c1.655-.885 5.9-3.292 8.568-4.354 2.668-1.063.101 2.821 1.32 3.104 1.218.283 5.112-1.814 5.112-1.814"
+    strokeWidth="1.25"
+  />,
+  modifiedTablerIconProps,
 );
 
 export const SloppinessArtistIcon = createIcon(
-  <>
-    <path
-      d="M2.5 12.563c1.655-.886 5.9-3.293 8.568-4.355 2.668-1.062.101 2.822 1.32 3.105 1.218.283 5.112-1.814 5.112-1.814m-13.469 2.23c2.963-1.586 6.13-5.62 7.468-4.998 1.338.623-1.153 4.11-.132 5.595 1.02 1.487 6.133-1.43 6.133-1.43"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-    />
-  </>,
-  newIconProps,
+  <path
+    d="M2.5 12.563c1.655-.886 5.9-3.293 8.568-4.355 2.668-1.062.101 2.822 1.32 3.105 1.218.283 5.112-1.814 5.112-1.814m-13.469 2.23c2.963-1.586 6.13-5.62 7.468-4.998 1.338.623-1.153 4.11-.132 5.595 1.02 1.487 6.133-1.43 6.133-1.43"
+    strokeWidth="1.25"
+  />,
+  modifiedTablerIconProps,
 );
 
 export const SloppinessCartoonistIcon = createIcon(
-  <>
-    <path
-      d="M2.5 11.936c1.737-.879 8.627-5.346 10.42-5.268 1.795.078-.418 5.138.345 5.736.763.598 3.53-1.789 4.235-2.147M2.929 9.788c1.164-.519 5.47-3.28 6.987-3.114 1.519.165 1 3.827 2.121 4.109 1.122.281 3.839-2.016 4.606-2.42"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-    />
-  </>,
-  newIconProps,
+  <path
+    d="M2.5 11.936c1.737-.879 8.627-5.346 10.42-5.268 1.795.078-.418 5.138.345 5.736.763.598 3.53-1.789 4.235-2.147M2.929 9.788c1.164-.519 5.47-3.28 6.987-3.114 1.519.165 1 3.827 2.121 4.109 1.122.281 3.839-2.016 4.606-2.42"
+    strokeWidth="1.25"
+  />,
+  modifiedTablerIconProps,
 );
 
 export const EdgeSharpIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.333 10V6.667l.002-3.33c1.617-.003 2.728-.004 3.332-.004H10M13.333 3.333v.01M16.667 3.333v.01M16.667 6.667v.01M16.667 10v.01M3.333 13.333v.01M16.667 13.333v.01M3.333 16.667v.01M6.667 16.667v.01M10 16.667v.01M13.333 16.667v.01M16.667 16.667v.01" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <svg strokeWidth="1.5">
+    <path d="M3.33334 9.99998V6.66665C3.33334 6.04326 3.33403 4.9332 3.33539 3.33646C4.95233 3.33436 6.06276 3.33331 6.66668 3.33331H10" />
+    <path d="M13.3333 3.33331V3.34331" />
+    <path d="M16.6667 3.33331V3.34331" />
+    <path d="M16.6667 6.66669V6.67669" />
+    <path d="M16.6667 10V10.01" />
+    <path d="M3.33334 13.3333V13.3433" />
+    <path d="M16.6667 13.3333V13.3433" />
+    <path d="M3.33334 16.6667V16.6767" />
+    <path d="M6.66666 16.6667V16.6767" />
+    <path d="M10 16.6667V16.6767" />
+    <path d="M13.3333 16.6667V16.6767" />
+    <path d="M16.6667 16.6667V16.6767" />
+  </svg>,
+  modifiedTablerIconProps,
 );
 
+// tabler-icons: border-radius
 export const EdgeRoundIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.333 10V6.667a3.333 3.333 0 0 1 3.334-3.334H10M13.333 3.333v.01M16.667 3.333v.01M16.667 6.667v.01M16.667 10v.01M3.333 13.333v.01M16.667 13.333v.01M3.333 16.667v.01M6.667 16.667v.01M10 16.667v.01M13.333 16.667v.01M16.667 16.667v.01" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g
+    strokeWidth="1.5"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 12v-4a4 4 0 0 1 4 -4h4" />
+    <line x1="16" y1="4" x2="16" y2="4.01" />
+    <line x1="20" y1="4" x2="20" y2="4.01" />
+    <line x1="20" y1="8" x2="20" y2="8.01" />
+    <line x1="20" y1="12" x2="20" y2="12.01" />
+    <line x1="4" y1="16" x2="4" y2="16.01" />
+    <line x1="20" y1="16" x2="20" y2="16.01" />
+    <line x1="4" y1="20" x2="4" y2="20.01" />
+    <line x1="8" y1="20" x2="8" y2="20.01" />
+    <line x1="12" y1="20" x2="12" y2="20.01" />
+    <line x1="16" y1="20" x2="16" y2="20.01" />
+    <line x1="20" y1="20" x2="20" y2="20.01" />
+  </g>,
+  tablerIconProps,
 );
 
 export const ArrowheadNoneIcon = createIcon(
@@ -1726,7 +1342,7 @@ export const FontSizeSmallIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const FontSizeMediumIcon = createIcon(
@@ -1746,7 +1362,7 @@ export const FontSizeMediumIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const FontSizeLargeIcon = createIcon(
@@ -1766,7 +1382,7 @@ export const FontSizeLargeIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const FontSizeExtraLargeIcon = createIcon(
@@ -1779,13 +1395,12 @@ export const FontSizeExtraLargeIcon = createIcon(
       strokeLinejoin="round"
     />
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const FontFamilyNormalIcon = createIcon(
   <>
     <g
-      clipPath="url(#a)"
       stroke="currentColor"
       strokeWidth="1.25"
       strokeLinecap="round"
@@ -1793,13 +1408,8 @@ export const FontFamilyNormalIcon = createIcon(
     >
       <path d="M5.833 16.667v-10a3.333 3.333 0 0 1 3.334-3.334h1.666a3.333 3.333 0 0 1 3.334 3.334v10M5.833 10.833h8.334" />
     </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const FontFamilyCodeIcon = createIcon(
@@ -1819,100 +1429,107 @@ export const FontFamilyCodeIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  newIconProps,
+  modifiedTablerIconProps,
 );
 
 export const TextAlignLeftIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.333 5h13.334M3.333 10h8.334M3.333 15H15" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g
+    stroke="currentColor"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth={2}
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="4" y1="8" x2="20" y2="8" />
+    <line x1="4" y1="12" x2="12" y2="12" />
+    <line x1="4" y1="16" x2="16" y2="16" />
+  </g>,
+  tablerIconProps,
 );
 
 export const TextAlignCenterIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.333 5h13.334M6.667 10h6.666M5 15h10" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g
+    stroke="currentColor"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="4" y1="8" x2="20" y2="8" />
+    <line x1="8" y1="12" x2="16" y2="12" />
+    <line x1="6" y1="16" x2="18" y2="16" />
+  </g>,
+  tablerIconProps,
 );
 
 export const TextAlignRightIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.333 5h13.334M8.333 10h8.334M5 15h11.667" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  newIconProps,
+  <g
+    stroke="currentColor"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="4" y1="8" x2="20" y2="8" />
+    <line x1="10" y1="12" x2="20" y2="12" />
+    <line x1="8" y1="16" x2="20" y2="16" />
+  </g>,
+  tablerIconProps,
 );
 
+// tabler-icons: layout-align-top
 export const TextAlignTopIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
-    <path
-      d="m16,132l416,0c8.837,0 16,-7.163 16,-16l0,-40c0,-8.837 -7.163,-16 -16,-16l-416,0c-8.837,0 -16,7.163 -16,16l0,40c0,8.837 7.163,16 16,16zm0,160l416,0c8.837,0 16,-7.163 16,-16l0,-40c0,-8.837 -7.163,-16 -16,-16l-416,0c-8.837,0 -16,7.163 -16,16l0,40c0,8.837 7.163,16 16,16z"
-      fill={iconFillColor(theme)}
-      strokeLinecap="round"
-    />,
-    { width: 448, height: 512 },
+    <g
+      stroke-width="1.5"
+      stroke="currentColor"
+      fill="none"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <line x1="4" y1="4" x2="20" y2="4" />
+      <rect x="9" y="8" width="6" height="12" rx="2" />
+    </g>,
+    tablerIconProps,
   ),
 );
 
+// tabler-icons: layout-align-bottom
 export const TextAlignBottomIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
-    <path
-      d="M16,292L432,292C440.837,292 448,284.837 448,276L448,236C448,227.163 440.837,220 432,220L16,220C7.163,220 0,227.163 0,236L0,276C0,284.837 7.163,292 16,292ZM16,452L432,452C440.837,452 448,444.837 448,436L448,396C448,387.163 440.837,380 432,380L16,380C7.163,380 0,387.163 0,396L0,436C0,444.837 7.163,452 16,452Z"
-      fill={iconFillColor(theme)}
-      strokeLinecap="round"
-    />,
-    { width: 448, height: 512 },
+    <g
+      stroke-width="2"
+      stroke="currentColor"
+      fill="none"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <line x1="4" y1="20" x2="20" y2="20" />
+      <rect x="9" y="4" width="6" height="12" rx="2"></rect>
+    </g>,
+    tablerIconProps,
   ),
 );
 
+// tabler-icons: layout-align-middle
 export const TextAlignMiddleIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
-    <path
-      transform="matrix(1,0,0,1,0,80)"
-      d="M16,132L432,132C440.837,132 448,124.837 448,116L448,76C448,67.163 440.837,60 432,60L16,60C7.163,60 0,67.163 0,76L0,116C0,124.837 7.163,132 16,132ZM16,292L432,292C440.837,292 448,284.837 448,276L448,236C448,227.163 440.837,220 432,220L16,220C7.163,220 0,227.163 0,236L0,276C0,284.837 7.163,292 16,292Z"
-      fill={iconFillColor(theme)}
-      strokeLinecap="round"
-    />,
-    { width: 448, height: 512 },
+    <g
+      stroke-width="1.5"
+      stroke="currentColor"
+      fill="none"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <line x1="4" y1="12" x2="9" y2="12" />
+      <line x1="15" y1="12" x2="20" y2="12" />
+      <rect x="9" y="6" width="6" height="12" rx="2" />
+    </g>,
+    tablerIconProps,
   ),
 );
 
