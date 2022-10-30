@@ -72,7 +72,7 @@ export const actionDeleteSelected = register({
       if (!element) {
         return false;
       }
-      // case: no point selected → do nothing, as deleting the whoel element
+      // case: no point selected → do nothing, as deleting the whole element
       // is most likely a mistake, where you wanted to delete a specific point
       // but failed to select it (or you thought it's selected, while it was
       // only in a hover state)
