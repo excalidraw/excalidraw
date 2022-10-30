@@ -62,7 +62,7 @@ import {
 import { isLinearElement } from "../element/typeChecks";
 
 const hasEmojiSupport = supportsEmoji();
-export const DEFAULT_SPACING = 4;
+export const DEFAULT_SPACING = 2;
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -534,7 +534,8 @@ export const _renderScene = ({
             elementX2,
             elementY1,
             elementY2,
-            selectionColors: [oc.black],
+            selectionColors: [selectionColor],
+            dashed: true,
           });
         };
 
@@ -571,7 +572,8 @@ export const _renderScene = ({
           );
         }
       } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
-        const dashedLinePadding = 8 / renderConfig.zoom.value;
+        const dashedLinePadding =
+          (DEFAULT_SPACING * 2) / renderConfig.zoom.value;
         context.fillStyle = oc.white;
         const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
         const initialLineDash = context.getLineDash();
@@ -847,7 +849,7 @@ const renderSelectionBorder = (
     selectionColors: string[];
     dashed?: boolean;
   },
-  padding = 8,
+  padding = DEFAULT_SPACING * 2,
 ) => {
   const {
     angle,
