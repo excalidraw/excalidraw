@@ -1,4 +1,4 @@
-import { GithubIcon, DiscordIcon, PlusPromoIcon } from "./icons";
+import { GithubIcon, DiscordIcon, PlusPromoIcon, TwitterIcon } from "./icons";
 
 export const MenuLinks = () => (
   <>
@@ -29,6 +29,15 @@ export const MenuLinks = () => (
     >
       <div className="menu-item__icon">{DiscordIcon}</div>
       <div className="menu-item__text">Discord</div>
+    </a>
+    <a
+      className="menu-item"
+      target="_blank"
+      href="https://twitter.com/excalidraw"
+      rel="noopener noreferrer"
+    >
+      <div className="menu-item__icon">{TwitterIcon}</div>
+      <div className="menu-item__text">Twitter</div>
     </a>
   </>
 );
