@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import { share, UsersIcon } from "./icons";
+import { UsersIcon } from "./icons";
 
 import "./CollabButton.scss";
 import MenuItem from "./MenuItem";
@@ -33,7 +33,7 @@ const CollabButton = ({
           onClick={onClick}
           style={{ position: "relative" }}
         >
-          {share}
+          {UsersIcon}
           {collaboratorCount > 0 && (
             <div className="CollabButton-collaborators">
               {collaboratorCount}

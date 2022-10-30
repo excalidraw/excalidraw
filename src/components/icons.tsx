@@ -895,22 +895,10 @@ export const CenterHorizontallyIcon = createIcon(
 );
 
 export const UsersIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M7.5 9.167a3.333 3.333 0 1 0 0-6.667 3.333 3.333 0 0 0 0 6.667ZM2.5 17.5v-1.667A3.333 3.333 0 0 1 5.833 12.5h3.334a3.333 3.333 0 0 1 3.333 3.333V17.5M13.333 2.608a3.333 3.333 0 0 1 0 6.459M17.5 17.5v-1.667a3.333 3.333 0 0 0-2.5-3.208" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
+  <path
+    strokeWidth="1.5"
+    d="M7.5 9.167a3.333 3.333 0 1 0 0-6.667 3.333 3.333 0 0 0 0 6.667ZM2.5 17.5v-1.667A3.333 3.333 0 0 1 5.833 12.5h3.334a3.333 3.333 0 0 1 3.333 3.333V17.5M13.333 2.608a3.333 3.333 0 0 1 0 6.459M17.5 17.5v-1.667a3.333 3.333 0 0 0-2.5-3.208"
+  />,
   modifiedTablerIconProps,
 );
 
