@@ -8,9 +8,9 @@ import { t } from "../i18n";
 import {
   ExcalLogo,
   HelpIcon,
-  ImportSceneIcon,
-  InviteToCollabIcon,
+  LoadIcon,
   PlusPromoIcon,
+  UsersIcon,
 } from "./icons";
 import "./WelcomeScreen.scss";
 
@@ -79,13 +79,13 @@ const WelcomeScreen = ({ actionManager }: { actionManager: ActionManager }) => {
           label={t("buttons.load")}
           onClick={() => actionManager.executeAction(actionLoadScene)}
           shortcut={getShortcutFromShortcutName("loadScene")}
-          icon={ImportSceneIcon}
+          icon={LoadIcon}
         />
         <WelcomeScreenItem
           label={t("labels.liveCollaboration")}
           shortcut={null}
           onClick={() => setCollabDialogShown(true)}
-          icon={InviteToCollabIcon}
+          icon={UsersIcon}
         />
         <WelcomeScreenItem
           onClick={() => actionManager.executeAction(actionShortcuts)}

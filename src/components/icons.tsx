@@ -886,7 +886,7 @@ export const CenterHorizontallyIcon = createIcon(
   modifiedTablerIconProps,
 );
 
-export const users = createIcon(
+export const UsersIcon = createIcon(
   <>
     <g
       clipPath="url(#a)"

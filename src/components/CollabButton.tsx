@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import { share, users } from "./icons";
+import { share, UsersIcon } from "./icons";
 
 import "./CollabButton.scss";
 import MenuItem from "./MenuItem";
@@ -22,7 +22,7 @@ const CollabButton = ({
         <MenuItem
           label={t("labels.liveCollaboration")}
           dataTestId="collab-button"
-          icon={users}
+          icon={UsersIcon}
           onClick={onClick}
           isCollaborating={isCollaborating}
         />
