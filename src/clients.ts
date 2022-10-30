@@ -11,9 +11,9 @@ export const getClientColors = (clientId: string, appState: AppState) => {
   // Naive way of getting an integer out of the clientId
   const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
 
-  // Skip transparent background.
-  const backgrounds = colors.elementBackground.slice(1);
-  const strokes = colors.elementStroke.slice(1);
+  // Skip transparent & gray colors
+  const backgrounds = colors.elementBackground.slice(3);
+  const strokes = colors.elementStroke.slice(3);
   return {
     background: backgrounds[sum % backgrounds.length],
     stroke: strokes[sum % strokes.length],

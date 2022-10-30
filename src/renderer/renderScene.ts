@@ -677,13 +677,11 @@ export const _renderScene = ({
         idleState = hasEmojiSupport ? "⚫️" : ` (${UserIdleState.AWAY})`;
       } else if (userState === UserIdleState.IDLE) {
         idleState = hasEmojiSupport ? "💤" : ` (${UserIdleState.IDLE})`;
-      } else if (userState === UserIdleState.ACTIVE) {
-        idleState = hasEmojiSupport ? "🟢" : "";
       }
 
-      const usernameAndIdleState = `${
-        username ? `${username} ` : ""
-      }${idleState}`;
+      const usernameAndIdleState = `${username || ""}${
+        idleState ? ` ${idleState}` : ""
+      }`;
 
       if (!isOutOfBounds && usernameAndIdleState) {
         const offsetX = x + width;
@@ -694,22 +692,31 @@ export const _renderScene = ({
         const measureHeight =
           measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
 
-        // Border
-        context.fillStyle = stroke;
-        context.fillRect(
-          offsetX - 1,
-          offsetY - 1,
-          measure.width + 2 * paddingHorizontal + 2,
-          measureHeight + 2 * paddingVertical + 2,
-        );
-        // Background
-        context.fillStyle = background;
-        context.fillRect(
-          offsetX,
-          offsetY,
-          measure.width + 2 * paddingHorizontal,
-          measureHeight + 2 * paddingVertical,
-        );
+        const boxX = offsetX - 1;
+        const boxY = offsetY - 1;
+        const boxWidth = measure.width + 2 * paddingHorizontal + 2;
+        const boxHeight = measureHeight + 2 * paddingVertical + 2;
+        if (context.roundRect) {
+          context.beginPath();
+          context.roundRect(
+            boxX,
+            boxY,
+            boxWidth,
+            boxHeight,
+            4 / renderConfig.zoom.value,
+          );
+          context.fillStyle = background;
+          context.fill();
+          context.fillStyle = stroke;
+          context.stroke();
+        } else {
+          // Border
+          context.fillStyle = stroke;
+          context.fillRect(boxX, boxY, boxWidth, boxHeight);
+          // Background
+          context.fillStyle = background;
+          context.fillRect(offsetX, offsetY, boxWidth - 2, boxHeight - 2);
+        }
         context.fillStyle = oc.white;
 
         context.fillText(
