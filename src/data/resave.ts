@@ -9,7 +9,7 @@ export const resaveAsImageWithScene = async (
   appState: AppState,
   files: BinaryFiles,
 ) => {
-  const { exportBackground, viewBackgroundColor, name, fileHandle } = appState;
+  const { exportBackground, viewBackgroundColor, tagsBackground, name, fileHandle } = appState;
 
   const fileHandleType = getFileHandleType(fileHandle);
 
@@ -31,6 +31,7 @@ export const resaveAsImageWithScene = async (
     {
       exportBackground,
       viewBackgroundColor,
+      tagsBackground,
       name,
       fileHandle,
     },

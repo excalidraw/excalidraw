@@ -100,7 +100,7 @@ const ImageExportModal = ({
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
-  const { exportBackground, viewBackgroundColor } = appState;
+  const { exportBackground, viewBackgroundColor, tagsBackground } = appState;
 
   const exportedElements = exportSelected
     ? getSelectedElements(elements, appState, true)
@@ -118,6 +118,7 @@ const ImageExportModal = ({
     exportToCanvas(exportedElements, appState, files, {
       exportBackground,
       viewBackgroundColor,
+      tagsBackground,
       exportPadding,
     })
       .then((canvas) => {
@@ -138,6 +139,7 @@ const ImageExportModal = ({
     exportBackground,
     exportPadding,
     viewBackgroundColor,
+    tagsBackground,
   ]);
 
   return (

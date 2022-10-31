@@ -23,6 +23,7 @@ const clearAppStatePropertiesForHistory = (appState: AppState) => {
     selectedElementIds: appState.selectedElementIds,
     selectedGroupIds: appState.selectedGroupIds,
     viewBackgroundColor: appState.viewBackgroundColor,
+    tagsBackground: appState.tagsBackground,
     editingLinearElement: appState.editingLinearElement,
     editingGroupId: appState.editingGroupId,
     name: appState.name,

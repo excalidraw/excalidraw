@@ -8,6 +8,7 @@ export type RenderConfig = {
   scrollY: AppState["scrollY"];
   /** null indicates transparent bg */
   viewBackgroundColor: AppState["viewBackgroundColor"] | null;
+  tagsBackground: AppState["tagsBackground"] | "";
   zoom: AppState["zoom"];
   shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
   theme: AppState["theme"];

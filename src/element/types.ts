@@ -28,6 +28,7 @@ type _ExcalidrawElementBase = Readonly<{
   strokeSharpness: StrokeSharpness;
   roughness: number;
   opacity: number;
+  tags: string;
   width: number;
   height: number;
   angle: number;

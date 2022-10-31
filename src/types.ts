@@ -118,6 +118,7 @@ export type AppState = {
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
+  currentItemTags: string;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
@@ -126,6 +127,7 @@ export type AppState = {
   currentItemEndArrowhead: Arrowhead | null;
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
+  tagsBackground: string;
   scrollX: number;
   scrollY: number;
   cursorButton: "up" | "down";
@@ -355,6 +357,7 @@ export type ExportOpts = {
 // excalidraw package index.tsx.
 type CanvasActions = {
   changeViewBackgroundColor?: boolean;
+  filterTagsBackground?: boolean;
   clearCanvas?: boolean;
   export?: false | ExportOpts;
   loadScene?: boolean;

@@ -76,6 +76,7 @@ export const actionPasteStyles = register({
             strokeStyle: elementStylesToCopyFrom?.strokeStyle,
             fillStyle: elementStylesToCopyFrom?.fillStyle,
             opacity: elementStylesToCopyFrom?.opacity,
+            tags: elementStylesToCopyFrom?.tags,
             roughness: elementStylesToCopyFrom?.roughness,
           });
 

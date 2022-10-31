@@ -18,6 +18,7 @@ describe("exportToSvg", () => {
   const DEFAULT_OPTIONS = {
     exportBackground: false,
     viewBackgroundColor: "#ffffff",
+    tagsBackground: "",
     files: {},
   };
 
@@ -40,6 +41,7 @@ describe("exportToSvg", () => {
         ...DEFAULT_OPTIONS,
         exportBackground: true,
         viewBackgroundColor: BACKGROUND_COLOR,
+        tagsBackground: "",
       },
       null,
     );

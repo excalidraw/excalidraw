@@ -12,6 +12,7 @@ import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
+import { FilterTagsBackground } from "./FilterTagsBackground";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
@@ -43,6 +44,8 @@ import Footer from "./Footer";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
+
+import "./TagsCanvas.scss";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -130,6 +133,7 @@ const LayerUI = ({
             exportBackground: appState.exportBackground,
             name: appState.name,
             viewBackgroundColor: appState.viewBackgroundColor,
+            tagsBackground: appState.tagsBackground,
           },
         )
           .catch(muteFSAbortError)
@@ -216,6 +220,7 @@ const LayerUI = ({
           {appState.fileHandle && (
             <>{actionManager.renderAction("saveToActiveFile")}</>
           )}
+          <FilterTagsBackground actionManager={actionManager} />
         </Stack.Col>
       </Island>
     </Section>

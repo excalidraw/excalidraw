@@ -170,6 +170,7 @@ const commonProps = {
   fontFamily: DEFAULT_FONT_FAMILY,
   fontSize: DEFAULT_FONT_SIZE,
   opacity: 100,
+  tags: "",
   roughness: 1,
   strokeColor: colors.elementStroke[0],
   strokeSharpness: "sharp",
@@ -294,6 +295,7 @@ const chartLines = (
     strokeStyle: "dotted",
     width: chartWidth,
     opacity: GRID_OPACITY,
+    tags: "",
     points: [
       [0, 0],
       [chartWidth, 0],
@@ -341,6 +343,7 @@ const chartBaseElements = (
         strokeColor: colors.elementStroke[0],
         fillStyle: "solid",
         opacity: 6,
+        tags: "",
       })
     : null;
 
@@ -459,6 +462,7 @@ const chartTypeLine = (
       height: cy,
       strokeStyle: "dotted",
       opacity: GRID_OPACITY,
+      tags: "",
       points: [
         [0, 0],
         [0, cy],

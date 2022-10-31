@@ -888,6 +888,7 @@ export const renderElementToSvg = (
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
+      node.setAttribute("tags", element.tags);
       root.appendChild(node);
       break;
     }
@@ -921,6 +922,7 @@ export const renderElementToSvg = (
         ) {
           node.setAttribute("fill-rule", "evenodd");
         }
+        node.setAttribute("tags", element.tags);
         group.appendChild(node);
       });
       root.appendChild(group);
@@ -949,6 +951,7 @@ export const renderElementToSvg = (
       path.setAttribute("fill", element.strokeColor);
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
+      node.setAttribute("tags", element.tags);
       root.appendChild(node);
       break;
     }
@@ -1009,6 +1012,7 @@ export const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
+        g.setAttribute("tags", element.tags);
 
         root.appendChild(g);
       }
@@ -1055,6 +1059,7 @@ export const renderElementToSvg = (
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
+          text.setAttribute("tags", element.tags);
           node.appendChild(text);
         }
         root.appendChild(node);

@@ -22,10 +22,12 @@ export const exportToCanvas = async (
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
+    tagsBackground,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
+    tagsBackground: string;
   },
   createCanvas: (
     width: number,
@@ -59,6 +61,7 @@ export const exportToCanvas = async (
     canvas,
     renderConfig: {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+      tagsBackground: exportBackground ? tagsBackground : "",
       scrollX: -minX + exportPadding,
       scrollY: -minY + exportPadding,
       zoom: defaultAppState.zoom,
@@ -86,6 +89,7 @@ export const exportToSvg = async (
     exportPadding?: number;
     exportScale?: number;
     viewBackgroundColor: string;
+    tagsBackground: string;
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
   },
@@ -94,6 +98,7 @@ export const exportToSvg = async (
   const {
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
+    tagsBackground,
     exportScale = 1,
     exportEmbedScene,
   } = appState;

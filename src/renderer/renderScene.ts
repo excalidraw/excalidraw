@@ -395,7 +395,7 @@ export const _renderScene = ({
 
     // Paint visible elements
     const visibleElements = elements.filter((element) =>
-      isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, {
+      isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, renderConfig.tagsBackground, {
         zoom: renderConfig.zoom,
         offsetLeft: appState.offsetLeft,
         offsetTop: appState.offsetTop,
@@ -1032,6 +1032,7 @@ const isVisibleElement = (
   element: ExcalidrawElement,
   canvasWidth: number,
   canvasHeight: number,
+  tagsBack: string,
   viewTransformations: {
     zoom: Zoom;
     offsetLeft: number;
@@ -1055,12 +1056,27 @@ const isVisibleElement = (
     },
     viewTransformations,
   );
-
+  var inTags = false;
+  if (tagsBack === "") {
+    inTags = true;
+  } else {
+    tagsBack.toLowerCase().split(' ').forEach((eltTagsBack) => {
+      if (eltTagsBack.length > 0){
+        if (element.tags.toLowerCase().split(' ').includes(eltTagsBack)) {
+          inTags = true;
+        }
+      }
+    })
+    if (element.tags.length === 0) {
+      inTags = true;
+    }
+  }
   return (
     topLeftSceneCoords.x <= x2 &&
     topLeftSceneCoords.y <= y2 &&
     bottomRightSceneCoords.x >= x1 &&
-    bottomRightSceneCoords.y >= y1
+    bottomRightSceneCoords.y >= y1 &&
+    inTags
   );
 };
 

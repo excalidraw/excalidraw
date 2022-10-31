@@ -17,6 +17,7 @@ const elements = [
     strokeWidth: 1,
     roughness: 1,
     opacity: 100,
+    tags: "",
     seed: 749612521,
   },
   {
@@ -32,6 +33,7 @@ const elements = [
     strokeWidth: 1,
     roughness: 1,
     opacity: 100,
+    tags: "",
     seed: 952056308,
   },
   {
@@ -47,6 +49,7 @@ const elements = [
     strokeWidth: 1,
     roughness: 1,
     opacity: 100,
+    tags: "",
     seed: 1683771448,
     text: "test",
     font: "20px Virgil",
@@ -70,6 +73,7 @@ const canvas = exportToCanvas(
   {
     exportBackground: true,
     viewBackgroundColor: "#ffffff",
+    tagsBackground: "",
   },
   createCanvas,
 );

@@ -49,6 +49,29 @@ export const actionChangeViewBackgroundColor = register({
   },
 });
 
+export const actionFilterTagsBackground = register({
+  name: "filterTagsBackground",
+  trackEvent: false,
+  perform: (_, appState, value) => {
+    return {
+      appState: { ...appState, ...value },
+      commitToHistory: !!value.tagsBackground,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    return (
+      <>
+        <h3 aria-hidden="true">{t("labels.tags")}</h3>      
+        <input
+          className="tags-input"
+          onChange={(event) => updateData({ tagsBackground: event.target.value })}
+          value={appState.tagsBackground}
+        />
+      </>
+    );
+  },
+});
+
 export const actionClearCanvas = register({
   name: "clearCanvas",
   trackEvent: { category: "canvas" },

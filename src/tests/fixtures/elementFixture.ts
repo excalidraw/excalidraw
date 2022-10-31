@@ -14,6 +14,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   strokeStyle: "solid",
   roughness: 1,
   opacity: 100,
+  tags: "",
   groupIds: [],
   strokeSharpness: "sharp",
   seed: 1041657908,

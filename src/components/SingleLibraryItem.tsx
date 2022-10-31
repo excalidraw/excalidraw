@@ -35,6 +35,7 @@ const SingleLibraryItem = ({
         appState: {
           ...appState,
           viewBackgroundColor: oc.white,
+          tagsBackground: "",
           exportBackground: true,
         },
         files: null,

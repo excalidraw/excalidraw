@@ -1,0 +1,35 @@
+.excalidraw {
+  [tags=SD] {
+    color: red !important;
+  }
+  .tags-input {
+    margin: 0;
+    font-size: 1rem;
+    background-color: var(--input-bg-color);
+    color: var(--text-primary-color);
+    border: 0;
+    outline: none;
+    height: 1.75em;
+    box-shadow: var(--input-border-color) 0 0 0 1px inset;
+
+    :root[dir="ltr"] & {
+      border-radius: 4px 4px 4px 4px;
+    }
+
+    :root[dir="rtl"] & {
+      border-radius: 4px 4px 4px 4px;
+    }
+
+    float: left;
+    padding: 1px;
+    padding-inline-start: 0.5em;
+    appearance: none;
+  }
+  .panelColumn {
+    .control-label{
+      .tags-input{
+        width: 90%;
+      }
+    }
+  } 
+}

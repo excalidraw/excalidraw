@@ -225,6 +225,7 @@ export const textWysiwyg = ({
         verticalAlign,
         color: updatedTextElement.strokeColor,
         opacity: updatedTextElement.opacity / 100,
+        tags: "",
         filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
       });

@@ -24,12 +24,14 @@ export const exportCanvas = async (
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
+    tagsBackground,
     name,
     fileHandle = null,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
+    tagsBackground: string;
     name: string;
     fileHandle?: FileSystemHandle | null;
   },
@@ -44,6 +46,7 @@ export const exportCanvas = async (
         exportBackground,
         exportWithDarkMode: appState.exportWithDarkMode,
         viewBackgroundColor,
+        tagsBackground,
         exportPadding,
         exportScale: appState.exportScale,
         exportEmbedScene: appState.exportEmbedScene && type === "svg",
@@ -69,6 +72,7 @@ export const exportCanvas = async (
   const tempCanvas = await exportToCanvas(elements, appState, files, {
     exportBackground,
     viewBackgroundColor,
+    tagsBackground,
     exportPadding,
   });
   tempCanvas.style.display = "none";

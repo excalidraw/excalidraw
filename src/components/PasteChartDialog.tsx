@@ -43,6 +43,7 @@ const ChartPreviewBtn = (props: {
         {
           exportBackground: false,
           viewBackgroundColor: oc.white,
+          tagsBackground: "",
         },
         null, // files
       );

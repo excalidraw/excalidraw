@@ -520,6 +520,43 @@ export const actionChangeOpacity = register({
   ),
 });
 
+export const actionChangeTags = register({
+  name: "changeTags",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) =>
+          newElementWith(el, {
+            tags: value,
+          }),
+        true,
+      ),
+      appState: { ...appState, currentItemTags: value },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <>
+      <h3 aria-hidden="true">{t("labels.tags")}</h3>      
+      <input
+        className="tags-input"
+        onChange={(event) => updateData(event.target.value)}
+        value={
+          getFormValue(
+            elements,
+            appState,
+            (element) => element.tags,
+            appState.currentItemTags,
+          ) ?? undefined
+        }
+      />
+    </>
+  ),
+});
+
 export const actionChangeFontSize = register({
   name: "changeFontSize",
   trackEvent: false,

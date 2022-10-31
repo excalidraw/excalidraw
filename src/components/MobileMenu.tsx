@@ -16,10 +16,12 @@ import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockButton } from "./LockButton";
 import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
+import { FilterTagsBackground } from "./FilterTagsBackground";
 import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
+import "./TagsCanvas.scss";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -176,6 +178,7 @@ export const MobileMenu = ({
           />
         )}
         {<BackgroundPickerAndDarkModeToggle actionManager={actionManager} />}
+        {<FilterTagsBackground actionManager={actionManager} />}
       </>
     );
   };

@@ -102,6 +102,7 @@ const restoreElementWithProperties = <
     strokeStyle: element.strokeStyle ?? "solid",
     roughness: element.roughness ?? 1,
     opacity: element.opacity == null ? 100 : element.opacity,
+    tags: element.tags == "" ? "" : element.tags,
     angle: element.angle || 0,
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
