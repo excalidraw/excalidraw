@@ -579,18 +579,17 @@ const ExcalidrawWrapper = () => {
   const renderFooter = (isMobile: boolean) => {
     const renderLanguageList = () => <LanguageList />;
     if (isMobile) {
-      const isTinyDevice = window.innerWidth < 362;
       return (
         <div
           style={{
             display: "flex",
-            flexDirection: isTinyDevice ? "column" : "row",
+            flexDirection: "column",
           }}
         >
-          <fieldset>
-            <legend>{t("labels.language")}</legend>
-            {renderLanguageList()}
-          </fieldset>
+          <div style={{ marginBottom: ".5rem", fontSize: "0.75rem" }}>
+            {t("labels.language")}
+          </div>
+          <div style={{ padding: "0 0.625rem" }}>{renderLanguageList()}</div>
         </div>
       );
     }

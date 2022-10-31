@@ -246,14 +246,16 @@ const LayerUI = ({
                 }}
               >
                 <div>{actionManager.renderAction("toggleTheme")}</div>
-                <div>
+                <div style={{ padding: "0 0.625rem" }}>
                   <LanguageList style={{ width: "100%" }} />
                 </div>
                 <div>
                   <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
                     {t("labels.canvasBackground")}
                   </div>
-                  {actionManager.renderAction("changeViewBackgroundColor")}
+                  <div style={{ padding: "0 0.625rem" }}>
+                    {actionManager.renderAction("changeViewBackgroundColor")}
+                  </div>
                 </div>
               </div>
             </Island>
