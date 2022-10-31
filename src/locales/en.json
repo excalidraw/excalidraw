@@ -215,7 +215,7 @@
     "text": "Text",
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
-    "penMode": "Prevent pinch-zoom and accept freedraw input only from pen",
+    "penMode": "Pen mode - prevent touch",
     "link": "Add/ Update link for a selected shape",
     "eraser": "Eraser"
   },

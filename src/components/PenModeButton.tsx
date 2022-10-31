@@ -2,7 +2,7 @@ import "./ToolIcon.scss";
 
 import clsx from "clsx";
 import { ToolButtonSize } from "./ToolButton";
-import { FreedrawIcon, LockedIcon, UnlockedIcon } from "./icons";
+import { PenModeIcon } from "./icons";
 
 type PenModeIconProps = {
   title?: string;
@@ -40,19 +40,7 @@ export const PenModeButton = (props: PenModeIconProps) => {
         checked={props.checked}
         aria-label={props.title}
       />
-      <div className="ToolIcon__icon">
-        {props.checked ? (
-          <div className="penmode-button">
-            <div className="penmode-button__pen">{FreedrawIcon}</div>
-            <div className="penmode-button__lock">{LockedIcon}</div>
-          </div>
-        ) : (
-          <div className="penmode-button">
-            <div className="penmode-button__pen">{FreedrawIcon}</div>
-            <div className="penmode-button__lock">{UnlockedIcon}</div>
-          </div>
-        )}
-      </div>
+      <div className="ToolIcon__icon">{PenModeIcon}</div>
     </label>
   );
 };

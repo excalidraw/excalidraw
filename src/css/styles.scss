@@ -541,24 +541,6 @@
     background: var(--scrollbar-thumb);
   }
 
-  .penmode-button {
-    display: flex;
-    align-items: baseline;
-
-    &__lock {
-      position: absolute;
-      right: 5px;
-      bottom: 5px;
-      svg {
-        width: 0.75rem !important;
-        height: 0.75rem !important;
-        g {
-          stroke-width: 1.5 !important;
-        }
-      }
-    }
-  }
-
   .mobile-misc-tools-container {
     position: fixed;
     top: 5rem;
