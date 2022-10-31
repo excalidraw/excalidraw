@@ -1057,7 +1057,7 @@ const isVisibleElement = (
     viewTransformations,
   );
   var inTags = false;
-  if (tagsBack === "") {
+  if (tagsBack.length === 0) {
     inTags = true;
   } else {
     tagsBack.toLowerCase().split(' ').forEach((eltTagsBack) => {

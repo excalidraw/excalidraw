@@ -59,6 +59,23 @@ export const getSelectedElements = (
   includeBoundTextElement: boolean = false,
 ) =>
   elements.filter((element) => {
+    var inTags = false;
+    if (appState.tagsBackground.length === 0) {
+      inTags = true;
+    }
+    appState.tagsBackground.toLowerCase().split(' ').forEach((eltTagsBack) => {
+      if (eltTagsBack.length > 0){
+        if (element.tags.toLowerCase().split(' ').includes(eltTagsBack)) {
+          inTags = true;
+        }
+      }
+    })
+    if (element.tags.length === 0) {
+      inTags = true;
+    }
+    if (inTags === false) {
+      return null;
+    }
     if (appState.selectedElementIds[element.id]) {
       return element;
     }
