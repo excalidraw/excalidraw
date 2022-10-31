@@ -103,6 +103,7 @@ export const MIME_TYPES = {
   bmp: "image/bmp",
   ico: "image/x-icon",
   binary: "application/octet-stream",
+  text: "text/plain",
 } as const;
 
 export const EXPORT_DATA_TYPES = {

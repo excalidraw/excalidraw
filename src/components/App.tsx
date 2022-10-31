@@ -266,6 +266,7 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
+import { isValidLink, ParsedData, parseText } from "../textContent";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -984,6 +985,11 @@ class App extends React.Component<AppProps, AppState> {
       this.updateCurrentCursorPosition,
       false,
     );
+    document.removeEventListener(
+      EVENT.DRAG_OVER,
+      this.updateCurrentCursorPosition,
+      false,
+    );
     document.removeEventListener(EVENT.KEYUP, this.onKeyUp);
     window.removeEventListener(EVENT.RESIZE, this.onResize, false);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
@@ -1034,6 +1040,10 @@ class App extends React.Component<AppProps, AppState> {
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
     document.addEventListener(
       EVENT.MOUSE_MOVE,
+      this.updateCurrentCursorPosition,
+    );
+    document.addEventListener(
+      EVENT.DRAG_OVER,
       this.updateCurrentCursorPosition,
     );
     // rerender text elements on font load to fix #637 && #1553
@@ -1446,9 +1456,38 @@ class App extends React.Component<AppProps, AppState> {
       // must be called in the same frame (thus before any awaits) as the paste
       // event else some browsers (FF...) will clear the clipboardData
       // (something something security)
-      let file = event?.clipboardData?.files[0];
+      const file = event?.clipboardData?.files[0];
 
       const data = await parseClipboard(event);
+
+      const onEvent = async () => {
+        if (this.props.onPaste) {
+          try {
+            return await this.props.onPaste(data, event);
+          } catch {
+            return true;
+          }
+        }
+        return true;
+      };
+
+      await this.addElementsFromText({
+        data,
+        defaultFile: file,
+        onEvent,
+      });
+      event?.preventDefault();
+    },
+  );
+
+  private addElementsFromText = withBatchedUpdates(
+    async (opts: {
+      data: ParsedData;
+      defaultFile?: File;
+      onEvent?: () => Promise<boolean>;
+    }) => {
+      const { data, defaultFile, onEvent } = opts;
+      let file = defaultFile;
 
       if (!file && data.text) {
         const string = data.text.trim();
@@ -1459,7 +1498,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
@@ -1470,19 +1508,17 @@ class App extends React.Component<AppProps, AppState> {
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
         this.setState({ selectedElementIds: { [imageElement.id]: true } });
-
         return;
       }
 
-      if (this.props.onPaste) {
-        try {
-          if ((await this.props.onPaste(data, event)) === false) {
-            return;
-          }
-        } catch (error: any) {
-          console.error(error);
+      try {
+        if ((await onEvent?.()) === false) {
+          return;
         }
+      } catch (error: any) {
+        console.error(error);
       }
+
       if (data.errorMessage) {
         this.setState({ errorMessage: data.errorMessage });
       } else if (data.spreadsheet) {
@@ -1502,7 +1538,6 @@ class App extends React.Component<AppProps, AppState> {
         this.addTextFromPaste(data.text);
       }
       this.setActiveTool({ type: "selection" });
-      event?.preventDefault();
     },
   );
 
@@ -1629,6 +1664,7 @@ class App extends React.Component<AppProps, AppState> {
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
+      ...(isValidLink(text) && { link: text }),
     });
 
     this.scene.replaceAllElements([
@@ -5606,6 +5642,13 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    const textContent = event.dataTransfer.getData(MIME_TYPES.text);
+    if (textContent) {
+      const data = await parseText(textContent);
+      await this.addElementsFromText({ data });
+      return;
+    }
+
     // must be retrieved first, in the same frame
     const { file, fileHandle } = await getFileFromEvent(event);
 
