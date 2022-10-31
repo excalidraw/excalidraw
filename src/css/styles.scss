@@ -545,16 +545,16 @@
     display: flex;
     align-items: baseline;
 
-    &__pen {
-      svg {
-        transform: rotate(-45deg);
-      }
-    }
-
     &__lock {
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
       svg {
         width: 0.75rem !important;
         height: 0.75rem !important;
+        g {
+          stroke-width: 1.5 !important;
+        }
       }
     }
   }
