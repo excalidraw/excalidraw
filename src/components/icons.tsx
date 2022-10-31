@@ -429,16 +429,11 @@ export const SunIcon = createIcon(
 );
 
 export const HamburgerMenuIcon = createIcon(
-  // <svg strokeWidth="1.5">
-  //   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-  //   <line x1="4" y1="6" x2="20" y2="6"></line>
-  //   <line x1="4" y1="12" x2="20" y2="12"></line>
-  //   <line x1="4" y1="18" x2="20" y2="18"></line>
-  // </svg>,
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-    <line x1="4" y1="8" x2="20" y2="8"></line>
-    <line x1="4" y1="16" x2="20" y2="16"></line>
+    <line x1="4" y1="6" x2="20" y2="6"></line>
+    <line x1="4" y1="12" x2="20" y2="12"></line>
+    <line x1="4" y1="18" x2="20" y2="18"></line>
   </g>,
   tablerIconProps,
 );
