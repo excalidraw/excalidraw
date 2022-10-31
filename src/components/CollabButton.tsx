@@ -32,6 +32,7 @@ const CollabButton = ({
           type="button"
           onClick={onClick}
           style={{ position: "relative" }}
+          title={t("labels.liveCollaboration")}
         >
           {UsersIcon}
           {collaboratorCount > 0 && (
