@@ -44,7 +44,7 @@
         transform: scaleX(-1) rotate(80deg);
 
         :root[dir="rtl"] & {
-          transform: scaleX(-1) rotate(180deg);
+          transform: rotate(80deg);
         }
       }
     }
@@ -81,6 +81,7 @@
 
       top: 100%;
       margin-top: 0.25rem;
+      margin-inline-start: 0.6rem;
 
       display: flex;
       align-items: flex-end;
