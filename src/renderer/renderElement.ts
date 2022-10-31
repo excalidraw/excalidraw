@@ -105,7 +105,7 @@ const generateElementCanvas = (
     if (!img || "then" in img.image) {
       throw new Error("this should never happen");
     }
-    canvas = img.image;
+    canvas = img.image.cloneNode(true) as HTMLImageElement;
   } else {
     canvas = document.createElement("canvas");
   }
