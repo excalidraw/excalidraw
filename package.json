@@ -35,7 +35,7 @@
     "firebase": "8.3.3",
     "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
-    "image-blob-reduce": "3.0.1",
+    "image-blob-reduce": "4.1.0",
     "jotai": "1.6.4",
     "lodash.throttle": "4.1.1",
     "nanoid": "3.3.3",
