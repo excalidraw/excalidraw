@@ -2,7 +2,7 @@ import { ColorPicker } from "../components/ColorPicker";
 import { eraser, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { DarkModeToggle } from "../components/DarkModeToggle";
-import { THEME, ZOOM_STEP } from "../constants";
+import { MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
@@ -206,7 +206,7 @@ const zoomValueToFitBoundsOnViewport = (
   const zoomAdjustedToSteps =
     Math.floor(smallestZoomValue / ZOOM_STEP) * ZOOM_STEP;
   const clampedZoomValueToFitElements = Math.min(
-    Math.max(zoomAdjustedToSteps, ZOOM_STEP),
+    Math.max(zoomAdjustedToSteps, MIN_ZOOM),
     1,
   );
   return clampedZoomValueToFitElements as NormalizedZoomValue;
