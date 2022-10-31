@@ -70,12 +70,24 @@ const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
 const getDashArrayDotted = (strokeWidth: number) => [1.5, 6 + strokeWidth];
 
-const getCanvasPadding = (element: ExcalidrawElement) =>
-  element.type === "freedraw" ? element.strokeWidth * 12 : 20;
+const getCanvasPadding = (element: ExcalidrawElement) => {
+  switch (element.type) {
+    case "freedraw":
+      return element.strokeWidth * 12;
+    case "image":
+      return 0;
+    default:
+      return 20;
+  }
+};
+
+const isCanvas = (el: any): el is HTMLCanvasElement => {
+  return el instanceof HTMLCanvasElement;
+};
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
-  canvas: HTMLCanvasElement;
+  canvas: HTMLCanvasElement | HTMLImageElement;
   theme: RenderConfig["theme"];
   canvasZoom: Zoom["value"];
   canvasOffsetX: number;
@@ -87,9 +99,19 @@ const generateElementCanvas = (
   zoom: Zoom,
   renderConfig: RenderConfig,
 ): ExcalidrawElementWithCanvas => {
-  const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d")!;
+  let canvas: HTMLImageElement | HTMLCanvasElement;
+  if (element.type === "image" && element.fileId) {
+    const img = renderConfig.imageCache.get(element.fileId);
+    if (!img || "then" in img.image) {
+      throw new Error("this should never happen");
+    }
+    canvas = img.image;
+  } else {
+    canvas = document.createElement("canvas");
+  }
   const padding = getCanvasPadding(element);
+
+  const context = isCanvas(canvas) ? canvas.getContext("2d")! : null;
 
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
@@ -114,7 +136,7 @@ const generateElementCanvas = (
         ? distance(element.y, y1) * window.devicePixelRatio * zoom.value
         : 0;
 
-    context.translate(canvasOffsetX, canvasOffsetY);
+    context?.translate(canvasOffsetX, canvasOffsetY);
   } else {
     canvas.width =
       element.width * window.devicePixelRatio * zoom.value +
@@ -124,22 +146,23 @@ const generateElementCanvas = (
       padding * zoom.value * 2;
   }
 
-  context.save();
-  context.translate(padding * zoom.value, padding * zoom.value);
-  context.scale(
-    window.devicePixelRatio * zoom.value,
-    window.devicePixelRatio * zoom.value,
-  );
+  if (context && isCanvas(canvas)) {
+    context.save();
+    context.translate(padding * zoom.value, padding * zoom.value);
+    context.scale(
+      window.devicePixelRatio * zoom.value,
+      window.devicePixelRatio * zoom.value,
+    );
+    const rc = rough.canvas(canvas);
 
-  const rc = rough.canvas(canvas);
+    // in dark theme, revert the image color filter
+    if (shouldResetImageFilter(element, renderConfig)) {
+      context.filter = IMAGE_INVERT_FILTER;
+    }
 
-  // in dark theme, revert the image color filter
-  if (shouldResetImageFilter(element, renderConfig)) {
-    context.filter = IMAGE_INVERT_FILTER;
+    drawElementOnCanvas(element, rc, context, renderConfig);
+    context.restore();
   }
-
-  drawElementOnCanvas(element, rc, context, renderConfig);
-  context.restore();
 
   return {
     element,
