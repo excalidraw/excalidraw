@@ -257,6 +257,11 @@
   .shapes-section {
     display: flex;
     justify-content: center;
+    pointer-events: none !important;
+
+    & > * {
+      pointer-events: all;
+    }
   }
 
   .App-menu_top {
