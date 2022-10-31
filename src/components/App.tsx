@@ -76,6 +76,7 @@ import {
   THEME,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
+  ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -6097,7 +6098,7 @@ class App extends React.Component<AppProps, AppState> {
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
       const sign = Math.sign(deltaY);
-      const MAX_STEP = 10;
+      const MAX_STEP = ZOOM_STEP * 100;
       const absDelta = Math.abs(deltaY);
       let delta = deltaY;
       if (absDelta > MAX_STEP) {
