@@ -442,11 +442,13 @@ export const ExportIcon = createIcon(
 );
 
 export const HelpIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path d="M10 17.5a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15ZM10 14.167v.01" />
-    <path d="M10 11.25a1.25 1.25 0 0 1 .833-1.25 2.167 2.167 0 1 0-2.5-3.333" />
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <line x1="12" y1="17" x2="12" y2="17.01"></line>
+    <path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"></path>
   </g>,
-  modifiedTablerIconProps,
+  tablerIconProps,
 );
 
 export const ExternalLinkIcon = createIcon(
@@ -895,11 +897,14 @@ export const CenterHorizontallyIcon = createIcon(
 );
 
 export const UsersIcon = createIcon(
-  <path
-    strokeWidth="1.5"
-    d="M7.5 9.167a3.333 3.333 0 1 0 0-6.667 3.333 3.333 0 0 0 0 6.667ZM2.5 17.5v-1.667A3.333 3.333 0 0 1 5.833 12.5h3.334a3.333 3.333 0 0 1 3.333 3.333V17.5M13.333 2.608a3.333 3.333 0 0 1 0 6.459M17.5 17.5v-1.667a3.333 3.333 0 0 0-2.5-3.208"
-  />,
-  modifiedTablerIconProps,
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="9" cy="7" r="4"></circle>
+    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+    <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
+  </g>,
+  tablerIconProps,
 );
 
 // not mirrored because it's inspired by a playback control, which is always RTL
