@@ -216,6 +216,13 @@
         color: var(--color-gray-10);
       }
     }
+
+    .WelcomeScreen-item:active {
+      background-color: var(--color-gray-90);
+      .WelcomeScreen-item__label {
+        color: var(--color-gray-10);
+      }
+    }
   }
 
   // Can tweak these values but for an initial effort, it looks OK to me
