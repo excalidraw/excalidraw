@@ -115,8 +115,8 @@
       "label": "Esteka"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Editatu lerroa",
+      "exit": "Irten lerro-editoretik"
     },
     "elementLock": {
       "lock": "Blokeatu",
