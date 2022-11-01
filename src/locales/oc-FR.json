@@ -71,7 +71,7 @@
     "layers": "Calques",
     "actions": "Accions",
     "language": "Lenga",
-    "liveCollaboration": "Collaboracion en dirèct",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplicar",
     "untitled": "Sens títol",
     "name": "Nom",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
     "exportJSON": "Exportar en fichièr",
-    "exportImage": "Salvar coma imatge",
-    "export": "Exportar",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Exportar en PNG",
     "exportToSvg": "Exportar en SVG",
     "copyToClipboard": "Copiar al quichapapièrs",
@@ -144,7 +144,7 @@
     "scale": "Escala",
     "save": "Salvar al fichièr actual",
     "saveAs": "Enregistrar jos",
-    "load": "Cargar",
+    "load": "",
     "getShareableLink": "Obténer lo ligam de partatge",
     "close": "Tampar",
     "selectLanguage": "Causir una lenga",
@@ -214,7 +214,7 @@
     "text": "Tèxt",
     "library": "Bibliotèca",
     "lock": "Mantenir activa l’aisina aprèp dessenhar",
-    "penMode": "Empachar l’agradiment tactil e acceptar la picada liura solament amb un estilò",
+    "penMode": "",
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
     "eraser": "Goma"
   },
@@ -439,5 +439,12 @@
     "5c940d": "Verd citron 9",
     "e67700": "Jaune 9",
     "d9480f": "Irange 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
