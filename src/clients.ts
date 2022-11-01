@@ -24,6 +24,5 @@ export const getClientInitials = (userName?: string | null) => {
   if (!userName) {
     return "?";
   }
-
-  return userName[0].toUpperCase();
+  return userName.trim()[0].toUpperCase();
 };
