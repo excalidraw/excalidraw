@@ -71,7 +71,7 @@
     "layers": "Lag",
     "actions": "",
     "language": "Sprog",
-    "liveCollaboration": "Direkte samarbejde",
+    "liveCollaboration": "",
     "duplicateSelection": "",
     "untitled": "",
     "name": "",
@@ -144,7 +144,7 @@
     "scale": "",
     "save": "",
     "saveAs": "Gem som",
-    "load": "Indlæs",
+    "load": "",
     "getShareableLink": "Lav et delbart link",
     "close": "Luk",
     "selectLanguage": "Vælg sprog",
@@ -439,5 +439,12 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
