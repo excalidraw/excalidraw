@@ -71,7 +71,7 @@
     "layers": "அடுக்குகள்",
     "actions": "செயல்கள்",
     "language": "மொழி",
-    "liveCollaboration": "நேரடி கூட்டுப்பணி",
+    "liveCollaboration": "",
     "duplicateSelection": "நகலாக்கு",
     "untitled": "தலைப்பற்றது",
     "name": "பெயர்",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "கித்தானை அகரமாக்கு",
     "exportJSON": "கோப்புக்கு ஏற்றுமதிசெய்",
-    "exportImage": "படமாகச் சேமி",
-    "export": "ஏற்றுமதி",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "PNGக்கு ஏற்றுமதிசெய்",
     "exportToSvg": "SVGக்கு ஏற்றுமதிசெய்",
     "copyToClipboard": "நகலகத்திற்கு நகலெடு",
@@ -144,7 +144,7 @@
     "scale": "அளவு",
     "save": "தற்போதைய கோப்புக்குச் சேமி",
     "saveAs": "இப்படி சேமி",
-    "load": "ஏற்று",
+    "load": "",
     "getShareableLink": "பகிரக்கூடிய தொடுப்பைப் பெறு",
     "close": "மூடு",
     "selectLanguage": "மொழியைத் தேர்ந்தெடு",
@@ -214,7 +214,7 @@
     "text": "உரை",
     "library": "நூலகம்",
     "lock": "தேர்ந்த கருவியை வரைந்த பின்பும் வைத்திரு",
-    "penMode": "கிள்ளிப்பெரிதாக்குவதைத் தவிர் மற்றும் பேனாவிலிருந்து மட்டும் கட்டற்றவரைவை ஏல்",
+    "penMode": "",
     "link": "தேர்தெடுத்த வடிவத்திற்குத் தொடுப்பைச் சேர்/ புதுப்பி",
     "eraser": "அழிப்பி"
   },
@@ -439,5 +439,12 @@
     "5c940d": "தேசிக்காய்நிறம் 9",
     "e67700": "மஞ்சள் 9",
     "d9480f": "ஆரஞ்சு 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
