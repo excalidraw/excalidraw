@@ -735,7 +735,7 @@ describe("regression tests", () => {
     expect(API.getSelectedElements().length).toBe(0);
   });
 
-  it.only("Drags selected element when hitting only bounding box and keeps element selected", () => {
+  it("Drags selected element when hitting only bounding box and keeps element selected", () => {
     UI.clickTool("ellipse");
     mouse.down();
     mouse.up(10, 10);
