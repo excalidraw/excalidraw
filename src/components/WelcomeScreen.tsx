@@ -23,19 +23,19 @@ const WelcomeScreenItem = ({
   shortcut,
   onClick,
   icon,
-  isPromoLink,
+  link,
 }: {
   label: string;
   shortcut: string | null;
   onClick?: () => void;
   icon: JSX.Element;
-  isPromoLink?: boolean;
+  link?: string;
 }) => {
-  if (isPromoLink) {
+  if (link) {
     return (
       <a
-        className="WelcomeScreen-item WelcomeScreen-item--promo"
-        href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"
+        className="WelcomeScreen-item"
+        href={link}
         target="_blank"
         rel="noreferrer"
       >
@@ -117,7 +117,7 @@ const WelcomeScreen = ({ actionManager }: { actionManager: ActionManager }) => {
         />
         {!isExcalidrawPlusSignedUser && (
           <WelcomeScreenItem
-            isPromoLink
+            link="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"
             label="Try Excalidraw Plus!"
             shortcut={null}
             icon={PlusPromoIcon}
