@@ -71,7 +71,7 @@
     "layers": "Disposition",
     "actions": "Actions",
     "language": "Langue",
-    "liveCollaboration": "Collaboration en direct",
+    "liveCollaboration": "",
     "duplicateSelection": "Dupliquer",
     "untitled": "Sans-titre",
     "name": "Nom",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
     "exportJSON": "Exporter comme fichier",
-    "exportImage": "Enregistrer comme image",
-    "export": "Exporter",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Enregistrer en PNG",
     "exportToSvg": "Enregistrer en SVG",
     "copyToClipboard": "Copier dans le presse-papier",
@@ -144,7 +144,7 @@
     "scale": "Échelle",
     "save": "Enregistrer dans le fichier actuel",
     "saveAs": "Enregistrer sous",
-    "load": "Ouvrir",
+    "load": "",
     "getShareableLink": "Obtenir un lien de partage",
     "close": "Fermer",
     "selectLanguage": "Choisir une langue",
@@ -214,7 +214,7 @@
     "text": "Texte",
     "library": "Bibliothèque",
     "lock": "Garder l'outil sélectionné actif après le dessin",
-    "penMode": "Empêcher le zoom tactile et accepter la saisie libre uniquement à partir du stylet",
+    "penMode": "",
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
     "eraser": "Gomme"
   },
@@ -439,5 +439,12 @@
     "5c940d": "Citron vert 9",
     "e67700": "Jaune 9",
     "d9480f": "Orange 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
