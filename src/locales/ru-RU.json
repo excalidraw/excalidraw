@@ -71,7 +71,7 @@
     "layers": "Слои",
     "actions": "Действия",
     "language": "Язык",
-    "liveCollaboration": "Совместное взаимодействие",
+    "liveCollaboration": "",
     "duplicateSelection": "Дубликат",
     "untitled": "Безымянный",
     "name": "Имя",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
     "exportJSON": "Сохранить в",
-    "exportImage": "Сохранить как изображение",
-    "export": "Экспортировать",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Экспорт в PNG",
     "exportToSvg": "Экспорт в SVG",
     "copyToClipboard": "Скопировать в буфер обмена",
@@ -144,7 +144,7 @@
     "scale": "Масштаб",
     "save": "Сохранить в текущий файл",
     "saveAs": "Сохранить как",
-    "load": "Загрузить",
+    "load": "",
     "getShareableLink": "Получить доступ по ссылке",
     "close": "Закрыть",
     "selectLanguage": "Выбрать язык",
@@ -214,7 +214,7 @@
     "text": "Текст",
     "library": "Библиотека",
     "lock": "Сохранять выбранный инструмент активным после рисования",
-    "penMode": "Отключить масштабирование щипком и рисовать только с помощью пера",
+    "penMode": "",
     "link": "Добавить/обновить ссылку для выбранной фигуры",
     "eraser": "Ластик"
   },
@@ -439,5 +439,12 @@
     "5c940d": "Лайм 9",
     "e67700": "Жёлтый 9",
     "d9480f": "Оранжевый 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
