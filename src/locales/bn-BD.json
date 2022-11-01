@@ -71,7 +71,7 @@
     "layers": "মাত্রা",
     "actions": "ক্রিয়া",
     "language": "ভাষা",
-    "liveCollaboration": "যুগ্ম কার্য",
+    "liveCollaboration": "",
     "duplicateSelection": "সদৃশ সিলেক্ট",
     "untitled": "অনামী",
     "name": "নাম",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "ক্যানভাস সাফ করুন",
     "exportJSON": "জেসন নিবদ্ধ করুন",
-    "exportImage": "চিত্র নিবদ্ধ করুন",
-    "export": "নিবদ্ধ",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "পীএনজী ছবির মতন নিবদ্ধ করুন",
     "exportToSvg": "এসভীজী ছবির মতন নিবদ্ধ করুন",
     "copyToClipboard": "ক্লিপবোর্ডে কপি করুন",
@@ -144,7 +144,7 @@
     "scale": "মাপ",
     "save": "জমা করুন",
     "saveAs": "অন্যভাবে জমা করুন",
-    "load": "লোড করুন",
+    "load": "",
     "getShareableLink": "ভাগযোগ্য লিঙ্ক পান",
     "close": "বন্ধ করুন",
     "selectLanguage": "ভাষা চিহ্নিত করুন",
@@ -214,7 +214,7 @@
     "text": "লেখা",
     "library": "সংগ্রহ",
     "lock": "আঁকার পরে নির্বাচিত টুল সক্রিয় রাখুন",
-    "penMode": "পিঞ্চ-জুম প্রতিরোধ করুন এবং শুধুমাত্র কলম থেকে ইনপুট গ্রহণ করুন",
+    "penMode": "",
     "link": "একটি নির্বাচিত আকৃতির জন্য লিঙ্ক যোগ বা আপডেট করুন",
     "eraser": "ঝাড়ন"
   },
@@ -439,5 +439,12 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
