@@ -6188,7 +6188,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.device.isMobile &&
+            true && //zsviczian this.device.isMobile
               navigator.clipboard && {
                 trackEvent: false,
                 name: "paste",
@@ -6200,7 +6200,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.device.isMobile && navigator.clipboard && separator,
+            true && navigator.clipboard && separator, //zsviczian this.device.isMobile
             probablySupportsClipboardBlob &&
               elements.length > 0 &&
               actionCopyAsPng,
@@ -6245,9 +6245,9 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.device.isMobile && actionCut,
-            this.device.isMobile && navigator.clipboard && actionCopy,
-            this.device.isMobile &&
+            true && actionCut, //zsviczian this.device.isMobile
+            true && navigator.clipboard && actionCopy, //zsviczian this.device.isMobile
+            true && //zsviczian this.device.isMobile
               navigator.clipboard && {
                 name: "paste",
                 trackEvent: false,
@@ -6259,7 +6259,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.device.isMobile && separator,
+            true && separator, //zsviczian this.device.isMobile
             ...options,
             separator,
             actionCopyStyles,
