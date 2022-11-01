@@ -71,7 +71,7 @@
     "layers": "Lager",
     "actions": "Åtgärder",
     "language": "Språk",
-    "liveCollaboration": "Samarbeta live",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplicera",
     "untitled": "Namnlös",
     "name": "Namn",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Återställ canvasen",
     "exportJSON": "Exportera till fil",
-    "exportImage": "Spara som bild",
-    "export": "Exportera",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Exportera till PNG",
     "exportToSvg": "Exportera till SVG",
     "copyToClipboard": "Kopiera till urklipp",
@@ -144,7 +144,7 @@
     "scale": "Skala",
     "save": "Spara till aktuell fil",
     "saveAs": "Spara som",
-    "load": "Öppna",
+    "load": "",
     "getShareableLink": "Hämta delbar länk",
     "close": "Stäng",
     "selectLanguage": "Välj språk",
@@ -214,7 +214,7 @@
     "text": "Text",
     "library": "Bibliotek",
     "lock": "Håll valt verktyg aktivt efter ritande",
-    "penMode": "Förhindra nypzoom och acceptera endast frihandsteckning från penna",
+    "penMode": "",
     "link": "Lägg till / Uppdatera länk för en vald form",
     "eraser": "Radergummi"
   },
@@ -439,5 +439,12 @@
     "5c940d": "Limegrön 9",
     "e67700": "Gul 9",
     "d9480f": "Orange 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
