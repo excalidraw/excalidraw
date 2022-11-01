@@ -229,26 +229,45 @@
   @media (max-width: 1024px) {
     .WelcomeScreen-decor {
       &--help-pointer,
-      &--top-toolbar-pointer,
       &--menu-pointer {
         display: none;
       }
     }
   }
 
-  @media (max-height: 600px) {
+  // @media (max-height: 400px) {
+  //   .WelcomeScreen-container {
+  //     margin-top: 0;
+  //   }
+  // }
+  @media (max-height: 599px) {
+    .WelcomeScreen-container {
+      margin-top: 4rem;
+    }
+  }
+  @media (min-height: 600px) and (max-height: 900px) {
+    .WelcomeScreen-container {
+      margin-top: 8rem;
+    }
+  }
+  @media (max-height: 630px) {
+    .WelcomeScreen-decor--top-toolbar-pointer {
+      display: none;
+    }
+  }
+  @media (max-height: 500px) {
     .WelcomeScreen-container {
       display: none;
     }
   }
 
-  @media (max-height: 800px) {
-    .WelcomeScreen-decor {
-      &--help-pointer,
-      &--top-toolbar-pointer,
-      &--menu-pointer {
-        display: none;
-      }
-    }
-  }
+  // @media (max-height: 740px) {
+  //   .WelcomeScreen-decor {
+  //     &--help-pointer,
+  //     &--top-toolbar-pointer,
+  //     &--menu-pointer {
+  //       display: none;
+  //     }
+  //   }
+  // }
 }
