@@ -71,7 +71,7 @@
     "layers": "Livelli",
     "actions": "Azioni",
     "language": "Lingua",
-    "liveCollaboration": "",
+    "liveCollaboration": "Collaborazione dal vivo...",
     "duplicateSelection": "Duplica",
     "untitled": "Senza titolo",
     "name": "Nome",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Svuota la tela",
     "exportJSON": "Esporta su file",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Esporta immagine...",
+    "export": "Salva in...",
     "exportToPng": "Esporta come PNG",
     "exportToSvg": "Esporta come SVG",
     "copyToClipboard": "Copia negli appunti",
@@ -144,7 +144,7 @@
     "scale": "Scala",
     "save": "Salva sul file corrente",
     "saveAs": "Salva con nome",
-    "load": "",
+    "load": "Apri",
     "getShareableLink": "Ottieni link condivisibile",
     "close": "Chiudi",
     "selectLanguage": "Seleziona lingua",
@@ -214,7 +214,7 @@
     "text": "Testo",
     "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato",
-    "penMode": "",
+    "penMode": "Modalità penna - previene il tocco",
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
     "eraser": "Gomma"
   },
@@ -441,10 +441,10 @@
     "d9480f": "Arancio 9"
   },
   "welcomeScreen": {
-    "data": "",
+    "data": "Tutti i tuoi dati sono salvati localmente nel browser.",
     "switchToPlusApp": "",
-    "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "menuHints": "Esporta, preferenze, lingue, ...",
+    "toolbarHints": "Scegli uno strumento & Inizia a disegnare!",
+    "helpHints": "Scorciatoie & aiuto"
   }
 }
