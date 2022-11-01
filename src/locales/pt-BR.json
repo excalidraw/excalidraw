@@ -71,7 +71,7 @@
     "layers": "Camadas",
     "actions": "Ações",
     "language": "Idioma",
-    "liveCollaboration": "Colaboração ao vivo",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplicar",
     "untitled": "Sem título",
     "name": "Nome",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
     "exportJSON": "Exportar arquivo",
-    "exportImage": "Salvar como imagem",
-    "export": "Exportar",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Exportar em PNG",
     "exportToSvg": "Exportar em SVG",
     "copyToClipboard": "Copiar para o clipboard",
@@ -144,7 +144,7 @@
     "scale": "Escala",
     "save": "Salvar para o arquivo atual",
     "saveAs": "Salvar como",
-    "load": "Carregar",
+    "load": "",
     "getShareableLink": "Obter um link de compartilhamento",
     "close": "Fechar",
     "selectLanguage": "Selecionar idioma",
@@ -214,7 +214,7 @@
     "text": "Texto",
     "library": "Biblioteca",
     "lock": "Manter ativa a ferramenta selecionada após desenhar",
-    "penMode": "Prevenir a ação de tocar-ampliar e permitir apenas interações da caneta",
+    "penMode": "",
     "link": "Adicionar/Atualizar link para uma forma selecionada",
     "eraser": "Borracha"
   },
@@ -439,5 +439,12 @@
     "5c940d": "Lima 9",
     "e67700": "Amarelo 9",
     "d9480f": "Laranja 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
