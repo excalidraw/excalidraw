@@ -5,6 +5,7 @@ import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { COOKIES } from "../constants";
 import { collabDialogShownAtom } from "../excalidraw-app/collab/Collab";
 import { t } from "../i18n";
+import { AppState } from "../types";
 import {
   ExcalLogo,
   HelpIcon,
@@ -60,7 +61,13 @@ const WelcomeScreenItem = ({
   );
 };
 
-const WelcomeScreen = ({ actionManager }: { actionManager: ActionManager }) => {
+const WelcomeScreen = ({
+  appState,
+  actionManager,
+}: {
+  appState: AppState;
+  actionManager: ActionManager;
+}) => {
   const [, setCollabDialogShown] = useAtom(collabDialogShownAtom);
 
   let subheadingJSX;
@@ -94,15 +101,17 @@ const WelcomeScreen = ({ actionManager }: { actionManager: ActionManager }) => {
         {subheadingJSX}
       </div>
       <div className="WelcomeScreen-items">
-        <WelcomeScreenItem
-          // TODO barnabasmolnar/editor-redesign
-          // do we want the internationalized labels here that are currently
-          // in use elsewhere or new ones?
-          label={t("buttons.load")}
-          onClick={() => actionManager.executeAction(actionLoadScene)}
-          shortcut={getShortcutFromShortcutName("loadScene")}
-          icon={LoadIcon}
-        />
+        {!appState.viewModeEnabled && (
+          <WelcomeScreenItem
+            // TODO barnabasmolnar/editor-redesign
+            // do we want the internationalized labels here that are currently
+            // in use elsewhere or new ones?
+            label={t("buttons.load")}
+            onClick={() => actionManager.executeAction(actionLoadScene)}
+            shortcut={getShortcutFromShortcutName("loadScene")}
+            icon={LoadIcon}
+          />
+        )}
         <WelcomeScreenItem
           label={t("labels.liveCollaboration")}
           shortcut={null}
