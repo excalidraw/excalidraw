@@ -71,7 +71,7 @@
     "layers": "परतें",
     "actions": "कार्रवाई",
     "language": "भाषा",
-    "liveCollaboration": "जीवंत सहयोग",
+    "liveCollaboration": "",
     "duplicateSelection": "डुप्लिकेट",
     "untitled": "अशीर्षित",
     "name": "नाम",
@@ -136,7 +136,7 @@
     "clearReset": "कैनवास रीसेट करें",
     "exportJSON": "",
     "exportImage": "",
-    "export": "निर्यात",
+    "export": "",
     "exportToPng": "पीएनजी के रूप में निर्यात करे",
     "exportToSvg": "Svg के रूप में निर्यात करे",
     "copyToClipboard": "क्लिपबोर्ड पर प्रतिलिपि बनाएँ",
@@ -144,7 +144,7 @@
     "scale": "पैमाना",
     "save": "",
     "saveAs": "सेव करे इस तरह",
-    "load": "लोड करें",
+    "load": "",
     "getShareableLink": "साझा करने योग्य लिंक प्राप्त करें",
     "close": "बंद करें",
     "selectLanguage": "भाषा चुनें",
@@ -439,5 +439,12 @@
     "5c940d": "",
     "e67700": "पीला",
     "d9480f": "नारंगी"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
