@@ -19,6 +19,10 @@
   height: 100%;
   width: 100%;
 
+  button {
+    cursor: pointer;
+  }
+
   &:focus {
     outline: none;
   }
@@ -85,27 +89,22 @@
   .panelColumn {
     display: flex;
     flex-direction: column;
+    row-gap: 0.75rem;
 
     h3,
     legend,
     .control-label {
-      margin-top: 0.333rem;
-      margin-bottom: 0.333rem;
+      margin: 0;
+      margin-bottom: 0.25rem;
       font-size: 0.75rem;
       color: var(--text-primary-color);
-      font-weight: bold;
+      font-weight: normal;
       display: block;
     }
 
     .control-label input {
       display: block;
       width: 100%;
-    }
-
-    h3:first-child,
-    legend:first-child,
-    .control-label:first-child {
-      margin-top: 0;
     }
 
     legend {
@@ -119,11 +118,12 @@
 
     .buttonList {
       flex-wrap: wrap;
+      display: flex;
+      column-gap: 0.5rem;
+      row-gap: 0.5rem;
 
       label {
-        margin-right: 0.25rem;
         font-size: 0.75rem;
-        display: inline-block;
       }
 
       input[type="radio"],
@@ -136,38 +136,10 @@
       .iconRow {
         margin-top: 8px;
       }
-
-      .ToolIcon {
-        margin: 0;
-        margin-inline-end: 8px;
-
-        &:focus {
-          outline: transparent;
-          box-shadow: 0 0 0 2px var(--focus-highlight-color);
-        }
-
-        &:hover {
-          background-color: var(--button-gray-2);
-        }
-
-        &:active {
-          background-color: var(--button-gray-3);
-        }
-
-        &:disabled {
-          cursor: not-allowed;
-        }
-      }
-
-      .ToolIcon__icon {
-        width: 28px;
-        height: 28px;
-      }
     }
 
     fieldset {
       margin: 0;
-      margin-top: 0.333rem;
       padding: 0;
       border: none;
     }
@@ -185,64 +157,26 @@
     box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
 
-  button,
-  .buttonList label {
-    user-select: none;
-    background-color: var(--button-gray-1);
-    border: 0;
-    border-radius: var(--border-radius-md);
-    margin: 0.125rem 0;
-    padding: 0.25rem;
-    white-space: nowrap;
-
-    cursor: pointer;
-
-    &:focus-visible {
-      outline: transparent;
-      box-shadow: 0 0 0 2px var(--focus-highlight-color);
+  .buttonList {
+    .ToolIcon__icon {
+      all: unset !important;
+      display: flex !important;
     }
 
-    &:hover {
-      background-color: var(--button-gray-2);
+    button {
+      background-color: transparent;
     }
 
-    &:active {
-      background-color: var(--button-gray-3);
-    }
+    label,
+    button,
+    .zIndexButton {
+      @include outlineButtonStyles;
 
-    &:disabled {
-      cursor: not-allowed;
-    }
-  }
+      padding: 0;
 
-  .active,
-  .buttonList label.active {
-    background-color: var(--color-primary);
-
-    --icon-fill-color: #{$oc-white};
-
-    &:hover {
-      background-color: var(--color-primary-darker);
-    }
-
-    &:active {
-      background-color: var(--color-primary-darkest);
-    }
-  }
-
-  .buttonList.buttonListIcon {
-    label {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
       svg {
-        width: 35px;
-        height: 14px;
-        padding: 2px;
-        opacity: 0.6;
-      }
-      &.active svg {
-        opacity: 1;
+        width: var(--default-icon-size);
+        height: var(--default-icon-size);
       }
     }
   }
@@ -289,8 +223,6 @@
   .App-toolbar {
     width: 100%;
 
-    box-sizing: border-box;
-
     .eraser {
       &.ToolIcon:hover {
         --icon-fill-color: #fff;
@@ -322,12 +254,27 @@
     color: var(--icon-fill-color);
   }
 
+  .shapes-section {
+    display: flex;
+    justify-content: center;
+    pointer-events: none !important;
+
+    & > * {
+      pointer-events: all;
+    }
+  }
+
   .App-menu_top {
-    grid-template-columns: auto max-content auto;
-    grid-gap: 4px;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-gap: 2rem;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
+
+    @media (min-width: 1536px) {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-gap: 3rem;
+    }
   }
 
   .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_top > * {
@@ -344,20 +291,14 @@
 
   .App-menu_bottom {
     position: absolute;
-    bottom: 0;
-    grid-template-columns: min-content auto min-content;
-    grid-gap: 15px;
+    bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
-
-    :root[dir="ltr"] & {
-      left: 0.25rem;
-    }
-
-    :root[dir="rtl"] & {
-      right: 0.25rem;
-    }
+    box-sizing: border-box;
+    padding: 0 1rem;
 
     &--transition-left {
       section {
@@ -390,7 +331,10 @@
 
   .App-menu__left {
     overflow-y: auto;
-    box-shadow: var(--shadow-island);
+    padding: 0.75rem;
+    width: 202px;
+    box-sizing: border-box;
+    position: absolute;
   }
 
   .dropdown-select {
@@ -426,55 +370,65 @@
     &:active {
       background-color: var(--button-gray-2);
     }
+
+    &__language {
+      height: 2rem;
+      background-color: var(--island-bg-color);
+      border-color: var(--default-border-color) !important;
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--island-bg-color);
+      }
+    }
   }
 
-  .zIndexButton {
-    margin: 0;
-    margin-inline-end: 8px;
-    padding: 5px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  .disable-zen-mode {
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-gray-20);
+    border: 1px solid var(--color-gray-30);
+    padding: 10px 20px;
 
-    svg {
-      width: 18px;
-      height: 18px;
+    &:hover {
+      background-color: var(--color-gray-30);
     }
   }
 
   .scroll-back-to-content {
-    color: var(--popup-text-color);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--island-bg-color);
+    color: var(--icon-fill-color);
+
+    border: 1px solid var(--default-border-color);
+    padding: 10px 20px;
     position: absolute;
     left: 50%;
     bottom: 30px;
     transform: translateX(-50%);
-    padding: 10px 20px;
     pointer-events: all;
+
+    &:hover {
+      background-color: var(--button-hover);
+    }
+
+    &:active {
+      border: 1px solid var(--color-primary-darkest);
+    }
   }
 
   .help-icon {
-    display: flex;
-    cursor: pointer;
-    fill: $oc-gray-6;
-    padding: 0;
-    margin: 0;
-    background: none;
-    color: var(--icon-fill-color);
+    @include outlineButtonStyles;
+    background-color: var(--island-bg-color);
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
 
     svg {
-      width: 1.5rem;
-      height: 1.5rem;
-    }
-
-    &:hover {
-      background: none;
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
     }
   }
 
   .reset-zoom-button {
-    padding: 0.2em;
-    background: transparent;
-    color: var(--text-primary-color);
     font-family: var(--ui-font);
   }
 
@@ -491,7 +445,6 @@
   .eraser-buttons {
     display: grid;
     grid-auto-flow: column;
-    gap: 0.4em;
     margin-top: auto;
     margin-bottom: auto;
     margin-inline-start: 0.6em;
@@ -572,17 +525,49 @@
   // use custom, minimalistic scrollbar
   // (doesn't work in Firefox)
   ::-webkit-scrollbar {
-    width: 5px;
+    width: 3px;
   }
+
   ::-webkit-scrollbar-thumb {
-    background: var(--button-gray-2);
+    background: var(--scrollbar-thumb);
     border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--button-gray-3);
+    background: var(--scrollbar-thumb-hover);
   }
   ::-webkit-scrollbar-thumb:active {
-    background: var(--button-gray-2);
+    background: var(--scrollbar-thumb);
+  }
+
+  .mobile-misc-tools-container {
+    position: fixed;
+    top: 5rem;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--sidebar-border-color);
+    border-top-left-radius: var(--border-radius-lg);
+    border-bottom-left-radius: var(--border-radius-lg);
+    border-right: 0;
+
+    background-color: var(--island-bg-color);
+
+    .ToolIcon__icon {
+      border-radius: 0;
+    }
+
+    .library-button {
+      border: 0;
+    }
+  }
+
+  .App-toolbar--mobile {
+    overflow-x: hidden;
+    max-width: 100vw;
+
+    .ToolIcon__keybinding {
+      display: none;
+    }
   }
 }
 

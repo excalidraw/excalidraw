@@ -33,6 +33,13 @@ export const Sidebar = Object.assign(
         onClose,
         onDock,
         docked,
+        /** Undocumented, may be removed later. Generally should either be
+         * `props.docked` or `appState.isSidebarDocked`. Currently serves to
+         *  prevent unwanted animation of the shadow if initially docked. */
+        //
+        // NOTE we'll want to remove this after we sort out how to subscribe to
+        // individual appState properties
+        initialDockedState = docked,
         dockable = true,
         className,
         __isInternal,
@@ -52,7 +59,9 @@ export const Sidebar = Object.assign(
 
       const setAppState = useExcalidrawSetAppState();
 
-      const [isDockedFallback, setIsDockedFallback] = useState(docked ?? false);
+      const [isDockedFallback, setIsDockedFallback] = useState(
+        docked ?? initialDockedState ?? false,
+      );
 
       useLayoutEffect(() => {
         if (docked === undefined) {
@@ -119,8 +128,11 @@ export const Sidebar = Object.assign(
 
       return (
         <Island
-          padding={2}
-          className={clsx("layer-ui__sidebar", className)}
+          className={clsx(
+            "layer-ui__sidebar",
+            { "layer-ui__sidebar--docked": isDockedFallback },
+            className,
+          )}
           ref={ref}
         >
           <SidebarPropsContext.Provider value={headerPropsRef.current}>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { close } from "./icons";
+import { CloseIcon } from "./icons";
 import "./Toast.scss";
 import { ToolButton } from "./ToolButton";
 
@@ -47,7 +47,7 @@ export const Toast = ({
       <p className="Toast__message">{message}</p>
       {closable && (
         <ToolButton
-          icon={close}
+          icon={CloseIcon}
           aria-label="close"
           type="icon"
           onClick={onClose}
