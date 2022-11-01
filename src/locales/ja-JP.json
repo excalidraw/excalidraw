@@ -71,7 +71,7 @@
     "layers": "レイヤー",
     "actions": "操作",
     "language": "言語",
-    "liveCollaboration": "共同編集",
+    "liveCollaboration": "",
     "duplicateSelection": "複製",
     "untitled": "無題",
     "name": "名前",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "キャンバスのリセット",
     "exportJSON": "ファイルへエクスポート",
-    "exportImage": "画像として保存",
-    "export": "エクスポート",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "PNG にエクスポート",
     "exportToSvg": "SVG にエクスポート",
     "copyToClipboard": "クリップボードにコピー",
@@ -144,7 +144,7 @@
     "scale": "スケール",
     "save": "現在のファイルに保存",
     "saveAs": "名前を付けて保存",
-    "load": "読み込み...",
+    "load": "",
     "getShareableLink": "共有URLの取得",
     "close": "閉じる",
     "selectLanguage": "言語の選択",
@@ -214,7 +214,7 @@
     "text": "テキスト",
     "library": "ライブラリ",
     "lock": "描画後も使用中のツールを選択したままにする",
-    "penMode": "ピンチとズームを抑止し、ペンからのみ自由な入力を受け付けます",
+    "penMode": "",
     "link": "選択した図形のリンクを追加/更新",
     "eraser": "消しゴム"
   },
@@ -439,5 +439,12 @@
     "5c940d": "ライム 9",
     "e67700": "イエロー 9",
     "d9480f": "オレンジ 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
