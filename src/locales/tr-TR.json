@@ -71,7 +71,7 @@
     "layers": "Katmanlar",
     "actions": "Eylemler",
     "language": "Dil",
-    "liveCollaboration": "",
+    "liveCollaboration": "Canlı ortak çalışma alanı...",
     "duplicateSelection": "Çoğalt",
     "untitled": "Adsız",
     "name": "İsim",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Tuvali sıfırla",
     "exportJSON": "Dosyaya aktar",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Resimleri dışa aktar...",
+    "export": "Şuraya kaydet...",
     "exportToPng": "PNG olarak dışa aktar",
     "exportToSvg": "SVG olarak dışa aktar",
     "copyToClipboard": "Panoya kopyala",
@@ -144,7 +144,7 @@
     "scale": "Ölçek",
     "save": "Geçerli dosyaya kaydet",
     "saveAs": "Farklı kaydet",
-    "load": "",
+    "load": "Aç",
     "getShareableLink": "Paylaşılabilir bağlantı al",
     "close": "Kapat",
     "selectLanguage": "Dil seçin",
@@ -214,7 +214,7 @@
     "text": "Yazı",
     "library": "Kütüphane",
     "lock": "Seçilen aracı çizimden sonra aktif tut",
-    "penMode": "",
+    "penMode": "Kalem modu - dokunmayı engelle",
     "link": "Seçilen şekil için bağlantı Ekle/Güncelle",
     "eraser": "Silgi"
   },
@@ -441,10 +441,10 @@
     "d9480f": "Turuncu 9"
   },
   "welcomeScreen": {
-    "data": "",
-    "switchToPlusApp": "",
-    "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "data": "Tüm veri internet gezgininize yerel olarak kaydedildi.",
+    "switchToPlusApp": "Excalidraw+ kullanmak ister miydiniz?",
+    "menuHints": "Dışa aktar, seçenkeler, diller, ...",
+    "toolbarHints": "Bir araç seçin & Çizime başlayın!",
+    "helpHints": "Kısayollar & yardım"
   }
 }
