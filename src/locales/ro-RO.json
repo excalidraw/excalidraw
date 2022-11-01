@@ -71,7 +71,7 @@
     "layers": "Straturi",
     "actions": "Acțiuni",
     "language": "Limbă",
-    "liveCollaboration": "",
+    "liveCollaboration": "Colaborare în direct...",
     "duplicateSelection": "Duplicare",
     "untitled": "Nedenumit",
     "name": "Nume",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Resetare pânză",
     "exportJSON": "Exportare la fișiere",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Exportare imagine...",
+    "export": "Salvare în...",
     "exportToPng": "Exportare ca PNG",
     "exportToSvg": "Exportare ca SVG",
     "copyToClipboard": "Copiere în memoria temporară",
@@ -144,7 +144,7 @@
     "scale": "Scală",
     "save": "Salvare în fișierul curent",
     "saveAs": "Salvare ca",
-    "load": "",
+    "load": "Deschidere",
     "getShareableLink": "Obține URL partajabil",
     "close": "Închidere",
     "selectLanguage": "Selectare limbă",
@@ -214,7 +214,7 @@
     "text": "Text",
     "library": "Bibliotecă",
     "lock": "Menține activ instrumentul selectat după desenare",
-    "penMode": "",
+    "penMode": "Mod stilou – împiedică atingerea",
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră"
   },
@@ -441,10 +441,10 @@
     "d9480f": "Portocaliu 9"
   },
   "welcomeScreen": {
-    "data": "",
-    "switchToPlusApp": "",
-    "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "data": "Toate datele tale sunt salvate local în navigatorul tău.",
+    "switchToPlusApp": "Ai vrut să mergi în schimb la Excalidraw+?",
+    "menuHints": "Exportare, preferințe, limbi, ...",
+    "toolbarHints": "Alege un instrument și începe să desenezi!",
+    "helpHints": "Comenzi rapide și ajutor"
   }
 }
