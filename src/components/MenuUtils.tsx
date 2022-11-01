@@ -3,7 +3,7 @@ import { GithubIcon, DiscordIcon, PlusPromoIcon, TwitterIcon } from "./icons";
 export const MenuLinks = () => (
   <>
     <a
-      href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=banner&utm_campaign=launch"
+      href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger"
       target="_blank"
       rel="noreferrer"
       className="menu-item"

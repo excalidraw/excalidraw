@@ -35,7 +35,7 @@ const WelcomeScreenItem = ({
     return (
       <a
         className="WelcomeScreen-item WelcomeScreen-item--promo"
-        href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=banner&utm_campaign=launch"
+        href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"
         target="_blank"
         rel="noreferrer"
       >
