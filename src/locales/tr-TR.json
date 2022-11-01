@@ -71,7 +71,7 @@
     "layers": "Katmanlar",
     "actions": "Eylemler",
     "language": "Dil",
-    "liveCollaboration": "Canlı ortak çalışma alanı",
+    "liveCollaboration": "",
     "duplicateSelection": "Çoğalt",
     "untitled": "Adsız",
     "name": "İsim",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Tuvali sıfırla",
     "exportJSON": "Dosyaya aktar",
-    "exportImage": "Görüntü olarak kaydet",
-    "export": "Dışa aktar",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "PNG olarak dışa aktar",
     "exportToSvg": "SVG olarak dışa aktar",
     "copyToClipboard": "Panoya kopyala",
@@ -144,7 +144,7 @@
     "scale": "Ölçek",
     "save": "Geçerli dosyaya kaydet",
     "saveAs": "Farklı kaydet",
-    "load": "Yükle",
+    "load": "",
     "getShareableLink": "Paylaşılabilir bağlantı al",
     "close": "Kapat",
     "selectLanguage": "Dil seçin",
@@ -214,7 +214,7 @@
     "text": "Yazı",
     "library": "Kütüphane",
     "lock": "Seçilen aracı çizimden sonra aktif tut",
-    "penMode": "Çift parmak sıkıştırmayı önle ve serbest çizimi yalnızca kalemle yap",
+    "penMode": "",
     "link": "Seçilen şekil için bağlantı Ekle/Güncelle",
     "eraser": "Silgi"
   },
@@ -439,5 +439,12 @@
     "5c940d": "Yeşil 9",
     "e67700": "Sarı 9",
     "d9480f": "Turuncu 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
