@@ -71,7 +71,7 @@
     "layers": "Rétegek",
     "actions": "Műveletek",
     "language": "Nyelv",
-    "liveCollaboration": "Élő együttműködés",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplikálás",
     "untitled": "Névtelen",
     "name": "Név",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Vászon törlése",
     "exportJSON": "Exportálás fájlba",
-    "exportImage": "Mentés képként",
-    "export": "Exportálás",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Exportálás PNG-be",
     "exportToSvg": "Exportálás SVG-be",
     "copyToClipboard": "Vágólapra másolás",
@@ -144,7 +144,7 @@
     "scale": "Nagyítás",
     "save": "Mentés az aktuális fájlba",
     "saveAs": "Mentés másként",
-    "load": "Betöltés",
+    "load": "",
     "getShareableLink": "Megosztható link létrehozása",
     "close": "Bezárás",
     "selectLanguage": "Nyelv kiválasztása",
@@ -214,7 +214,7 @@
     "text": "Szöveg",
     "library": "Könyvtár",
     "lock": "Rajzolás után az aktív eszközt tartsa kijelölve",
-    "penMode": "Akadályozza meg a kicsinyítést, és csak tollról fogadja el a szabadkézi bevitelt",
+    "penMode": "",
     "link": "Hivatkozás hozzáadása/frissítése a kiválasztott alakzathoz",
     "eraser": ""
   },
@@ -439,5 +439,12 @@
     "5c940d": "Lime 9",
     "e67700": "Sárga 9",
     "d9480f": "Narancs 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
