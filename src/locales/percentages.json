@@ -36,11 +36,11 @@
   "pl-PL": 87,
   "pt-BR": 97,
   "pt-PT": 96,
-  "ro-RO": 97,
+  "ro-RO": 100,
   "ru-RU": 96,
   "si-LK": 8,
   "sk-SK": 97,
-  "sl-SI": 97,
+  "sl-SI": 99,
   "sv-SE": 96,
   "ta-IN": 95,
   "tr-TR": 97,
@@ -48,5 +48,5 @@
   "vi-VN": 16,
   "zh-CN": 97,
   "zh-HK": 26,
-  "zh-TW": 97
+  "zh-TW": 100
 }
