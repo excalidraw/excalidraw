@@ -79,7 +79,9 @@ export type LastActiveToolBeforeEraser =
       customType: string;
     }
   | null;
+
 export type AppState = {
+  showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: string | null;
   draggingElement: NonDeletedExcalidrawElement | null;
@@ -142,13 +144,13 @@ export type AppState = {
     | "strokeColorPicker"
     | null;
   openSidebar: "library" | "customSidebar" | null;
+  openDialog: "imageExport" | "help" | null;
   isSidebarDocked: boolean;
 
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
   shouldCacheIgnoreZoom: boolean;
-  showHelpDialog: boolean;
   toast: { message: string; closable?: boolean; duration?: number } | null;
   zenModeEnabled: boolean;
   theme: Theme;

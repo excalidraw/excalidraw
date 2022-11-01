@@ -18,6 +18,22 @@ interface Window {
   gtag: Function;
 }
 
+interface CanvasRenderingContext2D {
+  // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/roundRect
+  roundRect?: (
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radii:
+      | number // [all-corners]
+      | [number] // [all-corners]
+      | [number, number] // [top-left-and-bottom-right, top-right-and-bottom-left]
+      | [number, number, number] // [top-left, top-right-and-bottom-left, bottom-right]
+      | [number, number, number, number], // [top-left, top-right, bottom-right, bottom-left]
+  ) => void;
+}
+
 // https://github.com/facebook/create-react-app/blob/ddcb7d5/packages/react-scripts/lib/react-app.d.ts
 declare namespace NodeJS {
   interface ProcessEnv {

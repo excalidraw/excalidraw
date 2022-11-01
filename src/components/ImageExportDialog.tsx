@@ -5,14 +5,12 @@ import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
-import { useDevice } from "./App";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../scene/export";
 import { AppState, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
-import { clipboard, exportImage } from "./icons";
+import { clipboard } from "./icons";
 import Stack from "./Stack";
-import { ToolButton } from "./ToolButton";
 import "./ExportDialog.scss";
 import OpenColor from "open-color";
 import { CheckboxItem } from "./CheckboxItem";
@@ -221,6 +219,7 @@ const ImageExportModal = ({
 export const ImageExportDialog = ({
   elements,
   appState,
+  setAppState,
   files,
   exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
@@ -229,6 +228,7 @@ export const ImageExportDialog = ({
   onExportToClipboard,
 }: {
   appState: AppState;
+  setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles;
   exportPadding?: number;
@@ -237,26 +237,13 @@ export const ImageExportDialog = ({
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
 }) => {
-  const [modalIsShown, setModalIsShown] = useState(false);
-
   const handleClose = React.useCallback(() => {
-    setModalIsShown(false);
-  }, []);
+    setAppState({ openDialog: null });
+  }, [setAppState]);
 
   return (
     <>
-      <ToolButton
-        onClick={() => {
-          setModalIsShown(true);
-        }}
-        data-testid="image-export-button"
-        icon={exportImage}
-        type="button"
-        aria-label={t("buttons.exportImage")}
-        showAriaLabel={useDevice().isMobile}
-        title={t("buttons.exportImage")}
-      />
-      {modalIsShown && (
+      {appState.openDialog === "imageExport" && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.exportImage")}>
           <ImageExportModal
             elements={elements}

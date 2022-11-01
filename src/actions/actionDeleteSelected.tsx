@@ -1,7 +1,6 @@
 import { isSomeElementSelected } from "../scene";
 import { KEYS } from "../keys";
 import { ToolButton } from "../components/ToolButton";
-import { trash } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
 import { getNonDeletedElements } from "../element";
@@ -13,6 +12,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
 import { isBoundToContainer } from "../element/typeChecks";
 import { updateActiveTool } from "../utils";
+import { TrashIcon } from "../components/icons";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
@@ -149,7 +149,7 @@ export const actionDeleteSelected = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"
-      icon={trash}
+      icon={TrashIcon}
       title={t("labels.delete")}
       aria-label={t("labels.delete")}
       onClick={() => updateData(null)}

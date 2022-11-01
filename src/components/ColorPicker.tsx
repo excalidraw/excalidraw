@@ -385,16 +385,20 @@ export const ColorPicker = ({
   const palette = customPalette
     ? colorPalette[type] ?? colors[type]
     : colors[type]; //zsviczian
+  const coords = pickerButton.current?.getBoundingClientRect();
+
   return (
     <div>
       <div className="color-picker-control-container">
-        <button
-          className="color-picker-label-swatch"
-          aria-label={label}
-          style={color ? { "--swatch-color": color } : undefined}
-          onClick={() => setActive(!isActive)}
-          ref={pickerButton}
-        />
+        <div className="color-picker-label-swatch-container">
+          <button
+            className="color-picker-label-swatch"
+            aria-label={label}
+            style={color ? { "--swatch-color": color } : undefined}
+            onClick={() => setActive(!isActive)}
+            ref={pickerButton}
+          />
+        </div>
         <ColorInput
           color={color}
           label={label}
@@ -405,28 +409,38 @@ export const ColorPicker = ({
       </div>
       <React.Suspense fallback="">
         {isActive ? (
-          <Popover
-            onCloseRequest={(event) =>
-              event.target !== pickerButton.current && setActive(false)
-            }
+          <div
+            className="color-picker-popover-container"
+            style={{
+              position: "fixed",
+              top: coords?.top,
+              left: coords?.right,
+              zIndex: 1,
+            }}
           >
-            <Picker
-              colors={palette} //zsviczian
-              customPalette={customPalette} //zsviczian
-              color={color || null}
-              onChange={(changedColor) => {
-                onChange(changedColor);
-              }}
-              onClose={() => {
-                setActive(false);
-                pickerButton.current?.focus();
-              }}
-              label={label}
-              showInput={false}
-              type={type}
-              elements={elements}
-            />
-          </Popover>
+            <Popover
+              onCloseRequest={(event) =>
+                event.target !== pickerButton.current && setActive(false)
+              }
+            >
+              <Picker
+                colors={palette} //zsviczian
+                customPalette={customPalette} //zsviczian
+                color={color || null}
+                onChange={(changedColor) => {
+                  onChange(changedColor);
+                }}
+                onClose={() => {
+                  setActive(false);
+                  pickerButton.current?.focus();
+                }}
+                label={label}
+                showInput={false}
+                type={type}
+                elements={elements}
+              />
+            </Popover>
+          </div>
         ) : null}
       </React.Suspense>
     </div>

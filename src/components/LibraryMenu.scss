@@ -35,103 +35,32 @@
     }
   }
 
-  .library-actions {
-    width: 100%;
+  .library-actions-counter {
+    background-color: var(--color-primary);
+    color: var(--color-primary-light);
+    font-weight: bold;
     display: flex;
-    margin-right: auto;
     align-items: center;
-
-    button .library-actions-counter {
-      position: absolute;
-      right: 2px;
-      bottom: 2px;
-      border-radius: 50%;
-      width: 1em;
-      height: 1em;
-      padding: 1px;
-      font-size: 0.7rem;
-      background: #fff;
-    }
-
-    &--remove {
-      background-color: $oc-red-7;
-      &:hover {
-        background-color: $oc-red-8;
-      }
-      &:active {
-        background-color: $oc-red-9;
-      }
-      svg {
-        color: $oc-white;
-      }
-      .library-actions-counter {
-        color: $oc-red-7;
-      }
-    }
-
-    &--export {
-      background-color: $oc-lime-5;
-
-      &:hover {
-        background-color: $oc-lime-7;
-      }
-
-      &:active {
-        background-color: $oc-lime-8;
-      }
-      svg {
-        color: $oc-white;
-      }
-      .library-actions-counter {
-        color: $oc-lime-5;
-      }
-    }
-
-    &--publish {
-      background-color: $oc-cyan-6;
-      &:hover {
-        background-color: $oc-cyan-7;
-      }
-      &:active {
-        background-color: $oc-cyan-9;
-      }
-      svg {
-        color: $oc-white;
-      }
-      label {
-        margin-left: -0.2em;
-        margin-right: 1.1em;
-        color: $oc-white;
-        font-size: 0.86em;
-      }
-      .library-actions-counter {
-        color: $oc-cyan-6;
-      }
-    }
-
-    &--load {
-      background-color: $oc-blue-6;
-      &:hover {
-        background-color: $oc-blue-7;
-      }
-      &:active {
-        background-color: $oc-blue-9;
-      }
-      svg {
-        color: $oc-white;
-      }
-    }
+    justify-content: center;
+    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    bottom: -0.25rem;
+    right: -0.25rem;
+    font-size: 0.625rem;
+    pointer-events: none;
   }
 
   .layer-ui__library-message {
-    padding: 2em 4em;
+    padding: 2rem;
     min-width: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    .Spinner {
-      margin-bottom: 1em;
-    }
+    flex-grow: 1;
+    justify-content: center;
+
     span {
       font-size: 0.8em;
     }
@@ -159,11 +88,10 @@
   }
 
   .library-menu-browse-button {
-    width: 80%;
-    min-height: 22px;
-    margin: 0 auto;
-    margin-top: 1rem;
-    padding: 10px;
+    margin: 1rem auto;
+
+    padding: 0.875rem 1rem;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -176,11 +104,21 @@
     text-align: center;
     white-space: nowrap;
     text-decoration: none !important;
+
+    font-weight: 600;
+    font-size: 0.75rem;
+
     &:hover {
       background-color: var(--color-primary-darker);
     }
     &:active {
       background-color: var(--color-primary-darkest);
+    }
+  }
+
+  &.theme--dark {
+    .library-menu-browse-button {
+      color: var(--color-gray-100);
     }
   }
 
