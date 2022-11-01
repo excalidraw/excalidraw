@@ -71,7 +71,7 @@
     "layers": "圖層",
     "actions": "動作",
     "language": "語言",
-    "liveCollaboration": "即時協作",
+    "liveCollaboration": "",
     "duplicateSelection": "複製",
     "untitled": "無標題",
     "name": "名稱",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "重置 canvas",
     "exportJSON": "匯出至檔案",
-    "exportImage": "另存為圖片",
-    "export": "輸出",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "輸出成 PNG",
     "exportToSvg": "輸出成 SVG",
     "copyToClipboard": "複製至剪貼簿",
@@ -144,7 +144,7 @@
     "scale": "縮放比例",
     "save": "儲存目前檔案",
     "saveAs": "儲存為",
-    "load": "載入",
+    "load": "",
     "getShareableLink": "取得共享連結",
     "close": "關閉",
     "selectLanguage": "選擇語言",
@@ -214,7 +214,7 @@
     "text": "文字",
     "library": "資料庫",
     "lock": "可連續使用選取的工具",
-    "penMode": "停止使用手勢縮放並接受以繪圖筆繪圖輸入",
+    "penMode": "",
     "link": "為所選的形狀增加\b/更新連結",
     "eraser": "橡皮擦"
   },
@@ -439,5 +439,12 @@
     "5c940d": "黃綠 9",
     "e67700": "黃 9",
     "d9480f": "橘 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
