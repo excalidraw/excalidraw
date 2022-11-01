@@ -267,6 +267,7 @@ export const LibraryMenu: React.FC<{
       // is colled correctly
       key="library"
       className="layer-ui__library-sidebar"
+      initialDockedState={appState.isSidebarDocked}
       onDock={(docked) => {
         trackEvent(
           "library",
