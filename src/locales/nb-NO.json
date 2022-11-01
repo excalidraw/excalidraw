@@ -71,7 +71,7 @@
     "layers": "Lag",
     "actions": "Handlinger",
     "language": "Språk",
-    "liveCollaboration": "",
+    "liveCollaboration": "Sanntids-samarbeid...",
     "duplicateSelection": "Dupliser",
     "untitled": "Uten navn",
     "name": "Navn",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
     "exportJSON": "Eksporter til fil",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Eksporter bilde...",
+    "export": "Lagre som...",
     "exportToPng": "Eksporter til PNG",
     "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavle",
@@ -144,7 +144,7 @@
     "scale": "Skalering",
     "save": "Lagre til aktiv fil",
     "saveAs": "Lagre som",
-    "load": "",
+    "load": "Åpne",
     "getShareableLink": "Få delingslenke",
     "close": "Lukk",
     "selectLanguage": "Velg språk",
@@ -214,7 +214,7 @@
     "text": "Tekst",
     "library": "Bibliotek",
     "lock": "Behold merket verktøy som aktivt",
-    "penMode": "",
+    "penMode": "Pennemodus - forhindre berøring",
     "link": "Legg til / oppdater link for en valgt figur",
     "eraser": "Viskelær"
   },
@@ -441,10 +441,10 @@
     "d9480f": "Oransje 9"
   },
   "welcomeScreen": {
-    "data": "",
-    "switchToPlusApp": "",
-    "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "data": "Alle dine data lagres lokalt i din nettleser.",
+    "switchToPlusApp": "Ønsker du å gå til Excalidraw+ i stedet?",
+    "menuHints": "Eksporter, innstillinger, språk, ...",
+    "toolbarHints": "Velg et verktøy og start å tegne!",
+    "helpHints": "Snarveier & hjelp"
   }
 }
