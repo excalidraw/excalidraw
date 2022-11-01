@@ -17,6 +17,10 @@
     justify-content: center;
     overflow: auto;
     padding: calc(var(--space-factor) * 10);
+
+    .Island {
+      padding: 2.5rem !important;
+    }
   }
 
   .Modal__background {
@@ -26,7 +30,7 @@
     right: 0;
     bottom: 0;
     z-index: 1;
-    background-color: transparentize($oc-black, 0.3);
+    background-color: rgba(#121212, 0.2);
   }
 
   .Modal__content {
@@ -46,7 +50,7 @@
     background: var(--island-bg-color);
 
     border: 1px solid var(--dialog-border-color);
-    box-shadow: 0 2px 10px transparentize($oc-black, 0.75);
+    box-shadow: var(--modal-shadow);
     border-radius: 6px;
     box-sizing: border-box;
 
@@ -73,14 +77,20 @@
   }
 
   .Modal__close {
-    width: calc(var(--space-factor) * 7);
-    height: calc(var(--space-factor) * 7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: var(--icon-fill-color);
+    margin: 0;
+    padding: 0.375rem;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    border: 0;
+    background-color: transparent;
+    line-height: 0;
+    cursor: pointer;
 
     svg {
-      height: calc(var(--space-factor) * 5);
+      width: 1.5rem;
+      height: 1.5rem;
     }
   }
 

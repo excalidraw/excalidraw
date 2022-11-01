@@ -71,7 +71,7 @@
     "layers": "Layers",
     "actions": "Actions",
     "language": "Language",
-    "liveCollaboration": "Live collaboration",
+    "liveCollaboration": "Live collaboration...",
     "duplicateSelection": "Duplicate",
     "untitled": "Untitled",
     "name": "Name",
@@ -136,8 +136,8 @@
   "buttons": {
     "clearReset": "Reset the canvas",
     "exportJSON": "Export to file",
-    "exportImage": "Save as image",
-    "export": "Export",
+    "exportImage": "Export image...",
+    "export": "Save to...",
     "exportToPng": "Export to PNG",
     "exportToSvg": "Export to SVG",
     "copyToClipboard": "Copy to clipboard",
@@ -145,7 +145,7 @@
     "scale": "Scale",
     "save": "Save to current file",
     "saveAs": "Save as",
-    "load": "Load",
+    "load": "Open",
     "getShareableLink": "Get shareable link",
     "close": "Close",
     "selectLanguage": "Select language",
@@ -215,7 +215,7 @@
     "text": "Text",
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
-    "penMode": "Prevent pinch-zoom and accept freedraw input only from pen",
+    "penMode": "Pen mode - prevent touch",
     "link": "Add/ Update link for a selected shape",
     "eraser": "Eraser"
   },
@@ -440,5 +440,12 @@
     "5c940d": "Lime 9",
     "e67700": "Yellow 9",
     "d9480f": "Orange 9"
+  },
+  "welcomeScreen": {
+    "data": "All your data is saved locally in your browser.",
+    "switchToPlusApp": "Did you want to go to the Excalidraw+ instead?",
+    "menuHints": "Export, preferences, languages, ...",
+    "toolbarHints": "Pick a tool & Start drawing!",
+    "helpHints": "Shortcuts & help"
   }
 }

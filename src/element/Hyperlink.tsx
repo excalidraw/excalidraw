@@ -10,7 +10,7 @@ import { NonDeletedExcalidrawElement } from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import { editIcon, link, trash } from "../components/icons";
+import { FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
 import { t } from "../i18n";
 import {
   useCallback,
@@ -197,7 +197,7 @@ export const Hyperlink = ({
             label={t("buttons.edit")}
             onClick={onEdit}
             className="excalidraw-hyperlinkContainer--edit"
-            icon={editIcon}
+            icon={FreedrawIcon}
           />
         )}
 
@@ -209,7 +209,7 @@ export const Hyperlink = ({
             label={t("buttons.remove")}
             onClick={handleRemove}
             className="excalidraw-hyperlinkContainer--remove"
-            icon={trash}
+            icon={TrashIcon}
           />
         )}
       </div>
@@ -277,7 +277,7 @@ export const actionLink = register({
     return (
       <ToolButton
         type="button"
-        icon={link}
+        icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
         title={`${t("labels.link.label")} - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}

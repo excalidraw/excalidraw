@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
-import { LibraryItem, LibraryItems } from "../types";
+import { AppState, ExcalidrawProps, LibraryItem, LibraryItems } from "../types";
 import { arrayToMap, chunk } from "../utils";
 import { LibraryUnit } from "./LibraryUnit";
 import Stack from "./Stack";
@@ -10,6 +10,8 @@ import Stack from "./Stack";
 import "./LibraryMenuItems.scss";
 import { MIME_TYPES } from "../constants";
 import Spinner from "./Spinner";
+import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
+import clsx from "clsx";
 
 const CELLS_PER_ROW = 4;
 
@@ -21,6 +23,9 @@ const LibraryMenuItems = ({
   pendingElements,
   selectedItems,
   onSelectItems,
+  theme,
+  id,
+  libraryReturnUrl,
 }: {
   isLoading: boolean;
   libraryItems: LibraryItems;
@@ -29,6 +34,9 @@ const LibraryMenuItems = ({
   onAddToLibrary: (elements: LibraryItem["elements"]) => void;
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
+  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
+  theme: AppState["theme"];
+  id: string;
 }) => {
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
@@ -167,7 +175,11 @@ const LibraryMenuItems = ({
         );
       }
       return (
-        <Stack.Row align="center" gap={1} key={index}>
+        <Stack.Row
+          align="center"
+          key={index}
+          className="library-menu-items-container__row"
+        >
           {rowItems}
         </Stack.Row>
       );
@@ -181,19 +193,21 @@ const LibraryMenuItems = ({
     (item) => item.status === "published",
   );
 
+  const showBtn =
+    !libraryItems.length &&
+    !unpublishedItems.length &&
+    !publishedItems.length &&
+    !pendingElements.length;
+
   return (
     <div
       className="library-menu-items-container"
       style={
-        publishedItems.length || unpublishedItems.length
-          ? {
-              flex: "1 1 0",
-              overflowY: "auto",
-            }
-          : {
-              marginBottom: "2rem",
-              flex: 0,
-            }
+        pendingElements.length ||
+        unpublishedItems.length ||
+        publishedItems.length
+          ? { justifyContent: "flex-start" }
+          : {}
       }
     >
       <Stack.Col
@@ -206,49 +220,37 @@ const LibraryMenuItems = ({
         }}
       >
         <>
-          <div className="separator">
+          <div>
             {(pendingElements.length > 0 ||
               unpublishedItems.length > 0 ||
               publishedItems.length > 0) && (
-              <div>{t("labels.personalLib")}</div>
+              <div className="library-menu-items-container__header">
+                {t("labels.personalLib")}
+              </div>
             )}
             {isLoading && (
               <div
                 style={{
-                  marginLeft: "auto",
-                  marginRight: "1rem",
-                  display: "flex",
-                  alignItems: "center",
-                  fontWeight: "normal",
+                  position: "absolute",
+                  top: "var(--container-padding-y)",
+                  right: "var(--container-padding-x)",
+                  transform: "translateY(50%)",
                 }}
               >
-                <div style={{ transform: "translateY(2px)" }}>
-                  <Spinner />
-                </div>
+                <Spinner />
               </div>
             )}
           </div>
           {!pendingElements.length && !unpublishedItems.length ? (
-            <div
-              style={{
-                height: 65,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-                fontSize: ".9rem",
-              }}
-            >
-              {t("library.noItems")}
+            <div className="library-menu-items__no-items">
               <div
-                style={{
-                  margin: ".6rem 0",
-                  fontSize: ".8em",
-                  width: "70%",
-                  textAlign: "center",
-                }}
+                className={clsx({
+                  "library-menu-items__no-items__label": showBtn,
+                })}
               >
+                {t("library.noItems")}
+              </div>
+              <div className="library-menu-items__no-items__hint">
                 {publishedItems.length > 0
                   ? t("library.hint_emptyPrivateLibrary")
                   : t("library.hint_emptyLibrary")}
@@ -269,7 +271,9 @@ const LibraryMenuItems = ({
           {(publishedItems.length > 0 ||
             pendingElements.length > 0 ||
             unpublishedItems.length > 0) && (
-            <div className="separator">{t("labels.excalidrawLib")}</div>
+            <div className="library-menu-items-container__header library-menu-items-container__header--excal">
+              {t("labels.excalidrawLib")}
+            </div>
           )}
           {publishedItems.length > 0 ? (
             renderLibrarySection(publishedItems)
@@ -289,6 +293,14 @@ const LibraryMenuItems = ({
             </div>
           ) : null}
         </>
+
+        {showBtn && (
+          <LibraryMenuBrowseButton
+            id={id}
+            libraryReturnUrl={libraryReturnUrl}
+            theme={theme}
+          />
+        )}
       </Stack.Col>
     </div>
   );

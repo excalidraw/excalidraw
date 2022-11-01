@@ -3,15 +3,9 @@ import { useContext } from "react";
 import { t } from "../../i18n";
 import { useDevice } from "../App";
 import { SidebarPropsContext } from "./common";
-import { close } from "../icons";
+import { CloseIcon, PinIcon } from "../icons";
 import { withUpstreamOverride } from "../hoc/withUpstreamOverride";
 import { Tooltip } from "../Tooltip";
-
-const SIDE_LIBRARY_TOGGLE_ICON = (
-  <svg viewBox="0 0 24 24" fill="#ffffff">
-    <path d="M19 22H5a3 3 0 01-3-3V5a3 3 0 013-3h14a3 3 0 013 3v14a3 3 0 01-3 3zm0-18h-9v16h9a1.01 1.01 0 001-1V5a1.01 1.01 0 00-1-1z"></path>
-  </svg>
-);
 
 export const SidebarDockButton = (props: {
   checked: boolean;
@@ -33,8 +27,13 @@ export const SidebarDockButton = (props: {
             checked={props.checked}
             aria-label={t("labels.sidebarLock")}
           />{" "}
-          <div className="ToolIcon__icon" tabIndex={0}>
-            {SIDE_LIBRARY_TOGGLE_ICON}
+          <div
+            className={clsx("Sidebar__pin-btn", {
+              "Sidebar__pin-btn--pinned": props.checked,
+            })}
+            tabIndex={0}
+          >
+            {PinIcon}
           </div>{" "}
         </label>{" "}
       </Tooltip>
@@ -64,24 +63,19 @@ const _SidebarHeader: React.FC<{
             <SidebarDockButton
               checked={!!props.docked}
               onChange={() => {
-                document
-                  .querySelector(".layer-ui__wrapper")
-                  ?.classList.add("animate");
-
                 props.onDock?.(!props.docked);
               }}
             />
           )}
           {renderCloseButton && (
-            <div className="ToolIcon__icon__close" data-testid="sidebar-close">
-              <button
-                className="Modal__close"
-                onClick={props.onClose}
-                aria-label={t("buttons.close")}
-              >
-                {close}
-              </button>
-            </div>
+            <button
+              data-testid="sidebar-close"
+              className="Sidebar__close-btn"
+              onClick={props.onClose}
+              aria-label={t("buttons.close")}
+            >
+              {CloseIcon}
+            </button>
           )}
         </div>
       )}

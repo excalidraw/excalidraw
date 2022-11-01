@@ -1,37 +1,47 @@
-import clsx from "clsx";
-import { ToolButton } from "./ToolButton";
 import { t } from "../i18n";
-import { useDevice } from "../components/App";
-import { users } from "./icons";
+import { UsersIcon } from "./icons";
 
 import "./CollabButton.scss";
+import MenuItem from "./MenuItem";
+import clsx from "clsx";
 
 const CollabButton = ({
   isCollaborating,
   collaboratorCount,
   onClick,
+  isInHamburgerMenu = true,
 }: {
   isCollaborating: boolean;
   collaboratorCount: number;
   onClick: () => void;
+  isInHamburgerMenu?: boolean;
 }) => {
   return (
     <>
-      <ToolButton
-        className={clsx("CollabButton", {
-          "is-collaborating": isCollaborating,
-        })}
-        onClick={onClick}
-        icon={users}
-        type="button"
-        title={t("labels.liveCollaboration")}
-        aria-label={t("labels.liveCollaboration")}
-        showAriaLabel={useDevice().isMobile}
-      >
-        {isCollaborating && (
-          <div className="CollabButton-collaborators">{collaboratorCount}</div>
-        )}
-      </ToolButton>
+      {isInHamburgerMenu ? (
+        <MenuItem
+          label={t("labels.liveCollaboration")}
+          dataTestId="collab-button"
+          icon={UsersIcon}
+          onClick={onClick}
+          isCollaborating={isCollaborating}
+        />
+      ) : (
+        <button
+          className={clsx("collab-button", { active: isCollaborating })}
+          type="button"
+          onClick={onClick}
+          style={{ position: "relative" }}
+          title={t("labels.liveCollaboration")}
+        >
+          {UsersIcon}
+          {collaboratorCount > 0 && (
+            <div className="CollabButton-collaborators">
+              {collaboratorCount}
+            </div>
+          )}
+        </button>
+      )}
     </>
   );
 };

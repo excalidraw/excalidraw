@@ -44,6 +44,26 @@ export const UserList: React.FC<{
         );
       });
 
+  // TODO barnabasmolnar/editor-redesign
+  // probably remove before shipping :)
+  // 20 fake collaborators; for easy, convenient debug purposes ˇˇ
+  // const avatars = Array.from({ length: 20 }).map((_, index) => {
+  //   const avatarJSX = actionManager.renderAction("goToCollaborator", [
+  //     index.toString(),
+  //     {
+  //       username: `User ${index}`,
+  //     },
+  //   ]);
+
+  //   return mobile ? (
+  //     <Tooltip label={`User ${index}`} key={index}>
+  //       {avatarJSX}
+  //     </Tooltip>
+  //   ) : (
+  //     <React.Fragment key={index}>{avatarJSX}</React.Fragment>
+  //   );
+  // });
+
   return (
     <div className={clsx("UserList", className, { UserList_mobile: mobile })}>
       {avatars}

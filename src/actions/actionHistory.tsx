@@ -1,5 +1,5 @@
 import { Action, ActionResult } from "./types";
-import { undo, redo } from "../components/icons";
+import { UndoIcon, RedoIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import History, { HistoryEntry } from "../history";
@@ -72,7 +72,7 @@ export const createUndoAction: ActionCreator = (history) => ({
   PanelComponent: ({ updateData, data }) => (
     <ToolButton
       type="button"
-      icon={undo}
+      icon={UndoIcon}
       aria-label={t("buttons.undo")}
       onClick={updateData}
       size={data?.size || "medium"}
@@ -94,7 +94,7 @@ export const createRedoAction: ActionCreator = (history) => ({
   PanelComponent: ({ updateData, data }) => (
     <ToolButton
       type="button"
-      icon={redo}
+      icon={RedoIcon}
       aria-label={t("buttons.redo")}
       onClick={updateData}
       size={data?.size || "medium"}

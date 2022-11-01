@@ -1,0 +1,85 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .menu-container {
+    background-color: #fff !important;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+  }
+
+  .menu-button {
+    @include outlineButtonStyles;
+    background-color: var(--island-bg-color);
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
+
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
+  }
+
+  .menu-item {
+    display: flex;
+    background-color: transparent;
+    border: 0;
+    align-items: center;
+    padding: 0 0.625rem;
+    height: 2rem;
+    column-gap: 0.625rem;
+    font-size: 0.875rem;
+    color: var(--color-gray-100);
+    cursor: pointer;
+    border-radius: var(--border-radius-md);
+    width: 100%;
+    box-sizing: border-box;
+    font-weight: normal;
+    font-family: inherit;
+
+    @media screen and (min-width: 1921px) {
+      height: 2.25rem;
+    }
+
+    &__text {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    &__shortcut {
+      margin-inline-start: auto;
+      opacity: 0.5;
+    }
+
+    &:hover {
+      background-color: var(--button-hover);
+      text-decoration: none;
+    }
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+      display: block;
+    }
+
+    &.active-collab {
+      background-color: #ecfdf5;
+      color: #064e3c;
+    }
+  }
+
+  &.theme--dark {
+    .menu-item {
+      color: var(--color-gray-40);
+
+      &.active-collab {
+        background-color: #064e3c;
+        color: #ecfdf5;
+      }
+    }
+
+    .menu-container {
+      background-color: var(--color-gray-90) !important;
+    }
+  }
+}

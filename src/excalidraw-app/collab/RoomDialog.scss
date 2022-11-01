@@ -1,6 +1,10 @@
 @import "../../css/variables.module";
 
 .excalidraw {
+  .RoomDialog__button {
+    border: 1px solid var(--default-border-color) !important;
+  }
+
   .RoomDialog-linkContainer {
     display: flex;
     margin: 1.5em 0;

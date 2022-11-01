@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { t } from "../i18n";
-import { useDevice } from "./App";
-import { trash } from "./icons";
-import { ToolButton } from "./ToolButton";
+import { TrashIcon } from "./icons";
 
 import ConfirmDialog from "./ConfirmDialog";
+import MenuItem from "./MenuItem";
 
 const ClearCanvas = ({ onConfirm }: { onConfirm: () => void }) => {
   const [showDialog, setShowDialog] = useState(false);
@@ -14,14 +13,11 @@ const ClearCanvas = ({ onConfirm }: { onConfirm: () => void }) => {
 
   return (
     <>
-      <ToolButton
-        type="button"
-        icon={trash}
-        title={t("buttons.clearReset")}
-        aria-label={t("buttons.clearReset")}
-        showAriaLabel={useDevice().isMobile}
+      <MenuItem
+        label={t("buttons.clearReset")}
+        icon={TrashIcon}
         onClick={toggleDialog}
-        data-testid="clear-canvas-button"
+        dataTestId="clear-canvas-button"
       />
 
       {showDialog && (

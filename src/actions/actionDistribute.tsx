@@ -56,7 +56,7 @@ export const distributeHorizontally = register({
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
       type="button"
-      icon={<DistributeHorizontallyIcon theme={appState.theme} />}
+      icon={DistributeHorizontallyIcon}
       onClick={() => updateData(null)}
       title={`${t("labels.distributeHorizontally")} — ${getShortcutKey(
         "Alt+H",
@@ -86,7 +86,7 @@ export const distributeVertically = register({
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
       type="button"
-      icon={<DistributeVerticallyIcon theme={appState.theme} />}
+      icon={DistributeVerticallyIcon}
       onClick={() => updateData(null)}
       title={`${t("labels.distributeVertically")} — ${getShortcutKey("Alt+V")}`}
       aria-label={t("labels.distributeVertically")}

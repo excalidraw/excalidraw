@@ -7,7 +7,7 @@
       flex-direction: column;
 
       label {
-        padding: 1em;
+        padding: 1em 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -34,6 +34,7 @@
       display: flex;
       padding: 0.2rem 0;
       justify-content: flex-end;
+      gap: 0.5rem;
 
       .ToolIcon__icon {
         min-width: 2.5rem;
@@ -74,7 +75,6 @@
 
     .selected-library-items {
       display: flex;
-      padding: 0 0.8rem;
       flex-wrap: wrap;
 
       .single-library-item-wrapper {
@@ -87,7 +87,7 @@
     }
 
     &-note {
-      padding: 1em;
+      padding: 1em 0;
       font-style: italic;
       font-size: 14px;
       display: block;

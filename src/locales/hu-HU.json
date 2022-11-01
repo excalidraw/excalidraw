@@ -439,5 +439,11 @@
     "5c940d": "Lime 9",
     "e67700": "Sárga 9",
     "d9480f": "Narancs 9"
+  },
+  "welcomeScreen": {
+    "data": "Minden adatodat kizárólag a böngésződben tároljuk.",
+    "menuHints": "Export, beállítások, nyelvek, ...",
+    "toolbarHints": "Válassz egy eszközt & kezdj alkotni!",
+    "helpHints": "Gyorsbillentyűk & súgó"
   }
 }

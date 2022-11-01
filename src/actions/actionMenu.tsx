@@ -1,11 +1,12 @@
-import { menu, palette } from "../components/icons";
+import { HamburgerMenuIcon, HelpIcon, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
 import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { KEYS } from "../keys";
-import { HelpIcon } from "../components/HelpIcon";
+import { HelpButton } from "../components/HelpButton";
+import MenuItem from "../components/MenuItem";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -20,7 +21,7 @@ export const actionToggleCanvasMenu = register({
   PanelComponent: ({ appState, updateData }) => (
     <ToolButton
       type="button"
-      icon={menu}
+      icon={HamburgerMenuIcon}
       aria-label={t("buttons.menu")}
       onClick={updateData}
       selected={appState.openMenu === "canvas"}
@@ -74,19 +75,28 @@ export const actionShortcuts = register({
   name: "toggleShortcuts",
   trackEvent: { category: "menu", action: "toggleHelpDialog" },
   perform: (_elements, appState, _, { focusContainer }) => {
-    if (appState.showHelpDialog) {
+    if (appState.openDialog === "help") {
       focusContainer();
     }
     return {
       appState: {
         ...appState,
-        showHelpDialog: !appState.showHelpDialog,
+        openDialog: appState.openDialog === "help" ? null : "help",
       },
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData }) => (
-    <HelpIcon title={t("helpDialog.title")} onClick={updateData} />
-  ),
+  PanelComponent: ({ updateData, isInHamburgerMenu }) =>
+    isInHamburgerMenu ? (
+      <MenuItem
+        label={t("helpDialog.title")}
+        dataTestId="help-menu-item"
+        icon={HelpIcon}
+        onClick={updateData}
+        shortcut="?"
+      />
+    ) : (
+      <HelpButton title={t("helpDialog.title")} onClick={updateData} />
+    ),
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,
 });

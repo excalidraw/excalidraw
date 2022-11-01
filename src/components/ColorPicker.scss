@@ -21,6 +21,23 @@
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: center;
+    column-gap: 0.5rem;
+  }
+
+  .color-picker-control-container + .popover {
+    position: static;
+  }
+
+  .color-picker-popover-container {
+    margin-top: -0.25rem;
+
+    :root[dir="ltr"] & {
+      margin-left: 0.5rem;
+    }
+
+    :root[dir="rtl"] & {
+      margin-left: -3rem;
+    }
   }
 
   .color-picker-triangle {
@@ -30,20 +47,29 @@
     border-width: 0 9px 10px;
     border-color: transparent transparent var(--popup-bg-color);
     position: absolute;
-    top: -10px;
+    top: 10px;
 
     :root[dir="ltr"] & {
-      left: 12px;
+      transform: rotate(270deg);
+      left: -14px;
     }
 
     :root[dir="rtl"] & {
-      right: 12px;
+      transform: rotate(90deg);
+      right: -14px;
     }
   }
 
   .color-picker-triangle-shadow {
     border-color: transparent transparent transparentize($oc-black, 0.9);
-    top: -11px;
+
+    :root[dir="ltr"] & {
+      left: -14px;
+    }
+
+    :root[dir="rtl"] & {
+      right: -16px;
+    }
   }
 
   .color-picker-content--default {
@@ -119,16 +145,21 @@
   }
 
   .color-picker-hash {
-    background: var(--input-border-color);
-    height: 1.875rem;
-    width: 1.875rem;
+    height: var(--default-button-size);
+    flex-shrink: 0;
+    padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+    border: 1px solid var(--default-border-color);
+    border-right: 0;
+    box-sizing: border-box;
 
     :root[dir="ltr"] & {
-      border-radius: 4px 0 0 4px;
+      border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
     }
 
     :root[dir="rtl"] & {
-      border-radius: 0 4px 4px 0;
+      border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) 0;
+      border-right: 1px solid var(--default-border-color);
+      border-left: 0;
     }
 
     color: var(--input-label-color);
@@ -138,81 +169,64 @@
     position: relative;
   }
 
-  .color-input-container:focus-within .color-picker-hash {
-    box-shadow: 0 0 0 2px var(--focus-highlight-color);
-  }
-
-  .color-input-container:focus-within .color-picker-hash::before,
-  .color-input-container:focus-within .color-picker-hash::after {
-    content: "";
-    width: 1px;
-    height: 100%;
-    position: absolute;
-    top: 0;
-  }
-
-  .color-input-container:focus-within .color-picker-hash::before {
-    background: var(--input-border-color);
-
-    :root[dir="ltr"] & {
-      right: -1px;
-    }
-
-    :root[dir="rtl"] & {
-      left: -1px;
-    }
-  }
-
-  .color-input-container:focus-within .color-picker-hash::after {
-    background: var(--input-bg-color);
-
-    :root[dir="ltr"] & {
-      right: -2px;
-    }
-
-    :root[dir="rtl"] & {
-      left: -2px;
-    }
-  }
-
   .color-input-container {
     display: flex;
+
+    &:focus-within {
+      box-shadow: 0 0 0 1px var(--color-primary-darkest);
+      border-radius: var(--border-radius-lg);
+    }
   }
 
   .color-picker-input {
-    width: 11ch; /* length of `transparent` */
+    box-sizing: border-box;
+    width: 100%;
     margin: 0;
-    font-size: 1rem;
-    background-color: var(--input-bg-color);
+    font-size: 0.875rem;
+    background-color: transparent;
     color: var(--text-primary-color);
     border: 0;
     outline: none;
-    height: 1.75em;
-    box-shadow: var(--input-border-color) 0 0 0 1px inset;
+    height: var(--default-button-size);
+    border: 1px solid var(--default-border-color);
+    border-left: 0;
+    letter-spacing: 0.4px;
 
     :root[dir="ltr"] & {
-      border-radius: 0 4px 4px 0;
+      border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) 0;
     }
 
     :root[dir="rtl"] & {
-      border-radius: 4px 0 0 4px;
+      border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
+      border-left: 1px solid var(--default-border-color);
+      border-right: 0;
     }
 
-    float: left;
-    padding: 1px;
-    padding-inline-start: 0.5em;
+    padding: 0.5rem;
+    padding-left: 0.25rem;
     appearance: none;
+
+    &:focus-visible {
+      box-shadow: none;
+    }
+  }
+
+  .color-picker-label-swatch-container {
+    border: 1px solid var(--default-border-color);
+    border-radius: var(--border-radius-lg);
+    width: var(--default-button-size);
+    height: var(--default-button-size);
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .color-picker-label-swatch {
-    height: 1.875rem;
-    width: 1.875rem;
-    margin-inline-end: 0.25rem;
-    border: 1px solid $oc-gray-3;
-    position: relative;
+    @include outlineButtonStyles;
+    background-color: var(--swatch-color) !important;
     overflow: hidden;
-    background-color: transparent !important;
+    position: relative;
     filter: var(--theme-filter);
+    border: 0 !important;
 
     &:after {
       content: "";

@@ -10,10 +10,10 @@ import { t } from "../i18n";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
 import {
-  SendBackwardIcon,
-  BringToFrontIcon,
-  SendToBackIcon,
   BringForwardIcon,
+  BringToFrontIcon,
+  SendBackwardIcon,
+  SendToBackIcon,
 } from "../components/icons";
 
 export const actionSendBackward = register({
@@ -39,7 +39,7 @@ export const actionSendBackward = register({
       onClick={() => updateData(null)}
       title={`${t("labels.sendBackward")} — ${getShortcutKey("CtrlOrCmd+[")}`}
     >
-      <SendBackwardIcon theme={appState.theme} />
+      {SendBackwardIcon}
     </button>
   ),
 });
@@ -67,7 +67,7 @@ export const actionBringForward = register({
       onClick={() => updateData(null)}
       title={`${t("labels.bringForward")} — ${getShortcutKey("CtrlOrCmd+]")}`}
     >
-      <BringForwardIcon theme={appState.theme} />
+      {BringForwardIcon}
     </button>
   ),
 });
@@ -102,7 +102,7 @@ export const actionSendToBack = register({
           : getShortcutKey("CtrlOrCmd+Shift+[")
       }`}
     >
-      <SendToBackIcon theme={appState.theme} />
+      {SendToBackIcon}
     </button>
   ),
 });
@@ -138,7 +138,7 @@ export const actionBringToFront = register({
           : getShortcutKey("CtrlOrCmd+Shift+]")
       }`}
     >
-      <BringToFrontIcon theme={appState.theme} />
+      {BringToFrontIcon}
     </button>
   ),
 });

@@ -100,7 +100,7 @@ export const getTransformHandlesFromCoords = (
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   const dashedLineMargin = margin / zoom.value;
-  const centeringOffset = (size - 8) / (2 * zoom.value);
+  const centeringOffset = (size - DEFAULT_SPACING * 2) / (2 * zoom.value);
 
   const transformHandles: TransformHandles = {
     nw: omitSides.nw
@@ -253,7 +253,7 @@ export const getTransformHandles = (
     omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   }
   const dashedLineMargin = isLinearElement(element)
-    ? DEFAULT_SPACING * 3
+    ? DEFAULT_SPACING + 8
     : DEFAULT_SPACING;
   return getTransformHandlesFromCoords(
     getElementAbsoluteCoords(element),
