@@ -40,7 +40,7 @@ import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./Footer";
 import {
-  ExportIcon,
+  ExportImageIcon,
   HamburgerMenuIcon,
   WelcomeScreenMenuArrow,
   WelcomeScreenTopToolbarArrow,
@@ -221,7 +221,7 @@ const LayerUI = ({
               {renderJSONExportDialog()}
               <MenuItem
                 label={t("buttons.exportImage")}
-                icon={ExportIcon}
+                icon={ExportImageIcon}
                 dataTestId="image-export-button"
                 onClick={() => setAppState({ openDialog: "imageExport" })}
                 shortcut={getShortcutFromShortcutName("imageExport")}

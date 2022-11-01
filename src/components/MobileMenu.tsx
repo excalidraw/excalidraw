@@ -22,7 +22,7 @@ import { actionToggleStats } from "../actions";
 import { MenuLinks, Separator } from "./MenuUtils";
 import WelcomeScreen from "./WelcomeScreen";
 import MenuItem from "./MenuItem";
-import { ExportIcon } from "./icons";
+import { ExportImageIcon } from "./icons";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -177,7 +177,7 @@ export const MobileMenu = ({
           {renderJSONExportDialog()}
           <MenuItem
             label={t("buttons.exportImage")}
-            icon={ExportIcon}
+            icon={ExportImageIcon}
             dataTestId="image-export-button"
             onClick={() => setAppState({ openDialog: "imageExport" })}
           />
@@ -192,7 +192,7 @@ export const MobileMenu = ({
         {renderImageExportDialog()}
         <MenuItem
           label={t("buttons.exportImage")}
-          icon={ExportIcon}
+          icon={ExportImageIcon}
           dataTestId="image-export-button"
           onClick={() => setAppState({ openDialog: "imageExport" })}
         />
