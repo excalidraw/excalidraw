@@ -111,8 +111,8 @@ export const MobileMenu = ({
                     />
                   </Stack.Row>
                 </Island>
-                {renderTopRightUI && renderTopRightUI(true, appState)}
                 <div className="mobile-misc-tools-container">
+                  {renderTopRightUI && renderTopRightUI(true, appState)}
                   <PenModeButton
                     checked={appState.penMode}
                     onChange={onPenModeToggle}
