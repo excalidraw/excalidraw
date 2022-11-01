@@ -2,16 +2,19 @@
 
 .excalidraw {
   .Avatar {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 100%;
+    outline: 2px solid var(--avatar-border-color);
+    outline-offset: 2px;
     display: flex;
     justify-content: center;
     align-items: center;
     color: $oc-white;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.625rem;
     font-weight: 500;
+    line-height: 1;
 
     &-img {
       width: 100%;
