@@ -71,7 +71,7 @@
     "layers": "Capas",
     "actions": "Accións",
     "language": "Idioma",
-    "liveCollaboration": "Colaboración en directo",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplicar",
     "untitled": "Sen título",
     "name": "Nome",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Limpar o lenzo",
     "exportJSON": "Exportar a arquivo",
-    "exportImage": "Gardar como imaxe",
-    "export": "Exportar",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Exportar a PNG",
     "exportToSvg": "Exportar a SVG",
     "copyToClipboard": "Copiar ao portapapeis",
@@ -144,7 +144,7 @@
     "scale": "Escala",
     "save": "Gardar no ficheiro actual",
     "saveAs": "Gardar como",
-    "load": "Cargar",
+    "load": "",
     "getShareableLink": "Obter unha ligazón que se poida compartir",
     "close": "Pechar",
     "selectLanguage": "Seleccionar idioma",
@@ -439,5 +439,12 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
