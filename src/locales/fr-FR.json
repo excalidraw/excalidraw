@@ -71,7 +71,7 @@
     "layers": "Disposition",
     "actions": "Actions",
     "language": "Langue",
-    "liveCollaboration": "",
+    "liveCollaboration": "Collaboration en direct...",
     "duplicateSelection": "Dupliquer",
     "untitled": "Sans-titre",
     "name": "Nom",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
     "exportJSON": "Exporter comme fichier",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Exporter l'image...",
+    "export": "Enregistrer sous...",
     "exportToPng": "Enregistrer en PNG",
     "exportToSvg": "Enregistrer en SVG",
     "copyToClipboard": "Copier dans le presse-papier",
@@ -144,7 +144,7 @@
     "scale": "Échelle",
     "save": "Enregistrer dans le fichier actuel",
     "saveAs": "Enregistrer sous",
-    "load": "",
+    "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
     "close": "Fermer",
     "selectLanguage": "Choisir une langue",
@@ -444,7 +444,7 @@
     "data": "",
     "switchToPlusApp": "",
     "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "toolbarHints": "Choisissez un outil et commencez à dessiner !",
+    "helpHints": "Raccourcis et aide"
   }
 }
