@@ -71,7 +71,7 @@
     "layers": "Plasti",
     "actions": "Dejanja",
     "language": "Jezik",
-    "liveCollaboration": "",
+    "liveCollaboration": "Sodelovanje v živo ...",
     "duplicateSelection": "Podvoji",
     "untitled": "Neimenovana",
     "name": "Ime",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Ponastavi platno",
     "exportJSON": "Izvozi v datoteko",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Izvozi sliko...",
+    "export": "Shrani v...",
     "exportToPng": "Izvozi v PNG",
     "exportToSvg": "Izvozi v SVG",
     "copyToClipboard": "Kopiraj v odložišče",
@@ -144,7 +144,7 @@
     "scale": "Povečava",
     "save": "Shrani v trenutno datoteko",
     "saveAs": "Shrani kot",
-    "load": "",
+    "load": "Odpri",
     "getShareableLink": "Pridobi povezavo za deljenje",
     "close": "Zapri",
     "selectLanguage": "Izberi jezik",
@@ -214,7 +214,7 @@
     "text": "Besedilo",
     "library": "Knjižnica",
     "lock": "Ohrani izbrano orodje aktivno po risanju",
-    "penMode": "",
+    "penMode": "Način peresa - prepreči dotik",
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
     "eraser": "Radirka"
   },
@@ -441,9 +441,9 @@
     "d9480f": "Oranžna 9"
   },
   "welcomeScreen": {
-    "data": "",
-    "switchToPlusApp": "",
-    "menuHints": "",
+    "data": "Vsi vaši podatki so shranjeni lokalno v vašem brskalniku.",
+    "switchToPlusApp": "Ste namesto tega želeli odpreti Excalidraw+?",
+    "menuHints": "Izvoz, nastavitve, jeziki, ...",
     "toolbarHints": "",
     "helpHints": ""
   }
