@@ -71,7 +71,7 @@
     "layers": "Ebenen",
     "actions": "Aktionen",
     "language": "Sprache",
-    "liveCollaboration": "Live-Zusammenarbeit",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplizieren",
     "untitled": "Unbenannt",
     "name": "Name",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
     "exportJSON": "In Datei exportieren",
-    "exportImage": "Als Bild speichern",
-    "export": "Exportieren",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Als PNG exportieren",
     "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In Zwischenablage kopieren",
@@ -144,7 +144,7 @@
     "scale": "Skalierung",
     "save": "In aktueller Datei speichern",
     "saveAs": "Speichern unter",
-    "load": "Laden",
+    "load": "",
     "getShareableLink": "Teilbaren Link erhalten",
     "close": "Schließen",
     "selectLanguage": "Sprache auswählen",
@@ -214,7 +214,7 @@
     "text": "Text",
     "library": "Bibliothek",
     "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen",
-    "penMode": "Verhindere Pinch-Zoom und akzeptiere Eingabe nur vom Stift",
+    "penMode": "",
     "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
     "eraser": "Radierer"
   },
@@ -439,5 +439,12 @@
     "5c940d": "Hellgrün 9",
     "e67700": "Gelb 9",
     "d9480f": "Orange 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
