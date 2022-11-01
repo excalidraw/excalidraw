@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "",
     "exportJSON": "Eksportuoti į failą",
-    "exportImage": "Išsaugoti kaip paveikslėlį",
-    "export": "Eksportuoti",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Eksportuoti į PNG",
     "exportToSvg": "Eksportuoti į SVG",
     "copyToClipboard": "Kopijuoti į iškarpinę",
@@ -144,7 +144,7 @@
     "scale": "",
     "save": "",
     "saveAs": "Išsaugoti kaip",
-    "load": "Įkelti",
+    "load": "",
     "getShareableLink": "Gauti nuorodą dalinimuisi",
     "close": "Uždaryti",
     "selectLanguage": "Pasirinkite kalbą",
@@ -439,5 +439,12 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
