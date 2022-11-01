@@ -71,7 +71,7 @@
     "layers": "Plasti",
     "actions": "Dejanja",
     "language": "Jezik",
-    "liveCollaboration": "Sodelovanje v živo ...",
+    "liveCollaboration": "Sodelovanje v živo...",
     "duplicateSelection": "Podvoji",
     "untitled": "Neimenovana",
     "name": "Ime",
@@ -444,7 +444,7 @@
     "data": "Vsi vaši podatki so shranjeni lokalno v vašem brskalniku.",
     "switchToPlusApp": "Ste namesto tega želeli odpreti Excalidraw+?",
     "menuHints": "Izvoz, nastavitve, jeziki, ...",
-    "toolbarHints": "",
-    "helpHints": ""
+    "toolbarHints": "Izberi orodje in začni z risanjem!",
+    "helpHints": "Bljižnice in pomoč"
   }
 }
