@@ -443,6 +443,7 @@
   },
   "welcomeScreen": {
     "data": "All your data is saved locally in your browser.",
+    "switchToPlusApp": "Did you want to go to the Excalidraw+ instead?",
     "menuHints": "Export, preferences, languages, ...",
     "toolbarHints": "Pick a tool & Start drawing!",
     "helpHints": "Shortcuts & help"

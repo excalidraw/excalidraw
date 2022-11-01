@@ -63,13 +63,35 @@ const WelcomeScreenItem = ({
 const WelcomeScreen = ({ actionManager }: { actionManager: ActionManager }) => {
   const [, setCollabDialogShown] = useAtom(collabDialogShownAtom);
 
+  let subheadingJSX;
+
+  if (isExcalidrawPlusSignedUser) {
+    subheadingJSX = t("welcomeScreen.switchToPlusApp")
+      .split(/(Excalidraw\+)/)
+      .map((bit) => {
+        if (bit === "Excalidraw+") {
+          return (
+            <a
+              style={{ pointerEvents: "all" }}
+              href={`${process.env.REACT_APP_PLUS_APP}?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenSignedInUser`}
+            >
+              Excalidraw+
+            </a>
+          );
+        }
+        return bit;
+      });
+  } else {
+    subheadingJSX = t("welcomeScreen.data");
+  }
+
   return (
     <div className="WelcomeScreen-container">
       <div className="WelcomeScreen-logo virgil WelcomeScreen-decor">
         {ExcalLogo} Excalidraw
       </div>
-      <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--data">
-        {t("welcomeScreen.data")}
+      <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--subheading">
+        {subheadingJSX}
       </div>
       <div className="WelcomeScreen-items">
         <WelcomeScreenItem
