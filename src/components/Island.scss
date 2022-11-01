@@ -1,6 +1,7 @@
 .excalidraw {
   .Island {
     --padding: 0;
+    box-sizing: border-box;
     background-color: var(--island-bg-color);
     box-shadow: var(--shadow-island);
     border-radius: var(--border-radius-lg);

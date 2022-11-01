@@ -3,36 +3,45 @@ import { isDarwin } from "../keys";
 import { getShortcutKey } from "../utils";
 import { ActionName } from "./types";
 
-export type ShortcutName = SubtypeOf<
-  ActionName,
-  | "cut"
-  | "copy"
-  | "paste"
-  | "copyStyles"
-  | "pasteStyles"
-  | "selectAll"
-  | "deleteSelectedElements"
-  | "duplicateSelection"
-  | "sendBackward"
-  | "bringForward"
-  | "sendToBack"
-  | "bringToFront"
-  | "copyAsPng"
-  | "copyAsSvg"
-  | "group"
-  | "ungroup"
-  | "gridMode"
-  | "zenMode"
-  | "stats"
-  | "addToLibrary"
-  | "viewMode"
-  | "flipHorizontal"
-  | "flipVertical"
-  | "hyperlink"
-  | "toggleLock"
->;
+export type ShortcutName =
+  | SubtypeOf<
+      ActionName,
+      | "toggleTheme"
+      | "loadScene"
+      | "cut"
+      | "copy"
+      | "paste"
+      | "copyStyles"
+      | "pasteStyles"
+      | "selectAll"
+      | "deleteSelectedElements"
+      | "duplicateSelection"
+      | "sendBackward"
+      | "bringForward"
+      | "sendToBack"
+      | "bringToFront"
+      | "copyAsPng"
+      | "copyAsSvg"
+      | "group"
+      | "ungroup"
+      | "gridMode"
+      | "zenMode"
+      | "stats"
+      | "addToLibrary"
+      | "viewMode"
+      | "flipHorizontal"
+      | "flipVertical"
+      | "hyperlink"
+      | "toggleLock"
+    >
+  | "saveScene"
+  | "imageExport";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
+  toggleTheme: [getShortcutKey("Shit+Alt+D")],
+  saveScene: [getShortcutKey("CtrlOrCmd+S")],
+  loadScene: [getShortcutKey("CtrlOrCmd+O")],
+  imageExport: [getShortcutKey("CtrlOrCmd+Shift+E")],
   cut: [getShortcutKey("CtrlOrCmd+X")],
   copy: [getShortcutKey("CtrlOrCmd+C")],
   paste: [getShortcutKey("CtrlOrCmd+V")],

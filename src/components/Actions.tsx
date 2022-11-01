@@ -28,6 +28,8 @@ import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
+import "./Actions.scss";
+import { Tooltip } from "./Tooltip";
 
 export const SelectedShapeActions = ({
   appState,
@@ -79,12 +81,16 @@ export const SelectedShapeActions = ({
 
   return (
     <div className="panelColumn">
-      {((hasStrokeColor(appState.activeTool.type) &&
-        appState.activeTool.type !== "image" &&
-        commonSelectedType !== "image") ||
-        targetElements.some((element) => hasStrokeColor(element.type))) &&
-        renderAction("changeStrokeColor")}
-      {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
+      <div>
+        {((hasStrokeColor(appState.activeTool.type) &&
+          appState.activeTool.type !== "image" &&
+          commonSelectedType !== "image") ||
+          targetElements.some((element) => hasStrokeColor(element.type))) &&
+          renderAction("changeStrokeColor")}
+      </div>
+      {showChangeBackgroundIcons && (
+        <div>{renderAction("changeBackgroundColor")}</div>
+      )}
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||
@@ -163,7 +169,16 @@ export const SelectedShapeActions = ({
             )}
             {targetElements.length > 2 &&
               renderAction("distributeHorizontally")}
-            <div className="iconRow">
+            {/* breaks the row ˇˇ */}
+            <div style={{ flexBasis: "100%", height: 0 }} />
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: ".5rem",
+                marginTop: "-0.5rem",
+              }}
+            >
               {renderAction("alignTop")}
               {renderAction("alignVerticallyCentered")}
               {renderAction("alignBottom")}
@@ -203,22 +218,23 @@ export const ShapesSwitcher = ({
   appState: AppState;
 }) => (
   <>
-    {SHAPES.map(({ value, icon, key }, index) => {
+    {SHAPES.map(({ value, icon, key, fillable }, index) => {
+      const numberKey = value === "eraser" ? 0 : index + 1;
       const label = t(`toolBar.${value}`);
       const letter = key && (typeof key === "string" ? key : key[0]);
       const shortcut = letter
-        ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
-        : `${index + 1}`;
+        ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${numberKey}`
+        : `${numberKey}`;
       return (
         <ToolButton
-          className="Shape"
+          className={clsx("Shape", { fillable })}
           key={value}
           type="radio"
           icon={icon}
           checked={activeTool.type === value}
           name="editor-current-shape"
           title={`${capitalizeString(label)} — ${shortcut}`}
-          keyBindingLabel={`${index + 1}`}
+          keyBindingLabel={`${numberKey}`}
           aria-label={capitalizeString(label)}
           aria-keyshortcuts={shortcut}
           data-testid={value}
@@ -263,11 +279,11 @@ export const ZoomActions = ({
   renderAction: ActionManager["renderAction"];
   zoom: Zoom;
 }) => (
-  <Stack.Col gap={1}>
-    <Stack.Row gap={1} align="center">
+  <Stack.Col gap={1} className="zoom-actions">
+    <Stack.Row align="center">
       {renderAction("zoomOut")}
-      {renderAction("zoomIn")}
       {renderAction("resetZoom")}
+      {renderAction("zoomIn")}
     </Stack.Row>
   </Stack.Col>
 );
@@ -280,8 +296,12 @@ export const UndoRedoActions = ({
   className?: string;
 }) => (
   <div className={`undo-redo-buttons ${className}`}>
-    {renderAction("undo", { size: "small" })}
-    {renderAction("redo", { size: "small" })}
+    <div className="undo-button-container">
+      <Tooltip label={t("buttons.undo")}>{renderAction("undo")}</Tooltip>
+    </div>
+    <div className="redo-button-container">
+      <Tooltip label={t("buttons.redo")}> {renderAction("redo")}</Tooltip>
+    </div>
   </div>
 );
 
