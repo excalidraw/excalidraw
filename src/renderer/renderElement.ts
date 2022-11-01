@@ -217,36 +217,9 @@ const drawElementOnCanvas = (
     case "line": {
       context.lineJoin = "round";
       context.lineCap = "round";
-      const boundTextElement = getBoundTextElement(element);
-      if (!renderConfig.isExporting && boundTextElement) {
-        const { x: boundTextX1, y: boundTextY1 } =
-          LinearElementEditor.getBoundTextPosition(element, boundTextElement);
-
-        const absoluteCoords = LinearElementEditor.pointFromAbsoluteCoords(
-          element,
-          [
-            boundTextX1 + boundTextElement.width / 2,
-            boundTextY1 + boundTextElement.height / 2,
-          ],
-        );
-        // Draw a rectangle of bound text dimensions so that the linear container can be drawn on non overlapping area due to the below
-        // globalCompositeOperation operation
-        context.fillRect(
-          absoluteCoords[0] - boundTextElement.width / 2,
-          absoluteCoords[1] - boundTextElement.height / 2,
-          boundTextElement.width,
-          boundTextElement.height,
-        );
-        context.globalCompositeOperation = "source-out";
-      }
 
       getShapeForElement(element)!.forEach((shape) => {
         rc.draw(shape);
-
-        // set the globalCompositeOperation back to its default after drawing
-        // the first shape of linear element so that only first shape is drawn
-        // in non overapped area of the the above bound text rectangle and rest
-        // of the shapes of linear element are drawn on top of prev canvas as usual
 
         if (context.globalCompositeOperation === "source-out") {
           context.globalCompositeOperation = "source-over";
@@ -723,6 +696,7 @@ const drawElementFromCanvas = (
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
+  const zoom = elementWithCanvas.canvasZoom;
   let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
   // Free draw elements will otherwise "shuffle" as the min x and y change
@@ -731,21 +705,6 @@ const drawElementFromCanvas = (
     x2 = Math.ceil(x2);
     y1 = Math.floor(y1);
     y2 = Math.ceil(y2);
-  }
-  if (isTextElement(element)) {
-    const container = getContainerElement(element);
-    if (container && isLinearElement(container)) {
-      const coords = LinearElementEditor.getBoundTextPosition(
-        container,
-        element as ExcalidrawTextElementWithContainer,
-      );
-      if (coords && coords.x && coords.y) {
-        x1 = coords.x;
-        x2 = x1 + element.width;
-        y1 = coords.y;
-        y2 = x2 + element.height;
-      }
-    }
   }
 
   const cx = ((x1 + x2) / 2 + renderConfig.scrollX) * window.devicePixelRatio;
@@ -767,18 +726,92 @@ const drawElementFromCanvas = (
     (1 / window.devicePixelRatio) * scaleXFactor,
     (1 / window.devicePixelRatio) * scaleYFactor,
   );
-  context.translate(cx * scaleXFactor, cy * scaleYFactor);
-  context.rotate(element.angle * scaleXFactor * scaleYFactor);
+  const boundTextElement = getBoundTextElement(element);
+  if (isLinearElement(element) && boundTextElement) {
+    const tempCanvas = document.createElement("canvas");
+    const tempCanvasContext = tempCanvas.getContext("2d")!;
 
-  context.drawImage(
-    elementWithCanvas.canvas!,
-    (-(x2 - x1) / 2) * window.devicePixelRatio -
-      (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
-    (-(y2 - y1) / 2) * window.devicePixelRatio -
-      (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
-    elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
-    elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
-  );
+    const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
+    tempCanvas.width =
+      maxDim * window.devicePixelRatio * elementWithCanvas.canvasZoom +
+      padding * elementWithCanvas.canvasZoom * 10;
+    tempCanvas.height =
+      maxDim * window.devicePixelRatio * elementWithCanvas.canvasZoom +
+      padding * elementWithCanvas.canvasZoom * 10;
+    const offsetX = (tempCanvas.width - elementWithCanvas.canvas!.width) / 2;
+    const offsetY = (tempCanvas.height - elementWithCanvas.canvas!.height) / 2;
+
+    tempCanvasContext.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+
+    tempCanvasContext.rotate(element.angle);
+
+    tempCanvasContext.drawImage(
+      elementWithCanvas.canvas!,
+      -elementWithCanvas.canvas.width / 2,
+      -elementWithCanvas.canvas.height / 2,
+      elementWithCanvas.canvas.width,
+      elementWithCanvas.canvas.height,
+    );
+
+    const [, , , , boundTextCx, boundTextCy] =
+      getElementAbsoluteCoords(boundTextElement);
+
+    tempCanvasContext.rotate(-element.angle);
+
+    const shiftX =
+      tempCanvas.width / 2 -
+      ((boundTextCx - x1) * window.devicePixelRatio) / zoom -
+      offsetX * zoom -
+      padding * zoom;
+    const shiftY =
+      tempCanvas.height / 2 -
+      ((boundTextCy - y1) * window.devicePixelRatio) / zoom -
+      offsetY * zoom -
+      padding * zoom;
+    // tempCanvasContext.scale(
+    //   window.devicePixelRatio * elementWithCanvas.canvasZoom,
+    //   window.devicePixelRatio * elementWithCanvas.canvasZoom,
+    // );
+    tempCanvasContext.translate(-shiftX, -shiftY);
+    // Draw a rectangle of bound text dimensions so that linear element
+    // on the temp canvas doesn't overlap the rectangle a due to the below
+    // globalCompositeOperation operation
+
+    tempCanvasContext.globalCompositeOperation = "destination-out";
+
+    tempCanvasContext.fillRect(
+      (-boundTextElement.width / 2) * window.devicePixelRatio,
+      (-boundTextElement.height / 2) * window.devicePixelRatio,
+      boundTextElement.width * window.devicePixelRatio,
+      boundTextElement.height * window.devicePixelRatio,
+    );
+
+    context.translate(cx * scaleXFactor, cy * scaleYFactor);
+
+    context.drawImage(
+      tempCanvas,
+      (-(x2 - x1) / 2) * window.devicePixelRatio -
+        ((padding + offsetX) * zoom) / zoom,
+      (-(y2 - y1) / 2) * window.devicePixelRatio -
+        ((padding + offsetY) * zoom) / zoom,
+      tempCanvas.width,
+      tempCanvas.height,
+    );
+  } else {
+    context.translate(cx * scaleXFactor, cy * scaleYFactor);
+
+    context.rotate(element.angle * scaleXFactor * scaleYFactor);
+
+    context.drawImage(
+      elementWithCanvas.canvas!,
+      (-(x2 - x1) / 2) * window.devicePixelRatio -
+        (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
+      (-(y2 - y1) / 2) * window.devicePixelRatio -
+        (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
+      elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
+      elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
+    );
+  }
   context.restore();
 
   // Clear the nested element we appended to the DOM
