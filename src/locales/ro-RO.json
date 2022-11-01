@@ -71,7 +71,7 @@
     "layers": "Straturi",
     "actions": "Acțiuni",
     "language": "Limbă",
-    "liveCollaboration": "Colaborare în direct",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplicare",
     "untitled": "Nedenumit",
     "name": "Nume",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Resetare pânză",
     "exportJSON": "Exportare la fișiere",
-    "exportImage": "Salvare ca imagine",
-    "export": "Exportare",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Exportare ca PNG",
     "exportToSvg": "Exportare ca SVG",
     "copyToClipboard": "Copiere în memoria temporară",
@@ -144,7 +144,7 @@
     "scale": "Scală",
     "save": "Salvare în fișierul curent",
     "saveAs": "Salvare ca",
-    "load": "Încărcare",
+    "load": "",
     "getShareableLink": "Obține URL partajabil",
     "close": "Închidere",
     "selectLanguage": "Selectare limbă",
@@ -214,7 +214,7 @@
     "text": "Text",
     "library": "Bibliotecă",
     "lock": "Menține activ instrumentul selectat după desenare",
-    "penMode": "Împiedică mărirea prin ciupire și acceptă desenarea liberă doar de la stilou",
+    "penMode": "",
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră"
   },
@@ -439,5 +439,12 @@
     "5c940d": "Verde-limetă 9",
     "e67700": "Galben 9",
     "d9480f": "Portocaliu 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
