@@ -71,7 +71,7 @@
     "layers": "لایه ها",
     "actions": "عملیات",
     "language": "زبان",
-    "liveCollaboration": "همکاری زنده",
+    "liveCollaboration": "",
     "duplicateSelection": "تکرار",
     "untitled": "بدون عنوان",
     "name": "نام",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
     "exportJSON": "خروجی در فایل",
-    "exportImage": "ذخیره به عنوان عکس",
-    "export": "تبدیل",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "تبدیل به PNG",
     "exportToSvg": "تبدیل به SVG",
     "copyToClipboard": "کپی در حافظه موقت",
@@ -144,7 +144,7 @@
     "scale": "مقیاس",
     "save": "ذخیره در همین فایل",
     "saveAs": "ذخیره با نام",
-    "load": "بارگذاری",
+    "load": "",
     "getShareableLink": "دریافت لینک قابل اشتراک",
     "close": "بستن",
     "selectLanguage": "انتخاب زبان",
@@ -214,7 +214,7 @@
     "text": "متن",
     "library": "کتابخانه",
     "lock": "ابزار انتخاب شده را بعد از کشیدن نگه دار",
-    "penMode": "از زوم کوچک کردن جلوگیری کنید و ورودی آزاد را فقط از قلم بپذیرید",
+    "penMode": "",
     "link": "افزودن/به‌روزرسانی پیوند برای شکل انتخابی",
     "eraser": "پاک کن"
   },
@@ -439,5 +439,12 @@
     "5c940d": "لیمویی 9",
     "e67700": "زرد 9",
     "d9480f": "نارنجی 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
