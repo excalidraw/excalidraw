@@ -71,7 +71,7 @@
     "layers": "圖層",
     "actions": "動作",
     "language": "語言",
-    "liveCollaboration": "",
+    "liveCollaboration": "即時協作...",
     "duplicateSelection": "複製",
     "untitled": "無標題",
     "name": "名稱",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "重置 canvas",
     "exportJSON": "匯出至檔案",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "匯出圖片",
+    "export": "儲存至...",
     "exportToPng": "輸出成 PNG",
     "exportToSvg": "輸出成 SVG",
     "copyToClipboard": "複製至剪貼簿",
@@ -144,7 +144,7 @@
     "scale": "縮放比例",
     "save": "儲存目前檔案",
     "saveAs": "儲存為",
-    "load": "",
+    "load": "開啟",
     "getShareableLink": "取得共享連結",
     "close": "關閉",
     "selectLanguage": "選擇語言",
@@ -214,7 +214,7 @@
     "text": "文字",
     "library": "資料庫",
     "lock": "可連續使用選取的工具",
-    "penMode": "",
+    "penMode": "筆模式 - 避免觸摸",
     "link": "為所選的形狀增加\b/更新連結",
     "eraser": "橡皮擦"
   },
@@ -441,10 +441,10 @@
     "d9480f": "橘 9"
   },
   "welcomeScreen": {
-    "data": "",
-    "switchToPlusApp": "",
-    "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "data": "您的所有資料都儲存在本機瀏覽器。",
+    "switchToPlusApp": "您是否是要前往 Excalidraw+ ？",
+    "menuHints": "輸出、偏好設定、語言...",
+    "toolbarHints": "選個工具開始畫圖吧！",
+    "helpHints": "快速鍵與說明"
   }
 }
