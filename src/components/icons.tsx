@@ -864,40 +864,22 @@ export const DistributeVerticallyIcon = createIcon(
 );
 
 export const CenterVerticallyIcon = createIcon(
-  <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
-      <path
-        d="M10 18.333v-2.916"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M10 11.667V8.333" strokeLinejoin="round" />
-      <path d="M10 4.583V1.667" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M4.792 13.125v.417c0 .92.746 1.666 1.666 1.666h7.084c.92 0 1.666-.746 1.666-1.666v-.417c0-.92-.746-1.667-1.666-1.667H6.458c-.92 0-1.666.746-1.666 1.667ZM6.458 6.458v.417c0 .92.747 1.667 1.667 1.667h3.75c.92 0 1.667-.747 1.667-1.667v-.417c0-.92-.746-1.666-1.667-1.666h-3.75c-.92 0-1.667.746-1.667 1.666Z" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
+  <g stroke="currentColor" strokeWidth="1.25">
+    <path d="M1.667 10h2.916" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M8.333 10h3.334" strokeLinejoin="round" />
+    <path d="M15.417 10h2.916" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M6.875 4.792h-.417c-.92 0-1.666.746-1.666 1.666v7.084c0 .92.746 1.666 1.666 1.666h.417c.92 0 1.667-.746 1.667-1.666V6.458c0-.92-.747-1.666-1.667-1.666ZM13.542 6.458h-.417c-.92 0-1.667.747-1.667 1.667v3.75c0 .92.746 1.667 1.667 1.667h.417c.92 0 1.666-.746 1.666-1.667v-3.75c0-.92-.746-1.667-1.666-1.667Z" />
+  </g>,
   modifiedTablerIconProps,
 );
 
 export const CenterHorizontallyIcon = createIcon(
-  <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
-      <path d="M1.667 10h2.916" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M8.333 10h3.334" strokeLinejoin="round" />
-      <path d="M15.417 10h2.916" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M6.875 4.792h-.417c-.92 0-1.666.746-1.666 1.666v7.084c0 .92.746 1.666 1.666 1.666h.417c.92 0 1.667-.746 1.667-1.666V6.458c0-.92-.747-1.666-1.667-1.666ZM13.542 6.458h-.417c-.92 0-1.667.747-1.667 1.667v3.75c0 .92.746 1.667 1.667 1.667h.417c.92 0 1.666-.746 1.666-1.667v-3.75c0-.92-.746-1.667-1.666-1.667Z" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
+  <g stroke="currentColor" strokeWidth="1.25">
+    <path d="M10 18.333v-2.916" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M10 11.667V8.333" strokeLinejoin="round" />
+    <path d="M10 4.583V1.667" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M4.792 13.125v.417c0 .92.746 1.666 1.666 1.666h7.084c.92 0 1.666-.746 1.666-1.666v-.417c0-.92-.746-1.667-1.666-1.667H6.458c-.92 0-1.666.746-1.666 1.667ZM6.458 6.458v.417c0 .92.747 1.667 1.667 1.667h3.75c.92 0 1.667-.747 1.667-1.667v-.417c0-.92-.746-1.666-1.667-1.666h-3.75c-.92 0-1.667.746-1.667 1.666Z" />
+  </g>,
   modifiedTablerIconProps,
 );
 
