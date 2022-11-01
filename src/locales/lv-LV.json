@@ -71,7 +71,7 @@
     "layers": "Slāņi",
     "actions": "Darbības",
     "language": "Valoda",
-    "liveCollaboration": "Sadarbība tiešsaistē",
+    "liveCollaboration": "",
     "duplicateSelection": "Izveidot kopiju",
     "untitled": "Bez nosaukuma",
     "name": "Vārds",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
     "exportJSON": "Eksportēt kā failu",
-    "exportImage": "Saglabāt kā attēlu",
-    "export": "Eksportēt",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Eksportēt kā PNG",
     "exportToSvg": "Eksportēt kā SVG",
     "copyToClipboard": "Kopēt starpliktuvē",
@@ -144,7 +144,7 @@
     "scale": "Mērogs",
     "save": "Saglabāt pašreizējo datni",
     "saveAs": "Saglabāt kā",
-    "load": "Ielādēt",
+    "load": "",
     "getShareableLink": "Iegūt kopīgošanas saiti",
     "close": "Aizvērt",
     "selectLanguage": "Izvēlieties valodu",
@@ -214,7 +214,7 @@
     "text": "Teksts",
     "library": "Bibliotēka",
     "lock": "Paturēt izvēlēto rīku pēc darbības",
-    "penMode": "Lietojot pildspalvu, bloķēt tuvināšanu un atļaut tikai zīmēšanu",
+    "penMode": "",
     "link": "Pievienot/rediģēt atlasītās figūras saiti",
     "eraser": "Dzēšgumija"
   },
@@ -439,5 +439,12 @@
     "5c940d": "Laims 9",
     "e67700": "Dzeltens 9",
     "d9480f": "Oranžs 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
