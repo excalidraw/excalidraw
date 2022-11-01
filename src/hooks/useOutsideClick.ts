@@ -21,10 +21,11 @@ export const useOutsideClickHook = (handler: (event: Event) => void) => {
 
         handler(event);
       };
-      document.addEventListener("mousedown", listener);
+
+      document.addEventListener("pointerdown", listener);
       document.addEventListener("touchstart", listener);
       return () => {
-        document.removeEventListener("mousedown", listener);
+        document.removeEventListener("pointerdown", listener);
         document.removeEventListener("touchstart", listener);
       };
     },
