@@ -71,7 +71,7 @@
     "layers": "Lag",
     "actions": "Handlingar",
     "language": "Språk",
-    "liveCollaboration": "Sanntids-samarbeid",
+    "liveCollaboration": "",
     "duplicateSelection": "Dupliser",
     "untitled": "Utan namn",
     "name": "Namn",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
     "exportJSON": "Eksporter til fil",
-    "exportImage": "Lagre som bilete",
-    "export": "Eksporter",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Eksporter til PNG",
     "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavla",
@@ -144,7 +144,7 @@
     "scale": "Skaler",
     "save": "Lagre til noverande fil",
     "saveAs": "Lagre som",
-    "load": "Opne",
+    "load": "",
     "getShareableLink": "Hent delingslenke",
     "close": "Lukk",
     "selectLanguage": "Vel språk",
@@ -214,7 +214,7 @@
     "text": "Tekst",
     "library": "Bibliotek",
     "lock": "Hald fram med valt verktøy",
-    "penMode": "Forhindre zoom ved kniping og godta frihandsteikning kun frå penn",
+    "penMode": "",
     "link": "Legg til/ oppdater lenke til valt figur",
     "eraser": "Viskelêr"
   },
@@ -439,5 +439,12 @@
     "5c940d": "Limegrøn 9",
     "e67700": "Gul 9",
     "d9480f": "Oransj 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
