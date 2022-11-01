@@ -71,7 +71,7 @@
     "layers": "Ebenen",
     "actions": "Aktionen",
     "language": "Sprache",
-    "liveCollaboration": "",
+    "liveCollaboration": "Live-Zusammenarbeit...",
     "duplicateSelection": "Duplizieren",
     "untitled": "Unbenannt",
     "name": "Name",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
     "exportJSON": "In Datei exportieren",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Exportiere Bild...",
+    "export": "Speichern als...",
     "exportToPng": "Als PNG exportieren",
     "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In Zwischenablage kopieren",
@@ -144,7 +144,7 @@
     "scale": "Skalierung",
     "save": "In aktueller Datei speichern",
     "saveAs": "Speichern unter",
-    "load": "",
+    "load": "Öffnen",
     "getShareableLink": "Teilbaren Link erhalten",
     "close": "Schließen",
     "selectLanguage": "Sprache auswählen",
@@ -214,7 +214,7 @@
     "text": "Text",
     "library": "Bibliothek",
     "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen",
-    "penMode": "",
+    "penMode": "Stift-Modus - Berührung verhindern",
     "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
     "eraser": "Radierer"
   },
@@ -441,10 +441,10 @@
     "d9480f": "Orange 9"
   },
   "welcomeScreen": {
-    "data": "",
-    "switchToPlusApp": "",
-    "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "data": "Alle Daten werden lokal in Deinem Browser gespeichert.",
+    "switchToPlusApp": "Möchtest du stattdessen zu Excalidraw+ gehen?",
+    "menuHints": "Exportieren, Einstellungen, Sprachen, ...",
+    "toolbarHints": "Wähle ein Werkzeug & beginne zu zeichnen!",
+    "helpHints": "Kurzbefehle & Hilfe"
   }
 }
