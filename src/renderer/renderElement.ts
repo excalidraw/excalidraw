@@ -24,10 +24,16 @@ import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
-import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
+import {
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+  isPromiseLike,
+} from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
-import { AppState, BinaryFiles, Zoom } from "../types";
+import { AppClassProperties, AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
@@ -94,6 +100,27 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetY: number;
 }
 
+const getImageOrPlaceholder = (
+  el: ExcalidrawImageElement,
+  imgFileMap: AppClassProperties["imageCache"],
+): HTMLImageElement => {
+  if (el.status === "error") {
+    return IMAGE_ERROR_PLACEHOLDER_IMG;
+  }
+  if (!el.fileId) {
+    return IMAGE_PLACEHOLDER_IMG;
+  }
+  const img = imgFileMap.get(el.fileId);
+  if (!img || isPromiseLike(img.image)) {
+    return IMAGE_PLACEHOLDER_IMG;
+  }
+  return img.image;
+};
+
+const cloneImage = (img: HTMLImageElement): HTMLImageElement => {
+  return img.cloneNode(true) as HTMLImageElement;
+};
+
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
@@ -101,11 +128,9 @@ const generateElementCanvas = (
 ): ExcalidrawElementWithCanvas => {
   let canvas: HTMLImageElement | HTMLCanvasElement;
   if (element.type === "image" && element.fileId) {
-    const img = renderConfig.imageCache.get(element.fileId);
-    if (!img || "then" in img.image) {
-      throw new Error("this should never happen");
-    }
-    canvas = img.image.cloneNode(true) as HTMLImageElement;
+    canvas = cloneImage(
+      getImageOrPlaceholder(element, renderConfig.imageCache),
+    );
   } else {
     canvas = document.createElement("canvas");
   }
@@ -737,6 +762,15 @@ const drawElementFromCanvas = (
   );
   context.translate(cx * scaleXFactor, cy * scaleYFactor);
   context.rotate(element.angle * scaleXFactor * scaleYFactor);
+
+  if (
+    elementWithCanvas.element.type === "image" &&
+    elementWithCanvas.canvas instanceof HTMLImageElement &&
+    shouldResetImageFilter(element, renderConfig)
+  ) {
+    // in dark theme, revert the image color filter
+    context.filter = IMAGE_INVERT_FILTER;
+  }
 
   context.drawImage(
     elementWithCanvas.canvas!,
