@@ -71,7 +71,7 @@
     "layers": "图层",
     "actions": "操作",
     "language": "语言",
-    "liveCollaboration": "",
+    "liveCollaboration": "实时协作...",
     "duplicateSelection": "复制",
     "untitled": "无标题",
     "name": "名字",
@@ -135,8 +135,8 @@
   "buttons": {
     "clearReset": "重置画布",
     "exportJSON": "导出为文件",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "导出图片...",
+    "export": "保存到...",
     "exportToPng": "导出为 PNG",
     "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
@@ -144,7 +144,7 @@
     "scale": "缩放",
     "save": "保存至当前文件",
     "saveAs": "保存为",
-    "load": "",
+    "load": "打开",
     "getShareableLink": "获取共享链接",
     "close": "关闭",
     "selectLanguage": "选择语言",
@@ -214,7 +214,7 @@
     "text": "文字",
     "library": "素材库",
     "lock": "绘制后保持所选的工具栏状态",
-    "penMode": "",
+    "penMode": "笔模式 - 防止触摸。",
     "link": "为选中的形状添加/更新链接",
     "eraser": "橡皮"
   },
@@ -441,10 +441,10 @@
     "d9480f": "橙 9"
   },
   "welcomeScreen": {
-    "data": "",
-    "switchToPlusApp": "",
-    "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "data": "您的所有数据都保存在您的浏览器中。",
+    "switchToPlusApp": "您想要访问 Excalidraw + 吗？",
+    "menuHints": "导出、首选项、语言...",
+    "toolbarHints": "选择工具并开始绘图！",
+    "helpHints": "快捷键和帮助"
   }
 }
