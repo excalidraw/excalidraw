@@ -733,10 +733,10 @@ const drawElementFromCanvas = (
 
     const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
     tempCanvas.width =
-      maxDim * window.devicePixelRatio * elementWithCanvas.canvasZoom +
+      maxDim * window.devicePixelRatio * zoom +
       padding * elementWithCanvas.canvasZoom * 10;
     tempCanvas.height =
-      maxDim * window.devicePixelRatio * elementWithCanvas.canvasZoom +
+      maxDim * window.devicePixelRatio * zoom +
       padding * elementWithCanvas.canvasZoom * 10;
     const offsetX = (tempCanvas.width - elementWithCanvas.canvas!.width) / 2;
     const offsetY = (tempCanvas.height - elementWithCanvas.canvas!.height) / 2;
@@ -745,12 +745,20 @@ const drawElementFromCanvas = (
 
     tempCanvasContext.rotate(element.angle);
 
+    const centerOffsetX =
+      (elementWithCanvas.canvas.width / zoom - elementWithCanvas.canvas.width) /
+      2;
+    const centerOffsetY =
+      (elementWithCanvas.canvas.height / zoom -
+        elementWithCanvas.canvas.height) /
+      2;
+
     tempCanvasContext.drawImage(
       elementWithCanvas.canvas!,
-      -elementWithCanvas.canvas.width / 2,
-      -elementWithCanvas.canvas.height / 2,
-      elementWithCanvas.canvas.width,
-      elementWithCanvas.canvas.height,
+      -elementWithCanvas.canvas.width / 2 - centerOffsetX,
+      -elementWithCanvas.canvas.height / 2 - centerOffsetY,
+      elementWithCanvas.canvas.width / zoom,
+      elementWithCanvas.canvas.height / zoom,
     );
 
     const [, , , , boundTextCx, boundTextCy] =
@@ -760,18 +768,15 @@ const drawElementFromCanvas = (
 
     const shiftX =
       tempCanvas.width / 2 -
-      ((boundTextCx - x1) * window.devicePixelRatio) / zoom -
-      offsetX * zoom -
-      padding * zoom;
+      (boundTextCx - x1) * window.devicePixelRatio -
+      offsetX -
+      padding;
     const shiftY =
       tempCanvas.height / 2 -
-      ((boundTextCy - y1) * window.devicePixelRatio) / zoom -
-      offsetY * zoom -
-      padding * zoom;
-    // tempCanvasContext.scale(
-    //   window.devicePixelRatio * elementWithCanvas.canvasZoom,
-    //   window.devicePixelRatio * elementWithCanvas.canvasZoom,
-    // );
+      (boundTextCy - y1) * window.devicePixelRatio -
+      offsetY -
+      padding;
+
     tempCanvasContext.translate(-shiftX, -shiftY);
     // Draw a rectangle of bound text dimensions so that linear element
     // on the temp canvas doesn't overlap the rectangle a due to the below
@@ -780,8 +785,8 @@ const drawElementFromCanvas = (
     tempCanvasContext.globalCompositeOperation = "destination-out";
 
     tempCanvasContext.fillRect(
-      (-boundTextElement.width / 2) * window.devicePixelRatio,
-      (-boundTextElement.height / 2) * window.devicePixelRatio,
+      (-boundTextElement.width / 2) * window.devicePixelRatio - centerOffsetX,
+      (-boundTextElement.height / 2) * window.devicePixelRatio - centerOffsetY,
       boundTextElement.width * window.devicePixelRatio,
       boundTextElement.height * window.devicePixelRatio,
     );
@@ -791,9 +796,11 @@ const drawElementFromCanvas = (
     context.drawImage(
       tempCanvas,
       (-(x2 - x1) / 2) * window.devicePixelRatio -
-        ((padding + offsetX) * zoom) / zoom,
+        ((padding + offsetX) * zoom) / zoom +
+        centerOffsetX,
       (-(y2 - y1) / 2) * window.devicePixelRatio -
-        ((padding + offsetY) * zoom) / zoom,
+        ((padding + offsetY) * zoom) / zoom +
+        centerOffsetY,
       tempCanvas.width,
       tempCanvas.height,
     );
