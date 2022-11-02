@@ -216,16 +216,19 @@ const LayerUI = ({
               {actionManager.renderAction("loadScene")}
               {/* // TODO barnabasmolnar/editor-redesign  */}
               {/* is this fine here? */}
-              {appState.fileHandle &&
+              {UIOptions.canvasActions.saveToActiveFile && //zsviczian
+                appState.fileHandle &&
                 actionManager.renderAction("saveToActiveFile")}
               {renderJSONExportDialog()}
-              <MenuItem
-                label={t("buttons.exportImage")}
-                icon={ExportImageIcon}
-                dataTestId="image-export-button"
-                onClick={() => setAppState({ openDialog: "imageExport" })}
-                shortcut={getShortcutFromShortcutName("imageExport")}
-              />
+              {UIOptions.canvasActions.export && ( //zsviczian
+                <MenuItem
+                  label={t("buttons.exportImage")}
+                  icon={ExportImageIcon}
+                  dataTestId="image-export-button"
+                  onClick={() => setAppState({ openDialog: "imageExport" })}
+                  shortcut={getShortcutFromShortcutName("imageExport")}
+                />
+              )}
               {onCollabButtonClick && (
                 <CollabButton
                   isCollaborating={isCollaborating}
