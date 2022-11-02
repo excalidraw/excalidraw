@@ -4836,10 +4836,6 @@ class App extends React.Component<AppProps, AppState> {
           } else {
             this.setState((prevState) => ({
               draggingElement: null,
-              selectedElementIds: {
-                ...prevState.selectedElementIds,
-                [draggingElement.id]: true,
-              },
             }));
           }
         }

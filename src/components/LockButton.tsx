@@ -39,6 +39,7 @@ export const LockButton = (props: LockIconProps) => {
         onChange={props.onChange}
         checked={props.checked}
         aria-label={props.title}
+        data-testid="toolbar-lock"
       />
       <div className="ToolIcon__icon">
         {props.checked ? ICONS.CHECKED : ICONS.UNCHECKED}

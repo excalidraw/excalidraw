@@ -11,7 +11,8 @@ import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { reseed } from "../random";
 import { API } from "./helpers/api";
-import { Keyboard, Pointer } from "./helpers/ui";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { SHAPES } from "../shapes";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -378,5 +379,21 @@ describe("select single element on the scene", () => {
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
+  });
+});
+
+describe("tool locking & selection", () => {
+  it("should not select newly created element while tool is locked", async () => {
+    await render(<ExcalidrawApp />);
+
+    UI.clickTool("lock");
+    expect(h.state.activeTool.locked).toBe(true);
+
+    for (const { value } of Object.values(SHAPES)) {
+      if (value !== "image" && value !== "selection") {
+        const element = UI.createElement(value);
+        expect(h.state.selectedElementIds[element.id]).not.toBe(true);
+      }
+    }
   });
 });

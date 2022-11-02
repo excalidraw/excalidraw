@@ -1,6 +1,7 @@
 import { queries, buildQueries } from "@testing-library/react";
 
 const toolMap = {
+  lock: "lock",
   selection: "selection",
   rectangle: "rectangle",
   diamond: "diamond",
@@ -15,7 +16,7 @@ export type ToolName = keyof typeof toolMap;
 
 const _getAllByToolName = (container: HTMLElement, tool: string) => {
   const toolTitle = toolMap[tool as ToolName];
-  return queries.getAllByTestId(container, toolTitle);
+  return queries.getAllByTestId(container, `toolbar-${toolTitle}`);
 };
 
 const getMultipleError = (_container: any, tool: any) =>
