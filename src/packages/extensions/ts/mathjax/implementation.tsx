@@ -1096,6 +1096,8 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   root.appendChild(node);
 } as SubtypeMethods["renderSvg"];
 
+const wrappedMathCache: { [key: string]: string } = {};
+
 const wrapMathElement = function (element, containerWidth, next) {
   ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
@@ -1123,6 +1125,12 @@ const wrapMathElement = function (element, containerWidth, next) {
   const wrappedLines: string[] = [];
   const spaceWidth = getTextWidth(" ", font);
   for (let index = 0; index < lines.length; index++) {
+    const mathLineKey = `${containerWidth} ${fontSize} ${mathProps.useTex} ${mathProps.mathOnly} ${lines[index]}`;
+    if (wrappedMathCache[mathLineKey] !== undefined) {
+      wrappedLines.push(...wrappedMathCache[mathLineKey].split("\n"));
+      continue;
+    }
+    const currLineNum = wrappedLines.length;
     const lineArray = splitMath(lines[index], mathProps).filter(
       (value) => value !== "",
     );
@@ -1216,6 +1224,7 @@ const wrapMathElement = function (element, containerWidth, next) {
         }
       }
     }
+    wrappedMathCache[mathLineKey] = wrappedLines.slice(currLineNum).join("\n");
   }
 
   if (wrappedLines[0] === "") {
