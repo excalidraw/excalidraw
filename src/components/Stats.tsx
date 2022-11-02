@@ -4,7 +4,7 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { getTargetElements } from "../scene";
 import { AppState, ExcalidrawProps } from "../types";
-import { close } from "./icons";
+import { CloseIcon } from "./icons";
 import { Island } from "./Island";
 import "./Stats.scss";
 
@@ -23,7 +23,7 @@ export const Stats = (props: {
     <div className="Stats">
       <Island padding={2}>
         <div className="close" onClick={props.onClose}>
-          {close}
+          {CloseIcon}
         </div>
         <h3>{t("stats.title")}</h3>
         <table>

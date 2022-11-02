@@ -114,6 +114,10 @@
       "create": "Skapa länk",
       "label": "Länk"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Lås",
       "unlock": "Lås upp",

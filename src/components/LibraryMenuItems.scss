@@ -1,105 +1,68 @@
 @import "open-color/open-color";
 
 .excalidraw {
+  --container-padding-y: 1.5rem;
+  --container-padding-x: 0.75rem;
+
+  .library-menu-items__no-items {
+    text-align: center;
+    color: var(--color-gray-70);
+    line-height: 1.5;
+    font-size: 0.875rem;
+    width: 100%;
+
+    &__label {
+      color: var(--color-primary);
+      font-weight: bold;
+      font-size: 1.125rem;
+      margin-bottom: 0.75rem;
+    }
+  }
+
+  &.theme--dark {
+    .library-menu-items__no-items {
+      color: var(--color-gray-40);
+    }
+  }
+
   .library-menu-items-container {
     display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    overflow-y: auto;
     flex-direction: column;
     height: 100%;
-    padding: 0.5rem;
-    box-sizing: border-box;
+    justify-content: center;
+    margin: 0;
+    border-bottom: 1px solid var(--sidebar-border-color);
 
-    .library-actions {
-      width: 100%;
-      display: flex;
-      margin-right: auto;
-      align-items: center;
+    position: relative;
 
-      button .library-actions-counter {
-        position: absolute;
-        right: 2px;
-        bottom: 2px;
-        border-radius: 50%;
-        width: 1em;
-        height: 1em;
-        padding: 1px;
-        font-size: 0.7rem;
-        background: #fff;
-      }
-
-      &--remove {
-        background-color: $oc-red-7;
-        &:hover {
-          background-color: $oc-red-8;
-        }
-        &:active {
-          background-color: $oc-red-9;
-        }
-        svg {
-          color: $oc-white;
-        }
-        .library-actions-counter {
-          color: $oc-red-7;
-        }
-      }
-
-      &--export {
-        background-color: $oc-lime-5;
-
-        &:hover {
-          background-color: $oc-lime-7;
-        }
-
-        &:active {
-          background-color: $oc-lime-8;
-        }
-        svg {
-          color: $oc-white;
-        }
-        .library-actions-counter {
-          color: $oc-lime-5;
-        }
-      }
-
-      &--publish {
-        background-color: $oc-cyan-6;
-        &:hover {
-          background-color: $oc-cyan-7;
-        }
-        &:active {
-          background-color: $oc-cyan-9;
-        }
-        svg {
-          color: $oc-white;
-        }
-        label {
-          margin-left: -0.2em;
-          margin-right: 1.1em;
-          color: $oc-white;
-          font-size: 0.86em;
-        }
-        .library-actions-counter {
-          color: $oc-cyan-6;
-        }
-      }
-
-      &--load {
-        background-color: $oc-blue-6;
-        &:hover {
-          background-color: $oc-blue-7;
-        }
-        &:active {
-          background-color: $oc-blue-9;
-        }
-        svg {
-          color: $oc-white;
-        }
-      }
+    &__row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
     }
+
     &__items {
+      row-gap: 0.5rem;
+      padding: var(--container-padding-y) var(--container-padding-x);
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
       margin-bottom: 1rem;
+    }
+
+    &__header {
+      color: var(--color-primary);
+      font-size: 1.125rem;
+      font-weight: bold;
+      margin-bottom: 0.75rem;
+
+      &--excal {
+        margin-top: 2.5rem;
+      }
     }
 
     .separator {

@@ -9,9 +9,10 @@
   }
 
   .FixedSideContainer_side_top {
-    left: var(--space-factor);
-    top: var(--space-factor);
-    right: var(--space-factor);
+    left: 1rem;
+    top: 1rem;
+    right: 1rem;
+    bottom: 1rem;
     z-index: 2;
   }
 

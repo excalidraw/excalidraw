@@ -34,6 +34,7 @@ import {
   actionUngroup,
   actionLink,
   actionToggleLock,
+  actionToggleLinearEditor,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -75,6 +76,7 @@ import {
   THEME,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
+  ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -252,6 +254,7 @@ import {
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
+  getContainerDims,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
@@ -263,6 +266,10 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
+import { atom } from "jotai";
+
+export const isMenuOpenAtom = atom(false);
+export const isDropdownOpenAtom = atom(false);
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -291,10 +298,17 @@ const ExcalidrawAppStateContext = React.createContext<AppState>({
   offsetLeft: 0,
   offsetTop: 0,
 });
+
+const ExcalidrawSetAppStateContent = React.createContext<
+  React.Component<any, AppState>["setState"]
+>(() => {});
+
 export const useExcalidrawElements = () =>
   useContext(ExcalidrawElementsContext);
 export const useExcalidrawAppState = () =>
   useContext(ExcalidrawAppStateContext);
+export const useExcalidrawSetAppState = () =>
+  useContext(ExcalidrawSetAppStateContent);
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
@@ -378,7 +392,7 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
       showHyperlinkPopup: false,
-      isLibraryMenuDocked: false,
+      isSidebarDocked: false,
     };
 
     this.id = nanoid();
@@ -410,6 +424,7 @@ class App extends React.Component<AppProps, AppState> {
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
+        toggleMenu: this.toggleMenu,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -522,69 +537,73 @@ class App extends React.Component<AppProps, AppState> {
           value={this.excalidrawContainerValue}
         >
           <DeviceContext.Provider value={this.device}>
-            <ExcalidrawAppStateContext.Provider value={this.state}>
-              <ExcalidrawElementsContext.Provider
-                value={this.scene.getNonDeletedElements()}
-              >
-                <LayerUI
-                  canvas={this.canvas}
-                  appState={this.state}
-                  files={this.files}
-                  setAppState={this.setAppState}
-                  actionManager={this.actionManager}
-                  elements={this.scene.getNonDeletedElements()}
-                  onCollabButtonClick={onCollabButtonClick}
-                  onLockToggle={this.toggleLock}
-                  onPenModeToggle={this.togglePenMode}
-                  onInsertElements={(elements) =>
-                    this.addElementsFromPasteOrLibrary({
-                      elements,
-                      position: "center",
-                      files: null,
-                    })
-                  }
-                  langCode={getLanguage().code}
-                  isCollaborating={this.props.isCollaborating}
-                  renderTopRightUI={renderTopRightUI}
-                  renderCustomFooter={renderFooter}
-                  renderCustomStats={renderCustomStats}
-                  showExitZenModeBtn={
-                    typeof this.props?.zenModeEnabled === "undefined" &&
-                    this.state.zenModeEnabled
-                  }
-                  showThemeBtn={
-                    typeof this.props?.theme === "undefined" &&
-                    this.props.UIOptions.canvasActions.theme
-                  }
-                  libraryReturnUrl={this.props.libraryReturnUrl}
-                  UIOptions={this.props.UIOptions}
-                  focusContainer={this.focusContainer}
-                  library={this.library}
-                  id={this.id}
-                  onImageAction={this.onImageAction}
-                />
-                <div className="excalidraw-textEditorContainer" />
-                <div className="excalidraw-contextMenuContainer" />
-                {selectedElement.length === 1 &&
-                  this.state.showHyperlinkPopup && (
-                    <Hyperlink
-                      key={selectedElement[0].id}
-                      element={selectedElement[0]}
-                      setAppState={this.setAppState}
-                      onLinkOpen={this.props.onLinkOpen}
+            <ExcalidrawSetAppStateContent.Provider value={this.setAppState}>
+              <ExcalidrawAppStateContext.Provider value={this.state}>
+                <ExcalidrawElementsContext.Provider
+                  value={this.scene.getNonDeletedElements()}
+                >
+                  <LayerUI
+                    canvas={this.canvas}
+                    appState={this.state}
+                    files={this.files}
+                    setAppState={this.setAppState}
+                    actionManager={this.actionManager}
+                    elements={this.scene.getNonDeletedElements()}
+                    onCollabButtonClick={onCollabButtonClick}
+                    onLockToggle={this.toggleLock}
+                    onPenModeToggle={this.togglePenMode}
+                    onInsertElements={(elements) =>
+                      this.addElementsFromPasteOrLibrary({
+                        elements,
+                        position: "center",
+                        files: null,
+                      })
+                    }
+                    langCode={getLanguage().code}
+                    isCollaborating={this.props.isCollaborating}
+                    renderTopRightUI={renderTopRightUI}
+                    renderCustomFooter={renderFooter}
+                    renderCustomStats={renderCustomStats}
+                    renderCustomSidebar={this.props.renderSidebar}
+                    showExitZenModeBtn={
+                      typeof this.props?.zenModeEnabled === "undefined" &&
+                      this.state.zenModeEnabled
+                    }
+                    libraryReturnUrl={this.props.libraryReturnUrl}
+                    UIOptions={this.props.UIOptions}
+                    focusContainer={this.focusContainer}
+                    library={this.library}
+                    id={this.id}
+                    onImageAction={this.onImageAction}
+                    renderWelcomeScreen={
+                      this.state.showWelcomeScreen &&
+                      this.state.activeTool.type === "selection" &&
+                      !this.scene.getElementsIncludingDeleted().length
+                    }
+                  />
+                  <div className="excalidraw-textEditorContainer" />
+                  <div className="excalidraw-contextMenuContainer" />
+                  {selectedElement.length === 1 &&
+                    this.state.showHyperlinkPopup && (
+                      <Hyperlink
+                        key={selectedElement[0].id}
+                        element={selectedElement[0]}
+                        setAppState={this.setAppState}
+                        onLinkOpen={this.props.onLinkOpen}
+                      />
+                    )}
+                  {this.state.toast !== null && (
+                    <Toast
+                      message={this.state.toast.message}
+                      onClose={() => this.setToast(null)}
+                      duration={this.state.toast.duration}
+                      closable={this.state.toast.closable}
                     />
                   )}
-                {this.state.toast !== null && (
-                  <Toast
-                    message={this.state.toast.message}
-                    onClose={() => this.setToast(null)}
-                    duration={this.state.toast.duration}
-                    closable={this.state.toast.closable}
-                  />
-                )}
-                <main>{this.renderCanvas()}</main>
-              </ExcalidrawElementsContext.Provider>{" "}
-            </ExcalidrawAppStateContext.Provider>
+                  <main>{this.renderCanvas()}</main>
+                </ExcalidrawElementsContext.Provider>{" "}
+              </ExcalidrawAppStateContext.Provider>
+            </ExcalidrawSetAppStateContent.Provider>
           </DeviceContext.Provider>
         </ExcalidrawContainerContext.Provider>
       </div>
@@ -645,7 +664,8 @@ class App extends React.Component<AppProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
-        let theme = actionResult?.appState?.theme || THEME.LIGHT;
+        const theme =
+          actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
         let name = actionResult?.appState?.name ?? this.state.name;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -657,10 +677,6 @@ class App extends React.Component<AppProps, AppState> {
 
         if (typeof this.props.gridModeEnabled !== "undefined") {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
-        }
-
-        if (typeof this.props.theme !== "undefined") {
-          theme = this.props.theme;
         }
 
         if (typeof this.props.name !== "undefined") {
@@ -755,6 +771,9 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
+    if (this.props.theme) {
+      this.setState({ theme: this.props.theme });
+    }
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });
     }
@@ -784,12 +803,12 @@ class App extends React.Component<AppProps, AppState> {
     const scene = restore(initialData, null, null);
     scene.appState = {
       ...scene.appState,
+      theme: this.props.theme || scene.appState.theme,
       // we're falling back to current (pre-init) state when deciding
       // whether to open the library, to handle a case where we
       // update the state outside of initialData (e.g. when loading the app
       // with a library install link, which should auto-open the library)
-      isLibraryOpen:
-        initialData?.appState?.isLibraryOpen || this.state.isLibraryOpen,
+      openSidebar: scene.appState?.openSidebar || this.state.openSidebar,
       activeTool:
         scene.appState.activeTool.type === "image"
           ? { ...scene.appState.activeTool, type: "selection" }
@@ -1076,6 +1095,13 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     if (
+      !this.state.showWelcomeScreen &&
+      !this.scene.getElementsIncludingDeleted().length
+    ) {
+      this.setState({ showWelcomeScreen: true });
+    }
+
+    if (
       this.excalidrawContainerRef.current &&
       prevProps.UIOptions.dockedSidebarBreakpoint !==
         this.props.UIOptions.dockedSidebarBreakpoint
@@ -1156,7 +1182,11 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       // defer so that the commitToHistory flag isn't reset via current update
       setTimeout(() => {
-        this.actionManager.executeAction(actionFinalize);
+        // execute only if the condition still holds when the deferred callback
+        // executes (it can be scheduled multiple times depending on how
+        // many times the component renders)
+        this.state.editingLinearElement &&
+          this.actionManager.executeAction(actionFinalize);
       });
     }
 
@@ -1262,6 +1292,10 @@ class App extends React.Component<AppProps, AppState> {
         );
       });
 
+    const selectionColor = getComputedStyle(
+      document.querySelector(".excalidraw")!,
+    ).getPropertyValue("--color-selection");
+
     renderScene(
       {
         elements: renderingElements,
@@ -1270,6 +1304,7 @@ class App extends React.Component<AppProps, AppState> {
         rc: this.rc!,
         canvas: this.canvas!,
         renderConfig: {
+          selectionColor,
           scrollX: this.state.scrollX,
           scrollY: this.state.scrollY,
           viewBackgroundColor: this.state.viewBackgroundColor,
@@ -1559,10 +1594,17 @@ class App extends React.Component<AppProps, AppState> {
       selectGroupsForSelectedElements(
         {
           ...this.state,
-          isLibraryOpen:
-            this.state.isLibraryOpen && this.device.canDeviceFitSidebar
-              ? this.state.isLibraryMenuDocked
-              : false,
+          // keep sidebar (presumably the library) open if it's docked and
+          // can fit.
+          //
+          // Note, we should close the sidebar only if we're dropping items
+          // from library, not when pasting from clipboard. Alas.
+          openSidebar:
+            this.state.openSidebar &&
+            this.device.canDeviceFitSidebar &&
+            this.state.isSidebarDocked
+              ? this.state.openSidebar
+              : null,
           selectedElementIds: newElements.reduce(
             (acc: Record<ExcalidrawElement["id"], true>, element) => {
               if (!isBoundToContainer(element)) {
@@ -1620,8 +1662,8 @@ class App extends React.Component<AppProps, AppState> {
 
   // Collaboration
 
-  setAppState = (obj: any) => {
-    this.setState(obj);
+  setAppState: React.Component<any, AppState>["setState"] = (state) => {
+    this.setState(state);
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
@@ -1759,6 +1801,35 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({});
   };
 
+  /**
+   * @returns whether the menu was toggled on or off
+   */
+  public toggleMenu = (
+    type: "library" | "customSidebar",
+    force?: boolean,
+  ): boolean => {
+    if (type === "customSidebar" && !this.props.renderSidebar) {
+      console.warn(
+        `attempting to toggle "customSidebar", but no "props.renderSidebar" is defined`,
+      );
+      return false;
+    }
+
+    if (type === "library" || type === "customSidebar") {
+      let nextValue;
+      if (force === undefined) {
+        nextValue = this.state.openSidebar === type ? null : type;
+      } else {
+        nextValue = force ? type : null;
+      }
+      this.setState({ openSidebar: nextValue });
+
+      return !!nextValue;
+    }
+
+    return false;
+  };
+
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
       cursorX = event.clientX;
@@ -1817,8 +1888,16 @@ class App extends React.Component<AppProps, AppState> {
 
       if (event.key === KEYS.QUESTION_MARK) {
         this.setState({
-          showHelpDialog: true,
+          openDialog: "help",
         });
+        return;
+      } else if (
+        event.key.toLowerCase() === KEYS.E &&
+        event.shiftKey &&
+        event[KEYS.CTRL_OR_CMD]
+      ) {
+        this.setState({ openDialog: "imageExport" });
+        return;
       }
 
       if (this.actionManager.handleKeyDown(event)) {
@@ -1834,8 +1913,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.code === CODES.ZERO) {
-        const nextState = !this.state.isLibraryOpen;
-        this.setState({ isLibraryOpen: nextState });
+        const nextState = this.toggleMenu("library");
         // track only openings
         if (nextState) {
           trackEvent(
@@ -2384,8 +2462,9 @@ class App extends React.Component<AppProps, AppState> {
       };
       const minWidth = getApproxMinLineWidth(getFontString(fontString));
       const minHeight = getApproxMinLineHeight(getFontString(fontString));
-      const newHeight = Math.max(container.height, minHeight);
-      const newWidth = Math.max(container.width, minWidth);
+      const containerDims = getContainerDims(container);
+      const newHeight = Math.max(containerDims.height, minHeight);
+      const newWidth = Math.max(containerDims.width, minWidth);
       mutateElement(container, { height: newHeight, width: newWidth });
       sceneX = container.x + newWidth / 2;
       sceneY = container.y + newHeight / 2;
@@ -2718,18 +2797,23 @@ class App extends React.Component<AppProps, AppState> {
         event,
         scenePointerX,
         scenePointerY,
-        this.state.editingLinearElement,
-        this.state.gridSize,
+        this.state,
       );
-      if (editingLinearElement !== this.state.editingLinearElement) {
+
+      if (
+        editingLinearElement &&
+        editingLinearElement !== this.state.editingLinearElement
+      ) {
         // Since we are reading from previous state which is not possible with
         // automatic batching in React 18 hence using flush sync to synchronously
         // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
         flushSync(() => {
-          this.setState({ editingLinearElement });
+          this.setState({
+            editingLinearElement,
+          });
         });
       }
-      if (editingLinearElement.lastUncommittedPoint != null) {
+      if (editingLinearElement?.lastUncommittedPoint != null) {
         this.maybeSuggestBindingAtCursor(scenePointer);
       } else {
         this.setState({ suggestedBindings: [] });
@@ -3058,7 +3142,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (this.state.selectedLinearElement) {
       let hoverPointIndex = -1;
-      let midPointHovered = false;
+      let segmentMidPointHoveredCoords = null;
       if (
         isHittingElementNotConsideringBoundingBox(element, this.state, [
           scenePointerX,
@@ -3071,13 +3155,14 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         );
-        midPointHovered = LinearElementEditor.isHittingMidPoint(
-          linearElementEditor,
-          { x: scenePointerX, y: scenePointerY },
-          this.state,
-        );
+        segmentMidPointHoveredCoords =
+          LinearElementEditor.getSegmentMidpointHitCoords(
+            linearElementEditor,
+            { x: scenePointerX, y: scenePointerY },
+            this.state,
+          );
 
-        if (hoverPointIndex >= 0 || midPointHovered) {
+        if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
           setCursor(this.canvas, CURSOR_TYPE.POINTER);
         } else {
           setCursor(this.canvas, CURSOR_TYPE.MOVE);
@@ -3106,12 +3191,15 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        this.state.selectedLinearElement.midPointHovered !== midPointHovered
+        !LinearElementEditor.arePointsEqual(
+          this.state.selectedLinearElement.segmentMidPointHoveredCoords,
+          segmentMidPointHoveredCoords,
+        )
       ) {
         this.setState({
           selectedLinearElement: {
             ...this.state.selectedLinearElement,
-            midPointHovered,
+            segmentMidPointHoveredCoords,
           },
         });
       }
@@ -4748,10 +4836,6 @@ class App extends React.Component<AppProps, AppState> {
           } else {
             this.setState((prevState) => ({
               draggingElement: null,
-              selectedElementIds: {
-                ...prevState.selectedElementIds,
-                [draggingElement.id]: true,
-              },
             }));
           }
         }
@@ -5864,6 +5948,12 @@ class App extends React.Component<AppProps, AppState> {
       this.actionManager.getAppState(),
     );
 
+    const mayBeAllowToggleLineEditing =
+      actionToggleLinearEditor.contextItemPredicate(
+        this.actionManager.getElementsIncludingDeleted(),
+        this.actionManager.getAppState(),
+      );
+
     const separator = "separator";
 
     const elements = this.scene.getNonDeletedElements();
@@ -6005,6 +6095,7 @@ class App extends React.Component<AppProps, AppState> {
             maybeFlipHorizontal && actionFlipHorizontal,
             maybeFlipVertical && actionFlipVertical,
             (maybeFlipHorizontal || maybeFlipVertical) && separator,
+            mayBeAllowToggleLineEditing && actionToggleLinearEditor,
             actionLink.contextItemPredicate(elements, this.state) && actionLink,
             actionDuplicateSelection,
             actionToggleLock,
@@ -6032,7 +6123,7 @@ class App extends React.Component<AppProps, AppState> {
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
       const sign = Math.sign(deltaY);
-      const MAX_STEP = 10;
+      const MAX_STEP = ZOOM_STEP * 100;
       const absDelta = Math.abs(deltaY);
       let delta = deltaY;
       if (absDelta > MAX_STEP) {

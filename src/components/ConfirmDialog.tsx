@@ -1,8 +1,11 @@
 import { t } from "../i18n";
 import { Dialog, DialogProps } from "./Dialog";
-import { ToolButton } from "./ToolButton";
 
 import "./ConfirmDialog.scss";
+import DialogActionButton from "./DialogActionButton";
+import { isMenuOpenAtom } from "./App";
+import { isDropdownOpenAtom } from "./App";
+import { useSetAtom } from "jotai";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;
@@ -20,6 +23,10 @@ const ConfirmDialog = (props: Props) => {
     className = "",
     ...rest
   } = props;
+
+  const setIsMenuOpen = useSetAtom(isMenuOpenAtom);
+  const setIsDropdownOpen = useSetAtom(isDropdownOpenAtom);
+
   return (
     <Dialog
       onCloseRequest={onCancel}
@@ -29,21 +36,22 @@ const ConfirmDialog = (props: Props) => {
     >
       {children}
       <div className="confirm-dialog-buttons">
-        <ToolButton
-          type="button"
-          title={cancelText}
-          aria-label={cancelText}
+        <DialogActionButton
           label={cancelText}
-          onClick={onCancel}
-          className="confirm-dialog--cancel"
+          onClick={() => {
+            setIsMenuOpen(false);
+            setIsDropdownOpen(false);
+            onCancel();
+          }}
         />
-        <ToolButton
-          type="button"
-          title={confirmText}
-          aria-label={confirmText}
+        <DialogActionButton
           label={confirmText}
-          onClick={onConfirm}
-          className="confirm-dialog--confirm"
+          onClick={() => {
+            setIsMenuOpen(false);
+            setIsDropdownOpen(false);
+            onConfirm();
+          }}
+          actionType="danger"
         />
       </div>
     </Dialog>
