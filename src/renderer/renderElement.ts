@@ -220,10 +220,6 @@ const drawElementOnCanvas = (
 
       getShapeForElement(element)!.forEach((shape) => {
         rc.draw(shape);
-
-        if (context.globalCompositeOperation === "source-out") {
-          context.globalCompositeOperation = "source-over";
-        }
       });
       break;
     }
@@ -779,7 +775,7 @@ const drawElementFromCanvas = (
 
     tempCanvasContext.translate(-shiftX, -shiftY);
     // Draw a rectangle of bound text dimensions so that linear element
-    // on the temp canvas doesn't overlap the rectangle a due to the below
+    // on the temp canvas doesn't overlap the rectangle due to the below
     // globalCompositeOperation operation
 
     tempCanvasContext.globalCompositeOperation = "destination-out";
@@ -896,11 +892,9 @@ export const renderElement = (
         }
         context.save();
         context.translate(cx, cy);
-        context.rotate(element.angle);
         if (element.type === "image") {
           context.scale(element.scale[0], element.scale[1]);
         }
-        context.translate(-shiftX, -shiftY);
 
         if (shouldResetImageFilter(element, renderConfig)) {
           context.filter = "none";
@@ -908,37 +902,66 @@ export const renderElement = (
         const boundTextElement = getBoundTextElement(element);
 
         if (isLinearElement(element) && boundTextElement) {
-          context.translate(shiftX, shiftY);
           const tempCanvas = document.createElement("canvas");
 
-          const tempCtx = tempCanvas.getContext("2d")!;
-          tempCanvas.width = distance(x1, x2) * appState.exportScale;
-          tempCanvas.height = distance(y1, y2) * appState.exportScale;
+          const tempCanvasContext = tempCanvas.getContext("2d")!;
+          const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
 
-          // Draw a rectangle of bound text dimensions so that the linear
-          // container can be drawn on non overlapping area due to the below
-          // globalCompositeOperation operation
-          tempCtx.fillRect(
-            0,
-            0,
-            boundTextElement.width,
-            boundTextElement.height,
+          tempCanvas.width = maxDim;
+          tempCanvas.height = maxDim;
+
+          const offsetX = (tempCanvas.width - element.width) / 2;
+          const offsetY = (tempCanvas.height - element.height) / 2;
+          shiftX = tempCanvas.width / 2 - (element.x - x1) + offsetX;
+          shiftY = tempCanvas.height / 2 - (element.y - y1) + offsetY;
+
+          tempCanvasContext.translate(
+            tempCanvas.width / 2,
+            tempCanvas.height / 2,
           );
 
-          tempCtx.globalCompositeOperation = "source-out";
+          tempCanvasContext.rotate(element.angle);
+
+          tempCanvasContext.translate(-shiftX, -shiftY);
 
           const canvasOffsetX = element.x > x1 ? distance(element.x, x1) : 0;
           const canvasOffsetY = element.y > y1 ? distance(element.y, y1) : 0;
-          tempCtx.translate(canvasOffsetX, canvasOffsetY);
-          const tempRc = rough.canvas(tempCanvas);
-          drawElementOnCanvas(element, tempRc, tempCtx, renderConfig);
 
+          tempCanvasContext.translate(canvasOffsetX, canvasOffsetY);
+          const tempRc = rough.canvas(tempCanvas);
+          drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
+          tempCanvasContext.translate(-canvasOffsetX, -canvasOffsetY);
+          tempCanvasContext.translate(shiftX, shiftY);
+
+          tempCanvasContext.rotate(-element.angle);
+
+          const [, , , , boundTextCx, boundTextCy] =
+            getElementAbsoluteCoords(boundTextElement);
+          const boundTextShiftX =
+            tempCanvas.width / 2 - (boundTextCx - x1) - offsetX;
+          const boundTextShiftY =
+            tempCanvas.height / 2 - (boundTextCy - y1) - offsetY;
+          tempCanvasContext.translate(-boundTextShiftX, -boundTextShiftY);
+
+          // Draw a rectangle of bound text dimensions so that linear element
+          // on the temp canvas doesn't overlap the rectangle due to the below
+          // globalCompositeOperation operation
+          tempCanvasContext.globalCompositeOperation = "destination-out";
+
+          tempCanvasContext.fillRect(
+            -boundTextElement.width / 2,
+            -boundTextElement.height / 2,
+            boundTextElement.width,
+            boundTextElement.height,
+          );
           context.drawImage(
             tempCanvas,
-            -element.width / 2,
-            -element.height / 2,
+            -tempCanvas.width / 2,
+            -tempCanvas.height / 2,
           );
         } else {
+          context.rotate(element.angle);
+          context.translate(-shiftX, -shiftY);
           drawElementOnCanvas(element, rc, context, renderConfig);
         }
 
