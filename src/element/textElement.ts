@@ -1,4 +1,4 @@
-import { arrayToMap, isTestEnv } from "../utils";
+import { arrayToMap, getFontString, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -25,11 +25,13 @@ export const redrawTextBoundingBox = (
     maxWidth = getMaxContainerWidth(container);
     text = wrapTextElement(textElement, getMaxContainerWidth(container));
   }
-  const metrics = measureTextElement(
+  const width = measureTextElement(
     textElement,
     { text: textElement.originalText },
     maxWidth,
-  );
+  ).width;
+  const { height, baseline } = measureTextElement(textElement, { text });
+  const metrics = { width, height, baseline };
   let coordY = textElement.y;
   let coordX = textElement.x;
   // Resize container and vertically center align the text
