@@ -213,7 +213,8 @@ const LayerUI = ({
               padding={2}
               style={{ zIndex: 1 }}
             >
-              {actionManager.renderAction("loadScene")}
+              {!appState.viewModeEnabled &&
+                actionManager.renderAction("loadScene")}
               {/* // TODO barnabasmolnar/editor-redesign  */}
               {/* is this fine here? */}
               {UIOptions.canvasActions.saveToActiveFile && //zsviczian
@@ -237,7 +238,8 @@ const LayerUI = ({
                 />
               )}
               {actionManager.renderAction("toggleShortcuts", undefined, true)}
-              {actionManager.renderAction("clearCanvas")}
+              {!appState.viewModeEnabled &&
+                actionManager.renderAction("clearCanvas")}
               <Separator />
               <MenuLinks />
               <Separator />
@@ -252,14 +254,16 @@ const LayerUI = ({
                 <div style={{ padding: "0 0.625rem" }}>
                   <LanguageList style={{ width: "100%" }} />
                 </div>
-                <div>
-                  <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
-                    {t("labels.canvasBackground")}
+                {!appState.viewModeEnabled && (
+                  <div>
+                    <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
+                      {t("labels.canvasBackground")}
+                    </div>
+                    <div style={{ padding: "0 0.625rem" }}>
+                      {actionManager.renderAction("changeViewBackgroundColor")}
+                    </div>
                   </div>
-                  <div style={{ padding: "0 0.625rem" }}>
-                    {actionManager.renderAction("changeViewBackgroundColor")}
-                  </div>
-                </div>
+                )}
               </div>
             </Island>
           </Section>
@@ -302,12 +306,12 @@ const LayerUI = ({
     return (
       <FixedSideContainer side="top">
         {renderWelcomeScreen && !appState.isLoading && (
-          <WelcomeScreen actionManager={actionManager} />
+          <WelcomeScreen appState={appState} actionManager={actionManager} />
         )}
         <div className="App-menu App-menu_top">
           <Stack.Col
             gap={6}
-            className={clsx({
+            className={clsx("App-menu_top__left", {
               "disable-pointerEvents": appState.zenModeEnabled,
             })}
           >
@@ -415,7 +419,9 @@ const LayerUI = ({
               />
             )}
             {renderTopRightUI?.(device.isMobile, appState)}
-            <LibraryButton appState={appState} setAppState={setAppState} />
+            {!appState.viewModeEnabled && (
+              <LibraryButton appState={appState} setAppState={setAppState} />
+            )}
           </div>
         </div>
       </FixedSideContainer>

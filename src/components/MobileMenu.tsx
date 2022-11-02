@@ -75,7 +75,7 @@ export const MobileMenu = ({
     return (
       <FixedSideContainer side="top" className="App-top-bar">
         {renderWelcomeScreen && !appState.isLoading && (
-          <WelcomeScreen actionManager={actionManager} />
+          <WelcomeScreen appState={appState} actionManager={actionManager} />
         )}
         <Section heading="shapes">
           {(heading: React.ReactNode) => (
@@ -127,11 +127,13 @@ export const MobileMenu = ({
                     title={t("toolBar.lock")}
                     isMobile
                   />
-                  <LibraryButton
-                    appState={appState}
-                    setAppState={setAppState}
-                    isMobile
-                  />
+                  {!appState.viewModeEnabled && (
+                    <LibraryButton
+                      appState={appState}
+                      setAppState={setAppState}
+                      isMobile
+                    />
+                  )}
                 </div>
               </Stack.Row>
             </Stack.Col>
@@ -187,7 +189,7 @@ export const MobileMenu = ({
     }
     return (
       <>
-        {actionManager.renderAction("loadScene")}
+        {!appState.viewModeEnabled && actionManager.renderAction("loadScene")}
         {renderJSONExportDialog()}
         {renderImageExportDialog()}
         <MenuItem
@@ -204,18 +206,20 @@ export const MobileMenu = ({
           />
         )}
         {actionManager.renderAction("toggleShortcuts", undefined, true)}
-        {actionManager.renderAction("clearCanvas")}
+        {!appState.viewModeEnabled && actionManager.renderAction("clearCanvas")}
         <Separator />
         <MenuLinks />
         <Separator />
-        <div style={{ marginBottom: ".5rem" }}>
-          <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
-            {t("labels.canvasBackground")}
+        {!appState.viewModeEnabled && (
+          <div style={{ marginBottom: ".5rem" }}>
+            <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
+              {t("labels.canvasBackground")}
+            </div>
+            <div style={{ padding: "0 0.625rem" }}>
+              {actionManager.renderAction("changeViewBackgroundColor")}
+            </div>
           </div>
-          <div style={{ padding: "0 0.625rem" }}>
-            {actionManager.renderAction("changeViewBackgroundColor")}
-          </div>
-        </div>
+        )}
         {actionManager.renderAction("toggleTheme")}
       </>
     );
