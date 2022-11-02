@@ -214,7 +214,7 @@
     "text": "Texte",
     "library": "Bibliothèque",
     "lock": "Garder l'outil sélectionné actif après le dessin",
-    "penMode": "",
+    "penMode": "Mode stylo - évite le toucher",
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
     "eraser": "Gomme"
   },
@@ -441,9 +441,9 @@
     "d9480f": "Orange 9"
   },
   "welcomeScreen": {
-    "data": "",
-    "switchToPlusApp": "",
-    "menuHints": "",
+    "data": "Toutes vos données sont sauvegardées en local dans votre navigateur.",
+    "switchToPlusApp": "Vous vouliez plutôt aller à Excalidraw+ ?",
+    "menuHints": "Exportation, préférences, langues...",
     "toolbarHints": "Choisissez un outil et commencez à dessiner !",
     "helpHints": "Raccourcis et aide"
   }
