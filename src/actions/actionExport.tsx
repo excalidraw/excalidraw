@@ -89,6 +89,28 @@ export const actionChangeExportScale = register({
   },
 });
 
+export const actionChangeExportPadding = register({
+  name: "changeExportPadding",
+  trackEvent: { category: "export", action: "togglePadding" },
+  perform: (_elements, appState, value) => {
+    return {
+      appState: {
+        ...appState,
+        exportPadding: value ? DEFAULT_EXPORT_PADDING : 0,
+      },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <CheckboxItem
+      checked={!!appState.exportPadding}
+      onChange={(checked) => updateData(checked)}
+    >
+      {"Padding"}
+    </CheckboxItem>
+  ),
+});
+
 export const actionChangeExportBackground = register({
   name: "changeExportBackground",
   trackEvent: { category: "export", action: "toggleBackground" },

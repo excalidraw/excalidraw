@@ -177,9 +177,16 @@ const getCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
   exportPadding: number,
 ): [number, number, number, number] => {
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  const bounds = getCommonBounds(elements);
+
+  const minX = Math.floor(bounds[0]);
+  const minY = Math.floor(bounds[1]);
+  const maxX = Math.ceil(bounds[2]);
+  const maxY = Math.ceil(bounds[3]);
+
   const width = distance(minX, maxX) + exportPadding * 2;
-  const height = distance(minY, maxY) + exportPadding + exportPadding;
+  const height =
+    Math.ceil(distance(minY, maxY)) + exportPadding + exportPadding;
 
   return [minX, minY, width, height];
 };

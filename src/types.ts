@@ -113,6 +113,7 @@ export type AppState = {
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
   exportScale: number;
+  exportPadding: number;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];

@@ -144,6 +144,7 @@ const LayerUI = ({
             exportBackground: appState.exportBackground,
             name: appState.name,
             viewBackgroundColor: appState.viewBackgroundColor,
+            exportPadding: appState.exportPadding,
           },
         )
           .catch(muteFSAbortError)
