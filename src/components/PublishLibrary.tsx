@@ -4,8 +4,6 @@ import OpenColor from "open-color";
 import { Dialog } from "./Dialog";
 import { t } from "../i18n";
 
-import { ToolButton } from "./ToolButton";
-
 import { AppState, LibraryItems, LibraryItem } from "../types";
 import { exportToCanvas } from "../packages/utils";
 import {
@@ -20,6 +18,7 @@ import "./PublishLibrary.scss";
 import SingleLibraryItem from "./SingleLibraryItem";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { chunk } from "../utils";
+import DialogActionButton from "./DialogActionButton";
 
 interface PublishLibraryDataParams {
   authorName: string;
@@ -434,21 +433,15 @@ const PublishLibrary = ({
             </span>
           </div>
           <div className="publish-library__buttons">
-            <ToolButton
-              type="button"
-              title={t("buttons.cancel")}
-              aria-label={t("buttons.cancel")}
+            <DialogActionButton
               label={t("buttons.cancel")}
               onClick={onDialogClose}
               data-testid="cancel-clear-canvas-button"
-              className="publish-library__buttons--cancel"
             />
-            <ToolButton
+            <DialogActionButton
               type="submit"
-              title={t("buttons.submit")}
-              aria-label={t("buttons.submit")}
               label={t("buttons.submit")}
-              className="publish-library__buttons--confirm"
+              actionType="primary"
               isLoading={isSubmitting}
             />
           </div>

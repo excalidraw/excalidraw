@@ -1,7 +1,12 @@
 import { ColorPicker } from "../components/ColorPicker";
-import { eraser, zoomIn, zoomOut } from "../components/icons";
+import {
+  eraser,
+  MoonIcon,
+  SunIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { DarkModeToggle } from "../components/DarkModeToggle";
 import { MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
@@ -18,6 +23,8 @@ import { newElementWith } from "../element/mutateElement";
 import { getDefaultAppState, isEraserActive } from "../appState";
 import ClearCanvas from "../components/ClearCanvas";
 import clsx from "clsx";
+import MenuItem from "../components/MenuItem";
+import { getShortcutFromShortcutName } from "./shortcuts";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -103,13 +110,13 @@ export const actionZoomIn = register({
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
-      icon={zoomIn}
+      className="zoom-in-button zoom-button"
+      icon={ZoomInIcon}
       title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
       onClick={() => {
         updateData(null);
       }}
-      size="small"
     />
   ),
   keyTest: (event) =>
@@ -139,13 +146,13 @@ export const actionZoomOut = register({
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
-      icon={zoomOut}
+      className="zoom-out-button zoom-button"
+      icon={ZoomOutIcon}
       title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
       onClick={() => {
         updateData(null);
       }}
-      size="small"
     />
   ),
   keyTest: (event) =>
@@ -176,13 +183,12 @@ export const actionResetZoom = register({
     <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
       <ToolButton
         type="button"
-        className="reset-zoom-button"
+        className="reset-zoom-button zoom-button"
         title={t("buttons.resetZoom")}
         aria-label={t("buttons.resetZoom")}
         onClick={() => {
           updateData(null);
         }}
-        size="small"
       >
         {(appState.zoom.value * 100).toFixed(0)}%
       </ToolButton>
@@ -288,14 +294,19 @@ export const actionToggleTheme = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <div style={{ marginInlineStart: "0.25rem" }}>
-      <DarkModeToggle
-        value={appState.theme}
-        onChange={(theme) => {
-          updateData(theme);
-        }}
-      />
-    </div>
+    <MenuItem
+      label={
+        appState.theme === "dark"
+          ? t("buttons.lightMode")
+          : t("buttons.darkMode")
+      }
+      onClick={() => {
+        updateData(appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT);
+      }}
+      icon={appState.theme === "dark" ? SunIcon : MoonIcon}
+      dataTestId="toggle-dark-mode"
+      shortcut={getShortcutFromShortcutName("toggleTheme")}
+    />
   ),
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
 });
