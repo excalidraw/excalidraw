@@ -1011,13 +1011,28 @@ export const renderElementToSvg = (
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   files: BinaryFiles,
-  offsetX?: number,
-  offsetY?: number,
+  offsetX: number,
+  offsetY: number,
   exportWithDarkMode?: boolean,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const cx = (x2 - x1) / 2 - (element.x - x1);
-  const cy = (y2 - y1) / 2 - (element.y - y1);
+  let cx = (x2 - x1) / 2 - (element.x - x1);
+  let cy = (y2 - y1) / 2 - (element.y - y1);
+  if (isTextElement(element)) {
+    const container = getContainerElement(element);
+    if (isLinearElement(container)) {
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(container);
+
+      const boundTextCoords = LinearElementEditor.getBoundTextPosition(
+        container,
+        element as ExcalidrawTextElementWithContainer,
+      );
+      cx = (x2 - x1) / 2 - (boundTextCoords.x - x1);
+      cy = (y2 - y1) / 2 - (boundTextCoords.y - y1);
+      offsetX = offsetX + boundTextCoords.x - element.x;
+      offsetY = offsetY + boundTextCoords.y - element.y;
+    }
+  }
   const degree = (180 * element.angle) / Math.PI;
   const generator = rsvg.generator;
 
