@@ -1993,24 +1993,9 @@ class App extends React.Component<AppProps, AppState> {
           } else {
             const selectedElement = selectedElements[0];
             const midPoint = getContainerCenter(selectedElement, this.state);
-            let sceneX = midPoint.x;
-            let sceneY = midPoint.y;
-            const boundTextElement = getBoundTextElement(selectedElement);
+            const sceneX = midPoint.x;
+            const sceneY = midPoint.y;
 
-            if (boundTextElement) {
-              if (isLinearElement(selectedElement)) {
-                const boundTextCoords =
-                  LinearElementEditor.getBoundTextPosition(
-                    selectedElement,
-                    boundTextElement,
-                  );
-                sceneX = boundTextCoords.x + boundTextElement.width / 2;
-                sceneY = boundTextCoords.y + boundTextElement.height / 2;
-              } else {
-                sceneX = boundTextElement.x + boundTextElement.width / 2;
-                sceneY = boundTextElement.y + boundTextElement.height / 2;
-              }
-            }
             this.startTextEditing({
               sceneX,
               sceneY,
@@ -2569,18 +2554,11 @@ class App extends React.Component<AppProps, AppState> {
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
-        !this.state.editingLinearElement ||
-        this.state.editingLinearElement.elementId !== selectedElements[0].id
+        this.state.editingLinearElement &&
+        this.state.editingLinearElement.elementId === selectedElements[0].id
       ) {
-        this.history.resumeRecording();
-        this.setState({
-          editingLinearElement: new LinearElementEditor(
-            selectedElements[0],
-            this.scene,
-          ),
-        });
+        return;
       }
-      return;
     }
 
     resetCursor(this.canvas);
@@ -2623,10 +2601,13 @@ class App extends React.Component<AppProps, AppState> {
       );
       if (selectedElements.length === 1) {
         const selectedElement = selectedElements[0];
-        const canBindText = hasBoundTextElement(selectedElement);
-        if (canBindText) {
-          sceneX = selectedElement.x + selectedElement.width / 2;
-          sceneY = selectedElement.y + selectedElement.height / 2;
+        const hasBoundText = hasBoundTextElement(selectedElement);
+
+        if (isLinearElement(selectedElement) || hasBoundText) {
+          const midPoint = getContainerCenter(selectedElement, this.state);
+
+          sceneX = midPoint.x;
+          sceneY = midPoint.y;
         }
       }
       this.startTextEditing({
