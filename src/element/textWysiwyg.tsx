@@ -248,15 +248,16 @@ export const textWysiwyg = ({
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
       }
       // Horizontal offset in case updatedTextElement has a non-WYSIWYG subtype
-      const offWidth =
-        Math.min(maxWidth, rMetrics.width) - Math.min(maxWidth, eMetrics.width);
-      const offsetX = container
-        ? 0
-        : textAlign === "right"
-        ? offWidth
-        : textAlign === "center"
-        ? offWidth / 2
-        : 0;
+      const offWidth = container
+        ? Math.max(0, maxWidth - eMetrics.width)
+        : Math.min(maxWidth, rMetrics.width) -
+          Math.min(maxWidth, eMetrics.width);
+      const offsetX =
+        textAlign === "right"
+          ? offWidth
+          : textAlign === "center"
+          ? offWidth / 2
+          : 0;
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
