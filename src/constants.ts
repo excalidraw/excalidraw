@@ -99,6 +99,9 @@ export const MIME_TYPES = {
   "excalidraw.png": "image/png",
   jpg: "image/jpeg",
   gif: "image/gif",
+  webp: "image/webp",
+  bmp: "image/bmp",
+  ico: "image/x-icon",
   binary: "application/octet-stream",
 } as const;
 
@@ -119,6 +122,7 @@ export const TITLE_TIMEOUT = 10000;
 export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
 export const ZOOM_STEP = 0.1;
+export const MIN_ZOOM = 0.1;
 export const HYPERLINK_TOOLTIP_DELAY = 300;
 
 // Report a user inactive after IDLE_THRESHOLD milliseconds
@@ -180,6 +184,9 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
   MIME_TYPES.jpg,
   MIME_TYPES.svg,
   MIME_TYPES.gif,
+  MIME_TYPES.webp,
+  MIME_TYPES.bmp,
+  MIME_TYPES.ico,
 ] as const;
 
 export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
@@ -212,3 +219,7 @@ export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 export const COOKIES = {
   AUTH_STATE_COOKIE: "excplus-auth",
 } as const;
+
+/** key containt id of precedeing elemnt id we use in reconciliation during
+ * collaboration */
+export const PRECEDING_ELEMENT_KEY = "__precedingElement__";

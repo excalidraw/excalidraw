@@ -522,31 +522,46 @@ export const getArrowheadPoints = (
   return [x2, y2, x3, y3, x4, y4];
 };
 
+const generateLinearElementShape = (
+  element: ExcalidrawLinearElement,
+): Drawable => {
+  const generator = rough.generator();
+  const options = generateRoughOptions(element);
+
+  const method = (() => {
+    if (element.strokeSharpness !== "sharp") {
+      return "curve";
+    }
+    if (options.fill) {
+      return "polygon";
+    }
+    return "linearPath";
+  })();
+
+  return generator[method](element.points as Mutable<Point>[], options);
+};
+
 const getLinearElementRotatedBounds = (
   element: ExcalidrawLinearElement,
   cx: number,
   cy: number,
 ): [number, number, number, number] => {
-  if (element.points.length < 2 || !getShapeForElement(element)) {
-    // XXX this is just a poor estimate and not very useful
-    const { minX, minY, maxX, maxY } = element.points.reduce(
-      (limits, [x, y]) => {
-        [x, y] = rotate(element.x + x, element.y + y, cx, cy, element.angle);
-        limits.minY = Math.min(limits.minY, y);
-        limits.minX = Math.min(limits.minX, x);
-        limits.maxX = Math.max(limits.maxX, x);
-        limits.maxY = Math.max(limits.maxY, y);
-        return limits;
-      },
-      { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
+  if (element.points.length < 2) {
+    const [pointX, pointY] = element.points[0];
+    const [x, y] = rotate(
+      element.x + pointX,
+      element.y + pointY,
+      cx,
+      cy,
+      element.angle,
     );
 
-    let coords: [number, number, number, number] = [minX, minY, maxX, maxY];
+    let coords: [number, number, number, number] = [x, y, x, y];
     const boundTextElement = getBoundTextElement(element);
     if (boundTextElement) {
       const coordsWithBoundText = getMinMaxXYWithBoundText(
         element,
-        [minX, minY, maxX, maxY],
+        [x, y, x, y],
         boundTextElement,
       );
       coords = [
@@ -559,11 +574,10 @@ const getLinearElementRotatedBounds = (
     return coords;
   }
 
-  const shape = getShapeForElement(element)!;
-
   // first element is always the curve
-  const ops = getCurvePathOps(shape[0]);
-
+  const cachedShape = getShapeForElement(element)?.[0];
+  const shape = cachedShape ?? generateLinearElementShape(element);
+  const ops = getCurvePathOps(shape);
   const transformXY = (x: number, y: number) =>
     rotate(element.x + x, element.y + y, cx, cy, element.angle);
   const res = getMinMaxXYFromCurvePathOps(ops, transformXY);
@@ -708,6 +722,7 @@ export const getResizedElementAbsoluteCoords = (
             points as [number, number][],
             generateRoughOptions(element),
           );
+
     const ops = getCurvePathOps(curve);
     bounds = getMinMaxXYFromCurvePathOps(ops);
   }

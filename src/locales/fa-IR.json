@@ -114,6 +114,10 @@
       "create": "ایجاد پیوند",
       "label": "لینک"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "قفل",
       "unlock": "باز کردن",

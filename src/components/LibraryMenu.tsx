@@ -6,20 +6,13 @@ import {
   RefObject,
   forwardRef,
 } from "react";
-import Library, { libraryItemsAtom } from "../data/library";
+import Library, {
+  distributeLibraryItemsOnSquareGrid,
+  libraryItemsAtom,
+} from "../data/library";
 import { t } from "../i18n";
 import { randomId } from "../random";
-import {
-  LibraryItems,
-  LibraryItem,
-  AppState,
-  BinaryFiles,
-  ExcalidrawProps,
-} from "../types";
-import { Dialog } from "./Dialog";
-import { Island } from "./Island";
-import PublishLibrary from "./PublishLibrary";
-import { ToolButton } from "./ToolButton";
+import { LibraryItems, LibraryItem, AppState, ExcalidrawProps } from "../types";
 
 import "./LibraryMenu.scss";
 import LibraryMenuItems from "./LibraryMenuItems";
@@ -29,7 +22,16 @@ import { trackEvent } from "../analytics";
 import { useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import Spinner from "./Spinner";
-import { useDevice } from "./App";
+import {
+  useDevice,
+  useExcalidrawElements,
+  useExcalidrawSetAppState,
+} from "./App";
+import { Sidebar } from "./Sidebar/Sidebar";
+import { getSelectedElements } from "../scene";
+import { NonDeletedExcalidrawElement } from "../element/types";
+import { LibraryMenuHeader } from "./LibraryMenuHeaderContent";
+import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
 
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
@@ -59,109 +61,41 @@ const useOnClickOutside = (
   }, [ref, cb]);
 };
 
-const getSelectedItems = (
-  libraryItems: LibraryItems,
-  selectedItems: LibraryItem["id"][],
-) => libraryItems.filter((item) => selectedItems.includes(item.id));
-
 const LibraryMenuWrapper = forwardRef<
   HTMLDivElement,
   { children: React.ReactNode }
 >(({ children }, ref) => {
   return (
-    <Island padding={1} ref={ref} className="layer-ui__library">
+    <div ref={ref} className="layer-ui__library">
       {children}
-    </Island>
+    </div>
   );
 });
 
-export const LibraryMenu = ({
-  onClose,
+export const LibraryMenuContent = ({
   onInsertLibraryItems,
   pendingElements,
   onAddToLibrary,
   setAppState,
-  files,
   libraryReturnUrl,
-  focusContainer,
   library,
   id,
   appState,
+  selectedItems,
+  onSelectItems,
 }: {
   pendingElements: LibraryItem["elements"];
-  onClose: () => void;
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: () => void;
-  files: BinaryFiles;
   setAppState: React.Component<any, AppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
-  focusContainer: () => void;
   library: Library;
   id: string;
   appState: AppState;
+  selectedItems: LibraryItem["id"][];
+  onSelectItems: (id: LibraryItem["id"][]) => void;
 }) => {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  const device = useDevice();
-  useOnClickOutside(
-    ref,
-    useCallback(
-      (event) => {
-        // If click on the library icon, do nothing so that LibraryButton
-        // can toggle library menu
-        if ((event.target as Element).closest(".ToolIcon__library")) {
-          return;
-        }
-        if (!appState.isLibraryMenuDocked || !device.canDeviceFitSidebar) {
-          onClose();
-        }
-      },
-      [onClose, appState.isLibraryMenuDocked, device.canDeviceFitSidebar],
-    ),
-  );
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === KEYS.ESCAPE &&
-        (!appState.isLibraryMenuDocked || !device.canDeviceFitSidebar)
-      ) {
-        onClose();
-      }
-    };
-    document.addEventListener(EVENT.KEYDOWN, handleKeyDown);
-    return () => {
-      document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
-    };
-  }, [onClose, appState.isLibraryMenuDocked, device.canDeviceFitSidebar]);
-
-  const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
-  const [showPublishLibraryDialog, setShowPublishLibraryDialog] =
-    useState(false);
-  const [publishLibSuccess, setPublishLibSuccess] = useState<null | {
-    url: string;
-    authorName: string;
-  }>(null);
-
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
-
-  const removeFromLibrary = useCallback(
-    async (libraryItems: LibraryItems) => {
-      const nextItems = libraryItems.filter(
-        (item) => !selectedItems.includes(item.id),
-      );
-      library.setLibrary(nextItems).catch(() => {
-        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
-      });
-      setSelectedItems([]);
-    },
-    [library, setAppState, selectedItems, setSelectedItems],
-  );
-
-  const resetLibrary = useCallback(() => {
-    library.resetLibrary();
-    focusContainer();
-  }, [library, focusContainer]);
 
   const addToLibrary = useCallback(
     async (elements: LibraryItem["elements"], libraryItems: LibraryItems) => {
@@ -188,114 +122,188 @@ export const LibraryMenu = ({
     [onAddToLibrary, library, setAppState],
   );
 
-  const renderPublishSuccess = useCallback(() => {
-    return (
-      <Dialog
-        onCloseRequest={() => setPublishLibSuccess(null)}
-        title={t("publishSuccessDialog.title")}
-        className="publish-library-success"
-        small={true}
-      >
-        <p>
-          {t("publishSuccessDialog.content", {
-            authorName: publishLibSuccess!.authorName,
-          })}{" "}
-          <a
-            href={publishLibSuccess?.url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t("publishSuccessDialog.link")}
-          </a>
-        </p>
-        <ToolButton
-          type="button"
-          title={t("buttons.close")}
-          aria-label={t("buttons.close")}
-          label={t("buttons.close")}
-          onClick={() => setPublishLibSuccess(null)}
-          data-testid="publish-library-success-close"
-          className="publish-library-success-close"
-        />
-      </Dialog>
-    );
-  }, [setPublishLibSuccess, publishLibSuccess]);
-
-  const onPublishLibSuccess = useCallback(
-    (data: { url: string; authorName: string }, libraryItems: LibraryItems) => {
-      setShowPublishLibraryDialog(false);
-      setPublishLibSuccess({ url: data.url, authorName: data.authorName });
-      const nextLibItems = libraryItems.slice();
-      nextLibItems.forEach((libItem) => {
-        if (selectedItems.includes(libItem.id)) {
-          libItem.status = "published";
-        }
-      });
-      library.setLibrary(nextLibItems);
-    },
-    [setShowPublishLibraryDialog, setPublishLibSuccess, selectedItems, library],
-  );
-
   if (
     libraryItemsData.status === "loading" &&
     !libraryItemsData.isInitialized
   ) {
     return (
-      <LibraryMenuWrapper ref={ref}>
+      <LibraryMenuWrapper>
         <div className="layer-ui__library-message">
-          <Spinner size="2em" />
-          <span>{t("labels.libraryLoadingMessage")}</span>
+          <div>
+            <Spinner size="2em" />
+            <span>{t("labels.libraryLoadingMessage")}</span>
+          </div>
         </div>
       </LibraryMenuWrapper>
     );
   }
 
+  const showBtn =
+    libraryItemsData.libraryItems.length > 0 || pendingElements.length > 0;
+
   return (
-    <LibraryMenuWrapper ref={ref}>
-      {showPublishLibraryDialog && (
-        <PublishLibrary
-          onClose={() => setShowPublishLibraryDialog(false)}
-          libraryItems={getSelectedItems(
-            libraryItemsData.libraryItems,
-            selectedItems,
-          )}
-          appState={appState}
-          onSuccess={(data) =>
-            onPublishLibSuccess(data, libraryItemsData.libraryItems)
-          }
-          onError={(error) => window.alert(error)}
-          updateItemsInStorage={() =>
-            library.setLibrary(libraryItemsData.libraryItems)
-          }
-          onRemove={(id: string) =>
-            setSelectedItems(selectedItems.filter((_id) => _id !== id))
-          }
-        />
-      )}
-      {publishLibSuccess && renderPublishSuccess()}
+    <LibraryMenuWrapper>
       <LibraryMenuItems
         isLoading={libraryItemsData.status === "loading"}
         libraryItems={libraryItemsData.libraryItems}
-        onRemoveFromLibrary={() =>
-          removeFromLibrary(libraryItemsData.libraryItems)
-        }
         onAddToLibrary={(elements) =>
           addToLibrary(elements, libraryItemsData.libraryItems)
         }
         onInsertLibraryItems={onInsertLibraryItems}
         pendingElements={pendingElements}
+        selectedItems={selectedItems}
+        onSelectItems={onSelectItems}
+        id={id}
+        libraryReturnUrl={libraryReturnUrl}
+        theme={appState.theme}
+      />
+      {showBtn && (
+        <LibraryMenuBrowseButton
+          id={id}
+          libraryReturnUrl={libraryReturnUrl}
+          theme={appState.theme}
+        />
+      )}
+    </LibraryMenuWrapper>
+  );
+};
+
+export const LibraryMenu: React.FC<{
+  appState: AppState;
+  onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
+  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
+  focusContainer: () => void;
+  library: Library;
+  id: string;
+}> = ({
+  appState,
+  onInsertElements,
+  libraryReturnUrl,
+  focusContainer,
+  library,
+  id,
+}) => {
+  const setAppState = useExcalidrawSetAppState();
+  const elements = useExcalidrawElements();
+  const device = useDevice();
+
+  const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
+  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
+
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  const closeLibrary = useCallback(() => {
+    const isDialogOpen = !!document.querySelector(".Dialog");
+
+    // Prevent closing if any dialog is open
+    if (isDialogOpen) {
+      return;
+    }
+    setAppState({ openSidebar: null });
+  }, [setAppState]);
+
+  useOnClickOutside(
+    ref,
+    useCallback(
+      (event) => {
+        // If click on the library icon, do nothing so that LibraryButton
+        // can toggle library menu
+        if ((event.target as Element).closest(".ToolIcon__library")) {
+          return;
+        }
+        if (!appState.isSidebarDocked || !device.canDeviceFitSidebar) {
+          closeLibrary();
+        }
+      },
+      [closeLibrary, appState.isSidebarDocked, device.canDeviceFitSidebar],
+    ),
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key === KEYS.ESCAPE &&
+        (!appState.isSidebarDocked || !device.canDeviceFitSidebar)
+      ) {
+        closeLibrary();
+      }
+    };
+    document.addEventListener(EVENT.KEYDOWN, handleKeyDown);
+    return () => {
+      document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
+    };
+  }, [closeLibrary, appState.isSidebarDocked, device.canDeviceFitSidebar]);
+
+  const deselectItems = useCallback(() => {
+    setAppState({
+      selectedElementIds: {},
+      selectedGroupIds: {},
+    });
+  }, [setAppState]);
+
+  const removeFromLibrary = useCallback(
+    async (libraryItems: LibraryItems) => {
+      const nextItems = libraryItems.filter(
+        (item) => !selectedItems.includes(item.id),
+      );
+      library.setLibrary(nextItems).catch(() => {
+        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
+      });
+      setSelectedItems([]);
+    },
+    [library, setAppState, selectedItems, setSelectedItems],
+  );
+
+  const resetLibrary = useCallback(() => {
+    library.resetLibrary();
+    focusContainer();
+  }, [library, focusContainer]);
+
+  return (
+    <Sidebar
+      __isInternal
+      // necessary to remount when switching between internal
+      // and custom (host app) sidebar, so that the `props.onClose`
+      // is colled correctly
+      key="library"
+      className="layer-ui__library-sidebar"
+      initialDockedState={appState.isSidebarDocked}
+      onDock={(docked) => {
+        trackEvent(
+          "library",
+          `toggleLibraryDock (${docked ? "dock" : "undock"})`,
+          `sidebar (${device.isMobile ? "mobile" : "desktop"})`,
+        );
+      }}
+      ref={ref}
+    >
+      <Sidebar.Header className="layer-ui__library-header">
+        <LibraryMenuHeader
+          appState={appState}
+          setAppState={setAppState}
+          selectedItems={selectedItems}
+          onSelectItems={setSelectedItems}
+          library={library}
+          onRemoveFromLibrary={() =>
+            removeFromLibrary(libraryItemsData.libraryItems)
+          }
+          resetLibrary={resetLibrary}
+        />
+      </Sidebar.Header>
+      <LibraryMenuContent
+        pendingElements={getSelectedElements(elements, appState, true)}
+        onInsertLibraryItems={(libraryItems) => {
+          onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
+        }}
+        onAddToLibrary={deselectItems}
         setAppState={setAppState}
-        appState={appState}
         libraryReturnUrl={libraryReturnUrl}
         library={library}
-        theme={appState.theme}
-        files={files}
         id={id}
+        appState={appState}
         selectedItems={selectedItems}
-        onSelectItems={(ids) => setSelectedItems(ids)}
-        onPublish={() => setShowPublishLibraryDialog(true)}
-        resetLibrary={resetLibrary}
+        onSelectItems={setSelectedItems}
       />
-    </LibraryMenuWrapper>
+    </Sidebar>
   );
 };

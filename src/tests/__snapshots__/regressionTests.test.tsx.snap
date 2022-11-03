@@ -38,18 +38,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -80,9 +81,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -509,7 +510,7 @@ Object {
 
 exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of elements 1`] = `3`;
 
-exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of renders 1`] = `27`;
+exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of renders 1`] = `28`;
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] appState 1`] = `
 Object {
@@ -549,18 +550,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -598,9 +600,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -1026,7 +1028,7 @@ Object {
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of elements 1`] = `3`;
 
-exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of renders 1`] = `23`;
+exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of renders 1`] = `24`;
 
 exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] appState 1`] = `
 Object {
@@ -1066,18 +1068,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": false,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -1098,9 +1101,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -1888,7 +1891,7 @@ Object {
 
 exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of renders 1`] = `42`;
+exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of renders 1`] = `43`;
 
 exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] appState 1`] = `
 Object {
@@ -1928,18 +1931,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -1947,9 +1951,7 @@ Object {
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {
-    "id0": true,
-  },
+  "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -1962,9 +1964,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -1986,7 +1988,7 @@ Object {
   "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
-  "height": 10,
+  "height": 15,
   "id": "id0",
   "isDeleted": false,
   "link": null,
@@ -2002,9 +2004,9 @@ Object {
   "updated": 1,
   "version": 3,
   "versionNonce": 453191,
-  "width": 10,
-  "x": 25,
-  "y": 25,
+  "width": 15,
+  "x": 10,
+  "y": 10,
 }
 `;
 
@@ -2083,7 +2085,7 @@ Object {
           "boundElements": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
-          "height": 10,
+          "height": 15,
           "id": "id0",
           "isDeleted": false,
           "link": null,
@@ -2099,9 +2101,9 @@ Object {
           "updated": 1,
           "version": 3,
           "versionNonce": 453191,
-          "width": 10,
-          "x": 25,
-          "y": 25,
+          "width": 15,
+          "x": 10,
+          "y": 10,
         },
       ],
     },
@@ -2111,7 +2113,7 @@ Object {
 
 exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of renders 1`] = `11`;
+exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests adjusts z order when grouping: [end of test] appState 1`] = `
 Object {
@@ -2151,18 +2153,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2190,9 +2193,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -2619,7 +2622,7 @@ Object {
 
 exports[`regression tests adjusts z order when grouping: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests adjusts z order when grouping: [end of test] number of renders 1`] = `21`;
+exports[`regression tests adjusts z order when grouping: [end of test] number of renders 1`] = `22`;
 
 exports[`regression tests alt-drag duplicates an element: [end of test] appState 1`] = `
 Object {
@@ -2659,18 +2662,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2678,9 +2682,7 @@ Object {
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {
-    "id0": true,
-  },
+  "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -2693,9 +2695,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -2718,35 +2720,6 @@ Object {
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
-  "id": "id0_copy",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "seed": 401146281,
-  "strokeColor": "#000000",
-  "strokeSharpness": "sharp",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 2019559783,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
-exports[`regression tests alt-drag duplicates an element: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "groupIds": Array [],
-  "height": 10,
   "id": "id0",
   "isDeleted": false,
   "link": null,
@@ -2760,11 +2733,11 @@ Object {
   "strokeWidth": 1,
   "type": "rectangle",
   "updated": 1,
-  "version": 3,
-  "versionNonce": 453191,
+  "version": 2,
+  "versionNonce": 1278240551,
   "width": 10,
-  "x": 20,
-  "y": 20,
+  "x": 10,
+  "y": 10,
 }
 `;
 
@@ -2824,80 +2797,13 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": true,
-          "id1": true,
-        },
-        "selectedGroupIds": Object {},
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0_copy",
-          "isDeleted": false,
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 401146281,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 4,
-          "versionNonce": 2019559783,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 3,
-          "versionNonce": 453191,
-          "width": 10,
-          "x": 20,
-          "y": 20,
-        },
-      ],
-    },
   ],
 }
 `;
 
-exports[`regression tests alt-drag duplicates an element: [end of test] number of elements 1`] = `2`;
+exports[`regression tests alt-drag duplicates an element: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `11`;
+exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests arrow keys: [end of test] appState 1`] = `
 Object {
@@ -2937,18 +2843,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2968,9 +2875,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -3076,7 +2983,7 @@ Object {
 
 exports[`regression tests arrow keys: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests arrow keys: [end of test] number of renders 1`] = `20`;
+exports[`regression tests arrow keys: [end of test] number of renders 1`] = `21`;
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] appState 1`] = `
 Object {
@@ -3116,18 +3023,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3150,9 +3058,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -3567,7 +3475,7 @@ Object {
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of renders 1`] = `19`;
+exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of renders 1`] = `20`;
 
 exports[`regression tests change the properties of a shape: [end of test] appState 1`] = `
 Object {
@@ -3607,18 +3515,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": "strokeColorPicker",
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3638,9 +3547,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -3826,230 +3735,7 @@ Object {
 
 exports[`regression tests change the properties of a shape: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `14`;
-
-exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
-Object {
-  "activeTool": Object {
-    "customType": null,
-    "lastActiveToolBeforeEraser": null,
-    "locked": false,
-    "type": "selection",
-  },
-  "collaborators": Map {},
-  "currentChartType": "bar",
-  "currentItemBackgroundColor": "transparent",
-  "currentItemEndArrowhead": "arrow",
-  "currentItemFillStyle": "hachure",
-  "currentItemFontFamily": 1,
-  "currentItemFontSize": 20,
-  "currentItemLinearStrokeSharpness": "round",
-  "currentItemOpacity": 100,
-  "currentItemRoughness": 1,
-  "currentItemStartArrowhead": null,
-  "currentItemStrokeColor": "#000000",
-  "currentItemStrokeSharpness": "sharp",
-  "currentItemStrokeStyle": "solid",
-  "currentItemStrokeWidth": 1,
-  "currentItemTextAlign": "left",
-  "cursorButton": "up",
-  "draggingElement": null,
-  "editingElement": null,
-  "editingGroupId": null,
-  "editingLinearElement": null,
-  "errorMessage": null,
-  "exportBackground": true,
-  "exportEmbedScene": false,
-  "exportScale": 1,
-  "exportWithDarkMode": false,
-  "fileHandle": null,
-  "gridSize": null,
-  "height": 768,
-  "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
-  "isLoading": false,
-  "isResizing": false,
-  "isRotating": false,
-  "lastPointerDownWith": "mouse",
-  "multiElement": null,
-  "name": "Untitled-201933152653",
-  "offsetLeft": 0,
-  "offsetTop": 0,
-  "openMenu": null,
-  "openPopup": null,
-  "pasteDialog": Object {
-    "data": null,
-    "shown": false,
-  },
-  "penDetected": false,
-  "penMode": false,
-  "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {
-    "id0": true,
-  },
-  "resizingElement": null,
-  "scrollX": 0,
-  "scrollY": 0,
-  "scrolledOutside": false,
-  "selectedElementIds": Object {
-    "id0": true,
-    "id1": true,
-  },
-  "selectedGroupIds": Object {},
-  "selectedLinearElement": null,
-  "selectionElement": null,
-  "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
-  "showHyperlinkPopup": false,
-  "showStats": false,
-  "startBoundElement": null,
-  "suggestedBindings": Array [],
-  "theme": "light",
-  "toast": null,
-  "viewBackgroundColor": "#ffffff",
-  "viewModeEnabled": false,
-  "width": 1024,
-  "zenModeEnabled": false,
-  "zoom": Object {
-    "value": 1,
-  },
-}
-`;
-
-exports[`regression tests click on an element and drag it: [dragged] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "seed": 337897,
-  "strokeColor": "#000000",
-  "strokeSharpness": "sharp",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 20,
-  "y": 20,
-}
-`;
-
-exports[`regression tests click on an element and drag it: [dragged] history 1`] = `
-Object {
-  "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "selectedGroupIds": Object {},
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": true,
-          "id1": true,
-        },
-        "selectedGroupIds": Object {},
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 3,
-          "versionNonce": 453191,
-          "width": 10,
-          "x": 20,
-          "y": 20,
-        },
-      ],
-    },
-  ],
-}
-`;
-
-exports[`regression tests click on an element and drag it: [dragged] number of elements 1`] = `1`;
-
-exports[`regression tests click on an element and drag it: [dragged] number of renders 1`] = `11`;
+exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests click on an element and drag it: [end of test] appState 1`] = `
 Object {
@@ -4089,18 +3775,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4108,10 +3795,7 @@ Object {
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {
-    "id0": true,
-    "id1": true,
-  },
+  "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -4119,15 +3803,14 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
   },
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -4163,8 +3846,8 @@ Object {
   "strokeWidth": 1,
   "type": "rectangle",
   "updated": 1,
-  "version": 4,
-  "versionNonce": 2019559783,
+  "version": 2,
+  "versionNonce": 1278240551,
   "width": 10,
   "x": 10,
   "y": 10,
@@ -4227,96 +3910,13 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": true,
-          "id1": true,
-        },
-        "selectedGroupIds": Object {},
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 3,
-          "versionNonce": 453191,
-          "width": 10,
-          "x": 20,
-          "y": 20,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": true,
-          "id1": true,
-          "id2": true,
-        },
-        "selectedGroupIds": Object {},
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 4,
-          "versionNonce": 2019559783,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
   ],
 }
 `;
 
 exports[`regression tests click on an element and drag it: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `14`;
+exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests click to select a shape: [end of test] appState 1`] = `
 Object {
@@ -4356,18 +3956,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4390,9 +3991,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -4593,7 +4194,7 @@ Object {
 
 exports[`regression tests click to select a shape: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `14`;
+exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests click-drag to select a group: [end of test] appState 1`] = `
 Object {
@@ -4633,18 +4234,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4668,9 +4270,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -4992,7 +4594,7 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `20`;
+exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `21`;
 
 exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] appState 1`] = `
 Object {
@@ -5057,18 +4659,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -5115,9 +4718,9 @@ Object {
     "y": 500,
   },
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -5318,7 +4921,7 @@ Object {
 
 exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `15`;
+exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `16`;
 
 exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] appState 1`] = `
 Object {
@@ -5383,18 +4986,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -5416,9 +5020,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -5619,7 +5223,7 @@ Object {
 
 exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of renders 1`] = `16`;
+exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] appState 1`] = `
 Object {
@@ -5684,18 +5288,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -5740,9 +5345,9 @@ Object {
     "y": 110,
   },
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -5848,7 +5453,7 @@ Object {
 
 exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `9`;
+exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] appState 1`] = `
 Object {
@@ -5875,32 +5480,7 @@ Object {
   "currentItemStrokeWidth": 1,
   "currentItemTextAlign": "left",
   "cursorButton": "up",
-  "draggingElement": Object {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "boundElements": null,
-    "fillStyle": "hachure",
-    "groupIds": Array [],
-    "height": 0,
-    "id": "id1",
-    "isDeleted": false,
-    "link": null,
-    "locked": false,
-    "opacity": 100,
-    "roughness": 1,
-    "seed": 449462985,
-    "strokeColor": "#000000",
-    "strokeSharpness": "sharp",
-    "strokeStyle": "solid",
-    "strokeWidth": 1,
-    "type": "selection",
-    "updated": 1,
-    "version": 1,
-    "versionNonce": 0,
-    "width": 0,
-    "x": 100,
-    "y": 100,
-  },
+  "draggingElement": null,
   "editingElement": null,
   "editingGroupId": null,
   "editingLinearElement": null,
@@ -5913,18 +5493,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -5932,21 +5513,22 @@ Object {
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {
-    "id0": true,
-  },
+  "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {},
+  "selectedElementIds": Object {
+    "id0": true,
+    "id1": true,
+  },
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -6052,7 +5634,7 @@ Object {
 
 exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of renders 1`] = `10`;
+exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests double click to edit a group: [end of test] appState 1`] = `
 Object {
@@ -6092,18 +5674,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -6123,9 +5706,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -6555,7 +6138,7 @@ Object {
 
 exports[`regression tests double click to edit a group: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests double click to edit a group: [end of test] number of renders 1`] = `19`;
+exports[`regression tests double click to edit a group: [end of test] number of renders 1`] = `20`;
 
 exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] appState 1`] = `
 Object {
@@ -6595,18 +6178,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -6633,9 +6217,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -6905,7 +6489,7 @@ Object {
 
 exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of renders 1`] = `17`;
+exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests draw every type of shape: [end of test] appState 1`] = `
 Object {
@@ -6945,18 +6529,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -6976,9 +6561,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -9146,7 +8731,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `8`;
 
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `56`;
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `57`;
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] appState 1`] = `
 Object {
@@ -9186,18 +8771,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9222,9 +8808,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -9546,7 +9132,7 @@ Object {
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of renders 1`] = `20`;
+exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of renders 1`] = `21`;
 
 exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] appState 1`] = `
 Object {
@@ -9586,18 +9172,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9623,9 +9210,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -9824,7 +9411,7 @@ Object {
 
 exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `18`;
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] appState 1`] = `
 Object {
@@ -9864,18 +9451,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9899,9 +9487,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -10063,7 +9651,7 @@ Object {
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of renders 1`] = `11`;
+exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] appState 1`] = `
 Object {
@@ -10103,18 +9691,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10139,9 +9728,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -10371,7 +9960,7 @@ Object {
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of renders 1`] = `12`;
+exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests key 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -10411,18 +10000,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10442,9 +10032,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -10550,7 +10140,7 @@ Object {
 
 exports[`regression tests key 2 selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 2 selects rectangle tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key 2 selects rectangle tool: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests key 3 selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -10590,18 +10180,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10621,9 +10212,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -10729,7 +10320,7 @@ Object {
 
 exports[`regression tests key 3 selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 3 selects diamond tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key 3 selects diamond tool: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests key 4 selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -10769,18 +10360,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10800,9 +10392,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -10908,7 +10500,7 @@ Object {
 
 exports[`regression tests key 4 selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 4 selects ellipse tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key 4 selects ellipse tool: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests key 5 selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -10948,18 +10540,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10996,9 +10589,9 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -11134,7 +10727,7 @@ Object {
 
 exports[`regression tests key 5 selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 5 selects arrow tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key 5 selects arrow tool: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests key 6 selects line tool: [end of test] appState 1`] = `
 Object {
@@ -11174,18 +10767,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11222,9 +10816,9 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -11360,7 +10954,7 @@ Object {
 
 exports[`regression tests key 6 selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 6 selects line tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key 6 selects line tool: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests key 7 selects freedraw tool: [end of test] appState 1`] = `
 Object {
@@ -11400,18 +10994,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11431,9 +11026,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -11587,7 +11182,7 @@ Object {
 
 exports[`regression tests key 7 selects freedraw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 7 selects freedraw tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key 7 selects freedraw tool: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests key a selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -11627,18 +11222,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11675,9 +11271,9 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -11813,7 +11409,7 @@ Object {
 
 exports[`regression tests key a selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key a selects arrow tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key a selects arrow tool: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests key d selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -11853,18 +11449,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11884,9 +11481,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -11992,7 +11589,7 @@ Object {
 
 exports[`regression tests key d selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key d selects diamond tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key d selects diamond tool: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests key l selects line tool: [end of test] appState 1`] = `
 Object {
@@ -12032,18 +11629,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12080,9 +11678,9 @@ Object {
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -12218,7 +11816,7 @@ Object {
 
 exports[`regression tests key l selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key l selects line tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key l selects line tool: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests key o selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -12258,18 +11856,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12289,9 +11888,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -12397,7 +11996,7 @@ Object {
 
 exports[`regression tests key o selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key o selects ellipse tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key o selects ellipse tool: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests key r selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -12437,18 +12036,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12468,9 +12068,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -12576,7 +12176,7 @@ Object {
 
 exports[`regression tests key r selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key r selects rectangle tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key r selects rectangle tool: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests key x selects freedraw tool: [end of test] appState 1`] = `
 Object {
@@ -12616,18 +12216,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12647,9 +12248,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -12803,7 +12404,7 @@ Object {
 
 exports[`regression tests key x selects freedraw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key x selects freedraw tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key x selects freedraw tool: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {
@@ -12843,18 +12444,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12885,9 +12487,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -13599,7 +13201,7 @@ Object {
 
 exports[`regression tests make a group and duplicate it: [end of test] number of elements 1`] = `6`;
 
-exports[`regression tests make a group and duplicate it: [end of test] number of renders 1`] = `23`;
+exports[`regression tests make a group and duplicate it: [end of test] number of renders 1`] = `24`;
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] appState 1`] = `
 Object {
@@ -13639,18 +13241,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -13674,9 +13277,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -13877,7 +13480,7 @@ Object {
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `20`;
+exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `21`;
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
@@ -13917,18 +13520,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "touch",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -13948,9 +13552,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": true,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -13987,7 +13591,7 @@ Object {
 
 exports[`regression tests pinch-to-zoom works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `10`;
+exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests rerenders UI on language change: [end of test] appState 1`] = `
 Object {
@@ -14027,18 +13631,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -14056,9 +13661,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -14095,7 +13700,7 @@ Object {
 
 exports[`regression tests rerenders UI on language change: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `9`;
+exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] appState 1`] = `
 Object {
@@ -14135,18 +13740,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -14154,24 +13760,22 @@ Object {
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {
-    "id0": true,
-  },
+  "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id0": false,
+    "id0": true,
     "id1": true,
   },
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -14277,7 +13881,7 @@ Object {
 
 exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of renders 1`] = `10`;
+exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] appState 1`] = `
 Object {
@@ -14317,18 +13921,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -14357,9 +13962,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -14630,7 +14235,608 @@ Object {
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `19`;
+exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `20`;
+
+exports[`regression tests should group elements and ungroup them: [end of test] appState 1`] = `
+Object {
+  "activeTool": Object {
+    "customType": null,
+    "lastActiveToolBeforeEraser": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemLinearStrokeSharpness": "round",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeSharpness": "sharp",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "gridSize": null,
+  "height": 768,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "isSidebarDocked": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "pasteDialog": Object {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": Object {
+    "id2": true,
+  },
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+    "id1": true,
+    "id2": true,
+    "id3": true,
+    "id5": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "startBoundElement": null,
+  "suggestedBindings": Array [],
+  "theme": "light",
+  "toast": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": Object {
+    "value": 1,
+  },
+}
+`;
+
+exports[`regression tests should group elements and ungroup them: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeSharpness": "sharp",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 4,
+  "versionNonce": 1505387817,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests should group elements and ungroup them: [end of test] element 1 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 10,
+  "id": "id1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 449462985,
+  "strokeColor": "#000000",
+  "strokeSharpness": "sharp",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 4,
+  "versionNonce": 23633383,
+  "width": 10,
+  "x": 30,
+  "y": 10,
+}
+`;
+
+exports[`regression tests should group elements and ungroup them: [end of test] element 2 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 10,
+  "id": "id2",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 401146281,
+  "strokeColor": "#000000",
+  "strokeSharpness": "sharp",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 4,
+  "versionNonce": 493213705,
+  "width": 10,
+  "x": 50,
+  "y": 10,
+}
+`;
+
+exports[`regression tests should group elements and ungroup them: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id2": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id2",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 401146281,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 2019559783,
+          "width": 10,
+          "x": 50,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+        },
+        "selectedGroupIds": Object {
+          "id4": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id4",
+          ],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 3,
+          "versionNonce": 1014066025,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id4",
+          ],
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 3,
+          "versionNonce": 238820263,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id4",
+          ],
+          "height": 10,
+          "id": "id2",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 401146281,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 3,
+          "versionNonce": 400692809,
+          "width": 10,
+          "x": 50,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+          "id3": true,
+          "id5": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 4,
+          "versionNonce": 1505387817,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 4,
+          "versionNonce": 23633383,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id2",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 401146281,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 4,
+          "versionNonce": 493213705,
+          "width": 10,
+          "x": 50,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests should group elements and ungroup them: [end of test] number of elements 1`] = `3`;
+
+exports[`regression tests should group elements and ungroup them: [end of test] number of renders 1`] = `25`;
 
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] appState 1`] = `
 Object {
@@ -14670,18 +14876,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -14701,9 +14908,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -14849,7 +15056,7 @@ Object {
 
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `13`;
+exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] appState 1`] = `
 Object {
@@ -14889,18 +15096,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -14931,9 +15139,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -15763,7 +15971,7 @@ Object {
 
 exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of elements 1`] = `4`;
 
-exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of renders 1`] = `38`;
+exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of renders 1`] = `39`;
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] appState 1`] = `
 Object {
@@ -15803,18 +16011,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -15832,9 +16041,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -15871,7 +16080,7 @@ Object {
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `7`;
+exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests supports nested groups: [end of test] appState 1`] = `
 Object {
@@ -15911,18 +16120,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -15944,9 +16154,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -16687,7 +16897,7 @@ Object {
 
 exports[`regression tests supports nested groups: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests supports nested groups: [end of test] number of renders 1`] = `31`;
+exports[`regression tests supports nested groups: [end of test] number of renders 1`] = `32`;
 
 exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] appState 1`] = `
 Object {
@@ -16752,18 +16962,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -16812,9 +17023,9 @@ Object {
     "y": 0,
   },
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -17136,7 +17347,7 @@ Object {
 
 exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of renders 1`] = `19`;
+exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of renders 1`] = `20`;
 
 exports[`regression tests switches selected element on pointer down: [end of test] appState 1`] = `
 Object {
@@ -17201,18 +17412,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -17259,9 +17471,9 @@ Object {
     "y": 0,
   },
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -17462,7 +17674,7 @@ Object {
 
 exports[`regression tests switches selected element on pointer down: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests switches selected element on pointer down: [end of test] number of renders 1`] = `13`;
+exports[`regression tests switches selected element on pointer down: [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests two-finger scroll works: [end of test] appState 1`] = `
 Object {
@@ -17502,18 +17714,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "touch",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -17533,9 +17746,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": true,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -17572,7 +17785,7 @@ Object {
 
 exports[`regression tests two-finger scroll works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `12`;
+exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
@@ -17612,18 +17825,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -17643,9 +17857,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -18118,7 +18332,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `30`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `31`;
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] appState 1`] = `
 Object {
@@ -18158,18 +18372,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -18187,9 +18402,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -18226,7 +18441,7 @@ Object {
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of renders 1`] = `6`;
+exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
@@ -18266,18 +18481,19 @@ Object {
   "gridSize": null,
   "height": 768,
   "isBindingEnabled": true,
-  "isLibraryMenuDocked": false,
-  "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isSidebarDocked": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
+  "openDialog": null,
   "openMenu": null,
   "openPopup": null,
+  "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -18295,9 +18511,9 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "showHelpDialog": false,
   "showHyperlinkPopup": false,
   "showStats": false,
+  "showWelcomeScreen": true,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -18334,4 +18550,4 @@ Object {
 
 exports[`regression tests zoom hotkeys: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `6`;
+exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `7`;

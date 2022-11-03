@@ -114,6 +114,10 @@
       "create": "Δημιουργία συνδέσμου",
       "label": "Σύνδεσμος"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "Κλείδωμα",
       "unlock": "Ξεκλείδωμα",

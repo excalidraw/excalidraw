@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
-import Sidebar from "./sidebar/Sidebar";
+import ExampleSidebar from "./sidebar/ExampleSidebar";
+
+import type * as TExcalidraw from "../index";
 
 import "./App.scss";
 import initialData from "./initialData";
@@ -24,15 +26,12 @@ import {
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
 } from "../../../types";
-import {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../../../element/types";
+import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 
 declare global {
   interface Window {
-    ExcalidrawLib: any;
+    ExcalidrawLib: typeof TExcalidraw;
   }
 }
 
@@ -68,6 +67,7 @@ const {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   restoreElements,
+  Sidebar,
 } = window.ExcalidrawLib;
 
 const COMMENT_SVG = (
@@ -275,11 +275,14 @@ export default function App() {
     [],
   );
 
-  const onCopy = async (type: string) => {
+  const onCopy = async (type: "png" | "svg" | "json") => {
+    if (!excalidrawAPI) {
+      return false;
+    }
     await exportToClipboard({
-      elements: excalidrawAPI?.getSceneElements(),
-      appState: excalidrawAPI?.getAppState(),
-      files: excalidrawAPI?.getFiles(),
+      elements: excalidrawAPI.getSceneElements(),
+      appState: excalidrawAPI.getAppState(),
+      files: excalidrawAPI.getFiles(),
       type,
     });
     window.alert(`Copied to clipboard as ${type} successfully`);
@@ -302,12 +305,15 @@ export default function App() {
   };
 
   const rerenderCommentIcons = () => {
+    if (!excalidrawAPI) {
+      return false;
+    }
     const commentIconsElements = appRef.current.querySelectorAll(
       ".comment-icon",
     ) as HTMLElement[];
     commentIconsElements.forEach((ele) => {
       const id = ele.id;
-      const appstate = excalidrawAPI?.getAppState();
+      const appstate = excalidrawAPI.getAppState();
       const { x, y } = sceneCoordsToViewportCoords(
         { sceneX: commentIcons[id].x, sceneY: commentIcons[id].y },
         appstate,
@@ -325,12 +331,15 @@ export default function App() {
     pointerDownState: PointerDownState,
   ) => {
     return withBatchedUpdatesThrottled((event) => {
+      if (!excalidrawAPI) {
+        return false;
+      }
       const { x, y } = viewportCoordsToSceneCoords(
         {
           clientX: event.clientX - pointerDownState.hitElementOffsets.x,
           clientY: event.clientY - pointerDownState.hitElementOffsets.y,
         },
-        excalidrawAPI?.getAppState(),
+        excalidrawAPI.getAppState(),
       );
       setCommentIcons({
         ...commentIcons,
@@ -371,10 +380,13 @@ export default function App() {
   };
   const renderCommentIcons = () => {
     return Object.values(commentIcons).map((commentIcon) => {
-      const appState = excalidrawAPI?.getAppState();
+      if (!excalidrawAPI) {
+        return false;
+      }
+      const appState = excalidrawAPI.getAppState();
       const { x, y } = sceneCoordsToViewportCoords(
         { sceneX: commentIcon.x, sceneY: commentIcon.y },
-        excalidrawAPI?.getAppState(),
+        excalidrawAPI.getAppState(),
       );
       return (
         <div
@@ -478,6 +490,7 @@ export default function App() {
     if (left + COMMENT_INPUT_WIDTH > appState.width) {
       left = appState.width - COMMENT_INPUT_WIDTH - COMMENT_ICON_DIMENSION / 2;
     }
+
     return (
       <textarea
         className="comment"
@@ -507,10 +520,20 @@ export default function App() {
       />
     );
   };
+
+  const renderSidebar = () => {
+    return (
+      <Sidebar>
+        <Sidebar.Header>Custom header!</Sidebar.Header>
+        Custom sidebar!
+      </Sidebar>
+    );
+  };
+
   return (
     <div className="App" ref={appRef}>
       <h1> Excalidraw Example</h1>
-      <Sidebar>
+      <ExampleSidebar>
         <div className="button-wrapper">
           <button onClick={loadSceneOrLibrary}>Load Scene or Library</button>
           <button className="update-scene" onClick={updateScene}>
@@ -644,10 +667,27 @@ export default function App() {
           </div>
         </div>
         <div className="excalidraw-wrapper">
+          <div
+            style={{
+              position: "absolute",
+              left: "50%",
+              bottom: "20px",
+              display: "flex",
+              zIndex: 9999999999999999,
+              padding: "5px 10px",
+              transform: "translateX(-50%)",
+              background: "rgba(255, 255, 255, 0.8)",
+              gap: "1rem",
+            }}
+          >
+            <button onClick={() => excalidrawAPI?.toggleMenu("customSidebar")}>
+              Toggle Custom Sidebar
+            </button>
+          </div>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
             initialData={initialStatePromiseRef.current.promise}
-            onChange={(elements: ExcalidrawElement[], state: AppState) => {
+            onChange={(elements, state) => {
               console.info("Elements :", elements, "State : ", state);
             }}
             onPointerUpdate={(payload: {
@@ -669,6 +709,7 @@ export default function App() {
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
+            renderSidebar={renderSidebar}
           />
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}
@@ -693,6 +734,9 @@ export default function App() {
           </label>
           <button
             onClick={async () => {
+              if (!excalidrawAPI) {
+                return;
+              }
               const svg = await exportToSvg({
                 elements: excalidrawAPI?.getSceneElements(),
                 appState: {
@@ -702,7 +746,6 @@ export default function App() {
                   width: 300,
                   height: 100,
                 },
-                embedScene: true,
                 files: excalidrawAPI?.getFiles(),
               });
               appRef.current.querySelector(".export-svg").innerHTML =
@@ -715,6 +758,9 @@ export default function App() {
 
           <button
             onClick={async () => {
+              if (!excalidrawAPI) {
+                return;
+              }
               const blob = await exportToBlob({
                 elements: excalidrawAPI?.getSceneElements(),
                 mimeType: "image/png",
@@ -736,15 +782,18 @@ export default function App() {
 
           <button
             onClick={async () => {
+              if (!excalidrawAPI) {
+                return;
+              }
               const canvas = await exportToCanvas({
-                elements: excalidrawAPI?.getSceneElements(),
+                elements: excalidrawAPI.getSceneElements(),
                 appState: {
                   ...initialData.appState,
                   exportWithDarkMode,
                 },
-                files: excalidrawAPI?.getFiles(),
+                files: excalidrawAPI.getFiles(),
               });
-              const ctx = canvas.getContext("2d");
+              const ctx = canvas.getContext("2d")!;
               ctx.font = "30px Virgil";
               ctx.strokeText("My custom text", 50, 60);
               setCanvasUrl(canvas.toDataURL());
@@ -756,7 +805,7 @@ export default function App() {
             <img src={canvasUrl} alt="" />
           </div>
         </div>
-      </Sidebar>
+      </ExampleSidebar>
     </div>
   );
 }

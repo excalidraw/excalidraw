@@ -62,7 +62,7 @@ import {
 import { isLinearElement } from "../element/typeChecks";
 
 const hasEmojiSupport = supportsEmoji();
-export const DEFAULT_SPACING = 4;
+export const DEFAULT_SPACING = 2;
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -341,6 +341,8 @@ export const _renderScene = ({
       isExporting,
     } = renderConfig;
 
+    const selectionColor = renderConfig.selectionColor || oc.black;
+
     const context = canvas.getContext("2d")!;
 
     context.setTransform(1, 0, 0, 1, 0, 0);
@@ -499,7 +501,7 @@ export const _renderScene = ({
             locallySelectedIds.includes(element.id) &&
             !isSelectedViaGroup(appState, element)
           ) {
-            selectionColors.push(oc.black);
+            selectionColors.push(selectionColor);
           }
           // remote users
           if (renderConfig.remoteSelectedElementIds[element.id]) {
@@ -512,6 +514,7 @@ export const _renderScene = ({
               ),
             );
           }
+
           if (selectionColors.length) {
             const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
               getElementAbsoluteCoords(element, true);
@@ -522,12 +525,13 @@ export const _renderScene = ({
               elementX2,
               elementY2,
               selectionColors,
+              dashed: !!renderConfig.remoteSelectedElementIds[element.id],
               cx,
               cy,
             });
           }
           return acc;
-        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; cx: number; cy: number }[]);
+        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean; cx: number; cy: number }[]);
 
         const addSelectionForGroupId = (groupId: GroupId) => {
           const groupElements = getElementsInGroup(elements, groupId);
@@ -540,6 +544,7 @@ export const _renderScene = ({
             elementY1,
             elementY2,
             selectionColors: [oc.black],
+            dashed: true,
             cx: elementX1 + (elementX2 - elementX1) / 2,
             cy: elementY1 + (elementY2 - elementY1) / 2,
           });
@@ -553,15 +558,9 @@ export const _renderScene = ({
         if (appState.editingGroupId) {
           addSelectionForGroupId(appState.editingGroupId);
         }
+
         selections.forEach((selection) =>
-          renderSelectionBorder(
-            context,
-            renderConfig,
-            selection,
-            isSingleLinearElementSelected
-              ? DEFAULT_SPACING * 2
-              : DEFAULT_SPACING,
-          ),
+          renderSelectionBorder(context, renderConfig, selection),
         );
       }
       // Paint resize transformHandles
@@ -584,13 +583,15 @@ export const _renderScene = ({
           );
         }
       } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
-        const dashedLinePadding = 4 / renderConfig.zoom.value;
+        const dashedLinePadding =
+          (DEFAULT_SPACING * 2) / renderConfig.zoom.value;
         context.fillStyle = oc.white;
         const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
         const initialLineDash = context.getLineDash();
         context.setLineDash([2 / renderConfig.zoom.value]);
         const lineWidth = context.lineWidth;
         context.lineWidth = 1 / renderConfig.zoom.value;
+        context.strokeStyle = selectionColor;
         strokeRectWithRotation(
           context,
           x1 - dashedLinePadding,
@@ -687,13 +688,11 @@ export const _renderScene = ({
         idleState = hasEmojiSupport ? "⚫️" : ` (${UserIdleState.AWAY})`;
       } else if (userState === UserIdleState.IDLE) {
         idleState = hasEmojiSupport ? "💤" : ` (${UserIdleState.IDLE})`;
-      } else if (userState === UserIdleState.ACTIVE) {
-        idleState = hasEmojiSupport ? "🟢" : "";
       }
 
-      const usernameAndIdleState = `${
-        username ? `${username} ` : ""
-      }${idleState}`;
+      const usernameAndIdleState = `${username || ""}${
+        idleState ? ` ${idleState}` : ""
+      }`;
 
       if (!isOutOfBounds && usernameAndIdleState) {
         const offsetX = x + width;
@@ -704,22 +703,31 @@ export const _renderScene = ({
         const measureHeight =
           measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
 
-        // Border
-        context.fillStyle = stroke;
-        context.fillRect(
-          offsetX - 1,
-          offsetY - 1,
-          measure.width + 2 * paddingHorizontal + 2,
-          measureHeight + 2 * paddingVertical + 2,
-        );
-        // Background
-        context.fillStyle = background;
-        context.fillRect(
-          offsetX,
-          offsetY,
-          measure.width + 2 * paddingHorizontal,
-          measureHeight + 2 * paddingVertical,
-        );
+        const boxX = offsetX - 1;
+        const boxY = offsetY - 1;
+        const boxWidth = measure.width + 2 * paddingHorizontal + 2;
+        const boxHeight = measureHeight + 2 * paddingVertical + 2;
+        if (context.roundRect) {
+          context.beginPath();
+          context.roundRect(
+            boxX,
+            boxY,
+            boxWidth,
+            boxHeight,
+            4 / renderConfig.zoom.value,
+          );
+          context.fillStyle = background;
+          context.fill();
+          context.fillStyle = stroke;
+          context.stroke();
+        } else {
+          // Border
+          context.fillStyle = stroke;
+          context.fillRect(boxX, boxY, boxWidth, boxHeight);
+          // Background
+          context.fillStyle = background;
+          context.fillRect(offsetX, offsetY, boxWidth - 2, boxHeight - 2);
+        }
         context.fillStyle = oc.white;
 
         context.fillText(
@@ -818,8 +826,17 @@ const renderTransformHandles = (
 
       context.save();
       context.lineWidth = 1 / renderConfig.zoom.value;
+      if (renderConfig.selectionColor) {
+        context.strokeStyle = renderConfig.selectionColor;
+      }
       if (key === "rotation") {
         fillCircle(context, x + width / 2, y + height / 2, width / 2);
+        // prefer round corners if roundRect API is available
+      } else if (context.roundRect) {
+        context.beginPath();
+        context.roundRect(x, y, width, height, 2 / renderConfig.zoom.value);
+        context.fill();
+        context.stroke();
       } else {
         strokeRectWithRotation(
           context,
@@ -848,10 +865,11 @@ const renderSelectionBorder = (
     elementX2: number;
     elementY2: number;
     selectionColors: string[];
+    dashed?: boolean;
     cx: number;
     cy: number;
   },
-  padding = 4,
+  padding = DEFAULT_SPACING * 2,
 ) => {
   const {
     angle,
@@ -862,12 +880,13 @@ const renderSelectionBorder = (
     selectionColors,
     cx,
     cy,
+    dashed,
   } = elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
 
-  const dashedLinePadding = padding / renderConfig.zoom.value;
-  const dashWidth = 8 / renderConfig.zoom.value;
+  const linePadding = padding / renderConfig.zoom.value;
+  const lineWidth = 8 / renderConfig.zoom.value;
   const spaceWidth = 4 / renderConfig.zoom.value;
 
   context.save();
@@ -877,17 +896,19 @@ const renderSelectionBorder = (
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {
     context.strokeStyle = selectionColors[index];
-    context.setLineDash([
-      dashWidth,
-      spaceWidth + (dashWidth + spaceWidth) * (count - 1),
-    ]);
-    context.lineDashOffset = (dashWidth + spaceWidth) * index;
+    if (dashed) {
+      context.setLineDash([
+        lineWidth,
+        spaceWidth + (lineWidth + spaceWidth) * (count - 1),
+      ]);
+    }
+    context.lineDashOffset = (lineWidth + spaceWidth) * index;
     strokeRectWithRotation(
       context,
-      elementX1 - dashedLinePadding,
-      elementY1 - dashedLinePadding,
-      elementWidth + dashedLinePadding * 2,
-      elementHeight + dashedLinePadding * 2,
+      elementX1 - linePadding,
+      elementY1 - linePadding,
+      elementWidth + linePadding * 2,
+      elementHeight + linePadding * 2,
       cx,
       cy,
       angle,
