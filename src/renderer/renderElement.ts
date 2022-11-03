@@ -1110,15 +1110,12 @@ export const renderElementToSvg = (
           element,
           boundText,
         );
-        const absoluteCoords = LinearElementEditor.pointFromAbsoluteCoords(
-          element,
-          [boundTextCoords.x, boundTextCoords.y],
-        );
-        const x = absoluteCoords[0] + offsetX;
-        const y = absoluteCoords[1] + offsetY;
 
-        maskRectInvisible.setAttribute("x", x.toString());
-        maskRectInvisible.setAttribute("y", y.toString());
+        const maskX = offsetX + boundTextCoords.x - element.x;
+        const maskY = offsetY + boundTextCoords.y - element.y;
+
+        maskRectInvisible.setAttribute("x", maskX.toString());
+        maskRectInvisible.setAttribute("y", maskY.toString());
         maskRectInvisible.setAttribute("fill", "#000");
         maskRectInvisible.setAttribute("width", `${boundText.width}`);
         maskRectInvisible.setAttribute("height", `${boundText.height}`);
