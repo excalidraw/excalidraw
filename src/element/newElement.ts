@@ -22,6 +22,7 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
+  getBoundTextElement,
   getBoundTextElementPadding,
   getContainerDims,
   getContainerElement,
@@ -261,7 +262,6 @@ export const refreshTextDimensions = (
 ) => {
   const container = getContainerElement(textElement);
   if (container) {
-    // text = wrapText(text, getFontString(textElement), container.width);
     text = wrapText(
       text,
       getFontString(textElement),
@@ -275,7 +275,15 @@ export const refreshTextDimensions = (
 export const getMaxContainerWidth = (container: ExcalidrawElement) => {
   const width = getContainerDims(container).width;
   if (isLinearElement(container)) {
-    return width - BOUND_TEXT_PADDING * 8 * 2;
+    const containerWidth = width - BOUND_TEXT_PADDING * 8 * 2;
+    if (containerWidth <= 0) {
+      const boundText = getBoundTextElement(container);
+      if (boundText) {
+        return boundText.width;
+      }
+      return BOUND_TEXT_PADDING * 8 * 2;
+    }
+    return containerWidth;
   }
   return width - BOUND_TEXT_PADDING * 2;
 };
@@ -283,7 +291,15 @@ export const getMaxContainerWidth = (container: ExcalidrawElement) => {
 export const getMaxContainerHeight = (container: ExcalidrawElement) => {
   const height = getContainerDims(container).height;
   if (isLinearElement(container)) {
-    return height - BOUND_TEXT_PADDING * 8 * 2;
+    const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
+    if (containerHeight <= 0) {
+      const boundText = getBoundTextElement(container);
+      if (boundText) {
+        return boundText.height;
+      }
+      return BOUND_TEXT_PADDING * 8 * 2;
+    }
+    return height;
   }
   return height - BOUND_TEXT_PADDING * 2;
 };
