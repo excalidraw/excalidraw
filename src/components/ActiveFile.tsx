@@ -14,7 +14,7 @@ type ActiveFileProps = {
 
 export const ActiveFile = ({ fileName, onSave }: ActiveFileProps) => (
   <MenuItem
-    label={`${t("buttons.save")}`}
+    label={`${t("buttons.save")} ${fileName}`}
     shortcut={getShortcutFromShortcutName("saveScene")}
     dataTestId="save-button"
     onClick={onSave}
