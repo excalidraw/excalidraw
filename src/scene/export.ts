@@ -14,6 +14,102 @@ import {
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
+const getExactBoundingBox = async (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: {
+    exportBackground: boolean;
+    exportPadding?: number;
+    exportScale?: number;
+    viewBackgroundColor: string;
+    exportWithDarkMode?: boolean;
+    exportEmbedScene?: boolean;
+  },
+  files: BinaryFiles,
+): Promise<
+  [offsetLeft: number, offsetTop: number, width: number, height: number]
+> => {
+  const padding = DEFAULT_EXPORT_PADDING;
+  // const padding = 0;
+  const [minX, minY, width, height] = getApproximateCanvasSize(
+    elements,
+    padding,
+  );
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const { imageCache } = await updateImageCache({
+    imageCache: new Map(),
+    fileIds: getInitializedImageElements(elements).map(
+      (element) => element.fileId,
+    ),
+    files,
+  });
+
+  const defaultAppState = getDefaultAppState();
+
+  renderScene({
+    elements,
+    // @ts-ignore
+    appState,
+    scale: 1,
+    rc: rough.canvas(canvas),
+    canvas,
+    renderConfig: {
+      viewBackgroundColor: null,
+      scrollX: -minX + padding,
+      scrollY: -minY + padding,
+      zoom: defaultAppState.zoom,
+      remotePointerViewportCoords: {},
+      remoteSelectedElementIds: {},
+      shouldCacheIgnoreZoom: false,
+      remotePointerUsernames: {},
+      remotePointerUserStates: {},
+      theme: "light",
+      imageCache,
+      renderScrollbars: false,
+      renderSelection: false,
+      renderGrid: false,
+      isExporting: true,
+    },
+  });
+
+  const ctx = canvas.getContext("2d")!;
+  const { data } = ctx.getImageData(0, 0, width, height);
+
+  let _minX = Infinity;
+  let _minY = Infinity;
+  let _maxX = -Infinity;
+  let _maxY = -Infinity;
+
+  const rows = [];
+  let row: number[][] = [];
+  for (let i = 0; i < data.length - 1; i = i + 4) {
+    if (i && i % (width * 4) === 0) {
+      rows.push(row);
+      row = [];
+    }
+    const pixel = [data[i], data[i + 1], data[i + 2], data[i + 3]];
+    row.push(pixel);
+  }
+
+  for (const [y, row] of rows.entries()) {
+    for (const [x, pixel] of row.entries()) {
+      if (pixel[3] > 0) {
+        _minX = Math.min(_minX, x);
+        _minY = Math.min(_minY, y);
+        _maxX = Math.max(_maxX, x);
+        _maxY = Math.max(_maxY, y);
+      }
+    }
+  }
+
+  const offsetLeft = padding - _minX;
+  const offsetTop = padding - _minY;
+
+  return [offsetLeft, offsetTop, _maxX - _minX, _maxY - _minY];
+};
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -37,7 +133,12 @@ export const exportToCanvas = async (
     return { canvas, scale: appState.exportScale };
   },
 ) => {
-  const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
+  const [scrollX, scrollY, width, height] = await getCanvasSize(
+    elements,
+    appState,
+    files,
+    exportPadding,
+  );
 
   const { canvas, scale = 1 } = createCanvas(width, height);
 
@@ -59,8 +160,8 @@ export const exportToCanvas = async (
     canvas,
     renderConfig: {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: -minX + exportPadding,
-      scrollY: -minY + exportPadding,
+      scrollX,
+      scrollY,
       zoom: defaultAppState.zoom,
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
@@ -109,7 +210,12 @@ export const exportToSvg = async (
       console.error(error);
     }
   }
-  const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
+  const [minX, minY, width, height] = await getCanvasSize(
+    elements,
+    appState,
+    files || {},
+    exportPadding,
+  );
 
   // initialize SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
@@ -172,8 +278,7 @@ export const exportToSvg = async (
   return svgRoot;
 };
 
-// calculate smallest area to fit the contents in
-const getCanvasSize = (
+const getApproximateCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
   exportPadding: number,
 ): [number, number, number, number] => {
@@ -191,14 +296,48 @@ const getCanvasSize = (
   return [minX, minY, width, height];
 };
 
+// calculate smallest area to fit the contents in
+const getCanvasSize = async (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: {
+    exportBackground: boolean;
+    exportPadding?: number;
+    exportScale?: number;
+    viewBackgroundColor: string;
+    exportWithDarkMode?: boolean;
+    exportEmbedScene?: boolean;
+  },
+  files: BinaryFiles,
+  exportPadding: number,
+): Promise<[number, number, number, number]> => {
+  if (exportPadding) {
+    const [minX, minY, width, height] = getApproximateCanvasSize(
+      elements,
+      exportPadding,
+    );
+
+    return [-minX + exportPadding, -minY + exportPadding, width, height];
+  } else {
+    const [minX, minY] = getApproximateCanvasSize(elements, exportPadding);
+
+    const [offsetLeft, offsetRight, width, height] = await getExactBoundingBox(
+      elements,
+      appState,
+      files,
+    );
+    return [-minX + offsetLeft, -minY + offsetRight, width, height];
+  }
+};
+
 export const getExportSize = (
   elements: readonly NonDeletedExcalidrawElement[],
   exportPadding: number,
   scale: number,
 ): [number, number] => {
-  const [, , width, height] = getCanvasSize(elements, exportPadding).map(
-    (dimension) => Math.trunc(dimension * scale),
-  );
+  const [, , width, height] = getApproximateCanvasSize(
+    elements,
+    exportPadding,
+  ).map((dimension) => Math.trunc(dimension * scale));
 
   return [width, height];
 };
