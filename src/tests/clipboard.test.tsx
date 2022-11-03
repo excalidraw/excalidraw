@@ -40,15 +40,15 @@ const sendPasteEvent = () => {
 const pasteWithCtrlCmdShiftV = () => {
   Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
     Keyboard.keyPress(KEYS.V);
+    sendPasteEvent();
   });
-  sendPasteEvent();
 };
 
 const pasteWithCtrlCmdV = () => {
   Keyboard.withModifierKeys({ ctrl: true }, () => {
     Keyboard.keyPress(KEYS.V);
+    sendPasteEvent();
   });
-  sendPasteEvent();
 };
 
 const sleep = (ms: number) => {

@@ -4,7 +4,6 @@ import { ExcalidrawElement } from "../element/types";
 import { duplicateElement, getNonDeletedElements } from "../element";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
-import { clone } from "../components/icons";
 import { t } from "../i18n";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -19,6 +18,7 @@ import { ActionResult } from "./types";
 import { GRID_SIZE } from "../constants";
 import { bindTextToShapeAfterDuplication } from "../element/textElement";
 import { isBoundToContainer } from "../element/typeChecks";
+import { DuplicateIcon } from "../components/icons";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -49,7 +49,7 @@ export const actionDuplicateSelection = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"
-      icon={clone}
+      icon={DuplicateIcon}
       title={`${t("labels.duplicateSelection")} — ${getShortcutKey(
         "CtrlOrCmd+D",
       )}`}

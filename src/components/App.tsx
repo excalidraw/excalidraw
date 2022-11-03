@@ -269,6 +269,10 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
+import { atom } from "jotai";
+
+export const isMenuOpenAtom = atom(false);
+export const isDropdownOpenAtom = atom(false);
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -578,6 +582,11 @@ class App extends React.Component<AppProps, AppState> {
                     library={this.library}
                     id={this.id}
                     onImageAction={this.onImageAction}
+                    renderWelcomeScreen={
+                      this.state.showWelcomeScreen &&
+                      this.state.activeTool.type === "selection" &&
+                      !this.scene.getElementsIncludingDeleted().length
+                    }
                   />
                   <div className="excalidraw-textEditorContainer" />
                   <div className="excalidraw-contextMenuContainer" />
@@ -1093,6 +1102,13 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     if (
+      !this.state.showWelcomeScreen &&
+      !this.scene.getElementsIncludingDeleted().length
+    ) {
+      this.setState({ showWelcomeScreen: true });
+    }
+
+    if (
       this.excalidrawContainerRef.current &&
       prevProps.UIOptions.dockedSidebarBreakpoint !==
         this.props.UIOptions.dockedSidebarBreakpoint
@@ -1283,6 +1299,10 @@ class App extends React.Component<AppProps, AppState> {
         );
       });
 
+    const selectionColor = getComputedStyle(
+      document.querySelector(".excalidraw")!,
+    ).getPropertyValue("--color-selection");
+
     renderScene(
       {
         elements: renderingElements,
@@ -1291,6 +1311,7 @@ class App extends React.Component<AppProps, AppState> {
         rc: this.rc!,
         canvas: this.canvas!,
         renderConfig: {
+          selectionColor,
           scrollX: this.state.scrollX,
           scrollY: this.state.scrollY,
           viewBackgroundColor: this.state.viewBackgroundColor,
@@ -1948,8 +1969,16 @@ class App extends React.Component<AppProps, AppState> {
 
       if (event.key === KEYS.QUESTION_MARK) {
         this.setState({
-          showHelpDialog: true,
+          openDialog: "help",
         });
+        return;
+      } else if (
+        event.key.toLowerCase() === KEYS.E &&
+        event.shiftKey &&
+        event[KEYS.CTRL_OR_CMD]
+      ) {
+        this.setState({ openDialog: "imageExport" });
+        return;
       }
 
       if (this.actionManager.handleKeyDown(event)) {
@@ -4888,10 +4917,6 @@ class App extends React.Component<AppProps, AppState> {
           } else {
             this.setState((prevState) => ({
               draggingElement: null,
-              selectedElementIds: {
-                ...prevState.selectedElementIds,
-                [draggingElement.id]: true,
-              },
             }));
           }
         }

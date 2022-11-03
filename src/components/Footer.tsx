@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { ActionManager } from "../actions/manager";
+import { t } from "../i18n";
 import { AppState, ExcalidrawProps } from "../types";
 import {
   ExitZenModeAction,
@@ -8,20 +9,23 @@ import {
   ZoomActions,
 } from "./Actions";
 import { useDevice } from "./App";
-import { Island } from "./Island";
+import { WelcomeScreenHelpArrow } from "./icons";
 import { Section } from "./Section";
 import Stack from "./Stack";
+import WelcomeScreenDecor from "./WelcomeScreenDecor";
 
 const Footer = ({
   appState,
   actionManager,
   renderCustomFooter,
   showExitZenModeBtn,
+  renderWelcomeScreen,
 }: {
   appState: AppState;
   actionManager: ActionManager;
   renderCustomFooter?: ExcalidrawProps["renderFooter"];
   showExitZenModeBtn: boolean;
+  renderWelcomeScreen: boolean;
 }) => {
   const device = useDevice();
   const showFinalize =
@@ -39,31 +43,19 @@ const Footer = ({
       >
         <Stack.Col gap={2}>
           <Section heading="canvasActions">
-            <Island padding={1}>
-              <ZoomActions
-                renderAction={actionManager.renderAction}
-                zoom={appState.zoom}
-              />
-            </Island>
-            {!appState.viewModeEnabled && (
-              <>
-                <UndoRedoActions
-                  renderAction={actionManager.renderAction}
-                  className={clsx("zen-mode-transition", {
-                    "layer-ui__wrapper__footer-left--transition-bottom":
-                      appState.zenModeEnabled,
-                  })}
-                />
+            <ZoomActions
+              renderAction={actionManager.renderAction}
+              zoom={appState.zoom}
+            />
 
-                <div
-                  className={clsx("eraser-buttons zen-mode-transition", {
-                    "layer-ui__wrapper__footer-left--transition-left":
-                      appState.zenModeEnabled,
-                  })}
-                >
-                  {actionManager.renderAction("eraser", { size: "small" })}
-                </div>
-              </>
+            {!appState.viewModeEnabled && (
+              <UndoRedoActions
+                renderAction={actionManager.renderAction}
+                className={clsx("zen-mode-transition", {
+                  "layer-ui__wrapper__footer-left--transition-bottom":
+                    appState.zenModeEnabled,
+                })}
+              />
             )}
             {showFinalize && (
               <FinalizeAction
@@ -93,7 +85,18 @@ const Footer = ({
           "transition-right disable-pointerEvents": appState.zenModeEnabled,
         })}
       >
-        {actionManager.renderAction("toggleShortcuts")}
+        <div style={{ position: "relative" }}>
+          <WelcomeScreenDecor
+            shouldRender={renderWelcomeScreen && !appState.isLoading}
+          >
+            <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--help-pointer">
+              <div>{t("welcomeScreen.helpHints")}</div>
+              {WelcomeScreenHelpArrow}
+            </div>
+          </WelcomeScreenDecor>
+
+          {actionManager.renderAction("toggleShortcuts")}
+        </div>
       </div>
       <ExitZenModeAction
         actionManager={actionManager}

@@ -10,7 +10,8 @@
   .picker {
     background: var(--popup-bg-color);
     border: 0 solid transparentize($oc-white, 0.75);
-    box-shadow: transparentize($oc-black, 0.75) 0 1px 4px;
+    // ˇˇ yeah, i dunno, open to suggestions here :D
+    box-shadow: rgb(0 0 0 / 25%) 2px 2px 4px 2px;
     border-radius: 4px;
     position: absolute;
   }
@@ -46,7 +47,6 @@
       margin: 0;
       width: 36px;
       height: 18px;
-      opacity: 0.6;
       pointer-events: none;
     }
   }
