@@ -906,14 +906,14 @@ export const renderElement = (
 
           const tempCanvasContext = tempCanvas.getContext("2d")!;
           const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
-
-          tempCanvas.width = maxDim;
-          tempCanvas.height = maxDim;
+          const padding = getCanvasPadding(element);
+          tempCanvas.width = maxDim + padding * 2;
+          tempCanvas.height = maxDim + padding * 2;
 
           const offsetX = (tempCanvas.width - element.width) / 2;
           const offsetY = (tempCanvas.height - element.height) / 2;
-          shiftX = tempCanvas.width / 2 - (element.x - x1) + offsetX;
-          shiftY = tempCanvas.height / 2 - (element.y - y1) + offsetY;
+          shiftX = tempCanvas.width / 2 - (element.x - x1) - offsetX;
+          shiftY = tempCanvas.height / 2 - (element.y - y1) - offsetY;
 
           tempCanvasContext.translate(
             tempCanvas.width / 2,
@@ -924,13 +924,8 @@ export const renderElement = (
 
           tempCanvasContext.translate(-shiftX, -shiftY);
 
-          const canvasOffsetX = element.x > x1 ? distance(element.x, x1) : 0;
-          const canvasOffsetY = element.y > y1 ? distance(element.y, y1) : 0;
-
-          tempCanvasContext.translate(canvasOffsetX, canvasOffsetY);
           const tempRc = rough.canvas(tempCanvas);
           drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
-          tempCanvasContext.translate(-canvasOffsetX, -canvasOffsetY);
           tempCanvasContext.translate(shiftX, shiftY);
 
           tempCanvasContext.rotate(-element.angle);
