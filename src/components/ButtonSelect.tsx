@@ -25,6 +25,8 @@ export const ButtonSelect = <T extends Object>({
         />
         <span
           style={{
+            textAlign: "center",
+            fontSize: "0.6rem",
             color: "var(--icon-fill-color)",
             fontWeight: "bold",
             opacity: value === option.value ? 1.0 : 0.6,

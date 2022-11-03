@@ -281,6 +281,21 @@ const getAdjustedDimensions = (
   };
 };
 
+export const refreshTextDimensions = (
+  textElement: ExcalidrawTextElement,
+  text = textElement.text,
+) => {
+  const container = getContainerElement(textElement);
+  if (container) {
+    // text = wrapText(text, getFontString(textElement), container.width);
+    text = wrapTextElement(textElement, getMaxContainerWidth(container), {
+      text,
+    });
+  }
+  const dimensions = getAdjustedDimensions(textElement, text);
+  return { text, ...dimensions };
+};
+
 export const getMaxContainerWidth = (container: ExcalidrawElement) => {
   return getContainerDims(container).width - BOUND_TEXT_PADDING * 2;
 };
@@ -301,18 +316,10 @@ export const updateTextElement = (
     originalText: string;
   },
 ): ExcalidrawTextElement => {
-  const container = getContainerElement(textElement);
-  if (container) {
-    text = wrapTextElement(textElement, getMaxContainerWidth(container), {
-      text: originalText,
-    });
-  }
-  const dimensions = getAdjustedDimensions(textElement, text);
   return newElementWith(textElement, {
-    text,
     originalText,
     isDeleted: isDeleted ?? textElement.isDeleted,
-    ...dimensions,
+    ...refreshTextDimensions(textElement, originalText),
   });
 };
 

@@ -201,8 +201,10 @@ export class ActionManager {
   renderAction = (
     name: ActionName | Action["name"],
     data?: PanelComponentProps["data"],
+    isInHamburgerMenu = false,
   ) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
+
     if (
       this.actions[name] &&
       "PanelComponent" in this.actions[name] &&
@@ -240,6 +242,7 @@ export class ActionManager {
           updateData={updateData}
           appProps={this.app.props}
           data={data}
+          isInHamburgerMenu={isInHamburgerMenu}
         />
       );
     }

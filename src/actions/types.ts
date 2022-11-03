@@ -145,7 +145,9 @@ export type PanelComponentProps = {
 
 export interface Action {
   name: string;
-  PanelComponent?: React.FC<PanelComponentProps>;
+  PanelComponent?: React.FC<
+    PanelComponentProps & { isInHamburgerMenu: boolean }
+  >;
   panelComponentPredicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,

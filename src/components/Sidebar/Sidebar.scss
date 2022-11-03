@@ -2,20 +2,101 @@
 @import "../../css/variables.module";
 
 .excalidraw {
+  .Sidebar {
+    &__dropdown-content {
+      z-index: 1;
+      position: absolute;
+      top: 100%;
+      left: 0;
+
+      :root[dir="rtl"] & {
+        right: 0;
+        left: auto;
+      }
+
+      margin-top: 0.25rem;
+      width: 180px;
+      box-shadow: var(--library-dropdown-shadow);
+      border-radius: var(--border-radius-lg);
+      padding: 0.25rem 0.5rem;
+    }
+
+    &__close-btn,
+    &__pin-btn,
+    &__dropdown-btn {
+      @include outlineButtonStyles;
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+      padding: 0;
+
+      svg {
+        width: var(--lg-icon-size);
+        height: var(--lg-icon-size);
+      }
+    }
+
+    &__pin-btn {
+      &--pinned {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+
+        svg {
+          color: #fff;
+        }
+
+        &:hover,
+        &:active {
+          background-color: var(--color-primary-darker);
+        }
+      }
+    }
+  }
+
+  &.theme--dark {
+    .Sidebar {
+      &__pin-btn {
+        &--pinned {
+          svg {
+            color: var(--color-gray-90);
+          }
+        }
+      }
+    }
+  }
+
   .layer-ui__sidebar {
     position: absolute;
-    top: var(--sat);
-    bottom: var(--sab);
-    right: var(--sar);
+    top: 0;
+    bottom: 0;
+    right: 0;
     z-index: 5;
+    margin: 0;
 
-    box-shadow: var(--shadow-island);
+    :root[dir="rtl"] & {
+      left: 0;
+      right: auto;
+    }
+
+    background-color: var(--sidebar-bg-color);
+
+    box-shadow: var(--sidebar-shadow);
+
+    &--docked {
+      box-shadow: none;
+    }
+
     overflow: hidden;
-    border-radius: var(--border-radius-lg);
-    margin: var(--space-factor);
+    border-radius: 0;
     width: calc(#{$right-sidebar-width} - var(--space-factor) * 2);
 
-    padding: 0.5rem;
+    border-left: 1px solid var(--sidebar-border-color);
+
+    :root[dir="rtl"] & {
+      border-right: 1px solid var(--sidebar-border-color);
+      border-left: 0;
+    }
+
+    padding: 0;
     box-sizing: border-box;
 
     .Island {
@@ -48,42 +129,18 @@
   }
 
   .layer-ui__sidebar__header {
+    box-sizing: border-box;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     width: 100%;
-    margin: 2px 0 15px 0;
-    &:empty {
-      margin: 0;
-    }
-    button {
-      // 2px from the left to account for focus border of left-most button
-      margin: 0 2px;
-    }
+    padding: 1rem;
+    border-bottom: 1px solid var(--sidebar-border-color);
   }
 
   .layer-ui__sidebar__header__buttons {
     display: flex;
     align-items: center;
-    margin-left: auto;
-  }
-
-  .layer-ui__sidebar-dock-button {
-    @include toolbarButtonColorStates;
-    margin-right: 0.2rem;
-
-    .ToolIcon_type_floating .ToolIcon__icon {
-      width: calc(var(--space-factor) * 7);
-      height: calc(var(--space-factor) * 7);
-      svg {
-        // mirror
-        transform: scale(-1, 1);
-      }
-    }
-
-    .ToolIcon_type_checkbox {
-      &:not(.ToolIcon_toggle_opaque):checked + .ToolIcon__icon {
-        background-color: var(--color-primary);
-      }
-    }
+    gap: 0.625rem;
   }
 }
