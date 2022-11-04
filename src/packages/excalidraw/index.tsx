@@ -20,6 +20,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     isCollaborating = false,
     onPointerUpdate,
     renderTopRightUI,
+    hideWelcomeScreen,
+    renderMenuLinks,
     renderFooter,
     renderSidebar,
     langCode = defaultLang.code,
@@ -93,6 +95,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
           renderTopRightUI={renderTopRightUI}
+          hideWelcomeScreen={hideWelcomeScreen}
+          renderMenuLinks={renderMenuLinks}
           renderFooter={renderFooter}
           langCode={langCode}
           viewModeEnabled={viewModeEnabled}

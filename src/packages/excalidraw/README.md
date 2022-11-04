@@ -392,6 +392,8 @@ No, Excalidraw package doesn't come with collaboration built in, since the imple
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
 | [`langCode`](#langCode) | string | `en` | Language code string |
 | [`renderTopRightUI`](#renderTopRightUI) | Function |  | Function that renders custom UI in top right corner |
+| [`hideWelcomeScreen`](#hideWelcomeScreen) | boolean |  | This implies if the app should always hide the welcome sreen |
+| [`renderMenuLinks`](#renderMenuLinks) | Function |  | Function that renders custom list of links (or other custom UI) in the app menu |
 | [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
 | [`renderCustomStats`](#renderCustomStats) | Function |  | Function that can be used to render custom stats on the stats dialog. |
 | [`renderSIdebar`](#renderSIdebar) | Function |  | Render function that renders custom sidebar. |
@@ -613,6 +615,22 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 
 A function returning JSX to render custom UI in the top right corner of the app.
 
+#### `hideWelcomeScreen`
+
+<pre>
+boolean
+</pre>
+
+Boolean value to override the displaying of the welcome screen elements. If set to true, the welcome screen will never be shown.
+
+#### `renderMenuLinks`
+
+<pre>
+((isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>) => JSX | null)|null
+</pre>
+
+A function returning JSX to render custom UI (intended to be a list of custom links) replacing the default list of links in the app menu. If set to null, the list of links will not be displayed. If unset, the default list of links will be displayed.
+
 #### `renderFooter`
 
 <pre>
@@ -702,6 +720,7 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
 | `toggleTheme` | boolean &#124; null | null | Implies whether to show `Theme toggle`. When defined as `boolean`, takes precedence over [`props.theme`](#theme) to show `Theme toggle` |
 | `saveAsImage` | boolean | true | Implies whether to show `Save as image button` |
+| `languageList` | boolean | true | Implies whether to show the `Language Selector Dropdown list` |
 
 ##### `dockedSidebarBreakpoint`
 

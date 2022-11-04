@@ -284,6 +284,10 @@ export interface ExcalidrawProps {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
+  renderMenuLinks?:
+    | ((isMobile: boolean, appState: AppState) => JSX.Element | null)
+    | null;
+  hideWelcomeScreen?: boolean;
   renderFooter?: (isMobile: boolean, appState: AppState) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
@@ -363,6 +367,7 @@ type CanvasActions = {
   saveToActiveFile?: boolean;
   toggleTheme?: boolean | null;
   saveAsImage?: boolean;
+  languageList?: boolean;
 };
 
 export type AppProps = Merge<

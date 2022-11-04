@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState, Device, ExcalidrawProps } from "../types";
+import { AppProps, AppState, Device, ExcalidrawProps } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -45,10 +45,12 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
+  renderMenuLinks?: ExcalidrawProps["renderMenuLinks"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderSidebars: () => JSX.Element | null;
   device: Device;
   renderWelcomeScreen?: boolean;
+  UIOptions: AppProps["UIOptions"];
 };
 
 export const MobileMenu = ({
@@ -66,10 +68,12 @@ export const MobileMenu = ({
   renderCustomFooter,
   onImageAction,
   renderTopRightUI,
+  renderMenuLinks,
   renderCustomStats,
   renderSidebars,
   device,
   renderWelcomeScreen,
+  UIOptions,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -111,8 +115,8 @@ export const MobileMenu = ({
                     />
                   </Stack.Row>
                 </Island>
-                {renderTopRightUI && renderTopRightUI(true, appState)}
                 <div className="mobile-misc-tools-container">
+                  {renderTopRightUI && renderTopRightUI(true, appState)}
                   <PenModeButton
                     checked={appState.penMode}
                     onChange={onPenModeToggle}
@@ -192,12 +196,14 @@ export const MobileMenu = ({
         {!appState.viewModeEnabled && actionManager.renderAction("loadScene")}
         {renderJSONExportDialog()}
         {renderImageExportDialog()}
-        <MenuItem
-          label={t("buttons.exportImage")}
-          icon={ExportImageIcon}
-          dataTestId="image-export-button"
-          onClick={() => setAppState({ openDialog: "imageExport" })}
-        />
+        {UIOptions.canvasActions.saveAsImage && (
+          <MenuItem
+            label={t("buttons.exportImage")}
+            icon={ExportImageIcon}
+            dataTestId="image-export-button"
+            onClick={() => setAppState({ openDialog: "imageExport" })}
+          />
+        )}
         {onCollabButtonClick && (
           <CollabButton
             isCollaborating={isCollaborating}
@@ -207,8 +213,16 @@ export const MobileMenu = ({
         )}
         {actionManager.renderAction("toggleShortcuts", undefined, true)}
         {!appState.viewModeEnabled && actionManager.renderAction("clearCanvas")}
-        <Separator />
-        <MenuLinks />
+        {typeof renderMenuLinks === "undefined" ? ( //zsviczian
+          <Separator />
+        ) : (
+          renderMenuLinks && <Separator />
+        )}
+        {typeof renderMenuLinks === "undefined" ? ( //zsviczian
+          <MenuLinks />
+        ) : (
+          renderMenuLinks && renderMenuLinks(device.isMobile, appState)
+        )}
         <Separator />
         {!appState.viewModeEnabled && (
           <div style={{ marginBottom: ".5rem" }}>

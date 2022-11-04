@@ -516,6 +516,7 @@ class App extends React.Component<AppProps, AppState> {
     const {
       onCollabButtonClick,
       renderTopRightUI,
+      renderMenuLinks,
       renderFooter,
       renderCustomStats,
     } = this.props;
@@ -562,6 +563,7 @@ class App extends React.Component<AppProps, AppState> {
                     langCode={getLanguage().code}
                     isCollaborating={this.props.isCollaborating}
                     renderTopRightUI={renderTopRightUI}
+                    renderMenuLinks={renderMenuLinks}
                     renderCustomFooter={renderFooter}
                     renderCustomStats={renderCustomStats}
                     renderCustomSidebar={this.props.renderSidebar}
@@ -576,6 +578,7 @@ class App extends React.Component<AppProps, AppState> {
                     id={this.id}
                     onImageAction={this.onImageAction}
                     renderWelcomeScreen={
+                      this.props.hideWelcomeScreen !== true &&
                       this.state.showWelcomeScreen &&
                       this.state.activeTool.type === "selection" &&
                       !this.scene.getElementsIncludingDeleted().length
