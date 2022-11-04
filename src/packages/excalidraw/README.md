@@ -703,7 +703,7 @@ This prop sets the name of the drawing which will be used when exporting the dra
 
 #### `UIOptions`
 
-This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasActions) and [`dockedSidebarBreakpoint`](dockedSidebarBreakpoint). It accepts the below parameters
+This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasActions), [`dockedSidebarBreakpoint`](dockedSidebarBreakpoint), and ['showLanguageList`](showLanguageList). It accepts the below parameters
 
 <pre>
 { canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }
@@ -720,13 +720,16 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
 | `toggleTheme` | boolean &#124; null | null | Implies whether to show `Theme toggle`. When defined as `boolean`, takes precedence over [`props.theme`](#theme) to show `Theme toggle` |
 | `saveAsImage` | boolean | true | Implies whether to show `Save as image button` |
-| `languageList` | boolean | true | Implies whether to show the `Language Selector Dropdown list` |
 
 ##### `dockedSidebarBreakpoint`
 
 This prop indicates at what point should we break to a docked, permanent sidebar. If not passed it defaults to [`MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L167). If the `width` of the `excalidraw` container exceeds `dockedSidebarBreakpoint`, the sidebar will be dockable. If user choses to dock the sidebar, it will push the right part of the UI towards the left, making space for the sidebar as shown below.
 
 ![image](https://user-images.githubusercontent.com/11256141/174664866-c698c3fa-197b-43ff-956c-d79852c7b326.png)
+
+### `showLanguageList`
+
+Boolean prop. If set to `true` the `language selector dropdown list` will be hidden in the app menu. If `false` or `undefined` the language dropdown will be rendered.
 
 #### `exportOpts`
 

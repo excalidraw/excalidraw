@@ -262,7 +262,7 @@ const LayerUI = ({
                 }}
               >
                 <div>{actionManager.renderAction("toggleTheme")}</div>
-                {UIOptions.canvasActions.languageList !== false && (
+                {UIOptions.showLanguageList !== false && (
                   <div style={{ padding: "0 0.625rem" }}>
                     <LanguageList style={{ width: "100%" }} />
                   </div>

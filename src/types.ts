@@ -303,6 +303,7 @@ export interface ExcalidrawProps {
   UIOptions?: {
     dockedSidebarBreakpoint?: number;
     canvasActions?: CanvasActions;
+    showLanguageList?: boolean;
   };
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
@@ -367,7 +368,6 @@ type CanvasActions = {
   saveToActiveFile?: boolean;
   toggleTheme?: boolean | null;
   saveAsImage?: boolean;
-  languageList?: boolean;
 };
 
 export type AppProps = Merge<
@@ -376,6 +376,7 @@ export type AppProps = Merge<
     UIOptions: {
       canvasActions: Required<CanvasActions> & { export: ExportOpts };
       dockedSidebarBreakpoint?: number;
+      showLanguageList?: boolean;
     };
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
