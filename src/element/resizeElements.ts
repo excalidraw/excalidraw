@@ -42,8 +42,8 @@ import {
   getBoundTextElement,
   getBoundTextElementId,
   handleBindTextResize,
+  measureTextElement,
 } from "./textElement";
-import { measureTextElement } from "./textWysiwyg";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {

@@ -3,9 +3,9 @@ import { getNonDeletedElements, isTextElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import {
   getBoundTextElement,
+  measureTextElement,
   redrawTextBoundingBox,
 } from "../element/textElement";
-import { measureTextElement } from "../element/textWysiwyg";
 import {
   hasBoundTextElement,
   isTextBindableContainer,

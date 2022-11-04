@@ -21,8 +21,12 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
-import { getContainerDims, getContainerElement } from "./textElement";
-import { measureTextElement, wrapTextElement } from "./textWysiwyg";
+import {
+  getContainerDims,
+  getContainerElement,
+  measureTextElement,
+  wrapTextElement,
+} from "./textElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import { getSubtypeMethods, isValidSubtype } from "../subtypes";
 

@@ -18,12 +18,12 @@ import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
-  measureText,
   getContainerDims,
   getContainerElement,
+  measureText,
+  measureTextElement,
   wrapText,
 } from "./textElement";
-import { getSubtypeMethods, SubtypeMethods } from "../subtypes";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -63,30 +63,6 @@ const getTransform = (
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg) translate(${offsetX}px, 0px)`;
 };
-
-export const measureTextElement = function (element, next, maxWidth) {
-  const map = getSubtypeMethods(element.subtype);
-  if (map?.measureText) {
-    return map.measureText(element, next, maxWidth);
-  }
-
-  const fontSize = next?.fontSize ?? element.fontSize;
-  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
-  const text = next?.text ?? element.text;
-  return measureText(text, font, maxWidth);
-} as SubtypeMethods["measureText"];
-
-export const wrapTextElement = function (element, containerWidth, next) {
-  const map = getSubtypeMethods(element.subtype);
-  if (map?.wrapText) {
-    return map.wrapText(element, containerWidth, next);
-  }
-
-  const fontSize = next?.fontSize ?? element.fontSize;
-  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
-  const text = next?.text ?? element.originalText;
-  return wrapText(text, font, containerWidth);
-} as SubtypeMethods["wrapText"];
 
 export const textWysiwyg = ({
   id,
