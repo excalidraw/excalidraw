@@ -683,12 +683,7 @@ class App extends React.Component<AppProps, AppState> {
           name = this.props.name;
         }
 
-        const fileName = actionResult?.appState?.fileHandle?.name;
-        if (fileName) {
-          document.title = fileName;
-        } else {
-          document.title = APP_NAME;
-        }
+        document.title = actionResult?.appState?.fileHandle?.name || APP_NAME;
 
         this.setState(
           (state) => {
