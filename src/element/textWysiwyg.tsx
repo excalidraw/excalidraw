@@ -249,7 +249,7 @@ export const textWysiwyg = ({
       }
       // Horizontal offset in case updatedTextElement has a non-WYSIWYG subtype
       const offWidth = container
-        ? Math.max(0, maxWidth - eMetrics.width)
+        ? Math.min(0, rMetrics.width - Math.min(maxWidth, eMetrics.width))
         : Math.min(maxWidth, rMetrics.width) -
           Math.min(maxWidth, eMetrics.width);
       const offsetX =

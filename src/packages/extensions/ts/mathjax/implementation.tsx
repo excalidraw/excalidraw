@@ -519,7 +519,6 @@ const measureMarkup = (
 
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
-    container.style.width = `${String(maxWidth)}px`;
     container.style.maxWidth = `${String(maxWidth)}px`;
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
@@ -550,7 +549,7 @@ const measureMarkup = (
   container.appendChild(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
-  const width = container.offsetWidth;
+  const width = container.offsetWidth + 1;
   const height = container.offsetHeight;
 
   const containerRect = container.getBoundingClientRect();
@@ -735,6 +734,9 @@ const renderMath = (
   }
   let ariaText = "";
   for (let i = 0; i < aria.length; i++) {
+    if (i > 0) {
+      ariaText = `${ariaText} `;
+    }
     for (let j = 0; j < aria[i].length; j++) {
       ariaText = `${ariaText}${aria[i][j]}`;
     }
@@ -941,6 +943,13 @@ const renderMathElement = function (element, context, renderCb) {
   const parentWidth = container
     ? container.width - BOUND_TEXT_PADDING * 2
     : undefined;
+
+  const offsetX =
+    (_element.width - (container ? parentWidth! : _element.width)) *
+    (textAlign === "right" ? 1 : textAlign === "center" ? 1 / 2 : 0);
+
+  context.save();
+  context.translate(offsetX, 0);
   element.customData!.ariaLabel = renderMath(
     text,
     fontSize,
@@ -951,6 +960,7 @@ const renderMathElement = function (element, context, renderCb) {
     doRenderChild,
     parentWidth,
   );
+  context.restore();
 } as SubtypeMethods["render"];
 
 const renderSvgMathElement = function (svgRoot, root, element, opt) {
@@ -1010,6 +1020,11 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   const parentWidth = container
     ? container.width - BOUND_TEXT_PADDING * 2
     : undefined;
+
+  const offsetX =
+    (_element.width - (container ? parentWidth! : _element.width)) *
+    (textAlign === "right" ? 1 : textAlign === "center" ? 1 / 2 : 0);
+
   const { width, height } = getImageMetrics(
     text,
     fontSize,
@@ -1018,7 +1033,6 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
     parentWidth,
   );
 
-  let _rtl: boolean;
   let childNode = {} as SVGSVGElement | SVGTextElement;
   const doSetupChild: (
     childIsSvg: boolean,
@@ -1028,7 +1042,6 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
     childRtl: boolean,
     lineHeight: number,
   ) => void = function (childIsSvg, svg, text, rtl, childRtl, lineHeight) {
-    _rtl = rtl;
     if (childIsSvg && text !== "") {
       childNode = svg!;
 
@@ -1070,7 +1083,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
     }
   };
   const doRenderChild: (x: number, y: number) => void = function (x, y) {
-    childNode.setAttribute("x", `${_rtl ? x : x}`);
+    childNode.setAttribute("x", `${x + offsetX}`);
     childNode.setAttribute("y", `${y}`);
     groupNode.appendChild(childNode);
   };
