@@ -91,8 +91,9 @@ describe("<Excalidraw/>", () => {
     it("should show the theme toggle by default", async () => {
       const { container } = await render(<Excalidraw />);
 
-      queryByTestId(container, "menu-button")!.click();
       expect(h.state.theme).toBe(THEME.LIGHT);
+
+      queryByTestId(container, "menu-button")!.click();
       const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
       expect(darkModeToggle).toBeTruthy();
     });
