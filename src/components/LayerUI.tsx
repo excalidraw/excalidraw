@@ -196,6 +196,7 @@ const LayerUI = ({
         })}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         type="button"
+        data-testid="menu-button"
       >
         {HamburgerMenuIcon}
       </button>
@@ -221,7 +222,7 @@ const LayerUI = ({
                 appState.fileHandle &&
                 actionManager.renderAction("saveToActiveFile")}
               {renderJSONExportDialog()}
-              {UIOptions.canvasActions.export && ( //zsviczian
+              {UIOptions.canvasActions.saveAsImage && (
                 <MenuItem
                   label={t("buttons.exportImage")}
                   icon={ExportImageIcon}
