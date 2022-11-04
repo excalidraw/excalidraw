@@ -16,8 +16,6 @@ import { SceneData } from "../types";
 import { getSelectedElements } from "../scene/selection";
 import { ExcalidrawElement } from "../element/types";
 
-require("fake-indexeddb/auto");
-
 const customQueries = {
   ...queries,
   ...toolQueries,

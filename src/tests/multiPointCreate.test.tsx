@@ -42,7 +42,7 @@ describe("remove shape in non linear elements", () => {
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(6);
+    expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.elements.length).toEqual(0);
   });
 
@@ -56,7 +56,7 @@ describe("remove shape in non linear elements", () => {
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(6);
+    expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.elements.length).toEqual(0);
   });
 
@@ -70,7 +70,7 @@ describe("remove shape in non linear elements", () => {
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(6);
+    expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.elements.length).toEqual(0);
   });
 });
@@ -102,7 +102,7 @@ describe("multi point mode in linear elements", () => {
       key: KEYS.ENTER,
     });
 
-    expect(renderScene).toHaveBeenCalledTimes(14);
+    expect(renderScene).toHaveBeenCalledTimes(15);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;
@@ -145,7 +145,7 @@ describe("multi point mode in linear elements", () => {
       key: KEYS.ENTER,
     });
 
-    expect(renderScene).toHaveBeenCalledTimes(14);
+    expect(renderScene).toHaveBeenCalledTimes(15);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;

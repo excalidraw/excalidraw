@@ -196,6 +196,7 @@ const LayerUI = ({
         })}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         type="button"
+        data-testid="menu-button"
       >
         {HamburgerMenuIcon}
       </button>
@@ -220,13 +221,15 @@ const LayerUI = ({
               {appState.fileHandle &&
                 actionManager.renderAction("saveToActiveFile")}
               {renderJSONExportDialog()}
-              <MenuItem
-                label={t("buttons.exportImage")}
-                icon={ExportImageIcon}
-                dataTestId="image-export-button"
-                onClick={() => setAppState({ openDialog: "imageExport" })}
-                shortcut={getShortcutFromShortcutName("imageExport")}
-              />
+              {UIOptions.canvasActions.saveAsImage && (
+                <MenuItem
+                  label={t("buttons.exportImage")}
+                  icon={ExportImageIcon}
+                  dataTestId="image-export-button"
+                  onClick={() => setAppState({ openDialog: "imageExport" })}
+                  shortcut={getShortcutFromShortcutName("imageExport")}
+                />
+              )}
               {onCollabButtonClick && (
                 <CollabButton
                   isCollaborating={isCollaborating}

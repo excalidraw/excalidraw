@@ -1,4 +1,6 @@
 import { fireEvent, render, waitFor } from "./test-utils";
+import { queryByTestId } from "@testing-library/react";
+
 import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { MIME_TYPES } from "../constants";
@@ -93,15 +95,11 @@ describe("library menu", () => {
     const latestLibrary = await h.app.library.getLatestLibrary();
     expect(latestLibrary.length).toBe(0);
 
-    const libraryButton = container.querySelector(".ToolIcon__library");
+    const libraryButton = container.querySelector(".library-button");
 
     fireEvent.click(libraryButton!);
-
-    const loadLibraryButton = container.querySelector(
-      ".library-actions .library-actions--load",
-    );
-
-    fireEvent.click(loadLibraryButton!);
+    fireEvent.click(container.querySelector(".Sidebar__dropdown-btn")!);
+    queryByTestId(container, "lib-dropdown--load")!.click();
 
     const libraryItems = parseLibraryJSON(await libraryJSONPromise);
 

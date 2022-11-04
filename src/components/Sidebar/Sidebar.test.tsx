@@ -90,10 +90,10 @@ describe("Sidebar", () => {
 
     const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
     expect(sidebar).not.toBe(null);
-    const closeButton = queryByTestId(sidebar!, "sidebar-close");
+    const closeButton = queryByTestId(sidebar!, "sidebar-close")!;
     expect(closeButton).not.toBe(null);
 
-    fireEvent.click(closeButton!.querySelector("button")!);
+    fireEvent.click(closeButton);
     await waitFor(() => {
       expect(container.querySelector<HTMLElement>(".test-sidebar")).toBe(null);
       expect(onClose).toHaveBeenCalled();
