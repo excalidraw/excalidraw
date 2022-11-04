@@ -12,6 +12,19 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
+jest.mock("../keys.ts", () => {
+  const actual = jest.requireActual("../keys.ts");
+  return {
+    __esmodule: true,
+    ...actual,
+    isDarwin: false,
+    KEYS: {
+      ...actual.KEYS,
+      CTRL_OR_CMD: "ctrlKey",
+    },
+  };
+});
+
 const setClipboardText = (text: string) => {
   Object.assign(navigator, {
     clipboard: {
@@ -39,14 +52,18 @@ const sendPasteEvent = () => {
 
 const pasteWithCtrlCmdShiftV = () => {
   Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+    //triggering keydown with an empty clipboard
     Keyboard.keyPress(KEYS.V);
+    //triggering paste event with faked clipboard
     sendPasteEvent();
   });
 };
 
 const pasteWithCtrlCmdV = () => {
   Keyboard.withModifierKeys({ ctrl: true }, () => {
+    //triggering keydown with an empty clipboard
     Keyboard.keyPress(KEYS.V);
+    //triggering paste event with faked clipboard
     sendPasteEvent();
   });
 };
