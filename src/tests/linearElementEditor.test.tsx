@@ -16,7 +16,7 @@ const renderScene = jest.spyOn(Renderer, "renderScene");
 
 const { h } = window;
 
-describe(" Test Linear Elements", () => {
+describe("Test Linear Elements", () => {
   let container: HTMLElement;
   let canvas: HTMLCanvasElement;
 
@@ -89,8 +89,15 @@ describe(" Test Linear Elements", () => {
     mouse.clickAt(p1[0], p1[1]);
   };
 
-  const enterLineEditingMode = (line: ExcalidrawLinearElement) => {
-    mouse.clickAt(p1[0], p1[1]);
+  const enterLineEditingMode = (
+    line: ExcalidrawLinearElement,
+    selectProgrammatically = false,
+  ) => {
+    if (selectProgrammatically) {
+      API.setSelectedElements([line]);
+    } else {
+      mouse.clickAt(p1[0], p1[1]);
+    }
     Keyboard.keyPress(KEYS.ENTER);
     expect(h.state.editingLinearElement?.elementId).toEqual(line.id);
   };
@@ -603,6 +610,44 @@ describe(" Test Linear Elements", () => {
           ]
         `);
       });
+    });
+
+    it("in-editor dragging a line point covered by another element", () => {
+      createTwoPointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      h.elements = [
+        line,
+        API.createElement({
+          type: "rectangle",
+          x: line.x - 50,
+          y: line.y - 50,
+          width: 100,
+          height: 100,
+          backgroundColor: "red",
+          fillStyle: "solid",
+        }),
+      ];
+
+      const origPoints = line.points.map((point) => [...point]);
+      const dragEndPositionOffset = [100, 100] as const;
+      API.setSelectedElements([line]);
+      enterLineEditingMode(line, true);
+      drag(
+        [line.points[0][0] + line.x, line.points[0][1] + line.y],
+        [dragEndPositionOffset[0] + line.x, dragEndPositionOffset[1] + line.y],
+      );
+      expect(line.points).toMatchInlineSnapshot(`
+        Array [
+          Array [
+            0,
+            0,
+          ],
+          Array [
+            ${origPoints[1][0] - dragEndPositionOffset[0]},
+            ${origPoints[1][1] - dragEndPositionOffset[1]},
+          ],
+        ]
+      `);
     });
   });
 });
