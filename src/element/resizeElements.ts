@@ -42,7 +42,7 @@ import {
   getBoundTextElement,
   getBoundTextElementId,
   handleBindTextResize,
-  measureText,
+  measureTextElement,
 } from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
@@ -289,9 +289,9 @@ const measureFontSizeFromWH = (
   if (nextFontSize < MIN_FONT_SIZE) {
     return null;
   }
-  const metrics = measureText(
-    element.text,
-    getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
+  const metrics = measureTextElement(
+    element,
+    { fontSize: nextFontSize },
     element.containerId ? element.width : null,
   );
   return {

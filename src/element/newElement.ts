@@ -13,7 +13,7 @@ import {
   FontFamilyValues,
   ExcalidrawRectangleElement,
 } from "../element/types";
-import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
+import { getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -24,8 +24,8 @@ import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
   getContainerDims,
   getContainerElement,
-  measureText,
-  wrapText,
+  measureTextElement,
+  wrapTextElement,
 } from "./textElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 
@@ -133,7 +133,7 @@ export const newTextElement = (
     containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const metrics = measureText(opts.text, getFontString(opts));
+  const metrics = measureTextElement(opts, { customData: opts.customData });
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
@@ -176,7 +176,7 @@ const getAdjustedDimensions = (
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureText(nextText, getFontString(element), maxWidth);
+  } = measureTextElement(element, { text: nextText }, maxWidth);
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
@@ -185,9 +185,9 @@ const getAdjustedDimensions = (
     verticalAlign === VERTICAL_ALIGN.MIDDLE &&
     !element.containerId
   ) {
-    const prevMetrics = measureText(
-      element.text,
-      getFontString(element),
+    const prevMetrics = measureTextElement(
+      element,
+      { fontSize: element.fontSize },
       maxWidth,
     );
     const offsets = getTextElementPositionOffsets(element, {
@@ -259,11 +259,9 @@ export const refreshTextDimensions = (
   const container = getContainerElement(textElement);
   if (container) {
     // text = wrapText(text, getFontString(textElement), container.width);
-    text = wrapText(
+    text = wrapTextElement(textElement, getMaxContainerWidth(container), {
       text,
-      getFontString(textElement),
-      getMaxContainerWidth(container),
-    );
+    });
   }
   const dimensions = getAdjustedDimensions(textElement, text);
   return { text, ...dimensions };

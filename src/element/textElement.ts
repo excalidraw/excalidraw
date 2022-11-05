@@ -1,4 +1,4 @@
-import { getFontString, arrayToMap, isTestEnv } from "../utils";
+import { arrayToMap, getFontString, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -13,6 +13,46 @@ import Scene from "../scene/Scene";
 import { isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 
+export const measureTextElement = (
+  element: Pick<
+    ExcalidrawTextElement,
+    "customData" | "fontSize" | "fontFamily" | "text"
+  >,
+  next?: {
+    fontSize?: number;
+    text?: string;
+    customData?: ExcalidrawElement["customData"];
+  },
+  maxWidth?: number | null,
+): { width: number; height: number; baseline: number } => {
+  // Non-WYSIWYG handling goes here
+
+  const fontSize = next?.fontSize ?? element.fontSize;
+  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
+  const text = next?.text ?? element.text;
+  return measureText(text, font, maxWidth);
+};
+
+export const wrapTextElement = (
+  element: Pick<
+    ExcalidrawTextElement,
+    "customData" | "fontSize" | "fontFamily" | "originalText"
+  >,
+  containerWidth: number,
+  next?: {
+    fontSize?: number;
+    text?: string;
+    customData?: ExcalidrawElement["customData"];
+  },
+): string => {
+  // Non-WYSIWYG handling goes here
+
+  const fontSize = next?.fontSize ?? element.fontSize;
+  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
+  const text = next?.text ?? element.originalText;
+  return wrapText(text, font, containerWidth);
+};
+
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
@@ -22,17 +62,15 @@ export const redrawTextBoundingBox = (
 
   if (container) {
     maxWidth = getMaxContainerWidth(container);
-    text = wrapText(
-      textElement.originalText,
-      getFontString(textElement),
-      getMaxContainerWidth(container),
-    );
+    text = wrapTextElement(textElement, getMaxContainerWidth(container));
   }
-  const metrics = measureText(
-    textElement.originalText,
-    getFontString(textElement),
+  const width = measureTextElement(
+    textElement,
+    { text: textElement.originalText },
     maxWidth,
-  );
+  ).width;
+  const { height, baseline } = measureTextElement(textElement, { text });
+  const metrics = { width, height, baseline };
   let coordY = textElement.y;
   let coordX = textElement.x;
   // Resize container and vertically center align the text
@@ -133,16 +171,12 @@ export const handleBindTextResize = (
       let nextBaseLine = textElement.baseline;
       if (transformHandleType !== "n" && transformHandleType !== "s") {
         if (text) {
-          text = wrapText(
-            textElement.originalText,
-            getFontString(textElement),
-            getMaxContainerWidth(element),
-          );
+          text = wrapTextElement(textElement, getMaxContainerWidth(element));
         }
 
-        const dimensions = measureText(
-          text,
-          getFontString(textElement),
+        const dimensions = measureTextElement(
+          textElement,
+          { text },
           element.width,
         );
         nextHeight = dimensions.height;
