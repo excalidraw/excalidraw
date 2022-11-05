@@ -285,6 +285,7 @@ const ExcalidrawWrapper = () => {
           collabAPI
             .fetchImageFilesFromFirebase({
               elements: data.scene.elements,
+              forceFetchFiles: true,
             })
             .then(({ loadedFiles, erroredFiles }) => {
               excalidrawAPI.addFiles(loadedFiles);

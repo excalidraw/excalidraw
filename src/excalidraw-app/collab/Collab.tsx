@@ -310,16 +310,27 @@ class Collab extends PureComponent<Props, CollabState> {
     }
   };
 
-  private fetchImageFilesFromFirebase = async (scene: {
+  private fetchImageFilesFromFirebase = async (opts: {
     elements: readonly ExcalidrawElement[];
+    /**
+     * Indicates whether to fetch files that are errored or pending and older
+     * than 10 seconds.
+     *
+     * Use this as a machanism to fetch files which may be ok but for some
+     * reason their status was not updated correctly.
+     */
+    forceFetchFiles?: boolean;
   }) => {
-    const unfetchedImages = scene.elements
+    const unfetchedImages = opts.elements
       .filter((element) => {
         return (
           isInitializedImageElement(element) &&
           !this.fileManager.isFileHandled(element.fileId) &&
           !element.isDeleted &&
-          element.status === "saved"
+          (opts.forceFetchFiles
+            ? element.status !== "pending" ||
+              Date.now() - element.updated > 10000
+            : element.status === "saved")
         );
       })
       .map((element) => (element as InitializedExcalidrawImageElement).fileId);
