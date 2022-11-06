@@ -218,13 +218,12 @@ export const ShapesSwitcher = ({
   appState: AppState;
 }) => (
   <>
-    {SHAPES.map(({ value, icon, key, fillable }, index) => {
-      const numberKey = value === "eraser" ? 0 : index + 1;
+    {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
       const label = t(`toolBar.${value}`);
       const letter = key && (typeof key === "string" ? key : key[0]);
       const shortcut = letter
-        ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${numberKey}`
-        : `${numberKey}`;
+        ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${numericKey}`
+        : `${numericKey}`;
       return (
         <ToolButton
           className={clsx("Shape", { fillable })}
@@ -234,7 +233,7 @@ export const ShapesSwitcher = ({
           checked={activeTool.type === value}
           name="editor-current-shape"
           title={`${capitalizeString(label)} — ${shortcut}`}
-          keyBindingLabel={`${numberKey}`}
+          keyBindingLabel={numericKey}
           aria-label={capitalizeString(label)}
           aria-keyshortcuts={shortcut}
           data-testid={`toolbar-${value}`}

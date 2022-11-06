@@ -22,7 +22,7 @@ export const LibraryButton: React.FC<{
   }
 
   return (
-    <label title={`${capitalizeString(t("toolBar.library"))} — 0`}>
+    <label title={`${capitalizeString(t("toolBar.library"))}`}>
       <input
         className="ToolIcon_type_checkbox"
         type="checkbox"
