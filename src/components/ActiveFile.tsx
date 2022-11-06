@@ -12,9 +12,13 @@ type ActiveFileProps = {
   onSave: () => void;
 };
 
+const removeFileExtension = (fileName: string): string => {
+  return fileName.replace(/.excalidraw$/, "");
+};
+
 export const ActiveFile = ({ fileName, onSave }: ActiveFileProps) => (
   <MenuItem
-    label={`${t("buttons.save")} ${fileName}`}
+    label={`${t("buttons.save")} ${fileName && removeFileExtension(fileName)}`}
     shortcut={getShortcutFromShortcutName("saveScene")}
     dataTestId="save-button"
     onClick={onSave}
