@@ -61,7 +61,18 @@ export type BinaryFileData = {
     | typeof MIME_TYPES.binary;
   id: FileId;
   dataURL: DataURL;
+  /**
+   * Epoch timestamp in milliseconds
+   */
   created: number;
+  /**
+   * Indicates when the file was last retrieved from storage to be loaded
+   * onto the scene. We use this flag to determine whether to delete unused
+   * files from storage.
+   *
+   * Epoch timestamp in milliseconds.
+   */
+  lastRetrieved?: number;
 };
 
 export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;

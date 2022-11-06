@@ -195,6 +195,7 @@ export const encodeFilesForUpload = async ({
         id,
         mimeType: fileData.mimeType,
         created: Date.now(),
+        lastRetrieved: Date.now(),
       },
     });
 
