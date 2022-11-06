@@ -5243,6 +5243,7 @@ class App extends React.Component<AppProps, AppState> {
               id: fileId,
               dataURL,
               created: Date.now(),
+              lastRetrieved: Date.now(),
             },
           };
           const cachedImageData = this.imageCache.get(fileId);
