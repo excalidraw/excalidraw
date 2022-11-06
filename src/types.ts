@@ -72,7 +72,7 @@ export type BinaryFileData = {
    *
    * Epoch timestamp in milliseconds.
    */
-  lastRetrieved: number | undefined;
+  lastRetrieved?: number;
 };
 
 export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
