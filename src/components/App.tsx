@@ -1913,18 +1913,6 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({ isBindingEnabled: false });
       }
 
-      if (event.code === CODES.ZERO) {
-        const nextState = this.toggleMenu("library");
-        // track only openings
-        if (nextState) {
-          trackEvent(
-            "library",
-            "toggleLibrary (open)",
-            `keyboard (${this.device.isMobile ? "mobile" : "desktop"})`,
-          );
-        }
-      }
-
       if (isArrowKey(event.key)) {
         const step =
           (this.state.gridSize &&
@@ -5247,6 +5235,7 @@ class App extends React.Component<AppProps, AppState> {
               id: fileId,
               dataURL,
               created: Date.now(),
+              lastRetrieved: Date.now(),
             },
           };
           const cachedImageData = this.imageCache.get(fileId);

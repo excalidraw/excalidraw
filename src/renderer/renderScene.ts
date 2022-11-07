@@ -406,9 +406,20 @@ export const _renderScene = ({
       }),
     );
 
-    visibleElements.forEach((element, index) => {
+    let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
+      undefined;
+    visibleElements.forEach((element) => {
       try {
         renderElement(element, rc, context, renderConfig, appState);
+        // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
+        // ShapeCache returns empty hence making sure that we get the
+        // correct element from visible elements
+        if (appState.editingLinearElement?.elementId === element.id) {
+          if (element) {
+            editingLinearElement =
+              element as NonDeleted<ExcalidrawLinearElement>;
+          }
+        }
         if (!isExporting) {
           renderLinkIcon(element, context, appState);
         }
@@ -416,6 +427,15 @@ export const _renderScene = ({
         console.error(error);
       }
     });
+
+    if (editingLinearElement) {
+      renderLinearPointHandles(
+        context,
+        appState,
+        renderConfig,
+        editingLinearElement,
+      );
+    }
 
     // Paint selection element
     if (appState.selectionElement) {
