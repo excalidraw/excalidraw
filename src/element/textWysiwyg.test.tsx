@@ -879,7 +879,7 @@ describe("textWysiwyg", () => {
       `);
     });
 
-    it.only("should compute the dimensions correctly when text pasted", async () => {
+    it("should compute the dimensions correctly when text pasted", async () => {
       Keyboard.keyPress(KEYS.ENTER);
       const editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
