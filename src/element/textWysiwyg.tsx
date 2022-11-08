@@ -291,11 +291,9 @@ export const textWysiwyg = ({
         fontFamily: app.state.currentItemFontFamily,
       });
 
-      const wrappedText = wrapText(
-        data,
-        font,
-        getMaxContainerWidth(container!),
-      );
+      const wrappedText = container
+        ? wrapText(data, font, getMaxContainerWidth(container!))
+        : data;
       const dimensions = measureText(wrappedText, font);
       editable.style.height = `${dimensions.height}px`;
       if (data) {
