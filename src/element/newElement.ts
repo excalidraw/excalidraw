@@ -202,8 +202,7 @@ const getAdjustedDimensions = (
   let maxWidth = null;
   const container = getContainerElement(element);
   if (container) {
-    const containerDims = getContainerDims(container);
-    maxWidth = containerDims.width - BOUND_TEXT_PADDING * 2;
+    maxWidth = getMaxContainerWidth(container);
   }
   const {
     width: nextWidth,
@@ -291,7 +290,6 @@ export const refreshTextDimensions = (
 ) => {
   const container = getContainerElement(textElement);
   if (container) {
-    // text = wrapText(text, getFontString(textElement), container.width);
     text = wrapTextElement(textElement, getMaxContainerWidth(container), {
       text,
     });

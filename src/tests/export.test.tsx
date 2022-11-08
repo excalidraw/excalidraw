@@ -158,6 +158,7 @@ describe("export", () => {
         dataURL: await getDataURL(await API.loadFile("./fixtures/deer.png")),
         mimeType: "image/png",
         created: Date.now(),
+        lastRetrieved: Date.now(),
       },
     } as const;
 

@@ -17,6 +17,7 @@ import { getFontString } from "../utils";
 import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
 import { resize } from "../tests/utils";
+import { getMaxContainerWidth } from "./newElement";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -891,6 +892,59 @@ describe("textWysiwyg", () => {
           -539,
         ]
       `);
+    });
+
+    it("should compute the dimensions correctly when text pasted", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
+
+      const wrappedText = textElementUtils.wrapText(
+        "Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.",
+        font,
+        getMaxContainerWidth(rectangle),
+      );
+
+      const mockMeasureText = (
+        text: string,
+        font: FontString,
+        maxWidth?: number | null,
+      ) => {
+        if (text === wrappedText) {
+          return { width: rectangle.width, height: 200, baseline: 30 };
+        }
+        return { width: 0, height: 0, baseline: 0 };
+      };
+      jest
+        .spyOn(textElementUtils, "measureText")
+        .mockImplementation(mockMeasureText);
+      jest
+        .spyOn(textElementUtils, "measureTextElement")
+        .mockImplementation((element, next, maxWidth) => {
+          return mockMeasureText(
+            next?.text ?? element.text,
+            getFontString(element),
+            maxWidth,
+          );
+        });
+
+      //@ts-ignore
+      editor.onpaste({
+        preventDefault: () => {},
+        //@ts-ignore
+        clipboardData: {
+          getData: () =>
+            "Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.",
+        },
+      });
+
+      await new Promise((cb) => setTimeout(cb, 0));
+      editor.blur();
+      expect(rectangle.width).toBe(110);
+      expect(rectangle.height).toBe(210);
     });
   });
 });

@@ -156,6 +156,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             dataURL: reader.result as BinaryFileData["dataURL"],
             mimeType: MIME_TYPES.jpg,
             created: 1644915140367,
+            lastRetrieved: 1644915140367,
           },
         ];
 

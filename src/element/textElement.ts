@@ -44,10 +44,9 @@ export const redrawTextBoundingBox = (
 ) => {
   let maxWidth = undefined;
   let text = textElement.text;
-
   if (container) {
     maxWidth = getMaxContainerWidth(container);
-    text = wrapTextElement(textElement, getMaxContainerWidth(container));
+    text = wrapTextElement(textElement, maxWidth);
   }
   const width = measureTextElement(
     textElement,
@@ -249,10 +248,9 @@ export const measureText = (
   const baseline = span.offsetTop + span.offsetHeight;
   // Since span adds 1px extra width to the container
   const width = container.offsetWidth + 1;
-
   const height = container.offsetHeight;
-  document.body.removeChild(container);
 
+  document.body.removeChild(container);
   return { width, height, baseline };
 };
 

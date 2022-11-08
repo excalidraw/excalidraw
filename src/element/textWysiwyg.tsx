@@ -21,7 +21,6 @@ import {
   getContainerDims,
   getContainerElement,
   measureText,
-  measureTextElement,
   wrapText,
 } from "./textElement";
 import {
@@ -31,6 +30,7 @@ import {
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { getMaxContainerWidth } from "./newElement";
+import { parseClipboard } from "../clipboard";
 
 const normalizeText = (text: string) => {
   return (
@@ -131,7 +131,11 @@ export const textWysiwyg = ({
         container ? getContainerDims(container).width : null,
       );
       // Rendered metrics
-      const rMetrics = measureTextElement(updatedTextElement);
+      const rMetrics = {
+        width: updatedTextElement.width,
+        height: updatedTextElement.height,
+        baseline: updatedTextElement.baseline,
+      };
 
       let maxWidth = eMetrics.width;
       let maxHeight = eMetrics.height;
@@ -155,11 +159,10 @@ export const textWysiwyg = ({
 
           // update height of the editor after properties updated
           const font = getFontString(updatedTextElement);
-          height = measureText(
-            updatedTextElement.originalText,
-            font,
-            containerDims.width,
-          ).height;
+          height =
+            getApproxLineHeight(font) *
+            updatedTextElement.text.split("\n").length;
+          height = Math.max(height, rMetrics.height);
         }
         if (!originalContainerHeight) {
           originalContainerHeight = containerDims.height;
@@ -312,6 +315,31 @@ export const textWysiwyg = ({
   updateWysiwygStyle();
 
   if (onChange) {
+    editable.onpaste = async (event) => {
+      event.preventDefault();
+      const clipboardData = await parseClipboard(event);
+      if (!clipboardData.text) {
+        return;
+      }
+      const data = normalizeText(clipboardData.text);
+      const container = getContainerElement(element);
+
+      const font = getFontString({
+        fontSize: app.state.currentItemFontSize,
+        fontFamily: app.state.currentItemFontFamily,
+      });
+
+      const wrappedText = wrapText(
+        data,
+        font,
+        getMaxContainerWidth(container!),
+      );
+      const dimensions = measureText(wrappedText, font);
+      editable.style.height = `${dimensions.height}px`;
+      if (data) {
+        onChange(wrappedText);
+      }
+    };
     editable.oninput = () => {
       const updatedTextElement = Scene.getScene(element)?.getElement(
         id,
