@@ -10,11 +10,13 @@ import { BOUND_TEXT_PADDING, FONT_FAMILY } from "../constants";
 import {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
+  FontString,
 } from "./types";
 import * as textElementUtils from "./textElement";
 import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
 import { resize } from "../tests/utils";
+import { getMaxContainerWidth } from "./newElement";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -875,6 +877,45 @@ describe("textWysiwyg", () => {
           -539,
         ]
       `);
+    });
+
+    it("should compute the dimensions correctly when text pasted", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
+
+      const wrappedText = textElementUtils.wrapText(
+        "Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.",
+        font,
+        getMaxContainerWidth(rectangle),
+      );
+
+      jest
+        .spyOn(textElementUtils, "measureText")
+        .mockImplementation((text, font, maxWidth) => {
+          if (text === wrappedText) {
+            return { width: rectangle.width, height: 200, baseline: 30 };
+          }
+          return { width: 0, height: 0, baseline: 0 };
+        });
+
+      //@ts-ignore
+      editor.onpaste({
+        preventDefault: () => {},
+        //@ts-ignore
+        clipboardData: {
+          getData: () =>
+            "Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.",
+        },
+      });
+
+      await new Promise((cb) => setTimeout(cb, 0));
+      editor.blur();
+      expect(rectangle.width).toBe(110);
+      expect(rectangle.height).toBe(210);
     });
   });
 });
