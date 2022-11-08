@@ -908,13 +908,27 @@ describe("textWysiwyg", () => {
         getMaxContainerWidth(rectangle),
       );
 
+      const mockMeasureText = (
+        text: string,
+        font: FontString,
+        maxWidth?: number | null,
+      ) => {
+        if (text === wrappedText) {
+          return { width: rectangle.width, height: 200, baseline: 30 };
+        }
+        return { width: 0, height: 0, baseline: 0 };
+      };
       jest
         .spyOn(textElementUtils, "measureText")
-        .mockImplementation((text, font, maxWidth) => {
-          if (text === wrappedText) {
-            return { width: rectangle.width, height: 200, baseline: 30 };
-          }
-          return { width: 0, height: 0, baseline: 0 };
+        .mockImplementation(mockMeasureText);
+      jest
+        .spyOn(textElementUtils, "measureTextElement")
+        .mockImplementation((element, next, maxWidth) => {
+          return mockMeasureText(
+            next?.text ?? element.text,
+            getFontString(element),
+            maxWidth,
+          );
         });
 
       //@ts-ignore

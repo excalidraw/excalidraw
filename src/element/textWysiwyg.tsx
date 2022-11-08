@@ -21,7 +21,6 @@ import {
   getContainerDims,
   getContainerElement,
   measureText,
-  measureTextElement,
   wrapText,
 } from "./textElement";
 import {
@@ -132,7 +131,11 @@ export const textWysiwyg = ({
         container ? getContainerDims(container).width : null,
       );
       // Rendered metrics
-      const rMetrics = measureTextElement(updatedTextElement);
+      const rMetrics = {
+        width: updatedTextElement.width,
+        height: updatedTextElement.height,
+        baseline: updatedTextElement.baseline,
+      };
 
       let maxWidth = eMetrics.width;
       let maxHeight = eMetrics.height;
@@ -156,11 +159,10 @@ export const textWysiwyg = ({
 
           // update height of the editor after properties updated
           const font = getFontString(updatedTextElement);
-          height = measureText(
-            updatedTextElement.originalText,
-            font,
-            containerDims.width,
-          ).height;
+          height =
+            getApproxLineHeight(font) *
+            updatedTextElement.text.split("\n").length;
+          height = Math.max(height, rMetrics.height);
         }
         if (!originalContainerHeight) {
           originalContainerHeight = containerDims.height;
