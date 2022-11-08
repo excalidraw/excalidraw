@@ -279,7 +279,6 @@ export const textWysiwyg = ({
   if (onChange) {
     editable.onpaste = async (event) => {
       event.preventDefault();
-
       const clipboardData = await parseClipboard(event);
       if (!clipboardData.text) {
         return;
@@ -298,7 +297,6 @@ export const textWysiwyg = ({
         getMaxContainerWidth(container!),
       );
       const dimensions = measureText(wrappedText, font);
-
       editable.style.height = `${dimensions.height}px`;
       if (data) {
         onChange(wrappedText);
