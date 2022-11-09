@@ -936,7 +936,29 @@ describe("textWysiwyg", () => {
       expect(rectangle.width).toBe(100);
       expect(rectangle.height).toBe(210);
       const textElement = h.elements[1] as ExcalidrawTextElement;
-      expect(textElement.text).toBe(wrappedText);
+      expect(textElement.text).toMatchInlineSnapshot(
+        `
+        "Wikipedi
+        a is 
+        hosted 
+        by the 
+        Wikimedi
+        a 
+        Foundati
+        on, a 
+        non-prof
+        it 
+        organiza
+        tion 
+        that 
+        also 
+        hosts a 
+        range of
+        other 
+        projects
+        ."
+      `,
+      );
     });
   });
 });
