@@ -40,16 +40,12 @@ import {
   getBoundTextElementPadding,
   handleBindTextResize,
 } from "./textElement";
-import { isPointHittingElementBoundingBox } from "./collision";
 
 const editorMidPointsCache: {
   version: number | null;
   points: (Point | null)[];
   zoom: number | null;
 } = { version: null, points: [], zoom: null };
-let isPointHittingBoundTextElement = false;
-let boundTextOnLeftSegment = false;
-let boundTextOnRightSegment = false;
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
     _brand: "excalidrawLinearElementId";
@@ -333,9 +329,6 @@ export class LinearElementEditor {
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
     const element = LinearElementEditor.getElement(elementId);
-    isPointHittingBoundTextElement = false;
-    boundTextOnLeftSegment = false;
-    boundTextOnRightSegment = false;
     if (!element) {
       return editingLinearElement;
     }
@@ -644,19 +637,7 @@ export class LinearElementEditor {
       scenePointer,
       appState,
     );
-    const textElement = getBoundTextElement(element);
-    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-    if (textElement) {
-      if (
-        isPointHittingElementBoundingBox(
-          textElement,
-          [scenePointer.x, scenePointer.y],
-          10,
-        )
-      ) {
-        isPointHittingBoundTextElement = true;
-      }
-    }
+
     if (segmentMidPoint) {
       const index = LinearElementEditor.getSegmentMidPointIndex(
         linearElementEditor,
@@ -689,52 +670,6 @@ export class LinearElementEditor {
         },
         lastUncommittedPoint: null,
       };
-    } else if (textElement && !isPointHittingBoundTextElement) {
-      const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-        element,
-        appState.zoom,
-        scenePointer.x,
-        scenePointer.y,
-      );
-      if (clickedPointIndex > 0) {
-        const midPointForLeftSegment = this.getSegmentMidPoint(
-          element,
-          points[clickedPointIndex],
-          points[clickedPointIndex - 1]!,
-          clickedPointIndex,
-        );
-
-        if (
-          isPointHittingElementBoundingBox(
-            textElement,
-            midPointForLeftSegment,
-            10,
-          )
-        ) {
-          boundTextOnLeftSegment = true;
-        }
-      }
-      if (
-        !boundTextOnLeftSegment &&
-        clickedPointIndex >= 0 &&
-        clickedPointIndex < points.length - 1
-      ) {
-        const midPointForRightSegment = this.getSegmentMidPoint(
-          element,
-          points[clickedPointIndex],
-          points[clickedPointIndex + 1]!,
-          clickedPointIndex + 1,
-        );
-        if (
-          isPointHittingElementBoundingBox(
-            textElement,
-            midPointForRightSegment,
-            10,
-          )
-        ) {
-          boundTextOnRightSegment = true;
-        }
-      }
     }
     if (event.altKey && appState.editingLinearElement) {
       if (linearElementEditor.lastUncommittedPoint == null) {
@@ -1253,7 +1188,6 @@ export class LinearElementEditor {
   static getBoundTextPosition = (
     element: ExcalidrawLinearElement,
     boundTextElement: ExcalidrawTextElementWithContainer,
-    indexes?: readonly number[],
   ): { x: number; y: number } => {
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
     if (points.length < 2) {
@@ -1261,33 +1195,7 @@ export class LinearElementEditor {
     }
     let x = 0;
     let y = 0;
-    if (indexes?.length) {
-      const index = indexes[0];
-      if (isPointHittingBoundTextElement) {
-        x = points[index][0] - boundTextElement.width / 2;
-        y = points[index][1] - boundTextElement.height / 2;
-      } else if (boundTextOnLeftSegment) {
-        const midPointForLeftSegment = this.getSegmentMidPoint(
-          element,
-          points[index],
-          points[index - 1]!,
-          index,
-        );
-
-        x = midPointForLeftSegment[0] - boundTextElement.width / 2;
-        y = midPointForLeftSegment[1] - boundTextElement.height / 2;
-      } else if (boundTextOnRightSegment) {
-        const midPointForRightSegment = this.getSegmentMidPoint(
-          element,
-          points[index],
-          points[index + 1]!,
-          index + 1,
-        );
-
-        x = midPointForRightSegment[0] - boundTextElement.width / 2;
-        y = midPointForRightSegment[1] - boundTextElement.height / 2;
-      }
-    } else if (element.points.length % 2 === 1) {
+    if (element.points.length % 2 === 1) {
       const index = Math.floor(element.points.length / 2);
       const midPoint = LinearElementEditor.getPointGlobalCoordinates(
         element,
@@ -1313,79 +1221,6 @@ export class LinearElementEditor {
       y = midSegmentMidpoint[1] - boundTextElement.height / 2;
     }
     return { x, y };
-  };
-
-  static updateBoundTextPosition = (
-    element: ExcalidrawLinearElement,
-    boundTextElement: ExcalidrawTextElementWithContainer | null,
-    type: "update",
-    indexes?: readonly number[],
-  ) => {
-    if (!boundTextElement) {
-      return;
-    }
-    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
-    if (points.length < 2) {
-      mutateElement(boundTextElement, { isDeleted: true });
-    }
-
-    if (indexes?.length) {
-      const index = indexes[0];
-      if (isPointHittingBoundTextElement) {
-        mutateElement(boundTextElement, {
-          x: points[index][0] - boundTextElement.width / 2,
-          y: points[index][1] - boundTextElement.height / 2,
-        });
-      } else if (boundTextOnLeftSegment) {
-        const midPointForLeftSegment = this.getSegmentMidPoint(
-          element,
-          points[index],
-          points[index - 1]!,
-          index,
-        );
-        mutateElement(boundTextElement, {
-          x: midPointForLeftSegment[0] - boundTextElement.width / 2,
-          y: midPointForLeftSegment[1] - boundTextElement.height / 2,
-        });
-      } else if (boundTextOnRightSegment) {
-        const midPointForRightSegment = this.getSegmentMidPoint(
-          element,
-          points[index],
-          points[index + 1]!,
-          index + 1,
-        );
-        mutateElement(boundTextElement, {
-          x: midPointForRightSegment[0] - boundTextElement.width / 2,
-          y: midPointForRightSegment[1] - boundTextElement.height / 2,
-        });
-      }
-    } else if (element.points.length % 2 === 1) {
-      const index = Math.floor(element.points.length / 2);
-      const midPoint = LinearElementEditor.getPointGlobalCoordinates(
-        element,
-        element.points[index],
-      );
-      const x = midPoint[0] - boundTextElement.width / 2;
-      const y = midPoint[1] - boundTextElement.height / 2;
-      mutateElement(boundTextElement, { x, y });
-    } else {
-      const index = element.points.length / 2 - 1;
-      let midSegmentMidpoint = editorMidPointsCache.points[index];
-      if (element.points.length === 2) {
-        midSegmentMidpoint = centerPoint(points[0], points[1]);
-      }
-      if (!midSegmentMidpoint) {
-        midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
-          element,
-          points[index],
-          points[index + 1],
-          index + 1,
-        );
-      }
-      const x = midSegmentMidpoint[0] - boundTextElement.width / 2;
-      const y = midSegmentMidpoint[1] - boundTextElement.height / 2;
-      mutateElement(boundTextElement, { x, y });
-    }
   };
 
   private static _getShiftLockedDelta(

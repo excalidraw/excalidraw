@@ -596,3 +596,15 @@ export const getBoundTextElementPadding = (
   }
   return BOUND_TEXT_PADDING;
 };
+
+export const getBoundTextElementPosition = (
+  container: ExcalidrawElement,
+  boundTextElement: ExcalidrawTextElementWithContainer,
+) => {
+  if (isLinearElement(container)) {
+    return LinearElementEditor.getBoundTextPosition(
+      container,
+      boundTextElement,
+    );
+  }
+};
