@@ -435,6 +435,25 @@ describe("textWysiwyg", () => {
       );
       expect(h.state.zoom.value).toBe(1);
     });
+
+    it("should paste text correctly", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      await new Promise((r) => setTimeout(r, 0));
+      const text = "A quick brown fox jumps over the lazy dog.";
+
+      //@ts-ignore
+      textarea.onpaste({
+        preventDefault: () => {},
+        //@ts-ignore
+        clipboardData: {
+          getData: () => text,
+        },
+      });
+
+      await new Promise((cb) => setTimeout(cb, 0));
+      textarea.blur();
+      expect(textElement.text).toBe(text);
+    });
   });
 
   describe("Test container-bound text", () => {
@@ -916,6 +935,8 @@ describe("textWysiwyg", () => {
       editor.blur();
       expect(rectangle.width).toBe(110);
       expect(rectangle.height).toBe(210);
+      const textElement = h.elements[1] as ExcalidrawTextElement;
+      expect(textElement.text).toBe(wrappedText);
     });
   });
 });
