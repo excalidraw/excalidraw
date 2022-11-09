@@ -284,20 +284,30 @@ export const textWysiwyg = ({
         return;
       }
       const data = normalizeText(clipboardData.text);
+      if (!data) {
+        return;
+      }
+
+      const text = editable.value;
+      const start = Math.min(editable.selectionStart, editable.selectionEnd);
+      const end = Math.max(editable.selectionStart, editable.selectionEnd);
+      const newText = `${text.substring(0, start)}${data}${text.substring(
+        end,
+      )}`;
+
       const container = getContainerElement(element);
 
       const font = getFontString({
         fontSize: app.state.currentItemFontSize,
         fontFamily: app.state.currentItemFontFamily,
       });
-      const wrappedText = container
-        ? wrapText(data, font, getMaxContainerWidth(container))
-        : data;
 
+      const wrappedText = container
+        ? wrapText(newText, font, getMaxContainerWidth(container))
+        : newText;
       const dimensions = measureText(wrappedText, font);
       editable.style.height = `${dimensions.height}px`;
-
-      onChange(wrappedText);
+      onChange(newText);
     };
     editable.oninput = () => {
       const updatedTextElement = Scene.getScene(element)?.getElement(
