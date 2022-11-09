@@ -290,17 +290,14 @@ export const textWysiwyg = ({
         fontSize: app.state.currentItemFontSize,
         fontFamily: app.state.currentItemFontFamily,
       });
+      const wrappedText = container
+        ? wrapText(data, font, getMaxContainerWidth(container))
+        : data;
 
-      const wrappedText = wrapText(
-        data,
-        font,
-        getMaxContainerWidth(container!),
-      );
       const dimensions = measureText(wrappedText, font);
       editable.style.height = `${dimensions.height}px`;
-      if (data) {
-        onChange(wrappedText);
-      }
+
+      onChange(wrappedText);
     };
     editable.oninput = () => {
       const updatedTextElement = Scene.getScene(element)?.getElement(
