@@ -933,7 +933,7 @@ describe("textWysiwyg", () => {
 
       await new Promise((cb) => setTimeout(cb, 0));
       editor.blur();
-      expect(rectangle.width).toBe(110);
+      expect(rectangle.width).toBe(100);
       expect(rectangle.height).toBe(210);
       const textElement = h.elements[1] as ExcalidrawTextElement;
       expect(textElement.text).toBe(wrappedText);
