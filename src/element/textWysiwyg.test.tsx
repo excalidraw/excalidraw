@@ -436,7 +436,7 @@ describe("textWysiwyg", () => {
       expect(h.state.zoom.value).toBe(1);
     });
 
-    it("should paste text correctly without a container", async () => {
+    it("should paste text correctly", async () => {
       Keyboard.keyPress(KEYS.ENTER);
       await new Promise((r) => setTimeout(r, 0));
       const text = "A quick brown fox jumps over the lazy dog.";
@@ -935,6 +935,8 @@ describe("textWysiwyg", () => {
       editor.blur();
       expect(rectangle.width).toBe(110);
       expect(rectangle.height).toBe(210);
+      const textElement = h.elements[1] as ExcalidrawTextElement;
+      expect(textElement.text).toBe(wrappedText);
     });
   });
 });
