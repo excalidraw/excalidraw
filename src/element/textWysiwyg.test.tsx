@@ -439,7 +439,7 @@ describe("textWysiwyg", () => {
     it("should paste text correctly", async () => {
       Keyboard.keyPress(KEYS.ENTER);
       await new Promise((r) => setTimeout(r, 0));
-      const text = "A quick brown fox jumps over the lazy dog.";
+      let text = "A quick brown fox jumps over the lazy dog.";
 
       //@ts-ignore
       textarea.onpaste({
@@ -453,6 +453,23 @@ describe("textWysiwyg", () => {
       await new Promise((cb) => setTimeout(cb, 0));
       textarea.blur();
       expect(textElement.text).toBe(text);
+
+      Keyboard.keyPress(KEYS.ENTER);
+      await new Promise((r) => setTimeout(r, 0));
+      text = "Hello this text should get merged with the existing one";
+      //@ts-ignore
+      textarea.onpaste({
+        preventDefault: () => {},
+        //@ts-ignore
+        clipboardData: {
+          getData: () => text,
+        },
+      });
+      await new Promise((cb) => setTimeout(cb, 0));
+      textarea.blur();
+      expect(textElement.text).toMatchInlineSnapshot(
+        `"A quick brown fox jumps over the lazy dog.Hello this text should get merged with the existing one"`,
+      );
     });
   });
 
@@ -905,9 +922,11 @@ describe("textWysiwyg", () => {
       ) as HTMLTextAreaElement;
       await new Promise((r) => setTimeout(r, 0));
       const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
+      let text =
+        "Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.";
 
-      const wrappedText = textElementUtils.wrapText(
-        "Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.",
+      let wrappedText = textElementUtils.wrapText(
+        text,
         font,
         getMaxContainerWidth(rectangle),
       );
@@ -926,17 +945,94 @@ describe("textWysiwyg", () => {
         preventDefault: () => {},
         //@ts-ignore
         clipboardData: {
-          getData: () =>
-            "Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.",
+          getData: () => text,
         },
       });
 
       await new Promise((cb) => setTimeout(cb, 0));
       editor.blur();
-      expect(rectangle.width).toBe(110);
+      expect(rectangle.width).toBe(100);
       expect(rectangle.height).toBe(210);
-      const textElement = h.elements[1] as ExcalidrawTextElement;
-      expect(textElement.text).toBe(wrappedText);
+      expect((h.elements[1] as ExcalidrawTextElement).text)
+        .toMatchInlineSnapshot(`
+        "Wikipedi
+        a is 
+        hosted 
+        by the 
+        Wikimedi
+        a 
+        Foundati
+        on, a 
+        non-prof
+        it 
+        organiza
+        tion 
+        that 
+        also 
+        hosts a 
+        range of
+        other 
+        projects
+        ."
+      `);
+      expect(
+        (h.elements[1] as ExcalidrawTextElement).originalText,
+      ).toMatchInlineSnapshot(
+        `"Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects."`,
+      );
+
+      text = "Hello this text should get merged with the existing one";
+      wrappedText = textElementUtils.wrapText(
+        text,
+        font,
+        getMaxContainerWidth(rectangle),
+      );
+      //@ts-ignore
+      editor.onpaste({
+        preventDefault: () => {},
+        //@ts-ignore
+        clipboardData: {
+          getData: () => text,
+        },
+      });
+
+      await new Promise((cb) => setTimeout(cb, 0));
+      editor.blur();
+      expect((h.elements[1] as ExcalidrawTextElement).text)
+        .toMatchInlineSnapshot(`
+        "Wikipedi
+        a is 
+        hosted 
+        by the 
+        Wikimedi
+        a 
+        Foundati
+        on, a 
+        non-prof
+        it 
+        organiza
+        tion 
+        that 
+        also 
+        hosts a 
+        range of
+        other 
+        projects
+        .Hello 
+        this 
+        text 
+        should 
+        get 
+        merged 
+        with the
+        existing
+        one"
+      `);
+      expect(
+        (h.elements[1] as ExcalidrawTextElement).originalText,
+      ).toMatchInlineSnapshot(
+        `"Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.Hello this text should get merged with the existing one"`,
+      );
     });
   });
 });
