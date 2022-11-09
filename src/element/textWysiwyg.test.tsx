@@ -975,6 +975,11 @@ describe("textWysiwyg", () => {
         projects
         ."
       `);
+      expect(
+        (h.elements[1] as ExcalidrawTextElement).originalText,
+      ).toMatchInlineSnapshot(
+        `"Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects."`,
+      );
 
       text = "Hello this text should get merged with the existing one";
       wrappedText = textElementUtils.wrapText(
@@ -1023,6 +1028,11 @@ describe("textWysiwyg", () => {
         existing
         one"
       `);
+      expect(
+        (h.elements[1] as ExcalidrawTextElement).originalText,
+      ).toMatchInlineSnapshot(
+        `"Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.Hello this text should get merged with the existing one"`,
+      );
     });
   });
 });
