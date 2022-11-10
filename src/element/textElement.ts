@@ -12,7 +12,7 @@ import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
-import { isLinearElement } from "./typeChecks";
+import { isBoundToContainer, isLinearElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 import { AppState } from "../types";
 
@@ -519,7 +519,9 @@ export const getBoundTextElement = (element: ExcalidrawElement | null) => {
 
 export const getContainerElement = (
   element:
-    | (ExcalidrawElement & { containerId: ExcalidrawElement["id"] | null })
+    | (ExcalidrawElement & {
+        containerId: ExcalidrawElement["id"] | null;
+      })
     | null,
 ) => {
   if (!element) {
@@ -606,4 +608,27 @@ export const getBoundTextElementPosition = (
       boundTextElement,
     );
   }
+};
+
+export const shouldAllowVerticalAlign = (
+  selectedElements: NonDeletedExcalidrawElement[],
+) => {
+  return selectedElements.some((element) => {
+    const hasBoundContainer = isBoundToContainer(element);
+    if (hasBoundContainer) {
+      const container = getContainerElement(element);
+      if (isTextElement(element) && isLinearElement(container)) {
+        return false;
+      }
+      return true;
+    }
+    const boundTextElement = getBoundTextElement(element);
+    if (boundTextElement) {
+      if (isLinearElement(element)) {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  });
 };
