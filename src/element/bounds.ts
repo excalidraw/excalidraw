@@ -40,7 +40,7 @@ export const getElementAbsoluteCoords = (
   } else if (isTextElement(element)) {
     const container = getContainerElement(element);
     if (isLinearElement(container)) {
-      const coords = LinearElementEditor.getBoundTextPosition(
+      const coords = LinearElementEditor.getBoundTextElementPosition(
         container,
         element as ExcalidrawTextElementWithContainer,
       );
@@ -332,7 +332,7 @@ export const getMinMaxXYWithBoundText = (
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   const { x: boundTextX1, y: boundTextY1 } =
-    LinearElementEditor.getBoundTextPosition(element, boundTextElement);
+    LinearElementEditor.getBoundTextElementPosition(element, boundTextElement);
   const boundTextX2 = boundTextX1 + boundTextElement.width;
   const boundTextY2 = boundTextY1 + boundTextElement.height;
 

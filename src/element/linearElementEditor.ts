@@ -1185,7 +1185,7 @@ export class LinearElementEditor {
     });
   }
 
-  static getBoundTextPosition = (
+  static getBoundTextElementPosition = (
     element: ExcalidrawLinearElement,
     boundTextElement: ExcalidrawTextElementWithContainer,
   ): { x: number; y: number } => {

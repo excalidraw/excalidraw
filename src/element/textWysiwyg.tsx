@@ -137,10 +137,11 @@ export const textWysiwyg = ({
       let height = updatedTextElement.height;
       if (container && updatedTextElement.containerId) {
         if (isLinearElement(container)) {
-          const boundTextCoords = LinearElementEditor.getBoundTextPosition(
-            container,
-            updatedTextElement as ExcalidrawTextElementWithContainer,
-          );
+          const boundTextCoords =
+            LinearElementEditor.getBoundTextElementPosition(
+              container,
+              updatedTextElement as ExcalidrawTextElementWithContainer,
+            );
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
         }

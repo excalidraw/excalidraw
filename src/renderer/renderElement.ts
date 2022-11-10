@@ -900,10 +900,11 @@ export const renderElement = (
         if (isTextElement(element)) {
           const container = getContainerElement(element);
           if (isLinearElement(container)) {
-            const boundTextCoords = LinearElementEditor.getBoundTextPosition(
-              container,
-              element as ExcalidrawTextElementWithContainer,
-            );
+            const boundTextCoords =
+              LinearElementEditor.getBoundTextElementPosition(
+                container,
+                element as ExcalidrawTextElementWithContainer,
+              );
             shiftX = (x2 - x1) / 2 - (boundTextCoords.x - x1);
             shiftY = (y2 - y1) / 2 - (boundTextCoords.y - y1);
           }
@@ -1030,7 +1031,7 @@ export const renderElementToSvg = (
     if (isLinearElement(container)) {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(container);
 
-      const boundTextCoords = LinearElementEditor.getBoundTextPosition(
+      const boundTextCoords = LinearElementEditor.getBoundTextElementPosition(
         container,
         element as ExcalidrawTextElementWithContainer,
       );
@@ -1113,7 +1114,7 @@ export const renderElementToSvg = (
           SVG_NS,
           "rect",
         );
-        const boundTextCoords = LinearElementEditor.getBoundTextPosition(
+        const boundTextCoords = LinearElementEditor.getBoundTextElementPosition(
           element,
           boundText,
         );

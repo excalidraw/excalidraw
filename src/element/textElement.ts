@@ -603,7 +603,7 @@ export const getBoundTextElementPosition = (
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
   if (isLinearElement(container)) {
-    return LinearElementEditor.getBoundTextPosition(
+    return LinearElementEditor.getBoundTextElementPosition(
       container,
       boundTextElement,
     );

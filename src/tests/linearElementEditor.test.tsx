@@ -1,5 +1,8 @@
 import ReactDOM from "react-dom";
-import { ExcalidrawLinearElement } from "../element/types";
+import {
+  ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
+} from "../element/types";
 import ExcalidrawApp from "../excalidraw-app";
 import { centerPoint } from "../math";
 import { reseed } from "../random";
@@ -630,7 +633,6 @@ describe("Test Linear Elements", () => {
         }),
       ];
 
-      const origPoints = line.points.map((point) => [...point]);
       const dragEndPositionOffset = [100, 100] as const;
       API.setSelectedElements([line]);
       enterLineEditingMode(line, true);
@@ -645,10 +647,86 @@ describe("Test Linear Elements", () => {
             0,
           ],
           Array [
-            ${origPoints[1][0] - dragEndPositionOffset[0]},
-            ${origPoints[1][1] - dragEndPositionOffset[1]},
+            -60,
+            -100,
           ],
         ]
+      `);
+    });
+  });
+
+  describe("Test getBoundTextElementPosition", () => {
+    const createBoundTextElement = (containerId: string) => {
+      return API.createElement({
+        type: "text",
+        x: 0,
+        y: 0,
+        text: "test",
+        containerId,
+        width: 30,
+        height: 20,
+      }) as ExcalidrawTextElementWithContainer;
+    };
+
+    it("should return correct position for 2 pointer line", () => {
+      createTwoPointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      const textElement = createBoundTextElement(line.id);
+      const position = LinearElementEditor.getBoundTextElementPosition(
+        line,
+        textElement,
+      );
+      expect(position).toMatchInlineSnapshot(`
+        Object {
+          "x": 25,
+          "y": 10,
+        }
+      `);
+    });
+
+    it("should return correct position for line with odd points", () => {
+      createThreePointerLinearElement("line", "round");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      const textElement = createBoundTextElement(line.id);
+
+      const position = LinearElementEditor.getBoundTextElementPosition(
+        line,
+        textElement,
+      );
+      expect(position).toMatchInlineSnapshot(`
+        Object {
+          "x": 75,
+          "y": 60,
+        }
+      `);
+    });
+
+    it("should return correct position for line with even points", () => {
+      createThreePointerLinearElement("line", "round");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      const textElement = createBoundTextElement(line.id);
+      enterLineEditingMode(line);
+      // This is the expected midpoint for line with round edge
+      // hence hardcoding it so if later some bug is introduced
+      // this will fail and we can fix it
+      const firstSegmentMidpoint: Point = [
+        55.9697848965255, 47.442326230998205,
+      ];
+      // drag line from first segment midpoint
+      drag(firstSegmentMidpoint, [
+        firstSegmentMidpoint[0] + delta,
+        firstSegmentMidpoint[1] + delta,
+      ]);
+
+      const position = LinearElementEditor.getBoundTextElementPosition(
+        line,
+        textElement,
+      );
+      expect(position).toMatchInlineSnapshot(`
+        Object {
+          "x": 85.82201843191861,
+          "y": 75.63461309860818,
+        }
       `);
     });
   });
