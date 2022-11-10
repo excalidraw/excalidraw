@@ -262,7 +262,7 @@ const getFreeDrawElementAbsoluteCoords = (
   const y1 = minY + element.y;
   const x2 = maxX + element.x;
   const y2 = maxY + element.y;
-  return [x1, y1, x2, y1, (x1 + x2) / 2, (y1 + y2) / 2];
+  return [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2];
 };
 
 const getLinearElementAbsoluteCoords = (
