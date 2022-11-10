@@ -23,7 +23,7 @@ import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
-  getBoundTextElementPadding,
+  getBoundTextElementOffset,
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
@@ -194,7 +194,7 @@ export const textWysiwyg = ({
               container.y +
               containerDims.height -
               height -
-              getBoundTextElementPadding(updatedTextElement);
+              getBoundTextElementOffset(updatedTextElement);
           }
         }
       }

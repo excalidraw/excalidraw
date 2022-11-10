@@ -37,7 +37,7 @@ import { shouldRotateWithDiscreteAngle } from "../keys";
 import {
   getApproxMinLineWidth,
   getBoundTextElement,
-  getBoundTextElementPadding,
+  getBoundTextElementOffset,
   handleBindTextResize,
 } from "./textElement";
 
@@ -205,7 +205,7 @@ export class LinearElementEditor {
         );
         const minWidth =
           getApproxMinLineWidth(getFontString(boundTextElement)) +
-          getBoundTextElementPadding(boundTextElement);
+          getBoundTextElementOffset(boundTextElement);
 
         if (width < minWidth) {
           return true;

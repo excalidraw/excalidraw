@@ -42,7 +42,7 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
-  getBoundTextElementPadding,
+  getBoundTextElementOffset,
   handleBindTextResize,
   measureText,
 } from "./textElement";
@@ -516,7 +516,7 @@ export const resizeSingleElement = (
     }
     if (shouldMaintainAspectRatio) {
       const boundTextElementPadding =
-        getBoundTextElementPadding(boundTextElement);
+        getBoundTextElementOffset(boundTextElement);
       const nextFont = measureFontSizeFromWH(
         boundTextElement,
         eleNewWidth - boundTextElementPadding * 2,
@@ -785,7 +785,7 @@ const resizeMultipleElements = (
     const boundTextElement = getBoundTextElement(element.latest);
 
     if (boundTextElement || isTextElement(element.orig)) {
-      const optionalPadding = getBoundTextElementPadding(boundTextElement) * 2;
+      const optionalPadding = getBoundTextElementOffset(boundTextElement) * 2;
       const textMeasurements = measureFontSizeFromWH(
         boundTextElement ?? (element.orig as ExcalidrawTextElement),
         width - optionalPadding,

@@ -23,7 +23,7 @@ import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
   getBoundTextElement,
-  getBoundTextElementPadding,
+  getBoundTextElementOffset,
   getContainerDims,
   getContainerElement,
   measureText,
@@ -232,7 +232,7 @@ const getAdjustedDimensions = (
   // make sure container dimensions are set properly when
   // text editor overflows beyond viewport dimensions
   if (container) {
-    const boundTextElementPadding = getBoundTextElementPadding(element);
+    const boundTextElementPadding = getBoundTextElementOffset(element);
 
     const containerDims = getContainerDims(container);
     let height = containerDims.height;

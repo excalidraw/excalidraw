@@ -42,7 +42,7 @@ export const redrawTextBoundingBox = (
     if (!isLinearElement(container)) {
       const containerDims = getContainerDims(container);
       let nextHeight = containerDims.height;
-      const boundTextElementPadding = getBoundTextElementPadding(textElement);
+      const boundTextElementPadding = getBoundTextElementOffset(textElement);
       if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
         coordY = container.y + boundTextElementPadding;
       } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
@@ -172,8 +172,7 @@ export const handleBindTextResize = (
     }
     // increase height in case text element height exceeds
     if (nextHeight > maxHeight) {
-      containerHeight =
-        nextHeight + getBoundTextElementPadding(textElement) * 2;
+      containerHeight = nextHeight + getBoundTextElementOffset(textElement) * 2;
       const diff = containerHeight - containerDims.height;
       // fix the y coord when resizing from ne/nw/n
       const updatedY =
@@ -210,7 +209,7 @@ const updateBoundTextPosition = (
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
   const containerDims = getContainerDims(container);
-  const boundTextElementPadding = getBoundTextElementPadding(boundTextElement);
+  const boundTextElementPadding = getBoundTextElementOffset(boundTextElement);
   let y;
   if (boundTextElement.verticalAlign === VERTICAL_ALIGN.TOP) {
     y = container.y + boundTextElementPadding;
@@ -584,7 +583,7 @@ export const getTextElementAngle = (textElement: ExcalidrawTextElement) => {
   return container.angle;
 };
 
-export const getBoundTextElementPadding = (
+export const getBoundTextElementOffset = (
   boundTextElement: ExcalidrawTextElement | null,
 ) => {
   const container = getContainerElement(boundTextElement);

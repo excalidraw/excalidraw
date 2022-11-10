@@ -31,6 +31,7 @@ import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
+  BOUND_TEXT_PADDING,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
@@ -40,7 +41,7 @@ import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
   getApproxLineHeight,
   getBoundTextElement,
-  getBoundTextElementPadding,
+  getBoundTextElementOffset,
   getContainerElement,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -280,7 +281,7 @@ const drawElementOnCanvas = (
           : element.height / lines.length;
         let verticalOffset = element.height - element.baseline;
         if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-          verticalOffset = getBoundTextElementPadding(element);
+          verticalOffset = getBoundTextElementOffset(element);
         }
 
         const horizontalOffset =
@@ -781,10 +782,16 @@ const drawElementFromCanvas = (
     tempCanvasContext.globalCompositeOperation = "destination-out";
 
     tempCanvasContext.fillRect(
-      (-boundTextElement.width / 2) * window.devicePixelRatio - centerOffsetX,
-      (-boundTextElement.height / 2) * window.devicePixelRatio - centerOffsetY,
-      boundTextElement.width * window.devicePixelRatio,
-      boundTextElement.height * window.devicePixelRatio,
+      -(boundTextElement.width / 2 + BOUND_TEXT_PADDING) *
+        window.devicePixelRatio -
+        centerOffsetX,
+      -(boundTextElement.height / 2 + BOUND_TEXT_PADDING) *
+        window.devicePixelRatio -
+        centerOffsetY,
+      (boundTextElement.width + BOUND_TEXT_PADDING * 2) *
+        window.devicePixelRatio,
+      (boundTextElement.height + BOUND_TEXT_PADDING * 2) *
+        window.devicePixelRatio,
     );
 
     context.translate(cx * scaleXFactor, cy * scaleYFactor);
