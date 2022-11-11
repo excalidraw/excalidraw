@@ -79,23 +79,23 @@ describe("Test Linear Elements", () => {
   ) => {
     //dragging line from midpoint
     const p3 = [midpoint[0] + delta - p1[0], midpoint[1] + delta - p1[1]];
-    h.elements = [
-      API.createElement({
-        x: p1[0],
-        y: p1[1],
-        width: p3[0] - p1[0],
-        height: 0,
-        type,
-        roughness,
-        points: [
-          [0, 0],
-          [p3[0], p3[1]],
-          [p2[0] - p1[0], p2[1] - p1[1]],
-        ],
-        strokeSharpness,
-      }),
-    ];
+    const line = API.createElement({
+      x: p1[0],
+      y: p1[1],
+      width: p3[0] - p1[0],
+      height: 0,
+      type,
+      roughness,
+      points: [
+        [0, 0],
+        [p3[0], p3[1]],
+        [p2[0] - p1[0], p2[1] - p1[1]],
+      ],
+      strokeSharpness,
+    });
+    h.elements = [line];
     mouse.clickAt(p1[0], p1[1]);
+    return line;
   };
 
   const enterLineEditingMode = (
@@ -329,8 +329,8 @@ describe("Test Linear Elements", () => {
       let line: ExcalidrawLinearElement;
 
       beforeEach(() => {
-        createThreePointerLinearElement("line");
-        line = h.elements[0] as ExcalidrawLinearElement;
+        line = createThreePointerLinearElement("line");
+
         expect(line.points.length).toEqual(3);
 
         enterLineEditingMode(line);
@@ -474,8 +474,7 @@ describe("Test Linear Elements", () => {
       let line: ExcalidrawLinearElement;
 
       beforeEach(() => {
-        createThreePointerLinearElement("line", "round");
-        line = h.elements[0] as ExcalidrawLinearElement;
+        line = createThreePointerLinearElement("line", "round");
         expect(line.points.length).toEqual(3);
 
         enterLineEditingMode(line);
@@ -998,7 +997,7 @@ describe("Test Linear Elements", () => {
       `);
     });
 
-    it.only("should resize and position the bound text correctly when 2 pointer linear element resized", () => {
+    it("should resize and position the bound text correctly when 2 pointer linear element resized", () => {
       createTwoPointerLinearElement("line");
 
       const line = h.elements[0] as ExcalidrawLinearElement;
