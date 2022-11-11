@@ -552,16 +552,19 @@ describe("textWysiwyg", () => {
     });
 
     it("shouldn't bind to non-text-bindable containers", async () => {
-      const line = API.createElement({
+      const freedraw = API.createElement({
         type: "freedraw",
         width: 100,
         height: 0,
       });
-      h.elements = [line];
+      h.elements = [freedraw];
 
       UI.clickTool("text");
 
-      mouse.clickAt(line.x + line.width / 2, line.y + line.height / 2);
+      mouse.clickAt(
+        freedraw.x + freedraw.width / 2,
+        freedraw.y + freedraw.height / 2,
+      );
 
       const editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
@@ -575,7 +578,7 @@ describe("textWysiwyg", () => {
       fireEvent.keyDown(editor, { key: KEYS.ESCAPE });
       editor.dispatchEvent(new Event("input"));
 
-      expect(line.boundElements).toBe(null);
+      expect(freedraw.boundElements).toBe(null);
       expect(h.elements[1].type).toBe("text");
       expect((h.elements[1] as ExcalidrawTextElement).containerId).toBe(null);
     });

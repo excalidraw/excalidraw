@@ -1,7 +1,9 @@
 import ReactDOM from "react-dom";
 import {
+  ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
+  FontString,
 } from "../element/types";
 import ExcalidrawApp from "../excalidraw-app";
 import { centerPoint } from "../math";
@@ -14,10 +16,14 @@ import { Point } from "../types";
 import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { queryByText } from "@testing-library/react";
+import { resize, rotate } from "./utils";
+import { getBoundTextElementPosition, wrapText } from "../element/textElement";
+import { getMaxContainerWidth } from "../element/newElement";
 
 const renderScene = jest.spyOn(Renderer, "renderScene");
 
 const { h } = window;
+const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
 
 describe("Test Linear Elements", () => {
   let container: HTMLElement;
@@ -654,79 +660,395 @@ describe("Test Linear Elements", () => {
       `);
     });
   });
+  describe("Test bound text element", () => {
+    const DEFAULT_TEXT = "Online whiteboard collaboration made easy";
 
-  describe("Test getBoundTextElementPosition", () => {
-    const createBoundTextElement = (containerId: string) => {
-      return API.createElement({
+    const createBoundTextElement = (
+      text: string,
+      container: ExcalidrawLinearElement,
+    ) => {
+      const textElement = API.createElement({
         type: "text",
         x: 0,
         y: 0,
-        text: "test",
-        containerId,
+        text: wrapText(text, font, getMaxContainerWidth(container)),
+        containerId: container.id,
         width: 30,
         height: 20,
       }) as ExcalidrawTextElementWithContainer;
+      container = {
+        ...container,
+        boundElements: (container.boundElements || []).concat({
+          type: "text",
+          id: textElement.id,
+        }),
+      };
+      const elements: ExcalidrawElement[] = [];
+      h.elements.forEach((element) => {
+        if (element.id === container.id) {
+          elements.push(container);
+        } else {
+          elements.push(element);
+        }
+      });
+      const updatedTextElement = { ...textElement, originalText: text };
+      h.elements = [...elements, updatedTextElement];
+      return { textElement: updatedTextElement, container };
     };
 
-    it("should return correct position for 2 pointer line", () => {
+    describe("Test getBoundTextElementPosition", () => {
+      it("should return correct position for 2 pointer line", () => {
+        createTwoPointerLinearElement("line");
+        const line = h.elements[0] as ExcalidrawLinearElement;
+        const { textElement, container } = createBoundTextElement(
+          DEFAULT_TEXT,
+          line,
+        );
+        const position = LinearElementEditor.getBoundTextElementPosition(
+          container,
+          textElement,
+        );
+        expect(position).toMatchInlineSnapshot(`
+          Object {
+            "x": 25,
+            "y": 10,
+          }
+        `);
+      });
+
+      it("should return correct position for line with odd points", () => {
+        createThreePointerLinearElement("line", "round");
+        const line = h.elements[0] as ExcalidrawLinearElement;
+        const { textElement, container } = createBoundTextElement(
+          DEFAULT_TEXT,
+          line,
+        );
+
+        const position = LinearElementEditor.getBoundTextElementPosition(
+          container,
+          textElement,
+        );
+        expect(position).toMatchInlineSnapshot(`
+          Object {
+            "x": 75,
+            "y": 60,
+          }
+        `);
+      });
+
+      it("should return correct position for line with even points", () => {
+        createThreePointerLinearElement("line", "round");
+        const line = h.elements[0] as ExcalidrawLinearElement;
+        const { textElement, container } = createBoundTextElement(
+          DEFAULT_TEXT,
+          line,
+        );
+        enterLineEditingMode(container);
+        // This is the expected midpoint for line with round edge
+        // hence hardcoding it so if later some bug is introduced
+        // this will fail and we can fix it
+        const firstSegmentMidpoint: Point = [
+          55.9697848965255, 47.442326230998205,
+        ];
+        // drag line from first segment midpoint
+        drag(firstSegmentMidpoint, [
+          firstSegmentMidpoint[0] + delta,
+          firstSegmentMidpoint[1] + delta,
+        ]);
+
+        const position = LinearElementEditor.getBoundTextElementPosition(
+          container,
+          textElement,
+        );
+        expect(position).toMatchInlineSnapshot(`
+          Object {
+            "x": 100.32201843191861,
+            "y": 85.63461309860818,
+          }
+        `);
+      });
+    });
+
+    it("should bind text to container when clicked", async () => {
       createTwoPointerLinearElement("line");
       const line = h.elements[0] as ExcalidrawLinearElement;
-      const textElement = createBoundTextElement(line.id);
-      const position = LinearElementEditor.getBoundTextElementPosition(
-        line,
-        textElement,
-      );
-      expect(position).toMatchInlineSnapshot(`
-        Object {
-          "x": 25,
-          "y": 10,
-        }
+
+      expect(h.elements.length).toBe(1);
+      expect(h.elements[0].id).toBe(line.id);
+      mouse.doubleClickAt(line.x, line.y);
+      expect(h.elements.length).toBe(2);
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(line.id);
+      mouse.down();
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      fireEvent.change(editor, {
+        target: { value: DEFAULT_TEXT },
+      });
+
+      await new Promise((r) => setTimeout(r, 0));
+      editor.blur();
+      expect(line.boundElements).toStrictEqual([{ id: text.id, type: "text" }]);
+      expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
+        .toMatchInlineSnapshot(`
+        "
+        O
+        n
+        l
+        i
+        n
+        e
+
+        w
+        h
+        i
+        t
+        e
+        b
+        o
+        a
+        r
+        d
+
+        c
+        o
+        l
+        l
+        a
+        b
+        o
+        r
+        a
+        t
+        i
+        o
+        n
+
+        m
+        a
+        d
+        e
+
+        e
+        a
+        s
+        y"
       `);
     });
 
-    it("should return correct position for line with odd points", () => {
-      createThreePointerLinearElement("line", "round");
+    it("should bind text to container when clicked on container and enter pressed", async () => {
+      createTwoPointerLinearElement("line");
       const line = h.elements[0] as ExcalidrawLinearElement;
-      const textElement = createBoundTextElement(line.id);
 
-      const position = LinearElementEditor.getBoundTextElementPosition(
+      expect(h.elements.length).toBe(1);
+      expect(h.elements[0].id).toBe(line.id);
+
+      Keyboard.keyPress(KEYS.ENTER);
+
+      expect(h.elements.length).toBe(2);
+
+      const textElement = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(textElement.type).toBe("text");
+      expect(textElement.containerId).toBe(line.id);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      await new Promise((r) => setTimeout(r, 0));
+
+      fireEvent.change(editor, {
+        target: { value: DEFAULT_TEXT },
+      });
+      editor.blur();
+      expect(line.boundElements).toStrictEqual([
+        { id: textElement.id, type: "text" },
+      ]);
+      expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
+        .toMatchInlineSnapshot(`
+        "
+        O
+        n
+        l
+        i
+        n
+        e
+
+        w
+        h
+        i
+        t
+        e
+        b
+        o
+        a
+        r
+        d
+
+        c
+        o
+        l
+        l
+        a
+        b
+        o
+        r
+        a
+        t
+        i
+        o
+        n
+
+        m
+        a
+        d
+        e
+
+        e
+        a
+        s
+        y"
+      `);
+    });
+
+    it("should not rotate the bound text and update position of bound text correctly when linear element rotated", () => {
+      createThreePointerLinearElement("line", "round");
+
+      const line = h.elements[0] as ExcalidrawLinearElement;
+
+      const { textElement, container } = createBoundTextElement(
+        DEFAULT_TEXT,
         line,
-        textElement,
       );
-      expect(position).toMatchInlineSnapshot(`
+
+      expect(container.angle).toBe(0);
+      expect(textElement.angle).toBe(0);
+      expect(getBoundTextElementPosition(line, textElement))
+        .toMatchInlineSnapshot(`
         Object {
           "x": 75,
           "y": 60,
         }
       `);
+      rotate(container, -35, 55);
+      expect(container.angle).toMatchInlineSnapshot(`1.3988061968364685`);
+      expect(textElement.angle).toBe(0);
+      expect(getBoundTextElementPosition(container, textElement))
+        .toMatchInlineSnapshot(`
+        Object {
+          "x": 21.73926141863671,
+          "y": 73.31003398390868,
+        }
+      `);
     });
 
-    it("should return correct position for line with even points", () => {
+    it("should resize and position the bound text correctly when 3 pointer linear element resized", () => {
       createThreePointerLinearElement("line", "round");
-      const line = h.elements[0] as ExcalidrawLinearElement;
-      const textElement = createBoundTextElement(line.id);
-      enterLineEditingMode(line);
-      // This is the expected midpoint for line with round edge
-      // hence hardcoding it so if later some bug is introduced
-      // this will fail and we can fix it
-      const firstSegmentMidpoint: Point = [
-        55.9697848965255, 47.442326230998205,
-      ];
-      // drag line from first segment midpoint
-      drag(firstSegmentMidpoint, [
-        firstSegmentMidpoint[0] + delta,
-        firstSegmentMidpoint[1] + delta,
-      ]);
 
-      const position = LinearElementEditor.getBoundTextElementPosition(
+      const line = h.elements[0] as ExcalidrawLinearElement;
+
+      const { textElement, container } = createBoundTextElement(
+        DEFAULT_TEXT,
         line,
-        textElement,
       );
-      expect(position).toMatchInlineSnapshot(`
+      expect(container.width).toBe(70);
+      expect(container.height).toBe(50);
+      expect(getBoundTextElementPosition(container, textElement))
+        .toMatchInlineSnapshot(`
         Object {
-          "x": 85.82201843191861,
-          "y": 75.63461309860818,
+          "x": 75,
+          "y": 60,
         }
+      `);
+      expect(textElement.text).toMatchInlineSnapshot(`
+        "Online 
+        whitebo
+        ard 
+        collabo
+        ration 
+        made 
+        easy"
+      `);
+
+      resize(container, "ne", [200, 200]);
+
+      expect({ width: container.width, height: container.height })
+        .toMatchInlineSnapshot(`
+        Object {
+          "height": 10,
+          "width": 268,
+        }
+      `);
+
+      expect(getBoundTextElementPosition(container, textElement))
+        .toMatchInlineSnapshot(`
+        Object {
+          "x": 287.5,
+          "y": 70,
+        }
+      `);
+      expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
+        .toMatchInlineSnapshot(`
+        "Online whiteboard 
+        collaboration made
+        easy"
+      `);
+    });
+
+    it.only("should resize and position the bound text correctly when 2 pointer linear element resized", () => {
+      createTwoPointerLinearElement("line");
+
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      const { textElement, container } = createBoundTextElement(
+        DEFAULT_TEXT,
+        line,
+      );
+      expect(container.width).toBe(40);
+      expect(getBoundTextElementPosition(container, textElement))
+        .toMatchInlineSnapshot(`
+        Object {
+          "x": 25,
+          "y": 10,
+        }
+      `);
+      expect(textElement.text).toMatchInlineSnapshot(`
+        "Online 
+        whitebo
+        ard 
+        collabo
+        ration 
+        made 
+        easy"
+      `);
+      const points = LinearElementEditor.getPointsGlobalCoordinates(container);
+
+      // Drag from last point
+      drag(points[1], [points[1][0] + 150, points[1][1]]);
+
+      expect({ width: container.width, height: container.height })
+        .toMatchInlineSnapshot(`
+        Object {
+          "height": 0,
+          "width": 190,
+        }
+      `);
+
+      expect(getBoundTextElementPosition(container, textElement))
+        .toMatchInlineSnapshot(`
+        Object {
+          "x": 114.5,
+          "y": 20,
+        }
+      `);
+      expect(textElement.text).toMatchInlineSnapshot(`
+        "Online 
+        whiteboard
+        collaborat
+        ion made 
+        easy"
       `);
     });
   });
