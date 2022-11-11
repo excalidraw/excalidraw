@@ -53,23 +53,23 @@ describe("Test Linear Elements", () => {
     strokeSharpness: ExcalidrawLinearElement["strokeSharpness"] = "sharp",
     roughness: ExcalidrawLinearElement["roughness"] = 0,
   ) => {
-    h.elements = [
-      API.createElement({
-        x: p1[0],
-        y: p1[1],
-        width: p2[0] - p1[0],
-        height: 0,
-        type,
-        roughness,
-        points: [
-          [0, 0],
-          [p2[0] - p1[0], p2[1] - p1[1]],
-        ],
-        strokeSharpness,
-      }),
-    ];
+    const line = API.createElement({
+      x: p1[0],
+      y: p1[1],
+      width: p2[0] - p1[0],
+      height: 0,
+      type,
+      roughness,
+      points: [
+        [0, 0],
+        [p2[0] - p1[0], p2[1] - p1[1]],
+      ],
+      strokeSharpness,
+    });
+    h.elements = [line];
 
     mouse.clickAt(p1[0], p1[1]);
+    return line;
   };
 
   const createThreePointerLinearElement = (
@@ -840,8 +840,7 @@ describe("Test Linear Elements", () => {
     });
 
     it("should bind text to container when clicked on container and enter pressed", async () => {
-      createTwoPointerLinearElement("line");
-      const line = h.elements[0] as ExcalidrawLinearElement;
+      const line = createTwoPointerLinearElement("line");
 
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(line.id);
@@ -913,7 +912,7 @@ describe("Test Linear Elements", () => {
       `);
     });
 
-    it("should not rotate the bound text and update position of bound text correctly when linear element rotated", () => {
+    it("should not rotate the bound text and update position of bound text and bounding box correctly when linear element rotated", () => {
       createThreePointerLinearElement("line", "round");
 
       const line = h.elements[0] as ExcalidrawLinearElement;
@@ -932,6 +931,27 @@ describe("Test Linear Elements", () => {
           "y": 60,
         }
       `);
+      expect(textElement.text).toMatchInlineSnapshot(`
+        "Online 
+        whitebo
+        ard 
+        collabo
+        ration 
+        made 
+        easy"
+      `);
+      expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
+        .toMatchInlineSnapshot(`
+        Array [
+          20,
+          20,
+          105,
+          80,
+          55.45893770831013,
+          45,
+        ]
+      `);
+
       rotate(container, -35, 55);
       expect(container.angle).toMatchInlineSnapshot(`1.3988061968364685`);
       expect(textElement.angle).toBe(0);
@@ -942,9 +962,29 @@ describe("Test Linear Elements", () => {
           "y": 73.31003398390868,
         }
       `);
+      expect(textElement.text).toMatchInlineSnapshot(`
+        "Online 
+        whitebo
+        ard 
+        collabo
+        ration 
+        made 
+        easy"
+      `);
+      expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
+        .toMatchInlineSnapshot(`
+        Array [
+          20,
+          20,
+          102.41961302274555,
+          86.49012635273976,
+          55.45893770831013,
+          45,
+        ]
+      `);
     });
 
-    it("should resize and position the bound text correctly when 3 pointer linear element resized", () => {
+    it("should resize and position the bound text and bounding box correctly when 3 pointer linear element resized", () => {
       createThreePointerLinearElement("line", "round");
 
       const line = h.elements[0] as ExcalidrawLinearElement;
@@ -971,6 +1011,17 @@ describe("Test Linear Elements", () => {
         made 
         easy"
       `);
+      expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
+        .toMatchInlineSnapshot(`
+        Array [
+          20,
+          20,
+          105,
+          80,
+          55.45893770831013,
+          45,
+        ]
+      `);
 
       resize(container, "ne", [200, 200]);
 
@@ -994,6 +1045,17 @@ describe("Test Linear Elements", () => {
         "Online whiteboard 
         collaboration made
         easy"
+      `);
+      expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
+        .toMatchInlineSnapshot(`
+        Array [
+          20,
+          60,
+          291.5141515950605,
+          70,
+          155.75707579753026,
+          65,
+        ]
       `);
     });
 
