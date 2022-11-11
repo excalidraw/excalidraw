@@ -743,8 +743,19 @@ export const renderElement = (
         element.x + renderConfig.scrollX,
         element.y + renderConfig.scrollY,
       );
-      context.fillStyle = "rgba(0, 0, 255, 0.10)";
-      context.fillRect(0, 0, element.width, element.height);
+      context.fillStyle = "rgba(0, 0, 200, 0.04)";
+
+      // render from 0.5px offset  to get 1px wide line
+      // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
+      // TODO can be be improved by offseting to the negative when user selects
+      // from right to left
+      const offset = 0.5 / renderConfig.zoom.value;
+
+      context.fillRect(offset, offset, element.width, element.height);
+      context.lineWidth = 1 / renderConfig.zoom.value;
+      context.strokeStyle = "rgb(105, 101, 219)";
+      context.strokeRect(offset, offset, element.width, element.height);
+
       context.restore();
       break;
     }
@@ -790,6 +801,9 @@ export const renderElement = (
         context.save();
         context.translate(cx, cy);
         context.rotate(element.angle);
+        if (element.type === "image") {
+          context.scale(element.scale[0], element.scale[1]);
+        }
         context.translate(-shiftX, -shiftY);
 
         if (shouldResetImageFilter(element, renderConfig)) {
@@ -950,6 +964,8 @@ export const renderElementToSvg = (
       break;
     }
     case "image": {
+      const width = Math.round(element.width);
+      const height = Math.round(element.height);
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
@@ -978,17 +994,34 @@ export const renderElementToSvg = (
           use.setAttribute("filter", IMAGE_INVERT_FILTER);
         }
 
-        use.setAttribute("width", `${Math.round(element.width)}`);
-        use.setAttribute("height", `${Math.round(element.height)}`);
+        use.setAttribute("width", `${width}`);
+        use.setAttribute("height", `${height}`);
 
-        use.setAttribute(
+        // We first apply `scale` transforms (horizontal/vertical mirroring)
+        // on the <use> element, then apply translation and rotation
+        // on the <g> element which wraps the <use>.
+        // Doing this separately is a quick hack to to work around compositing
+        // the transformations correctly (the transform-origin was not being
+        // applied correctly).
+        if (element.scale[0] !== 1 || element.scale[1] !== 1) {
+          const translateX = element.scale[0] !== 1 ? -width : 0;
+          const translateY = element.scale[1] !== 1 ? -height : 0;
+          use.setAttribute(
+            "transform",
+            `scale(${element.scale[0]}, ${element.scale[1]}) translate(${translateX} ${translateY})`,
+          );
+        }
+
+        const g = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+        g.appendChild(use);
+        g.setAttribute(
           "transform",
           `translate(${offsetX || 0} ${
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
 
-        root.appendChild(use);
+        root.appendChild(g);
       }
       break;
     }

@@ -11,6 +11,12 @@ import {
   isPathALoop,
   getGridPoint,
   rotatePoint,
+  centerPoint,
+  getControlPointsForBezierCurve,
+  getBezierXY,
+  getBezierCurveLength,
+  mapIntervalToBezierT,
+  arePointsEqual,
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import { getElementPointsCoords } from "./bounds";
@@ -27,6 +33,12 @@ import {
 import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
 import { shouldRotateWithDiscreteAngle } from "../keys";
+
+const editorMidPointsCache: {
+  version: number | null;
+  points: (Point | null)[];
+  zoom: number | null;
+} = { version: null, points: [], zoom: null };
 
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
@@ -51,6 +63,7 @@ export class LinearElementEditor {
     | "keep";
   public readonly endBindingElement: ExcalidrawBindableElement | null | "keep";
   public readonly hoverPointIndex: number;
+  public readonly segmentMidPointHoveredCoords: Point | null;
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
     this.elementId = element.id as string & {
@@ -70,6 +83,7 @@ export class LinearElementEditor {
       lastClickedPoint: -1,
     };
     this.hoverPointIndex = -1;
+    this.segmentMidPointHoveredCoords = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -77,7 +91,6 @@ export class LinearElementEditor {
   // ---------------------------------------------------------------------------
 
   static POINT_HANDLE_SIZE = 10;
-
   /**
    * @param id the `elementId` from the instance of this class (so that we can
    *  statically guarantee this method returns an ExcalidrawLinearElement)
@@ -157,7 +170,6 @@ export class LinearElementEditor {
     if (!linearElementEditor) {
       return false;
     }
-
     const { selectedPointsIndices, elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
@@ -178,16 +190,12 @@ export class LinearElementEditor {
         const referencePoint =
           element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
 
-        let [width, height] = LinearElementEditor._getShiftLockedDelta(
+        const [width, height] = LinearElementEditor._getShiftLockedDelta(
           element,
           referencePoint,
           [scenePointerX, scenePointerY],
           appState.gridSize,
         );
-
-        // rounding to stop the dragged point from jiggling
-        width = Math.round(width);
-        height = Math.round(height);
 
         LinearElementEditor.movePoints(element, [
           {
@@ -361,6 +369,197 @@ export class LinearElementEditor {
     };
   }
 
+  static getEditorMidPoints = (
+    element: NonDeleted<ExcalidrawLinearElement>,
+    appState: AppState,
+  ): typeof editorMidPointsCache["points"] => {
+    // Since its not needed outside editor unless 2 pointer lines
+    if (!appState.editingLinearElement && element.points.length > 2) {
+      return [];
+    }
+    if (
+      editorMidPointsCache.version === element.version &&
+      editorMidPointsCache.zoom === appState.zoom.value
+    ) {
+      return editorMidPointsCache.points;
+    }
+    LinearElementEditor.updateEditorMidPointsCache(element, appState);
+    return editorMidPointsCache.points!;
+  };
+
+  static updateEditorMidPointsCache = (
+    element: NonDeleted<ExcalidrawLinearElement>,
+    appState: AppState,
+  ) => {
+    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+
+    let index = 0;
+    const midpoints: (Point | null)[] = [];
+    while (index < points.length - 1) {
+      if (
+        LinearElementEditor.isSegmentTooShort(
+          element,
+          element.points[index],
+          element.points[index + 1],
+          appState.zoom,
+        )
+      ) {
+        midpoints.push(null);
+        index++;
+        continue;
+      }
+      const segmentMidPoint = LinearElementEditor.getSegmentMidPoint(
+        element,
+        points[index],
+        points[index + 1],
+        index + 1,
+      );
+      midpoints.push(segmentMidPoint);
+      index++;
+    }
+    editorMidPointsCache.points = midpoints;
+    editorMidPointsCache.version = element.version;
+    editorMidPointsCache.zoom = appState.zoom.value;
+  };
+
+  static getSegmentMidpointHitCoords = (
+    linearElementEditor: LinearElementEditor,
+    scenePointer: { x: number; y: number },
+    appState: AppState,
+  ) => {
+    const { elementId } = linearElementEditor;
+    const element = LinearElementEditor.getElement(elementId);
+    if (!element) {
+      return null;
+    }
+    const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+      element,
+      appState.zoom,
+      scenePointer.x,
+      scenePointer.y,
+    );
+    if (clickedPointIndex >= 0) {
+      return null;
+    }
+    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+    if (points.length >= 3 && !appState.editingLinearElement) {
+      return null;
+    }
+
+    const threshold =
+      LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
+
+    const existingSegmentMidpointHitCoords =
+      linearElementEditor.segmentMidPointHoveredCoords;
+    if (existingSegmentMidpointHitCoords) {
+      const distance = distance2d(
+        existingSegmentMidpointHitCoords[0],
+        existingSegmentMidpointHitCoords[1],
+        scenePointer.x,
+        scenePointer.y,
+      );
+      if (distance <= threshold) {
+        return existingSegmentMidpointHitCoords;
+      }
+    }
+    let index = 0;
+    const midPoints: typeof editorMidPointsCache["points"] =
+      LinearElementEditor.getEditorMidPoints(element, appState);
+    while (index < midPoints.length) {
+      if (midPoints[index] !== null) {
+        const distance = distance2d(
+          midPoints[index]![0],
+          midPoints[index]![1],
+          scenePointer.x,
+          scenePointer.y,
+        );
+        if (distance <= threshold) {
+          return midPoints[index];
+        }
+      }
+
+      index++;
+    }
+    return null;
+  };
+
+  static isSegmentTooShort(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    startPoint: Point,
+    endPoint: Point,
+    zoom: AppState["zoom"],
+  ) {
+    let distance = distance2d(
+      startPoint[0],
+      startPoint[1],
+      endPoint[0],
+      endPoint[1],
+    );
+    if (element.points.length > 2 && element.strokeSharpness === "round") {
+      distance = getBezierCurveLength(element, endPoint);
+    }
+
+    return distance * zoom.value < LinearElementEditor.POINT_HANDLE_SIZE * 4;
+  }
+
+  static getSegmentMidPoint(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    startPoint: Point,
+    endPoint: Point,
+    endPointIndex: number,
+  ) {
+    let segmentMidPoint = centerPoint(startPoint, endPoint);
+    if (element.points.length > 2 && element.strokeSharpness === "round") {
+      const controlPoints = getControlPointsForBezierCurve(
+        element,
+        element.points[endPointIndex],
+      );
+      if (controlPoints) {
+        const t = mapIntervalToBezierT(
+          element,
+          element.points[endPointIndex],
+          0.5,
+        );
+
+        const [tx, ty] = getBezierXY(
+          controlPoints[0],
+          controlPoints[1],
+          controlPoints[2],
+          controlPoints[3],
+          t,
+        );
+        segmentMidPoint = LinearElementEditor.getPointGlobalCoordinates(
+          element,
+          [tx, ty],
+        );
+      }
+    }
+
+    return segmentMidPoint;
+  }
+
+  static getSegmentMidPointIndex(
+    linearElementEditor: LinearElementEditor,
+    appState: AppState,
+    midPoint: Point,
+  ) {
+    const element = LinearElementEditor.getElement(
+      linearElementEditor.elementId,
+    );
+    if (!element) {
+      return -1;
+    }
+    const midPoints = LinearElementEditor.getEditorMidPoints(element, appState);
+    let index = 0;
+    while (index < midPoints.length - 1) {
+      if (LinearElementEditor.arePointsEqual(midPoint, midPoints[index])) {
+        return index + 1;
+      }
+      index++;
+    }
+    return -1;
+  }
+
   static handlePointerDown(
     event: React.PointerEvent<HTMLCanvasElement>,
     appState: AppState,
@@ -371,11 +570,13 @@ export class LinearElementEditor {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
+    isMidPoint: boolean;
   } {
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
       linearElementEditor: null,
+      isMidPoint: false,
     };
 
     if (!linearElementEditor) {
@@ -387,6 +588,44 @@ export class LinearElementEditor {
 
     if (!element) {
       return ret;
+    }
+    const segmentMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
+      linearElementEditor,
+      scenePointer,
+      appState,
+    );
+    if (segmentMidPoint) {
+      const index = LinearElementEditor.getSegmentMidPointIndex(
+        linearElementEditor,
+        appState,
+        segmentMidPoint,
+      );
+      const newMidPoint = LinearElementEditor.createPointAt(
+        element,
+        segmentMidPoint[0],
+        segmentMidPoint[1],
+        appState.gridSize,
+      );
+      const points = [
+        ...element.points.slice(0, index),
+        newMidPoint,
+        ...element.points.slice(index),
+      ];
+      mutateElement(element, {
+        points,
+      });
+
+      ret.didAddPoint = true;
+      ret.isMidPoint = true;
+      ret.linearElementEditor = {
+        ...linearElementEditor,
+        selectedPointsIndices: element.points[1],
+        pointerDownState: {
+          prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
+          lastClickedPoint: -1,
+        },
+        lastUncommittedPoint: null,
+      };
     }
     if (event.altKey && appState.editingLinearElement) {
       if (linearElementEditor.lastUncommittedPoint == null) {
@@ -401,6 +640,7 @@ export class LinearElementEditor {
             ),
           ],
         });
+        ret.didAddPoint = true;
       }
       history.resumeRecording();
       ret.linearElementEditor = {
@@ -430,7 +670,7 @@ export class LinearElementEditor {
 
     // if we clicked on a point, set the element as hitElement otherwise
     // it would get deselected if the point is outside the hitbox area
-    if (clickedPointIndex > -1) {
+    if (clickedPointIndex >= 0 || segmentMidPoint) {
       ret.hitElement = element;
     } else {
       // You might be wandering why we are storing the binding elements on
@@ -489,17 +729,29 @@ export class LinearElementEditor {
     return ret;
   }
 
+  static arePointsEqual(point1: Point | null, point2: Point | null) {
+    if (!point1 && !point2) {
+      return true;
+    }
+    if (!point1 || !point2) {
+      return false;
+    }
+    return arePointsEqual(point1, point2);
+  }
+
   static handlePointerMove(
     event: React.PointerEvent<HTMLCanvasElement>,
     scenePointerX: number,
     scenePointerY: number,
-    linearElementEditor: LinearElementEditor,
-    gridSize: number | null,
-  ): LinearElementEditor {
-    const { elementId, lastUncommittedPoint } = linearElementEditor;
+    appState: AppState,
+  ): LinearElementEditor | null {
+    if (!appState.editingLinearElement) {
+      return null;
+    }
+    const { elementId, lastUncommittedPoint } = appState.editingLinearElement;
     const element = LinearElementEditor.getElement(elementId);
     if (!element) {
-      return linearElementEditor;
+      return appState.editingLinearElement;
     }
 
     const { points } = element;
@@ -509,7 +761,10 @@ export class LinearElementEditor {
       if (lastPoint === lastUncommittedPoint) {
         LinearElementEditor.deletePoints(element, [points.length - 1]);
       }
-      return { ...linearElementEditor, lastUncommittedPoint: null };
+      return {
+        ...appState.editingLinearElement,
+        lastUncommittedPoint: null,
+      };
     }
 
     let newPoint: Point;
@@ -521,7 +776,7 @@ export class LinearElementEditor {
         element,
         lastCommittedPoint,
         [scenePointerX, scenePointerY],
-        gridSize,
+        appState.gridSize,
       );
 
       newPoint = [
@@ -531,9 +786,9 @@ export class LinearElementEditor {
     } else {
       newPoint = LinearElementEditor.createPointAt(
         element,
-        scenePointerX - linearElementEditor.pointerOffset.x,
-        scenePointerY - linearElementEditor.pointerOffset.y,
-        gridSize,
+        scenePointerX - appState.editingLinearElement.pointerOffset.x,
+        scenePointerY - appState.editingLinearElement.pointerOffset.y,
+        appState.gridSize,
       );
     }
 
@@ -545,11 +800,10 @@ export class LinearElementEditor {
         },
       ]);
     } else {
-      LinearElementEditor.addPoints(element, [{ point: newPoint }]);
+      LinearElementEditor.addPoints(element, appState, [{ point: newPoint }]);
     }
-
     return {
-      ...linearElementEditor,
+      ...appState.editingLinearElement,
       lastUncommittedPoint: element.points[element.points.length - 1],
     };
   }
@@ -571,14 +825,14 @@ export class LinearElementEditor {
   /** scene coords */
   static getPointsGlobalCoordinates(
     element: NonDeleted<ExcalidrawLinearElement>,
-  ) {
+  ): Point[] {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
     return element.points.map((point) => {
       let { x, y } = element;
       [x, y] = rotate(x + point[0], y + point[1], cx, cy, element.angle);
-      return [x, y];
+      return [x, y] as const;
     });
   }
 
@@ -596,7 +850,9 @@ export class LinearElementEditor {
 
     const point = element.points[index];
     const { x, y } = element;
-    return rotate(x + point[0], y + point[1], cx, cy, element.angle);
+    return point
+      ? rotate(x + point[0], y + point[1], cx, cy, element.angle)
+      : rotate(x, y, cx, cy, element.angle);
   }
 
   static pointFromAbsoluteCoords(
@@ -622,7 +878,8 @@ export class LinearElementEditor {
     x: number,
     y: number,
   ) {
-    const pointHandles = this.getPointsGlobalCoordinates(element);
+    const pointHandles =
+      LinearElementEditor.getPointsGlobalCoordinates(element);
     let idx = pointHandles.length;
     // loop from right to left because points on the right are rendered over
     // points on the left, thus should take precedence when clicking, if they
@@ -632,7 +889,7 @@ export class LinearElementEditor {
       if (
         distance2d(x, y, point[0], point[1]) * zoom.value <
         // +1px to account for outline stroke
-        this.POINT_HANDLE_SIZE + 1
+        LinearElementEditor.POINT_HANDLE_SIZE + 1
       ) {
         return idx;
       }
@@ -791,6 +1048,7 @@ export class LinearElementEditor {
 
   static addPoints(
     element: NonDeleted<ExcalidrawLinearElement>,
+    appState: AppState,
     targetPoints: { point: Point }[],
   ) {
     const offsetX = 0;

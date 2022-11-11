@@ -10,10 +10,13 @@ import { BOUND_TEXT_PADDING, FONT_FAMILY } from "../constants";
 import {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
+  FontString,
 } from "./types";
 import * as textElementUtils from "./textElement";
 import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
+import { resize } from "../tests/utils";
+import { getMaxContainerWidth } from "./newElement";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -432,6 +435,42 @@ describe("textWysiwyg", () => {
       );
       expect(h.state.zoom.value).toBe(1);
     });
+
+    it("should paste text correctly", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      await new Promise((r) => setTimeout(r, 0));
+      let text = "A quick brown fox jumps over the lazy dog.";
+
+      //@ts-ignore
+      textarea.onpaste({
+        preventDefault: () => {},
+        //@ts-ignore
+        clipboardData: {
+          getData: () => text,
+        },
+      });
+
+      await new Promise((cb) => setTimeout(cb, 0));
+      textarea.blur();
+      expect(textElement.text).toBe(text);
+
+      Keyboard.keyPress(KEYS.ENTER);
+      await new Promise((r) => setTimeout(r, 0));
+      text = "Hello this text should get merged with the existing one";
+      //@ts-ignore
+      textarea.onpaste({
+        preventDefault: () => {},
+        //@ts-ignore
+        clipboardData: {
+          getData: () => text,
+        },
+      });
+      await new Promise((cb) => setTimeout(cb, 0));
+      textarea.blur();
+      expect(textElement.text).toMatchInlineSnapshot(
+        `"A quick brown fox jumps over the lazy dog.Hello this text should get merged with the existing one"`,
+      );
+    });
   });
 
   describe("Test container-bound text", () => {
@@ -492,9 +531,7 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
 
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
 
       expect(h.elements.length).toBe(2);
 
@@ -695,9 +732,8 @@ describe("textWysiwyg", () => {
       // Edit and text by removing second line and it should
       // still vertically align correctly
       mouse.select(rectangle);
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
+
       editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
@@ -734,9 +770,7 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
 
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
 
       expect(h.elements.length).toBe(2);
 
@@ -771,12 +805,11 @@ describe("textWysiwyg", () => {
         null,
       );
     });
+
     it("shouldn't bind to container if container has bound text", async () => {
       expect(h.elements.length).toBe(1);
 
-      Keyboard.withModifierKeys({}, () => {
-        Keyboard.keyPress(KEYS.ENTER);
-      });
+      Keyboard.keyPress(KEYS.ENTER);
 
       expect(h.elements.length).toBe(2);
 
@@ -812,6 +845,194 @@ describe("textWysiwyg", () => {
         { id: h.elements[1].id, type: "text" },
       ]);
       expect(text.containerId).toBe(null);
+    });
+
+    it("should respect text alignment when resizing", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+
+      let editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello" } });
+      editor.blur();
+
+      // should center align horizontally and vertically by default
+      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
+      expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+        Array [
+          109.5,
+          17,
+        ]
+      `);
+
+      mouse.select(rectangle);
+      Keyboard.keyPress(KEYS.ENTER);
+
+      editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      editor.select();
+
+      fireEvent.click(screen.getByTitle("Left"));
+      fireEvent.click(screen.getByTitle("Align bottom"));
+      await new Promise((r) => setTimeout(r, 0));
+
+      editor.blur();
+
+      // should left align horizontally and bottom vertically after resize
+      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
+      expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+        Array [
+          15,
+          90,
+        ]
+      `);
+
+      mouse.select(rectangle);
+      Keyboard.keyPress(KEYS.ENTER);
+      editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      editor.select();
+
+      fireEvent.click(screen.getByTitle("Right"));
+      fireEvent.click(screen.getByTitle("Align top"));
+
+      await new Promise((r) => setTimeout(r, 0));
+
+      editor.blur();
+
+      // should right align horizontally and top vertically after resize
+      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
+      expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+        Array [
+          424,
+          -539,
+        ]
+      `);
+    });
+
+    it("should compute the dimensions correctly when text pasted", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
+      let text =
+        "Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.";
+
+      let wrappedText = textElementUtils.wrapText(
+        text,
+        font,
+        getMaxContainerWidth(rectangle),
+      );
+
+      jest
+        .spyOn(textElementUtils, "measureText")
+        .mockImplementation((text, font, maxWidth) => {
+          if (text === wrappedText) {
+            return { width: rectangle.width, height: 200, baseline: 30 };
+          }
+          return { width: 0, height: 0, baseline: 0 };
+        });
+
+      //@ts-ignore
+      editor.onpaste({
+        preventDefault: () => {},
+        //@ts-ignore
+        clipboardData: {
+          getData: () => text,
+        },
+      });
+
+      await new Promise((cb) => setTimeout(cb, 0));
+      editor.blur();
+      expect(rectangle.width).toBe(100);
+      expect(rectangle.height).toBe(210);
+      expect((h.elements[1] as ExcalidrawTextElement).text)
+        .toMatchInlineSnapshot(`
+        "Wikipedi
+        a is 
+        hosted 
+        by the 
+        Wikimedi
+        a 
+        Foundati
+        on, a 
+        non-prof
+        it 
+        organiza
+        tion 
+        that 
+        also 
+        hosts a 
+        range of
+        other 
+        projects
+        ."
+      `);
+      expect(
+        (h.elements[1] as ExcalidrawTextElement).originalText,
+      ).toMatchInlineSnapshot(
+        `"Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects."`,
+      );
+
+      text = "Hello this text should get merged with the existing one";
+      wrappedText = textElementUtils.wrapText(
+        text,
+        font,
+        getMaxContainerWidth(rectangle),
+      );
+      //@ts-ignore
+      editor.onpaste({
+        preventDefault: () => {},
+        //@ts-ignore
+        clipboardData: {
+          getData: () => text,
+        },
+      });
+
+      await new Promise((cb) => setTimeout(cb, 0));
+      editor.blur();
+      expect((h.elements[1] as ExcalidrawTextElement).text)
+        .toMatchInlineSnapshot(`
+        "Wikipedi
+        a is 
+        hosted 
+        by the 
+        Wikimedi
+        a 
+        Foundati
+        on, a 
+        non-prof
+        it 
+        organiza
+        tion 
+        that 
+        also 
+        hosts a 
+        range of
+        other 
+        projects
+        .Hello 
+        this 
+        text 
+        should 
+        get 
+        merged 
+        with the
+        existing
+        one"
+      `);
+      expect(
+        (h.elements[1] as ExcalidrawTextElement).originalText,
+      ).toMatchInlineSnapshot(
+        `"Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.Hello this text should get merged with the existing one"`,
+      );
     });
   });
 });

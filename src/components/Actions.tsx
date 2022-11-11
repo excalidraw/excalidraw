@@ -26,17 +26,19 @@ import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
+import clsx from "clsx";
+import { actionToggleZenMode } from "../actions";
+import "./Actions.scss";
+import { Tooltip } from "./Tooltip";
 
 export const SelectedShapeActions = ({
   appState,
   elements,
   renderAction,
-  activeTool,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
-  activeTool: AppState["activeTool"]["type"];
 }) => {
   const targetElements = getTargetElements(
     getNonDeletedElements(elements),
@@ -56,13 +58,13 @@ export const SelectedShapeActions = ({
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
-    hasBackground(activeTool) ||
+    hasBackground(appState.activeTool.type) ||
     targetElements.some(
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
   const showChangeBackgroundIcons =
-    hasBackground(activeTool) ||
+    hasBackground(appState.activeTool.type) ||
     targetElements.some((element) => hasBackground(element.type));
 
   const showLinkIcon =
@@ -79,23 +81,27 @@ export const SelectedShapeActions = ({
 
   return (
     <div className="panelColumn">
-      {((hasStrokeColor(activeTool) &&
-        activeTool !== "image" &&
-        commonSelectedType !== "image") ||
-        targetElements.some((element) => hasStrokeColor(element.type))) &&
-        renderAction("changeStrokeColor")}
-      {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
+      <div>
+        {((hasStrokeColor(appState.activeTool.type) &&
+          appState.activeTool.type !== "image" &&
+          commonSelectedType !== "image") ||
+          targetElements.some((element) => hasStrokeColor(element.type))) &&
+          renderAction("changeStrokeColor")}
+      </div>
+      {showChangeBackgroundIcons && (
+        <div>{renderAction("changeBackgroundColor")}</div>
+      )}
       {showFillIcons && renderAction("changeFillStyle")}
 
-      {(hasStrokeWidth(activeTool) ||
+      {(hasStrokeWidth(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}
 
-      {(activeTool === "freedraw" ||
+      {(appState.activeTool.type === "freedraw" ||
         targetElements.some((element) => element.type === "freedraw")) &&
         renderAction("changeStrokeShape")}
 
-      {(hasStrokeStyle(activeTool) ||
+      {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>
           {renderAction("changeStrokeStyle")}
@@ -103,12 +109,12 @@ export const SelectedShapeActions = ({
         </>
       )}
 
-      {(canChangeSharpness(activeTool) ||
+      {(canChangeSharpness(appState.activeTool.type) ||
         targetElements.some((element) => canChangeSharpness(element.type))) && (
         <>{renderAction("changeSharpness")}</>
       )}
 
-      {(hasText(activeTool) ||
+      {(hasText(appState.activeTool.type) ||
         targetElements.some((element) => hasText(element.type))) && (
         <>
           {renderAction("changeFontSize")}
@@ -123,7 +129,7 @@ export const SelectedShapeActions = ({
         (element) =>
           hasBoundTextElement(element) || isBoundToContainer(element),
       ) && renderAction("changeVerticalAlign")}
-      {(canHaveArrowheads(activeTool) ||
+      {(canHaveArrowheads(appState.activeTool.type) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
       )}
@@ -163,7 +169,16 @@ export const SelectedShapeActions = ({
             )}
             {targetElements.length > 2 &&
               renderAction("distributeHorizontally")}
-            <div className="iconRow">
+            {/* breaks the row ˇˇ */}
+            <div style={{ flexBasis: "100%", height: 0 }} />
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: ".5rem",
+                marginTop: "-0.5rem",
+              }}
+            >
               {renderAction("alignTop")}
               {renderAction("alignVerticallyCentered")}
               {renderAction("alignBottom")}
@@ -203,25 +218,25 @@ export const ShapesSwitcher = ({
   appState: AppState;
 }) => (
   <>
-    {SHAPES.map(({ value, icon, key }, index) => {
+    {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
       const label = t(`toolBar.${value}`);
       const letter = key && (typeof key === "string" ? key : key[0]);
       const shortcut = letter
-        ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
-        : `${index + 1}`;
+        ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${numericKey}`
+        : `${numericKey}`;
       return (
         <ToolButton
-          className="Shape"
+          className={clsx("Shape", { fillable })}
           key={value}
           type="radio"
           icon={icon}
           checked={activeTool.type === value}
           name="editor-current-shape"
           title={`${capitalizeString(label)} — ${shortcut}`}
-          keyBindingLabel={`${index + 1}`}
+          keyBindingLabel={numericKey}
           aria-label={capitalizeString(label)}
           aria-keyshortcuts={shortcut}
-          data-testid={value}
+          data-testid={`toolbar-${value}`}
           onPointerDown={({ pointerType }) => {
             if (!appState.penDetected && pointerType === "pen") {
               setAppState({
@@ -263,11 +278,57 @@ export const ZoomActions = ({
   renderAction: ActionManager["renderAction"];
   zoom: Zoom;
 }) => (
-  <Stack.Col gap={1}>
-    <Stack.Row gap={1} align="center">
+  <Stack.Col gap={1} className="zoom-actions">
+    <Stack.Row align="center">
       {renderAction("zoomOut")}
-      {renderAction("zoomIn")}
       {renderAction("resetZoom")}
+      {renderAction("zoomIn")}
     </Stack.Row>
   </Stack.Col>
+);
+
+export const UndoRedoActions = ({
+  renderAction,
+  className,
+}: {
+  renderAction: ActionManager["renderAction"];
+  className?: string;
+}) => (
+  <div className={`undo-redo-buttons ${className}`}>
+    <div className="undo-button-container">
+      <Tooltip label={t("buttons.undo")}>{renderAction("undo")}</Tooltip>
+    </div>
+    <div className="redo-button-container">
+      <Tooltip label={t("buttons.redo")}> {renderAction("redo")}</Tooltip>
+    </div>
+  </div>
+);
+
+export const ExitZenModeAction = ({
+  actionManager,
+  showExitZenModeBtn,
+}: {
+  actionManager: ActionManager;
+  showExitZenModeBtn: boolean;
+}) => (
+  <button
+    className={clsx("disable-zen-mode", {
+      "disable-zen-mode--visible": showExitZenModeBtn,
+    })}
+    onClick={() => actionManager.executeAction(actionToggleZenMode)}
+  >
+    {t("buttons.exitZenMode")}
+  </button>
+);
+
+export const FinalizeAction = ({
+  renderAction,
+  className,
+}: {
+  renderAction: ActionManager["renderAction"];
+  className?: string;
+}) => (
+  <div className={`finalize-button ${className}`}>
+    {renderAction("finalize", { size: "small" })}
+  </div>
 );

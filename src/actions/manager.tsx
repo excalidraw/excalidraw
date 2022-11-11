@@ -135,7 +135,11 @@ export class ActionManager {
   /**
    * @param data additional data sent to the PanelComponent
    */
-  renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
+  renderAction = (
+    name: ActionName,
+    data?: PanelComponentProps["data"],
+    isInHamburgerMenu = false,
+  ) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
     if (
@@ -147,6 +151,7 @@ export class ActionManager {
     ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
+      PanelComponent.displayName = "PanelComponent";
       const elements = this.getElementsIncludingDeleted();
       const appState = this.getAppState();
       const updateData = (formState?: any) => {
@@ -169,6 +174,7 @@ export class ActionManager {
           updateData={updateData}
           appProps={this.app.props}
           data={data}
+          isInHamburgerMenu={isInHamburgerMenu}
         />
       );
     }

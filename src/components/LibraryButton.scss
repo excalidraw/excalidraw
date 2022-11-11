@@ -1,0 +1,32 @@
+@import "../css/variables.module";
+
+.library-button {
+  @include outlineButtonStyles;
+
+  background-color: var(--island-bg-color);
+
+  width: auto;
+  height: var(--lg-button-size);
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  line-height: 0;
+
+  font-size: 0.75rem;
+  letter-spacing: 0.4px;
+
+  svg {
+    width: var(--lg-icon-size);
+    height: var(--lg-icon-size);
+  }
+
+  &__label {
+    display: none;
+
+    @media screen and (min-width: 1024px) {
+      display: block;
+    }
+  }
+}

@@ -1,10 +1,16 @@
 @import "open-color/open-color";
 
 .excalidraw {
+  .layer-ui__library-sidebar {
+    display: flex;
+    flex-direction: column;
+  }
+
   .layer-ui__library {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+
+    flex: 1 1 auto;
 
     .layer-ui__library-header {
       display: flex;
@@ -23,25 +29,38 @@
   }
 
   .layer-ui__sidebar {
-    .layer-ui__library {
-      padding: 0;
-      height: 100%;
-    }
     .library-menu-items-container {
       height: 100%;
       width: 100%;
     }
   }
 
+  .library-actions-counter {
+    background-color: var(--color-primary);
+    color: var(--color-primary-light);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    bottom: -0.25rem;
+    right: -0.25rem;
+    font-size: 0.625rem;
+    pointer-events: none;
+  }
+
   .layer-ui__library-message {
-    padding: 2em 4em;
+    padding: 2rem;
     min-width: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    .Spinner {
-      margin-bottom: 1em;
-    }
+    flex-grow: 1;
+    justify-content: center;
+
     span {
       font-size: 0.8em;
     }
@@ -69,11 +88,10 @@
   }
 
   .library-menu-browse-button {
-    width: 80%;
-    min-height: 22px;
-    margin: 0 auto;
-    margin-top: 1rem;
-    padding: 10px;
+    margin: 1rem auto;
+
+    padding: 0.875rem 1rem;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -86,11 +104,21 @@
     text-align: center;
     white-space: nowrap;
     text-decoration: none !important;
+
+    font-weight: 600;
+    font-size: 0.75rem;
+
     &:hover {
       background-color: var(--color-primary-darker);
     }
     &:active {
       background-color: var(--color-primary-darkest);
+    }
+  }
+
+  &.theme--dark {
+    .library-menu-browse-button {
+      color: var(--color-gray-100);
     }
   }
 

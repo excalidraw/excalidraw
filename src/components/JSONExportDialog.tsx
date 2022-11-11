@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { useDevice } from "./App";
+
 import { AppState, ExportOpts, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
-import { exportFile, exportToFileIcon, link } from "./icons";
+import { ExportIcon, exportToFileIcon, LinkIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
 import { actionSaveFileToDisk } from "../actions/actionExport";
 import { Card } from "./Card";
@@ -14,6 +14,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { trackEvent } from "../analytics";
 import { ActionManager } from "../actions/manager";
 import { getFrame } from "../utils";
+import MenuItem from "./MenuItem";
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -63,7 +64,7 @@ const JSONExportModal = ({
         )}
         {onExportToBackend && (
           <Card color="pink">
-            <div className="Card-icon">{link}</div>
+            <div className="Card-icon">{LinkIcon}</div>
             <h2>{t("exportDialog.link_title")}</h2>
             <div className="Card-details">{t("exportDialog.link_details")}</div>
             <ToolButton
@@ -109,16 +110,13 @@ export const JSONExportDialog = ({
 
   return (
     <>
-      <ToolButton
+      <MenuItem
+        icon={ExportIcon}
+        label={t("buttons.export")}
         onClick={() => {
           setModalIsShown(true);
         }}
-        data-testid="json-export-button"
-        icon={exportFile}
-        type="button"
-        aria-label={t("buttons.export")}
-        showAriaLabel={useDevice().isMobile}
-        title={t("buttons.export")}
+        dataTestId="json-export-button"
       />
       {modalIsShown && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
