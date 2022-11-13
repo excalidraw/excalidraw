@@ -19,7 +19,7 @@ import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
-import { MenuLinks, Separator } from "./MenuUtils";
+import { Separator } from "./MenuUtils";
 import WelcomeScreen from "./WelcomeScreen";
 import MenuItem from "./MenuItem";
 import { ExportImageIcon } from "./icons";
@@ -192,12 +192,12 @@ export const MobileMenu = ({
         {!appState.viewModeEnabled && actionManager.renderAction("loadScene")}
         {renderJSONExportDialog()}
         {renderImageExportDialog()}
-        <MenuItem
+        {/*<MenuItem //zsviczian editor-ui-changes
           label={t("buttons.exportImage")}
           icon={ExportImageIcon}
           dataTestId="image-export-button"
           onClick={() => setAppState({ openDialog: "imageExport" })}
-        />
+        />*/}
         {onCollabButtonClick && (
           <CollabButton
             isCollaborating={isCollaborating}
@@ -207,8 +207,8 @@ export const MobileMenu = ({
         )}
         {actionManager.renderAction("toggleShortcuts", undefined, true)}
         {!appState.viewModeEnabled && actionManager.renderAction("clearCanvas")}
-        <Separator />
-        <MenuLinks />
+        {/*<Separator /> //zsviczian editor-ui-changes
+        <MenuLinks />*/}
         <Separator />
         {!appState.viewModeEnabled && (
           <div style={{ marginBottom: ".5rem" }}>

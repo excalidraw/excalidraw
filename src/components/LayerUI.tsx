@@ -45,13 +45,12 @@ import {
   WelcomeScreenMenuArrow,
   WelcomeScreenTopToolbarArrow,
 } from "./icons";
-import { MenuLinks, Separator } from "./MenuUtils";
+import { Separator } from "./MenuUtils";
 import { useOutsideClickHook } from "../hooks/useOutsideClick";
 import WelcomeScreen from "./WelcomeScreen";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
-import { LanguageList } from "../excalidraw-app/components/LanguageList";
 import WelcomeScreenDecor from "./WelcomeScreenDecor";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import MenuItem from "./MenuItem";
@@ -241,8 +240,8 @@ const LayerUI = ({
               {actionManager.renderAction("toggleShortcuts", undefined, true)}
               {!appState.viewModeEnabled &&
                 actionManager.renderAction("clearCanvas")}
-              <Separator />
-              <MenuLinks />
+              {/*<Separator /> //zsviczian editor-ui-changes
+              <MenuLinks />*/}
               <Separator />
               <div
                 style={{
@@ -252,9 +251,9 @@ const LayerUI = ({
                 }}
               >
                 <div>{actionManager.renderAction("toggleTheme")}</div>
-                <div style={{ padding: "0 0.625rem" }}>
+                {/*<div style={{ padding: "0 0.625rem" }}> //zsviczian editor-ui-changes
                   <LanguageList style={{ width: "100%" }} />
-                </div>
+                </div>*/}
                 {!appState.viewModeEnabled && (
                   <div>
                     <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>

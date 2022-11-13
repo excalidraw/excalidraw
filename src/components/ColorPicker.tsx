@@ -386,6 +386,14 @@ export const ColorPicker = ({
     ? colorPalette[type] ?? colors[type]
     : colors[type]; //zsviczian
   const coords = pickerButton.current?.getBoundingClientRect();
+  //zsviczian
+  let parent = pickerButton.current?.parentElement;
+  //@ts-ignore
+  while (parent && !parent.hasClass("workspace-leaf")) {
+    parent = parent.parentElement;
+  }
+  const parentCoords = parent ? parent.getBoundingClientRect() : undefined;
+  //zsviczian
 
   return (
     <div>
@@ -413,8 +421,12 @@ export const ColorPicker = ({
             className="color-picker-popover-container"
             style={{
               position: "fixed",
-              top: coords?.top,
-              left: coords?.right,
+              top: coords //zsviczian
+                ? coords.top - (parentCoords ? parentCoords.y : 0)
+                : undefined,
+              left: coords //zsviczian
+                ? coords.right - (parentCoords ? parentCoords.x : 0)
+                : undefined,
               zIndex: 1,
             }}
           >

@@ -231,6 +231,9 @@ export {
   intersectElementWithLine, //zsviczian
   determineFocusDistance, //zsviczian
   measureText, //zsviczian
+  wrapText, //zsviczian
+  getFontString, //zsviczian
+  getMaxContainerWidth, //zsviczian
   exportToClipboard,
   mergeLibraryItems,
 } from "../../packages/utils";

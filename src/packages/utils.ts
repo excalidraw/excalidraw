@@ -208,5 +208,7 @@ export { getCommonBoundingBox } from "../element/bounds"; //zsviczian
 export { getMaximumGroups } from "../groups"; //zsviczian
 export { intersectElementWithLine } from "../element/collision"; //zsviczian
 export { determineFocusDistance } from "../element/collision"; //zsviczian
-export { measureText } from "../element/textElement"; //zsviczian
+export { measureText, wrapText } from "../element/textElement"; //zsviczian
+export { getFontString } from "../utils"; //zsviczian
+export { getMaxContainerWidth } from "../element/newElement"; //zsviczian
 export { mergeLibraryItems } from "../data/library";

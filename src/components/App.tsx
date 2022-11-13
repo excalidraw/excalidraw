@@ -596,6 +596,7 @@ class App extends React.Component<AppProps, AppState> {
                     id={this.id}
                     onImageAction={this.onImageAction}
                     renderWelcomeScreen={
+                      false && //zsviczian editor-ui-changes
                       this.state.showWelcomeScreen &&
                       this.state.activeTool.type === "selection" &&
                       !this.scene.getElementsIncludingDeleted().length
@@ -1312,6 +1313,10 @@ class App extends React.Component<AppProps, AppState> {
           element.id !== this.state.editingElement.id
         );
       });
+
+    if (!document.querySelector(".excalidraw")) {
+      return;
+    } //zsviczian - address issue when moving excalidraw to a new window/document
 
     const selectionColor = getComputedStyle(
       document.querySelector(".excalidraw")!,
