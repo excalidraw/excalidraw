@@ -97,7 +97,7 @@ export const SelectedShapeActions = ({
           action.panelComponentPredicate &&
           action.panelComponentPredicate(targetElements, appState)
         ) {
-          return <div>{renderAction(action.name)}</div>;
+          return renderAction(action.name);
         }
         return null;
       })}
