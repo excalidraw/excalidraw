@@ -17,6 +17,7 @@ import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
 import { resize } from "../tests/utils";
 import { getMaxContainerWidth } from "./newElement";
+import { parseClipboard } from "../clipboard";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -218,6 +219,21 @@ describe("textWysiwyg", () => {
       expect(editor).not.toBe(null);
       expect(h.state.editingElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
+    });
+  });
+
+  describe("Test general text", () => {
+    it("should parse non-ExcalidrawElement data correctly", async () => {
+      const text = "123";
+
+      const clipboardData = await parseClipboard({
+        //@ts-ignore
+        clipboardData: {
+          getData: () => text,
+        },
+      });
+
+      expect(clipboardData.text).toBe(text);
     });
   });
 
