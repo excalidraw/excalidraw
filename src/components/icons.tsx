@@ -1470,11 +1470,11 @@ export const TextAlignRightIcon = createIcon(
 export const TextAlignTopIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <g
-      stroke-width="1.5"
+      strokeWidth="1.5"
       stroke="currentColor"
       fill="none"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <line x1="4" y1="4" x2="20" y2="4" />
@@ -1488,11 +1488,11 @@ export const TextAlignTopIcon = React.memo(({ theme }: { theme: Theme }) =>
 export const TextAlignBottomIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <g
-      stroke-width="2"
+      strokeWidth="2"
       stroke="currentColor"
       fill="none"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <line x1="4" y1="20" x2="20" y2="20" />
@@ -1506,11 +1506,11 @@ export const TextAlignBottomIcon = React.memo(({ theme }: { theme: Theme }) =>
 export const TextAlignMiddleIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <g
-      stroke-width="1.5"
+      strokeWidth="1.5"
       stroke="currentColor"
       fill="none"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <line x1="4" y1="12" x2="9" y2="12" />
