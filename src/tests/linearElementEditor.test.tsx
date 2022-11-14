@@ -15,7 +15,7 @@ import { API } from "../tests/helpers/api";
 import { Point } from "../types";
 import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { queryByText } from "@testing-library/react";
+import { queryByTestId, queryByText } from "@testing-library/react";
 import { resize, rotate } from "./utils";
 import { getBoundTextElementPosition, wrapText } from "../element/textElement";
 import { getMaxContainerWidth } from "../element/newElement";
@@ -659,6 +659,7 @@ describe("Test Linear Elements", () => {
       `);
     });
   });
+
   describe("Test bound text element", () => {
     const DEFAULT_TEXT = "Online whiteboard collaboration made easy";
 
@@ -1111,6 +1112,18 @@ describe("Test Linear Elements", () => {
         ion made 
         easy"
       `);
+    });
+
+    it("should not render vertical align tool when element selected", () => {
+      createTwoPointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+
+      createBoundTextElement(DEFAULT_TEXT, line);
+      API.setSelectedElements([line]);
+
+      expect(queryByTestId(container, "align-top")).toBeNull();
+      expect(queryByTestId(container, "align-middle")).toBeNull();
+      expect(queryByTestId(container, "align-bottom")).toBeNull();
     });
   });
 });
