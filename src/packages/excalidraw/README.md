@@ -932,7 +932,7 @@ This function will make sure all properties of element is correctly set and if a
 
 When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`. Use this when you import elements which may already be present in the scene to ensure that you do not disregard the newly imported elements if you're using element version to detect the updates.
 
-Parameter `refreshDimensions` indicates whether we should also recalculate text element dimensions. Defaults to `true`, but since this is a potentially costly operation, you may want to disable it if you restore elements in tight loops, such as during collaboration.
+Parameter `refreshDimensions` indicates whether we should also recalculate text element dimensions. Defaults to `false`. Since this is a potentially costly operation, you may want to disable it if you restore elements in tight loops, such as during collaboration.
 
 #### `restore`
 
