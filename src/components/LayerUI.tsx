@@ -418,7 +418,8 @@ const LayerUI = ({
                 onClick={onCollabButtonClick}
               />
             )}
-            {renderTopRightUI?.(device.isMobile, appState)}
+            {!appState.viewModeEnabled &&
+              renderTopRightUI?.(device.isMobile, appState)}
             {!appState.viewModeEnabled && (
               <LibraryButton appState={appState} setAppState={setAppState} />
             )}
