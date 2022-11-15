@@ -730,16 +730,18 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private onFontLoaded = () => {
-    const didChange = this.scene.mapElements((element) => {
+    let didUpdate = false;
+    this.scene.mapElements((element) => {
       if (isTextElement(element)) {
         invalidateShapeForElement(element);
+        didUpdate = true;
         return newElementWith(element, {
           ...refreshTextDimensions(element),
         });
       }
       return element;
     });
-    if (didChange) {
+    if (didUpdate) {
       this.onSceneUpdated();
     }
   };
