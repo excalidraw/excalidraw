@@ -1034,5 +1034,35 @@ describe("textWysiwyg", () => {
         `"Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.Hello this text should get merged with the existing one"`,
       );
     });
+    it("should always bind to selected container", async () => {
+      const rectangle2 = UI.createElement("rectangle", {
+        x: 5,
+        y: 10,
+        width: 120,
+        height: 100,
+      });
+
+      API.setSelectedElements([rectangle]);
+      Keyboard.keyPress(KEYS.ENTER);
+
+      expect(h.elements.length).toBe(3);
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(rectangle.id);
+      mouse.down();
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      fireEvent.change(editor, { target: { value: "Hello World!" } });
+
+      await new Promise((r) => setTimeout(r, 0));
+      editor.blur();
+      expect(rectangle2.boundElements).toBeNull();
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
+    });
   });
 });
