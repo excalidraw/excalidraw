@@ -1987,12 +1987,13 @@ class App extends React.Component<AppProps, AppState> {
               });
             }
           } else {
-            const selectedElement = selectedElements[0];
+            const container = selectedElements[0] as ExcalidrawTextContainer;
 
             this.startTextEditing({
-              sceneX: selectedElement.x + selectedElement.width / 2,
-              sceneY: selectedElement.y + selectedElement.height / 2,
-              shouldBind: true,
+              sceneX: container.x + container.width / 2,
+              sceneY: container.y + container.height / 2,
+
+              container,
             });
             event.preventDefault();
             return;
@@ -2393,29 +2394,31 @@ class App extends React.Component<AppProps, AppState> {
   private startTextEditing = ({
     sceneX,
     sceneY,
-    shouldBind,
     insertAtParentCenter = true,
+    container,
   }: {
     /** X position to insert text at */
     sceneX: number;
     /** Y position to insert text at */
     sceneY: number;
-    shouldBind: boolean;
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
+    container?: ExcalidrawTextContainer | null;
   }) => {
+    let shouldBindToContainer = false;
+
     let parentCenterPosition =
       insertAtParentCenter &&
       this.getTextWysiwygSnappedToCenterPosition(
         sceneX,
         sceneY,
         this.state,
-        this.canvas,
-        window.devicePixelRatio,
+        container,
       );
-
+    if (container && parentCenterPosition) {
+      shouldBindToContainer = true;
+    }
     let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
-    let container: ExcalidrawTextContainer | null = null;
 
     const selectedElements = getSelectedElements(
       this.scene.getNonDeletedElements(),
@@ -2434,26 +2437,7 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
 
-    // bind to container when shouldBind is true or
-    // clicked on center of container
-    if (
-      !container &&
-      !existingTextElement &&
-      (shouldBind || parentCenterPosition)
-    ) {
-      container = getTextBindableContainerAtPosition(
-        this.scene
-          .getNonDeletedElements()
-          .filter(
-            (ele) =>
-              isTextBindableContainer(ele, false) && !getBoundTextElement(ele),
-          ),
-        sceneX,
-        sceneY,
-      );
-    }
-
-    if (!existingTextElement && container) {
+    if (!existingTextElement && shouldBindToContainer && container) {
       const fontString = {
         fontSize: this.state.currentItemFontSize,
         fontFamily: this.state.currentItemFontFamily,
@@ -2471,8 +2455,7 @@ class App extends React.Component<AppProps, AppState> {
           sceneX,
           sceneY,
           this.state,
-          this.canvas,
-          window.devicePixelRatio,
+          container,
         );
       }
     }
@@ -2503,7 +2486,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? VERTICAL_ALIGN.MIDDLE
             : DEFAULT_VERTICAL_ALIGN,
-          containerId: container?.id ?? undefined,
+          containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
           locked: false,
         });
@@ -2606,19 +2589,20 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getNonDeletedElements(),
         this.state,
       );
+      let container;
       if (selectedElements.length === 1) {
-        const selectedElement = selectedElements[0];
-        const canBindText = hasBoundTextElement(selectedElement);
+        container = selectedElements[0] as ExcalidrawTextContainer;
+        const canBindText = hasBoundTextElement(container);
         if (canBindText) {
-          sceneX = selectedElement.x + selectedElement.width / 2;
-          sceneY = selectedElement.y + selectedElement.height / 2;
+          sceneX = container.x + container.width / 2;
+          sceneY = container.y + container.height / 2;
         }
       }
       this.startTextEditing({
         sceneX,
         sceneY,
-        shouldBind: false,
         insertAtParentCenter: !event.altKey,
+        container,
       });
     }
   };
@@ -3907,20 +3891,23 @@ class App extends React.Component<AppProps, AppState> {
     let sceneX = pointerDownState.origin.x;
     let sceneY = pointerDownState.origin.y;
 
-    const element = this.getElementAtPosition(sceneX, sceneY, {
-      includeBoundTextElement: true,
-    });
+    const container = getTextBindableContainerAtPosition(
+      this.scene.getNonDeletedElements(),
+      sceneX,
+      sceneY,
+    );
 
-    const canBindText = hasBoundTextElement(element);
+    const canBindText = hasBoundTextElement(container);
     if (canBindText) {
-      sceneX = element.x + element.width / 2;
-      sceneY = element.y + element.height / 2;
+      sceneX = container.x + container.width / 2;
+      sceneY = container.y + container.height / 2;
     }
+
     this.startTextEditing({
       sceneX,
       sceneY,
-      shouldBind: false,
       insertAtParentCenter: !event.altKey,
+      container,
     });
 
     resetCursor(this.canvas);
@@ -6171,21 +6158,11 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
     appState: AppState,
-    canvas: HTMLCanvasElement | null,
-    scale: number,
+    container?: ExcalidrawTextContainer | null,
   ) {
-    const elementClickedInside = getTextBindableContainerAtPosition(
-      this.scene
-        .getElementsIncludingDeleted()
-        .filter((element) => !isTextElement(element)),
-      x,
-      y,
-    );
-    if (elementClickedInside) {
-      const elementCenterX =
-        elementClickedInside.x + elementClickedInside.width / 2;
-      const elementCenterY =
-        elementClickedInside.y + elementClickedInside.height / 2;
+    if (container) {
+      const elementCenterX = container.x + container.width / 2;
+      const elementCenterY = container.y + container.height / 2;
       const distanceToCenter = Math.hypot(
         x - elementCenterX,
         y - elementCenterY,
