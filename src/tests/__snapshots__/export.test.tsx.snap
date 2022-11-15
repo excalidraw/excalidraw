@@ -5,7 +5,7 @@ exports[`export exporting svg containing transformed images: svg export output 1
   <!-- svg-source:excalidraw -->
   
   <defs>
-    <style>
+    <style class=\\"style-fonts\\">
       @font-face {
         font-family: \\"Virgil\\";
         src: url(\\"https://excalidraw.com/Virgil.woff2\\");
