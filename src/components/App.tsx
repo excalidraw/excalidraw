@@ -2493,10 +2493,15 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ editingElement: element });
 
     if (!existingTextElement) {
-      this.scene.replaceAllElements([
-        ...this.scene.getElementsIncludingDeleted(),
-        element,
-      ]);
+      if (container) {
+        const containerIndex = this.scene.getElementIndex(container.id);
+        this.scene.insertElementAtIndex(element, containerIndex);
+      } else {
+        this.scene.replaceAllElements([
+          ...this.scene.getElementsIncludingDeleted(),
+          element,
+        ]);
+      }
 
       // case: creating new text not centered to parent element → offset Y
       // so that the text is centered to cursor position

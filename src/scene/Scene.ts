@@ -121,6 +121,19 @@ class Scene {
     // (I guess?)
     this.callbacks.clear();
   }
+
+  insertElementAtIndex(element: ExcalidrawElement, index: number) {
+    const nextElements = [
+      ...this.elements.slice(0, index + 1),
+      element,
+      ...this.elements.slice(index + 1),
+    ];
+    this.replaceAllElements(nextElements);
+  }
+
+  getElementIndex(elementId: string) {
+    return this.elements.findIndex((element) => element.id === elementId);
+  }
 }
 
 export default Scene;
