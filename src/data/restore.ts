@@ -139,7 +139,7 @@ const restoreElementWithProperties = <
 
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-  refreshDimensions = true,
+  refreshDimensions = false,
 ): typeof element | null => {
   switch (element.type) {
     case "text":
@@ -240,7 +240,7 @@ export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  refreshDimensions = true,
+  refreshDimensions = false,
 ): ExcalidrawElement[] => {
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
   return (elements || []).reduce((elements, element) => {
@@ -388,7 +388,7 @@ export const restore = (
   localElements: readonly ExcalidrawElement[] | null | undefined,
 ): RestoredDataState => {
   return {
-    elements: restoreElements(data?.elements, localElements, true),
+    elements: restoreElements(data?.elements, localElements),
     appState: restoreAppState(data?.appState, localAppState || null),
     files: data?.files || {},
   };
