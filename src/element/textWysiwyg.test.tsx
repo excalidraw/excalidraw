@@ -1034,7 +1034,7 @@ describe("textWysiwyg", () => {
         `"Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.Hello this text should get merged with the existing one"`,
       );
     });
-    it("should always bind to selected container", async () => {
+    it("should always bind to selected container and insert it in correct position", async () => {
       const rectangle2 = UI.createElement("rectangle", {
         x: 5,
         y: 10,
@@ -1046,7 +1046,7 @@ describe("textWysiwyg", () => {
       Keyboard.keyPress(KEYS.ENTER);
 
       expect(h.elements.length).toBe(3);
-
+      expect(h.elements[1].type).toBe("text");
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(rectangle.id);
