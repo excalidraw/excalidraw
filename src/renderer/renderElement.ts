@@ -926,18 +926,16 @@ export const renderElement = (
           const tempCanvasContext = tempCanvas.getContext("2d")!;
           const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
           const padding = getCanvasPadding(element);
-          tempCanvas.width = maxDim + padding * 2;
-          tempCanvas.height = maxDim + padding * 2;
-
-          const offsetX = (tempCanvas.width - element.width) / 2;
-          const offsetY = (tempCanvas.height - element.height) / 2;
-          shiftX = tempCanvas.width / 2 - (element.x - x1) - offsetX;
-          shiftY = tempCanvas.height / 2 - (element.y - y1) - offsetY;
+          tempCanvas.width = maxDim + padding * 10;
+          tempCanvas.height = maxDim + padding * 10;
 
           tempCanvasContext.translate(
             tempCanvas.width / 2,
             tempCanvas.height / 2,
           );
+
+          shiftX = element.width / 2 - (element.x - x1);
+          shiftY = element.height / 2 - (element.y - y1);
 
           tempCanvasContext.rotate(element.angle);
 
@@ -951,10 +949,8 @@ export const renderElement = (
 
           const [, , , , boundTextCx, boundTextCy] =
             getElementAbsoluteCoords(boundTextElement);
-          const boundTextShiftX =
-            tempCanvas.width / 2 - (boundTextCx - x1) - offsetX;
-          const boundTextShiftY =
-            tempCanvas.height / 2 - (boundTextCy - y1) - offsetY;
+          const boundTextShiftX = (x1 + x2) / 2 - boundTextCx;
+          const boundTextShiftY = (y1 + y2) / 2 - boundTextCy;
           tempCanvasContext.translate(-boundTextShiftX, -boundTextShiftY);
 
           // Draw a rectangle of bound text dimensions so that linear element
@@ -963,10 +959,10 @@ export const renderElement = (
           tempCanvasContext.globalCompositeOperation = "destination-out";
 
           tempCanvasContext.fillRect(
-            -boundTextElement.width / 2,
-            -boundTextElement.height / 2,
-            boundTextElement.width,
-            boundTextElement.height,
+            -(boundTextElement.width / 2 + BOUND_TEXT_PADDING),
+            -(boundTextElement.height / 2 + BOUND_TEXT_PADDING),
+            boundTextElement.width + BOUND_TEXT_PADDING * 2,
+            boundTextElement.height + BOUND_TEXT_PADDING * 2,
           );
           context.drawImage(
             tempCanvas,
