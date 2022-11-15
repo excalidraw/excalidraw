@@ -179,7 +179,6 @@ import { renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
-  getTextBindableContainerAtPosition,
   getElementsAtPosition,
   getElementsWithinSelection,
   getNormalizedZoom,
@@ -3888,26 +3887,13 @@ class App extends React.Component<AppProps, AppState> {
     if (isTextElement(this.state.editingElement)) {
       return;
     }
-    let sceneX = pointerDownState.origin.x;
-    let sceneY = pointerDownState.origin.y;
-
-    const container = getTextBindableContainerAtPosition(
-      this.scene.getNonDeletedElements(),
-      sceneX,
-      sceneY,
-    );
-
-    const canBindText = hasBoundTextElement(container);
-    if (canBindText) {
-      sceneX = container.x + container.width / 2;
-      sceneY = container.y + container.height / 2;
-    }
+    const sceneX = pointerDownState.origin.x;
+    const sceneY = pointerDownState.origin.y;
 
     this.startTextEditing({
       sceneX,
       sceneY,
       insertAtParentCenter: !event.altKey,
-      container,
     });
 
     resetCursor(this.canvas);
