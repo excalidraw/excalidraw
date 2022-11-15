@@ -730,18 +730,20 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private onFontLoaded = () => {
-    this.scene.replaceAllElements([
-      ...this.scene.getElementsIncludingDeleted().map((element) => {
-        if (isTextElement(element)) {
-          invalidateShapeForElement(element);
-          return newElementWith(element, {
-            ...refreshTextDimensions(element),
-          });
-        }
-        return element;
-      }),
-    ]);
-    this.onSceneUpdated();
+    let didUpdate = false;
+    this.scene.mapElements((element) => {
+      if (isTextElement(element)) {
+        invalidateShapeForElement(element);
+        didUpdate = true;
+        return newElementWith(element, {
+          ...refreshTextDimensions(element),
+        });
+      }
+      return element;
+    });
+    if (didUpdate) {
+      this.onSceneUpdated();
+    }
   };
 
   private resetHistory = () => {

@@ -44,6 +44,7 @@ export const LibraryUnit = ({
         },
         null,
       );
+      svg.querySelector(".style-fonts")?.remove();
       node.innerHTML = svg.outerHTML;
     })();
 
