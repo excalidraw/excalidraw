@@ -69,6 +69,7 @@ const ChartPreviewBtn = (props: {
             },
             null, // files
           );
+          svg.querySelector(".style-fonts")?.remove();
           previewNode.replaceChildren();
           previewNode.appendChild(svg);
 

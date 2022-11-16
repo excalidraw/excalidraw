@@ -161,7 +161,7 @@ export const parseClipboard = async (
         files: systemClipboardData.files,
       };
     }
-  } catch {}
+  } catch (e) {}
   // system clipboard doesn't contain excalidraw elements → return plaintext
   // unless we set a flag to prefer in-app clipboard because browser didn't
   // support storing to system clipboard on copy

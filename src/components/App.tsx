@@ -124,7 +124,11 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
+import {
+  deepCopyElement,
+  newFreeDrawElement,
+  refreshTextDimensions,
+} from "../element/newElement";
 import {
   hasBoundTextElement,
   isBindingElement,
@@ -787,12 +791,20 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private onFontLoaded = () => {
-    this.scene.getElementsIncludingDeleted().forEach((element) => {
+    let didUpdate = false;
+    this.scene.mapElements((element) => {
       if (isTextElement(element)) {
         invalidateShapeForElement(element);
+        didUpdate = true;
+        return newElementWith(element, {
+          ...refreshTextDimensions(element),
+        });
       }
+      return element;
     });
-    this.onSceneUpdated();
+    if (didUpdate) {
+      this.onSceneUpdated();
+    }
   };
 
   private resetHistory = () => {
