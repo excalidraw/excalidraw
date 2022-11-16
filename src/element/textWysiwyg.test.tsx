@@ -500,9 +500,43 @@ describe("textWysiwyg", () => {
       });
     });
 
-    it("should bind text to container when double clicked on center", async () => {
+    it("should bind text to container when double clicked on center of filled container", async () => {
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
+
+      mouse.doubleClickAt(
+        rectangle.x + rectangle.width / 2,
+        rectangle.y + rectangle.height / 2,
+      );
+      expect(h.elements.length).toBe(2);
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(rectangle.id);
+      mouse.down();
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      fireEvent.change(editor, { target: { value: "Hello World!" } });
+
+      await new Promise((r) => setTimeout(r, 0));
+      editor.blur();
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
+    });
+
+    it("should bind text to container when double clicked on center of transparent container", async () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        backgroundColor: "transparent",
+      });
+      h.elements = [rectangle];
 
       mouse.doubleClickAt(
         rectangle.x + rectangle.width / 2,
@@ -1034,6 +1068,7 @@ describe("textWysiwyg", () => {
         `"Wikipedia is hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other projects.Hello this text should get merged with the existing one"`,
       );
     });
+
     it("should always bind to selected container and insert it in correct position", async () => {
       const rectangle2 = UI.createElement("rectangle", {
         x: 5,

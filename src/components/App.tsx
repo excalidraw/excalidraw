@@ -258,6 +258,7 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
   getContainerDims,
+  getTextBindableContainerAtPosition,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
@@ -2589,13 +2590,13 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.canvas);
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
-      const selectedElements = getSelectedElements(
+      const container = getTextBindableContainerAtPosition(
         this.scene.getNonDeletedElements(),
         this.state,
+        sceneX,
+        sceneY,
       );
-      let container;
-      if (selectedElements.length === 1) {
-        container = selectedElements[0] as ExcalidrawTextContainer;
+      if (container) {
         const canBindText = hasBoundTextElement(container);
         if (canBindText) {
           sceneX = container.x + container.width / 2;
