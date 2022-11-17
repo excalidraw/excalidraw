@@ -1991,7 +1991,10 @@ class App extends React.Component<AppProps, AppState> {
                 ),
               });
             }
-          } else if (isValidTextContainer(selectedElement)) {
+          } else if (
+            isTextElement(selectedElement) ||
+            isValidTextContainer(selectedElement)
+          ) {
             this.startTextEditing({
               sceneX: selectedElement.x + selectedElement.width / 2,
               sceneY: selectedElement.y + selectedElement.height / 2,

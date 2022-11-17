@@ -494,7 +494,6 @@ export const getContainerDims = (element: ExcalidrawElement) => {
 
 export const isValidTextContainer = (element: ExcalidrawElement) => {
   return (
-    isTextElement(element) ||
     element.type === "rectangle" ||
     element.type === "ellipse" ||
     element.type === "diamond" ||
