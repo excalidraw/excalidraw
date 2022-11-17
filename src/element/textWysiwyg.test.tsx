@@ -584,6 +584,17 @@ describe("textWysiwyg", () => {
       expect((h.elements[1] as ExcalidrawTextElement).containerId).toBe(null);
     });
 
+    it("shouldn't bind to non-text-bindable containers", async () => {
+      h.elements = [];
+      const freeDraw = UI.createElement("freedraw", {
+        width: 100,
+        height: 50,
+      });
+      API.setSelectedElements([freeDraw]);
+      Keyboard.keyPress(KEYS.ENTER);
+      expect(h.elements[1]).toBeUndefined();
+    });
+
     it("should'nt bind text to container when not double clicked on center", async () => {
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
