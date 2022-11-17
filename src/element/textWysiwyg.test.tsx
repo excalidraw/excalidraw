@@ -551,7 +551,7 @@ describe("textWysiwyg", () => {
       ]);
     });
 
-    it("shouldn't bind to non-text-bindable containers", async () => {
+    it("shouldn't create text element when pressing 'Enter' key on non text bindable container", async () => {
       const line = API.createElement({
         type: "line",
         width: 100,
