@@ -12,10 +12,19 @@ import { render } from "./test-utils";
 import { API } from "./helpers/api";
 import ExcalidrawApp from "../excalidraw-app";
 
-import { Theme } from "../element/types";
+import { FontString, Theme } from "../element/types";
 import { createIcon, iconFillColor } from "../components/icons";
 import { SubtypeButton } from "../components/SubtypeButton";
 import { registerAuxLangData } from "../i18n";
+import { getFontString } from "../utils";
+import * as textElementUtils from "../element/textElement";
+import { isTextElement } from "../element";
+
+const MW = 200;
+const TWIDTH = 200;
+const THEIGHT = 20;
+const TBASELINE = 15;
+const DBFONTSIZE = 40;
 
 const getLangData = async (langCode: string): Promise<Object | undefined> => {
   try {
@@ -99,7 +108,35 @@ const prepareTest2Subtype = function (
   addLangData,
   onSubtypeLoaded,
 ) {
-  const methods = {} as SubtypeMethods;
+  const measureTest2: SubtypeMethods["measureText"] = function (
+    element,
+    next,
+    maxWidth,
+  ) {
+    const text = next?.text ?? element.text;
+    const fontSize = next?.fontSize ?? element.fontSize;
+    const fontFamily = element.fontFamily;
+    const fontString = getFontString({ fontSize, fontFamily });
+    const metrics = textElementUtils.measureText(text, fontString, maxWidth);
+    const width = Math.max(metrics.width - 10, 0);
+    const height = Math.max(metrics.height - 5, 0);
+    return { width, height, baseline: metrics.baseline + 1 };
+  };
+  const wrapTest2: SubtypeMethods["wrapText"] = function (
+    element,
+    maxWidth,
+    next,
+  ) {
+    const text = next?.text ?? element.originalText;
+    if (next?.fontSize === DBFONTSIZE) {
+      return `${text.split(" ").join("\n")}\nHELLO WORLD.`;
+    }
+    return `${text.split(" ").join("\n")}\nHello world.`;
+  };
+  const methods = {
+    measureText: measureTest2,
+    wrapText: wrapTest2,
+  } as SubtypeMethods;
 
   addLangData(fallbackLangData, getLangData);
   registerAuxLangData(fallbackLangData, getLangData);
@@ -199,6 +236,80 @@ describe("subtypes", () => {
         expect(el.roughness).toBe(0);
       } else {
         expect(el.roughness).toBe(1);
+      }
+    });
+  });
+  it("should call custom text methods", async () => {
+    const testString = "A quick brown fox jumps over the lazy dog.";
+    await render(<ExcalidrawApp />, {
+      localStorageData: {
+        elements: [
+          API.createElement({
+            type: "text",
+            id: "A",
+            subtype: test2.subtype,
+            text: testString,
+          }),
+        ],
+      },
+    });
+    const mockMeasureText = (
+      text: string,
+      font: FontString,
+      maxWidth?: number | null,
+    ) => {
+      if (text === testString) {
+        if (font.includes(`${DBFONTSIZE}`)) {
+          return {
+            width: 2 * TWIDTH,
+            height: 2 * THEIGHT,
+            baseline: 2 * TBASELINE,
+          };
+        }
+        return { width: TWIDTH, height: THEIGHT, baseline: TBASELINE };
+      }
+      return { width: 1, height: 0, baseline: 0 };
+    };
+
+    jest
+      .spyOn(textElementUtils, "measureText")
+      .mockImplementation(mockMeasureText);
+
+    h.elements.forEach((el) => {
+      if (isTextElement(el)) {
+        // First test with `ExcalidrawTextElement.text`
+        const metrics = textElementUtils.measureTextElement(el);
+        expect(metrics).toStrictEqual({
+          width: TWIDTH - 10,
+          height: THEIGHT - 5,
+          baseline: TBASELINE + 1,
+        });
+        const wrappedText = textElementUtils.wrapTextElement(el, MW);
+        expect(wrappedText).toEqual(
+          `${testString.split(" ").join("\n")}\nHello world.`,
+        );
+
+        // Now test with modified text in `next`
+        let next: { text?: string; fontSize?: number } = {
+          text: "Hello world.",
+        };
+        const nextMetrics = textElementUtils.measureTextElement(el, next);
+        expect(nextMetrics).toStrictEqual({ width: 0, height: 0, baseline: 1 });
+        const nextWrappedText = textElementUtils.wrapTextElement(el, MW, next);
+        expect(nextWrappedText).toEqual("Hello\nworld.\nHello world.");
+
+        // Now test modified fontSizes in `next`
+        next = { fontSize: DBFONTSIZE };
+        const nextFM = textElementUtils.measureTextElement(el, next);
+        expect(nextFM).toStrictEqual({
+          width: 2 * TWIDTH - 10,
+          height: 2 * THEIGHT - 5,
+          baseline: 2 * TBASELINE + 1,
+        });
+        const nextFWrText = textElementUtils.wrapTextElement(el, MW, next);
+        expect(nextFWrText).toEqual(
+          `${testString.split(" ").join("\n")}\nHELLO WORLD.`,
+        );
       }
     });
   });
