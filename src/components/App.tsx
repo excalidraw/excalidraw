@@ -272,6 +272,7 @@ import {
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { atom } from "jotai";
+import { actionUnlockAllCanvasElements } from "../actions/actionToggleLock";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -5983,19 +5984,20 @@ class App extends React.Component<AppProps, AppState> {
       options.push(copyText);
     }
     if (type === "canvas") {
-      const viewModeOptions = [
-        ...options,
-        typeof this.props.gridModeEnabled === "undefined" &&
-          actionToggleGridMode,
-        typeof this.props.zenModeEnabled === "undefined" && actionToggleZenMode,
-        typeof this.props.viewModeEnabled === "undefined" &&
-          actionToggleViewMode,
-        actionToggleStats,
-      ];
-
+      if (elements.some((element) => element.locked)) {
+      }
       if (this.state.viewModeEnabled) {
         ContextMenu.push({
-          options: viewModeOptions,
+          options: [
+            ...options,
+            typeof this.props.gridModeEnabled === "undefined" &&
+              actionToggleGridMode,
+            typeof this.props.zenModeEnabled === "undefined" &&
+              actionToggleZenMode,
+            typeof this.props.viewModeEnabled === "undefined" &&
+              actionToggleViewMode,
+            actionToggleStats,
+          ],
           top,
           left,
           actionManager: this.actionManager,
@@ -6032,6 +6034,10 @@ class App extends React.Component<AppProps, AppState> {
               (probablySupportsClipboardWriteText && elements.length > 0)) &&
               separator,
             actionSelectAll,
+            actionUnlockAllCanvasElements.contextItemPredicate(
+              elements,
+              this.state,
+            ) && actionUnlockAllCanvasElements,
             separator,
             typeof this.props.gridModeEnabled === "undefined" &&
               actionToggleGridMode,

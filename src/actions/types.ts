@@ -111,6 +111,7 @@ export type ActionName =
   | "hyperlink"
   | "eraser"
   | "bindText"
+  | "unlockAllCanvasElements"
   | "toggleLock"
   | "toggleLinearEditor";
 

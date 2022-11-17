@@ -61,6 +61,34 @@ export const actionToggleLock = register({
   },
 });
 
+export const actionUnlockAllCanvasElements = register({
+  name: "unlockAllCanvasElements",
+  trackEvent: { category: "canvas" },
+  perform: (elements, appState) => {
+    const lockedElements = elements.filter((el) => el.locked);
+
+    return {
+      elements: elements.map((element) => {
+        if (element.locked) {
+          return newElementWith(element, { locked: false });
+        }
+        return element;
+      }),
+      appState: {
+        ...appState,
+        selectedElementIds: Object.fromEntries(
+          lockedElements.map((el) => [el.id, true]),
+        ),
+      },
+      commitToHistory: true,
+    };
+  },
+  contextItemPredicate: (elements, appState) => {
+    return elements.some((element) => element.locked);
+  },
+  contextItemLabel: "labels.elementLock.unlockAllCanvasElements",
+});
+
 const getOperation = (
   elements: readonly ExcalidrawElement[],
 ): "lock" | "unlock" => (elements.some((el) => !el.locked) ? "lock" : "unlock");
