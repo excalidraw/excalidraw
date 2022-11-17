@@ -1,4 +1,4 @@
-import { render, unmountComponentAtNode } from "react-dom";
+import { createRoot, Root } from "react-dom/client";
 import clsx from "clsx";
 import { Popover } from "./Popover";
 import { t } from "../i18n";
@@ -89,19 +89,18 @@ const ContextMenu = ({
   );
 };
 
-const contextMenuNodeByContainer = new WeakMap<HTMLElement, HTMLDivElement>();
+const contextMenuRoots = new WeakMap<HTMLElement, Root>();
 
-const getContextMenuNode = (container: HTMLElement): HTMLDivElement => {
-  let contextMenuNode = contextMenuNodeByContainer.get(container);
-  if (contextMenuNode) {
-    return contextMenuNode;
+const getContextMenuNode = (container: HTMLElement): Root => {
+  let contextMenuRoot = contextMenuRoots.get(container);
+  if (contextMenuRoot) {
+    return contextMenuRoot;
   }
-  contextMenuNode = document.createElement("div");
-  container
-    .querySelector(".excalidraw-contextMenuContainer")!
-    .appendChild(contextMenuNode);
-  contextMenuNodeByContainer.set(container, contextMenuNode);
-  return contextMenuNode;
+  contextMenuRoot = createRoot(
+    container.querySelector(".excalidraw-contextMenuContainer")!,
+  );
+  contextMenuRoots.set(container, contextMenuRoot);
+  return contextMenuRoot;
 };
 
 type ContextMenuParams = {
@@ -115,11 +114,10 @@ type ContextMenuParams = {
 };
 
 const handleClose = (container: HTMLElement) => {
-  const contextMenuNode = contextMenuNodeByContainer.get(container);
-  if (contextMenuNode) {
-    unmountComponentAtNode(contextMenuNode);
-    contextMenuNode.remove();
-    contextMenuNodeByContainer.delete(container);
+  const contextMenuRoot = contextMenuRoots.get(container);
+  if (contextMenuRoot) {
+    contextMenuRoot.unmount();
+    contextMenuRoots.delete(container);
   }
 };
 
@@ -132,7 +130,7 @@ export default {
       }
     });
     if (options.length) {
-      render(
+      getContextMenuNode(params.container).render(
         <ContextMenu
           top={params.top}
           left={params.left}
@@ -142,7 +140,6 @@ export default {
           appState={params.appState}
           elements={params.elements}
         />,
-        getContextMenuNode(params.container),
       );
     }
   },
