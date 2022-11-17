@@ -592,7 +592,7 @@ describe("textWysiwyg", () => {
       });
       API.setSelectedElements([freeDraw]);
       Keyboard.keyPress(KEYS.ENTER);
-      expect(h.elements[1]).toBeUndefined();
+      expect(h.elements.length).toBe(1);
     });
 
     it("should'nt bind text to container when not double clicked on center", async () => {
