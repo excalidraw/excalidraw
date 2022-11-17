@@ -91,7 +91,7 @@ const ContextMenu = ({
 
 const contextMenuRoots = new WeakMap<HTMLElement, Root>();
 
-const getContextMenuNode = (container: HTMLElement): Root => {
+const getContextMenuRoot = (container: HTMLElement): Root => {
   let contextMenuRoot = contextMenuRoots.get(container);
   if (contextMenuRoot) {
     return contextMenuRoot;
@@ -130,7 +130,7 @@ export default {
       }
     });
     if (options.length) {
-      getContextMenuNode(params.container).render(
+      getContextMenuRoot(params.container).render(
         <ContextMenu
           top={params.top}
           left={params.left}
