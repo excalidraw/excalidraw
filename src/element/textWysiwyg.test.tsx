@@ -551,7 +551,7 @@ describe("textWysiwyg", () => {
       ]);
     });
 
-    it("shouldn't create text element when pressing 'Enter' key on non text bindable container", async () => {
+    it("shouldn't bind to non-text-bindable containers", async () => {
       const line = API.createElement({
         type: "line",
         width: 100,
@@ -584,7 +584,7 @@ describe("textWysiwyg", () => {
       expect((h.elements[1] as ExcalidrawTextElement).containerId).toBe(null);
     });
 
-    it("shouldn't bind to non-text-bindable containers", async () => {
+    it("shouldn't create text element when pressing 'Enter' key on non text bindable container", async () => {
       h.elements = [];
       const freeDraw = UI.createElement("freedraw", {
         width: 100,
