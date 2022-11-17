@@ -103,16 +103,6 @@ const getContextMenuRoot = (container: HTMLElement): Root => {
   return contextMenuRoot;
 };
 
-type ContextMenuParams = {
-  options: (ContextMenuOption | false | null | undefined)[];
-  top: ContextMenuProps["top"];
-  left: ContextMenuProps["left"];
-  actionManager: ContextMenuProps["actionManager"];
-  appState: Readonly<AppState>;
-  container: HTMLElement;
-  elements: readonly NonDeletedExcalidrawElement[];
-};
-
 const handleClose = (container: HTMLElement) => {
   const contextMenuRoot = contextMenuRoots.get(container);
   if (contextMenuRoot) {
@@ -122,7 +112,15 @@ const handleClose = (container: HTMLElement) => {
 };
 
 export default {
-  push(params: ContextMenuParams) {
+  push(params: {
+    options: (ContextMenuOption | false | null | undefined)[];
+    top: ContextMenuProps["top"];
+    left: ContextMenuProps["left"];
+    actionManager: ContextMenuProps["actionManager"];
+    appState: Readonly<AppState>;
+    container: HTMLElement;
+    elements: readonly NonDeletedExcalidrawElement[];
+  }) {
     const options = Array.of<ContextMenuOption>();
     params.options.forEach((option) => {
       if (option) {
