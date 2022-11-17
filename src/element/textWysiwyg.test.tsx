@@ -583,15 +583,17 @@ describe("textWysiwyg", () => {
       expect((h.elements[1] as ExcalidrawTextElement).containerId).toBe(null);
     });
 
-    it("shouldn't create text element when pressing 'Enter' key on non text bindable container", async () => {
-      h.elements = [];
-      const freeDraw = UI.createElement("freedraw", {
-        width: 100,
-        height: 50,
+    ["freedraw", "line"].forEach((type: any) => {
+      it(`shouldn't create text element when pressing 'Enter' key on ${type} `, async () => {
+        h.elements = [];
+        const elemnet = UI.createElement(type, {
+          width: 100,
+          height: 50,
+        });
+        API.setSelectedElements([elemnet]);
+        Keyboard.keyPress(KEYS.ENTER);
+        expect(h.elements.length).toBe(1);
       });
-      API.setSelectedElements([freeDraw]);
-      Keyboard.keyPress(KEYS.ENTER);
-      expect(h.elements.length).toBe(1);
     });
 
     it("should'nt bind text to container when not double clicked on center", async () => {

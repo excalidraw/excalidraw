@@ -769,7 +769,7 @@ describe("Test Linear Elements", () => {
       });
     });
 
-    it("should bind text to arrow when clicked", async () => {
+    it("should bind text to arrow when double clicked", async () => {
       createTwoPointerLinearElement("arrow");
       const arrow = h.elements[0] as ExcalidrawLinearElement;
 
@@ -842,7 +842,7 @@ describe("Test Linear Elements", () => {
       `);
     });
 
-    it("should bind text to arrow when clicked on container and enter pressed", async () => {
+    it("should bind text to arrow when clicked on arrow and enter pressed", async () => {
       const arrow = createTwoPointerLinearElement("arrow");
 
       expect(h.elements.length).toBe(1);
@@ -913,6 +913,20 @@ describe("Test Linear Elements", () => {
         s
         y"
       `);
+    });
+
+    it("should not bind text to line when double clicked", async () => {
+      const line = createTwoPointerLinearElement("line");
+
+      expect(h.elements.length).toBe(1);
+      mouse.doubleClickAt(line.x, line.y);
+
+      expect(h.elements.length).toBe(2);
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBeNull();
+      expect(line.boundElements).toBeNull();
     });
 
     it("should not rotate the bound text and update position of bound text and bounding box correctly when arrow rotated", () => {
