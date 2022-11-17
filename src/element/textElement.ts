@@ -12,6 +12,7 @@ import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
+import { isImageElement } from "./typeChecks";
 
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
@@ -489,4 +490,13 @@ export const getContainerElement = (
 
 export const getContainerDims = (element: ExcalidrawElement) => {
   return { width: element.width, height: element.height };
+};
+
+export const isValidTextContainer = (element: ExcalidrawElement) => {
+  return (
+    element.type === "rectangle" ||
+    element.type === "ellipse" ||
+    element.type === "diamond" ||
+    isImageElement(element)
+  );
 };
