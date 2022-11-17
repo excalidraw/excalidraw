@@ -14,8 +14,8 @@ import { isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import {
   isBoundToContainer,
-  isLinearElement,
   isImageElement,
+  isArrowElement,
 } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 import { AppState } from "../types";
@@ -43,7 +43,7 @@ export const redrawTextBoundingBox = (
   let coordX = textElement.x;
   // Resize container and vertically center align the text
   if (container) {
-    if (!isLinearElement(container)) {
+    if (!isArrowElement(container)) {
       const containerDims = getContainerDims(container);
       let nextHeight = containerDims.height;
       const boundTextElementPadding = getBoundTextElementOffset(textElement);
@@ -180,7 +180,7 @@ export const handleBindTextResize = (
       const diff = containerHeight - containerDims.height;
       // fix the y coord when resizing from ne/nw/n
       const updatedY =
-        !isLinearElement(container) &&
+        !isArrowElement(container) &&
         (transformHandleType === "ne" ||
           transformHandleType === "nw" ||
           transformHandleType === "n")
@@ -199,7 +199,7 @@ export const handleBindTextResize = (
 
       baseline: nextBaseLine,
     });
-    if (!isLinearElement(container)) {
+    if (!isArrowElement(container)) {
       updateBoundTextPosition(
         container,
         textElement as ExcalidrawTextElementWithContainer,
@@ -538,7 +538,7 @@ export const getContainerElement = (
 };
 
 export const getContainerDims = (element: ExcalidrawElement) => {
-  if (isLinearElement(element)) {
+  if (isArrowElement(element)) {
     const width = Math.max(element.width, element.height);
     const height = Math.min(element.width, element.height);
     return { width, height };
@@ -550,7 +550,7 @@ export const getContainerCenter = (
   container: ExcalidrawElement,
   appState: AppState,
 ) => {
-  if (!isLinearElement(container)) {
+  if (!isArrowElement(container)) {
     return {
       x: container.x + container.width / 2,
       y: container.y + container.height / 2,
@@ -583,7 +583,7 @@ export const getContainerCenter = (
 
 export const getTextElementAngle = (textElement: ExcalidrawTextElement) => {
   const container = getContainerElement(textElement);
-  if (!container || isLinearElement(container)) {
+  if (!container || isArrowElement(container)) {
     return textElement.angle;
   }
   return container.angle;
@@ -596,7 +596,7 @@ export const getBoundTextElementOffset = (
   if (!container) {
     return 0;
   }
-  if (isLinearElement(container)) {
+  if (isArrowElement(container)) {
     return BOUND_TEXT_PADDING * 8;
   }
   return BOUND_TEXT_PADDING;
@@ -606,7 +606,7 @@ export const getBoundTextElementPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
-  if (isLinearElement(container)) {
+  if (isArrowElement(container)) {
     return LinearElementEditor.getBoundTextElementPosition(
       container,
       boundTextElement,
@@ -621,14 +621,14 @@ export const shouldAllowVerticalAlign = (
     const hasBoundContainer = isBoundToContainer(element);
     if (hasBoundContainer) {
       const container = getContainerElement(element);
-      if (isTextElement(element) && isLinearElement(container)) {
+      if (isTextElement(element) && isArrowElement(container)) {
         return false;
       }
       return true;
     }
     const boundTextElement = getBoundTextElement(element);
     if (boundTextElement) {
-      if (isLinearElement(element)) {
+      if (isArrowElement(element)) {
         return false;
       }
       return true;
@@ -642,6 +642,7 @@ export const isValidTextContainer = (element: ExcalidrawElement) => {
     element.type === "rectangle" ||
     element.type === "ellipse" ||
     element.type === "diamond" ||
-    isImageElement(element)
+    isImageElement(element) ||
+    isArrowElement(element)
   );
 };

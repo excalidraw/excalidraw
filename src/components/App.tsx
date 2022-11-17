@@ -130,6 +130,7 @@ import {
 } from "../element/newElement";
 import {
   hasBoundTextElement,
+  isArrowElement,
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
@@ -2460,7 +2461,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    if (!existingTextElement && container && !isLinearElement(container)) {
+    if (!existingTextElement && container && !isArrowElement(container)) {
       const fontString = {
         fontSize: this.state.currentItemFontSize,
         fontFamily: this.state.currentItemFontFamily,
@@ -2603,12 +2604,11 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getNonDeletedElements(),
         this.state,
       );
-
       if (selectedElements.length === 1) {
         const selectedElement = selectedElements[0];
 
         if (
-          isLinearElement(selectedElement) ||
+          isArrowElement(selectedElement) ||
           hasBoundTextElement(selectedElement)
         ) {
           const midPoint = getContainerCenter(selectedElement, this.state);
@@ -2616,13 +2616,13 @@ class App extends React.Component<AppProps, AppState> {
           sceneX = midPoint.x;
           sceneY = midPoint.y;
         }
-        this.startTextEditing({
-          sceneX,
-          sceneY,
-          shouldBind: false,
-          insertAtParentCenter: !event.altKey,
-        });
       }
+      this.startTextEditing({
+        sceneX,
+        sceneY,
+        shouldBind: false,
+        insertAtParentCenter: !event.altKey,
+      });
     }
   };
 

@@ -5,10 +5,7 @@ import {
 } from "../element/types";
 
 import { getElementAbsoluteCoords } from "../element";
-import {
-  isLinearElement,
-  isTextBindableContainer,
-} from "../element/typeChecks";
+import { isArrowElement, isTextBindableContainer } from "../element/typeChecks";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import { AppState } from "../types";
 
@@ -94,7 +91,7 @@ export const getTextBindableContainerAtPosition = (
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
 
     if (
-      isLinearElement(elements[index]) &&
+      isArrowElement(elements[index]) &&
       isHittingElementNotConsideringBoundingBox(elements[index], appState, [
         x,
         y,

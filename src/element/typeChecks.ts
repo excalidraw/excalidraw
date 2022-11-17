@@ -60,6 +60,12 @@ export const isLinearElement = (
   return element != null && isLinearElementType(element.type);
 };
 
+export const isArrowElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawLinearElement => {
+  return element != null && element.type === "arrow";
+};
+
 export const isLinearElementType = (
   elementType: AppState["activeTool"]["type"],
 ): boolean => {
@@ -111,7 +117,7 @@ export const isTextBindableContainer = (
       element.type === "diamond" ||
       element.type === "ellipse" ||
       element.type === "image" ||
-      isLinearElement(element))
+      isArrowElement(element))
   );
 };
 

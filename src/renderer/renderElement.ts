@@ -13,6 +13,7 @@ import {
   isLinearElement,
   isFreeDrawElement,
   isInitializedImageElement,
+  isArrowElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -724,7 +725,7 @@ const drawElementFromCanvas = (
     (1 / window.devicePixelRatio) * scaleYFactor,
   );
   const boundTextElement = getBoundTextElement(element);
-  if (isLinearElement(element) && boundTextElement) {
+  if (isArrowElement(element) && boundTextElement) {
     const tempCanvas = document.createElement("canvas");
     const tempCanvasContext = tempCanvas.getContext("2d")!;
 
@@ -899,7 +900,7 @@ export const renderElement = (
         let shiftY = (y2 - y1) / 2 - (element.y - y1);
         if (isTextElement(element)) {
           const container = getContainerElement(element);
-          if (isLinearElement(container)) {
+          if (isArrowElement(container)) {
             const boundTextCoords =
               LinearElementEditor.getBoundTextElementPosition(
                 container,
@@ -920,7 +921,7 @@ export const renderElement = (
         }
         const boundTextElement = getBoundTextElement(element);
 
-        if (isLinearElement(element) && boundTextElement) {
+        if (isArrowElement(element) && boundTextElement) {
           const tempCanvas = document.createElement("canvas");
 
           const tempCanvasContext = tempCanvas.getContext("2d")!;
@@ -1024,7 +1025,7 @@ export const renderElementToSvg = (
   let cy = (y2 - y1) / 2 - (element.y - y1);
   if (isTextElement(element)) {
     const container = getContainerElement(element);
-    if (isLinearElement(container)) {
+    if (isArrowElement(container)) {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(container);
 
       const boundTextCoords = LinearElementEditor.getBoundTextElementPosition(

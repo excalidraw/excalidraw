@@ -697,12 +697,12 @@ describe("Test Linear Elements", () => {
     };
 
     describe("Test getBoundTextElementPosition", () => {
-      it("should return correct position for 2 pointer line", () => {
-        createTwoPointerLinearElement("line");
-        const line = h.elements[0] as ExcalidrawLinearElement;
+      it("should return correct position for 2 pointer arrow", () => {
+        createTwoPointerLinearElement("arrow");
+        const arrow = h.elements[0] as ExcalidrawLinearElement;
         const { textElement, container } = createBoundTextElement(
           DEFAULT_TEXT,
-          line,
+          arrow,
         );
         const position = LinearElementEditor.getBoundTextElementPosition(
           container,
@@ -716,12 +716,12 @@ describe("Test Linear Elements", () => {
         `);
       });
 
-      it("should return correct position for line with odd points", () => {
-        createThreePointerLinearElement("line", "round");
-        const line = h.elements[0] as ExcalidrawLinearElement;
+      it("should return correct position for arrow with odd points", () => {
+        createThreePointerLinearElement("arrow", "round");
+        const arrow = h.elements[0] as ExcalidrawLinearElement;
         const { textElement, container } = createBoundTextElement(
           DEFAULT_TEXT,
-          line,
+          arrow,
         );
 
         const position = LinearElementEditor.getBoundTextElementPosition(
@@ -736,12 +736,12 @@ describe("Test Linear Elements", () => {
         `);
       });
 
-      it("should return correct position for line with even points", () => {
-        createThreePointerLinearElement("line", "round");
-        const line = h.elements[0] as ExcalidrawLinearElement;
+      it("should return correct position for arrow with even points", () => {
+        createThreePointerLinearElement("arrow", "round");
+        const arrow = h.elements[0] as ExcalidrawLinearElement;
         const { textElement, container } = createBoundTextElement(
           DEFAULT_TEXT,
-          line,
+          arrow,
         );
         enterLineEditingMode(container);
         // This is the expected midpoint for line with round edge
@@ -769,18 +769,18 @@ describe("Test Linear Elements", () => {
       });
     });
 
-    it("should bind text to container when clicked", async () => {
-      createTwoPointerLinearElement("line");
-      const line = h.elements[0] as ExcalidrawLinearElement;
+    it("should bind text to arrow when clicked", async () => {
+      createTwoPointerLinearElement("arrow");
+      const arrow = h.elements[0] as ExcalidrawLinearElement;
 
       expect(h.elements.length).toBe(1);
-      expect(h.elements[0].id).toBe(line.id);
-      mouse.doubleClickAt(line.x, line.y);
+      expect(h.elements[0].id).toBe(arrow.id);
+      mouse.doubleClickAt(arrow.x, arrow.y);
       expect(h.elements.length).toBe(2);
 
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.type).toBe("text");
-      expect(text.containerId).toBe(line.id);
+      expect(text.containerId).toBe(arrow.id);
       mouse.down();
       const editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
@@ -792,7 +792,9 @@ describe("Test Linear Elements", () => {
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
-      expect(line.boundElements).toStrictEqual([{ id: text.id, type: "text" }]);
+      expect(arrow.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
         "
@@ -840,11 +842,11 @@ describe("Test Linear Elements", () => {
       `);
     });
 
-    it("should bind text to container when clicked on container and enter pressed", async () => {
-      const line = createTwoPointerLinearElement("line");
+    it("should bind text to arrow when clicked on container and enter pressed", async () => {
+      const arrow = createTwoPointerLinearElement("arrow");
 
       expect(h.elements.length).toBe(1);
-      expect(h.elements[0].id).toBe(line.id);
+      expect(h.elements[0].id).toBe(arrow.id);
 
       Keyboard.keyPress(KEYS.ENTER);
 
@@ -852,7 +854,7 @@ describe("Test Linear Elements", () => {
 
       const textElement = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(textElement.type).toBe("text");
-      expect(textElement.containerId).toBe(line.id);
+      expect(textElement.containerId).toBe(arrow.id);
       const editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
@@ -863,7 +865,7 @@ describe("Test Linear Elements", () => {
         target: { value: DEFAULT_TEXT },
       });
       editor.blur();
-      expect(line.boundElements).toStrictEqual([
+      expect(arrow.boundElements).toStrictEqual([
         { id: textElement.id, type: "text" },
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
@@ -913,19 +915,19 @@ describe("Test Linear Elements", () => {
       `);
     });
 
-    it("should not rotate the bound text and update position of bound text and bounding box correctly when linear element rotated", () => {
-      createThreePointerLinearElement("line", "round");
+    it("should not rotate the bound text and update position of bound text and bounding box correctly when arrow rotated", () => {
+      createThreePointerLinearElement("arrow", "round");
 
-      const line = h.elements[0] as ExcalidrawLinearElement;
+      const arrow = h.elements[0] as ExcalidrawLinearElement;
 
       const { textElement, container } = createBoundTextElement(
         DEFAULT_TEXT,
-        line,
+        arrow,
       );
 
       expect(container.angle).toBe(0);
       expect(textElement.angle).toBe(0);
-      expect(getBoundTextElementPosition(line, textElement))
+      expect(getBoundTextElementPosition(arrow, textElement))
         .toMatchInlineSnapshot(`
         Object {
           "x": 75,
@@ -985,14 +987,14 @@ describe("Test Linear Elements", () => {
       `);
     });
 
-    it("should resize and position the bound text and bounding box correctly when 3 pointer linear element resized", () => {
-      createThreePointerLinearElement("line", "round");
+    it("should resize and position the bound text and bounding box correctly when 3 pointer arrow element resized", () => {
+      createThreePointerLinearElement("arrow", "round");
 
-      const line = h.elements[0] as ExcalidrawLinearElement;
+      const arrow = h.elements[0] as ExcalidrawLinearElement;
 
       const { textElement, container } = createBoundTextElement(
         DEFAULT_TEXT,
-        line,
+        arrow,
       );
       expect(container.width).toBe(70);
       expect(container.height).toBe(50);
@@ -1061,12 +1063,12 @@ describe("Test Linear Elements", () => {
     });
 
     it("should resize and position the bound text correctly when 2 pointer linear element resized", () => {
-      createTwoPointerLinearElement("line");
+      createTwoPointerLinearElement("arrow");
 
-      const line = h.elements[0] as ExcalidrawLinearElement;
+      const arrow = h.elements[0] as ExcalidrawLinearElement;
       const { textElement, container } = createBoundTextElement(
         DEFAULT_TEXT,
-        line,
+        arrow,
       );
       expect(container.width).toBe(40);
       expect(getBoundTextElementPosition(container, textElement))
@@ -1115,11 +1117,11 @@ describe("Test Linear Elements", () => {
     });
 
     it("should not render vertical align tool when element selected", () => {
-      createTwoPointerLinearElement("line");
-      const line = h.elements[0] as ExcalidrawLinearElement;
+      createTwoPointerLinearElement("arrow");
+      const arrow = h.elements[0] as ExcalidrawLinearElement;
 
-      createBoundTextElement(DEFAULT_TEXT, line);
-      API.setSelectedElements([line]);
+      createBoundTextElement(DEFAULT_TEXT, arrow);
+      API.setSelectedElements([arrow]);
 
       expect(queryByTestId(container, "align-top")).toBeNull();
       expect(queryByTestId(container, "align-middle")).toBeNull();

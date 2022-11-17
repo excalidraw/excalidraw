@@ -30,7 +30,7 @@ import {
   wrapText,
 } from "./textElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
-import { isLinearElement } from "./typeChecks";
+import { isArrowElement } from "./typeChecks";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -274,7 +274,7 @@ export const refreshTextDimensions = (
 
 export const getMaxContainerWidth = (container: ExcalidrawElement) => {
   const width = getContainerDims(container).width;
-  if (isLinearElement(container)) {
+  if (isArrowElement(container)) {
     const containerWidth = width - BOUND_TEXT_PADDING * 8 * 2;
     if (containerWidth <= 0) {
       const boundText = getBoundTextElement(container);
@@ -290,7 +290,7 @@ export const getMaxContainerWidth = (container: ExcalidrawElement) => {
 
 export const getMaxContainerHeight = (container: ExcalidrawElement) => {
   const height = getContainerDims(container).height;
-  if (isLinearElement(container)) {
+  if (isArrowElement(container)) {
     const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
     if (containerHeight <= 0) {
       const boundText = getBoundTextElement(container);

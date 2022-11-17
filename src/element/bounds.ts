@@ -15,6 +15,7 @@ import {
   generateRoughOptions,
 } from "../renderer/renderElement";
 import {
+  isArrowElement,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
@@ -42,7 +43,7 @@ export const getElementAbsoluteCoords = (
     );
   } else if (isTextElement(element)) {
     const container = getContainerElement(element);
-    if (isLinearElement(container)) {
+    if (isArrowElement(container)) {
       const coords = LinearElementEditor.getBoundTextElementPosition(
         container,
         element as ExcalidrawTextElementWithContainer,

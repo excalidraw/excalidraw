@@ -7,8 +7,8 @@ import {
 } from "../utils";
 import Scene from "../scene/Scene";
 import {
+  isArrowElement,
   isBoundToContainer,
-  isLinearElement,
   isTextElement,
 } from "./typeChecks";
 import { CLASSES, VERTICAL_ALIGN } from "../constants";
@@ -136,7 +136,7 @@ export const textWysiwyg = ({
       // what is going to be used for unbounded text
       let height = updatedTextElement.height;
       if (container && updatedTextElement.containerId) {
-        if (isLinearElement(container)) {
+        if (isArrowElement(container)) {
           const boundTextCoords =
             LinearElementEditor.getBoundTextElementPosition(
               container,
@@ -186,7 +186,7 @@ export const textWysiwyg = ({
         else {
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
-            if (!isLinearElement(container)) {
+            if (!isArrowElement(container)) {
               coordY = container.y + containerDims.height / 2 - height / 2;
             }
           }
@@ -277,7 +277,7 @@ export const textWysiwyg = ({
     whiteSpace = "pre-wrap";
     wordBreak = "break-word";
   }
-  const background = isLinearElement(getContainerElement(element))
+  const background = isArrowElement(getContainerElement(element))
     ? "#fff"
     : "transparent";
   Object.assign(editable.style, {

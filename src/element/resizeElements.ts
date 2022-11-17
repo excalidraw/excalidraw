@@ -22,6 +22,7 @@ import {
   getCommonBoundingBox,
 } from "./bounds";
 import {
+  isArrowElement,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
@@ -178,7 +179,7 @@ const rotateSingleElement = (
       boundTextElementId,
     ) as ExcalidrawTextElementWithContainer;
 
-    if (!isLinearElement(element)) {
+    if (!isArrowElement(element)) {
       mutateElement(textElement, { angle });
     }
   }
@@ -859,7 +860,7 @@ const rotateMultipleElements = (
       const textElement = Scene.getScene(element)!.getElement(
         boundTextElementId,
       ) as ExcalidrawTextElementWithContainer;
-      if (!isLinearElement(element)) {
+      if (!isArrowElement(element)) {
         mutateElement(textElement, {
           x: textElement.x + (rotatedCX - cx),
           y: textElement.y + (rotatedCY - cy),
