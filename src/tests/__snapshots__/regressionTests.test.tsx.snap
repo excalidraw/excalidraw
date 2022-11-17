@@ -12410,6 +12410,234 @@ exports[`regression tests key o selects ellipse tool: [end of test] number of el
 
 exports[`regression tests key o selects ellipse tool: [end of test] number of renders 1`] = `9`;
 
+exports[`regression tests key p selects freedraw tool: [end of test] appState 1`] = `
+Object {
+  "activeTool": Object {
+    "customType": null,
+    "lastActiveToolBeforeEraser": null,
+    "locked": false,
+    "type": "freedraw",
+  },
+  "collaborators": Map {},
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemLinearStrokeSharpness": "round",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeSharpness": "sharp",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "gridSize": null,
+  "height": 768,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "isSidebarDocked": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "pasteDialog": Object {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": false,
+  },
+  "selectedGroupIds": Object {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "startBoundElement": null,
+  "suggestedBindings": Array [],
+  "theme": "light",
+  "toast": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": Object {
+    "value": 1,
+  },
+}
+`;
+
+exports[`regression tests key p selects freedraw tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": Array [
+    10,
+    10,
+  ],
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      10,
+      10,
+    ],
+    Array [
+      10,
+      10,
+    ],
+  ],
+  "pressures": Array [
+    0,
+    0,
+    0,
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "simulatePressure": false,
+  "strokeColor": "#000000",
+  "strokeSharpness": "round",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "freedraw",
+  "updated": 1,
+  "version": 4,
+  "versionNonce": 453191,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests key p selects freedraw tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": false,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "lastCommittedPoint": Array [
+            10,
+            10,
+          ],
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "pressures": Array [
+            0,
+            0,
+            0,
+          ],
+          "roughness": 1,
+          "seed": 337897,
+          "simulatePressure": false,
+          "strokeColor": "#000000",
+          "strokeSharpness": "round",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "freedraw",
+          "updated": 1,
+          "version": 4,
+          "versionNonce": 453191,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests key p selects freedraw tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests key p selects freedraw tool: [end of test] number of renders 1`] = `9`;
+
 exports[`regression tests key r selects rectangle tool: [end of test] appState 1`] = `
 Object {
   "activeTool": Object {
@@ -12589,234 +12817,6 @@ Object {
 exports[`regression tests key r selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
 exports[`regression tests key r selects rectangle tool: [end of test] number of renders 1`] = `9`;
-
-exports[`regression tests key x selects freedraw tool: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
-    "customType": null,
-    "lastActiveToolBeforeEraser": null,
-    "locked": false,
-    "type": "freedraw",
-  },
-  "collaborators": Map {},
-  "currentChartType": "bar",
-  "currentItemBackgroundColor": "transparent",
-  "currentItemEndArrowhead": "arrow",
-  "currentItemFillStyle": "hachure",
-  "currentItemFontFamily": 1,
-  "currentItemFontSize": 20,
-  "currentItemLinearStrokeSharpness": "round",
-  "currentItemOpacity": 100,
-  "currentItemRoughness": 1,
-  "currentItemStartArrowhead": null,
-  "currentItemStrokeColor": "#000000",
-  "currentItemStrokeSharpness": "sharp",
-  "currentItemStrokeStyle": "solid",
-  "currentItemStrokeWidth": 1,
-  "currentItemTextAlign": "left",
-  "cursorButton": "up",
-  "draggingElement": null,
-  "editingElement": null,
-  "editingGroupId": null,
-  "editingLinearElement": null,
-  "errorMessage": null,
-  "exportBackground": true,
-  "exportEmbedScene": false,
-  "exportScale": 1,
-  "exportWithDarkMode": false,
-  "fileHandle": null,
-  "gridSize": null,
-  "height": 768,
-  "isBindingEnabled": true,
-  "isLoading": false,
-  "isResizing": false,
-  "isRotating": false,
-  "isSidebarDocked": false,
-  "lastPointerDownWith": "mouse",
-  "multiElement": null,
-  "name": "Untitled-201933152653",
-  "offsetLeft": 0,
-  "offsetTop": 0,
-  "openDialog": null,
-  "openMenu": null,
-  "openPopup": null,
-  "openSidebar": null,
-  "pasteDialog": Object {
-    "data": null,
-    "shown": false,
-  },
-  "penDetected": false,
-  "penMode": false,
-  "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
-  "resizingElement": null,
-  "scrollX": 0,
-  "scrollY": 0,
-  "scrolledOutside": false,
-  "selectedElementIds": Object {
-    "id0": false,
-  },
-  "selectedGroupIds": Object {},
-  "selectedLinearElement": null,
-  "selectionElement": null,
-  "shouldCacheIgnoreZoom": false,
-  "showHyperlinkPopup": false,
-  "showStats": false,
-  "showWelcomeScreen": true,
-  "startBoundElement": null,
-  "suggestedBindings": Array [],
-  "theme": "light",
-  "toast": null,
-  "viewBackgroundColor": "#ffffff",
-  "viewModeEnabled": false,
-  "width": 1024,
-  "zenModeEnabled": false,
-  "zoom": Object {
-    "value": 1,
-  },
-}
-`;
-
-exports[`regression tests key x selects freedraw tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "lastCommittedPoint": Array [
-    10,
-    10,
-  ],
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      10,
-      10,
-    ],
-    Array [
-      10,
-      10,
-    ],
-  ],
-  "pressures": Array [
-    0,
-    0,
-    0,
-  ],
-  "roughness": 1,
-  "seed": 337897,
-  "simulatePressure": false,
-  "strokeColor": "#000000",
-  "strokeSharpness": "round",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "freedraw",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
-exports[`regression tests key x selects freedraw tool: [end of test] history 1`] = `
-Object {
-  "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": false,
-        },
-        "selectedGroupIds": Object {},
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "lastCommittedPoint": Array [
-            10,
-            10,
-          ],
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "points": Array [
-            Array [
-              0,
-              0,
-            ],
-            Array [
-              10,
-              10,
-            ],
-            Array [
-              10,
-              10,
-            ],
-          ],
-          "pressures": Array [
-            0,
-            0,
-            0,
-          ],
-          "roughness": 1,
-          "seed": 337897,
-          "simulatePressure": false,
-          "strokeColor": "#000000",
-          "strokeSharpness": "round",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "freedraw",
-          "updated": 1,
-          "version": 4,
-          "versionNonce": 453191,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
-  ],
-}
-`;
-
-exports[`regression tests key x selects freedraw tool: [end of test] number of elements 1`] = `1`;
-
-exports[`regression tests key x selects freedraw tool: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {
