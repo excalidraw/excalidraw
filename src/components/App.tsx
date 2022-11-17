@@ -124,7 +124,11 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
+import {
+  deepCopyElement,
+  newFreeDrawElement,
+  refreshTextDimensions,
+} from "../element/newElement";
 import {
   hasBoundTextElement,
   isBindingElement,
@@ -258,6 +262,7 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
   getContainerDims,
+  isValidTextContainer,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
@@ -733,12 +738,20 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private onFontLoaded = () => {
-    this.scene.getElementsIncludingDeleted().forEach((element) => {
+    let didUpdate = false;
+    this.scene.mapElements((element) => {
       if (isTextElement(element)) {
         invalidateShapeForElement(element);
+        didUpdate = true;
+        return newElementWith(element, {
+          ...refreshTextDimensions(element),
+        });
       }
+      return element;
     });
-    this.onSceneUpdated();
+    if (didUpdate) {
+      this.onSceneUpdated();
+    }
   };
 
   private resetHistory = () => {
@@ -1993,18 +2006,6 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({ isBindingEnabled: false });
       }
 
-      if (event.code === CODES.ZERO) {
-        const nextState = this.toggleMenu("library");
-        // track only openings
-        if (nextState) {
-          trackEvent(
-            "library",
-            "toggleLibrary (open)",
-            `keyboard (${this.device.isMobile ? "mobile" : "desktop"})`,
-          );
-        }
-      }
-
       if (isArrowKey(event.key)) {
         const step =
           (this.state.gridSize &&
@@ -2055,7 +2056,9 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (selectedElements.length === 1) {
-          if (isLinearElement(selectedElements[0])) {
+          const selectedElement = selectedElements[0];
+
+          if (isLinearElement(selectedElement)) {
             if (
               !this.state.editingLinearElement ||
               this.state.editingLinearElement.elementId !==
@@ -2064,14 +2067,15 @@ class App extends React.Component<AppProps, AppState> {
               this.history.resumeRecording();
               this.setState({
                 editingLinearElement: new LinearElementEditor(
-                  selectedElements[0],
+                  selectedElement,
                   this.scene,
                 ),
               });
             }
-          } else {
-            const selectedElement = selectedElements[0];
-
+          } else if (
+            isTextElement(selectedElement) ||
+            isValidTextContainer(selectedElement)
+          ) {
             this.startTextEditing({
               sceneX: selectedElement.x + selectedElement.width / 2,
               sceneY: selectedElement.y + selectedElement.height / 2,
@@ -2691,8 +2695,7 @@ class App extends React.Component<AppProps, AppState> {
       );
       if (selectedElements.length === 1) {
         const selectedElement = selectedElements[0];
-        const canBindText = hasBoundTextElement(selectedElement);
-        if (canBindText) {
+        if (hasBoundTextElement(selectedElement)) {
           sceneX = selectedElement.x + selectedElement.width / 2;
           sceneY = selectedElement.y + selectedElement.height / 2;
         }
@@ -3994,8 +3997,7 @@ class App extends React.Component<AppProps, AppState> {
       includeBoundTextElement: true,
     });
 
-    const canBindText = hasBoundTextElement(element);
-    if (canBindText) {
+    if (hasBoundTextElement(element)) {
       sceneX = element.x + element.width / 2;
       sceneY = element.y + element.height / 2;
     }
@@ -5324,6 +5326,7 @@ class App extends React.Component<AppProps, AppState> {
               id: fileId,
               dataURL,
               created: Date.now(),
+              lastRetrieved: Date.now(),
             },
           };
           const cachedImageData = this.imageCache.get(fileId);
