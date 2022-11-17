@@ -21,7 +21,7 @@ describe("element locking", () => {
     expect(item).toBe(null);
   });
 
-  it("should unlock all elements when using unlockAllCanvasElements action in contextMenu", async () => {
+  it("should unlock all elements and select them when using unlockAllCanvasElements action in contextMenu", async () => {
     await render(
       <Excalidraw
         initialData={{
@@ -54,6 +54,7 @@ describe("element locking", () => {
 
     mouse.rightClickAt(0, 0);
 
+    expect(Object.keys(h.state.selectedElementIds).length).toBe(0);
     expect(h.elements.map((el) => el.locked)).toEqual([true, true, false]);
 
     const item = queryByTestId(
@@ -65,5 +66,10 @@ describe("element locking", () => {
     fireEvent.click(item!.querySelector("button")!);
 
     expect(h.elements.map((el) => el.locked)).toEqual([false, false, false]);
+    // should select the unlocked elements
+    expect(h.state.selectedElementIds).toEqual({
+      [h.elements[0].id]: true,
+      [h.elements[1].id]: true,
+    });
   });
 });
