@@ -17,6 +17,7 @@ import { isTextBindableContainer } from "./typeChecks";
 import { getElementAbsoluteCoords } from "../element";
 import { AppState } from "../types";
 import { getSelectedElements } from "../scene";
+import { isImageElement } from "./typeChecks";
 
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
@@ -518,5 +519,15 @@ export const getTextBindableContainerAtPosition = (
       break;
     }
   }
+
   return isTextBindableContainer(hitElement, false) ? hitElement : null;
+};
+
+export const isValidTextContainer = (element: ExcalidrawElement) => {
+  return (
+    element.type === "rectangle" ||
+    element.type === "ellipse" ||
+    element.type === "diamond" ||
+    isImageElement(element)
+  );
 };
