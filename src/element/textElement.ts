@@ -12,7 +12,11 @@ import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
-import { isBoundToContainer, isLinearElement } from "./typeChecks";
+import {
+  isBoundToContainer,
+  isLinearElement,
+  isImageElement,
+} from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 import { AppState } from "../types";
 
@@ -631,4 +635,13 @@ export const shouldAllowVerticalAlign = (
     }
     return false;
   });
+};
+
+export const isValidTextContainer = (element: ExcalidrawElement) => {
+  return (
+    element.type === "rectangle" ||
+    element.type === "ellipse" ||
+    element.type === "diamond" ||
+    isImageElement(element)
+  );
 };

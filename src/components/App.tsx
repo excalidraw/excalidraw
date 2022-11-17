@@ -123,7 +123,11 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
+import {
+  deepCopyElement,
+  newFreeDrawElement,
+  refreshTextDimensions,
+} from "../element/newElement";
 import {
   hasBoundTextElement,
   isBindingElement,
@@ -256,6 +260,7 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerDims,
+  isValidTextContainer,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
@@ -727,12 +732,20 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private onFontLoaded = () => {
-    this.scene.getElementsIncludingDeleted().forEach((element) => {
+    let didUpdate = false;
+    this.scene.mapElements((element) => {
       if (isTextElement(element)) {
         invalidateShapeForElement(element);
+        didUpdate = true;
+        return newElementWith(element, {
+          ...refreshTextDimensions(element),
+        });
       }
+      return element;
     });
-    this.onSceneUpdated();
+    if (didUpdate) {
+      this.onSceneUpdated();
+    }
   };
 
   private resetHistory = () => {
@@ -1962,8 +1975,9 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
         if (selectedElements.length === 1) {
+          const selectedElement = selectedElements[0];
           if (event[KEYS.CTRL_OR_CMD]) {
-            if (isLinearElement(selectedElements[0])) {
+            if (isLinearElement(selectedElement)) {
               if (
                 !this.state.editingLinearElement ||
                 this.state.editingLinearElement.elementId !==
@@ -1972,14 +1986,16 @@ class App extends React.Component<AppProps, AppState> {
                 this.history.resumeRecording();
                 this.setState({
                   editingLinearElement: new LinearElementEditor(
-                    selectedElements[0],
+                    selectedElement,
                     this.scene,
                   ),
                 });
               }
             }
-          } else {
-            const selectedElement = selectedElements[0];
+          } else if (
+            isTextElement(selectedElement) ||
+            isValidTextContainer(selectedElement)
+          ) {
             const midPoint = getContainerCenter(selectedElement, this.state);
             const sceneX = midPoint.x;
             const sceneY = midPoint.y;
@@ -2587,23 +2603,26 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getNonDeletedElements(),
         this.state,
       );
+
       if (selectedElements.length === 1) {
         const selectedElement = selectedElements[0];
-        const hasBoundText = hasBoundTextElement(selectedElement);
 
-        if (isLinearElement(selectedElement) || hasBoundText) {
+        if (
+          isLinearElement(selectedElement) ||
+          hasBoundTextElement(selectedElement)
+        ) {
           const midPoint = getContainerCenter(selectedElement, this.state);
 
           sceneX = midPoint.x;
           sceneY = midPoint.y;
         }
+        this.startTextEditing({
+          sceneX,
+          sceneY,
+          shouldBind: false,
+          insertAtParentCenter: !event.altKey,
+        });
       }
-      this.startTextEditing({
-        sceneX,
-        sceneY,
-        shouldBind: false,
-        insertAtParentCenter: !event.altKey,
-      });
     }
   };
 
@@ -3905,8 +3924,7 @@ class App extends React.Component<AppProps, AppState> {
       includeBoundTextElement: true,
     });
 
-    const canBindText = hasBoundTextElement(element);
-    if (canBindText) {
+    if (hasBoundTextElement(element)) {
       sceneX = element.x + element.width / 2;
       sceneY = element.y + element.height / 2;
     }
