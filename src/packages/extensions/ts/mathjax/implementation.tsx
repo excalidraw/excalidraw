@@ -126,6 +126,9 @@ let mathJaxLoaded = false;
 let mathJaxLoading = false;
 let mathJaxLoadedCallback: SubtypeLoadedCb | undefined;
 
+// Configure use or non-use of speech-rule-engine
+const useSRE = false;
+
 let errorSvg: string;
 let errorAria: string;
 
@@ -138,7 +141,7 @@ const loadMathJax = async () => {
       mathJax.texHtml === undefined ||
       mathJax.visitor === undefined ||
       mathJax.mmlSvg === undefined ||
-      mathJax.mmlSre === undefined);
+      (useSRE && mathJax.mmlSre === undefined));
   if (!shouldLoad && !mathJaxLoaded) {
     stopLoadingMathJax = true;
   }
@@ -162,7 +165,9 @@ const loadMathJax = async () => {
     const SerializedMmlVisitor = (
       await import("mathjax-full/js/core/MmlTree/SerializedMmlVisitor")
     ).SerializedMmlVisitor;
-    const Sre = (await import("mathjax-full/js/a11y/sre")).Sre;
+    const Sre = useSRE
+      ? (await import("mathjax-full/js/a11y/sre")).Sre
+      : undefined;
 
     // Import some TeX packages
     await import("mathjax-full/js/input/tex/ams/AmsConfiguration");
@@ -233,23 +238,7 @@ const loadMathJax = async () => {
       OutputJax: svg,
     });
 
-    // Set up a custom loader to use our local mathmaps
-    const custom = (locale: string) => {
-      return new Promise<string>((resolve, reject) => {
-        try {
-          const mathmap = JSON.stringify(
-            require(`mathjax-full/es5/sre/mathmaps/${locale}.json`),
-          );
-          resolve(mathmap);
-        } catch (e) {
-          reject("");
-        }
-      });
-    };
-    global.SREfeature = { custom };
-
-    // Configure MathJax for accessibility
-    Sre.setupEngine({ speech: "shallow", custom: true }).then(() => {
+    const mathJaxReady = function () {
       mathJax.mmlSre = Sre;
 
       // Error indicator
@@ -257,14 +246,38 @@ const loadMathJax = async () => {
         mathJax.texHtml.convert("ERR", { display: false }),
       );
       errorSvg = mathJax.adaptor.outerHTML(mathJax.mmlSvg.convert(errorMML));
-      errorAria = mathJax.mmlSre.toSpeech(errorMML);
+      errorAria = useSRE ? mathJax.mmlSre.toSpeech(errorMML) : "ERR";
 
       // Finalize loading MathJax
       mathJaxLoaded = true;
       if (mathJaxLoadedCallback !== undefined) {
         mathJaxLoadedCallback(isMathElement);
       }
-    });
+    };
+
+    if (useSRE) {
+      // Set up a custom loader to use our local mathmaps
+      const custom = (locale: string) => {
+        return new Promise<string>((resolve, reject) => {
+          try {
+            const mathmap = JSON.stringify(
+              require(`mathjax-full/es5/sre/mathmaps/${locale}.json`),
+            );
+            resolve(mathmap);
+          } catch (e) {
+            reject("");
+          }
+        });
+      };
+      global.SREfeature = { custom };
+
+      // Configure MathJax for accessibility
+      Sre?.setupEngine({ speech: "shallow", custom: true }).then(() => {
+        mathJaxReady();
+      });
+    } else {
+      mathJaxReady();
+    }
   }
 };
 
@@ -427,7 +440,9 @@ const math2Svg = (
       : text;
     // For accessibility
     const ariaString = isMathJaxLoaded
-      ? mathJax.mmlSre.toSpeech(mmlString)
+      ? useSRE
+        ? mathJax.mmlSre.toSpeech(mmlString)
+        : text
       : mmlString;
     if (isMathJaxLoaded) {
       if (useTex) {
