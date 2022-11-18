@@ -272,6 +272,7 @@ import {
   getContainerElement,
   redrawTextBoundingBox,
   getContainerDims,
+  isValidTextContainer,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
@@ -2050,7 +2051,9 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (selectedElements.length === 1) {
-          if (isLinearElement(selectedElements[0])) {
+          const selectedElement = selectedElements[0];
+
+          if (isLinearElement(selectedElement)) {
             if (
               !this.state.editingLinearElement ||
               this.state.editingLinearElement.elementId !==
@@ -2059,14 +2062,15 @@ class App extends React.Component<AppProps, AppState> {
               this.history.resumeRecording();
               this.setState({
                 editingLinearElement: new LinearElementEditor(
-                  selectedElements[0],
+                  selectedElement,
                   this.scene,
                 ),
               });
             }
-          } else {
-            const selectedElement = selectedElements[0];
-
+          } else if (
+            isTextElement(selectedElement) ||
+            isValidTextContainer(selectedElement)
+          ) {
             this.startTextEditing({
               sceneX: selectedElement.x + selectedElement.width / 2,
               sceneY: selectedElement.y + selectedElement.height / 2,
@@ -2687,8 +2691,7 @@ class App extends React.Component<AppProps, AppState> {
       );
       if (selectedElements.length === 1) {
         const selectedElement = selectedElements[0];
-        const canBindText = hasBoundTextElement(selectedElement);
-        if (canBindText) {
+        if (hasBoundTextElement(selectedElement)) {
           sceneX = selectedElement.x + selectedElement.width / 2;
           sceneY = selectedElement.y + selectedElement.height / 2;
         }
@@ -3990,8 +3993,7 @@ class App extends React.Component<AppProps, AppState> {
       includeBoundTextElement: true,
     });
 
-    const canBindText = hasBoundTextElement(element);
-    if (canBindText) {
+    if (hasBoundTextElement(element)) {
       sceneX = element.x + element.width / 2;
       sceneY = element.y + element.height / 2;
     }
