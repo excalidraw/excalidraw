@@ -139,7 +139,7 @@ export const exportToSvg = async (
   ${SVG_EXPORT_TAG}
   ${metadata}
   <defs>
-    <style>
+    <style class="style-fonts">
       @font-face {
         font-family: "Virgil";
         src: url("${assetPath}Virgil.woff2");
