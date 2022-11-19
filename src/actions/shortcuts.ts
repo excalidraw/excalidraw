@@ -48,7 +48,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   copyStyles: [getShortcutKey("CtrlOrCmd+Alt+C")],
   pasteStyles: [getShortcutKey("CtrlOrCmd+Alt+V")],
   selectAll: [getShortcutKey("CtrlOrCmd+A")],
-  deleteSelectedElements: [getShortcutKey("Del")],
+  deleteSelectedElements: [getShortcutKey("Delete")],
   duplicateSelection: [
     getShortcutKey("CtrlOrCmd+D"),
     getShortcutKey(`Alt+${t("helpDialog.drag")}`),

@@ -303,7 +303,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             />
             <Shortcut
               label={t("labels.delete")}
-              shortcuts={[getShortcutKey("Del")]}
+              shortcuts={[getShortcutKey("Delete")]}
             />
             <Shortcut
               label={t("labels.sendToBack")}
