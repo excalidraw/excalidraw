@@ -326,8 +326,7 @@ export const getShortcutKey = (shortcut: string): string => {
   shortcut = shortcut
     .replace(/\bAlt\b/i, "Alt")
     .replace(/\bShift\b/i, "Shift")
-    .replace(/\b(Enter|Return)\b/i, "Enter")
-    .replace(/\bDel\b/i, "Delete");
+    .replace(/\b(Enter|Return)\b/i, "Enter");
 
   if (isDarwin) {
     return shortcut
