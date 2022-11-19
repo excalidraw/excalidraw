@@ -6012,6 +6012,7 @@ class App extends React.Component<AppProps, AppState> {
     type: "canvas" | "element" | "shape",
     source?: string,
   ) => {
+    trackEvent("contextMenu", "openContextMenu", type);
     if (this.state.showHyperlinkPopup) {
       this.setState({ showHyperlinkPopup: false });
     }
