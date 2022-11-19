@@ -19,6 +19,7 @@ import { registerAuxLangData } from "../i18n";
 import { getFontString } from "../utils";
 import * as textElementUtils from "../element/textElement";
 import { isTextElement } from "../element";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 
 const MW = 200;
 const TWIDTH = 200;
@@ -238,6 +239,45 @@ describe("subtypes", () => {
         expect(el.roughness).toBe(1);
       }
     });
+  });
+  it("should consider enforced prop values in version increments", async () => {
+    const rectA = API.createElement({
+      type: "line",
+      id: "A",
+      subtype: test1.subtype,
+      roughness: 1,
+      strokeWidth: 1,
+    });
+    const rectB = API.createElement({
+      type: "line",
+      id: "B",
+      subtype: test1.subtype,
+      roughness: 1,
+      strokeWidth: 1,
+    });
+    // Initial element creation checks
+    expect(rectA.roughness).toBe(0);
+    expect(rectB.roughness).toBe(0);
+    expect(rectA.version).toBe(1);
+    expect(rectB.version).toBe(1);
+    // Check that attempting to set prop values not permitted by the subtype
+    // doesn't increment element versions
+    mutateElement(rectA, { roughness: 2 });
+    mutateElement(rectB, { roughness: 2, strokeWidth: 2 });
+    expect(rectA.version).toBe(1);
+    expect(rectB.version).toBe(2);
+    // Check that element versions don't increment when creating new elements
+    // while attempting to use prop values not permitted by the subtype
+    // First check based on `rectA` (unsuccessfully mutated)
+    const rectC = newElementWith(rectA, { roughness: 1 });
+    const rectD = newElementWith(rectA, { roughness: 1, strokeWidth: 1.5 });
+    expect(rectC.version).toBe(1);
+    expect(rectD.version).toBe(2);
+    // Then check based on `rectB` (successfully mutated)
+    const rectE = newElementWith(rectB, { roughness: 1 });
+    const rectF = newElementWith(rectB, { roughness: 1, strokeWidth: 1.5 });
+    expect(rectE.version).toBe(2);
+    expect(rectF.version).toBe(3);
   });
   it("should call custom text methods", async () => {
     const testString = "A quick brown fox jumps over the lazy dog.";
