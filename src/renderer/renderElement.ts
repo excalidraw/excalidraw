@@ -227,7 +227,7 @@ const drawElementOnCanvas = (
         rc.draw(fillShape);
       }
       
-      context.beginPath();
+      window.navigator.clipboard.writeText(element.id);
       context.fillStyle = element.strokeColor;
       context.fill(path);
 
