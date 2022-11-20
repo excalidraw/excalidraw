@@ -221,14 +221,14 @@ const drawElementOnCanvas = (
       context.fillStyle = element.strokeColor;
 
       const path = getFreeDrawPath2D(element) as Path2D;
-      const fillShape = getShapeForElement(element);
+      /*const fillShape = getShapeForElement(element);
 
       if (fillShape) {
         rc.draw(fillShape);
-      }
+      }*/
 
-      //context.fillStyle = element.strokeColor;
-      //context.fill(path);
+      context.fillStyle = element.strokeColor;
+      context.fill(path);
 
       context.restore();
       break;
