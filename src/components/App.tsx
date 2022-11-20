@@ -2499,7 +2499,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ editingElement: element });
 
     if (!existingTextElement) {
-      if (container) {
+      if (container && shouldBindToContainer) {
         const containerIndex = this.scene.getElementIndex(container.id);
         this.scene.insertElementAtIndex(element, containerIndex);
       } else {
