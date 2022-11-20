@@ -775,12 +775,11 @@ export const renderElement = (
         drawElementOnCanvas(element, rc, context, renderConfig);
         context.restore();
       } else {
-        const elementWithCanvas = generateElementWithCanvas(
+        /*const elementWithCanvas = generateElementWithCanvas(
           element,
           renderConfig,
         );
-        console.log(elementWithCanvas.theme);
-        //drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
+        drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);*/
       }
 
       break;
