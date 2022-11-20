@@ -779,7 +779,8 @@ export const renderElement = (
           element,
           renderConfig,
         );
-        drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
+        console.log(elementWithCanvas.theme);
+        //drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
       }
 
       break;
