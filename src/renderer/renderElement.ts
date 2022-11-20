@@ -217,7 +217,7 @@ const drawElementOnCanvas = (
     }
     case "freedraw": {
       // Draw directly to canvas
-      /*context.save();
+      context.save();
       context.fillStyle = element.strokeColor;
 
       const path = getFreeDrawPath2D(element) as Path2D;
@@ -227,10 +227,10 @@ const drawElementOnCanvas = (
         rc.draw(fillShape);
       }
 
-      context.fillStyle = element.strokeColor;
-      context.fill(path);
+      //context.fillStyle = element.strokeColor;
+      //context.fill(path);
 
-      context.restore();*/
+      context.restore();
       break;
     }
     case "image": {
