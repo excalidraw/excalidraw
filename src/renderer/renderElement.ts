@@ -228,7 +228,7 @@ const drawElementOnCanvas = (
       }
       
       context.fillStyle = element.strokeColor;
-      if(Math.random()>0.5) context.fill(path);
+      context.fill(path);
 
       context.restore();
       break;
