@@ -137,7 +137,6 @@ import {
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
-  isTextBindableContainer,
 } from "../element/typeChecks";
 import {
   ExcalidrawBindableElement,
@@ -2325,7 +2324,6 @@ class App extends React.Component<AppProps, AppState> {
     const element = this.getElementAtPosition(x, y, {
       includeBoundTextElement: true,
     });
-
     if (element && isTextElement(element) && !element.isDeleted) {
       return element;
     }
@@ -2436,7 +2434,7 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length === 1) {
       if (isTextElement(selectedElements[0])) {
         existingTextElement = selectedElements[0];
-      } else if (isTextBindableContainer(selectedElements[0], false)) {
+      } else if (container) {
         existingTextElement = getBoundTextElement(selectedElements[0]);
       } else {
         existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
@@ -2467,7 +2465,6 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
     }
-
     const element = existingTextElement
       ? existingTextElement
       : newTextElement({
@@ -3907,7 +3904,15 @@ class App extends React.Component<AppProps, AppState> {
       includeBoundTextElement: true,
     });
 
+    let container = getTextBindableContainerAtPosition(
+      this.scene.getNonDeletedElements(),
+      this.state,
+      sceneX,
+      sceneY,
+    );
+
     if (hasBoundTextElement(element)) {
+      container = element as ExcalidrawTextContainer;
       sceneX = element.x + element.width / 2;
       sceneY = element.y + element.height / 2;
     }
@@ -3915,6 +3920,7 @@ class App extends React.Component<AppProps, AppState> {
       sceneX,
       sceneY,
       insertAtParentCenter: !event.altKey,
+      container,
     });
 
     resetCursor(this.canvas);

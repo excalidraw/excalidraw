@@ -859,9 +859,9 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(2);
 
       // Bind first text
-      let text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.containerId).toBe(rectangle.id);
-      let editor = document.querySelector(
+      const editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
       await new Promise((r) => setTimeout(r, 0));
@@ -871,25 +871,14 @@ describe("textWysiwyg", () => {
         { id: text.id, type: "text" },
       ]);
 
-      // Attempt to bind another text
-      UI.clickTool("text");
-      mouse.clickAt(
-        rectangle.x + rectangle.width / 2,
-        rectangle.y + rectangle.height / 2,
-      );
-      mouse.down();
-      expect(h.elements.length).toBe(3);
-      text = h.elements[2] as ExcalidrawTextElementWithContainer;
-      editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
-      await new Promise((r) => setTimeout(r, 0));
-      fireEvent.change(editor, { target: { value: "Whats up?" } });
-      editor.blur();
+      mouse.select(rectangle);
+      Keyboard.keyPress(KEYS.ENTER);
+      expect(h.elements.length).toBe(2);
+
       expect(rectangle.boundElements).toStrictEqual([
         { id: h.elements[1].id, type: "text" },
       ]);
-      expect(text.containerId).toBe(null);
+      expect(text.containerId).toBe(rectangle.id);
     });
 
     it("should respect text alignment when resizing", async () => {
