@@ -538,9 +538,10 @@ export const getContainerElement = (
 };
 
 export const getContainerDims = (element: ExcalidrawElement) => {
+  const MAX_WIDTH = 300;
   if (isArrowElement(element)) {
-    const width = Math.max(element.width, element.height);
-    const height = Math.min(element.width, element.height);
+    const width = Math.max(element.width, MAX_WIDTH);
+    const height = element.height;
     return { width, height };
   }
   return { width: element.width, height: element.height };
