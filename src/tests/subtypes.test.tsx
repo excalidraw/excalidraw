@@ -7,7 +7,6 @@ import {
   getSubtypeNames,
   hasAlwaysEnabledActions,
   isValidSubtype,
-  prepareSubtype,
   selectSubtype,
   subtypeCollides,
 } from "../subtypes";
@@ -175,9 +174,9 @@ const prepareTest3Subtype = function (
 
 const { h } = window;
 
-prepareSubtype(test1, prepareTest1Subtype);
-prepareSubtype(test2, prepareTest2Subtype);
-prepareSubtype(test3, prepareTest3Subtype);
+API.addSubtype(test1, prepareTest1Subtype);
+API.addSubtype(test2, prepareTest2Subtype);
+API.addSubtype(test3, prepareTest3Subtype);
 
 describe("subtypes", () => {
   it("should correctly register", async () => {

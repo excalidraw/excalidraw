@@ -22,7 +22,12 @@ import {
 } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
-import { selectSubtype } from "../../subtypes";
+import {
+  SubtypePrepFn,
+  SubtypeRecord,
+  prepareSubtype,
+  selectSubtype,
+} from "../../subtypes";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -34,6 +39,11 @@ export class API {
       // Call `prepareSubtype()` here for `@excalidraw/excalidraw`-specific subtypes
     }
   }
+
+  static addSubtype = (record: SubtypeRecord, subtypePrepFn: SubtypePrepFn) => {
+    const prep = prepareSubtype(record, subtypePrepFn);
+    return prep;
+  };
 
   static setSelectedElements = (elements: ExcalidrawElement[]) => {
     h.setState({
