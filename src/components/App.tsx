@@ -2501,7 +2501,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!existingTextElement) {
       if (container && shouldBindToContainer) {
         const containerIndex = this.scene.getElementIndex(container.id);
-        this.scene.insertElementAtIndex(element, containerIndex);
+        this.scene.insertElementAtIndex(element, containerIndex + 1);
       } else {
         this.scene.replaceAllElements([
           ...this.scene.getElementsIncludingDeleted(),

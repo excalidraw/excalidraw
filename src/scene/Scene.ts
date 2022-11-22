@@ -153,9 +153,9 @@ class Scene {
 
   insertElementAtIndex(element: ExcalidrawElement, index: number) {
     const nextElements = [
-      ...this.elements.slice(0, index + 1),
+      ...this.elements.slice(0, index),
       element,
-      ...this.elements.slice(index + 1),
+      ...this.elements.slice(index),
     ];
     this.replaceAllElements(nextElements);
   }
