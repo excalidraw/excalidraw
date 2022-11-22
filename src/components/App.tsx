@@ -242,8 +242,6 @@ import {
   prepareSubtype,
   selectSubtype,
 } from "../subtypes";
-import { getCrispSubtypeRecord } from "../element/subtypes/crisp/types";
-import { prepareCrispSubtype } from "../element/subtypes/crisp";
 import {
   dataURLToFile,
   generateIdFromFile,
@@ -474,7 +472,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
-    this.addSubtype(getCrispSubtypeRecord(), prepareCrispSubtype);
+    // Call `this.addSubtype()` here for `@excalidraw/excalidraw`-specific subtypes
     this.actionManager.registerActionGuards();
   }
 

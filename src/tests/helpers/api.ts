@@ -22,9 +22,7 @@ import {
 } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
-import { prepareSubtype, selectSubtype } from "../../subtypes";
-import { prepareCrispSubtype } from "../../element/subtypes/crisp";
-import { getCrispSubtypeRecord } from "../../element/subtypes/crisp/types";
+import { selectSubtype } from "../../subtypes";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -34,7 +32,6 @@ export class API {
   constructor() {
     if (true) {
       // Call `prepareSubtype()` here for `@excalidraw/excalidraw`-specific subtypes
-      prepareSubtype(getCrispSubtypeRecord(), prepareCrispSubtype);
     }
   }
 
