@@ -3,8 +3,12 @@ import {
   SubtypeRecord,
   SubtypeMethods,
   SubtypePrepFn,
+  getSubtypeMethods,
+  getSubtypeNames,
+  hasAlwaysEnabledActions,
   isValidSubtype,
   prepareSubtype,
+  selectSubtype,
   subtypeCollides,
 } from "../subtypes";
 
@@ -16,10 +20,12 @@ import { FontString, Theme } from "../element/types";
 import { createIcon, iconFillColor } from "../components/icons";
 import { SubtypeButton } from "../components/SubtypeButton";
 import { registerAuxLangData } from "../i18n";
-import { getFontString } from "../utils";
+import { getFontString, getShortcutKey } from "../utils";
 import * as textElementUtils from "../element/textElement";
 import { isTextElement } from "../element";
 import { mutateElement, newElementWith } from "../element/mutateElement";
+import { AppState } from "../types";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
 
 const MW = 200;
 const TWIDTH = 200;
@@ -73,7 +79,10 @@ const test3: SubtypeRecord = {
   parents: ["text", "line"],
   actionNames: [],
   disabledNames: [],
-  shortcutMap: {},
+  shortcutMap: {
+    testShortcut: [getShortcutKey("Shift+T")],
+  },
+  alwaysEnabledNames: ["test3Always"],
 };
 
 const cleanTestElementUpdate = function (updates) {
@@ -171,6 +180,25 @@ prepareSubtype(test2, prepareTest2Subtype);
 prepareSubtype(test3, prepareTest3Subtype);
 
 describe("subtypes", () => {
+  it("should correctly register", async () => {
+    const subtypes = getSubtypeNames();
+    expect(subtypes).toContain(test1.subtype);
+    expect(subtypes).toContain(test2.subtype);
+    expect(subtypes).toContain(test3.subtype);
+  });
+  it("should return subtype methods", async () => {
+    expect(getSubtypeMethods(undefined)).toBeUndefined();
+    const test1Methods = getSubtypeMethods(test1.subtype);
+    expect(test1Methods?.clean).toBeDefined();
+    expect(test1Methods?.render).toBeUndefined();
+    expect(test1Methods?.wrapText).toBeUndefined();
+    expect(test1Methods?.renderSvg).toBeUndefined();
+    expect(test1Methods?.measureText).toBeUndefined();
+    expect(test1Methods?.ensureLoaded).toBeUndefined();
+  });
+  it("should register custom shortcuts", async () => {
+    expect(getShortcutFromShortcutName("testShortcut")).toBe("Shift+T");
+  });
   it("should correctly validate", async () => {
     test1.parents.forEach((p) => {
       expect(isValidSubtype(test1.subtype, p)).toBe(true);
@@ -352,5 +380,86 @@ describe("subtypes", () => {
         );
       }
     });
+  });
+  it("should recognize subtypes with always-enabled actions", async () => {
+    expect(hasAlwaysEnabledActions(test1.subtype)).toBe(false);
+    expect(hasAlwaysEnabledActions(test2.subtype)).toBe(false);
+    expect(hasAlwaysEnabledActions(test3.subtype)).toBe(true);
+  });
+  it("should select active subtypes and customData", async () => {
+    const appState = {} as {
+      activeSubtypes: AppState["activeSubtypes"];
+      customData: AppState["customData"];
+    };
+
+    // No active subtypes
+    let subtypes = selectSubtype(appState, "text");
+    expect(subtypes.subtype).toBeUndefined();
+    expect(subtypes.customData).toBeUndefined();
+    // Subtype for both "text" and "line" types
+    appState.activeSubtypes = [test3.subtype];
+    subtypes = selectSubtype(appState, "text");
+    expect(subtypes.subtype).toBe(test3.subtype);
+    subtypes = selectSubtype(appState, "line");
+    expect(subtypes.subtype).toBe(test3.subtype);
+    subtypes = selectSubtype(appState, "arrow");
+    expect(subtypes.subtype).toBeUndefined();
+    // Subtype for multiple linear types
+    appState.activeSubtypes = [test1.subtype];
+    subtypes = selectSubtype(appState, "text");
+    expect(subtypes.subtype).toBeUndefined();
+    subtypes = selectSubtype(appState, "line");
+    expect(subtypes.subtype).toBe(test1.subtype);
+    subtypes = selectSubtype(appState, "arrow");
+    expect(subtypes.subtype).toBe(test1.subtype);
+    // Subtype for "text" only
+    appState.activeSubtypes = [test2.subtype];
+    subtypes = selectSubtype(appState, "text");
+    expect(subtypes.subtype).toBe(test2.subtype);
+    subtypes = selectSubtype(appState, "line");
+    expect(subtypes.subtype).toBeUndefined();
+    subtypes = selectSubtype(appState, "arrow");
+    expect(subtypes.subtype).toBeUndefined();
+
+    // Test customData
+    appState.customData = {};
+    appState.customData[test1.subtype] = { test: true };
+    appState.customData[test2.subtype] = { test2: true };
+    appState.customData[test3.subtype] = { test3: true };
+    // Subtype for both "text" and "line" types
+    appState.activeSubtypes = [test3.subtype];
+    subtypes = selectSubtype(appState, "text");
+    expect(subtypes.customData).toBeDefined();
+    expect(subtypes.customData![test1.subtype]).toBeUndefined();
+    expect(subtypes.customData![test2.subtype]).toBeUndefined();
+    expect(subtypes.customData![test3.subtype]).toBe(true);
+    subtypes = selectSubtype(appState, "line");
+    expect(subtypes.customData).toBeDefined();
+    expect(subtypes.customData![test1.subtype]).toBeUndefined();
+    expect(subtypes.customData![test2.subtype]).toBeUndefined();
+    expect(subtypes.customData![test3.subtype]).toBe(true);
+    subtypes = selectSubtype(appState, "arrow");
+    expect(subtypes.customData).toBeUndefined();
+    // Subtype for multiple linear types
+    appState.activeSubtypes = [test1.subtype];
+    subtypes = selectSubtype(appState, "text");
+    expect(subtypes.customData).toBeUndefined();
+    subtypes = selectSubtype(appState, "line");
+    expect(subtypes.customData).toBeDefined();
+    expect(subtypes.customData![test1.subtype]).toBe(true);
+    expect(subtypes.customData![test2.subtype]).toBeUndefined();
+    expect(subtypes.customData![test3.subtype]).toBeUndefined();
+    // Multiple, non-colliding subtypes
+    appState.activeSubtypes = [test1.subtype, test2.subtype];
+    subtypes = selectSubtype(appState, "text");
+    expect(subtypes.customData).toBeDefined();
+    expect(subtypes.customData![test1.subtype]).toBeUndefined();
+    expect(subtypes.customData![test2.subtype]).toBe(true);
+    expect(subtypes.customData![test3.subtype]).toBeUndefined();
+    subtypes = selectSubtype(appState, "line");
+    expect(subtypes.customData).toBeDefined();
+    expect(subtypes.customData![test1.subtype]).toBe(true);
+    expect(subtypes.customData![test2.subtype]).toBeUndefined();
+    expect(subtypes.customData![test3.subtype]).toBeUndefined();
   });
 });

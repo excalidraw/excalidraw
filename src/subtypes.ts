@@ -240,7 +240,7 @@ export type SubtypeMethods = {
 type MethodMap = { subtype: Subtype; methods: Partial<SubtypeMethods> };
 const methodMaps = [] as Array<MethodMap>;
 
-// Use `getSUbtypeMethods` to call subtype-specialized methods, like `render`.
+// Use `getSubtypeMethods` to call subtype-specialized methods, like `render`.
 export const getSubtypeMethods = (subtype: Subtype | undefined) => {
   const map = methodMaps.find((method) => method.subtype === subtype);
   return map?.methods;
@@ -281,7 +281,7 @@ export const selectSubtype = (
   if (appState.customData === undefined || !(subtype in appState.customData)) {
     return { subtype };
   }
-  const customData = appState.customData?.subtype;
+  const customData = appState.customData[subtype];
   return { subtype, customData };
 };
 
