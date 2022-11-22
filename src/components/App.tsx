@@ -1994,12 +1994,13 @@ class App extends React.Component<AppProps, AppState> {
             isTextElement(selectedElement) ||
             isValidTextContainer(selectedElement)
           ) {
-            const container = selectedElements[0] as ExcalidrawTextContainer;
-
+            let container;
+            if (!isTextElement(selectedElement)) {
+              container = selectedElement as ExcalidrawTextContainer;
+            }
             this.startTextEditing({
-              sceneX: container.x + container.width / 2,
-              sceneY: container.y + container.height / 2,
-
+              sceneX: selectedElement.x + selectedElement.width / 2,
+              sceneY: selectedElement.y + selectedElement.height / 2,
               container,
             });
             event.preventDefault();
