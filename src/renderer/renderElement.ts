@@ -731,14 +731,13 @@ const drawElementFromCanvas = (
 
     const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
     tempCanvas.width =
-      maxDim * window.devicePixelRatio * zoom +
+      maxDim * window.devicePixelRatio +
       padding * elementWithCanvas.canvasZoom * 10;
     tempCanvas.height =
-      maxDim * window.devicePixelRatio * zoom +
+      maxDim * window.devicePixelRatio +
       padding * elementWithCanvas.canvasZoom * 10;
     const offsetX = (tempCanvas.width - elementWithCanvas.canvas!.width) / 2;
     const offsetY = (tempCanvas.height - elementWithCanvas.canvas!.height) / 2;
-
     tempCanvasContext.translate(tempCanvas.width / 2, tempCanvas.height / 2);
 
     tempCanvasContext.rotate(element.angle);
