@@ -2,6 +2,8 @@
 interface Document {
   fonts?: {
     ready?: Promise<void>;
+    check?: (font: string, text?: string) => boolean;
+    load?: (font: string, text?: string) => Promise<FontFace[]>;
     addEventListener?(
       type: "loading" | "loadingdone" | "loadingerror",
       listener: (this: Document, ev: Event) => any,
