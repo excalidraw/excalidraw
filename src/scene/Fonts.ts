@@ -34,19 +34,17 @@ export class Fonts {
    */
   public onFontsLoaded = (fontFaces: readonly FontFace[]) => {
     if (
-      fontFaces &&
-      (!fontFaces.length ||
-        // bail if all fonts with have been processed. We're checking just a
-        // subset of the font properties (though it should be enough), so it
-        // can technically bail on a false positive.
-        fontFaces.every((fontFace) => {
-          const sig = `${fontFace.family}-${fontFace.style}-${fontFace.weight}`;
-          if (Fonts.loadedFontFaces.has(sig)) {
-            return true;
-          }
-          Fonts.loadedFontFaces.add(sig);
-          return false;
-        }))
+      // bail if all fonts with have been processed. We're checking just a
+      // subset of the font properties (though it should be enough), so it
+      // can technically bail on a false positive.
+      fontFaces.every((fontFace) => {
+        const sig = `${fontFace.family}-${fontFace.style}-${fontFace.weight}`;
+        if (Fonts.loadedFontFaces.has(sig)) {
+          return true;
+        }
+        Fonts.loadedFontFaces.add(sig);
+        return false;
+      })
     ) {
       return false;
     }
