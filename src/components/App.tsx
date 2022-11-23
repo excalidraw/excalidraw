@@ -123,11 +123,7 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import {
-  deepCopyElement,
-  newFreeDrawElement,
-  refreshTextDimensions,
-} from "../element/newElement";
+import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   hasBoundTextElement,
   isBindingElement,
@@ -272,6 +268,7 @@ import {
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { atom } from "jotai";
+import { Fonts } from "../scene/Fonts";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -354,6 +351,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public scene: Scene;
+  private fonts: Fonts;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
@@ -445,6 +443,10 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.scene = new Scene();
+    this.fonts = new Fonts({
+      scene: this.scene,
+      onSceneUpdated: this.onSceneUpdated,
+    });
     this.history = new History();
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -730,23 +732,6 @@ class App extends React.Component<AppProps, AppState> {
     event.preventDefault();
   };
 
-  private onFontLoaded = () => {
-    let didUpdate = false;
-    this.scene.mapElements((element) => {
-      if (isTextElement(element)) {
-        invalidateShapeForElement(element);
-        didUpdate = true;
-        return newElementWith(element, {
-          ...refreshTextDimensions(element),
-        });
-      }
-      return element;
-    });
-    if (didUpdate) {
-      this.onSceneUpdated();
-    }
-  };
-
   private resetHistory = () => {
     this.history.clear();
   };
@@ -845,6 +830,12 @@ class App extends React.Component<AppProps, AppState> {
         ),
       };
     }
+
+    // FontFaceSet loadingdone event we listen on may not always fire
+    // (looking at you Safari), so on init we manually load fonts for current
+    // text elements on canvas, and rerender them once done. This also
+    // seems faster even in browsers that do fire the loadingdone event.
+    this.fonts.loadFontsForElements(scene.elements);
 
     this.resetHistory();
     this.syncActionResult({
@@ -1059,7 +1050,11 @@ class App extends React.Component<AppProps, AppState> {
       this.updateCurrentCursorPosition,
     );
     // rerender text elements on font load to fix #637 && #1553
-    document.fonts?.addEventListener?.("loadingdone", this.onFontLoaded);
+    document.fonts?.addEventListener?.("loadingdone", (event) => {
+      const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
+      this.fonts.onFontsLoaded(loadedFontFaces);
+    });
+
     // Safari-only desktop pinch zoom
     document.addEventListener(
       EVENT.GESTURE_START,
