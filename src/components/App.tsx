@@ -2559,6 +2559,19 @@ class App extends React.Component<AppProps, AppState> {
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
+        event[KEYS.CTRL_OR_CMD] &&
+        (!this.state.editingLinearElement ||
+          this.state.editingLinearElement.elementId !== selectedElements[0].id)
+      ) {
+        this.history.resumeRecording();
+        this.setState({
+          editingLinearElement: new LinearElementEditor(
+            selectedElements[0],
+            this.scene,
+          ),
+        });
+        return;
+      } else if (
         this.state.editingLinearElement &&
         this.state.editingLinearElement.elementId === selectedElements[0].id
       ) {

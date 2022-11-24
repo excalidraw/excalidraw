@@ -205,6 +205,16 @@ describe("Test Linear Elements", () => {
     expect(h.state.editingLinearElement?.elementId).toBeUndefined();
   });
 
+  it("should enter line editor when using double clicked with ctrl key", () => {
+    createTwoPointerLinearElement("line");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.doubleClick();
+    });
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
   describe("Inside editor", () => {
     it("should allow dragging line from midpoint in 2 pointer lines", async () => {
       createTwoPointerLinearElement("line");
