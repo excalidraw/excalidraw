@@ -1,6 +1,7 @@
 import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
+  ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
   FontString,
@@ -12,6 +13,10 @@ import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
+import { isTextBindableContainer } from "./typeChecks";
+import { getElementAbsoluteCoords } from "../element";
+import { AppState } from "../types";
+import { getSelectedElements } from "../scene";
 import { isImageElement } from "./typeChecks";
 
 export const redrawTextBoundingBox = (
@@ -490,6 +495,32 @@ export const getContainerElement = (
 
 export const getContainerDims = (element: ExcalidrawElement) => {
   return { width: element.width, height: element.height };
+};
+
+export const getTextBindableContainerAtPosition = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  x: number,
+  y: number,
+): ExcalidrawTextContainer | null => {
+  const selectedElements = getSelectedElements(elements, appState);
+  if (selectedElements.length === 1) {
+    return selectedElements[0] as ExcalidrawTextContainer;
+  }
+  let hitElement = null;
+  // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  for (let index = elements.length - 1; index >= 0; --index) {
+    if (elements[index].isDeleted) {
+      continue;
+    }
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
+    if (x1 < x && x < x2 && y1 < y && y < y2) {
+      hitElement = elements[index];
+      break;
+    }
+  }
+
+  return isTextBindableContainer(hitElement, false) ? hitElement : null;
 };
 
 export const isValidTextContainer = (element: ExcalidrawElement) => {
