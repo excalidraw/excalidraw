@@ -124,11 +124,7 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import {
-  deepCopyElement,
-  newFreeDrawElement,
-  refreshTextDimensions,
-} from "../element/newElement";
+import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   hasBoundTextElement,
   isBindingElement,
@@ -138,7 +134,6 @@ import {
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
-  isTextBindableContainer,
 } from "../element/typeChecks";
 import {
   ExcalidrawBindableElement,
@@ -180,7 +175,6 @@ import { renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
-  getTextBindableContainerAtPosition,
   getElementsAtPosition,
   getElementsWithinSelection,
   getNormalizedZoom,
@@ -270,6 +264,7 @@ import {
   getContainerElement,
   redrawTextBoundingBox,
   getContainerDims,
+  getTextBindableContainerAtPosition,
   isValidTextContainer,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
@@ -283,6 +278,7 @@ import {
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { atom } from "jotai";
+import { Fonts } from "../scene/Fonts";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -366,6 +362,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public scene: Scene;
+  private fonts: Fonts;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
@@ -416,6 +413,10 @@ class App extends React.Component<AppProps, AppState> {
 
     this.library = new Library(this);
     this.scene = new Scene();
+    this.fonts = new Fonts({
+      scene: this.scene,
+      onSceneUpdated: this.onSceneUpdated,
+    });
 
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -789,23 +790,6 @@ class App extends React.Component<AppProps, AppState> {
     event.preventDefault();
   };
 
-  private onFontLoaded = () => {
-    let didUpdate = false;
-    this.scene.mapElements((element) => {
-      if (isTextElement(element)) {
-        invalidateShapeForElement(element);
-        didUpdate = true;
-        return newElementWith(element, {
-          ...refreshTextDimensions(element),
-        });
-      }
-      return element;
-    });
-    if (didUpdate) {
-      this.onSceneUpdated();
-    }
-  };
-
   private resetHistory = () => {
     this.history.clear();
   };
@@ -904,6 +888,12 @@ class App extends React.Component<AppProps, AppState> {
         ),
       };
     }
+
+    // FontFaceSet loadingdone event we listen on may not always fire
+    // (looking at you Safari), so on init we manually load fonts for current
+    // text elements on canvas, and rerender them once done. This also
+    // seems faster even in browsers that do fire the loadingdone event.
+    this.fonts.loadFontsForElements(scene.elements);
 
     this.resetHistory();
     this.syncActionResult({
@@ -1118,7 +1108,11 @@ class App extends React.Component<AppProps, AppState> {
       this.updateCurrentCursorPosition,
     );
     // rerender text elements on font load to fix #637 && #1553
-    document.fonts?.addEventListener?.("loadingdone", this.onFontLoaded);
+    document.fonts?.addEventListener?.("loadingdone", (event) => {
+      const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
+      this.fonts.onFontsLoaded(loadedFontFaces);
+    });
+
     // Safari-only desktop pinch zoom
     document.addEventListener(
       EVENT.GESTURE_START,
@@ -2069,10 +2063,14 @@ class App extends React.Component<AppProps, AppState> {
             isTextElement(selectedElement) ||
             isValidTextContainer(selectedElement)
           ) {
+            let container;
+            if (!isTextElement(selectedElement)) {
+              container = selectedElement as ExcalidrawTextContainer;
+            }
             this.startTextEditing({
               sceneX: selectedElement.x + selectedElement.width / 2,
               sceneY: selectedElement.y + selectedElement.height / 2,
-              shouldBind: true,
+              container,
             });
             event.preventDefault();
             return;
@@ -2396,7 +2394,6 @@ class App extends React.Component<AppProps, AppState> {
     const element = this.getElementAtPosition(x, y, {
       includeBoundTextElement: true,
     });
-
     if (element && isTextElement(element) && !element.isDeleted) {
       return element;
     }
@@ -2473,29 +2470,31 @@ class App extends React.Component<AppProps, AppState> {
   private startTextEditing = ({
     sceneX,
     sceneY,
-    shouldBind,
     insertAtParentCenter = true,
+    container,
   }: {
     /** X position to insert text at */
     sceneX: number;
     /** Y position to insert text at */
     sceneY: number;
-    shouldBind: boolean;
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
+    container?: ExcalidrawTextContainer | null;
   }) => {
+    let shouldBindToContainer = false;
+
     let parentCenterPosition =
       insertAtParentCenter &&
       this.getTextWysiwygSnappedToCenterPosition(
         sceneX,
         sceneY,
         this.state,
-        this.canvas,
-        window.devicePixelRatio,
+        container,
       );
-
+    if (container && parentCenterPosition) {
+      shouldBindToContainer = true;
+    }
     let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
-    let container: ExcalidrawTextContainer | null = null;
 
     const selectedElements = getSelectedElements(
       this.scene.getNonDeletedElements(),
@@ -2505,7 +2504,7 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length === 1) {
       if (isTextElement(selectedElements[0])) {
         existingTextElement = selectedElements[0];
-      } else if (isTextBindableContainer(selectedElements[0], false)) {
+      } else if (container) {
         existingTextElement = getBoundTextElement(selectedElements[0]);
       } else {
         existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
@@ -2514,26 +2513,7 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
 
-    // bind to container when shouldBind is true or
-    // clicked on center of container
-    if (
-      !container &&
-      !existingTextElement &&
-      (shouldBind || parentCenterPosition)
-    ) {
-      container = getTextBindableContainerAtPosition(
-        this.scene
-          .getNonDeletedElements()
-          .filter(
-            (ele) =>
-              isTextBindableContainer(ele, false) && !getBoundTextElement(ele),
-          ),
-        sceneX,
-        sceneY,
-      );
-    }
-
-    if (!existingTextElement && container) {
+    if (!existingTextElement && shouldBindToContainer && container) {
       const fontString = {
         fontSize: this.state.currentItemFontSize,
         fontFamily: this.state.currentItemFontFamily,
@@ -2551,12 +2531,10 @@ class App extends React.Component<AppProps, AppState> {
           sceneX,
           sceneY,
           this.state,
-          this.canvas,
-          window.devicePixelRatio,
+          container,
         );
       }
     }
-
     const element = existingTextElement
       ? existingTextElement
       : newTextElement({
@@ -2584,7 +2562,7 @@ class App extends React.Component<AppProps, AppState> {
             ? VERTICAL_ALIGN.MIDDLE
             : DEFAULT_VERTICAL_ALIGN,
           ...selectSubtype(this.state, "text"),
-          containerId: container?.id ?? undefined,
+          containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
           locked: false,
         });
@@ -2592,10 +2570,15 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ editingElement: element });
 
     if (!existingTextElement) {
-      this.scene.replaceAllElements([
-        ...this.scene.getElementsIncludingDeleted(),
-        element,
-      ]);
+      if (container && shouldBindToContainer) {
+        const containerIndex = this.scene.getElementIndex(container.id);
+        this.scene.insertElementAtIndex(element, containerIndex + 1);
+      } else {
+        this.scene.replaceAllElements([
+          ...this.scene.getElementsIncludingDeleted(),
+          element,
+        ]);
+      }
 
       // case: creating new text not centered to parent element → offset Y
       // so that the text is centered to cursor position
@@ -2683,22 +2666,23 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.canvas);
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
-      const selectedElements = getSelectedElements(
+      const container = getTextBindableContainerAtPosition(
         this.scene.getNonDeletedElements(),
         this.state,
+        sceneX,
+        sceneY,
       );
-      if (selectedElements.length === 1) {
-        const selectedElement = selectedElements[0];
-        if (hasBoundTextElement(selectedElement)) {
-          sceneX = selectedElement.x + selectedElement.width / 2;
-          sceneY = selectedElement.y + selectedElement.height / 2;
+      if (container) {
+        if (hasBoundTextElement(container)) {
+          sceneX = container.x + container.width / 2;
+          sceneY = container.y + container.height / 2;
         }
       }
       this.startTextEditing({
         sceneX,
         sceneY,
-        shouldBind: false,
         insertAtParentCenter: !event.altKey,
+        container,
       });
     }
   };
@@ -3991,15 +3975,23 @@ class App extends React.Component<AppProps, AppState> {
       includeBoundTextElement: true,
     });
 
+    let container = getTextBindableContainerAtPosition(
+      this.scene.getNonDeletedElements(),
+      this.state,
+      sceneX,
+      sceneY,
+    );
+
     if (hasBoundTextElement(element)) {
+      container = element as ExcalidrawTextContainer;
       sceneX = element.x + element.width / 2;
       sceneY = element.y + element.height / 2;
     }
     this.startTextEditing({
       sceneX,
       sceneY,
-      shouldBind: false,
       insertAtParentCenter: !event.altKey,
+      container,
     });
 
     resetCursor(this.canvas);
@@ -6306,21 +6298,11 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
     appState: AppState,
-    canvas: HTMLCanvasElement | null,
-    scale: number,
+    container?: ExcalidrawTextContainer | null,
   ) {
-    const elementClickedInside = getTextBindableContainerAtPosition(
-      this.scene
-        .getElementsIncludingDeleted()
-        .filter((element) => !isTextElement(element)),
-      x,
-      y,
-    );
-    if (elementClickedInside) {
-      const elementCenterX =
-        elementClickedInside.x + elementClickedInside.width / 2;
-      const elementCenterY =
-        elementClickedInside.y + elementClickedInside.height / 2;
+    if (container) {
+      const elementCenterX = container.x + container.width / 2;
+      const elementCenterY = container.y + container.height / 2;
       const distanceToCenter = Math.hypot(
         x - elementCenterX,
         y - elementCenterY,
