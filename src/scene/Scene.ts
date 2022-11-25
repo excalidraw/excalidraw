@@ -150,6 +150,24 @@ class Scene {
     // (I guess?)
     this.callbacks.clear();
   }
+
+  insertElementAtIndex(element: ExcalidrawElement, index: number) {
+    if (!Number.isFinite(index) || index < 0) {
+      throw new Error(
+        "insertElementAtIndex can only be called with index >= 0",
+      );
+    }
+    const nextElements = [
+      ...this.elements.slice(0, index),
+      element,
+      ...this.elements.slice(index),
+    ];
+    this.replaceAllElements(nextElements);
+  }
+
+  getElementIndex(elementId: string) {
+    return this.elements.findIndex((element) => element.id === elementId);
+  }
 }
 
 export default Scene;
