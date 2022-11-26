@@ -394,7 +394,7 @@
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
     "selection": "selection",
-    "pasteAsSingleElement": "To paste the text as a single element use {{shortcut}},\nor paste into an existing text editor"
+    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor"
   },
   "colors": {
     "ffffff": "White",
