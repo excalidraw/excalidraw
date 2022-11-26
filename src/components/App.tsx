@@ -1476,7 +1476,8 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (IS_PLAIN_PASTE) {
+      // only consider IS_PLAINTEXT_PASTE for keyboard paste (event is supplied)
+      if (IS_PLAIN_PASTE && event) {
         const text = await getSystemClipboard(event);
         this.addTextFromPaste(text, false);
         return;
@@ -1942,13 +1943,12 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
-      if (
-        event[KEYS.CTRL_OR_CMD] &&
-        event.key.toLowerCase() === KEYS.V &&
-        event.shiftKey
-      ) {
-        IS_PLAIN_PASTE = true;
+      if (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.V) {
+        IS_PLAIN_PASTE = event.shiftKey;
         clearTimeout(IS_PLAIN_PASTE_TIMER);
+        // reset (100ms to be safe that we it runs after the ensuing
+        // paste event). Though, technically unnecessary to reset since we
+        // (re)set the flag before each paste event.
         IS_PLAIN_PASTE_TIMER = window.setTimeout(() => {
           IS_PLAIN_PASTE = false;
         }, 100);
