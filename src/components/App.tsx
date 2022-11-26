@@ -43,7 +43,6 @@ import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
 import {
-  getSystemClipboard,
   parseClipboard,
   probablySupportsClipboardBlob,
   probablySupportsClipboardWriteText,
@@ -1459,6 +1458,8 @@ class App extends React.Component<AppProps, AppState> {
 
   private pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent | null) => {
+      const isPlainPaste = !!(IS_PLAIN_PASTE && event);
+
       // #686
       const target = document.activeElement;
       const isExcalidrawActive =
@@ -1476,21 +1477,14 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      // only consider IS_PLAINTEXT_PASTE for keyboard paste (event is supplied)
-      if (IS_PLAIN_PASTE && event) {
-        const text = await getSystemClipboard(event);
-        this.addTextFromPaste(text, false);
-        return;
-      }
-
       // must be called in the same frame (thus before any awaits) as the paste
       // event else some browsers (FF...) will clear the clipboardData
       // (something something security)
       let file = event?.clipboardData?.files[0];
 
-      const data = await parseClipboard(event);
+      const data = await parseClipboard(event, isPlainPaste);
 
-      if (!file && data.text) {
+      if (!file && data.text && !isPlainPaste) {
         const string = data.text.trim();
         if (string.startsWith("<svg") && string.endsWith("</svg>")) {
           // ignore SVG validation/normalization which will be done during image
@@ -1523,9 +1517,10 @@ class App extends React.Component<AppProps, AppState> {
           console.error(error);
         }
       }
+
       if (data.errorMessage) {
         this.setState({ errorMessage: data.errorMessage });
-      } else if (data.spreadsheet) {
+      } else if (data.spreadsheet && !isPlainPaste) {
         this.setState({
           pasteDialog: {
             data: data.spreadsheet,
@@ -1533,13 +1528,14 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       } else if (data.elements) {
+        // TODO remove formatting from elements if isPlainPaste
         this.addElementsFromPasteOrLibrary({
           elements: data.elements,
           files: data.files || null,
           position: "cursor",
         });
       } else if (data.text) {
-        this.addTextFromPaste(data.text);
+        this.addTextFromPaste(data.text, isPlainPaste);
       }
       this.setActiveTool({ type: "selection" });
       event?.preventDefault();
@@ -1646,7 +1642,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setActiveTool({ type: "selection" });
   };
 
-  private addTextFromPaste(text: string, splitText = true) {
+  private addTextFromPaste(text: string, isPlainPaste = false) {
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX: cursorX, clientY: cursorY },
       this.state,
@@ -1672,7 +1668,7 @@ class App extends React.Component<AppProps, AppState> {
     };
     const DELTA_GAP = 10;
     const newElements: ExcalidrawTextElement[] = [];
-    if (splitText) {
+    if (!isPlainPaste) {
       let currentY = y;
       const splittedText = text.split("\n");
       for (const line of splittedText) {
@@ -1722,7 +1718,7 @@ class App extends React.Component<AppProps, AppState> {
     newElements.forEach((e) => (selectedElementIds[e.id] = true));
     this.setState({ selectedElementIds });
     if (
-      splitText &&
+      !isPlainPaste &&
       newElements.length > 1 &&
       PLAIN_PASTE_TOAST_SHOWN === false &&
       !this.device.isMobile
@@ -1735,6 +1731,7 @@ class App extends React.Component<AppProps, AppState> {
       });
       PLAIN_PASTE_TOAST_SHOWN = true;
     }
+
     this.history.resumeRecording();
   }
 
