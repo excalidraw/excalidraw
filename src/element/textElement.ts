@@ -19,6 +19,16 @@ import { AppState } from "../types";
 import { getSelectedElements } from "../scene";
 import { isImageElement } from "./typeChecks";
 
+export const normalizeText = (text: string) => {
+  return (
+    text
+      // replace tabs with spaces so they render and measure correctly
+      .replace(/\t/g, "        ")
+      // normalize newlines
+      .replace(/\r?\n|\r/g, "\n")
+  );
+};
+
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
