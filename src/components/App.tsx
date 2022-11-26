@@ -324,14 +324,14 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
-let plainTextPasteToastShown = false;
 
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
 let THROTTLE_NEXT_RENDER = true;
 
-let IS_PLAINTEXT_PASTE = false;
-let IS_PLAINTEXT_PASTE_TIMER = 0;
+let IS_PLAIN_PASTE = false;
+let IS_PLAIN_PASTE_TIMER = 0;
+let PLAIN_PASTE_TOAST_SHOWN = false;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -1476,7 +1476,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (IS_PLAINTEXT_PASTE) {
+      if (IS_PLAIN_PASTE) {
         const text = await getSystemClipboard(event);
         this.addTextFromPaste(text, false);
         return;
@@ -1723,7 +1723,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       splitText &&
       newElements.length > 1 &&
-      plainTextPasteToastShown === false
+      PLAIN_PASTE_TOAST_SHOWN === false
     ) {
       this.setToast({
         message: t("toast.pasteAsSingleElement", {
@@ -1731,7 +1731,7 @@ class App extends React.Component<AppProps, AppState> {
         }),
         duration: 5000,
       });
-      plainTextPasteToastShown = true;
+      PLAIN_PASTE_TOAST_SHOWN = true;
     }
     this.history.resumeRecording();
   }
@@ -1947,10 +1947,10 @@ class App extends React.Component<AppProps, AppState> {
         event.key.toLowerCase() === KEYS.V &&
         event.shiftKey
       ) {
-        IS_PLAINTEXT_PASTE = true;
-        clearTimeout(IS_PLAINTEXT_PASTE_TIMER);
-        IS_PLAINTEXT_PASTE_TIMER = window.setTimeout(() => {
-          IS_PLAINTEXT_PASTE = false;
+        IS_PLAIN_PASTE = true;
+        clearTimeout(IS_PLAIN_PASTE_TIMER);
+        IS_PLAIN_PASTE_TIMER = window.setTimeout(() => {
+          IS_PLAIN_PASTE = false;
         }, 100);
       }
 
