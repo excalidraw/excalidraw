@@ -1648,7 +1648,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
 
-    const newElementProps = {
+    const textElementProps = {
       x,
       y,
       strokeColor: this.state.currentItemStrokeColor,
@@ -1666,60 +1666,63 @@ class App extends React.Component<AppProps, AppState> {
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
     };
-    const DELTA_GAP = 10;
-    const newElements: ExcalidrawTextElement[] = [];
-    if (!isPlainPaste) {
-      let currentY = y;
-      const splittedText = text.split("\n");
-      for (const line of splittedText) {
-        const lineHeight =
-          getApproxLineHeight(
-            getFontString({
-              fontSize: newElementProps.fontSize,
-              fontFamily: newElementProps.fontFamily,
-            }),
-          ) +
-          DELTA_GAP / this.state.zoom.value;
-        if (line.trim().length === 0) {
-          currentY += lineHeight;
-          continue;
-        }
-        const element = newTextElement({
-          ...newElementProps,
-          x,
-          y: currentY,
-          text: line.trim(),
-        });
-        newElements.push(element);
-        currentY += lineHeight;
-      }
-    } else {
-      if (text.length === 0) {
-        return;
-      }
-      const element = newTextElement({
-        ...newElementProps,
-        x,
-        y,
-        text,
-      });
-      newElements.push(element);
-    }
 
-    if (newElements.length === 0) {
+    const LINE_GAP = 10;
+    let currentY = y;
+
+    const lines = isPlainPaste ? [text] : text.split("\n");
+    const textElements = lines.reduce(
+      (acc: ExcalidrawTextElement[], line, idx) => {
+        const text = line.trim();
+
+        if (text.length) {
+          const element = newTextElement({
+            ...textElementProps,
+            x,
+            y: currentY,
+            text,
+          });
+          acc.push(element);
+          currentY += element.height + LINE_GAP;
+        } else {
+          const prevLine = lines[idx - 1]?.trim();
+          // add paragraph only if previous line was not empty, IOW don't add
+          // more than one empty line
+          if (prevLine) {
+            const defaultLineHeight = getApproxLineHeight(
+              getFontString({
+                fontSize: textElementProps.fontSize,
+                fontFamily: textElementProps.fontFamily,
+              }),
+            );
+
+            currentY += defaultLineHeight + LINE_GAP;
+          }
+        }
+
+        return acc;
+      },
+      [],
+    );
+
+    if (textElements.length === 0) {
       return;
     }
 
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
-      ...newElements,
+      ...textElements,
     ]);
-    const selectedElementIds: { [id: string]: boolean } = {};
-    newElements.forEach((e) => (selectedElementIds[e.id] = true));
-    this.setState({ selectedElementIds });
+
+    this.setState({
+      selectedElementIds: Object.fromEntries(
+        textElements.map((el) => [el.id, true]),
+      ),
+    });
+
     if (
       !isPlainPaste &&
-      newElements.length > 1 &&
+      textElements.length > 1 &&
       PLAIN_PASTE_TOAST_SHOWN === false &&
       !this.device.isMobile
     ) {
