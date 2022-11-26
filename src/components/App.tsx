@@ -1477,7 +1477,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (IS_PLAINTEXT_PASTE) {
-        const text = (await getSystemClipboard(event)).trim();
+        const text = await getSystemClipboard(event);
         this.addTextFromPaste(text, false);
         return;
       }

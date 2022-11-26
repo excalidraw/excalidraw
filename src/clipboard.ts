@@ -120,7 +120,7 @@ export const getSystemClipboard = async (
         "readText" in navigator.clipboard &&
         (await navigator.clipboard.readText());
 
-    return text || "";
+    return (text || "").trim();
   } catch {
     return "";
   }
@@ -132,7 +132,7 @@ export const getSystemClipboard = async (
 export const parseClipboard = async (
   event: ClipboardEvent | null,
 ): Promise<ClipboardData> => {
-  const systemClipboard = (await getSystemClipboard(event)).trim();
+  const systemClipboard = await getSystemClipboard(event);
 
   // if system clipboard empty, couldn't be resolved, or contains previously
   // copied excalidraw scene as SVG, fall back to previously copied excalidraw
