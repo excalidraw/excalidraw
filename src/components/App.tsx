@@ -4260,9 +4260,12 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.selectedLinearElement) {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
+        const { segmentMidpoint } = linearElementEditor.pointerDownState;
+
         if (
-          !linearElementEditor.pointerDownState.segmentPointAdded &&
-          linearElementEditor.pointerDownState.segmentMidpoint
+          !segmentMidpoint.added &&
+          segmentMidpoint.value &&
+          segmentMidpoint.index !== null
         ) {
           const origin = linearElementEditor.pointerDownState.origin!;
           const dist = distance2d(
@@ -4274,7 +4277,6 @@ class App extends React.Component<AppProps, AppState> {
           if (dist < 10) {
             return;
           }
-          const { segmentMidpointIndex } = linearElementEditor.pointerDownState;
           const element = LinearElementEditor.getElement(
             linearElementEditor.elementId,
           )!;
@@ -4286,9 +4288,9 @@ class App extends React.Component<AppProps, AppState> {
             this.state.gridSize,
           );
           const points = [
-            ...element.points.slice(0, segmentMidpointIndex!),
+            ...element.points.slice(0, segmentMidpoint.index!),
             newMidPoint,
-            ...element.points.slice(segmentMidpointIndex!),
+            ...element.points.slice(segmentMidpoint.index!),
           ];
           mutateElement(element, {
             points,
@@ -4299,10 +4301,14 @@ class App extends React.Component<AppProps, AppState> {
               ...this.state.selectedLinearElement,
               pointerDownState: {
                 ...this.state.selectedLinearElement.pointerDownState,
-                segmentPointAdded: true,
-                lastClickedPoint: segmentMidpointIndex!,
+                segmentMidpoint: {
+                  ...this.state.selectedLinearElement.pointerDownState
+                    .segmentMidpoint,
+                  added: true,
+                },
+                lastClickedPoint: segmentMidpoint.index,
               },
-              selectedPointsIndices: [segmentMidpointIndex!],
+              selectedPointsIndices: [segmentMidpoint.index],
             },
           });
           if (this.state.editingLinearElement) {
@@ -4311,10 +4317,14 @@ class App extends React.Component<AppProps, AppState> {
                 ...this.state.editingLinearElement,
                 pointerDownState: {
                   ...this.state.editingLinearElement.pointerDownState,
-                  segmentPointAdded: true,
-                  lastClickedPoint: segmentMidpointIndex!,
+                  segmentMidpoint: {
+                    ...this.state.editingLinearElement.pointerDownState
+                      .segmentMidpoint,
+                    added: true,
+                  },
+                  lastClickedPoint: segmentMidpoint.index,
                 },
-                selectedPointsIndices: [segmentMidpointIndex!],
+                selectedPointsIndices: [segmentMidpoint.index],
               },
             });
           }

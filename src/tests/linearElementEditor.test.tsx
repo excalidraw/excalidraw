@@ -138,7 +138,7 @@ describe("Test Linear Elements", () => {
 
     // drag line from midpoint
     drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
-    expect(renderScene).toHaveBeenCalledTimes(10);
+    expect(renderScene).toHaveBeenCalledTimes(11);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
       Array [
@@ -359,7 +359,7 @@ describe("Test Linear Elements", () => {
             ],
             Array [
               105,
-              75,
+              70,
             ],
             Array [
               40,
@@ -503,8 +503,8 @@ describe("Test Linear Elements", () => {
               50,
             ],
             Array [
-              104.58050066266131,
-              74.24758482724201,
+              106.08587175006699,
+              73.29416593965323,
             ],
             Array [
               40,
@@ -628,7 +628,6 @@ describe("Test Linear Elements", () => {
         }),
       ];
 
-      const origPoints = line.points.map((point) => [...point]);
       const dragEndPositionOffset = [100, 100] as const;
       API.setSelectedElements([line]);
       enterLineEditingMode(line, true);
@@ -643,8 +642,8 @@ describe("Test Linear Elements", () => {
             0,
           ],
           Array [
-            ${origPoints[1][0] - dragEndPositionOffset[0]},
-            ${origPoints[1][1] - dragEndPositionOffset[1]},
+            -60,
+            -100,
           ],
         ]
       `);

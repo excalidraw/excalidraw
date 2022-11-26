@@ -52,9 +52,11 @@ export class LinearElementEditor {
     /** index */
     lastClickedPoint: number;
     origin: Readonly<{ x: number; y: number }> | null;
-    segmentMidpointIndex: number | null;
-    segmentMidpoint: Point | null;
-    segmentPointAdded: boolean;
+    segmentMidpoint: {
+      value: Point | null;
+      index: number | null;
+      added: boolean;
+    };
   }>;
 
   /** whether you're dragging a point */
@@ -86,9 +88,12 @@ export class LinearElementEditor {
       prevSelectedPointsIndices: null,
       lastClickedPoint: -1,
       origin: null,
-      segmentMidpointIndex: null,
-      segmentMidpoint: null,
-      segmentPointAdded: false,
+
+      segmentMidpoint: {
+        value: null,
+        index: null,
+        added: false,
+      },
     };
     this.hoverPointIndex = -1;
     this.segmentMidPointHoveredCoords = null;
@@ -632,9 +637,11 @@ export class LinearElementEditor {
           prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
           lastClickedPoint: -1,
           origin: { x: scenePointer.x, y: scenePointer.y },
-          segmentMidpointIndex: null,
-          segmentMidpoint,
-          segmentPointAdded: false,
+          segmentMidpoint: {
+            value: segmentMidpoint,
+            index: segmentMidpointIndex,
+            added: false,
+          },
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
@@ -704,9 +711,11 @@ export class LinearElementEditor {
         prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
         lastClickedPoint: clickedPointIndex,
         origin: { x: scenePointer.x, y: scenePointer.y },
-        segmentMidpointIndex,
-        segmentMidpoint,
-        segmentPointAdded: false,
+        segmentMidpoint: {
+          value: segmentMidpoint,
+          index: segmentMidpointIndex,
+          added: false,
+        },
       },
       selectedPointsIndices: nextSelectedPointsIndices,
       pointerOffset: targetPoint
