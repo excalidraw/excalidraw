@@ -609,34 +609,6 @@ export class LinearElementEditor {
         appState,
         segmentMidpoint,
       );
-      // const newMidPoint = LinearElementEditor.createPointAt(
-      //   element,
-      //   segmentMidpoint[0],
-      //   segmentMidpoint[1],
-      //   appState.gridSize,
-      // );
-      // const points = [
-      //   ...element.points.slice(0, segmentMidpointIndex),
-      //   newMidPoint,
-      //   ...element.points.slice(segmentMidpointIndex),
-      // ];
-      // mutateElement(element, {
-      //   points,
-      // });
-      // ret.didAddPoint = true;
-      // ret.isMidPoint = true;
-      // ret.linearElementEditor = {
-      //   ...linearElementEditor,
-      //   selectedPointsIndices: element.points[1],
-      //   pointerDownState: {
-      //     prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
-      //     lastClickedPoint: -1,
-      //     origin: { x: scenePointer.x, y: scenePointer.y },
-      //     segmentMidpointIndex,
-      //     segmentMidpoint,
-      //   },
-      //   lastUncommittedPoint: null,
-      //};
     }
     if (event.altKey && appState.editingLinearElement) {
       if (linearElementEditor.lastUncommittedPoint == null) {
