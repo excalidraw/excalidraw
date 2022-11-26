@@ -159,13 +159,15 @@ const strokeGrid = (
 
 const renderSingleLinearPoint = (
   context: CanvasRenderingContext2D,
-  appState: AppState,
   renderConfig: RenderConfig,
   point: Point,
   radius: number,
   isSelected: boolean,
   isPhantomPoint = false,
 ) => {
+  if (!point) {
+    return;
+  }
   context.strokeStyle = "#5e5ad8";
   context.setLineDash([]);
   context.fillStyle = "rgba(255, 255, 255, 0.9)";
@@ -202,18 +204,16 @@ const renderLinearPointHandles = (
   const radius = appState.editingLinearElement
     ? POINT_HANDLE_SIZE
     : POINT_HANDLE_SIZE / 2;
-  points.forEach((point, idx) => {
-    const isSelected =
-      !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
-    renderSingleLinearPoint(
-      context,
-      appState,
-      renderConfig,
-      point,
-      radius,
-      isSelected,
-    );
+  const visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
+    element,
+    appState,
+  );
+  visiblePointIndexes.forEach((index) => {
+    const isSelected =
+      !!appState.editingLinearElement?.selectedPointsIndices?.includes(index);
+    const point = points[index];
+    renderSingleLinearPoint(context, renderConfig, point, radius, isSelected);
   });
 
   //Rendering segment mid points
@@ -237,7 +237,6 @@ const renderLinearPointHandles = (
       if (appState.editingLinearElement) {
         renderSingleLinearPoint(
           context,
-          appState,
           renderConfig,
           segmentMidPoint,
           radius,
@@ -248,7 +247,7 @@ const renderLinearPointHandles = (
         highlightPoint(segmentMidPoint, context, renderConfig);
         renderSingleLinearPoint(
           context,
-          appState,
+
           renderConfig,
           segmentMidPoint,
           radius,
@@ -258,7 +257,6 @@ const renderLinearPointHandles = (
     } else if (appState.editingLinearElement || points.length === 2) {
       renderSingleLinearPoint(
         context,
-        appState,
         renderConfig,
         segmentMidPoint,
         POINT_HANDLE_SIZE / 2,
@@ -458,7 +456,22 @@ export const _renderScene = ({
       appState.selectedLinearElement &&
       appState.selectedLinearElement.hoverPointIndex >= 0
     ) {
-      renderLinearElementPointHighlight(context, appState, renderConfig);
+      const element = LinearElementEditor.getElement(
+        appState.selectedLinearElement.elementId,
+      );
+      if (element) {
+        const visiblePointIndexes = LinearElementEditor.getVisiblePointIndexes(
+          element,
+          appState,
+        );
+        if (
+          visiblePointIndexes.includes(
+            appState.selectedLinearElement.hoverPointIndex,
+          )
+        ) {
+          renderLinearElementPointHighlight(context, appState, renderConfig);
+        }
+      }
     }
     // Paint selected elements
     if (

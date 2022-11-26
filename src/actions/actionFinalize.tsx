@@ -33,6 +33,9 @@ export const actionFinalize = register({
             endBindingElement,
           );
         }
+        const selectedLinearElement = appState.selectedLinearElement
+          ? new LinearElementEditor(element, scene, appState)
+          : null;
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
@@ -42,6 +45,7 @@ export const actionFinalize = register({
             ...appState,
             cursorButton: "up",
             editingLinearElement: null,
+            selectedLinearElement,
           },
           commitToHistory: true,
         };
@@ -184,7 +188,7 @@ export const actionFinalize = register({
         // To select the linear element when user has finished mutipoint editing
         selectedLinearElement:
           multiPointElement && isLinearElement(multiPointElement)
-            ? new LinearElementEditor(multiPointElement, scene)
+            ? new LinearElementEditor(multiPointElement, scene, appState)
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },

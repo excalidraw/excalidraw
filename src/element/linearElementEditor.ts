@@ -40,6 +40,11 @@ const editorMidPointsCache: {
   zoom: number | null;
 } = { version: null, points: [], zoom: null };
 
+const visiblePointIndexesCache: {
+  points: number[];
+  zoom: number | null;
+  isEditingLinearElement: boolean;
+} = { points: [], zoom: null, isEditingLinearElement: false };
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
     _brand: "excalidrawLinearElementId";
@@ -65,7 +70,12 @@ export class LinearElementEditor {
   public readonly hoverPointIndex: number;
   public readonly segmentMidPointHoveredCoords: Point | null;
 
-  constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
+  constructor(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    scene: Scene,
+    appState: AppState,
+    editingLinearElement = false,
+  ) {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
     };
@@ -433,7 +443,7 @@ export class LinearElementEditor {
       return null;
     }
     const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-      element,
+      appState.selectedLinearElement,
       appState.zoom,
       scenePointer.x,
       scenePointer.y,
@@ -560,6 +570,59 @@ export class LinearElementEditor {
     return -1;
   }
 
+  static getVisiblePointIndexes(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    appState: AppState,
+  ): typeof visiblePointIndexesCache["points"] {
+    const isEditingLinearElement = !!appState.editingLinearElement;
+    if (appState.editingLinearElement) {
+      // So that when we exit the editor the points are calculated again
+      visiblePointIndexesCache.isEditingLinearElement = true;
+      return element.points.map((_, index) => index);
+    }
+
+    if (
+      visiblePointIndexesCache.points &&
+      visiblePointIndexesCache.zoom === appState.zoom.value &&
+      isEditingLinearElement === visiblePointIndexesCache.isEditingLinearElement
+    ) {
+      return visiblePointIndexesCache.points;
+    }
+
+    LinearElementEditor.updateVisiblePointIndexesCache(element, appState);
+    return visiblePointIndexesCache.points;
+  }
+
+  static updateVisiblePointIndexesCache(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    appState: AppState,
+  ) {
+    const visiblePointIndexes: number[] = [];
+    let previousPoint: Point | null = null;
+    element.points.forEach((point, index) => {
+      let distance = Infinity;
+      if (previousPoint) {
+        distance =
+          distance2d(point[0], point[1], previousPoint[0], previousPoint[1]) *
+          appState.zoom.value;
+      }
+      const isExtremePoint = index === 0 || index === element.points.length - 1;
+      const threshold = 2 * LinearElementEditor.POINT_HANDLE_SIZE;
+      if (isExtremePoint || distance >= threshold) {
+        // hide n-1 point if distance is less than threshold
+        if (isExtremePoint && distance < threshold) {
+          visiblePointIndexes.pop();
+        }
+        visiblePointIndexes.push(index);
+        previousPoint = point;
+      }
+    });
+    visiblePointIndexesCache.points = visiblePointIndexes;
+    visiblePointIndexesCache.zoom = appState.zoom.value;
+    visiblePointIndexesCache.isEditingLinearElement =
+      !!appState.editingLinearElement;
+  }
+
   static handlePointerDown(
     event: React.PointerEvent<HTMLCanvasElement>,
     appState: AppState,
@@ -617,15 +680,6 @@ export class LinearElementEditor {
 
       ret.didAddPoint = true;
       ret.isMidPoint = true;
-      ret.linearElementEditor = {
-        ...linearElementEditor,
-        selectedPointsIndices: element.points[1],
-        pointerDownState: {
-          prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
-          lastClickedPoint: -1,
-        },
-        lastUncommittedPoint: null,
-      };
     }
     if (event.altKey && appState.editingLinearElement) {
       if (linearElementEditor.lastUncommittedPoint == null) {
@@ -662,7 +716,7 @@ export class LinearElementEditor {
     }
 
     const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-      element,
+      appState.selectedLinearElement,
       appState.zoom,
       scenePointer.x,
       scenePointer.y,
@@ -725,7 +779,11 @@ export class LinearElementEditor {
           }
         : { x: 0, y: 0 },
     };
-
+    if (ret.didAddPoint) {
+      ret.linearElementEditor = {
+        ...ret.linearElementEditor,
+      };
+    }
     return ret;
   }
 
@@ -873,25 +931,37 @@ export class LinearElementEditor {
   }
 
   static getPointIndexUnderCursor(
-    element: NonDeleted<ExcalidrawLinearElement>,
+    linearElementEditor: LinearElementEditor | null,
     zoom: AppState["zoom"],
     x: number,
     y: number,
   ) {
+    if (!linearElementEditor) {
+      return -1;
+    }
+    const element = LinearElementEditor.getElement(
+      linearElementEditor.elementId,
+    );
+    if (!element) {
+      return -1;
+    }
+
     const pointHandles =
       LinearElementEditor.getPointsGlobalCoordinates(element);
-    let idx = pointHandles.length;
+    let counter = visiblePointIndexesCache.points.length;
+
     // loop from right to left because points on the right are rendered over
     // points on the left, thus should take precedence when clicking, if they
     // overlap
-    while (--idx > -1) {
-      const point = pointHandles[idx];
+    while (--counter >= 0) {
+      const index = visiblePointIndexesCache.points[counter];
+      const point = pointHandles[index];
       if (
         distance2d(x, y, point[0], point[1]) * zoom.value <
         // +1px to account for outline stroke
         LinearElementEditor.POINT_HANDLE_SIZE + 1
       ) {
-        return idx;
+        return index;
       }
     }
     return -1;

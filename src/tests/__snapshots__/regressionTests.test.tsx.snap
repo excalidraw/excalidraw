@@ -10998,6 +10998,9 @@ Object {
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
+    "visiblePointIndexes": Array [
+      1,
+    ],
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -11225,6 +11228,9 @@ Object {
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
+    "visiblePointIndexes": Array [
+      1,
+    ],
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -11680,6 +11686,9 @@ Object {
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
+    "visiblePointIndexes": Array [
+      1,
+    ],
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -12087,6 +12096,9 @@ Object {
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
+    "visiblePointIndexes": Array [
+      1,
+    ],
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
