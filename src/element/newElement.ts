@@ -25,6 +25,7 @@ import {
   getContainerDims,
   getContainerElement,
   measureText,
+  normalizeText,
   wrapText,
 } from "./textElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
@@ -133,12 +134,13 @@ export const newTextElement = (
     containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const metrics = measureText(opts.text, getFontString(opts));
+  const text = normalizeText(opts.text);
+  const metrics = measureText(text, getFontString(opts));
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
-      text: opts.text,
+      text,
       fontSize: opts.fontSize,
       fontFamily: opts.fontFamily,
       textAlign: opts.textAlign,
@@ -149,7 +151,7 @@ export const newTextElement = (
       height: metrics.height,
       baseline: metrics.baseline,
       containerId: opts.containerId || null,
-      originalText: opts.text,
+      originalText: text,
     },
     {},
   );
