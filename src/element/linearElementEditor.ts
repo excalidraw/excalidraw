@@ -51,6 +51,10 @@ export class LinearElementEditor {
     prevSelectedPointsIndices: readonly number[] | null;
     /** index */
     lastClickedPoint: number;
+    origin: Readonly<{ x: number; y: number }> | null;
+    segmentMidpointIndex: number | null;
+    segmentMidpoint: Point | null;
+    segmentPointAdded: boolean;
   }>;
 
   /** whether you're dragging a point */
@@ -81,6 +85,10 @@ export class LinearElementEditor {
     this.pointerDownState = {
       prevSelectedPointsIndices: null,
       lastClickedPoint: -1,
+      origin: null,
+      segmentMidpointIndex: null,
+      segmentMidpoint: null,
+      segmentPointAdded: false,
     };
     this.hoverPointIndex = -1;
     this.segmentMidPointHoveredCoords = null;
@@ -551,7 +559,7 @@ export class LinearElementEditor {
     }
     const midPoints = LinearElementEditor.getEditorMidPoints(element, appState);
     let index = 0;
-    while (index < midPoints.length - 1) {
+    while (index < midPoints.length) {
       if (LinearElementEditor.arePointsEqual(midPoint, midPoints[index])) {
         return index + 1;
       }
@@ -589,43 +597,46 @@ export class LinearElementEditor {
     if (!element) {
       return ret;
     }
-    const segmentMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
+    const segmentMidpoint = LinearElementEditor.getSegmentMidpointHitCoords(
       linearElementEditor,
       scenePointer,
       appState,
     );
-    if (segmentMidPoint) {
-      const index = LinearElementEditor.getSegmentMidPointIndex(
+    let segmentMidpointIndex = null;
+    if (segmentMidpoint) {
+      segmentMidpointIndex = LinearElementEditor.getSegmentMidPointIndex(
         linearElementEditor,
         appState,
-        segmentMidPoint,
+        segmentMidpoint,
       );
-      const newMidPoint = LinearElementEditor.createPointAt(
-        element,
-        segmentMidPoint[0],
-        segmentMidPoint[1],
-        appState.gridSize,
-      );
-      const points = [
-        ...element.points.slice(0, index),
-        newMidPoint,
-        ...element.points.slice(index),
-      ];
-      mutateElement(element, {
-        points,
-      });
-
-      ret.didAddPoint = true;
-      ret.isMidPoint = true;
-      ret.linearElementEditor = {
-        ...linearElementEditor,
-        selectedPointsIndices: element.points[1],
-        pointerDownState: {
-          prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
-          lastClickedPoint: -1,
-        },
-        lastUncommittedPoint: null,
-      };
+      // const newMidPoint = LinearElementEditor.createPointAt(
+      //   element,
+      //   segmentMidpoint[0],
+      //   segmentMidpoint[1],
+      //   appState.gridSize,
+      // );
+      // const points = [
+      //   ...element.points.slice(0, segmentMidpointIndex),
+      //   newMidPoint,
+      //   ...element.points.slice(segmentMidpointIndex),
+      // ];
+      // mutateElement(element, {
+      //   points,
+      // });
+      // ret.didAddPoint = true;
+      // ret.isMidPoint = true;
+      // ret.linearElementEditor = {
+      //   ...linearElementEditor,
+      //   selectedPointsIndices: element.points[1],
+      //   pointerDownState: {
+      //     prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
+      //     lastClickedPoint: -1,
+      //     origin: { x: scenePointer.x, y: scenePointer.y },
+      //     segmentMidpointIndex,
+      //     segmentMidpoint,
+      //   },
+      //   lastUncommittedPoint: null,
+      //};
     }
     if (event.altKey && appState.editingLinearElement) {
       if (linearElementEditor.lastUncommittedPoint == null) {
@@ -648,6 +659,10 @@ export class LinearElementEditor {
         pointerDownState: {
           prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
           lastClickedPoint: -1,
+          origin: { x: scenePointer.x, y: scenePointer.y },
+          segmentMidpointIndex: null,
+          segmentMidpoint,
+          segmentPointAdded: false,
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
@@ -670,7 +685,7 @@ export class LinearElementEditor {
 
     // if we clicked on a point, set the element as hitElement otherwise
     // it would get deselected if the point is outside the hitbox area
-    if (clickedPointIndex >= 0 || segmentMidPoint) {
+    if (clickedPointIndex >= 0 || segmentMidpoint) {
       ret.hitElement = element;
     } else {
       // You might be wandering why we are storing the binding elements on
@@ -716,6 +731,10 @@ export class LinearElementEditor {
       pointerDownState: {
         prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
         lastClickedPoint: clickedPointIndex,
+        origin: { x: scenePointer.x, y: scenePointer.y },
+        segmentMidpointIndex,
+        segmentMidpoint,
+        segmentPointAdded: false,
       },
       selectedPointsIndices: nextSelectedPointsIndices,
       pointerOffset: targetPoint

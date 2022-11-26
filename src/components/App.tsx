@@ -4233,7 +4233,6 @@ class App extends React.Component<AppProps, AppState> {
       // to ensure we don't create a 2-point arrow by mistake when
       // user clicks mouse in a way that it moves a tiny bit (thus
       // triggering pointermove)
-
       if (
         !pointerDownState.drag.hasOccurred &&
         (this.state.activeTool.type === "arrow" ||
@@ -4261,6 +4260,67 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.selectedLinearElement) {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
+        if (
+          !linearElementEditor.pointerDownState.segmentPointAdded &&
+          linearElementEditor.pointerDownState.segmentMidpoint
+        ) {
+          const origin = linearElementEditor.pointerDownState.origin!;
+          const dist = distance2d(
+            origin.x,
+            origin.y,
+            pointerCoords.x,
+            pointerCoords.y,
+          );
+          if (dist < 10) {
+            return;
+          }
+          const { segmentMidpointIndex } = linearElementEditor.pointerDownState;
+          const element = LinearElementEditor.getElement(
+            linearElementEditor.elementId,
+          )!;
+
+          const newMidPoint = LinearElementEditor.createPointAt(
+            element,
+            pointerCoords.x,
+            pointerCoords.y,
+            this.state.gridSize,
+          );
+          const points = [
+            ...element.points.slice(0, segmentMidpointIndex!),
+            newMidPoint,
+            ...element.points.slice(segmentMidpointIndex!),
+          ];
+          mutateElement(element, {
+            points,
+          });
+
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              pointerDownState: {
+                ...this.state.selectedLinearElement.pointerDownState,
+                segmentPointAdded: true,
+                lastClickedPoint: segmentMidpointIndex!,
+              },
+              selectedPointsIndices: [segmentMidpointIndex!],
+            },
+          });
+          if (this.state.editingLinearElement) {
+            this.setState({
+              editingLinearElement: {
+                ...this.state.editingLinearElement,
+                pointerDownState: {
+                  ...this.state.editingLinearElement.pointerDownState,
+                  segmentPointAdded: true,
+                  lastClickedPoint: segmentMidpointIndex!,
+                },
+                selectedPointsIndices: [segmentMidpointIndex!],
+              },
+            });
+          }
+
+          return;
+        }
         const didDrag = LinearElementEditor.handlePointDragging(
           event,
           this.state,
