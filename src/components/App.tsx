@@ -1724,7 +1724,8 @@ class App extends React.Component<AppProps, AppState> {
     if (
       splitText &&
       newElements.length > 1 &&
-      PLAIN_PASTE_TOAST_SHOWN === false
+      PLAIN_PASTE_TOAST_SHOWN === false &&
+      !this.device.isMobile
     ) {
       this.setToast({
         message: t("toast.pasteAsSingleElement", {
