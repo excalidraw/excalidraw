@@ -3743,7 +3743,7 @@ class App extends React.Component<AppProps, AppState> {
               this.setState({ editingLinearElement: ret.linearElementEditor });
             }
           }
-          if (ret.didAddPoint && !ret.isMidPoint) {
+          if (ret.didAddPoint) {
             return true;
           }
         }
