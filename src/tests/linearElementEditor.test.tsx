@@ -129,6 +129,20 @@ describe("Test Linear Elements", () => {
     Keyboard.keyPress(KEYS.DELETE);
   };
 
+  it("should not add midpoint until dragged beyond a threshold", () => {
+    createTwoPointerLinearElement("line");
+    expect((h.elements[0] as ExcalidrawLinearElement).points.length).toEqual(2);
+
+    mouse.clickAt(midpoint[0], midpoint[1]);
+    expect((h.elements[0] as ExcalidrawLinearElement).points.length).toEqual(2);
+
+    drag(midpoint, [midpoint[0] + 1, midpoint[1] + 1]);
+    expect((h.elements[0] as ExcalidrawLinearElement).points.length).toEqual(2);
+
+    drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
+    expect((h.elements[0] as ExcalidrawLinearElement).points.length).toEqual(3);
+  });
+
   it("should allow dragging line from midpoint in 2 pointer lines outside editor", async () => {
     createTwoPointerLinearElement("line");
     const line = h.elements[0] as ExcalidrawLinearElement;

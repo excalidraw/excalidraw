@@ -4274,7 +4274,8 @@ class App extends React.Component<AppProps, AppState> {
             pointerCoords.x,
             pointerCoords.y,
           );
-          if (dist < 10) {
+
+          if (dist < DRAGGING_THRESHOLD) {
             return;
           }
           const element = LinearElementEditor.getElement(
