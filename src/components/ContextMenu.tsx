@@ -1,4 +1,4 @@
-import { render, unmountComponentAtNode } from "react-dom";
+import { createRoot, Root } from "react-dom/client";
 import clsx from "clsx";
 import { Popover } from "./Popover";
 import { t } from "../i18n";
@@ -89,42 +89,38 @@ const ContextMenu = ({
   );
 };
 
-const contextMenuNodeByContainer = new WeakMap<HTMLElement, HTMLDivElement>();
+const contextMenuRoots = new WeakMap<HTMLElement, Root>();
 
-const getContextMenuNode = (container: HTMLElement): HTMLDivElement => {
-  let contextMenuNode = contextMenuNodeByContainer.get(container);
-  if (contextMenuNode) {
-    return contextMenuNode;
+const getContextMenuRoot = (container: HTMLElement): Root => {
+  let contextMenuRoot = contextMenuRoots.get(container);
+  if (contextMenuRoot) {
+    return contextMenuRoot;
   }
-  contextMenuNode = document.createElement("div");
-  container
-    .querySelector(".excalidraw-contextMenuContainer")!
-    .appendChild(contextMenuNode);
-  contextMenuNodeByContainer.set(container, contextMenuNode);
-  return contextMenuNode;
-};
-
-type ContextMenuParams = {
-  options: (ContextMenuOption | false | null | undefined)[];
-  top: ContextMenuProps["top"];
-  left: ContextMenuProps["left"];
-  actionManager: ContextMenuProps["actionManager"];
-  appState: Readonly<AppState>;
-  container: HTMLElement;
-  elements: readonly NonDeletedExcalidrawElement[];
+  contextMenuRoot = createRoot(
+    container.querySelector(".excalidraw-contextMenuContainer")!,
+  );
+  contextMenuRoots.set(container, contextMenuRoot);
+  return contextMenuRoot;
 };
 
 const handleClose = (container: HTMLElement) => {
-  const contextMenuNode = contextMenuNodeByContainer.get(container);
-  if (contextMenuNode) {
-    unmountComponentAtNode(contextMenuNode);
-    contextMenuNode.remove();
-    contextMenuNodeByContainer.delete(container);
+  const contextMenuRoot = contextMenuRoots.get(container);
+  if (contextMenuRoot) {
+    contextMenuRoot.unmount();
+    contextMenuRoots.delete(container);
   }
 };
 
 export default {
-  push(params: ContextMenuParams) {
+  push(params: {
+    options: (ContextMenuOption | false | null | undefined)[];
+    top: ContextMenuProps["top"];
+    left: ContextMenuProps["left"];
+    actionManager: ContextMenuProps["actionManager"];
+    appState: Readonly<AppState>;
+    container: HTMLElement;
+    elements: readonly NonDeletedExcalidrawElement[];
+  }) {
     const options = Array.of<ContextMenuOption>();
     params.options.forEach((option) => {
       if (option) {
@@ -132,7 +128,7 @@ export default {
       }
     });
     if (options.length) {
-      render(
+      getContextMenuRoot(params.container).render(
         <ContextMenu
           top={params.top}
           left={params.left}
@@ -142,7 +138,6 @@ export default {
           appState={params.appState}
           elements={params.elements}
         />,
-        getContextMenuNode(params.container),
       );
     }
   },

@@ -290,6 +290,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("CtrlOrCmd+V")]}
             />
             <Shortcut
+              label={t("labels.pasteAsPlaintext")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
+            />
+            <Shortcut
               label={t("labels.copyAsPng")}
               shortcuts={[getShortcutKey("Shift+Alt+C")]}
             />
@@ -303,7 +307,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             />
             <Shortcut
               label={t("labels.delete")}
-              shortcuts={[getShortcutKey("Del")]}
+              shortcuts={[getShortcutKey("Delete")]}
             />
             <Shortcut
               label={t("labels.sendToBack")}
