@@ -627,7 +627,7 @@ describe("Test Linear Elements", () => {
           fillStyle: "solid",
         }),
       ];
-
+      const origPoints = line.points.map((point) => [...point]);
       const dragEndPositionOffset = [100, 100] as const;
       API.setSelectedElements([line]);
       enterLineEditingMode(line, true);
@@ -642,8 +642,8 @@ describe("Test Linear Elements", () => {
             0,
           ],
           Array [
-            -60,
-            -100,
+            ${origPoints[1][0] - dragEndPositionOffset[0]},
+            ${origPoints[1][1] - dragEndPositionOffset[1]},
           ],
         ]
       `);
