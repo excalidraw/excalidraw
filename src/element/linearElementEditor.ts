@@ -1147,8 +1147,7 @@ export class LinearElementEditor {
       pointerCoords.x,
       pointerCoords.y,
     );
-
-    if (dist < DRAGGING_THRESHOLD) {
+    if (dist < DRAGGING_THRESHOLD / appState.zoom.value) {
       return ret;
     }
 

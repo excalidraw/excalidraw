@@ -4266,6 +4266,14 @@ class App extends React.Component<AppProps, AppState> {
           pointerCoords,
           this.state,
         );
+
+        if (
+          ret?.pointerDownState.segmentMidpoint.value !== null &&
+          !ret?.pointerDownState.segmentMidpoint.added
+        ) {
+          return;
+        }
+
         if (ret?.didAddPoint) {
           this.setState({
             selectedLinearElement: {
@@ -4286,6 +4294,7 @@ class App extends React.Component<AppProps, AppState> {
           }
           return;
         }
+
         const didDrag = LinearElementEditor.handlePointDragging(
           event,
           this.state,
