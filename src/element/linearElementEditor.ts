@@ -35,15 +35,10 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
 } from "./binding";
-import { getFontString, tupleToCoors } from "../utils";
+import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
 import { shouldRotateWithDiscreteAngle } from "../keys";
-import {
-  getApproxMinLineWidth,
-  getBoundTextElement,
-  getBoundTextElementOffset,
-  handleBindTextResize,
-} from "./textElement";
+import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { getShapeForElement } from "../renderer/renderElement";
 
 const editorMidPointsCache: {
@@ -191,32 +186,7 @@ export class LinearElementEditor {
     const draggingPoint = element.points[
       linearElementEditor.pointerDownState.lastClickedPoint
     ] as [number, number] | undefined;
-    const boundTextElement = getBoundTextElement(element);
-    if (boundTextElement && draggingPoint && element.points.length === 2) {
-      if (selectedPointsIndices?.length === 1) {
-        const draggedPoint =
-          linearElementEditor.pointerDownState.lastClickedPoint === 0
-            ? [
-                element.x + element.points[1][0],
-                element.y + element.points[1][1],
-              ]
-            : [element.x, element.y];
 
-        const width = distance2d(
-          draggedPoint[0],
-          draggedPoint[1],
-          scenePointerX,
-          scenePointerY,
-        );
-        const minWidth =
-          getApproxMinLineWidth(getFontString(boundTextElement)) +
-          getBoundTextElementOffset(boundTextElement);
-
-        if (width < minWidth) {
-          return true;
-        }
-      }
-    }
     if (selectedPointsIndices && draggingPoint) {
       if (
         shouldRotateWithDiscreteAngle(event) &&
