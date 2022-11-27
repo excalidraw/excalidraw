@@ -20,7 +20,7 @@ import {
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import { getElementPointsCoords } from "./bounds";
-import { Point, AppState } from "../types";
+import { Point, AppState, PointerCoords } from "../types";
 import { mutateElement } from "./mutateElement";
 import History from "../history";
 
@@ -33,6 +33,7 @@ import {
 import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
 import { shouldRotateWithDiscreteAngle } from "../keys";
+import { DRAGGING_THRESHOLD } from "../constants";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -1107,6 +1108,76 @@ export class LinearElementEditor {
       offsetY,
       otherUpdates,
     );
+  }
+
+  static addMidpoint(
+    linearElementEditor: LinearElementEditor,
+    pointerCoords: PointerCoords,
+    appState: AppState,
+  ) {
+    const element = LinearElementEditor.getElement(
+      linearElementEditor.elementId,
+    );
+    if (!element) {
+      return;
+    }
+    const { segmentMidpoint } = linearElementEditor.pointerDownState;
+    const ret: {
+      didAddPoint: boolean;
+      pointerDownState: LinearElementEditor["pointerDownState"];
+      selectedPointsIndices: LinearElementEditor["selectedPointsIndices"];
+    } = {
+      didAddPoint: false,
+      pointerDownState: linearElementEditor.pointerDownState,
+      selectedPointsIndices: linearElementEditor.selectedPointsIndices,
+    };
+
+    if (
+      segmentMidpoint.added ||
+      segmentMidpoint.value === null ||
+      segmentMidpoint.index === null ||
+      linearElementEditor.pointerDownState.origin === null
+    ) {
+      return ret;
+    }
+    const origin = linearElementEditor.pointerDownState.origin!;
+    const dist = distance2d(
+      origin.x,
+      origin.y,
+      pointerCoords.x,
+      pointerCoords.y,
+    );
+
+    if (dist < DRAGGING_THRESHOLD) {
+      return ret;
+    }
+
+    const midpoint = LinearElementEditor.createPointAt(
+      element,
+      pointerCoords.x,
+      pointerCoords.y,
+      appState.gridSize,
+    );
+    const points = [
+      ...element.points.slice(0, segmentMidpoint.index!),
+      midpoint,
+      ...element.points.slice(segmentMidpoint.index!),
+    ];
+
+    mutateElement(element, {
+      points,
+    });
+    ret.didAddPoint = true;
+    ret.pointerDownState = {
+      ...linearElementEditor.pointerDownState,
+      segmentMidpoint: {
+        ...linearElementEditor.pointerDownState.segmentMidpoint,
+        added: true,
+      },
+      lastClickedPoint: segmentMidpoint.index,
+    };
+    ret.selectedPointsIndices = [segmentMidpoint.index];
+    return ret;
   }
 
   private static _updatePoints(
