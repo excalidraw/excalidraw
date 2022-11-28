@@ -17,6 +17,7 @@ Object {
   "currentItemFontSize": 20,
   "currentItemLinearStrokeSharpness": "round",
   "currentItemOpacity": 100,
+  "currentItemRadius": 0.25,
   "currentItemRoughness": 1,
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#000000",

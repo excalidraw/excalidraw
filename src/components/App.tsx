@@ -4227,6 +4227,7 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
+      radius: this.state.currentItemRadius,
       locked: false,
     });
 

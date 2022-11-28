@@ -4,6 +4,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
   EXPORT_SCALES,
+  RECTANGULAR_DEFAULT_RADIUS,
   THEME,
 } from "./constants";
 import { t } from "./i18n";
@@ -29,6 +30,7 @@ export const getDefaultAppState = (): Omit<
     currentItemFontFamily: DEFAULT_FONT_FAMILY,
     currentItemFontSize: DEFAULT_FONT_SIZE,
     currentItemLinearStrokeSharpness: "round",
+    currentItemRadius: RECTANGULAR_DEFAULT_RADIUS,
     currentItemOpacity: 100,
     currentItemRoughness: 1,
     currentItemStartArrowhead: null,
@@ -130,6 +132,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemStartArrowhead: { browser: true, export: false, server: false },
   currentItemStrokeColor: { browser: true, export: false, server: false },
   currentItemStrokeSharpness: { browser: true, export: false, server: false },
+  currentItemRadius: { browser: true, export: false, server: false },
   currentItemStrokeStyle: { browser: true, export: false, server: false },
   currentItemStrokeWidth: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },

@@ -24,6 +24,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   PRECEDING_ELEMENT_KEY,
   FONT_FAMILY,
+  RECTANGULAR_DEFAULT_RADIUS,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -114,6 +115,7 @@ const restoreElementWithProperties = <
     strokeSharpness:
       element.strokeSharpness ??
       (isLinearElementType(element.type) ? "round" : "sharp"),
+    radius: element.radius ?? RECTANGULAR_DEFAULT_RADIUS,
     boundElements: element.boundElementIds
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],

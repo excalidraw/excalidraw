@@ -33,6 +33,7 @@ import {
   BOUND_TEXT_PADDING,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
+  RECTANGULAR_DEFAULT_RADIUS,
   SVG_NS,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -417,7 +418,8 @@ const generateElementShape = (
         if (element.strokeSharpness === "round") {
           const w = element.width;
           const h = element.height;
-          const r = Math.min(w, h) * 0.25;
+          const r =
+            Math.min(w, h) * (element.radius ?? RECTANGULAR_DEFAULT_RADIUS);
           shape = generator.path(
             `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
               h - r
@@ -442,31 +444,28 @@ const generateElementShape = (
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
           getDiamondPoints(element);
         if (element.strokeSharpness === "round") {
+          const r = element.radius ?? RECTANGULAR_DEFAULT_RADIUS;
           shape = generator.path(
-            `M ${topX + (rightX - topX) * 0.25} ${
-              topY + (rightY - topY) * 0.25
-            } L ${rightX - (rightX - topX) * 0.25} ${
-              rightY - (rightY - topY) * 0.25
-            }
+            `M ${topX + (rightX - topX) * r} ${topY + (rightY - topY) * r} L ${
+              rightX - (rightX - topX) * r
+            } ${rightY - (rightY - topY) * r}
             C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
-              rightX - (rightX - bottomX) * 0.25
-            } ${rightY + (bottomY - rightY) * 0.25}
-            L ${bottomX + (rightX - bottomX) * 0.25} ${
-              bottomY - (bottomY - rightY) * 0.25
+              rightX - (rightX - bottomX) * r
+            } ${rightY + (bottomY - rightY) * r}
+            L ${bottomX + (rightX - bottomX) * r} ${
+              bottomY - (bottomY - rightY) * r
             }
             C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
-              bottomX - (bottomX - leftX) * 0.25
-            } ${bottomY - (bottomY - leftY) * 0.25}
-            L ${leftX + (bottomX - leftX) * 0.25} ${
-              leftY + (bottomY - leftY) * 0.25
-            }
+              bottomX - (bottomX - leftX) * r
+            } ${bottomY - (bottomY - leftY) * r}
+            L ${leftX + (bottomX - leftX) * r} ${leftY + (bottomY - leftY) * r}
             C ${leftX} ${leftY}, ${leftX} ${leftY}, ${
-              leftX + (topX - leftX) * 0.25
-            } ${leftY - (leftY - topY) * 0.25}
-            L ${topX - (topX - leftX) * 0.25} ${topY + (leftY - topY) * 0.25}
-            C ${topX} ${topY}, ${topX} ${topY}, ${
-              topX + (rightX - topX) * 0.25
-            } ${topY + (rightY - topY) * 0.25}`,
+              leftX + (topX - leftX) * r
+            } ${leftY - (leftY - topY) * r}
+            L ${topX - (topX - leftX) * r} ${topY + (leftY - topY) * r}
+            C ${topX} ${topY}, ${topX} ${topY}, ${topX + (rightX - topX) * r} ${
+              topY + (rightY - topY) * r
+            }`,
             generateRoughOptions(element, true),
           );
         } else {

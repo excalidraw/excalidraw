@@ -242,6 +242,7 @@ export default function App() {
             link: null,
             updated: 1,
             strokeSharpness: "round",
+            radius: 0.25,
           },
         ],
         null,

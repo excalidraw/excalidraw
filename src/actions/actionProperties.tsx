@@ -42,6 +42,7 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
+  RECTANGULAR_DEFAULT_RADIUS,
   VERTICAL_ALIGN,
 } from "../constants";
 import {
@@ -907,6 +908,53 @@ export const actionChangeSharpness = register({
         onChange={(value) => updateData(value)}
       />
     </fieldset>
+  ),
+});
+
+export const actionChangeRadius = register({
+  name: "changeRadius",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) => {
+          if (el.type === "rectangle" || el.type === "diamond") {
+            return newElementWith(el, {
+              radius: value,
+            });
+          }
+          return newElementWith(el, {});
+        },
+        true,
+      ),
+      appState: {
+        ...appState,
+        currentItemRadius: value,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <label className="control-label">
+      {t("labels.radius")}
+      <input
+        type="range"
+        min="0"
+        max="0.5"
+        step="0.05"
+        onChange={(event) => updateData(+event.target.value)}
+        value={
+          getFormValue(
+            elements,
+            appState,
+            (element) => element.radius,
+            appState.currentItemRadius,
+          ) ?? RECTANGULAR_DEFAULT_RADIUS
+        }
+      />
+    </label>
   ),
 });
 

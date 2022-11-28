@@ -92,6 +92,7 @@ export type ActionName =
   | "goToCollaborator"
   | "addToLibrary"
   | "changeSharpness"
+  | "changeRadius"
   | "alignTop"
   | "alignBottom"
   | "alignLeft"
