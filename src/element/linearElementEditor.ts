@@ -1110,6 +1110,42 @@ export class LinearElementEditor {
     );
   }
 
+  static shouldAddMidpoint(
+    linearElementEditor: LinearElementEditor,
+    pointerCoords: PointerCoords,
+    appState: AppState,
+  ) {
+    const element = LinearElementEditor.getElement(
+      linearElementEditor.elementId,
+    );
+    if (!element) {
+      return false;
+    }
+
+    const { segmentMidpoint } = linearElementEditor.pointerDownState;
+
+    if (
+      segmentMidpoint.added ||
+      segmentMidpoint.value === null ||
+      segmentMidpoint.index === null ||
+      linearElementEditor.pointerDownState.origin === null
+    ) {
+      return false;
+    }
+
+    const origin = linearElementEditor.pointerDownState.origin!;
+    const dist = distance2d(
+      origin.x,
+      origin.y,
+      pointerCoords.x,
+      pointerCoords.y,
+    );
+    if (dist < DRAGGING_THRESHOLD / appState.zoom.value) {
+      return false;
+    }
+    return true;
+  }
+
   static addMidpoint(
     linearElementEditor: LinearElementEditor,
     pointerCoords: PointerCoords,
@@ -1123,33 +1159,12 @@ export class LinearElementEditor {
     }
     const { segmentMidpoint } = linearElementEditor.pointerDownState;
     const ret: {
-      didAddPoint: boolean;
       pointerDownState: LinearElementEditor["pointerDownState"];
       selectedPointsIndices: LinearElementEditor["selectedPointsIndices"];
     } = {
-      didAddPoint: false,
       pointerDownState: linearElementEditor.pointerDownState,
       selectedPointsIndices: linearElementEditor.selectedPointsIndices,
     };
-
-    if (
-      segmentMidpoint.added ||
-      segmentMidpoint.value === null ||
-      segmentMidpoint.index === null ||
-      linearElementEditor.pointerDownState.origin === null
-    ) {
-      return ret;
-    }
-    const origin = linearElementEditor.pointerDownState.origin!;
-    const dist = distance2d(
-      origin.x,
-      origin.y,
-      pointerCoords.x,
-      pointerCoords.y,
-    );
-    if (dist < DRAGGING_THRESHOLD / appState.zoom.value) {
-      return ret;
-    }
 
     const midpoint = LinearElementEditor.createPointAt(
       element,
@@ -1166,16 +1181,16 @@ export class LinearElementEditor {
     mutateElement(element, {
       points,
     });
-    ret.didAddPoint = true;
+
     ret.pointerDownState = {
       ...linearElementEditor.pointerDownState,
       segmentMidpoint: {
         ...linearElementEditor.pointerDownState.segmentMidpoint,
         added: true,
       },
-      lastClickedPoint: segmentMidpoint.index,
+      lastClickedPoint: segmentMidpoint.index!,
     };
-    ret.selectedPointsIndices = [segmentMidpoint.index];
+    ret.selectedPointsIndices = [segmentMidpoint.index!];
     return ret;
   }
 

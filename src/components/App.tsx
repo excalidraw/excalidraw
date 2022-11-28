@@ -4261,20 +4261,26 @@ class App extends React.Component<AppProps, AppState> {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
 
-        const ret = LinearElementEditor.addMidpoint(
-          this.state.selectedLinearElement,
-          pointerCoords,
-          this.state,
-        );
-
         if (
-          ret?.pointerDownState.segmentMidpoint.value !== null &&
-          !ret?.pointerDownState.segmentMidpoint.added
+          LinearElementEditor.shouldAddMidpoint(
+            this.state.selectedLinearElement,
+            pointerCoords,
+            this.state,
+          )
         ) {
-          return;
-        }
+          const ret = LinearElementEditor.addMidpoint(
+            this.state.selectedLinearElement,
+            pointerCoords,
+            this.state,
+          );
 
-        if (ret?.didAddPoint) {
+          if (
+            ret?.pointerDownState.segmentMidpoint.value !== null &&
+            !ret?.pointerDownState.segmentMidpoint.added
+          ) {
+            return;
+          }
+
           this.setState({
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
