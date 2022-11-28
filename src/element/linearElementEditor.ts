@@ -194,6 +194,7 @@ export class LinearElementEditor {
     const draggingPoint = element.points[
       linearElementEditor.pointerDownState.lastClickedPoint
     ] as [number, number] | undefined;
+
     if (selectedPointsIndices && draggingPoint) {
       if (
         shouldRotateWithDiscreteAngle(event) &&
@@ -1118,6 +1119,7 @@ export class LinearElementEditor {
     const element = LinearElementEditor.getElement(
       linearElementEditor.elementId,
     );
+
     if (!element) {
       return false;
     }

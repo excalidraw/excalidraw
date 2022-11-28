@@ -129,19 +129,25 @@ describe("Test Linear Elements", () => {
     Keyboard.keyPress(KEYS.DELETE);
   };
 
-  it("should not add midpoint until dragged beyond a threshold", () => {
+  it("should not drag line and add midpoint until dragged beyond a threshold", () => {
     createTwoPointerLinearElement("line");
     const line = h.elements[0] as ExcalidrawLinearElement;
-
+    const originalX = line.x;
+    const originalY = line.y;
     expect(line.points.length).toEqual(2);
 
     mouse.clickAt(midpoint[0], midpoint[1]);
+    drag(midpoint, [midpoint[0] + 1, midpoint[1] + 1]);
+
     expect(line.points.length).toEqual(2);
 
-    drag(midpoint, [midpoint[0] + 1, midpoint[1] + 1]);
+    expect(line.x).toBe(originalX);
+    expect(line.y).toBe(originalY);
     expect(line.points.length).toEqual(2);
 
     drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
+    expect(line.x).toBe(originalX);
+    expect(line.y).toBe(originalY);
     expect(line.points.length).toEqual(3);
   });
 
@@ -211,9 +217,11 @@ describe("Test Linear Elements", () => {
   });
 
   describe("Inside editor", () => {
-    it("should add midpoint when dragged irrespective of threshold", () => {
+    it("should not drag line and add midpoint when dragged irrespective of threshold", () => {
       createTwoPointerLinearElement("line");
       const line = h.elements[0] as ExcalidrawLinearElement;
+      const originalX = line.x;
+      const originalY = line.y;
       enterLineEditingMode(line);
 
       expect(line.points.length).toEqual(2);
@@ -222,6 +230,8 @@ describe("Test Linear Elements", () => {
       expect(line.points.length).toEqual(2);
 
       drag(midpoint, [midpoint[0] + 1, midpoint[1] + 1]);
+      expect(line.x).toBe(originalX);
+      expect(line.y).toBe(originalY);
       expect(line.points.length).toEqual(3);
     });
 
