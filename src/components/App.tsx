@@ -4281,23 +4281,31 @@ class App extends React.Component<AppProps, AppState> {
             return;
           }
 
-          this.setState({
-            selectedLinearElement: {
-              ...this.state.selectedLinearElement,
-              pointerDownState: ret.pointerDownState,
-              selectedPointsIndices: ret.selectedPointsIndices,
-            },
+          // Since we are reading from previous state which is not possible with
+          // automatic batching in React 18 hence using flush sync to synchronously
+          // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
+
+          flushSync(() => {
+            if (this.state.selectedLinearElement) {
+              this.setState({
+                selectedLinearElement: {
+                  ...this.state.selectedLinearElement,
+                  pointerDownState: ret.pointerDownState,
+                  selectedPointsIndices: ret.selectedPointsIndices,
+                },
+              });
+            }
+            if (this.state.editingLinearElement) {
+              this.setState({
+                editingLinearElement: {
+                  ...this.state.editingLinearElement,
+                  pointerDownState: ret.pointerDownState,
+                  selectedPointsIndices: ret.selectedPointsIndices,
+                },
+              });
+            }
           });
 
-          if (this.state.editingLinearElement) {
-            this.setState({
-              editingLinearElement: {
-                ...this.state.editingLinearElement,
-                pointerDownState: ret.pointerDownState,
-                selectedPointsIndices: ret.selectedPointsIndices,
-              },
-            });
-          }
           return;
         }
 
