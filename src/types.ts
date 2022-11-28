@@ -29,6 +29,7 @@ import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
+import { ContextMenuOption } from "./components/ContextMenu";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -91,6 +92,11 @@ export type LastActiveToolBeforeEraser =
   | null;
 
 export type AppState = {
+  contextMenu: {
+    options: any[]; 
+    top: number;
+    left: number;
+  };
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: string | null;

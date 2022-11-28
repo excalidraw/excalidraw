@@ -26,14 +26,15 @@ type ContextMenuProps = {
 };
 
 const ContextMenu = ({
-  options,
   onCloseRequest,
-  top,
-  left,
   actionManager,
   appState,
   elements,
 }: ContextMenuProps) => {
+  const top = appState.contextMenu.top;
+  const left = appState.contextMenu.left;
+  const options = appState.contextMenu.options;
+
   return (
     <Popover
       onCloseRequest={onCloseRequest}
@@ -113,16 +114,13 @@ const handleClose = (container: HTMLElement) => {
 
 export default {
   push(params: {
-    options: (ContextMenuOption | false | null | undefined)[];
-    top: ContextMenuProps["top"];
-    left: ContextMenuProps["left"];
     actionManager: ContextMenuProps["actionManager"];
     appState: Readonly<AppState>;
     container: HTMLElement;
     elements: readonly NonDeletedExcalidrawElement[];
   }) {
     const options = Array.of<ContextMenuOption>();
-    params.options.forEach((option) => {
+    params.appState.contextMenu.options.forEach((option: any) => {
       if (option) {
         options.push(option);
       }
@@ -130,8 +128,8 @@ export default {
     if (options.length) {
       getContextMenuRoot(params.container).render(
         <ContextMenu
-          top={params.top}
-          left={params.left}
+          top={params.appState.contextMenu.top}
+          left={params.appState.contextMenu.left}
           options={options}
           onCloseRequest={() => handleClose(params.container)}
           actionManager={params.actionManager}

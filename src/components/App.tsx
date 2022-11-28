@@ -5987,55 +5987,57 @@ class App extends React.Component<AppProps, AppState> {
       ];
 
       if (this.state.viewModeEnabled) {
+        this.setState({
+          ...this.state,
+          contextMenu: { options: viewModeOptions, top: 0, left: 0 },
+        });
         ContextMenu.push({
-          options: viewModeOptions,
-          top,
-          left,
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
           elements,
         });
       } else {
-        ContextMenu.push({
-          options: [
-            this.device.isMobile &&
-              navigator.clipboard && {
-                trackEvent: false,
-                name: "paste",
-                perform: (elements, appStates) => {
-                  this.pasteFromClipboard(null);
-                  return {
-                    commitToHistory: false,
-                  };
-                },
-                contextItemLabel: "labels.paste",
+        const options = [
+          this.device.isMobile &&
+            navigator.clipboard && {
+              trackEvent: false,
+              name: "paste",
+              perform: (elements: any, appStates: any) => {
+                this.pasteFromClipboard(null);
+                return {
+                  commitToHistory: false,
+                };
               },
-            this.device.isMobile && navigator.clipboard && separator,
-            probablySupportsClipboardBlob &&
-              elements.length > 0 &&
-              actionCopyAsPng,
-            probablySupportsClipboardWriteText &&
-              elements.length > 0 &&
-              actionCopyAsSvg,
-            probablySupportsClipboardWriteText &&
-              selectedElements.length > 0 &&
-              copyText,
-            ((probablySupportsClipboardBlob && elements.length > 0) ||
-              (probablySupportsClipboardWriteText && elements.length > 0)) &&
-              separator,
-            actionSelectAll,
+              contextItemLabel: "labels.paste",
+            },
+          this.device.isMobile && navigator.clipboard && separator,
+          probablySupportsClipboardBlob &&
+            elements.length > 0 &&
+            actionCopyAsPng,
+          probablySupportsClipboardWriteText &&
+            elements.length > 0 &&
+            actionCopyAsSvg,
+          probablySupportsClipboardWriteText &&
+            selectedElements.length > 0 &&
+            copyText,
+          ((probablySupportsClipboardBlob && elements.length > 0) ||
+            (probablySupportsClipboardWriteText && elements.length > 0)) &&
             separator,
-            typeof this.props.gridModeEnabled === "undefined" &&
-              actionToggleGridMode,
-            typeof this.props.zenModeEnabled === "undefined" &&
-              actionToggleZenMode,
-            typeof this.props.viewModeEnabled === "undefined" &&
-              actionToggleViewMode,
-            actionToggleStats,
-          ],
-          top,
-          left,
+          actionSelectAll,
+          separator,
+          typeof this.props.gridModeEnabled === "undefined" &&
+            actionToggleGridMode,
+          typeof this.props.zenModeEnabled === "undefined" &&
+            actionToggleZenMode,
+          typeof this.props.viewModeEnabled === "undefined" &&
+            actionToggleViewMode,
+          actionToggleStats,
+        ];
+
+        this.setState({ ...this.state, contextMenu: { options, top, left } });
+
+        ContextMenu.push({
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
@@ -6044,62 +6046,70 @@ class App extends React.Component<AppProps, AppState> {
       }
     } else if (type === "element") {
       if (this.state.viewModeEnabled) {
+        this.setState({
+          ...this.state,
+          contextMenu: {
+            options: [navigator.clipboard && actionCopy, ...options],
+            top,
+            left,
+          },
+        });
         ContextMenu.push({
-          options: [navigator.clipboard && actionCopy, ...options],
-          top,
-          left,
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
           elements,
         });
       } else {
-        ContextMenu.push({
-          options: [
-            this.device.isMobile && actionCut,
-            this.device.isMobile && navigator.clipboard && actionCopy,
-            this.device.isMobile &&
-              navigator.clipboard && {
-                name: "paste",
-                trackEvent: false,
-                perform: (elements, appStates) => {
-                  this.pasteFromClipboard(null);
-                  return {
-                    commitToHistory: false,
-                  };
-                },
-                contextItemLabel: "labels.paste",
+        const opt = [
+          this.device.isMobile && actionCut,
+          this.device.isMobile && navigator.clipboard && actionCopy,
+          this.device.isMobile &&
+            navigator.clipboard && {
+              name: "paste",
+              trackEvent: false,
+              perform: (elements: any, appStates: any) => {
+                this.pasteFromClipboard(null);
+                return {
+                  commitToHistory: false,
+                };
               },
-            this.device.isMobile && separator,
-            ...options,
-            separator,
-            actionCopyStyles,
-            actionPasteStyles,
-            separator,
-            maybeGroupAction && actionGroup,
-            mayBeAllowUnbinding && actionUnbindText,
-            mayBeAllowBinding && actionBindText,
-            maybeUngroupAction && actionUngroup,
-            (maybeGroupAction || maybeUngroupAction) && separator,
-            actionAddToLibrary,
-            separator,
-            actionSendBackward,
-            actionBringForward,
-            actionSendToBack,
-            actionBringToFront,
-            separator,
-            maybeFlipHorizontal && actionFlipHorizontal,
-            maybeFlipVertical && actionFlipVertical,
-            (maybeFlipHorizontal || maybeFlipVertical) && separator,
-            mayBeAllowToggleLineEditing && actionToggleLinearEditor,
-            actionLink.contextItemPredicate(elements, this.state) && actionLink,
-            actionDuplicateSelection,
-            actionToggleLock,
-            separator,
-            actionDeleteSelected,
-          ],
-          top,
-          left,
+              contextItemLabel: "labels.paste",
+            },
+          this.device.isMobile && separator,
+          ...options,
+          separator,
+          actionCopyStyles,
+          actionPasteStyles,
+          separator,
+          maybeGroupAction && actionGroup,
+          mayBeAllowUnbinding && actionUnbindText,
+          mayBeAllowBinding && actionBindText,
+          maybeUngroupAction && actionUngroup,
+          (maybeGroupAction || maybeUngroupAction) && separator,
+          actionAddToLibrary,
+          separator,
+          actionSendBackward,
+          actionBringForward,
+          actionSendToBack,
+          actionBringToFront,
+          separator,
+          maybeFlipHorizontal && actionFlipHorizontal,
+          maybeFlipVertical && actionFlipVertical,
+          (maybeFlipHorizontal || maybeFlipVertical) && separator,
+          mayBeAllowToggleLineEditing && actionToggleLinearEditor,
+          actionLink.contextItemPredicate(elements, this.state) && actionLink,
+          actionDuplicateSelection,
+          actionToggleLock,
+          separator,
+          actionDeleteSelected,
+        ];
+        this.setState({
+          ...this.state,
+          contextMenu: { options: opt, left, top },
+        });
+
+        ContextMenu.push({
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
