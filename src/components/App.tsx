@@ -223,6 +223,7 @@ import {
   updateObject,
   setEraserCursor,
   updateActiveTool,
+  getShortcutKey,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -258,6 +259,7 @@ import throttle from "lodash.throttle";
 import { fileOpen, FileSystemHandle } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
+  getApproxLineHeight,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
@@ -337,6 +339,10 @@ let invalidateContextMenu = false;
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
 let THROTTLE_NEXT_RENDER = true;
+
+let IS_PLAIN_PASTE = false;
+let IS_PLAIN_PASTE_TIMER = 0;
+let PLAIN_PASTE_TOAST_SHOWN = false;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -1525,6 +1531,8 @@ class App extends React.Component<AppProps, AppState> {
 
   private pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent | null) => {
+      const isPlainPaste = !!(IS_PLAIN_PASTE && event);
+
       // #686
       const target = document.activeElement;
       const isExcalidrawActive =
@@ -1535,8 +1543,6 @@ class App extends React.Component<AppProps, AppState> {
 
       const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
       if (
-        // if no ClipboardEvent supplied, assume we're pasting via contextMenu
-        // thus these checks don't make sense
         event &&
         (!(elementUnderCursor instanceof HTMLCanvasElement) ||
           isWritableElement(target))
@@ -1549,9 +1555,9 @@ class App extends React.Component<AppProps, AppState> {
       // (something something security)
       let file = event?.clipboardData?.files[0];
 
-      const data = await parseClipboard(event, this.state);
+      const data = await parseClipboard(event, isPlainPaste, this.state);
 
-      if (!file && data.text) {
+      if (!file && data.text && !isPlainPaste) {
         const string = data.text.trim();
         if (string.startsWith("<svg") && string.endsWith("</svg>")) {
           // ignore SVG validation/normalization which will be done during image
@@ -1584,9 +1590,10 @@ class App extends React.Component<AppProps, AppState> {
           console.error(error);
         }
       }
+
       if (data.errorMessage) {
         this.setState({ errorMessage: data.errorMessage });
-      } else if (data.spreadsheet) {
+      } else if (data.spreadsheet && !isPlainPaste) {
         this.setState({
           pasteDialog: {
             data: data.spreadsheet,
@@ -1594,13 +1601,14 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       } else if (data.elements) {
+        // TODO remove formatting from elements if isPlainPaste
         this.addElementsFromPasteOrLibrary({
           elements: data.elements,
           files: data.files || null,
           position: "cursor",
         });
       } else if (data.text) {
-        this.addTextFromPaste(data.text);
+        this.addTextFromPaste(data.text, isPlainPaste);
       }
       this.setActiveTool({ type: "selection" });
       event?.preventDefault();
@@ -1707,13 +1715,13 @@ class App extends React.Component<AppProps, AppState> {
     this.setActiveTool({ type: "selection" });
   };
 
-  private addTextFromPaste(text: any) {
+  private addTextFromPaste(text: string, isPlainPaste = false) {
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX: cursorX, clientY: cursorY },
       this.state,
     );
 
-    const element = newTextElement({
+    const textElementProps = {
       x,
       y,
       strokeColor: this.state.currentItemStrokeColor,
@@ -1731,13 +1739,76 @@ class App extends React.Component<AppProps, AppState> {
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       ...selectSubtype(this.state, "text"),
       locked: false,
-    });
+    };
+
+    const LINE_GAP = 10;
+    let currentY = y;
+
+    const lines = isPlainPaste ? [text] : text.split("\n");
+    const textElements = lines.reduce(
+      (acc: ExcalidrawTextElement[], line, idx) => {
+        const text = line.trim();
+
+        if (text.length) {
+          const element = newTextElement({
+            ...textElementProps,
+            x,
+            y: currentY,
+            text,
+          });
+          acc.push(element);
+          currentY += element.height + LINE_GAP;
+        } else {
+          const prevLine = lines[idx - 1]?.trim();
+          // add paragraph only if previous line was not empty, IOW don't add
+          // more than one empty line
+          if (prevLine) {
+            const defaultLineHeight = getApproxLineHeight(
+              getFontString({
+                fontSize: textElementProps.fontSize,
+                fontFamily: textElementProps.fontFamily,
+              }),
+            );
+
+            currentY += defaultLineHeight + LINE_GAP;
+          }
+        }
+
+        return acc;
+      },
+      [],
+    );
+
+    if (textElements.length === 0) {
+      return;
+    }
 
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
-      element,
+      ...textElements,
     ]);
-    this.setState({ selectedElementIds: { [element.id]: true } });
+
+    this.setState({
+      selectedElementIds: Object.fromEntries(
+        textElements.map((el) => [el.id, true]),
+      ),
+    });
+
+    if (
+      !isPlainPaste &&
+      textElements.length > 1 &&
+      PLAIN_PASTE_TOAST_SHOWN === false &&
+      !this.device.isMobile
+    ) {
+      this.setToast({
+        message: t("toast.pasteAsSingleElement", {
+          shortcut: getShortcutKey("CtrlOrCmd+Shift+V"),
+        }),
+        duration: 5000,
+      });
+      PLAIN_PASTE_TOAST_SHOWN = true;
+    }
+
     this.history.resumeRecording();
   }
 
@@ -1945,6 +2016,17 @@ class App extends React.Component<AppProps, AppState> {
               : value;
           },
         });
+      }
+
+      if (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.V) {
+        IS_PLAIN_PASTE = event.shiftKey;
+        clearTimeout(IS_PLAIN_PASTE_TIMER);
+        // reset (100ms to be safe that we it runs after the ensuing
+        // paste event). Though, technically unnecessary to reset since we
+        // (re)set the flag before each paste event.
+        IS_PLAIN_PASTE_TIMER = window.setTimeout(() => {
+          IS_PLAIN_PASTE = false;
+        }, 100);
       }
 
       // prevent browser zoom in input fields

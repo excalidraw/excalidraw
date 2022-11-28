@@ -25,6 +25,7 @@ import {
   getContainerDims,
   getContainerElement,
   measureTextElement,
+  normalizeText,
   wrapTextElement,
 } from "./textElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
@@ -166,12 +167,16 @@ export const newTextElement = (
 ): NonDeleted<ExcalidrawTextElement> => {
   const map = getSubtypeMethods(opts?.subtype);
   map?.clean && map.clean(opts);
-  const metrics = measureTextElement(opts, { customData: opts.customData });
+  const text = normalizeText(opts.text);
+  const metrics = measureTextElement(opts, {
+    text,
+    customData: opts.customData,
+  });
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
-      text: opts.text,
+      text,
       fontSize: opts.fontSize,
       fontFamily: opts.fontFamily,
       textAlign: opts.textAlign,
@@ -182,7 +187,7 @@ export const newTextElement = (
       height: metrics.height,
       baseline: metrics.baseline,
       containerId: opts.containerId || null,
-      originalText: opts.text,
+      originalText: text,
     },
     {},
   );
