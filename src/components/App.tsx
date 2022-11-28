@@ -5998,7 +5998,7 @@ class App extends React.Component<AppProps, AppState> {
           elements,
         });
       } else {
-        const options = [
+        const options: (ContextMenuOption | false | null | undefined)[] = [
           this.device.isMobile &&
             navigator.clipboard && {
               trackEvent: false,
@@ -6061,7 +6061,7 @@ class App extends React.Component<AppProps, AppState> {
           elements,
         });
       } else {
-        const opt = [
+        const opt: (ContextMenuOption | false | null | undefined)[] = [
           this.device.isMobile && actionCut,
           this.device.isMobile && navigator.clipboard && actionCopy,
           this.device.isMobile &&

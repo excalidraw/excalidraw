@@ -16,10 +16,7 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 export type ContextMenuOption = "separator" | Action;
 
 type ContextMenuProps = {
-  options: ContextMenuOption[];
   onCloseRequest?(): void;
-  top: number;
-  left: number;
   actionManager: ActionManager;
   appState: Readonly<AppState>;
   elements: readonly NonDeletedExcalidrawElement[];
@@ -31,15 +28,11 @@ const ContextMenu = ({
   appState,
   elements,
 }: ContextMenuProps) => {
-  const top = appState.contextMenu.top;
-  const left = appState.contextMenu.left;
-  const options = appState.contextMenu.options;
-
   return (
     <Popover
       onCloseRequest={onCloseRequest}
-      top={top}
-      left={left}
+      top={appState.contextMenu.top}
+      left={appState.contextMenu.left}
       fitInViewport={true}
       offsetLeft={appState.offsetLeft}
       offsetTop={appState.offsetTop}
@@ -50,9 +43,13 @@ const ContextMenu = ({
         className="context-menu"
         onContextMenu={(event) => event.preventDefault()}
       >
-        {options.map((option, idx) => {
+        {appState.contextMenu.options.map((option, idx) => {
           if (option === "separator") {
             return <hr key={idx} className="context-menu-option-separator" />;
+          }
+
+          if (option === undefined || option === null || option === false) {
+            return <></>;
           }
 
           const actionName = option.name;
@@ -128,9 +125,6 @@ export default {
     if (options.length) {
       getContextMenuRoot(params.container).render(
         <ContextMenu
-          top={params.appState.contextMenu.top}
-          left={params.appState.contextMenu.left}
-          options={options}
           onCloseRequest={() => handleClose(params.container)}
           actionManager={params.actionManager}
           appState={params.appState}

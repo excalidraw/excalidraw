@@ -93,7 +93,7 @@ export type LastActiveToolBeforeEraser =
 
 export type AppState = {
   contextMenu: {
-    options: any[]; 
+    options: (ContextMenuOption | false | null | undefined)[];
     top: number;
     left: number;
   };
