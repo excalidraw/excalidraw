@@ -312,7 +312,7 @@ describe("Test Linear Elements", () => {
       // Move the element
       drag(startPoint, endPoint);
 
-      expect(renderScene).toHaveBeenCalledTimes(15);
+      expect(renderScene).toHaveBeenCalledTimes(16);
       expect([line.x, line.y]).toEqual([
         points[0][0] + deltaX,
         points[0][1] + deltaY,
@@ -408,7 +408,7 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] - delta, hitCoords[1] - delta]);
 
-        expect(renderScene).toHaveBeenCalledTimes(15);
+        expect(renderScene).toHaveBeenCalledTimes(16);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -434,7 +434,7 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
-        expect(renderScene).toHaveBeenCalledTimes(15);
+        expect(renderScene).toHaveBeenCalledTimes(16);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -589,7 +589,7 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
-        expect(renderScene).toHaveBeenCalledTimes(15);
+        expect(renderScene).toHaveBeenCalledTimes(16);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
