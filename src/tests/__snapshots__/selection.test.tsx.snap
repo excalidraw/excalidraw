@@ -22,10 +22,6 @@ Object {
       0,
     ],
     Array [
-      15,
-      25,
-    ],
-    Array [
       30,
       50,
     ],
@@ -40,8 +36,8 @@ Object {
   "strokeWidth": 1,
   "type": "arrow",
   "updated": 1,
-  "version": 4,
-  "versionNonce": 453191,
+  "version": 3,
+  "versionNonce": 449462985,
   "width": 30,
   "x": 10,
   "y": 10,
@@ -70,10 +66,6 @@ Object {
       0,
     ],
     Array [
-      15,
-      25,
-    ],
-    Array [
       30,
       50,
     ],
@@ -88,8 +80,8 @@ Object {
   "strokeWidth": 1,
   "type": "line",
   "updated": 1,
-  "version": 4,
-  "versionNonce": 453191,
+  "version": 3,
+  "versionNonce": 449462985,
   "width": 30,
   "x": 10,
   "y": 10,

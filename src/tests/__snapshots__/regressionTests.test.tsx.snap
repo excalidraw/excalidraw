@@ -10989,7 +10989,13 @@ Object {
     "lastUncommittedPoint": null,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
+      "origin": null,
       "prevSelectedPointsIndices": null,
+      "segmentMidpoint": Object {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
     },
     "pointerOffset": Object {
       "x": 0,
@@ -11216,7 +11222,13 @@ Object {
     "lastUncommittedPoint": null,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
+      "origin": null,
       "prevSelectedPointsIndices": null,
+      "segmentMidpoint": Object {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
     },
     "pointerOffset": Object {
       "x": 0,
@@ -11671,7 +11683,13 @@ Object {
     "lastUncommittedPoint": null,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
+      "origin": null,
       "prevSelectedPointsIndices": null,
+      "segmentMidpoint": Object {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
     },
     "pointerOffset": Object {
       "x": 0,
@@ -12078,7 +12096,13 @@ Object {
     "lastUncommittedPoint": null,
     "pointerDownState": Object {
       "lastClickedPoint": -1,
+      "origin": null,
       "prevSelectedPointsIndices": null,
+      "segmentMidpoint": Object {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
     },
     "pointerOffset": Object {
       "x": 0,
