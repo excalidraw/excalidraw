@@ -4276,11 +4276,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerCoords,
             this.state,
           );
-
-          if (
-            ret?.pointerDownState.segmentMidpoint.value !== null &&
-            !ret?.pointerDownState.segmentMidpoint.added
-          ) {
+          if (!ret) {
             return;
           }
 
@@ -4309,6 +4305,11 @@ class App extends React.Component<AppProps, AppState> {
             }
           });
 
+          return;
+        } else if (
+          linearElementEditor.pointerDownState.segmentMidpoint.value !== null &&
+          !linearElementEditor.pointerDownState.segmentMidpoint.added
+        ) {
           return;
         }
 
