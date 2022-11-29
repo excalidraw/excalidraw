@@ -168,13 +168,15 @@ export const textWysiwyg = ({
         maxHeight = getMaxContainerHeight(container);
 
         // autogrow container height if text exceeds
-        if (height > maxHeight) {
+
+        if (!isArrowElement(container) && height > maxHeight) {
           const diff = Math.min(height - maxHeight, approxLineHeight);
           mutateElement(container, { height: containerDims.height + diff });
           return;
         } else if (
           // autoshrink container height until original container height
           // is reached when text is removed
+          !isArrowElement(container) &&
           containerDims.height > originalContainerHeight &&
           height < maxHeight
         ) {

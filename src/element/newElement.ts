@@ -243,7 +243,10 @@ const getAdjustedDimensions = (
     if (nextWidth > width - boundTextElementPadding * 2) {
       width = nextWidth + boundTextElementPadding * 2;
     }
-    if (height !== containerDims.height || width !== containerDims.width) {
+    if (
+      !isArrowElement(container) &&
+      (height !== containerDims.height || width !== containerDims.width)
+    ) {
       mutateElement(container, { height, width });
     }
   }
