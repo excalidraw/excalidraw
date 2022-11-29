@@ -12,7 +12,6 @@ import {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
-  ExcalidrawElement,
 } from "./types";
 import {
   getElementAbsoluteCoords,
@@ -26,7 +25,6 @@ import {
   isTextElement,
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
-import { getPerfectElementSize } from "./sizeHelpers";
 import { getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
@@ -76,21 +74,6 @@ export const transformElements = (
         shouldRotateWithDiscreteAngle,
       );
       updateBoundElements(element);
-    } else if (
-      isLinearElement(element) &&
-      element.points.length === 2 &&
-      (transformHandleType === "nw" ||
-        transformHandleType === "ne" ||
-        transformHandleType === "sw" ||
-        transformHandleType === "se")
-    ) {
-      reshapeSingleTwoPointElement(
-        element,
-        resizeArrowDirection,
-        shouldRotateWithDiscreteAngle,
-        pointerX,
-        pointerY,
-      );
     } else if (
       isTextElement(element) &&
       (transformHandleType === "nw" ||
@@ -172,92 +155,6 @@ const rotateSingleElement = (
     const textElement = Scene.getScene(element)!.getElement(boundTextElementId);
     mutateElement(textElement!, { angle });
   }
-};
-
-// used in DEV only
-const validateTwoPointElementNormalized = (
-  element: NonDeleted<ExcalidrawLinearElement>,
-) => {
-  if (
-    element.points.length !== 2 ||
-    element.points[0][0] !== 0 ||
-    element.points[0][1] !== 0 ||
-    Math.abs(element.points[1][0]) !== element.width ||
-    Math.abs(element.points[1][1]) !== element.height
-  ) {
-    throw new Error("Two-point element is not normalized");
-  }
-};
-
-const getPerfectElementSizeWithRotation = (
-  elementType: ExcalidrawElement["type"],
-  width: number,
-  height: number,
-  angle: number,
-): [number, number] => {
-  const size = getPerfectElementSize(
-    elementType,
-    ...rotate(width, height, 0, 0, angle),
-  );
-  return rotate(size.width, size.height, 0, 0, -angle);
-};
-
-export const reshapeSingleTwoPointElement = (
-  element: NonDeleted<ExcalidrawLinearElement>,
-  resizeArrowDirection: "origin" | "end",
-  shouldRotateWithDiscreteAngle: boolean,
-  pointerX: number,
-  pointerY: number,
-) => {
-  if (process.env.NODE_ENV !== "production") {
-    validateTwoPointElementNormalized(element);
-  }
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
-  // rotation pointer with reverse angle
-  const [rotatedX, rotatedY] = rotate(
-    pointerX,
-    pointerY,
-    cx,
-    cy,
-    -element.angle,
-  );
-  let [width, height] =
-    resizeArrowDirection === "end"
-      ? [rotatedX - element.x, rotatedY - element.y]
-      : [
-          element.x + element.points[1][0] - rotatedX,
-          element.y + element.points[1][1] - rotatedY,
-        ];
-  if (shouldRotateWithDiscreteAngle) {
-    [width, height] = getPerfectElementSizeWithRotation(
-      element.type,
-      width,
-      height,
-      element.angle,
-    );
-  }
-  const [nextElementX, nextElementY] = adjustXYWithRotation(
-    resizeArrowDirection === "end"
-      ? { s: true, e: true }
-      : { n: true, w: true },
-    element.x,
-    element.y,
-    element.angle,
-    0,
-    0,
-    (element.points[1][0] - width) / 2,
-    (element.points[1][1] - height) / 2,
-  );
-  mutateElement(element, {
-    x: nextElementX,
-    y: nextElementY,
-    points: [
-      [0, 0],
-      [width, height],
-    ],
-  });
 };
 
 const rescalePointsInElement = (
