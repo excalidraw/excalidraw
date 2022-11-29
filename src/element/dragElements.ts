@@ -6,6 +6,7 @@ import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
+import { getDefaultRadiusOfRectangularElement } from "./resizeElements";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -148,6 +149,11 @@ export const dragNewElement = (
       y: newY,
       width,
       height,
+      ...getDefaultRadiusOfRectangularElement({
+        ...draggingElement,
+        width,
+        height,
+      }),
     });
   }
 };

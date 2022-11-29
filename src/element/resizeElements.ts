@@ -6,6 +6,7 @@ import {
   adjustXYWithRotation,
   centerPoint,
   rotatePoint,
+  getDefaultCornerRadius,
 } from "../math";
 import {
   ExcalidrawLinearElement,
@@ -403,6 +404,20 @@ const resizeSingleTextElement = (
   }
 };
 
+export const getDefaultRadiusOfRectangularElement = (
+  element: NonDeletedExcalidrawElement,
+) => {
+  if (
+    (element.type === "rectangle" || element.type === "diamond") &&
+    element.radiusSetting === "default"
+  ) {
+    return {
+      radius: getDefaultCornerRadius(Math.min(element.width, element.height)),
+    };
+  }
+  return {};
+};
+
 export const resizeSingleElement = (
   originalElements: PointerDownState["originalElements"],
   shouldMaintainAspectRatio: boolean,
@@ -615,6 +630,7 @@ export const resizeSingleElement = (
     x: newOrigin[0],
     y: newOrigin[1],
     ...rescaledPoints,
+    ...getDefaultRadiusOfRectangularElement(element),
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {

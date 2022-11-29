@@ -135,7 +135,6 @@ export type AppState = {
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
-  currentItemRadius: number;
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];

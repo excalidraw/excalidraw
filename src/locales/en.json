@@ -32,7 +32,10 @@
     "edges": "Edges",
     "sharp": "Sharp",
     "round": "Round",
-    "radius": "Radius",
+    "radius": {
+      "fixed": "Fixed radius",
+      "default": "Default radius"
+    },
     "arrowheads": "Arrowheads",
     "arrowhead_none": "None",
     "arrowhead_arrow": "Arrow",

@@ -70,6 +70,7 @@ import {
   MQ_RIGHT_SIDEBAR_MIN_WIDTH,
   MQ_SM_MAX_WIDTH,
   POINTER_BUTTON,
+  RECTANGULAR_DEFAULT_RADIUS,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
@@ -4227,7 +4228,11 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
-      radius: this.state.currentItemRadius,
+      radius:
+        this.state.currentItemLinearStrokeSharpness === "round"
+          ? RECTANGULAR_DEFAULT_RADIUS
+          : 0,
+      radiusSetting: "default",
       locked: false,
     });
 

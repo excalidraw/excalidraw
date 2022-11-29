@@ -116,6 +116,7 @@ const restoreElementWithProperties = <
       element.strokeSharpness ??
       (isLinearElementType(element.type) ? "round" : "sharp"),
     radius: element.radius ?? RECTANGULAR_DEFAULT_RADIUS,
+    radiusSetting: element.radiusSetting ?? "fixed",
     boundElements: element.boundElementIds
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],

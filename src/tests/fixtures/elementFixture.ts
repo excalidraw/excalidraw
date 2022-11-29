@@ -17,6 +17,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   groupIds: [],
   strokeSharpness: "sharp",
   radius: 0,
+  radiusSetting: "default",
   seed: 1041657908,
   version: 120,
   versionNonce: 1188004276,

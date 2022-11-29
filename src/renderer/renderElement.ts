@@ -25,7 +25,7 @@ import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
-import { isPathALoop } from "../math";
+import { getDefaultCornerRadius, isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
@@ -418,8 +418,18 @@ const generateElementShape = (
         if (element.strokeSharpness === "round") {
           const w = element.width;
           const h = element.height;
-          const r =
-            Math.min(w, h) * (element.radius ?? RECTANGULAR_DEFAULT_RADIUS);
+          let r: number;
+          switch (element.radiusSetting) {
+            case "fixed":
+              r = element.radius;
+              break;
+            case "default":
+              r = getDefaultCornerRadius(Math.min(w, h));
+              break;
+            default:
+              r = RECTANGULAR_DEFAULT_RADIUS;
+          }
+          r = Math.min(w, h) * r;
           shape = generator.path(
             `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
               h - r
@@ -444,7 +454,20 @@ const generateElementShape = (
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
           getDiamondPoints(element);
         if (element.strokeSharpness === "round") {
-          const r = element.radius ?? RECTANGULAR_DEFAULT_RADIUS;
+          let r: number;
+          switch (element.radiusSetting) {
+            case "fixed":
+              r = element.radius;
+              break;
+            case "default":
+              r = getDefaultCornerRadius(
+                Math.min(element.width, element.height),
+              );
+              break;
+            default:
+              r = RECTANGULAR_DEFAULT_RADIUS;
+          }
+          // const r = element.radius ?? RECTANGULAR_DEFAULT_RADIUS;
           shape = generator.path(
             `M ${topX + (rightX - topX) * r} ${topY + (rightY - topY) * r} L ${
               rightX - (rightX - topX) * r

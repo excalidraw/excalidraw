@@ -1,5 +1,8 @@
 import { NormalizedZoomValue, Point, Zoom } from "./types";
-import { LINE_CONFIRM_THRESHOLD } from "./constants";
+import {
+  LINE_CONFIRM_THRESHOLD,
+  RECTANGULAR_DEFAULT_RADIUS,
+} from "./constants";
 import { ExcalidrawLinearElement, NonDeleted } from "./element/types";
 import { getShapeForElement } from "./renderer/renderElement";
 import { getCurvePathOps } from "./element/bounds";
@@ -426,4 +429,30 @@ export const mapIntervalToBezierT = (
 
 export const arePointsEqual = (p1: Point, p2: Point) => {
   return p1[0] === p2[0] && p1[1] === p2[1];
+};
+
+const SCALE_STEP_SIZE = 0.0005;
+const CUTOFF_SIZE = 500;
+// g(x) = 1 - (1 - e^(-x)) is a monotonically decreasing function
+// in the range of [0,1].
+const f = (x: number, scale: number) => {
+  return (1 - (1 - Math.exp(-x * scale))) * RECTANGULAR_DEFAULT_RADIUS;
+};
+
+// We further define a scale, that increases as x increases.
+// Together, they provide smaller default radius size as x gets larger.
+const s = (x: number) => {
+  return (Math.log2(x + 1) + 1) * SCALE_STEP_SIZE;
+};
+
+export const SMALLEST_RECTANGULAR_RADIUS =
+  Math.round(f(CUTOFF_SIZE, s(CUTOFF_SIZE)) * 1000) / 1000;
+
+// This is to provide a better default radius size for squares and diamonds.
+export const getDefaultCornerRadius = (x: number) => {
+  if (x >= CUTOFF_SIZE) {
+    return SMALLEST_RECTANGULAR_RADIUS;
+  }
+
+  return Math.round(f(x, s(x)) * 1000) / 1000;
 };

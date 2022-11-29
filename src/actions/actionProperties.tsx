@@ -71,6 +71,7 @@ import {
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
 import { KEYS } from "../keys";
+import { getDefaultCornerRadius, SMALLEST_RECTANGULAR_RADIUS } from "../math";
 import { randomInteger } from "../random";
 import {
   canChangeSharpness,
@@ -864,6 +865,11 @@ export const actionChangeSharpness = register({
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
           strokeSharpness: value,
+          radiusSetting: "default",
+          radius:
+            value === "sharp"
+              ? 0
+              : getDefaultCornerRadius(Math.min(el.width, el.height)),
         }),
       ),
       appState: {
@@ -923,6 +929,7 @@ export const actionChangeRadius = register({
           if (el.type === "rectangle" || el.type === "diamond") {
             return newElementWith(el, {
               radius: value,
+              radiusSetting: "fixed",
             });
           }
           return newElementWith(el, {});
@@ -931,31 +938,38 @@ export const actionChangeRadius = register({
       ),
       appState: {
         ...appState,
-        currentItemRadius: value,
       },
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <label className="control-label">
-      {t("labels.radius")}
-      <input
-        type="range"
-        min="0"
-        max="0.5"
-        step="0.05"
-        onChange={(event) => updateData(+event.target.value)}
-        value={
-          getFormValue(
-            elements,
-            appState,
-            (element) => element.radius,
-            appState.currentItemRadius,
-          ) ?? RECTANGULAR_DEFAULT_RADIUS
-        }
-      />
-    </label>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const nonTextElements = elements.filter((el) => el.type !== "text");
+    const selectedRectangularElement = nonTextElements.filter(
+      (el) => el.id in appState.selectedElementIds,
+    )?.[0];
+    return (
+      <label className="control-label">
+        {selectedRectangularElement.radiusSetting === "fixed"
+          ? t("labels.radius.fixed")
+          : t("labels.radius.default")}
+        <input
+          type="range"
+          min={`${SMALLEST_RECTANGULAR_RADIUS}`}
+          max="0.5"
+          step="0.001"
+          onChange={(event) => updateData(+event.target.value)}
+          value={
+            getFormValue(
+              elements,
+              appState,
+              (element) => element.radius,
+              RECTANGULAR_DEFAULT_RADIUS,
+            ) ?? RECTANGULAR_DEFAULT_RADIUS
+          }
+        />
+      </label>
+    );
+  },
 });
 
 export const actionChangeArrowhead = register({
