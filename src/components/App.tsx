@@ -4229,10 +4229,11 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
       radius:
-        this.state.currentItemLinearStrokeSharpness === "round"
+        this.state.currentItemStrokeSharpness === "fixed"
+          ? this.state.currentItemFixedRadius ?? RECTANGULAR_DEFAULT_RADIUS
+          : this.state.currentItemStrokeSharpness === "round"
           ? RECTANGULAR_DEFAULT_RADIUS
           : 0,
-      radiusSetting: "default",
       locked: false,
     });
 
@@ -5895,6 +5896,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.activeTool.type !== "eraser"
     ) {
       dragNewElement(
+        this.state,
         draggingElement,
         this.state.activeTool.type,
         pointerDownState.origin.x,
@@ -5922,6 +5924,7 @@ class App extends React.Component<AppProps, AppState> {
           : null;
 
       dragNewElement(
+        this.state,
         draggingElement,
         this.state.activeTool.type,
         pointerDownState.originInGrid.x,
@@ -5965,6 +5968,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     if (
       transformElements(
+        this.state,
         pointerDownState,
         transformHandleType,
         selectedElements,

@@ -243,7 +243,6 @@ export default function App() {
             updated: 1,
             strokeSharpness: "round",
             radius: RECTANGULAR_DEFAULT_RADIUS,
-            radiusSetting: "default",
           },
         ],
         null,

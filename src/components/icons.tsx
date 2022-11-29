@@ -1244,6 +1244,36 @@ export const EdgeRoundIcon = createIcon(
   tablerIconProps,
 );
 
+export const EdgeFixedIcon = createIcon(
+  <g
+    strokeWidth="1.5"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 12v-4a4 4 0 0 1 4 -4h4" />
+    <line x1="16" y1="4" x2="16" y2="4.01" />
+    <line x1="20" y1="4" x2="20" y2="4.01" />
+    <line x1="20" y1="8" x2="20" y2="8.01" />
+    <line x1="20" y1="12" x2="20" y2="12.01" />
+    <line x1="4" y1="16" x2="4" y2="16.01" />
+    <line x1="20" y1="16" x2="20" y2="16.01" />
+    <line x1="4" y1="20" x2="4" y2="20.01" />
+    <line x1="8" y1="20" x2="8" y2="20.01" />
+    <line x1="12" y1="20" x2="12" y2="20.01" />
+    <line x1="16" y1="20" x2="16" y2="20.01" />
+    <line x1="20" y1="20" x2="20" y2="20.01" />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      strokeWidth="1.5"
+      d="M10.5714 7.75V8.8H8.42857V7.75C8.42857 7.1701 8.90827 6.7 9.5 6.7C10.0917 6.7 10.5714 7.1701 10.5714 7.75ZM7.71429 8.8V7.75C7.71429 6.7835 8.51378 6 9.5 6C10.4862 6 11.2857 6.7835 11.2857 7.75V8.8H11.6429C11.8401 8.8 12 8.95671 12 9.15V12.65C12 12.8433 11.8401 13 11.6429 13H7.35714C7.1599 13 7 12.8433 7 12.65V9.15C7 8.95671 7.1599 8.8 7.35714 8.8H7.71429Z"
+    />
+  </g>,
+  tablerIconProps,
+);
+
 export const ArrowheadNoneIcon = createIcon(
   <path d="M6 10H34" stroke="currentColor" strokeWidth={2} fill="none" />,
   {

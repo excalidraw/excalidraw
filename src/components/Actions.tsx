@@ -79,10 +79,6 @@ export const SelectedShapeActions = ({
     }
   }
 
-  const nonTextElements = targetElements.filter(
-    (element) => element.type !== "text",
-  );
-
   return (
     <div className="panelColumn">
       <div>
@@ -118,11 +114,9 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeSharpness")}</>
       )}
 
-      {!appState.draggingElement &&
-        nonTextElements.length > 0 &&
-        nonTextElements.length < 2 &&
-        nonTextElements.every((element) => canSetRadius(element.type)) &&
-        appState.currentItemStrokeSharpness === "round" && (
+      {appState.currentItemStrokeSharpness === "fixed" &&
+        (canSetRadius(appState.activeTool.type) ||
+          targetElements.some((element) => canSetRadius(element.type))) && (
           <>{renderAction("changeRadius")}</>
         )}
 

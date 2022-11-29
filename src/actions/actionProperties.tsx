@@ -37,6 +37,7 @@ import {
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
+  EdgeFixedIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -81,7 +82,7 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
-import { hasStrokeColor } from "../scene/comparisons";
+import { canSetRadius, hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
@@ -861,11 +862,11 @@ export const actionChangeSharpness = register({
     const shouldUpdateForLinearElements = targetElements.length
       ? targetElements.every(isLinearElement)
       : isLinearElementType(appState.activeTool.type);
+
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
           strokeSharpness: value,
-          radiusSetting: "default",
           radius:
             value === "sharp"
               ? 0
@@ -884,37 +885,58 @@ export const actionChangeSharpness = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.edges")}</legend>
-      <ButtonIconSelect
-        group="edges"
-        options={[
-          {
-            value: "sharp",
-            text: t("labels.sharp"),
-            icon: EdgeSharpIcon,
-          },
-          {
-            value: "round",
-            text: t("labels.round"),
-            icon: EdgeRoundIcon,
-          },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => element.strokeSharpness,
-          (canChangeSharpness(appState.activeTool.type) &&
-            (isLinearElementType(appState.activeTool.type)
-              ? appState.currentItemLinearStrokeSharpness
-              : appState.currentItemStrokeSharpness)) ||
-            null,
-        )}
-        onChange={(value) => updateData(value)}
-      />
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const targetElements = getTargetElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+
+    const hasRectangularElements = targetElements.some((el) =>
+      canSetRadius(el.type),
+    );
+
+    return (
+      <fieldset>
+        <legend>{t("labels.edges")}</legend>
+        <ButtonIconSelect
+          group="edges"
+          options={[
+            {
+              value: "sharp",
+              text: t("labels.sharp"),
+              icon: EdgeSharpIcon,
+            },
+            {
+              value: "round",
+              text: t("labels.round"),
+              icon: EdgeRoundIcon,
+            },
+          ].concat(
+            hasRectangularElements || canSetRadius(appState.activeTool.type)
+              ? [
+                  {
+                    value: "fixed",
+                    text: t("labels.fixed"),
+                    icon: EdgeFixedIcon,
+                  },
+                ]
+              : [],
+          )}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => element.strokeSharpness,
+            (canChangeSharpness(appState.activeTool.type) &&
+              (isLinearElementType(appState.activeTool.type)
+                ? appState.currentItemLinearStrokeSharpness
+                : appState.currentItemStrokeSharpness)) ||
+              null,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeRadius = register({
@@ -929,7 +951,6 @@ export const actionChangeRadius = register({
           if (el.type === "rectangle" || el.type === "diamond") {
             return newElementWith(el, {
               radius: value,
-              radiusSetting: "fixed",
             });
           }
           return newElementWith(el, {});
@@ -938,38 +959,28 @@ export const actionChangeRadius = register({
       ),
       appState: {
         ...appState,
+        currentItemFixedRadius: value,
       },
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
-    const nonTextElements = elements.filter((el) => el.type !== "text");
-    const selectedRectangularElement = nonTextElements.filter(
-      (el) => el.id in appState.selectedElementIds,
-    )?.[0];
-    return (
-      <label className="control-label">
-        {selectedRectangularElement.radiusSetting === "fixed"
-          ? t("labels.radius.fixed")
-          : t("labels.radius.default")}
-        <input
-          type="range"
-          min={`${SMALLEST_RECTANGULAR_RADIUS}`}
-          max="0.5"
-          step="0.001"
-          onChange={(event) => updateData(+event.target.value)}
-          value={
-            getFormValue(
-              elements,
-              appState,
-              (element) => element.radius,
-              RECTANGULAR_DEFAULT_RADIUS,
-            ) ?? RECTANGULAR_DEFAULT_RADIUS
-          }
-        />
-      </label>
-    );
-  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <label className="control-label">
+      {t("labels.radius")}
+      <input
+        type="range"
+        min={`${SMALLEST_RECTANGULAR_RADIUS}`}
+        max="0.5"
+        step="0.001"
+        onChange={(event) => updateData(+event.target.value)}
+        value={
+          getFormValue(elements, appState, (element) => element.radius) ??
+          appState.currentItemFixedRadius ??
+          RECTANGULAR_DEFAULT_RADIUS
+        }
+      />
+    </label>
+  ),
 });
 
 export const actionChangeArrowhead = register({

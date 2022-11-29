@@ -92,6 +92,7 @@ export const getDragOffsetXY = (
 };
 
 export const dragNewElement = (
+  appState: AppState,
   draggingElement: NonDeletedExcalidrawElement,
   elementType: AppState["activeTool"]["type"],
   originX: number,
@@ -149,11 +150,14 @@ export const dragNewElement = (
       y: newY,
       width,
       height,
-      ...getDefaultRadiusOfRectangularElement({
-        ...draggingElement,
-        width,
-        height,
-      }),
+      ...getDefaultRadiusOfRectangularElement(
+        {
+          ...draggingElement,
+          width,
+          height,
+        },
+        appState,
+      ),
     });
   }
 };

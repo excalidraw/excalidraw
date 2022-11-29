@@ -46,7 +46,6 @@ type ElementConstructorOpts = MarkOptional<
   | "versionNonce"
   | "link"
   | "radius"
-  | "radiusSetting"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -67,7 +66,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     groupIds = [],
     strokeSharpness,
     radius = RECTANGULAR_DEFAULT_RADIUS,
-    radiusSetting = "default",
     boundElements = null,
     link = null,
     locked,
@@ -92,7 +90,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     groupIds,
     strokeSharpness,
     radius,
-    radiusSetting,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
     versionNonce: rest.versionNonce ?? 0,

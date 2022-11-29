@@ -33,7 +33,6 @@ import {
   BOUND_TEXT_PADDING,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
-  RECTANGULAR_DEFAULT_RADIUS,
   SVG_NS,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -415,19 +414,19 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
-        if (element.strokeSharpness === "round") {
+        if (element.strokeSharpness !== "sharp") {
           const w = element.width;
           const h = element.height;
           let r: number;
-          switch (element.radiusSetting) {
+          switch (element.strokeSharpness) {
             case "fixed":
               r = element.radius;
               break;
-            case "default":
+            case "round":
               r = getDefaultCornerRadius(Math.min(w, h));
               break;
             default:
-              r = RECTANGULAR_DEFAULT_RADIUS;
+              r = 0;
           }
           r = Math.min(w, h) * r;
           shape = generator.path(
@@ -453,19 +452,19 @@ const generateElementShape = (
       case "diamond": {
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
           getDiamondPoints(element);
-        if (element.strokeSharpness === "round") {
+        if (element.strokeSharpness !== "sharp") {
           let r: number;
-          switch (element.radiusSetting) {
+          switch (element.strokeSharpness) {
             case "fixed":
               r = element.radius;
               break;
-            case "default":
+            case "round":
               r = getDefaultCornerRadius(
                 Math.min(element.width, element.height),
               );
               break;
             default:
-              r = RECTANGULAR_DEFAULT_RADIUS;
+              r = 0;
           }
           // const r = element.radius ?? RECTANGULAR_DEFAULT_RADIUS;
           shape = generator.path(

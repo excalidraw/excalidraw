@@ -1,4 +1,8 @@
-import { BOUND_TEXT_PADDING, SHIFT_LOCKING_ANGLE } from "../constants";
+import {
+  BOUND_TEXT_PADDING,
+  RECTANGULAR_DEFAULT_RADIUS,
+  SHIFT_LOCKING_ANGLE,
+} from "../constants";
 import { rescalePoints } from "../points";
 
 import {
@@ -35,7 +39,7 @@ import {
   MaybeTransformHandleType,
   TransformHandleDirection,
 } from "./transformHandles";
-import { Point, PointerDownState } from "../types";
+import { AppState, Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
   getApproxMinLineHeight,
@@ -55,6 +59,7 @@ export const normalizeAngle = (angle: number): number => {
 
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
+  appState: AppState,
   pointerDownState: PointerDownState,
   transformHandleType: MaybeTransformHandleType,
   selectedElements: readonly NonDeletedExcalidrawElement[],
@@ -109,6 +114,7 @@ export const transformElements = (
       updateBoundElements(element);
     } else if (transformHandleType) {
       resizeSingleElement(
+        appState,
         pointerDownState.originalElements,
         shouldMaintainAspectRatio,
         element,
@@ -406,19 +412,23 @@ const resizeSingleTextElement = (
 
 export const getDefaultRadiusOfRectangularElement = (
   element: NonDeletedExcalidrawElement,
+  appState: AppState,
 ) => {
-  if (
-    (element.type === "rectangle" || element.type === "diamond") &&
-    element.radiusSetting === "default"
-  ) {
+  if (element.type === "rectangle" || element.type === "diamond") {
+    if (element.strokeSharpness === "round") {
+      return {
+        radius: getDefaultCornerRadius(Math.min(element.width, element.height)),
+      };
+    }
     return {
-      radius: getDefaultCornerRadius(Math.min(element.width, element.height)),
+      radius: appState.currentItemFixedRadius ?? RECTANGULAR_DEFAULT_RADIUS,
     };
   }
   return {};
 };
 
 export const resizeSingleElement = (
+  appState: AppState,
   originalElements: PointerDownState["originalElements"],
   shouldMaintainAspectRatio: boolean,
   element: NonDeletedExcalidrawElement,
@@ -630,7 +640,7 @@ export const resizeSingleElement = (
     x: newOrigin[0],
     y: newOrigin[1],
     ...rescaledPoints,
-    ...getDefaultRadiusOfRectangularElement(element),
+    ...getDefaultRadiusOfRectangularElement(element, appState),
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {

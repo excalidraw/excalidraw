@@ -181,6 +181,7 @@ const flipElement = (
       : [initialElementAbsoluteCoords[0], initialElementAbsoluteCoords[1]];
 
     resizeSingleElement(
+      appState,
       new Map().set(element.id, element),
       false,
       element,

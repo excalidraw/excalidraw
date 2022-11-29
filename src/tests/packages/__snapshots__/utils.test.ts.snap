@@ -13,6 +13,7 @@ Object {
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "hachure",
+  "currentItemFixedRadius": 0.25,
   "currentItemFontFamily": 1,
   "currentItemFontSize": 20,
   "currentItemLinearStrokeSharpness": "round",
