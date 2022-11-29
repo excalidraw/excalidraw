@@ -3085,7 +3085,10 @@ class App extends React.Component<AppProps, AppState> {
       if (editingLinearElement?.lastUncommittedPoint != null) {
         this.maybeSuggestBindingAtCursor(scenePointer);
       } else {
-        this.setState({ suggestedBindings: [] });
+        // causes stack overflow if not sync
+        flushSync(() => {
+          this.setState({ suggestedBindings: [] });
+        });
       }
     }
 
@@ -4030,7 +4033,7 @@ class App extends React.Component<AppProps, AppState> {
               this.setState({ editingLinearElement: ret.linearElementEditor });
             }
           }
-          if (ret.didAddPoint && !ret.isMidPoint) {
+          if (ret.didAddPoint) {
             return true;
           }
         }
@@ -4520,7 +4523,6 @@ class App extends React.Component<AppProps, AppState> {
       // to ensure we don't create a 2-point arrow by mistake when
       // user clicks mouse in a way that it moves a tiny bit (thus
       // triggering pointermove)
-
       if (
         !pointerDownState.drag.hasOccurred &&
         (this.state.activeTool.type === "arrow" ||
@@ -4548,6 +4550,56 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.selectedLinearElement) {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
+
+        if (
+          LinearElementEditor.shouldAddMidpoint(
+            this.state.selectedLinearElement,
+            pointerCoords,
+            this.state,
+          )
+        ) {
+          const ret = LinearElementEditor.addMidpoint(
+            this.state.selectedLinearElement,
+            pointerCoords,
+            this.state,
+          );
+          if (!ret) {
+            return;
+          }
+
+          // Since we are reading from previous state which is not possible with
+          // automatic batching in React 18 hence using flush sync to synchronously
+          // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
+
+          flushSync(() => {
+            if (this.state.selectedLinearElement) {
+              this.setState({
+                selectedLinearElement: {
+                  ...this.state.selectedLinearElement,
+                  pointerDownState: ret.pointerDownState,
+                  selectedPointsIndices: ret.selectedPointsIndices,
+                },
+              });
+            }
+            if (this.state.editingLinearElement) {
+              this.setState({
+                editingLinearElement: {
+                  ...this.state.editingLinearElement,
+                  pointerDownState: ret.pointerDownState,
+                  selectedPointsIndices: ret.selectedPointsIndices,
+                },
+              });
+            }
+          });
+
+          return;
+        } else if (
+          linearElementEditor.pointerDownState.segmentMidpoint.value !== null &&
+          !linearElementEditor.pointerDownState.segmentMidpoint.added
+        ) {
+          return;
+        }
+
         const didDrag = LinearElementEditor.handlePointDragging(
           event,
           this.state,
