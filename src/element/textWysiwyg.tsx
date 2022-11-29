@@ -28,6 +28,7 @@ import {
   getContainerElement,
   getTextElementAngle,
   measureText,
+  normalizeText,
   wrapText,
 } from "./textElement";
 import {
@@ -39,16 +40,6 @@ import App from "../components/App";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
-
-const normalizeText = (text: string) => {
-  return (
-    text
-      // replace tabs with spaces so they render and measure correctly
-      .replace(/\t/g, "        ")
-      // normalize newlines
-      .replace(/\r?\n|\r/g, "\n")
-  );
-};
 
 const getTransform = (
   width: number,
@@ -306,7 +297,7 @@ export const textWysiwyg = ({
   if (onChange) {
     editable.onpaste = async (event) => {
       event.preventDefault();
-      const clipboardData = await parseClipboard(event);
+      const clipboardData = await parseClipboard(event, true);
       if (!clipboardData.text) {
         return;
       }

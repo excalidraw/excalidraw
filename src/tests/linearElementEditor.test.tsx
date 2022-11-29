@@ -140,6 +140,28 @@ describe("Test Linear Elements", () => {
     Keyboard.keyPress(KEYS.DELETE);
   };
 
+  it("should not drag line and add midpoint until dragged beyond a threshold", () => {
+    createTwoPointerLinearElement("line");
+    const line = h.elements[0] as ExcalidrawLinearElement;
+    const originalX = line.x;
+    const originalY = line.y;
+    expect(line.points.length).toEqual(2);
+
+    mouse.clickAt(midpoint[0], midpoint[1]);
+    drag(midpoint, [midpoint[0] + 1, midpoint[1] + 1]);
+
+    expect(line.points.length).toEqual(2);
+
+    expect(line.x).toBe(originalX);
+    expect(line.y).toBe(originalY);
+    expect(line.points.length).toEqual(2);
+
+    drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
+    expect(line.x).toBe(originalX);
+    expect(line.y).toBe(originalY);
+    expect(line.points.length).toEqual(3);
+  });
+
   it("should allow dragging line from midpoint in 2 pointer lines outside editor", async () => {
     createTwoPointerLinearElement("line");
     const line = h.elements[0] as ExcalidrawLinearElement;
@@ -149,7 +171,7 @@ describe("Test Linear Elements", () => {
 
     // drag line from midpoint
     drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
-    expect(renderScene).toHaveBeenCalledTimes(10);
+    expect(renderScene).toHaveBeenCalledTimes(11);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
       Array [
@@ -216,6 +238,24 @@ describe("Test Linear Elements", () => {
   });
 
   describe("Inside editor", () => {
+    it("should not drag line and add midpoint when dragged irrespective of threshold", () => {
+      createTwoPointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      const originalX = line.x;
+      const originalY = line.y;
+      enterLineEditingMode(line);
+
+      expect(line.points.length).toEqual(2);
+
+      mouse.clickAt(midpoint[0], midpoint[1]);
+      expect(line.points.length).toEqual(2);
+
+      drag(midpoint, [midpoint[0] + 1, midpoint[1] + 1]);
+      expect(line.x).toBe(originalX);
+      expect(line.y).toBe(originalY);
+      expect(line.points.length).toEqual(3);
+    });
+
     it("should allow dragging line from midpoint in 2 pointer lines", async () => {
       createTwoPointerLinearElement("line");
 
@@ -224,7 +264,7 @@ describe("Test Linear Elements", () => {
 
       // drag line from midpoint
       drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
-      expect(renderScene).toHaveBeenCalledTimes(14);
+      expect(renderScene).toHaveBeenCalledTimes(15);
 
       expect(line.points.length).toEqual(3);
       expect(line.points).toMatchInlineSnapshot(`
@@ -303,7 +343,7 @@ describe("Test Linear Elements", () => {
       // Move the element
       drag(startPoint, endPoint);
 
-      expect(renderScene).toHaveBeenCalledTimes(15);
+      expect(renderScene).toHaveBeenCalledTimes(16);
       expect([line.x, line.y]).toEqual([
         points[0][0] + deltaX,
         points[0][1] + deltaY,
@@ -360,7 +400,7 @@ describe("Test Linear Elements", () => {
           lastSegmentMidpoint[1] + delta,
         ]);
 
-        expect(renderScene).toHaveBeenCalledTimes(19);
+        expect(renderScene).toHaveBeenCalledTimes(21);
         expect(line.points.length).toEqual(5);
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
@@ -380,7 +420,7 @@ describe("Test Linear Elements", () => {
             ],
             Array [
               105,
-              75,
+              70,
             ],
             Array [
               40,
@@ -399,7 +439,7 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] - delta, hitCoords[1] - delta]);
 
-        expect(renderScene).toHaveBeenCalledTimes(15);
+        expect(renderScene).toHaveBeenCalledTimes(16);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -425,7 +465,7 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
-        expect(renderScene).toHaveBeenCalledTimes(15);
+        expect(renderScene).toHaveBeenCalledTimes(16);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -459,7 +499,7 @@ describe("Test Linear Elements", () => {
         // delete 3rd point
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
-        expect(renderScene).toHaveBeenCalledTimes(21);
+        expect(renderScene).toHaveBeenCalledTimes(22);
 
         const newMidPoints = LinearElementEditor.getEditorMidPoints(
           line,
@@ -503,7 +543,7 @@ describe("Test Linear Elements", () => {
           lastSegmentMidpoint[0] + delta,
           lastSegmentMidpoint[1] + delta,
         ]);
-        expect(renderScene).toHaveBeenCalledTimes(19);
+        expect(renderScene).toHaveBeenCalledTimes(21);
 
         expect(line.points.length).toEqual(5);
 
@@ -523,8 +563,8 @@ describe("Test Linear Elements", () => {
               50,
             ],
             Array [
-              104.58050066266131,
-              74.24758482724201,
+              106.08587175006699,
+              73.29416593965323,
             ],
             Array [
               40,
@@ -579,7 +619,7 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
-        expect(renderScene).toHaveBeenCalledTimes(15);
+        expect(renderScene).toHaveBeenCalledTimes(16);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -647,7 +687,6 @@ describe("Test Linear Elements", () => {
           fillStyle: "solid",
         }),
       ];
-
       const dragEndPositionOffset = [100, 100] as const;
       API.setSelectedElements([line]);
       enterLineEditingMode(line, true);
@@ -772,8 +811,8 @@ describe("Test Linear Elements", () => {
         );
         expect(position).toMatchInlineSnapshot(`
           Object {
-            "x": 100.32201843191861,
-            "y": 85.63461309860818,
+            "x": 85.82201843191861,
+            "y": 75.63461309860818,
           }
         `);
       });
