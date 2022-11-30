@@ -1099,5 +1099,27 @@ describe("textWysiwyg", () => {
         { id: text.id, type: "text" },
       ]);
     });
+
+    it("should scale font size correctly when resizing using shift", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello" } });
+      editor.blur();
+      const textElement = h.elements[1] as ExcalidrawTextElement;
+      expect(rectangle.width).toBe(90);
+      expect(rectangle.height).toBe(75);
+      expect(textElement.fontSize).toBe(20);
+
+      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 50], {
+        shift: true,
+      });
+      expect(rectangle.width).toBe(200);
+      expect(rectangle.height).toBe(166.66666666666669);
+      expect(textElement.fontSize).toBe(47.5);
+    });
   });
 });
