@@ -28,8 +28,7 @@ export const canChangeSharpness = (type: string) =>
   type === "rectangle" ||
   type === "arrow" ||
   type === "line" ||
-  type === "diamond" ||
-  type === "selection";
+  type === "diamond";
 
 export const hasText = (type: string) => type === "text";
 

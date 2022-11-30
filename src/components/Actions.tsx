@@ -114,11 +114,12 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeSharpness")}</>
       )}
 
-      {appState.currentItemStrokeSharpness === "round" &&
-        (canChangeRadius(appState.activeTool.type) ||
-          targetElements.some((element) => canChangeRadius(element.type))) && (
-          <>{renderAction("changeRadius")}</>
-        )}
+      {(canChangeRadius(appState.activeTool.type) ||
+        targetElements.some(
+          (element) =>
+            canChangeRadius(element.type) &&
+            element.strokeSharpness === "round",
+        )) && <>{renderAction("changeRadius")}</>}
 
       {(hasText(appState.activeTool.type) ||
         targetElements.some((element) => hasText(element.type))) && (
