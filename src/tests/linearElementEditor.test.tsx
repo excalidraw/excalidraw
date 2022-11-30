@@ -9,7 +9,7 @@ import ExcalidrawApp from "../excalidraw-app";
 import { centerPoint } from "../math";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
-import { Keyboard, Pointer } from "./helpers/ui";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { screen, render, fireEvent, GlobalTestState } from "./test-utils";
 import { API } from "../tests/helpers/api";
 import { Point } from "../types";
@@ -19,6 +19,7 @@ import { queryByTestId, queryByText } from "@testing-library/react";
 import { resize, rotate } from "./utils";
 import { getBoundTextElementPosition, wrapText } from "../element/textElement";
 import { getMaxContainerWidth } from "../element/newElement";
+import * as textElementUtils from "../element/textElement";
 
 const renderScene = jest.spyOn(Renderer, "renderScene");
 
@@ -725,6 +726,7 @@ describe("Test Linear Elements", () => {
         width: 30,
         height: 20,
       }) as ExcalidrawTextElementWithContainer;
+
       container = {
         ...container,
         boundElements: (container.boundElements || []).concat({
@@ -1102,6 +1104,66 @@ describe("Test Linear Elements", () => {
       ) as HTMLTextAreaElement;
       expect(editor.style.padding).toBe("0px 5px");
       expect(editor.style.left).toBe("34.5px");
+    });
+
+    it("should wrap the bound text when arrow bound container moves", async () => {
+      const rect = UI.createElement("rectangle", {
+        x: 400,
+        width: 200,
+        height: 500,
+      });
+      const arrow = UI.createElement("arrow", {
+        x: 210,
+        y: 250,
+        width: 400,
+        height: 1,
+      });
+
+      mouse.select(arrow);
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: DEFAULT_TEXT } });
+      editor.blur();
+
+      const textElement = h.elements[2] as ExcalidrawTextElementWithContainer;
+
+      expect(arrow.endBinding?.elementId).toBe(rect.id);
+      expect(arrow.width).toBe(400);
+      expect(rect.x).toBe(400);
+      expect(rect.y).toBe(0);
+      expect(
+        wrapText(textElement.originalText, font, getMaxContainerWidth(arrow)),
+      ).toMatchInlineSnapshot(`
+        "Online whiteboard collaboration
+        made easy"
+      `);
+      const handleBindTextResizeSpy = jest.spyOn(
+        textElementUtils,
+        "handleBindTextResize",
+      );
+
+      mouse.select(rect);
+      mouse.downAt(rect.x, rect.y);
+      mouse.moveTo(200, 0);
+      mouse.upAt(200, 0);
+
+      expect(arrow.width).toBe(170);
+      expect(rect.x).toBe(200);
+      expect(rect.y).toBe(0);
+      expect(handleBindTextResizeSpy).toHaveBeenCalledWith(
+        h.elements[1],
+        false,
+      );
+      expect(
+        wrapText(textElement.originalText, font, getMaxContainerWidth(arrow)),
+      ).toMatchInlineSnapshot(`
+        "Online whiteboard 
+        collaboration made 
+        easy"
+      `);
     });
   });
 });

@@ -317,6 +317,7 @@ export const updateBoundElements = (
   if (boundLinearElements.length === 0) {
     return;
   }
+
   const { newSize, simultaneouslyUpdated } = options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
@@ -335,6 +336,7 @@ export const updateBoundElements = (
     if (!doesNeedUpdate(element, bindableElement)) {
       return;
     }
+
     const startBinding = maybeCalculateNewGapWhenScaling(
       bindableElement,
       element.startBinding,
@@ -350,6 +352,7 @@ export const updateBoundElements = (
       mutateElement(element, { startBinding, endBinding });
       return;
     }
+
     updateBoundPoint(
       element,
       "start",
@@ -362,7 +365,9 @@ export const updateBoundElements = (
       endBinding,
       changedElement as ExcalidrawBindableElement,
     );
+
     const boundText = getBoundTextElement(element);
+
     if (boundText) {
       handleBindTextResize(element, false);
     }
