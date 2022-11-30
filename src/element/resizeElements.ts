@@ -20,6 +20,7 @@ import {
   getCommonBoundingBox,
 } from "./bounds";
 import {
+  isBoundToContainer,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
@@ -39,9 +40,11 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
+  getContainerElement,
   handleBindTextResize,
   measureText,
 } from "./textElement";
+import { getMaxContainerWidth } from "./newElement";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -182,14 +185,21 @@ const measureFontSizeFromWH = (
   nextHeight: number,
 ): { size: number; baseline: number } | null => {
   // We only use width to scale font on resize
-  const nextFontSize = element.fontSize * (nextWidth / element.width);
+  let width = element.width;
+
+  const hasContainer = isBoundToContainer(element);
+  if (hasContainer) {
+    const container = getContainerElement(element)!;
+    width = getMaxContainerWidth(container);
+  }
+  const nextFontSize = element.fontSize * (nextWidth / width);
   if (nextFontSize < MIN_FONT_SIZE) {
     return null;
   }
   const metrics = measureText(
     element.text,
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
-    element.containerId ? element.width : null,
+    hasContainer ? width : null,
   );
   return {
     size: nextFontSize,
