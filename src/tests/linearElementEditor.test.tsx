@@ -1092,5 +1092,16 @@ describe("Test Linear Elements", () => {
       expect(queryByTestId(container, "align-middle")).toBeNull();
       expect(queryByTestId(container, "align-bottom")).toBeNull();
     });
+
+    it("should add a padding of 5px when container is arrow", () => {
+      createTwoPointerLinearElement("arrow");
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      expect(editor.style.padding).toBe("0px 5px");
+      expect(editor.style.left).toBe("34.5px");
+    });
   });
 });

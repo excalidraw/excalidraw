@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, VERTICAL_ALIGN } from "../constants";
+import { BOUND_TEXT_PADDING, CLASSES, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -222,13 +222,16 @@ export const textWysiwyg = ({
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
+      const left = isArrowElement(container)
+        ? viewportX - BOUND_TEXT_PADDING
+        : viewportX;
       Object.assign(editable.style, {
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
         width: `${Math.min(width, maxWidth)}px`,
         height: `${height}px`,
-        left: `${viewportX}px`,
+        left: `${left}px`,
         top: `${viewportY}px`,
         transform: getTransform(
           width,
@@ -270,16 +273,16 @@ export const textWysiwyg = ({
     whiteSpace = "pre-wrap";
     wordBreak = "break-word";
   }
-  const background = isArrowElement(getContainerElement(element))
-    ? "#fff"
-    : "transparent";
+  const isContainerArrow = isArrowElement(getContainerElement(element));
+  const background = isContainerArrow ? "#fff" : "transparent";
+  const padding = isContainerArrow ? `0 ${BOUND_TEXT_PADDING}px` : "0";
   Object.assign(editable.style, {
     position: "absolute",
     display: "inline-block",
     minHeight: "1em",
     backfaceVisibility: "hidden",
     margin: 0,
-    padding: 0,
+    padding,
     border: 0,
     outline: 0,
     resize: "none",
