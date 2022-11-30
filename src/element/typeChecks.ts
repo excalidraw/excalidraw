@@ -139,6 +139,9 @@ export const isBoundToContainer = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawTextElementWithContainer => {
   return (
-    element !== null && isTextElement(element) && element.containerId !== null
+    element !== null &&
+    "containerId" in element &&
+    element.containerId !== null &&
+    isTextElement(element)
   );
 };
