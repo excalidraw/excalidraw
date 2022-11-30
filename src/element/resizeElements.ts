@@ -404,8 +404,8 @@ export const resizeSingleElement = (
     if (shouldMaintainAspectRatio) {
       const nextFont = measureFontSizeFromWH(
         boundTextElement,
-        eleNewWidth - BOUND_TEXT_PADDING * 2,
-        eleNewHeight - BOUND_TEXT_PADDING * 2,
+        boundTextElement.width * scaleX,
+        boundTextElement.height * scaleY,
       );
       if (nextFont === null) {
         return;
