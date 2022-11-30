@@ -419,10 +419,10 @@ const generateElementShape = (
           const h = element.height;
           let r: number;
           switch (element.strokeSharpness) {
-            case "fixed":
+            case "round":
               r = element.radius;
               break;
-            case "round":
+            case "smart-default":
               r = getDefaultCornerRadius(Math.min(w, h));
               break;
             default:
@@ -455,10 +455,10 @@ const generateElementShape = (
         if (element.strokeSharpness !== "sharp") {
           let r: number;
           switch (element.strokeSharpness) {
-            case "fixed":
+            case "round":
               r = element.radius;
               break;
-            case "round":
+            case "smart-default":
               r = getDefaultCornerRadius(
                 Math.min(element.width, element.height),
               );

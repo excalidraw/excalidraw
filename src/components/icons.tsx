@@ -1244,7 +1244,7 @@ export const EdgeRoundIcon = createIcon(
   tablerIconProps,
 );
 
-export const EdgeFixedIcon = createIcon(
+export const EdgeRatioIcon = createIcon(
   <g
     strokeWidth="1.5"
     stroke="currentColor"

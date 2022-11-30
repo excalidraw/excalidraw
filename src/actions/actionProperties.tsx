@@ -37,7 +37,7 @@ import {
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
-  EdgeFixedIcon,
+  EdgeRatioIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -82,7 +82,7 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
-import { canSetRadius, hasStrokeColor } from "../scene/comparisons";
+import { canChangeRadius, hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
@@ -891,9 +891,9 @@ export const actionChangeSharpness = register({
       appState,
     );
 
-    const hasRectangularElements = targetElements.some((el) =>
-      canSetRadius(el.type),
-    );
+    const shouldShowRectangularOption =
+      canChangeRadius(appState.activeTool.type) ||
+      targetElements.some((el) => canChangeRadius(el.type));
 
     return (
       <fieldset>
@@ -906,18 +906,24 @@ export const actionChangeSharpness = register({
               text: t("labels.sharp"),
               icon: EdgeSharpIcon,
             },
-            {
-              value: "round",
-              text: t("labels.round"),
-              icon: EdgeRoundIcon,
-            },
+            shouldShowRectangularOption
+              ? {
+                  value: "smart-default",
+                  text: t("labels.smartDefault"),
+                  icon: EdgeRoundIcon,
+                }
+              : {
+                  value: "round",
+                  text: t("labels.round"),
+                  icon: EdgeRoundIcon,
+                },
           ].concat(
-            hasRectangularElements || canSetRadius(appState.activeTool.type)
+            shouldShowRectangularOption
               ? [
                   {
-                    value: "fixed",
-                    text: t("labels.fixed"),
-                    icon: EdgeFixedIcon,
+                    value: "round",
+                    text: t("labels.ratio"),
+                    icon: EdgeRatioIcon,
                   },
                 ]
               : [],
@@ -959,14 +965,14 @@ export const actionChangeRadius = register({
       ),
       appState: {
         ...appState,
-        currentItemFixedRadius: value,
+        currentItemRadiusRatio: value,
       },
       commitToHistory: true,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <label className="control-label">
-      {t("labels.radius")}
+      {t("labels.radius_ratio")}
       <input
         type="range"
         min={`${SMALLEST_RECTANGULAR_RADIUS}`}
@@ -975,7 +981,7 @@ export const actionChangeRadius = register({
         onChange={(event) => updateData(+event.target.value)}
         value={
           getFormValue(elements, appState, (element) => element.radius) ??
-          appState.currentItemFixedRadius ??
+          appState.currentItemRadiusRatio ??
           RECTANGULAR_DEFAULT_RADIUS
         }
       />

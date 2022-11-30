@@ -241,7 +241,7 @@ export default function App() {
             locked: false,
             link: null,
             updated: 1,
-            strokeSharpness: "round",
+            strokeSharpness: "smart-default",
             radius: RECTANGULAR_DEFAULT_RADIUS,
           },
         ],

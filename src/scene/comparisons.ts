@@ -35,7 +35,7 @@ export const hasText = (type: string) => type === "text";
 
 export const canHaveArrowheads = (type: string) => type === "arrow";
 
-export const canSetRadius = (type: string) =>
+export const canChangeRadius = (type: string) =>
   type === "rectangle" || type === "diamond";
 
 export const getElementAtPosition = (

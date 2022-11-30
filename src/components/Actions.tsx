@@ -23,7 +23,7 @@ import {
 } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
-import { canSetRadius, hasStrokeColor } from "../scene/comparisons";
+import { canChangeRadius, hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
 import clsx from "clsx";
@@ -114,9 +114,9 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeSharpness")}</>
       )}
 
-      {appState.currentItemStrokeSharpness === "fixed" &&
-        (canSetRadius(appState.activeTool.type) ||
-          targetElements.some((element) => canSetRadius(element.type))) && (
+      {appState.currentItemStrokeSharpness === "round" &&
+        (canChangeRadius(appState.activeTool.type) ||
+          targetElements.some((element) => canChangeRadius(element.type))) && (
           <>{renderAction("changeRadius")}</>
         )}
 

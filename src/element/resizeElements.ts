@@ -410,18 +410,18 @@ const resizeSingleTextElement = (
   }
 };
 
-export const getDefaultRadiusOfRectangularElement = (
+export const getRadiusOfRectangularElement = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
 ) => {
   if (element.type === "rectangle" || element.type === "diamond") {
-    if (element.strokeSharpness === "round") {
+    if (element.strokeSharpness === "smart-default") {
       return {
         radius: getDefaultCornerRadius(Math.min(element.width, element.height)),
       };
     }
     return {
-      radius: appState.currentItemFixedRadius ?? RECTANGULAR_DEFAULT_RADIUS,
+      radius: appState.currentItemRadiusRatio ?? RECTANGULAR_DEFAULT_RADIUS,
     };
   }
   return {};
@@ -640,7 +640,7 @@ export const resizeSingleElement = (
     x: newOrigin[0],
     y: newOrigin[1],
     ...rescaledPoints,
-    ...getDefaultRadiusOfRectangularElement(element, appState),
+    ...getRadiusOfRectangularElement(element, appState),
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {

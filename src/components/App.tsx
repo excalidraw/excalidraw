@@ -4229,9 +4229,9 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
       radius:
-        this.state.currentItemStrokeSharpness === "fixed"
-          ? this.state.currentItemFixedRadius ?? RECTANGULAR_DEFAULT_RADIUS
-          : this.state.currentItemStrokeSharpness === "round"
+        this.state.currentItemStrokeSharpness === "round"
+          ? this.state.currentItemRadiusRatio ?? RECTANGULAR_DEFAULT_RADIUS
+          : this.state.currentItemStrokeSharpness === "smart-default"
           ? RECTANGULAR_DEFAULT_RADIUS
           : 0,
       locked: false,
