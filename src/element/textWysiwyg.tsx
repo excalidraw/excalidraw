@@ -297,6 +297,7 @@ export const textWysiwyg = ({
     // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
     whiteSpace,
     overflowWrap: "break-word",
+    boxSizing: "content-box",
   });
   updateWysiwygStyle();
 
