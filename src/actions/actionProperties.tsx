@@ -79,7 +79,7 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
-import { hasStrokeColor } from "../scene/comparisons";
+import { canChangeRadius, hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
@@ -863,11 +863,10 @@ export const actionChangeSharpness = register({
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
           strokeSharpness: value,
-          // old rectangular elements can be converted to using the new rounded corners
-          // by switching to "sharp" then "round"
-          ...(value === "round" && el.factor === "previous"
-            ? { factor: appState.currentItemRadiusFactor }
-            : {}),
+          radius:
+            value === "round" && canChangeRadius(el.type)
+              ? appState.currentItemFixedRadius
+              : null,
         }),
       ),
       appState: {

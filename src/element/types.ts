@@ -26,7 +26,7 @@ type _ExcalidrawElementBase = Readonly<{
   strokeWidth: number;
   strokeStyle: StrokeStyle;
   strokeSharpness: StrokeSharpness;
-  factor: number | "previous";
+  radius: number | null;
   roughness: number;
   opacity: number;
   width: number;

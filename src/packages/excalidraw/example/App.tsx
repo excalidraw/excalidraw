@@ -13,7 +13,7 @@ import {
   withBatchedUpdates,
   withBatchedUpdatesThrottled,
 } from "../../../utils";
-import { DEFAULT_RECTANGULAR_RADIUS, EVENT } from "../../../constants";
+import { DEFAULT_RECTANGULAR_FIXED_RADIUS, EVENT } from "../../../constants";
 import { distance2d } from "../../../math";
 import { fileOpen } from "../../../data/filesystem";
 import { loadSceneOrLibraryFromBlob } from "../../utils";
@@ -242,7 +242,7 @@ export default function App() {
             link: null,
             updated: 1,
             strokeSharpness: "round",
-            factor: DEFAULT_RECTANGULAR_RADIUS,
+            radius: DEFAULT_RECTANGULAR_FIXED_RADIUS,
           },
         ],
         null,

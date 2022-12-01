@@ -469,7 +469,7 @@ const generateElementShape = (
             C ${topX} ${topY}, ${topX} ${topY}, ${
               topX + getCornerRadius(rightX - topX, element)
             } ${topY + getCornerRadius(rightY - topY, element)}`,
-            generateRoughOptions(element, true),
+            generateRoughOptions(element),
           );
         } else {
           shape = generator.polygon(

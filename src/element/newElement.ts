@@ -30,9 +30,10 @@ import {
 } from "./textElement";
 import {
   BOUND_TEXT_PADDING,
-  DEFAULT_RECTANGULAR_RADIUS,
+  DEFAULT_RECTANGULAR_FIXED_RADIUS,
   VERTICAL_ALIGN,
 } from "../constants";
+import { canChangeRadius } from "../scene/comparisons";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -45,7 +46,7 @@ type ElementConstructorOpts = MarkOptional<
   | "version"
   | "versionNonce"
   | "link"
-  | "factor"
+  | "radius"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -65,7 +66,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     angle = 0,
     groupIds = [],
     strokeSharpness,
-    factor = DEFAULT_RECTANGULAR_RADIUS,
+    radius,
     boundElements = null,
     link = null,
     locked,
@@ -89,7 +90,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     opacity,
     groupIds,
     strokeSharpness,
-    factor,
+    radius: canChangeRadius(type) ? DEFAULT_RECTANGULAR_FIXED_RADIUS : null,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
     versionNonce: rest.versionNonce ?? 0,
