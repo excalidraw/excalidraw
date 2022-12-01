@@ -371,6 +371,7 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
           continue;
         }
         if (key === "boundElements") {
+          tmp[key] = null;
           continue;
         }
         tmp[key] = deepCopyElement(val[key], depth + 1);
