@@ -370,6 +370,10 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
         if (depth === 0 && (key === "shape" || key === "canvas")) {
           continue;
         }
+        if (key === "boundElements") {
+          tmp[key] = null;
+          continue;
+        }
         tmp[key] = deepCopyElement(val[key], depth + 1);
       }
     }
@@ -409,6 +413,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   overrides?: Partial<TElement>,
 ): TElement => {
   let copy: TElement = deepCopyElement(element);
+
   if (isTestEnv()) {
     copy.id = `${copy.id}_copy`;
     // `window.h` may not be defined in some unit tests
