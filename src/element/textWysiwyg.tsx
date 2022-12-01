@@ -225,6 +225,9 @@ export const textWysiwyg = ({
       const left = isArrowElement(container)
         ? viewportX - BOUND_TEXT_PADDING
         : viewportX;
+      const top = isArrowElement(container)
+        ? viewportY - BOUND_TEXT_PADDING
+        : viewportY;
       Object.assign(editable.style, {
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -232,7 +235,7 @@ export const textWysiwyg = ({
         width: `${Math.min(width, maxWidth)}px`,
         height: `${height}px`,
         left: `${left}px`,
-        top: `${viewportY}px`,
+        top: `${top}px`,
         transform: getTransform(
           width,
           height,
@@ -275,7 +278,7 @@ export const textWysiwyg = ({
   }
   const isContainerArrow = isArrowElement(getContainerElement(element));
   const background = isContainerArrow ? "#fff" : "transparent";
-  const padding = isContainerArrow ? `0 ${BOUND_TEXT_PADDING}px` : "0";
+  const padding = isContainerArrow ? `${BOUND_TEXT_PADDING}px` : "0";
   Object.assign(editable.style, {
     position: "absolute",
     display: "inline-block",

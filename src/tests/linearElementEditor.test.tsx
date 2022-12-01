@@ -1102,8 +1102,9 @@ describe("Test Linear Elements", () => {
       const editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
-      expect(editor.style.padding).toBe("0px 5px");
+      expect(editor.style.padding).toBe("5px");
       expect(editor.style.left).toBe("34.5px");
+      expect(editor.style.top).toBe("15px");
     });
 
     it("should wrap the bound text when arrow bound container moves", async () => {
