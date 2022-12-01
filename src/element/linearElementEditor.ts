@@ -1293,11 +1293,15 @@ export class LinearElementEditor {
       y = midPoint[1] - boundTextElement.height / 2;
     } else {
       const index = element.points.length / 2 - 1;
+
       let midSegmentMidpoint = editorMidPointsCache.points[index];
       if (element.points.length === 2) {
         midSegmentMidpoint = centerPoint(points[0], points[1]);
       }
-      if (!midSegmentMidpoint) {
+      if (
+        !midSegmentMidpoint ||
+        editorMidPointsCache.version !== element.version
+      ) {
         midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
           element,
           points[index],
