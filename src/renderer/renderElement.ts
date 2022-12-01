@@ -666,7 +666,8 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.canvasZoom !== zoom.value &&
     !renderConfig?.shouldCacheIgnoreZoom;
-  const boundTextElementVersion = getBoundTextElement(element)?.version;
+  const boundTextElementVersion = getBoundTextElement(element)?.version || null;
+
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
