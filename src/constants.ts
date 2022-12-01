@@ -216,6 +216,10 @@ export const TEXT_ALIGN = {
 
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 
+// in the range of 0 - 1, controls how round the rectangular elements' radii are
+export const DEFAULT_RECTANGULAR_RADIUS = 0.6;
+export const PREVIOUS_RECTANGULAR_RADIUS = 0.5;
+
 export const COOKIES = {
   AUTH_STATE_COOKIE: "excplus-auth",
 } as const;

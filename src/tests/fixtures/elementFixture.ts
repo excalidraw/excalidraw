@@ -1,3 +1,4 @@
+import { DEFAULT_RECTANGULAR_RADIUS } from "../../constants";
 import { ExcalidrawElement } from "../../element/types";
 
 const elementBase: Omit<ExcalidrawElement, "type"> = {
@@ -16,6 +17,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   opacity: 100,
   groupIds: [],
   strokeSharpness: "sharp",
+  factor: DEFAULT_RECTANGULAR_RADIUS,
   seed: 1041657908,
   version: 120,
   versionNonce: 1188004276,

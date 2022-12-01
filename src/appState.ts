@@ -2,6 +2,7 @@ import oc from "open-color";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_RECTANGULAR_RADIUS,
   DEFAULT_TEXT_ALIGN,
   EXPORT_SCALES,
   THEME,
@@ -34,6 +35,7 @@ export const getDefaultAppState = (): Omit<
     currentItemStartArrowhead: null,
     currentItemStrokeColor: oc.black,
     currentItemStrokeSharpness: "sharp",
+    currentItemRadiusFactor: DEFAULT_RECTANGULAR_RADIUS,
     currentItemStrokeStyle: "solid",
     currentItemStrokeWidth: 1,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
@@ -130,6 +132,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemStartArrowhead: { browser: true, export: false, server: false },
   currentItemStrokeColor: { browser: true, export: false, server: false },
   currentItemStrokeSharpness: { browser: true, export: false, server: false },
+  currentItemRadiusFactor: { browser: true, export: false, server: false },
   currentItemStrokeStyle: { browser: true, export: false, server: false },
   currentItemStrokeWidth: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },

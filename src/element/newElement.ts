@@ -28,7 +28,11 @@ import {
   normalizeText,
   wrapText,
 } from "./textElement";
-import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+import {
+  BOUND_TEXT_PADDING,
+  DEFAULT_RECTANGULAR_RADIUS,
+  VERTICAL_ALIGN,
+} from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -41,6 +45,7 @@ type ElementConstructorOpts = MarkOptional<
   | "version"
   | "versionNonce"
   | "link"
+  | "factor"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -60,6 +65,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     angle = 0,
     groupIds = [],
     strokeSharpness,
+    factor = DEFAULT_RECTANGULAR_RADIUS,
     boundElements = null,
     link = null,
     locked,
@@ -83,6 +89,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     opacity,
     groupIds,
     strokeSharpness,
+    factor,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
     versionNonce: rest.versionNonce ?? 0,

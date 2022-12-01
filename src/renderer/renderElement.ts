@@ -25,7 +25,7 @@ import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
-import { getDefaultCornerRadius, isPathALoop } from "../math";
+import { getCornerRadius, isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
@@ -417,7 +417,7 @@ const generateElementShape = (
         if (element.strokeSharpness === "round") {
           const w = element.width;
           const h = element.height;
-          const r = getDefaultCornerRadius(Math.min(w, h));
+          const r = getCornerRadius(Math.min(w, h), element);
           shape = generator.path(
             `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
               h - r
@@ -443,32 +443,32 @@ const generateElementShape = (
           getDiamondPoints(element);
         if (element.strokeSharpness === "round") {
           shape = generator.path(
-            `M ${topX + getDefaultCornerRadius(rightX - topX)} ${
-              topY + getDefaultCornerRadius(rightY - topY)
-            } L ${rightX - getDefaultCornerRadius(rightX - topX)} ${
-              rightY - getDefaultCornerRadius(rightY - topY)
+            `M ${topX + getCornerRadius(rightX - topX, element)} ${
+              topY + getCornerRadius(rightY - topY, element)
+            } L ${rightX - getCornerRadius(rightX - topX, element)} ${
+              rightY - getCornerRadius(rightY - topY, element)
             }
             C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
-              rightX - getDefaultCornerRadius(rightX - bottomX)
-            } ${rightY + getDefaultCornerRadius(bottomY - rightY)}
-            L ${bottomX + getDefaultCornerRadius(rightX - bottomX)} ${
-              bottomY - getDefaultCornerRadius(bottomY - rightY)
+              rightX - getCornerRadius(rightX - bottomX, element)
+            } ${rightY + getCornerRadius(bottomY - rightY, element)}
+            L ${bottomX + getCornerRadius(rightX - bottomX, element)} ${
+              bottomY - getCornerRadius(bottomY - rightY, element)
             }
             C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
-              bottomX - getDefaultCornerRadius(bottomX - leftX)
-            } ${bottomY - getDefaultCornerRadius(bottomY - leftY)}
-            L ${leftX + getDefaultCornerRadius(bottomX - leftX)} ${
-              leftY + getDefaultCornerRadius(bottomY - leftY)
+              bottomX - getCornerRadius(bottomX - leftX, element)
+            } ${bottomY - getCornerRadius(bottomY - leftY, element)}
+            L ${leftX + getCornerRadius(bottomX - leftX, element)} ${
+              leftY + getCornerRadius(bottomY - leftY, element)
             }
             C ${leftX} ${leftY}, ${leftX} ${leftY}, ${
-              leftX + getDefaultCornerRadius(topX - leftX)
-            } ${leftY - getDefaultCornerRadius(leftY - topY)}
-            L ${topX - getDefaultCornerRadius(topX - leftX)} ${
-              topY + getDefaultCornerRadius(leftY - topY)
+              leftX + getCornerRadius(topX - leftX, element)
+            } ${leftY - getCornerRadius(leftY - topY, element)}
+            L ${topX - getCornerRadius(topX - leftX, element)} ${
+              topY + getCornerRadius(leftY - topY, element)
             }
             C ${topX} ${topY}, ${topX} ${topY}, ${
-              topX + getDefaultCornerRadius(rightX - topX)
-            } ${topY + getDefaultCornerRadius(rightY - topY)}`,
+              topX + getCornerRadius(rightX - topX, element)
+            } ${topY + getCornerRadius(rightY - topY, element)}`,
             generateRoughOptions(element, true),
           );
         } else {

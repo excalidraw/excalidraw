@@ -114,6 +114,7 @@ const restoreElementWithProperties = <
     strokeSharpness:
       element.strokeSharpness ??
       (isLinearElementType(element.type) ? "round" : "sharp"),
+    factor: element.factor ?? "previous",
     boundElements: element.boundElementIds
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
