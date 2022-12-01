@@ -5,7 +5,7 @@
     "selectAll": "Selecionar tudo",
     "multiSelect": "Adicionar elemento à seleção",
     "moveCanvas": "Mover tela",
-    "cut": "Cortar",
+    "cut": "Recortar",
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
@@ -113,6 +113,10 @@
       "edit": "Editar link",
       "create": "Criar link",
       "label": "Link"
+    },
+    "lineEditor": {
+      "edit": "Editar linha",
+      "exit": "Sair do editor de linha"
     },
     "elementLock": {
       "lock": "Bloquear",

@@ -61,7 +61,18 @@ export type BinaryFileData = {
     | typeof MIME_TYPES.binary;
   id: FileId;
   dataURL: DataURL;
+  /**
+   * Epoch timestamp in milliseconds
+   */
   created: number;
+  /**
+   * Indicates when the file was last retrieved from storage to be loaded
+   * onto the scene. We use this flag to determine whether to delete unused
+   * files from storage.
+   *
+   * Epoch timestamp in milliseconds.
+   */
+  lastRetrieved?: number;
 };
 
 export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
@@ -78,7 +89,9 @@ export type LastActiveToolBeforeEraser =
       customType: string;
     }
   | null;
+
 export type AppState = {
+  showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: string | null;
   draggingElement: NonDeletedExcalidrawElement | null;
@@ -140,11 +153,14 @@ export type AppState = {
     | "backgroundColorPicker"
     | "strokeColorPicker"
     | null;
+  openSidebar: "library" | "customSidebar" | null;
+  openDialog: "imageExport" | "help" | null;
+  isSidebarDocked: boolean;
+
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
   shouldCacheIgnoreZoom: boolean;
-  showHelpDialog: boolean;
   toast: { message: string; closable?: boolean; duration?: number } | null;
   zenModeEnabled: boolean;
   theme: Theme;
@@ -161,8 +177,6 @@ export type AppState = {
   offsetTop: number;
   offsetLeft: number;
 
-  isLibraryOpen: boolean;
-  isLibraryMenuDocked: boolean;
   fileHandle: FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
@@ -313,6 +327,10 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
+  /**
+   * Render function that renders custom <Sidebar /> component.
+   */
+  renderSidebar?: () => JSX.Element | null;
 }
 
 export type SceneData = {
@@ -344,13 +362,17 @@ export type ExportOpts = {
   ) => JSX.Element;
 };
 
+// NOTE at the moment, if action name coressponds to canvasAction prop, its
+// truthiness value will determine whether the action is rendered or not
+// (see manager renderAction). We also override canvasAction values in
+// excalidraw package index.tsx.
 type CanvasActions = {
   changeViewBackgroundColor?: boolean;
   clearCanvas?: boolean;
   export?: false | ExportOpts;
   loadScene?: boolean;
   saveToActiveFile?: boolean;
-  theme?: boolean;
+  toggleTheme?: boolean | null;
   saveAsImage?: boolean;
 };
 
@@ -364,6 +386,7 @@ export type AppProps = Merge<
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;
+    children?: React.ReactNode;
   }
 >;
 
@@ -475,6 +498,7 @@ export type ExcalidrawImperativeAPI = {
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
+  toggleMenu: InstanceType<typeof App>["toggleMenu"];
 };
 
 export type Device = Readonly<{

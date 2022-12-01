@@ -18,11 +18,8 @@ export const CODES = {
   SLASH: "Slash",
   C: "KeyC",
   D: "KeyD",
-  G: "KeyG",
-  F: "KeyF",
   H: "KeyH",
   V: "KeyV",
-  X: "KeyX",
   Z: "KeyZ",
   R: "KeyR",
 } as const;
@@ -47,9 +44,12 @@ export const KEYS = {
   COMMA: ",",
 
   A: "a",
+  C: "c",
   D: "d",
   E: "e",
+  F: "f",
   G: "g",
+  H: "h",
   I: "i",
   L: "l",
   O: "o",
@@ -63,6 +63,17 @@ export const KEYS = {
   Y: "y",
   Z: "z",
   K: "k",
+
+  0: "0",
+  1: "1",
+  2: "2",
+  3: "3",
+  4: "4",
+  5: "5",
+  6: "6",
+  7: "7",
+  8: "8",
+  9: "9",
 } as const;
 
 export type Key = keyof typeof KEYS;

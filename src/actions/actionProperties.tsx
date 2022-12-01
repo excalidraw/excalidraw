@@ -2,37 +2,41 @@ import { AppState } from "../../src/types";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
+// TODO barnabasmolnar/editor-redesign
+// TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
+// ArrowHead icons
 import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
   ArrowheadDotIcon,
   ArrowheadTriangleIcon,
   ArrowheadNoneIcon,
-  EdgeRoundIcon,
-  EdgeSharpIcon,
-  FillCrossHatchIcon,
-  FillHachureIcon,
-  FillSolidIcon,
-  FontFamilyCodeIcon,
-  FontFamilyHandDrawnIcon,
-  FontFamilyNormalIcon,
-  FontSizeExtraLargeIcon,
-  FontSizeLargeIcon,
-  FontSizeMediumIcon,
-  FontSizeSmallIcon,
-  SloppinessArchitectIcon,
-  SloppinessArtistIcon,
-  SloppinessCartoonistIcon,
   StrokeStyleDashedIcon,
   StrokeStyleDottedIcon,
-  StrokeStyleSolidIcon,
-  StrokeWidthIcon,
-  TextAlignCenterIcon,
-  TextAlignLeftIcon,
-  TextAlignRightIcon,
   TextAlignTopIcon,
   TextAlignBottomIcon,
   TextAlignMiddleIcon,
+  FillHachureIcon,
+  FillCrossHatchIcon,
+  FillSolidIcon,
+  SloppinessArchitectIcon,
+  SloppinessArtistIcon,
+  SloppinessCartoonistIcon,
+  StrokeWidthBaseIcon,
+  StrokeWidthBoldIcon,
+  StrokeWidthExtraBoldIcon,
+  FontSizeSmallIcon,
+  FontSizeMediumIcon,
+  FontSizeLargeIcon,
+  FontSizeExtraLargeIcon,
+  EdgeSharpIcon,
+  EdgeRoundIcon,
+  FreedrawIcon,
+  FontFamilyNormalIcon,
+  FontFamilyCodeIcon,
+  TextAlignLeftIcon,
+  TextAlignCenterIcon,
+  TextAlignRightIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -307,17 +311,17 @@ export const actionChangeFillStyle = register({
           {
             value: "hachure",
             text: t("labels.hachure"),
-            icon: <FillHachureIcon theme={appState.theme} />,
+            icon: FillHachureIcon,
           },
           {
             value: "cross-hatch",
             text: t("labels.crossHatch"),
-            icon: <FillCrossHatchIcon theme={appState.theme} />,
+            icon: FillCrossHatchIcon,
           },
           {
             value: "solid",
             text: t("labels.solid"),
-            icon: <FillSolidIcon theme={appState.theme} />,
+            icon: FillSolidIcon,
           },
         ]}
         group="fill"
@@ -358,17 +362,17 @@ export const actionChangeStrokeWidth = register({
           {
             value: 1,
             text: t("labels.thin"),
-            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={2} />,
+            icon: StrokeWidthBaseIcon,
           },
           {
             value: 2,
             text: t("labels.bold"),
-            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={6} />,
+            icon: StrokeWidthBoldIcon,
           },
           {
             value: 4,
             text: t("labels.extraBold"),
-            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={10} />,
+            icon: StrokeWidthExtraBoldIcon,
           },
         ]}
         value={getFormValue(
@@ -407,17 +411,17 @@ export const actionChangeSloppiness = register({
           {
             value: 0,
             text: t("labels.architect"),
-            icon: <SloppinessArchitectIcon theme={appState.theme} />,
+            icon: SloppinessArchitectIcon,
           },
           {
             value: 1,
             text: t("labels.artist"),
-            icon: <SloppinessArtistIcon theme={appState.theme} />,
+            icon: SloppinessArtistIcon,
           },
           {
             value: 2,
             text: t("labels.cartoonist"),
-            icon: <SloppinessCartoonistIcon theme={appState.theme} />,
+            icon: SloppinessCartoonistIcon,
           },
         ]}
         value={getFormValue(
@@ -455,17 +459,17 @@ export const actionChangeStrokeStyle = register({
           {
             value: "solid",
             text: t("labels.strokeStyle_solid"),
-            icon: <StrokeStyleSolidIcon theme={appState.theme} />,
+            icon: StrokeWidthBaseIcon,
           },
           {
             value: "dashed",
             text: t("labels.strokeStyle_dashed"),
-            icon: <StrokeStyleDashedIcon theme={appState.theme} />,
+            icon: StrokeStyleDashedIcon,
           },
           {
             value: "dotted",
             text: t("labels.strokeStyle_dotted"),
-            icon: <StrokeStyleDottedIcon theme={appState.theme} />,
+            icon: StrokeStyleDottedIcon,
           },
         ]}
         value={getFormValue(
@@ -535,25 +539,25 @@ export const actionChangeFontSize = register({
           {
             value: 16,
             text: t("labels.small"),
-            icon: <FontSizeSmallIcon theme={appState.theme} />,
+            icon: FontSizeSmallIcon,
             testId: "fontSize-small",
           },
           {
             value: 20,
             text: t("labels.medium"),
-            icon: <FontSizeMediumIcon theme={appState.theme} />,
+            icon: FontSizeMediumIcon,
             testId: "fontSize-medium",
           },
           {
             value: 28,
             text: t("labels.large"),
-            icon: <FontSizeLargeIcon theme={appState.theme} />,
+            icon: FontSizeLargeIcon,
             testId: "fontSize-large",
           },
           {
             value: 36,
             text: t("labels.veryLarge"),
-            icon: <FontSizeExtraLargeIcon theme={appState.theme} />,
+            icon: FontSizeExtraLargeIcon,
             testId: "fontSize-veryLarge",
           },
         ]}
@@ -658,17 +662,17 @@ export const actionChangeFontFamily = register({
       {
         value: FONT_FAMILY.Virgil,
         text: t("labels.handDrawn"),
-        icon: <FontFamilyHandDrawnIcon theme={appState.theme} />,
+        icon: FreedrawIcon,
       },
       {
         value: FONT_FAMILY.Helvetica,
         text: t("labels.normal"),
-        icon: <FontFamilyNormalIcon theme={appState.theme} />,
+        icon: FontFamilyNormalIcon,
       },
       {
         value: FONT_FAMILY.Cascadia,
         text: t("labels.code"),
-        icon: <FontFamilyCodeIcon theme={appState.theme} />,
+        icon: FontFamilyCodeIcon,
       },
     ];
 
@@ -739,17 +743,17 @@ export const actionChangeTextAlign = register({
             {
               value: "left",
               text: t("labels.left"),
-              icon: <TextAlignLeftIcon theme={appState.theme} />,
+              icon: TextAlignLeftIcon,
             },
             {
               value: "center",
               text: t("labels.center"),
-              icon: <TextAlignCenterIcon theme={appState.theme} />,
+              icon: TextAlignCenterIcon,
             },
             {
               value: "right",
               text: t("labels.right"),
-              icon: <TextAlignRightIcon theme={appState.theme} />,
+              icon: TextAlignRightIcon,
             },
           ]}
           value={getFormValue(
@@ -882,12 +886,12 @@ export const actionChangeSharpness = register({
           {
             value: "sharp",
             text: t("labels.sharp"),
-            icon: <EdgeSharpIcon theme={appState.theme} />,
+            icon: EdgeSharpIcon,
           },
           {
             value: "round",
             text: t("labels.round"),
-            icon: <EdgeRoundIcon theme={appState.theme} />,
+            icon: EdgeRoundIcon,
           },
         ]}
         value={getFormValue(
@@ -949,42 +953,38 @@ export const actionChangeArrowhead = register({
     return (
       <fieldset>
         <legend>{t("labels.arrowheads")}</legend>
-        <div className="iconSelectList">
+        <div className="iconSelectList buttonList">
           <IconPicker
             label="arrowhead_start"
             options={[
               {
                 value: null,
                 text: t("labels.arrowhead_none"),
-                icon: <ArrowheadNoneIcon theme={appState.theme} />,
+                icon: ArrowheadNoneIcon,
                 keyBinding: "q",
               },
               {
                 value: "arrow",
                 text: t("labels.arrowhead_arrow"),
-                icon: (
-                  <ArrowheadArrowIcon theme={appState.theme} flip={!isRTL} />
-                ),
+                icon: <ArrowheadArrowIcon flip={!isRTL} />,
                 keyBinding: "w",
               },
               {
                 value: "bar",
                 text: t("labels.arrowhead_bar"),
-                icon: <ArrowheadBarIcon theme={appState.theme} flip={!isRTL} />,
+                icon: <ArrowheadBarIcon flip={!isRTL} />,
                 keyBinding: "e",
               },
               {
                 value: "dot",
                 text: t("labels.arrowhead_dot"),
-                icon: <ArrowheadDotIcon theme={appState.theme} flip={!isRTL} />,
+                icon: <ArrowheadDotIcon flip={!isRTL} />,
                 keyBinding: "r",
               },
               {
                 value: "triangle",
                 text: t("labels.arrowhead_triangle"),
-                icon: (
-                  <ArrowheadTriangleIcon theme={appState.theme} flip={!isRTL} />
-                ),
+                icon: <ArrowheadTriangleIcon flip={!isRTL} />,
                 keyBinding: "t",
               },
             ]}
@@ -1007,34 +1007,30 @@ export const actionChangeArrowhead = register({
                 value: null,
                 text: t("labels.arrowhead_none"),
                 keyBinding: "q",
-                icon: <ArrowheadNoneIcon theme={appState.theme} />,
+                icon: ArrowheadNoneIcon,
               },
               {
                 value: "arrow",
                 text: t("labels.arrowhead_arrow"),
                 keyBinding: "w",
-                icon: (
-                  <ArrowheadArrowIcon theme={appState.theme} flip={isRTL} />
-                ),
+                icon: <ArrowheadArrowIcon flip={isRTL} />,
               },
               {
                 value: "bar",
                 text: t("labels.arrowhead_bar"),
                 keyBinding: "e",
-                icon: <ArrowheadBarIcon theme={appState.theme} flip={isRTL} />,
+                icon: <ArrowheadBarIcon flip={isRTL} />,
               },
               {
                 value: "dot",
                 text: t("labels.arrowhead_dot"),
                 keyBinding: "r",
-                icon: <ArrowheadDotIcon theme={appState.theme} flip={isRTL} />,
+                icon: <ArrowheadDotIcon flip={isRTL} />,
               },
               {
                 value: "triangle",
                 text: t("labels.arrowhead_triangle"),
-                icon: (
-                  <ArrowheadTriangleIcon theme={appState.theme} flip={isRTL} />
-                ),
+                icon: <ArrowheadTriangleIcon flip={isRTL} />,
                 keyBinding: "t",
               },
             ]}

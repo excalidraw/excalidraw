@@ -21,7 +21,13 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
-import { getContainerElement, measureText, wrapText } from "./textElement";
+import {
+  getContainerDims,
+  getContainerElement,
+  measureText,
+  normalizeText,
+  wrapText,
+} from "./textElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
@@ -128,12 +134,13 @@ export const newTextElement = (
     containerId?: ExcalidrawRectangleElement["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const metrics = measureText(opts.text, getFontString(opts));
+  const text = normalizeText(opts.text);
+  const metrics = measureText(text, getFontString(opts));
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
-      text: opts.text,
+      text,
       fontSize: opts.fontSize,
       fontFamily: opts.fontFamily,
       textAlign: opts.textAlign,
@@ -144,7 +151,7 @@ export const newTextElement = (
       height: metrics.height,
       baseline: metrics.baseline,
       containerId: opts.containerId || null,
-      originalText: opts.text,
+      originalText: text,
     },
     {},
   );
@@ -164,7 +171,7 @@ const getAdjustedDimensions = (
   let maxWidth = null;
   const container = getContainerElement(element);
   if (container) {
-    maxWidth = container.width - BOUND_TEXT_PADDING * 2;
+    maxWidth = getMaxContainerWidth(container);
   }
   const {
     width: nextWidth,
@@ -224,15 +231,16 @@ const getAdjustedDimensions = (
   // make sure container dimensions are set properly when
   // text editor overflows beyond viewport dimensions
   if (container) {
-    let height = container.height;
-    let width = container.width;
+    const containerDims = getContainerDims(container);
+    let height = containerDims.height;
+    let width = containerDims.width;
     if (nextHeight > height - BOUND_TEXT_PADDING * 2) {
       height = nextHeight + BOUND_TEXT_PADDING * 2;
     }
     if (nextWidth > width - BOUND_TEXT_PADDING * 2) {
       width = nextWidth + BOUND_TEXT_PADDING * 2;
     }
-    if (height !== container.height || width !== container.width) {
+    if (height !== containerDims.height || width !== containerDims.width) {
       mutateElement(container, { height, width });
     }
   }
@@ -245,8 +253,32 @@ const getAdjustedDimensions = (
   };
 };
 
+export const refreshTextDimensions = (
+  textElement: ExcalidrawTextElement,
+  text = textElement.text,
+) => {
+  const container = getContainerElement(textElement);
+  if (container) {
+    text = wrapText(
+      text,
+      getFontString(textElement),
+      getMaxContainerWidth(container),
+    );
+  }
+  const dimensions = getAdjustedDimensions(textElement, text);
+  return { text, ...dimensions };
+};
+
+export const getMaxContainerWidth = (container: ExcalidrawElement) => {
+  return getContainerDims(container).width - BOUND_TEXT_PADDING * 2;
+};
+
+export const getMaxContainerHeight = (container: ExcalidrawElement) => {
+  return getContainerDims(container).height - BOUND_TEXT_PADDING * 2;
+};
+
 export const updateTextElement = (
-  element: ExcalidrawTextElement,
+  textElement: ExcalidrawTextElement,
   {
     text,
     isDeleted,
@@ -257,16 +289,10 @@ export const updateTextElement = (
     originalText: string;
   },
 ): ExcalidrawTextElement => {
-  const container = getContainerElement(element);
-  if (container) {
-    text = wrapText(text, getFontString(element), container.width);
-  }
-  const dimensions = getAdjustedDimensions(element, text);
-  return newElementWith(element, {
-    text,
+  return newElementWith(textElement, {
     originalText,
-    isDeleted: isDeleted ?? element.isDeleted,
-    ...dimensions,
+    isDeleted: isDeleted ?? textElement.isDeleted,
+    ...refreshTextDimensions(textElement, originalText),
   });
 };
 
@@ -308,6 +334,9 @@ export const newLinearElement = (
 export const newImageElement = (
   opts: {
     type: ExcalidrawImageElement["type"];
+    status?: ExcalidrawImageElement["status"];
+    fileId?: ExcalidrawImageElement["fileId"];
+    scale?: ExcalidrawImageElement["scale"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
   return {
@@ -315,9 +344,9 @@ export const newImageElement = (
     // in the future we'll support changing stroke color for some SVG elements,
     // and `transparent` will likely mean "use original colors of the image"
     strokeColor: "transparent",
-    status: "pending",
-    fileId: null,
-    scale: [1, 1],
+    status: opts.status ?? "pending",
+    fileId: opts.fileId ?? null,
+    scale: opts.scale ?? [1, 1],
   };
 };
 

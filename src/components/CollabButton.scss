@@ -1,6 +1,51 @@
 @import "../css/variables.module";
 
 .excalidraw {
+  .collab-button {
+    @include outlineButtonStyles;
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
+
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+    flex-shrink: 0;
+
+    &:hover {
+      background-color: var(--color-primary-darker);
+      border-color: var(--color-primary-darker);
+    }
+
+    &:active {
+      background-color: var(--color-primary-darker);
+    }
+
+    &.active {
+      background-color: #0fb884;
+      border-color: #0fb884;
+
+      svg {
+        color: #fff;
+      }
+
+      &:hover,
+      &:active {
+        background-color: #0fb884;
+        border-color: #0fb884;
+      }
+    }
+  }
+
+  &.theme--dark {
+    .collab-button {
+      color: var(--color-gray-90);
+    }
+  }
+
   .CollabButton.is-collaborating {
     background-color: var(--button-special-active-bg-color);
 
@@ -24,9 +69,9 @@
     bottom: -5px;
     padding: 3px;
     border-radius: 50%;
-    background-color: $oc-green-6;
-    color: $oc-white;
-    font-size: 0.6em;
+    background-color: $oc-green-2;
+    color: $oc-green-9;
+    font-size: 0.6rem;
     font-family: "Cascadia";
   }
 }

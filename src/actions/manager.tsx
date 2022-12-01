@@ -135,7 +135,11 @@ export class ActionManager {
   /**
    * @param data additional data sent to the PanelComponent
    */
-  renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
+  renderAction = (
+    name: ActionName,
+    data?: PanelComponentProps["data"],
+    isInHamburgerMenu = false,
+  ) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
     if (
@@ -170,6 +174,7 @@ export class ActionManager {
           updateData={updateData}
           appProps={this.app.props}
           data={data}
+          isInHamburgerMenu={isInHamburgerMenu}
         />
       );
     }
