@@ -1159,7 +1159,6 @@ describe("textWysiwyg", () => {
 
     it("should not allow bound text with only whitespaces", async () => {
       Keyboard.keyPress(KEYS.ENTER);
-      const textElement = h.elements[1] as ExcalidrawTextElementWithContainer;
 
       const editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
@@ -1167,10 +1166,8 @@ describe("textWysiwyg", () => {
       await new Promise((r) => setTimeout(r, 0));
       fireEvent.change(editor, { target: { value: "   " } });
       editor.blur();
-
       expect(rectangle.boundElements).toBeNull();
-      expect(textElement.containerId).toBeNull();
-      expect(textElement.isDeleted).toBe(true);
+      expect(h.elements[1].isDeleted).toBe(true);
     });
   });
 });
