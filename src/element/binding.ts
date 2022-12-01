@@ -695,7 +695,6 @@ export const fixBindingsAfterDeletion = (
       }
     }
   });
-
   sceneElements
     .filter(({ id }) => affectedElements.has(id))
     .forEach((element) => {
