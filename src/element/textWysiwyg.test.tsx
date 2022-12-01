@@ -1156,5 +1156,21 @@ describe("textWysiwyg", () => {
 
       expect(duplicatedText.containerId).toBe(duplicatedRectangle.id);
     });
+
+    it("should not allow bound text with only whitespaces", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const textElement = h.elements[1] as ExcalidrawTextElementWithContainer;
+
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "   " } });
+      editor.blur();
+
+      expect(rectangle.boundElements).toBeNull();
+      expect(textElement.containerId).toBeNull();
+      expect(textElement.isDeleted).toBe(true);
+    });
   });
 });

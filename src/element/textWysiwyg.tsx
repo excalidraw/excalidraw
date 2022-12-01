@@ -510,7 +510,7 @@ export const textWysiwyg = ({
 
     if (container) {
       text = updateElement.text;
-      if (editable.value) {
+      if (editable.value.trim().length) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
           mutateElement(container, {
@@ -529,6 +529,7 @@ export const textWysiwyg = ({
               ),
           ),
         });
+        mutateElement(updateElement, { isDeleted: true, containerId: null });
       }
     }
 
