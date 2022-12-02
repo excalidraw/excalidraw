@@ -516,7 +516,6 @@ export const textWysiwyg = ({
             }),
           });
         }
-      } else {
       }
     }
 
