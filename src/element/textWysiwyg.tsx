@@ -506,7 +506,7 @@ export const textWysiwyg = ({
 
     if (container) {
       text = updateElement.text;
-      if (editable.value.trim().length) {
+      if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
           mutateElement(container, {
