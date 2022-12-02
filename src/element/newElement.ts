@@ -370,10 +370,6 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
         if (depth === 0 && (key === "shape" || key === "canvas")) {
           continue;
         }
-        if (key === "boundElements") {
-          tmp[key] = null;
-          continue;
-        }
         tmp[key] = deepCopyElement(val[key], depth + 1);
       }
     }
@@ -427,6 +423,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   } else {
     copy.id = randomId();
   }
+  copy.boundElements = null;
   copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();
   copy.groupIds = getNewGroupIdsForDuplication(
