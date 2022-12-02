@@ -1157,7 +1157,7 @@ describe("textWysiwyg", () => {
       expect(duplicatedText.containerId).toBe(duplicatedRectangle.id);
     });
 
-    it("undo should restore bound text when container is deleted", async () => {
+    it("undo should work", async () => {
       Keyboard.keyPress(KEYS.ENTER);
       const editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
@@ -1168,26 +1168,33 @@ describe("textWysiwyg", () => {
       expect(rectangle.boundElements).toStrictEqual([
         { id: h.elements[1].id, type: "text" },
       ]);
+      let text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      const originalRectX = rectangle.x;
+      const originalRectY = rectangle.y;
+      const originalTextX = text.x;
+      const originalTextY = text.y;
+
       mouse.select(rectangle);
-      Keyboard.keyPress(KEYS.DELETE);
-      expect(rectangle.isDeleted).toBe(true);
-      expect(
-        (h.elements[1] as ExcalidrawTextElementWithContainer).isDeleted,
-      ).toBe(true);
+      mouse.downAt(rectangle.x, rectangle.y);
+      mouse.moveTo(rectangle.x + 100, rectangle.y + 50);
+      mouse.up(rectangle.x + 100, rectangle.y + 50);
+      expect(rectangle.x).toBe(80);
+      expect(rectangle.y).toBe(85);
+      expect(text.x).toBe(89.5);
+      expect(text.y).toBe(90);
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
         Keyboard.keyPress(KEYS.Z);
       });
-      const textElement = h.elements[1] as ExcalidrawTextElementWithContainer;
-
-      expect(rectangle.isDeleted).toBe(false);
+      expect(rectangle.x).toBe(originalRectX);
+      expect(rectangle.y).toBe(originalRectY);
+      text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.x).toBe(originalTextX);
+      expect(text.y).toBe(originalTextY);
       expect(rectangle.boundElements).toStrictEqual([
-        { id: textElement.id, type: "text" },
+        { id: text.id, type: "text" },
       ]);
-      //@todo Check this later why text attribute isDeleted not set to false
-      //expect(textElement.isDeleted).toBe(false);
-
-      expect(textElement.containerId).toBe(rectangle.id);
+      expect(text.containerId).toBe(rectangle.id);
     });
   });
 });
