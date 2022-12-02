@@ -375,7 +375,8 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
         : {};
     for (const key in val) {
       if (val.hasOwnProperty(key)) {
-        // don't copy top-level shape property, which we want to regenerate
+        // don't copy non-serializable objects like these caches. They'll be
+        // populated when the element is rendered.
         if (depth === 0 && (key === "shape" || key === "canvas")) {
           continue;
         }
@@ -418,6 +419,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   overrides?: Partial<TElement>,
 ): TElement => {
   let copy: TElement = deepCopyElement(element);
+
   if (isTestEnv()) {
     copy.id = `${copy.id}_copy`;
     // `window.h` may not be defined in some unit tests
@@ -431,6 +433,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   } else {
     copy.id = copy.type === "text" ? obsidianId() : randomId(); //zsviczian
   }
+  copy.boundElements = null;
   copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();
   copy.groupIds = getNewGroupIdsForDuplication(
