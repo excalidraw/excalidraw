@@ -1156,5 +1156,45 @@ describe("textWysiwyg", () => {
 
       expect(duplicatedText.containerId).toBe(duplicatedRectangle.id);
     });
+
+    it("undo should work", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello" } });
+      editor.blur();
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: h.elements[1].id, type: "text" },
+      ]);
+      let text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      const originalRectX = rectangle.x;
+      const originalRectY = rectangle.y;
+      const originalTextX = text.x;
+      const originalTextY = text.y;
+
+      mouse.select(rectangle);
+      mouse.downAt(rectangle.x, rectangle.y);
+      mouse.moveTo(rectangle.x + 100, rectangle.y + 50);
+      mouse.up(rectangle.x + 100, rectangle.y + 50);
+      expect(rectangle.x).toBe(80);
+      expect(rectangle.y).toBe(85);
+      expect(text.x).toBe(89.5);
+      expect(text.y).toBe(90);
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.Z);
+      });
+      expect(rectangle.x).toBe(originalRectX);
+      expect(rectangle.y).toBe(originalRectY);
+      text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.x).toBe(originalTextX);
+      expect(text.y).toBe(originalTextY);
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
+      expect(text.containerId).toBe(rectangle.id);
+    });
   });
 });

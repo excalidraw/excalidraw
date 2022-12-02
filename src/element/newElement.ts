@@ -366,12 +366,9 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
         : {};
     for (const key in val) {
       if (val.hasOwnProperty(key)) {
-        // don't copy top-level shape property, which we want to regenerate
+        // don't copy non-serializable objects like these caches. They'll be
+        // populated when the element is rendered.
         if (depth === 0 && (key === "shape" || key === "canvas")) {
-          continue;
-        }
-        if (key === "boundElements") {
-          tmp[key] = null;
           continue;
         }
         tmp[key] = deepCopyElement(val[key], depth + 1);
@@ -427,6 +424,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   } else {
     copy.id = randomId();
   }
+  copy.boundElements = null;
   copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();
   copy.groupIds = getNewGroupIdsForDuplication(
