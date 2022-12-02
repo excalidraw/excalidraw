@@ -8,7 +8,11 @@ import {
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
 import { CLASSES, BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
-import { ExcalidrawElement, ExcalidrawTextElement } from "./types";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+} from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
@@ -516,6 +520,15 @@ export const textWysiwyg = ({
             }),
           });
         }
+      } else {
+        mutateElement(container, {
+          boundElements: container.boundElements?.filter(
+            (ele) =>
+              !isTextElement(
+                ele as ExcalidrawTextElement | ExcalidrawLinearElement,
+              ),
+          ),
+        });
       }
     }
 
