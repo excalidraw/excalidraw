@@ -123,7 +123,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         ref={innerRef}
         disabled={isLoading || props.isLoading}
       >
-        {(props.icon || props.label) && (
+        {(props.icon || props.label) ? (
           <div className="ToolIcon__icon" aria-hidden="true">
             {props.icon || props.label}
             {props.keyBindingLabel && (
@@ -131,14 +131,14 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
                 {props.keyBindingLabel}
               </span>
             )}
-            {props.isLoading && <Spinner />}
+            {props.isLoading ? <Spinner />: null}
           </div>
-        )}
-        {props.showAriaLabel && (
+        ): null}
+        {props.showAriaLabel ? (
           <div className="ToolIcon__label">
-            {props["aria-label"]} {isLoading && <Spinner />}
+            {props["aria-label"]} {isLoading ? <Spinner /> : null}
           </div>
-        )}
+        ) : null}
         {props.children}
       </button>
     );
@@ -174,9 +174,9 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
       />
       <div className="ToolIcon__icon">
         {props.icon}
-        {props.keyBindingLabel && (
+        {props.keyBindingLabel ? (
           <span className="ToolIcon__keybinding">{props.keyBindingLabel}</span>
-        )}
+        ): null}
       </div>
     </label>
   );
