@@ -2023,9 +2023,11 @@ class App extends React.Component<AppProps, AppState> {
         this.history.resumeRecording();
       }
 
-      if (sceneData.appState) {
-        this.setState(sceneData.appState);
-      }
+      flushSync(() => {
+        if (sceneData.appState) {
+          this.setState(sceneData.appState);
+        }
+      });
 
       if (sceneData.elements) {
         this.scene.replaceAllElements(sceneData.elements);
