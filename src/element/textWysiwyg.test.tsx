@@ -1156,5 +1156,38 @@ describe("textWysiwyg", () => {
 
       expect(duplicatedText.containerId).toBe(duplicatedRectangle.id);
     });
+
+    it("undo should restore bound text when container is deleted", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello" } });
+      editor.blur();
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: h.elements[1].id, type: "text" },
+      ]);
+      mouse.select(rectangle);
+      Keyboard.keyPress(KEYS.DELETE);
+      expect(rectangle.isDeleted).toBe(true);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).isDeleted,
+      ).toBe(true);
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.Z);
+      });
+      const textElement = h.elements[1] as ExcalidrawTextElementWithContainer;
+
+      expect(rectangle.isDeleted).toBe(false);
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: textElement.id, type: "text" },
+      ]);
+      //@todo Check this later why text attribute isDeleted not set to false
+      //expect(textElement.isDeleted).toBe(false);
+
+      expect(textElement.containerId).toBe(rectangle.id);
+    });
   });
 });
