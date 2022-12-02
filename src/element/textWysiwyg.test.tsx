@@ -1196,5 +1196,18 @@ describe("textWysiwyg", () => {
       ]);
       expect(text.containerId).toBe(rectangle.id);
     });
+
+    it("should not allow bound text with only whitespaces", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+
+      fireEvent.change(editor, { target: { value: "   " } });
+      editor.blur();
+      expect(rectangle.boundElements).toBeNull();
+      expect(h.elements[1].isDeleted).toBe(true);
+    });
   });
 });
