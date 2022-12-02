@@ -16,7 +16,11 @@ import {
   isInvisiblySmallElement,
   refreshTextDimensions,
 } from "../element";
-import { isLinearElementType } from "../element/typeChecks";
+import {
+  isFreeDrawElement,
+  isLinearElement,
+  isLinearElementType,
+} from "../element/typeChecks";
 import { randomId } from "../random";
 import {
   DEFAULT_FONT_FAMILY,
@@ -245,7 +249,14 @@ export const restoreElements = (
   return (elements || []).reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
     // and causing issues if retained
-    if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
+    if (element.type !== "selection") {
+      if (
+        !isLinearElement(element) &&
+        !isFreeDrawElement(element) &&
+        isInvisiblySmallElement(element)
+      ) {
+        return elements;
+      }
       let migratedElement: ExcalidrawElement | null = restoreElement(
         element,
         refreshDimensions,

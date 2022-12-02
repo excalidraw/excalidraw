@@ -7,7 +7,6 @@ import {
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
-import { isInvisiblySmallElement } from "../../element/sizeHelpers";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { ExcalidrawElement, FileId } from "../../element/types";
 import { t } from "../../i18n";
@@ -39,7 +38,7 @@ export const isSyncableElement = (
     }
     return false;
   }
-  return !isInvisiblySmallElement(element);
+  return true;
 };
 
 export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
