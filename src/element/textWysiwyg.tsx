@@ -14,9 +14,9 @@ import {
 import { CLASSES, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
-  ExcalidrawTextElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
+  ExcalidrawTextElement,
 } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
@@ -538,7 +538,7 @@ export const textWysiwyg = ({
 
     if (container) {
       text = updateElement.text;
-      if (editable.value) {
+      if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
           mutateElement(container, {
