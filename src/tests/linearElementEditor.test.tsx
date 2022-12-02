@@ -1095,18 +1095,6 @@ describe("Test Linear Elements", () => {
       expect(queryByTestId(container, "align-bottom")).toBeNull();
     });
 
-    it("should add a padding of 5px when container is arrow", () => {
-      createTwoPointerLinearElement("arrow");
-      Keyboard.keyPress(KEYS.ENTER);
-
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
-      expect(editor.style.padding).toBe("5px");
-      expect(editor.style.left).toBe("34.5px");
-      expect(editor.style.top).toBe("15px");
-    });
-
     it("should wrap the bound text when arrow bound container moves", async () => {
       const rect = UI.createElement("rectangle", {
         x: 400,

@@ -2584,6 +2584,14 @@ class App extends React.Component<AppProps, AppState> {
           locked: false,
         });
 
+    if (!existingTextElement && shouldBindToContainer && container) {
+      mutateElement(container, {
+        boundElements: (container.boundElements || []).concat({
+          type: "text",
+          id: element.id,
+        }),
+      });
+    }
     this.setState({ editingElement: element });
 
     if (!existingTextElement) {
