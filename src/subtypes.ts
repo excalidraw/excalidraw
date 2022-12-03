@@ -40,9 +40,9 @@ let alwaysEnabledMap: readonly {
 export type SubtypeRecord = Readonly<{
   subtype: Subtype;
   parents: readonly ExcalidrawElement["type"][];
-  actionNames: readonly SubtypeActionName[];
-  disabledNames: readonly DisabledActionName[];
-  shortcutMap: Record<CustomShortcutName, string[]>;
+  actionNames?: readonly SubtypeActionName[];
+  disabledNames?: readonly DisabledActionName[];
+  shortcutMap?: Record<CustomShortcutName, string[]>;
   alwaysEnabledNames?: readonly SubtypeActionName[];
 }>;
 
@@ -334,21 +334,27 @@ export const prepareSubtype = (
   record.parents.forEach((parentType) => {
     parentTypeMap = [...parentTypeMap, { subtype, parentType }];
   });
-  subtypeActionMap = [
-    ...subtypeActionMap,
-    { subtype, actions: record.actionNames },
-  ];
-  disabledActionMap = [
-    ...disabledActionMap,
-    { subtype, actions: record.disabledNames },
-  ];
+  if (record.actionNames) {
+    subtypeActionMap = [
+      ...subtypeActionMap,
+      { subtype, actions: record.actionNames },
+    ];
+  }
+  if (record.disabledNames) {
+    disabledActionMap = [
+      ...disabledActionMap,
+      { subtype, actions: record.disabledNames },
+    ];
+  }
   if (record.alwaysEnabledNames) {
     alwaysEnabledMap = [
       ...alwaysEnabledMap,
       { subtype, actions: record.alwaysEnabledNames },
     ];
   }
-  registerCustomShortcuts(record.shortcutMap);
+  if (record.shortcutMap) {
+    registerCustomShortcuts(record.shortcutMap);
+  }
 
   // Prepare the subtype
   const { actions, methods } = subtypePrepFn(
@@ -357,10 +363,10 @@ export const prepareSubtype = (
     onSubtypeLoaded,
   );
 
-  record.disabledNames.forEach((name) => {
+  record.disabledNames?.forEach((name) => {
     registerDisableFn(name, isActionDisabled);
   });
-  record.actionNames.forEach((name) => {
+  record.actionNames?.forEach((name) => {
     registerEnableFn(name, isActionEnabled);
   });
   registerEnableFn(record.subtype, isActionEnabled);

@@ -3,6 +3,7 @@ import {
   SubtypeRecord,
   SubtypeMethods,
   SubtypePrepFn,
+  addSubtypeMethods,
   getSubtypeMethods,
   getSubtypeNames,
   hasAlwaysEnabledActions,
@@ -30,7 +31,9 @@ const MW = 200;
 const TWIDTH = 200;
 const THEIGHT = 20;
 const TBASELINE = 15;
+const FONTSIZE = 20;
 const DBFONTSIZE = 40;
+const TRFONTSIZE = 60;
 
 const getLangData = async (langCode: string): Promise<Object | undefined> => {
   try {
@@ -58,31 +61,41 @@ const testSubtypeIcon = ({ theme }: { theme: Theme }) =>
 const test1: SubtypeRecord = {
   subtype: "test",
   parents: ["line", "arrow", "rectangle", "diamond", "ellipse"],
-  actionNames: [],
   disabledNames: ["changeSloppiness"],
-  shortcutMap: {},
 };
 
+const test1Button = SubtypeButton(
+  test1.subtype,
+  test1.parents[0],
+  testSubtypeIcon,
+);
 const test1NonParent = "text" as const;
 
 const test2: SubtypeRecord = {
   subtype: "test2",
   parents: ["text"],
-  actionNames: [],
-  disabledNames: [],
-  shortcutMap: {},
 };
+
+const test2Button = SubtypeButton(
+  test2.subtype,
+  test2.parents[0],
+  testSubtypeIcon,
+);
 
 const test3: SubtypeRecord = {
   subtype: "test3",
   parents: ["text", "line"],
-  actionNames: [],
-  disabledNames: [],
   shortcutMap: {
     testShortcut: [getShortcutKey("Shift+T")],
   },
   alwaysEnabledNames: ["test3Always"],
 };
+
+const test3Button = SubtypeButton(
+  test3.subtype,
+  test3.parents[0],
+  testSubtypeIcon,
+);
 
 const cleanTestElementUpdate = function (updates) {
   const oldUpdates = {};
@@ -95,6 +108,16 @@ const cleanTestElementUpdate = function (updates) {
   return oldUpdates;
 } as SubtypeMethods["clean"];
 
+const prepareNullSubtype = function () {
+  const methods = {} as SubtypeMethods;
+  methods.clean = cleanTestElementUpdate;
+  methods.measureText = measureTest2;
+  methods.wrapText = wrapTest2;
+
+  const actions = [test1Button, test2Button, test3Button];
+  return { actions, methods };
+} as SubtypePrepFn;
+
 const prepareTest1Subtype = function (
   addSubtypeAction,
   addLangData,
@@ -106,42 +129,50 @@ const prepareTest1Subtype = function (
   addLangData(fallbackLangData, getLangData);
   registerAuxLangData(fallbackLangData, getLangData);
 
-  const actions = [SubtypeButton("test", "line", testSubtypeIcon)];
+  const actions = [test1Button];
   actions.forEach((action) => addSubtypeAction(action));
 
   return { actions, methods };
 } as SubtypePrepFn;
+
+const measureTest2: SubtypeMethods["measureText"] = function (
+  element,
+  next,
+  maxWidth,
+) {
+  const text = next?.text ?? element.text;
+  const customData = next?.customData ?? {};
+  const fontSize = customData.triple
+    ? TRFONTSIZE
+    : next?.fontSize ?? element.fontSize;
+  const fontFamily = element.fontFamily;
+  const fontString = getFontString({ fontSize, fontFamily });
+  const metrics = textElementUtils.measureText(text, fontString, maxWidth);
+  const width = Math.max(metrics.width - 10, 0);
+  const height = Math.max(metrics.height - 5, 0);
+  return { width, height, baseline: metrics.baseline + 1 };
+};
+
+const wrapTest2: SubtypeMethods["wrapText"] = function (
+  element,
+  maxWidth,
+  next,
+) {
+  const text = next?.text ?? element.originalText;
+  if (next?.customData && next?.customData.triple === true) {
+    return `${text.split(" ").join("\n")}\nHELLO WORLD.`;
+  }
+  if (next?.fontSize === DBFONTSIZE) {
+    return `${text.split(" ").join("\n")}\nHELLO World.`;
+  }
+  return `${text.split(" ").join("\n")}\nHello world.`;
+};
 
 const prepareTest2Subtype = function (
   addSubtypeAction,
   addLangData,
   onSubtypeLoaded,
 ) {
-  const measureTest2: SubtypeMethods["measureText"] = function (
-    element,
-    next,
-    maxWidth,
-  ) {
-    const text = next?.text ?? element.text;
-    const fontSize = next?.fontSize ?? element.fontSize;
-    const fontFamily = element.fontFamily;
-    const fontString = getFontString({ fontSize, fontFamily });
-    const metrics = textElementUtils.measureText(text, fontString, maxWidth);
-    const width = Math.max(metrics.width - 10, 0);
-    const height = Math.max(metrics.height - 5, 0);
-    return { width, height, baseline: metrics.baseline + 1 };
-  };
-  const wrapTest2: SubtypeMethods["wrapText"] = function (
-    element,
-    maxWidth,
-    next,
-  ) {
-    const text = next?.text ?? element.originalText;
-    if (next?.fontSize === DBFONTSIZE) {
-      return `${text.split(" ").join("\n")}\nHELLO WORLD.`;
-    }
-    return `${text.split(" ").join("\n")}\nHello world.`;
-  };
   const methods = {
     measureText: measureTest2,
     wrapText: wrapTest2,
@@ -150,7 +181,7 @@ const prepareTest2Subtype = function (
   addLangData(fallbackLangData, getLangData);
   registerAuxLangData(fallbackLangData, getLangData);
 
-  const actions = [SubtypeButton("test2", "text", testSubtypeIcon)];
+  const actions = [test2Button];
   actions.forEach((action) => addSubtypeAction(action));
 
   return { actions, methods };
@@ -166,7 +197,7 @@ const prepareTest3Subtype = function (
   addLangData(fallbackLangData, getLangData);
   registerAuxLangData(fallbackLangData, getLangData);
 
-  const actions = [SubtypeButton("test3", "text", testSubtypeIcon)];
+  const actions = [test3Button];
   actions.forEach((action) => addSubtypeAction(action));
 
   return { actions, methods };
@@ -174,9 +205,59 @@ const prepareTest3Subtype = function (
 
 const { h } = window;
 
-API.addSubtype(test1, prepareTest1Subtype);
-API.addSubtype(test2, prepareTest2Subtype);
-API.addSubtype(test3, prepareTest3Subtype);
+describe("subtype registration", () => {
+  it("should check for invalid subtype or parents", async () => {
+    // Define invalid subtype records
+    const null1 = {} as SubtypeRecord;
+    const null2 = { subtype: "" } as SubtypeRecord;
+    const null3 = { subtype: "null" } as SubtypeRecord;
+    const null4 = { subtype: "null", parents: [] } as SubtypeRecord;
+    // Try registering the invalid subtypes
+    const prepN1 = API.addSubtype(null1, prepareNullSubtype);
+    const prepN2 = API.addSubtype(null2, prepareNullSubtype);
+    const prepN3 = API.addSubtype(null3, prepareNullSubtype);
+    const prepN4 = API.addSubtype(null4, prepareNullSubtype);
+    // Verify the guards in `prepareSubtype` worked
+    expect(prepN1).toStrictEqual({ actions: null, methods: {} });
+    expect(prepN2).toStrictEqual({ actions: null, methods: {} });
+    expect(prepN3).toStrictEqual({ actions: null, methods: {} });
+    expect(prepN4).toStrictEqual({ actions: null, methods: {} });
+  });
+  it("should return subtype actions and methods correctly", async () => {
+    // Check initial registration works
+    let prep1 = API.addSubtype(test1, prepareTest1Subtype);
+    expect(prep1.actions).toStrictEqual([test1Button]);
+    expect(prep1.methods).toStrictEqual({ clean: cleanTestElementUpdate });
+    // Check repeat registration fails
+    prep1 = API.addSubtype(test1, prepareNullSubtype);
+    expect(prep1.actions).toBeNull();
+    expect(prep1.methods).toStrictEqual({ clean: cleanTestElementUpdate });
+
+    // Check initial registration works
+    let prep2 = API.addSubtype(test2, prepareTest2Subtype);
+    expect(prep2.actions).toStrictEqual([test2Button]);
+    expect(prep2.methods).toStrictEqual({
+      measureText: measureTest2,
+      wrapText: wrapTest2,
+    });
+    // Check repeat registration fails
+    prep2 = API.addSubtype(test2, prepareNullSubtype);
+    expect(prep2.actions).toBeNull();
+    expect(prep2.methods).toStrictEqual({
+      measureText: measureTest2,
+      wrapText: wrapTest2,
+    });
+
+    // Check initial registration works
+    let prep3 = API.addSubtype(test3, prepareTest3Subtype);
+    expect(prep3.actions).toStrictEqual([test3Button]);
+    expect(prep3.methods).toStrictEqual({});
+    // Check repeat registration fails
+    prep3 = API.addSubtype(test3, prepareNullSubtype);
+    expect(prep3.actions).toBeNull();
+    expect(prep3.methods).toStrictEqual({});
+  });
+});
 
 describe("subtypes", () => {
   it("should correctly register", async () => {
@@ -194,6 +275,18 @@ describe("subtypes", () => {
     expect(test1Methods?.renderSvg).toBeUndefined();
     expect(test1Methods?.measureText).toBeUndefined();
     expect(test1Methods?.ensureLoaded).toBeUndefined();
+  });
+  it("should not overwrite subtype methods", async () => {
+    addSubtypeMethods(test1.subtype, {});
+    addSubtypeMethods(test2.subtype, {});
+    addSubtypeMethods(test3.subtype, { clean: cleanTestElementUpdate });
+    const test1Methods = getSubtypeMethods(test1.subtype);
+    expect(test1Methods?.clean).toBeDefined();
+    const test2Methods = getSubtypeMethods(test2.subtype);
+    expect(test2Methods?.measureText).toBeDefined();
+    expect(test2Methods?.wrapText).toBeDefined();
+    const test3Methods = getSubtypeMethods(test3.subtype);
+    expect(test3Methods?.clean).toBeUndefined();
   });
   it("should register custom shortcuts", async () => {
     expect(getShortcutFromShortcutName("testShortcut")).toBe("Shift+T");
@@ -316,6 +409,7 @@ describe("subtypes", () => {
             id: "A",
             subtype: test2.subtype,
             text: testString,
+            fontSize: FONTSIZE,
           }),
         ],
       },
@@ -326,14 +420,19 @@ describe("subtypes", () => {
       maxWidth?: number | null,
     ) => {
       if (text === testString) {
+        let multiplier = 1;
         if (font.includes(`${DBFONTSIZE}`)) {
-          return {
-            width: 2 * TWIDTH,
-            height: 2 * THEIGHT,
-            baseline: 2 * TBASELINE,
-          };
+          multiplier = 2;
         }
-        return { width: TWIDTH, height: THEIGHT, baseline: TBASELINE };
+        if (font.includes(`${TRFONTSIZE}`)) {
+          multiplier = 3;
+        }
+        const width = maxWidth
+          ? Math.min(multiplier * TWIDTH, maxWidth)
+          : multiplier * TWIDTH;
+        const height = multiplier * THEIGHT;
+        const baseline = multiplier * TBASELINE;
+        return { width, height, baseline };
       }
       return { width: 1, height: 0, baseline: 0 };
     };
@@ -351,13 +450,23 @@ describe("subtypes", () => {
           height: THEIGHT - 5,
           baseline: TBASELINE + 1,
         });
+        const mMetrics = textElementUtils.measureTextElement(el, {}, MW);
+        expect(mMetrics).toStrictEqual({
+          width: Math.min(TWIDTH, MW) - 10,
+          height: THEIGHT - 5,
+          baseline: TBASELINE + 1,
+        });
         const wrappedText = textElementUtils.wrapTextElement(el, MW);
         expect(wrappedText).toEqual(
           `${testString.split(" ").join("\n")}\nHello world.`,
         );
 
         // Now test with modified text in `next`
-        let next: { text?: string; fontSize?: number } = {
+        let next: {
+          text?: string;
+          fontSize?: number;
+          customData?: Record<string, any>;
+        } = {
           text: "Hello world.",
         };
         const nextMetrics = textElementUtils.measureTextElement(el, next);
@@ -373,8 +482,33 @@ describe("subtypes", () => {
           height: 2 * THEIGHT - 5,
           baseline: 2 * TBASELINE + 1,
         });
+        const nextFMW = textElementUtils.measureTextElement(el, next, MW);
+        expect(nextFMW).toStrictEqual({
+          width: Math.min(2 * TWIDTH, MW) - 10,
+          height: 2 * THEIGHT - 5,
+          baseline: 2 * TBASELINE + 1,
+        });
         const nextFWrText = textElementUtils.wrapTextElement(el, MW, next);
         expect(nextFWrText).toEqual(
+          `${testString.split(" ").join("\n")}\nHELLO World.`,
+        );
+
+        // Now test customData in `next`
+        next = { customData: { triple: true } };
+        const nextCD = textElementUtils.measureTextElement(el, next);
+        expect(nextCD).toStrictEqual({
+          width: 3 * TWIDTH - 10,
+          height: 3 * THEIGHT - 5,
+          baseline: 3 * TBASELINE + 1,
+        });
+        const nextCDMW = textElementUtils.measureTextElement(el, next, MW);
+        expect(nextCDMW).toStrictEqual({
+          width: Math.min(3 * TWIDTH, MW) - 10,
+          height: 3 * THEIGHT - 5,
+          baseline: 3 * TBASELINE + 1,
+        });
+        const nextCDWrText = textElementUtils.wrapTextElement(el, MW, next);
+        expect(nextCDWrText).toEqual(
           `${testString.split(" ").join("\n")}\nHELLO WORLD.`,
         );
       }
