@@ -10,8 +10,8 @@ import { isBoundToContainer, isTextElement } from "./typeChecks";
 import { CLASSES, BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
-  ExcalidrawTextElement,
   ExcalidrawLinearElement,
+  ExcalidrawTextElement,
 } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
@@ -548,7 +548,7 @@ export const textWysiwyg = ({
 
     if (container) {
       text = updateElement.text;
-      if (editable.value) {
+      if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
           mutateElement(container, {

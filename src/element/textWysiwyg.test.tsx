@@ -1144,5 +1144,115 @@ describe("textWysiwyg", () => {
         { id: text.id, type: "text" },
       ]);
     });
+
+    it("should scale font size correctly when resizing using shift", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello" } });
+      editor.blur();
+      const textElement = h.elements[1] as ExcalidrawTextElement;
+      expect(rectangle.width).toBe(90);
+      expect(rectangle.height).toBe(75);
+      expect(textElement.fontSize).toBe(20);
+
+      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 50], {
+        shift: true,
+      });
+      expect(rectangle.width).toBe(200);
+      expect(rectangle.height).toBe(166.66666666666669);
+      expect(textElement.fontSize).toBe(47.5);
+    });
+
+    it("should bind text correctly when container duplicated with alt-drag", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello" } });
+      editor.blur();
+      expect(h.elements.length).toBe(2);
+
+      mouse.select(rectangle);
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.down(rectangle.x + 10, rectangle.y + 10);
+        mouse.up(rectangle.x + 10, rectangle.y + 10);
+      });
+      expect(h.elements.length).toBe(4);
+      const duplicatedRectangle = h.elements[0];
+      const duplicatedText = h
+        .elements[1] as ExcalidrawTextElementWithContainer;
+      const originalRect = h.elements[2];
+      const originalText = h.elements[3] as ExcalidrawTextElementWithContainer;
+      expect(originalRect.boundElements).toStrictEqual([
+        { id: originalText.id, type: "text" },
+      ]);
+
+      expect(originalText.containerId).toBe(originalRect.id);
+
+      expect(duplicatedRectangle.boundElements).toStrictEqual([
+        { id: duplicatedText.id, type: "text" },
+      ]);
+
+      expect(duplicatedText.containerId).toBe(duplicatedRectangle.id);
+    });
+
+    it("undo should work", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello" } });
+      editor.blur();
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: h.elements[1].id, type: "text" },
+      ]);
+      let text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      const originalRectX = rectangle.x;
+      const originalRectY = rectangle.y;
+      const originalTextX = text.x;
+      const originalTextY = text.y;
+
+      mouse.select(rectangle);
+      mouse.downAt(rectangle.x, rectangle.y);
+      mouse.moveTo(rectangle.x + 100, rectangle.y + 50);
+      mouse.up(rectangle.x + 100, rectangle.y + 50);
+      expect(rectangle.x).toBe(80);
+      expect(rectangle.y).toBe(85);
+      expect(text.x).toBe(89.5);
+      expect(text.y).toBe(90);
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.Z);
+      });
+      expect(rectangle.x).toBe(originalRectX);
+      expect(rectangle.y).toBe(originalRectY);
+      text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.x).toBe(originalTextX);
+      expect(text.y).toBe(originalTextY);
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
+      expect(text.containerId).toBe(rectangle.id);
+    });
+
+    it("should not allow bound text with only whitespaces", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+
+      fireEvent.change(editor, { target: { value: "   " } });
+      editor.blur();
+      expect(rectangle.boundElements).toBeNull();
+      expect(h.elements[1].isDeleted).toBe(true);
+    });
   });
 });
