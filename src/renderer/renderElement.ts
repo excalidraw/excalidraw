@@ -24,10 +24,16 @@ import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
-import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
+import {
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+  isPromiseLike,
+} from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
-import { AppState, BinaryFiles, Zoom } from "../types";
+import { AppClassProperties, AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
@@ -70,26 +76,67 @@ const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
 const getDashArrayDotted = (strokeWidth: number) => [1.5, 6 + strokeWidth];
 
-const getCanvasPadding = (element: ExcalidrawElement) =>
-  element.type === "freedraw" ? element.strokeWidth * 12 : 20;
+const getCanvasPadding = (element: ExcalidrawElement) => {
+  switch (element.type) {
+    case "freedraw":
+      return element.strokeWidth * 12;
+    case "image":
+      return 0;
+    default:
+      return 20;
+  }
+};
+
+const isCanvas = (el: any): el is HTMLCanvasElement => {
+  return el instanceof HTMLCanvasElement;
+};
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
-  canvas: HTMLCanvasElement;
+  canvas: HTMLCanvasElement | HTMLImageElement;
   theme: RenderConfig["theme"];
   canvasZoom: Zoom["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
 }
 
+const getImageOrPlaceholder = (
+  el: ExcalidrawImageElement,
+  imgFileMap: AppClassProperties["imageCache"],
+): HTMLImageElement => {
+  if (el.status === "error") {
+    return IMAGE_ERROR_PLACEHOLDER_IMG;
+  }
+  if (!el.fileId) {
+    return IMAGE_PLACEHOLDER_IMG;
+  }
+  const img = imgFileMap.get(el.fileId);
+  if (!img || isPromiseLike(img.image)) {
+    return IMAGE_PLACEHOLDER_IMG;
+  }
+  return img.image;
+};
+
+const cloneImage = (img: HTMLImageElement): HTMLImageElement => {
+  return img.cloneNode(true) as HTMLImageElement;
+};
+
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
   renderConfig: RenderConfig,
 ): ExcalidrawElementWithCanvas => {
-  const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d")!;
+  let canvas: HTMLImageElement | HTMLCanvasElement;
+  if (element.type === "image" && element.fileId) {
+    canvas = cloneImage(
+      getImageOrPlaceholder(element, renderConfig.imageCache),
+    );
+  } else {
+    canvas = document.createElement("canvas");
+  }
   const padding = getCanvasPadding(element);
+
+  const context = isCanvas(canvas) ? canvas.getContext("2d")! : null;
 
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
@@ -114,7 +161,7 @@ const generateElementCanvas = (
         ? distance(element.y, y1) * window.devicePixelRatio * zoom.value
         : 0;
 
-    context.translate(canvasOffsetX, canvasOffsetY);
+    context?.translate(canvasOffsetX, canvasOffsetY);
   } else {
     canvas.width =
       element.width * window.devicePixelRatio * zoom.value +
@@ -124,22 +171,23 @@ const generateElementCanvas = (
       padding * zoom.value * 2;
   }
 
-  context.save();
-  context.translate(padding * zoom.value, padding * zoom.value);
-  context.scale(
-    window.devicePixelRatio * zoom.value,
-    window.devicePixelRatio * zoom.value,
-  );
+  if (context && isCanvas(canvas)) {
+    context.save();
+    context.translate(padding * zoom.value, padding * zoom.value);
+    context.scale(
+      window.devicePixelRatio * zoom.value,
+      window.devicePixelRatio * zoom.value,
+    );
+    const rc = rough.canvas(canvas);
 
-  const rc = rough.canvas(canvas);
+    // in dark theme, revert the image color filter
+    if (shouldResetImageFilter(element, renderConfig)) {
+      context.filter = IMAGE_INVERT_FILTER;
+    }
 
-  // in dark theme, revert the image color filter
-  if (shouldResetImageFilter(element, renderConfig)) {
-    context.filter = IMAGE_INVERT_FILTER;
+    drawElementOnCanvas(element, rc, context, renderConfig);
+    context.restore();
   }
-
-  drawElementOnCanvas(element, rc, context, renderConfig);
-  context.restore();
 
   return {
     element,
@@ -714,6 +762,15 @@ const drawElementFromCanvas = (
   );
   context.translate(cx * scaleXFactor, cy * scaleYFactor);
   context.rotate(element.angle * scaleXFactor * scaleYFactor);
+
+  if (
+    elementWithCanvas.element.type === "image" &&
+    elementWithCanvas.canvas instanceof HTMLImageElement &&
+    shouldResetImageFilter(element, renderConfig)
+  ) {
+    // in dark theme, revert the image color filter
+    context.filter = IMAGE_INVERT_FILTER;
+  }
 
   context.drawImage(
     elementWithCanvas.canvas!,
