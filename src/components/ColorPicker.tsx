@@ -66,10 +66,10 @@ const getColor = (color: string): string | null => {
     return color;
   }
 
-  return isValidColor(color)
-    ? color
-    : isValidColor(`#${color}`)
+  return isValidColor(`#${color}`)
     ? `#${color}`
+    : isValidColor(color)
+    ? color
     : null;
 };
 
