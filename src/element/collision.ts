@@ -36,6 +36,7 @@ import { hasBoundTextElement, isImageElement } from "./typeChecks";
 import { isTextElement } from ".";
 import { isTransparent } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
+import { getBoundTextElement } from "./textElement";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -72,6 +73,13 @@ export const hitTest = (
     return isPointHittingElementBoundingBox(element, point, threshold);
   }
 
+  const boundTextElement = getBoundTextElement(element);
+  if (boundTextElement) {
+    const isHittingBoundTextElement = hitTest(boundTextElement, appState, x, y);
+    if (isHittingBoundTextElement) {
+      return true;
+    }
+  }
   return isHittingElementNotConsideringBoundingBox(element, appState, point);
 };
 
@@ -82,6 +90,13 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
   y: number,
 ): boolean => {
   const threshold = 10 / appState.zoom.value;
+
+  // So that bound text element hit is considered within bounding box of container even if its outside actual bounding box of element
+  // eg for linear elements text can be outside the element bounding box
+  const boundTextElement = getBoundTextElement(element);
+  if (boundTextElement && hitTest(boundTextElement, appState, x, y)) {
+    return false;
+  }
 
   return (
     !isHittingElementNotConsideringBoundingBox(element, appState, [x, y]) &&
@@ -95,7 +110,6 @@ export const isHittingElementNotConsideringBoundingBox = (
   point: Point,
 ): boolean => {
   const threshold = 10 / appState.zoom.value;
-
   const check = isTextElement(element)
     ? isStrictlyInside
     : isElementDraggableFromInside(element)
@@ -382,6 +396,7 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
   if (!getShapeForElement(element)) {
     return false;
   }
+
   const [point, pointAbs, hwidth, hheight] = pointRelativeToElement(
     args.element,
     args.point,
@@ -434,8 +449,9 @@ const pointRelativeToElement = (
   pointTuple: Point,
 ): [GA.Point, GA.Point, number, number] => {
   const point = GAPoint.from(pointTuple);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const elementCoords = getElementAbsoluteCoords(element);
-  const center = coordsCenter(elementCoords);
+  const center = coordsCenter([x1, y1, x2, y2]);
   // GA has angle orientation opposite to `rotate`
   const rotate = GATransform.rotation(center, element.angle);
   const pointRotated = GATransform.apply(rotate, point);
@@ -466,8 +482,8 @@ export const pointInAbsoluteCoords = (
 const relativizationToElementCenter = (
   element: ExcalidrawElement,
 ): GA.Transform => {
-  const elementCoords = getElementAbsoluteCoords(element);
-  const center = coordsCenter(elementCoords);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const center = coordsCenter([x1, y1, x2, y2]);
   // GA has angle orientation opposite to `rotate`
   const rotate = GATransform.rotation(center, element.angle);
   const translate = GA.reverse(
@@ -524,8 +540,8 @@ export const determineFocusPoint = (
   adjecentPoint: Point,
 ): Point => {
   if (focus === 0) {
-    const elementCoords = getElementAbsoluteCoords(element);
-    const center = coordsCenter(elementCoords);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const center = coordsCenter([x1, y1, x2, y2]);
     return GAPoint.toTuple(center);
   }
   const relateToCenter = relativizationToElementCenter(element);
