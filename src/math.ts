@@ -2,7 +2,7 @@ import { NormalizedZoomValue, Point, Zoom } from "./types";
 import {
   DEFAULT_RECTANGULAR_FIXED_RADIUS,
   LINE_CONFIRM_THRESHOLD,
-  PREVIOUS_RECTANGULAR_RADIUS,
+  PREVIOUS_RECTANGULAR_RADIUS_RATIO,
 } from "./constants";
 import {
   ExcalidrawElement,
@@ -274,33 +274,18 @@ export const getGridPoint = (
   return [x, y];
 };
 
-// const SCALE_STEP_SIZE = 0.00035;
-// const CUTOFF_SIZE = 100;
-
-// // g(x) = 1 - (1 - e^(-x)) is a monotonically decreasing function
-// // in the range of [0,1].
-// const f = (x: number, factor: number, scale: number) => {
-//   return ((1 - (1 - Math.exp(-x * scale))) * x * factor) / 2;
-// };
-
-// // We further define a scale, that increases as x increases.
-// // Together, they provide smaller default radius size as x gets larger.
-// const s = (x: number) => {
-//   return (Math.log2(x + 1) + 1) * SCALE_STEP_SIZE;
-// };
-
-// This is to provide a better default radius size for squares and diamonds.
+// This is to provide a better default radius size for rectangles
 export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   if (element.strokeSharpness === "round" && element.radius === null) {
-    return PREVIOUS_RECTANGULAR_RADIUS * x;
+    return PREVIOUS_RECTANGULAR_RADIUS_RATIO * x;
   }
 
   const fixedRadiusSize = element.radius ?? DEFAULT_RECTANGULAR_FIXED_RADIUS;
 
-  const CUTOFF_SIZE = fixedRadiusSize / PREVIOUS_RECTANGULAR_RADIUS;
+  const CUTOFF_SIZE = fixedRadiusSize / PREVIOUS_RECTANGULAR_RADIUS_RATIO;
 
   if (x <= CUTOFF_SIZE) {
-    return x * PREVIOUS_RECTANGULAR_RADIUS;
+    return x * PREVIOUS_RECTANGULAR_RADIUS_RATIO;
   }
 
   return fixedRadiusSize;
