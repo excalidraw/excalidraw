@@ -143,7 +143,8 @@ export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawArrowEleement;
 
 export type ExcalidrawTextElementWithContainer = {
   containerId: ExcalidrawTextContainer["id"];
@@ -166,6 +167,11 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endBinding: PointBinding | null;
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
+  }>;
+
+export type ExcalidrawArrowEleement = ExcalidrawLinearElement &
+  Readonly<{
+    type: "arrow";
   }>;
 
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &

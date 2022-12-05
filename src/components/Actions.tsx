@@ -25,12 +25,13 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
-import { hasBoundTextElement, isBoundToContainer } from "../element/typeChecks";
+import { hasBoundTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import { getCustomActions } from "../actions/register";
 import "./Actions.scss";
 import { Tooltip } from "./Tooltip";
+import { shouldAllowVerticalAlign } from "../element/textElement";
 
 export const SelectedShapeActions = ({
   appState,
@@ -135,10 +136,8 @@ export const SelectedShapeActions = ({
         </>
       )}
 
-      {targetElements.some(
-        (element) =>
-          hasBoundTextElement(element) || isBoundToContainer(element),
-      ) && renderAction("changeVerticalAlign")}
+      {shouldAllowVerticalAlign(targetElements) &&
+        renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(appState.activeTool.type) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>

@@ -1,6 +1,6 @@
 // Some imports
 import fallbackMathJaxLangData from "./locales/en.json";
-import { BOUND_TEXT_PADDING, FONT_FAMILY, SVG_NS } from "../../../../constants";
+import { FONT_FAMILY, SVG_NS } from "../../../../constants";
 import { getFontString, getFontFamilyString, isRTL } from "../../../../utils";
 import {
   getApproxLineHeight,
@@ -46,6 +46,7 @@ import {
 import { mathSubtypeIcon } from "./icon";
 import { getMathSubtypeRecord } from "./types";
 import { SubtypeButton } from "../../../../components/SubtypeButton";
+import { getMaxContainerWidth } from "../../../../element/newElement";
 
 const mathSubtype = getMathSubtypeRecord().subtype;
 const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;
@@ -955,9 +956,7 @@ const renderMathElement = function (element, context, renderCb) {
     }
   };
   const container = getContainerElement(_element);
-  const parentWidth = container
-    ? container.width - BOUND_TEXT_PADDING * 2
-    : undefined;
+  const parentWidth = container ? getMaxContainerWidth(container) : undefined;
 
   const offsetX =
     (_element.width - (container ? parentWidth! : _element.width)) *
@@ -1032,9 +1031,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   tempSvg.appendChild(groupNode);
 
   const container = getContainerElement(_element);
-  const parentWidth = container
-    ? container.width - BOUND_TEXT_PADDING * 2
-    : undefined;
+  const parentWidth = container ? getMaxContainerWidth(container) : undefined;
 
   const offsetX =
     (_element.width - (container ? parentWidth! : _element.width)) *
@@ -1142,7 +1139,7 @@ const wrapMathElement = function (element, containerWidth, next) {
     return wrapText(text, font, containerWidth);
   }
 
-  const maxWidth = containerWidth - BOUND_TEXT_PADDING * 2;
+  const maxWidth = containerWidth;
 
   const markup = markupText(text, mathProps, isMathJaxLoaded).markup;
   const metrics = getMetrics(markup, fontSize, mathProps, isMathJaxLoaded);
