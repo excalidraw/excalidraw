@@ -127,6 +127,7 @@ import { mutateElement, newElementWith } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   hasBoundTextElement,
+  isArrowElement,
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
@@ -255,6 +256,7 @@ import {
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
+  getContainerCenter,
   getContainerDims,
   getTextBindableContainerAtPosition,
   isValidTextContainer,
@@ -2213,23 +2215,23 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           this.state,
         );
-
         if (selectedElements.length === 1) {
           const selectedElement = selectedElements[0];
-
-          if (isLinearElement(selectedElement)) {
-            if (
-              !this.state.editingLinearElement ||
-              this.state.editingLinearElement.elementId !==
-                selectedElements[0].id
-            ) {
-              this.history.resumeRecording();
-              this.setState({
-                editingLinearElement: new LinearElementEditor(
-                  selectedElement,
-                  this.scene,
-                ),
-              });
+          if (event[KEYS.CTRL_OR_CMD]) {
+            if (isLinearElement(selectedElement)) {
+              if (
+                !this.state.editingLinearElement ||
+                this.state.editingLinearElement.elementId !==
+                  selectedElements[0].id
+              ) {
+                this.history.resumeRecording();
+                this.setState({
+                  editingLinearElement: new LinearElementEditor(
+                    selectedElement,
+                    this.scene,
+                  ),
+                });
+              }
             }
           } else if (
             isTextElement(selectedElement) ||
@@ -2239,9 +2241,12 @@ class App extends React.Component<AppProps, AppState> {
             if (!isTextElement(selectedElement)) {
               container = selectedElement as ExcalidrawTextContainer;
             }
+            const midPoint = getContainerCenter(selectedElement, this.state);
+            const sceneX = midPoint.x;
+            const sceneY = midPoint.y;
             this.startTextEditing({
-              sceneX: selectedElement.x + selectedElement.width / 2,
-              sceneY: selectedElement.y + selectedElement.height / 2,
+              sceneX,
+              sceneY,
               container,
             });
             event.preventDefault();
@@ -2722,7 +2727,12 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
 
-    if (!existingTextElement && shouldBindToContainer && container) {
+    if (
+      !existingTextElement &&
+      shouldBindToContainer &&
+      container &&
+      !isArrowElement(container)
+    ) {
       const fontString = {
         fontSize: this.state.currentItemFontSize,
         fontFamily: this.state.currentItemFontFamily,
@@ -2776,6 +2786,14 @@ class App extends React.Component<AppProps, AppState> {
           locked: false,
         });
 
+    if (!existingTextElement && shouldBindToContainer && container) {
+      mutateElement(container, {
+        boundElements: (container.boundElements || []).concat({
+          type: "text",
+          id: element.id,
+        }),
+      });
+    }
     this.setState({ editingElement: element });
 
     if (!existingTextElement) {
@@ -2827,8 +2845,9 @@ class App extends React.Component<AppProps, AppState> {
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
-        !this.state.editingLinearElement ||
-        this.state.editingLinearElement.elementId !== selectedElements[0].id
+        event[KEYS.CTRL_OR_CMD] &&
+        (!this.state.editingLinearElement ||
+          this.state.editingLinearElement.elementId !== selectedElements[0].id)
       ) {
         this.history.resumeRecording();
         this.setState({
@@ -2837,8 +2856,13 @@ class App extends React.Component<AppProps, AppState> {
             this.scene,
           ),
         });
+        return;
+      } else if (
+        this.state.editingLinearElement &&
+        this.state.editingLinearElement.elementId === selectedElements[0].id
+      ) {
+        return;
       }
-      return;
     }
 
     resetCursor(this.canvas);
@@ -2882,9 +2906,11 @@ class App extends React.Component<AppProps, AppState> {
         sceneY,
       );
       if (container) {
-        if (hasBoundTextElement(container)) {
-          sceneX = container.x + container.width / 2;
-          sceneY = container.y + container.height / 2;
+        if (isArrowElement(container) || hasBoundTextElement(container)) {
+          const midPoint = getContainerCenter(container, this.state);
+
+          sceneX = midPoint.x;
+          sceneY = midPoint.y;
         }
       }
       this.startTextEditing({
@@ -2985,6 +3011,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
+
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(event.pointerId, {
         x: event.clientX,
@@ -3296,15 +3323,18 @@ class App extends React.Component<AppProps, AppState> {
         );
       } else if (
         // if using cmd/ctrl, we're not dragging
-        !event[KEYS.CTRL_OR_CMD] &&
-        (hitElement ||
-          this.isHittingCommonBoundingBoxOfSelectedElements(
-            scenePointer,
-            selectedElements,
-          )) &&
-        !hitElement?.locked
+        !event[KEYS.CTRL_OR_CMD]
       ) {
-        setCursor(this.canvas, CURSOR_TYPE.MOVE);
+        if (
+          (hitElement ||
+            this.isHittingCommonBoundingBoxOfSelectedElements(
+              scenePointer,
+              selectedElements,
+            )) &&
+          !hitElement?.locked
+        ) {
+          setCursor(this.canvas, CURSOR_TYPE.MOVE);
+        }
       } else {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
       }
@@ -3414,6 +3444,8 @@ class App extends React.Component<AppProps, AppState> {
       linearElementEditor.elementId,
     );
 
+    const boundTextElement = getBoundTextElement(element);
+
     if (!element) {
       return;
     }
@@ -3452,6 +3484,11 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         )
+      ) {
+        setCursor(this.canvas, CURSOR_TYPE.MOVE);
+      } else if (
+        boundTextElement &&
+        hitTest(boundTextElement, this.state, scenePointerX, scenePointerY)
       ) {
         setCursor(this.canvas, CURSOR_TYPE.MOVE);
       }
@@ -6522,8 +6559,14 @@ class App extends React.Component<AppProps, AppState> {
     container?: ExcalidrawTextContainer | null,
   ) {
     if (container) {
-      const elementCenterX = container.x + container.width / 2;
-      const elementCenterY = container.y + container.height / 2;
+      let elementCenterX = container.x + container.width / 2;
+      let elementCenterY = container.y + container.height / 2;
+
+      const elementCenter = getContainerCenter(container, appState);
+      if (elementCenter) {
+        elementCenterX = elementCenter.x;
+        elementCenterY = elementCenter.y;
+      }
       const distanceToCenter = Math.hypot(
         x - elementCenterX,
         y - elementCenterY,

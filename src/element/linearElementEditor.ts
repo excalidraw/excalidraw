@@ -4,6 +4,7 @@ import {
   ExcalidrawElement,
   PointBinding,
   ExcalidrawBindableElement,
+  ExcalidrawTextElementWithContainer,
 } from "./types";
 import {
   distance2d,
@@ -19,7 +20,11 @@ import {
   arePointsEqual,
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
-import { getElementPointsCoords } from "./bounds";
+import {
+  getCurvePathOps,
+  getElementPointsCoords,
+  getMinMaxXYFromCurvePathOps,
+} from "./bounds";
 import { Point, AppState, PointerCoords } from "../types";
 import { mutateElement } from "./mutateElement";
 import History from "../history";
@@ -33,6 +38,8 @@ import {
 import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
 import { shouldRotateWithDiscreteAngle } from "../keys";
+import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import { getShapeForElement } from "../renderer/renderElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 
 const editorMidPointsCache: {
@@ -40,7 +47,6 @@ const editorMidPointsCache: {
   points: (Point | null)[];
   zoom: number | null;
 } = { version: null, points: [], zoom: null };
-
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
     _brand: "excalidrawLinearElementId";
@@ -257,6 +263,11 @@ export class LinearElementEditor {
             };
           }),
         );
+
+        const boundTextElement = getBoundTextElement(element);
+        if (boundTextElement) {
+          handleBindTextResize(element, false);
+        }
       }
 
       // suggest bindings for first and last point if selected
@@ -388,8 +399,14 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     appState: AppState,
   ): typeof editorMidPointsCache["points"] => {
-    // Since its not needed outside editor unless 2 pointer lines
-    if (!appState.editingLinearElement && element.points.length > 2) {
+    const boundText = getBoundTextElement(element);
+
+    // Since its not needed outside editor unless 2 pointer lines or bound text
+    if (
+      !appState.editingLinearElement &&
+      element.points.length > 2 &&
+      !boundText
+    ) {
       return [];
     }
     if (
@@ -661,7 +678,6 @@ export class LinearElementEditor {
       scenePointer.x,
       scenePointer.y,
     );
-
     // if we clicked on a point, set the element as hitElement otherwise
     // it would get deselected if the point is outside the hitbox area
     if (clickedPointIndex >= 0 || segmentMidpoint) {
@@ -1055,7 +1071,6 @@ export class LinearElementEditor {
     const offsetY = 0;
 
     const nextPoints = [...element.points, ...targetPoints.map((x) => x.point)];
-
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
   }
 
@@ -1223,7 +1238,6 @@ export class LinearElementEditor {
     const dX = prevCenterX - nextCenterX;
     const dY = prevCenterY - nextCenterY;
     const rotated = rotate(offsetX, offsetY, dX, dY, element.angle);
-
     mutateElement(element, {
       ...otherUpdates,
       points: nextPoints,
@@ -1258,6 +1272,207 @@ export class LinearElementEditor {
 
     return rotatePoint([width, height], [0, 0], -element.angle);
   }
+
+  static getBoundTextElementPosition = (
+    element: ExcalidrawLinearElement,
+    boundTextElement: ExcalidrawTextElementWithContainer,
+  ): { x: number; y: number } => {
+    const points = LinearElementEditor.getPointsGlobalCoordinates(element);
+    if (points.length < 2) {
+      mutateElement(boundTextElement, { isDeleted: true });
+    }
+    let x = 0;
+    let y = 0;
+    if (element.points.length % 2 === 1) {
+      const index = Math.floor(element.points.length / 2);
+      const midPoint = LinearElementEditor.getPointGlobalCoordinates(
+        element,
+        element.points[index],
+      );
+      x = midPoint[0] - boundTextElement.width / 2;
+      y = midPoint[1] - boundTextElement.height / 2;
+    } else {
+      const index = element.points.length / 2 - 1;
+
+      let midSegmentMidpoint = editorMidPointsCache.points[index];
+      if (element.points.length === 2) {
+        midSegmentMidpoint = centerPoint(points[0], points[1]);
+      }
+      if (
+        !midSegmentMidpoint ||
+        editorMidPointsCache.version !== element.version
+      ) {
+        midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
+          element,
+          points[index],
+          points[index + 1],
+          index + 1,
+        );
+      }
+      x = midSegmentMidpoint[0] - boundTextElement.width / 2;
+      y = midSegmentMidpoint[1] - boundTextElement.height / 2;
+    }
+    return { x, y };
+  };
+
+  static getMinMaxXYWithBoundText = (
+    element: ExcalidrawLinearElement,
+    elementBounds: [number, number, number, number],
+    boundTextElement: ExcalidrawTextElementWithContainer,
+  ): [number, number, number, number, number, number] => {
+    let [x1, y1, x2, y2] = elementBounds;
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    const { x: boundTextX1, y: boundTextY1 } =
+      LinearElementEditor.getBoundTextElementPosition(
+        element,
+        boundTextElement,
+      );
+    const boundTextX2 = boundTextX1 + boundTextElement.width;
+    const boundTextY2 = boundTextY1 + boundTextElement.height;
+
+    const topLeftRotatedPoint = rotatePoint([x1, y1], [cx, cy], element.angle);
+    const topRightRotatedPoint = rotatePoint([x2, y1], [cx, cy], element.angle);
+
+    const counterRotateBoundTextTopLeft = rotatePoint(
+      [boundTextX1, boundTextY1],
+
+      [cx, cy],
+
+      -element.angle,
+    );
+    const counterRotateBoundTextTopRight = rotatePoint(
+      [boundTextX2, boundTextY1],
+
+      [cx, cy],
+
+      -element.angle,
+    );
+    const counterRotateBoundTextBottomLeft = rotatePoint(
+      [boundTextX1, boundTextY2],
+
+      [cx, cy],
+
+      -element.angle,
+    );
+    const counterRotateBoundTextBottomRight = rotatePoint(
+      [boundTextX2, boundTextY2],
+
+      [cx, cy],
+
+      -element.angle,
+    );
+
+    if (
+      topLeftRotatedPoint[0] < topRightRotatedPoint[0] &&
+      topLeftRotatedPoint[1] >= topRightRotatedPoint[1]
+    ) {
+      x1 = Math.min(x1, counterRotateBoundTextBottomLeft[0]);
+      x2 = Math.max(
+        x2,
+        Math.max(
+          counterRotateBoundTextTopRight[0],
+          counterRotateBoundTextBottomRight[0],
+        ),
+      );
+      y1 = Math.min(y1, counterRotateBoundTextTopLeft[1]);
+
+      y2 = Math.max(y2, counterRotateBoundTextBottomRight[1]);
+    } else if (
+      topLeftRotatedPoint[0] >= topRightRotatedPoint[0] &&
+      topLeftRotatedPoint[1] > topRightRotatedPoint[1]
+    ) {
+      x1 = Math.min(x1, counterRotateBoundTextBottomRight[0]);
+      x2 = Math.max(
+        x2,
+        Math.max(
+          counterRotateBoundTextTopLeft[0],
+          counterRotateBoundTextTopRight[0],
+        ),
+      );
+      y1 = Math.min(y1, counterRotateBoundTextBottomLeft[1]);
+
+      y2 = Math.max(y2, counterRotateBoundTextTopRight[1]);
+    } else if (topLeftRotatedPoint[0] >= topRightRotatedPoint[0]) {
+      x1 = Math.min(x1, counterRotateBoundTextTopRight[0]);
+      x2 = Math.max(x2, counterRotateBoundTextBottomLeft[0]);
+      y1 = Math.min(y1, counterRotateBoundTextBottomRight[1]);
+
+      y2 = Math.max(y2, counterRotateBoundTextTopLeft[1]);
+    } else if (topLeftRotatedPoint[1] <= topRightRotatedPoint[1]) {
+      x1 = Math.min(
+        x1,
+        Math.min(
+          counterRotateBoundTextTopRight[0],
+          counterRotateBoundTextTopLeft[0],
+        ),
+      );
+
+      x2 = Math.max(x2, counterRotateBoundTextBottomRight[0]);
+      y1 = Math.min(y1, counterRotateBoundTextTopRight[1]);
+      y2 = Math.max(y2, counterRotateBoundTextBottomLeft[1]);
+    }
+
+    return [x1, y1, x2, y2, cx, cy];
+  };
+
+  static getElementAbsoluteCoords = (
+    element: ExcalidrawLinearElement,
+    includeBoundText: boolean = false,
+  ): [number, number, number, number, number, number] => {
+    let coords: [number, number, number, number, number, number];
+    let x1;
+    let y1;
+    let x2;
+    let y2;
+    if (element.points.length < 2 || !getShapeForElement(element)) {
+      // XXX this is just a poor estimate and not very useful
+      const { minX, minY, maxX, maxY } = element.points.reduce(
+        (limits, [x, y]) => {
+          limits.minY = Math.min(limits.minY, y);
+          limits.minX = Math.min(limits.minX, x);
+
+          limits.maxX = Math.max(limits.maxX, x);
+          limits.maxY = Math.max(limits.maxY, y);
+
+          return limits;
+        },
+        { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
+      );
+      x1 = minX + element.x;
+      y1 = minY + element.y;
+      x2 = maxX + element.x;
+      y2 = maxY + element.y;
+    } else {
+      const shape = getShapeForElement(element)!;
+
+      // first element is always the curve
+      const ops = getCurvePathOps(shape[0]);
+
+      const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+      x1 = minX + element.x;
+      y1 = minY + element.y;
+      x2 = maxX + element.x;
+      y2 = maxY + element.y;
+    }
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    coords = [x1, y1, x2, y2, cx, cy];
+
+    if (!includeBoundText) {
+      return coords;
+    }
+    const boundTextElement = getBoundTextElement(element);
+    if (boundTextElement) {
+      coords = LinearElementEditor.getMinMaxXYWithBoundText(
+        element,
+        [x1, y1, x2, y2],
+        boundTextElement,
+      );
+    }
+
+    return coords;
+  };
 }
 
 const normalizeSelectedPoints = (

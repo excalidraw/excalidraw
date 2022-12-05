@@ -11,7 +11,7 @@ import {
   Arrowhead,
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
-  ExcalidrawRectangleElement,
+  ExcalidrawTextContainer,
 } from "../element/types";
 import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId, obsidianId } from "../random"; //zsviczian
@@ -22,6 +22,8 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
+  getBoundTextElement,
+  getBoundTextElementOffset,
   getContainerDims,
   getContainerElement,
   measureText,
@@ -29,6 +31,7 @@ import {
   wrapText,
 } from "./textElement";
 import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+import { isArrowElement } from "./typeChecks";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -132,7 +135,7 @@ export const newTextElement = (
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    containerId?: ExcalidrawRectangleElement["id"];
+    containerId?: ExcalidrawTextContainer["id"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const text = normalizeText(opts.text);
@@ -234,16 +237,21 @@ const getAdjustedDimensions = (
   // make sure container dimensions are set properly when
   // text editor overflows beyond viewport dimensions
   if (container) {
+    const boundTextElementPadding = getBoundTextElementOffset(element);
+
     const containerDims = getContainerDims(container);
     let height = containerDims.height;
     let width = containerDims.width;
-    if (nextHeight > height - BOUND_TEXT_PADDING * 2) {
-      height = nextHeight + BOUND_TEXT_PADDING * 2;
+    if (nextHeight > height - boundTextElementPadding * 2) {
+      height = nextHeight + boundTextElementPadding * 2;
     }
-    if (nextWidth > width - BOUND_TEXT_PADDING * 2) {
-      width = nextWidth + BOUND_TEXT_PADDING * 2;
+    if (nextWidth > width - boundTextElementPadding * 2) {
+      width = nextWidth + boundTextElementPadding * 2;
     }
-    if (height !== containerDims.height || width !== containerDims.width) {
+    if (
+      !isArrowElement(container) &&
+      (height !== containerDims.height || width !== containerDims.width)
+    ) {
       mutateElement(container, { height, width });
     }
   }
@@ -273,11 +281,35 @@ export const refreshTextDimensions = (
 };
 
 export const getMaxContainerWidth = (container: ExcalidrawElement) => {
-  return getContainerDims(container).width - BOUND_TEXT_PADDING * 2;
+  const width = getContainerDims(container).width;
+  if (isArrowElement(container)) {
+    const containerWidth = width - BOUND_TEXT_PADDING * 8 * 2;
+    if (containerWidth <= 0) {
+      const boundText = getBoundTextElement(container);
+      if (boundText) {
+        return boundText.width;
+      }
+      return BOUND_TEXT_PADDING * 8 * 2;
+    }
+    return containerWidth;
+  }
+  return width - BOUND_TEXT_PADDING * 2;
 };
 
 export const getMaxContainerHeight = (container: ExcalidrawElement) => {
-  return getContainerDims(container).height - BOUND_TEXT_PADDING * 2;
+  const height = getContainerDims(container).height;
+  if (isArrowElement(container)) {
+    const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
+    if (containerHeight <= 0) {
+      const boundText = getBoundTextElement(container);
+      if (boundText) {
+        return boundText.height;
+      }
+      return BOUND_TEXT_PADDING * 8 * 2;
+    }
+    return height;
+  }
+  return height - BOUND_TEXT_PADDING * 2;
 };
 
 export const updateTextElement = (

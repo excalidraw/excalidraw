@@ -51,6 +51,5 @@ export const rescalePoints = (
         return currentDimension === dimension ? value + translation : value;
       }) as [number, number],
   );
-
   return nextPoints;
 };
