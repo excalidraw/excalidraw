@@ -773,12 +773,8 @@ const drawElementFromCanvas = (
       padding * zoom;
     tempCanvasContext.translate(-shiftX, -shiftY);
 
-    // Draw a rectangle of bound text dimensions so that linear element
-    // on the temp canvas doesn't overlap the rectangle due to the below
-    // globalCompositeOperation operation
-
-    tempCanvasContext.globalCompositeOperation = "destination-out";
-    tempCanvasContext.fillRect(
+    // Clear the bound text area
+    tempCanvasContext.clearRect(
       -(boundTextElement.width / 2 + BOUND_TEXT_PADDING) *
         window.devicePixelRatio *
         zoom,
@@ -956,12 +952,8 @@ export const renderElement = (
           const boundTextShiftY = (y1 + y2) / 2 - boundTextCy;
           tempCanvasContext.translate(-boundTextShiftX, -boundTextShiftY);
 
-          // Draw a rectangle of bound text dimensions so that linear element
-          // on the temp canvas doesn't overlap the rectangle due to the below
-          // globalCompositeOperation operation
-          tempCanvasContext.globalCompositeOperation = "destination-out";
-
-          tempCanvasContext.fillRect(
+          // Clear the bound text area
+          tempCanvasContext.clearRect(
             -boundTextElement.width / 2,
             -boundTextElement.height / 2,
             boundTextElement.width,
