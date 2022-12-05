@@ -259,12 +259,11 @@ const repairContainerElement = (
         binding,
       ) => {
         const boundElement = elementsMap.get(binding.id);
-        if (
-          boundElement &&
-          isTextElement(boundElement) &&
-          !boundIds.has(binding.id)
-        ) {
-          if (boundElement.containerId !== container.id) {
+        if (boundElement && !boundIds.has(binding.id)) {
+          if (
+            isTextElement(boundElement) &&
+            boundElement.containerId !== container.id
+          ) {
             (boundElement as Mutable<ExcalidrawTextElement>).containerId =
               container.id;
           }
