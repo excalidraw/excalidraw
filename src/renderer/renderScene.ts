@@ -348,7 +348,6 @@ export const _renderScene = ({
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.save();
     context.scale(scale, scale);
-
     // When doing calculations based on canvas width we should used normalized one
     const normalizedCanvasWidth = canvas.width / scale;
     const normalizedCanvasHeight = canvas.height / scale;
@@ -410,7 +409,7 @@ export const _renderScene = ({
       undefined;
     visibleElements.forEach((element) => {
       try {
-        renderElement(element, rc, context, renderConfig);
+        renderElement(element, rc, context, renderConfig, appState);
         // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
         // ShapeCache returns empty hence making sure that we get the
         // correct element from visible elements
@@ -440,7 +439,13 @@ export const _renderScene = ({
     // Paint selection element
     if (appState.selectionElement) {
       try {
-        renderElement(appState.selectionElement, rc, context, renderConfig);
+        renderElement(
+          appState.selectionElement,
+          rc,
+          context,
+          renderConfig,
+          appState,
+        );
       } catch (error: any) {
         console.error(error);
       }
@@ -452,6 +457,22 @@ export const _renderScene = ({
         .forEach((suggestedBinding) => {
           renderBindingHighlight(context, renderConfig, suggestedBinding!);
         });
+    }
+    const locallySelectedElements = getSelectedElements(elements, appState);
+
+    // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
+    // ShapeCache returns empty hence making sure that we get the
+    // correct element from visible elements
+    if (
+      locallySelectedElements.length === 1 &&
+      appState.editingLinearElement?.elementId === locallySelectedElements[0].id
+    ) {
+      renderLinearPointHandles(
+        context,
+        appState,
+        renderConfig,
+        locallySelectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
+      );
     }
 
     if (
@@ -466,7 +487,6 @@ export const _renderScene = ({
       !appState.multiElement &&
       !appState.editingLinearElement
     ) {
-      const locallySelectedElements = getSelectedElements(elements, appState);
       const showBoundingBox = shouldShowBoundingBox(
         locallySelectedElements,
         appState,
@@ -515,8 +535,8 @@ export const _renderScene = ({
           }
 
           if (selectionColors.length) {
-            const [elementX1, elementY1, elementX2, elementY2] =
-              getElementAbsoluteCoords(element);
+            const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
+              getElementAbsoluteCoords(element, true);
             acc.push({
               angle: element.angle,
               elementX1,
@@ -525,10 +545,12 @@ export const _renderScene = ({
               elementY2,
               selectionColors,
               dashed: !!renderConfig.remoteSelectedElementIds[element.id],
+              cx,
+              cy,
             });
           }
           return acc;
-        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean }[]);
+        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean; cx: number; cy: number }[]);
 
         const addSelectionForGroupId = (groupId: GroupId) => {
           const groupElements = getElementsInGroup(elements, groupId);
@@ -540,8 +562,10 @@ export const _renderScene = ({
             elementX2,
             elementY1,
             elementY2,
-            selectionColors: [selectionColor],
+            selectionColors: [oc.black],
             dashed: true,
+            cx: elementX1 + (elementX2 - elementX1) / 2,
+            cy: elementY1 + (elementY2 - elementY1) / 2,
           });
         };
 
@@ -600,7 +624,7 @@ export const _renderScene = ({
         context.lineWidth = lineWidth;
         context.setLineDash(initialLineDash);
         const transformHandles = getTransformHandlesFromCoords(
-          [x1, y1, x2, y2],
+          [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
           0,
           renderConfig.zoom,
           "mouse",
@@ -861,6 +885,8 @@ const renderSelectionBorder = (
     elementY2: number;
     selectionColors: string[];
     dashed?: boolean;
+    cx: number;
+    cy: number;
   },
   padding = DEFAULT_SPACING * 2,
 ) => {
@@ -871,6 +897,8 @@ const renderSelectionBorder = (
     elementX2,
     elementY2,
     selectionColors,
+    cx,
+    cy,
     dashed,
   } = elementProperties;
   const elementWidth = elementX2 - elementX1;
@@ -900,8 +928,8 @@ const renderSelectionBorder = (
       elementY1 - linePadding,
       elementWidth + linePadding * 2,
       elementHeight + linePadding * 2,
-      elementX1 + elementWidth / 2,
-      elementY1 + elementHeight / 2,
+      cx,
+      cy,
       angle,
     );
   }
@@ -1117,7 +1145,7 @@ export const renderSceneToSvg = (
     return;
   }
   // render elements
-  elements.forEach((element) => {
+  elements.forEach((element, index) => {
     if (!element.isDeleted) {
       try {
         renderElementToSvg(

@@ -513,6 +513,9 @@ describe("textWysiwyg", () => {
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(rectangle.id);
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
       mouse.down();
       const editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
@@ -586,20 +589,19 @@ describe("textWysiwyg", () => {
     });
 
     it("shouldn't bind to non-text-bindable containers", async () => {
-      const line = API.createElement({
-        type: "line",
+      const freedraw = API.createElement({
+        type: "freedraw",
         width: 100,
         height: 0,
-        points: [
-          [0, 0],
-          [100, 0],
-        ],
       });
-      h.elements = [line];
+      h.elements = [freedraw];
 
       UI.clickTool("text");
 
-      mouse.clickAt(line.x + line.width / 2, line.y + line.height / 2);
+      mouse.clickAt(
+        freedraw.x + freedraw.width / 2,
+        freedraw.y + freedraw.height / 2,
+      );
 
       const editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
@@ -613,20 +615,22 @@ describe("textWysiwyg", () => {
       fireEvent.keyDown(editor, { key: KEYS.ESCAPE });
       editor.dispatchEvent(new Event("input"));
 
-      expect(line.boundElements).toBe(null);
+      expect(freedraw.boundElements).toBe(null);
       expect(h.elements[1].type).toBe("text");
       expect((h.elements[1] as ExcalidrawTextElement).containerId).toBe(null);
     });
 
-    it("shouldn't create text element when pressing 'Enter' key on non text bindable container", async () => {
-      h.elements = [];
-      const freeDraw = UI.createElement("freedraw", {
-        width: 100,
-        height: 50,
+    ["freedraw", "line"].forEach((type: any) => {
+      it(`shouldn't create text element when pressing 'Enter' key on ${type} `, async () => {
+        h.elements = [];
+        const elemnet = UI.createElement(type, {
+          width: 100,
+          height: 50,
+        });
+        API.setSelectedElements([elemnet]);
+        Keyboard.keyPress(KEYS.ENTER);
+        expect(h.elements.length).toBe(1);
       });
-      API.setSelectedElements([freeDraw]);
-      Keyboard.keyPress(KEYS.ENTER);
-      expect(h.elements.length).toBe(1);
     });
 
     it("should'nt bind text to container when not double clicked on center", async () => {
@@ -1206,7 +1210,7 @@ describe("textWysiwyg", () => {
 
       fireEvent.change(editor, { target: { value: "   " } });
       editor.blur();
-      expect(rectangle.boundElements).toBeNull();
+      expect(rectangle.boundElements).toStrictEqual([]);
       expect(h.elements[1].isDeleted).toBe(true);
     });
   });

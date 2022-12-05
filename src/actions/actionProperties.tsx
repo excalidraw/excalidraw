@@ -816,16 +816,19 @@ export const actionChangeVerticalAlign = register({
               value: VERTICAL_ALIGN.TOP,
               text: t("labels.alignTop"),
               icon: <TextAlignTopIcon theme={appState.theme} />,
+              testId: "align-top",
             },
             {
               value: VERTICAL_ALIGN.MIDDLE,
               text: t("labels.centerVertically"),
               icon: <TextAlignMiddleIcon theme={appState.theme} />,
+              testId: "align-middle",
             },
             {
               value: VERTICAL_ALIGN.BOTTOM,
               text: t("labels.alignBottom"),
               icon: <TextAlignBottomIcon theme={appState.theme} />,
+              testId: "align-bottom",
             },
           ]}
           value={getFormValue(elements, appState, (element) => {

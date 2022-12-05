@@ -327,13 +327,12 @@ export const getShortcutKey = (shortcut: string): string => {
     .replace(/\bAlt\b/i, "Alt")
     .replace(/\bShift\b/i, "Shift")
     .replace(/\b(Enter|Return)\b/i, "Enter");
-
   if (isDarwin) {
     return shortcut
-      .replace(/\bCtrlOrCmd\b/i, "Cmd")
+      .replace(/\bCtrlOrCmd\b/gi, "Cmd")
       .replace(/\bAlt\b/i, "Option");
   }
-  return shortcut.replace(/\bCtrlOrCmd\b/i, "Ctrl");
+  return shortcut.replace(/\bCtrlOrCmd\b/gi, "Ctrl");
 };
 
 export const viewportCoordsToSceneCoords = (
