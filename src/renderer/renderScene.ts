@@ -348,7 +348,6 @@ export const _renderScene = ({
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.save();
     context.scale(scale, scale);
-
     // When doing calculations based on canvas width we should used normalized one
     const normalizedCanvasWidth = canvas.width / scale;
     const normalizedCanvasHeight = canvas.height / scale;

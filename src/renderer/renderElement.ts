@@ -918,29 +918,38 @@ export const renderElement = (
           const tempCanvas = document.createElement("canvas");
 
           const tempCanvasContext = tempCanvas.getContext("2d")!;
+
+          // Take max dimensions of arrow canvas so that when canvas is rotated
+          // the arrow doesn't get clipped
           const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
           const padding = getCanvasPadding(element);
-          tempCanvas.width = maxDim + padding * 10;
-          tempCanvas.height = maxDim + padding * 10;
+          tempCanvas.width =
+            maxDim * appState.exportScale + padding * 10 * appState.exportScale;
+          tempCanvas.height =
+            maxDim * appState.exportScale + padding * 10 * appState.exportScale;
 
           tempCanvasContext.translate(
             tempCanvas.width / 2,
             tempCanvas.height / 2,
           );
+          tempCanvasContext.scale(appState.exportScale, appState.exportScale);
 
+          // Shift the canvas to left most point of the arrow
           shiftX = element.width / 2 - (element.x - x1);
           shiftY = element.height / 2 - (element.y - y1);
 
           tempCanvasContext.rotate(element.angle);
+          const tempRc = rough.canvas(tempCanvas);
 
           tempCanvasContext.translate(-shiftX, -shiftY);
 
-          const tempRc = rough.canvas(tempCanvas);
           drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
+
           tempCanvasContext.translate(shiftX, shiftY);
 
           tempCanvasContext.rotate(-element.angle);
 
+          // Shift the canvas to center of bound text
           const [, , , , boundTextCx, boundTextCy] =
             getElementAbsoluteCoords(boundTextElement);
           const boundTextShiftX = (x1 + x2) / 2 - boundTextCx;
@@ -953,15 +962,18 @@ export const renderElement = (
           tempCanvasContext.globalCompositeOperation = "destination-out";
 
           tempCanvasContext.fillRect(
-            -(boundTextElement.width / 2 + BOUND_TEXT_PADDING),
-            -(boundTextElement.height / 2 + BOUND_TEXT_PADDING),
-            boundTextElement.width + BOUND_TEXT_PADDING * 2,
-            boundTextElement.height + BOUND_TEXT_PADDING * 2,
+            -boundTextElement.width / 2,
+            -boundTextElement.height / 2,
+            boundTextElement.width,
+            boundTextElement.height,
           );
+          context.scale(1 / appState.exportScale, 1 / appState.exportScale);
           context.drawImage(
             tempCanvas,
             -tempCanvas.width / 2,
             -tempCanvas.height / 2,
+            tempCanvas.width,
+            tempCanvas.height,
           );
         } else {
           context.rotate(element.angle);
