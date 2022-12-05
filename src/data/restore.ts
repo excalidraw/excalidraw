@@ -262,7 +262,9 @@ const repairContainerElement = (
         if (boundElement && !boundIds.has(binding.id)) {
           if (
             isTextElement(boundElement) &&
-            boundElement.containerId !== container.id
+            // being slightly conservative here, preserving existing containerId
+            // if defined, lest boundElements is stale
+            !boundElement.containerId
           ) {
             (boundElement as Mutable<ExcalidrawTextElement>).containerId =
               container.id;
