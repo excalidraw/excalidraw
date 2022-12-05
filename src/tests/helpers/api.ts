@@ -109,6 +109,9 @@ export class API {
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
     status?: T extends "image" ? ExcalidrawImageElement["status"] : never;
+    endBinding?: T extends "arrow"
+      ? ExcalidrawLinearElement["endBinding"]
+      : never;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
