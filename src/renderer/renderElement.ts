@@ -726,37 +726,32 @@ const drawElementFromCanvas = (
     (1 / window.devicePixelRatio) * scaleYFactor,
   );
   const boundTextElement = getBoundTextElement(element);
+
   if (isArrowElement(element) && boundTextElement) {
     const tempCanvas = document.createElement("canvas");
     const tempCanvasContext = tempCanvas.getContext("2d")!;
 
+    // Take max dimensions of arrow canvas so that when canvas is rotated
+    // the arrow doesn't get clipped
     const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
     tempCanvas.width =
-      maxDim * window.devicePixelRatio +
+      maxDim * window.devicePixelRatio * zoom +
       padding * elementWithCanvas.canvasZoom * 10;
     tempCanvas.height =
-      maxDim * window.devicePixelRatio +
+      maxDim * window.devicePixelRatio * zoom +
       padding * elementWithCanvas.canvasZoom * 10;
     const offsetX = (tempCanvas.width - elementWithCanvas.canvas!.width) / 2;
     const offsetY = (tempCanvas.height - elementWithCanvas.canvas!.height) / 2;
+
     tempCanvasContext.translate(tempCanvas.width / 2, tempCanvas.height / 2);
-
     tempCanvasContext.rotate(element.angle);
-
-    const centerOffsetX =
-      (elementWithCanvas.canvas.width / zoom - elementWithCanvas.canvas.width) /
-      2;
-    const centerOffsetY =
-      (elementWithCanvas.canvas.height / zoom -
-        elementWithCanvas.canvas.height) /
-      2;
 
     tempCanvasContext.drawImage(
       elementWithCanvas.canvas!,
-      -elementWithCanvas.canvas.width / 2 - centerOffsetX,
-      -elementWithCanvas.canvas.height / 2 - centerOffsetY,
-      elementWithCanvas.canvas.width / zoom,
-      elementWithCanvas.canvas.height / zoom,
+      -elementWithCanvas.canvas.width / 2,
+      -elementWithCanvas.canvas.height / 2,
+      elementWithCanvas.canvas.width,
+      elementWithCanvas.canvas.height,
     );
 
     const [, , , , boundTextCx, boundTextCy] =
@@ -764,49 +759,47 @@ const drawElementFromCanvas = (
 
     tempCanvasContext.rotate(-element.angle);
 
+    // Shift the canvas to the center of the bound text element
     const shiftX =
       tempCanvas.width / 2 -
-      (boundTextCx - x1) * window.devicePixelRatio -
+      (boundTextCx - x1) * window.devicePixelRatio * zoom -
       offsetX -
-      padding;
+      padding * zoom;
+
     const shiftY =
       tempCanvas.height / 2 -
-      (boundTextCy - y1) * window.devicePixelRatio -
+      (boundTextCy - y1) * window.devicePixelRatio * zoom -
       offsetY -
-      padding;
-
+      padding * zoom;
     tempCanvasContext.translate(-shiftX, -shiftY);
+
     // Draw a rectangle of bound text dimensions so that linear element
     // on the temp canvas doesn't overlap the rectangle due to the below
     // globalCompositeOperation operation
 
     tempCanvasContext.globalCompositeOperation = "destination-out";
-
     tempCanvasContext.fillRect(
       -(boundTextElement.width / 2 + BOUND_TEXT_PADDING) *
-        window.devicePixelRatio -
-        centerOffsetX,
+        window.devicePixelRatio *
+        zoom,
       -(boundTextElement.height / 2 + BOUND_TEXT_PADDING) *
-        window.devicePixelRatio -
-        centerOffsetY,
+        window.devicePixelRatio *
+        zoom,
       (boundTextElement.width + BOUND_TEXT_PADDING * 2) *
-        window.devicePixelRatio,
+        window.devicePixelRatio *
+        zoom,
       (boundTextElement.height + BOUND_TEXT_PADDING * 2) *
-        window.devicePixelRatio,
+        window.devicePixelRatio *
+        zoom,
     );
 
     context.translate(cx * scaleXFactor, cy * scaleYFactor);
-
     context.drawImage(
       tempCanvas,
-      (-(x2 - x1) / 2) * window.devicePixelRatio -
-        ((padding + offsetX) * zoom) / zoom +
-        centerOffsetX,
-      (-(y2 - y1) / 2) * window.devicePixelRatio -
-        ((padding + offsetY) * zoom) / zoom +
-        centerOffsetY,
-      tempCanvas.width,
-      tempCanvas.height,
+      (-(x2 - x1) / 2) * window.devicePixelRatio - offsetX / zoom - padding,
+      (-(y2 - y1) / 2) * window.devicePixelRatio - offsetY / zoom - padding,
+      tempCanvas.width / zoom,
+      tempCanvas.height / zoom,
     );
   } else {
     context.translate(cx * scaleXFactor, cy * scaleYFactor);
