@@ -24,7 +24,7 @@ const allLanguages: Language[] = [
   { code: "fa-IR", label: "فارسی", rtl: true },
   { code: "fi-FI", label: "Suomi" },
   { code: "fr-FR", label: "Français" },
-  { code: "gl-ES	", label: "Galego" },
+  { code: "gl-ES", label: "Galego" },
   { code: "he-IL", label: "עברית", rtl: true },
   { code: "hi-IN", label: "हिन्दी" },
   { code: "hu-HU", label: "Magyar" },
