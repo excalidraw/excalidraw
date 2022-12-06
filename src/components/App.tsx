@@ -1710,6 +1710,7 @@ class App extends React.Component<AppProps, AppState> {
             x,
             y: currentY,
             text,
+            rawText: text, //zsviczian
           });
           acc.push(element);
           currentY += element.height + LINE_GAP;
