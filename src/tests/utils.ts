@@ -27,3 +27,22 @@ export const resize = (
     mouse.up();
   });
 };
+
+export const rotate = (
+  element: ExcalidrawElement,
+  deltaX: number,
+  deltaY: number,
+  keyboardModifiers: KeyboardModifiers = {},
+) => {
+  mouse.select(element);
+  const handle = getTransformHandles(element, h.state.zoom, "mouse").rotation!;
+  const clientX = handle[0] + handle[2] / 2;
+  const clientY = handle[1] + handle[3] / 2;
+
+  Keyboard.withModifierKeys(keyboardModifiers, () => {
+    mouse.reset();
+    mouse.down(clientX, clientY);
+    mouse.move(clientX + deltaX, clientY + deltaY);
+    mouse.up();
+  });
+};

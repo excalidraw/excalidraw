@@ -1,4 +1,4 @@
-import { BOUND_TEXT_PADDING, SHIFT_LOCKING_ANGLE } from "../constants";
+import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
 import {
@@ -12,6 +12,8 @@ import {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
+  ExcalidrawElement,
+  ExcalidrawTextElementWithContainer,
 } from "./types";
 import {
   getElementAbsoluteCoords,
@@ -20,6 +22,7 @@ import {
   getCommonBoundingBox,
 } from "./bounds";
 import {
+  isArrowElement,
   isBoundToContainer,
   isFreeDrawElement,
   isLinearElement,
@@ -40,6 +43,7 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
+  getBoundTextElementOffset,
   getContainerElement,
   handleBindTextResize,
   measureText,
@@ -75,6 +79,7 @@ export const transformElements = (
         pointerX,
         pointerY,
         shouldRotateWithDiscreteAngle,
+        pointerDownState.originalElements,
       );
       updateBoundElements(element);
     } else if (
@@ -142,6 +147,7 @@ const rotateSingleElement = (
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
+  originalElements: Map<string, NonDeleted<ExcalidrawElement>>,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
@@ -152,11 +158,17 @@ const rotateSingleElement = (
     angle -= angle % SHIFT_LOCKING_ANGLE;
   }
   angle = normalizeAngle(angle);
-  mutateElement(element, { angle });
   const boundTextElementId = getBoundTextElementId(element);
+
+  mutateElement(element, { angle });
   if (boundTextElementId) {
-    const textElement = Scene.getScene(element)!.getElement(boundTextElementId);
-    mutateElement(textElement!, { angle });
+    const textElement = Scene.getScene(element)!.getElement(
+      boundTextElementId,
+    ) as ExcalidrawTextElementWithContainer;
+
+    if (!isArrowElement(element)) {
+      mutateElement(textElement, { angle });
+    }
   }
 };
 
@@ -412,10 +424,12 @@ export const resizeSingleElement = (
       };
     }
     if (shouldMaintainAspectRatio) {
+      const boundTextElementPadding =
+        getBoundTextElementOffset(boundTextElement);
       const nextFont = measureFontSizeFromWH(
         boundTextElement,
-        eleNewWidth - BOUND_TEXT_PADDING * 2,
-        eleNewHeight - BOUND_TEXT_PADDING * 2,
+        eleNewWidth - boundTextElementPadding * 2,
+        eleNewHeight - boundTextElementPadding * 2,
       );
       if (nextFont === null) {
         return;
@@ -504,24 +518,36 @@ export const resizeSingleElement = (
   newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
 
   // Readjust points for linear elements
-  const rescaledPoints = rescalePointsInElement(
-    stateAtResizeStart,
-    eleNewWidth,
-    eleNewHeight,
-    true,
-  );
+  let rescaledElementPointsY;
+  let rescaledPoints;
+
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    rescaledElementPointsY = rescalePoints(
+      1,
+      eleNewHeight,
+      (stateAtResizeStart as ExcalidrawLinearElement).points,
+      true,
+    );
+
+    rescaledPoints = rescalePoints(
+      0,
+      eleNewWidth,
+      rescaledElementPointsY,
+      true,
+    );
+  }
+
   // For linear elements (x,y) are the coordinates of the first drawn point not the top-left corner
   // So we need to readjust (x,y) to be where the first point should be
   const newOrigin = [...newTopLeft];
   newOrigin[0] += stateAtResizeStart.x - newBoundsX1;
   newOrigin[1] += stateAtResizeStart.y - newBoundsY1;
-
   const resizedElement = {
     width: Math.abs(eleNewWidth),
     height: Math.abs(eleNewHeight),
     x: newOrigin[0],
     y: newOrigin[1],
-    ...rescaledPoints,
+    points: rescaledPoints,
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {
@@ -545,6 +571,7 @@ export const resizeSingleElement = (
     updateBoundElements(element, {
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
+
     mutateElement(element, resizedElement);
     if (boundTextElement && boundTextFont) {
       mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
@@ -667,7 +694,7 @@ const resizeMultipleElements = (
     const boundTextElement = getBoundTextElement(element.latest);
 
     if (boundTextElement || isTextElement(element.orig)) {
-      const optionalPadding = boundTextElement ? BOUND_TEXT_PADDING * 2 : 0;
+      const optionalPadding = getBoundTextElementOffset(boundTextElement) * 2;
       const textMeasurements = measureFontSizeFromWH(
         boundTextElement ?? (element.orig as ExcalidrawTextElement),
         width - optionalPadding,
@@ -697,6 +724,7 @@ const resizeMultipleElements = (
 
     if (boundTextElement && boundTextUpdates) {
       mutateElement(boundTextElement, boundTextUpdates);
+
       handleBindTextResize(element.latest, transformHandleType);
     }
   });
@@ -717,7 +745,7 @@ const rotateMultipleElements = (
     centerAngle += SHIFT_LOCKING_ANGLE / 2;
     centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
-  elements.forEach((element, index) => {
+  elements.forEach((element) => {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
@@ -737,13 +765,16 @@ const rotateMultipleElements = (
     });
     const boundTextElementId = getBoundTextElementId(element);
     if (boundTextElementId) {
-      const textElement =
-        Scene.getScene(element)!.getElement(boundTextElementId)!;
-      mutateElement(textElement, {
-        x: textElement.x + (rotatedCX - cx),
-        y: textElement.y + (rotatedCY - cy),
-        angle: normalizeAngle(centerAngle + origAngle),
-      });
+      const textElement = Scene.getScene(element)!.getElement(
+        boundTextElementId,
+      ) as ExcalidrawTextElementWithContainer;
+      if (!isArrowElement(element)) {
+        mutateElement(textElement, {
+          x: textElement.x + (rotatedCX - cx),
+          y: textElement.y + (rotatedCY - cy),
+          angle: normalizeAngle(centerAngle + origAngle),
+        });
+      }
     }
   });
 };
