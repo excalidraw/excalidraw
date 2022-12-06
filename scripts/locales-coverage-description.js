@@ -50,8 +50,8 @@ const crowdinMap = {
   "lv-LV": "en-lv",
   "cs-CZ": "en-cs",
   "kk-KZ": "en-kk",
-  "vi-vn": "en-vi",
-  "mr-in": "en-mr",
+  "vi-VN": "en-vi",
+  "mr-IN": "en-mr",
 };
 
 const flags = {
@@ -120,6 +120,7 @@ const languages = {
   "fa-IR": "فارسی",
   "fi-FI": "Suomi",
   "fr-FR": "Français",
+  "gl-ES": "Galego",
   "he-IL": "עברית",
   "hi-IN": "हिन्दी",
   "hu-HU": "Magyar",
@@ -129,6 +130,7 @@ const languages = {
   "kab-KAB": "Taqbaylit",
   "kk-KZ": "Қазақ тілі",
   "ko-KR": "한국어",
+  "ku-TR": "Kurdî",
   "lt-LT": "Lietuvių",
   "lv-LV": "Latviešu",
   "my-MM": "Burmese",
