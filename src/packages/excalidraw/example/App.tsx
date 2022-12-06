@@ -192,7 +192,10 @@ export default function App() {
         >
           {COMMENT_SVG}
         </button>
-        <button onClick={() => alert("This is dummy footer")}>
+        <button
+          className="custom-footer"
+          onClick={() => alert("This is dummy footer")}
+        >
           {" "}
           custom footer{" "}
         </button>

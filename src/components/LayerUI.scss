@@ -85,6 +85,10 @@
       & > * {
         pointer-events: all;
       }
+
+      display: flex;
+      width: 100%;
+      justify-content: flex-start;
     }
     .layer-ui__wrapper__footer-left,
     .layer-ui__wrapper__footer-right,

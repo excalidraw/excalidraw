@@ -66,10 +66,16 @@
   button.custom-element {
     width: 2rem;
     height: 2rem;
-    margin: 0.4rem;
-    margin-left: -10px;
+    margin: 0 8px;
   }
-  .layer-ui__wrapper__footer-center {
-    display: flex;
+
+  .custom-footer,
+  .custom-element {
+    padding: 0.1rem;
+  }
+
+  &.excalidraw-container .layer-ui__wrapper .layer-ui__wrapper__footer-center {
+    // Remove once we stop importing langauge list from excalidraw app
+    justify-content: flex-start;
   }
 }
