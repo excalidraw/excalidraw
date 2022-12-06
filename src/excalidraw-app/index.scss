@@ -4,9 +4,8 @@
   &.theme--dark {
     --color-primary-contrast-offset: #726dff; // to offset Chubb illusion
   }
-  .layer-ui__wrapper__footer-center {
-    display: flex;
-    justify-content: space-between;
+  .layer-ui__wrapper .layer-ui__wrapper__footer-center {
+    justify-content: flex-end;
     margin-top: auto;
     margin-bottom: auto;
     margin-inline-start: auto;
