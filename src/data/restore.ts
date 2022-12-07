@@ -25,6 +25,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   PRECEDING_ELEMENT_KEY,
   FONT_FAMILY,
+  ROUNDNESS,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -115,7 +116,7 @@ const restoreElementWithProperties = <
     roundness: element.roundness
       ? element.roundness
       : (element as any).strokeSharpness === "round"
-      ? ["default"]
+      ? { type: ROUNDNESS.GENERIC }
       : null,
     boundElements: element.boundElementIds
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))

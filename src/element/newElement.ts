@@ -30,12 +30,7 @@ import {
   normalizeText,
   wrapText,
 } from "./textElement";
-import {
-  BOUND_TEXT_PADDING,
-  DEFAULT_RECTANGULAR_FIXED_RADIUS,
-  VERTICAL_ALIGN,
-} from "../constants";
-import { canChangeRadius } from "../scene/comparisons";
+import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
 import { isArrowElement } from "./typeChecks";
 
 type ElementConstructorOpts = MarkOptional<
@@ -74,7 +69,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
-  const element = {
+  // assign type to guard against excess properties
+  const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
     id: rest.id || randomId(),
     type,
     x,
@@ -91,7 +87,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     opacity,
     groupIds,
     roundness,
-    radius: canChangeRadius(type) ? DEFAULT_RECTANGULAR_FIXED_RADIUS : null,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
     versionNonce: rest.versionNonce ?? 0,

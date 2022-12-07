@@ -41,8 +41,8 @@ import {
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
-  DEFAULT_RECTANGULAR_FIXED_RADIUS,
   FONT_FAMILY,
+  ROUNDNESS,
   VERTICAL_ALIGN,
 } from "../constants";
 import {
@@ -853,9 +853,12 @@ export const actionChangeSharpness = register({
         newElementWith(el, {
           roundness:
             value === "round"
-              ? isLinearElement(el) || !canChangeRadius(el.type)
-                ? ["default"]
-                : ["custom-fixed-radius", DEFAULT_RECTANGULAR_FIXED_RADIUS]
+              ? {
+                  type:
+                    isLinearElement(el) || !canChangeRadius(el.type)
+                      ? ROUNDNESS.GENERIC
+                      : ROUNDNESS.ADAPTIVE_RADIUS,
+                }
               : null,
         }),
       ),

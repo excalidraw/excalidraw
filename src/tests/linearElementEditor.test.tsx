@@ -20,6 +20,7 @@ import { resize, rotate } from "./utils";
 import { getBoundTextElementPosition, wrapText } from "../element/textElement";
 import { getMaxContainerWidth } from "../element/newElement";
 import * as textElementUtils from "../element/textElement";
+import { ROUNDNESS } from "../constants";
 
 const renderScene = jest.spyOn(Renderer, "renderScene");
 
@@ -325,7 +326,7 @@ describe("Test Linear Elements", () => {
     });
 
     it("should update all the midpoints when element position changed", async () => {
-      createThreePointerLinearElement("line", ["default"]);
+      createThreePointerLinearElement("line", { type: ROUNDNESS.GENERIC });
 
       const line = h.elements[0] as ExcalidrawLinearElement;
       expect(line.points.length).toEqual(3);
@@ -525,7 +526,9 @@ describe("Test Linear Elements", () => {
       let line: ExcalidrawLinearElement;
 
       beforeEach(() => {
-        line = createThreePointerLinearElement("line", ["default"]);
+        line = createThreePointerLinearElement("line", {
+          type: ROUNDNESS.GENERIC,
+        });
         expect(line.points.length).toEqual(3);
 
         enterLineEditingMode(line);
@@ -768,7 +771,7 @@ describe("Test Linear Elements", () => {
       });
 
       it("should return correct position for arrow with odd points", () => {
-        createThreePointerLinearElement("arrow", ["default"]);
+        createThreePointerLinearElement("arrow", { type: ROUNDNESS.GENERIC });
         const arrow = h.elements[0] as ExcalidrawLinearElement;
         const { textElement, container } = createBoundTextElement(
           DEFAULT_TEXT,
@@ -788,7 +791,7 @@ describe("Test Linear Elements", () => {
       });
 
       it("should return correct position for arrow with even points", () => {
-        createThreePointerLinearElement("arrow", ["default"]);
+        createThreePointerLinearElement("arrow", { type: ROUNDNESS.GENERIC });
         const arrow = h.elements[0] as ExcalidrawLinearElement;
         const { textElement, container } = createBoundTextElement(
           DEFAULT_TEXT,
@@ -903,7 +906,7 @@ describe("Test Linear Elements", () => {
     });
 
     it("should not rotate the bound text and update position of bound text and bounding box correctly when arrow rotated", () => {
-      createThreePointerLinearElement("arrow", ["default"]);
+      createThreePointerLinearElement("arrow", { type: ROUNDNESS.GENERIC });
 
       const arrow = h.elements[0] as ExcalidrawLinearElement;
 
@@ -967,7 +970,7 @@ describe("Test Linear Elements", () => {
     });
 
     it("should resize and position the bound text and bounding box correctly when 3 pointer arrow element resized", () => {
-      createThreePointerLinearElement("arrow", ["default"]);
+      createThreePointerLinearElement("arrow", { type: ROUNDNESS.GENERIC });
 
       const arrow = h.elements[0] as ExcalidrawLinearElement;
 

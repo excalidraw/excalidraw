@@ -26,11 +26,10 @@ Object {
       50,
     ],
   ],
-  "radius": null,
   "roughness": 1,
-  "roundness": Array [
-    "default",
-  ],
+  "roundness": Object {
+    "type": 1,
+  },
   "seed": 337897,
   "startArrowhead": null,
   "startBinding": null,
@@ -73,11 +72,10 @@ Object {
       50,
     ],
   ],
-  "radius": null,
   "roughness": 1,
-  "roundness": Array [
-    "default",
-  ],
+  "roundness": Object {
+    "type": 1,
+  },
   "seed": 337897,
   "startArrowhead": null,
   "startBinding": null,
@@ -107,11 +105,10 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "radius": null,
   "roughness": 1,
-  "roundness": Array [
-    "default",
-  ],
+  "roundness": Object {
+    "type": 1,
+  },
   "seed": 337897,
   "strokeColor": "#000000",
   "strokeStyle": "solid",
@@ -139,11 +136,10 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "radius": null,
   "roughness": 1,
-  "roundness": Array [
-    "default",
-  ],
+  "roundness": Object {
+    "type": 1,
+  },
   "seed": 337897,
   "strokeColor": "#000000",
   "strokeStyle": "solid",
@@ -171,12 +167,10 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "radius": 32,
   "roughness": 1,
-  "roundness": Array [
-    "custom-fixed-radius",
-    32,
-  ],
+  "roundness": Object {
+    "type": 2,
+  },
   "seed": 337897,
   "strokeColor": "#000000",
   "strokeStyle": "solid",

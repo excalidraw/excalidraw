@@ -1,3 +1,4 @@
+import { ROUNDNESS } from "../constants";
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 
@@ -22,7 +23,7 @@ const _ce = ({
     backgroundColor: "#000",
     fillStyle: "solid",
     strokeWidth: 1,
-    roundness: ["default"],
+    roundness: { type: ROUNDNESS.GENERIC },
     roughness: 0,
     opacity: 1,
     x,

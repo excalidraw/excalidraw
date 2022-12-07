@@ -8,7 +8,7 @@ import {
   FileId,
 } from "../../element/types";
 import { newElement, newTextElement, newLinearElement } from "../../element";
-import { DEFAULT_VERTICAL_ALIGN } from "../../constants";
+import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
 import { getDefaultAppState } from "../../appState";
 import { GlobalTestState, createEvent, fireEvent } from "../test-utils";
 import fs from "fs";
@@ -126,7 +126,20 @@ export class API {
 
     const appState = h?.state || getDefaultAppState();
 
-    const base = {
+    const base: Omit<
+      ExcalidrawGenericElement,
+      | "id"
+      | "width"
+      | "height"
+      | "type"
+      | "seed"
+      | "version"
+      | "versionNonce"
+      | "isDeleted"
+      | "groupIds"
+      | "link"
+      | "updated"
+    > = {
       x,
       y,
       angle: rest.angle ?? 0,
@@ -136,19 +149,17 @@ export class API {
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,
       strokeWidth: rest.strokeWidth ?? appState.currentItemStrokeWidth,
       strokeStyle: rest.strokeStyle ?? appState.currentItemStrokeStyle,
-      roundness: ((
+      roundness: (
         rest.roundness === undefined
           ? appState.currentItemRoundness === "round"
           : rest.roundness
       )
-        ? isLinearElementType(type)
-          ? {
-              algorithm: "default",
-            }
-          : {
-              algorithm: "custom-fixed-radius",
-            }
-        : null) as ExcalidrawGenericElement["roundness"],
+        ? {
+            type: isLinearElementType(type)
+              ? ROUNDNESS.GENERIC
+              : ROUNDNESS.ADAPTIVE_RADIUS,
+          }
+        : null,
       roughness: rest.roughness ?? appState.currentItemRoughness,
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,

@@ -51,7 +51,6 @@ import {
   APP_NAME,
   CURSOR_TYPE,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-  DEFAULT_RECTANGULAR_FIXED_RADIUS,
   DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -71,6 +70,7 @@ import {
   MQ_RIGHT_SIDEBAR_MIN_WIDTH,
   MQ_SM_MAX_WIDTH,
   POINTER_BUTTON,
+  ROUNDNESS,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
@@ -4218,7 +4218,9 @@ class App extends React.Component<AppProps, AppState> {
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
         roundness:
-          this.state.currentItemRoundness === "round" ? ["default"] : null,
+          this.state.currentItemRoundness === "round"
+            ? { type: ROUNDNESS.GENERIC }
+            : null,
         startArrowhead,
         endArrowhead,
         locked: false,
@@ -4271,9 +4273,11 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       roundness:
         this.state.currentItemRoundness === "round"
-          ? canChangeRadius(elementType)
-            ? ["custom-fixed-radius", DEFAULT_RECTANGULAR_FIXED_RADIUS]
-            : ["default"]
+          ? {
+              type: canChangeRadius(elementType)
+                ? ROUNDNESS.ADAPTIVE_RADIUS
+                : ROUNDNESS.GENERIC,
+            }
           : null,
       locked: false,
     });

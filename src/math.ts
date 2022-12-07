@@ -1,8 +1,9 @@
 import { NormalizedZoomValue, Point, Zoom } from "./types";
 import {
-  DEFAULT_RECTANGULAR_FIXED_RADIUS,
+  DEFAULT_ADAPTIVE_RADIUS,
   LINE_CONFIRM_THRESHOLD,
-  PREVIOUS_RECTANGULAR_RADIUS_RATIO,
+  GENERIC_RADIUS_RATIO,
+  ROUNDNESS,
 } from "./constants";
 import {
   ExcalidrawElement,
@@ -274,20 +275,18 @@ export const getGridPoint = (
   return [x, y];
 };
 
-// This is to provide a better default radius size for rectangles
 export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
-  if (element.roundness?.[0] === "default") {
-    return PREVIOUS_RECTANGULAR_RADIUS_RATIO * x;
+  if (element.roundness?.type === ROUNDNESS.GENERIC) {
+    return x * GENERIC_RADIUS_RATIO;
   }
 
-  if (element.roundness?.[0] === "custom-fixed-radius") {
-    const fixedRadiusSize =
-      element.roundness?.[1] ?? DEFAULT_RECTANGULAR_FIXED_RADIUS;
+  if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
+    const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
 
-    const CUTOFF_SIZE = fixedRadiusSize / PREVIOUS_RECTANGULAR_RADIUS_RATIO;
+    const CUTOFF_SIZE = fixedRadiusSize / GENERIC_RADIUS_RATIO;
 
     if (x <= CUTOFF_SIZE) {
-      return x * PREVIOUS_RECTANGULAR_RADIUS_RATIO;
+      return x * GENERIC_RADIUS_RATIO;
     }
 
     return fixedRadiusSize;

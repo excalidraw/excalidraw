@@ -216,8 +216,27 @@ export const TEXT_ALIGN = {
 
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 
-export const PREVIOUS_RECTANGULAR_RADIUS_RATIO = 0.25;
-export const DEFAULT_RECTANGULAR_FIXED_RADIUS = 32;
+// radius represented as 25% of elements largest side (width/height).
+// Used for legacy roundness, generic rounding (diamonds...), or when
+// element below cutoff size.
+export const GENERIC_RADIUS_RATIO = 0.25;
+// 32px. Applies to the ADAPTIVE_RADIUS algorithm.
+export const DEFAULT_ADAPTIVE_RADIUS = 32;
+// roundness type (algorithm)
+export const ROUNDNESS = {
+  // no roundness (sharp edges)
+  NONE: 0,
+  // generic roundness algorithm. Used for linear elements, diamonds, and
+  // legacy rounding
+  GENERIC: 1,
+  // current default algorithm for rectangles/diamonds. It's working similarly
+  // to a rregular border-radius, but attemps to make radius visually similar
+  // across differnt element sizes, especially very large and very small.
+  //
+  // NOTE that right now we don't allow configuration and use a fixed radius
+  // (see DEFAULT_ADAPTIVE_RADIUS constant)
+  ADAPTIVE_RADIUS: 2,
+} as const;
 
 export const COOKIES = {
   AUTH_STATE_COOKIE: "excplus-auth",

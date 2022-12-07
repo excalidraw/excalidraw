@@ -33,11 +33,10 @@ Object {
       110,
     ],
   ],
-  "radius": null,
   "roughness": 1,
-  "roundness": Array [
-    "default",
-  ],
+  "roundness": Object {
+    "type": 1,
+  },
   "seed": 337897,
   "startArrowhead": null,
   "startBinding": null,
@@ -87,11 +86,10 @@ Object {
       110,
     ],
   ],
-  "radius": null,
   "roughness": 1,
-  "roundness": Array [
-    "default",
-  ],
+  "roundness": Object {
+    "type": 1,
+  },
   "seed": 337897,
   "startArrowhead": null,
   "startBinding": null,
