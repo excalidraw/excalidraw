@@ -1221,16 +1221,8 @@ export class LinearElementEditor {
     offsetY: number,
     otherUpdates?: { startBinding?: PointBinding; endBinding?: PointBinding },
   ) {
-    const nextCoords = getElementPointsCoords(
-      element,
-      nextPoints,
-      element.roundness ? "round" : "sharp",
-    );
-    const prevCoords = getElementPointsCoords(
-      element,
-      element.points,
-      element.roundness ? "round" : "sharp",
-    );
+    const nextCoords = getElementPointsCoords(element, nextPoints);
+    const prevCoords = getElementPointsCoords(element, element.points);
     const nextCenterX = (nextCoords[0] + nextCoords[2]) / 2;
     const nextCenterY = (nextCoords[1] + nextCoords[3]) / 2;
     const prevCenterX = (prevCoords[0] + prevCoords[2]) / 2;

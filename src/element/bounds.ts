@@ -5,7 +5,6 @@ import {
   ExcalidrawFreeDrawElement,
   NonDeleted,
   ExcalidrawTextElementWithContainer,
-  StrokeSharpness,
 } from "./types";
 import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
@@ -585,12 +584,11 @@ export const getResizedElementAbsoluteCoords = (
 export const getElementPointsCoords = (
   element: ExcalidrawLinearElement,
   points: readonly (readonly [number, number])[],
-  sharpness: StrokeSharpness,
 ): [number, number, number, number] => {
   // This might be computationally heavey
   const gen = rough.generator();
   const curve =
-    sharpness === "sharp"
+    element.roundness == null
       ? gen.linearPath(
           points as [number, number][],
           generateRoughOptions(element),
