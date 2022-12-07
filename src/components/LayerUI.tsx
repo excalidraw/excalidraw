@@ -71,7 +71,6 @@ interface LayerUIProps {
   langCode: Language["code"];
   isCollaborating: boolean;
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
-  renderCustomFooter?: ExcalidrawProps["renderFooter"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -81,6 +80,7 @@ interface LayerUIProps {
   id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderWelcomeScreen: boolean;
+  children?: React.ReactNode;
 }
 const LayerUI = ({
   actionManager,
@@ -96,7 +96,7 @@ const LayerUI = ({
   showExitZenModeBtn,
   isCollaborating,
   renderTopRightUI,
-  renderCustomFooter,
+
   renderCustomStats,
   renderCustomSidebar,
   libraryReturnUrl,
@@ -106,6 +106,7 @@ const LayerUI = ({
   id,
   onImageAction,
   renderWelcomeScreen,
+  children,
 }: LayerUIProps) => {
   const device = useDevice();
 
@@ -437,7 +438,16 @@ const LayerUI = ({
   };
 
   const [hostSidebarCounters] = useAtom(hostSidebarCountersAtom, jotaiScope);
-
+  const FooterComponent = React.Children.toArray(children).find(
+    (child) =>
+      //@ts-ignore
+      React.isValidElement(child) && child.type?.displayName === "Footer",
+  ) || (
+    <Footer
+      renderWelcomeScreen={renderWelcomeScreen}
+      showExitZenModeBtn={showExitZenModeBtn}
+    />
+  );
   return (
     <>
       {appState.isLoading && <LoadingMessage delay={250} />}
@@ -481,7 +491,6 @@ const LayerUI = ({
           onPenModeToggle={onPenModeToggle}
           canvas={canvas}
           isCollaborating={isCollaborating}
-          renderCustomFooter={renderCustomFooter}
           onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
@@ -510,13 +519,8 @@ const LayerUI = ({
             }
           >
             {renderFixedSideContainer()}
-            <Footer
-              renderWelcomeScreen={renderWelcomeScreen}
-              appState={appState}
-              actionManager={actionManager}
-              renderCustomFooter={renderCustomFooter}
-              showExitZenModeBtn={showExitZenModeBtn}
-            />
+            {FooterComponent}
+
             {appState.showStats && (
               <Stats
                 appState={appState}
@@ -563,7 +567,6 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
 
   return (
-    prev.renderCustomFooter === next.renderCustomFooter &&
     prev.renderTopRightUI === next.renderTopRightUI &&
     prev.renderCustomStats === next.renderCustomStats &&
     prev.renderCustomSidebar === next.renderCustomSidebar &&

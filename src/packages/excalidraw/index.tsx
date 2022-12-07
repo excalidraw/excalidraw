@@ -20,7 +20,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     isCollaborating = false,
     onPointerUpdate,
     renderTopRightUI,
-    renderFooter,
     renderSidebar,
     langCode = defaultLang.code,
     viewModeEnabled,
@@ -39,6 +38,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onLinkOpen,
     onPointerDown,
     onScrollChange,
+    children,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -93,7 +93,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
           renderTopRightUI={renderTopRightUI}
-          renderFooter={renderFooter}
           langCode={langCode}
           viewModeEnabled={viewModeEnabled}
           zenModeEnabled={zenModeEnabled}
@@ -113,7 +112,9 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
           renderSidebar={renderSidebar}
-        />
+        >
+          {children}
+        </App>
       </Provider>
     </InitializeApp>
   );
@@ -236,3 +237,4 @@ export {
 } from "../../utils";
 
 export { Sidebar } from "../../components/Sidebar/Sidebar";
+export { useDevice } from "../../components/App";

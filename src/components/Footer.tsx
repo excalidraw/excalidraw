@@ -1,35 +1,39 @@
 import clsx from "clsx";
-import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
-import { AppState, ExcalidrawProps } from "../types";
 import {
   ExitZenModeAction,
   FinalizeAction,
   UndoRedoActions,
   ZoomActions,
 } from "./Actions";
-import { useDevice } from "./App";
+import {
+  useDevice,
+  useExcalidrawActionManager,
+  useExcalidrawAppState,
+} from "./App";
 import { WelcomeScreenHelpArrow } from "./icons";
 import { Section } from "./Section";
 import Stack from "./Stack";
 import WelcomeScreenDecor from "./WelcomeScreenDecor";
 
 const Footer = ({
-  appState,
-  actionManager,
-  renderCustomFooter,
-  showExitZenModeBtn,
-  renderWelcomeScreen,
+  showExitZenModeBtn = true,
+  renderWelcomeScreen = true,
+  children,
 }: {
-  appState: AppState;
-  actionManager: ActionManager;
-  renderCustomFooter?: ExcalidrawProps["renderFooter"];
-  showExitZenModeBtn: boolean;
-  renderWelcomeScreen: boolean;
+  showExitZenModeBtn?: boolean;
+  renderWelcomeScreen?: boolean;
+  children?: React.ReactNode;
 }) => {
   const device = useDevice();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useExcalidrawAppState();
   const showFinalize =
     !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
+
+  if (!actionManager) {
+    return null;
+  }
   return (
     <footer
       role="contentinfo"
@@ -78,7 +82,7 @@ const Footer = ({
           },
         )}
       >
-        {renderCustomFooter?.(false, appState)}
+        {children}
       </div>
       <div
         className={clsx("layer-ui__wrapper__footer-right zen-mode-transition", {
@@ -107,3 +111,4 @@ const Footer = ({
 };
 
 export default Footer;
+Footer.displayName = "Footer";
