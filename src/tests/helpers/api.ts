@@ -136,7 +136,11 @@ export class API {
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,
       strokeWidth: rest.strokeWidth ?? appState.currentItemStrokeWidth,
       strokeStyle: rest.strokeStyle ?? appState.currentItemStrokeStyle,
-      roundness: (rest.roundness ?? appState.currentItemRoundness === "round"
+      roundness: ((
+        rest.roundness === undefined
+          ? appState.currentItemRoundness === "round"
+          : rest.roundness
+      )
         ? isLinearElementType(type)
           ? {
               algorithm: "default",
