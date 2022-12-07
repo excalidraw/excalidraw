@@ -452,33 +452,35 @@ const generateElementShape = (
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
           getDiamondPoints(element);
         if (element.strokeSharpness === "round") {
+          const verticalRadius = getCornerRadius(
+            Math.abs(topX - leftX),
+            element,
+          );
+
+          const horizontalRadius = getCornerRadius(
+            Math.abs(rightY - topY),
+            element,
+          );
+
           shape = generator.path(
-            `M ${topX + getCornerRadius(rightX - topX, element)} ${
-              topY + getCornerRadius(rightY - topY, element)
-            } L ${rightX - getCornerRadius(rightX - topX, element)} ${
-              rightY - getCornerRadius(rightY - topY, element)
-            }
+            `M ${topX + verticalRadius} ${topY + horizontalRadius} L ${
+              rightX - verticalRadius
+            } ${rightY - horizontalRadius}
             C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
-              rightX - getCornerRadius(rightX - bottomX, element)
-            } ${rightY + getCornerRadius(bottomY - rightY, element)}
-            L ${bottomX + getCornerRadius(rightX - bottomX, element)} ${
-              bottomY - getCornerRadius(bottomY - rightY, element)
-            }
+              rightX - verticalRadius
+            } ${rightY + horizontalRadius}
+            L ${bottomX + verticalRadius} ${bottomY - horizontalRadius}
             C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
-              bottomX - getCornerRadius(bottomX - leftX, element)
-            } ${bottomY - getCornerRadius(bottomY - leftY, element)}
-            L ${leftX + getCornerRadius(bottomX - leftX, element)} ${
-              leftY + getCornerRadius(bottomY - leftY, element)
+              bottomX - verticalRadius
+            } ${bottomY - horizontalRadius}
+            L ${leftX + verticalRadius} ${leftY + horizontalRadius}
+            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${leftX + verticalRadius} ${
+              leftY - horizontalRadius
             }
-            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${
-              leftX + getCornerRadius(topX - leftX, element)
-            } ${leftY - getCornerRadius(leftY - topY, element)}
-            L ${topX - getCornerRadius(topX - leftX, element)} ${
-              topY + getCornerRadius(leftY - topY, element)
-            }
-            C ${topX} ${topY}, ${topX} ${topY}, ${
-              topX + getCornerRadius(rightX - topX, element)
-            } ${topY + getCornerRadius(rightY - topY, element)}`,
+            L ${topX - verticalRadius} ${topY + horizontalRadius}
+            C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
+              topY + horizontalRadius
+            }`,
             generateRoughOptions(element, true),
           );
         } else {
