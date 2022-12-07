@@ -276,19 +276,24 @@ export const getGridPoint = (
 
 // This is to provide a better default radius size for rectangles
 export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
-  if (element.strokeSharpness === "round" && element.radius === null) {
+  if (element.roundness?.[0] === "default") {
     return PREVIOUS_RECTANGULAR_RADIUS_RATIO * x;
   }
 
-  const fixedRadiusSize = element.radius ?? DEFAULT_RECTANGULAR_FIXED_RADIUS;
+  if (element.roundness?.[0] === "custom-fixed-radius") {
+    const fixedRadiusSize =
+      element.roundness?.[1] ?? DEFAULT_RECTANGULAR_FIXED_RADIUS;
 
-  const CUTOFF_SIZE = fixedRadiusSize / PREVIOUS_RECTANGULAR_RADIUS_RATIO;
+    const CUTOFF_SIZE = fixedRadiusSize / PREVIOUS_RECTANGULAR_RADIUS_RATIO;
 
-  if (x <= CUTOFF_SIZE) {
-    return x * PREVIOUS_RECTANGULAR_RADIUS_RATIO;
+    if (x <= CUTOFF_SIZE) {
+      return x * PREVIOUS_RECTANGULAR_RADIUS_RATIO;
+    }
+
+    return fixedRadiusSize;
   }
 
-  return fixedRadiusSize;
+  return 0;
 };
 
 export const getControlPointsForBezierCurve = (

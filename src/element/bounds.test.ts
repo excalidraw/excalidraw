@@ -22,6 +22,7 @@ const _ce = ({
     backgroundColor: "#000",
     fillStyle: "solid",
     strokeWidth: 1,
+    roundness: ["default"],
     roughness: 0,
     opacity: 1,
     x,

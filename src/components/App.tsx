@@ -51,6 +51,7 @@ import {
   APP_NAME,
   CURSOR_TYPE,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+  DEFAULT_RECTANGULAR_FIXED_RADIUS,
   DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -272,6 +273,7 @@ import {
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { atom } from "jotai";
 import { Fonts } from "../scene/Fonts";
+import { canChangeRadius } from "../scene/comparisons";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -1658,9 +1660,9 @@ class App extends React.Component<AppProps, AppState> {
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.state.currentItemStrokeWidth,
       strokeStyle: this.state.currentItemStrokeStyle,
+      roundness: null,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
-      strokeSharpness: this.state.currentItemStrokeSharpness,
       text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
@@ -2569,7 +2571,7 @@ class App extends React.Component<AppProps, AppState> {
           strokeStyle: this.state.currentItemStrokeStyle,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
-          strokeSharpness: this.state.currentItemStrokeSharpness,
+          roundness: null,
           text: "",
           fontSize: this.state.currentItemFontSize,
           fontFamily: this.state.currentItemFontFamily,
@@ -4072,7 +4074,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
-      strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+      roundness: null,
       simulatePressure: event.pressure === 0.5,
       locked: false,
     });
@@ -4128,8 +4130,8 @@ class App extends React.Component<AppProps, AppState> {
       strokeWidth: this.state.currentItemStrokeWidth,
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
+      roundness: null,
       opacity: this.state.currentItemOpacity,
-      strokeSharpness: this.state.currentItemLinearStrokeSharpness,
       locked: false,
     });
 
@@ -4215,7 +4217,8 @@ class App extends React.Component<AppProps, AppState> {
         strokeStyle: this.state.currentItemStrokeStyle,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
-        strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+        roundness:
+          this.state.currentItemRoundness === "round" ? ["default"] : null,
         startArrowhead,
         endArrowhead,
         locked: false,
@@ -4266,7 +4269,12 @@ class App extends React.Component<AppProps, AppState> {
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
-      strokeSharpness: this.state.currentItemStrokeSharpness,
+      roundness:
+        this.state.currentItemRoundness === "round"
+          ? canChangeRadius(elementType)
+            ? ["custom-fixed-radius", DEFAULT_RECTANGULAR_FIXED_RADIUS]
+            : ["default"]
+          : null,
       locked: false,
     });
 

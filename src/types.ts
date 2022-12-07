@@ -135,11 +135,9 @@ export type AppState = {
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
-  currentItemStrokeSharpness: StrokeSharpness;
-  currentItemFixedRadius: number;
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
-  currentItemLinearStrokeSharpness: StrokeSharpness;
+  currentItemRoundness: StrokeSharpness;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;

@@ -424,7 +424,7 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
-        if (element.strokeSharpness === "round") {
+        if (element.roundness) {
           const w = element.width;
           const h = element.height;
           const r = getCornerRadius(Math.min(w, h), element);
@@ -451,7 +451,7 @@ const generateElementShape = (
       case "diamond": {
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
           getDiamondPoints(element);
-        if (element.strokeSharpness === "round") {
+        if (element.roundness) {
           const verticalRadius = getCornerRadius(
             Math.abs(topX - leftX),
             element,
@@ -519,7 +519,7 @@ const generateElementShape = (
 
         // curve is always the first element
         // this simplifies finding the curve for an element
-        if (element.strokeSharpness === "sharp") {
+        if (!element.roundness) {
           if (options.fill) {
             shape = [generator.polygon(points as [number, number][], options)];
           } else {

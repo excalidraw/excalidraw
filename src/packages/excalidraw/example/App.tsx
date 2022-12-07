@@ -241,8 +241,10 @@ export default function App() {
             locked: false,
             link: null,
             updated: 1,
-            strokeSharpness: "round",
-            radius: DEFAULT_RECTANGULAR_FIXED_RADIUS,
+            roundness: [
+              "custom-fixed-radius",
+              DEFAULT_RECTANGULAR_FIXED_RADIUS,
+            ],
           },
         ],
         null,

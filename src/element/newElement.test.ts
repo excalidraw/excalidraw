@@ -25,7 +25,7 @@ it("clones arrow element", () => {
     fillStyle: "hachure",
     strokeWidth: 1,
     strokeStyle: "solid",
-    strokeSharpness: "round",
+    roundness: ["default"],
     roughness: 1,
     opacity: 100,
   });
@@ -71,7 +71,7 @@ it("clones text element", () => {
     fillStyle: "hachure",
     strokeWidth: 1,
     strokeStyle: "solid",
-    strokeSharpness: "round",
+    roundness: null,
     roughness: 1,
     opacity: 100,
     text: "hello",

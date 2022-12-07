@@ -18,6 +18,7 @@ import { getMimeType } from "../../data/blob";
 import { newFreeDrawElement, newImageElement } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
+import { isLinearElementType } from "../../element/typeChecks";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -89,7 +90,7 @@ export class API {
     fillStyle?: ExcalidrawGenericElement["fillStyle"];
     strokeWidth?: ExcalidrawGenericElement["strokeWidth"];
     strokeStyle?: ExcalidrawGenericElement["strokeStyle"];
-    strokeSharpness?: ExcalidrawGenericElement["strokeSharpness"];
+    roundness?: ExcalidrawGenericElement["roundness"];
     roughness?: ExcalidrawGenericElement["roughness"];
     opacity?: ExcalidrawGenericElement["opacity"];
     // text props
@@ -135,8 +136,15 @@ export class API {
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,
       strokeWidth: rest.strokeWidth ?? appState.currentItemStrokeWidth,
       strokeStyle: rest.strokeStyle ?? appState.currentItemStrokeStyle,
-      strokeSharpness:
-        rest.strokeSharpness ?? appState.currentItemStrokeSharpness,
+      roundness: (rest.roundness ?? appState.currentItemRoundness === "round"
+        ? isLinearElementType(type)
+          ? {
+              algorithm: "default",
+            }
+          : {
+              algorithm: "custom-fixed-radius",
+            }
+        : null) as ExcalidrawGenericElement["roundness"],
       roughness: rest.roughness ?? appState.currentItemRoughness,
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,

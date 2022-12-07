@@ -41,6 +41,7 @@ import {
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_RECTANGULAR_FIXED_RADIUS,
   FONT_FAMILY,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -54,11 +55,7 @@ import {
   getBoundTextElement,
   getContainerElement,
 } from "../element/textElement";
-import {
-  isBoundToContainer,
-  isLinearElement,
-  isLinearElementType,
-} from "../element/typeChecks";
+import { isBoundToContainer, isLinearElement } from "../element/typeChecks";
 import {
   Arrowhead,
   ExcalidrawElement,
@@ -76,7 +73,6 @@ import {
   canHaveArrowheads,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
-  getTargetElements,
   isSomeElementSelected,
 } from "../scene";
 import { canChangeRadius, hasStrokeColor } from "../scene/comparisons";
@@ -852,34 +848,20 @@ export const actionChangeSharpness = register({
   name: "changeSharpness",
   trackEvent: false,
   perform: (elements, appState, value) => {
-    const targetElements = getTargetElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
-    const shouldUpdateForNonLinearElements = targetElements.length
-      ? targetElements.every((el) => !isLinearElement(el))
-      : !isLinearElementType(appState.activeTool.type);
-    const shouldUpdateForLinearElements = targetElements.length
-      ? targetElements.every(isLinearElement)
-      : isLinearElementType(appState.activeTool.type);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
-          strokeSharpness: value,
-          radius:
-            value === "round" && canChangeRadius(el.type)
-              ? appState.currentItemFixedRadius
+          roundness:
+            value === "round"
+              ? isLinearElement(el) || !canChangeRadius(el.type)
+                ? ["default"]
+                : ["custom-fixed-radius", DEFAULT_RECTANGULAR_FIXED_RADIUS]
               : null,
         }),
       ),
       appState: {
         ...appState,
-        currentItemStrokeSharpness: shouldUpdateForNonLinearElements
-          ? value
-          : appState.currentItemStrokeSharpness,
-        currentItemLinearStrokeSharpness: shouldUpdateForLinearElements
-          ? value
-          : appState.currentItemLinearStrokeSharpness,
+        currentItemRoundness: value,
       },
       commitToHistory: true,
     };
@@ -904,11 +886,9 @@ export const actionChangeSharpness = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => element.strokeSharpness,
+          (element) => (element.roundness ? "round" : null),
           (canChangeSharpness(appState.activeTool.type) &&
-            (isLinearElementType(appState.activeTool.type)
-              ? appState.currentItemLinearStrokeSharpness
-              : appState.currentItemStrokeSharpness)) ||
+            appState.currentItemRoundness) ||
             null,
         )}
         onChange={(value) => updateData(value)}

@@ -156,7 +156,7 @@ const flipElement = (
     initialPointsCoords = getElementPointsCoords(
       element,
       element.points,
-      element.strokeSharpness,
+      element.roundness ? "round" : "sharp",
     );
   }
   const initialElementAbsoluteCoords = getElementAbsoluteCoords(element);
@@ -218,7 +218,7 @@ const flipElement = (
     const finalPointsCoords = getElementPointsCoords(
       element,
       element.points,
-      element.strokeSharpness,
+      element.roundness ? "round" : "sharp",
     );
 
     const topLeftCoordsDiff = initialPointsCoords[0] - finalPointsCoords[0];

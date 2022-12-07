@@ -10,6 +10,7 @@ export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
 export type PointerType = "mouse" | "pen" | "touch";
 export type StrokeSharpness = "round" | "sharp";
+export type RoundnessAlgorithm = "default" | "custom-fixed-radius";
 export type StrokeStyle = "solid" | "dashed" | "dotted";
 export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
 
@@ -25,8 +26,7 @@ type _ExcalidrawElementBase = Readonly<{
   fillStyle: FillStyle;
   strokeWidth: number;
   strokeStyle: StrokeStyle;
-  strokeSharpness: StrokeSharpness;
-  radius: number | null;
+  roundness: null | [RoundnessAlgorithm] | [RoundnessAlgorithm, number];
   roughness: number;
   opacity: number;
   width: number;

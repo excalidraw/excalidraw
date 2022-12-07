@@ -255,7 +255,7 @@ describe("restoreElements", () => {
         width: 100,
         height: 200,
         groupIds: ["1", "2", "3"],
-        strokeSharpness: "round",
+        roundness: ["default"],
       });
 
       elements.push(element);

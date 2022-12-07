@@ -17,7 +17,7 @@ import {
   isInvisiblySmallElement,
   refreshTextDimensions,
 } from "../element";
-import { isLinearElementType, isTextElement } from "../element/typeChecks";
+import { isTextElement } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
   DEFAULT_FONT_FAMILY,
@@ -112,10 +112,11 @@ const restoreElementWithProperties = <
     height: element.height || 0,
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
-    strokeSharpness:
-      element.strokeSharpness ??
-      (isLinearElementType(element.type) ? "round" : "sharp"),
-    radius: element.radius ?? null,
+    roundness: element.roundness
+      ? element.roundness
+      : (element as any).strokeSharpness === "round"
+      ? ["default"]
+      : null,
     boundElements: element.boundElementIds
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
