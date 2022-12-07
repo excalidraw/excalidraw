@@ -886,7 +886,7 @@ export const actionChangeSharpness = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => (element.roundness ? "round" : null),
+          (element) => (element.roundness ? "round" : "sharp"),
           (canChangeSharpness(appState.activeTool.type) &&
             appState.currentItemRoundness) ||
             null,
