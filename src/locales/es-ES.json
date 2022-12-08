@@ -115,8 +115,8 @@
       "label": "Enlace"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Editar linea",
+      "exit": "Salir del editor de linea"
     },
     "elementLock": {
       "lock": "Bloquear",
@@ -172,7 +172,7 @@
     "confirm": "Confirmar"
   },
   "alerts": {
-    "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
+    "clearReset": "Esto limpiará todo el lienzo. ¿Estás seguro?",
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
     "couldNotCreateShareableLinkTooBig": "No se pudo crear el enlace para compartir: la escena es demasiado grande",
     "couldNotLoadInvalidFile": "No se pudo cargar el archivo no válido",
@@ -225,23 +225,23 @@
   },
   "hints": {
     "canvasPanning": "Para mover el lienzo, mantenga la rueda del ratón o la barra de espacio mientras arrastra",
-    "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
-    "freeDraw": "Haz clic y arrastra, suelta al terminar",
-    "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
-    "text_selected": "Doble clic o pulse ENTER para editar el texto",
-    "text_editing": "Pulse Escape o CtrlOrCmd+ENTER para terminar de editar",
-    "linearElementMulti": "Haz clic en el último punto o presiona Escape o Enter para finalizar",
+    "linearElement": "Haz click para dibujar múltiples puntos, arrastrar para solo una línea",
+    "freeDraw": "Haz click y arrastra, suelta al terminar",
+    "text": "Consejo: también puedes añadir texto haciendo doble click en cualquier lugar con la herramienta de selección",
+    "text_selected": "Doble click o pulse ENTER para editar el texto",
+    "text_editing": "Pulse Escape o Ctrl o Cmd+ENTER para terminar de editar",
+    "linearElementMulti": "Haz click en el último punto o presiona Escape o Enter para finalizar",
     "lockAngle": "Puedes restringir el ángulo manteniendo presionado el botón SHIFT",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "resizeImage": "Puede redimensionar libremente pulsando SHIFT,\npulse ALT para redimensionar desde el centro",
     "rotate": "Puedes restringir los ángulos manteniendo presionado SHIFT mientras giras",
-    "lineEditor_info": "Doble clic o pulse Enter para editar puntos",
+    "lineEditor_info": "Doble clickk o pulse Enter para editar puntos",
     "lineEditor_pointSelected": "Presione Suprimir para eliminar el/los punto(s), CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
-    "lineEditor_nothingSelected": "Seleccione un punto a editar (mantenga MAYÚSCULAS para seleccionar múltiples),\no mantenga pulsado Alt y haga clic para añadir nuevos puntos",
-    "placeImage": "Haga clic para colocar la imagen o haga clic y arrastre para establecer su tamaño manualmente",
+    "lineEditor_nothingSelected": "Seleccione un punto a editar (mantenga MAYÚSCULAS para seleccionar múltiples),\no mantenga pulsado Alt y haga click para añadir nuevos puntos",
+    "placeImage": "Haga clickk para colocar la imagen o haga click y arrastre para establecer su tamaño manualmente",
     "publishLibrary": "Publica tu propia biblioteca",
     "bindTextToElement": "Presione Entrar para agregar",
-    "deepBoxSelect": "Mantén CtrlOrCmd para seleccionar en profundidad, y para evitar arrastrar",
+    "deepBoxSelect": "Mantén Ctrl o Cmd para seleccionar en profundidad, y para evitar arrastrar",
     "eraserRevert": "Mantenga pulsado Alt para revertir los elementos marcados para su eliminación"
   },
   "canvasError": {
@@ -288,24 +288,24 @@
   },
   "helpDialog": {
     "blog": "Lea nuestro blog",
-    "click": "clic",
+    "clickk": "click",
     "deepSelect": "Selección profunda",
     "deepBoxSelect": "Seleccione en profundidad dentro de la caja, y evite arrastrar",
     "curvedArrow": "Flecha curva",
     "curvedLine": "Línea curva",
     "documentation": "Documentación",
-    "doubleClick": "doble clic",
+    "doubleclickk": "doble click",
     "drag": "arrastrar",
     "editor": "Editor",
     "editSelectedShape": "Editar la forma seleccionada (texto/flecha/línea)",
     "github": "¿Ha encontrado un problema? Envíelo",
     "howto": "Siga nuestras guías",
     "or": "o",
-    "preventBinding": "Evitar yuxtaposición de flechas",
+    "preventBinding": "Evitar enlace de flechas",
     "tools": "Herramientas",
     "shortcuts": "Atajos del teclado",
     "textFinish": "Finalizar edición (editor de texto)",
-    "textNewLine": "Añadir nueva linea (editor de texto)",
+    "textNewLine": "Añadir nueva línea (editor de texto)",
     "title": "Ayuda",
     "view": "Vista",
     "zoomToFit": "Ajustar la vista para mostrar todos los elementos",
@@ -342,12 +342,12 @@
       "post": "para que otras personas utilicen en sus dibujos."
     },
     "noteGuidelines": {
-      "pre": "La biblioteca debe ser aprobada manualmente primero. Por favor, lea la ",
+      "pre": "La biblioteca debe ser aprobada manualmente primero. Por favor, lea las ",
       "link": "pautas",
       "post": " antes de enviar. Necesitará una cuenta de GitHub para comunicarse y hacer cambios si se solicita, pero no es estrictamente necesario."
     },
     "noteLicense": {
-      "pre": "Al enviar, usted acepta que la biblioteca se publicará bajo el ",
+      "pre": "Al enviar, usted acepta que la biblioteca se publicará bajo la ",
       "link": "Licencia MIT ",
       "post": "que en breve significa que cualquiera puede utilizarlos sin restricciones."
     },
@@ -379,7 +379,7 @@
     "title": "Estadísticas para nerds",
     "total": "Total",
     "version": "Versión",
-    "versionCopy": "Clic para copiar",
+    "versionCopy": "click para copiar",
     "versionNotAvailable": "Versión no disponible",
     "width": "Ancho"
   },
