@@ -216,28 +216,31 @@ export const TEXT_ALIGN = {
 
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 
-// radius represented as 25% of elements largest side (width/height).
-// Used for legacy roundness, generic rounding (diamonds...), or when
-// element below cutoff size.
-export const GENERIC_RADIUS_RATIO = 0.25;
-// 32px. Applies to the ADAPTIVE_RADIUS algorithm.
+// Radius represented as 25% of element's largest side (width/height).
+// Used for LEGACY and PROPORTIONAL_RADIUS algorithms, or when the element is
+// below the cutoff size.
+export const DEFAULT_PROPORTIONAL_RADIUS = 0.25;
+// Fixed radius for the ADAPTIVE_RADIUS algorithm. In pixels.
 export const DEFAULT_ADAPTIVE_RADIUS = 32;
 // roundness type (algorithm)
 export const ROUNDNESS = {
-  // no roundness (sharp edges)
+  // no radius (sharp edges)
   NONE: 0,
 
-  // Used for legacy rounding (rectangles), which is the same
-  // as PROPORTIONAL_RADIUS, but needed in ui for differentiation
+  // Used for legacy rounding (rectangles), which currently works the same
+  // as PROPORTIONAL_RADIUS, but we need to differentiate for UI purposes and
+  // forwards-compat.
   LEGACY: 1,
 
   // Used for linear elements & diamonds
   PROPORTIONAL_RADIUS: 2,
 
-  // Current default algorithm for rectangles. It's working similarly
-  // to a rregular border-radius, but attemps to make radius visually similar
-  // across differnt element sizes, especially very large and very small.
-  // NOTE that right now we don't allow configuration and use a fixed radius
+  // Current default algorithm for rectangles, using fixed pixel radius.
+  // It's working similarly to a regular border-radius, but attemps to make
+  // radius visually similar across differnt element sizes, especially
+  // very large and very small elements.
+  //
+  // NOTE right now we don't allow configuration and use a constant radius
   // (see DEFAULT_ADAPTIVE_RADIUS constant)
   ADAPTIVE_RADIUS: 3,
 } as const;
