@@ -287,7 +287,7 @@ describe("Test Linear Elements", () => {
       `);
     });
 
-    it("should update the midpoints when element sharpness changed", async () => {
+    it("should update the midpoints when element roundness changed", async () => {
       createThreePointerLinearElement("line");
 
       const line = h.elements[0] as ExcalidrawLinearElement;
@@ -300,7 +300,7 @@ describe("Test Linear Elements", () => {
         h.state,
       );
 
-      // update sharpness
+      // update roundness
       fireEvent.click(screen.getByTitle("Round"));
 
       expect(renderScene).toHaveBeenCalledTimes(12);
@@ -373,8 +373,8 @@ describe("Test Linear Elements", () => {
       `);
     });
 
-    describe("When edges are sharp", () => {
-      // This is the expected midpoint for line with sharp edge
+    describe("When edges are round", () => {
+      // This is the expected midpoint for line with round edge
       // hence hardcoding it so if later some bug is introduced
       // this will fail and we can fix it
       const firstSegmentMidpoint: Point = [55, 45];

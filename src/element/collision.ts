@@ -25,7 +25,7 @@ import {
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
-  StrokeSharpness,
+  StrokeRoundness,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -857,7 +857,7 @@ const hitTestCurveInside = (
   drawable: Drawable,
   x: number,
   y: number,
-  sharpness: StrokeSharpness,
+  roundness: StrokeRoundness,
 ) => {
   const ops = getCurvePathOps(drawable);
   const points: Mutable<Point>[] = [];
@@ -881,7 +881,7 @@ const hitTestCurveInside = (
     }
   }
   if (points.length >= 4) {
-    if (sharpness === "sharp") {
+    if (roundness === "sharp") {
       return isPointInPolygon(points, x, y);
     }
     const polygonPoints = pointsOnBezierCurves(points, 10, 5);

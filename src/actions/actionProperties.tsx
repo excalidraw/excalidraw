@@ -73,7 +73,7 @@ import { getLanguage, t } from "../i18n";
 import { KEYS } from "../keys";
 import { randomInteger } from "../random";
 import {
-  canChangeSharpness,
+  canChangeRoundness,
   canHaveArrowheads,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
@@ -849,8 +849,8 @@ export const actionChangeVerticalAlign = register({
   },
 });
 
-export const actionChangeSharpness = register({
-  name: "changeSharpness",
+export const actionChangeRoundness = register({
+  name: "changeRoundness",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -905,7 +905,7 @@ export const actionChangeSharpness = register({
             appState,
             (element) =>
               hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
-            (canChangeSharpness(appState.activeTool.type) &&
+            (canChangeRoundness(appState.activeTool.type) &&
               appState.currentItemRoundness) ||
               null,
           )}

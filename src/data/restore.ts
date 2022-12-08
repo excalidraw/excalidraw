@@ -3,6 +3,7 @@ import {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
+  StrokeRoundness,
 } from "../element/types";
 import {
   AppState,
@@ -76,7 +77,7 @@ const restoreElementWithProperties = <
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
     /** @deprecated */
-    strokeSharpness?: "sharp" | "round";
+    strokeSharpness?: StrokeRoundness;
     /** metadata that may be present in elements during collaboration */
     [PRECEDING_ELEMENT_KEY]?: string;
   },
