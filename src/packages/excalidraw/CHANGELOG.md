@@ -11,6 +11,12 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+### Excalidraw schema
+
+- Merged `appState.currentItemStrokeSharpness` and `appState.currentItemLinearStrokeSharpness` into `appState.currentItemRoundness`. Renamed `changeSharpness` action to `changeRoundness`. Excalidraw element's `strokeSharpness` was changed to `roundness`. Check the PR for types and more details [#5553](https://github.com/excalidraw/excalidraw/pull/5553).
+
 ## 0.13.0 (2022-10-27)
 
 ### Excalidraw API
@@ -19,7 +25,7 @@ Please add the latest change on the top under the correct section.
 
 - `restoreElements()` now takes an optional parameter to indicate whether we should also recalculate text element dimensions. Defaults to `true`, but since this is a potentially costly operation, you may want to disable it if you restore elements in tight loops, such as during collaboration [#5432](https://github.com/excalidraw/excalidraw/pull/5432).
 - Support rendering custom sidebar using [`renderSidebar`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderSidebar) prop ([#5663](https://github.com/excalidraw/excalidraw/pull/5663)).
-- Add [`toggleMenu`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#toggleMenu) prop to toggle specific menu open/close state ([#5663](https://github.com/excalidraw/excalidraw/pull/5663)).
+- Add [`toggleMenu`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#toggleMenu) prop to toggle specific menu open/close state ([#5663](https://github.com/excalidrafiw/excalidraw/pull/5663)).
 - Support [theme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#theme) to be semi-controlled [#5660](https://github.com/excalidraw/excalidraw/pull/5660).
 - Added support for storing [`customData`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#storing-custom-data-on-excalidraw-elements) on Excalidraw elements [#5592].
 - Added `exportPadding?: number;` to [exportToCanvas](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exporttocanvas) and [exportToBlob](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exporttoblob). The default value of the padding is `10`.
