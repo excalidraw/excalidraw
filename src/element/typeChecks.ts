@@ -152,3 +152,5 @@ export const isBoundToContainer = (
     isTextElement(element)
   );
 };
+
+export const isUsingAdaptiveRadius = (type: string) => type === "rectangle";

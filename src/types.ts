@@ -13,6 +13,7 @@ import {
   FileId,
   ExcalidrawImageElement,
   Theme,
+  StrokeRoundness,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -134,10 +135,9 @@ export type AppState = {
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
-  currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
-  currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
+  currentItemRoundness: StrokeRoundness;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
