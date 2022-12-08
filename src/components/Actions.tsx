@@ -5,7 +5,7 @@ import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
 import { useDevice } from "../components/App";
 import {
-  canChangeSharpness,
+  canChangeRoundness,
   canHaveArrowheads,
   getTargetElements,
   hasBackground,
@@ -110,9 +110,9 @@ export const SelectedShapeActions = ({
         </>
       )}
 
-      {(canChangeSharpness(appState.activeTool.type) ||
-        targetElements.some((element) => canChangeSharpness(element.type))) && (
-        <>{renderAction("changeSharpness")}</>
+      {(canChangeRoundness(appState.activeTool.type) ||
+        targetElements.some((element) => canChangeRoundness(element.type))) && (
+        <>{renderAction("changeRoundness")}</>
       )}
 
       {(hasText(appState.activeTool.type) ||

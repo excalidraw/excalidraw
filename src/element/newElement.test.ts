@@ -1,7 +1,7 @@
 import { duplicateElement } from "./newElement";
 import { mutateElement } from "./mutateElement";
 import { API } from "../tests/helpers/api";
-import { FONT_FAMILY } from "../constants";
+import { FONT_FAMILY, ROUNDNESS } from "../constants";
 import { isPrimitive } from "../utils";
 
 const assertCloneObjects = (source: any, clone: any) => {
@@ -25,7 +25,7 @@ it("clones arrow element", () => {
     fillStyle: "hachure",
     strokeWidth: 1,
     strokeStyle: "solid",
-    strokeSharpness: "round",
+    roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
     roughness: 1,
     opacity: 100,
   });
@@ -71,7 +71,7 @@ it("clones text element", () => {
     fillStyle: "hachure",
     strokeWidth: 1,
     strokeStyle: "solid",
-    strokeSharpness: "round",
+    roundness: null,
     roughness: 1,
     opacity: 100,
     text: "hello",

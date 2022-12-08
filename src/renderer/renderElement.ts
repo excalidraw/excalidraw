@@ -27,7 +27,7 @@ import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
-import { isPathALoop } from "../math";
+import { getCornerRadius, isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
@@ -424,10 +424,10 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
-        if (element.strokeSharpness === "round") {
+        if (element.roundness) {
           const w = element.width;
           const h = element.height;
-          const r = Math.min(w, h) * 0.25;
+          const r = getCornerRadius(Math.min(w, h), element);
           shape = generator.path(
             `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
               h - r
@@ -451,32 +451,36 @@ const generateElementShape = (
       case "diamond": {
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
           getDiamondPoints(element);
-        if (element.strokeSharpness === "round") {
+        if (element.roundness) {
+          const verticalRadius = getCornerRadius(
+            Math.abs(topX - leftX),
+            element,
+          );
+
+          const horizontalRadius = getCornerRadius(
+            Math.abs(rightY - topY),
+            element,
+          );
+
           shape = generator.path(
-            `M ${topX + (rightX - topX) * 0.25} ${
-              topY + (rightY - topY) * 0.25
-            } L ${rightX - (rightX - topX) * 0.25} ${
-              rightY - (rightY - topY) * 0.25
-            }
+            `M ${topX + verticalRadius} ${topY + horizontalRadius} L ${
+              rightX - verticalRadius
+            } ${rightY - horizontalRadius}
             C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
-              rightX - (rightX - bottomX) * 0.25
-            } ${rightY + (bottomY - rightY) * 0.25}
-            L ${bottomX + (rightX - bottomX) * 0.25} ${
-              bottomY - (bottomY - rightY) * 0.25
-            }
+              rightX - verticalRadius
+            } ${rightY + horizontalRadius}
+            L ${bottomX + verticalRadius} ${bottomY - horizontalRadius}
             C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
-              bottomX - (bottomX - leftX) * 0.25
-            } ${bottomY - (bottomY - leftY) * 0.25}
-            L ${leftX + (bottomX - leftX) * 0.25} ${
-              leftY + (bottomY - leftY) * 0.25
+              bottomX - verticalRadius
+            } ${bottomY - horizontalRadius}
+            L ${leftX + verticalRadius} ${leftY + horizontalRadius}
+            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${leftX + verticalRadius} ${
+              leftY - horizontalRadius
             }
-            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${
-              leftX + (topX - leftX) * 0.25
-            } ${leftY - (leftY - topY) * 0.25}
-            L ${topX - (topX - leftX) * 0.25} ${topY + (leftY - topY) * 0.25}
-            C ${topX} ${topY}, ${topX} ${topY}, ${
-              topX + (rightX - topX) * 0.25
-            } ${topY + (rightY - topY) * 0.25}`,
+            L ${topX - verticalRadius} ${topY + horizontalRadius}
+            C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
+              topY + horizontalRadius
+            }`,
             generateRoughOptions(element, true),
           );
         } else {
@@ -515,7 +519,7 @@ const generateElementShape = (
 
         // curve is always the first element
         // this simplifies finding the curve for an element
-        if (element.strokeSharpness === "sharp") {
+        if (!element.roundness) {
           if (options.fill) {
             shape = [generator.polygon(points as [number, number][], options)];
           } else {

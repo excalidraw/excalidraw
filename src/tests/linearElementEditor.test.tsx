@@ -20,6 +20,7 @@ import { resize, rotate } from "./utils";
 import { getBoundTextElementPosition, wrapText } from "../element/textElement";
 import { getMaxContainerWidth } from "../element/newElement";
 import * as textElementUtils from "../element/textElement";
+import { ROUNDNESS } from "../constants";
 
 const renderScene = jest.spyOn(Renderer, "renderScene");
 
@@ -51,7 +52,7 @@ describe("Test Linear Elements", () => {
 
   const createTwoPointerLinearElement = (
     type: ExcalidrawLinearElement["type"],
-    strokeSharpness: ExcalidrawLinearElement["strokeSharpness"] = "sharp",
+    roundness: ExcalidrawElement["roundness"] = null,
     roughness: ExcalidrawLinearElement["roughness"] = 0,
   ) => {
     const line = API.createElement({
@@ -65,7 +66,7 @@ describe("Test Linear Elements", () => {
         [0, 0],
         [p2[0] - p1[0], p2[1] - p1[1]],
       ],
-      strokeSharpness,
+      roundness,
     });
     h.elements = [line];
 
@@ -75,7 +76,7 @@ describe("Test Linear Elements", () => {
 
   const createThreePointerLinearElement = (
     type: ExcalidrawLinearElement["type"],
-    strokeSharpness: ExcalidrawLinearElement["strokeSharpness"] = "sharp",
+    roundness: ExcalidrawElement["roundness"] = null,
     roughness: ExcalidrawLinearElement["roughness"] = 0,
   ) => {
     //dragging line from midpoint
@@ -92,7 +93,7 @@ describe("Test Linear Elements", () => {
         [p3[0], p3[1]],
         [p2[0] - p1[0], p2[1] - p1[1]],
       ],
-      strokeSharpness,
+      roundness,
     });
     h.elements = [line];
     mouse.clickAt(p1[0], p1[1]);
@@ -286,7 +287,7 @@ describe("Test Linear Elements", () => {
       `);
     });
 
-    it("should update the midpoints when element sharpness changed", async () => {
+    it("should update the midpoints when element roundness changed", async () => {
       createThreePointerLinearElement("line");
 
       const line = h.elements[0] as ExcalidrawLinearElement;
@@ -299,7 +300,7 @@ describe("Test Linear Elements", () => {
         h.state,
       );
 
-      // update sharpness
+      // update roundness
       fireEvent.click(screen.getByTitle("Round"));
 
       expect(renderScene).toHaveBeenCalledTimes(12);
@@ -325,7 +326,9 @@ describe("Test Linear Elements", () => {
     });
 
     it("should update all the midpoints when element position changed", async () => {
-      createThreePointerLinearElement("line", "round");
+      createThreePointerLinearElement("line", {
+        type: ROUNDNESS.PROPORTIONAL_RADIUS,
+      });
 
       const line = h.elements[0] as ExcalidrawLinearElement;
       expect(line.points.length).toEqual(3);
@@ -370,8 +373,8 @@ describe("Test Linear Elements", () => {
       `);
     });
 
-    describe("When edges are sharp", () => {
-      // This is the expected midpoint for line with sharp edge
+    describe("When edges are round", () => {
+      // This is the expected midpoint for line with round edge
       // hence hardcoding it so if later some bug is introduced
       // this will fail and we can fix it
       const firstSegmentMidpoint: Point = [55, 45];
@@ -525,7 +528,9 @@ describe("Test Linear Elements", () => {
       let line: ExcalidrawLinearElement;
 
       beforeEach(() => {
-        line = createThreePointerLinearElement("line", "round");
+        line = createThreePointerLinearElement("line", {
+          type: ROUNDNESS.PROPORTIONAL_RADIUS,
+        });
         expect(line.points.length).toEqual(3);
 
         enterLineEditingMode(line);
@@ -768,7 +773,9 @@ describe("Test Linear Elements", () => {
       });
 
       it("should return correct position for arrow with odd points", () => {
-        createThreePointerLinearElement("arrow", "round");
+        createThreePointerLinearElement("arrow", {
+          type: ROUNDNESS.PROPORTIONAL_RADIUS,
+        });
         const arrow = h.elements[0] as ExcalidrawLinearElement;
         const { textElement, container } = createBoundTextElement(
           DEFAULT_TEXT,
@@ -788,7 +795,9 @@ describe("Test Linear Elements", () => {
       });
 
       it("should return correct position for arrow with even points", () => {
-        createThreePointerLinearElement("arrow", "round");
+        createThreePointerLinearElement("arrow", {
+          type: ROUNDNESS.PROPORTIONAL_RADIUS,
+        });
         const arrow = h.elements[0] as ExcalidrawLinearElement;
         const { textElement, container } = createBoundTextElement(
           DEFAULT_TEXT,
@@ -903,7 +912,9 @@ describe("Test Linear Elements", () => {
     });
 
     it("should not rotate the bound text and update position of bound text and bounding box correctly when arrow rotated", () => {
-      createThreePointerLinearElement("arrow", "round");
+      createThreePointerLinearElement("arrow", {
+        type: ROUNDNESS.PROPORTIONAL_RADIUS,
+      });
 
       const arrow = h.elements[0] as ExcalidrawLinearElement;
 
@@ -967,7 +978,9 @@ describe("Test Linear Elements", () => {
     });
 
     it("should resize and position the bound text and bounding box correctly when 3 pointer arrow element resized", () => {
-      createThreePointerLinearElement("arrow", "round");
+      createThreePointerLinearElement("arrow", {
+        type: ROUNDNESS.PROPORTIONAL_RADIUS,
+      });
 
       const arrow = h.elements[0] as ExcalidrawLinearElement;
 

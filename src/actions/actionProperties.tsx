@@ -42,6 +42,7 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
+  ROUNDNESS,
   VERTICAL_ALIGN,
 } from "../constants";
 import {
@@ -57,7 +58,7 @@ import {
 import {
   isBoundToContainer,
   isLinearElement,
-  isLinearElementType,
+  isUsingAdaptiveRadius,
 } from "../element/typeChecks";
 import {
   Arrowhead,
@@ -72,7 +73,7 @@ import { getLanguage, t } from "../i18n";
 import { KEYS } from "../keys";
 import { randomInteger } from "../random";
 import {
-  canChangeSharpness,
+  canChangeRoundness,
   canHaveArrowheads,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
@@ -848,69 +849,71 @@ export const actionChangeVerticalAlign = register({
   },
 });
 
-export const actionChangeSharpness = register({
-  name: "changeSharpness",
+export const actionChangeRoundness = register({
+  name: "changeRoundness",
   trackEvent: false,
   perform: (elements, appState, value) => {
-    const targetElements = getTargetElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
-    const shouldUpdateForNonLinearElements = targetElements.length
-      ? targetElements.every((el) => !isLinearElement(el))
-      : !isLinearElementType(appState.activeTool.type);
-    const shouldUpdateForLinearElements = targetElements.length
-      ? targetElements.every(isLinearElement)
-      : isLinearElementType(appState.activeTool.type);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
-          strokeSharpness: value,
+          roundness:
+            value === "round"
+              ? {
+                  type: isUsingAdaptiveRadius(el.type)
+                    ? ROUNDNESS.ADAPTIVE_RADIUS
+                    : ROUNDNESS.PROPORTIONAL_RADIUS,
+                }
+              : null,
         }),
       ),
       appState: {
         ...appState,
-        currentItemStrokeSharpness: shouldUpdateForNonLinearElements
-          ? value
-          : appState.currentItemStrokeSharpness,
-        currentItemLinearStrokeSharpness: shouldUpdateForLinearElements
-          ? value
-          : appState.currentItemLinearStrokeSharpness,
+        currentItemRoundness: value,
       },
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.edges")}</legend>
-      <ButtonIconSelect
-        group="edges"
-        options={[
-          {
-            value: "sharp",
-            text: t("labels.sharp"),
-            icon: EdgeSharpIcon,
-          },
-          {
-            value: "round",
-            text: t("labels.round"),
-            icon: EdgeRoundIcon,
-          },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => element.strokeSharpness,
-          (canChangeSharpness(appState.activeTool.type) &&
-            (isLinearElementType(appState.activeTool.type)
-              ? appState.currentItemLinearStrokeSharpness
-              : appState.currentItemStrokeSharpness)) ||
-            null,
-        )}
-        onChange={(value) => updateData(value)}
-      />
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const targetElements = getTargetElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+
+    const hasLegacyRoundness = targetElements.some(
+      (el) => el.roundness?.type === ROUNDNESS.LEGACY,
+    );
+
+    return (
+      <fieldset>
+        <legend>{t("labels.edges")}</legend>
+        <ButtonIconSelect
+          group="edges"
+          options={[
+            {
+              value: "sharp",
+              text: t("labels.sharp"),
+              icon: EdgeSharpIcon,
+            },
+            {
+              value: "round",
+              text: t("labels.round"),
+              icon: EdgeRoundIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) =>
+              hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
+            (canChangeRoundness(appState.activeTool.type) &&
+              appState.currentItemRoundness) ||
+              null,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeArrowhead = register({

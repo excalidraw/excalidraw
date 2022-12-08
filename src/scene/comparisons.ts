@@ -24,7 +24,7 @@ export const hasStrokeStyle = (type: string) =>
   type === "arrow" ||
   type === "line";
 
-export const canChangeSharpness = (type: string) =>
+export const canChangeRoundness = (type: string) =>
   type === "rectangle" ||
   type === "arrow" ||
   type === "line" ||

@@ -378,7 +378,7 @@ const generateLinearElementShape = (
   const options = generateRoughOptions(element);
 
   const method = (() => {
-    if (element.strokeSharpness !== "sharp") {
+    if (element.roundness) {
       return "curve";
     }
     if (options.fill) {
@@ -561,16 +561,12 @@ export const getResizedElementAbsoluteCoords = (
   } else {
     // Line
     const gen = rough.generator();
-    const curve =
-      element.strokeSharpness === "sharp"
-        ? gen.linearPath(
-            points as [number, number][],
-            generateRoughOptions(element),
-          )
-        : gen.curve(
-            points as [number, number][],
-            generateRoughOptions(element),
-          );
+    const curve = !element.roundness
+      ? gen.linearPath(
+          points as [number, number][],
+          generateRoughOptions(element),
+        )
+      : gen.curve(points as [number, number][], generateRoughOptions(element));
 
     const ops = getCurvePathOps(curve);
     bounds = getMinMaxXYFromCurvePathOps(ops);
@@ -588,12 +584,11 @@ export const getResizedElementAbsoluteCoords = (
 export const getElementPointsCoords = (
   element: ExcalidrawLinearElement,
   points: readonly (readonly [number, number])[],
-  sharpness: ExcalidrawElement["strokeSharpness"],
 ): [number, number, number, number] => {
   // This might be computationally heavey
   const gen = rough.generator();
   const curve =
-    sharpness === "sharp"
+    element.roundness == null
       ? gen.linearPath(
           points as [number, number][],
           generateRoughOptions(element),

@@ -527,7 +527,7 @@ export class LinearElementEditor {
       endPoint[0],
       endPoint[1],
     );
-    if (element.points.length > 2 && element.strokeSharpness === "round") {
+    if (element.points.length > 2 && element.roundness) {
       distance = getBezierCurveLength(element, endPoint);
     }
 
@@ -541,7 +541,7 @@ export class LinearElementEditor {
     endPointIndex: number,
   ) {
     let segmentMidPoint = centerPoint(startPoint, endPoint);
-    if (element.points.length > 2 && element.strokeSharpness === "round") {
+    if (element.points.length > 2 && element.roundness) {
       const controlPoints = getControlPointsForBezierCurve(
         element,
         element.points[endPointIndex],
@@ -1221,16 +1221,8 @@ export class LinearElementEditor {
     offsetY: number,
     otherUpdates?: { startBinding?: PointBinding; endBinding?: PointBinding },
   ) {
-    const nextCoords = getElementPointsCoords(
-      element,
-      nextPoints,
-      element.strokeSharpness || "round",
-    );
-    const prevCoords = getElementPointsCoords(
-      element,
-      element.points,
-      element.strokeSharpness || "round",
-    );
+    const nextCoords = getElementPointsCoords(element, nextPoints);
+    const prevCoords = getElementPointsCoords(element, element.points);
     const nextCenterX = (nextCoords[0] + nextCoords[2]) / 2;
     const nextCenterY = (nextCoords[1] + nextCoords[3]) / 2;
     const prevCenterX = (prevCoords[0] + prevCoords[2]) / 2;
