@@ -91,7 +91,7 @@ export type ActionName =
   | "ungroup"
   | "goToCollaborator"
   | "addToLibrary"
-  | "changeSharpness"
+  | "changeRoundness"
   | "alignTop"
   | "alignBottom"
   | "alignLeft"
