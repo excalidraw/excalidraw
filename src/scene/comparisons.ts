@@ -30,8 +30,6 @@ export const canChangeSharpness = (type: string) =>
   type === "line" ||
   type === "diamond";
 
-export const canChangeRadius = (type: string) => type === "rectangle";
-
 export const hasText = (type: string) => type === "text";
 
 export const canHaveArrowheads = (type: string) => type === "arrow";

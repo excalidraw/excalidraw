@@ -17,7 +17,7 @@ import {
   isInvisiblySmallElement,
   refreshTextDimensions,
 } from "../element";
-import { isTextElement } from "../element/typeChecks";
+import { isTextElement, isUsingAdaptiveRadius } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
   DEFAULT_FONT_FAMILY,
@@ -32,7 +32,6 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
-import { canChangeRadius } from "../scene/comparisons";
 
 type RestoredAppState = Omit<
   AppState,
@@ -76,6 +75,8 @@ const restoreElementWithProperties = <
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
+    /** @deprecated */
+    strokeSharpness?: "sharp" | "round";
     /** metadata that may be present in elements during collaboration */
     [PRECEDING_ELEMENT_KEY]?: string;
   },
@@ -116,12 +117,14 @@ const restoreElementWithProperties = <
     groupIds: element.groupIds ?? [],
     roundness: element.roundness
       ? element.roundness
-      : (element as any).strokeSharpness === "round"
-      ? canChangeRadius(element.type)
-        ? {
-            type: ROUNDNESS.LEGACY,
-          }
-        : { type: ROUNDNESS.PROPORTIONAL_RADIUS }
+      : element.strokeSharpness === "round"
+      ? {
+          // for old elements that would now use adaptive radius algo,
+          // use legacy algo instead
+          type: isUsingAdaptiveRadius(element.type)
+            ? ROUNDNESS.LEGACY
+            : ROUNDNESS.PROPORTIONAL_RADIUS,
+        }
       : null,
     boundElements: element.boundElementIds
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))

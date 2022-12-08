@@ -135,6 +135,7 @@ import {
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
+  isUsingAdaptiveRadius,
 } from "../element/typeChecks";
 import {
   ExcalidrawBindableElement,
@@ -273,7 +274,6 @@ import {
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { atom } from "jotai";
 import { Fonts } from "../scene/Fonts";
-import { canChangeRadius } from "../scene/comparisons";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -4274,7 +4274,7 @@ class App extends React.Component<AppProps, AppState> {
       roundness:
         this.state.currentItemRoundness === "round"
           ? {
-              type: canChangeRadius(elementType)
+              type: isUsingAdaptiveRadius(elementType)
                 ? ROUNDNESS.ADAPTIVE_RADIUS
                 : ROUNDNESS.PROPORTIONAL_RADIUS,
             }

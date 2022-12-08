@@ -55,7 +55,11 @@ import {
   getBoundTextElement,
   getContainerElement,
 } from "../element/textElement";
-import { isBoundToContainer, isLinearElement } from "../element/typeChecks";
+import {
+  isBoundToContainer,
+  isLinearElement,
+  isUsingAdaptiveRadius,
+} from "../element/typeChecks";
 import {
   Arrowhead,
   ExcalidrawElement,
@@ -76,7 +80,7 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
-import { canChangeRadius, hasStrokeColor } from "../scene/comparisons";
+import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
@@ -855,10 +859,9 @@ export const actionChangeSharpness = register({
           roundness:
             value === "round"
               ? {
-                  type:
-                    isLinearElement(el) || !canChangeRadius(el.type)
-                      ? ROUNDNESS.PROPORTIONAL_RADIUS
-                      : ROUNDNESS.ADAPTIVE_RADIUS,
+                  type: isUsingAdaptiveRadius(el.type)
+                    ? ROUNDNESS.ADAPTIVE_RADIUS
+                    : ROUNDNESS.PROPORTIONAL_RADIUS,
                 }
               : null,
         }),
