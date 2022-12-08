@@ -156,7 +156,7 @@ export class API {
       )
         ? {
             type: isLinearElementType(type)
-              ? ROUNDNESS.GENERIC
+              ? ROUNDNESS.PROPORTIONAL_RADIUS
               : ROUNDNESS.ADAPTIVE_RADIUS,
           }
         : null,

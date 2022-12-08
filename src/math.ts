@@ -276,7 +276,10 @@ export const getGridPoint = (
 };
 
 export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
-  if (element.roundness?.type === ROUNDNESS.GENERIC) {
+  if (
+    element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ||
+    element.roundness?.type === ROUNDNESS.LEGACY
+  ) {
     return x * GENERIC_RADIUS_RATIO;
   }
 

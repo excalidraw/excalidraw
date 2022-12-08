@@ -106,7 +106,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 337897,
   "strokeColor": "#000000",
@@ -139,7 +139,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#000000",
@@ -282,7 +282,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#000000",
@@ -340,7 +340,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -465,7 +465,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 453191,
   "strokeColor": "#000000",
@@ -496,7 +496,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#000000",
@@ -554,7 +554,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -596,7 +596,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -624,7 +624,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -666,7 +666,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -694,7 +694,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -819,7 +819,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 453191,
   "strokeColor": "#000000",
@@ -850,7 +850,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#000000",
@@ -908,7 +908,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -950,7 +950,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -978,7 +978,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -1020,7 +1020,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -1048,7 +1048,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -1175,7 +1175,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 449462985,
   "strokeColor": "#000000",
@@ -1233,7 +1233,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 449462985,
           "strokeColor": "#000000",
@@ -1356,7 +1356,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 337897,
   "strokeColor": "#000000",
@@ -1414,7 +1414,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 337897,
           "strokeColor": "#000000",
@@ -1454,7 +1454,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 337897,
           "strokeColor": "#000000",
@@ -1579,7 +1579,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#000000",
@@ -1610,7 +1610,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 453191,
   "strokeColor": "#000000",
@@ -1668,7 +1668,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -1710,7 +1710,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -1738,7 +1738,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -1871,7 +1871,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#000000",
@@ -1904,7 +1904,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 453191,
   "strokeColor": "#000000",
@@ -1962,7 +1962,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2004,7 +2004,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2032,7 +2032,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -2080,7 +2080,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2110,7 +2110,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -2237,7 +2237,7 @@ Object {
   "opacity": 60,
   "roughness": 2,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#c92a2a",
@@ -2268,7 +2268,7 @@ Object {
   "opacity": 60,
   "roughness": 2,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 400692809,
   "strokeColor": "#c92a2a",
@@ -2326,7 +2326,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2368,7 +2368,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2396,7 +2396,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -2438,7 +2438,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2466,7 +2466,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#c92a2a",
@@ -2508,7 +2508,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2536,7 +2536,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#c92a2a",
@@ -2578,7 +2578,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2606,7 +2606,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#c92a2a",
@@ -2648,7 +2648,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2676,7 +2676,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#c92a2a",
@@ -2718,7 +2718,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2746,7 +2746,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#c92a2a",
@@ -2788,7 +2788,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2816,7 +2816,7 @@ Object {
           "opacity": 100,
           "roughness": 2,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 400692809,
           "strokeColor": "#c92a2a",
@@ -2858,7 +2858,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -2886,7 +2886,7 @@ Object {
           "opacity": 60,
           "roughness": 2,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 400692809,
           "strokeColor": "#c92a2a",
@@ -2928,7 +2928,7 @@ Object {
           "opacity": 60,
           "roughness": 2,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#c92a2a",
@@ -2956,7 +2956,7 @@ Object {
           "opacity": 60,
           "roughness": 2,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 400692809,
           "strokeColor": "#c92a2a",
@@ -3081,7 +3081,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 453191,
   "strokeColor": "#000000",
@@ -3112,7 +3112,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#000000",
@@ -3170,7 +3170,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -3212,7 +3212,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -3240,7 +3240,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -3282,7 +3282,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -3310,7 +3310,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -3435,7 +3435,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 453191,
   "strokeColor": "#000000",
@@ -3466,7 +3466,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#000000",
@@ -3524,7 +3524,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -3566,7 +3566,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -3594,7 +3594,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -3636,7 +3636,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -3664,7 +3664,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -3793,7 +3793,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 449462985,
   "strokeColor": "#000000",
@@ -3824,7 +3824,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 401146281,
   "strokeColor": "#000000",
@@ -3882,7 +3882,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 449462985,
           "strokeColor": "#000000",
@@ -3924,7 +3924,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 449462985,
           "strokeColor": "#000000",
@@ -3952,7 +3952,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 401146281,
           "strokeColor": "#000000",
@@ -4000,7 +4000,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 449462985,
           "strokeColor": "#000000",
@@ -4030,7 +4030,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 401146281,
           "strokeColor": "#000000",
@@ -4074,7 +4074,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 449462985,
           "strokeColor": "#000000",
@@ -4102,7 +4102,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 401146281,
           "strokeColor": "#000000",
@@ -4233,7 +4233,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#000000",
@@ -4264,7 +4264,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 453191,
   "strokeColor": "#000000",
@@ -4322,7 +4322,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -4364,7 +4364,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",
@@ -4392,7 +4392,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 453191,
           "strokeColor": "#000000",
@@ -4527,7 +4527,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 449462985,
   "strokeColor": "#000000",
@@ -4560,7 +4560,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 401146281,
   "strokeColor": "#000000",
@@ -4618,7 +4618,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 449462985,
           "strokeColor": "#000000",
@@ -4660,7 +4660,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 449462985,
           "strokeColor": "#000000",
@@ -4688,7 +4688,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 401146281,
           "strokeColor": "#000000",
@@ -4737,7 +4737,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 449462985,
           "strokeColor": "#000000",
@@ -4767,7 +4767,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 401146281,
           "strokeColor": "#000000",
@@ -5086,7 +5086,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#000000",
@@ -5117,7 +5117,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 337897,
   "strokeColor": "#000000",
@@ -5148,7 +5148,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 1278240551,
   "strokeColor": "#000000",
@@ -5206,7 +5206,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "roundness": Object {
-            "type": 2,
+            "type": 3,
           },
           "seed": 1278240551,
           "strokeColor": "#000000",

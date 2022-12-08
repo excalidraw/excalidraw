@@ -326,7 +326,9 @@ describe("Test Linear Elements", () => {
     });
 
     it("should update all the midpoints when element position changed", async () => {
-      createThreePointerLinearElement("line", { type: ROUNDNESS.GENERIC });
+      createThreePointerLinearElement("line", {
+        type: ROUNDNESS.PROPORTIONAL_RADIUS,
+      });
 
       const line = h.elements[0] as ExcalidrawLinearElement;
       expect(line.points.length).toEqual(3);
@@ -527,7 +529,7 @@ describe("Test Linear Elements", () => {
 
       beforeEach(() => {
         line = createThreePointerLinearElement("line", {
-          type: ROUNDNESS.GENERIC,
+          type: ROUNDNESS.PROPORTIONAL_RADIUS,
         });
         expect(line.points.length).toEqual(3);
 
@@ -771,7 +773,9 @@ describe("Test Linear Elements", () => {
       });
 
       it("should return correct position for arrow with odd points", () => {
-        createThreePointerLinearElement("arrow", { type: ROUNDNESS.GENERIC });
+        createThreePointerLinearElement("arrow", {
+          type: ROUNDNESS.PROPORTIONAL_RADIUS,
+        });
         const arrow = h.elements[0] as ExcalidrawLinearElement;
         const { textElement, container } = createBoundTextElement(
           DEFAULT_TEXT,
@@ -791,7 +795,9 @@ describe("Test Linear Elements", () => {
       });
 
       it("should return correct position for arrow with even points", () => {
-        createThreePointerLinearElement("arrow", { type: ROUNDNESS.GENERIC });
+        createThreePointerLinearElement("arrow", {
+          type: ROUNDNESS.PROPORTIONAL_RADIUS,
+        });
         const arrow = h.elements[0] as ExcalidrawLinearElement;
         const { textElement, container } = createBoundTextElement(
           DEFAULT_TEXT,
@@ -906,7 +912,9 @@ describe("Test Linear Elements", () => {
     });
 
     it("should not rotate the bound text and update position of bound text and bounding box correctly when arrow rotated", () => {
-      createThreePointerLinearElement("arrow", { type: ROUNDNESS.GENERIC });
+      createThreePointerLinearElement("arrow", {
+        type: ROUNDNESS.PROPORTIONAL_RADIUS,
+      });
 
       const arrow = h.elements[0] as ExcalidrawLinearElement;
 
@@ -970,7 +978,9 @@ describe("Test Linear Elements", () => {
     });
 
     it("should resize and position the bound text and bounding box correctly when 3 pointer arrow element resized", () => {
-      createThreePointerLinearElement("arrow", { type: ROUNDNESS.GENERIC });
+      createThreePointerLinearElement("arrow", {
+        type: ROUNDNESS.PROPORTIONAL_RADIUS,
+      });
 
       const arrow = h.elements[0] as ExcalidrawLinearElement;
 

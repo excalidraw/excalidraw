@@ -30,7 +30,7 @@ Object {
   ],
   "roughness": 1,
   "roundness": Object {
-    "type": 1,
+    "type": 2,
   },
   "seed": 337897,
   "startArrowhead": null,
@@ -65,7 +65,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 1,
+    "type": 2,
   },
   "seed": 337897,
   "strokeColor": "#000000",
@@ -98,7 +98,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 1,
+    "type": 2,
   },
   "seed": 337897,
   "strokeColor": "#000000",
@@ -142,7 +142,7 @@ Object {
   ],
   "roughness": 1,
   "roundness": Object {
-    "type": 1,
+    "type": 2,
   },
   "seed": 337897,
   "startArrowhead": null,
@@ -177,7 +177,7 @@ Object {
   "opacity": 100,
   "roughness": 1,
   "roundness": Object {
-    "type": 2,
+    "type": 3,
   },
   "seed": 337897,
   "strokeColor": "#000000",

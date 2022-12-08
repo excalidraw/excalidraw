@@ -73,6 +73,7 @@ import {
   canHaveArrowheads,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
+  getTargetElements,
   isSomeElementSelected,
 } from "../scene";
 import { canChangeRadius, hasStrokeColor } from "../scene/comparisons";
@@ -856,7 +857,7 @@ export const actionChangeSharpness = register({
               ? {
                   type:
                     isLinearElement(el) || !canChangeRadius(el.type)
-                      ? ROUNDNESS.GENERIC
+                      ? ROUNDNESS.PROPORTIONAL_RADIUS
                       : ROUNDNESS.ADAPTIVE_RADIUS,
                 }
               : null,
@@ -869,35 +870,47 @@ export const actionChangeSharpness = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.edges")}</legend>
-      <ButtonIconSelect
-        group="edges"
-        options={[
-          {
-            value: "sharp",
-            text: t("labels.sharp"),
-            icon: EdgeSharpIcon,
-          },
-          {
-            value: "round",
-            text: t("labels.round"),
-            icon: EdgeRoundIcon,
-          },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => (element.roundness ? "round" : "sharp"),
-          (canChangeSharpness(appState.activeTool.type) &&
-            appState.currentItemRoundness) ||
-            null,
-        )}
-        onChange={(value) => updateData(value)}
-      />
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const targetElements = getTargetElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+
+    const hasLegacyRoundness = targetElements.some(
+      (el) => el.roundness?.type === ROUNDNESS.LEGACY,
+    );
+
+    return (
+      <fieldset>
+        <legend>{t("labels.edges")}</legend>
+        <ButtonIconSelect
+          group="edges"
+          options={[
+            {
+              value: "sharp",
+              text: t("labels.sharp"),
+              icon: EdgeSharpIcon,
+            },
+            {
+              value: "round",
+              text: t("labels.round"),
+              icon: EdgeRoundIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) =>
+              hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
+            (canChangeSharpness(appState.activeTool.type) &&
+              appState.currentItemRoundness) ||
+              null,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeArrowhead = register({

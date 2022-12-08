@@ -226,16 +226,20 @@ export const DEFAULT_ADAPTIVE_RADIUS = 32;
 export const ROUNDNESS = {
   // no roundness (sharp edges)
   NONE: 0,
-  // generic roundness algorithm. Used for linear elements, diamonds, and
-  // legacy rounding
-  GENERIC: 1,
-  // current default algorithm for rectangles/diamonds. It's working similarly
+
+  // Used for legacy rounding (rectangles), which is the same
+  // as PROPORTIONAL_RADIUS, but needed in ui for differentiation
+  LEGACY: 1,
+
+  // Used for linear elements & diamonds
+  PROPORTIONAL_RADIUS: 2,
+
+  // Current default algorithm for rectangles. It's working similarly
   // to a rregular border-radius, but attemps to make radius visually similar
   // across differnt element sizes, especially very large and very small.
-  //
   // NOTE that right now we don't allow configuration and use a fixed radius
   // (see DEFAULT_ADAPTIVE_RADIUS constant)
-  ADAPTIVE_RADIUS: 2,
+  ADAPTIVE_RADIUS: 3,
 } as const;
 
 export const COOKIES = {

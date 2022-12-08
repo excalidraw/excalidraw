@@ -4219,7 +4219,7 @@ class App extends React.Component<AppProps, AppState> {
         opacity: this.state.currentItemOpacity,
         roundness:
           this.state.currentItemRoundness === "round"
-            ? { type: ROUNDNESS.GENERIC }
+            ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
             : null,
         startArrowhead,
         endArrowhead,
@@ -4276,7 +4276,7 @@ class App extends React.Component<AppProps, AppState> {
           ? {
               type: canChangeRadius(elementType)
                 ? ROUNDNESS.ADAPTIVE_RADIUS
-                : ROUNDNESS.GENERIC,
+                : ROUNDNESS.PROPORTIONAL_RADIUS,
             }
           : null,
       locked: false,

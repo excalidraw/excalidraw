@@ -23,7 +23,7 @@ const _ce = ({
     backgroundColor: "#000",
     fillStyle: "solid",
     strokeWidth: 1,
-    roundness: { type: ROUNDNESS.GENERIC },
+    roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
     roughness: 0,
     opacity: 1,
     x,

@@ -32,6 +32,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
+import { canChangeRadius } from "../scene/comparisons";
 
 type RestoredAppState = Omit<
   AppState,
@@ -116,7 +117,11 @@ const restoreElementWithProperties = <
     roundness: element.roundness
       ? element.roundness
       : (element as any).strokeSharpness === "round"
-      ? { type: ROUNDNESS.GENERIC }
+      ? canChangeRadius(element.type)
+        ? {
+            type: ROUNDNESS.LEGACY,
+          }
+        : { type: ROUNDNESS.PROPORTIONAL_RADIUS }
       : null,
     boundElements: element.boundElementIds
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))

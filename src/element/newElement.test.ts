@@ -25,7 +25,7 @@ it("clones arrow element", () => {
     fillStyle: "hachure",
     strokeWidth: 1,
     strokeStyle: "solid",
-    roundness: { type: ROUNDNESS.GENERIC },
+    roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
     roughness: 1,
     opacity: 100,
   });
