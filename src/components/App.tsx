@@ -283,18 +283,21 @@ const deviceContextInitialValue = {
   canDeviceFitSidebar: false,
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
+DeviceContext.displayName = "DeviceContext";
 export const useDevice = () => useContext<Device>(DeviceContext);
 
 const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
   id: string | null;
 }>({ container: null, id: null });
+ExcalidrawContainerContext.displayName = "ExcalidrawContainerContext";
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 
 const ExcalidrawElementsContext = React.createContext<
   readonly NonDeletedExcalidrawElement[]
 >([]);
+ExcalidrawElementsContext.displayName = "ExcalidrawElementsContext";
 
 const ExcalidrawAppStateContext = React.createContext<AppState>({
   ...getDefaultAppState(),
@@ -303,10 +306,12 @@ const ExcalidrawAppStateContext = React.createContext<AppState>({
   offsetLeft: 0,
   offsetTop: 0,
 });
+ExcalidrawAppStateContext.displayName = "ExcalidrawAppStateContext";
 
 const ExcalidrawSetAppStateContent = React.createContext<
   React.Component<any, AppState>["setState"]
 >(() => {});
+ExcalidrawSetAppStateContent.displayName = "ExcalidrawSetAppStateContent";
 
 export const useExcalidrawElements = () =>
   useContext(ExcalidrawElementsContext);
