@@ -224,9 +224,6 @@ export const DEFAULT_PROPORTIONAL_RADIUS = 0.25;
 export const DEFAULT_ADAPTIVE_RADIUS = 32;
 // roundness type (algorithm)
 export const ROUNDNESS = {
-  // no radius (sharp edges)
-  NONE: 0,
-
   // Used for legacy rounding (rectangles), which currently works the same
   // as PROPORTIONAL_RADIUS, but we need to differentiate for UI purposes and
   // forwards-compat.
