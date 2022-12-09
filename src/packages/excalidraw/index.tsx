@@ -238,5 +238,4 @@ export {
 } from "../../utils";
 
 export { Sidebar } from "../../components/Sidebar/Sidebar";
-export { useDevice } from "../../components/App";
 export { Footer };
