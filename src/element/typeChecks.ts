@@ -1,3 +1,4 @@
+import { ROUNDNESS } from "../constants";
 import { AppState } from "../types";
 import {
   ExcalidrawElement,
@@ -10,6 +11,7 @@ import {
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextContainer,
+  RoundnessType,
 } from "./types";
 
 export const isGenericElement = (
@@ -154,3 +156,62 @@ export const isBoundToContainer = (
 };
 
 export const isUsingAdaptiveRadius = (type: string) => type === "rectangle";
+
+export const canApplyRoundnessTypeToElement = (
+  roundnessType: RoundnessType,
+  element: ExcalidrawElement,
+) => {
+  if (
+    element.type !== "line" &&
+    element.type !== "arrow" &&
+    element.type !== "diamond" &&
+    element.type !== "rectangle"
+  ) {
+    return false;
+  }
+
+  if (element.type === "line" || element.type === "arrow") {
+    if (roundnessType === ROUNDNESS.PROPORTIONAL_RADIUS) {
+      return true;
+    }
+    return false;
+  }
+
+  if (element.type === "diamond") {
+    if (roundnessType === ROUNDNESS.ADAPTIVE_RADIUS) {
+      return false;
+    }
+    return true;
+  }
+
+  if (element.type === "rectangle") {
+    if (roundnessType === ROUNDNESS.PROPORTIONAL_RADIUS) {
+      return false;
+    }
+    return true;
+  }
+
+  return false;
+};
+
+export const getDefaultRoundnessTypeForElement = (
+  element: ExcalidrawElement,
+) => {
+  if (
+    element.type === "arrow" ||
+    element.type === "line" ||
+    element.type === "diamond"
+  ) {
+    return {
+      type: ROUNDNESS.PROPORTIONAL_RADIUS,
+    };
+  }
+
+  if (element.type === "rectangle") {
+    return {
+      type: ROUNDNESS.ADAPTIVE_RADIUS,
+    };
+  }
+
+  return null;
+};
