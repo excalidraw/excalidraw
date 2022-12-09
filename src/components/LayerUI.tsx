@@ -440,8 +440,9 @@ const LayerUI = ({
   const [hostSidebarCounters] = useAtom(hostSidebarCountersAtom, jotaiScope);
   const FooterCenterComponent = React.Children.toArray(children).find(
     (child) =>
-      //@ts-ignore
-      React.isValidElement(child) && child.type?.displayName === "FooterCenter",
+      React.isValidElement(child) &&
+      typeof child.type !== "string" &&
+      child?.type.name === "FooterCenter",
   );
   return (
     <>
