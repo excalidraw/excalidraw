@@ -157,37 +157,26 @@ export const isBoundToContainer = (
 
 export const isUsingAdaptiveRadius = (type: string) => type === "rectangle";
 
+export const isUsingProportionalRadius = (type: string) =>
+  type === "line" || type === "arrow" || type === "diamond";
+
 export const canApplyRoundnessTypeToElement = (
   roundnessType: RoundnessType,
   element: ExcalidrawElement,
 ) => {
   if (
-    element.type !== "line" &&
-    element.type !== "arrow" &&
-    element.type !== "diamond" &&
-    element.type !== "rectangle"
+    (roundnessType === ROUNDNESS.ADAPTIVE_RADIUS ||
+      // if legacy roundness, it can be applied to elements that currently
+      // use adaptive radius
+      roundnessType === ROUNDNESS.LEGACY) &&
+    isUsingAdaptiveRadius(element.type)
   ) {
-    return false;
-  }
-
-  if (element.type === "line" || element.type === "arrow") {
-    if (roundnessType === ROUNDNESS.PROPORTIONAL_RADIUS) {
-      return true;
-    }
-    return false;
-  }
-
-  if (element.type === "diamond") {
-    if (roundnessType === ROUNDNESS.ADAPTIVE_RADIUS) {
-      return false;
-    }
     return true;
   }
-
-  if (element.type === "rectangle") {
-    if (roundnessType === ROUNDNESS.PROPORTIONAL_RADIUS) {
-      return false;
-    }
+  if (
+    roundnessType === ROUNDNESS.PROPORTIONAL_RADIUS &&
+    isUsingProportionalRadius(element.type)
+  ) {
     return true;
   }
 
