@@ -38,8 +38,10 @@ describe("copyToClipboard", () => {
   const copyTextToSystemClipboard = jest
     .spyOn(clipboard, "copyTextToSystemClipboard")
     .mockResolvedValue();
-  const transformClipboardElementsToText = jest
-    .spyOn(clipboard, "transformClipboardElementsToText")
+  const transformClipboardElementsToText = jest.spyOn(
+    clipboard,
+    "transformClipboardElementsToText",
+  );
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -90,9 +92,7 @@ describe("copyToClipboard", () => {
 
     await clipboard.copyToClipboard(...input);
 
-    expect(transformClipboardElementsToText).toHaveBeenCalledWith(
-      elements,
-    );
+    expect(transformClipboardElementsToText).toHaveBeenCalledWith(elements);
   });
 
   it("should copy elements as text to clipboard", async () => {
@@ -164,18 +164,18 @@ describe("copyToClipboard", () => {
 
 describe("transformClipboardElementsToText", () => {
   it('should return a concatenated string of the text contents when all elements are of type "text"', () => {
-      const elements: Parameters<typeof transformClipboardElementsToText>[0] = [
-        // @ts-expect-error - we only care about the type and text properties in this test
-        {
-          type: "text",
-          text: "123\n456",
-        },
-        // @ts-expect-error - we only care about the type and text properties in this test
-        {
-          type: "text",
-          text: "789",
-        },
-      ];
+    const elements: Parameters<typeof transformClipboardElementsToText>[0] = [
+      // @ts-expect-error - we only care about the type and text properties in this test
+      {
+        type: "text",
+        text: "123\n456",
+      },
+      // @ts-expect-error - we only care about the type and text properties in this test
+      {
+        type: "text",
+        text: "789",
+      },
+    ];
 
     const result = transformClipboardElementsToText(elements);
 

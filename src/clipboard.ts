@@ -74,7 +74,9 @@ export const copyToClipboard = async (
       : undefined,
   };
 
-  const clipboardDataAsText = transformClipboardElementsToText(contents.elements);
+  const clipboardDataAsText = transformClipboardElementsToText(
+    contents.elements,
+  );
   CLIPBOARD = clipboardDataAsText;
 
   try {
