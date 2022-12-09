@@ -515,8 +515,9 @@ const LayerUI = ({
           >
             {renderFixedSideContainer()}
             <Footer
-              actionManager={actionManager}
               renderWelcomeScreen={renderWelcomeScreen}
+              appState={appState}
+              actionManager={actionManager}
               showExitZenModeBtn={showExitZenModeBtn}
             >
               {FooterCenterComponent}

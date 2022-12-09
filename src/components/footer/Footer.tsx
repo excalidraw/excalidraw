@@ -1,13 +1,15 @@
 import clsx from "clsx";
+import React from "react";
 import { ActionManager } from "../../actions/manager";
 import { t } from "../../i18n";
+import { AppState } from "../../types";
 import {
   ExitZenModeAction,
   FinalizeAction,
   UndoRedoActions,
   ZoomActions,
 } from "../Actions";
-import { useDevice, useExcalidrawAppState } from "../App";
+import { useDevice } from "../App";
 import { WelcomeScreenHelpArrow } from "../icons";
 import { Section } from "../Section";
 import Stack from "../Stack";
@@ -15,18 +17,19 @@ import WelcomeScreenDecor from "../WelcomeScreenDecor";
 import FooterCenter from "./FooterCenter";
 
 const Footer = ({
+  appState,
   actionManager,
-  showExitZenModeBtn = true,
-  renderWelcomeScreen = true,
+  showExitZenModeBtn,
+  renderWelcomeScreen,
   children,
 }: {
+  appState: AppState;
   actionManager: ActionManager;
-  showExitZenModeBtn?: boolean;
-  renderWelcomeScreen?: boolean;
+  showExitZenModeBtn: boolean;
+  renderWelcomeScreen: boolean;
   children?: React.ReactNode;
 }) => {
   const device = useDevice();
-  const appState = useExcalidrawAppState();
   const showFinalize =
     !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
 
