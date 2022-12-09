@@ -77,7 +77,10 @@ export const actionPasteStyles = register({
             fillStyle: elementStylesToCopyFrom?.fillStyle,
             opacity: elementStylesToCopyFrom?.opacity,
             roughness: elementStylesToCopyFrom?.roughness,
-            roundness: elementStylesToCopyFrom?.roundness,
+            roundness:
+              element.type === elementStylesToCopyFrom.type
+                ? elementStylesToCopyFrom?.roundness
+                : element.roundness,
           });
 
           if (isTextElement(newElement)) {
