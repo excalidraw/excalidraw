@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import React from "react";
 import { ActionManager } from "../../actions/manager";
 import { t } from "../../i18n";
 import { AppState } from "../../types";
@@ -33,9 +32,6 @@ const Footer = ({
   const showFinalize =
     !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
 
-  if (!actionManager) {
-    return null;
-  }
   return (
     <footer
       role="contentinfo"

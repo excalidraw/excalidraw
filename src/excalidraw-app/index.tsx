@@ -641,7 +641,6 @@ const ExcalidrawWrapper = () => {
         theme={theme}
       >
         <Footer>
-          {" "}
           <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
             <ExcalidrawPlusAppLink />
             <EncryptedIcon />
