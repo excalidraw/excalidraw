@@ -10,7 +10,7 @@ import { isInitializedImageElement } from "./element/typeChecks";
 import { isPromiseLike } from "./utils";
 import { normalizeText } from "./element/textElement";
 
-type ElementsClipboard = {
+export type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles | undefined;
@@ -85,7 +85,7 @@ export const copyToClipboard = async (
   }
 };
 
-const transformClipboardElementsToText = (
+export const transformClipboardElementsToText = (
   clipboardData: ElementsClipboard,
 ): string => {
   const { elements } = clipboardData;
