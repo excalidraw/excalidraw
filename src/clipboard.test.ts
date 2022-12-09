@@ -67,9 +67,8 @@ describe("copyToClipboard", () => {
     const appState: Parameters<typeof clipboard["copyToClipboard"]>[1] = {}
     const files: Parameters<typeof clipboard["copyToClipboard"]>[2] = null;
 
-    const input: Parameters<typeof clipboard['copyToClipboard']> = [elements, appState, files];
 
-    await clipboard.copyToClipboard(...input);
+    await clipboard.copyToClipboard(elements, appState, files);
 
     expect(copyTextToSystemClipboard).toHaveBeenCalledWith(expect.any(String));
   })
