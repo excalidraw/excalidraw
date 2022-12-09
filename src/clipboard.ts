@@ -74,7 +74,7 @@ export const copyToClipboard = async (
       : undefined,
   };
 
-  const clipboardDataAsText = transformClipboardElementsToText(contents);
+  const clipboardDataAsText = transformClipboardElementsToText(contents.elements);
   CLIPBOARD = clipboardDataAsText;
 
   try {
@@ -87,10 +87,8 @@ export const copyToClipboard = async (
 };
 
 export const transformClipboardElementsToText = (
-  clipboardData: ElementsClipboard,
+  elements: readonly NonDeletedExcalidrawElement[],
 ): string => {
-  const { elements } = clipboardData;
-
   const onlyTextElements = elements.every((element) => element.type === "text");
   if (onlyTextElements) {
     return elements

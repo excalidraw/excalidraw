@@ -40,7 +40,6 @@ describe("copyToClipboard", () => {
     .mockResolvedValue();
   const transformClipboardElementsToText = jest
     .spyOn(clipboard, "transformClipboardElementsToText")
-    .mockReturnValue("123");
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -92,7 +91,7 @@ describe("copyToClipboard", () => {
     await clipboard.copyToClipboard(...input);
 
     expect(transformClipboardElementsToText).toHaveBeenCalledWith(
-      expect.any(String),
+      elements,
     );
   });
 
@@ -146,8 +145,18 @@ describe("copyToClipboard", () => {
 
     const consoleError = jest.spyOn(console, "error").mockImplementation();
 
-    // @ts-expect-error - we're testing the error case
-    await clipboard.copyToClipboard({ elements: [] });
+    const elements: Parameters<typeof clipboard["copyToClipboard"]>[0] = [];
+    // @ts-expect-error - we don't really need to pass an app state here to test this
+    const appState: Parameters<typeof clipboard["copyToClipboard"]>[1] = {};
+    const files: Parameters<typeof clipboard["copyToClipboard"]>[2] = null;
+
+    const input: Parameters<typeof clipboard["copyToClipboard"]> = [
+      elements,
+      appState,
+      files,
+    ];
+
+    await clipboard.copyToClipboard(...input);
 
     expect(consoleError).toHaveBeenNthCalledWith(2, error);
   });
@@ -155,8 +164,7 @@ describe("copyToClipboard", () => {
 
 describe("transformClipboardElementsToText", () => {
   it('should return a concatenated string of the text contents when all elements are of type "text"', () => {
-    const clipboardData: ElementsClipboard = {
-      elements: [
+      const elements: Parameters<typeof transformClipboardElementsToText>[0] = [
         // @ts-expect-error - we only care about the type and text properties in this test
         {
           type: "text",
@@ -167,10 +175,9 @@ describe("transformClipboardElementsToText", () => {
           type: "text",
           text: "789",
         },
-      ],
-    };
+      ];
 
-    const result = transformClipboardElementsToText(clipboardData);
+    const result = transformClipboardElementsToText(elements);
 
     expect(result).toBe("123\n456\n789");
   });
