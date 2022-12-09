@@ -10,7 +10,7 @@ import { API } from "../helpers/api";
 import { getDefaultAppState } from "../../appState";
 import { ImportedDataState } from "../../data/types";
 import { NormalizedZoomValue } from "../../types";
-import { FONT_FAMILY } from "../../constants";
+import { FONT_FAMILY, ROUNDNESS } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
 
 const mockSizeHelper = jest.spyOn(sizeHelpers, "isInvisiblySmallElement");
@@ -255,7 +255,7 @@ describe("restoreElements", () => {
         width: 100,
         height: 200,
         groupIds: ["1", "2", "3"],
-        strokeSharpness: "round",
+        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
       });
 
       elements.push(element);
