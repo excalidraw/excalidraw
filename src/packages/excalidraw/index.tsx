@@ -10,6 +10,7 @@ import { defaultLang } from "../../i18n";
 import { DEFAULT_UI_OPTIONS } from "../../constants";
 import { Provider } from "jotai";
 import { jotaiScope, jotaiStore } from "../../jotai";
+import Footer from "../../components/footer/FooterCenter";
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
@@ -238,3 +239,4 @@ export {
 
 export { Sidebar } from "../../components/Sidebar/Sidebar";
 export { useDevice } from "../../components/App";
+export { Footer };

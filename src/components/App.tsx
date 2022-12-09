@@ -310,9 +310,6 @@ const ExcalidrawAppStateContext = React.createContext<AppState>({
 });
 ExcalidrawAppStateContext.displayName = "ExcalidrawAppStateContext";
 
-const ExcalidrawActionManagerContext =
-  React.createContext<ActionManager | null>(null);
-
 const ExcalidrawSetAppStateContext = React.createContext<
   React.Component<any, AppState>["setState"]
 >(() => {});
@@ -324,8 +321,6 @@ export const useExcalidrawAppState = () =>
   useContext(ExcalidrawAppStateContext);
 export const useExcalidrawSetAppState = () =>
   useContext(ExcalidrawSetAppStateContext);
-export const useExcalidrawActionManager = () =>
-  useContext(ExcalidrawActionManagerContext);
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
@@ -564,70 +559,66 @@ class App extends React.Component<AppProps, AppState> {
                 <ExcalidrawElementsContext.Provider
                   value={this.scene.getNonDeletedElements()}
                 >
-                  <ExcalidrawActionManagerContext.Provider
-                    value={this.actionManager}
+                  <LayerUI
+                    canvas={this.canvas}
+                    appState={this.state}
+                    files={this.files}
+                    setAppState={this.setAppState}
+                    actionManager={this.actionManager}
+                    elements={this.scene.getNonDeletedElements()}
+                    onCollabButtonClick={onCollabButtonClick}
+                    onLockToggle={this.toggleLock}
+                    onPenModeToggle={this.togglePenMode}
+                    onInsertElements={(elements) =>
+                      this.addElementsFromPasteOrLibrary({
+                        elements,
+                        position: "center",
+                        files: null,
+                      })
+                    }
+                    langCode={getLanguage().code}
+                    isCollaborating={this.props.isCollaborating}
+                    renderTopRightUI={renderTopRightUI}
+                    renderCustomStats={renderCustomStats}
+                    renderCustomSidebar={this.props.renderSidebar}
+                    showExitZenModeBtn={
+                      typeof this.props?.zenModeEnabled === "undefined" &&
+                      this.state.zenModeEnabled
+                    }
+                    libraryReturnUrl={this.props.libraryReturnUrl}
+                    UIOptions={this.props.UIOptions}
+                    focusContainer={this.focusContainer}
+                    library={this.library}
+                    id={this.id}
+                    onImageAction={this.onImageAction}
+                    renderWelcomeScreen={
+                      this.state.showWelcomeScreen &&
+                      this.state.activeTool.type === "selection" &&
+                      !this.scene.getElementsIncludingDeleted().length
+                    }
                   >
-                    <LayerUI
-                      canvas={this.canvas}
-                      appState={this.state}
-                      files={this.files}
-                      setAppState={this.setAppState}
-                      actionManager={this.actionManager}
-                      elements={this.scene.getNonDeletedElements()}
-                      onCollabButtonClick={onCollabButtonClick}
-                      onLockToggle={this.toggleLock}
-                      onPenModeToggle={this.togglePenMode}
-                      onInsertElements={(elements) =>
-                        this.addElementsFromPasteOrLibrary({
-                          elements,
-                          position: "center",
-                          files: null,
-                        })
-                      }
-                      langCode={getLanguage().code}
-                      isCollaborating={this.props.isCollaborating}
-                      renderTopRightUI={renderTopRightUI}
-                      renderCustomStats={renderCustomStats}
-                      renderCustomSidebar={this.props.renderSidebar}
-                      showExitZenModeBtn={
-                        typeof this.props?.zenModeEnabled === "undefined" &&
-                        this.state.zenModeEnabled
-                      }
-                      libraryReturnUrl={this.props.libraryReturnUrl}
-                      UIOptions={this.props.UIOptions}
-                      focusContainer={this.focusContainer}
-                      library={this.library}
-                      id={this.id}
-                      onImageAction={this.onImageAction}
-                      renderWelcomeScreen={
-                        this.state.showWelcomeScreen &&
-                        this.state.activeTool.type === "selection" &&
-                        !this.scene.getElementsIncludingDeleted().length
-                      }
-                    >
-                      {this.props.children}
-                    </LayerUI>
-                    <div className="excalidraw-textEditorContainer" />
-                    <div className="excalidraw-contextMenuContainer" />
-                    {selectedElement.length === 1 &&
-                      this.state.showHyperlinkPopup && (
-                        <Hyperlink
-                          key={selectedElement[0].id}
-                          element={selectedElement[0]}
-                          setAppState={this.setAppState}
-                          onLinkOpen={this.props.onLinkOpen}
-                        />
-                      )}
-                    {this.state.toast !== null && (
-                      <Toast
-                        message={this.state.toast.message}
-                        onClose={() => this.setToast(null)}
-                        duration={this.state.toast.duration}
-                        closable={this.state.toast.closable}
+                    {this.props.children}
+                  </LayerUI>
+                  <div className="excalidraw-textEditorContainer" />
+                  <div className="excalidraw-contextMenuContainer" />
+                  {selectedElement.length === 1 &&
+                    this.state.showHyperlinkPopup && (
+                      <Hyperlink
+                        key={selectedElement[0].id}
+                        element={selectedElement[0]}
+                        setAppState={this.setAppState}
+                        onLinkOpen={this.props.onLinkOpen}
                       />
                     )}
-                    <main>{this.renderCanvas()}</main>
-                  </ExcalidrawActionManagerContext.Provider>
+                  {this.state.toast !== null && (
+                    <Toast
+                      message={this.state.toast.message}
+                      onClose={() => this.setToast(null)}
+                      duration={this.state.toast.duration}
+                      closable={this.state.toast.closable}
+                    />
+                  )}
+                  <main>{this.renderCanvas()}</main>
                 </ExcalidrawElementsContext.Provider>{" "}
               </ExcalidrawAppStateContext.Provider>
             </ExcalidrawSetAppStateContext.Provider>

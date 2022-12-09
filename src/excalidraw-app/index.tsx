@@ -21,7 +21,7 @@ import {
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import { Excalidraw, defaultLang } from "../packages/excalidraw/index";
+import { Excalidraw, defaultLang, Footer } from "../packages/excalidraw/index";
 import {
   AppState,
   LibraryItems,
@@ -79,7 +79,6 @@ import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 import EncryptedIcon from "../components/EncryptedIcon";
 import ExcalidrawPlusAppLink from "./components/ExcalidrawPlusAppLink";
-import Footer from "../components/Footer";
 
 polyfill();
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -641,9 +640,8 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={theme}
       >
-        <Footer
-          showExitZenModeBtn={excalidrawAPI?.getAppState().zenModeEnabled}
-        >
+        <Footer>
+          {" "}
           <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
             <ExcalidrawPlusAppLink />
             <EncryptedIcon />

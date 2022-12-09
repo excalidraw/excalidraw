@@ -38,7 +38,7 @@ import { trackEvent } from "../analytics";
 import { isMenuOpenAtom, useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
-import Footer from "./Footer";
+import Footer from "./footer/Footer";
 import {
   ExportImageIcon,
   HamburgerMenuIcon,
@@ -438,15 +438,10 @@ const LayerUI = ({
   };
 
   const [hostSidebarCounters] = useAtom(hostSidebarCountersAtom, jotaiScope);
-  const FooterComponent = React.Children.toArray(children).find(
+  const FooterCenterComponent = React.Children.toArray(children).find(
     (child) =>
       //@ts-ignore
-      React.isValidElement(child) && child.type?.displayName === "Footer",
-  ) || (
-    <Footer
-      renderWelcomeScreen={renderWelcomeScreen}
-      showExitZenModeBtn={showExitZenModeBtn}
-    />
+      React.isValidElement(child) && child.type?.displayName === "FooterCenter",
   );
   return (
     <>
@@ -519,7 +514,13 @@ const LayerUI = ({
             }
           >
             {renderFixedSideContainer()}
-            {FooterComponent}
+            <Footer
+              actionManager={actionManager}
+              renderWelcomeScreen={renderWelcomeScreen}
+              showExitZenModeBtn={showExitZenModeBtn}
+            >
+              {FooterCenterComponent}
+            </Footer>
 
             {appState.showStats && (
               <Stats

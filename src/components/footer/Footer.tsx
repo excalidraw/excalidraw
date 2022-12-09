@@ -1,32 +1,31 @@
 import clsx from "clsx";
-import { t } from "../i18n";
+import { ActionManager } from "../../actions/manager";
+import { t } from "../../i18n";
 import {
   ExitZenModeAction,
   FinalizeAction,
   UndoRedoActions,
   ZoomActions,
-} from "./Actions";
-import {
-  useDevice,
-  useExcalidrawActionManager,
-  useExcalidrawAppState,
-} from "./App";
-import { WelcomeScreenHelpArrow } from "./icons";
-import { Section } from "./Section";
-import Stack from "./Stack";
-import WelcomeScreenDecor from "./WelcomeScreenDecor";
+} from "../Actions";
+import { useDevice, useExcalidrawAppState } from "../App";
+import { WelcomeScreenHelpArrow } from "../icons";
+import { Section } from "../Section";
+import Stack from "../Stack";
+import WelcomeScreenDecor from "../WelcomeScreenDecor";
+import FooterCenter from "./FooterCenter";
 
 const Footer = ({
+  actionManager,
   showExitZenModeBtn = true,
   renderWelcomeScreen = true,
   children,
 }: {
+  actionManager: ActionManager;
   showExitZenModeBtn?: boolean;
   renderWelcomeScreen?: boolean;
   children?: React.ReactNode;
 }) => {
   const device = useDevice();
-  const actionManager = useExcalidrawActionManager();
   const appState = useExcalidrawAppState();
   const showFinalize =
     !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
@@ -73,17 +72,7 @@ const Footer = ({
           </Section>
         </Stack.Col>
       </div>
-      <div
-        className={clsx(
-          "layer-ui__wrapper__footer-center zen-mode-transition",
-          {
-            "layer-ui__wrapper__footer-left--transition-bottom":
-              appState.zenModeEnabled,
-          },
-        )}
-      >
-        {children}
-      </div>
+      <FooterCenter>{children}</FooterCenter>
       <div
         className={clsx("layer-ui__wrapper__footer-right zen-mode-transition", {
           "transition-right disable-pointerEvents": appState.zenModeEnabled,
