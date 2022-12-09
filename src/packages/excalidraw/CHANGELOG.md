@@ -13,9 +13,16 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
-### Excalidraw schema
+### Excalidraw API
 
-- Merged `appState.currentItemStrokeSharpness` and `appState.currentItemLinearStrokeSharpness` into `appState.currentItemRoundness`. Renamed `changeSharpness` action to `changeRoundness`. Excalidraw element's `strokeSharpness` was changed to `roundness`. Check the PR for types and more details [#5553](https://github.com/excalidraw/excalidraw/pull/5553).
+#### Features
+
+- Better default radius sizes for rectangles [#5553](https://github.com/excalidraw/excalidraw/pull/5553).
+
+#### Breaking changes
+
+- Merged `appState.currentItemStrokeSharpness` and `appState.currentItemLinearStrokeSharpness` into [`appState.currentItemRoundness`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L140). This denotes the `roundness` of the element and accepts the values `round` | `sharp`.
+- Renamed element's `strokeSharpness` to [`roundness`](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L35).
 
 ## 0.13.0 (2022-10-27)
 
