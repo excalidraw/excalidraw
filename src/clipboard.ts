@@ -73,19 +73,19 @@ export const copyToClipboard = async (
       : undefined,
   };
 
-  const clipboardData = parseElementsForClipboardCopy(contents);
-  CLIPBOARD = clipboardData;
+  const clipboardDataAsText = transformClipboardElementsToText(contents);
+  CLIPBOARD = clipboardDataAsText;
 
   try {
     PREFER_APP_CLIPBOARD = false;
-    await copyTextToSystemClipboard(clipboardData);
+    await copyTextToSystemClipboard(clipboardDataAsText);
   } catch (error: any) {
     PREFER_APP_CLIPBOARD = true;
     console.error(error);
   }
 };
 
-const parseElementsForClipboardCopy = (
+const transformClipboardElementsToText = (
   clipboardData: ElementsClipboard,
 ): string => {
   const { elements } = clipboardData;
