@@ -8,7 +8,7 @@ import {
   FileId,
 } from "../../element/types";
 import { newElement, newTextElement, newLinearElement } from "../../element";
-import { DEFAULT_VERTICAL_ALIGN } from "../../constants";
+import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
 import { getDefaultAppState } from "../../appState";
 import { GlobalTestState, createEvent, fireEvent } from "../test-utils";
 import fs from "fs";
@@ -16,18 +16,19 @@ import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
 import {
+  SubtypePrepFn,
+  SubtypeRecord,
+  prepareSubtype,
+  selectSubtype,
+} from "../../subtypes";
+import {
   maybeGetSubtypeProps,
   newFreeDrawElement,
   newImageElement,
 } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
-import {
-  SubtypePrepFn,
-  SubtypeRecord,
-  prepareSubtype,
-  selectSubtype,
-} from "../../subtypes";
+import { isLinearElementType } from "../../element/typeChecks";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -110,7 +111,7 @@ export class API {
     fillStyle?: ExcalidrawGenericElement["fillStyle"];
     strokeWidth?: ExcalidrawGenericElement["strokeWidth"];
     strokeStyle?: ExcalidrawGenericElement["strokeStyle"];
-    strokeSharpness?: ExcalidrawGenericElement["strokeSharpness"];
+    roundness?: ExcalidrawGenericElement["roundness"];
     roughness?: ExcalidrawGenericElement["roughness"];
     opacity?: ExcalidrawGenericElement["opacity"];
     // text props
@@ -156,7 +157,20 @@ export class API {
       },
       type,
     );
-    const base = {
+    const base: Omit<
+      ExcalidrawGenericElement,
+      | "id"
+      | "width"
+      | "height"
+      | "type"
+      | "seed"
+      | "version"
+      | "versionNonce"
+      | "isDeleted"
+      | "groupIds"
+      | "link"
+      | "updated"
+    > = {
       ...custom,
       x,
       y,
@@ -167,8 +181,17 @@ export class API {
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,
       strokeWidth: rest.strokeWidth ?? appState.currentItemStrokeWidth,
       strokeStyle: rest.strokeStyle ?? appState.currentItemStrokeStyle,
-      strokeSharpness:
-        rest.strokeSharpness ?? appState.currentItemStrokeSharpness,
+      roundness: (
+        rest.roundness === undefined
+          ? appState.currentItemRoundness === "round"
+          : rest.roundness
+      )
+        ? {
+            type: isLinearElementType(type)
+              ? ROUNDNESS.PROPORTIONAL_RADIUS
+              : ROUNDNESS.ADAPTIVE_RADIUS,
+          }
+        : null,
       roughness: rest.roughness ?? appState.currentItemRoughness,
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,

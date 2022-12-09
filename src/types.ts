@@ -13,6 +13,7 @@ import {
   FileId,
   ExcalidrawImageElement,
   Theme,
+  StrokeRoundness,
 } from "./element/types";
 import { Action } from "./actions/types";
 import { SHAPES } from "./shapes";
@@ -145,10 +146,9 @@ export type AppState = {
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
-  currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
-  currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
+  currentItemRoundness: StrokeRoundness;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;

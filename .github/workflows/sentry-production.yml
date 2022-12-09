@@ -3,7 +3,7 @@ name: New Sentry production release
 on:
   push:
     branches:
-      - master
+      - release
 
 jobs:
   sentry:

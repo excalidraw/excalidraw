@@ -88,7 +88,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     height = 0,
     angle = 0,
     groupIds = [],
-    strokeSharpness,
+    roundness = null,
     boundElements = null,
     link = null,
     locked,
@@ -96,7 +96,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
   const { subtype, customData } = rest;
-  const element = {
+  // assign type to guard against excess properties
+  const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
     ...maybeGetSubtypeProps({ subtype, customData }, type),
     id: rest.id || randomId(),
     type,
@@ -113,7 +114,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     roughness,
     opacity,
     groupIds,
-    strokeSharpness,
+    roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
     versionNonce: rest.versionNonce ?? 0,

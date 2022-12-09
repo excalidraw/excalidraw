@@ -107,7 +107,7 @@ const actionNames = [
   "ungroup",
   "goToCollaborator",
   "addToLibrary",
-  "changeSharpness",
+  "changeRoundness",
   "alignTop",
   "alignBottom",
   "alignLeft",
@@ -128,6 +128,7 @@ const actionNames = [
   "eraser",
   "bindText",
   "toggleLock",
+  "toggleLinearEditor",
 ] as const;
 
 // So we can have the `isActionName` type guard
