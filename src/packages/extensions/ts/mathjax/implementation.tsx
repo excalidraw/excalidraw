@@ -150,16 +150,14 @@ const loadMathJax = async () => {
     mathJaxLoading = true;
 
     // MathJax components we use
-    const AsciiMath = (await import("mathjax-full/js/input/asciimath.js"))
+    const AsciiMath = (await import("mathjax-full/js/input/asciimath"))
       .AsciiMath;
-    const TeX = (await import("mathjax-full/js/input/tex.js")).TeX;
-    const SVG = (await import("mathjax-full/js/output/svg.js")).SVG;
-    const liteAdaptor = (
-      await import("mathjax-full/js/adaptors/liteAdaptor.js")
-    ).liteAdaptor;
-    const HTMLDocument = (
-      await import("mathjax-full/js/handlers/html/HTMLDocument.js")
-    ).HTMLDocument;
+    const TeX = (await import("mathjax-full/js/input/tex")).TeX;
+    const SVG = (await import("mathjax-full/js/output/svg")).SVG;
+    const liteAdaptor = (await import("mathjax-full/js/adaptors/liteAdaptor"))
+      .liteAdaptor;
+    const RegisterHTMLHandler = (await import("mathjax-full/js/handlers/html"))
+      .RegisterHTMLHandler;
 
     // Components for MathJax accessibility
     const MathML = (await import("mathjax-full/js/input/mathml")).MathML;
@@ -187,13 +185,12 @@ const loadMathJax = async () => {
       : ["base", "ams", "boldsymbol"];
 
     // Types needed to lazy-load MathJax
-    const LiteElement = (
-      await import("mathjax-full/js/adaptors/lite/Element.js")
-    ).LiteElement;
-    const LiteText = (await import("mathjax-full/js/adaptors/lite/Text.js"))
+    const LiteElement = (await import("mathjax-full/js/adaptors/lite/Element"))
+      .LiteElement;
+    const LiteText = (await import("mathjax-full/js/adaptors/lite/Text"))
       .LiteText;
     const LiteDocument = (
-      await import("mathjax-full/js/adaptors/lite/Document.js")
+      await import("mathjax-full/js/adaptors/lite/Document")
     ).LiteDocument;
 
     // Configure AsciiMath to use the "display" option.  See
@@ -202,6 +199,9 @@ const loadMathJax = async () => {
       await require("mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax")
     ).MathJax;
     MathJax.InputJax.AsciiMath.AM.Augment({ displaystyle: false });
+
+    // Load the document creator last
+    const mathjax = (await import("mathjax-full/js/mathjax")).mathjax;
 
     type E = typeof LiteElement;
     type T = typeof LiteText;
@@ -214,6 +214,7 @@ const loadMathJax = async () => {
     // Set up shared components
     mathJax.adaptor = liteAdaptor();
     mathJax.visitor = new SerializedMmlVisitor();
+    RegisterHTMLHandler(mathJax.adaptor);
 
     // Set up input components
     const asciimath = new AsciiMath<E | T, T, D>({});
@@ -224,17 +225,13 @@ const loadMathJax = async () => {
     const svg = new SVG<E | T, T, D>({ fontCache: "local" });
 
     // AsciiMath input
-    mathJax.amHtml = new HTMLDocument<E | T, T, D>("", mathJax.adaptor, {
-      InputJax: asciimath,
-    });
+    mathJax.amHtml = mathjax.document("", { InputJax: asciimath });
 
     // LaTeX input
-    mathJax.texHtml = new HTMLDocument<E | T, T, D>("", mathJax.adaptor, {
-      InputJax: tex,
-    });
+    mathJax.texHtml = mathjax.document("", { InputJax: tex });
 
     // Capture the MathML for accessibility purposes
-    mathJax.mmlSvg = new HTMLDocument<E | T, T, D>("", mathJax.adaptor, {
+    mathJax.mmlSvg = mathjax.document("", {
       InputJax: mml,
       OutputJax: svg,
     });
