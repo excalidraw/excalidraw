@@ -1,7 +1,8 @@
 import {
-  ExcalidrawElement, ExcalidrawTextElement,
+  ExcalidrawElement,
+  ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
-} from './element/types';
+} from "./element/types";
 import { AppState, BinaryFiles } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
@@ -92,12 +93,13 @@ export const transformClipboardElementsToText = (
 
   const onlyTextElements = elements.every((element) => element.type === "text");
   if (onlyTextElements) {
-    return elements.map((element) => normalizeText((element as ExcalidrawTextElement).text)).join("\n");
+    return elements
+      .map((element) => normalizeText((element as ExcalidrawTextElement).text))
+      .join("\n");
   }
 
-  return JSON.stringify(elements)
-}
-
+  return JSON.stringify(elements);
+};
 
 const getAppClipboard = (): Partial<ElementsClipboard> => {
   if (!CLIPBOARD) {
