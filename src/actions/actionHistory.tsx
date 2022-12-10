@@ -58,7 +58,9 @@ const writeData = (
   return { commitToHistory };
 };
 
-type ActionCreator = (history: History) => Action;
+type ActionCreator = (
+  history: Pick<History, "undoOnce" | "redoOnce">,
+) => Action;
 
 export const createUndoAction: ActionCreator = (history) => ({
   name: "undo",

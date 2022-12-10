@@ -430,6 +430,8 @@ class App extends React.Component<AppProps, AppState> {
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
         history: {
           clear: this.resetHistory,
+          redoOnce: this.redoOnce,
+          undoOnce: this.undoOnce,
         },
         scrollToContent: this.scrollToContent,
         getSceneElements: this.getSceneElements,
@@ -749,6 +751,14 @@ class App extends React.Component<AppProps, AppState> {
 
   private resetHistory = () => {
     this.history.clear();
+  };
+
+  private undoOnce = () => {
+    return this.history.undoOnce();
+  };
+
+  private redoOnce = () => {
+    return this.history.redoOnce();
   };
 
   private executeAction = (action: Action, source?: ActionSource) => {

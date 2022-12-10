@@ -28,6 +28,7 @@ import {
 } from "../../../types";
 import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
+import { createRedoAction, createUndoAction } from "../../../actions";
 
 declare global {
   interface Window {
@@ -576,6 +577,26 @@ export default function App() {
             }}
           >
             Update Library
+          </button>
+
+          <button
+            onClick={() => {
+              excalidrawAPI?.executeAction(
+                createUndoAction(excalidrawAPI?.history),
+              );
+            }}
+          >
+            Undo{" "}
+          </button>
+
+          <button
+            onClick={() => {
+              excalidrawAPI?.executeAction(
+                createRedoAction(excalidrawAPI?.history),
+              );
+            }}
+          >
+            Redo{" "}
           </button>
 
           <label>
