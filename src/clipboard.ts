@@ -1,6 +1,5 @@
 import {
   ExcalidrawElement,
-  ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
 } from "./element/types";
 import { AppState, BinaryFiles } from "./types";
