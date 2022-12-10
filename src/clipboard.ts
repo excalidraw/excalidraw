@@ -91,7 +91,7 @@ export const copyToClipboard = async (
 export const transformClipboardElementsToText = (
   elements: readonly NonDeletedExcalidrawElement[],
 ): string => {
-  const onlyTextElements = elements.every((element) => element.type === "text");
+  const onlyTextElements = elements.some((element) => element.type === "text");
   if (onlyTextElements) {
     return elements
       .map((element) => normalizeText((element as ExcalidrawTextElement).text))
