@@ -254,8 +254,7 @@ export const copyTextToSystemClipboard = async (text: string | null) => {
   }
 };
 
-// adapted from
-// https://github.com/zenorocha/clipboard.js/blob/ce79f170aa655c408b6aab33c9472e8e4fa52e19/src/clipboard-action.js#L48
+// adapted from https://github.com/zenorocha/clipboard.js/blob/ce79f170aa655c408b6aab33c9472e8e4fa52e19/src/clipboard-action.js#L48
 export const copyTextViaExecCommand = (text: string): boolean => {
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 

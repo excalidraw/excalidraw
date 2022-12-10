@@ -5,7 +5,7 @@ describe("clipboard", () => {
     it('should return text elements content if "isPlainPaste" is true', async () => {
       const clipboardData = await parseClipboard(
         {
-          // @ts-expect-error
+          // @ts-expect-error - we don't need to mock the whole event for this test
           clipboardData: {
             getData: () =>
               JSON.stringify({
