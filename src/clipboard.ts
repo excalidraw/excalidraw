@@ -95,7 +95,7 @@ export const transformClipboardElementsToText = (
   if (onlyTextElements) {
     return elements
       .map((element) => normalizeText((element as ExcalidrawTextElement).text))
-      .join("\n");
+      .join("\n\n");
   }
 
   return JSON.stringify(elements);
