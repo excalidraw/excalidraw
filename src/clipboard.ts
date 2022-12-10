@@ -7,7 +7,7 @@ import { AppState, BinaryFiles } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "./constants";
-import { isInitializedImageElement } from "./element/typeChecks";
+import { isInitializedImageElement, isTextElement } from "./element/typeChecks";
 import { isPromiseLike } from "./utils";
 import { normalizeText } from "./element/textElement";
 
@@ -91,11 +91,18 @@ export const copyToClipboard = async (
 export const transformClipboardElementsToText = (
   elements: readonly NonDeletedExcalidrawElement[],
 ): string => {
-  const onlyTextElements = elements.some((element) => element.type === "text");
-  if (onlyTextElements) {
+  const someTextElements = elements.some((element) => element.type === "text");
+  if (someTextElements) {
     return elements
-      .map((element) => normalizeText((element as ExcalidrawTextElement).text))
-      .join("\n\n");
+      .reduce((acc: string[], element) => {
+        if (isTextElement(element)) {
+          acc.push(element.text);
+        }
+
+        return acc;
+      }, [])
+      .join("\n\n")
+      .trim();
   }
 
   return JSON.stringify(elements);
@@ -248,7 +255,8 @@ export const copyTextToSystemClipboard = async (text: string | null) => {
   }
 };
 
-// adapted from https://github.com/zenorocha/clipboard.js/blob/ce79f170aa655c408b6aab33c9472e8e4fa52e19/src/clipboard-action.js#L48
+// adapted from
+// https://github.com/zenorocha/clipboard.js/blob/ce79f170aa655c408b6aab33c9472e8e4fa52e19/src/clipboard-action.js#L48
 export const copyTextViaExecCommand = (text: string): boolean => {
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
