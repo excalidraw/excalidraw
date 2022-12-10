@@ -39,7 +39,7 @@ import {
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
-import { ActionResult } from "../actions/types";
+import { Action, ActionResult, ActionSource } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
 import {
@@ -442,6 +442,7 @@ class App extends React.Component<AppProps, AppState> {
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
         toggleMenu: this.toggleMenu,
+        executeAction: this.executeAction,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -748,6 +749,10 @@ class App extends React.Component<AppProps, AppState> {
 
   private resetHistory = () => {
     this.history.clear();
+  };
+
+  private executeAction = (action: Action, source?: ActionSource) => {
+    this.actionManager.executeAction(action, source);
   };
 
   /**

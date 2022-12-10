@@ -509,6 +509,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | [setCursor](#setCursor) | <code>(cursor: string) => void </code> | This API can be used to set customise the mouse cursor on the canvas |
 | [resetCursor](#resetCursor) | <code>() => void </code> | This API can be used to reset to default mouse cursor on the canvas |
 | [toggleMenu](#toggleMenu) | <code>(type: string, force?: boolean) => boolean</code> | Toggles specific menus on/off |
+| [executeAction](#executeAction) | <code>(action: Action, source: ActionSource) => void</code> | Executes specified Action |
 
 #### `readyPromise`
 
