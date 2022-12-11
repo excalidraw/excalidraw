@@ -56,6 +56,7 @@ export const actionToggleEditMenu = register({
 
 export const actionFullScreen = register({
   name: "toggleFullScreen",
+  viewMode: true,
   trackEvent: { category: "canvas", predicate: (appState) => !isFullScreen() },
   perform: () => {
     if (!isFullScreen()) {
@@ -73,6 +74,7 @@ export const actionFullScreen = register({
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
+  viewMode: true,
   trackEvent: { category: "menu", action: "toggleHelpDialog" },
   perform: (_elements, appState, _, { focusContainer }) => {
     if (appState.openDialog === "help") {

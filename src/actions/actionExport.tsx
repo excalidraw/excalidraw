@@ -179,6 +179,7 @@ export const actionSaveToActiveFile = register({
 
 export const actionSaveFileToDisk = register({
   name: "saveFileToDisk",
+  viewMode: true,
   trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {
     try {

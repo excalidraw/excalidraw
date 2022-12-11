@@ -164,4 +164,7 @@ export interface Action {
           value: any,
         ) => boolean;
       };
+  /** if set to `true`, allow action to be performed in viewMode.
+   *  Defaults to `false` */
+  viewMode?: boolean;
 }
