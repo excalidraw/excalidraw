@@ -1,6 +1,15 @@
 import { NormalizedZoomValue, Point, Zoom } from "./types";
-import { LINE_CONFIRM_THRESHOLD } from "./constants";
-import { ExcalidrawLinearElement, NonDeleted } from "./element/types";
+import {
+  DEFAULT_ADAPTIVE_RADIUS,
+  LINE_CONFIRM_THRESHOLD,
+  DEFAULT_PROPORTIONAL_RADIUS,
+  ROUNDNESS,
+} from "./constants";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeleted,
+} from "./element/types";
 import { getShapeForElement } from "./renderer/renderElement";
 import { getCurvePathOps } from "./element/bounds";
 
@@ -264,6 +273,29 @@ export const getGridPoint = (
     ];
   }
   return [x, y];
+};
+
+export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
+  if (
+    element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ||
+    element.roundness?.type === ROUNDNESS.LEGACY
+  ) {
+    return x * DEFAULT_PROPORTIONAL_RADIUS;
+  }
+
+  if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
+    const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
+
+    const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;
+
+    if (x <= CUTOFF_SIZE) {
+      return x * DEFAULT_PROPORTIONAL_RADIUS;
+    }
+
+    return fixedRadiusSize;
+  }
+
+  return 0;
 };
 
 export const getControlPointsForBezierCurve = (

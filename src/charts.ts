@@ -172,7 +172,7 @@ const commonProps = {
   opacity: 100,
   roughness: 1,
   strokeColor: colors.elementStroke[0],
-  strokeSharpness: "sharp",
+  roundness: null,
   strokeStyle: "solid",
   strokeWidth: 1,
   verticalAlign: VERTICAL_ALIGN.MIDDLE,
@@ -326,7 +326,7 @@ const chartBaseElements = (
         rawText: spreadsheet.title,
         x: x + chartWidth / 2,
         y: y - BAR_HEIGHT - BAR_GAP * 2 - DEFAULT_FONT_SIZE,
-        strokeSharpness: "sharp",
+        roundness: null,
         strokeStyle: "solid",
         textAlign: "center",
       })
