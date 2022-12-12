@@ -12,7 +12,7 @@ export {
   hasStrokeWidth,
   hasStrokeStyle,
   canHaveArrowheads,
-  canChangeSharpness,
+  canChangeRoundness,
   getElementAtPosition,
   hasText,
   getElementsAtPosition,
