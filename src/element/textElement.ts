@@ -331,6 +331,12 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   const spaceWidth = getTextWidth(" ", font);
+
+  const push = (str: string) => {
+    if (str.trim()) {
+      lines.push(str);
+    }
+  };
   originalLines.forEach((originalLine) => {
     const words = originalLine.split(" ");
     // This means its newline so push it
@@ -348,9 +354,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
         if (currentWordWidth >= maxWidth) {
           // push current line since the current word exceeds the max width
           // so will be appended in next line
-          if (currentLine) {
-            lines.push(currentLine);
-          }
+          push(currentLine);
           currentLine = "";
           currentLineWidthTillNow = 0;
           while (words[index].length > 0) {
@@ -364,7 +368,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
               if (currentLine.slice(-1) === " ") {
                 currentLine = currentLine.slice(0, -1);
               }
-              lines.push(currentLine);
+              push(currentLine);
               currentLine = currentChar;
               currentLineWidthTillNow = width;
               if (currentLineWidthTillNow === maxWidth) {
@@ -377,7 +381,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           }
           // push current line if appending space exceeds max width
           if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
-            lines.push(currentLine);
+            push(currentLine);
             currentLine = "";
             currentLineWidthTillNow = 0;
           } else {
@@ -396,7 +400,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
             currentLineWidthTillNow = getTextWidth(currentLine + word, font);
 
             if (currentLineWidthTillNow >= maxWidth) {
-              lines.push(currentLine);
+              push(currentLine);
               currentLineWidthTillNow = 0;
               currentLine = "";
 
@@ -408,9 +412,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
             // Push the word if appending space exceeds max width
             if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
               const word = currentLine.slice(0, -1);
-              if (word.trim()) {
-                lines.push(word);
-              }
+              push(word);
               currentLine = "";
               currentLineWidthTillNow = 0;
               break;
@@ -427,9 +429,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
         if (currentLine.slice(-1) === " ") {
           currentLine = currentLine.slice(0, -1);
         }
-        if (currentLine.trim().length) {
-          lines.push(currentLine);
-        }
+        push(currentLine);
       }
     }
   });
