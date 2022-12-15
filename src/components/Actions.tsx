@@ -29,7 +29,6 @@ import { hasBoundTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import "./Actions.scss";
-import { Tooltip } from "./Tooltip";
 import { shouldAllowVerticalAlign } from "../element/textElement";
 
 export const SelectedShapeActions = ({
@@ -302,10 +301,10 @@ export const UndoRedoActions = ({
 }) => (
   <div className={`undo-redo-buttons ${className}`}>
     <div className="undo-button-container">
-      <Tooltip label={t("buttons.undo")}>{renderAction("undo")}</Tooltip>
+      {renderAction("undo") /* //zsviczian */}
     </div>
     <div className="redo-button-container">
-      <Tooltip label={t("buttons.redo")}> {renderAction("redo")}</Tooltip>
+      {renderAction("redo") /* //zsviczian */}
     </div>
   </div>
 );

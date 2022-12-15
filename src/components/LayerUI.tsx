@@ -188,17 +188,19 @@ const LayerUI = ({
         </div>
       </WelcomeScreenDecor>
 
-      <button
-        data-prevent-outside-click
-        className={clsx("menu-button", "zen-mode-transition", {
-          "transition-left": appState.zenModeEnabled,
-        })}
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        type="button"
-        data-testid="menu-button"
-      >
-        {HamburgerMenuIcon}
-      </button>
+      {!appState.viewModeEnabled && (
+        <button //zsviczian hide menu in viewMode
+          data-prevent-outside-click
+          className={clsx("menu-button", "zen-mode-transition", {
+            "transition-left": appState.zenModeEnabled,
+          })}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          type="button"
+          data-testid="menu-button"
+        >
+          {HamburgerMenuIcon}
+        </button>
+      )}
 
       {isMenuOpen && (
         <div
