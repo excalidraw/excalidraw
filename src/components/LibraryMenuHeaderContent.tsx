@@ -228,12 +228,14 @@ export const LibraryMenuHeader: React.FC<{
           {publishLibSuccess && renderPublishSuccess()}
           {!!items.length && (
             <>
-              <MenuItem
-                label={t("buttons.export")}
-                icon={ExportIcon}
-                onClick={onLibraryExport}
-                dataTestId="lib-dropdown--export"
-              />
+              {false && (
+                <MenuItem //zsviczian hide export button
+                  label={t("buttons.export")}
+                  icon={ExportIcon}
+                  onClick={onLibraryExport}
+                  dataTestId="lib-dropdown--export"
+                />
+              )}
               <MenuItem
                 label={resetLabel}
                 icon={TrashIcon}
