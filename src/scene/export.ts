@@ -11,6 +11,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
+import Scene from "../scene/Scene";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
