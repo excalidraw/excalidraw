@@ -8,7 +8,6 @@ import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "./constants";
 import { isInitializedImageElement } from "./element/typeChecks";
 import { isPromiseLike } from "./utils";
-import { normalizeText } from "./element/textElement";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
@@ -119,7 +118,7 @@ export const getSystemClipboard = async (
       : probablySupportsClipboardReadText &&
         (await navigator.clipboard.readText());
 
-    return normalizeText(text || "").trim();
+    return (text || "").trim();
   } catch {
     return "";
   }
@@ -148,6 +147,7 @@ export const parseClipboard = async (
   // technically possible it's staler than in-app clipboard
   const spreadsheetResult =
     !isPlainPaste && parsePotentialSpreadsheet(systemClipboard);
+
   if (spreadsheetResult) {
     return spreadsheetResult;
   }
