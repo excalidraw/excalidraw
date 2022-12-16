@@ -49,11 +49,7 @@ export const redrawTextBoundingBox = (
       maxWidth,
     );
   }
-  const metrics = measureText(
-    textElement.originalText,
-    getFontString(textElement),
-    maxWidth,
-  );
+  const metrics = measureText(text, getFontString(textElement), maxWidth);
   let coordY = textElement.y;
   let coordX = textElement.x;
   // Resize container and vertically center align the text
@@ -272,7 +268,7 @@ export const measureText = (
   container.style.minHeight = "1em";
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
-    container.style.width = `${String(maxWidth)}px`;
+    container.style.width = `${String(maxWidth + 1)}px`;
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
     container.style.lineHeight = `${String(lineHeight)}px`;
@@ -290,9 +286,8 @@ export const measureText = (
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
   // Since span adds 1px extra width to the container
-  const width = container.offsetWidth + 1;
+  const width = container.offsetWidth - 1;
   const height = container.offsetHeight;
-
   document.body.removeChild(container);
   if (isTestEnv()) {
     return { width, height, baseline, container };
