@@ -272,7 +272,7 @@ export const measureText = (
   container.style.minHeight = "1em";
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
-    container.style.maxWidth = `${String(maxWidth)}px`;
+    container.style.width = `${String(maxWidth)}px`;
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
     container.style.lineHeight = `${String(lineHeight)}px`;
