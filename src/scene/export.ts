@@ -11,8 +11,22 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
+import Scene from "../scene/Scene";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
+
+const createScene = (
+  //zsviczian
+  elements: readonly NonDeletedExcalidrawElement[],
+): Scene | null => {
+  if (!elements || Scene.getScene(elements[0])) {
+    return null;
+  }
+  const scene = new Scene();
+  scene.replaceAllElements(elements);
+  elements?.forEach((el) => Scene.mapElementToScene(el, scene));
+  return scene;
+};
 
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -37,6 +51,7 @@ export const exportToCanvas = async (
     return { canvas, scale: appState.exportScale };
   },
 ) => {
+  const scene = createScene(elements); //zsviczian
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
   const { canvas, scale = 1 } = createCanvas(width, height);
@@ -76,6 +91,7 @@ export const exportToCanvas = async (
     },
   });
 
+  scene?.destroy(); //zsviczian
   return canvas;
 };
 
@@ -97,6 +113,7 @@ export const exportToSvg = async (
     exportScale = 1,
     exportEmbedScene,
   } = appState;
+  const scene = createScene(elements); //zsviczian
   let metadata = "";
   if (exportEmbedScene) {
     try {
@@ -169,6 +186,7 @@ export const exportToSvg = async (
     exportWithDarkMode: appState.exportWithDarkMode,
   });
 
+  scene?.destroy(); //zsviczian
   return svgRoot;
 };
 
