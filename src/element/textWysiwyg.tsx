@@ -525,7 +525,7 @@ export const textWysiwyg = ({
         });
       }
     }
-
+    app.setState({ openPopup: null }); //zsviczian (container text color issue)
     onSubmit({
       text,
       viaKeyboard: submittedViaKeyboard,
