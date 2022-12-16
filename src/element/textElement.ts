@@ -294,6 +294,9 @@ export const measureText = (
   const height = container.offsetHeight;
 
   document.body.removeChild(container);
+  if (isTestEnv()) {
+    return { width, height, baseline, container };
+  }
   return { width, height, baseline };
 };
 
