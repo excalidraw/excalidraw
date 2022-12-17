@@ -657,6 +657,15 @@ The `<Sidebar.Header>` component takes these props children (all are optional):
 
 For example code, see the example [`App.tsx`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/example/App.tsx#L524) file.
 
+#### `openCustomContextMenu`
+
+Optional function that can open custom context menu. It takes the following props:
+
+| name | type | description |
+| --- | --- | --- |
+| position | <pre>{ left: number; top: number; }</pre> | Context menu click position |
+| type | <pre>"canvas" \| "element"</pre> | Context menu clicked on element type |
+
 #### `viewModeEnabled`
 
 This prop indicates whether the app is in `view mode`. When supplied, the value takes precedence over `intialData.appState.viewModeEnabled`, the `view mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.

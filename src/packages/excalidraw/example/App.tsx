@@ -107,6 +107,8 @@ export default function App() {
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
+  const [customContextMenuEnabled, setCustomContextMenuEnabled] =
+    useState(false);
   const [blobUrl, setBlobUrl] = useState<string>("");
   const [canvasUrl, setCanvasUrl] = useState<string>("");
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
@@ -537,6 +539,21 @@ export default function App() {
     );
   };
 
+  const openCustomContextMenu = (
+    {
+      left,
+      top,
+    }: {
+      left: number;
+      top: number;
+    },
+    type: "canvas" | "element",
+  ) => {
+    window.alert(
+      `Context menu click on type "${type}" at (x: ${left}, y: ${top})`,
+    );
+  };
+
   return (
     <div className="App" ref={appRef}>
       <h1> Excalidraw Example</h1>
@@ -650,6 +667,16 @@ export default function App() {
             />
             Show collaborators
           </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={customContextMenuEnabled}
+              onChange={() => {
+                setCustomContextMenuEnabled(!customContextMenuEnabled);
+              }}
+            />
+            Custom context menu
+          </label>
           <div>
             <button onClick={onCopy.bind(null, "png")}>
               Copy to Clipboard as PNG
@@ -717,6 +744,9 @@ export default function App() {
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
             renderSidebar={renderSidebar}
+            openCustomContextMenu={
+              customContextMenuEnabled ? openCustomContextMenu : undefined
+            }
           />
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}
