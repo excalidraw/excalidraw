@@ -171,6 +171,7 @@ import {
   isArrowKey,
   KEYS,
   isAndroid,
+  isDarwin,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer/renderScene";
@@ -6187,7 +6188,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.device.isMobile &&
+            (this.device.isTouchScreen || isDarwin) &&
               navigator.clipboard && {
                 trackEvent: false,
                 name: "paste",
@@ -6199,7 +6200,9 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.device.isMobile && navigator.clipboard && separator,
+            (this.device.isTouchScreen || isDarwin) &&
+              navigator.clipboard &&
+              separator,
             probablySupportsClipboardBlob &&
               elements.length > 0 &&
               actionCopyAsPng,
@@ -6244,9 +6247,11 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         ContextMenu.push({
           options: [
-            this.device.isMobile && actionCut,
-            this.device.isMobile && navigator.clipboard && actionCopy,
-            this.device.isMobile &&
+            (this.device.isTouchScreen || isDarwin) && actionCut,
+            (this.device.isTouchScreen || isDarwin) &&
+              navigator.clipboard &&
+              actionCopy,
+            (this.device.isTouchScreen || isDarwin) &&
               navigator.clipboard && {
                 name: "paste",
                 trackEvent: false,
@@ -6258,7 +6263,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 contextItemLabel: "labels.paste",
               },
-            this.device.isMobile && separator,
+            (this.device.isTouchScreen || isDarwin) && separator,
             ...options,
             separator,
             actionCopyStyles,
