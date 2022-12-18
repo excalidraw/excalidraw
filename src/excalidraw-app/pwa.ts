@@ -1,4 +1,4 @@
-import { register as registerServiceWorker } from "../serviceWorker";
+import { register as registerServiceWorker } from "../serviceWorkerRegistration";
 import { EVENT } from "../constants";
 
 // On Apple mobile devices add the proprietary app icon and splashscreen markup.
