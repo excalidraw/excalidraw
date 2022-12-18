@@ -162,11 +162,12 @@ const rotateSingleElement = (
 
   mutateElement(element, { angle });
   if (boundTextElementId) {
-    const textElement = Scene.getScene(element)!.getElement(
-      boundTextElementId,
-    ) as ExcalidrawTextElementWithContainer;
+    const textElement =
+      Scene.getScene(element)?.getElement<ExcalidrawTextElementWithContainer>(
+        boundTextElementId,
+      );
 
-    if (!isArrowElement(element)) {
+    if (textElement && !isArrowElement(element)) {
       mutateElement(textElement, { angle });
     }
   }
@@ -201,8 +202,10 @@ const measureFontSizeFromWH = (
 
   const hasContainer = isBoundToContainer(element);
   if (hasContainer) {
-    const container = getContainerElement(element)!;
-    width = getMaxContainerWidth(container);
+    const container = getContainerElement(element);
+    if (container) {
+      width = getMaxContainerWidth(container);
+    }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
   if (nextFontSize < MIN_FONT_SIZE) {
@@ -211,7 +214,7 @@ const measureFontSizeFromWH = (
   const metrics = measureText(
     element.text,
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
-    hasContainer ? width : null,
+    element.containerId ? width : null,
   );
   return {
     size: nextFontSize,
@@ -765,10 +768,11 @@ const rotateMultipleElements = (
     });
     const boundTextElementId = getBoundTextElementId(element);
     if (boundTextElementId) {
-      const textElement = Scene.getScene(element)!.getElement(
-        boundTextElementId,
-      ) as ExcalidrawTextElementWithContainer;
-      if (!isArrowElement(element)) {
+      const textElement =
+        Scene.getScene(element)?.getElement<ExcalidrawTextElementWithContainer>(
+          boundTextElementId,
+        );
+      if (textElement && !isArrowElement(element)) {
         mutateElement(textElement, {
           x: textElement.x + (rotatedCX - cx),
           y: textElement.y + (rotatedCY - cy),
