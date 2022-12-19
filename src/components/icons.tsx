@@ -13,7 +13,7 @@ import clsx from "clsx";
 import { Theme } from "../element/types";
 import { THEME } from "../constants";
 
-const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";
+export const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";
 
 const handlerColor = (theme: Theme) =>
   theme === THEME.LIGHT ? oc.white : "#1e1e1e";

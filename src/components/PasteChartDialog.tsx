@@ -1,13 +1,26 @@
 import oc from "open-color";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
-import { ChartElements, renderSpreadsheet, Spreadsheet } from "../charts";
+import {
+  ChartElements,
+  renderSpreadsheet,
+  sortSpreadsheet,
+  Spreadsheet,
+  tryParseNumber,
+} from "../charts";
 import { ChartType } from "../element/types";
 import { t } from "../i18n";
 import { exportToSvg } from "../scene/export";
 import { AppState, LibraryItem } from "../types";
 import { Dialog } from "./Dialog";
 import "./PasteChartDialog.scss";
+import { ensureSubtypesLoaded } from "../subtypes";
+import { isTextElement } from "../element";
+import {
+  getContainerElement,
+  redrawTextBoundingBox,
+} from "../element/textElement";
+import { CheckboxItem } from "./CheckboxItem";
 
 type OnInsertChart = (chartType: ChartType, elements: ChartElements) => void;
 
@@ -16,6 +29,7 @@ const ChartPreviewBtn = (props: {
   chartType: ChartType;
   selected: boolean;
   onClick: OnInsertChart;
+  sortChartLabels: boolean;
 }) => {
   const previewRef = useRef<HTMLDivElement | null>(null);
   const [chartElements, setChartElements] = useState<ChartElements | null>(
@@ -23,42 +37,58 @@ const ChartPreviewBtn = (props: {
   );
 
   useLayoutEffect(() => {
-    if (!props.spreadsheet) {
-      return;
-    }
-
-    const elements = renderSpreadsheet(
-      props.chartType,
-      props.spreadsheet,
-      0,
-      0,
-    );
-    setChartElements(elements);
     let svg: SVGSVGElement;
     const previewNode = previewRef.current!;
-
     (async () => {
-      svg = await exportToSvg(
-        elements,
-        {
-          exportBackground: false,
-          viewBackgroundColor: oc.white,
-        },
-        null, // files
-      );
-      svg.querySelector(".style-fonts")?.remove();
-      previewNode.replaceChildren();
-      previewNode.appendChild(svg);
+      (async () => {
+        let elements: ChartElements;
+        await ensureSubtypesLoaded(
+          props.spreadsheet?.activeSubtypes ?? [],
+          () => {
+            if (!props.spreadsheet) {
+              return;
+            }
 
-      if (props.selected) {
-        (previewNode.parentNode as HTMLDivElement).focus();
-      }
+            const spreadsheet = props.sortChartLabels
+              ? sortSpreadsheet(props.spreadsheet)
+              : props.spreadsheet;
+            elements = renderSpreadsheet(props.chartType, spreadsheet, 0, 0);
+            elements.forEach(
+              (el) =>
+                isTextElement(el) &&
+                redrawTextBoundingBox(el, getContainerElement(el)),
+            );
+            setChartElements(elements);
+          },
+        ).then(async () => {
+          svg = await exportToSvg(
+            elements,
+            {
+              exportBackground: false,
+              viewBackgroundColor: oc.white,
+            },
+            null, // files
+          );
+          svg.querySelector(".style-fonts")?.remove();
+          previewNode.replaceChildren();
+          previewNode.appendChild(svg);
+
+          if (props.selected) {
+            (previewNode.parentNode as HTMLDivElement).focus();
+          }
+        });
+      })();
+
+      return () => {
+        previewNode.replaceChildren();
+      };
     })();
-
-    return () => {
-      previewNode.replaceChildren();
-    };
-  }, [props.spreadsheet, props.chartType, props.selected]);
+  }, [
+    props.spreadsheet,
+    props.chartType,
+    props.selected,
+    props.sortChartLabels,
+  ]);
 
   return (
     <button
@@ -102,6 +132,10 @@ export const PasteChartDialog = ({
       },
     });
   };
+  const showSortChartLabels = appState.pasteDialog.data?.labels?.every((val) =>
+    tryParseNumber(val),
+  );
+  const [sortChartLabels, setSortChartLabels] = useState<boolean>(false);
 
   return (
     <Dialog
@@ -117,14 +151,28 @@ export const PasteChartDialog = ({
           spreadsheet={appState.pasteDialog.data}
           selected={appState.currentChartType === "bar"}
           onClick={handleChartClick}
+          sortChartLabels={(showSortChartLabels && sortChartLabels) ?? false}
         />
         <ChartPreviewBtn
           chartType="line"
           spreadsheet={appState.pasteDialog.data}
           selected={appState.currentChartType === "line"}
           onClick={handleChartClick}
+          sortChartLabels={(showSortChartLabels && sortChartLabels) ?? false}
         />
       </div>
+      {showSortChartLabels && (
+        <div className={"container"}>
+          <CheckboxItem
+            checked={sortChartLabels}
+            onChange={(checked: boolean) => {
+              setSortChartLabels(checked);
+            }}
+          >
+            {t("labels.sortChartLabels")}
+          </CheckboxItem>
+        </div>
+      )}
     </Dialog>
   );
 };

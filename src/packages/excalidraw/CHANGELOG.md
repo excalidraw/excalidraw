@@ -23,6 +23,12 @@ Please add the latest change on the top under the correct section.
 
 #### Features
 
+- Render math notation using the MathJax library. Both standard Latex input and simplified AsciiMath input are supported.
+
+  Also added plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code.
+
+  Also created an `@excalidraw/extensions` package. This package holds the MathJax extension to make it completely decoupled from `@excalidraw/excalidraw`. The MathJax extension is implemented as a `math` subtype of `ExcalidrawTextElement`. [#2993](https://github.com/excalidraw/excalidraw/pull/2993).
+
 - `restoreElements()` now takes an optional parameter to indicate whether we should also recalculate text element dimensions. Defaults to `true`, but since this is a potentially costly operation, you may want to disable it if you restore elements in tight loops, such as during collaboration [#5432](https://github.com/excalidraw/excalidraw/pull/5432).
 - Support rendering custom sidebar using [`renderSidebar`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderSidebar) prop ([#5663](https://github.com/excalidraw/excalidraw/pull/5663)).
 - Add [`toggleMenu`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#toggleMenu) prop to toggle specific menu open/close state ([#5663](https://github.com/excalidraw/excalidraw/pull/5663)).

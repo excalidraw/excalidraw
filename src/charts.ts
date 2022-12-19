@@ -8,6 +8,8 @@ import {
 import { newElement, newLinearElement, newTextElement } from "./element";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
+import { AppState } from "./types";
+import { selectSubtype } from "./subtypes";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];
 
@@ -20,6 +22,8 @@ export interface Spreadsheet {
   title: string | null;
   labels: string[] | null;
   values: number[];
+  activeSubtypes?: AppState["activeSubtypes"];
+  customData?: AppState["customData"];
 }
 
 export const NOT_SPREADSHEET = "NOT_SPREADSHEET";
@@ -29,11 +33,8 @@ type ParseSpreadsheetResult =
   | { type: typeof NOT_SPREADSHEET; reason: string }
   | { type: typeof VALID_SPREADSHEET; spreadsheet: Spreadsheet };
 
-/**
- * @private exported for testing
- */
 export const tryParseNumber = (s: string): number | null => {
-  const match = /^([-+]?)[$€£¥₩]?([-+]?)([\d.,]+)[%]?$/.exec(s);
+  const match = /^([-+]?)[$€£¥₩]?([-+]?)([\d.,]+)[%°]?$/.exec(s);
   if (!match) {
     return null;
   }
@@ -158,6 +159,32 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   return result;
 };
 
+export const sortSpreadsheet = (spreadsheet: Spreadsheet) => {
+  const rows = [] as { label: string; value: number }[];
+  if (spreadsheet.labels == null || spreadsheet.values == null) {
+    return spreadsheet;
+  }
+  if (spreadsheet.labels.every((val) => tryParseNumber(val))) {
+    for (let i = 0; i < spreadsheet.labels.length; i++) {
+      rows.push({
+        label: spreadsheet.labels[i],
+        value: spreadsheet.values[i],
+      });
+    }
+    rows.sort((a, b) => {
+      const aParsed = tryParseNumber(a.label)!;
+      const bParsed = tryParseNumber(b.label)!;
+      return aParsed - bParsed;
+    });
+    const newSpreadsheet = {} as Spreadsheet;
+    newSpreadsheet.title = spreadsheet.title;
+    newSpreadsheet.labels = rows.flatMap((row) => row.label);
+    newSpreadsheet.values = rows.flatMap((row) => row.value);
+    return newSpreadsheet;
+  }
+  return spreadsheet;
+};
+
 const bgColors = colors.elementBackground.slice(
   2,
   colors.elementBackground.length,
@@ -193,13 +220,17 @@ const chartXLabels = (
   groupId: string,
   backgroundColor: string,
 ): ChartElements => {
+  const custom = selectSubtype(spreadsheet, "text");
   return (
     spreadsheet.labels?.map((label, index) => {
       return newTextElement({
         groupIds: [groupId],
         backgroundColor,
         ...commonProps,
-        text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
+        text:
+          label.length > 8 && custom.subtype === undefined
+            ? `${label.slice(0, 5)}...`
+            : label,
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
         y: y + BAR_GAP / 2,
         width: BAR_WIDTH,
@@ -207,6 +238,7 @@ const chartXLabels = (
         fontSize: 16,
         textAlign: "center",
         verticalAlign: "top",
+        ...custom,
       });
     }) || []
   );
@@ -227,6 +259,7 @@ const chartYLabels = (
     y: y - BAR_GAP,
     text: "0",
     textAlign: "right",
+    ...selectSubtype(spreadsheet, "text"),
   });
 
   const maxYLabel = newTextElement({
@@ -237,6 +270,7 @@ const chartYLabels = (
     y: y - BAR_HEIGHT - minYLabel.height / 2,
     text: Math.max(...spreadsheet.values).toLocaleString(),
     textAlign: "right",
+    ...selectSubtype(spreadsheet, "text"),
   });
 
   return [minYLabel, maxYLabel];
@@ -264,6 +298,7 @@ const chartLines = (
       [0, 0],
       [chartWidth, 0],
     ],
+    ...selectSubtype(spreadsheet, "line"),
   });
 
   const yLine = newLinearElement({
@@ -280,6 +315,7 @@ const chartLines = (
       [0, 0],
       [0, -chartHeight],
     ],
+    ...selectSubtype(spreadsheet, "line"),
   });
 
   const maxLine = newLinearElement({
@@ -298,6 +334,7 @@ const chartLines = (
       [0, 0],
       [chartWidth, 0],
     ],
+    ...selectSubtype(spreadsheet, "line"),
   });
 
   return [xLine, yLine, maxLine];
@@ -325,6 +362,7 @@ const chartBaseElements = (
         roundness: null,
         strokeStyle: "solid",
         textAlign: "center",
+        ...selectSubtype(spreadsheet, "text"),
       })
     : null;
 
@@ -341,6 +379,7 @@ const chartBaseElements = (
         strokeColor: colors.elementStroke[0],
         fillStyle: "solid",
         opacity: 6,
+        ...selectSubtype(spreadsheet, "rectangle"),
       })
     : null;
 
@@ -373,6 +412,7 @@ const chartTypeBar = (
       y: y - barHeight - BAR_GAP,
       width: BAR_WIDTH,
       height: barHeight,
+      ...selectSubtype(spreadsheet, "rectangle"),
     });
   });
 
@@ -425,6 +465,7 @@ const chartTypeLine = (
     width: maxX - minX,
     strokeWidth: 2,
     points: points as any,
+    ...selectSubtype(spreadsheet, "line"),
   });
 
   const dots = spreadsheet.values.map((value, index) => {
@@ -441,6 +482,7 @@ const chartTypeLine = (
       y: y + cy - BAR_GAP * 2,
       width: BAR_GAP,
       height: BAR_GAP,
+      ...selectSubtype(spreadsheet, "ellipse"),
     });
   });
 
@@ -463,6 +505,7 @@ const chartTypeLine = (
         [0, 0],
         [0, cy],
       ],
+      ...selectSubtype(spreadsheet, "line"),
     });
   });
 
