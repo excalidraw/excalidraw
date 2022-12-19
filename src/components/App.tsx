@@ -2084,6 +2084,15 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({ isBindingEnabled: false });
       }
 
+      if (event.key === KEYS.PAGE_UP || event.key === KEYS.PAGE_DOWN) {
+        let offsetY = this.state.height / this.state.zoom.value;
+        if (event.key === KEYS.PAGE_DOWN) {
+          offsetY = -offsetY;
+        }
+        const scrollY = this.state.scrollY + offsetY;
+        this.setState({ scrollY });
+      }
+
       if (isArrowKey(event.key)) {
         const step =
           (this.state.gridSize &&
