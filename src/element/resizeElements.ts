@@ -52,6 +52,9 @@ import {
 import { getMaxContainerWidth } from "./newElement";
 
 export const normalizeAngle = (angle: number): number => {
+  if (angle < 0) {
+    return angle + 2 * Math.PI;
+  }
   if (angle >= 2 * Math.PI) {
     return angle - 2 * Math.PI;
   }
@@ -667,7 +670,10 @@ const resizeMultipleElements = (
   targetElements.forEach((element) => {
     const width = element.orig.width * scale;
     const height = element.orig.height * scale;
-    const angle = element.orig.angle * flipFactorX * flipFactorY;
+    const angle = normalizeAngle(
+      (isFlippedByY ? Math.PI - element.orig.angle : element.orig.angle) *
+        flipFactorX,
+    );
 
     const hasPoints =
       isLinearElement(element.orig) || isFreeDrawElement(element.orig);
