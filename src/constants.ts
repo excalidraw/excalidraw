@@ -118,7 +118,6 @@ export const EXPORT_SOURCE =
 export const IMAGE_RENDER_TIMEOUT = 500;
 export const TAP_TWICE_TIMEOUT = 300;
 export const TOUCH_CTX_MENU_TIMEOUT = 500;
-export const TITLE_TIMEOUT = 10000;
 export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
 export const ZOOM_STEP = 0.1;

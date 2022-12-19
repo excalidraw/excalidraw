@@ -703,6 +703,9 @@ class App extends React.Component<AppProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
+
+        document.title = actionResult?.appState?.fileHandle?.name || APP_NAME;
+
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
