@@ -498,7 +498,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | getSceneElementsIncludingDeleted | <code> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a></code> | Returns all the elements including the deleted in the scene |
 | getSceneElements | <code> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a></code> | Returns all the elements excluding the deleted in the scene |
 | getAppState | <code> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L66">AppState</a></code> | Returns current appState |
-| history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
+| history | `{ clear: () => void, redoOnce: () => HistoryEntry, undoOnce: () => HistoryEntry }` | This is the history API. `history.clear()` will clear the history. `history.redoOnce()` will redo an action. `history.undoOnce()` will undo an action. |
 | scrollToContent | <code> (target?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement</a> &#124; <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement</a>[]) => void </code> | Scroll the nearest element out of the elements supplied to the center. Defaults to the elements on the scene. |
 | refresh | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you should call this API. |
 | [importLibrary](#importlibrary) | <code>(url: string, token?: string) => void</code> | Imports library from given URL |
@@ -509,6 +509,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | [setCursor](#setCursor) | <code>(cursor: string) => void </code> | This API can be used to set customise the mouse cursor on the canvas |
 | [resetCursor](#resetCursor) | <code>() => void </code> | This API can be used to reset to default mouse cursor on the canvas |
 | [toggleMenu](#toggleMenu) | <code>(type: string, force?: boolean) => boolean</code> | Toggles specific menus on/off |
+| [executeAction](#executeAction) | <code>(action: Action, source: ActionSource) => void</code> | Executes specified Action |
 
 #### `readyPromise`
 

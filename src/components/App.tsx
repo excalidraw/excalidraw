@@ -39,7 +39,7 @@ import {
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
-import { ActionResult } from "../actions/types";
+import { Action, ActionResult, ActionSource } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
 import {
@@ -430,6 +430,8 @@ class App extends React.Component<AppProps, AppState> {
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
         history: {
           clear: this.resetHistory,
+          redoOnce: this.redoOnce,
+          undoOnce: this.undoOnce,
         },
         scrollToContent: this.scrollToContent,
         getSceneElements: this.getSceneElements,
@@ -442,6 +444,7 @@ class App extends React.Component<AppProps, AppState> {
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
         toggleMenu: this.toggleMenu,
+        executeAction: this.executeAction,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -748,6 +751,18 @@ class App extends React.Component<AppProps, AppState> {
 
   private resetHistory = () => {
     this.history.clear();
+  };
+
+  private undoOnce = () => {
+    return this.history.undoOnce();
+  };
+
+  private redoOnce = () => {
+    return this.history.redoOnce();
+  };
+
+  private executeAction = (action: Action, source?: ActionSource) => {
+    this.actionManager.executeAction(action, source);
   };
 
   /**
