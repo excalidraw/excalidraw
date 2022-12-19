@@ -106,20 +106,25 @@ export const setLanguage = async (lang: Language) => {
   if (lang.code.startsWith(TEST_LANG_CODE)) {
     currentLangData = {};
   } else {
-    currentLangData = await import(
-      /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
-    );
-    // Empty the auxCurrentLangData array
-    while (auxCurrentLangData.length > 0) {
-      auxCurrentLangData.pop();
-    }
-    // Fill the auxCurrentLangData array with each locale file found in auxLangDataRoots for this language
-    auxSetLanguageFuncs.forEach(async (setLanguageFn) => {
-      const condData = await setLanguageFn(currentLang.code);
-      if (condData) {
-        auxCurrentLangData.push(condData);
+    try {
+      currentLangData = await import(
+        /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
+      );
+      // Empty the auxCurrentLangData array
+      while (auxCurrentLangData.length > 0) {
+        auxCurrentLangData.pop();
       }
-    });
+      // Fill the auxCurrentLangData array with each locale file found in auxLangDataRoots for this language
+      auxSetLanguageFuncs.forEach(async (setLanguageFn) => {
+        const condData = await setLanguageFn(currentLang.code);
+        if (condData) {
+          auxCurrentLangData.push(condData);
+        }
+      });
+    } catch (error: any) {
+      console.error(`Failed to load language ${lang.code}:`, error.message);
+      currentLangData = fallbackLangData;
+    }
   }
 };
 

@@ -34,6 +34,7 @@ import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import { isValidSubtype } from "../subtypes";
+import oc from "open-color";
 
 type RestoredAppState = Omit<
   AppState,
@@ -112,8 +113,8 @@ const restoreElementWithProperties = <
     angle: element.angle || 0,
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
-    strokeColor: element.strokeColor,
-    backgroundColor: element.backgroundColor,
+    strokeColor: element.strokeColor || oc.black,
+    backgroundColor: element.backgroundColor || "transparent",
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,

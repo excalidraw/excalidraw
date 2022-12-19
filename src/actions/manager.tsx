@@ -13,7 +13,6 @@ import {
 import { getActionDisablers, getActionEnablers } from "./guards";
 import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
-import { MODES } from "../constants";
 import { trackEvent } from "../analytics";
 
 const trackAction = (
@@ -166,11 +165,8 @@ export class ActionManager {
 
     const action = data[0];
 
-    const { viewModeEnabled } = this.getAppState();
-    if (viewModeEnabled) {
-      if (!Object.values(MODES).includes(data[0].name)) {
-        return false;
-      }
+    if (this.getAppState().viewModeEnabled && action.viewMode !== true) {
+      return false;
     }
 
     const elements = this.getElementsIncludingDeleted();
