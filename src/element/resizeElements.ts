@@ -587,7 +587,7 @@ export const resizeSingleElement = (
   }
 };
 
-const resizeMultipleElements = (
+export const resizeMultipleElements = (
   pointerDownState: PointerDownState,
   selectedElements: readonly NonDeletedExcalidrawElement[],
   transformHandleType: "nw" | "ne" | "sw" | "se",
@@ -684,6 +684,7 @@ const resizeMultipleElements = (
     const x = anchorX + flipFactorX * (offsetX * scale + flipAdjustX);
     const y = anchorY + flipFactorY * (offsetY * scale + flipAdjustY);
 
+    // TODO curved lines adjustment
     // readjust points for linear & free draw elements
     const rescaledPoints = rescalePointsInElement(
       element.orig,
