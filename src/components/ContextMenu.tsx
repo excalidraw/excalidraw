@@ -90,7 +90,7 @@ export const ContextMenu = ({
               onClick={() => {
                 // we need update state before executing the action in case
                 // the action uses the appState it's being passed (that still
-                // contains the contextMenu=true) to return the next state.
+                // contains a defined contextMenu) to return the next state.
                 setAppState({ contextMenu: null }, () => {
                   actionManager.executeAction(item, "contextMenu");
                 });
