@@ -18,6 +18,9 @@ export const actionToggleViewMode = register({
     };
   },
   checked: (appState) => appState.viewModeEnabled,
+  contextItemPredicate: (elements, appState, appProps) => {
+    return typeof appProps.viewModeEnabled === "undefined";
+  },
   contextItemLabel: "labels.viewMode",
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R,

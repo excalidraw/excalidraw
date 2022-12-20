@@ -1,4 +1,3 @@
-import { createRoot, Root } from "react-dom/client";
 import clsx from "clsx";
 import { Popover } from "./Popover";
 import { t } from "../i18n";
@@ -13,30 +12,44 @@ import { ActionManager } from "../actions/manager";
 import { AppState } from "../types";
 import { NonDeletedExcalidrawElement } from "../element/types";
 
-export type ContextMenuOption = "separator" | Action;
+export type ContextMenuItem = typeof CONTEXT_MENU_SEPARATOR | Action;
 
 type ContextMenuProps = {
-  options: ContextMenuOption[];
-  onCloseRequest?(): void;
-  top: number;
-  left: number;
   actionManager: ActionManager;
   appState: Readonly<AppState>;
+  setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
+  items: Exclude<AppState["contextMenu"], null>["items"];
+  top: number;
+  left: number;
 };
 
-const ContextMenu = ({
-  options,
-  onCloseRequest,
-  top,
-  left,
+export const CONTEXT_MENU_SEPARATOR = "separator";
+
+export const ContextMenu = ({
   actionManager,
   appState,
+  setAppState,
   elements,
+  items,
+  top,
+  left,
 }: ContextMenuProps) => {
+  const filteredItems = items.reduce((acc: ContextMenuItem[], item) => {
+    if (
+      item &&
+      (item === CONTEXT_MENU_SEPARATOR ||
+        !item.contextItemPredicate ||
+        item.contextItemPredicate(elements, appState, actionManager.app.props))
+    ) {
+      acc.push(item);
+    }
+    return acc;
+  }, []);
+
   return (
     <Popover
-      onCloseRequest={onCloseRequest}
+      onCloseRequest={() => setAppState({ contextMenu: null })}
       top={top}
       left={left}
       fitInViewport={true}
@@ -49,33 +62,48 @@ const ContextMenu = ({
         className="context-menu"
         onContextMenu={(event) => event.preventDefault()}
       >
-        {options.map((option, idx) => {
-          if (option === "separator") {
-            return <hr key={idx} className="context-menu-option-separator" />;
+        {filteredItems.map((item, idx) => {
+          if (item === CONTEXT_MENU_SEPARATOR) {
+            if (
+              !filteredItems[idx - 1] ||
+              filteredItems[idx - 1] === CONTEXT_MENU_SEPARATOR
+            ) {
+              return null;
+            }
+            return <hr key={idx} className="context-menu-item-separator" />;
           }
 
-          const actionName = option.name;
+          const actionName = item.name;
           let label = "";
-          if (option.contextItemLabel) {
-            if (typeof option.contextItemLabel === "function") {
-              label = t(option.contextItemLabel(elements, appState));
+          if (item.contextItemLabel) {
+            if (typeof item.contextItemLabel === "function") {
+              label = t(item.contextItemLabel(elements, appState));
             } else {
-              label = t(option.contextItemLabel);
+              label = t(item.contextItemLabel);
             }
           }
+
           return (
-            <li key={idx} data-testid={actionName} onClick={onCloseRequest}>
+            <li
+              key={idx}
+              data-testid={actionName}
+              onClick={() => {
+                // we need update state before executing the action in case
+                // the action uses the appState it's being passed (that still
+                // contains the contextMenu=true) to return the next state.
+                setAppState({ contextMenu: null }, () => {
+                  actionManager.executeAction(item, "contextMenu");
+                });
+              }}
+            >
               <button
-                className={clsx("context-menu-option", {
+                className={clsx("context-menu-item", {
                   dangerous: actionName === "deleteSelectedElements",
-                  checkmark: option.checked?.(appState),
+                  checkmark: item.checked?.(appState),
                 })}
-                onClick={() =>
-                  actionManager.executeAction(option, "contextMenu")
-                }
               >
-                <div className="context-menu-option__label">{label}</div>
-                <kbd className="context-menu-option__shortcut">
+                <div className="context-menu-item__label">{label}</div>
+                <kbd className="context-menu-item__shortcut">
                   {actionName
                     ? getShortcutFromShortcutName(actionName as ShortcutName)
                     : ""}
@@ -87,58 +115,4 @@ const ContextMenu = ({
       </ul>
     </Popover>
   );
-};
-
-const contextMenuRoots = new WeakMap<HTMLElement, Root>();
-
-const getContextMenuRoot = (container: HTMLElement): Root => {
-  let contextMenuRoot = contextMenuRoots.get(container);
-  if (contextMenuRoot) {
-    return contextMenuRoot;
-  }
-  contextMenuRoot = createRoot(
-    container.querySelector(".excalidraw-contextMenuContainer")!,
-  );
-  contextMenuRoots.set(container, contextMenuRoot);
-  return contextMenuRoot;
-};
-
-const handleClose = (container: HTMLElement) => {
-  const contextMenuRoot = contextMenuRoots.get(container);
-  if (contextMenuRoot) {
-    contextMenuRoot.unmount();
-    contextMenuRoots.delete(container);
-  }
-};
-
-export default {
-  push(params: {
-    options: (ContextMenuOption | false | null | undefined)[];
-    top: ContextMenuProps["top"];
-    left: ContextMenuProps["left"];
-    actionManager: ContextMenuProps["actionManager"];
-    appState: Readonly<AppState>;
-    container: HTMLElement;
-    elements: readonly NonDeletedExcalidrawElement[];
-  }) {
-    const options = Array.of<ContextMenuOption>();
-    params.options.forEach((option) => {
-      if (option) {
-        options.push(option);
-      }
-    });
-    if (options.length) {
-      getContextMenuRoot(params.container).render(
-        <ContextMenu
-          top={params.top}
-          left={params.left}
-          options={options}
-          onCloseRequest={() => handleClose(params.container)}
-          actionManager={params.actionManager}
-          appState={params.appState}
-          elements={params.elements}
-        />,
-      );
-    }
-  },
 };

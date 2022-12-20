@@ -42,11 +42,7 @@ import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
-import {
-  parseClipboard,
-  probablySupportsClipboardBlob,
-  probablySupportsClipboardWriteText,
-} from "../clipboard";
+import { parseClipboard } from "../clipboard";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -227,7 +223,11 @@ import {
   updateActiveTool,
   getShortcutKey,
 } from "../utils";
-import ContextMenu, { ContextMenuOption } from "./ContextMenu";
+import {
+  ContextMenu,
+  ContextMenuItem,
+  CONTEXT_MENU_SEPARATOR,
+} from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
@@ -619,6 +619,17 @@ class App extends React.Component<AppProps, AppState> {
                       onClose={() => this.setToast(null)}
                       duration={this.state.toast.duration}
                       closable={this.state.toast.closable}
+                    />
+                  )}
+                  {this.state.contextMenu && (
+                    <ContextMenu
+                      items={this.state.contextMenu.items}
+                      top={this.state.contextMenu.top}
+                      left={this.state.contextMenu.left}
+                      elements={this.scene.getNonDeletedElements()}
+                      appState={this.state}
+                      setAppState={this.setAppState}
+                      actionManager={this.actionManager}
                     />
                   )}
                   <main>{this.renderCanvas()}</main>
@@ -1747,10 +1758,11 @@ class App extends React.Component<AppProps, AppState> {
     this.history.resumeRecording();
   }
 
-  // Collaboration
-
-  setAppState: React.Component<any, AppState>["setState"] = (state) => {
-    this.setState(state);
+  setAppState: React.Component<any, AppState>["setState"] = (
+    state,
+    callback,
+  ) => {
+    this.setState(state, callback);
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
@@ -3326,6 +3338,14 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    // since contextMenu options are potentially evaluated on each render,
+    // and an contextMenu action may depend on selection state, we must
+    // close the contextMenu before we update the selection on pointerDown
+    // (e.g. resetting selection)
+    if (this.state.contextMenu) {
+      this.setState({ contextMenu: null });
+    }
+
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
@@ -6102,196 +6122,119 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ showHyperlinkPopup: false });
     }
     this.contextMenuOpen = true;
-    const maybeGroupAction = actionGroup.contextItemPredicate!(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
 
-    const maybeUngroupAction = actionUngroup.contextItemPredicate!(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
+    const options: ContextMenuItem[] = [];
 
-    const maybeFlipHorizontal = actionFlipHorizontal.contextItemPredicate!(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
+    options.push(actionCopyAsPng, actionCopyAsSvg);
 
-    const maybeFlipVertical = actionFlipVertical.contextItemPredicate!(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
-
-    const mayBeAllowUnbinding = actionUnbindText.contextItemPredicate(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
-
-    const mayBeAllowBinding = actionBindText.contextItemPredicate(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
-
-    const mayBeAllowToggleLineEditing =
-      actionToggleLinearEditor.contextItemPredicate(
-        this.actionManager.getElementsIncludingDeleted(),
-        this.actionManager.getAppState(),
-      );
-
-    const separator = "separator";
-
-    const elements = this.scene.getNonDeletedElements();
-
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
-
-    const options: ContextMenuOption[] = [];
-    if (probablySupportsClipboardBlob && elements.length > 0) {
-      options.push(actionCopyAsPng);
-    }
-
-    if (probablySupportsClipboardWriteText && elements.length > 0) {
-      options.push(actionCopyAsSvg);
-    }
-
-    if (
-      type === "element" &&
-      copyText.contextItemPredicate(elements, this.state) &&
-      probablySupportsClipboardWriteText
-    ) {
-      options.push(copyText);
-    }
     if (type === "canvas") {
-      const viewModeOptions = [
-        ...options,
-        typeof this.props.gridModeEnabled === "undefined" &&
-          actionToggleGridMode,
-        typeof this.props.zenModeEnabled === "undefined" && actionToggleZenMode,
-        typeof this.props.viewModeEnabled === "undefined" &&
-          actionToggleViewMode,
-        actionToggleStats,
-      ];
-
       if (this.state.viewModeEnabled) {
-        ContextMenu.push({
-          options: viewModeOptions,
-          top,
-          left,
-          actionManager: this.actionManager,
-          appState: this.state,
-          container: this.excalidrawContainerRef.current!,
-          elements,
+        this.setState({
+          contextMenu: {
+            top,
+            left,
+            items: [
+              ...options,
+              actionToggleGridMode,
+              actionToggleZenMode,
+              actionToggleViewMode,
+              actionToggleStats,
+            ],
+          },
         });
       } else {
-        ContextMenu.push({
-          options: [
-            this.device.isMobile &&
-              navigator.clipboard && {
-                trackEvent: false,
-                name: "paste",
-                perform: (elements, appStates) => {
-                  this.pasteFromClipboard(null);
-                  return {
-                    commitToHistory: false,
-                  };
+        this.setState({
+          contextMenu: {
+            top,
+            left,
+            items: [
+              this.device.isMobile &&
+                navigator.clipboard && {
+                  trackEvent: false,
+                  name: "paste",
+                  perform: (elements: any, appStates: any) => {
+                    this.pasteFromClipboard(null);
+                    return {
+                      commitToHistory: false,
+                    };
+                  },
+                  contextItemLabel: "labels.paste",
                 },
-                contextItemLabel: "labels.paste",
-              },
-            this.device.isMobile && navigator.clipboard && separator,
-            probablySupportsClipboardBlob &&
-              elements.length > 0 &&
+              CONTEXT_MENU_SEPARATOR,
               actionCopyAsPng,
-            probablySupportsClipboardWriteText &&
-              elements.length > 0 &&
               actionCopyAsSvg,
-            probablySupportsClipboardWriteText &&
-              selectedElements.length > 0 &&
               copyText,
-            ((probablySupportsClipboardBlob && elements.length > 0) ||
-              (probablySupportsClipboardWriteText && elements.length > 0)) &&
-              separator,
-            actionSelectAll,
-            separator,
-            typeof this.props.gridModeEnabled === "undefined" &&
+              CONTEXT_MENU_SEPARATOR,
+              actionSelectAll,
+              CONTEXT_MENU_SEPARATOR,
               actionToggleGridMode,
-            typeof this.props.zenModeEnabled === "undefined" &&
               actionToggleZenMode,
-            typeof this.props.viewModeEnabled === "undefined" &&
               actionToggleViewMode,
-            actionToggleStats,
-          ],
-          top,
-          left,
-          actionManager: this.actionManager,
-          appState: this.state,
-          container: this.excalidrawContainerRef.current!,
-          elements,
+              actionToggleStats,
+            ],
+          },
         });
       }
     } else if (type === "element") {
+      options.push(copyText);
+
       if (this.state.viewModeEnabled) {
-        ContextMenu.push({
-          options: [navigator.clipboard && actionCopy, ...options],
-          top,
-          left,
-          actionManager: this.actionManager,
-          appState: this.state,
-          container: this.excalidrawContainerRef.current!,
-          elements,
+        this.setState({
+          contextMenu: {
+            top,
+            left,
+            items: [navigator.clipboard && actionCopy, ...options],
+          },
         });
       } else {
-        ContextMenu.push({
-          options: [
-            this.device.isMobile && actionCut,
-            this.device.isMobile && navigator.clipboard && actionCopy,
-            this.device.isMobile &&
-              navigator.clipboard && {
-                name: "paste",
-                trackEvent: false,
-                perform: (elements, appStates) => {
-                  this.pasteFromClipboard(null);
-                  return {
-                    commitToHistory: false,
-                  };
+        this.setState({
+          contextMenu: {
+            left,
+            top,
+            items: [
+              this.device.isMobile && actionCut,
+              this.device.isMobile && navigator.clipboard && actionCopy,
+              this.device.isMobile &&
+                navigator.clipboard && {
+                  name: "paste",
+                  trackEvent: false,
+                  perform: (elements: any, appStates: any) => {
+                    this.pasteFromClipboard(null);
+                    return {
+                      commitToHistory: false,
+                    };
+                  },
+                  contextItemLabel: "labels.paste",
                 },
-                contextItemLabel: "labels.paste",
-              },
-            this.device.isMobile && separator,
-            ...options,
-            separator,
-            actionCopyStyles,
-            actionPasteStyles,
-            separator,
-            maybeGroupAction && actionGroup,
-            mayBeAllowUnbinding && actionUnbindText,
-            mayBeAllowBinding && actionBindText,
-            maybeUngroupAction && actionUngroup,
-            (maybeGroupAction || maybeUngroupAction) && separator,
-            actionAddToLibrary,
-            separator,
-            actionSendBackward,
-            actionBringForward,
-            actionSendToBack,
-            actionBringToFront,
-            separator,
-            maybeFlipHorizontal && actionFlipHorizontal,
-            maybeFlipVertical && actionFlipVertical,
-            (maybeFlipHorizontal || maybeFlipVertical) && separator,
-            mayBeAllowToggleLineEditing && actionToggleLinearEditor,
-            actionLink.contextItemPredicate(elements, this.state) && actionLink,
-            actionDuplicateSelection,
-            actionToggleLock,
-            separator,
-            actionDeleteSelected,
-          ],
-          top,
-          left,
-          actionManager: this.actionManager,
-          appState: this.state,
-          container: this.excalidrawContainerRef.current!,
-          elements,
+              this.device.isMobile && CONTEXT_MENU_SEPARATOR,
+              ...options,
+              CONTEXT_MENU_SEPARATOR,
+              actionCopyStyles,
+              actionPasteStyles,
+              CONTEXT_MENU_SEPARATOR,
+              actionGroup,
+              actionUnbindText,
+              actionBindText,
+              actionUngroup,
+              CONTEXT_MENU_SEPARATOR,
+              actionAddToLibrary,
+              CONTEXT_MENU_SEPARATOR,
+              actionSendBackward,
+              actionBringForward,
+              actionSendToBack,
+              actionBringToFront,
+              CONTEXT_MENU_SEPARATOR,
+              actionFlipHorizontal,
+              actionFlipVertical,
+              CONTEXT_MENU_SEPARATOR,
+              actionToggleLinearEditor,
+              actionLink,
+              actionDuplicateSelection,
+              actionToggleLock,
+              CONTEXT_MENU_SEPARATOR,
+              actionDeleteSelected,
+            ],
+          },
         });
       }
     }

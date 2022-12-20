@@ -143,6 +143,7 @@ export interface Action {
   contextItemPredicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
+    appProps: ExcalidrawProps,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
   trackEvent:

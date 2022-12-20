@@ -18,6 +18,9 @@ export const actionToggleZenMode = register({
     };
   },
   checked: (appState) => appState.zenModeEnabled,
+  contextItemPredicate: (elements, appState, appProps) => {
+    return typeof appProps.zenModeEnabled === "undefined";
+  },
   contextItemLabel: "buttons.zenMode",
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z,
