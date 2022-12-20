@@ -22,6 +22,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     renderTopRightUI,
     renderFooter,
     renderSidebar,
+    openCustomContextMenu,
     langCode = defaultLang.code,
     viewModeEnabled,
     zenModeEnabled,
@@ -113,6 +114,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
           renderSidebar={renderSidebar}
+          openCustomContextMenu={openCustomContextMenu}
         />
       </Provider>
     </InitializeApp>

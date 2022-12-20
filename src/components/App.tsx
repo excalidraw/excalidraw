@@ -5959,6 +5959,10 @@ class App extends React.Component<AppProps, AppState> {
       container.getBoundingClientRect();
     const left = event.clientX - offsetLeft;
     const top = event.clientY - offsetTop;
+    const openContextMenu =
+      typeof this.props.openCustomContextMenu === "function"
+        ? this.props.openCustomContextMenu
+        : this._openContextMenu;
 
     if (element && !this.state.selectedElementIds[element.id]) {
       this.setState(
@@ -5973,11 +5977,11 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
         ),
         () => {
-          this._openContextMenu({ top, left }, type);
+          openContextMenu({ top, left }, type);
         },
       );
     } else {
-      this._openContextMenu({ top, left }, type);
+      openContextMenu({ top, left }, type);
     }
   };
 

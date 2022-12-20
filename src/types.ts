@@ -331,6 +331,16 @@ export interface ExcalidrawProps {
    * Render function that renders custom <Sidebar /> component.
    */
   renderSidebar?: () => JSX.Element | null;
+  openCustomContextMenu?: (
+    {
+      left,
+      top,
+    }: {
+      left: number;
+      top: number;
+    },
+    type: "canvas" | "element",
+  ) => void;
 }
 
 export type SceneData = {
