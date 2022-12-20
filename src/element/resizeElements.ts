@@ -25,6 +25,7 @@ import {
   isArrowElement,
   isBoundToContainer,
   isFreeDrawElement,
+  isImageElement,
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
@@ -666,27 +667,24 @@ export const resizeMultipleElements = (
   const isFlippedByX = flipFactorX < 0;
   const isFlippedByY = flipFactorY < 0;
 
-  targetElements.forEach((element) => {
-    const width = element.orig.width * scale;
-    const height = element.orig.height * scale;
-    const angle = normalizeAngle(
-      (isFlippedByY ? Math.PI - element.orig.angle : element.orig.angle) *
-        flipFactorX,
-    );
+  targetElements.forEach(({ orig: element, latest: latestElement }) => {
+    const width = element.width * scale;
+    const height = element.height * scale;
+    const angle = normalizeAngle(element.angle * flipFactorX * flipFactorY);
 
-    const hasPoints =
-      isLinearElement(element.orig) || isFreeDrawElement(element.orig);
-    const offsetX = element.orig.x - anchorX;
-    const offsetY = element.orig.y - anchorY;
-    const flipAdjustX = isFlippedByX && !hasPoints ? width : 0;
-    const flipAdjustY = isFlippedByY && !hasPoints ? height : 0;
+    const isLinearOrFreeDraw =
+      isLinearElement(element) || isFreeDrawElement(element);
+    const offsetX = element.x - anchorX;
+    const offsetY = element.y - anchorY;
+    const flipAdjustX = isFlippedByX && !isLinearOrFreeDraw ? width : 0;
+    const flipAdjustY = isFlippedByY && !isLinearOrFreeDraw ? height : 0;
     const x = anchorX + flipFactorX * (offsetX * scale + flipAdjustX);
     const y = anchorY + flipFactorY * (offsetY * scale + flipAdjustY);
 
     // TODO curved lines adjustment
     // readjust points for linear & free draw elements
     const rescaledPoints = rescalePointsInElement(
-      element.orig,
+      element,
       width * flipFactorX,
       height * flipFactorY,
       false,
@@ -701,6 +699,7 @@ export const resizeMultipleElements = (
       points?: Point[];
       fontSize?: number;
       baseline?: number;
+      scale?: [-1 | 1, -1 | 1];
     } = {
       width,
       height,
@@ -710,18 +709,38 @@ export const resizeMultipleElements = (
       ...rescaledPoints,
     };
 
+    // don't flip text vertically
+    // flip a single image horizontally & vertically (angle & content)
+    // flip images in a multiple selection - only horizontally (angle)
+    // currently linear & free draw elements are not rotated
+    if (
+      isFlippedByY &&
+      !isTextElement(element) &&
+      !(isImageElement(element) && targetElements.length > 1) &&
+      !isLinearOrFreeDraw
+    ) {
+      update.angle = normalizeAngle(Math.PI + angle);
+    }
+
+    if (isImageElement(element) && targetElements.length === 1) {
+      update.scale = [
+        (element.scale[0] * flipFactorX * flipFactorY) as -1 | 1,
+        1,
+      ];
+    }
+
     let boundTextUpdates: {
       angle: number;
       fontSize: number;
       baseline: number;
     } | null = null;
 
-    const boundTextElement = getBoundTextElement(element.latest);
+    const boundTextElement = getBoundTextElement(element);
 
-    if (boundTextElement || isTextElement(element.orig)) {
+    if (boundTextElement || isTextElement(element)) {
       const optionalPadding = getBoundTextElementOffset(boundTextElement) * 2;
       const textMeasurements = measureFontSizeFromWH(
-        boundTextElement ?? (element.orig as ExcalidrawTextElement),
+        boundTextElement ?? (element as ExcalidrawTextElement),
         width - optionalPadding,
         height - optionalPadding,
       );
@@ -730,7 +749,7 @@ export const resizeMultipleElements = (
         return;
       }
 
-      if (isTextElement(element.orig)) {
+      if (isTextElement(element)) {
         update.fontSize = textMeasurements.size;
         update.baseline = textMeasurements.baseline;
       }
@@ -744,14 +763,13 @@ export const resizeMultipleElements = (
       }
     }
 
-    updateBoundElements(element.latest, { newSize: { width, height } });
+    updateBoundElements(latestElement, { newSize: { width, height } });
 
-    mutateElement(element.latest, update);
+    mutateElement(latestElement, update);
 
     if (boundTextElement && boundTextUpdates) {
       mutateElement(boundTextElement, boundTextUpdates);
-
-      handleBindTextResize(element.latest, transformHandleType);
+      handleBindTextResize(latestElement, transformHandleType);
     }
   });
 };
