@@ -8,8 +8,14 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { ExportType } from "../scene/types";
-import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
-import { muteFSAbortError } from "../utils";
+import {
+  AppProps,
+  AppState,
+  ExcalidrawProps,
+  BinaryFiles,
+  UIChildrenComponents,
+} from "../types";
+import { muteFSAbortError, ReactChildrenToObject } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
@@ -82,6 +88,7 @@ interface LayerUIProps {
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
 }
+
 const LayerUI = ({
   actionManager,
   appState,
@@ -109,6 +116,9 @@ const LayerUI = ({
   children,
 }: LayerUIProps) => {
   const device = useDevice();
+
+  const childrenComponents =
+    ReactChildrenToObject<UIChildrenComponents>(children);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -438,12 +448,7 @@ const LayerUI = ({
   };
 
   const [hostSidebarCounters] = useAtom(hostSidebarCountersAtom, jotaiScope);
-  const FooterCenterComponent = React.Children.toArray(children).find(
-    (child) =>
-      React.isValidElement(child) &&
-      typeof child.type !== "string" &&
-      child?.type.name === "FooterCenter",
-  );
+
   return (
     <>
       {appState.isLoading && <LoadingMessage delay={250} />}
@@ -521,7 +526,7 @@ const LayerUI = ({
               actionManager={actionManager}
               showExitZenModeBtn={showExitZenModeBtn}
             >
-              {FooterCenterComponent}
+              {childrenComponents.FooterCenter}
             </Footer>
 
             {appState.showStats && (

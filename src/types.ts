@@ -507,3 +507,9 @@ export type Device = Readonly<{
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
 }>;
+
+export type UIChildrenComponents = {
+  [k in "FooterCenter"]?:
+    | React.ReactPortal
+    | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
+};
