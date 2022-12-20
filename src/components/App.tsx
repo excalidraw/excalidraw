@@ -383,6 +383,7 @@ class App extends React.Component<AppProps, AppState> {
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
+  lastPointerMove: React.PointerEvent<HTMLCanvasElement> | null = null;
   contextMenuOpen: boolean = false;
   lastScenePointer: { x: number; y: number } | null = null;
 
@@ -2120,7 +2121,10 @@ class App extends React.Component<AppProps, AppState> {
       }
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
-        setCursor(this.canvas, CURSOR_TYPE.GRAB);
+        setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+        if (this.lastPointerMove) {
+          this.handleCanvasPointerDown(this.lastPointerMove);
+        }
         event.preventDefault();
       }
 
@@ -2815,6 +2819,8 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    this.lastPointerMove = event;
+
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
 
     if (gesture.pointers.has(event.pointerId)) {
@@ -3323,6 +3329,7 @@ class App extends React.Component<AppProps, AppState> {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
     }
   }
+
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -3474,7 +3481,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const onKeyDown = this.onKeyDownFromPointerDownHandler(pointerDownState);
     const onKeyUp = this.onKeyUpFromPointerDownHandler(pointerDownState);
-
     lastPointerUp = onPointerUp;
 
     if (!this.state.viewModeEnabled) {
@@ -4322,6 +4328,14 @@ class App extends React.Component<AppProps, AppState> {
     return withBatchedUpdates((event: KeyboardEvent) => {
       // Prevents focus from escaping excalidraw tab
       event.key === KEYS.ALT && event.preventDefault();
+
+      if (event.key === KEYS.SPACE) {
+        window.removeEventListener(
+          EVENT.POINTER_MOVE,
+          pointerDownState.eventListeners.onMove!,
+        );
+      }
+
       if (this.maybeHandleResize(pointerDownState, event)) {
         return;
       }
