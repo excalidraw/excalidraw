@@ -5972,7 +5972,17 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements: true,
     });
 
-    const type = element ? "element" : "canvas";
+    const selectedElements = getSelectedElements(
+      this.scene.getNonDeletedElements(),
+      this.state,
+    );
+    const isHittignCommonBoundBox =
+      this.isHittingCommonBoundingBoxOfSelectedElements(
+        { x, y },
+        selectedElements,
+      );
+
+    const type = element || isHittignCommonBoundBox ? "element" : "canvas";
 
     const container = this.excalidrawContainerRef.current!;
     const { top: offsetTop, left: offsetLeft } =
