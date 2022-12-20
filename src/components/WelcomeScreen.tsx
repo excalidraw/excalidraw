@@ -2,8 +2,8 @@ import { useAtom } from "jotai";
 import { actionLoadScene, actionShortcuts } from "../actions";
 import { ActionManager } from "../actions/manager";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { isExcalidrawPlusSignedUser } from "../constants";
 import { collabDialogShownAtom } from "../excalidraw-app/collab/Collab";
-import { isExcalidrawPlusSignedUser } from "../excalidraw-app/components/ExcalidrawPlusAppLink";
 import { t } from "../i18n";
 import { AppState } from "../types";
 import {
