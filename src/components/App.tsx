@@ -2120,7 +2120,7 @@ class App extends React.Component<AppProps, AppState> {
       }
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
-        setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+        setCursor(this.canvas, CURSOR_TYPE.GRAB);
         event.preventDefault();
       }
 
