@@ -333,6 +333,27 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const spaceWidth = getTextWidth(" ", font);
   originalLines.forEach((originalLine) => {
     const words = originalLine.split(" ");
+    let index = 0;
+    while (index < words.length) {
+      const word = words[index];
+      const splitWords = word.split("-");
+      // Splitting words containing "-" as those are treated as separate words
+      // by css wrapping algorithm eg non-profit => non-, profit
+      if (splitWords.length > 1) {
+        splitWords.forEach((word, index) => {
+          if (index !== splitWords.length - 1) {
+            splitWords[index] = word += "-";
+          }
+        });
+        words[index] = splitWords[0];
+        for (let i = 1; i < splitWords.length; i++) {
+          words.splice(index + i, 0, splitWords[i]);
+        }
+        index = index + splitWords.length;
+      } else {
+        index++;
+      }
+    }
     // This means its newline so push it
     if (words.length === 1 && words[0] === "") {
       lines.push(words[0]);
@@ -393,8 +414,9 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           // Start appending words in a line till max width reached
           while (currentLineWidthTillNow < maxWidth && index < words.length) {
             const word = words[index];
-            currentLineWidthTillNow = getTextWidth(currentLine + word, font);
 
+            currentLineWidthTillNow = getTextWidth(currentLine + word, font);
+            // push the line since append next word exceeds max width
             if (currentLineWidthTillNow >= maxWidth) {
               lines.push(currentLine);
               currentLineWidthTillNow = 0;
@@ -402,12 +424,22 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
 
               break;
             }
+            // space is not need if word ends with "-" since "-" is itself a separator
+            const shouldAppendSpace = !word.endsWith("-");
+            currentLine += word;
+
+            if (shouldAppendSpace) {
+              currentLine += " ";
+            }
             index++;
-            currentLine += `${word} `;
 
             // Push the word if appending space exceeds max width
             if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
-              lines.push(currentLine.slice(0, -1));
+              if (shouldAppendSpace) {
+                lines.push(currentLine.slice(0, -1));
+              } else {
+                lines.push(currentLine);
+              }
               currentLine = "";
               currentLineWidthTillNow = 0;
               break;
