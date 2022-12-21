@@ -225,7 +225,7 @@ import {
 } from "../utils";
 import {
   ContextMenu,
-  ContextMenuItem,
+  ContextMenuItems,
   CONTEXT_MENU_SEPARATOR,
 } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -274,6 +274,7 @@ import {
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { atom } from "jotai";
 import { Fonts } from "../scene/Fonts";
+import { actionPaste } from "../actions/actionClipboard";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -604,6 +605,7 @@ class App extends React.Component<AppProps, AppState> {
                   <div className="excalidraw-textEditorContainer" />
                   <div className="excalidraw-contextMenuContainer" />
                   {selectedElement.length === 1 &&
+                    !this.state.contextMenu &&
                     this.state.showHyperlinkPopup && (
                       <Hyperlink
                         key={selectedElement[0].id}
@@ -1475,7 +1477,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private pasteFromClipboard = withBatchedUpdates(
+  public pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent | null) => {
       const isPlainPaste = !!(IS_PLAIN_PASTE && event);
 
@@ -1483,7 +1485,7 @@ class App extends React.Component<AppProps, AppState> {
       const target = document.activeElement;
       const isExcalidrawActive =
         this.excalidrawContainerRef.current?.contains(target);
-      if (!isExcalidrawActive) {
+      if (event && !isExcalidrawActive) {
         return;
       }
 
@@ -5987,25 +5989,34 @@ class App extends React.Component<AppProps, AppState> {
     const left = event.clientX - offsetLeft;
     const top = event.clientY - offsetTop;
 
-    if (element && !this.state.selectedElementIds[element.id]) {
-      this.setState(
-        selectGroupsForSelectedElements(
-          {
-            ...this.state,
-            selectedElementIds: { [element.id]: true },
-            selectedLinearElement: isLinearElement(element)
-              ? new LinearElementEditor(element, this.scene)
-              : null,
-          },
-          this.scene.getNonDeletedElements(),
-        ),
-        () => {
-          this._openContextMenu({ top, left }, type);
-        },
-      );
-    } else {
-      this._openContextMenu({ top, left }, type);
+    trackEvent("contextMenu", "openContextMenu", type);
+    if (this.state.showHyperlinkPopup) {
+      // this.setState({ showHyperlinkPopup: false });
     }
+
+    this.setState(
+      {
+        ...(element && !this.state.selectedElementIds[element.id]
+          ? selectGroupsForSelectedElements(
+              {
+                ...this.state,
+                selectedElementIds: { [element.id]: true },
+                selectedLinearElement: isLinearElement(element)
+                  ? new LinearElementEditor(element, this.scene)
+                  : null,
+              },
+              this.scene.getNonDeletedElements(),
+            )
+          : this.state),
+        showHyperlinkPopup: false,
+      },
+      () => {
+        this.setState({
+          contextMenu: { top, left, items: this.getContextMenuItems(type) },
+        });
+      },
+    );
+    // this._openContextMenu({ top, left }, type);
   };
 
   private maybeDragNewGenericElement = (
@@ -6113,137 +6124,84 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   };
 
-  /** @private use this.handleCanvasContextMenu */
-  private _openContextMenu = (
-    {
-      left,
-      top,
-    }: {
-      left: number;
-      top: number;
-    },
+  private getContextMenuItems = (
     type: "canvas" | "element",
-  ) => {
-    trackEvent("contextMenu", "openContextMenu", type);
-    if (this.state.showHyperlinkPopup) {
-      this.setState({ showHyperlinkPopup: false });
-    }
-
-    const options: ContextMenuItem[] = [];
+  ): ContextMenuItems => {
+    const options: ContextMenuItems = [];
 
     options.push(actionCopyAsPng, actionCopyAsSvg);
 
+    // canvas contextMenu
+    // -------------------------------------------------------------------------
+
     if (type === "canvas") {
       if (this.state.viewModeEnabled) {
-        this.setState({
-          contextMenu: {
-            top,
-            left,
-            items: [
-              ...options,
-              actionToggleGridMode,
-              actionToggleZenMode,
-              actionToggleViewMode,
-              actionToggleStats,
-            ],
-          },
-        });
-      } else {
-        this.setState({
-          contextMenu: {
-            top,
-            left,
-            items: [
-              this.device.isMobile &&
-                navigator.clipboard && {
-                  trackEvent: false,
-                  name: "paste",
-                  perform: (elements: any, appStates: any) => {
-                    this.pasteFromClipboard(null);
-                    return {
-                      commitToHistory: false,
-                    };
-                  },
-                  contextItemLabel: "labels.paste",
-                },
-              CONTEXT_MENU_SEPARATOR,
-              actionCopyAsPng,
-              actionCopyAsSvg,
-              copyText,
-              CONTEXT_MENU_SEPARATOR,
-              actionSelectAll,
-              CONTEXT_MENU_SEPARATOR,
-              actionToggleGridMode,
-              actionToggleZenMode,
-              actionToggleViewMode,
-              actionToggleStats,
-            ],
-          },
-        });
+        return [
+          ...options,
+          actionToggleGridMode,
+          actionToggleZenMode,
+          actionToggleViewMode,
+          actionToggleStats,
+        ];
       }
-    } else if (type === "element") {
-      options.push(copyText);
 
-      if (this.state.viewModeEnabled) {
-        this.setState({
-          contextMenu: {
-            top,
-            left,
-            items: [navigator.clipboard && actionCopy, ...options],
-          },
-        });
-      } else {
-        this.setState({
-          contextMenu: {
-            left,
-            top,
-            items: [
-              this.device.isMobile && actionCut,
-              this.device.isMobile && navigator.clipboard && actionCopy,
-              this.device.isMobile &&
-                navigator.clipboard && {
-                  name: "paste",
-                  trackEvent: false,
-                  perform: (elements: any, appStates: any) => {
-                    this.pasteFromClipboard(null);
-                    return {
-                      commitToHistory: false,
-                    };
-                  },
-                  contextItemLabel: "labels.paste",
-                },
-              this.device.isMobile && CONTEXT_MENU_SEPARATOR,
-              ...options,
-              CONTEXT_MENU_SEPARATOR,
-              actionCopyStyles,
-              actionPasteStyles,
-              CONTEXT_MENU_SEPARATOR,
-              actionGroup,
-              actionUnbindText,
-              actionBindText,
-              actionUngroup,
-              CONTEXT_MENU_SEPARATOR,
-              actionAddToLibrary,
-              CONTEXT_MENU_SEPARATOR,
-              actionSendBackward,
-              actionBringForward,
-              actionSendToBack,
-              actionBringToFront,
-              CONTEXT_MENU_SEPARATOR,
-              actionFlipHorizontal,
-              actionFlipVertical,
-              CONTEXT_MENU_SEPARATOR,
-              actionToggleLinearEditor,
-              actionLink,
-              actionDuplicateSelection,
-              actionToggleLock,
-              CONTEXT_MENU_SEPARATOR,
-              actionDeleteSelected,
-            ],
-          },
-        });
-      }
+      return [
+        actionPaste,
+        CONTEXT_MENU_SEPARATOR,
+        actionCopyAsPng,
+        actionCopyAsSvg,
+        copyText,
+        CONTEXT_MENU_SEPARATOR,
+        actionSelectAll,
+        CONTEXT_MENU_SEPARATOR,
+        actionToggleGridMode,
+        actionToggleZenMode,
+        actionToggleViewMode,
+        actionToggleStats,
+      ];
     }
+
+    // element contextMenu
+    // -------------------------------------------------------------------------
+
+    options.push(copyText);
+
+    if (this.state.viewModeEnabled) {
+      return [actionCopy, ...options];
+    }
+
+    return [
+      actionCut,
+      actionCopy,
+      actionPaste,
+      CONTEXT_MENU_SEPARATOR,
+      ...options,
+      CONTEXT_MENU_SEPARATOR,
+      actionCopyStyles,
+      actionPasteStyles,
+      CONTEXT_MENU_SEPARATOR,
+      actionGroup,
+      actionUnbindText,
+      actionBindText,
+      actionUngroup,
+      CONTEXT_MENU_SEPARATOR,
+      actionAddToLibrary,
+      CONTEXT_MENU_SEPARATOR,
+      actionSendBackward,
+      actionBringForward,
+      actionSendToBack,
+      actionBringToFront,
+      CONTEXT_MENU_SEPARATOR,
+      actionFlipHorizontal,
+      actionFlipVertical,
+      CONTEXT_MENU_SEPARATOR,
+      actionToggleLinearEditor,
+      actionLink,
+      actionDuplicateSelection,
+      actionToggleLock,
+      CONTEXT_MENU_SEPARATOR,
+      actionDeleteSelected,
+    ];
   };
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {

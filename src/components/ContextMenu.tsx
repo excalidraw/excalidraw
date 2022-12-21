@@ -9,7 +9,6 @@ import {
 } from "../actions/shortcuts";
 import { Action } from "../actions/types";
 import { ActionManager } from "../actions/manager";
-import { AppState } from "../types";
 import {
   useExcalidrawAppState,
   useExcalidrawElements,
@@ -19,9 +18,11 @@ import React from "react";
 
 export type ContextMenuItem = typeof CONTEXT_MENU_SEPARATOR | Action;
 
+export type ContextMenuItems = (ContextMenuItem | false | null | undefined)[];
+
 type ContextMenuProps = {
   actionManager: ActionManager;
-  items: Exclude<AppState["contextMenu"], null>["items"];
+  items: ContextMenuItems;
   top: number;
   left: number;
 };
@@ -43,6 +44,7 @@ export const ContextMenu = React.memo(
             elements,
             appState,
             actionManager.app.props,
+            actionManager.app,
           ))
       ) {
         acc.push(item);
