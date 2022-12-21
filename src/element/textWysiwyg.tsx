@@ -85,6 +85,16 @@ export const resetOriginalContainerCache = (
     delete originalContainerCache[id];
   }
 };
+
+export const getOriginalContainerHeightFromCache = (
+  id: ExcalidrawTextContainer["id"],
+) => {
+  if (!originalContainerCache[id]) {
+    return null;
+  }
+  return originalContainerCache[id].height;
+};
+
 export const textWysiwyg = ({
   id,
   onChange,
