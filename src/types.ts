@@ -295,7 +295,6 @@ export interface ExcalidrawProps {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  renderFooter?: (isMobile: boolean, appState: AppState) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
@@ -331,6 +330,7 @@ export interface ExcalidrawProps {
    * Render function that renders custom <Sidebar /> component.
    */
   renderSidebar?: () => JSX.Element | null;
+  children?: React.ReactNode;
 }
 
 export type SceneData = {
@@ -507,3 +507,9 @@ export type Device = Readonly<{
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
 }>;
+
+export type UIChildrenComponents = {
+  [k in "FooterCenter"]?:
+    | React.ReactPortal
+    | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
+};

@@ -534,12 +534,8 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.getNonDeletedElements(),
       this.state,
     );
-    const {
-      onCollabButtonClick,
-      renderTopRightUI,
-      renderFooter,
-      renderCustomStats,
-    } = this.props;
+    const { onCollabButtonClick, renderTopRightUI, renderCustomStats } =
+      this.props;
 
     return (
       <div
@@ -583,7 +579,6 @@ class App extends React.Component<AppProps, AppState> {
                     langCode={getLanguage().code}
                     isCollaborating={this.props.isCollaborating}
                     renderTopRightUI={renderTopRightUI}
-                    renderCustomFooter={renderFooter}
                     renderCustomStats={renderCustomStats}
                     renderCustomSidebar={this.props.renderSidebar}
                     showExitZenModeBtn={
@@ -601,7 +596,9 @@ class App extends React.Component<AppProps, AppState> {
                       this.state.activeTool.type === "selection" &&
                       !this.scene.getElementsIncludingDeleted().length
                     }
-                  />
+                  >
+                    {this.props.children}
+                  </LayerUI>
                   <div className="excalidraw-textEditorContainer" />
                   <div className="excalidraw-contextMenuContainer" />
                   {selectedElement.length === 1 &&

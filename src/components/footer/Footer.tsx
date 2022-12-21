@@ -1,35 +1,37 @@
 import clsx from "clsx";
-import { ActionManager } from "../actions/manager";
-import { t } from "../i18n";
-import { AppState, ExcalidrawProps } from "../types";
+import { ActionManager } from "../../actions/manager";
+import { t } from "../../i18n";
+import { AppState } from "../../types";
 import {
   ExitZenModeAction,
   FinalizeAction,
   UndoRedoActions,
   ZoomActions,
-} from "./Actions";
-import { useDevice } from "./App";
-import { WelcomeScreenHelpArrow } from "./icons";
-import { Section } from "./Section";
-import Stack from "./Stack";
-import WelcomeScreenDecor from "./WelcomeScreenDecor";
+} from "../Actions";
+import { useDevice } from "../App";
+import { WelcomeScreenHelpArrow } from "../icons";
+import { Section } from "../Section";
+import Stack from "../Stack";
+import WelcomeScreenDecor from "../WelcomeScreenDecor";
+import FooterCenter from "./FooterCenter";
 
 const Footer = ({
   appState,
   actionManager,
-  renderCustomFooter,
   showExitZenModeBtn,
   renderWelcomeScreen,
+  children,
 }: {
   appState: AppState;
   actionManager: ActionManager;
-  renderCustomFooter?: ExcalidrawProps["renderFooter"];
   showExitZenModeBtn: boolean;
   renderWelcomeScreen: boolean;
+  children?: React.ReactNode;
 }) => {
   const device = useDevice();
   const showFinalize =
     !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
+
   return (
     <footer
       role="contentinfo"
@@ -69,17 +71,7 @@ const Footer = ({
           </Section>
         </Stack.Col>
       </div>
-      <div
-        className={clsx(
-          "layer-ui__wrapper__footer-center zen-mode-transition",
-          {
-            "layer-ui__wrapper__footer-left--transition-bottom":
-              appState.zenModeEnabled,
-          },
-        )}
-      >
-        {renderCustomFooter?.(false, appState)}
-      </div>
+      <FooterCenter>{children}</FooterCenter>
       <div
         className={clsx("layer-ui__wrapper__footer-right zen-mode-transition", {
           "transition-right disable-pointerEvents": appState.zenModeEnabled,
@@ -107,3 +99,4 @@ const Footer = ({
 };
 
 export default Footer;
+Footer.displayName = "Footer";

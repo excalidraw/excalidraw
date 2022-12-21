@@ -380,6 +380,31 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 
 No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
 
+### Component API
+
+#### Footer
+
+Earlier we were using `renderFooter` prop to render custom footer which was removed in [#5970](https://github.com/excalidraw/excalidraw/pull/5970). Now you can pass a `Footer` component instead to render the custom UI for footer.
+
+You will need to import the `Footer` component from the package and wrap your component with the Footer component. The `Footer` should a valid React Node.
+
+**Usage**
+
+```js
+import { Footer } from "@excalidraw/excalidraw";
+
+const CustomFooter = () => <button> custom button</button>;
+const App = () => {
+  return (
+    <Excalidraw>
+      <Footer>
+        <CustomFooter />
+      </Footer>
+    </Excalidraw>
+  );
+};
+```
+
 ### Props
 
 | Name | Type | Default | Description |
@@ -392,7 +417,6 @@ No, Excalidraw package doesn't come with collaboration built in, since the imple
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
 | [`langCode`](#langCode) | string | `en` | Language code string |
 | [`renderTopRightUI`](#renderTopRightUI) | Function |  | Function that renders custom UI in top right corner |
-| [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
 | [`renderCustomStats`](#renderCustomStats) | Function |  | Function that can be used to render custom stats on the stats dialog. |
 | [`renderSIdebar`](#renderSIdebar) | Function |  | Render function that renders custom sidebar. |
 | [`viewModeEnabled`](#viewModeEnabled) | boolean |  | This implies if the app is in view mode. |
@@ -612,14 +636,6 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 </pre>
 
 A function returning JSX to render custom UI in the top right corner of the app.
-
-#### `renderFooter`
-
-<pre>
-(isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>) => JSX | null
-</pre>
-
-A function returning JSX to render custom UI footer. For example, you can use this to render a language picker that was previously being rendered by Excalidraw itself (for now, you'll need to implement your own language picker).
 
 #### `renderCustomStats`
 

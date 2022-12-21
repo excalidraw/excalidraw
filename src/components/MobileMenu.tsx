@@ -36,10 +36,7 @@ type MobileMenuProps = {
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
-  renderCustomFooter?: (
-    isMobile: boolean,
-    appState: AppState,
-  ) => JSX.Element | null;
+
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
@@ -63,7 +60,6 @@ export const MobileMenu = ({
   onPenModeToggle,
   canvas,
   isCollaborating,
-  renderCustomFooter,
   onImageAction,
   renderTopRightUI,
   renderCustomStats,
@@ -253,7 +249,6 @@ export const MobileMenu = ({
               <div className="panelColumn">
                 <Stack.Col gap={2}>
                   {renderCanvasActions()}
-                  {renderCustomFooter?.(true, appState)}
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>

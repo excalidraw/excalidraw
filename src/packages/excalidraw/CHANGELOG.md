@@ -13,6 +13,14 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Features
+
+- Render Footer as a component instead of render prop [#5970](https://github.com/excalidraw/excalidraw/pull/5970). You can read more about its usage [here](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Footer)
+
+#### BREAKING CHANGE
+
+- With this change, the prop `renderFooter` is now removed.
+
 ### Excalidraw schema
 
 - Merged `appState.currentItemStrokeSharpness` and `appState.currentItemLinearStrokeSharpness` into `appState.currentItemRoundness`. Renamed `changeSharpness` action to `changeRoundness`. Excalidraw element's `strokeSharpness` was changed to `roundness`. Check the PR for types and more details [#5553](https://github.com/excalidraw/excalidraw/pull/5553).
