@@ -6,7 +6,10 @@ import {
   measureText,
   redrawTextBoundingBox,
 } from "../element/textElement";
-import { getOriginalContainerHeightFromCache } from "../element/textWysiwyg";
+import {
+  getOriginalContainerHeightFromCache,
+  resetOriginalContainerCache,
+} from "../element/textWysiwyg";
 import {
   hasBoundTextElement,
   isTextBindableContainer,
@@ -42,6 +45,7 @@ export const actionUnbindText = register({
         const originalContainerHeight = getOriginalContainerHeightFromCache(
           element.id,
         );
+        resetOriginalContainerCache(element.id);
 
         mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
