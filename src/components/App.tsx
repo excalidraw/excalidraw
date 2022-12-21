@@ -5990,9 +5990,6 @@ class App extends React.Component<AppProps, AppState> {
     const top = event.clientY - offsetTop;
 
     trackEvent("contextMenu", "openContextMenu", type);
-    if (this.state.showHyperlinkPopup) {
-      // this.setState({ showHyperlinkPopup: false });
-    }
 
     this.setState(
       {
@@ -6016,7 +6013,6 @@ class App extends React.Component<AppProps, AppState> {
         });
       },
     );
-    // this._openContextMenu({ top, left }, type);
   };
 
   private maybeDragNewGenericElement = (
