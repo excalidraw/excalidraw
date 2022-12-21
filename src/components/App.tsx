@@ -625,9 +625,6 @@ class App extends React.Component<AppProps, AppState> {
                       items={this.state.contextMenu.items}
                       top={this.state.contextMenu.top}
                       left={this.state.contextMenu.left}
-                      elements={this.scene.getNonDeletedElements()}
-                      appState={this.state}
-                      setAppState={this.setAppState}
                       actionManager={this.actionManager}
                     />
                   )}
