@@ -17,6 +17,7 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
+  ExcalidrawTextContainer,
 } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
@@ -60,6 +61,12 @@ const getTransform = (
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
+const originalContainerCache: {
+  [id: ExcalidrawTextContainer["id"]]: {
+    height: ExcalidrawTextContainer["height"];
+  };
+} = {};
+
 export const textWysiwyg = ({
   id,
   onChange,
@@ -87,6 +94,9 @@ export const textWysiwyg = ({
     updatedTextElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
   ) => {
+    if (!editable.style.fontFamily || !editable.style.fontSize) {
+      return false;
+    }
     const currentFont = editable.style.fontFamily.replace(/"/g, "");
     if (
       getFontFamilyString({ fontFamily: updatedTextElement.fontFamily }) !==
@@ -99,7 +109,6 @@ export const textWysiwyg = ({
     }
     return false;
   };
-  let originalContainerHeight: number;
 
   const updateWysiwygStyle = () => {
     const appState = app.state;
@@ -145,14 +154,17 @@ export const textWysiwyg = ({
           height = editorHeight;
         }
         if (propertiesUpdated) {
-          originalContainerHeight = containerDims.height;
-
           // update height of the editor after properties updated
           height = updatedTextElement.height;
         }
-        if (!originalContainerHeight) {
-          originalContainerHeight = containerDims.height;
+        if (!originalContainerCache[container.id]) {
+          originalContainerCache[container.id] = {
+            height: containerDims.height,
+          };
+        } else if (propertiesUpdated) {
+          originalContainerCache[container.id].height = containerDims.height;
         }
+
         maxWidth = getMaxContainerWidth(container);
         maxHeight = getMaxContainerHeight(container);
 
@@ -166,7 +178,7 @@ export const textWysiwyg = ({
           // autoshrink container height until original container height
           // is reached when text is removed
           !isArrowElement(container) &&
-          containerDims.height > originalContainerHeight &&
+          containerDims.height > originalContainerCache[container.id].height &&
           height < maxHeight
         ) {
           const diff = Math.min(maxHeight - height, approxLineHeight);
