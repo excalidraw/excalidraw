@@ -77,7 +77,8 @@ import { atom, Provider, useAtom } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
-import { AppFooter } from "./components/AppFooter";
+import { EncryptedIcon } from "./components/EncryptedIcon";
+import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
 
 polyfill();
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -640,7 +641,10 @@ const ExcalidrawWrapper = () => {
         theme={theme}
       >
         <Footer>
-          <AppFooter />
+          <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
+            <ExcalidrawPlusAppLink />
+            <EncryptedIcon />
+          </div>
         </Footer>
       </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
