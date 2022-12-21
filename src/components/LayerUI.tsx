@@ -8,8 +8,14 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { ExportType } from "../scene/types";
-import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
-import { muteFSAbortError } from "../utils";
+import {
+  AppProps,
+  AppState,
+  ExcalidrawProps,
+  BinaryFiles,
+  UIChildrenComponents,
+} from "../types";
+import { muteFSAbortError, ReactChildrenToObject } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
@@ -38,7 +44,7 @@ import { trackEvent } from "../analytics";
 import { isMenuOpenAtom, useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
-import Footer from "./Footer";
+import Footer from "./footer/Footer";
 import {
   ExportImageIcon,
   HamburgerMenuIcon,
@@ -72,7 +78,6 @@ interface LayerUIProps {
   isCollaborating: boolean;
   renderShapeToggles?: (JSX.Element | null)[];
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
-  renderCustomFooter?: ExcalidrawProps["renderFooter"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -82,7 +87,9 @@ interface LayerUIProps {
   id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderWelcomeScreen: boolean;
+  children?: React.ReactNode;
 }
+
 const LayerUI = ({
   actionManager,
   appState,
@@ -98,7 +105,7 @@ const LayerUI = ({
   isCollaborating,
   renderShapeToggles,
   renderTopRightUI,
-  renderCustomFooter,
+
   renderCustomStats,
   renderCustomSidebar,
   libraryReturnUrl,
@@ -108,8 +115,12 @@ const LayerUI = ({
   id,
   onImageAction,
   renderWelcomeScreen,
+  children,
 }: LayerUIProps) => {
   const device = useDevice();
+
+  const childrenComponents =
+    ReactChildrenToObject<UIChildrenComponents>(children);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -485,7 +496,6 @@ const LayerUI = ({
           canvas={canvas}
           isCollaborating={isCollaborating}
           renderShapeToggles={renderShapeToggles}
-          renderCustomFooter={renderCustomFooter}
           onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
@@ -518,9 +528,11 @@ const LayerUI = ({
               renderWelcomeScreen={renderWelcomeScreen}
               appState={appState}
               actionManager={actionManager}
-              renderCustomFooter={renderCustomFooter}
               showExitZenModeBtn={showExitZenModeBtn}
-            />
+            >
+              {childrenComponents.FooterCenter}
+            </Footer>
+
             {appState.showStats && (
               <Stats
                 appState={appState}
@@ -567,7 +579,6 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
 
   return (
-    prev.renderCustomFooter === next.renderCustomFooter &&
     prev.renderTopRightUI === next.renderTopRightUI &&
     prev.renderCustomStats === next.renderCustomStats &&
     prev.renderCustomSidebar === next.renderCustomSidebar &&

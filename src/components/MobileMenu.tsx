@@ -37,10 +37,6 @@ type MobileMenuProps = {
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
   renderShapeToggles?: (JSX.Element | null)[];
-  renderCustomFooter?: (
-    isMobile: boolean,
-    appState: AppState,
-  ) => JSX.Element | null;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
@@ -65,7 +61,6 @@ export const MobileMenu = ({
   canvas,
   isCollaborating,
   renderShapeToggles,
-  renderCustomFooter,
   onImageAction,
   renderTopRightUI,
   renderCustomStats,
@@ -256,7 +251,6 @@ export const MobileMenu = ({
               <div className="panelColumn">
                 <Stack.Col gap={2}>
                   {renderCanvasActions()}
-                  {renderCustomFooter?.(true, appState)}
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>
