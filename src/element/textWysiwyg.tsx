@@ -81,7 +81,9 @@ export const updateOriginalContainerCache = (
 export const resetOriginalContainerCache = (
   id: ExcalidrawTextContainer["id"],
 ) => {
-  delete originalContainerCache[id];
+  if (originalContainerCache[id]) {
+    delete originalContainerCache[id];
+  }
 };
 export const textWysiwyg = ({
   id,
