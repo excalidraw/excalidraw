@@ -24,7 +24,10 @@ import { isTextBindableContainer } from "./typeChecks";
 import { getElementAbsoluteCoords } from "../element";
 import { getSelectedElements } from "../scene";
 import { isHittingElementNotConsideringBoundingBox } from "./collision";
-import { resetOriginalContainerCache } from "./textWysiwyg";
+import {
+  resetOriginalContainerCache,
+  updateOriginalContainerCache,
+} from "./textWysiwyg";
 
 export const normalizeText = (text: string) => {
   return (
@@ -85,7 +88,7 @@ export const redrawTextBoundingBox = (
       } else {
         coordX = container.x + containerDims.width / 2 - metrics.width / 2;
       }
-
+      updateOriginalContainerCache(container.id, nextHeight);
       mutateElement(container, { height: nextHeight });
     } else {
       const centerX = textElement.x + textElement.width / 2;
