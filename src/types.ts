@@ -30,6 +30,7 @@ import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
+import { ContextMenuItems } from "./components/ContextMenu";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -92,6 +93,11 @@ export type LastActiveToolBeforeEraser =
   | null;
 
 export type AppState = {
+  contextMenu: {
+    items: ContextMenuItems;
+    top: number;
+    left: number;
+  } | null;
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: string | null;
@@ -147,6 +153,7 @@ export type AppState = {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
+  // mobile-only
   openMenu: "canvas" | "shape" | null;
   openPopup:
     | "canvasColorPicker"
@@ -407,6 +414,7 @@ export type AppClassProperties = {
   files: BinaryFiles;
   device: App["device"];
   scene: App["scene"];
+  pasteFromClipboard: App["pasteFromClipboard"];
 };
 
 export type PointerDownState = Readonly<{
