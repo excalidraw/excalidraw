@@ -24,6 +24,7 @@ import { isTextBindableContainer } from "./typeChecks";
 import { getElementAbsoluteCoords } from "../element";
 import { getSelectedElements } from "../scene";
 import { isHittingElementNotConsideringBoundingBox } from "./collision";
+import { resetOriginalContainerCache } from "./textWysiwyg";
 
 export const normalizeText = (text: string) => {
   return (
@@ -149,6 +150,7 @@ export const handleBindTextResize = (
   if (!boundTextElementId) {
     return;
   }
+  resetOriginalContainerCache(container.id);
   let textElement = Scene.getScene(container)!.getElement(
     boundTextElementId,
   ) as ExcalidrawTextElement;

@@ -67,6 +67,22 @@ const originalContainerCache: {
   };
 } = {};
 
+export const updateOriginalContainerCache = (
+  id: ExcalidrawTextContainer["id"],
+  height: ExcalidrawTextContainer["height"],
+) => {
+  if (!originalContainerCache[id]) {
+    originalContainerCache[id] = { height };
+  } else {
+    originalContainerCache[id].height = height;
+  }
+};
+
+export const resetOriginalContainerCache = (
+  id: ExcalidrawTextContainer["id"],
+) => {
+  delete originalContainerCache[id];
+};
 export const textWysiwyg = ({
   id,
   onChange,
@@ -158,11 +174,9 @@ export const textWysiwyg = ({
           textElementHeight = updatedTextElement.height;
         }
         if (!originalContainerCache[container.id]) {
-          originalContainerCache[container.id] = {
-            height: containerDims.height,
-          };
+          updateOriginalContainerCache(container.id, containerDims.height);
         } else if (propertiesUpdated) {
-          originalContainerCache[container.id].height = containerDims.height;
+          updateOriginalContainerCache(container.id, containerDims.height);
         }
 
         maxWidth = getMaxContainerWidth(container);
