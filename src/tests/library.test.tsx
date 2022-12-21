@@ -109,8 +109,6 @@ describe("library menu", () => {
       expect(latestLibrary.length).toBe(libraryItems.length);
       expect(latestLibrary[0].elements).toEqual(libraryItems[0].elements);
     });
-
-    expect(true).toBe(true);
   });
 });
 

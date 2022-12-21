@@ -58,4 +58,5 @@ export interface ExportedLibraryData {
 export interface ImportedLibraryData extends Partial<ExportedLibraryData> {
   /** @deprecated v1 */
   library?: LibraryItems;
+  elements?: LibraryItems;
 }

@@ -200,7 +200,7 @@ export const parseLibraryJSON = (
   if (!isValidLibrary(data)) {
     throw new Error("Invalid library");
   }
-  const libraryItems = data.libraryItems || data.library;
+  const libraryItems = data.libraryItems || data.library || data.elements;
   return restoreLibraryItems(libraryItems, defaultStatus);
 };
 
