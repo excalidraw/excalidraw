@@ -383,7 +383,6 @@ class App extends React.Component<AppProps, AppState> {
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
-  contextMenuOpen: boolean = false;
   lastScenePointer: { x: number; y: number } | null = null;
 
   constructor(props: AppProps) {
@@ -658,8 +657,6 @@ class App extends React.Component<AppProps, AppState> {
 
   private syncActionResult = withBatchedUpdates(
     (actionResult: ActionResult) => {
-      // Since context menu closes when action triggered so setting to false
-      this.contextMenuOpen = false;
       if (this.unmounted || actionResult === false) {
         return;
       }
@@ -688,7 +685,7 @@ class App extends React.Component<AppProps, AppState> {
         this.addNewImagesToImageCache();
       }
 
-      if (actionResult.appState || editingElement) {
+      if (actionResult.appState || editingElement || this.state.contextMenu) {
         if (actionResult.commitToHistory) {
           this.history.resumeRecording();
         }
@@ -714,12 +711,17 @@ class App extends React.Component<AppProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
+
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
             // regarding the resulting type as not containing undefined
             // (which the following expression will never contain)
             return Object.assign(actionResult.appState || {}, {
+              // NOTE this will prevent opening context menu using an action
+              // or programmatically from the host, so it will need to be
+              // rewritten later
+              contextMenu: null,
               editingElement:
                 editingElement || actionResult.appState?.editingElement || null,
               viewModeEnabled,
@@ -3116,7 +3118,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElement &&
         hitElement.link &&
         this.state.selectedElementIds[hitElement.id] &&
-        !this.contextMenuOpen &&
+        !this.state.contextMenu &&
         !this.state.showHyperlinkPopup
       ) {
         this.setState({ showHyperlinkPopup: "info" });
@@ -3412,8 +3414,6 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    // Since context menu closes on pointer down so setting to false
-    this.contextMenuOpen = false;
     this.clearSelectionIfNotUsingSelection();
     this.updateBindingEnabledOnPointerMove(event);
 
@@ -6131,7 +6131,6 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.showHyperlinkPopup) {
       this.setState({ showHyperlinkPopup: false });
     }
-    this.contextMenuOpen = true;
 
     const options: ContextMenuItem[] = [];
 
