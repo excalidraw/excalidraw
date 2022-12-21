@@ -1027,7 +1027,7 @@ describe("Test Linear Elements", () => {
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
         Object {
-          "x": 386.5,
+          "x": 387.5,
           "y": 70,
         }
       `);
@@ -1086,7 +1086,7 @@ describe("Test Linear Elements", () => {
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
         Object {
-          "x": 189.5,
+          "x": 190.5,
           "y": 20,
         }
       `);

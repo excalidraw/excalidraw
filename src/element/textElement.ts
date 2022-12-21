@@ -49,11 +49,7 @@ export const redrawTextBoundingBox = (
       maxWidth,
     );
   }
-  const metrics = measureText(
-    textElement.originalText,
-    getFontString(textElement),
-    maxWidth,
-  );
+  const metrics = measureText(text, getFontString(textElement), maxWidth);
   let coordY = textElement.y;
   let coordX = textElement.x;
   // Resize container and vertically center align the text
@@ -272,7 +268,7 @@ export const measureText = (
   container.style.minHeight = "1em";
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
-    container.style.maxWidth = `${String(maxWidth)}px`;
+    container.style.width = `${String(maxWidth + 1)}px`;
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
     container.style.lineHeight = `${String(lineHeight)}px`;
@@ -290,10 +286,12 @@ export const measureText = (
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
   // Since span adds 1px extra width to the container
-  const width = container.offsetWidth + 1;
+  const width = container.offsetWidth - 1;
   const height = container.offsetHeight;
-
   document.body.removeChild(container);
+  if (isTestEnv()) {
+    return { width, height, baseline, container };
+  }
   return { width, height, baseline };
 };
 
@@ -331,6 +329,12 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   const spaceWidth = getTextWidth(" ", font);
+
+  const push = (str: string) => {
+    if (str.trim()) {
+      lines.push(str);
+    }
+  };
   originalLines.forEach((originalLine) => {
     const words = originalLine.split(" ");
     // This means its newline so push it
@@ -348,9 +352,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
         if (currentWordWidth >= maxWidth) {
           // push current line since the current word exceeds the max width
           // so will be appended in next line
-          if (currentLine) {
-            lines.push(currentLine);
-          }
+          push(currentLine);
           currentLine = "";
           currentLineWidthTillNow = 0;
           while (words[index].length > 0) {
@@ -364,7 +366,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
               if (currentLine.slice(-1) === " ") {
                 currentLine = currentLine.slice(0, -1);
               }
-              lines.push(currentLine);
+              push(currentLine);
               currentLine = currentChar;
               currentLineWidthTillNow = width;
               if (currentLineWidthTillNow === maxWidth) {
@@ -377,7 +379,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           }
           // push current line if appending space exceeds max width
           if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
-            lines.push(currentLine);
+            push(currentLine);
             currentLine = "";
             currentLineWidthTillNow = 0;
           } else {
@@ -396,7 +398,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
             currentLineWidthTillNow = getTextWidth(currentLine + word, font);
 
             if (currentLineWidthTillNow >= maxWidth) {
-              lines.push(currentLine);
+              push(currentLine);
               currentLineWidthTillNow = 0;
               currentLine = "";
 
@@ -407,7 +409,8 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
 
             // Push the word if appending space exceeds max width
             if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
-              lines.push(currentLine.slice(0, -1));
+              const word = currentLine.slice(0, -1);
+              push(word);
               currentLine = "";
               currentLineWidthTillNow = 0;
               break;
@@ -424,7 +427,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
         if (currentLine.slice(-1) === " ") {
           currentLine = currentLine.slice(0, -1);
         }
-        lines.push(currentLine);
+        push(currentLine);
       }
     }
   });
