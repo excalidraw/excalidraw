@@ -62,20 +62,21 @@ const getTransform = (
 };
 
 const originalContainerCache: {
-  [id: ExcalidrawTextContainer["id"]]: {
-    height: ExcalidrawTextContainer["height"];
-  };
+  [id: ExcalidrawTextContainer["id"]]:
+    | {
+        height: ExcalidrawTextContainer["height"];
+      }
+    | undefined;
 } = {};
 
 export const updateOriginalContainerCache = (
   id: ExcalidrawTextContainer["id"],
   height: ExcalidrawTextContainer["height"],
 ) => {
-  if (!originalContainerCache[id]) {
-    originalContainerCache[id] = { height };
-  } else {
-    originalContainerCache[id].height = height;
-  }
+  const data =
+    originalContainerCache[id] || (originalContainerCache[id] = { height });
+  data.height = height;
+  return data;
 };
 
 export const resetOriginalContainerCache = (
@@ -89,10 +90,7 @@ export const resetOriginalContainerCache = (
 export const getOriginalContainerHeightFromCache = (
   id: ExcalidrawTextContainer["id"],
 ) => {
-  if (!originalContainerCache[id]) {
-    return null;
-  }
-  return originalContainerCache[id].height;
+  return originalContainerCache[id]?.height ?? null;
 };
 
 export const textWysiwyg = ({
@@ -185,10 +183,21 @@ export const textWysiwyg = ({
           // update height of the editor after properties updated
           textElementHeight = updatedTextElement.height;
         }
-        if (!originalContainerCache[container.id]) {
-          updateOriginalContainerCache(container.id, containerDims.height);
-        } else if (propertiesUpdated) {
-          updateOriginalContainerCache(container.id, containerDims.height);
+
+        let originalContainerData;
+        if (propertiesUpdated) {
+          originalContainerData = updateOriginalContainerCache(
+            container.id,
+            containerDims.height,
+          );
+        } else {
+          originalContainerData = originalContainerCache[container.id];
+          if (!originalContainerData) {
+            originalContainerData = updateOriginalContainerCache(
+              container.id,
+              containerDims.height,
+            );
+          }
         }
 
         maxWidth = getMaxContainerWidth(container);
@@ -207,7 +216,7 @@ export const textWysiwyg = ({
           // autoshrink container height until original container height
           // is reached when text is removed
           !isArrowElement(container) &&
-          containerDims.height > originalContainerCache[container.id].height &&
+          containerDims.height > originalContainerData.height &&
           textElementHeight < maxHeight
         ) {
           const diff = Math.min(
