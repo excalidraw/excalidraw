@@ -80,7 +80,12 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
-import { hasStrokeColor } from "../scene/comparisons";
+import {
+  hasStrokeColor,
+  hasStrokeWidth,
+  hasStrokeStyle,
+  hasBackground,
+} from "../scene/comparisons";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
@@ -109,7 +114,7 @@ const changeProperty = (
 const getFormValue = function <T>(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-  getAttribute: (element: ExcalidrawElement) => T,
+  getAttribute: (element: ExcalidrawElement) => T | null,
   defaultValue?: T,
 ): T | null {
   const editingElement = appState.editingElement;
@@ -232,7 +237,8 @@ export const actionChangeStrokeColor = register({
         color={getFormValue(
           elements,
           appState,
-          (element) => element.strokeColor,
+          (element) =>
+            hasStrokeColor(element.type) ? element.strokeColor : null,
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
@@ -275,7 +281,8 @@ export const actionChangeBackgroundColor = register({
         color={getFormValue(
           elements,
           appState,
-          (element) => element.backgroundColor,
+          (element) =>
+            hasBackground(element.type) ? element.backgroundColor : null,
           appState.currentItemBackgroundColor,
         )}
         onChange={(color) => updateData({ currentItemBackgroundColor: color })}
@@ -329,7 +336,7 @@ export const actionChangeFillStyle = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => element.fillStyle,
+          (element) => (hasBackground(element.type) ? element.fillStyle : null),
           appState.currentItemFillStyle,
         )}
         onChange={(value) => {
@@ -379,7 +386,8 @@ export const actionChangeStrokeWidth = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => element.strokeWidth,
+          (element) =>
+            hasStrokeWidth(element.type) ? element.strokeWidth : null,
           appState.currentItemStrokeWidth,
         )}
         onChange={(value) => updateData(value)}
@@ -428,7 +436,8 @@ export const actionChangeSloppiness = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => element.roughness,
+          (element) =>
+            hasStrokeStyle(element.type) ? element.roughness : null,
           appState.currentItemRoughness,
         )}
         onChange={(value) => updateData(value)}
@@ -476,7 +485,8 @@ export const actionChangeStrokeStyle = register({
         value={getFormValue(
           elements,
           appState,
-          (element) => element.strokeStyle,
+          (element) =>
+            hasStrokeStyle(element.type) ? element.strokeStyle : null,
           appState.currentItemStrokeStyle,
         )}
         onChange={(value) => updateData(value)}
@@ -904,7 +914,11 @@ export const actionChangeRoundness = register({
             elements,
             appState,
             (element) =>
-              hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
+              hasLegacyRoundness || !canChangeRoundness(element.type)
+                ? null
+                : element.roundness
+                ? "round"
+                : "sharp",
             (canChangeRoundness(appState.activeTool.type) &&
               appState.currentItemRoundness) ||
               null,
