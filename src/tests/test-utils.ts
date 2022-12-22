@@ -184,8 +184,3 @@ export const assertSelectedElements = (
   expect(selectedElementIds.length).toBe(ids.length);
   expect(selectedElementIds).toEqual(expect.arrayContaining(ids));
 };
-
-export const APPROX_LINE_HEIGHT = 25;
-export const INITIAL_WIDTH = 10;
-export const DUMMY_WIDTH = 160;
-export const DUMMY_HEIGHT = 240;

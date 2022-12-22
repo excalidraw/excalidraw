@@ -1,14 +1,6 @@
 import ReactDOM from "react-dom";
 import ExcalidrawApp from "../excalidraw-app";
-import {
-  APPROX_LINE_HEIGHT,
-  DUMMY_HEIGHT,
-  DUMMY_WIDTH,
-  GlobalTestState,
-  INITIAL_WIDTH,
-  render,
-  screen,
-} from "../tests/test-utils";
+import { GlobalTestState, render, screen } from "../tests/test-utils";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { CODES, KEYS } from "../keys";
 import { fireEvent } from "../tests/test-utils";
@@ -447,6 +439,11 @@ describe("textWysiwyg", () => {
   describe("Test container-bound text", () => {
     let rectangle: any;
     const { h } = window;
+
+    const DUMMY_HEIGHT = 240;
+    const DUMMY_WIDTH = 160;
+    const APPROX_LINE_HEIGHT = 25;
+    const INITIAL_WIDTH = 10;
 
     beforeAll(() => {
       jest
