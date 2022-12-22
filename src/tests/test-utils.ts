@@ -14,7 +14,7 @@ import { STORAGE_KEYS } from "../excalidraw-app/app_constants";
 
 import { SceneData } from "../types";
 import { getSelectedElements } from "../scene/selection";
-import { ExcalidrawElement, FontString } from "../element/types";
+import { ExcalidrawElement } from "../element/types";
 
 const customQueries = {
   ...queries,
@@ -189,38 +189,3 @@ export const APPROX_LINE_HEIGHT = 25;
 export const INITIAL_WIDTH = 10;
 export const DUMMY_WIDTH = 160;
 export const DUMMY_HEIGHT = 240;
-
-export const mockMeasureText = (
-  text: string,
-  font: FontString,
-  container: HTMLDivElement,
-  maxWidth?: number | null,
-) => {
-  let width = INITIAL_WIDTH;
-  let height = APPROX_LINE_HEIGHT;
-  let baseline = 10;
-  if (!text) {
-    return {
-      width,
-      height,
-      baseline,
-    };
-  }
-  baseline = 30;
-  width = DUMMY_WIDTH;
-  height = APPROX_LINE_HEIGHT * 5;
-  if (font.includes("Virgil")) {
-    height = APPROX_LINE_HEIGHT * 3;
-  }
-
-  if (font.includes("36")) {
-    height += APPROX_LINE_HEIGHT;
-  }
-
-  return {
-    width,
-    height,
-    baseline,
-    container,
-  };
-};
