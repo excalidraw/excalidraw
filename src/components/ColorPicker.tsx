@@ -66,7 +66,7 @@ const getColor = (color: string): string | null => {
     return color;
   }
 
-  // testing for `#` first fixes a bug on Electron (more specfically, an 
+  // testing for `#` first fixes a bug on Electron (more specfically, an
   // Obsidian popout window), where a hex color without `#` is (incorrectly)
   // considered valid
   return isValidColor(`#${color}`)
