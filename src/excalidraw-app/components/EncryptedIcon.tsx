@@ -1,8 +1,8 @@
-import { t } from "../i18n";
-import { shield } from "./icons";
-import { Tooltip } from "./Tooltip";
+import { shield } from "../../components/icons";
+import { Tooltip } from "../../components/Tooltip";
+import { t } from "../../i18n";
 
-const EncryptedIcon = () => (
+export const EncryptedIcon = () => (
   <a
     className="encrypted-icon tooltip"
     href="https://blog.excalidraw.com/end-to-end-encryption/"
@@ -15,5 +15,3 @@ const EncryptedIcon = () => (
     </Tooltip>
   </a>
 );
-
-export default EncryptedIcon;
