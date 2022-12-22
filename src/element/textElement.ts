@@ -28,6 +28,7 @@ import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./textWysiwyg";
+import { mockMeasureText } from "../tests/test-utils";
 
 export const normalizeText = (text: string) => {
   return (
@@ -295,6 +296,9 @@ export const measureText = (
   const height = container.offsetHeight;
   document.body.removeChild(container);
   if (isTestEnv()) {
+    if (window.mockMeasureText) {
+      return mockMeasureText(text, font, container, maxWidth);
+    }
     return { width, height, baseline, container };
   }
   return { width, height, baseline };

@@ -6489,6 +6489,7 @@ declare global {
       app: InstanceType<typeof App>;
       history: History;
     };
+    mockMeasureText: boolean;
   }
 }
 
