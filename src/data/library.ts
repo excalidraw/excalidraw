@@ -154,7 +154,8 @@ class Library {
     return this.setLibrary(() => {
       return new Promise<LibraryItems>(async (resolve, reject) => {
         try {
-          const source = await (typeof libraryItems === "function"
+          const source = await (typeof libraryItems === "function" &&
+          !(libraryItems instanceof Blob)
             ? libraryItems(this.lastLibraryItems)
             : libraryItems);
 
