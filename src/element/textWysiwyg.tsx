@@ -367,7 +367,7 @@ export const textWysiwyg = ({
       });
       if (container) {
         const wrappedText = wrapText(
-          data,
+          `${editable.value}${data}`,
           font,
           getMaxContainerWidth(container),
         );
