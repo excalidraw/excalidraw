@@ -317,6 +317,10 @@ const repairBoundElement = (
     return;
   }
 
+  if (boundElement.isDeleted) {
+    return;
+  }
+
   if (
     container.boundElements &&
     !container.boundElements.find((binding) => binding.id === boundElement.id)
@@ -359,7 +363,7 @@ export const restoreElements = (
   // repair binding. Mutates elements.
   const restoredElementsMap = arrayToMap(restoredElements);
   for (const element of restoredElements) {
-    if (isTextElement(element) && !element.isDeleted && element.containerId) {
+    if (isTextElement(element) && element.containerId) {
       repairBoundElement(element, restoredElementsMap);
     } else if (element.boundElements) {
       repairContainerElement(element, restoredElementsMap);
