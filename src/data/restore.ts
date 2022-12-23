@@ -273,6 +273,14 @@ const repairContainerElement = (
       ) => {
         const boundElement = elementsMap.get(binding.id);
         if (boundElement && !boundIds.has(binding.id)) {
+          boundIds.add(binding.id);
+
+          if (boundElement.isDeleted) {
+            return acc;
+          }
+
+          acc.push(binding);
+
           if (
             isTextElement(boundElement) &&
             // being slightly conservative here, preserving existing containerId
@@ -282,9 +290,6 @@ const repairContainerElement = (
             (boundElement as Mutable<ExcalidrawTextElement>).containerId =
               container.id;
           }
-
-          acc.push(binding);
-          boundIds.add(binding.id);
         }
         return acc;
       },
@@ -354,7 +359,7 @@ export const restoreElements = (
   // repair binding. Mutates elements.
   const restoredElementsMap = arrayToMap(restoredElements);
   for (const element of restoredElements) {
-    if (isTextElement(element) && element.containerId) {
+    if (isTextElement(element) && !element.isDeleted && element.containerId) {
       repairBoundElement(element, restoredElementsMap);
     } else if (element.boundElements) {
       repairContainerElement(element, restoredElementsMap);
