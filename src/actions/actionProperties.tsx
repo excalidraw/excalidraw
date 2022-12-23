@@ -201,12 +201,23 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   trackEvent: false,
   perform: (elements, appState, value) => {
+    const containers = getSelectedElements(elements, appState, false)
+      .filter((el) => el.boundElements)
+      .map((el) => el.id);
     return {
       ...(value.currentItemStrokeColor && {
         elements: changeProperty(
           elements,
           appState,
           (el) => {
+            if (
+              isTextElement(el) &&
+              el.containerId &&
+              containers.includes(el.containerId) &&
+              getContainerElement(el)?.strokeColor !== el.strokeColor
+            ) {
+              return el;
+            }
             return hasStrokeColor(el.type)
               ? newElementWith(el, {
                   strokeColor: value.currentItemStrokeColor,
