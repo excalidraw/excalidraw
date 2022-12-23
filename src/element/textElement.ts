@@ -271,9 +271,11 @@ export const measureText = (
   container.style.whiteSpace = "pre";
   container.style.font = font;
   container.style.minHeight = "1em";
+  const textWidth = getTextWidth(text, font);
+
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
-    container.style.width = `${String(maxWidth + 1)}px`;
+    container.style.width = `${String(Math.min(textWidth, maxWidth) + 1)}px`;
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
     container.style.lineHeight = `${String(lineHeight)}px`;
@@ -291,7 +293,10 @@ export const measureText = (
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
   // Since span adds 1px extra width to the container
-  const width = container.offsetWidth - 1;
+  let width = container.offsetWidth;
+  if (maxWidth && textWidth > maxWidth) {
+    width = width - 1;
+  }
   const height = container.offsetHeight;
   document.body.removeChild(container);
   if (isTestEnv()) {
