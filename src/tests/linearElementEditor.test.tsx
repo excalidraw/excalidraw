@@ -829,6 +829,15 @@ describe("Test Linear Elements", () => {
       });
     });
 
+    it("should match styles for text editor", () => {
+      createTwoPointerLinearElement("arrow");
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      expect(editor).toMatchSnapshot();
+    });
+
     it("should bind text to arrow when double clicked", async () => {
       createTwoPointerLinearElement("arrow");
       const arrow = h.elements[0] as ExcalidrawLinearElement;
