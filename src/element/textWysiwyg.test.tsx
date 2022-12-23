@@ -15,6 +15,7 @@ import * as textElementUtils from "./textElement";
 import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
 import { resize } from "../tests/utils";
+import { getOriginalContainerHeightFromCache } from "./textWysiwyg";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -1019,7 +1020,6 @@ describe("textWysiwyg", () => {
       const originalRectY = rectangle.y;
       const originalTextX = text.x;
       const originalTextY = text.y;
-
       mouse.select(rectangle);
       mouse.downAt(rectangle.x, rectangle.y);
       mouse.moveTo(rectangle.x + 100, rectangle.y + 50);
@@ -1054,6 +1054,116 @@ describe("textWysiwyg", () => {
       editor.blur();
       expect(rectangle.boundElements).toStrictEqual([]);
       expect(h.elements[1].isDeleted).toBe(true);
+    });
+
+    it("should restore original container height and clear cache once text is unbind", async () => {
+      jest
+        .spyOn(textElementUtils, "measureText")
+        .mockImplementation((text, font, maxWidth) => {
+          let width = INITIAL_WIDTH;
+          let height = APPROX_LINE_HEIGHT;
+          let baseline = 10;
+          if (!text) {
+            return {
+              width,
+              height,
+              baseline,
+            };
+          }
+          baseline = 30;
+          width = DUMMY_WIDTH;
+          height = APPROX_LINE_HEIGHT * 5;
+
+          return {
+            width,
+            height,
+            baseline,
+          };
+        });
+      const originalRectHeight = rectangle.height;
+      expect(rectangle.height).toBe(originalRectHeight);
+
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+
+      fireEvent.change(editor, {
+        target: { value: "Online whiteboard collaboration made easy" },
+      });
+      editor.blur();
+      expect(rectangle.height).toBe(135);
+      mouse.select(rectangle);
+      fireEvent.contextMenu(GlobalTestState.canvas, {
+        button: 2,
+        clientX: 20,
+        clientY: 30,
+      });
+      const contextMenu = document.querySelector(".context-menu");
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Unbind text")!);
+      expect(h.elements[0].boundElements).toEqual([]);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(null);
+
+      expect(rectangle.height).toBe(originalRectHeight);
+    });
+
+    it("should reset the container height cache when resizing", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
+      let editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello" } });
+      editor.blur();
+
+      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
+      expect(rectangle.height).toBe(215);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(null);
+
+      mouse.select(rectangle);
+      Keyboard.keyPress(KEYS.ENTER);
+
+      editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      await new Promise((r) => setTimeout(r, 0));
+      editor.blur();
+      expect(rectangle.height).toBe(215);
+      // cache updated again
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(215);
+    });
+
+    //@todo fix this test later once measureText is mocked correctly
+    it.skip("should reset the container height cache when font properties updated", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
+
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      editor.blur();
+
+      mouse.select(rectangle);
+      Keyboard.keyPress(KEYS.ENTER);
+
+      fireEvent.click(screen.getByTitle(/code/i));
+
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
+      ).toEqual(FONT_FAMILY.Cascadia);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
+
+      fireEvent.click(screen.getByTitle(/Very large/i));
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontSize,
+      ).toEqual(36);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
     });
   });
 });
