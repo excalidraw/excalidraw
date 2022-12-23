@@ -275,8 +275,8 @@ export const measureText = (
 
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
-
     container.style.width = `${String(Math.min(textWidth, maxWidth) + 1)}px`;
+
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
     container.style.lineHeight = `${String(lineHeight)}px`;
