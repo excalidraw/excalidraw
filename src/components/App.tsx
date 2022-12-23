@@ -43,11 +43,7 @@ import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
-import {
-  parseClipboard,
-  probablySupportsClipboardBlob,
-  probablySupportsClipboardWriteText,
-} from "../clipboard";
+import { parseClipboard } from "../clipboard";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -228,7 +224,11 @@ import {
   updateActiveTool,
   getShortcutKey,
 } from "../utils";
-import ContextMenu, { ContextMenuOption } from "./ContextMenu";
+import {
+  ContextMenu,
+  ContextMenuItems,
+  CONTEXT_MENU_SEPARATOR,
+} from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
@@ -277,6 +277,7 @@ import { ImportedDataState } from "../data/types"; //zsviczian
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { atom } from "jotai";
 import { Fonts } from "../scene/Fonts";
+import { actionPaste } from "../actions/actionClipboard";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -387,7 +388,6 @@ class App extends React.Component<AppProps, AppState> {
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
-  contextMenuOpen: boolean = false;
   lastScenePointer: { x: number; y: number } | null = null;
   allowMobileMode: boolean = true; //zsviczian
 
@@ -551,12 +551,8 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.getNonDeletedElements(),
       this.state,
     );
-    const {
-      onCollabButtonClick,
-      renderTopRightUI,
-      renderFooter,
-      renderCustomStats,
-    } = this.props;
+    const { onCollabButtonClick, renderTopRightUI, renderCustomStats } =
+      this.props;
 
     return (
       <div
@@ -603,7 +599,6 @@ class App extends React.Component<AppProps, AppState> {
                     langCode={getLanguage().code}
                     isCollaborating={this.props.isCollaborating}
                     renderTopRightUI={renderTopRightUI}
-                    renderCustomFooter={renderFooter}
                     renderCustomStats={renderCustomStats}
                     renderCustomSidebar={this.props.renderSidebar}
                     showExitZenModeBtn={
@@ -622,10 +617,13 @@ class App extends React.Component<AppProps, AppState> {
                       this.state.activeTool.type === "selection" &&
                       !this.scene.getElementsIncludingDeleted().length
                     }
-                  />
+                  >
+                    {this.props.children}
+                  </LayerUI>
                   <div className="excalidraw-textEditorContainer" />
                   <div className="excalidraw-contextMenuContainer" />
                   {selectedElement.length === 1 &&
+                    !this.state.contextMenu &&
                     this.state.showHyperlinkPopup && (
                       <Hyperlink
                         key={selectedElement[0].id}
@@ -640,6 +638,14 @@ class App extends React.Component<AppProps, AppState> {
                       onClose={() => this.setToast(null)}
                       duration={this.state.toast.duration}
                       closable={this.state.toast.closable}
+                    />
+                  )}
+                  {this.state.contextMenu && (
+                    <ContextMenu
+                      items={this.state.contextMenu.items}
+                      top={this.state.contextMenu.top}
+                      left={this.state.contextMenu.left}
+                      actionManager={this.actionManager}
                     />
                   )}
                   <main>{this.renderCanvas()}</main>
@@ -668,8 +674,6 @@ class App extends React.Component<AppProps, AppState> {
 
   private syncActionResult = withBatchedUpdates(
     (actionResult: ActionResult) => {
-      // Since context menu closes when action triggered so setting to false
-      this.contextMenuOpen = false;
       if (this.unmounted || actionResult === false) {
         return;
       }
@@ -698,7 +702,7 @@ class App extends React.Component<AppProps, AppState> {
         this.addNewImagesToImageCache();
       }
 
-      if (actionResult.appState || editingElement) {
+      if (actionResult.appState || editingElement || this.state.contextMenu) {
         if (actionResult.commitToHistory) {
           this.history.resumeRecording();
         }
@@ -724,12 +728,17 @@ class App extends React.Component<AppProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
+
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
             // regarding the resulting type as not containing undefined
             // (which the following expression will never contain)
             return Object.assign(actionResult.appState || {}, {
+              // NOTE this will prevent opening context menu using an action
+              // or programmatically from the host, so it will need to be
+              // rewritten later
+              contextMenu: null,
               editingElement:
                 editingElement || actionResult.appState?.editingElement || null,
               viewModeEnabled,
@@ -1491,7 +1500,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private pasteFromClipboard = withBatchedUpdates(
+  public pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent | null) => {
       const isPlainPaste = !!(IS_PLAIN_PASTE && event);
 
@@ -1499,7 +1508,7 @@ class App extends React.Component<AppProps, AppState> {
       const target = document.activeElement;
       const isExcalidrawActive =
         this.excalidrawContainerRef.current?.contains(target);
-      if (!isExcalidrawActive) {
+      if (event && !isExcalidrawActive) {
         return;
       }
 
@@ -1775,10 +1784,11 @@ class App extends React.Component<AppProps, AppState> {
     this.history.resumeRecording();
   }
 
-  // Collaboration
-
-  setAppState: React.Component<any, AppState>["setState"] = (state) => {
-    this.setState(state);
+  setAppState: React.Component<any, AppState>["setState"] = (
+    state,
+    callback,
+  ) => {
+    this.setState(state, callback);
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
@@ -2285,7 +2295,7 @@ class App extends React.Component<AppProps, AppState> {
       }
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
-        setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+        setCursor(this.canvas, CURSOR_TYPE.GRAB);
         event.preventDefault();
       }
 
@@ -3310,7 +3320,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElement &&
         hitElement.link &&
         this.state.selectedElementIds[hitElement.id] &&
-        !this.contextMenuOpen &&
+        !this.state.contextMenu &&
         !this.state.showHyperlinkPopup
       ) {
         this.setState({ showHyperlinkPopup: "info" });
@@ -3533,6 +3543,13 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.focusContainer(); //zsviczian
+    // since contextMenu options are potentially evaluated on each render,
+    // and an contextMenu action may depend on selection state, we must
+    // close the contextMenu before we update the selection on pointerDown
+    // (e.g. resetting selection)
+    if (this.state.contextMenu) {
+      this.setState({ contextMenu: null });
+    }
 
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
@@ -3600,8 +3617,6 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    // Since context menu closes on pointer down so setting to false
-    this.contextMenuOpen = false;
     this.clearSelectionIfNotUsingSelection();
     this.updateBindingEnabledOnPointerMove(event);
 
@@ -6170,7 +6185,17 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements: true,
     });
 
-    const type = element ? "element" : "canvas";
+    const selectedElements = getSelectedElements(
+      this.scene.getNonDeletedElements(),
+      this.state,
+    );
+    const isHittignCommonBoundBox =
+      this.isHittingCommonBoundingBoxOfSelectedElements(
+        { x, y },
+        selectedElements,
+      );
+
+    const type = element || isHittignCommonBoundBox ? "element" : "canvas";
 
     const container = this.excalidrawContainerRef.current!;
     const { top: offsetTop, left: offsetLeft } =
@@ -6178,25 +6203,30 @@ class App extends React.Component<AppProps, AppState> {
     const left = event.clientX - offsetLeft;
     const top = event.clientY - offsetTop;
 
-    if (element && !this.state.selectedElementIds[element.id]) {
-      this.setState(
-        selectGroupsForSelectedElements(
-          {
-            ...this.state,
-            selectedElementIds: { [element.id]: true },
-            selectedLinearElement: isLinearElement(element)
-              ? new LinearElementEditor(element, this.scene)
-              : null,
-          },
-          this.scene.getNonDeletedElements(),
-        ),
-        () => {
-          this._openContextMenu({ top, left }, type);
-        },
-      );
-    } else {
-      this._openContextMenu({ top, left }, type);
-    }
+    trackEvent("contextMenu", "openContextMenu", type);
+
+    this.setState(
+      {
+        ...(element && !this.state.selectedElementIds[element.id]
+          ? selectGroupsForSelectedElements(
+              {
+                ...this.state,
+                selectedElementIds: { [element.id]: true },
+                selectedLinearElement: isLinearElement(element)
+                  ? new LinearElementEditor(element, this.scene)
+                  : null,
+              },
+              this.scene.getNonDeletedElements(),
+            )
+          : this.state),
+        showHyperlinkPopup: false,
+      },
+      () => {
+        this.setState({
+          contextMenu: { top, left, items: this.getContextMenuItems(type) },
+        });
+      },
+    );
   };
 
   private maybeDragNewGenericElement = (
@@ -6304,215 +6334,84 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   };
 
-  /** @private use this.handleCanvasContextMenu */
-  private _openContextMenu = (
-    {
-      left,
-      top,
-    }: {
-      left: number;
-      top: number;
-    },
+  private getContextMenuItems = (
     type: "canvas" | "element",
-  ) => {
-    trackEvent("contextMenu", "openContextMenu", type);
-    if (this.state.showHyperlinkPopup) {
-      this.setState({ showHyperlinkPopup: false });
-    }
-    this.contextMenuOpen = true;
-    const maybeGroupAction = actionGroup.contextItemPredicate!(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
+  ): ContextMenuItems => {
+    const options: ContextMenuItems = [];
 
-    const maybeUngroupAction = actionUngroup.contextItemPredicate!(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
+    options.push(actionCopyAsPng, actionCopyAsSvg);
 
-    const maybeFlipHorizontal = actionFlipHorizontal.contextItemPredicate!(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
+    // canvas contextMenu
+    // -------------------------------------------------------------------------
 
-    const maybeFlipVertical = actionFlipVertical.contextItemPredicate!(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
-
-    const mayBeAllowUnbinding = actionUnbindText.contextItemPredicate(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
-
-    const mayBeAllowBinding = actionBindText.contextItemPredicate(
-      this.actionManager.getElementsIncludingDeleted(),
-      this.actionManager.getAppState(),
-    );
-
-    const mayBeAllowToggleLineEditing =
-      actionToggleLinearEditor.contextItemPredicate(
-        this.actionManager.getElementsIncludingDeleted(),
-        this.actionManager.getAppState(),
-      );
-
-    const separator = "separator";
-
-    const elements = this.scene.getNonDeletedElements();
-
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
-
-    const options: ContextMenuOption[] = [];
-    if (probablySupportsClipboardBlob && elements.length > 0) {
-      options.push(actionCopyAsPng);
-    }
-
-    if (probablySupportsClipboardWriteText && elements.length > 0) {
-      options.push(actionCopyAsSvg);
-    }
-
-    if (
-      type === "element" &&
-      copyText.contextItemPredicate(elements, this.state) &&
-      probablySupportsClipboardWriteText
-    ) {
-      options.push(copyText);
-    }
     if (type === "canvas") {
-      const viewModeOptions = [
-        ...options,
-        typeof this.props.gridModeEnabled === "undefined" &&
+      if (this.state.viewModeEnabled) {
+        return [
+          ...options,
           actionToggleGridMode,
-        typeof this.props.zenModeEnabled === "undefined" && actionToggleZenMode,
-        typeof this.props.viewModeEnabled === "undefined" &&
+          actionToggleZenMode,
           actionToggleViewMode,
+          actionToggleStats,
+        ];
+      }
+
+      return [
+        actionPaste,
+        CONTEXT_MENU_SEPARATOR,
+        actionCopyAsPng,
+        actionCopyAsSvg,
+        copyText,
+        CONTEXT_MENU_SEPARATOR,
+        actionSelectAll,
+        CONTEXT_MENU_SEPARATOR,
+        actionToggleGridMode,
+        actionToggleZenMode,
+        actionToggleViewMode,
         actionToggleStats,
       ];
-
-      if (this.state.viewModeEnabled) {
-        ContextMenu.push({
-          options: viewModeOptions,
-          top,
-          left,
-          actionManager: this.actionManager,
-          appState: this.state,
-          container: this.excalidrawContainerRef.current!,
-          elements,
-        });
-      } else {
-        ContextMenu.push({
-          options: [
-            true && //zsviczian this.device.isMobile
-              navigator.clipboard && {
-                trackEvent: false,
-                name: "paste",
-                perform: (elements, appStates) => {
-                  this.pasteFromClipboard(null);
-                  return {
-                    commitToHistory: false,
-                  };
-                },
-                contextItemLabel: "labels.paste",
-              },
-            true && navigator.clipboard && separator, //zsviczian this.device.isMobile
-            probablySupportsClipboardBlob &&
-              elements.length > 0 &&
-              actionCopyAsPng,
-            probablySupportsClipboardWriteText &&
-              elements.length > 0 &&
-              actionCopyAsSvg,
-            probablySupportsClipboardWriteText &&
-              selectedElements.length > 0 &&
-              copyText,
-            ((probablySupportsClipboardBlob && elements.length > 0) ||
-              (probablySupportsClipboardWriteText && elements.length > 0)) &&
-              separator,
-            actionSelectAll,
-            separator,
-            typeof this.props.gridModeEnabled === "undefined" &&
-              actionToggleGridMode,
-            typeof this.props.zenModeEnabled === "undefined" &&
-              actionToggleZenMode,
-            typeof this.props.viewModeEnabled === "undefined" &&
-              actionToggleViewMode,
-            actionToggleStats,
-          ],
-          top,
-          left,
-          actionManager: this.actionManager,
-          appState: this.state,
-          container: this.excalidrawContainerRef.current!,
-          elements,
-        });
-      }
-    } else if (type === "element") {
-      if (this.state.viewModeEnabled) {
-        ContextMenu.push({
-          options: [navigator.clipboard && actionCopy, ...options],
-          top,
-          left,
-          actionManager: this.actionManager,
-          appState: this.state,
-          container: this.excalidrawContainerRef.current!,
-          elements,
-        });
-      } else {
-        ContextMenu.push({
-          options: [
-            true && actionCut, //zsviczian this.device.isMobile
-            true && navigator.clipboard && actionCopy, //zsviczian this.device.isMobile
-            true && //zsviczian this.device.isMobile
-              navigator.clipboard && {
-                name: "paste",
-                trackEvent: false,
-                perform: (elements, appStates) => {
-                  this.pasteFromClipboard(null);
-                  return {
-                    commitToHistory: false,
-                  };
-                },
-                contextItemLabel: "labels.paste",
-              },
-            true && separator, //zsviczian this.device.isMobile
-            ...options,
-            separator,
-            actionCopyStyles,
-            actionPasteStyles,
-            separator,
-            maybeGroupAction && actionGroup,
-            mayBeAllowUnbinding && actionUnbindText,
-            mayBeAllowBinding && actionBindText,
-            maybeUngroupAction && actionUngroup,
-            (maybeGroupAction || maybeUngroupAction) && separator,
-            actionAddToLibrary,
-            separator,
-            actionSendBackward,
-            actionBringForward,
-            actionSendToBack,
-            actionBringToFront,
-            separator,
-            maybeFlipHorizontal && actionFlipHorizontal,
-            maybeFlipVertical && actionFlipVertical,
-            (maybeFlipHorizontal || maybeFlipVertical) && separator,
-            mayBeAllowToggleLineEditing && actionToggleLinearEditor,
-            actionLink.contextItemPredicate(elements, this.state) && actionLink,
-            actionDuplicateSelection,
-            actionToggleLock,
-            separator,
-            actionDeleteSelected,
-          ],
-          top,
-          left,
-          actionManager: this.actionManager,
-          appState: this.state,
-          container: this.excalidrawContainerRef.current!,
-          elements,
-        });
-      }
     }
+
+    // element contextMenu
+    // -------------------------------------------------------------------------
+
+    options.push(copyText);
+
+    if (this.state.viewModeEnabled) {
+      return [actionCopy, ...options];
+    }
+
+    return [
+      actionCut,
+      actionCopy,
+      actionPaste,
+      CONTEXT_MENU_SEPARATOR,
+      ...options,
+      CONTEXT_MENU_SEPARATOR,
+      actionCopyStyles,
+      actionPasteStyles,
+      CONTEXT_MENU_SEPARATOR,
+      actionGroup,
+      actionUnbindText,
+      actionBindText,
+      actionUngroup,
+      CONTEXT_MENU_SEPARATOR,
+      actionAddToLibrary,
+      CONTEXT_MENU_SEPARATOR,
+      actionSendBackward,
+      actionBringForward,
+      actionSendToBack,
+      actionBringToFront,
+      CONTEXT_MENU_SEPARATOR,
+      actionFlipHorizontal,
+      actionFlipVertical,
+      CONTEXT_MENU_SEPARATOR,
+      actionToggleLinearEditor,
+      actionLink,
+      actionDuplicateSelection,
+      actionToggleLock,
+      CONTEXT_MENU_SEPARATOR,
+      actionDeleteSelected,
+    ];
   };
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {

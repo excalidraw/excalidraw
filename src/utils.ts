@@ -15,6 +15,7 @@ import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 import { SHAPES } from "./shapes";
+import React from "react";
 
 let mockDateTime: string | null = null;
 
@@ -685,4 +686,26 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
           element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
       )
     : [];
+};
+
+export const ReactChildrenToObject = <
+  T extends {
+    [k in string]?:
+      | React.ReactPortal
+      | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
+  },
+>(
+  children: React.ReactNode,
+) => {
+  return React.Children.toArray(children).reduce((acc, child) => {
+    if (
+      React.isValidElement(child) &&
+      typeof child.type !== "string" &&
+      child?.type.name
+    ) {
+      // @ts-ignore
+      acc[child.type.name] = child;
+    }
+    return acc;
+  }, {} as Partial<T>);
 };

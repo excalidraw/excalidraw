@@ -9,6 +9,257 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": Object {
+    "items": Array [
+      Object {
+        "contextItemLabel": "labels.cut",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "cut",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copy",
+        "contextItemPredicate": [Function],
+        "keyTest": undefined,
+        "name": "copy",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.paste",
+        "contextItemPredicate": [Function],
+        "keyTest": undefined,
+        "name": "paste",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.copyAsPng",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "copyAsPng",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyAsSvg",
+        "contextItemPredicate": [Function],
+        "name": "copyAsSvg",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyText",
+        "contextItemPredicate": [Function],
+        "name": "copyText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.copyStyles",
+        "keyTest": [Function],
+        "name": "copyStyles",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.pasteStyles",
+        "keyTest": [Function],
+        "name": "pasteStyles",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.group",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "group",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.unbindText",
+        "contextItemPredicate": [Function],
+        "name": "unbindText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.bindText",
+        "contextItemPredicate": [Function],
+        "name": "bindText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.ungroup",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "ungroup",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.addToLibrary",
+        "name": "addToLibrary",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.sendBackward",
+        "keyPriority": 40,
+        "keyTest": [Function],
+        "name": "sendBackward",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.bringForward",
+        "keyPriority": 40,
+        "keyTest": [Function],
+        "name": "bringForward",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.sendToBack",
+        "keyTest": [Function],
+        "name": "sendToBack",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.bringToFront",
+        "keyTest": [Function],
+        "name": "bringToFront",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.flipHorizontal",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "flipHorizontal",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.flipVertical",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "flipVertical",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": [Function],
+        "contextItemPredicate": [Function],
+        "name": "toggleLinearEditor",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": [Function],
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "hyperlink",
+        "perform": [Function],
+        "trackEvent": Object {
+          "action": "click",
+          "category": "hyperlink",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.duplicateSelection",
+        "keyTest": [Function],
+        "name": "duplicateSelection",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": [Function],
+        "keyTest": [Function],
+        "name": "toggleLock",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.delete",
+        "keyTest": [Function],
+        "name": "deleteSelectedElements",
+        "perform": [Function],
+        "trackEvent": Object {
+          "action": "delete",
+          "category": "element",
+        },
+      },
+    ],
+    "left": 30,
+    "top": 40,
+  },
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -177,7 +428,7 @@ Object {
 
 exports[`contextMenu element right-clicking on a group should select whole group: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element right-clicking on a group should select whole group: [end of test] number of renders 1`] = `6`;
+exports[`contextMenu element right-clicking on a group should select whole group: [end of test] number of renders 1`] = `7`;
 
 exports[`contextMenu element selecting 'Add to library' in context menu adds element to library: [end of test] appState 1`] = `
 Object {
@@ -188,6 +439,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -362,7 +614,7 @@ Object {
 
 exports[`contextMenu element selecting 'Add to library' in context menu adds element to library: [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element selecting 'Add to library' in context menu adds element to library: [end of test] number of renders 1`] = `11`;
+exports[`contextMenu element selecting 'Add to library' in context menu adds element to library: [end of test] number of renders 1`] = `14`;
 
 exports[`contextMenu element selecting 'Bring forward' in context menu brings element forward: [end of test] appState 1`] = `
 Object {
@@ -373,6 +625,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -716,7 +969,7 @@ Object {
 
 exports[`contextMenu element selecting 'Bring forward' in context menu brings element forward: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Bring forward' in context menu brings element forward: [end of test] number of renders 1`] = `16`;
+exports[`contextMenu element selecting 'Bring forward' in context menu brings element forward: [end of test] number of renders 1`] = `18`;
 
 exports[`contextMenu element selecting 'Bring to front' in context menu brings element to front: [end of test] appState 1`] = `
 Object {
@@ -727,6 +980,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -1070,7 +1324,7 @@ Object {
 
 exports[`contextMenu element selecting 'Bring to front' in context menu brings element to front: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Bring to front' in context menu brings element to front: [end of test] number of renders 1`] = `16`;
+exports[`contextMenu element selecting 'Bring to front' in context menu brings element to front: [end of test] number of renders 1`] = `18`;
 
 exports[`contextMenu element selecting 'Copy styles' in context menu copies styles: [end of test] appState 1`] = `
 Object {
@@ -1081,6 +1335,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -1255,7 +1510,7 @@ Object {
 
 exports[`contextMenu element selecting 'Copy styles' in context menu copies styles: [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element selecting 'Copy styles' in context menu copies styles: [end of test] number of renders 1`] = `11`;
+exports[`contextMenu element selecting 'Copy styles' in context menu copies styles: [end of test] number of renders 1`] = `14`;
 
 exports[`contextMenu element selecting 'Delete' in context menu deletes element: [end of test] appState 1`] = `
 Object {
@@ -1266,6 +1521,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -1476,7 +1732,7 @@ Object {
 
 exports[`contextMenu element selecting 'Delete' in context menu deletes element: [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element selecting 'Delete' in context menu deletes element: [end of test] number of renders 1`] = `11`;
+exports[`contextMenu element selecting 'Delete' in context menu deletes element: [end of test] number of renders 1`] = `14`;
 
 exports[`contextMenu element selecting 'Duplicate' in context menu duplicates element: [end of test] appState 1`] = `
 Object {
@@ -1487,6 +1743,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -1760,7 +2017,7 @@ Object {
 
 exports[`contextMenu element selecting 'Duplicate' in context menu duplicates element: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Duplicate' in context menu duplicates element: [end of test] number of renders 1`] = `11`;
+exports[`contextMenu element selecting 'Duplicate' in context menu duplicates element: [end of test] number of renders 1`] = `14`;
 
 exports[`contextMenu element selecting 'Group selection' in context menu groups selected elements: [end of test] appState 1`] = `
 Object {
@@ -1771,6 +2028,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -2132,7 +2390,7 @@ Object {
 
 exports[`contextMenu element selecting 'Group selection' in context menu groups selected elements: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Group selection' in context menu groups selected elements: [end of test] number of renders 1`] = `17`;
+exports[`contextMenu element selecting 'Group selection' in context menu groups selected elements: [end of test] number of renders 1`] = `20`;
 
 exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] appState 1`] = `
 Object {
@@ -2143,6 +2401,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "#e64980",
   "currentItemEndArrowhead": "arrow",
@@ -2978,7 +3237,7 @@ Object {
 
 exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `28`;
+exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `33`;
 
 exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] appState 1`] = `
 Object {
@@ -2989,6 +3248,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -3332,7 +3592,7 @@ Object {
 
 exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] number of renders 1`] = `15`;
+exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] number of renders 1`] = `18`;
 
 exports[`contextMenu element selecting 'Send to back' in context menu sends element to back: [end of test] appState 1`] = `
 Object {
@@ -3343,6 +3603,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -3686,7 +3947,7 @@ Object {
 
 exports[`contextMenu element selecting 'Send to back' in context menu sends element to back: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Send to back' in context menu sends element to back: [end of test] number of renders 1`] = `15`;
+exports[`contextMenu element selecting 'Send to back' in context menu sends element to back: [end of test] number of renders 1`] = `18`;
 
 exports[`contextMenu element selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] appState 1`] = `
 Object {
@@ -3697,6 +3958,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -4124,7 +4386,7 @@ Object {
 
 exports[`contextMenu element selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of renders 1`] = `18`;
+exports[`contextMenu element selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of renders 1`] = `21`;
 
 exports[`contextMenu element shows 'Group selection' in context menu for multiple selected elements: [end of test] appState 1`] = `
 Object {
@@ -4135,6 +4397,257 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": Object {
+    "items": Array [
+      Object {
+        "contextItemLabel": "labels.cut",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "cut",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copy",
+        "contextItemPredicate": [Function],
+        "keyTest": undefined,
+        "name": "copy",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.paste",
+        "contextItemPredicate": [Function],
+        "keyTest": undefined,
+        "name": "paste",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.copyAsPng",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "copyAsPng",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyAsSvg",
+        "contextItemPredicate": [Function],
+        "name": "copyAsSvg",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyText",
+        "contextItemPredicate": [Function],
+        "name": "copyText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.copyStyles",
+        "keyTest": [Function],
+        "name": "copyStyles",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.pasteStyles",
+        "keyTest": [Function],
+        "name": "pasteStyles",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.group",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "group",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.unbindText",
+        "contextItemPredicate": [Function],
+        "name": "unbindText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.bindText",
+        "contextItemPredicate": [Function],
+        "name": "bindText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.ungroup",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "ungroup",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.addToLibrary",
+        "name": "addToLibrary",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.sendBackward",
+        "keyPriority": 40,
+        "keyTest": [Function],
+        "name": "sendBackward",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.bringForward",
+        "keyPriority": 40,
+        "keyTest": [Function],
+        "name": "bringForward",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.sendToBack",
+        "keyTest": [Function],
+        "name": "sendToBack",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.bringToFront",
+        "keyTest": [Function],
+        "name": "bringToFront",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.flipHorizontal",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "flipHorizontal",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.flipVertical",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "flipVertical",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": [Function],
+        "contextItemPredicate": [Function],
+        "name": "toggleLinearEditor",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": [Function],
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "hyperlink",
+        "perform": [Function],
+        "trackEvent": Object {
+          "action": "click",
+          "category": "hyperlink",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.duplicateSelection",
+        "keyTest": [Function],
+        "name": "duplicateSelection",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": [Function],
+        "keyTest": [Function],
+        "name": "toggleLock",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.delete",
+        "keyTest": [Function],
+        "name": "deleteSelectedElements",
+        "perform": [Function],
+        "trackEvent": Object {
+          "action": "delete",
+          "category": "element",
+        },
+      },
+    ],
+    "left": -19,
+    "top": -9,
+  },
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -4414,7 +4927,7 @@ Object {
 
 exports[`contextMenu element shows 'Group selection' in context menu for multiple selected elements: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element shows 'Group selection' in context menu for multiple selected elements: [end of test] number of renders 1`] = `18`;
+exports[`contextMenu element shows 'Group selection' in context menu for multiple selected elements: [end of test] number of renders 1`] = `20`;
 
 exports[`contextMenu element shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] appState 1`] = `
 Object {
@@ -4425,6 +4938,257 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": Object {
+    "items": Array [
+      Object {
+        "contextItemLabel": "labels.cut",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "cut",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copy",
+        "contextItemPredicate": [Function],
+        "keyTest": undefined,
+        "name": "copy",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.paste",
+        "contextItemPredicate": [Function],
+        "keyTest": undefined,
+        "name": "paste",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.copyAsPng",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "copyAsPng",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyAsSvg",
+        "contextItemPredicate": [Function],
+        "name": "copyAsSvg",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyText",
+        "contextItemPredicate": [Function],
+        "name": "copyText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.copyStyles",
+        "keyTest": [Function],
+        "name": "copyStyles",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.pasteStyles",
+        "keyTest": [Function],
+        "name": "pasteStyles",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.group",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "group",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.unbindText",
+        "contextItemPredicate": [Function],
+        "name": "unbindText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.bindText",
+        "contextItemPredicate": [Function],
+        "name": "bindText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.ungroup",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "ungroup",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.addToLibrary",
+        "name": "addToLibrary",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.sendBackward",
+        "keyPriority": 40,
+        "keyTest": [Function],
+        "name": "sendBackward",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.bringForward",
+        "keyPriority": 40,
+        "keyTest": [Function],
+        "name": "bringForward",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.sendToBack",
+        "keyTest": [Function],
+        "name": "sendToBack",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.bringToFront",
+        "keyTest": [Function],
+        "name": "bringToFront",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.flipHorizontal",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "flipHorizontal",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.flipVertical",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "flipVertical",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": [Function],
+        "contextItemPredicate": [Function],
+        "name": "toggleLinearEditor",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": [Function],
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "hyperlink",
+        "perform": [Function],
+        "trackEvent": Object {
+          "action": "click",
+          "category": "hyperlink",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.duplicateSelection",
+        "keyTest": [Function],
+        "name": "duplicateSelection",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": [Function],
+        "keyTest": [Function],
+        "name": "toggleLock",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.delete",
+        "keyTest": [Function],
+        "name": "deleteSelectedElements",
+        "perform": [Function],
+        "trackEvent": Object {
+          "action": "delete",
+          "category": "element",
+        },
+      },
+    ],
+    "left": -19,
+    "top": -9,
+  },
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -4789,7 +5553,7 @@ Object {
 
 exports[`contextMenu element shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] number of renders 1`] = `19`;
+exports[`contextMenu element shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] number of renders 1`] = `21`;
 
 exports[`contextMenu element shows context menu for canvas: [end of test] appState 1`] = `
 Object {
@@ -4800,6 +5564,112 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": Object {
+    "items": Array [
+      Object {
+        "contextItemLabel": "labels.paste",
+        "contextItemPredicate": [Function],
+        "keyTest": undefined,
+        "name": "paste",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.copyAsPng",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "copyAsPng",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyAsSvg",
+        "contextItemPredicate": [Function],
+        "name": "copyAsSvg",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyText",
+        "contextItemPredicate": [Function],
+        "name": "copyText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.selectAll",
+        "keyTest": [Function],
+        "name": "selectAll",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "canvas",
+        },
+      },
+      "separator",
+      Object {
+        "checked": [Function],
+        "contextItemLabel": "labels.showGrid",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "gridMode",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "canvas",
+          "predicate": [Function],
+        },
+        "viewMode": true,
+      },
+      Object {
+        "checked": [Function],
+        "contextItemLabel": "buttons.zenMode",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "zenMode",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "canvas",
+          "predicate": [Function],
+        },
+        "viewMode": true,
+      },
+      Object {
+        "checked": [Function],
+        "contextItemLabel": "labels.viewMode",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "viewMode",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "canvas",
+          "predicate": [Function],
+        },
+        "viewMode": true,
+      },
+      Object {
+        "checked": [Function],
+        "contextItemLabel": "stats.title",
+        "keyTest": [Function],
+        "name": "stats",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+    ],
+    "left": -19,
+    "top": -9,
+  },
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -4897,7 +5767,7 @@ Object {
 
 exports[`contextMenu element shows context menu for canvas: [end of test] number of elements 1`] = `0`;
 
-exports[`contextMenu element shows context menu for canvas: [end of test] number of renders 1`] = `4`;
+exports[`contextMenu element shows context menu for canvas: [end of test] number of renders 1`] = `6`;
 
 exports[`contextMenu element shows context menu for element: [end of test] appState 1`] = `
 Object {
@@ -4908,6 +5778,257 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": Object {
+    "items": Array [
+      Object {
+        "contextItemLabel": "labels.cut",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "cut",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copy",
+        "contextItemPredicate": [Function],
+        "keyTest": undefined,
+        "name": "copy",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.paste",
+        "contextItemPredicate": [Function],
+        "keyTest": undefined,
+        "name": "paste",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.copyAsPng",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "copyAsPng",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyAsSvg",
+        "contextItemPredicate": [Function],
+        "name": "copyAsSvg",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyText",
+        "contextItemPredicate": [Function],
+        "name": "copyText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.copyStyles",
+        "keyTest": [Function],
+        "name": "copyStyles",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.pasteStyles",
+        "keyTest": [Function],
+        "name": "pasteStyles",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.group",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "group",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.unbindText",
+        "contextItemPredicate": [Function],
+        "name": "unbindText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.bindText",
+        "contextItemPredicate": [Function],
+        "name": "bindText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.ungroup",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "ungroup",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.addToLibrary",
+        "name": "addToLibrary",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.sendBackward",
+        "keyPriority": 40,
+        "keyTest": [Function],
+        "name": "sendBackward",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.bringForward",
+        "keyPriority": 40,
+        "keyTest": [Function],
+        "name": "bringForward",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.sendToBack",
+        "keyTest": [Function],
+        "name": "sendToBack",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.bringToFront",
+        "keyTest": [Function],
+        "name": "bringToFront",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.flipHorizontal",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "flipHorizontal",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.flipVertical",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "flipVertical",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": [Function],
+        "contextItemPredicate": [Function],
+        "name": "toggleLinearEditor",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": [Function],
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "hyperlink",
+        "perform": [Function],
+        "trackEvent": Object {
+          "action": "click",
+          "category": "hyperlink",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.duplicateSelection",
+        "keyTest": [Function],
+        "name": "duplicateSelection",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": [Function],
+        "keyTest": [Function],
+        "name": "toggleLock",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.delete",
+        "keyTest": [Function],
+        "name": "deleteSelectedElements",
+        "perform": [Function],
+        "trackEvent": Object {
+          "action": "delete",
+          "category": "element",
+        },
+      },
+    ],
+    "left": -19,
+    "top": -9,
+  },
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -4994,6 +6115,257 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": Object {
+    "items": Array [
+      Object {
+        "contextItemLabel": "labels.cut",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "cut",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copy",
+        "contextItemPredicate": [Function],
+        "keyTest": undefined,
+        "name": "copy",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.paste",
+        "contextItemPredicate": [Function],
+        "keyTest": undefined,
+        "name": "paste",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.copyAsPng",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "copyAsPng",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyAsSvg",
+        "contextItemPredicate": [Function],
+        "name": "copyAsSvg",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.copyText",
+        "contextItemPredicate": [Function],
+        "name": "copyText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.copyStyles",
+        "keyTest": [Function],
+        "name": "copyStyles",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.pasteStyles",
+        "keyTest": [Function],
+        "name": "pasteStyles",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.group",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "group",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.unbindText",
+        "contextItemPredicate": [Function],
+        "name": "unbindText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.bindText",
+        "contextItemPredicate": [Function],
+        "name": "bindText",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.ungroup",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "ungroup",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.addToLibrary",
+        "name": "addToLibrary",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.sendBackward",
+        "keyPriority": 40,
+        "keyTest": [Function],
+        "name": "sendBackward",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.bringForward",
+        "keyPriority": 40,
+        "keyTest": [Function],
+        "name": "bringForward",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.sendToBack",
+        "keyTest": [Function],
+        "name": "sendToBack",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.bringToFront",
+        "keyTest": [Function],
+        "name": "bringToFront",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": "labels.flipHorizontal",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "flipHorizontal",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.flipVertical",
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "flipVertical",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "contextItemLabel": [Function],
+        "contextItemPredicate": [Function],
+        "name": "toggleLinearEditor",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": [Function],
+        "contextItemPredicate": [Function],
+        "keyTest": [Function],
+        "name": "hyperlink",
+        "perform": [Function],
+        "trackEvent": Object {
+          "action": "click",
+          "category": "hyperlink",
+        },
+      },
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.duplicateSelection",
+        "keyTest": [Function],
+        "name": "duplicateSelection",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": [Function],
+        "keyTest": [Function],
+        "name": "toggleLock",
+        "perform": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      "separator",
+      Object {
+        "PanelComponent": [Function],
+        "contextItemLabel": "labels.delete",
+        "keyTest": [Function],
+        "name": "deleteSelectedElements",
+        "perform": [Function],
+        "trackEvent": Object {
+          "action": "delete",
+          "category": "element",
+        },
+      },
+    ],
+    "left": 80,
+    "top": 90,
+  },
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
@@ -5250,6 +6622,6 @@ exports[`contextMenu element shows context menu for element: [end of test] numbe
 
 exports[`contextMenu element shows context menu for element: [end of test] number of elements 2`] = `2`;
 
-exports[`contextMenu element shows context menu for element: [end of test] number of renders 1`] = `10`;
+exports[`contextMenu element shows context menu for element: [end of test] number of renders 1`] = `12`;
 
-exports[`contextMenu element shows context menu for element: [end of test] number of renders 2`] = `7`;
+exports[`contextMenu element shows context menu for element: [end of test] number of renders 2`] = `11`;
