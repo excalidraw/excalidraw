@@ -312,7 +312,7 @@ Object {
   "versionNonce": 0,
   "verticalAlign": "middle",
   "width": 100,
-  "x": 0.5,
+  "x": 0,
   "y": 0,
 }
 `;
