@@ -336,7 +336,7 @@ const getLineWidth = (text: string, font: FontString) => {
   return metrics.width;
 };
 
-const getTextWidth = (text: string, font: FontString) => {
+export const getTextWidth = (text: string, font: FontString) => {
   const lines = text.split("\n");
   let width = 0;
   lines.forEach((line) => {
