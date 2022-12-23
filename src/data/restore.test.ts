@@ -89,18 +89,36 @@ describe("repairing bindings", () => {
       containerId: container.id,
       isDeleted: true,
     });
+    const invisibleBoundElement = API.createElement({
+      type: "text",
+      containerId: container.id,
+      width: 0,
+      height: 0,
+    });
 
     const obsoleteBinding = { type: boundElement.type, id: boundElement.id };
+    const invisibleBinding = {
+      type: invisibleBoundElement.type,
+      id: invisibleBoundElement.id,
+    };
     const nonExistentBinding = { type: "text", id: "non-existent" };
     // @ts-ignore
-    container.boundElements = [obsoleteBinding, nonExistentBinding];
+    container.boundElements = [
+      obsoleteBinding,
+      invisibleBinding,
+      nonExistentBinding,
+    ];
 
     expect(container.boundElements).toEqual([
       obsoleteBinding,
+      invisibleBinding,
       nonExistentBinding,
     ]);
 
-    const restoredElements = restoreElements([container, boundElement], null);
+    const restoredElements = restoreElements(
+      [container, invisibleBoundElement, boundElement],
+      null,
+    );
 
     expect(restoredElements).toEqual([
       expect.objectContaining({
