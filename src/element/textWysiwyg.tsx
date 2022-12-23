@@ -28,6 +28,7 @@ import {
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
+  getTextWidth,
   normalizeText,
   wrapText,
 } from "./textElement";
@@ -39,6 +40,7 @@ import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import { LinearElementEditor } from "./linearElementEditor";
+import { parseClipboard } from "../clipboard";
 
 const getTransform = (
   width: number,
@@ -348,6 +350,32 @@ export const textWysiwyg = ({
   updateWysiwygStyle();
 
   if (onChange) {
+    editable.onpaste = async (event) => {
+      const clipboardData = await parseClipboard(event, true);
+      if (!clipboardData.text) {
+        return;
+      }
+      const data = normalizeText(clipboardData.text);
+      if (!data) {
+        return;
+      }
+      const container = getContainerElement(element);
+
+      const font = getFontString({
+        fontSize: app.state.currentItemFontSize,
+        fontFamily: app.state.currentItemFontFamily,
+      });
+      if (container) {
+        const wrappedText = wrapText(
+          `${editable.value}${data}`,
+          font,
+          getMaxContainerWidth(container),
+        );
+        const width = getTextWidth(wrappedText, font);
+        editable.style.width = `${width}px`;
+      }
+    };
+
     editable.oninput = () => {
       const updatedTextElement = Scene.getScene(element)?.getElement(
         id,
