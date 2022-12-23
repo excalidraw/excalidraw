@@ -2,7 +2,7 @@
 
 .excalidraw {
   .menu-container {
-    background-color: #fff !important;
+    //background-color: var(--island-bg-color); //zsviczian
     max-height: calc(100vh - 150px);
     overflow-y: auto;
   }
@@ -52,7 +52,7 @@
     }
 
     &:hover {
-      background-color: var(--button-hover);
+      background-color: var(--button-hover) !important; //zsviczian
       text-decoration: none;
     }
 
@@ -78,8 +78,8 @@
       }
     }
 
-    .menu-container {
-      background-color: var(--color-gray-90) !important;
-    }
+    /*.menu-container {
+      background-color: var(--island-bg-color); //zsviczian
+    }*/
   }
 }
