@@ -7,6 +7,10 @@ import {
   redrawTextBoundingBox,
 } from "../element/textElement";
 import {
+  getOriginalContainerHeightFromCache,
+  resetOriginalContainerCache,
+} from "../element/textWysiwyg";
+import {
   hasBoundTextElement,
   isTextBindableContainer,
 } from "../element/typeChecks";
@@ -33,8 +37,15 @@ export const actionUnbindText = register({
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
-        const { width, height, baseline } =
-          measureTextElement(boundTextElement);
+        const { width, height, baseline } = measureTextElement(
+          boundTextElement,
+          { text: boundTextElement.originalText },
+        );
+        const originalContainerHeight = getOriginalContainerHeightFromCache(
+          element.id,
+        );
+        resetOriginalContainerCache(element.id);
+
         mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
           width,
@@ -46,6 +57,9 @@ export const actionUnbindText = register({
           boundElements: element.boundElements?.filter(
             (ele) => ele.id !== boundTextElement.id,
           ),
+          height: originalContainerHeight
+            ? originalContainerHeight
+            : element.height,
         });
       }
     });

@@ -1,4 +1,5 @@
-import { arrayToMap, getFontString, isTestEnv } from "../utils";
+import { getSubtypeMethods, SubtypeMethods } from "../subtypes";
+import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
   ExcalidrawTextContainer,
@@ -24,7 +25,10 @@ import { isTextBindableContainer } from "./typeChecks";
 import { getElementAbsoluteCoords } from "../element";
 import { getSelectedElements } from "../scene";
 import { isHittingElementNotConsideringBoundingBox } from "./collision";
-import { getSubtypeMethods, SubtypeMethods } from "../subtypes";
+import {
+  resetOriginalContainerCache,
+  updateOriginalContainerCache,
+} from "./textWysiwyg";
 
 export const measureTextElement = function (element, next, maxWidth) {
   const map = getSubtypeMethods(element.subtype);
@@ -111,7 +115,7 @@ export const redrawTextBoundingBox = (
       } else {
         coordX = container.x + containerDims.width / 2 - metrics.width / 2;
       }
-
+      updateOriginalContainerCache(container.id, nextHeight);
       mutateElement(container, { height: nextHeight });
     } else {
       const centerX = textElement.x + textElement.width / 2;
@@ -176,6 +180,7 @@ export const handleBindTextResize = (
   if (!boundTextElementId) {
     return;
   }
+  resetOriginalContainerCache(container.id);
   let textElement = Scene.getScene(container)!.getElement(
     boundTextElementId,
   ) as ExcalidrawTextElement;
@@ -289,9 +294,12 @@ export const measureText = (
   container.style.whiteSpace = "pre";
   container.style.font = font;
   container.style.minHeight = "1em";
+  const textWidth = getTextWidth(text, font);
+
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
-    container.style.width = `${String(maxWidth + 1)}px`;
+    container.style.width = `${String(Math.min(textWidth, maxWidth) + 1)}px`;
+
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
     container.style.lineHeight = `${String(lineHeight)}px`;
@@ -309,7 +317,10 @@ export const measureText = (
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
   // Since span adds 1px extra width to the container
-  const width = container.offsetWidth - 1;
+  let width = container.offsetWidth;
+  if (maxWidth && textWidth > maxWidth) {
+    width = width - 1;
+  }
   const height = container.offsetHeight;
   document.body.removeChild(container);
   if (isTestEnv()) {
@@ -330,7 +341,7 @@ export const getApproxLineHeight = (font: FontString) => {
 };
 
 let canvas: HTMLCanvasElement | undefined;
-export const getTextWidth = (text: string, font: FontString) => {
+const getLineWidth = (text: string, font: FontString) => {
   if (!canvas) {
     canvas = document.createElement("canvas");
   }
@@ -348,10 +359,18 @@ export const getTextWidth = (text: string, font: FontString) => {
   return metrics.width;
 };
 
+export const getTextWidth = (text: string, font: FontString) => {
+  const lines = text.split("\n");
+  let width = 0;
+  lines.forEach((line) => {
+    width = Math.max(width, getLineWidth(line, font));
+  });
+  return width;
+};
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
-  const spaceWidth = getTextWidth(" ", font);
+  const spaceWidth = getLineWidth(" ", font);
 
   const push = (str: string) => {
     if (str.trim()) {
@@ -369,7 +388,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
 
       let index = 0;
       while (index < words.length) {
-        const currentWordWidth = getTextWidth(words[index], font);
+        const currentWordWidth = getLineWidth(words[index], font);
 
         // Start breaking longer words exceeding max width
         if (currentWordWidth >= maxWidth) {
@@ -418,7 +437,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           // Start appending words in a line till max width reached
           while (currentLineWidthTillNow < maxWidth && index < words.length) {
             const word = words[index];
-            currentLineWidthTillNow = getTextWidth(currentLine + word, font);
+            currentLineWidthTillNow = getLineWidth(currentLine + word, font);
 
             if (currentLineWidthTillNow >= maxWidth) {
               push(currentLine);
@@ -466,7 +485,7 @@ export const charWidth = (() => {
       cachedCharWidth[font] = [];
     }
     if (!cachedCharWidth[font][ascii]) {
-      const width = getTextWidth(char, font);
+      const width = getLineWidth(char, font);
       cachedCharWidth[font][ascii] = width;
     }
 
@@ -526,7 +545,7 @@ export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
   while (widthTillNow <= width) {
     const batch = dummyText.substr(index, index + batchLength);
     str += batch;
-    widthTillNow += getTextWidth(str, font);
+    widthTillNow += getLineWidth(str, font);
     if (index === dummyText.length - 1) {
       index = 0;
     }
@@ -535,7 +554,7 @@ export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
 
   while (widthTillNow > width) {
     str = str.substr(0, str.length - 1);
-    widthTillNow = getTextWidth(str, font);
+    widthTillNow = getLineWidth(str, font);
   }
   return str.length;
 };
