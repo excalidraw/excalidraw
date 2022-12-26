@@ -45,17 +45,11 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
-import {
-  UsersIcon,
-  WelcomeScreenMenuArrow,
-  WelcomeScreenTopToolbarArrow,
-} from "./icons";
-import { MenuLinks } from "./menu/MenuUtils";
+import { WelcomeScreenMenuArrow, WelcomeScreenTopToolbarArrow } from "./icons";
 import WelcomeScreen from "./WelcomeScreen";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
-import { LanguageList } from "../excalidraw-app/components/LanguageList";
 import WelcomeScreenDecor from "./WelcomeScreenDecor";
 import Menu from "./menu/Menu";
 
@@ -116,7 +110,6 @@ const LayerUI = ({
 
   const childrenComponents =
     ReactChildrenToObject<UIChildrenComponents>(children);
-  console.log(childrenComponents, "compons");
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
       return null;
@@ -196,7 +189,7 @@ const LayerUI = ({
         <Menu.Help />
         <Menu.ClearCanvas />
         <Menu.Separator />
-        <MenuLinks />
+        <Menu.Socials />
         <Menu.Separator />
         <div
           style={{

@@ -517,7 +517,7 @@ export type Device = Readonly<{
 }>;
 
 export type UIChildrenComponents = {
-  [k in "FooterCenter" | "Menu"]?:
+  [k in "FooterCenter" | "Menu" | "Menu.Item"]?:
     | React.ReactPortal
     | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
 };

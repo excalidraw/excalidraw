@@ -7,6 +7,15 @@ import MenuItem from "./MenuItem";
 import MenuButton from "./MenuButton";
 import MenuSeparator from "./MenuSeparator";
 import * as MenuComponents from "./MenuComponents";
+import { ReactChildrenToObject } from "../../utils";
+import MenuSocials from "./MenuSocials";
+
+const validMenuChildren = [
+  ...Object.keys(MenuComponents),
+  "MenuSeparator",
+  "MenuSocials",
+  "MenuItem",
+];
 const Menu = ({ children }: { children?: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useAtom(isMenuOpenAtom);
   const menuRef = useOutsideClickHook(() => {
@@ -15,6 +24,7 @@ const Menu = ({ children }: { children?: React.ReactNode }) => {
   if (!isMenuOpen) {
     return <MenuButton />;
   }
+  const childrenComponents = ReactChildrenToObject<any>(children);
   return (
     <>
       <MenuButton />
@@ -26,7 +36,9 @@ const Menu = ({ children }: { children?: React.ReactNode }) => {
         {/* the zIndex ensures this menu has higher stacking order,
   see https://github.com/excalidraw/excalidraw/pull/1445 */}
         <Island className="menu-container" padding={2}>
-          {children}
+          {Object.keys(childrenComponents)
+            .filter((comp) => validMenuChildren.includes(comp))
+            .map((comp) => childrenComponents[comp])}
         </Island>
       </div>
     </>
@@ -42,7 +54,7 @@ Menu.Help = MenuComponents.Help;
 Menu.ClearCanvas = MenuComponents.ClearCanvas;
 Menu.ToggleTheme = MenuComponents.ToggleTheme;
 Menu.ChangeCanvasBackground = MenuComponents.ChangeCanvasBackground;
-
+Menu.Socials = MenuSocials;
 export default Menu;
 
 Menu.displayName = "Menu";

@@ -1,7 +1,7 @@
 import { GithubIcon, DiscordIcon, PlusPromoIcon, TwitterIcon } from "../icons";
 import MenuItem from "./MenuItem";
 
-export const MenuLinks = () => (
+const MenuSocials = () => (
   <>
     <MenuItem
       icon={PlusPromoIcon}
@@ -21,3 +21,5 @@ export const MenuLinks = () => (
     </MenuItem>
   </>
 );
+
+export default MenuSocials;

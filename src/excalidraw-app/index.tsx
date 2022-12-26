@@ -84,10 +84,10 @@ import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 import { EncryptedIcon } from "./components/EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
-import { MenuLinks } from "../components/menu/MenuUtils";
 import { LanguageList } from "./components/LanguageList";
 import { UsersIcon } from "../components/icons";
 polyfill();
+
 window.EXCALIDRAW_THROTTLE_RENDER = true;
 
 const languageDetector = new LanguageDetector();
@@ -624,8 +624,9 @@ const ExcalidrawWrapper = () => {
         <Menu.Help />
         <Menu.ClearCanvas />
         <Menu.Separator />
-        <MenuLinks />
+        <Menu.Socials />
         <Menu.Separator />
+
         <div
           style={{
             display: "flex",
