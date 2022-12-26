@@ -19,7 +19,7 @@ import ConfirmDialog from "./ConfirmDialog";
 import PublishLibrary from "./PublishLibrary";
 import { Dialog } from "./Dialog";
 import { useOutsideClickHook } from "../hooks/useOutsideClick";
-import MenuItem from "./MenuItem";
+import MenuItem from "./menu/MenuItem";
 import { isDropdownOpenAtom } from "./App";
 
 const getSelectedItems = (
@@ -198,11 +198,12 @@ export const LibraryMenuHeader: React.FC<{
         >
           {!itemsSelected && (
             <MenuItem
-              label={t("buttons.load")}
               icon={LoadIcon}
               dataTestId="lib-dropdown--load"
               onClick={onLibraryImport}
-            />
+            >
+              {t("buttons.load")}
+            </MenuItem>
           )}
           {showRemoveLibAlert && renderRemoveLibAlert()}
           {showPublishLibraryDialog && (
@@ -229,26 +230,29 @@ export const LibraryMenuHeader: React.FC<{
           {!!items.length && (
             <>
               <MenuItem
-                label={t("buttons.export")}
                 icon={ExportIcon}
                 onClick={onLibraryExport}
                 dataTestId="lib-dropdown--export"
-              />
+              >
+                {t("buttons.export")}
+              </MenuItem>
               <MenuItem
-                label={resetLabel}
                 icon={TrashIcon}
                 onClick={() => setShowRemoveLibAlert(true)}
                 dataTestId="lib-dropdown--remove"
-              />
+              >
+                {resetLabel}
+              </MenuItem>
             </>
           )}
           {itemsSelected && (
             <MenuItem
-              label={t("buttons.publishLibrary")}
               icon={publishIcon}
               dataTestId="lib-dropdown--publish"
               onClick={() => setShowPublishLibraryDialog(true)}
-            />
+            >
+              {t("buttons.publishLibrary")}
+            </MenuItem>
           )}
         </div>
       )}

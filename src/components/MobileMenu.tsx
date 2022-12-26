@@ -19,10 +19,11 @@ import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
-import { MenuLinks, Separator } from "./MenuUtils";
+import { MenuLinks } from "./menu/MenuUtils";
 import WelcomeScreen from "./WelcomeScreen";
-import MenuItem from "./MenuItem";
+import MenuItem from "./menu/MenuItem";
 import { ExportImageIcon } from "./icons";
+import Menu from "./menu/Menu";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -174,11 +175,12 @@ export const MobileMenu = ({
         <>
           {renderJSONExportDialog()}
           <MenuItem
-            label={t("buttons.exportImage")}
             icon={ExportImageIcon}
             dataTestId="image-export-button"
             onClick={() => setAppState({ openDialog: "imageExport" })}
-          />
+          >
+            {t("buttons.exportImage")}
+          </MenuItem>
           {renderImageExportDialog()}
         </>
       );
@@ -189,11 +191,12 @@ export const MobileMenu = ({
         {renderJSONExportDialog()}
         {renderImageExportDialog()}
         <MenuItem
-          label={t("buttons.exportImage")}
           icon={ExportImageIcon}
           dataTestId="image-export-button"
           onClick={() => setAppState({ openDialog: "imageExport" })}
-        />
+        >
+          {t("buttons.exportImage")}
+        </MenuItem>
         {onCollabButtonClick && (
           <CollabButton
             isCollaborating={isCollaborating}
@@ -203,9 +206,9 @@ export const MobileMenu = ({
         )}
         {actionManager.renderAction("toggleShortcuts", undefined, true)}
         {!appState.viewModeEnabled && actionManager.renderAction("clearCanvas")}
-        <Separator />
+        <Menu.Separator />
         <MenuLinks />
-        <Separator />
+        <Menu.Separator />
         {!appState.viewModeEnabled && (
           <div style={{ marginBottom: ".5rem" }}>
             <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>

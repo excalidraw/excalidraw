@@ -5,7 +5,7 @@ import { save } from "../components/icons";
 import { t } from "../i18n";
 
 import "./ActiveFile.scss";
-import MenuItem from "./MenuItem";
+import MenuItem from "./menu/MenuItem";
 
 type ActiveFileProps = {
   fileName?: string;
@@ -14,10 +14,9 @@ type ActiveFileProps = {
 
 export const ActiveFile = ({ fileName, onSave }: ActiveFileProps) => (
   <MenuItem
-    label={`${t("buttons.save")}`}
     shortcut={getShortcutFromShortcutName("saveScene")}
     dataTestId="save-button"
     onClick={onSave}
     icon={save}
-  />
+  >{`${t("buttons.save")}`}</MenuItem>
 );

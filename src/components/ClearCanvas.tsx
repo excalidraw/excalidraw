@@ -3,7 +3,7 @@ import { t } from "../i18n";
 import { TrashIcon } from "./icons";
 
 import ConfirmDialog from "./ConfirmDialog";
-import MenuItem from "./MenuItem";
+import MenuItem from "./menu/MenuItem";
 
 const ClearCanvas = ({ onConfirm }: { onConfirm: () => void }) => {
   const [showDialog, setShowDialog] = useState(false);
@@ -14,11 +14,12 @@ const ClearCanvas = ({ onConfirm }: { onConfirm: () => void }) => {
   return (
     <>
       <MenuItem
-        label={t("buttons.clearReset")}
         icon={TrashIcon}
         onClick={toggleDialog}
         dataTestId="clear-canvas-button"
-      />
+      >
+        {t("buttons.clearReset")}
+      </MenuItem>
 
       {showDialog && (
         <ConfirmDialog

@@ -21,7 +21,12 @@ import {
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import { Excalidraw, defaultLang, Footer } from "../packages/excalidraw/index";
+import {
+  Excalidraw,
+  defaultLang,
+  Footer,
+  Menu,
+} from "../packages/excalidraw/index";
 import {
   AppState,
   LibraryItems,
@@ -79,7 +84,9 @@ import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 import { EncryptedIcon } from "./components/EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
-
+import { MenuLinks } from "../components/menu/MenuUtils";
+import { LanguageList } from "./components/LanguageList";
+import { UsersIcon } from "../components/icons";
 polyfill();
 window.EXCALIDRAW_THROTTLE_RENDER = true;
 
@@ -594,6 +601,47 @@ const ExcalidrawWrapper = () => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
   };
 
+  const renderMenu = () => {
+    return (
+      <Menu>
+        <Menu.LoadScene />
+        {/* // TODO barnabasmolnar/editor-redesign  */}
+        {/* is this fine here? */}
+        <Menu.SaveToActiveFile />
+        <Menu.SaveAsImage />
+
+        <Menu.Item
+          dataTestId="collab-button"
+          icon={UsersIcon}
+          className={clsx({
+            "active-collab": isCollaborating,
+          })}
+          onClick={() => setCollabDialogShown(true)}
+        >
+          {t("labels.liveCollaboration")}
+        </Menu.Item>
+
+        <Menu.Help />
+        <Menu.ClearCanvas />
+        <Menu.Separator />
+        <MenuLinks />
+        <Menu.Separator />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            rowGap: ".5rem",
+          }}
+        >
+          <Menu.ToggleTheme />
+          <div style={{ padding: "0 0.625rem" }}>
+            <LanguageList style={{ width: "100%" }} />
+          </div>
+          <Menu.ChangeCanvasBackground />
+        </div>
+      </Menu>
+    );
+  };
   return (
     <div
       style={{ height: "100%" }}
@@ -605,7 +653,6 @@ const ExcalidrawWrapper = () => {
         ref={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
-        onCollabButtonClick={() => setCollabDialogShown(true)}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{
@@ -640,6 +687,7 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={theme}
       >
+        {renderMenu()}
         <Footer>
           <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
             <ExcalidrawPlusAppLink />

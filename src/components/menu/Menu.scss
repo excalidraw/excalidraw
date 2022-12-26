@@ -1,4 +1,4 @@
-@import "../css/variables.module";
+@import "../../css/variables.module";
 
 .excalidraw {
   .menu-container {
@@ -61,21 +61,11 @@
       height: 1rem;
       display: block;
     }
-
-    &.active-collab {
-      background-color: #ecfdf5;
-      color: #064e3c;
-    }
   }
 
   &.theme--dark {
     .menu-item {
       color: var(--color-gray-40);
-
-      &.active-collab {
-        background-color: #064e3c;
-        color: #ecfdf5;
-      }
     }
 
     .menu-container {

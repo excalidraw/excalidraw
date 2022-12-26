@@ -14,7 +14,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { trackEvent } from "../analytics";
 import { ActionManager } from "../actions/manager";
 import { getFrame } from "../utils";
-import MenuItem from "./MenuItem";
+import MenuItem from "./menu/MenuItem";
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -112,12 +112,13 @@ export const JSONExportDialog = ({
     <>
       <MenuItem
         icon={ExportIcon}
-        label={t("buttons.export")}
         onClick={() => {
           setModalIsShown(true);
         }}
         dataTestId="json-export-button"
-      />
+      >
+        {t("buttons.export")}
+      </MenuItem>
       {modalIsShown && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
           <JSONExportModal

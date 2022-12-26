@@ -569,6 +569,25 @@
       display: none;
     }
   }
+
+  .menu-item {
+    &.active-collab {
+      background-color: #ecfdf5;
+      color: #064e3c;
+    }
+    &.ExcalidrawPlus {
+      color: var(--color-promo);
+    }
+  }
+
+  &.theme--dark {
+    .menu-item {
+      &.active-collab {
+        background-color: #064e3c;
+        color: #ecfdf5;
+      }
+    }
+  }
 }
 
 .ErrorSplash.excalidraw {
