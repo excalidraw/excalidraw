@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 
 import { AppState, ExportOpts, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
-import { ExportIcon, exportToFileIcon, LinkIcon } from "./icons";
+import { exportToFileIcon, LinkIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
 import { actionSaveFileToDisk } from "../actions/actionExport";
 import { Card } from "./Card";
@@ -14,7 +14,6 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { trackEvent } from "../analytics";
 import { ActionManager } from "../actions/manager";
 import { getFrame } from "../utils";
-import App from "./App";
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -102,7 +101,7 @@ export const JSONExportDialog = ({
   actionManager: ActionManager;
   exportOpts: ExportOpts;
   canvas: HTMLCanvasElement | null;
-  setAppState: App["setAppState"];
+  setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const handleClose = React.useCallback(() => {
     setAppState({ openDialog: null });
