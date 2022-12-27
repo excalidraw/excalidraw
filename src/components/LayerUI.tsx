@@ -191,17 +191,11 @@ const LayerUI = ({
         <Menu.Separator />
         <Menu.Socials />
         <Menu.Separator />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            rowGap: ".5rem",
-          }}
-        >
-          <Menu.ToggleTheme />
 
+        <Menu.Group className="menu-footer">
+          <Menu.ToggleTheme />
           <Menu.ChangeCanvasBackground />
-        </div>
+        </Menu.Group>
       </Menu>
     );
   };
