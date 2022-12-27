@@ -4,7 +4,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { isMenuOpenAtom } from "../App";
 import { Island } from "../Island";
 import MenuItem from "./MenuItem";
-import MenuButton from "./MenuButton";
+import MenuTrigger from "./MenuTrigger";
 import MenuSeparator from "./MenuSeparator";
 import * as MenuComponents from "./MenuComponents";
 import MenuSocials from "./MenuSocials";
@@ -21,7 +21,7 @@ const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <>
-      <MenuButton />
+      <MenuTrigger />
 
       <div
         ref={menuRef}
@@ -41,7 +41,7 @@ const Menu = ({ children }: { children?: React.ReactNode }) => {
   const isMenuOpen = useAtomValue(isMenuOpenAtom);
 
   if (!isMenuOpen) {
-    return <MenuButton />;
+    return <MenuTrigger />;
   }
 
   return <OpenMenu>{children}</OpenMenu>;

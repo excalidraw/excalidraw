@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { isMenuOpenAtom, useExcalidrawAppState } from "../App";
 import { HamburgerMenuIcon } from "../icons";
 
-const MenuButton = () => {
+const MenuTrigger = () => {
   const appState = useExcalidrawAppState();
   const [isMenuOpen, setIsMenuOpen] = useAtom(isMenuOpenAtom);
 
@@ -22,4 +22,4 @@ const MenuButton = () => {
   );
 };
 
-export default MenuButton;
+export default MenuTrigger;

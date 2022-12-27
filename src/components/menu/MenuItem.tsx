@@ -1,6 +1,6 @@
 import "./Menu.scss";
 
-const MenuContent = ({
+const MenuItemContent = ({
   icon,
   shortcut,
   label,
@@ -45,7 +45,7 @@ const MenuItem = ({
           rel="noreferrer"
           className={`menu-item ${className}`}
         >
-          <MenuContent icon={icon} shortcut={shortcut} label={label} />
+          <MenuItemContent icon={icon} shortcut={shortcut} label={label} />
         </a>
       );
     }
@@ -58,7 +58,7 @@ const MenuItem = ({
         type="button"
         className={`menu-item ${className}`}
       >
-        <MenuContent icon={icon} shortcut={shortcut} label={label} />
+        <MenuItemContent icon={icon} shortcut={shortcut} label={label} />
       </button>
     );
   }
