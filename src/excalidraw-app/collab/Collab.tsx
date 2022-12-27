@@ -710,6 +710,25 @@ class Collab extends PureComponent<Props, CollabState> {
         collaborators.set(socketId, {});
       }
     }
+
+    if (sockets.length < this.collaborators.size) {
+      for (const [socketId, value] of this.collaborators) {
+        if (!collaborators.has(socketId)) {
+          this.excalidrawAPI.updateScene({
+            appState: {
+              toast: {
+                message: t("toast.leftTheCollaboration", {
+                  collaborator: value?.username
+                    ? value.username
+                    : `A ${t("labels.collaborator")}`,
+                }),
+              },
+            },
+          });
+        }
+      }
+    }
+
     this.collaborators = collaborators;
     this.excalidrawAPI.updateScene({ collaborators });
   }

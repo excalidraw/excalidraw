@@ -81,6 +81,7 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
+    "collaborator": "Collaborator",
     "showGrid": "Show grid",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
@@ -394,7 +395,8 @@
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
     "selection": "selection",
-    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor"
+    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor",
+    "leftTheCollaboration": "{{collaborator}} left the collaboration"
   },
   "colors": {
     "ffffff": "White",
