@@ -23,3 +23,4 @@ const MenuSocials = () => (
 );
 
 export default MenuSocials;
+MenuSocials.displayName = "MenuSocials";

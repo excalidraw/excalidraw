@@ -12,3 +12,4 @@ const MenuGroup = ({
 };
 
 export default MenuGroup;
+MenuGroup.displayName = "MenuGroup";

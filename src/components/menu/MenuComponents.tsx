@@ -16,6 +16,7 @@ export const LoadScene = () => {
   }
   return actionManager.renderAction("loadScene");
 };
+LoadScene.displayName = "LoadScene";
 
 export const SaveToActiveFile = () => {
   const appState = useExcalidrawAppState();
@@ -25,6 +26,7 @@ export const SaveToActiveFile = () => {
   }
   return actionManager.renderAction("saveToActiveFile");
 };
+SaveToActiveFile.displayName = "SaveToActiveFile";
 
 export const SaveAsImage = () => {
   const setAppState = useExcalidrawSetAppState();
@@ -39,11 +41,13 @@ export const SaveAsImage = () => {
     </MenuItem>
   );
 };
+SaveAsImage.displayName = "SaveAsImage";
 
 export const Help = () => {
   const actionManager = useExcalidrawActionManager();
   return actionManager.renderAction("toggleShortcuts", undefined, true);
 };
+Help.displayName = "Help";
 
 export const ClearCanvas = () => {
   const appState = useExcalidrawAppState();
@@ -54,10 +58,13 @@ export const ClearCanvas = () => {
   }
   return actionManager.renderAction("clearCanvas");
 };
+ClearCanvas.displayName = "ClearCanvas";
+
 export const ToggleTheme = () => {
   const actionManager = useExcalidrawActionManager();
   return actionManager.renderAction("toggleTheme");
 };
+ToggleTheme.displayName = "ToggleTheme";
 
 export const ChangeCanvasBackground = () => {
   const appState = useExcalidrawAppState();
@@ -77,3 +84,4 @@ export const ChangeCanvasBackground = () => {
     </div>
   );
 };
+ChangeCanvasBackground.displayName = "ChangeCanvasBackground";

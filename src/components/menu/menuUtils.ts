@@ -17,7 +17,8 @@ export const getValidMenuChildren = (
     if (
       React.isValidElement(child) &&
       typeof child.type !== "string" &&
-      child?.type.name &&
+      //@ts-ignore
+      child?.type.displayName &&
       validMenuChildren.includes(child.type.name)
     ) {
       childrenComponents.push(child);

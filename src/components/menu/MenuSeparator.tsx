@@ -11,3 +11,4 @@ const MenuSeparator = () => (
 );
 
 export default MenuSeparator;
+MenuSeparator.displayName = "MenuSeparator";
