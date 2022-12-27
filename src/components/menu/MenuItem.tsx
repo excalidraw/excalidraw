@@ -1,7 +1,7 @@
 import "./Menu.scss";
 
 interface MenuProps {
-  icon: JSX.Element;
+  icon?: JSX.Element;
   onClick?: () => void;
   children: React.ReactNode;
   dataTestId?: string;
@@ -15,7 +15,7 @@ const MenuContent = ({
   shortcut,
   label,
 }: {
-  icon: JSX.Element;
+  icon?: JSX.Element;
   shortcut?: string;
   label: string;
 }) => {
@@ -64,7 +64,7 @@ const MenuItem = ({
       </button>
     );
   }
-  return <div>{children}</div>;
+  return <div className={`menu-item ${className}`}>{children}</div>;
 };
 
 export default MenuItem;

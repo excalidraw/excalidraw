@@ -628,9 +628,9 @@ const ExcalidrawWrapper = () => {
         <Menu.Separator />
         <Menu.Group className="menu-footer">
           <Menu.ToggleTheme />
-          <div style={{ padding: "0 0.625rem" }}>
+          <Menu.Item className="language">
             <LanguageList style={{ width: "100%" }} />
-          </div>
+          </Menu.Item>
           <Menu.ChangeCanvasBackground />
         </Menu.Group>
       </Menu>
