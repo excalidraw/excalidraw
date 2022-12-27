@@ -3,7 +3,7 @@ import { getNonDeletedElements, isTextElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import {
   getBoundTextElement,
-  measureText,
+  measureTextElement,
   redrawTextBoundingBox,
 } from "../element/textElement";
 import {
@@ -19,7 +19,6 @@ import {
   ExcalidrawTextElement,
 } from "../element/types";
 import { getSelectedElements } from "../scene";
-import { getFontString } from "../utils";
 import { register } from "./register";
 
 export const actionUnbindText = register({
@@ -38,9 +37,9 @@ export const actionUnbindText = register({
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
-        const { width, height, baseline } = measureText(
-          boundTextElement.originalText,
-          getFontString(boundTextElement),
+        const { width, height, baseline } = measureTextElement(
+          boundTextElement,
+          { text: boundTextElement.originalText },
         );
         const originalContainerHeight = getOriginalContainerHeightFromCache(
           element.id,

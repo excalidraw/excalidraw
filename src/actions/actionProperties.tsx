@@ -86,7 +86,7 @@ import { register } from "./register";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
-const changeProperty = (
+export const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   callback: (element: ExcalidrawElement) => ExcalidrawElement,
@@ -106,7 +106,7 @@ const changeProperty = (
   });
 };
 
-const getFormValue = function <T>(
+export const getFormValue = function <T>(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,

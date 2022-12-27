@@ -28,6 +28,7 @@ import { trackEvent } from "../analytics";
 import { hasBoundTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
+import { getCustomActions } from "../actions/register";
 import "./Actions.scss";
 import { Tooltip } from "./Tooltip";
 import { shouldAllowVerticalAlign } from "../element/textElement";
@@ -92,6 +93,15 @@ export const SelectedShapeActions = ({
       {showChangeBackgroundIcons && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
+      {getCustomActions().map((action) => {
+        if (
+          action.panelComponentPredicate &&
+          action.panelComponentPredicate(targetElements, appState)
+        ) {
+          return renderAction(action.name);
+        }
+        return null;
+      })}
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||

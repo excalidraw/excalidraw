@@ -28,6 +28,7 @@ import {
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
+  measureText,
   getTextWidth,
   normalizeText,
   wrapText,
@@ -43,6 +44,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
 
 const getTransform = (
+  offsetX: number,
   width: number,
   height: number,
   angle: number,
@@ -60,7 +62,7 @@ const getTransform = (
   if (height > maxHeight && zoom.value !== 1) {
     translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
-  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
+  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg) translate(${offsetX}px, 0px)`;
 };
 
 const originalContainerCache: {
@@ -153,11 +155,19 @@ export const textWysiwyg = ({
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
+      let eCoordY = coordY;
       const container = getContainerElement(updatedTextElement);
-      let maxWidth = updatedTextElement.width;
 
-      let maxHeight = updatedTextElement.height;
-      const width = updatedTextElement.width;
+      // Editing metrics
+      const eMetrics = measureText(
+        updatedTextElement.originalText,
+        getFontString(updatedTextElement),
+        container ? getContainerDims(container).width : null,
+      );
+
+      let maxWidth = eMetrics.width;
+      let maxHeight = eMetrics.height;
+      const width = eMetrics.width;
       // Set to element height by default since that's
       // what is going to be used for unbounded text
       let textElementHeight = updatedTextElement.height;
@@ -170,6 +180,7 @@ export const textWysiwyg = ({
             );
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
+          eCoordY = coordY;
         }
         const propertiesUpdated = textPropertiesUpdated(
           updatedTextElement,
@@ -183,7 +194,14 @@ export const textWysiwyg = ({
         }
         if (propertiesUpdated) {
           // update height of the editor after properties updated
-          textElementHeight = updatedTextElement.height;
+          const font = getFontString(updatedTextElement);
+          textElementHeight =
+            getApproxLineHeight(font) *
+            updatedTextElement.text.split("\n").length;
+          textElementHeight = Math.max(
+            textElementHeight,
+            updatedTextElement.height,
+          );
         }
 
         let originalContainerData;
@@ -235,6 +253,7 @@ export const textWysiwyg = ({
             if (!isArrowElement(container)) {
               coordY =
                 container.y + containerDims.height / 2 - textElementHeight / 2;
+              eCoordY = coordY + textElementHeight / 2 - eMetrics.height / 2;
             }
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
@@ -243,10 +262,11 @@ export const textWysiwyg = ({
               containerDims.height -
               textElementHeight -
               getBoundTextElementOffset(updatedTextElement);
+            eCoordY = coordY + textElementHeight - eMetrics.height;
           }
         }
       }
-      const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
+      const [viewportX, viewportY] = getViewportCoords(coordX, eCoordY);
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
       const initialLength = editable.value.length;
@@ -268,10 +288,24 @@ export const textWysiwyg = ({
       const lines = updatedTextElement.originalText.split("\n");
       const lineHeight = updatedTextElement.containerId
         ? approxLineHeight
-        : updatedTextElement.height / lines.length;
+        : eMetrics.height / lines.length;
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
       }
+      // Horizontal offset in case updatedTextElement has a non-WYSIWYG subtype
+      const offWidth = container
+        ? Math.min(
+            0,
+            updatedTextElement.width - Math.min(maxWidth, eMetrics.width),
+          )
+        : Math.min(maxWidth, updatedTextElement.width) -
+          Math.min(maxWidth, eMetrics.width);
+      const offsetX =
+        textAlign === "right"
+          ? offWidth
+          : textAlign === "center"
+          ? offWidth / 2
+          : 0;
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
@@ -285,9 +319,12 @@ export const textWysiwyg = ({
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
+        transformOrigin: `${updatedTextElement.width / 2}px
+          ${updatedTextElement.height / 2}px`,
         transform: getTransform(
-          width,
-          textElementHeight,
+          offsetX,
+          updatedTextElement.width,
+          updatedTextElement.height,
           getTextElementAngle(updatedTextElement),
           appState,
           maxWidth,

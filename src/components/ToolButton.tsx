@@ -43,6 +43,7 @@ type ToolButtonProps =
       type: "icon";
       children?: React.ReactNode;
       onClick?(): void;
+      onContextMenu?: React.MouseEventHandler;
     })
   | (ToolButtonBaseProps & {
       type: "radio";
@@ -120,6 +121,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         aria-label={props["aria-label"]}
         type={type}
         onClick={onClick}
+        onContextMenu={props.type === "icon" ? props.onContextMenu : undefined}
         ref={innerRef}
         disabled={isLoading || props.isLoading}
       >

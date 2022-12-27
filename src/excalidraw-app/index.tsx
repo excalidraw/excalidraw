@@ -5,6 +5,7 @@ import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
+import { useExtensions } from "@excalidraw/extensions";
 import {
   APP_NAME,
   EVENT,
@@ -189,7 +190,7 @@ const initializeScene = async (opts: {
           ...restoreAppState(
             {
               ...scene?.appState,
-              theme: localDataState?.appState?.theme || scene?.appState?.theme,
+              ...localDataState?.appState,
             },
             excalidrawAPI.getAppState(),
           ),
@@ -251,6 +252,8 @@ const ExcalidrawWrapper = () => {
 
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
+
+  useExtensions(excalidrawAPI);
 
   const [collabAPI] = useAtom(collabAPIAtom);
   const [, setCollabDialogShown] = useAtom(collabDialogShownAtom);
@@ -538,6 +541,8 @@ const ExcalidrawWrapper = () => {
           }
         }
       });
+    } else {
+      LocalData.saveAppState(appState);
     }
   };
 

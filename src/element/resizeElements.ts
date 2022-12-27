@@ -46,7 +46,7 @@ import {
   getBoundTextElementOffset,
   getContainerElement,
   handleBindTextResize,
-  measureText,
+  measureTextElement,
 } from "./textElement";
 import { getMaxContainerWidth } from "./newElement";
 
@@ -211,9 +211,9 @@ const measureFontSizeFromWH = (
   if (nextFontSize < MIN_FONT_SIZE) {
     return null;
   }
-  const metrics = measureText(
-    element.text,
-    getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
+  const metrics = measureTextElement(
+    element,
+    { fontSize: nextFontSize },
     element.containerId ? width : null,
   );
   return {
