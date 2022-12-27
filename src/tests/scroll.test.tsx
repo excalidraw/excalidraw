@@ -6,6 +6,9 @@ import {
 } from "./test-utils";
 import { Excalidraw } from "../packages/excalidraw/index";
 import { API } from "./helpers/api";
+import { Keyboard } from "./helpers/ui";
+import { KEYS } from "../keys";
+import ExcalidrawApp from "../excalidraw-app";
 
 const { h } = window;
 
@@ -48,6 +51,35 @@ describe("appState", () => {
       expect(h.state.scrollX).toBe(WIDTH / 2 - ELEM_WIDTH / 2);
       expect(h.state.scrollY).toBe(HEIGHT / 2 - ELEM_HEIGHT / 2);
     });
+    restoreOriginalGetBoundingClientRect();
+  });
+  it("zoomed canvas scrolls on page keys", async () => {
+    mockBoundingClientRect();
+    await render(<ExcalidrawApp />, {});
+
+    const scrollTest = () => {
+      const scrollY = h.state.scrollY;
+      const pageStep = h.state.height / h.state.zoom.value;
+      // Assert the following assertions have meaning
+      expect(pageStep).toBeGreaterThan(0);
+      // Assert we scroll up
+      Keyboard.keyPress(KEYS.PAGE_UP);
+      expect(h.state.scrollY).toBe(scrollY + pageStep);
+      // Assert we scroll down
+      Keyboard.keyPress(KEYS.PAGE_DOWN);
+      Keyboard.keyPress(KEYS.PAGE_DOWN);
+      expect(h.state.scrollY).toBe(scrollY - pageStep);
+    };
+    const zoom = h.state.zoom.value;
+    // Assert we scroll properly when zoomed in
+    h.setState({ zoom: { value: (zoom * 1.1) as typeof zoom } });
+    scrollTest();
+    // Assert we scroll properly when zoomed out
+    h.setState({ zoom: { value: (zoom * 0.9) as typeof zoom } });
+    scrollTest();
+    // Assert we scroll properly with normal zoom
+    h.setState({ zoom: { value: zoom } });
+    scrollTest();
     restoreOriginalGetBoundingClientRect();
   });
 });
