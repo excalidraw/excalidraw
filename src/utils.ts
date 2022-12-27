@@ -697,7 +697,6 @@ export const ReactChildrenToObject = <
 >(
   children: React.ReactNode,
 ) => {
-  console.log(React.Children.toArray(children));
   return React.Children.toArray(children).reduce((acc, child) => {
     if (
       React.isValidElement(child) &&

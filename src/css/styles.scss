@@ -569,14 +569,20 @@
       display: none;
     }
   }
-
-  .menu-item {
-    &.active-collab {
-      background-color: #ecfdf5;
-      color: #064e3c;
+  .menu-container {
+    .menu-item {
+      &.active-collab {
+        background-color: #ecfdf5;
+        color: #064e3c;
+      }
+      &.ExcalidrawPlus {
+        color: var(--color-promo);
+      }
     }
-    &.ExcalidrawPlus {
-      color: var(--color-promo);
+    .menu-group.menu-footer {
+      display: flex;
+      flex-direction: column;
+      row-gap: 0.5rem;
     }
   }
 

@@ -626,20 +626,13 @@ const ExcalidrawWrapper = () => {
         <Menu.Separator />
         <Menu.Socials />
         <Menu.Separator />
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            rowGap: ".5rem",
-          }}
-        >
+        <Menu.Group className="menu-footer">
           <Menu.ToggleTheme />
           <div style={{ padding: "0 0.625rem" }}>
             <LanguageList style={{ width: "100%" }} />
           </div>
           <Menu.ChangeCanvasBackground />
-        </div>
+        </Menu.Group>
       </Menu>
     );
   };
