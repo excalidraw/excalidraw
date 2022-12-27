@@ -1511,6 +1511,16 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      if (this.props.onPaste) {
+        try {
+          if ((await this.props.onPaste(data, event)) === false) {
+            return;
+          }
+        } catch (error: any) {
+          console.error(error);
+        }
+      }
+
       // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
@@ -1524,16 +1534,6 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({ selectedElementIds: { [imageElement.id]: true } });
 
         return;
-      }
-
-      if (this.props.onPaste) {
-        try {
-          if ((await this.props.onPaste(data, event)) === false) {
-            return;
-          }
-        } catch (error: any) {
-          console.error(error);
-        }
       }
 
       if (data.errorMessage) {
