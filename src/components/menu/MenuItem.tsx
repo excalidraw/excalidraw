@@ -1,15 +1,5 @@
 import "./Menu.scss";
 
-interface MenuProps {
-  icon?: JSX.Element;
-  onClick?: () => void;
-  children: React.ReactNode;
-  dataTestId?: string;
-  shortcut?: string;
-  className?: string;
-  link?: string;
-}
-
 const MenuContent = ({
   icon,
   shortcut,
@@ -36,7 +26,15 @@ const MenuItem = ({
   shortcut,
   className,
   link,
-}: MenuProps) => {
+}: {
+  icon?: JSX.Element;
+  onClick?: () => void;
+  children: React.ReactNode;
+  dataTestId?: string;
+  shortcut?: string;
+  className?: string;
+  link?: string;
+}) => {
   if (typeof children === "string") {
     const label = children;
     if (link) {
