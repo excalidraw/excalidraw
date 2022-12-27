@@ -209,7 +209,7 @@ const LayerUI = ({
           <div>{t("welcomeScreen.menuHints")}</div>
         </div>
       </WelcomeScreenDecor>
-      {childrenComponents.Menu ? childrenComponents.Menu : renderDefaultMenu()}
+      {childrenComponents.Menu || renderDefaultMenu()}
     </div>
   );
 
