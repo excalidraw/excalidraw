@@ -47,6 +47,7 @@ Menu.Help = MenuComponents.Help;
 Menu.ClearCanvas = MenuComponents.ClearCanvas;
 Menu.ToggleTheme = MenuComponents.ToggleTheme;
 Menu.ChangeCanvasBackground = MenuComponents.ChangeCanvasBackground;
+Menu.Export = MenuComponents.Export;
 Menu.Socials = MenuSocials;
 Menu.Group = MenuGroup;
 

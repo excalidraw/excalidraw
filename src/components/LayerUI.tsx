@@ -94,7 +94,6 @@ const LayerUI = ({
   showExitZenModeBtn,
   isCollaborating,
   renderTopRightUI,
-
   renderCustomStats,
   renderCustomSidebar,
   libraryReturnUrl,
@@ -123,6 +122,7 @@ const LayerUI = ({
         actionManager={actionManager}
         exportOpts={UIOptions.canvasActions.export}
         canvas={canvas}
+        setAppState={setAppState}
       />
     );
   };
@@ -183,7 +183,7 @@ const LayerUI = ({
         {/* // TODO barnabasmolnar/editor-redesign  */}
         {/* is this fine here? */}
         <Menu.SaveToActiveFile />
-        {renderJSONExportDialog()}
+        <Menu.Export />
         {UIOptions.canvasActions.saveAsImage && <Menu.SaveAsImage />}
 
         <Menu.Help />
@@ -396,6 +396,7 @@ const LayerUI = ({
         />
       )}
       {renderImageExportDialog()}
+      {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (
         <PasteChartDialog
           setAppState={setAppState}

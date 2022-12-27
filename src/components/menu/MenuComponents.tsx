@@ -5,7 +5,7 @@ import {
   useExcalidrawSetAppState,
   useExcalidrawActionManager,
 } from "../App";
-import { ExportImageIcon } from "../icons";
+import { ExportIcon, ExportImageIcon } from "../icons";
 import MenuItem from "./MenuItem";
 
 export const LoadScene = () => {
@@ -85,3 +85,19 @@ export const ChangeCanvasBackground = () => {
   );
 };
 ChangeCanvasBackground.displayName = "ChangeCanvasBackground";
+
+export const Export = () => {
+  const setAppState = useExcalidrawSetAppState();
+  return (
+    <MenuItem
+      icon={ExportIcon}
+      onClick={() => {
+        setAppState({ openDialog: "jsonExport" });
+      }}
+      dataTestId="json-export-button"
+    >
+      {t("buttons.export")}
+    </MenuItem>
+  );
+};
+Export.displayName = "Export";
