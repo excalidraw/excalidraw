@@ -19,7 +19,8 @@ export const getValidMenuChildren = (
       typeof child.type !== "string" &&
       //@ts-ignore
       child?.type.displayName &&
-      validMenuChildren.includes(child.type.name)
+      //@ts-ignore
+      validMenuChildren.includes(child.type.displayName)
     ) {
       childrenComponents.push(child);
     }
