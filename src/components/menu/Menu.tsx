@@ -1,6 +1,6 @@
 import React from "react";
 import { useOutsideClickHook } from "../../hooks/useOutsideClick";
-import { useAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { isMenuOpenAtom } from "../App";
 import { Island } from "../Island";
 import MenuItem from "./MenuItem";
@@ -11,15 +11,14 @@ import MenuSocials from "./MenuSocials";
 import MenuGroup from "./MenuGroup";
 import { getValidMenuChildren } from "./menuUtils";
 
-const Menu = ({ children }: { children?: React.ReactNode }) => {
-  const [isMenuOpen, setIsMenuOpen] = useAtom(isMenuOpenAtom);
+const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
+  const setIsMenuOpen = useSetAtom(isMenuOpenAtom);
   const menuRef = useOutsideClickHook(() => {
     setIsMenuOpen(false);
   });
-  if (!isMenuOpen) {
-    return <MenuButton />;
-  }
+
   const menuChildren = getValidMenuChildren(children);
+
   return (
     <>
       <MenuButton />
@@ -36,6 +35,16 @@ const Menu = ({ children }: { children?: React.ReactNode }) => {
       </div>
     </>
   );
+};
+
+const Menu = ({ children }: { children?: React.ReactNode }) => {
+  const isMenuOpen = useAtomValue(isMenuOpenAtom);
+
+  if (!isMenuOpen) {
+    return <MenuButton />;
+  }
+
+  return <OpenMenu>{children}</OpenMenu>;
 };
 
 Menu.Item = MenuItem;
