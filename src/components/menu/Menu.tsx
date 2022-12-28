@@ -6,10 +6,9 @@ import { Island } from "../Island";
 import MenuItem from "./MenuItem";
 import MenuTrigger from "./MenuTrigger";
 import MenuSeparator from "./MenuSeparator";
-import * as MenuComponents from "./MenuComponents";
-import MenuSocials from "./MenuSocials";
 import MenuGroup from "./MenuGroup";
 import { getValidMenuChildren } from "./menuUtils";
+import { copiedStyles } from "../../actions/actionStyles";
 
 const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
   const setIsMenuOpen = useSetAtom(isMenuOpenAtom);
@@ -48,17 +47,8 @@ const Menu = ({ children }: { children?: React.ReactNode }) => {
 };
 
 Menu.Item = MenuItem;
-Menu.Separator = MenuSeparator;
-Menu.LoadScene = MenuComponents.LoadScene;
-Menu.SaveToActiveFile = MenuComponents.SaveToActiveFile;
-Menu.SaveAsImage = MenuComponents.SaveAsImage;
-Menu.Help = MenuComponents.Help;
-Menu.ClearCanvas = MenuComponents.ClearCanvas;
-Menu.ToggleTheme = MenuComponents.ToggleTheme;
-Menu.ChangeCanvasBackground = MenuComponents.ChangeCanvasBackground;
-Menu.Export = MenuComponents.Export;
-Menu.Socials = MenuSocials;
 Menu.Group = MenuGroup;
+Menu.Separator = MenuSeparator;
 
 export default Menu;
 

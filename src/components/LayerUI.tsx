@@ -179,22 +179,22 @@ const LayerUI = ({
   const renderDefaultMenu = () => {
     return (
       <Menu>
-        <Menu.LoadScene />
+        <Menu.Item.LoadScene />
         {/* // TODO barnabasmolnar/editor-redesign  */}
         {/* is this fine here? */}
-        <Menu.SaveToActiveFile />
-        <Menu.Export />
-        {UIOptions.canvasActions.saveAsImage && <Menu.SaveAsImage />}
+        <Menu.Item.SaveToActiveFile />
+        <Menu.Item.Export />
+        {UIOptions.canvasActions.saveAsImage && <Menu.Item.SaveAsImage />}
 
-        <Menu.Help />
-        <Menu.ClearCanvas />
+        <Menu.Item.Help />
+        <Menu.Item.ClearCanvas />
         <Menu.Separator />
-        <Menu.Socials />
+        <Menu.Item.Socials />
         <Menu.Separator />
 
         <Menu.Group className="menu-footer">
-          <Menu.ToggleTheme />
-          <Menu.ChangeCanvasBackground />
+          <Menu.Item.ToggleTheme />
+          <Menu.Item.ChangeCanvasBackground />
         </Menu.Group>
       </Menu>
     );

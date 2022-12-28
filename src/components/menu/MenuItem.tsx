@@ -1,4 +1,6 @@
 import "./Menu.scss";
+import * as MenuComponents from "./MenuDefaultItems";
+import MenuSocials from "./MenuSocials";
 
 const MenuItemContent = ({
   icon,
@@ -64,6 +66,16 @@ const MenuItem = ({
   }
   return <div className={`menu-item ${className}`}>{children}</div>;
 };
+
+MenuItem.LoadScene = MenuComponents.LoadScene;
+MenuItem.SaveToActiveFile = MenuComponents.SaveToActiveFile;
+MenuItem.SaveAsImage = MenuComponents.SaveAsImage;
+MenuItem.Help = MenuComponents.Help;
+MenuItem.ClearCanvas = MenuComponents.ClearCanvas;
+MenuItem.ToggleTheme = MenuComponents.ToggleTheme;
+MenuItem.ChangeCanvasBackground = MenuComponents.ChangeCanvasBackground;
+MenuItem.Export = MenuComponents.Export;
+MenuItem.Socials = MenuSocials;
 
 export default MenuItem;
 MenuItem.displayName = "MenuItem";

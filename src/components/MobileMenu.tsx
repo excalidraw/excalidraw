@@ -206,7 +206,7 @@ export const MobileMenu = ({
         {actionManager.renderAction("toggleShortcuts", undefined, true)}
         {!appState.viewModeEnabled && actionManager.renderAction("clearCanvas")}
         <Menu.Separator />
-        <Menu.Socials />
+        <Menu.Item.Socials />
         <Menu.Separator />
         {!appState.viewModeEnabled && (
           <div style={{ marginBottom: ".5rem" }}>

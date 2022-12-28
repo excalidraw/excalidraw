@@ -604,12 +604,12 @@ const ExcalidrawWrapper = () => {
   const renderMenu = () => {
     return (
       <Menu>
-        <Menu.LoadScene />
+        <Menu.Item.LoadScene />
         {/* // TODO barnabasmolnar/editor-redesign  */}
         {/* is this fine here? */}
-        <Menu.SaveToActiveFile />
-        <Menu.Export />
-        <Menu.SaveAsImage />
+        <Menu.Item.SaveToActiveFile />
+        <Menu.Item.Export />
+        <Menu.Item.SaveAsImage />
 
         <Menu.Item
           dataTestId="collab-button"
@@ -622,17 +622,17 @@ const ExcalidrawWrapper = () => {
           {t("labels.liveCollaboration")}
         </Menu.Item>
 
-        <Menu.Help />
-        <Menu.ClearCanvas />
+        <Menu.Item.Help />
+        <Menu.Item.ClearCanvas />
         <Menu.Separator />
-        <Menu.Socials />
+        <Menu.Item.Socials />
         <Menu.Separator />
         <Menu.Group className="menu-footer">
-          <Menu.ToggleTheme />
+          <Menu.Item.ToggleTheme />
           <Menu.Item className="language">
             <LanguageList style={{ width: "100%" }} />
           </Menu.Item>
-          <Menu.ChangeCanvasBackground />
+          <Menu.Item.ChangeCanvasBackground />
         </Menu.Group>
       </Menu>
     );
