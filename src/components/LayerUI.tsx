@@ -190,7 +190,7 @@ const LayerUI = ({
         <Menu.Item.Help />
         <Menu.Item.ClearCanvas />
         <Menu.Separator />
-        <MenuGroup header="Excalidraw links">
+        <MenuGroup title="Excalidraw links">
           <Menu.Item.Socials />
         </MenuGroup>
         <Menu.Separator />
