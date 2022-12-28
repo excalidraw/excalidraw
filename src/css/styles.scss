@@ -569,34 +569,6 @@
       display: none;
     }
   }
-  .menu-container {
-    .menu-item {
-      &.active-collab {
-        background-color: #ecfdf5;
-        color: #064e3c;
-      }
-      &.ExcalidrawPlus {
-        color: var(--color-promo);
-      }
-      &.language {
-        padding: 0.0625rem;
-      }
-    }
-    .menu-group.menu-footer {
-      display: flex;
-      flex-direction: column;
-      row-gap: 0.5rem;
-    }
-  }
-
-  &.theme--dark {
-    .menu-item {
-      &.active-collab {
-        background-color: #064e3c;
-        color: #ecfdf5;
-      }
-    }
-  }
 }
 
 .ErrorSplash.excalidraw {
