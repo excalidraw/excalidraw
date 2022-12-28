@@ -1,5 +1,3 @@
-import { getValidMenuChildren } from "./menuUtils";
-
 const MenuGroup = ({
   children,
   className = "",
@@ -7,8 +5,7 @@ const MenuGroup = ({
   children: React.ReactNode;
   className?: string;
 }) => {
-  const menuChildren = getValidMenuChildren(children, ["MenuGroup"]);
-  return <div className={`menu-group ${className}`}>{menuChildren}</div>;
+  return <div className={`menu-group ${className}`}>{children}</div>;
 };
 
 export default MenuGroup;
