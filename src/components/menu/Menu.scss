@@ -1,6 +1,18 @@
 @import "../../css/variables.module";
 
 .excalidraw {
+  .menu {
+    position: absolute;
+    top: 100%;
+    margin-top: 0.25rem;
+
+    &--mobile {
+      bottom: 55px;
+      top: auto;
+      left: 0;
+      width: 100%;
+    }
+  }
   .menu-container {
     background-color: #fff !important;
     max-height: calc(100vh - 150px);
@@ -16,6 +28,14 @@
     svg {
       width: var(--lg-icon-size);
       height: var(--lg-icon-size);
+    }
+
+    &--mobile {
+      border: none;
+      margin: 0;
+      padding: 0;
+      width: var(--default-button-size);
+      height: var(--default-button-size);
     }
   }
 

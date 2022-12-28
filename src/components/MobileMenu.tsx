@@ -11,7 +11,6 @@ import { HintViewer } from "./HintViewer";
 import { calculateScrollCenter } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
-import CollabButton from "./CollabButton";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockButton } from "./LockButton";
 import { UserList } from "./UserList";
@@ -20,9 +19,6 @@ import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import WelcomeScreen from "./WelcomeScreen";
-import MenuItem from "./menu/MenuItem";
-import { ExportImageIcon } from "./icons";
-import Menu from "./menu/Menu";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -46,6 +42,7 @@ type MobileMenuProps = {
   renderSidebars: () => JSX.Element | null;
   device: Device;
   renderWelcomeScreen?: boolean;
+  renderDefaultMenu: () => React.ReactNode;
 };
 
 export const MobileMenu = ({
@@ -66,6 +63,7 @@ export const MobileMenu = ({
   renderSidebars,
   device,
   renderWelcomeScreen,
+  renderDefaultMenu,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -156,7 +154,8 @@ export const MobileMenu = ({
 
     return (
       <div className="App-toolbar-content">
-        {actionManager.renderAction("toggleCanvasMenu")}
+        {renderDefaultMenu()}
+
         {actionManager.renderAction("toggleEditMenu")}
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
@@ -168,60 +167,6 @@ export const MobileMenu = ({
     );
   };
 
-  const renderCanvasActions = () => {
-    if (appState.viewModeEnabled) {
-      return (
-        <>
-          {renderJSONExportDialog()}
-          <MenuItem
-            icon={ExportImageIcon}
-            dataTestId="image-export-button"
-            onClick={() => setAppState({ openDialog: "imageExport" })}
-          >
-            {t("buttons.exportImage")}
-          </MenuItem>
-          {renderImageExportDialog()}
-        </>
-      );
-    }
-    return (
-      <>
-        {!appState.viewModeEnabled && actionManager.renderAction("loadScene")}
-        {renderJSONExportDialog()}
-        {renderImageExportDialog()}
-        <MenuItem
-          icon={ExportImageIcon}
-          dataTestId="image-export-button"
-          onClick={() => setAppState({ openDialog: "imageExport" })}
-        >
-          {t("buttons.exportImage")}
-        </MenuItem>
-        {onCollabButtonClick && (
-          <CollabButton
-            isCollaborating={isCollaborating}
-            collaboratorCount={appState.collaborators.size}
-            onClick={onCollabButtonClick}
-          />
-        )}
-        {actionManager.renderAction("toggleShortcuts", undefined, true)}
-        {!appState.viewModeEnabled && actionManager.renderAction("clearCanvas")}
-        <Menu.Separator />
-        <Menu.Item.Socials />
-        <Menu.Separator />
-        {!appState.viewModeEnabled && (
-          <div style={{ marginBottom: ".5rem" }}>
-            <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
-              {t("labels.canvasBackground")}
-            </div>
-            <div style={{ padding: "0 0.625rem" }}>
-              {actionManager.renderAction("changeViewBackgroundColor")}
-            </div>
-          </div>
-        )}
-        {actionManager.renderAction("toggleTheme")}
-      </>
-    );
-  };
   return (
     <>
       {renderSidebars()}
@@ -250,7 +195,6 @@ export const MobileMenu = ({
             <Section className="App-mobile-menu" heading="canvasActions">
               <div className="panelColumn">
                 <Stack.Col gap={2}>
-                  {renderCanvasActions()}
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>

@@ -202,6 +202,10 @@ const LayerUI = ({
       </Menu>
     );
   };
+
+  const renderMenu = () => {
+    return childrenComponents.Menu || renderDefaultMenu();
+  };
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
       <WelcomeScreenDecor
@@ -212,7 +216,7 @@ const LayerUI = ({
           <div>{t("welcomeScreen.menuHints")}</div>
         </div>
       </WelcomeScreenDecor>
-      {childrenComponents.Menu || renderDefaultMenu()}
+      {renderMenu()}
     </div>
   );
 
@@ -431,6 +435,7 @@ const LayerUI = ({
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
           device={device}
+          renderDefaultMenu={renderMenu}
         />
       )}
 

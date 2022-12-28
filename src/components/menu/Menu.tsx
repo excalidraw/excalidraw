@@ -1,7 +1,7 @@
 import React from "react";
 import { useOutsideClickHook } from "../../hooks/useOutsideClick";
 import { useAtomValue, useSetAtom } from "jotai";
-import { isMenuOpenAtom } from "../App";
+import { isMenuOpenAtom, useDevice } from "../App";
 import { Island } from "../Island";
 import MenuItem from "./MenuItem";
 import MenuTrigger from "./MenuTrigger";
@@ -10,8 +10,11 @@ import MenuGroup from "./MenuGroup";
 import { getValidMenuChildren } from "./menuUtils";
 
 import "./Menu.scss";
+import clsx from "clsx";
 
 const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
+  const device = useDevice();
+
   const setIsMenuOpen = useSetAtom(isMenuOpenAtom);
   const menuRef = useOutsideClickHook(() => {
     setIsMenuOpen(false);
@@ -25,7 +28,7 @@ const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
 
       <div
         ref={menuRef}
-        style={{ position: "absolute", top: "100%", marginTop: ".25rem" }}
+        className={clsx("menu", { "menu--mobile": device.isMobile })}
       >
         {/* the zIndex ensures this menu has higher stacking order,
   see https://github.com/excalidraw/excalidraw/pull/1445 */}
