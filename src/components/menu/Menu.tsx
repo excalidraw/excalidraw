@@ -8,7 +8,8 @@ import MenuTrigger from "./MenuTrigger";
 import MenuSeparator from "./MenuSeparator";
 import MenuGroup from "./MenuGroup";
 import { getValidMenuChildren } from "./menuUtils";
-import { copiedStyles } from "../../actions/actionStyles";
+
+import "./Menu.scss";
 
 const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
   const setIsMenuOpen = useSetAtom(isMenuOpenAtom);

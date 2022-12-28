@@ -1,4 +1,3 @@
-import "./Menu.scss";
 import * as MenuComponents from "./MenuDefaultItems";
 import MenuSocials from "./MenuSocials";
 
