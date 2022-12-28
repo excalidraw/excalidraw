@@ -27,6 +27,7 @@ const MenuItem = ({
   shortcut,
   className,
   link,
+  style,
 }: {
   icon?: JSX.Element;
   onClick?: () => void;
@@ -35,6 +36,7 @@ const MenuItem = ({
   shortcut?: string;
   className?: string;
   link?: string;
+  style?: React.CSSProperties;
 }) => {
   if (typeof children === "string") {
     const label = children;
@@ -45,6 +47,7 @@ const MenuItem = ({
           target="_blank"
           rel="noreferrer"
           className={`menu-item ${className}`}
+          style={style}
         >
           <MenuItemContent icon={icon} shortcut={shortcut} label={label} />
         </a>
@@ -58,12 +61,17 @@ const MenuItem = ({
         title={label}
         type="button"
         className={`menu-item ${className}`}
+        style={style}
       >
         <MenuItemContent icon={icon} shortcut={shortcut} label={label} />
       </button>
     );
   }
-  return <div className={`menu-item ${className}`}>{children}</div>;
+  return (
+    <div className={`menu-item ${className}`} style={style}>
+      {children}
+    </div>
+  );
 };
 
 MenuItem.LoadScene = MenuComponents.LoadScene;
