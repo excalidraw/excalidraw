@@ -63,6 +63,12 @@
     }
   }
 
+  .menu-group-header {
+    font-size: 13px;
+    text-align: left;
+    margin: 10px 0;
+  }
+
   &.theme--dark {
     .menu-item {
       color: var(--color-gray-40);

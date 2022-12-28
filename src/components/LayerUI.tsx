@@ -52,6 +52,7 @@ import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import WelcomeScreenDecor from "./WelcomeScreenDecor";
 import Menu from "./menu/Menu";
+import MenuGroup from "./menu/MenuGroup";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -189,7 +190,9 @@ const LayerUI = ({
         <Menu.Item.Help />
         <Menu.Item.ClearCanvas />
         <Menu.Separator />
-        <Menu.Item.Socials />
+        <MenuGroup header="Excalidraw links">
+          <Menu.Item.Socials />
+        </MenuGroup>
         <Menu.Separator />
 
         <Menu.Group className="menu-footer">
