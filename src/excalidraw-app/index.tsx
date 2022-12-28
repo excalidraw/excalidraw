@@ -85,7 +85,7 @@ import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 import { EncryptedIcon } from "./components/EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
 import { LanguageList } from "./components/LanguageList";
-import { UsersIcon } from "../components/icons";
+import { PlusPromoIcon, UsersIcon } from "../components/icons";
 polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -621,10 +621,16 @@ const ExcalidrawWrapper = () => {
         >
           {t("labels.liveCollaboration")}
         </Menu.Item>
-
         <Menu.Item.Help />
         <Menu.Item.ClearCanvas />
         <Menu.Separator />
+        <Menu.Item
+          icon={PlusPromoIcon}
+          link="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger"
+          className="ExcalidrawPlus"
+        >
+          Excalidraw+
+        </Menu.Item>
         <Menu.Item.Socials />
         <Menu.Separator />
         <Menu.Group className="menu-footer">
