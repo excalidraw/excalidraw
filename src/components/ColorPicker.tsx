@@ -214,6 +214,7 @@ const Picker = ({
       return (
         <button
           className="color-picker-swatch"
+          type="button"
           onClick={(event) => {
             (event.currentTarget as HTMLButtonElement).focus();
             onChange(_color);
@@ -380,6 +381,7 @@ export const ColorPicker = ({
             style={color ? { "--swatch-color": color } : undefined}
             onClick={() => setActive(!isActive)}
             ref={pickerButton}
+            type="button"
           />
         </div>
         <ColorInput
