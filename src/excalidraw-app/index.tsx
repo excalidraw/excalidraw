@@ -605,8 +605,6 @@ const ExcalidrawWrapper = () => {
     return (
       <Menu>
         <Menu.Item.LoadScene />
-        {/* // TODO barnabasmolnar/editor-redesign  */}
-        {/* is this fine here? */}
         <Menu.Item.SaveToActiveFile />
         <Menu.Item.Export />
         <Menu.Item.SaveAsImage />

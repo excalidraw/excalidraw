@@ -25,7 +25,7 @@ const MenuItem = ({
   children,
   dataTestId,
   shortcut,
-  className,
+  className = "",
   link,
   style,
 }: {

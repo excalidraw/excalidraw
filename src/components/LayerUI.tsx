@@ -110,6 +110,7 @@ const LayerUI = ({
 
   const childrenComponents =
     ReactChildrenToObject<UIChildrenComponents>(children);
+
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
       return null;
@@ -177,34 +178,30 @@ const LayerUI = ({
     );
   };
 
-  const renderDefaultMenu = () => {
-    return (
-      <Menu>
-        <Menu.Item.LoadScene />
-        {/* // TODO barnabasmolnar/editor-redesign  */}
-        {/* is this fine here? */}
-        <Menu.Item.SaveToActiveFile />
-        <Menu.Item.Export />
-        {UIOptions.canvasActions.saveAsImage && <Menu.Item.SaveAsImage />}
-
-        <Menu.Item.Help />
-        <Menu.Item.ClearCanvas />
-        <Menu.Separator />
-        <MenuGroup title="Excalidraw links">
-          <Menu.Item.Socials />
-        </MenuGroup>
-        <Menu.Separator />
-
-        <Menu.Group className="menu-footer">
-          <Menu.Item.ToggleTheme />
-          <Menu.Item.ChangeCanvasBackground />
-        </Menu.Group>
-      </Menu>
-    );
-  };
-
   const renderMenu = () => {
-    return childrenComponents.Menu || renderDefaultMenu();
+    return (
+      childrenComponents.Menu || (
+        <Menu>
+          <Menu.Item.LoadScene />
+          <Menu.Item.SaveToActiveFile />
+          <Menu.Item.Export />
+          {UIOptions.canvasActions.saveAsImage && <Menu.Item.SaveAsImage />}
+
+          <Menu.Item.Help />
+          <Menu.Item.ClearCanvas />
+          <Menu.Separator />
+          <MenuGroup title="Excalidraw links">
+            <Menu.Item.Socials />
+          </MenuGroup>
+          <Menu.Separator />
+
+          <Menu.Group className="menu-footer">
+            <Menu.Item.ToggleTheme />
+            <Menu.Item.ChangeCanvasBackground />
+          </Menu.Group>
+        </Menu>
+      )
+    );
   };
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
