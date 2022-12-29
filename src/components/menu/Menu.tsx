@@ -11,6 +11,7 @@ import { getValidMenuChildren } from "./menuUtils";
 
 import "./Menu.scss";
 import clsx from "clsx";
+import Stack from "../Stack";
 
 const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
   const device = useDevice();
@@ -28,13 +29,21 @@ const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
 
       <div
         ref={menuRef}
-        className={clsx("menu", { "menu--mobile": device.isMobile })}
+        className={clsx("menu", {
+          "menu--mobile": device.isMobile,
+        })}
       >
         {/* the zIndex ensures this menu has higher stacking order,
   see https://github.com/excalidraw/excalidraw/pull/1445 */}
-        <Island className="menu-container" padding={2} style={{ zIndex: 1 }}>
-          {menuChildren}
-        </Island>
+        {device.isMobile ? (
+          <Stack.Col className="menu-container" gap={2}>
+            {menuChildren}
+          </Stack.Col>
+        ) : (
+          <Island className="menu-container" padding={2} style={{ zIndex: 1 }}>
+            {menuChildren}
+          </Island>
+        )}
       </div>
     </>
   );
