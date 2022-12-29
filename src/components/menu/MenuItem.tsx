@@ -1,6 +1,7 @@
 import * as MenuComponents from "./MenuDefaultItems";
 import MenuSocials from "./MenuSocials";
 import Collaborators from "./Collaborators";
+import { useDevice } from "../App";
 
 const MenuItemContent = ({
   icon,
@@ -11,11 +12,14 @@ const MenuItemContent = ({
   shortcut?: string;
   label: string;
 }) => {
+  const device = useDevice();
   return (
     <>
       <div className="menu-item__icon">{icon}</div>
       <div className="menu-item__text">{label}</div>
-      {shortcut && <div className="menu-item__shortcut">{shortcut}</div>}
+      {shortcut && !device.isMobile && (
+        <div className="menu-item__shortcut">{shortcut}</div>
+      )}
     </>
   );
 };
