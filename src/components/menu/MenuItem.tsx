@@ -1,5 +1,6 @@
 import * as MenuComponents from "./MenuDefaultItems";
 import MenuSocials from "./MenuSocials";
+import Collaborators from "./Collaborators";
 
 const MenuItemContent = ({
   icon,
@@ -83,6 +84,7 @@ MenuItem.ToggleTheme = MenuComponents.ToggleTheme;
 MenuItem.ChangeCanvasBackground = MenuComponents.ChangeCanvasBackground;
 MenuItem.Export = MenuComponents.Export;
 MenuItem.Socials = MenuSocials;
+MenuItem.Collaborators = Collaborators;
 
 export default MenuItem;
 MenuItem.displayName = "MenuItem";

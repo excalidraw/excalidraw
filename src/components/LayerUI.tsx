@@ -199,6 +199,7 @@ const LayerUI = ({
             <Menu.Item.ToggleTheme />
             <Menu.Item.ChangeCanvasBackground />
           </Menu.Group>
+          <Menu.Item.Collaborators />
         </Menu>
       )
     );
@@ -344,10 +345,7 @@ const LayerUI = ({
               },
             )}
           >
-            <UserList
-              collaborators={appState.collaborators}
-              actionManager={actionManager}
-            />
+            <UserList collaborators={appState.collaborators} />
             {onCollabButtonClick && (
               <CollabButton
                 isInHamburgerMenu={false}

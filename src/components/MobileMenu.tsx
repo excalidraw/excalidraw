@@ -198,11 +198,7 @@ export const MobileMenu = ({
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>
-                      <UserList
-                        mobile
-                        collaborators={appState.collaborators}
-                        actionManager={actionManager}
-                      />
+                      <UserList mobile collaborators={appState.collaborators} />
                     </fieldset>
                   )}
                 </Stack.Col>

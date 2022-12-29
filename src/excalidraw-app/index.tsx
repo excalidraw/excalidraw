@@ -86,6 +86,9 @@ import { EncryptedIcon } from "./components/EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
 import { LanguageList } from "./components/LanguageList";
 import { PlusPromoIcon, UsersIcon } from "../components/icons";
+import { UserList } from "../components/UserList";
+import { useDevice, useExcalidrawAppState } from "../components/App";
+import MenuItem from "../components/menu/MenuItem";
 polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -236,7 +239,8 @@ export const langCodeAtom = atom(
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [langCode, setLangCode] = useAtom(langCodeAtom);
-
+  const device = useDevice();
+  console.log(device, "device");
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -638,9 +642,11 @@ const ExcalidrawWrapper = () => {
           </Menu.Item>
           <Menu.Item.ChangeCanvasBackground />
         </Menu.Group>
+        <MenuItem.Collaborators />
       </Menu>
     );
   };
+
   return (
     <div
       style={{ height: "100%" }}

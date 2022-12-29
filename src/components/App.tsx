@@ -289,7 +289,7 @@ const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 DeviceContext.displayName = "DeviceContext";
 export const useDevice = () => useContext<Device>(DeviceContext);
 
-const ExcalidrawContainerContext = React.createContext<{
+export const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
   id: string | null;
 }>({ container: null, id: null });
