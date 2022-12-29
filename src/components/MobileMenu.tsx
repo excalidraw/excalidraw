@@ -19,6 +19,8 @@ import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import WelcomeScreen from "./WelcomeScreen";
+import { isMenuOpenAtom } from "./App";
+import { useAtom } from "jotai";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -62,6 +64,8 @@ export const MobileMenu = ({
   renderWelcomeScreen,
   renderMenu,
 }: MobileMenuProps) => {
+  const [isMenuOpen] = useAtom(isMenuOpenAtom);
+
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
@@ -163,7 +167,7 @@ export const MobileMenu = ({
     <>
       {renderSidebars()}
       {!appState.viewModeEnabled && renderToolbar()}
-      {!appState.openMenu && appState.showStats && (
+      {!isMenuOpen && appState.showStats && (
         <Stats
           appState={appState}
           setAppState={setAppState}
@@ -183,22 +187,9 @@ export const MobileMenu = ({
         }}
       >
         <Island padding={0}>
-          {appState.openMenu === "canvas" ? (
-            <Section className="App-mobile-menu" heading="canvasActions">
-              <div className="panelColumn">
-                <Stack.Col gap={2}>
-                  {appState.collaborators.size > 0 && (
-                    <fieldset>
-                      <legend>{t("labels.collaborators")}</legend>
-                      <UserList mobile collaborators={appState.collaborators} />
-                    </fieldset>
-                  )}
-                </Stack.Col>
-              </div>
-            </Section>
-          ) : appState.openMenu === "shape" &&
-            !appState.viewModeEnabled &&
-            showSelectedShapeActions(appState, elements) ? (
+          {appState.openMenu === "shape" &&
+          !appState.viewModeEnabled &&
+          showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
               <SelectedShapeActions
                 appState={appState}
