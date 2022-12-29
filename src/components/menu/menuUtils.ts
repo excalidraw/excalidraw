@@ -11,6 +11,7 @@ export const getValidMenuChildren = (
     "MenuSocials",
     "MenuItem",
     "MenuGroup",
+    "Collaborators",
   ].filter((item) => !exclude?.includes(item));
   const childrenComponents: React.ReactNode[] = [];
   React.Children.toArray(children).forEach((child) => {

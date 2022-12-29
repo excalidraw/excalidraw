@@ -1,4 +1,3 @@
-import React from "react";
 import { t } from "../../i18n";
 import { useDevice, useExcalidrawAppState } from "../App";
 import { UserList } from "../UserList";
@@ -11,7 +10,13 @@ const Collaborators = () => {
   }
   return (
     <fieldset
-      style={{ margin: 0, marginTop: "10px", padding: 0, border: "none" }}
+      style={{
+        margin: 0,
+        marginTop: "10px",
+        padding: 0,
+        border: "none",
+        textAlign: "left",
+      }}
     >
       <legend
         style={{
