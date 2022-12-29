@@ -86,7 +86,6 @@ import { EncryptedIcon } from "./components/EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
 import { LanguageList } from "./components/LanguageList";
 import { PlusPromoIcon, UsersIcon } from "../components/icons";
-import { useDevice } from "../components/App";
 import MenuItem from "../components/menu/MenuItem";
 polyfill();
 
