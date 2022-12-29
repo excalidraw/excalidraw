@@ -42,7 +42,7 @@ type MobileMenuProps = {
   renderSidebars: () => JSX.Element | null;
   device: Device;
   renderWelcomeScreen?: boolean;
-  renderDefaultMenu: () => React.ReactNode;
+  renderMenu: () => React.ReactNode;
 };
 
 export const MobileMenu = ({
@@ -63,7 +63,7 @@ export const MobileMenu = ({
   renderSidebars,
   device,
   renderWelcomeScreen,
-  renderDefaultMenu,
+  renderMenu,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -154,7 +154,7 @@ export const MobileMenu = ({
 
     return (
       <div className="App-toolbar-content">
-        {renderDefaultMenu()}
+        {renderMenu()}
 
         {actionManager.renderAction("toggleEditMenu")}
         {actionManager.renderAction("undo")}

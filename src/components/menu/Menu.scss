@@ -83,10 +83,11 @@
     }
   }
 
-  .menu-group-header {
-    font-size: 13px;
+  .menu-group-title {
+    font-size: 14px;
     text-align: left;
     margin: 10px 0;
+    font-weight: 500;
   }
 
   &.theme--dark {

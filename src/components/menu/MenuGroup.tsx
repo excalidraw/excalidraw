@@ -13,7 +13,7 @@ const MenuGroup = ({
 }) => {
   return (
     <div className={`menu-group ${className}`} style={style}>
-      {title && <p className="menu-group-header">{title}</p>}
+      {title && <p className="menu-group-title">{title}</p>}
       {children}
     </div>
   );
