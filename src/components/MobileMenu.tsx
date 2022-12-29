@@ -145,17 +145,12 @@ export const MobileMenu = ({
 
   const renderAppToolbar = () => {
     if (appState.viewModeEnabled) {
-      return (
-        <div className="App-toolbar-content">
-          {actionManager.renderAction("toggleCanvasMenu")}
-        </div>
-      );
+      return <div className="App-toolbar-content">{renderMenu()}</div>;
     }
 
     return (
       <div className="App-toolbar-content">
         {renderMenu()}
-
         {actionManager.renderAction("toggleEditMenu")}
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
