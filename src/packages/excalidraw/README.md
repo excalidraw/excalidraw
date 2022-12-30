@@ -380,6 +380,31 @@ For a complete list of variables, check [theme.scss](https://github.com/excalidr
 
 No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
 
+### Component API
+
+#### Footer
+
+Earlier we were using `renderFooter` prop to render custom footer which was removed in [#5970](https://github.com/excalidraw/excalidraw/pull/5970). Now you can pass a `Footer` component instead to render the custom UI for footer.
+
+You will need to import the `Footer` component from the package and wrap your component with the Footer component. The `Footer` should a valid React Node.
+
+**Usage**
+
+```js
+import { Footer } from "@excalidraw/excalidraw";
+
+const CustomFooter = () => <button> custom button</button>;
+const App = () => {
+  return (
+    <Excalidraw>
+      <Footer>
+        <CustomFooter />
+      </Footer>
+    </Excalidraw>
+  );
+};
+```
+
 ### Props
 
 | Name | Type | Default | Description |
@@ -392,7 +417,6 @@ No, Excalidraw package doesn't come with collaboration built in, since the imple
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
 | [`langCode`](#langCode) | string | `en` | Language code string |
 | [`renderTopRightUI`](#renderTopRightUI) | Function |  | Function that renders custom UI in top right corner |
-| [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
 | [`renderCustomStats`](#renderCustomStats) | Function |  | Function that can be used to render custom stats on the stats dialog. |
 | [`renderSIdebar`](#renderSIdebar) | Function |  | Render function that renders custom sidebar. |
 | [`viewModeEnabled`](#viewModeEnabled) | boolean |  | This implies if the app is in view mode. |
@@ -612,14 +636,6 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 </pre>
 
 A function returning JSX to render custom UI in the top right corner of the app.
-
-#### `renderFooter`
-
-<pre>
-(isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>) => JSX | null
-</pre>
-
-A function returning JSX to render custom UI footer. For example, you can use this to render a language picker that was previously being rendered by Excalidraw itself (for now, you'll need to implement your own language picker).
 
 #### `renderCustomStats`
 
@@ -915,7 +931,11 @@ When `localAppState` is supplied, it's used in place of values that are missing 
 **_Signature_**
 
 <pre>
-restoreElements(elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ImportedDataState["elements"]</a>, localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>
+restoreElements(
+  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ImportedDataState["elements"]</a>,
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>,
+  refreshDimensions: boolean
+)
 </pre>
 
 **_How to use_**
@@ -928,12 +948,18 @@ This function will make sure all properties of element is correctly set and if a
 
 When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`. Use this when you import elements which may already be present in the scene to ensure that you do not disregard the newly imported elements if you're using element version to detect the updates.
 
+Parameter `refreshDimensions` indicates whether we should also recalculate text element dimensions. Defaults to `false`. Since this is a potentially costly operation, you may want to disable it if you restore elements in tight loops, such as during collaboration.
+
 #### `restore`
 
 **_Signature_**
 
 <pre>
-restoreElements(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L12">ImportedDataState</a>, localAppState: Partial<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>> | null | undefined, localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L4">DataState</a>
+restoreElements(
+  data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L12">ImportedDataState</a>,
+  localAppState: Partial<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>> | null | undefined,
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L4">DataState</a>
+)
 </pre>
 
 See [`restoreAppState()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreAppState) about `localAppState`, and [`restoreElements()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreElements) about `localElements`.

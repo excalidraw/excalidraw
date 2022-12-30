@@ -6,20 +6,30 @@ import {
   isTestEnv,
 } from "../utils";
 import Scene from "../scene/Scene";
-import { isBoundToContainer, isTextElement } from "./typeChecks";
-import { CLASSES, BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+import {
+  isArrowElement,
+  isBoundToContainer,
+  isTextElement,
+} from "./typeChecks";
+import { CLASSES, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
-  ExcalidrawTextElement,
   ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
+  ExcalidrawTextElement,
+  ExcalidrawTextContainer,
 } from "./types";
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
+  getBoundTextElementOffset,
   getContainerDims,
   getContainerElement,
+  getTextElementAngle,
+  getTextWidth,
+  normalizeText,
   wrapText,
 } from "./textElement";
 import {
@@ -28,17 +38,9 @@ import {
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
-import { getMaxContainerWidth } from "./newElement";
-
-const normalizeText = (text: string) => {
-  return (
-    text
-      // replace tabs with spaces so they render and measure correctly
-      .replace(/\t/g, "        ")
-      // normalize newlines
-      .replace(/\r?\n|\r/g, "\n")
-  );
-};
+import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
+import { LinearElementEditor } from "./linearElementEditor";
+import { parseClipboard } from "../clipboard";
 
 const getTransform = (
   width: number,
@@ -59,6 +61,38 @@ const getTransform = (
     translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
+};
+
+const originalContainerCache: {
+  [id: ExcalidrawTextContainer["id"]]:
+    | {
+        height: ExcalidrawTextContainer["height"];
+      }
+    | undefined;
+} = {};
+
+export const updateOriginalContainerCache = (
+  id: ExcalidrawTextContainer["id"],
+  height: ExcalidrawTextContainer["height"],
+) => {
+  const data =
+    originalContainerCache[id] || (originalContainerCache[id] = { height });
+  data.height = height;
+  return data;
+};
+
+export const resetOriginalContainerCache = (
+  id: ExcalidrawTextContainer["id"],
+) => {
+  if (originalContainerCache[id]) {
+    delete originalContainerCache[id];
+  }
+};
+
+export const getOriginalContainerHeightFromCache = (
+  id: ExcalidrawTextContainer["id"],
+) => {
+  return originalContainerCache[id]?.height ?? null;
 };
 
 export const textWysiwyg = ({
@@ -88,6 +122,9 @@ export const textWysiwyg = ({
     updatedTextElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
   ) => {
+    if (!editable.style.fontFamily || !editable.style.fontSize) {
+      return false;
+    }
     const currentFont = editable.style.fontFamily.replace(/"/g, "");
     if (
       getFontFamilyString({ fontFamily: updatedTextElement.fontFamily }) !==
@@ -100,7 +137,6 @@ export const textWysiwyg = ({
     }
     return false;
   };
-  let originalContainerHeight: number;
 
   const updateWysiwygStyle = () => {
     const appState = app.state;
@@ -115,7 +151,7 @@ export const textWysiwyg = ({
       getFontString(updatedTextElement),
     );
     if (updatedTextElement && isTextElement(updatedTextElement)) {
-      const coordX = updatedTextElement.x;
+      let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
       const container = getContainerElement(updatedTextElement);
       let maxWidth = updatedTextElement.width;
@@ -124,8 +160,17 @@ export const textWysiwyg = ({
       const width = updatedTextElement.width;
       // Set to element height by default since that's
       // what is going to be used for unbounded text
-      let height = updatedTextElement.height;
+      let textElementHeight = updatedTextElement.height;
       if (container && updatedTextElement.containerId) {
+        if (isArrowElement(container)) {
+          const boundTextCoords =
+            LinearElementEditor.getBoundTextElementPosition(
+              container,
+              updatedTextElement as ExcalidrawTextElementWithContainer,
+            );
+          coordX = boundTextCoords.x;
+          coordY = boundTextCoords.y;
+        }
         const propertiesUpdated = textPropertiesUpdated(
           updatedTextElement,
           editable,
@@ -134,31 +179,52 @@ export const textWysiwyg = ({
         // using editor.style.height to get the accurate height of text editor
         const editorHeight = Number(editable.style.height.slice(0, -2));
         if (editorHeight > 0) {
-          height = editorHeight;
+          textElementHeight = editorHeight;
         }
         if (propertiesUpdated) {
-          originalContainerHeight = containerDims.height;
-
           // update height of the editor after properties updated
-          height = updatedTextElement.height;
+          textElementHeight = updatedTextElement.height;
         }
-        if (!originalContainerHeight) {
-          originalContainerHeight = containerDims.height;
+
+        let originalContainerData;
+        if (propertiesUpdated) {
+          originalContainerData = updateOriginalContainerCache(
+            container.id,
+            containerDims.height,
+          );
+        } else {
+          originalContainerData = originalContainerCache[container.id];
+          if (!originalContainerData) {
+            originalContainerData = updateOriginalContainerCache(
+              container.id,
+              containerDims.height,
+            );
+          }
         }
-        maxWidth = containerDims.width - BOUND_TEXT_PADDING * 2;
-        maxHeight = containerDims.height - BOUND_TEXT_PADDING * 2;
+
+        maxWidth = getMaxContainerWidth(container);
+        maxHeight = getMaxContainerHeight(container);
+
         // autogrow container height if text exceeds
-        if (height > maxHeight) {
-          const diff = Math.min(height - maxHeight, approxLineHeight);
+
+        if (!isArrowElement(container) && textElementHeight > maxHeight) {
+          const diff = Math.min(
+            textElementHeight - maxHeight,
+            approxLineHeight,
+          );
           mutateElement(container, { height: containerDims.height + diff });
           return;
         } else if (
           // autoshrink container height until original container height
           // is reached when text is removed
-          containerDims.height > originalContainerHeight &&
-          height < maxHeight
+          !isArrowElement(container) &&
+          containerDims.height > originalContainerData.height &&
+          textElementHeight < maxHeight
         ) {
-          const diff = Math.min(maxHeight - height, approxLineHeight);
+          const diff = Math.min(
+            maxHeight - textElementHeight,
+            approxLineHeight,
+          );
           mutateElement(container, { height: containerDims.height - diff });
         }
         // Start pushing text upward until a diff of 30px (padding)
@@ -166,11 +232,17 @@ export const textWysiwyg = ({
         else {
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
-            coordY = container.y + containerDims.height / 2 - height / 2;
+            if (!isArrowElement(container)) {
+              coordY =
+                container.y + containerDims.height / 2 - textElementHeight / 2;
+            }
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
             coordY =
-              container.y + containerDims.height - height - BOUND_TEXT_PADDING;
+              container.y +
+              containerDims.height -
+              textElementHeight -
+              getBoundTextElementOffset(updatedTextElement);
           }
         }
       }
@@ -204,19 +276,19 @@ export const textWysiwyg = ({
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
-      const angle = container ? container.angle : updatedTextElement.angle;
+
       Object.assign(editable.style, {
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
         width: `${Math.min(width, maxWidth)}px`,
-        height: `${height}px`,
+        height: `${textElementHeight}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
         transform: getTransform(
           width,
-          height,
-          angle,
+          textElementHeight,
+          getTextElementAngle(updatedTextElement),
           appState,
           maxWidth,
           editorMaxHeight,
@@ -271,10 +343,37 @@ export const textWysiwyg = ({
     // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
     whiteSpace,
     overflowWrap: "break-word",
+    boxSizing: "content-box",
   });
   updateWysiwygStyle();
 
   if (onChange) {
+    editable.onpaste = async (event) => {
+      const clipboardData = await parseClipboard(event, true);
+      if (!clipboardData.text) {
+        return;
+      }
+      const data = normalizeText(clipboardData.text);
+      if (!data) {
+        return;
+      }
+      const container = getContainerElement(element);
+
+      const font = getFontString({
+        fontSize: app.state.currentItemFontSize,
+        fontFamily: app.state.currentItemFontFamily,
+      });
+      if (container) {
+        const wrappedText = wrapText(
+          `${editable.value}${data}`,
+          font,
+          getMaxContainerWidth(container),
+        );
+        const width = getTextWidth(wrappedText, font);
+        editable.style.width = `${width}px`;
+      }
+    };
+
     editable.oninput = () => {
       const updatedTextElement = Scene.getScene(element)?.getElement(
         id,
@@ -485,7 +584,7 @@ export const textWysiwyg = ({
 
     if (container) {
       text = updateElement.text;
-      if (editable.value) {
+      if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
           mutateElement(container, {

@@ -443,10 +443,9 @@
     "d9480f": "Narancs 9"
   },
   "welcomeScreen": {
-    "data": "",
-    "switchToPlusApp": "",
-    "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "data": "Minden adatodat kizárólag a böngésződben tároljuk.",
+    "menuHints": "Export, beállítások, nyelvek, ...",
+    "toolbarHints": "Válassz egy eszközt & kezdj alkotni!",
+    "helpHints": "Gyorsbillentyűk & súgó"
   }
 }

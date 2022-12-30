@@ -66,10 +66,13 @@ const getColor = (color: string): string | null => {
     return color;
   }
 
-  return isValidColor(color)
-    ? color
-    : isValidColor(`#${color}`)
+  // testing for `#` first fixes a bug on Electron (more specfically, an
+  // Obsidian popout window), where a hex color without `#` is (incorrectly)
+  // considered valid
+  return isValidColor(`#${color}`)
     ? `#${color}`
+    : isValidColor(color)
+    ? color
     : null;
 };
 
@@ -365,17 +368,20 @@ export const ColorPicker = ({
   appState: AppState;
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
+  const coords = pickerButton.current?.getBoundingClientRect();
 
   return (
     <div>
       <div className="color-picker-control-container">
-        <button
-          className="color-picker-label-swatch"
-          aria-label={label}
-          style={color ? { "--swatch-color": color } : undefined}
-          onClick={() => setActive(!isActive)}
-          ref={pickerButton}
-        />
+        <div className="color-picker-label-swatch-container">
+          <button
+            className="color-picker-label-swatch"
+            aria-label={label}
+            style={color ? { "--swatch-color": color } : undefined}
+            onClick={() => setActive(!isActive)}
+            ref={pickerButton}
+          />
+        </div>
         <ColorInput
           color={color}
           label={label}
@@ -386,27 +392,37 @@ export const ColorPicker = ({
       </div>
       <React.Suspense fallback="">
         {isActive ? (
-          <Popover
-            onCloseRequest={(event) =>
-              event.target !== pickerButton.current && setActive(false)
-            }
+          <div
+            className="color-picker-popover-container"
+            style={{
+              position: "fixed",
+              top: coords?.top,
+              left: coords?.right,
+              zIndex: 1,
+            }}
           >
-            <Picker
-              colors={colors[type]}
-              color={color || null}
-              onChange={(changedColor) => {
-                onChange(changedColor);
-              }}
-              onClose={() => {
-                setActive(false);
-                pickerButton.current?.focus();
-              }}
-              label={label}
-              showInput={false}
-              type={type}
-              elements={elements}
-            />
-          </Popover>
+            <Popover
+              onCloseRequest={(event) =>
+                event.target !== pickerButton.current && setActive(false)
+              }
+            >
+              <Picker
+                colors={colors[type]}
+                color={color || null}
+                onChange={(changedColor) => {
+                  onChange(changedColor);
+                }}
+                onClose={() => {
+                  setActive(false);
+                  pickerButton.current?.focus();
+                }}
+                label={label}
+                showInput={false}
+                type={type}
+                elements={elements}
+              />
+            </Popover>
+          </div>
         ) : null}
       </React.Suspense>
     </div>

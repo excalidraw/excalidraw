@@ -1,4 +1,4 @@
-import { load, questionCircle, saveAs } from "../components/icons";
+import { LoadIcon, questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
@@ -19,6 +19,8 @@ import { ActiveFile } from "../components/ActiveFile";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
+import MenuItem from "../components/MenuItem";
+import { getShortcutFromShortcutName } from "./shortcuts";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -177,6 +179,7 @@ export const actionSaveToActiveFile = register({
 
 export const actionSaveFileToDisk = register({
   name: "saveFileToDisk",
+  viewMode: true,
   trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {
     try {
@@ -245,14 +248,12 @@ export const actionLoadScene = register({
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
   PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="button"
-      icon={load}
-      title={t("buttons.load")}
-      aria-label={t("buttons.load")}
-      showAriaLabel={useDevice().isMobile}
+    <MenuItem
+      label={t("buttons.load")}
+      icon={LoadIcon}
       onClick={updateData}
-      data-testid="load-button"
+      dataTestId="load-button"
+      shortcut={getShortcutFromShortcutName("loadScene")}
     />
   ),
 });

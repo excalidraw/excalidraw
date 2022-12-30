@@ -91,7 +91,7 @@ export type ActionName =
   | "ungroup"
   | "goToCollaborator"
   | "addToLibrary"
-  | "changeSharpness"
+  | "changeRoundness"
   | "alignTop"
   | "alignBottom"
   | "alignLeft"
@@ -124,7 +124,9 @@ export type PanelComponentProps = {
 
 export interface Action {
   name: ActionName;
-  PanelComponent?: React.FC<PanelComponentProps>;
+  PanelComponent?: React.FC<
+    PanelComponentProps & { isInHamburgerMenu: boolean }
+  >;
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (
@@ -141,6 +143,8 @@ export interface Action {
   contextItemPredicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
+    appProps: ExcalidrawProps,
+    app: AppClassProperties,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
   trackEvent:
@@ -162,4 +166,7 @@ export interface Action {
           value: any,
         ) => boolean;
       };
+  /** if set to `true`, allow action to be performed in viewMode.
+   *  Defaults to `false` */
+  viewMode?: boolean;
 }

@@ -68,7 +68,7 @@ const excalidrawDiagram = {
       roughness: 1,
       opacity: 100,
       groupIds: [],
-      strokeSharpness: "sharp",
+      roundness: null,
       seed: 1041657908,
       version: 120,
       versionNonce: 1188004276,

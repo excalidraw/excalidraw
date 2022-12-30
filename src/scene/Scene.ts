@@ -79,6 +79,35 @@ class Scene {
     return null;
   }
 
+  /**
+   * A utility method to help with updating all scene elements, with the added
+   * performance optimization of not renewing the array if no change is made.
+   *
+   * Maps all current excalidraw elements, invoking the callback for each
+   * element. The callback should either return a new mapped element, or the
+   * original element if no changes are made. If no changes are made to any
+   * element, this results in a no-op. Otherwise, the newly mapped elements
+   * are set as the next scene's elements.
+   *
+   * @returns whether a change was made
+   */
+  mapElements(
+    iteratee: (element: ExcalidrawElement) => ExcalidrawElement,
+  ): boolean {
+    let didChange = false;
+    const newElements = this.elements.map((element) => {
+      const nextElement = iteratee(element);
+      if (nextElement !== element) {
+        didChange = true;
+      }
+      return nextElement;
+    });
+    if (didChange) {
+      this.replaceAllElements(newElements);
+    }
+    return didChange;
+  }
+
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
     this.elements = nextElements;
     this.elementsMap.clear();
@@ -120,6 +149,24 @@ class Scene {
     // done not for memory leaks, but to guard against possible late fires
     // (I guess?)
     this.callbacks.clear();
+  }
+
+  insertElementAtIndex(element: ExcalidrawElement, index: number) {
+    if (!Number.isFinite(index) || index < 0) {
+      throw new Error(
+        "insertElementAtIndex can only be called with index >= 0",
+      );
+    }
+    const nextElements = [
+      ...this.elements.slice(0, index),
+      element,
+      ...this.elements.slice(index),
+    ];
+    this.replaceAllElements(nextElements);
+  }
+
+  getElementIndex(elementId: string) {
+    return this.elements.findIndex((element) => element.id === elementId);
   }
 }
 

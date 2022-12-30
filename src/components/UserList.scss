@@ -7,23 +7,31 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
+    align-items: center;
+    gap: 0.625rem;
 
     &:empty {
       display: none;
     }
+
+    // can fit max 5 avatars in a column
+    max-height: 140px;
+
+    // can fit max 10 avatars in a row when there's enough space
+    max-width: 290px;
+
+    // Tweak in 30px increments to fit more/fewer avatars in a row/column ^^
+
+    overflow: hidden;
   }
 
   .UserList > * {
     pointer-events: all;
-    margin: 0 0 var(--space-factor) var(--space-factor);
   }
 
   .UserList_mobile {
     padding: 0;
     justify-content: normal;
-  }
-
-  .UserList_mobile > * {
-    margin: 0 var(--space-factor) var(--space-factor) 0;
+    margin: 0.5rem 0;
   }
 }

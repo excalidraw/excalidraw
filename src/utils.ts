@@ -15,6 +15,7 @@ import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 import { SHAPES } from "./shapes";
+import React from "react";
 
 let mockDateTime: string | null = null;
 
@@ -326,15 +327,13 @@ export const getShortcutKey = (shortcut: string): string => {
   shortcut = shortcut
     .replace(/\bAlt\b/i, "Alt")
     .replace(/\bShift\b/i, "Shift")
-    .replace(/\b(Enter|Return)\b/i, "Enter")
-    .replace(/\bDel\b/i, "Delete");
-
+    .replace(/\b(Enter|Return)\b/i, "Enter");
   if (isDarwin) {
     return shortcut
-      .replace(/\bCtrlOrCmd\b/i, "Cmd")
+      .replace(/\bCtrlOrCmd\b/gi, "Cmd")
       .replace(/\bAlt\b/i, "Option");
   }
-  return shortcut.replace(/\bCtrlOrCmd\b/i, "Ctrl");
+  return shortcut.replace(/\bCtrlOrCmd\b/gi, "Ctrl");
 };
 
 export const viewportCoordsToSceneCoords = (
@@ -687,4 +686,27 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
           element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
       )
     : [];
+};
+
+export const ReactChildrenToObject = <
+  T extends {
+    [k in string]?:
+      | React.ReactPortal
+      | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
+  },
+>(
+  children: React.ReactNode,
+) => {
+  return React.Children.toArray(children).reduce((acc, child) => {
+    if (
+      React.isValidElement(child) &&
+      typeof child.type !== "string" &&
+      //@ts-ignore
+      child?.type.displayName
+    ) {
+      // @ts-ignore
+      acc[child.type.displayName] = child;
+    }
+    return acc;
+  }, {} as Partial<T>);
 };

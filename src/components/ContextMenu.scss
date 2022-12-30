@@ -19,7 +19,7 @@
     color: var(--popup-text-color);
   }
 
-  .context-menu-option {
+  .context-menu-item {
     position: relative;
     width: 100%;
     min-width: 9.5rem;
@@ -43,16 +43,16 @@
     }
 
     &.dangerous {
-      .context-menu-option__label {
+      .context-menu-item__label {
         color: $oc-red-7;
       }
     }
 
-    .context-menu-option__label {
+    .context-menu-item__label {
       justify-self: start;
       margin-inline-end: 20px;
     }
-    .context-menu-option__shortcut {
+    .context-menu-item__shortcut {
       justify-self: end;
       opacity: 0.6;
       font-family: inherit;
@@ -60,37 +60,37 @@
     }
   }
 
-  .context-menu-option:hover {
+  .context-menu-item:hover {
     color: var(--popup-bg-color);
     background-color: var(--select-highlight-color);
 
     &.dangerous {
-      .context-menu-option__label {
+      .context-menu-item__label {
         color: var(--popup-bg-color);
       }
       background-color: $oc-red-6;
     }
   }
 
-  .context-menu-option:focus {
+  .context-menu-item:focus {
     z-index: 1;
   }
 
   @include isMobile {
-    .context-menu-option {
+    .context-menu-item {
       display: block;
 
-      .context-menu-option__label {
+      .context-menu-item__label {
         margin-inline-end: 0;
       }
 
-      .context-menu-option__shortcut {
+      .context-menu-item__shortcut {
         display: none;
       }
     }
   }
 
-  .context-menu-option-separator {
+  .context-menu-item-separator {
     border: none;
     border-top: 1px solid $oc-gray-5;
   }

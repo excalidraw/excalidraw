@@ -1,18 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { render, unmountComponentAtNode } from "react-dom";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
-import { CanvasError } from "../errors";
 import { t } from "../i18n";
-import { useDevice } from "./App";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../scene/export";
 import { AppState, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
-import { clipboard, exportImage } from "./icons";
+import { clipboard } from "./icons";
 import Stack from "./Stack";
-import { ToolButton } from "./ToolButton";
 import "./ExportDialog.scss";
 import OpenColor from "open-color";
 import { CheckboxItem } from "./CheckboxItem";
@@ -33,19 +29,6 @@ export const ErrorCanvasPreview = () => {
       <em>({t("canvasError.canvasTooBigTip")})</em>
     </div>
   );
-};
-
-const renderPreview = (
-  content: HTMLCanvasElement | Error,
-  previewNode: HTMLDivElement,
-) => {
-  unmountComponentAtNode(previewNode);
-  previewNode.innerHTML = "";
-  if (content instanceof HTMLCanvasElement) {
-    previewNode.appendChild(content);
-  } else {
-    render(<ErrorCanvasPreview />, previewNode);
-  }
 };
 
 export type ExportCB = (
@@ -101,6 +84,7 @@ const ImageExportModal = ({
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
   const { exportBackground, viewBackgroundColor } = appState;
+  const [renderError, setRenderError] = useState<Error | null>(null);
 
   const exportedElements = exportSelected
     ? getSelectedElements(elements, appState, true)
@@ -121,15 +105,16 @@ const ImageExportModal = ({
       exportPadding,
     })
       .then((canvas) => {
+        setRenderError(null);
         // if converting to blob fails, there's some problem that will
         // likely prevent preview and export (e.g. canvas too big)
         return canvasToBlob(canvas).then(() => {
-          renderPreview(canvas, previewNode);
+          previewNode.replaceChildren(canvas);
         });
       })
       .catch((error) => {
         console.error(error);
-        renderPreview(new CanvasError(), previewNode);
+        setRenderError(error);
       });
   }, [
     appState,
@@ -142,7 +127,9 @@ const ImageExportModal = ({
 
   return (
     <div className="ExportDialog">
-      <div className="ExportDialog__preview" ref={previewRef} />
+      <div className="ExportDialog__preview" ref={previewRef}>
+        {renderError && <ErrorCanvasPreview />}
+      </div>
       {supportsContextFilters &&
         actionManager.renderAction("exportWithDarkMode")}
       <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
@@ -221,6 +208,7 @@ const ImageExportModal = ({
 export const ImageExportDialog = ({
   elements,
   appState,
+  setAppState,
   files,
   exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
@@ -229,6 +217,7 @@ export const ImageExportDialog = ({
   onExportToClipboard,
 }: {
   appState: AppState;
+  setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles;
   exportPadding?: number;
@@ -237,26 +226,13 @@ export const ImageExportDialog = ({
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
 }) => {
-  const [modalIsShown, setModalIsShown] = useState(false);
-
   const handleClose = React.useCallback(() => {
-    setModalIsShown(false);
-  }, []);
+    setAppState({ openDialog: null });
+  }, [setAppState]);
 
   return (
     <>
-      <ToolButton
-        onClick={() => {
-          setModalIsShown(true);
-        }}
-        data-testid="image-export-button"
-        icon={exportImage}
-        type="button"
-        aria-label={t("buttons.exportImage")}
-        showAriaLabel={useDevice().isMobile}
-        title={t("buttons.exportImage")}
-      />
-      {modalIsShown && (
+      {appState.openDialog === "imageExport" && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.exportImage")}>
           <ImageExportModal
             elements={elements}

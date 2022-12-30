@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Paste",
+    "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
@@ -71,7 +72,7 @@
     "layers": "Layers",
     "actions": "Actions",
     "language": "Language",
-    "liveCollaboration": "Live collaboration",
+    "liveCollaboration": "Live collaboration...",
     "duplicateSelection": "Duplicate",
     "untitled": "Untitled",
     "name": "Name",
@@ -136,8 +137,8 @@
   "buttons": {
     "clearReset": "Reset the canvas",
     "exportJSON": "Export to file",
-    "exportImage": "Save as image",
-    "export": "Export",
+    "exportImage": "Export image...",
+    "export": "Save to...",
     "exportToPng": "Export to PNG",
     "exportToSvg": "Export to SVG",
     "copyToClipboard": "Copy to clipboard",
@@ -145,7 +146,7 @@
     "scale": "Scale",
     "save": "Save to current file",
     "saveAs": "Save as",
-    "load": "Load",
+    "load": "Open",
     "getShareableLink": "Get shareable link",
     "close": "Close",
     "selectLanguage": "Select language",
@@ -215,7 +216,7 @@
     "text": "Text",
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
-    "penMode": "Prevent pinch-zoom and accept freedraw input only from pen",
+    "penMode": "Pen mode - prevent touch",
     "link": "Add/ Update link for a selected shape",
     "eraser": "Eraser"
   },
@@ -236,7 +237,7 @@
     "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
     "resizeImage": "You can resize freely by holding SHIFT,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating",
-    "lineEditor_info": "Double-click or press Enter to edit points",
+    "lineEditor_info": "Hold CtrlOrCmd and Double-click or press CtrlOrCmd + Enter to edit points",
     "lineEditor_pointSelected": "Press Delete to remove point(s),\nCtrlOrCmd+D to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to edit (hold SHIFT to select multiple),\nor hold Alt and click to add new points",
     "placeImage": "Click to place the image, or click and drag to set its size manually",
@@ -392,7 +393,8 @@
     "fileSaved": "File saved.",
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
-    "selection": "selection"
+    "selection": "selection",
+    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor"
   },
   "colors": {
     "ffffff": "White",
@@ -440,5 +442,12 @@
     "5c940d": "Lime 9",
     "e67700": "Yellow 9",
     "d9480f": "Orange 9"
+  },
+  "welcomeScreen": {
+    "data": "All your data is saved locally in your browser.",
+    "switchToPlusApp": "Did you want to go to the Excalidraw+ instead?",
+    "menuHints": "Export, preferences, languages, ...",
+    "toolbarHints": "Pick a tool & Start drawing!",
+    "helpHints": "Shortcuts & help"
   }
 }
