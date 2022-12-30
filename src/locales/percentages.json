@@ -16,9 +16,9 @@
   "gl-ES": 99,
   "he-IL": 92,
   "hi-IN": 70,
-  "hu-HU": 92,
+  "hu-HU": 91,
   "id-ID": 99,
-  "it-IT": 99,
+  "it-IT": 100,
   "ja-JP": 99,
   "kab-KAB": 95,
   "kk-KZ": 21,
@@ -28,7 +28,7 @@
   "lv-LV": 98,
   "mr-IN": 99,
   "my-MM": 42,
-  "nb-NO": 99,
+  "nb-NO": 100,
   "nl-NL": 88,
   "nn-NO": 92,
   "oc-FR": 99,
@@ -40,7 +40,7 @@
   "ru-RU": 99,
   "si-LK": 8,
   "sk-SK": 99,
-  "sl-SI": 99,
+  "sl-SI": 100,
   "sv-SE": 99,
   "ta-IN": 94,
   "tr-TR": 99,
@@ -48,5 +48,5 @@
   "vi-VN": 20,
   "zh-CN": 99,
   "zh-HK": 26,
-  "zh-TW": 99
+  "zh-TW": 100
 }
