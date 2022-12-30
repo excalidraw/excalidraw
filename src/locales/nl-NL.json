@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Plakken",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Plakken als platte tekst",
     "pasteCharts": "Plak grafieken",
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
@@ -72,7 +72,7 @@
     "layers": "Lagen",
     "actions": "Acties",
     "language": "Taal",
-    "liveCollaboration": "",
+    "liveCollaboration": "Live Samenwerking...",
     "duplicateSelection": "Dupliceer",
     "untitled": "Naamloos",
     "name": "Naam",
@@ -106,10 +106,10 @@
     "toggleTheme": "Thema aan/uit",
     "personalLib": "Persoonlijke bibliotheek",
     "excalidrawLib": "Excalidraw bibliotheek",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
+    "decreaseFontSize": "Letters verkleinen",
+    "increaseFontSize": "Letters vergroten",
     "unbindText": "Ontkoppel tekst",
-    "bindText": "",
+    "bindText": "Koppel tekst aan de container",
     "link": {
       "edit": "Wijzig link",
       "create": "Maak link",
@@ -120,18 +120,18 @@
       "exit": "Verlaat regel-editor"
     },
     "elementLock": {
-      "lock": "",
+      "lock": "Vergrendel",
       "unlock": "Ontgrendel",
       "lockAll": "Vergrendel alles",
       "unlockAll": "Ontgrendel alles"
     },
     "statusPublished": "Gepubliceerd",
-    "sidebarLock": ""
+    "sidebarLock": "Zijbalk open houden"
   },
   "library": {
     "noItems": "Nog geen items toegevoegd...",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Selecteer een item op het canvas om het hier toe te voegen of installeer een bibliotheek uit de openbare repository, hieronder.",
+    "hint_emptyPrivateLibrary": "Selecteer een item op het canvas om het hier toe te voegen."
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -200,7 +200,7 @@
     "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
     "svgImageInsertError": "Kon geen SVG-afbeelding invoegen. De SVG-opmaak ziet er niet geldig uit.",
     "invalidSVGString": "Ongeldige SVG.",
-    "cannotResolveCollabServer": "",
+    "cannotResolveCollabServer": "Kan geen verbinding maken met de collab server. Herlaad de pagina en probeer het opnieuw.",
     "importLibraryError": "Kon bibliotheek niet laden"
   },
   "toolBar": {
@@ -215,7 +215,7 @@
     "text": "Tekst",
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
-    "penMode": "",
+    "penMode": "Pen modus - Blokkeer aanraken",
     "link": "",
     "eraser": "Gum"
   },
