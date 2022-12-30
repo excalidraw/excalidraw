@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lim inn",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Lim inn diagrammer",
     "selectAll": "Velg alt",
     "multiSelect": "Legg til element i utvalg",
@@ -235,7 +236,7 @@
     "resize": "Du kan beholde forholdet ved å trykke SHIFT mens du endrer størrelse,\ntrykk ALT for å endre størrelsen fra midten",
     "resizeImage": "Du kan endre størrelse fritt ved å holde SHIFT,\nhold ALT for å endre størrelse fra midten",
     "rotate": "Du kan låse vinklene ved å holde SHIFT mens du roterer",
-    "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkter",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, Ctrl / Cmd+D for å duplisere, eller dra for å flytte",
     "lineEditor_nothingSelected": "Velg et punkt å redigere (hold SHIFT for å velge flere),\neller hold Alt og klikk for å legge til nye punkter",
     "placeImage": "Klikk for å plassere bildet, eller klikk og dra for å angi størrelsen manuelt",
@@ -391,7 +392,8 @@
     "fileSaved": "Fil lagret.",
     "fileSavedToFilename": "Lagret til {filename}",
     "canvas": "lerret",
-    "selection": "utvalg"
+    "selection": "utvalg",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Hvit",
