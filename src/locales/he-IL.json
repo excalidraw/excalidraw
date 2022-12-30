@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "הדבק",
+    "pasteAsPlaintext": "",
     "pasteCharts": "הדבק גרפים",
     "selectAll": "בחר הכל",
     "multiSelect": "הוסף אובייקט לבחירה",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "אפס את הלוח",
     "exportJSON": "ייצא לקובץ",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "ייצוא התמונה...",
+    "export": "שמור ל...",
     "exportToPng": "יצא ל PNG",
     "exportToSvg": "יצא ל SVG",
     "copyToClipboard": "העתק ללוח",
@@ -144,7 +145,7 @@
     "scale": "קנה מידה",
     "save": "שמירת קובץ נוכחי",
     "saveAs": "שמירה בשם",
-    "load": "",
+    "load": "פתח",
     "getShareableLink": "קבל קישור לשיתוף",
     "close": "סגור",
     "selectLanguage": "בחר שפה",
@@ -235,7 +236,7 @@
     "resize": "ניתן להגביל פרופורציות על ידי לחיצה על SHIFT תוך כדי שינוי גודל,\nהחזק ALT בשביל לשנות גודל ביחס למרכז",
     "resizeImage": "",
     "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב",
-    "lineEditor_info": "לחץ לחיצה כפולה או אנטר לעריכת הנקודות",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -391,7 +392,8 @@
     "fileSaved": "קובץ נשמר.",
     "fileSavedToFilename": "נשמר לקובץ {filename}",
     "canvas": "משטח ציור",
-    "selection": "בחירה"
+    "selection": "בחירה",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "לבן",
