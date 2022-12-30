@@ -343,7 +343,7 @@ const joinMath = (
 };
 
 const getMathNewline = (mathProps: MathProps) => {
-  return mathProps.useTex && mathProps.mathOnly ? "\\\\" : "\n";
+  return mathProps.useTex && mathProps.mathOnly ? "\\newline" : "\n";
 };
 
 // This lets math input run across multiple newlines.
