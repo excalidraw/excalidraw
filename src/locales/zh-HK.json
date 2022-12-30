@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "貼上",
+    "pasteAsPlaintext": "",
     "pasteCharts": "貼上圖表",
     "selectAll": "全選",
     "multiSelect": "多重選取",
@@ -391,7 +392,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "畫布",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
