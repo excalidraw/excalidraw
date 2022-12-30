@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Постави",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Постави графики",
     "selectAll": "Маркирай всичко",
     "multiSelect": "Добави елемент към селекция",
@@ -235,7 +236,7 @@
     "resize": "Може да ограничите при преоразмеряване като задържите SHIFT,\nзадръжте ALT за преоразмерите през центъра",
     "resizeImage": "",
     "rotate": "Можете да ограничите ъглите, като държите SHIFT, докато се въртите",
-    "lineEditor_info": "Кликнете два пъти или натиснете Enter за да промените точките",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Натиснете Delete за да изтриете точка(и), CtrlOrCmd+D за дуплициране, или извлачете за да преместите",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -391,7 +392,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
