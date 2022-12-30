@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "붙여넣기",
+    "pasteAsPlaintext": "",
     "pasteCharts": "차트 붙여넣기",
     "selectAll": "전체 선택",
     "multiSelect": "선택 영역에 추가하기",
@@ -235,7 +236,7 @@
     "resize": "SHIFT 키를 누르면서 조정하면 크기의 비율이 제한됩니다.\nALT를 누르면서 조정하면 중앙을 기준으로 크기를 조정합니다.",
     "resizeImage": "SHIFT를 눌러서 자유롭게 크기를 변경하거나,\nALT를 눌러서 중앙을 고정하고 크기를 변경하기",
     "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
-    "lineEditor_info": "지점을 수정하려면 두 번 클릭하거나 Enter 키를 누르세요.",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Delete 키로 꼭짓점을 제거하거나,\nCtrlOrCmd+D 로 복제하거나, 드래그 해서 이동시키기",
     "lineEditor_nothingSelected": "꼭짓점을 선택해서 수정하거나 (SHIFT를 눌러서 여러개 선택),\nAlt를 누르고 클릭해서 새로운 꼭짓점 추가하기",
     "placeImage": "클릭해서 이미지를 배치하거나, 클릭하고 드래그해서 사이즈를 조정하기",
@@ -391,7 +392,8 @@
     "fileSaved": "파일이 저장되었습니다.",
     "fileSavedToFilename": "{filename} 로 저장되었습니다",
     "canvas": "캔버스",
-    "selection": "선택한 요소"
+    "selection": "선택한 요소",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "화이트",
