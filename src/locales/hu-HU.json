@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Beillesztés",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Grafikon beillesztése",
     "selectAll": "Összes kijelölése",
     "multiSelect": "Elem hozzáadása a kijelöléshez",
@@ -235,7 +236,7 @@
     "resize": "A SHIFT billentyű lenyomva tartásával az átméretezés megtartja az arányokat,\naz ALT lenyomva tartásával pedig a középpont egy helyben marad",
     "resizeImage": "A SHIFT billentyű lenyomva tartásával szabadon átméretezheted,\ntartsd lenyomva az ALT billentyűt a középről való átméretezéshez",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
-    "lineEditor_info": "Kattints duplán, vagy nyomj entert a pontok szerkesztéséhez",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Nyomd meg a Törlés gombot a pont(ok) eltávolításához,\nA Ctrl/Cmd+D a többszörözéshez, vagy húzással mozgathatja",
     "lineEditor_nothingSelected": "Válaszd ki a szerkeszteni kívánt pontot (több kijelöléséhez tartsd lenyomva a SHIFT billentyűt),\nvagy Alt, és kattintson az új pontok hozzáadásához",
     "placeImage": "Kattints a kép elhelyezéséhez, vagy kattints és méretezd manuálisan",
@@ -391,7 +392,8 @@
     "fileSaved": "Fájl elmentve.",
     "fileSavedToFilename": "Mentve mint {filename}",
     "canvas": "rajzvászon",
-    "selection": "kijelölés"
+    "selection": "kijelölés",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Fehér",
