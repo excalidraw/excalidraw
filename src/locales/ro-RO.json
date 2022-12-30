@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Lipire",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Inserare ca text simplu",
     "pasteCharts": "Lipire diagrame",
     "selectAll": "Selectare totală",
     "multiSelect": "Adaugă element la selecție",
@@ -236,7 +236,7 @@
     "resize": "Poți constrânge proporțiile, ținând apăsată tasta SHIFT în timp ce redimensionezi,\nține apăsată tasta ALT pentru a redimensiona de la centru",
     "resizeImage": "Poți redimensiona liber ținând apăsată tasta SHIFT,\nține apăsată tasta ALT pentru a redimensiona din centru",
     "rotate": "Poți constrânge unghiurile, ținând apăsată tasta SHIFT în timp ce rotești",
-    "lineEditor_info": "",
+    "lineEditor_info": "Ține apăsată tasta Ctrl sau Cmd și dă dublu clic sau apasă tasta Ctrl sau Cmd + Enter pentru a edita puncte",
     "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctele,\ncombinația de taste Ctrl sau Cmd + D pentru a le duplica sau glisează-le pentru a le schimba poziția",
     "lineEditor_nothingSelected": "Selectează un punct pentru a-l edita (ține apăsată tasta SHIFT pentru a selecta mai multe),\nsau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi",
     "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
@@ -393,7 +393,7 @@
     "fileSavedToFilename": "Salvat în {filename}",
     "canvas": "pânza",
     "selection": "selecția",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Folosește {{shortcut}} pentru a insera ca un singur element\nsau insera într-un editor de text existent"
   },
   "colors": {
     "ffffff": "Alb",
