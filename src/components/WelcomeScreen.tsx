@@ -1,13 +1,21 @@
 import { actionLoadScene, actionShortcuts } from "../actions";
-import { ActionManager } from "../actions/manager";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import { isExcalidrawPlusSignedUser } from "../constants";
 import { t } from "../i18n";
-import { AppState } from "../types";
-import { ExcalLogo, HelpIcon, LoadIcon, PlusPromoIcon } from "./icons";
+import { UIWelcomeScreenCenterComponents } from "../types";
+import { ReactChildrenToObject } from "../utils";
+import { useExcalidrawActionManager, useExcalidrawAppState } from "./App";
+import {
+  ExcalLogo,
+  HelpIcon,
+  LoadIcon,
+  WelcomeScreenHelpArrow,
+  WelcomeScreenMenuArrow,
+  WelcomeScreenTopToolbarArrow,
+} from "./icons";
+
 import "./WelcomeScreen.scss";
 
-const WelcomeScreenItem = ({
+const WelcomeScreenMenuItem = ({
   label,
   shortcut,
   onClick,
@@ -49,73 +57,126 @@ const WelcomeScreenItem = ({
   );
 };
 
-const WelcomeScreen = ({
-  appState,
-  actionManager,
-}: {
-  appState: AppState;
-  actionManager: ActionManager;
-}) => {
-  let subheadingJSX;
-
-  if (isExcalidrawPlusSignedUser) {
-    subheadingJSX = t("welcomeScreen.switchToPlusApp")
-      .split(/(Excalidraw\+)/)
-      .map((bit, idx) => {
-        if (bit === "Excalidraw+") {
-          return (
-            <a
-              style={{ pointerEvents: "all" }}
-              href={`${process.env.REACT_APP_PLUS_APP}?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenSignedInUser`}
-              key={idx}
-            >
-              Excalidraw+
-            </a>
-          );
-        }
-        return bit;
-      });
-  } else {
-    subheadingJSX = t("welcomeScreen.data");
-  }
+const Center = ({ children }: { children?: React.ReactNode }) => {
+  const childrenComponents =
+    ReactChildrenToObject<UIWelcomeScreenCenterComponents>(children);
 
   return (
     <div className="WelcomeScreen-container">
-      <div className="WelcomeScreen-logo virgil WelcomeScreen-decor">
-        {ExcalLogo} Excalidraw
-      </div>
-      <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--subheading">
-        {subheadingJSX}
-      </div>
-      <div className="WelcomeScreen-items">
-        {!appState.viewModeEnabled && (
-          <WelcomeScreenItem
-            // TODO barnabasmolnar/editor-redesign
-            // do we want the internationalized labels here that are currently
-            // in use elsewhere or new ones?
-            label={t("buttons.load")}
-            onClick={() => actionManager.executeAction(actionLoadScene)}
-            shortcut={getShortcutFromShortcutName("loadScene")}
-            icon={LoadIcon}
-          />
-        )}
-        <WelcomeScreenItem
-          onClick={() => actionManager.executeAction(actionShortcuts)}
-          label={t("helpDialog.title")}
-          shortcut="?"
-          icon={HelpIcon}
-        />
-        {!isExcalidrawPlusSignedUser && (
-          <WelcomeScreenItem
-            link="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"
-            label="Try Excalidraw Plus!"
-            shortcut={null}
-            icon={PlusPromoIcon}
-          />
-        )}
-      </div>
+      {childrenComponents.Logo}
+      {childrenComponents.Heading}
+      {childrenComponents.Menu}
     </div>
   );
 };
+Center.displayName = "Center";
+
+const Logo = ({ children }: { children?: React.ReactNode }) => {
+  return (
+    <div className="WelcomeScreen-logo virgil WelcomeScreen-decor">
+      {children || <>{ExcalLogo} Excalidraw</>}
+    </div>
+  );
+};
+Logo.displayName = "Logo";
+
+const Heading = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--subheading">
+      {children}
+    </div>
+  );
+};
+Heading.displayName = "Heading";
+
+const Menu = ({ children }: { children?: React.ReactNode }) => {
+  return <div className="WelcomeScreen-items">{children}</div>;
+};
+Menu.displayName = "Menu";
+
+const MenuItemHelp = () => {
+  const actionManager = useExcalidrawActionManager();
+
+  return (
+    <WelcomeScreenMenuItem
+      onClick={() => actionManager.executeAction(actionShortcuts)}
+      label={t("helpDialog.title")}
+      shortcut="?"
+      icon={HelpIcon}
+    />
+  );
+};
+MenuItemHelp.displayName = "MenuItemHelp";
+
+const MenuItemLoadScene = () => {
+  const appState = useExcalidrawAppState();
+  const actionManager = useExcalidrawActionManager();
+
+  if (appState.viewModeEnabled) {
+    return null;
+  }
+
+  return (
+    <WelcomeScreenMenuItem
+      label={t("buttons.load")}
+      onClick={() => actionManager.executeAction(actionLoadScene)}
+      shortcut={getShortcutFromShortcutName("loadScene")}
+      icon={LoadIcon}
+    />
+  );
+};
+MenuItemLoadScene.displayName = "MenuItemLoadScene";
+
+const HelpHint = () => {
+  return (
+    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--help-pointer">
+      <div>{t("welcomeScreen.defaults.helpHint")}</div>
+      {WelcomeScreenHelpArrow}
+    </div>
+  );
+};
+HelpHint.displayName = "HelpHint";
+
+const MenuHint = ({ children }: { children?: React.ReactNode }) => {
+  return (
+    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--menu-pointer">
+      {WelcomeScreenMenuArrow}
+      <div>{children || t("welcomeScreen.defaults.menuHint")}</div>
+    </div>
+  );
+};
+MenuHint.displayName = "MenuHint";
+
+const ToolbarHint = () => {
+  return (
+    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--top-toolbar-pointer">
+      <div className="WelcomeScreen-decor--top-toolbar-pointer__label">
+        {t("welcomeScreen.defaults.toolbarHint")}
+      </div>
+      {WelcomeScreenTopToolbarArrow}
+    </div>
+  );
+};
+ToolbarHint.displayName = "ToolbarHint";
+
+const WelcomeScreen = (props: { children: React.ReactNode }) => {
+  // NOTE this component is used as a dummy wrapper to retrieve child props
+  // from, and will never be rendered to DOM directly. As such, we can't
+  // do anything here (use hooks and such)
+  return null;
+};
+WelcomeScreen.displayName = "WelcomeScreen";
+
+WelcomeScreen.HelpHint = HelpHint;
+WelcomeScreen.MenuHint = MenuHint;
+WelcomeScreen.ToolbarHint = ToolbarHint;
+WelcomeScreen.Center = Center;
+
+Center.Logo = Logo;
+Center.Heading = Heading;
+Center.Menu = Menu;
+Center.MenuItem = WelcomeScreenMenuItem;
+Center.MenuItemHelp = MenuItemHelp;
+Center.MenuItemLoadScene = MenuItemLoadScene;
 
 export default WelcomeScreen;

@@ -12,6 +12,7 @@ import { Provider } from "jotai";
 import { jotaiScope, jotaiStore } from "../../jotai";
 import Footer from "../../components/footer/FooterCenter";
 import MainMenu from "../../components/mainMenu/MainMenu";
+import WelcomeScreen from "../../components/WelcomeScreen";
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
@@ -242,3 +243,4 @@ export { Sidebar } from "../../components/Sidebar/Sidebar";
 export { Footer };
 export { MainMenu };
 export { useDevice } from "../../components/App";
+export { WelcomeScreen };

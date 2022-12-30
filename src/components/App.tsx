@@ -283,15 +283,12 @@ const deviceContextInitialValue = {
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 DeviceContext.displayName = "DeviceContext";
-export const useDevice = () => useContext<Device>(DeviceContext);
 
 export const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
   id: string | null;
 }>({ container: null, id: null });
 ExcalidrawContainerContext.displayName = "ExcalidrawContainerContext";
-export const useExcalidrawContainer = () =>
-  useContext(ExcalidrawContainerContext);
 
 const ExcalidrawElementsContext = React.createContext<
   readonly NonDeletedExcalidrawElement[]
@@ -309,7 +306,7 @@ ExcalidrawAppStateContext.displayName = "ExcalidrawAppStateContext";
 
 const ExcalidrawSetAppStateContext = React.createContext<
   React.Component<any, AppState>["setState"]
->(() => {});
+>(null!);
 ExcalidrawSetAppStateContext.displayName = "ExcalidrawSetAppStateContext";
 
 const ExcalidrawActionManagerContext = React.createContext<ActionManager>(
@@ -317,6 +314,9 @@ const ExcalidrawActionManagerContext = React.createContext<ActionManager>(
 );
 ExcalidrawActionManagerContext.displayName = "ExcalidrawActionManagerContext";
 
+export const useDevice = () => useContext<Device>(DeviceContext);
+export const useExcalidrawContainer = () =>
+  useContext(ExcalidrawContainerContext);
 export const useExcalidrawElements = () =>
   useContext(ExcalidrawElementsContext);
 export const useExcalidrawAppState = () =>
@@ -598,6 +598,7 @@ class App extends React.Component<AppProps, AppState> {
                       id={this.id}
                       onImageAction={this.onImageAction}
                       renderWelcomeScreen={
+                        !this.state.isLoading &&
                         this.state.showWelcomeScreen &&
                         this.state.activeTool.type === "selection" &&
                         !this.scene.getElementsIncludingDeleted().length

@@ -517,7 +517,31 @@ export type Device = Readonly<{
 }>;
 
 export type UIChildrenComponents = {
-  [k in "FooterCenter" | "Menu"]?:
-    | React.ReactPortal
-    | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
+  [k in "FooterCenter" | "Menu" | "WelcomeScreen"]?: React.ReactElement<
+    { children?: React.ReactNode },
+    React.JSXElementConstructor<any>
+  >;
+};
+
+export type UIWelcomeScreenComponents = {
+  [k in
+    | "Center"
+    | "MenuHint"
+    | "ToolbarHint"
+    | "HelpHint"]?: React.ReactElement<
+    { children?: React.ReactNode },
+    React.JSXElementConstructor<any>
+  >;
+};
+
+export type UIWelcomeScreenCenterComponents = {
+  [k in
+    | "Logo"
+    | "Heading"
+    | "Menu"
+    | "MenuItemLoadScene"
+    | "MenuItemHelp"]?: React.ReactElement<
+    { children?: React.ReactNode },
+    React.JSXElementConstructor<any>
+  >;
 };
