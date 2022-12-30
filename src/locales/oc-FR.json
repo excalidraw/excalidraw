@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Pegar",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Pegar en tèxt brut",
     "pasteCharts": "Pegar los grafics",
     "selectAll": "Tot seleccionar",
     "multiSelect": "Apondre un element a la seleccion",
