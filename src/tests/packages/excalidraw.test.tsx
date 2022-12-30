@@ -3,7 +3,6 @@ import { Excalidraw, Footer } from "../../packages/excalidraw/index";
 import { queryByText, queryByTestId } from "@testing-library/react";
 import { GRID_SIZE, THEME } from "../../constants";
 import { t } from "../../i18n";
-import { ExcalidrawProps } from "../../types";
 
 const { h } = window;
 
