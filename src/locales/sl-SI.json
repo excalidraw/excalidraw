@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Prilepi",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Prilepi kot navadno besedilo",
     "pasteCharts": "Prilepi grafikone",
     "selectAll": "Izberi vse",
     "multiSelect": "Dodaj element v izbor",
@@ -236,7 +236,7 @@
     "resize": "Razmerja lahko omejite tako, da držite tipko Shift med spreminjanjem velikosti. Držite tipko Alt, da spremenite velikost od središča",
     "resizeImage": "Velikost lahko prosto spreminjate tako, da držite tipko Shift. Držite tipko Alt, da spremenite velikost od središča",
     "rotate": "Kote lahko omejite tako, da med vrtenjem držite tipko Shift",
-    "lineEditor_info": "",
+    "lineEditor_info": "Držite CtrlOrCmd in dvokliknite ali pritisnite CtrlOrCmd + Enter za urejanje točk",
     "lineEditor_pointSelected": "Pritisnite tipko Delete, da odstranite točko(e), CtrlOrCmd+D za podvojitev ali povlecite za premikanje",
     "lineEditor_nothingSelected": "Izberite točko za urejanje (pridržite tipko Shift za izbiro več točk), ali držite tipko Alt in kliknite za dodajanje novih točk",
     "placeImage": "Kliknite, da postavite sliko, ali kliknite in povlecite, da ročno nastavite njeno velikost",
@@ -393,7 +393,7 @@
     "fileSavedToFilename": "Shranjeno v {filename}",
     "canvas": "platno",
     "selection": "izbor",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Uporabite {{shortcut}}, da prilepite kot en element,\n ali prilepite v obstoječ urejevalnik besedil"
   },
   "colors": {
     "ffffff": "Bela",
