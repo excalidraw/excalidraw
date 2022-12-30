@@ -8,6 +8,7 @@ import MenuTrigger from "./MenuTrigger";
 import MenuSeparator from "./MenuSeparator";
 import MenuGroup from "./MenuGroup";
 import { getValidMenuChildren } from "./menuUtils";
+import * as DefaultItems from "./MenuDefaultItems";
 
 import "./Menu.scss";
 import clsx from "clsx";
@@ -62,7 +63,7 @@ const Menu = ({ children }: { children?: React.ReactNode }) => {
 Menu.Item = MenuItem;
 Menu.Group = MenuGroup;
 Menu.Separator = MenuSeparator;
-
+Menu.DefaultItems = DefaultItems;
 export default Menu;
 
 Menu.displayName = "Menu";

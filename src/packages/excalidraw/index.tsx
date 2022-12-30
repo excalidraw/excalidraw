@@ -240,3 +240,5 @@ export {
 export { Sidebar } from "../../components/Sidebar/Sidebar";
 export { Footer };
 export { Menu };
+export { UserList } from "../../components/UserList";
+export { useDevice, useExcalidrawAppState } from "../../components/App";

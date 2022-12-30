@@ -182,28 +182,28 @@ const LayerUI = ({
     return (
       childrenComponents.Menu || (
         <Menu>
-          <Menu.Item.LoadScene />
-          <Menu.Item.SaveToActiveFile />
-          <Menu.Item.Export />
-          {UIOptions.canvasActions.saveAsImage && <Menu.Item.SaveAsImage />}
+          <Menu.DefaultItems.LoadScene />
+          <Menu.DefaultItems.SaveToActiveFile />
+          <Menu.DefaultItems.Export />
+          {UIOptions.canvasActions.saveAsImage && (
+            <Menu.DefaultItems.SaveAsImage />
+          )}
 
-          <Menu.Item.Help />
-          <Menu.Item.ClearCanvas />
+          <Menu.DefaultItems.Help />
+          <Menu.DefaultItems.ClearCanvas />
           <Menu.Separator />
           <MenuGroup title="Excalidraw links">
-            <Menu.Item.Socials />
+            <Menu.DefaultItems.Socials />
           </MenuGroup>
           <Menu.Separator />
 
           <Menu.Group className="menu-footer">
-            <Menu.Item.ToggleTheme />
-            <Menu.Item.ChangeCanvasBackground />
+            <Menu.DefaultItems.ToggleTheme />
+            <Menu.DefaultItems.ChangeCanvasBackground />
           </Menu.Group>
-          {device.isMobile && appState.collaborators.size > 0 && (
-            <Menu.Item style={{ padding: 0, marginTop: "10px" }}>
-              <UserList collaborators={appState.collaborators} />
-            </Menu.Item>
-          )}
+          <Menu.Group>
+            <UserList />
+          </Menu.Group>
         </Menu>
       )
     );
@@ -349,7 +349,7 @@ const LayerUI = ({
               },
             )}
           >
-            <UserList collaborators={appState.collaborators} />
+            <UserList />
             {onCollabButtonClick && (
               <CollabButton
                 isInHamburgerMenu={false}

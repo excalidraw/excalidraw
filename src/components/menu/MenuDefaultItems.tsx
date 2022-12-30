@@ -6,6 +6,7 @@ import {
   useExcalidrawActionManager,
 } from "../App";
 import { ExportIcon, ExportImageIcon } from "../icons";
+import MenuSocials from "./MenuSocials";
 import MenuItem from "./MenuItem";
 
 export const LoadScene = () => {
@@ -101,3 +102,5 @@ export const Export = () => {
   );
 };
 Export.displayName = "Export";
+
+export { MenuSocials as Socials };

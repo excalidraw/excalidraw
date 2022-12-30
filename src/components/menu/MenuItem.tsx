@@ -1,5 +1,3 @@
-import * as MenuComponents from "./MenuDefaultItems";
-import MenuSocials from "./MenuSocials";
 import { useDevice } from "../App";
 
 const MenuItemContent = ({
@@ -77,16 +75,6 @@ const MenuItem = ({
     </div>
   );
 };
-
-MenuItem.LoadScene = MenuComponents.LoadScene;
-MenuItem.SaveToActiveFile = MenuComponents.SaveToActiveFile;
-MenuItem.SaveAsImage = MenuComponents.SaveAsImage;
-MenuItem.Help = MenuComponents.Help;
-MenuItem.ClearCanvas = MenuComponents.ClearCanvas;
-MenuItem.ToggleTheme = MenuComponents.ToggleTheme;
-MenuItem.ChangeCanvasBackground = MenuComponents.ChangeCanvasBackground;
-MenuItem.Export = MenuComponents.Export;
-MenuItem.Socials = MenuSocials;
 
 export default MenuItem;
 MenuItem.displayName = "MenuItem";

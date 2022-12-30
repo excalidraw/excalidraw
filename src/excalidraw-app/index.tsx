@@ -26,6 +26,7 @@ import {
   defaultLang,
   Footer,
   Menu,
+  UserList,
 } from "../packages/excalidraw/index";
 import {
   AppState,
@@ -86,7 +87,7 @@ import { EncryptedIcon } from "./components/EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
 import { LanguageList } from "./components/LanguageList";
 import { PlusPromoIcon, UsersIcon } from "../components/icons";
-import UserListWrapper from "./components/UserListWrapper";
+
 polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -604,10 +605,10 @@ const ExcalidrawWrapper = () => {
   const renderMenu = () => {
     return (
       <Menu>
-        <Menu.Item.LoadScene />
-        <Menu.Item.SaveToActiveFile />
-        <Menu.Item.Export />
-        <Menu.Item.SaveAsImage />
+        <Menu.DefaultItems.LoadScene />
+        <Menu.DefaultItems.SaveToActiveFile />
+        <Menu.DefaultItems.Export />
+        <Menu.DefaultItems.SaveAsImage />
 
         <Menu.Item
           dataTestId="collab-button"
@@ -619,8 +620,8 @@ const ExcalidrawWrapper = () => {
         >
           {t("labels.liveCollaboration")}
         </Menu.Item>
-        <Menu.Item.Help />
-        <Menu.Item.ClearCanvas />
+        <Menu.DefaultItems.Help />
+        <Menu.DefaultItems.ClearCanvas />
         <Menu.Separator />
         <Menu.Item
           icon={PlusPromoIcon}
@@ -629,18 +630,18 @@ const ExcalidrawWrapper = () => {
         >
           Excalidraw+
         </Menu.Item>
-        <Menu.Item.Socials />
+        <Menu.DefaultItems.Socials />
         <Menu.Separator />
         <Menu.Group className="menu-footer">
-          <Menu.Item.ToggleTheme />
+          <Menu.DefaultItems.ToggleTheme />
           <Menu.Item className="language">
             <LanguageList style={{ width: "100%" }} />
           </Menu.Item>
-          <Menu.Item.ChangeCanvasBackground />
+          <Menu.DefaultItems.ChangeCanvasBackground />
         </Menu.Group>
-        <Menu.Item style={{ padding: 0, marginTop: "10px" }}>
-          <UserListWrapper />
-        </Menu.Item>
+        <Menu.Group>
+          <UserList mobile={true} />
+        </Menu.Group>
       </Menu>
     );
   };

@@ -2,20 +2,30 @@ import "./UserList.scss";
 
 import React from "react";
 import clsx from "clsx";
-import { AppState, Collaborator } from "../types";
+import { Collaborator } from "../types";
 import { Tooltip } from "./Tooltip";
-import { useDevice, useExcalidrawActionManager } from "./App";
+import {
+  useDevice,
+  useExcalidrawActionManager,
+  useExcalidrawAppState,
+} from "./App";
 import { t } from "../i18n";
 
 export const UserList: React.FC<{
   className?: string;
-  collaborators: AppState["collaborators"];
-}> = ({ className, collaborators }) => {
+  mobile?: boolean;
+}> = ({ className, mobile }) => {
   const actionManager = useExcalidrawActionManager();
+  const appState = useExcalidrawAppState();
   const device = useDevice();
-
+  if (appState.collaborators.size === 0) {
+    return null;
+  }
+  if (mobile && !device.isMobile) {
+    return null;
+  }
   const uniqueCollaborators = new Map<string, Collaborator>();
-  collaborators.forEach((collaborator, socketId) => {
+  appState.collaborators.forEach((collaborator, socketId) => {
     uniqueCollaborators.set(
       // filter on user id, else fall back on unique socketId
       collaborator.id || socketId,
