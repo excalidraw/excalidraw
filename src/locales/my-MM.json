@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "ထား",
+    "pasteAsPlaintext": "",
     "pasteCharts": "",
     "selectAll": "အကုန်ရွေး",
     "multiSelect": "ရွေးထားသည့်ထဲပုံထည့်",
@@ -235,7 +236,7 @@
     "resize": "အချိုးအစားကန့်သတ်ရန် Shift နှင့် ဗဟိုမှချိန်ညှိရန် Alt တို့ကိုနှိပ်ထားနိုင်သည်",
     "resizeImage": "",
     "rotate": "Shift ကိုနှိပ်ထားခြင်းဖြင့် ထောင့်အလိုက်လှည့်နိုင်သည်",
-    "lineEditor_info": "အမှတ်များပြင်ဆင်သတ်မှတ်ရင် ကလစ်နှစ်ချက် (သို့) Enter ကိုနှိပ်ပါ",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -391,7 +392,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
