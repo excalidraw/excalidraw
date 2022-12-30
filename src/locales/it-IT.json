@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Incolla",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Incolla grafici",
     "selectAll": "Seleziona tutto",
     "multiSelect": "Aggiungi elemento alla selezione",
@@ -235,7 +236,7 @@
     "resize": "Per vincolare le proporzioni, tieni premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tieni premuto ALT",
     "resizeImage": "Puoi ridimensionare liberamente tenendo premuto SHIFT,\ntieni premuto ALT per ridimensionare dal centro",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
-    "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Premi Elimina per rimuovere il punto(i),\nCtrlOCmd+D per duplicare o trascinare per spostare",
     "lineEditor_nothingSelected": "Seleziona un punto da modificare (tieni premuto MAIUSC per selezionare più punti),\noppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
     "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente",
@@ -391,7 +392,8 @@
     "fileSaved": "File salvato.",
     "fileSavedToFilename": "Salvato in {filename}",
     "canvas": "tela",
-    "selection": "selezione"
+    "selection": "selezione",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Bianco",
@@ -442,7 +444,7 @@
   },
   "welcomeScreen": {
     "data": "Tutti i tuoi dati sono salvati localmente nel browser.",
-    "switchToPlusApp": "",
+    "switchToPlusApp": "Volevi invece andare su Excalidraw+?",
     "menuHints": "Esporta, preferenze, lingue, ...",
     "toolbarHints": "Scegli uno strumento & Inizia a disegnare!",
     "helpHints": "Scorciatoie & aiuto"
