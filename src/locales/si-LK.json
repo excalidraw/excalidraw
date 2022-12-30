@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "අලවන්න",
+    "pasteAsPlaintext": "",
     "pasteCharts": "ප්‍රස්ථාරය",
     "selectAll": "සියල්ලම",
     "multiSelect": "තෝරා ගැනීමට අංගය එකතු කරන්න",
@@ -391,7 +392,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
