@@ -26,7 +26,6 @@ import {
   defaultLang,
   Footer,
   Menu,
-  UserList,
 } from "../packages/excalidraw/index";
 import {
   AppState,
@@ -638,9 +637,6 @@ const ExcalidrawWrapper = () => {
             <LanguageList style={{ width: "100%" }} />
           </Menu.Item>
           <Menu.DefaultItems.ChangeCanvasBackground />
-        </Menu.Group>
-        <Menu.Group>
-          <UserList mobile={true} />
         </Menu.Group>
       </Menu>
     );

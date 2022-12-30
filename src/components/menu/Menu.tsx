@@ -13,6 +13,7 @@ import * as DefaultItems from "./MenuDefaultItems";
 import "./Menu.scss";
 import clsx from "clsx";
 import Stack from "../Stack";
+import { UserList } from "../UserList";
 
 const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
   const device = useDevice();
@@ -40,6 +41,7 @@ const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
         {device.isMobile ? (
           <Stack.Col className="menu-container" gap={2}>
             {menuChildren}
+            <UserList mobile={true} />
           </Stack.Col>
         ) : (
           <Island className="menu-container" padding={2} style={{ zIndex: 1 }}>

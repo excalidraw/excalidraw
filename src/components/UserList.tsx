@@ -21,9 +21,7 @@ export const UserList: React.FC<{
   if (appState.collaborators.size === 0) {
     return null;
   }
-  if (mobile && !device.isMobile) {
-    return null;
-  }
+
   const uniqueCollaborators = new Map<string, Collaborator>();
   appState.collaborators.forEach((collaborator, socketId) => {
     uniqueCollaborators.set(

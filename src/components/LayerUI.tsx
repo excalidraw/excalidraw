@@ -216,9 +216,6 @@ const LayerUI = ({
             <Menu.DefaultItems.ToggleTheme />
             <Menu.DefaultItems.ChangeCanvasBackground />
           </Menu.Group>
-          <Menu.Group>
-            <UserList mobile={true} />
-          </Menu.Group>
         </Menu>
       )
     );
