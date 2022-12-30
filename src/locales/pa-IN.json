@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "ਪੇਸਟ ਕਰੋ",
+    "pasteAsPlaintext": "",
     "pasteCharts": "ਚਾਰਟ ਪੇਸਟ ਕਰੋ",
     "selectAll": "ਸਾਰੇ ਚੁਣੋ",
     "multiSelect": "ਐਲੀਮੈਂਟ ਨੂੰ ਚੋਣ ਵਿੱਚ ਜੋੜੋ",
@@ -235,7 +236,7 @@
     "resize": "ਤੁਸੀਂ ਅਕਾਰ ਬਦਲਦੇ ਸਮੇਂ SHIFT ਦਬਾਈ ਰੱਖ ਕੇ ਅਨੁਪਾਤ ਨੂੰ ਕਾਬੂ ਕਰ ਸਕਦੇ ਹੋ, ਵਿਚਕਾਰ ਤੋਂ ਅਕਾਰ ਬਦਲਣ ਲਈ ALT ਦਬਾਓ",
     "resizeImage": "",
     "rotate": "ਤੁਸੀਂ ਘੁਮਾਉਂਦੇ ਹੋਏ SHIFT ਦਬਾਈ ਰੱਖ ਕੇ ਕੋਣਾਂ ਨੂੰ ਕਾਬੂ ਕਰ ਸਕਦੇ ਹੋ",
-    "lineEditor_info": "ਬਿੰਦੂਆਂ ਨੂੰ ਸੋਧਣ ਲਈ ਡਬਲ-ਕਲਿੱਕ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -391,7 +392,8 @@
     "fileSaved": "ਫਾਈਲ ਸਾਂਭੀ ਗਈ।",
     "fileSavedToFilename": "{filename} ਵਿੱਚ ਸਾਂਭੀ",
     "canvas": "ਕੈਨਵਸ",
-    "selection": "ਚੋਣ"
+    "selection": "ਚੋਣ",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "ਚਿੱਟਾ",
