@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "粘贴",
+    "pasteAsPlaintext": "",
     "pasteCharts": "粘贴图表",
     "selectAll": "全部选中",
     "multiSelect": "添加元素到选区",
@@ -45,12 +46,12 @@
     "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
     "handDrawn": "手写",
-    "normal": "正常",
+    "normal": "普通",
     "code": "代码",
-    "small": "小号",
-    "medium": "中等",
-    "large": "大号",
-    "veryLarge": "极大",
+    "small": "小",
+    "medium": "中",
+    "large": "大",
+    "veryLarge": "加大",
     "solid": "实心",
     "hachure": "线条",
     "crossHatch": "交叉线条",
@@ -214,7 +215,7 @@
     "text": "文字",
     "library": "素材库",
     "lock": "绘制后保持所选的工具栏状态",
-    "penMode": "笔模式 - 防止触摸。",
+    "penMode": "笔模式 – 避免误触",
     "link": "为选中的形状添加/更新链接",
     "eraser": "橡皮"
   },
@@ -235,7 +236,7 @@
     "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
     "resizeImage": "按住SHIFT可以自由缩放，\n按住ALT可以从中间缩放",
     "rotate": "旋转时可以按住 Shift 来约束角度",
-    "lineEditor_info": "双击或按回车键编辑",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，拖动以移动",
     "lineEditor_nothingSelected": "选择要编辑的点 (按住 SHIFT 选择多个)，\n或按住 Alt 并点击以添加新点",
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
@@ -391,7 +392,8 @@
     "fileSaved": "文件已保存。",
     "fileSavedToFilename": "保存到 {filename}",
     "canvas": "画布",
-    "selection": "选择项"
+    "selection": "选择项",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "白",
@@ -441,8 +443,8 @@
     "d9480f": "橙 9"
   },
   "welcomeScreen": {
-    "data": "您的所有数据都保存在您的浏览器中。",
-    "switchToPlusApp": "您想要访问 Excalidraw + 吗？",
+    "data": "您的所有数据都储存在浏览器本地。",
+    "switchToPlusApp": "是否前往 Excalidraw+ ？",
     "menuHints": "导出、首选项、语言...",
     "toolbarHints": "选择工具并开始绘图！",
     "helpHints": "快捷键和帮助"
