@@ -33,6 +33,7 @@ const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
         className={clsx("menu", {
           "menu--mobile": device.isMobile,
         })}
+        data-testid="menu"
       >
         {/* the zIndex ensures this menu has higher stacking order,
   see https://github.com/excalidraw/excalidraw/pull/1445 */}

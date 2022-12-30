@@ -40,6 +40,8 @@ const MenuItem = ({
   link?: string;
   style?: React.CSSProperties;
 }) => {
+  const classNames = `menu-item ${className}`.trim();
+
   if (typeof children === "string") {
     const label = children;
     if (link) {
@@ -48,7 +50,7 @@ const MenuItem = ({
           href={link}
           target="_blank"
           rel="noreferrer"
-          className={`menu-item ${className}`}
+          className={classNames}
           style={style}
         >
           <MenuItemContent icon={icon} shortcut={shortcut} label={label} />
@@ -62,7 +64,7 @@ const MenuItem = ({
         data-testid={dataTestId}
         title={label}
         type="button"
-        className={`menu-item ${className}`}
+        className={classNames}
         style={style}
       >
         <MenuItemContent icon={icon} shortcut={shortcut} label={label} />
@@ -70,7 +72,7 @@ const MenuItem = ({
     );
   }
   return (
-    <div className={`menu-item ${className}`} style={style}>
+    <div className={classNames} style={style}>
       {children}
     </div>
   );
