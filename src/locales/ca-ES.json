@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Enganxa",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Enganxa els diagrames",
     "selectAll": "Selecciona-ho tot",
     "multiSelect": "Afegeix un element a la selecció",
@@ -235,7 +236,7 @@
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "resizeImage": "Podeu redimensionar lliurement prement MAJÚSCULA;\nper a redimensionar des del centre, premeu ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
-    "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Premeu Suprimir per a eliminar el(s) punt(s), CtrlOrCmd+D per a duplicar-lo, o arrossegueu-lo per a moure'l",
     "lineEditor_nothingSelected": "Seleccioneu un punt per a editar-lo (premeu SHIFT si voleu\nselecció múltiple), o manteniu Alt i feu clic per a afegir més punts",
     "placeImage": "Feu clic per a col·locar la imatge o clic i arrossegar per a establir-ne la mida manualment",
@@ -391,7 +392,8 @@
     "fileSaved": "S'ha desat el fitxer.",
     "fileSavedToFilename": "S'ha desat a {filename}",
     "canvas": "el llenç",
-    "selection": "la selecció"
+    "selection": "la selecció",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Blanc",
