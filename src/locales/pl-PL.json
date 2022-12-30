@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Wklej",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Wklej wykresy",
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
@@ -235,7 +236,7 @@
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "resizeImage": "Możesz zmienić rozmiar swobodnie trzymając SHIFT,\nprzytrzymaj ALT, aby przeskalować względem środka obiektu",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
-    "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Kliknij, aby umieścić obraz, lub kliknij i przeciągnij, aby ustawić jego rozmiar ręcznie",
@@ -391,7 +392,8 @@
     "fileSaved": "Zapisano plik.",
     "fileSavedToFilename": "Zapisano jako {filename}",
     "canvas": "płótno",
-    "selection": "zaznaczenie"
+    "selection": "zaznaczenie",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Biały",
