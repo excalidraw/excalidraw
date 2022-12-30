@@ -202,7 +202,7 @@ const LayerUI = ({
             <Menu.DefaultItems.ChangeCanvasBackground />
           </Menu.Group>
           <Menu.Group>
-            <UserList />
+            <UserList mobile={true} />
           </Menu.Group>
         </Menu>
       )
