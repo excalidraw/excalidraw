@@ -361,7 +361,7 @@ const LayerUI = ({
               },
             )}
           >
-            <UserList />
+            <UserList collaborators={appState.collaborators} />
             {onCollabButtonClick && (
               <CollabButton
                 isInHamburgerMenu={false}

@@ -86,6 +86,21 @@
       margin: 10px 0;
       font-weight: 500;
     }
+
+    .UserList-Wrapper {
+      margin: 0;
+      padding: 0;
+      border: none;
+      text-align: left;
+
+      legend {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 400;
+        margin: 0 0 0.25rem;
+        padding: 0;
+      }
+    }
   }
   &.theme--dark {
     .menu-item {

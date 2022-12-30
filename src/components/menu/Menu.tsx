@@ -1,7 +1,7 @@
 import React from "react";
 import { useOutsideClickHook } from "../../hooks/useOutsideClick";
 import { useAtomValue, useSetAtom } from "jotai";
-import { isMenuOpenAtom, useDevice } from "../App";
+import { isMenuOpenAtom, useDevice, useExcalidrawAppState } from "../App";
 import { Island } from "../Island";
 import MenuItem from "./MenuItem";
 import MenuTrigger from "./MenuTrigger";
@@ -14,10 +14,11 @@ import "./Menu.scss";
 import clsx from "clsx";
 import Stack from "../Stack";
 import { UserList } from "../UserList";
+import { t } from "../../i18n";
 
 const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
   const device = useDevice();
-
+  const appState = useExcalidrawAppState();
   const setIsMenuOpen = useSetAtom(isMenuOpenAtom);
   const menuRef = useOutsideClickHook(() => {
     setIsMenuOpen(false);
@@ -41,7 +42,15 @@ const OpenMenu = ({ children }: { children?: React.ReactNode }) => {
         {device.isMobile ? (
           <Stack.Col className="menu-container" gap={2}>
             {menuChildren}
-            <UserList mobile={true} />
+            {appState.collaborators.size > 0 && (
+              <fieldset className="UserList-Wrapper">
+                <legend>{t("labels.collaborators")}</legend>
+                <UserList
+                  mobile={true}
+                  collaborators={appState.collaborators}
+                />
+              </fieldset>
+            )}
           </Stack.Col>
         ) : (
           <Island className="menu-container" padding={2} style={{ zIndex: 1 }}>

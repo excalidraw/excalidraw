@@ -447,9 +447,6 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         </div>
       </div>
     </div>
-    <div
-      class="menu-group "
-    />
   </div>
 </div>
 `;
