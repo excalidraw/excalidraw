@@ -120,6 +120,7 @@ const mathJax = {} as {
   visitor: any;
   mmlSvg: any;
   mmlSre: any;
+  amFixes: any;
 };
 
 let stopLoadingMathJax = false;
@@ -142,6 +143,7 @@ const loadMathJax = async () => {
       mathJax.texHtml === undefined ||
       mathJax.visitor === undefined ||
       mathJax.mmlSvg === undefined ||
+      mathJax.amFixes === undefined ||
       (useSRE && mathJax.mmlSre === undefined));
   if (!shouldLoad && !mathJaxLoaded) {
     stopLoadingMathJax = true;
@@ -198,7 +200,7 @@ const loadMathJax = async () => {
     const MathJax = (
       await require("mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax")
     ).MathJax;
-    MathJax.InputJax.AsciiMath.AM.Augment({ displaystyle: false });
+    mathJax.amFixes = MathJax.InputJax.AsciiMath.AM.Augment;
 
     // Load the document creator last
     const mathjax = (await import("mathjax-full/js/mathjax")).mathjax;
@@ -415,15 +417,21 @@ const math2Svg = (
   isMathJaxLoaded: boolean,
 ): { svg: string; aria: string } => {
   const useTex = mathProps.useTex;
+  const key = `${mathProps.mathOnly}${text}`;
   if (
     isMathJaxLoaded &&
-    (useTex ? mathJaxSvgCacheTex[text] : mathJaxSvgCacheAM[text])
+    (useTex ? mathJaxSvgCacheTex[key] : mathJaxSvgCacheAM[key])
   ) {
-    return useTex ? mathJaxSvgCacheTex[text] : mathJaxSvgCacheAM[text];
+    return useTex ? mathJaxSvgCacheTex[key] : mathJaxSvgCacheAM[key];
   }
   loadMathJax();
   try {
     const userOptions = { display: mathProps.mathOnly };
+    // For some reason this needs to be set before each call to the AsciiMath
+    // input jax to render display/inline correctly.
+    if (isMathJaxLoaded && !useTex) {
+      mathJax.amFixes({ displaystyle: mathProps.mathOnly });
+    }
     // Intermediate MathML
     const mmlString = isMathJaxLoaded
       ? mathJax.visitor.visitTree(
@@ -444,9 +452,9 @@ const math2Svg = (
       : mmlString;
     if (isMathJaxLoaded) {
       if (useTex) {
-        mathJaxSvgCacheTex[text] = { svg: htmlString, aria: ariaString };
+        mathJaxSvgCacheTex[key] = { svg: htmlString, aria: ariaString };
       } else {
-        mathJaxSvgCacheAM[text] = { svg: htmlString, aria: ariaString };
+        mathJaxSvgCacheAM[key] = { svg: htmlString, aria: ariaString };
       }
     }
     return { svg: htmlString, aria: ariaString };
