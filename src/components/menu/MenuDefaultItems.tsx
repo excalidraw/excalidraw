@@ -6,7 +6,7 @@ import {
   useExcalidrawActionManager,
 } from "../App";
 import { ExportIcon, ExportImageIcon } from "../icons";
-import MenuSocials from "./MenuSocials";
+import { GithubIcon, DiscordIcon, TwitterIcon } from "../icons";
 import MenuItem from "./MenuItem";
 
 export const LoadScene = () => {
@@ -103,4 +103,18 @@ export const Export = () => {
 };
 Export.displayName = "Export";
 
-export { MenuSocials as Socials };
+export const Socials = () => (
+  <>
+    <MenuItem icon={GithubIcon} link="https://github.com/excalidraw/excalidraw">
+      GitHub
+    </MenuItem>
+    <MenuItem icon={DiscordIcon} link="https://discord.gg/UexuTaE">
+      Discord
+    </MenuItem>
+    <MenuItem icon={TwitterIcon} link="https://twitter.com/excalidraw">
+      Twitter
+    </MenuItem>
+  </>
+);
+
+Socials.displayName = "Socials";
