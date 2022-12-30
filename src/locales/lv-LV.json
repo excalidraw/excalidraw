@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Ielīmēt",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Ielīmēt grafikus",
     "selectAll": "Atlasīt visu",
     "multiSelect": "Pievienot elementu atlasei",
@@ -71,7 +72,7 @@
     "layers": "Slāņi",
     "actions": "Darbības",
     "language": "Valoda",
-    "liveCollaboration": "",
+    "liveCollaboration": "Sadarbība tiešsaistē...",
     "duplicateSelection": "Izveidot kopiju",
     "untitled": "Bez nosaukuma",
     "name": "Vārds",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
     "exportJSON": "Eksportēt kā failu",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Eksportēt attēlu...",
+    "export": "Saglabāt uz...",
     "exportToPng": "Eksportēt kā PNG",
     "exportToSvg": "Eksportēt kā SVG",
     "copyToClipboard": "Kopēt starpliktuvē",
@@ -144,7 +145,7 @@
     "scale": "Mērogs",
     "save": "Saglabāt pašreizējo datni",
     "saveAs": "Saglabāt kā",
-    "load": "",
+    "load": "Atvērt",
     "getShareableLink": "Iegūt kopīgošanas saiti",
     "close": "Aizvērt",
     "selectLanguage": "Izvēlieties valodu",
@@ -214,7 +215,7 @@
     "text": "Teksts",
     "library": "Bibliotēka",
     "lock": "Paturēt izvēlēto rīku pēc darbības",
-    "penMode": "",
+    "penMode": "Pildspalvas režīms – novērst pieskaršanos",
     "link": "Pievienot/rediģēt atlasītās figūras saiti",
     "eraser": "Dzēšgumija"
   },
@@ -235,7 +236,7 @@
     "resize": "Kad maināt izmēru, varat ierobežot proporcijas, turot nospiestu SHIFT,\nvai arī ALT, lai mainītu izmēru ap centru",
     "resizeImage": "Varat brīvi mainīt izmēru, turot nospiestu SHIFT;\nturiet nospiestu ALT, lai mainītu izmēru ap centru",
     "rotate": "Rotējot varat ierobežot leņķi, turot nospiestu SHIFT",
-    "lineEditor_info": "Dubultklikšķiniet vai spiediet ievades taustiņu, lai rediģētu punktus",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Spiediet dzēšanas taustiņu, lai noņemtu punktus, – CtrlOrCmd+D, lai to kopētu, vai velciet, lai pārvietotu",
     "lineEditor_nothingSelected": "Atlasiet punktu, lai labotu (turiet nospiestu SHIFT, lai atlasītu vairākus),\nvai turiet Alt un clikšķiniet, lai pievienotu jaunus punktus",
     "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru",
@@ -391,7 +392,8 @@
     "fileSaved": "Datne saglabāta.",
     "fileSavedToFilename": "Saglabāts kā {filename}",
     "canvas": "tāfeli",
-    "selection": "atlasi"
+    "selection": "atlasi",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Balts",
@@ -441,10 +443,10 @@
     "d9480f": "Oranžs 9"
   },
   "welcomeScreen": {
-    "data": "",
+    "data": "Visi jūsu dati tiek glabāti uz vietas jūsu pārlūkā.",
     "switchToPlusApp": "",
-    "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "menuHints": "Eksportēšana, iestatījumi, valodas...",
+    "toolbarHints": "Izvēlieties rīku un sāciet zīmēt!",
+    "helpHints": "Saīsnes un palīdzība"
   }
 }
