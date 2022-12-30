@@ -86,7 +86,7 @@ import { EncryptedIcon } from "./components/EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
 import { LanguageList } from "./components/LanguageList";
 import { PlusPromoIcon, UsersIcon } from "../components/icons";
-import MenuItem from "../components/menu/MenuItem";
+import UserListWrapper from "./components/UserListWrapper";
 polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -638,7 +638,9 @@ const ExcalidrawWrapper = () => {
           </Menu.Item>
           <Menu.Item.ChangeCanvasBackground />
         </Menu.Group>
-        <MenuItem.Collaborators />
+        <Menu.Item style={{ padding: 0, marginTop: "10px" }}>
+          <UserListWrapper />
+        </Menu.Item>
       </Menu>
     );
   };

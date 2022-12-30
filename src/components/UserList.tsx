@@ -4,14 +4,15 @@ import React from "react";
 import clsx from "clsx";
 import { AppState, Collaborator } from "../types";
 import { Tooltip } from "./Tooltip";
-import { useExcalidrawActionManager } from "./App";
+import { useDevice, useExcalidrawActionManager } from "./App";
+import { t } from "../i18n";
 
 export const UserList: React.FC<{
   className?: string;
-  mobile?: boolean;
   collaborators: AppState["collaborators"];
-}> = ({ className, mobile, collaborators }) => {
+}> = ({ className, collaborators }) => {
   const actionManager = useExcalidrawActionManager();
+  const device = useDevice();
 
   const uniqueCollaborators = new Map<string, Collaborator>();
   collaborators.forEach((collaborator, socketId) => {
@@ -32,7 +33,7 @@ export const UserList: React.FC<{
           collaborator,
         ]);
 
-        return mobile ? (
+        return device.isMobile ? (
           <Tooltip
             label={collaborator.username || "Unknown user"}
             key={clientId}
@@ -44,9 +45,15 @@ export const UserList: React.FC<{
         );
       });
 
-  return (
-    <div className={clsx("UserList", className, { UserList_mobile: mobile })}>
-      {avatars}
-    </div>
-  );
+  if (device.isMobile) {
+    return (
+      <fieldset className="UserList-Wrapper">
+        <legend>{t("labels.collaborators")}</legend>
+        <div className={clsx("UserList UserList_mobile", className)}>
+          {avatars}
+        </div>
+      </fieldset>
+    );
+  }
+  return <div className={clsx("UserList", className)}>{avatars}</div>;
 };

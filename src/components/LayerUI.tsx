@@ -199,7 +199,11 @@ const LayerUI = ({
             <Menu.Item.ToggleTheme />
             <Menu.Item.ChangeCanvasBackground />
           </Menu.Group>
-          <Menu.Item.Collaborators />
+          {device.isMobile && appState.collaborators.size > 0 && (
+            <Menu.Item style={{ padding: 0, marginTop: "10px" }}>
+              <UserList collaborators={appState.collaborators} />
+            </Menu.Item>
+          )}
         </Menu>
       )
     );
