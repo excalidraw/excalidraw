@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Liitä",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Liitä kaaviot",
     "selectAll": "Valitse kaikki",
     "multiSelect": "Lisää kohde valintaan",
@@ -235,7 +236,7 @@
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT-näppäintä alaspainettuna kun muutat kokoa, pidä ALT-näppäintä alaspainettuna muuttaaksesi kokoa keskipisteen suhteen",
     "resizeImage": "Voit muuttaa kokoa vapaasti pitämällä SHIFTiä pohjassa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen ympäri",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
-    "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Poista piste(et) painamalla delete, monista painamalla CtrlOrCmd+D, tai liikuta raahaamalla",
     "lineEditor_nothingSelected": "Valitse muokattava piste (monivalinta pitämällä SHIFT pohjassa), tai paina Alt ja klikkaa lisätäksesi uusia pisteitä",
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
@@ -391,7 +392,8 @@
     "fileSaved": "Tiedosto tallennettu.",
     "fileSavedToFilename": "Tallennettiin kohteeseen {filename}",
     "canvas": "piirtoalue",
-    "selection": "valinta"
+    "selection": "valinta",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Valkoinen",
