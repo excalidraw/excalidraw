@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Қою",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Диаграммаларды қою",
     "selectAll": "Бәрін таңдау",
     "multiSelect": "",
@@ -391,7 +392,8 @@
     "fileSaved": "Файл сақталды.",
     "fileSavedToFilename": "{filename} сақталды",
     "canvas": "",
-    "selection": "таңдау"
+    "selection": "таңдау",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
