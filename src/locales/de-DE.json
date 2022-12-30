@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Einfügen",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Diagramme einfügen",
     "selectAll": "Alle auswählen",
     "multiSelect": "Element zur Auswahl hinzufügen",
@@ -235,7 +236,7 @@
     "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
     "resizeImage": "Du kannst die Größe frei ändern, indem du SHIFT gedrückt hältst; halte ALT, um die Größe vom Zentrum aus zu ändern",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
-    "lineEditor_info": "Doppelklicken oder Eingabetaste drücken, um Punkte zu bearbeiten",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Drücke Löschen, um Punkt(e) zu entfernen, CtrlOrCmd+D zum Duplizieren oder ziehe zum Verschieben",
     "lineEditor_nothingSelected": "Wähle einen zu bearbeitenden Punkt (halte SHIFT gedrückt um mehrere Punkte auszuwählen),\noder halte Alt gedrückt und klicke um neue Punkte hinzuzufügen",
     "placeImage": "Klicken, um das Bild zu platzieren oder klicken und ziehen um seine Größe manuell zu setzen",
@@ -391,7 +392,8 @@
     "fileSaved": "Datei gespeichert.",
     "fileSavedToFilename": "Als {filename} gespeichert",
     "canvas": "Zeichenfläche",
-    "selection": "Auswahl"
+    "selection": "Auswahl",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Weiß",
