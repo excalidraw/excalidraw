@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "لصق",
+    "pasteAsPlaintext": "",
     "pasteCharts": "لصق الرسوم البيانية",
     "selectAll": "تحديد الكل",
     "multiSelect": "إضافة عنصر للتحديد",
@@ -235,7 +236,7 @@
     "resize": "يمكنك تقييد النسب بالضغط على SHIFT أثناء تغيير الحجم،\nاضغط على ALT لتغيير الحجم من المركز",
     "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط بأستمرار على SHIFT،\nاضغط بأستمرار على ALT أيضا لتغيير الحجم من المركز",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
-    "lineEditor_info": "انقر نقراً مزدوجاً أو اضغط Enter لتعديل النقاط",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -391,7 +392,8 @@
     "fileSaved": "تم حفظ الملف.",
     "fileSavedToFilename": "حفظ باسم {filename}",
     "canvas": "لوحة الرسم",
-    "selection": "العنصر المحدد"
+    "selection": "العنصر المحدد",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "أبيض",
