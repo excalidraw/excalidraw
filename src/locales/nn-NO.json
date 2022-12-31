@@ -311,7 +311,9 @@
     "view": "Vising",
     "zoomToFit": "Zoom for å sjå alle elementa",
     "zoomToSelection": "Zoom til utval",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Tøm lerretet"
