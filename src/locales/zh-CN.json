@@ -311,7 +311,9 @@
     "view": "视图",
     "zoomToFit": "缩放以适应所有元素",
     "zoomToSelection": "缩放到选区",
-    "toggleElementLock": "锁定/解锁"
+    "toggleElementLock": "锁定/解锁",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "清除画布"
