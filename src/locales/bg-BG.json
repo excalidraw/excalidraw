@@ -311,7 +311,9 @@
     "view": "Преглед",
     "zoomToFit": "Приближи докато се виждат всички елементи",
     "zoomToSelection": "Приближи селекцията",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
