@@ -311,7 +311,9 @@
     "view": "보기",
     "zoomToFit": "모든 요소가 보이도록 확대/축소",
     "zoomToSelection": "선택 영역으로 확대/축소",
-    "toggleElementLock": "선택한 항목을 잠금/잠금 해제"
+    "toggleElementLock": "선택한 항목을 잠금/잠금 해제",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "캔버스 지우기"
