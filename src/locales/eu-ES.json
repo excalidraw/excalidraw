@@ -311,7 +311,9 @@
     "view": "Bistaratu",
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
     "zoomToSelection": "Zooma hautapenera",
-    "toggleElementLock": "Blokeatu/desbloketatu hautapena"
+    "toggleElementLock": "Blokeatu/desbloketatu hautapena",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Garbitu oihala"
