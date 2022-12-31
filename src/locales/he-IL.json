@@ -311,7 +311,9 @@
     "view": "תצוגה",
     "zoomToFit": "גלילה להצגת כל האלמנטים במסך",
     "zoomToSelection": "התמקד בבחירה",
-    "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים"
+    "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "ניקוי הקנבס"
