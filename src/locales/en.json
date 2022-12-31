@@ -202,7 +202,9 @@
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
     "invalidSVGString": "Invalid SVG.",
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
-    "importLibraryError": "Couldn't load library"
+    "importLibraryError": "Couldn't load library",
+    "socketDisconnected": "We've been disconnected from the server",
+    "socketConnectionError": "Couldn't connect to the server"
   },
   "toolBar": {
     "selection": "Selection",

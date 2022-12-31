@@ -414,7 +414,27 @@ class Collab extends PureComponent<Props, CollabState> {
         roomKey,
       );
 
-      this.portal.socket.once("connect_error", fallbackInitializationHandler);
+      this.portal.socket.on("disconnect", (reason) => {
+        // reason `io server disconnect` probably means CORS issue
+        console.warn(
+          `${
+            this.portal.socketInitialized ? "initialized" : "uninitialized"
+          } socket disconnected from server: ${reason}`,
+        );
+        this.setState({
+          errorMessage: this.portal.socketInitialized
+            ? t("errors.socketDisconnected")
+            : t("errors.socketConnectionError"),
+        });
+        fallbackInitializationHandler();
+      });
+
+      this.portal.socket.once("connect_error", (err: any) => {
+        this.setState({
+          errorMessage: t("errors.socketConnectionError"),
+        });
+        fallbackInitializationHandler();
+      });
     } catch (error: any) {
       console.error(error);
       this.setState({ errorMessage: error.message });
