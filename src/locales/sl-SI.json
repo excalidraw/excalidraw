@@ -311,7 +311,9 @@
     "view": "Pogled",
     "zoomToFit": "Približaj na vse elemente",
     "zoomToSelection": "Približaj na izbor",
-    "toggleElementLock": "Zakleni/odkleni izbor"
+    "toggleElementLock": "Zakleni/odkleni izbor",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Počisti platno"
