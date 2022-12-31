@@ -311,7 +311,9 @@
     "view": "Tampilan",
     "zoomToFit": "Perbesar agar sesuai dengan semua elemen",
     "zoomToSelection": "Perbesar ke seleksi",
-    "toggleElementLock": "Kunci/lepas seleksi"
+    "toggleElementLock": "Kunci/lepas seleksi",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Hapus kanvas"
