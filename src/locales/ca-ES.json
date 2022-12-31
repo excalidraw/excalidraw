@@ -311,7 +311,9 @@
     "view": "Visualització",
     "zoomToFit": "Zoom per veure tots els elements",
     "zoomToSelection": "Zoom per veure la selecció",
-    "toggleElementLock": "Blocar/desblocar la selecció"
+    "toggleElementLock": "Blocar/desblocar la selecció",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Neteja el llenç"
