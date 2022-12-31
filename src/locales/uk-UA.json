@@ -311,7 +311,9 @@
     "view": "Вигляд",
     "zoomToFit": "Збільшити щоб умістити всі елементи",
     "zoomToSelection": "Наблизити вибране",
-    "toggleElementLock": "Заблокувати/розблокувати вибране"
+    "toggleElementLock": "Заблокувати/розблокувати вибране",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Очистити полотно"
