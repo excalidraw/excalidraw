@@ -311,7 +311,9 @@
     "view": "Προβολή",
     "zoomToFit": "Zoom ώστε να χωρέσουν όλα τα στοιχεία",
     "zoomToSelection": "Ζουμ στην επιλογή",
-    "toggleElementLock": "Κλείδωμα/Ξεκλείδωμα επιλογής"
+    "toggleElementLock": "Κλείδωμα/Ξεκλείδωμα επιλογής",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Καθαρισμός καμβά"
