@@ -311,7 +311,9 @@
     "view": "Vista",
     "zoomToFit": "Zoom que se axuste a todos os elementos",
     "zoomToSelection": "Zoom á selección",
-    "toggleElementLock": "Bloquear/desbloquear selección"
+    "toggleElementLock": "Bloquear/desbloquear selección",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Limpar lenzo"
