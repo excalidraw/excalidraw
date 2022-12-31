@@ -311,7 +311,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": "Priartinti iki pažymėtos vietos",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Išvalyti drobę"
