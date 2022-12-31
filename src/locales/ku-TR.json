@@ -311,7 +311,9 @@
     "view": "دیمەن",
     "zoomToFit": "زووم بکە بۆ ئەوەی لەگەڵ هەموو توخمەکاندا بگونجێت",
     "zoomToSelection": "زووم بکە بۆ دەستنیشانکراوەکان",
-    "toggleElementLock": "قفڵ/کردنەوەی دەستنیشانکراوەکان"
+    "toggleElementLock": "قفڵ/کردنەوەی دەستنیشانکراوەکان",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "تابلۆکە خاوێن بکەرەوە"
