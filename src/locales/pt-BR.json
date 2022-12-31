@@ -311,7 +311,9 @@
     "view": "Visualizar",
     "zoomToFit": "Ampliar para encaixar todos os elementos",
     "zoomToSelection": "Ampliar a seleção",
-    "toggleElementLock": "Bloquear/desbloquear seleção"
+    "toggleElementLock": "Bloquear/desbloquear seleção",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Limpar a tela"
