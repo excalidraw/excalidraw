@@ -311,7 +311,9 @@
     "view": "Vista",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
     "zoomToSelection": "Zoom alla selezione",
-    "toggleElementLock": "Blocca/sblocca selezione"
+    "toggleElementLock": "Blocca/sblocca selezione",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Svuota la tela"
