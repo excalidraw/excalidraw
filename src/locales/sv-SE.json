@@ -311,7 +311,9 @@
     "view": "Visa",
     "zoomToFit": "Zooma för att rymma alla element",
     "zoomToSelection": "Zooma till markering",
-    "toggleElementLock": "Lås/Lås upp valda"
+    "toggleElementLock": "Lås/Lås upp valda",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Rensa canvas"
