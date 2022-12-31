@@ -311,7 +311,9 @@
     "view": "Vista",
     "zoomToFit": "Ajustar la vista para mostrar todos los elementos",
     "zoomToSelection": "Zoom a la selección",
-    "toggleElementLock": "Bloquear/desbloquear selección"
+    "toggleElementLock": "Bloquear/desbloquear selección",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Borrar lienzo"
