@@ -311,7 +311,9 @@
     "view": "Tamuɣli",
     "zoomToFit": "Simɣur akken ad twliḍ akk iferdisen",
     "zoomToSelection": "Simɣur ɣer tefrayt",
-    "toggleElementLock": "Sekkeṛ/kkes asekker i tefrayt"
+    "toggleElementLock": "Sekkeṛ/kkes asekker i tefrayt",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Sfeḍ taɣzut n usuneɣ"
