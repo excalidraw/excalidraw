@@ -311,7 +311,9 @@
     "view": "Näkymä",
     "zoomToFit": "Näytä kaikki elementit",
     "zoomToSelection": "Näytä valinta",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Pyyhi piirtoalue"
