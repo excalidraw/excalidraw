@@ -311,7 +311,9 @@
     "view": "Просмотр",
     "zoomToFit": "Отмастштабировать, чтобы поместились все элементы",
     "zoomToSelection": "Увеличить до выделенного",
-    "toggleElementLock": "Заблокировать/разблокировать выделение"
+    "toggleElementLock": "Заблокировать/разблокировать выделение",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Очистить холст"
