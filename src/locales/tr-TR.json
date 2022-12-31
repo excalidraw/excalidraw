@@ -311,7 +311,9 @@
     "view": "Görünüm",
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
     "zoomToSelection": "Seçime yakınlaş",
-    "toggleElementLock": "Seçimi Kilitle/çöz"
+    "toggleElementLock": "Seçimi Kilitle/çöz",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Tuvali temizle"
