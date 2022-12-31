@@ -311,7 +311,9 @@
     "view": "عرض",
     "zoomToFit": "تكبير للملائمة",
     "zoomToSelection": "تكبير للعنصر المحدد",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "مسح اللوحة"
