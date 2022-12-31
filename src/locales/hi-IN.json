@@ -311,7 +311,9 @@
     "view": "दृश्य",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
     "zoomToSelection": "चयन तक ज़ूम करे",
-    "toggleElementLock": "ताले के अंदर/बाहर चुनाव"
+    "toggleElementLock": "ताले के अंदर/बाहर चुनाव",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
