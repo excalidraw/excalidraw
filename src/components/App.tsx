@@ -2008,6 +2008,20 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (event.key === KEYS.PAGE_UP || event.key === KEYS.PAGE_DOWN) {
+        let offset =
+          (event.shiftKey ? this.state.width : this.state.height) /
+          this.state.zoom.value;
+        if (event.key === KEYS.PAGE_DOWN) {
+          offset = -offset;
+        }
+        if (event.shiftKey) {
+          this.setState((state) => ({ scrollX: state.scrollX + offset }));
+        } else {
+          this.setState((state) => ({ scrollY: state.scrollY + offset }));
+        }
+      }
+
       if (this.actionManager.handleKeyDown(event)) {
         return;
       }
@@ -2030,12 +2044,6 @@ class App extends React.Component<AppProps, AppState> {
             ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
             : ELEMENT_TRANSLATE_AMOUNT);
 
-        const selectedElements = getSelectedElements(
-          this.scene.getNonDeletedElements(),
-          this.state,
-          true,
-        );
-
         let offsetX = 0;
         let offsetY = 0;
 
@@ -2048,6 +2056,12 @@ class App extends React.Component<AppProps, AppState> {
         } else if (event.key === KEYS.ARROW_DOWN) {
           offsetY = step;
         }
+
+        const selectedElements = getSelectedElements(
+          this.scene.getNonDeletedElements(),
+          this.state,
+          true,
+        );
 
         selectedElements.forEach((element) => {
           mutateElement(element, {
