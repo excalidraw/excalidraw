@@ -311,7 +311,9 @@
     "view": "பார்",
     "zoomToFit": "அனைத்துறுப்புகளும் பொருந்தும்படி விரிவாக்கு",
     "zoomToSelection": "தெரிவுக்கு விரிவாக்கு",
-    "toggleElementLock": "தேர்ந்தெடுப்பைப் பூட்டு/பூட்டவிழ்"
+    "toggleElementLock": "தேர்ந்தெடுப்பைப் பூட்டு/பூட்டவிழ்",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "கித்தானைத் துடை"
