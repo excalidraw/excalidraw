@@ -311,7 +311,9 @@
     "view": "Zobrazení",
     "zoomToFit": "Přiblížit na zobrazení všech prvků",
     "zoomToSelection": "Přiblížit na výběr",
-    "toggleElementLock": "Zamknout/odemknout výběr"
+    "toggleElementLock": "Zamknout/odemknout výběr",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Vymazat plátno"
