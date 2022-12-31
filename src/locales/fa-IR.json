@@ -311,7 +311,9 @@
     "view": "مشاهده",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
     "zoomToSelection": "بزرگنمایی قسمت انتخاب شده",
-    "toggleElementLock": "قفل/بازکردن انتخاب شده ها"
+    "toggleElementLock": "قفل/بازکردن انتخاب شده ها",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "پاک کردن بوم"
