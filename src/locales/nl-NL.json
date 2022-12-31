@@ -311,7 +311,9 @@
     "view": "Weergave",
     "zoomToFit": "Zoom in op alle elementen",
     "zoomToSelection": "Inzoomen op selectie",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Wis canvas"
