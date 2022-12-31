@@ -311,7 +311,9 @@
     "view": "Vizualizare",
     "zoomToFit": "Transfocare pentru a cuprinde totul",
     "zoomToSelection": "Transfocare la selecție",
-    "toggleElementLock": "Blocare/deblocare selecție"
+    "toggleElementLock": "Blocare/deblocare selecție",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Ștergere pânză"
