@@ -143,7 +143,12 @@ class Portal {
     // periodically we'll resync the whole thing to make sure no one diverges
     // due to a dropped message (server goes down etc).
     const syncableElements = allElements.reduce(
-      (acc, element: BroadcastedExcalidrawElement, idx, elements) => {
+      (
+        acc: BroadcastedExcalidrawElement[],
+        element: BroadcastedExcalidrawElement,
+        idx,
+        elements,
+      ) => {
         if (
           (syncAll ||
             !this.broadcastedElementVersions.has(element.id) ||
@@ -159,7 +164,7 @@ class Portal {
         }
         return acc;
       },
-      [] as BroadcastedExcalidrawElement[],
+      [],
     );
 
     const data: SocketUpdateDataSource[typeof updateType] = {
