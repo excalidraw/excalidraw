@@ -311,7 +311,9 @@
     "view": "Vista",
     "zoomToFit": "Zoomar per veire totes los elements",
     "zoomToSelection": "Zoomar la seleccion",
-    "toggleElementLock": "Verrolhar/Desverrolhar la seleccion"
+    "toggleElementLock": "Verrolhar/Desverrolhar la seleccion",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Escafar canabàs"
