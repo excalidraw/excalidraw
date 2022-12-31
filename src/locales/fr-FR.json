@@ -311,7 +311,9 @@
     "view": "Affichage",
     "zoomToFit": "Zoomer pour voir tous les éléments",
     "zoomToSelection": "Zoomer sur la sélection",
-    "toggleElementLock": "Verrouiller/déverrouiller la sélection"
+    "toggleElementLock": "Verrouiller/déverrouiller la sélection",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Effacer la zone de dessin"
