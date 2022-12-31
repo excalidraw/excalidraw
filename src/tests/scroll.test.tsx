@@ -65,6 +65,7 @@ describe("appState", () => {
       const pageStepX = h.state.width / h.state.zoom.value;
       // Assert the following assertions have meaning
       expect(pageStepY).toBeGreaterThan(0);
+      expect(pageStepX).toBeGreaterThan(0);
       // Assert we scroll up
       Keyboard.keyPress(KEYS.PAGE_UP);
       expect(h.state.scrollY).toBe(initialScrollY + pageStepY);
@@ -100,7 +101,7 @@ describe("appState", () => {
     // Assert we scroll properly when zoomed in
     h.setState({ zoom: { value: (zoom * 1.1) as typeof zoom } });
     scrollTest();
-    // // Assert we scroll properly when zoomed out
+    // Assert we scroll properly when zoomed out
     h.setState({ zoom: { value: (zoom * 0.9) as typeof zoom } });
     scrollTest();
     // Assert we scroll properly with normal zoom
