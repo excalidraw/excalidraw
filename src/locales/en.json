@@ -203,7 +203,7 @@
     "invalidSVGString": "Invalid SVG.",
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
     "importLibraryError": "Couldn't load library",
-    "socketDisconnected": "We've been disconnected from the server",
+    "socketDisconnected": "You've been disconnected from the server",
     "socketConnectionError": "Couldn't connect to the server"
   },
   "toolBar": {
