@@ -311,7 +311,9 @@
     "view": "Visualizar",
     "zoomToFit": "Ajustar para todos os elementos caberem",
     "zoomToSelection": "Ampliar a seleção",
-    "toggleElementLock": "Trancar/destrancar selecção"
+    "toggleElementLock": "Trancar/destrancar selecção",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Apagar tela"
