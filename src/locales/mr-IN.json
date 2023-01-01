@@ -312,8 +312,8 @@
     "zoomToFit": "सर्व तत्व दिसतील असे दृश्यरूप आकार करा",
     "zoomToSelection": "निवडी प्रयंत दृश्यरूप आकार करा",
     "toggleElementLock": "कुलूपातून आत/बाहेर निवड",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "पान वर/खाली करा",
+    "movePageLeftRight": "पान डावी/उजवी कडे करा"
   },
   "clearCanvasDialog": {
     "title": "पटल स्वच्छ करा"
