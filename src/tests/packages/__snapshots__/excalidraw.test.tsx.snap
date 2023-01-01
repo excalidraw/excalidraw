@@ -505,6 +505,11 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
             Français
           </option>
           <option
+            value="gl-ES"
+          >
+            Galego
+          </option>
+          <option
             value="it-IT"
           >
             Italiano
@@ -628,11 +633,6 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
             value="mr-IN"
           >
             मराठी
-          </option>
-          <option
-            value="pa-IN"
-          >
-            ਪੰਜਾਬੀ
           </option>
           <option
             value="ja-JP"
@@ -1211,6 +1211,11 @@ exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when t
             Français
           </option>
           <option
+            value="gl-ES"
+          >
+            Galego
+          </option>
+          <option
             value="it-IT"
           >
             Italiano
@@ -1334,11 +1339,6 @@ exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when t
             value="mr-IN"
           >
             मराठी
-          </option>
-          <option
-            value="pa-IN"
-          >
-            ਪੰਜਾਬੀ
           </option>
           <option
             value="ja-JP"
