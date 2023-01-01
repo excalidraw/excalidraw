@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Coller",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Coller les graphiques",
     "selectAll": "Tout sélectionner",
     "multiSelect": "Ajouter l'élément à la sélection",
@@ -44,7 +45,7 @@
     "exportEmbedScene": "Intégrer la scène",
     "exportEmbedScene_details": "Les données de scène seront enregistrées dans le fichier PNG/SVG exporté, afin que la scène puisse être restaurée à partir de celui-ci.\nCela augmentera la taille du fichier exporté.",
     "addWatermark": "Ajouter \"Réalisé avec Excalidraw\"",
-    "handDrawn": "À la main",
+    "handDrawn": "Manuscrit",
     "normal": "Normale",
     "code": "Code",
     "small": "Petite",
@@ -71,7 +72,7 @@
     "layers": "Disposition",
     "actions": "Actions",
     "language": "Langue",
-    "liveCollaboration": "Collaboration en direct",
+    "liveCollaboration": "Collaboration en direct...",
     "duplicateSelection": "Dupliquer",
     "untitled": "Sans-titre",
     "name": "Nom",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
     "exportJSON": "Exporter comme fichier",
-    "exportImage": "Enregistrer comme image",
-    "export": "Exporter",
+    "exportImage": "Exporter l'image...",
+    "export": "Enregistrer sous...",
     "exportToPng": "Enregistrer en PNG",
     "exportToSvg": "Enregistrer en SVG",
     "copyToClipboard": "Copier dans le presse-papier",
@@ -214,7 +215,7 @@
     "text": "Texte",
     "library": "Bibliothèque",
     "lock": "Garder l'outil sélectionné actif après le dessin",
-    "penMode": "Empêcher le zoom tactile et accepter la saisie libre uniquement à partir du stylet",
+    "penMode": "Mode stylo - évite le toucher",
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
     "eraser": "Gomme"
   },
@@ -235,7 +236,7 @@
     "resize": "Vous pouvez conserver les proportions en maintenant la touche MAJ pendant le redimensionnement, maintenez la touche ALT pour redimensionner par rapport au centre",
     "resizeImage": "Vous pouvez redimensionner librement en maintenant SHIFT,\nmaintenez ALT pour redimensionner depuis le centre",
     "rotate": "Vous pouvez restreindre les angles en maintenant MAJ pendant la rotation",
-    "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Appuyer sur Suppr. pour supprimer des points, Ctrl ou Cmd+D pour dupliquer, ou faire glisser pour déplacer",
     "lineEditor_nothingSelected": "Sélectionner un point pour éditer (maintenir la touche MAJ pour en sélectionner plusieurs),\nou maintenir la touche Alt enfoncée et cliquer pour ajouter de nouveaux points",
     "placeImage": "Cliquez pour placer l'image, ou cliquez et faites glisser pour définir sa taille manuellement",
@@ -310,7 +311,9 @@
     "view": "Affichage",
     "zoomToFit": "Zoomer pour voir tous les éléments",
     "zoomToSelection": "Zoomer sur la sélection",
-    "toggleElementLock": "Verrouiller/déverrouiller la sélection"
+    "toggleElementLock": "Verrouiller/déverrouiller la sélection",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Effacer la zone de dessin"
@@ -391,7 +394,8 @@
     "fileSaved": "Fichier enregistré.",
     "fileSavedToFilename": "Enregistré sous {filename}",
     "canvas": "canevas",
-    "selection": "sélection"
+    "selection": "sélection",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Blanc",
@@ -439,5 +443,12 @@
     "5c940d": "Citron vert 9",
     "e67700": "Jaune 9",
     "d9480f": "Orange 9"
+  },
+  "welcomeScreen": {
+    "data": "Toutes vos données sont sauvegardées en local dans votre navigateur.",
+    "switchToPlusApp": "Vous vouliez plutôt aller à Excalidraw+ ?",
+    "menuHints": "Exportation, préférences, langues, ...",
+    "toolbarHints": "Choisissez un outil et commencez à dessiner !",
+    "helpHints": "Raccourcis et aide"
   }
 }

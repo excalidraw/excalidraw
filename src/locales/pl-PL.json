@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Wklej",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Wklej wykresy",
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
@@ -71,7 +72,7 @@
     "layers": "Warstwy",
     "actions": "Akcje",
     "language": "Język",
-    "liveCollaboration": "Współpraca na żywo",
+    "liveCollaboration": "",
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
     "name": "Nazwa",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
     "exportJSON": "Eksportuj do pliku",
-    "exportImage": "Zapisz jako obraz",
-    "export": "Zapisz jako",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Zapisz jako PNG",
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
@@ -144,7 +145,7 @@
     "scale": "Skala",
     "save": "",
     "saveAs": "Zapisz jako",
-    "load": "Otwórz",
+    "load": "",
     "getShareableLink": "Udostępnij",
     "close": "Zamknij",
     "selectLanguage": "Wybierz język",
@@ -235,7 +236,7 @@
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "resizeImage": "Możesz zmienić rozmiar swobodnie trzymając SHIFT,\nprzytrzymaj ALT, aby przeskalować względem środka obiektu",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
-    "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Kliknij, aby umieścić obraz, lub kliknij i przeciągnij, aby ustawić jego rozmiar ręcznie",
@@ -310,7 +311,9 @@
     "view": "Widok",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
     "zoomToSelection": "Przybliż do zaznaczenia",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Wyczyść płótno"
@@ -391,7 +394,8 @@
     "fileSaved": "Zapisano plik.",
     "fileSavedToFilename": "Zapisano jako {filename}",
     "canvas": "płótno",
-    "selection": "zaznaczenie"
+    "selection": "zaznaczenie",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Biały",
@@ -439,5 +443,12 @@
     "5c940d": "Limonkowy 9",
     "e67700": "Żółty 9",
     "d9480f": "Pomarańczowy 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }

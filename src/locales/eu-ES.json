@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Itsatsi",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Itsatsi grafikoak",
     "selectAll": "Hautatu dena",
     "multiSelect": "Gehitu elementua hautapenera",
@@ -71,7 +72,7 @@
     "layers": "Geruzak",
     "actions": "Ekintzak",
     "language": "Hizkuntza",
-    "liveCollaboration": "Zuzeneko elkarlana",
+    "liveCollaboration": "Zuzeneko elkarlana...",
     "duplicateSelection": "Bikoiztu",
     "untitled": "Izengabea",
     "name": "Izena",
@@ -115,8 +116,8 @@
       "label": "Esteka"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Editatu lerroa",
+      "exit": "Irten lerro-editoretik"
     },
     "elementLock": {
       "lock": "Blokeatu",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Garbitu oihala",
     "exportJSON": "Esportatu fitxategira",
-    "exportImage": "Gorde irudi gisa",
-    "export": "Esportatu",
+    "exportImage": "Esportatu irudia...",
+    "export": "Gorde hemen...",
     "exportToPng": "Esportatu PNG gisa",
     "exportToSvg": "Esportatu SVG gisa",
     "copyToClipboard": "Kopiatu arbelera",
@@ -144,7 +145,7 @@
     "scale": "Eskala",
     "save": "Gorde uneko fitxategian",
     "saveAs": "Gorde honela",
-    "load": "Kargatu",
+    "load": "Ireki",
     "getShareableLink": "Lortu partekatzeko esteka",
     "close": "Itxi",
     "selectLanguage": "Hautatu hizkuntza",
@@ -214,7 +215,7 @@
     "text": "Testua",
     "library": "Liburutegia",
     "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
-    "penMode": "Saihestu txikiagotzea eta onartu marrazte libreko idazketa solik arkatza bidez",
+    "penMode": "Luma modua - ukipena saihestu",
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma"
   },
@@ -235,7 +236,7 @@
     "resize": "Proportzioak mantendu ditzakezu SHIFT sakatuta tamaina aldatzen duzun bitartean.\nsakatu ALT erditik tamaina aldatzeko",
     "resizeImage": "Tamaina libreki alda dezakezu SHIFT sakatuta,\nsakatu ALT erditik tamaina aldatzeko",
     "rotate": "Angeluak mantendu ditzakezu SHIFT sakatuta biratzen duzun bitartean",
-    "lineEditor_info": "Egin klik bikoitza edo sakatu Sartu puntuak editatzeko",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Sakatu Ezabatu puntuak kentzeko,\nKtrl+D bikoizteko, edo arrastatu mugitzeko",
     "lineEditor_nothingSelected": "Hautatu editatzeko puntu bat (SHIFT sakatuta anitz hautatzeko),\nedo eduki Alt sakatuta eta egin klik puntu berriak gehitzeko",
     "placeImage": "Egin klik irudia kokatzeko, edo egin klik eta arrastatu bere tamaina eskuz ezartzeko",
@@ -310,7 +311,9 @@
     "view": "Bistaratu",
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
     "zoomToSelection": "Zooma hautapenera",
-    "toggleElementLock": "Blokeatu/desbloketatu hautapena"
+    "toggleElementLock": "Blokeatu/desbloketatu hautapena",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Garbitu oihala"
@@ -391,7 +394,8 @@
     "fileSaved": "Fitxategia gorde da.",
     "fileSavedToFilename": "{filename}-n gorde da",
     "canvas": "oihala",
-    "selection": "hautapena"
+    "selection": "hautapena",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Zuria",
@@ -439,5 +443,12 @@
     "5c940d": "Lima 9",
     "e67700": "Horia 9",
     "d9480f": "Laranja 9"
+  },
+  "welcomeScreen": {
+    "data": "Zure datu guztiak modu lokalean gordetzen dira zure nabigatzailean.",
+    "switchToPlusApp": "Horren ordez Excalidraw+-ra joan nahi al zenuen?",
+    "menuHints": "Esportatu, hobespenak, hizkuntzak,...",
+    "toolbarHints": "Aukeratu tresna bat eta hasi marrazten!",
+    "helpHints": "Lasterbideak eta laguntza"
   }
 }

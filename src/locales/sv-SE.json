@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Klistra in",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Klistra in diagram",
     "selectAll": "Markera alla",
     "multiSelect": "Lägg till element till markering",
@@ -71,7 +72,7 @@
     "layers": "Lager",
     "actions": "Åtgärder",
     "language": "Språk",
-    "liveCollaboration": "Samarbeta live",
+    "liveCollaboration": "Samarbeta live...",
     "duplicateSelection": "Duplicera",
     "untitled": "Namnlös",
     "name": "Namn",
@@ -115,8 +116,8 @@
       "label": "Länk"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Redigera linje",
+      "exit": "Avsluta linjeredigerare"
     },
     "elementLock": {
       "lock": "Lås",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Återställ canvasen",
     "exportJSON": "Exportera till fil",
-    "exportImage": "Spara som bild",
-    "export": "Exportera",
+    "exportImage": "Exportera bild...",
+    "export": "Spara till...",
     "exportToPng": "Exportera till PNG",
     "exportToSvg": "Exportera till SVG",
     "copyToClipboard": "Kopiera till urklipp",
@@ -214,7 +215,7 @@
     "text": "Text",
     "library": "Bibliotek",
     "lock": "Håll valt verktyg aktivt efter ritande",
-    "penMode": "Förhindra nypzoom och acceptera endast frihandsteckning från penna",
+    "penMode": "Pennläge - förhindra touch",
     "link": "Lägg till / Uppdatera länk för en vald form",
     "eraser": "Radergummi"
   },
@@ -235,7 +236,7 @@
     "resize": "Du kan behålla proportioner genom att hålla SHIFT medan du ändrar storlek,\nhåller du ALT ändras storlek relativt mitten",
     "resizeImage": "Du kan ändra storlek fritt genom att hålla SHIFT,\nhåll ALT för att ändra storlek från mitten",
     "rotate": "Du kan begränsa vinklar genom att hålla SHIFT medan du roterar",
-    "lineEditor_info": "Dubbelklicka eller tryck på Enter för att redigera punkter",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Tryck på Ta bort för att ta bort punkt(er), Ctrl + D eller Cmd + D för att duplicera, eller dra för att flytta",
     "lineEditor_nothingSelected": "Välj en punkt att redigera (håll SHIFT för att välja flera),\neller håll ned Alt och klicka för att lägga till nya punkter",
     "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt",
@@ -310,7 +311,9 @@
     "view": "Visa",
     "zoomToFit": "Zooma för att rymma alla element",
     "zoomToSelection": "Zooma till markering",
-    "toggleElementLock": "Lås/Lås upp valda"
+    "toggleElementLock": "Lås/Lås upp valda",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Rensa canvas"
@@ -391,7 +394,8 @@
     "fileSaved": "Fil sparad.",
     "fileSavedToFilename": "Sparad till {filename}",
     "canvas": "canvas",
-    "selection": "markering"
+    "selection": "markering",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Vit",
@@ -439,5 +443,12 @@
     "5c940d": "Limegrön 9",
     "e67700": "Gul 9",
     "d9480f": "Orange 9"
+  },
+  "welcomeScreen": {
+    "data": "All din data sparas lokalt i din webbläsare.",
+    "switchToPlusApp": "Ville du gå till Excalidraw+ istället?",
+    "menuHints": "Export, inställningar, språk, ...",
+    "toolbarHints": "Välj ett verktyg och börja rita!",
+    "helpHints": "Genvägar och hjälp"
   }
 }

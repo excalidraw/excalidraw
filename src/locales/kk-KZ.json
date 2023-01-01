@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Қою",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Диаграммаларды қою",
     "selectAll": "Бәрін таңдау",
     "multiSelect": "",
@@ -136,7 +137,7 @@
     "clearReset": "",
     "exportJSON": "",
     "exportImage": "",
-    "export": "Экспорт",
+    "export": "",
     "exportToPng": "",
     "exportToSvg": "",
     "copyToClipboard": "",
@@ -310,7 +311,9 @@
     "view": "Көру",
     "zoomToFit": "Барлық элементтердің көлеміне сәйкес үлкейту",
     "zoomToSelection": "Таңдалғанды үлкейту",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -391,7 +394,8 @@
     "fileSaved": "Файл сақталды.",
     "fileSavedToFilename": "{filename} сақталды",
     "canvas": "",
-    "selection": "таңдау"
+    "selection": "таңдау",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -439,5 +443,12 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }

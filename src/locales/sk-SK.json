@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Vložiť",
+    "pasteAsPlaintext": "Vložiť ako obyčajný text",
     "pasteCharts": "Vložiť grafy",
     "selectAll": "Vybrať všetko",
     "multiSelect": "Pridať prvok do výberu",
@@ -71,7 +72,7 @@
     "layers": "Vrstvy",
     "actions": "Akcie",
     "language": "Jazyk",
-    "liveCollaboration": "Živá spolupráca",
+    "liveCollaboration": "Živá spolupráca...",
     "duplicateSelection": "Duplikovať",
     "untitled": "Bez názvu",
     "name": "Meno",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Obnoviť plátno",
     "exportJSON": "Exportovať do súboru",
-    "exportImage": "Uložiť ako obrázok",
-    "export": "Exportovať",
+    "exportImage": "Exportovať obrázok...",
+    "export": "Uložiť do...",
     "exportToPng": "Exportovať do PNG",
     "exportToSvg": "Exportovať do SVG",
     "copyToClipboard": "Kopírovať do schránky",
@@ -144,7 +145,7 @@
     "scale": "Mierka",
     "save": "Uložiť do aktuálneho súboru",
     "saveAs": "Uložiť ako",
-    "load": "Nahrať",
+    "load": "Otvoriť",
     "getShareableLink": "Získať odkaz na zdieľanie",
     "close": "Zavrieť",
     "selectLanguage": "Zvoliť jazyk",
@@ -214,7 +215,7 @@
     "text": "Text",
     "library": "Knižnica",
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia",
-    "penMode": "Zabrániť priblíženiu potiahnutím a povoliť vstup voľnou rokou iba z pera",
+    "penMode": "Režim pera – zabrániť dotyku",
     "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
     "eraser": "Guma"
   },
@@ -235,7 +236,7 @@
     "resize": "Počas zmeny veľkosti zachováte proporcie podržaním SHIFT,\\npodržaním ALT meníte veľkosť so zachovaním stredu",
     "resizeImage": "Podržte SHIFT pre voľnú zmenu veľkosti, podržte ALT pre zmenu veľkosti od stredu",
     "rotate": "Počas rotácie obmedzíte uhol podržaním SHIFT",
-    "lineEditor_info": "Použite dvojklik alebo stlačte Enter na editáciu bodov",
+    "lineEditor_info": "Podržte CtrlOrCmd a kliknite dva krát alebo stlačte CtrlOrCmd + Enter pre editáciu bodov",
     "lineEditor_pointSelected": "Stačte Delete na vymazanie bodu (bodov), CtrlOrCmd+D na duplikovanie, alebo potiahnite na presunutie",
     "lineEditor_nothingSelected": "Zvoľte bod na upravovanie (podržte SHIFT pre zvolenie viacerých bodov) alebo podržte Alt a kliknite na pridanie nového bodu",
     "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
@@ -310,7 +311,9 @@
     "view": "Zobrazenie",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
     "zoomToSelection": "Priblížiť na výber",
-    "toggleElementLock": "Zamknúť/odomknúť vybrané"
+    "toggleElementLock": "Zamknúť/odomknúť vybrané",
+    "movePageUpDown": "Posunúť stranu hore/dole",
+    "movePageLeftRight": "Posunúť stranu doľava/doprava"
   },
   "clearCanvasDialog": {
     "title": "Vyčistiť plátno"
@@ -391,7 +394,8 @@
     "fileSaved": "Súbor uložený.",
     "fileSavedToFilename": "Uložený ako {filename}",
     "canvas": "plátna",
-    "selection": "výberu"
+    "selection": "výberu",
+    "pasteAsSingleElement": "Použitím {{shortcut}} vložte ako samostatný prvok alebo vložte do existujúceho editovaného textu"
   },
   "colors": {
     "ffffff": "Biela",
@@ -439,5 +443,12 @@
     "5c940d": "Limetková 9",
     "e67700": "Žltá 9",
     "d9480f": "Oranžová 9"
+  },
+  "welcomeScreen": {
+    "data": "Všetky vaše dáta sú uložené lokálne vo vašom prehliadači.",
+    "switchToPlusApp": "Chceli ste namiesto toho prejsť do Excalidraw+?",
+    "menuHints": "Exportovanie, nastavenia, jazyky, ...",
+    "toolbarHints": "Zvoľte nástroj a začnite kresliť!",
+    "helpHints": "Klávesové skratky a pomocník"
   }
 }

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Enganxa",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Enganxa els diagrames",
     "selectAll": "Selecciona-ho tot",
     "multiSelect": "Afegeix un element a la selecció",
@@ -71,7 +72,7 @@
     "layers": "Capes",
     "actions": "Accions",
     "language": "Llengua",
-    "liveCollaboration": "Col·laboració en directe",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplica",
     "untitled": "Sense títol",
     "name": "Nom",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Neteja el llenç",
     "exportJSON": "Exporta a un fitxer",
-    "exportImage": "Desa com a imatge",
-    "export": "Exporta",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Exporta a PNG",
     "exportToSvg": "Exporta a SNG",
     "copyToClipboard": "Copia al porta-retalls",
@@ -144,7 +145,7 @@
     "scale": "Escala",
     "save": "Desa al fitxer actual",
     "saveAs": "Anomena i desa",
-    "load": "Carrega",
+    "load": "",
     "getShareableLink": "Obté l'enllaç per a compartir",
     "close": "Tanca",
     "selectLanguage": "Trieu la llengua",
@@ -214,7 +215,7 @@
     "text": "Text",
     "library": "Biblioteca",
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
-    "penMode": "Evita el zoom i accepta solament el dibuix lliure amb bolígraf",
+    "penMode": "",
     "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
     "eraser": "Esborrador"
   },
@@ -235,7 +236,7 @@
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "resizeImage": "Podeu redimensionar lliurement prement MAJÚSCULA;\nper a redimensionar des del centre, premeu ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
-    "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Premeu Suprimir per a eliminar el(s) punt(s), CtrlOrCmd+D per a duplicar-lo, o arrossegueu-lo per a moure'l",
     "lineEditor_nothingSelected": "Seleccioneu un punt per a editar-lo (premeu SHIFT si voleu\nselecció múltiple), o manteniu Alt i feu clic per a afegir més punts",
     "placeImage": "Feu clic per a col·locar la imatge o clic i arrossegar per a establir-ne la mida manualment",
@@ -310,7 +311,9 @@
     "view": "Visualització",
     "zoomToFit": "Zoom per veure tots els elements",
     "zoomToSelection": "Zoom per veure la selecció",
-    "toggleElementLock": "Blocar/desblocar la selecció"
+    "toggleElementLock": "Blocar/desblocar la selecció",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Neteja el llenç"
@@ -391,7 +394,8 @@
     "fileSaved": "S'ha desat el fitxer.",
     "fileSavedToFilename": "S'ha desat a {filename}",
     "canvas": "el llenç",
-    "selection": "la selecció"
+    "selection": "la selecció",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Blanc",
@@ -439,5 +443,12 @@
     "5c940d": "Llima 9",
     "e67700": "Groc 9",
     "d9480f": "Taronja 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }

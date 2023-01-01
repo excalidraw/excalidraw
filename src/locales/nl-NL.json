@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Plakken",
+    "pasteAsPlaintext": "Plakken als platte tekst",
     "pasteCharts": "Plak grafieken",
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
@@ -9,14 +10,14 @@
     "copy": "Kopiëren",
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer naar klembord als SVG",
-    "copyText": "Kopiëren naar klembord als tekst",
+    "copyText": "Kopieer naar klembord als tekst",
     "bringForward": "Breng naar voren",
     "sendToBack": "Stuur naar achtergrond",
     "bringToFront": "Breng naar voorgrond",
     "sendBackward": "Breng naar achter",
     "delete": "Verwijderen",
-    "copyStyles": "Opmaak kopiëren",
-    "pasteStyles": "Opmaak plakken",
+    "copyStyles": "Kopieer opmaak",
+    "pasteStyles": "Plak opmaak",
     "stroke": "Lijn",
     "background": "Achtergrond",
     "fill": "Invulling",
@@ -71,7 +72,7 @@
     "layers": "Lagen",
     "actions": "Acties",
     "language": "Taal",
-    "liveCollaboration": "Live Samenwerking",
+    "liveCollaboration": "Live Samenwerking...",
     "duplicateSelection": "Dupliceer",
     "untitled": "Naamloos",
     "name": "Naam",
@@ -105,38 +106,38 @@
     "toggleTheme": "Thema aan/uit",
     "personalLib": "Persoonlijke bibliotheek",
     "excalidrawLib": "Excalidraw bibliotheek",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
+    "decreaseFontSize": "Letters verkleinen",
+    "increaseFontSize": "Letters vergroten",
     "unbindText": "Ontkoppel tekst",
-    "bindText": "",
+    "bindText": "Koppel tekst aan de container",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Wijzig link",
+      "create": "Maak link",
+      "label": "Link"
     },
     "lineEditor": {
       "edit": "Bewerk regel",
       "exit": "Verlaat regel-editor"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Vergrendel",
+      "unlock": "Ontgrendel",
+      "lockAll": "Vergrendel alles",
+      "unlockAll": "Ontgrendel alles"
     },
-    "statusPublished": "",
-    "sidebarLock": ""
+    "statusPublished": "Gepubliceerd",
+    "sidebarLock": "Zijbalk open houden"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "Nog geen items toegevoegd...",
+    "hint_emptyLibrary": "Selecteer een item op het canvas om het hier toe te voegen of installeer een bibliotheek uit de openbare repository, hieronder.",
+    "hint_emptyPrivateLibrary": "Selecteer een item op het canvas om het hier toe te voegen."
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
     "exportJSON": "Exporteren naar bestand",
-    "exportImage": "Als afbeelding opslaan",
-    "export": "Exporteren",
+    "exportImage": "Exporteer afbeelding...",
+    "export": "Sla op...",
     "exportToPng": "Exporteren naar PNG",
     "exportToSvg": "Exporteren naar SVG",
     "copyToClipboard": "Kopieer",
@@ -181,11 +182,11 @@
     "couldNotCopyToClipboard": "Kon niet naar klembord kopiëren.",
     "decryptFailed": "Kan gegevens niet decoderen.",
     "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
-    "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wil je doorgaan?",
+    "loadSceneOverridePrompt": "Het inladen van een externe tekening zal je bestaande inhoud vervangen. Wil je verdergaan?",
     "collabStopOverridePrompt": "Wanneer de sessie wordt gestopt, overschrijft u de eerdere, lokaal opgeslagen tekening. Weet je het zeker?\n\n(Als je de lokale tekening wilt behouden, sluit je in plaats daarvan het browsertabblad)",
     "errorAddingToLibrary": "Kan item niet toevoegen aan de bibliotheek",
     "errorRemovingFromLibrary": "Kan item niet uit de bibliotheek verwijderen",
-    "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
+    "confirmAddLibrary": "Dit zal {{numShapes}} vorm(en) toevoegen aan je bibliotheek. Weet je het zeker?",
     "imageDoesNotContainScene": "Deze afbeelding lijkt geen scène gegevens te bevatten. Heb je scène embedding tijdens het exporteren ingeschakeld?",
     "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand",
     "invalidSceneUrl": "Kan scène niet importeren vanuit de opgegeven URL. Het is onjuist of bevat geen geldige Excalidraw JSON-gegevens.",
@@ -197,26 +198,26 @@
     "unsupportedFileType": "Niet-ondersteund bestandstype.",
     "imageInsertError": "Afbeelding invoegen mislukt. Probeer het later opnieuw...",
     "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
-    "svgImageInsertError": "",
+    "svgImageInsertError": "Kon geen SVG-afbeelding invoegen. De SVG-opmaak ziet er niet geldig uit.",
     "invalidSVGString": "Ongeldige SVG.",
-    "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "cannotResolveCollabServer": "Kan geen verbinding maken met de collab server. Herlaad de pagina en probeer het opnieuw.",
+    "importLibraryError": "Kon bibliotheek niet laden"
   },
   "toolBar": {
     "selection": "Selectie",
-    "image": "",
+    "image": "Voeg afbeelding in",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
     "ellipse": "Ovaal",
     "arrow": "Pijl",
     "line": "Lijn",
-    "freedraw": "Tekenen",
+    "freedraw": "Teken",
     "text": "Tekst",
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
-    "penMode": "Voorkom pinch-zoom en accepteer freedraw invoer alleen van pen",
+    "penMode": "Pen modus - Blokkeer aanraken",
     "link": "",
-    "eraser": ""
+    "eraser": "Gum"
   },
   "headings": {
     "canvasActions": "Canvasacties",
@@ -235,7 +236,7 @@
     "resize": "Houd tijdens het vergroten SHIFT ingedrukt om verhoudingen te behouden,\ngebruik ALT om vanuit het midden te vergroten/verkleinen",
     "resizeImage": "",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
-    "lineEditor_info": "Dubbelklik of druk op Enter om punten te bewerken",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -258,15 +259,15 @@
     "trackedToSentry_pre": "De fout met ID ",
     "trackedToSentry_post": " was gevolgd op ons systeem.",
     "openIssueMessage_pre": "We waren voorzichtig om je scène-informatie niet in de fout toe te voegen. Als je scène niet privé is, overweeg dan alstublieft het opvolgen op onze ",
-    "openIssueMessage_button": "bug tracker.",
+    "openIssueMessage_button": "bugtracker.",
     "openIssueMessage_post": " Kopieer de informatie hieronder naar de GitHub issue.",
     "sceneContent": "Scène-inhoud:"
   },
   "roomDialog": {
     "desc_intro": "Je kunt mensen uitnodigen om met je samen te werken.",
     "desc_privacy": "Geen zorgen, de sessie gebruikt end-to-end encryptie, dus wat je tekent blijft privé. Zelfs onze server zal niet kunnen zien wat je tekent.",
-    "button_startSession": "Sessie starten",
-    "button_stopSession": "Sessie afbreken",
+    "button_startSession": "Start sessie",
+    "button_stopSession": "Stop sessie",
     "desc_inProgressIntro": "De live-samenwerkingssessie is nu gestart.",
     "desc_shareLink": "Deel deze link met iedereen waarmee je wil samenwerken:",
     "desc_exitSession": "Het stoppen van de sessie zal je loskoppelen van de kamer, maar je kunt lokaal doorwerken met de scène.\nPas op: dit heeft geen invloed op andere mensen en dat zij nog steeds in staat zullen zijn om samen te werken aan hun versie.",
@@ -283,7 +284,7 @@
     "link_details": "Exporteren als een alleen-lezen link.",
     "link_button": "Exporteer naar link",
     "excalidrawplus_description": "Sla de scène op in je Excalidraw+ werkruimte.",
-    "excalidrawplus_button": "Exporteren",
+    "excalidrawplus_button": "Exporteer",
     "excalidrawplus_exportError": "Kan op dit moment niet exporteren naar Excalidraw+..."
   },
   "helpDialog": {
@@ -302,7 +303,7 @@
     "howto": "Volg onze handleidingen",
     "or": "of",
     "preventBinding": "Pijlbinding voorkomen",
-    "tools": "",
+    "tools": "Tools",
     "shortcuts": "Sneltoetsen",
     "textFinish": "Voltooi het bewerken (teksteditor)",
     "textNewLine": "Nieuwe regel toevoegen (teksteditor)",
@@ -310,10 +311,12 @@
     "view": "Weergave",
     "zoomToFit": "Zoom in op alle elementen",
     "zoomToSelection": "Inzoomen op selectie",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "Pagina omhoog/omlaag",
+    "movePageLeftRight": "Verplaats pagina links/rechts"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Wis canvas"
   },
   "publishDialog": {
     "title": "Publiceer bibliotheek",
@@ -321,13 +324,13 @@
     "authorName": "Naam auteur",
     "githubUsername": "GitHub gebruikersnaam",
     "twitterUsername": "Twitter gebruikersnaam",
-    "libraryName": "Bibliotheek naam",
-    "libraryDesc": "Bibliotheek beschrijving",
+    "libraryName": "Naam bibliotheek",
+    "libraryDesc": "Beschrijving van de bibliotheek",
     "website": "Website",
     "placeholder": {
-      "authorName": "Uw naam of gebruikersnaam:",
+      "authorName": "Je naam of gebruikersnaam",
       "libraryName": "Naam van je bibliotheek",
-      "libraryDesc": "Beschrijving van uw bibliotheek om mensen te helpen het gebruik ervan te begrijpen",
+      "libraryDesc": "Beschrijving van je bibliotheek om mensen te helpen het gebruik ervan te begrijpen",
       "githubHandle": "",
       "twitterHandle": "",
       "website": "Link naar je persoonlijke website of elders (optioneel)"
@@ -343,12 +346,12 @@
     },
     "noteGuidelines": {
       "pre": "",
-      "link": "",
+      "link": "richtlijnen",
       "post": ""
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
+      "link": "MIT-licentie, ",
       "post": ""
     },
     "noteItems": "",
@@ -391,7 +394,8 @@
     "fileSaved": "Bestand opgeslagen.",
     "fileSavedToFilename": "Opgeslagen als {filename}",
     "canvas": "canvas",
-    "selection": "selectie"
+    "selection": "selectie",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Wit",
@@ -439,5 +443,12 @@
     "5c940d": "Limoen 9",
     "e67700": "Geel 9",
     "d9480f": "Oranje 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }

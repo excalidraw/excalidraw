@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "ထား",
+    "pasteAsPlaintext": "",
     "pasteCharts": "",
     "selectAll": "အကုန်ရွေး",
     "multiSelect": "ရွေးထားသည့်ထဲပုံထည့်",
@@ -136,7 +137,7 @@
     "clearReset": "ကားချပ်ရှင်းလင်း",
     "exportJSON": "",
     "exportImage": "",
-    "export": "ထုတ်",
+    "export": "",
     "exportToPng": "PNG ထုတ်",
     "exportToSvg": "SVG ထုတ်",
     "copyToClipboard": "ကူးယူ",
@@ -144,7 +145,7 @@
     "scale": "စကေး",
     "save": "",
     "saveAs": "ပြောင်းသိမ်း",
-    "load": "တင်သွင်း",
+    "load": "",
     "getShareableLink": "မျှဝေရန် လင့်ခ်ရယူ",
     "close": "ပိတ်",
     "selectLanguage": "ဘာသာစကားရွေးပါ",
@@ -235,7 +236,7 @@
     "resize": "အချိုးအစားကန့်သတ်ရန် Shift နှင့် ဗဟိုမှချိန်ညှိရန် Alt တို့ကိုနှိပ်ထားနိုင်သည်",
     "resizeImage": "",
     "rotate": "Shift ကိုနှိပ်ထားခြင်းဖြင့် ထောင့်အလိုက်လှည့်နိုင်သည်",
-    "lineEditor_info": "အမှတ်များပြင်ဆင်သတ်မှတ်ရင် ကလစ်နှစ်ချက် (သို့) Enter ကိုနှိပ်ပါ",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -310,7 +311,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": "",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -391,7 +394,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -439,5 +443,12 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }

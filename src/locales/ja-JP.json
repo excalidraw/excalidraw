@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "貼り付け",
+    "pasteAsPlaintext": "",
     "pasteCharts": "チャートの貼り付け",
     "selectAll": "すべて選択",
     "multiSelect": "複数選択",
@@ -71,7 +72,7 @@
     "layers": "レイヤー",
     "actions": "操作",
     "language": "言語",
-    "liveCollaboration": "共同編集",
+    "liveCollaboration": "共同編集...",
     "duplicateSelection": "複製",
     "untitled": "無題",
     "name": "名前",
@@ -115,8 +116,8 @@
       "label": "リンク"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "行を編集",
+      "exit": "行エディタを終了"
     },
     "elementLock": {
       "lock": "ロック",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "キャンバスのリセット",
     "exportJSON": "ファイルへエクスポート",
-    "exportImage": "画像として保存",
-    "export": "エクスポート",
+    "exportImage": "画像のエクスポート...",
+    "export": "名前を付けて保存...",
     "exportToPng": "PNG にエクスポート",
     "exportToSvg": "SVG にエクスポート",
     "copyToClipboard": "クリップボードにコピー",
@@ -144,7 +145,7 @@
     "scale": "スケール",
     "save": "現在のファイルに保存",
     "saveAs": "名前を付けて保存",
-    "load": "読み込み...",
+    "load": "開く",
     "getShareableLink": "共有URLの取得",
     "close": "閉じる",
     "selectLanguage": "言語の選択",
@@ -214,7 +215,7 @@
     "text": "テキスト",
     "library": "ライブラリ",
     "lock": "描画後も使用中のツールを選択したままにする",
-    "penMode": "ピンチとズームを抑止し、ペンからのみ自由な入力を受け付けます",
+    "penMode": "ペンモード - タッチ防止",
     "link": "選択した図形のリンクを追加/更新",
     "eraser": "消しゴム"
   },
@@ -235,7 +236,7 @@
     "resize": "サイズを変更中にSHIFTを押すと縦横比を固定できます。Altを押すと中央からサイズを変更できます",
     "resizeImage": "SHIFTを長押しすると自由にサイズを変更できます。\n中央からサイズを変更するにはALTを長押しします",
     "rotate": "回転中にSHIFT キーを押すと角度を制限することができます",
-    "lineEditor_info": "ポイントを編集するには、ダブルクリックまたはEnterキーを押します",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Deleteキーを押すと点を削除、CtrlOrCmd+Dで複製、マウスドラッグで移動",
     "lineEditor_nothingSelected": "編集する点を選択（SHIFTを押したままで複数選択）、\nAltキーを押しながらクリックすると新しい点を追加",
     "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
@@ -310,7 +311,9 @@
     "view": "表示",
     "zoomToFit": "すべての要素が収まるようにズーム",
     "zoomToSelection": "選択要素にズーム",
-    "toggleElementLock": "選択したアイテムをロック/ロック解除"
+    "toggleElementLock": "選択したアイテムをロック/ロック解除",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "キャンバスを消去"
@@ -391,7 +394,8 @@
     "fileSaved": "ファイルを保存しました",
     "fileSavedToFilename": "{filename} に保存しました",
     "canvas": "キャンバス",
-    "selection": "選択"
+    "selection": "選択",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "ホワイト",
@@ -439,5 +443,12 @@
     "5c940d": "ライム 9",
     "e67700": "イエロー 9",
     "d9480f": "オレンジ 9"
+  },
+  "welcomeScreen": {
+    "data": "すべてのデータはブラウザにローカル保存されます。",
+    "switchToPlusApp": "代わりにExcalidraw+を開きますか？",
+    "menuHints": "エクスポート, 設定, 言語, ...",
+    "toolbarHints": "ツールを選んで描き始めよう！",
+    "helpHints": "ショートカットとヘルプ"
   }
 }

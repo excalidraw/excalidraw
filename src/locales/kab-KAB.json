@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Senṭeḍ",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Senṭeḍ udlifen",
     "selectAll": "Fren akk",
     "multiSelect": "Rnu aferdis ɣer tefrayt",
@@ -71,7 +72,7 @@
     "layers": "Tissiyin",
     "actions": "Tigawin",
     "language": "Tutlayt",
-    "liveCollaboration": "Amɛiwen s srid",
+    "liveCollaboration": "",
     "duplicateSelection": "Sisleg",
     "untitled": "War azwel",
     "name": "Isem",
@@ -115,8 +116,8 @@
       "label": "Aseɣwen"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Ẓreg izirig",
+      "exit": "Ffeɣ seg umaẓrag n yizirig"
     },
     "elementLock": {
       "lock": "Sekkeṛ",
@@ -125,18 +126,18 @@
       "unlockAll": "Serreḥ akk"
     },
     "statusPublished": "Yeffeɣ-d",
-    "sidebarLock": ""
+    "sidebarLock": "Eǧǧ afeggag n yidis yeldi"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "Ulac iferdisen yettwarnan yakan...",
+    "hint_emptyLibrary": "Fren aferdis di teɣzut nusuneɣ akken at-ternuḍ dagi, neɣ sbedd tamkarḍit seg usarsay azayez, ukessar-agi.",
+    "hint_emptyPrivateLibrary": "Fren aferdis di teɣzut nusuneɣ akken at-ternuḍ dagi."
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
     "exportJSON": "Sifeḍ afaylu",
-    "exportImage": "Sekles am tugna",
-    "export": "Sifeḍ",
+    "exportImage": "Sifeḍ tugna...",
+    "export": "Sekles di...",
     "exportToPng": "Sifeḍ ɣer PNG",
     "exportToSvg": "Sifeḍ ɣer SVG",
     "copyToClipboard": "Nɣel ɣer tecfawit",
@@ -144,7 +145,7 @@
     "scale": "Taskala",
     "save": "Sekles deg ufaylu amiran",
     "saveAs": "Sekles am",
-    "load": "Sali-d",
+    "load": "Ldi",
     "getShareableLink": "Awi-d aseɣwen n beṭṭu",
     "close": "Mdel",
     "selectLanguage": "Fren tutlayt",
@@ -235,7 +236,7 @@
     "resize": "Tzemreḍ ad tḥettemeḍ assaɣ s tuṭṭfa n tqeffalt SHIFT mi ara tettbeddileḍ tiddi,\nma teṭṭfeḍ ALT abeddel n tiddi ad yili si tlemmast",
     "resizeImage": "Tzemreḍ ad talseḍ tiddi s tilelli s tuṭṭfa n SHIFT,\nṭṭef ALT akken ad talseḍ tiddi si tlemmast",
     "rotate": "Tzemreḍ ad tḥettemeḍ tiɣemmar s tuṭṭfa n SHIFT di tuzzya",
-    "lineEditor_info": "Ssit snat n tikkal neɣ ssed taqeffalt Kcem akken ad tẓergeḍ tinqiḍin",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Ssed taqeffalt kkes akken ad tekkseḍ tanqiḍ (tinqiḍin),\nCtrlOrCmd+D akken ad tsiselgeḍ, neɣ zuɣer akken ad tesmuttiḍ",
     "lineEditor_nothingSelected": "Fren tanqiḍt akken ad tẓergeḍ (ṭṭef SHIFT akken ad tferneḍ aṭas),\nneɣ ṭṭef Alt akken ad ternuḍ tinqiḍin timaynutin",
     "placeImage": "Ssit akken ad tserseḍ tugna, neɣ ssit u zuɣer akken ad tesbaduḍ tiddi-ines s ufus",
@@ -310,7 +311,9 @@
     "view": "Tamuɣli",
     "zoomToFit": "Simɣur akken ad twliḍ akk iferdisen",
     "zoomToSelection": "Simɣur ɣer tefrayt",
-    "toggleElementLock": "Sekkeṛ/kkes asekker i tefrayt"
+    "toggleElementLock": "Sekkeṛ/kkes asekker i tefrayt",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Sfeḍ taɣzut n usuneɣ"
@@ -391,7 +394,8 @@
     "fileSaved": "Afaylu yettwasekles.",
     "fileSavedToFilename": "Yettwasekles di {filename}",
     "canvas": "taɣzut n usuneɣ",
-    "selection": "tafrayt"
+    "selection": "tafrayt",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Amellal",
@@ -439,5 +443,12 @@
     "5c940d": "Llim 9",
     "e67700": "Awraɣ 9",
     "d9480f": "Aččinawi 9"
+  },
+  "welcomeScreen": {
+    "data": "Akk isefka-inek•inem ttwakelsen s wudem adigan deg yiminig-inek•inem.",
+    "switchToPlusApp": "Tebɣiḍ ad tedduḍ ɣer Excalidraw+ deg umḍiq?",
+    "menuHints": "Asifeḍ, ismenyifen, tutlayin, ...",
+    "toolbarHints": "Fren afecku tebduḍ asuneɣ!",
+    "helpHints": "Inegzumen akked tallelt"
   }
 }
