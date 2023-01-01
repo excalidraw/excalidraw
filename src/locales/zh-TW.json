@@ -312,8 +312,8 @@
     "zoomToFit": "放大至填滿畫面",
     "zoomToSelection": "縮放至選取區",
     "toggleElementLock": "鎖定/解鎖已選的項目",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "向上/下移動頁面",
+    "movePageLeftRight": "向左/右移動頁面"
   },
   "clearCanvasDialog": {
     "title": "清除畫布"
