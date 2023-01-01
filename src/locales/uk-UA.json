@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Вставити",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Вставити як простий текст",
     "pasteCharts": "Вставити діаграми",
     "selectAll": "Вибрати все",
     "multiSelect": "Додати елемент до вибраного",
@@ -136,8 +136,8 @@
   "buttons": {
     "clearReset": "Очистити полотно",
     "exportJSON": "Експорт у файл",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Експорт зображення...",
+    "export": "Зберегти як...",
     "exportToPng": "Експортувати в PNG",
     "exportToSvg": "Експортувати в SVG",
     "copyToClipboard": "Скопіювати до буферу обміну",
@@ -145,7 +145,7 @@
     "scale": "Масштаб",
     "save": "Зберегти до поточного файлу",
     "saveAs": "Зберегти як",
-    "load": "",
+    "load": "Відкрити",
     "getShareableLink": "Отримати посилання",
     "close": "Закрити",
     "selectLanguage": "Обрати мову",
@@ -215,7 +215,7 @@
     "text": "Текст",
     "library": "Бібліотека",
     "lock": "Залишити обраний інструмент після креслення",
-    "penMode": "",
+    "penMode": "Режим пера - запобігання дотику",
     "link": "Додати/Оновити посилання для вибраної форми",
     "eraser": "Очищувач"
   },
@@ -312,8 +312,8 @@
     "zoomToFit": "Збільшити щоб умістити всі елементи",
     "zoomToSelection": "Наблизити вибране",
     "toggleElementLock": "Заблокувати/розблокувати вибране",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Пересунути сторінку вгору/вниз",
+    "movePageLeftRight": "Пересунути сторінку вліво/вправо"
   },
   "clearCanvasDialog": {
     "title": "Очистити полотно"
@@ -448,7 +448,7 @@
     "data": "",
     "switchToPlusApp": "",
     "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "toolbarHints": "Оберіть інструмент і почніть малювати!",
+    "helpHints": "Комбінації клавіш і допомога"
   }
 }
