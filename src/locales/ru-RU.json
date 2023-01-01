@@ -312,8 +312,8 @@
     "zoomToFit": "Отмастштабировать, чтобы поместились все элементы",
     "zoomToSelection": "Увеличить до выделенного",
     "toggleElementLock": "Заблокировать/разблокировать выделение",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Сдвинуть страницу вверх/вниз",
+    "movePageLeftRight": "Сдвинуть страницу вправо/влево"
   },
   "clearCanvasDialog": {
     "title": "Очистить холст"
