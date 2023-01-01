@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lipire",
+    "pasteAsPlaintext": "Inserare ca text simplu",
     "pasteCharts": "Lipire diagrame",
     "selectAll": "Selectare totală",
     "multiSelect": "Adaugă element la selecție",
@@ -71,7 +72,7 @@
     "layers": "Straturi",
     "actions": "Acțiuni",
     "language": "Limbă",
-    "liveCollaboration": "Colaborare în direct",
+    "liveCollaboration": "Colaborare în direct...",
     "duplicateSelection": "Duplicare",
     "untitled": "Nedenumit",
     "name": "Nume",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Resetare pânză",
     "exportJSON": "Exportare la fișiere",
-    "exportImage": "Salvare ca imagine",
-    "export": "Exportare",
+    "exportImage": "Exportare imagine...",
+    "export": "Salvare în...",
     "exportToPng": "Exportare ca PNG",
     "exportToSvg": "Exportare ca SVG",
     "copyToClipboard": "Copiere în memoria temporară",
@@ -144,7 +145,7 @@
     "scale": "Scală",
     "save": "Salvare în fișierul curent",
     "saveAs": "Salvare ca",
-    "load": "Încărcare",
+    "load": "Deschidere",
     "getShareableLink": "Obține URL partajabil",
     "close": "Închidere",
     "selectLanguage": "Selectare limbă",
@@ -214,7 +215,7 @@
     "text": "Text",
     "library": "Bibliotecă",
     "lock": "Menține activ instrumentul selectat după desenare",
-    "penMode": "Împiedică mărirea prin ciupire și acceptă desenarea liberă doar de la stilou",
+    "penMode": "Mod stilou – împiedică atingerea",
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră"
   },
@@ -235,7 +236,7 @@
     "resize": "Poți constrânge proporțiile, ținând apăsată tasta SHIFT în timp ce redimensionezi,\nține apăsată tasta ALT pentru a redimensiona de la centru",
     "resizeImage": "Poți redimensiona liber ținând apăsată tasta SHIFT,\nține apăsată tasta ALT pentru a redimensiona din centru",
     "rotate": "Poți constrânge unghiurile, ținând apăsată tasta SHIFT în timp ce rotești",
-    "lineEditor_info": "Dă dublu clic sau apasă tasta Enter pentru a edita punctele",
+    "lineEditor_info": "Ține apăsată tasta Ctrl sau Cmd și dă dublu clic sau apasă tasta Ctrl sau Cmd + Enter pentru a edita puncte",
     "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctele,\ncombinația de taste Ctrl sau Cmd + D pentru a le duplica sau glisează-le pentru a le schimba poziția",
     "lineEditor_nothingSelected": "Selectează un punct pentru a-l edita (ține apăsată tasta SHIFT pentru a selecta mai multe),\nsau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi",
     "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
@@ -310,7 +311,9 @@
     "view": "Vizualizare",
     "zoomToFit": "Transfocare pentru a cuprinde totul",
     "zoomToSelection": "Transfocare la selecție",
-    "toggleElementLock": "Blocare/deblocare selecție"
+    "toggleElementLock": "Blocare/deblocare selecție",
+    "movePageUpDown": "Deplasare pagină sus/jos",
+    "movePageLeftRight": "Deplasare pagină stânga/dreapta"
   },
   "clearCanvasDialog": {
     "title": "Ștergere pânză"
@@ -391,7 +394,8 @@
     "fileSaved": "Fișier salvat.",
     "fileSavedToFilename": "Salvat în {filename}",
     "canvas": "pânza",
-    "selection": "selecția"
+    "selection": "selecția",
+    "pasteAsSingleElement": "Folosește {{shortcut}} pentru a insera ca un singur element\nsau insera într-un editor de text existent"
   },
   "colors": {
     "ffffff": "Alb",
@@ -439,5 +443,12 @@
     "5c940d": "Verde-limetă 9",
     "e67700": "Galben 9",
     "d9480f": "Portocaliu 9"
+  },
+  "welcomeScreen": {
+    "data": "Toate datele tale sunt salvate local în navigatorul tău.",
+    "switchToPlusApp": "Ai vrut să mergi în schimb la Excalidraw+?",
+    "menuHints": "Exportare, preferințe, limbi, ...",
+    "toolbarHints": "Alege un instrument și începe să desenezi!",
+    "helpHints": "Comenzi rapide și ajutor"
   }
 }
