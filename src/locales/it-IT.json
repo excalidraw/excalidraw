@@ -312,8 +312,8 @@
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
     "zoomToSelection": "Zoom alla selezione",
     "toggleElementLock": "Blocca/sblocca selezione",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Sposta la pagina su/giù",
+    "movePageLeftRight": "Sposta la pagina a sinistra/destra"
   },
   "clearCanvasDialog": {
     "title": "Svuota la tela"
