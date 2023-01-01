@@ -312,8 +312,8 @@
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
     "zoomToSelection": "Priblížiť na výber",
     "toggleElementLock": "Zamknúť/odomknúť vybrané",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Posunúť stranu hore/dole",
+    "movePageLeftRight": "Posunúť stranu doľava/doprava"
   },
   "clearCanvasDialog": {
     "title": "Vyčistiť plátno"
