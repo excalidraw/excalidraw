@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Įklijuoti",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Įklijuoti kaip paprastą tekstą",
     "pasteCharts": "Įklijuoti diagramas",
     "selectAll": "Pažymėti viską",
     "multiSelect": "Pridėkite elementą prie pasirinktų",
@@ -312,8 +312,8 @@
     "zoomToFit": "",
     "zoomToSelection": "Priartinti iki pažymėtos vietos",
     "toggleElementLock": "",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Pajudinti puslapį aukštyn/žemyn",
+    "movePageLeftRight": "Pajudinti puslapį kairėn/dešinėn"
   },
   "clearCanvasDialog": {
     "title": "Išvalyti drobę"
