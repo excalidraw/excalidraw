@@ -312,8 +312,8 @@
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
     "zoomToSelection": "Auf Auswahl zoomen",
     "toggleElementLock": "Auswahl sperren/entsperren",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Seite nach oben/unten verschieben",
+    "movePageLeftRight": "Seite nach links/rechts verschieben"
   },
   "clearCanvasDialog": {
     "title": "Zeichenfläche löschen"
