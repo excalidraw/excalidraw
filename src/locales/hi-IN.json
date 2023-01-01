@@ -312,8 +312,8 @@
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
     "zoomToSelection": "चयन तक ज़ूम करे",
     "toggleElementLock": "ताले के अंदर/बाहर चुनाव",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "पृष्ठ ऊपर/नीचे करे",
+    "movePageLeftRight": "पृष्ठ बायी/दायी तरफ करे"
   },
   "clearCanvasDialog": {
     "title": ""
