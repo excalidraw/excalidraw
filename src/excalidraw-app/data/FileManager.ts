@@ -225,8 +225,7 @@ export const updateStaleImageStatuses = (params: {
     return;
   }
   params.excalidrawAPI.updateScene({
-    elements: params.excalidrawAPI
-      .getSceneElementsIncludingDeleted()
+    elements: elements
       .map((element) => {
         if (
           isInitializedImageElement(element) &&
