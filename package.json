@@ -103,7 +103,7 @@
   "private": true,
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
-    "build:app:docker": "REACT_APP_DISABLE_SENTRY=true react-scripts build",
+    "build:app:docker": "cross-env REACT_APP_DISABLE_SENTRY=true REACT_APP_DISABLE_TRACKING=true react-scripts build",
     "build:app": "cross-env REACT_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA react-scripts build",
     "build:version": "node ./scripts/build-version.js",
     "build": "yarn build:app && yarn build:version",
@@ -116,7 +116,7 @@
     "prepare": "husky install",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
-    "start:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
+    "start:production": "npm run build:app:docker && npx http-server build -a localhost -p 5001 -o",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watchAll=false",
     "test:app": "react-scripts test --passWithNoTests",
     "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
