@@ -116,7 +116,7 @@
     "prepare": "husky install",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
-    "start:production": "npm run build:app:docker && npx http-server build -a localhost -p 5001 -o",
+    "start:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watchAll=false",
     "test:app": "react-scripts test --passWithNoTests",
     "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
