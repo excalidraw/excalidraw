@@ -1,11 +1,13 @@
+import clsx from "clsx";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { t } from "../../i18n";
+import { ExcalidrawProps } from "../../types";
 import {
   useExcalidrawAppState,
   useExcalidrawSetAppState,
   useExcalidrawActionManager,
 } from "../App";
-import { ExportIcon, ExportImageIcon } from "../icons";
+import { ExportIcon, ExportImageIcon, UsersIcon } from "../icons";
 import { GithubIcon, DiscordIcon, TwitterIcon } from "../icons";
 import MenuItem from "./MenuItem";
 
@@ -118,3 +120,26 @@ export const Socials = () => (
 );
 
 Socials.displayName = "Socials";
+
+export const LiveCollaboration = ({
+  onClick,
+  isCollaborating,
+}: {
+  onClick: ExcalidrawProps["onCollabButtonClick"];
+  isCollaborating: ExcalidrawProps["isCollaborating"];
+}) => {
+  return (
+    <MenuItem
+      dataTestId="collab-button"
+      icon={UsersIcon}
+      className={clsx({
+        "active-collab": isCollaborating,
+      })}
+      onClick={onClick}
+    >
+      {t("labels.liveCollaboration")}
+    </MenuItem>
+  );
+};
+
+LiveCollaboration.displayName = "LiveCollaboration";

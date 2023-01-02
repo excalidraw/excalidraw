@@ -608,17 +608,11 @@ const ExcalidrawWrapper = () => {
         <Menu.DefaultItems.SaveToActiveFile />
         <Menu.DefaultItems.Export />
         <Menu.DefaultItems.SaveAsImage />
-
-        <Menu.Item
-          dataTestId="collab-button"
-          icon={UsersIcon}
-          className={clsx({
-            "active-collab": isCollaborating,
-          })}
+        <Menu.DefaultItems.LiveCollaboration
+          isCollaborating={isCollaborating}
           onClick={() => setCollabDialogShown(true)}
-        >
-          {t("labels.liveCollaboration")}
-        </Menu.Item>
+        />
+
         <Menu.DefaultItems.Help />
         <Menu.DefaultItems.ClearCanvas />
         <Menu.Separator />
@@ -653,6 +647,7 @@ const ExcalidrawWrapper = () => {
         ref={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
+        onCollabButtonClick={() => setCollabDialogShown(true)}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{

@@ -193,16 +193,10 @@ const LayerUI = ({
             <Menu.DefaultItems.SaveAsImage />
           )}
           {onCollabButtonClick && (
-            <Menu.Item
-              dataTestId="collab-button"
-              icon={UsersIcon}
-              className={clsx({
-                "active-collab": isCollaborating,
-              })}
+            <Menu.DefaultItems.LiveCollaboration
               onClick={onCollabButtonClick}
-            >
-              {t("labels.liveCollaboration")}
-            </Menu.Item>
+              isCollaborating={isCollaborating}
+            />
           )}
           <Menu.DefaultItems.Help />
           <Menu.DefaultItems.ClearCanvas />
