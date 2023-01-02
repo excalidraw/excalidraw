@@ -18,8 +18,8 @@ import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import WelcomeScreen from "./WelcomeScreen";
-import { isMenuOpenAtom } from "./App";
 import { useAtom } from "jotai";
+import { isMenuOpenAtom } from "./menu/Menu";
 
 type MobileMenuProps = {
   appState: AppState;

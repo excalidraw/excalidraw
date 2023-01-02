@@ -10,8 +10,9 @@ import { Island } from "./Island";
 import { Modal } from "./Modal";
 import { AppState } from "../types";
 import { queryFocusableElements } from "../utils";
-import { isMenuOpenAtom, isDropdownOpenAtom } from "./App";
+import { isDropdownOpenAtom } from "./App";
 import { useSetAtom } from "jotai";
+import { isMenuOpenAtom } from "./menu/Menu";
 
 export interface DialogProps {
   children: React.ReactNode;

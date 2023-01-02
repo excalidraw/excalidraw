@@ -45,11 +45,7 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
-import {
-  UsersIcon,
-  WelcomeScreenMenuArrow,
-  WelcomeScreenTopToolbarArrow,
-} from "./icons";
+import { WelcomeScreenMenuArrow, WelcomeScreenTopToolbarArrow } from "./icons";
 import WelcomeScreen from "./WelcomeScreen";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
@@ -186,6 +182,7 @@ const LayerUI = ({
     return (
       childrenComponents.Menu || (
         <Menu>
+          <Menu.Trigger />
           <Menu.DefaultItems.LoadScene />
           <Menu.DefaultItems.SaveToActiveFile />
           {UIOptions.canvasActions.export && <Menu.DefaultItems.Export />}

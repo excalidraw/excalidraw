@@ -3,9 +3,9 @@ import { Dialog, DialogProps } from "./Dialog";
 
 import "./ConfirmDialog.scss";
 import DialogActionButton from "./DialogActionButton";
-import { isMenuOpenAtom } from "./App";
 import { isDropdownOpenAtom } from "./App";
 import { useSetAtom } from "jotai";
+import { isMenuOpenAtom } from "./menu/Menu";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;

@@ -604,6 +604,7 @@ const ExcalidrawWrapper = () => {
   const renderMenu = () => {
     return (
       <Menu>
+        <Menu.Trigger />
         <Menu.DefaultItems.LoadScene />
         <Menu.DefaultItems.SaveToActiveFile />
         <Menu.DefaultItems.Export />

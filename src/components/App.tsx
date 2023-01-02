@@ -276,7 +276,6 @@ import { atom } from "jotai";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
 
-export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
 
 const deviceContextInitialValue = {

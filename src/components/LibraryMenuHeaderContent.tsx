@@ -21,6 +21,7 @@ import { Dialog } from "./Dialog";
 import { useOutsideClickHook } from "../hooks/useOutsideClick";
 import MenuItem from "./menu/MenuItem";
 import { isDropdownOpenAtom } from "./App";
+import Menu from "./menu/Menu";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,
@@ -178,14 +179,46 @@ export const LibraryMenuHeader: React.FC<{
 
   return (
     <div style={{ position: "relative" }}>
-      <button
-        type="button"
-        className="Sidebar__dropdown-btn"
-        data-prevent-outside-click
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-      >
-        {DotsIcon}
-      </button>
+      <Menu>
+        <Menu.Trigger className="Sidebar__dropdown-btn">
+          {DotsIcon}
+        </Menu.Trigger>
+        {!itemsSelected && (
+          <Menu.Item
+            onClick={onLibraryImport}
+            icon={LoadIcon}
+            dataTestId="lib-dropdown--load"
+          >
+            {t("buttons.load")}
+          </Menu.Item>
+        )}
+        {!!items.length && (
+          <Menu.Item
+            onClick={onLibraryExport}
+            icon={ExportIcon}
+            dataTestId="lib-dropdown--export"
+          >
+            {t("buttons.export")}
+          </Menu.Item>
+        )}
+        {!!items.length && (
+          <Menu.Item
+            onClick={() => setShowRemoveLibAlert(true)}
+            icon={TrashIcon}
+          >
+            {resetLabel}
+          </Menu.Item>
+        )}
+        {itemsSelected && (
+          <Menu.Item
+            icon={publishIcon}
+            onClick={() => setShowPublishLibraryDialog(true)}
+            dataTestId="lib-dropdown--remove"
+          >
+            {t("buttons.publishLibrary")}
+          </Menu.Item>
+        )}
+      </Menu>
 
       {selectedItems.length > 0 && (
         <div className="library-actions-counter">{selectedItems.length}</div>
@@ -196,15 +229,6 @@ export const LibraryMenuHeader: React.FC<{
           className="Sidebar__dropdown-content menu-container"
           ref={dropdownRef}
         >
-          {!itemsSelected && (
-            <MenuItem
-              icon={LoadIcon}
-              dataTestId="lib-dropdown--load"
-              onClick={onLibraryImport}
-            >
-              {t("buttons.load")}
-            </MenuItem>
-          )}
           {showRemoveLibAlert && renderRemoveLibAlert()}
           {showPublishLibraryDialog && (
             <PublishLibrary
@@ -227,24 +251,7 @@ export const LibraryMenuHeader: React.FC<{
             />
           )}
           {publishLibSuccess && renderPublishSuccess()}
-          {!!items.length && (
-            <>
-              <MenuItem
-                icon={ExportIcon}
-                onClick={onLibraryExport}
-                dataTestId="lib-dropdown--export"
-              >
-                {t("buttons.export")}
-              </MenuItem>
-              <MenuItem
-                icon={TrashIcon}
-                onClick={() => setShowRemoveLibAlert(true)}
-                dataTestId="lib-dropdown--remove"
-              >
-                {resetLabel}
-              </MenuItem>
-            </>
-          )}
+
           {itemsSelected && (
             <MenuItem
               icon={publishIcon}
