@@ -201,7 +201,9 @@
     "svgImageInsertError": "",
     "invalidSVGString": "",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Селекция",
