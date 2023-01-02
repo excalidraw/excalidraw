@@ -242,6 +242,11 @@ class Collab extends PureComponent<Props, CollabState> {
         );
       }
     } catch (error: any) {
+      this.setState({
+        errorMessage: /is longer than.*?bytes/.test(error.message)
+          ? t("errors.collabSaveFailed_sizeExceeded")
+          : t("errors.collabSaveFailed"),
+      });
       console.error(error);
     }
   };
